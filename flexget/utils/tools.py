@@ -8,7 +8,8 @@ import os
 import queue
 import re
 import sys
-from collections import defaultdict, OrderedDict
+import weakref
+from collections import OrderedDict, defaultdict
 from collections.abc import MutableMapping
 from datetime import datetime, timedelta
 from html.entities import name2codepoint
@@ -27,6 +28,7 @@ from typing import (
     Union,
 )
 
+import psutil
 import requests
 from loguru import logger
 
@@ -54,12 +56,14 @@ def convert_bytes(bytes_num: Union[int, float]) -> str:
     """Returns given bytes as prettified string."""
 
     bytes_num = float(bytes_num)
-    units_prefixes = OrderedDict({
-        'T': 1099511627776,  # 1024 ** 4
-        'G': 1073741824,  # 1024 ** 3
-        'M': 1048576,  # 1024 ** 2
-        'K': 1024,
-    })
+    units_prefixes = OrderedDict(
+        {
+            'T': 1099511627776,  # 1024 ** 4
+            'G': 1073741824,  # 1024 ** 3
+            'M': 1048576,  # 1024 ** 2
+            'K': 1024,
+        }
+    )
     for unit, threshold in units_prefixes.items():
         if bytes_num > threshold:
             return f'{bytes_num/threshold:.2f}{unit}'
@@ -143,8 +147,9 @@ def merge_dict_from_to(d1: dict, d2: dict) -> None:
                     pass
                 else:
                     raise Exception(f'Unknown type: {type(v)} value: {repr(v)} in dictionary')
-            elif (isinstance(v, (str, bool, int, float, list, type(None))) and
-                  isinstance(d2[k], (str, bool, int, float, list, type(None)))):
+            elif isinstance(v, (str, bool, int, float, list, type(None))) and isinstance(
+                d2[k], (str, bool, int, float, list, type(None))
+            ):
                 # Allow overriding of non-container types with other non-container types
                 pass
             else:
@@ -232,45 +237,11 @@ def multiply_timedelta(interval: timedelta, number: Union[int, float]) -> timede
     return timedelta(seconds=interval.total_seconds() * number)
 
 
-if os.name == 'posix':
-
-    def pid_exists(pid: int) -> bool:
-        """Check whether pid exists in the current process table."""
-        import errno
-
-        if pid < 0:
-            return False
-        try:
-            os.kill(pid, 0)
-        except OSError as e:
-            return e.errno == errno.EPERM
-        else:
-            return True
-
-
-else:
-
-    def pid_exists(pid: int) -> bool:
-        import ctypes
-        import ctypes.wintypes
-
-        kernel32 = ctypes.windll.kernel32
-        PROCESS_QUERY_INFORMATION = 0x0400
-        STILL_ACTIVE = 259
-
-        handle = kernel32.OpenProcess(PROCESS_QUERY_INFORMATION, 0, pid)
-        if handle == 0:
-            return False
-
-        # If the process exited recently, a pid may still exist for the handle.
-        # So, check if we can get the exit code.
-        exit_code = ctypes.wintypes.DWORD()
-        is_running = kernel32.GetExitCodeProcess(handle, ctypes.byref(exit_code)) == 0
-        kernel32.CloseHandle(handle)
-
-        # See if we couldn't get the exit code or the exit code indicates that the
-        # process is still running.
-        return is_running or exit_code.value == STILL_ACTIVE
+def pid_exists(pid: int):
+    try:
+        return psutil.Process(pid).status() != psutil.STATUS_STOPPED
+    except psutil.NoSuchProcess:
+        return False
 
 
 _binOps = {
@@ -285,10 +256,13 @@ _binOps = {
 class TimedDict(MutableMapping):
     """Acts like a normal dict, but keys will only remain in the dictionary for a specified time span."""
 
+    _instances: Dict[int, 'TimedDict'] = weakref.WeakValueDictionary()
+
     def __init__(self, cache_time: Union[timedelta, str] = '5 minutes'):
         self.cache_time = parse_timedelta(cache_time)
         self._store: dict = {}
         self._last_prune = datetime.now()
+        self._instances[id(self)] = self
 
     def _prune(self):
         """Prune all expired keys."""
@@ -326,6 +300,15 @@ class TimedDict(MutableMapping):
             self.__class__.__name__,
             dict(list(zip(self._store, (v[1] for v in list(self._store.values()))))),
         )
+
+    @classmethod
+    def clear_all(cls):
+        """
+        Clears all instantiated TimedDicts.
+        Used by tests to make sure artifacts don't leak between tests.
+        """
+        for store in cls._instances.values():
+            store.clear()
 
 
 class BufferQueue(queue.Queue):

@@ -11,8 +11,8 @@ logger = logger.bind(name='modif_torrent')
 
 class TorrentFilename:
     """
-        Makes sure that entries containing torrent-file have .torrent
-        extension. This is enabled always by default (builtins).
+    Makes sure that entries containing torrent-file have .torrent
+    extension. This is enabled always by default (builtins).
     """
 
     TORRENT_PRIO = 255

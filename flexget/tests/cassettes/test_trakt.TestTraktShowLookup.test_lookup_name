@@ -2,20 +2,22 @@ interactions:
 - request:
     body: null
     headers:
-      Content-Type: [application/json]
-      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: ['2']
+      Content-Type:
+      - application/json
+      trakt-api-key:
+      - 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af
+      trakt-api-version:
+      - '2'
     method: GET
-    uri: https://api.trakt.tv/search?type=show&query=House
+    uri: https://api.trakt.tv/search?query=House&type=show
   response:
-    body: {string: "[{\"type\":\"show\",\"score\":61.689377,\"show\":{\"title\":\"House\",\"overview\":\"Go
-        deeper into the medical mysteries of House, TV's most compelling drama. Hugh
-        Laurie stars as the brilliant but sarcastic Dr. Gregory House, a maverick
-        physician who is devoid of bedside manner. While his behavior can border on
-        antisocial, Dr. House thrives on the challenge of solving the medical puzzles
-        that other doctors give up on. Together with his hand-picked team of young
-        medical experts, he'll do whatever it takes in the race against the clock
-        to solve the case.\",\"year\":2004,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":1399,\"slug\":\"house\",\"tvdb\":73255,\"imdb\":\"tt0412142\",\"tmdb\":1408,\"tvrage\":3908}}},{\"type\":\"show\",\"score\":49.852543,\"show\":{\"title\":\"House
+    body:
+      string: "[{\"type\":\"show\",\"score\":61.29207,\"show\":{\"title\":\"House\",\"overview\":\"Dr.
+        Gregory House is a maverick physician who is devoid of bedside manner. While
+        his behavior can border on antisocial, Dr. House thrives on the challenge
+        of solving the medical puzzles that other doctors give up on. Together with
+        his hand-picked team of young medical experts, he'll do whatever it takes
+        in the race against the clock to solve the case.\",\"year\":2004,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":1399,\"slug\":\"house\",\"tvdb\":73255,\"imdb\":\"tt0412142\",\"tmdb\":1408,\"tvrage\":3908}}},{\"type\":\"show\",\"score\":49.53147,\"show\":{\"title\":\"House
         vs. House\",\"overview\":\"House vs. House is a new home makeover competition
         series where amateur and experienced renovation teams compete for the chance
         to win $10,000 by proving they can create the better DIY projects in their
@@ -23,113 +25,167 @@ interactions:
         each episode features two teams will go head-to-head in grueling challenges.
         Tanya McQueen, a DIY design expert, and David Brian Sanders, an architect
         and designer, will determine which team completes the most impressive transformation
-        and award the cash prize.\",\"year\":1969,\"status\":\"\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":93965,\"slug\":\"house-vs-house\",\"tvdb\":287378,\"imdb\":\"tt4097428\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":44.06384,\"show\":{\"title\":\"Full
+        and award the cash prize.\",\"year\":1969,\"status\":\"\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":93965,\"slug\":\"house-vs-house\",\"tvdb\":287378,\"imdb\":\"tt4097428\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":43.780052,\"show\":{\"title\":\"Full
         House\",\"overview\":\"Full House is an American sitcom created by Jeff Franklin
         for ABC. The show chronicles a widowed father, who enlists his best friend
         and his brother-in-law to help raise his three daughters. It aired from September
-        22, 1987, to May 23, 1995, broadcasting eight seasons and 192 episodes.\",\"year\":1987,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":4289,\"slug\":\"full-house-1987\",\"tvdb\":70500,\"imdb\":\"tt0092359\",\"tmdb\":4313,\"tvrage\":3622}}},{\"type\":\"show\",\"score\":44.06384,\"show\":{\"title\":\"House
+        22, 1987, to May 23, 1995, broadcasting eight seasons and 192 episodes.\",\"year\":1987,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":4289,\"slug\":\"full-house-1987\",\"tvdb\":70500,\"imdb\":\"tt0092359\",\"tmdb\":4313,\"tvrage\":3622}}},{\"type\":\"show\",\"score\":43.780052,\"show\":{\"title\":\"House
         Hunters\",\"overview\":\"House Hunters takes viewers behind the scenes as
         individuals, couples and families learn what to look for and decide whether
         or not a home is meant for them. Focusing on the emotional experience of finding
         and purchasing a new home, each episode follows a prospective buyer and real
         estate agent through the home-buying process, from start to finish.\",\"year\":1999,\"status\":\"returning
-        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":6441,\"slug\":\"house-hunters\",\"tvdb\":73182,\"imdb\":\"tt0369117\",\"tmdb\":6480,\"tvrage\":null}}},{\"type\":\"show\",\"score\":44.06384,\"show\":{\"title\":\"Fuller
+        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":6441,\"slug\":\"house-hunters\",\"tvdb\":73182,\"imdb\":\"tt0369117\",\"tmdb\":6480,\"tvrage\":null}}},{\"type\":\"show\",\"score\":43.780052,\"show\":{\"title\":\"Fuller
         House\",\"overview\":\"Recently widowed D.J. Tanner-Fuller gets help from
         her sister Stephanie and best friend Kimmy when the women move in with their
-        families to help D.J. raise her children in this spin-off series.\",\"year\":2016,\"status\":\"returning
-        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":102424,\"slug\":\"fuller-house\",\"tvdb\":301236,\"imdb\":\"tt3986586\",\"tmdb\":63623,\"tvrage\":48701}}},{\"type\":\"show\",\"score\":44.06384,\"show\":{\"title\":\"Alpha
+        families to help D.J. raise her children in this spin-off series filled with
+        familiar faces.\",\"year\":2016,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":102424,\"slug\":\"fuller-house\",\"tvdb\":301236,\"imdb\":\"tt3986586\",\"tmdb\":63623,\"tvrage\":48701}}},{\"type\":\"show\",\"score\":43.780052,\"show\":{\"title\":\"Alpha
         House\",\"overview\":\"Alpha House follows four senators who live together
         in a rented house in Washington DC.Re-election battles, looming indictments,
-        parties, their Party... these senators need a drink. And a new housemate.\",\"year\":2013,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":60285,\"slug\":\"alpha-house\",\"tvdb\":269008,\"imdb\":\"tt3012160\",\"tmdb\":60719,\"tvrage\":34454}}},{\"type\":\"show\",\"score\":44.06384,\"show\":{\"title\":\"Playing
+        parties, their Party... these senators need a drink. And a new housemate.\",\"year\":2013,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":60285,\"slug\":\"alpha-house\",\"tvdb\":269008,\"imdb\":\"tt3012160\",\"tmdb\":60719,\"tvrage\":34454}}},{\"type\":\"show\",\"score\":43.780052,\"show\":{\"title\":\"Playing
         House\",\"overview\":\"A single-camera buddy comedy about what happens when
         two best friends come back together, just when they need each other most.Inspired
         by the ultra-close friendship between the series' creators and stars, \\\"Playing
         House\\\" centers on mother to-be Maggie who asks her single and career-driven
         best friend Emma to return home from her job overseas to attend her baby shower,
-        having no idea what\u2019s truly in store.\",\"year\":2014,\"status\":\"returning
-        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":73385,\"slug\":\"playing-house\",\"tvdb\":269898,\"imdb\":\"tt2750182\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":44.06384,\"show\":{\"title\":\"House
+        having no idea what\u2019s truly in store.\",\"year\":2014,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":73385,\"slug\":\"playing-house\",\"tvdb\":269898,\"imdb\":\"tt2750182\",\"tmdb\":61762,\"tvrage\":35945}}},{\"type\":\"show\",\"score\":43.780052,\"show\":{\"title\":\"Summer
+        House\",\"overview\":\"Summer House takes the beach town of Montauk, New York
+        by storm, while following a group of nine friends who make the exclusive enclave
+        their go-to party spot between Memorial Day and Labor Day \u2014 that is,
+        when they're not hustling at their day jobs. You could say they work hard
+        and party way harder.\",\"year\":2017,\"status\":\"returning series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":113867,\"slug\":\"summer-house\",\"tvdb\":321121,\"imdb\":\"tt6645582\",\"tmdb\":69720,\"tvrage\":null}}},{\"type\":\"show\",\"score\":43.780052,\"show\":{\"title\":\"House
         Husbands\",\"overview\":\"House Husbands centres around four families with
-        one thing in common, the husbands stay home to raise the children.\",\"year\":2012,\"status\":\"returning
-        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":43830,\"slug\":\"house-husbands\",\"tvdb\":262026,\"imdb\":\"tt2402807\",\"tmdb\":44072,\"tvrage\":null}}},{\"type\":\"show\",\"score\":44.06384,\"show\":{\"title\":\"Bleak
-        House\",\"overview\":\"In this star-studded adaptation of a literary classic,
-        acclaimed writer Andrew Davies turns his talents to one of Charles Dickens'
-        most brilliant novels \u2014 arguably the greatest-ever depiction of Victorian
-        London. Fresh and imaginative, yet faithful to the original, this thrilling
-        fast-paced adaptation is shot with a contemporary edge. At its heart is the
-        story of the icily beautiful Lady Dedlock, who nurses a dark secret, and the
-        merciless lawyer Tulkinghorn, who seeks to uncover it. The generous John Jarndyce,
-        struggling with his own past, and his two young wards Richard and Ada, are
-        all caught up, like Lady Dedlock, in the infamous case of Jarndyce vs. Jarndyce,
-        which will make one of them rich beyond imagination if it can ever be brought
-        to a conclusion. As Tulkinghorn digs deeper into Lady Dedlock's past, he unearths
-        a secret that will change their lives forever, and which is almost as astounding
-        as the final outcome of the Jarndyce case.\",\"year\":2005,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":2474,\"slug\":\"bleak-house\",\"tvdb\":73558,\"imdb\":\"tt0442632\",\"tmdb\":2489,\"tvrage\":null}}},{\"type\":\"show\",\"score\":44.06384,\"show\":{\"title\":\"Full
-        House\",\"overview\":\"Han Ji Eun is a naive writer who got swindled out of
-        everything she owned including her house by her best friends. Stranded in
-        China, She managed to borrow money from an actor Lee Young Jae to return to
-        Korea. On her return, she found out that her house was bought by Lee Young
-        Jae. In an attempt to get her possessions back, she entered in a contract
-        marriage with Young Jae for one year. In spite of losing all, Ji Eun manages
-        to be cheerful and takes things in strike and the business relationship between
-        the two becomes personal as they start to rely and care for each other. \",\"year\":2004,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":3482,\"slug\":\"full-house\",\"tvdb\":84928,\"imdb\":\"tt0464625\",\"tmdb\":3504,\"tvrage\":null}}}]"}
+        one thing in common, the husbands stay home to raise the children.\",\"year\":2012,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":43830,\"slug\":\"house-husbands\",\"tvdb\":262026,\"imdb\":\"tt2402807\",\"tmdb\":44072,\"tvrage\":null}}},{\"type\":\"show\",\"score\":43.780052,\"show\":{\"title\":\"Safe
+        House\",\"overview\":\"A married couple, former detective Robert and teacher
+        Katy, are asked by close friend and police officer Mark, to turn their remote
+        Guest House into a Safe House.\",\"year\":2015,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":97962,\"slug\":\"safe-house\",\"tvdb\":294195,\"imdb\":\"tt4567314\",\"tmdb\":62452,\"tvrage\":42379}}}]"
     headers:
-      CF-Cache-Status: [HIT]
-      CF-RAY: [312a165bfce43cd7-CPH]
-      Cache-Control: ['public, max-age=28800']
-      Connection: [keep-alive]
-      Content-Type: [application/json; charset=utf-8]
-      Date: ['Sat, 17 Dec 2016 11:38:11 GMT']
-      ETag: [W/"bd88943cc0ddc14f3315697ac3a632ef"]
-      Expires: ['Sat, 17 Dec 2016 19:38:11 GMT']
-      Server: [cloudflare-nginx]
-      Set-Cookie: ['__cfduid=d936b2197260b5a7ea4fb2820ee6fd4ab1481974691; expires=Sun,
-          17-Dec-17 11:38:11 GMT; path=/; domain=.trakt.tv; HttpOnly']
-      Vary: [Accept-Encoding]
-      X-Content-Type-Options: [nosniff]
-      X-Frame-Options: [SAMEORIGIN]
-      X-Pagination-Item-Count: ['1737']
-      X-Pagination-Limit: ['10']
-      X-Pagination-Page: ['1']
-      X-Pagination-Page-Count: ['174']
-      X-Request-Id: [736fd637-8769-45e7-bd06-fab2e44bbc94]
-      X-Runtime: ['0.018501']
-      X-XSS-Protection: [1; mode=block]
-    status: {code: 200, message: OK}
+      CF-Cache-Status:
+      - MISS
+      CF-RAY:
+      - 60caabe91eff098c-IAD
+      Cache-Control:
+      - public, max-age=28800
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Tue, 05 Jan 2021 05:06:42 GMT
+      ETag:
+      - W/"0cf3d4a9f1312e6c842e9909cbe57074"
+      Expect-CT:
+      - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+      Expires:
+      - Tue, 05 Jan 2021 13:06:41 GMT
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cfduid=ddf440dec0c4f8dfed6a8271f4c5ea6421609823202; expires=Thu, 04-Feb-21
+        05:06:42 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Pagination-Item-Count:
+      - '2771'
+      X-Pagination-Limit:
+      - '10'
+      X-Pagination-Page:
+      - '1'
+      X-Pagination-Page-Count:
+      - '278'
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Ratelimit:
+      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":996,"until":"2021-01-05T05:10:00Z"}'
+      X-Request-Id:
+      - c49b1d72-4730-4d30-bb32-9a94a15128fa
+      X-Runtime:
+      - '0.021687'
+      X-XSS-Protection:
+      - 1; mode=block
+      cf-request-id:
+      - 077289c5ac0000098c62a57000000001
+    status:
+      code: 200
+      message: OK
 - request:
     body: null
     headers:
-      Content-Type: [application/json]
-      Cookie: [__cfduid=d936b2197260b5a7ea4fb2820ee6fd4ab1481974691]
-      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: ['2']
+      Content-Type:
+      - application/json
+      trakt-api-key:
+      - 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af
+      trakt-api-version:
+      - '2'
     method: GET
     uri: https://api.trakt.tv/shows/1399?extended=full
   response:
-    body: {string: '{"title":"House","year":2004,"ids":{"trakt":1399,"slug":"house","tvdb":73255,"imdb":"tt0412142","tmdb":1408,"tvrage":3908},"overview":"Go
-        deeper into the medical mysteries of House, TV''s most compelling drama. Hugh
-        Laurie stars as the brilliant but sarcastic Dr. Gregory House, a maverick
-        physician who is devoid of bedside manner. While his behavior can border on
-        antisocial, Dr. House thrives on the challenge of solving the medical puzzles
-        that other doctors give up on. Together with his hand-picked team of young
-        medical experts, he''ll do whatever it takes in the race against the clock
-        to solve the case.","first_aired":"2004-11-16T08:00:00.000Z","airs":{"day":null,"time":null,"timezone":"America/New_York"},"runtime":44,"certification":"TV-14","network":"FOX
-        (US)","country":"us","trailer":null,"homepage":"http://www.fox.com/house/index.htm","status":"ended","rating":8.78719,"votes":17579,"updated_at":"2016-12-14T09:35:37.000Z","language":"en","available_translations":["ar","bg","bs","cs","da","de","el","en","es","fr","he","hu","it","ko","lt","nl","pl","pt","ro","ru","sk","sr","tr","uk","zh"],"genres":["comedy","drama","mystery"],"aired_episodes":176}'}
+    body:
+      string: '{"title":"House","year":2004,"ids":{"trakt":1399,"slug":"house","tvdb":73255,"imdb":"tt0412142","tmdb":1408,"tvrage":3908},"overview":"Dr.
+        Gregory House is a maverick physician who is devoid of bedside manner. While
+        his behavior can border on antisocial, Dr. House thrives on the challenge
+        of solving the medical puzzles that other doctors give up on. Together with
+        his hand-picked team of young medical experts, he''ll do whatever it takes
+        in the race against the clock to solve the case.","first_aired":"2004-11-17T02:00:00.000Z","airs":{"day":"Monday","time":"21:00","timezone":"America/New_York"},"runtime":45,"certification":"TV-14","network":"FOX","country":"us","trailer":"https://youtube.com/watch?v=MczMB8nU1sY","homepage":"http://www.fox.com/house/index.htm","status":"ended","rating":8.67064,"votes":27790,"comment_count":78,"updated_at":"2021-01-04T10:06:30.000Z","language":"en","available_translations":["ar","bg","bs","cs","da","de","el","en","es","fi","fr","he","hr","hu","it","ja","ko","lt","lv","nl","no","pl","pt","ro","ru","sk","sr","sv","tr","uk","zh"],"genres":["comedy","drama","mystery"],"aired_episodes":176}'
     headers:
-      CF-Cache-Status: [HIT]
-      CF-RAY: [312a165c2cea3cd7-CPH]
-      Cache-Control: ['public, max-age=28800']
-      Connection: [keep-alive]
-      Content-Type: [application/json; charset=utf-8]
-      Date: ['Sat, 17 Dec 2016 11:38:11 GMT']
-      ETag: [W/"6cabdad3b0db0c728ee72f8827a38aa5"]
-      Expires: ['Sat, 17 Dec 2016 19:38:11 GMT']
-      Last-Modified: ['Wed, 14 Dec 2016 09:35:37 GMT']
-      Server: [cloudflare-nginx]
-      Vary: [Accept-Encoding]
-      X-Content-Type-Options: [nosniff]
-      X-Frame-Options: [SAMEORIGIN]
-      X-Request-Id: [33446abf-9aaa-4f6d-a5bc-f192b686fdcf]
-      X-Runtime: ['0.013575']
-      X-XSS-Protection: [1; mode=block]
-    status: {code: 200, message: OK}
+      Age:
+      - '6527'
+      CF-Cache-Status:
+      - HIT
+      CF-RAY:
+      - 60caabe9ee8d2aec-IAD
+      Cache-Control:
+      - public, max-age=28800
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Tue, 05 Jan 2021 05:06:42 GMT
+      ETag:
+      - W/"827bab8d052f204657fcd14b08b642e9"
+      Expect-CT:
+      - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+      Expires:
+      - Tue, 05 Jan 2021 11:17:54 GMT
+      Last-Modified:
+      - Mon, 04 Jan 2021 10:06:30 GMT
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cfduid=d9406508a1d2924dce016a25287fce44b1609823202; expires=Thu, 04-Feb-21
+        05:06:42 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Ratelimit:
+      - '{"name":"AUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":977,"until":"2021-01-04T11:15:00Z"}'
+      X-Request-Id:
+      - e566eda7-88e1-448d-a4e2-63f5974c15bd
+      X-Runtime:
+      - '0.009825'
+      X-XSS-Protection:
+      - 1; mode=block
+      cf-request-id:
+      - 077289c63500002aece70bc000000001
+    status:
+      code: 200
+      message: OK
 version: 1

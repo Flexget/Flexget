@@ -1,6 +1,13 @@
 import pytest
+from flexget.components.managed_lists.lists.radarr_list import RadarrAPIService
 
+RADARR_API_KEY = '65e246ce581a426781e1a8645f0a1f2c'
+RADARR_BASE_URL = 'http://127.0.0.1'
+RADARR_PORT = 7878
 
+# Load up a radarr container and put VCR in record mode to record.
+# NOTE: You'll need to reset radarr during runs otherwise the tags generated will have a different id. You'll also need to setup a root folder
+# docker run -d --name=radarr-tmp -p 7878:7878 linuxserver/radarr:nightly
 @pytest.mark.online
 class TestRadarrListActions:
     config = """
@@ -12,9 +19,9 @@ class TestRadarrListActions:
             list_clear:
               what:
                 - radarr_list:
-                    base_url: http://127.0.0.1
-                    api_key: d2bcc5ec0c894b9587b6fbc3ff6ec11e
-                    port: 7878
+                    base_url: %(RADARR_BASE_URL)s
+                    api_key: %(RADARR_API_KEY)s
+                    port: %(RADARR_PORT)s
             mock:
               - { title: 'Despicable Me 2 (2013)', imdb_id: 'tt1690953', tmdb_id: 93456 }
               - { title: 'Sinister 2 (2015)', imdb_id: 'tt2752772', tmdb_id: 283445 }
@@ -23,18 +30,35 @@ class TestRadarrListActions:
             accept_all: yes
             list_add:
               - radarr_list:
-                  base_url: http://127.0.0.1
-                  api_key: d2bcc5ec0c894b9587b6fbc3ff6ec11e
-                  port: 7878
+                  base_url: %(RADARR_BASE_URL)s
+                  api_key: %(RADARR_API_KEY)s
+                  port: %(RADARR_PORT)s
 
+          clear_and_add_to_radarr_with_tags:
+            list_clear:
+              what:
+                - radarr_list:
+                    base_url: %(RADARR_BASE_URL)s
+                    api_key: %(RADARR_API_KEY)s
+                    port: %(RADARR_PORT)s
+            mock:
+              - { title: 'Deadpool (2016)', imdb_id: 'tt1431045', tmdb_id: 293660 }
+            accept_all: yes
+            list_add:
+              - radarr_list:
+                  base_url: %(RADARR_BASE_URL)s
+                  api_key: %(RADARR_API_KEY)s
+                  port: %(RADARR_PORT)s
+                  tags: ["movies", "othertag"]
+                      
           radarr_list_as_input_plugin:
             radarr_list:
-              base_url: http://127.0.0.1
-              api_key: d2bcc5ec0c894b9587b6fbc3ff6ec11e
-              port: 7878
+              base_url: %(RADARR_BASE_URL)s
+              api_key: %(RADARR_API_KEY)s
+              port: %(RADARR_PORT)s
               include_data: True
             accept_all: yes
-
+    
           remove_from_radarr_list:
             mock:
               - { title: "Ocean\'s Twelve (2004)", imdb_id: 'tt0349903', tmdb_id: 163 }
@@ -42,10 +66,10 @@ class TestRadarrListActions:
             accept_all: yes
             list_remove:
               - radarr_list:
-                  base_url: http://127.0.0.1
-                  api_key: d2bcc5ec0c894b9587b6fbc3ff6ec11e
-                  port: 7878
-
+                  base_url: %(RADARR_BASE_URL)s
+                  api_key: %(RADARR_API_KEY)s
+                  port: %(RADARR_PORT)s
+    
           match_radarr_list:
             mock:
               - { title: 'Despicable.Me.2.2013.1080p.BluRay.x264-FlexGet', imdb_id: 'tt1690953', tmdb_id: 93456 }
@@ -56,10 +80,28 @@ class TestRadarrListActions:
             list_match:
               from:
                 - radarr_list:
-                    base_url: http://127.0.0.1
-                    api_key: d2bcc5ec0c894b9587b6fbc3ff6ec11e
-                    port: 7878
-    """
+                    base_url: %(RADARR_BASE_URL)s
+                    api_key: %(RADARR_API_KEY)s
+                    port: %(RADARR_PORT)s
+    """ % {
+        'RADARR_API_KEY': RADARR_API_KEY,
+        'RADARR_BASE_URL': RADARR_BASE_URL,
+        'RADARR_PORT': RADARR_PORT,
+    }
+
+    def test_radarr_list_tags(self, execute_task, manager):
+        radarr = RadarrAPIService(RADARR_API_KEY, RADARR_BASE_URL, RADARR_PORT)
+        tag_by_id = radarr.add_tag('tag_by_id')["id"]
+        manager.config['tasks']['clear_and_add_to_radarr_with_tags']['list_add'][0]['radarr_list'][
+            'tags'
+        ].append(tag_by_id)
+
+        execute_task('clear_and_add_to_radarr_with_tags')
+        tags = {t["label"].lower(): t["id"] for t in radarr.get_tags()}
+        for movie in radarr.get_movies():
+            assert sorted(movie['tags']) == sorted(
+                [tag_by_id, tags.get("movies"), tags.get("othertag")]
+            )
 
     # TODO: each action should be own test case
     def test_radarr_list_actions(self, execute_task):

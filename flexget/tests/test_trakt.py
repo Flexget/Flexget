@@ -94,9 +94,11 @@ class TestTraktShowLookup:
         assert entry['trakt_ep_name'] == 'Paternity', (
             '%s trakt_ep_name should be Paternity' % entry['title']
         )
-        assert entry['trakt_series_status'] == 'ended', (
-            'runtime for %s is %s, should be "ended"'
-            % (entry['title'], entry['trakt_series_status'])
+        assert (
+            entry['trakt_series_status'] == 'ended'
+        ), 'runtime for %s is %s, should be "ended"' % (
+            entry['title'],
+            entry['trakt_series_status'],
         )
         assert entry['afield'] == '73255Paternity', 'afield was not set correctly'
         assert task.find_entry(
@@ -128,7 +130,7 @@ class TestTraktShowLookup:
                 len(session.query(TraktShow).all()) == 1
             ), 'should only have added one show to show table'
             assert session.query(TraktShow).first().title == 'Shameless', (
-                'should have added Shameless and' 'not Shameless (2011)'
+                'should have added Shameless and' 'not Shameless (2010)'
             )
             # change the search query
             session.query(TraktShowSearchResult).update(
@@ -481,9 +483,10 @@ class TestTraktMovieLookup:
             'Belinda McClory',
             'Anthony Ray Parker',
             'Paul Goddard',
+            'Rana Morrison',
             'Robert Taylor',
             'David Aston',
-            'Marc Aden',
+            'Marc Aden Gray',
             'Ada Nicodemou',
             'Deni Gordon',
             'Rowan Witt',

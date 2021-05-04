@@ -105,7 +105,7 @@ class MoreThanTVCookie(Base):
 
 class SearchMoreThanTV:
     """
-        MorethanTV search plugin.
+    MorethanTV search plugin.
     """
 
     schema = {
@@ -230,7 +230,7 @@ class SearchMoreThanTV:
     @plugin.internet(logger)
     def search(self, task, entry, config):
         """
-            Search for entries on MoreThanTV
+        Search for entries on MoreThanTV
         """
         params = {}
 

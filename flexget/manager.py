@@ -34,6 +34,7 @@ from sqlalchemy.ext.declarative import declarative_base  # noqa
 from sqlalchemy.orm import sessionmaker  # noqa
 
 # These need to be declared before we start importing from other flexget modules, since they might import them
+from flexget.config_schema import ConfigError
 from flexget.utils.sqlalchemy_utils import ContextSession  # noqa
 from flexget.utils.tools import get_current_flexget_version, io_encoding, pid_exists  # noqa
 
@@ -344,7 +345,7 @@ class Manager:
         """
         # When we are in test mode, we use a different lock file and db
         if self.options.test:
-            self.lockfile = os.path.join(self.config_base, '.test-%s-lock' % self.config_name)
+            self.lockfile = os.path.join(self.config_base, f'.test-{self.config_name}-lock')
         # If another process is started, send the execution to the running process
         ipc_info = self.check_ipc_info()
         # If we are connecting to a running daemon, we don't want to log to the log file,
@@ -372,7 +373,7 @@ class Manager:
             return
         if self.options.test:
             logger.info('Test mode, creating a copy from database ...')
-            db_test_filename = os.path.join(self.config_base, 'test-%s.sqlite' % self.config_name)
+            db_test_filename = os.path.join(self.config_base, f'test-{self.config_name}.sqlite')
             if os.path.exists(self.db_filename):
                 shutil.copy(self.db_filename, db_test_filename)
                 logger.info('Test database created')
@@ -507,10 +508,11 @@ class Manager:
 
         elif options.action in ['stop', 'reload-config', 'status']:
             if not self.is_daemon:
-                logger.error('There does not appear to be a daemon running.')
+                console('There does not appear to be a daemon running.')
                 return
             if options.action == 'status':
-                logger.info('Daemon running. (PID: {})', os.getpid())
+                logger.debug('`daemon status` called. Daemon running. (PID: {})', os.getpid())
+                console(f'Daemon running. (PID: {os.getpid()})')
             elif options.action == 'stop':
                 tasks = (
                     'all queued tasks (if any) have'
@@ -620,14 +622,14 @@ class Manager:
             logger.info('Tried to read from: {}', ', '.join(possible))
             raise OSError('No configuration file found.')
         if not os.path.isfile(config):
-            raise OSError('Config `%s` does not appear to be a file.' % config)
+            raise OSError(f'Config `{config}` does not appear to be a file.')
 
         logger.debug('Config file {} selected', config)
         self.config_path = config
         self.config_name = os.path.splitext(os.path.basename(config))[0]
         self.config_base = os.path.normpath(os.path.dirname(config))
-        self.lockfile = os.path.join(self.config_base, '.%s-lock' % self.config_name)
-        self.db_filename = os.path.join(self.config_base, 'db-%s.sqlite' % self.config_name)
+        self.lockfile = os.path.join(self.config_base, f'.{self.config_name}-lock')
+        self.db_filename = os.path.join(self.config_base, f'db-{self.config_name}.sqlite')
 
     def hash_config(self) -> Optional[str]:
         if not self.config_path:
@@ -680,7 +682,7 @@ class Manager:
                 if isinstance(e, yaml.MarkedYAMLError):
                     lines = 0
                     if e.problem is not None:
-                        print(' Reason: %s\n' % e.problem)
+                        print(f' Reason: {e.problem}\n')
                         if e.problem == 'mapping values are not allowed here':
                             print(' ----> MOST LIKELY REASON: Missing : from end of the line!')
                             print('')
@@ -724,7 +726,7 @@ class Manager:
         old_config = self.config
         try:
             self.config = self.validate_config(config)
-        except ValueError as e:
+        except ConfigError as e:
             for error in getattr(e, 'errors', []):
                 logger.critical('[{}] {}', error.json_pointer, error.message)
             logger.debug('invalid config, rolling back')
@@ -737,14 +739,14 @@ class Manager:
     def backup_config(self) -> str:
         backup_path = os.path.join(
             self.config_base,
-            '%s-%s.bak' % (self.config_name, datetime.now().strftime('%y%m%d%H%M%S')),
+            f'{self.config_name}-{datetime.now().strftime("%y%m%d%H%M%S")}.bak',
         )
 
-        logger.debug('backing up old config to {} before new save', backup_path)
+        logger.debug(f'backing up old config to {backup_path} before new save')
         try:
             shutil.copy(self.config_path, backup_path)
         except OSError as e:
-            logger.warning('Config backup creation failed: {}', str(e))
+            logger.warning(f'Config backup creation failed: {e}')
             raise
         return backup_path
 
@@ -781,7 +783,7 @@ class Manager:
         conf = fire_event('manager.before_config_validate', conf, self)
         errors = config_schema.process_config(conf)
         if errors:
-            err = ValueError('Did not pass schema validation.')
+            err = ConfigError('Did not pass schema validation.')
             err.errors = errors
             raise err
         else:
@@ -823,7 +825,7 @@ class Manager:
                 'If you\'re running correct version of Python then it is not equipped with SQLite.\n'
                 'You can try installing `pysqlite`. If you have compiled python yourself, '
                 'recompile it with SQLite support.\n'
-                'Error: %s' % e,
+                f'Error: {e}',
                 file=sys.stderr,
             )
             sys.exit(1)
@@ -909,7 +911,7 @@ class Manager:
                         file=sys.stderr,
                     )
                     print(
-                        'If you\'re sure there is no other instance running, delete %s'
+                        "If you're sure there is no other instance running, delete %s"
                         % self.lockfile,
                         file=sys.stderr,
                     )
@@ -929,10 +931,10 @@ class Manager:
     def write_lock(self, ipc_info: dict = None) -> None:
         assert self._has_lock
         with open(self.lockfile, 'w', encoding='utf-8') as f:
-            f.write('PID: %s\n' % os.getpid())
+            f.write(f'PID: {os.getpid()}\n')
             if ipc_info:
                 for key in sorted(ipc_info):
-                    f.write('%s: %s\n' % (key, ipc_info[key]))
+                    f.write(f'{key}: {ipc_info[key]}\n')
 
     def release_lock(self) -> None:
         try:
@@ -940,9 +942,9 @@ class Manager:
         except OSError as e:
             if e.errno != errno.ENOENT:
                 raise
-            logger.debug('Lockfile {} not found', self.lockfile)
+            logger.debug(f'Lockfile {self.lockfile} not found')
         else:
-            logger.debug('Removed {}', self.lockfile)
+            logger.debug(f'Removed {self.lockfile}')
 
     def daemonize(self) -> None:
         """Daemonizes the current process. Returns the new pid"""
@@ -965,7 +967,7 @@ class Manager:
                 # exit first parent
                 sys.exit(0)
         except OSError as e:
-            sys.stderr.write('fork #1 failed: %d (%s)\n' % (e.errno, e.strerror))
+            sys.stderr.write(f'fork #1 failed: {e.errno} ({e.strerror})\n')
             sys.exit(1)
 
         # decouple from parent environment
@@ -982,10 +984,10 @@ class Manager:
                 # exit from second parent
                 sys.exit(0)
         except OSError as e:
-            sys.stderr.write('fork #2 failed: %d (%s)\n' % (e.errno, e.strerror))
+            sys.stderr.write(f'fork #2 failed: {e.errno} ({e.strerror})\n')
             sys.exit(1)
 
-        logger.info('Daemonize complete. New PID: {}', os.getpid())
+        logger.info(f'Daemonize complete. New PID: {os.getpid()}')
         # redirect standard file descriptors
         sys.stdout.flush()
         sys.stderr.flush()

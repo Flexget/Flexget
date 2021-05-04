@@ -638,7 +638,8 @@ class TraktShow(Base):
             self.air_day = airs.get('day')
             self.timezone = airs.get('timezone')
             if airs.get('time'):
-                self.air_time = datetime.strptime(airs.get('time'), '%H:%M').time()
+                # Time might be HH:MM, or HH:MM:SS #2783
+                self.air_time = dateutil_parse(airs['time'], ignoretz=True).time()
             else:
                 self.air_time = None
         if trakt_show.get('first_aired'):

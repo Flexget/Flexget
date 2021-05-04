@@ -12,14 +12,14 @@ logger = logger.bind(name='age')
 
 class Age:
     """
-        Rejects/accepts entries based on date in specified entry field
+    Rejects/accepts entries based on date in specified entry field
 
-        Example:
+    Example:
 
-          age:
-            field: 'accessed'  # 'accessed' is a field set from filesystem plugin
-            age: '7 days'
-            action: 'accept'
+      age:
+        field: 'accessed'  # 'accessed' is a field set from filesystem plugin
+        age: '7 days'
+        action: 'accept'
     """
 
     schema = {

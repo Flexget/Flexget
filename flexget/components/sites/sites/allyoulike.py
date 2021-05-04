@@ -28,7 +28,7 @@ class UrlRewriteAllyoulike:
 
     Rewrites urls for allyoulike.com
 
-    On allyoulike, each link points to a page which contains the links to the actual files. 
+    On allyoulike, each link points to a page which contains the links to the actual files.
     Often these pages contain links to more than one quality (for example 1080p, 720p etc.).
     The plugin chooses the set of links with the most files which should translate into the
     Best quality movie.

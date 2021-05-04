@@ -13,29 +13,29 @@ logger = logger.bind(name='regexp')
 
 class FilterRegexp:
     """
-        All possible forms.
+    All possible forms.
 
-        regexp:
-          [operation]:           # operation to perform on matches
-            - [regexp]           # simple regexp
-            - [regexp]: <path>   # override path
-            - [regexp]:
-                [path]: <path>   # override path
-                [not]: <regexp>  # not match
-                [from]: <field>  # search from given entry field
-            - [regexp]:
-                [path]: <path>   # override path
-                [not]:           # list of not match regexps
-                  - <regexp>
-                [from]:          # search only from these fields
-                  - <field>
-          [operation]:
-            - <regexp>
-          [rest]: <operation>    # non matching entries are
-          [from]:                # search only from these fields for all regexps
-            - <field>
+    regexp:
+      [operation]:           # operation to perform on matches
+        - [regexp]           # simple regexp
+        - [regexp]: <path>   # override path
+        - [regexp]:
+            [path]: <path>   # override path
+            [not]: <regexp>  # not match
+            [from]: <field>  # search from given entry field
+        - [regexp]:
+            [path]: <path>   # override path
+            [not]:           # list of not match regexps
+              - <regexp>
+            [from]:          # search only from these fields
+              - <field>
+      [operation]:
+        - <regexp>
+      [rest]: <operation>    # non matching entries are
+      [from]:                # search only from these fields for all regexps
+        - <field>
 
-        Possible operations: accept, reject, accept_excluding, reject_excluding
+    Possible operations: accept, reject, accept_excluding, reject_excluding
     """
 
     schema = {

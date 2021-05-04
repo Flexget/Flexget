@@ -1,7 +1,7 @@
 import copy
 import functools
 import re
-from typing import Dict, Iterator, List, Optional, Tuple, Union, Set
+from typing import Dict, Iterator, List, Optional, Set, Tuple, Union
 
 from loguru import logger
 
@@ -166,8 +166,8 @@ _audios = [
     QualityComponent('audio', 45, 'dd+5.1', 'dd[p+]%s' % channels),
     QualityComponent('audio', 50, 'flac', 'flac%s?' % channels),
     # The DTSs are a bit backwards, but the more specific one needs to be parsed first
-    QualityComponent('audio', 60, 'dtshd', r'dts[\W_]?hd(?:[\W_]?ma)?%s?' % channels),
-    QualityComponent('audio', 70, 'dts'),
+    QualityComponent('audio', 70, 'dtshd', r'dts[\W_]?hd(?:[\W_]?ma)?%s?' % channels),
+    QualityComponent('audio', 60, 'dts'),
     QualityComponent('audio', 80, 'truehd', 'truehd%s?' % channels),
 ]
 
@@ -503,4 +503,4 @@ class Requirements:
         return self.text or 'any'
 
     def __repr__(self) -> str:
-        return f'<Requirements(self)>'
+        return f'<Requirements({self})>'

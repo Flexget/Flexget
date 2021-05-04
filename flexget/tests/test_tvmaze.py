@@ -147,13 +147,17 @@ class TestTVMazeShowLookup:
     def test_lookup(self, execute_task):
         task = execute_task('test')
         entry = task.find_entry(title='House.MD.S01E02.HDTV.XViD-FlexGet')
-        assert entry['tvmaze_episode_name'] == 'Paternity', (
-            '%s tvmaze_episode_name should be Paternity, is actually %s'
-            % (entry['title'], entry['tvmaze_episode_name'])
+        assert (
+            entry['tvmaze_episode_name'] == 'Paternity'
+        ), '%s tvmaze_episode_name should be Paternity, is actually %s' % (
+            entry['title'],
+            entry['tvmaze_episode_name'],
         )
-        assert entry['tvmaze_series_status'] == 'Ended', (
-            'status for %s is %s, should be "ended"'
-            % (entry['title'], entry['tvmaze_series_status'])
+        assert (
+            entry['tvmaze_series_status'] == 'Ended'
+        ), 'status for %s is %s, should be "ended"' % (
+            entry['title'],
+            entry['tvmaze_series_status'],
         )
         assert entry['afield'] == '73255PaternityHouse', (
             'afield was not set correctly, expected 73255PaternityHouse M.D., got %s'

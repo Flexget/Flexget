@@ -4,6 +4,7 @@
 import re
 
 import feedparser
+from urllib.request import ProxyHandler
 from loguru import logger
 
 from flexget import plugin
@@ -18,7 +19,7 @@ __author__ = 'danfocus'
 logger = logger.bind(name='lostfilm')
 
 EPISODE_REGEXP = re.compile(r'.*/series/.*/season_(\d+)/episode_(\d+)/.*')
-LOSTFILM_ID_REGEXP = re.compile(r'.*static.lostfilm.tv/Images/(\d+)/Posters/.*')
+LOSTFILM_ID_REGEXP = re.compile(r'.*static\.lostfilm\..*/Images/(\d+)/Posters/.*')
 TEXT_REGEXP = re.compile(r'^\d+\s+сезон\s+\d+\s+серия\.\s(.+)\s\((.+)\)$')
 
 quality_map = {
@@ -61,8 +62,11 @@ class LostFilm:
         config = self.build_config(config)
         if config is False:
             return
+        proxy_handler = None
+        if task.requests.proxies is not None:
+            proxy_handler = ProxyHandler(task.requests.proxies)
         try:
-            rss = feedparser.parse(config['url'])
+            rss = feedparser.parse(config['url'], handlers=[proxy_handler])
         except Exception:
             raise PluginError('Cannot parse rss feed')
         status = rss.get('status')

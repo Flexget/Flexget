@@ -17,7 +17,7 @@ ANIME_TYPE = ['all', 'tv', 'ova', 'movie', 'special', 'ona', 'music', 'unknown']
 
 
 class MyAnimeList:
-    """" Creates entries for series and movies from MyAnimeList list
+    """ " Creates entries for series and movies from MyAnimeList list
 
     Syntax:
     my_anime_list:
@@ -97,6 +97,8 @@ class MyAnimeList:
                 or config['type'] == 'all'
             )
             if has_selected_status and has_selected_type and has_selected_airing_status:
+                # MAL sometimes returns title as an integer :| GH #2901
+                anime["anime_title"] = str(anime["anime_title"])
                 entries.append(
                     Entry(
                         title=anime["anime_title"],

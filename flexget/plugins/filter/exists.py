@@ -12,11 +12,11 @@ logger = logger.bind(name='exists')
 
 class FilterExists:
     """
-        Reject entries that already exist in given path.
+    Reject entries that already exist in given path.
 
-        Example::
+    Example::
 
-          exists: /storage/movies/
+      exists: /storage/movies/
     """
 
     schema = one_or_more({'type': 'string', 'format': 'path'})

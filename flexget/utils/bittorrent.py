@@ -40,12 +40,12 @@ METAFILE_STD_KEYS = [
 def clean_meta(
     meta: Dict[str, Any], including_info: bool = False, log_func: Callable[..., None] = None
 ):
-    """ Clean meta dict. Optionally log changes using the given logger.
+    """Clean meta dict. Optionally log changes using the given logger.
 
-        See also http://packages.python.org/pyrocore/apidocs/pyrocore.util.metafile-pysrc.html#clean_meta
+    See also http://packages.python.org/pyrocore/apidocs/pyrocore.util.metafile-pysrc.html#clean_meta
 
-        @param log_func: If given, a callable accepting a string message.
-        @return: Set of keys removed from C{meta}.
+    @param log_func: If given, a callable accepting a string message.
+    @return: Set of keys removed from C{meta}.
     """
     modified = set()
 
@@ -76,13 +76,13 @@ def clean_meta(
 
 
 def is_torrent_file(metafilepath: str) -> bool:
-    """ Check whether a file looks like a metafile by peeking into its content.
+    """Check whether a file looks like a metafile by peeking into its content.
 
-        Note that this doesn't ensure that the file is a complete and valid torrent,
-        it just allows fast filtering of candidate files.
+    Note that this doesn't ensure that the file is a complete and valid torrent,
+    it just allows fast filtering of candidate files.
 
-        @param metafilepath: Path to the file to check, must have read permissions for it.
-        @return: True if there is a high probability this is a metafile.
+    @param metafilepath: Path to the file to check, must have read permissions for it.
+    @return: True if there is a high probability this is a metafile.
     """
     with open(metafilepath, 'rb') as f:
         data = f.read(200)
@@ -98,8 +98,9 @@ def is_torrent_file(metafilepath: str) -> bool:
 
 def tokenize(
     text: bytes,
-    match=re.compile(br'([idel])|(\d+):|(-?\d+)').match \
-        # type: Callable[[bytes, int], Match[bytes]]
+    match=re.compile(
+        br'([idel])|(\d+):|(-?\d+)'
+    ).match,  # type: Callable[[bytes, int], Match[bytes]]
 ) -> Generator[bytes, None, None]:
     i = 0
     while i < len(text):
@@ -114,9 +115,7 @@ def tokenize(
             yield s
 
 
-def decode_item(
-    src_iter: Iterator[bytes], token: bytes
-) -> Union[bytes, str, int, list, dict]:
+def decode_item(src_iter: Iterator[bytes], token: bytes) -> Union[bytes, str, int, list, dict]:
     data: Union[bytes, str, int, list, dict]
     if token == b'i':
         # integer: "i" value "e"

@@ -8,11 +8,11 @@ logger = logger.bind(name='accept_all')
 
 class FilterAcceptAll:
     """
-        Just accepts all entries.
+    Just accepts all entries.
 
-        Example::
+    Example::
 
-          accept_all: true
+      accept_all: true
     """
 
     schema = {'type': 'boolean'}

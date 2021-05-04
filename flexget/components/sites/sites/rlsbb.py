@@ -29,15 +29,15 @@ class UrlRewriteRlsbb:
         - RAPiDGATOR
       parse_comments: no
 
-    filehosters_re: Only add links that match any of the regular expressions 
+    filehosters_re: Only add links that match any of the regular expressions
       listed under filehosters_re.
-    link_text_re: search for <a> tags where the text (not the url) matches 
+    link_text_re: search for <a> tags where the text (not the url) matches
       one of the given regular expressions. The href property of these <a> tags
       will be used as the url (or urls).
-    parse_comments: whether the plugin should also parse the comments or only 
+    parse_comments: whether the plugin should also parse the comments or only
       the main post. Note that it is highly recommended to use filehosters_re
       if you enable parse_comments. Otherwise, the plugin may return too
-      many and even some potentially dangerous links. 
+      many and even some potentially dangerous links.
 
     If more than one valid link is found, the url of the entry is rewritten to
     the first link found. The complete list of valid links is placed in the

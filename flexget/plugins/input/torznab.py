@@ -190,7 +190,7 @@ class Torznab:
                 if child.tag in ['{http://torznab.com/schemas/2015/feed}attr', 'enclosure']:
                     continue
                 else:
-                    if child.tag in ['description', 'title']:
+                    if child.tag in ['description', 'title'] and child.text:
                         entry[child.tag] = child.text
             entries.append(entry)
         return entries

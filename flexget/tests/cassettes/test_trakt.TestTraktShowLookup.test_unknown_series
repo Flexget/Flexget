@@ -2,34 +2,72 @@ interactions:
 - request:
     body: null
     headers:
-      Content-Type: [application/json]
-      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: ['2']
+      Content-Type:
+      - application/json
+      trakt-api-key:
+      - 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af
+      trakt-api-version:
+      - '2'
     method: GET
-    uri: https://api.trakt.tv/search?type=show&query=Aoeu+Htns
+    uri: https://api.trakt.tv/search?query=Aoeu+Htns&type=show
   response:
-    body: {string: '[]'}
+    body:
+      string: '[]'
     headers:
-      CF-Cache-Status: [MISS]
-      CF-RAY: [312a16655b403d49-CPH]
-      Cache-Control: ['public, max-age=28800']
-      Connection: [keep-alive]
-      Content-Type: [application/json; charset=utf-8]
-      Date: ['Sat, 17 Dec 2016 11:38:13 GMT']
-      ETag: [W/"91e34b7ad3a2e480f32594e9e4ed936f"]
-      Expires: ['Sat, 17 Dec 2016 19:38:13 GMT']
-      Server: [cloudflare-nginx]
-      Set-Cookie: ['__cfduid=d56875246e1644c9e2104647b475bdea51481974692; expires=Sun,
-          17-Dec-17 11:38:12 GMT; path=/; domain=.trakt.tv; HttpOnly']
-      Vary: [Accept-Encoding]
-      X-Content-Type-Options: [nosniff]
-      X-Frame-Options: [SAMEORIGIN]
-      X-Pagination-Item-Count: ['0']
-      X-Pagination-Limit: ['10']
-      X-Pagination-Page: ['1']
-      X-Pagination-Page-Count: ['0']
-      X-Request-Id: [57aab443-c312-49d1-a93f-57cb097813f9]
-      X-Runtime: ['0.011682']
-      X-XSS-Protection: [1; mode=block]
-    status: {code: 200, message: OK}
+      CF-Cache-Status:
+      - MISS
+      CF-RAY:
+      - 60caabf46a37ceec-IAD
+      Cache-Control:
+      - public, max-age=28800
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Tue, 05 Jan 2021 05:06:44 GMT
+      ETag:
+      - W/"e5b8f17ec5f89246c8840bc688b98983"
+      Expect-CT:
+      - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+      Expires:
+      - Tue, 05 Jan 2021 13:06:44 GMT
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cfduid=ddcc6c4d0ceb915256e0cd79e9b69b9401609823204; expires=Thu, 04-Feb-21
+        05:06:44 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Pagination-Item-Count:
+      - '0'
+      X-Pagination-Limit:
+      - '10'
+      X-Pagination-Page:
+      - '1'
+      X-Pagination-Page-Count:
+      - '0'
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Ratelimit:
+      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":992,"until":"2021-01-05T05:10:00Z"}'
+      X-Request-Id:
+      - c316cf13-ba97-406e-bd2b-86e83c0f18f2
+      X-Runtime:
+      - '0.006899'
+      X-XSS-Protection:
+      - 1; mode=block
+      cf-request-id:
+      - 077289ccc40000ceec42bb0000000001
+    status:
+      code: 200
+      message: OK
 version: 1

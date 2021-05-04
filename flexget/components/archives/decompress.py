@@ -53,11 +53,14 @@ def get_output_path(to, entry):
         raise plugin.PluginError('Could not render path: %s' % to)
 
 
-def extract_info(info, archive, to, keep_dirs):
+def extract_info(info, archive, to, keep_dirs, test=False):
     """Extract ArchiveInfo object"""
 
     destination = get_destination_path(info, to, keep_dirs)
 
+    if test:
+        logger.info('Would extract: {} to {}', info.filename, destination)
+        return
     logger.debug('Attempting to extract: {} to {}', info.filename, destination)
     try:
         info.extract(archive, destination)
@@ -164,7 +167,7 @@ class Decompress:
         return config
 
     @staticmethod
-    def handle_entry(entry, config):
+    def handle_entry(entry, config, test=False):
         """
         Extract matching files into the directory specified
 
@@ -180,10 +183,14 @@ class Decompress:
 
         for info in archive.infolist():
             if is_match(info, config['regexp']):
-                extract_info(info, archive, to, config['keep_dirs'])
+                extract_info(info, archive, to, config['keep_dirs'], test=test)
 
         if config['delete_archive']:
-            archive.delete()
+            if not test:
+                archive.delete()
+            else:
+                logger.info(f'Would delete archive {archive.path}')
+                archive.close()
         else:
             archive.close()
 
@@ -199,7 +206,7 @@ class Decompress:
         archiveutil.rarfile_set_path_sep(os.path.sep)
 
         for entry in task.accepted:
-            self.handle_entry(entry, config)
+            self.handle_entry(entry, config, test=task.options.test)
 
 
 @event('plugin.register')

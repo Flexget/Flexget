@@ -2,20 +2,22 @@ interactions:
 - request:
     body: null
     headers:
-      Content-Type: [application/json]
-      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: ['2']
+      Content-Type:
+      - application/json
+      trakt-api-key:
+      - 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af
+      trakt-api-version:
+      - '2'
     method: GET
-    uri: https://api.trakt.tv/search?type=show&query=House
+    uri: https://api.trakt.tv/search?query=House&type=show
   response:
-    body: {string: "[{\"type\":\"show\",\"score\":61.689377,\"show\":{\"title\":\"House\",\"overview\":\"Go
-        deeper into the medical mysteries of House, TV's most compelling drama. Hugh
-        Laurie stars as the brilliant but sarcastic Dr. Gregory House, a maverick
-        physician who is devoid of bedside manner. While his behavior can border on
-        antisocial, Dr. House thrives on the challenge of solving the medical puzzles
-        that other doctors give up on. Together with his hand-picked team of young
-        medical experts, he'll do whatever it takes in the race against the clock
-        to solve the case.\",\"year\":2004,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":1399,\"slug\":\"house\",\"tvdb\":73255,\"imdb\":\"tt0412142\",\"tmdb\":1408,\"tvrage\":3908}}},{\"type\":\"show\",\"score\":49.852543,\"show\":{\"title\":\"House
+    body:
+      string: "[{\"type\":\"show\",\"score\":61.29207,\"show\":{\"title\":\"House\",\"overview\":\"Dr.
+        Gregory House is a maverick physician who is devoid of bedside manner. While
+        his behavior can border on antisocial, Dr. House thrives on the challenge
+        of solving the medical puzzles that other doctors give up on. Together with
+        his hand-picked team of young medical experts, he'll do whatever it takes
+        in the race against the clock to solve the case.\",\"year\":2004,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":1399,\"slug\":\"house\",\"tvdb\":73255,\"imdb\":\"tt0412142\",\"tmdb\":1408,\"tvrage\":3908}}},{\"type\":\"show\",\"score\":49.53147,\"show\":{\"title\":\"House
         vs. House\",\"overview\":\"House vs. House is a new home makeover competition
         series where amateur and experienced renovation teams compete for the chance
         to win $10,000 by proving they can create the better DIY projects in their
@@ -23,166 +25,260 @@ interactions:
         each episode features two teams will go head-to-head in grueling challenges.
         Tanya McQueen, a DIY design expert, and David Brian Sanders, an architect
         and designer, will determine which team completes the most impressive transformation
-        and award the cash prize.\",\"year\":1969,\"status\":\"\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":93965,\"slug\":\"house-vs-house\",\"tvdb\":287378,\"imdb\":\"tt4097428\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":44.06384,\"show\":{\"title\":\"Full
+        and award the cash prize.\",\"year\":1969,\"status\":\"\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":93965,\"slug\":\"house-vs-house\",\"tvdb\":287378,\"imdb\":\"tt4097428\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":43.780052,\"show\":{\"title\":\"Full
         House\",\"overview\":\"Full House is an American sitcom created by Jeff Franklin
         for ABC. The show chronicles a widowed father, who enlists his best friend
         and his brother-in-law to help raise his three daughters. It aired from September
-        22, 1987, to May 23, 1995, broadcasting eight seasons and 192 episodes.\",\"year\":1987,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":4289,\"slug\":\"full-house-1987\",\"tvdb\":70500,\"imdb\":\"tt0092359\",\"tmdb\":4313,\"tvrage\":3622}}},{\"type\":\"show\",\"score\":44.06384,\"show\":{\"title\":\"House
+        22, 1987, to May 23, 1995, broadcasting eight seasons and 192 episodes.\",\"year\":1987,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":4289,\"slug\":\"full-house-1987\",\"tvdb\":70500,\"imdb\":\"tt0092359\",\"tmdb\":4313,\"tvrage\":3622}}},{\"type\":\"show\",\"score\":43.780052,\"show\":{\"title\":\"House
         Hunters\",\"overview\":\"House Hunters takes viewers behind the scenes as
         individuals, couples and families learn what to look for and decide whether
         or not a home is meant for them. Focusing on the emotional experience of finding
         and purchasing a new home, each episode follows a prospective buyer and real
         estate agent through the home-buying process, from start to finish.\",\"year\":1999,\"status\":\"returning
-        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":6441,\"slug\":\"house-hunters\",\"tvdb\":73182,\"imdb\":\"tt0369117\",\"tmdb\":6480,\"tvrage\":null}}},{\"type\":\"show\",\"score\":44.06384,\"show\":{\"title\":\"Fuller
+        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":6441,\"slug\":\"house-hunters\",\"tvdb\":73182,\"imdb\":\"tt0369117\",\"tmdb\":6480,\"tvrage\":null}}},{\"type\":\"show\",\"score\":43.780052,\"show\":{\"title\":\"Fuller
         House\",\"overview\":\"Recently widowed D.J. Tanner-Fuller gets help from
         her sister Stephanie and best friend Kimmy when the women move in with their
-        families to help D.J. raise her children in this spin-off series.\",\"year\":2016,\"status\":\"returning
-        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":102424,\"slug\":\"fuller-house\",\"tvdb\":301236,\"imdb\":\"tt3986586\",\"tmdb\":63623,\"tvrage\":48701}}},{\"type\":\"show\",\"score\":44.06384,\"show\":{\"title\":\"Alpha
+        families to help D.J. raise her children in this spin-off series filled with
+        familiar faces.\",\"year\":2016,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":102424,\"slug\":\"fuller-house\",\"tvdb\":301236,\"imdb\":\"tt3986586\",\"tmdb\":63623,\"tvrage\":48701}}},{\"type\":\"show\",\"score\":43.780052,\"show\":{\"title\":\"Alpha
         House\",\"overview\":\"Alpha House follows four senators who live together
         in a rented house in Washington DC.Re-election battles, looming indictments,
-        parties, their Party... these senators need a drink. And a new housemate.\",\"year\":2013,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":60285,\"slug\":\"alpha-house\",\"tvdb\":269008,\"imdb\":\"tt3012160\",\"tmdb\":60719,\"tvrage\":34454}}},{\"type\":\"show\",\"score\":44.06384,\"show\":{\"title\":\"Playing
+        parties, their Party... these senators need a drink. And a new housemate.\",\"year\":2013,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":60285,\"slug\":\"alpha-house\",\"tvdb\":269008,\"imdb\":\"tt3012160\",\"tmdb\":60719,\"tvrage\":34454}}},{\"type\":\"show\",\"score\":43.780052,\"show\":{\"title\":\"Playing
         House\",\"overview\":\"A single-camera buddy comedy about what happens when
         two best friends come back together, just when they need each other most.Inspired
         by the ultra-close friendship between the series' creators and stars, \\\"Playing
         House\\\" centers on mother to-be Maggie who asks her single and career-driven
         best friend Emma to return home from her job overseas to attend her baby shower,
-        having no idea what\u2019s truly in store.\",\"year\":2014,\"status\":\"returning
-        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":73385,\"slug\":\"playing-house\",\"tvdb\":269898,\"imdb\":\"tt2750182\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":44.06384,\"show\":{\"title\":\"House
+        having no idea what\u2019s truly in store.\",\"year\":2014,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":73385,\"slug\":\"playing-house\",\"tvdb\":269898,\"imdb\":\"tt2750182\",\"tmdb\":61762,\"tvrage\":35945}}},{\"type\":\"show\",\"score\":43.780052,\"show\":{\"title\":\"Summer
+        House\",\"overview\":\"Summer House takes the beach town of Montauk, New York
+        by storm, while following a group of nine friends who make the exclusive enclave
+        their go-to party spot between Memorial Day and Labor Day \u2014 that is,
+        when they're not hustling at their day jobs. You could say they work hard
+        and party way harder.\",\"year\":2017,\"status\":\"returning series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":113867,\"slug\":\"summer-house\",\"tvdb\":321121,\"imdb\":\"tt6645582\",\"tmdb\":69720,\"tvrage\":null}}},{\"type\":\"show\",\"score\":43.780052,\"show\":{\"title\":\"House
         Husbands\",\"overview\":\"House Husbands centres around four families with
-        one thing in common, the husbands stay home to raise the children.\",\"year\":2012,\"status\":\"returning
-        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":43830,\"slug\":\"house-husbands\",\"tvdb\":262026,\"imdb\":\"tt2402807\",\"tmdb\":44072,\"tvrage\":null}}},{\"type\":\"show\",\"score\":44.06384,\"show\":{\"title\":\"Bleak
-        House\",\"overview\":\"In this star-studded adaptation of a literary classic,
-        acclaimed writer Andrew Davies turns his talents to one of Charles Dickens'
-        most brilliant novels \u2014 arguably the greatest-ever depiction of Victorian
-        London. Fresh and imaginative, yet faithful to the original, this thrilling
-        fast-paced adaptation is shot with a contemporary edge. At its heart is the
-        story of the icily beautiful Lady Dedlock, who nurses a dark secret, and the
-        merciless lawyer Tulkinghorn, who seeks to uncover it. The generous John Jarndyce,
-        struggling with his own past, and his two young wards Richard and Ada, are
-        all caught up, like Lady Dedlock, in the infamous case of Jarndyce vs. Jarndyce,
-        which will make one of them rich beyond imagination if it can ever be brought
-        to a conclusion. As Tulkinghorn digs deeper into Lady Dedlock's past, he unearths
-        a secret that will change their lives forever, and which is almost as astounding
-        as the final outcome of the Jarndyce case.\",\"year\":2005,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":2474,\"slug\":\"bleak-house\",\"tvdb\":73558,\"imdb\":\"tt0442632\",\"tmdb\":2489,\"tvrage\":null}}},{\"type\":\"show\",\"score\":44.06384,\"show\":{\"title\":\"Full
-        House\",\"overview\":\"Han Ji Eun is a naive writer who got swindled out of
-        everything she owned including her house by her best friends. Stranded in
-        China, She managed to borrow money from an actor Lee Young Jae to return to
-        Korea. On her return, she found out that her house was bought by Lee Young
-        Jae. In an attempt to get her possessions back, she entered in a contract
-        marriage with Young Jae for one year. In spite of losing all, Ji Eun manages
-        to be cheerful and takes things in strike and the business relationship between
-        the two becomes personal as they start to rely and care for each other. \",\"year\":2004,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":3482,\"slug\":\"full-house\",\"tvdb\":84928,\"imdb\":\"tt0464625\",\"tmdb\":3504,\"tvrage\":null}}}]"}
+        one thing in common, the husbands stay home to raise the children.\",\"year\":2012,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":43830,\"slug\":\"house-husbands\",\"tvdb\":262026,\"imdb\":\"tt2402807\",\"tmdb\":44072,\"tvrage\":null}}},{\"type\":\"show\",\"score\":43.780052,\"show\":{\"title\":\"Safe
+        House\",\"overview\":\"A married couple, former detective Robert and teacher
+        Katy, are asked by close friend and police officer Mark, to turn their remote
+        Guest House into a Safe House.\",\"year\":2015,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":97962,\"slug\":\"safe-house\",\"tvdb\":294195,\"imdb\":\"tt4567314\",\"tmdb\":62452,\"tvrage\":42379}}}]"
     headers:
-      CF-Cache-Status: [HIT]
-      CF-RAY: [312a165e88fb3d07-CPH]
-      Cache-Control: ['public, max-age=28800']
-      Connection: [keep-alive]
-      Content-Type: [application/json; charset=utf-8]
-      Date: ['Sat, 17 Dec 2016 11:38:11 GMT']
-      ETag: [W/"bd88943cc0ddc14f3315697ac3a632ef"]
-      Expires: ['Sat, 17 Dec 2016 19:38:11 GMT']
-      Server: [cloudflare-nginx]
-      Set-Cookie: ['__cfduid=d079038fd63a3628c0d0d481440a448951481974691; expires=Sun,
-          17-Dec-17 11:38:11 GMT; path=/; domain=.trakt.tv; HttpOnly']
-      Vary: [Accept-Encoding]
-      X-Content-Type-Options: [nosniff]
-      X-Frame-Options: [SAMEORIGIN]
-      X-Pagination-Item-Count: ['1737']
-      X-Pagination-Limit: ['10']
-      X-Pagination-Page: ['1']
-      X-Pagination-Page-Count: ['174']
-      X-Request-Id: [736fd637-8769-45e7-bd06-fab2e44bbc94]
-      X-Runtime: ['0.018501']
-      X-XSS-Protection: [1; mode=block]
-    status: {code: 200, message: OK}
+      Age:
+      - '1'
+      CF-Cache-Status:
+      - HIT
+      CF-RAY:
+      - 60caabed2e69c189-IAD
+      Cache-Control:
+      - public, max-age=28800
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Tue, 05 Jan 2021 05:06:43 GMT
+      ETag:
+      - W/"0cf3d4a9f1312e6c842e9909cbe57074"
+      Expect-CT:
+      - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+      Expires:
+      - Tue, 05 Jan 2021 13:06:41 GMT
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cfduid=de3167ebb24684b8c249fae91bd3b465c1609823203; expires=Thu, 04-Feb-21
+        05:06:43 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Pagination-Item-Count:
+      - '2771'
+      X-Pagination-Limit:
+      - '10'
+      X-Pagination-Page:
+      - '1'
+      X-Pagination-Page-Count:
+      - '278'
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Ratelimit:
+      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":996,"until":"2021-01-05T05:10:00Z"}'
+      X-Request-Id:
+      - c49b1d72-4730-4d30-bb32-9a94a15128fa
+      X-Runtime:
+      - '0.021687'
+      X-XSS-Protection:
+      - 1; mode=block
+      cf-request-id:
+      - 077289c83b0000c1898e081000000001
+    status:
+      code: 200
+      message: OK
 - request:
     body: null
     headers:
-      Content-Type: [application/json]
-      Cookie: [__cfduid=d079038fd63a3628c0d0d481440a448951481974691]
-      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: ['2']
+      Content-Type:
+      - application/json
+      trakt-api-key:
+      - 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af
+      trakt-api-version:
+      - '2'
     method: GET
     uri: https://api.trakt.tv/shows/1399?extended=full
   response:
-    body: {string: '{"title":"House","year":2004,"ids":{"trakt":1399,"slug":"house","tvdb":73255,"imdb":"tt0412142","tmdb":1408,"tvrage":3908},"overview":"Go
-        deeper into the medical mysteries of House, TV''s most compelling drama. Hugh
-        Laurie stars as the brilliant but sarcastic Dr. Gregory House, a maverick
-        physician who is devoid of bedside manner. While his behavior can border on
-        antisocial, Dr. House thrives on the challenge of solving the medical puzzles
-        that other doctors give up on. Together with his hand-picked team of young
-        medical experts, he''ll do whatever it takes in the race against the clock
-        to solve the case.","first_aired":"2004-11-16T08:00:00.000Z","airs":{"day":null,"time":null,"timezone":"America/New_York"},"runtime":44,"certification":"TV-14","network":"FOX
-        (US)","country":"us","trailer":null,"homepage":"http://www.fox.com/house/index.htm","status":"ended","rating":8.78719,"votes":17579,"updated_at":"2016-12-14T09:35:37.000Z","language":"en","available_translations":["ar","bg","bs","cs","da","de","el","en","es","fr","he","hu","it","ko","lt","nl","pl","pt","ro","ru","sk","sr","tr","uk","zh"],"genres":["comedy","drama","mystery"],"aired_episodes":176}'}
+    body:
+      string: '{"title":"House","year":2004,"ids":{"trakt":1399,"slug":"house","tvdb":73255,"imdb":"tt0412142","tmdb":1408,"tvrage":3908},"overview":"Dr.
+        Gregory House is a maverick physician who is devoid of bedside manner. While
+        his behavior can border on antisocial, Dr. House thrives on the challenge
+        of solving the medical puzzles that other doctors give up on. Together with
+        his hand-picked team of young medical experts, he''ll do whatever it takes
+        in the race against the clock to solve the case.","first_aired":"2004-11-17T02:00:00.000Z","airs":{"day":"Monday","time":"21:00","timezone":"America/New_York"},"runtime":45,"certification":"TV-14","network":"FOX","country":"us","trailer":"https://youtube.com/watch?v=MczMB8nU1sY","homepage":"http://www.fox.com/house/index.htm","status":"ended","rating":8.67064,"votes":27790,"comment_count":78,"updated_at":"2021-01-04T10:06:30.000Z","language":"en","available_translations":["ar","bg","bs","cs","da","de","el","en","es","fi","fr","he","hr","hu","it","ja","ko","lt","lv","nl","no","pl","pt","ro","ru","sk","sr","sv","tr","uk","zh"],"genres":["comedy","drama","mystery"],"aired_episodes":176}'
     headers:
-      CF-Cache-Status: [HIT]
-      CF-RAY: [312a165ea9003d07-CPH]
-      Cache-Control: ['public, max-age=28800']
-      Connection: [keep-alive]
-      Content-Type: [application/json; charset=utf-8]
-      Date: ['Sat, 17 Dec 2016 11:38:11 GMT']
-      ETag: [W/"6cabdad3b0db0c728ee72f8827a38aa5"]
-      Expires: ['Sat, 17 Dec 2016 19:38:11 GMT']
-      Last-Modified: ['Wed, 14 Dec 2016 09:35:37 GMT']
-      Server: [cloudflare-nginx]
-      Vary: [Accept-Encoding]
-      X-Content-Type-Options: [nosniff]
-      X-Frame-Options: [SAMEORIGIN]
-      X-Request-Id: [33446abf-9aaa-4f6d-a5bc-f192b686fdcf]
-      X-Runtime: ['0.013575']
-      X-XSS-Protection: [1; mode=block]
-    status: {code: 200, message: OK}
+      Age:
+      - '6528'
+      CF-Cache-Status:
+      - HIT
+      CF-RAY:
+      - 60caabedc91d7449-IAD
+      Cache-Control:
+      - public, max-age=28800
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Tue, 05 Jan 2021 05:06:43 GMT
+      ETag:
+      - W/"827bab8d052f204657fcd14b08b642e9"
+      Expect-CT:
+      - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+      Expires:
+      - Tue, 05 Jan 2021 11:17:54 GMT
+      Last-Modified:
+      - Mon, 04 Jan 2021 10:06:30 GMT
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cfduid=d884c693fd14da323390fe515418ebb151609823203; expires=Thu, 04-Feb-21
+        05:06:43 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Ratelimit:
+      - '{"name":"AUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":977,"until":"2021-01-04T11:15:00Z"}'
+      X-Request-Id:
+      - e566eda7-88e1-448d-a4e2-63f5974c15bd
+      X-Runtime:
+      - '0.009825'
+      X-XSS-Protection:
+      - 1; mode=block
+      cf-request-id:
+      - 077289c8a1000074499603f000000001
+    status:
+      code: 200
+      message: OK
 - request:
     body: null
     headers:
-      Content-Type: [application/json]
-      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: ['2']
+      Content-Type:
+      - application/json
+      trakt-api-key:
+      - 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af
+      trakt-api-version:
+      - '2'
     method: GET
     uri: https://api.trakt.tv/shows/1399/seasons/1/episodes/2/?extended=full
   response:
-    body: {string: '{"season":1,"number":2,"title":"Paternity","ids":{"trakt":74344,"tvdb":110995,"imdb":"tt0606034","tmdb":63739,"tvrage":84700},"number_abs":3,"overview":"When
+    body:
+      string: '{"season":1,"number":2,"title":"Paternity","ids":{"trakt":74344,"tvdb":110995,"imdb":"tt0606034","tmdb":63739,"tvrage":84700},"number_abs":3,"overview":"When
         a teenage lacrosse player is stricken with an unidentifiable brain disease,
         Dr. House and the team hustle to give his parents answers. Chase breaks the
         bad news, the kid has MS, but the boy''s night-terror hallucinations disprove
         the diagnosis and send House and his team back to square one. As the boy''s
         health deteriorates. House''s side-bet on the paternity of the patient infuriates
-        Dr. Cuddy and the teenager''s parents, but may just pay off in spades.","rating":7.97254,"votes":692,"first_aired":"2004-11-23T05:00:00.000Z","updated_at":"2016-12-17T11:02:15.000Z","available_translations":["cs","de","en","es","fr","he","nl","pt","ro"]}'}
+        Dr. Cuddy and the teenager''s parents, but may just pay off in spades.","rating":7.8134,"votes":1522,"comment_count":3,"first_aired":"2004-11-24T02:00:00.000Z","updated_at":"2021-01-04T16:33:19.000Z","available_translations":["ar","bg","bs","cs","da","de","el","en","es","fi","fr","he","hr","hu","it","ja","ko","lt","lv","nl","no","pl","pt","ro","ru","sk","sr","sv","tr","uk","zh"],"runtime":43}'
     headers:
-      CF-Cache-Status: [HIT]
-      CF-RAY: [312a165f3a1e3d49-CPH]
-      Cache-Control: ['public, max-age=28800']
-      Connection: [keep-alive]
-      Content-Type: [application/json; charset=utf-8]
-      Date: ['Sat, 17 Dec 2016 11:38:11 GMT']
-      Expires: ['Sat, 17 Dec 2016 19:38:11 GMT']
-      Last-Modified: ['Sat, 17 Dec 2016 11:02:15 GMT']
-      Server: [cloudflare-nginx]
-      Set-Cookie: ['__cfduid=d915b957c74221afa97713fd826715b421481974691; expires=Sun,
-          17-Dec-17 11:38:11 GMT; path=/; domain=.trakt.tv; HttpOnly']
-      Vary: [Accept-Encoding]
-      X-Content-Type-Options: [nosniff]
-      X-Frame-Options: [SAMEORIGIN]
-      X-Request-Id: [8969a531-8927-4b4a-b9d0-88f989f6a9da]
-      X-Runtime: ['0.019577']
-      X-XSS-Protection: [1; mode=block]
-    status: {code: 200, message: OK}
+      CF-Cache-Status:
+      - MISS
+      CF-RAY:
+      - 60caabee9e62097b-IAD
+      Cache-Control:
+      - public, max-age=28800
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Tue, 05 Jan 2021 05:06:43 GMT
+      Expect-CT:
+      - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+      Expires:
+      - Tue, 05 Jan 2021 13:06:40 GMT
+      Last-Modified:
+      - Mon, 04 Jan 2021 16:33:19 GMT
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cfduid=de56316891b75bb4a15e38a53a81bd5511609823203; expires=Thu, 04-Feb-21
+        05:06:43 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Ratelimit:
+      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":995,"until":"2021-01-05T05:10:00Z"}'
+      X-Request-Id:
+      - a18d3e7f-43aa-48fa-bc5c-1838937b415f
+      X-Runtime:
+      - '0.008832'
+      X-XSS-Protection:
+      - 1; mode=block
+      cf-request-id:
+      - 077289c9210000097bc811a000000001
+    status:
+      code: 200
+      message: OK
 - request:
     body: null
     headers:
-      Content-Type: [application/json]
-      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: ['2']
+      Content-Type:
+      - application/json
+      trakt-api-key:
+      - 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af
+      trakt-api-version:
+      - '2'
     method: GET
-    uri: https://api.trakt.tv/search?type=show&year=2005&query=Doctor+Who
+    uri: https://api.trakt.tv/search?query=Doctor+Who&type=show&year=2005
   response:
-    body: {string: "[{\"type\":\"show\",\"score\":63.71572,\"show\":{\"title\":\"Doctor
+    body:
+      string: "[{\"type\":\"show\",\"score\":62.294415,\"show\":{\"title\":\"Doctor
         Who\",\"overview\":\"The Doctor is an alien Time Lord from the planet Gallifrey
-        who travels through all of time and space in his TARDIS. He has a long list
-        of friends and companions who have shared journeys with him. Instead of dying,
-        the Doctor is able to \u201Cregenerate\u201D into a new body, taking on a
-        new personality with each regeneration. Twelve actors, plus John Hurt, have
-        played The Doctor thus far.\",\"year\":2005,\"status\":\"returning series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":56872,\"slug\":\"doctor-who-2005\",\"tvdb\":78804,\"imdb\":\"tt0436992\",\"tmdb\":57243,\"tvrage\":3332}}},{\"type\":\"show\",\"score\":50.972576,\"show\":{\"title\":\"Doctor
+        who travels through all of time and space in the TARDIS. The Doctor has a
+        long list of friends and companions who have shared journeys along the way.
+        Instead of dying, the Doctor is able to \u201Cregenerate\u201D into a new
+        body, taking on a new personality with each regeneration.\",\"year\":2005,\"status\":\"returning
+        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":56872,\"slug\":\"doctor-who-2005\",\"tvdb\":78804,\"imdb\":\"tt0436992\",\"tmdb\":57243,\"tvrage\":3332}}},{\"type\":\"show\",\"score\":49.835533,\"show\":{\"title\":\"Doctor
         Who Confidential\",\"overview\":\"Specially filmed for BBC Three as a companion
         piece to Doctor Who, Doctor Who Confidential aims to give a taste of the excitement
         and the energy that surrounds the show. The programme includes behind-the-scenes
@@ -190,21 +286,30 @@ interactions:
         bring our favourite Time Lord back to our screens.An abbreviated 15-minute
         version, concentrating on the production of the new series and without reference
         to the original show, is also broadcast on BBC Three as Doctor Who Confidential
-        Cutdown.\",\"year\":2005,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":1051,\"slug\":\"doctor-who-confidential\",\"tvdb\":79298,\"imdb\":\"tt0453422\",\"tmdb\":1056,\"tvrage\":null}}},{\"type\":\"show\",\"score\":0.44222233,\"show\":{\"title\":\"The
+        Cutdown.\",\"year\":2005,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":1051,\"slug\":\"doctor-who-confidential\",\"tvdb\":79298,\"imdb\":\"tt0453422\",\"tmdb\":1056,\"tvrage\":null}}},{\"type\":\"show\",\"score\":0.4700349,\"show\":{\"title\":\"The
         Herbalist's Manual\",\"overview\":\"This drama is about Lee Si Jan who studies
         medicine by secretly following his dad and learning it, since his father doesn't
-        want him to be a doctor as it wasn't popular back then.\",\"year\":2005,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":103842,\"slug\":\"the-herbalist-s-manual\",\"tvdb\":303990,\"imdb\":\"tt0855304\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":0.35377786,\"show\":{\"title\":\"Inconceivable\",\"overview\":\"Marco
+        want him to be a doctor as it wasn't popular back then.\",\"year\":2005,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":103842,\"slug\":\"the-herbalist-s-manual\",\"tvdb\":303990,\"imdb\":\"tt0855304\",\"tmdb\":4767,\"tvrage\":null}}},{\"type\":\"show\",\"score\":0.37602788,\"show\":{\"title\":\"Inconceivable\",\"overview\":\"Marco
         Pennette (\\\"All About the Andersons\\\") and Oliver Goldstick (\\\"Desperate
         Housewives\\\") are set to team on a new comedy pilot at the Peacock, about
         doctors, shrinks and lawyers who work in a fertility clinic. The project,
         which has a green light to produce a pilot, is set up at the Touchstone Television-based
-        Tollin/Robbins Productions.\",\"year\":2005,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":2748,\"slug\":\"inconceivable\",\"tvdb\":75645,\"imdb\":null,\"tmdb\":2766,\"tvrage\":3954}}},{\"type\":\"show\",\"score\":0.30955565,\"show\":{\"title\":\"Dangerous
+        Tollin/Robbins Productions.\",\"year\":2005,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":2748,\"slug\":\"inconceivable\",\"tvdb\":75645,\"imdb\":\"tt0460089\",\"tmdb\":2766,\"tvrage\":3954}}},{\"type\":\"show\",\"score\":0.3290244,\"show\":{\"title\":\"Dangerous
         Sister\",\"overview\":\"Ito Misaki stars as the number-one cabaret/hostess
         club girl. Hailing from the Miyazaki countryside, she has been told since
         her youth that all she has is a beautiful face. Her brilliant younger brother
         (played by Moriyama Mirai) who aims to become a doctor, is her only pride.
         For his sake, she is willing to put up with all sorts of hardships in a display
-        of unconditional love.\",\"year\":2005,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":9462,\"slug\":\"dangerous-sister\",\"tvdb\":99681,\"imdb\":null,\"tmdb\":9510,\"tvrage\":16128}}},{\"type\":\"show\",\"score\":0.26197043,\"show\":{\"title\":\"H2\",\"overview\":\"Kunimi
+        of unconditional love.\",\"year\":2005,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":9462,\"slug\":\"dangerous-sister\",\"tvdb\":99681,\"imdb\":\"tt4118842\",\"tmdb\":9510,\"tvrage\":16128}}},{\"type\":\"show\",\"score\":0.28202093,\"show\":{\"title\":\"Malice
+        Aforethought\",\"overview\":\"Dr Edmund Bickleigh is married to a particularly
+        overbearing woman who reminds him at every turn that he is living in her house.
+        But the good doctor has outside interests to help him cope: many of the town's
+        female population seems to have had intimate relations with him. When a new
+        arrival to town becomes involved romantically with Edmund, he decides maybe
+        it was time his wife wasn't around much longer. He puts in place a plan to
+        become free to remarry -- after all he has a cabinet full of lethal (and mostly
+        legal) drugs on hand. But it's an old lover that proves his saviour, at least
+        for a short time.\",\"year\":2005,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":145284,\"slug\":\"malice-aforethought-145284\",\"tvdb\":360991,\"imdb\":\"\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":0.280241,\"show\":{\"title\":\"H2\",\"overview\":\"Kunimi
         Hiro was an ace pitcher in junior high school,until he was diagnosed by a
         doctor as having a \\\"glass elbow\\\". He gave up baseball and joined Senkawa
         Senior High School's soccer team. But then something happens that reignites
@@ -214,18 +319,7 @@ interactions:
         by Hideo's girlfriend Amamiya Hikari, who is also Hiro's childhood friend.
         Meanwhile, Haruka finds herself increasingly drawn towards Hiro, despite his
         being interested only in baseball. It's a story about high school students
-        who dream of appearing at Koushien baseball tournament and young love.\",\"year\":2005,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":61726,\"slug\":\"h2-2005\",\"tvdb\":84824,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":0.26197043,\"show\":{\"title\":\"H2
-        The Day with You\",\"overview\":\"Kunimi Hiro was an ace pitcher in junior
-        high school,until he was diagnosed by a doctor as having a \\\"glass elbow\\\".
-        He gave up baseball and joined Senkawa Senior High School's soccer team. But
-        then something happens that reignites his passion for baseball and he joins
-        a baseball team managed by Koga Haruka. And he finds himself in a match against
-        his old friend/rival Tachibana Hideo who has advanced to Meiwa No.1 High School.
-        The meeting of the two is observed by Hideo's girlfriend Amamiya Hikari, who
-        is also Hiro's childhood friend. Meanwhile, Haruka finds herself increasingly
-        drawn towards Hiro, despite his being interested only in baseball. It's a
-        story about high school students who dream of appearing at Koushien baseball
-        tournament and young love\",\"year\":2005,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":107698,\"slug\":\"h2-the-day-with-you\",\"tvdb\":259196,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":0.26197043,\"show\":{\"title\":\"Kimi
+        who dream of appearing at Koushien baseball tournament and young love.\",\"year\":2005,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":61726,\"slug\":\"h2-2005\",\"tvdb\":84824,\"imdb\":\"tt0759951\",\"tmdb\":65194,\"tvrage\":null}}},{\"type\":\"show\",\"score\":0.280241,\"show\":{\"title\":\"Kimi
         to Itahibi\",\"overview\":\"Kunimi Hiro was an ace pitcher in junior high
         school,until he was diagnosed by a doctor as having a \\\"glass elbow\\\".
         He gave up baseball and joined Senkawa Senior High School's soccer team. But
@@ -236,7 +330,18 @@ interactions:
         is also Hiro's childhood friend. Meanwhile, Haruka finds herself increasingly
         drawn towards Hiro, despite his being interested only in baseball. It's a
         story about high school students who dream of appearing at Koushien baseball
-        tournament and young love.\",\"year\":2005,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":79747,\"slug\":\"kimi-to-itahibi\",\"tvdb\":259209,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":0.25015873,\"show\":{\"title\":\"Hanoi
+        tournament and young love.\",\"year\":2005,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":79747,\"slug\":\"kimi-to-itahibi\",\"tvdb\":259209,\"imdb\":\"\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":0.280241,\"show\":{\"title\":\"H2
+        The Day with You\",\"overview\":\"Kunimi Hiro was an ace pitcher in junior
+        high school,until he was diagnosed by a doctor as having a \\\"glass elbow\\\".
+        He gave up baseball and joined Senkawa Senior High School's soccer team. But
+        then something happens that reignites his passion for baseball and he joins
+        a baseball team managed by Koga Haruka. And he finds himself in a match against
+        his old friend/rival Tachibana Hideo who has advanced to Meiwa No.1 High School.
+        The meeting of the two is observed by Hideo's girlfriend Amamiya Hikari, who
+        is also Hiro's childhood friend. Meanwhile, Haruka finds herself increasingly
+        drawn towards Hiro, despite his being interested only in baseball. It's a
+        story about high school students who dream of appearing at Koushien baseball
+        tournament and young love\",\"year\":2005,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":107698,\"slug\":\"h2-the-day-with-you\",\"tvdb\":259196,\"imdb\":\"tt0759951\",\"tmdb\":65194,\"tvrage\":null}}},{\"type\":\"show\",\"score\":0.26589188,\"show\":{\"title\":\"Hanoi
         Bride\",\"overview\":\"Park Eun Woo (Lee Dong Wook) worked as a doctor in
         a clinic in Hanoi where he fell in love with a Vietnamese girl Ly Thi Vu (Kim
         Ok Bin). Due to the sudden death of his father, he had to return to Korea
@@ -251,115 +356,204 @@ interactions:
         wife and liked her didn't think she was good enough for her second son as
         he was a doctor. Ly Thi Vu was hurt and returned to Hanoi. Later the mother
         came to realize her folly and relented. Park Eun Woo didn't want to give up
-        Ly Thi Vu and so he went back to work in Hanoi and search for her.\",\"year\":2005,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":99658,\"slug\":\"hanoi-bride\",\"tvdb\":256432,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":0.20957634,\"show\":{\"title\":\"My
-        Rosy Life\",\"overview\":\"Maeng Sun-yi sacrificed her childhood and youth
-        to taking care of her father, who started drinking heavily after her mother
-        abandoned them when she was 10, and her two younger siblings. She even gave
-        up her own education because she had to work hard to earn her siblings\u2019
-        tuitions. She is married to a guy named Ban Sung-moon, her five years junior,
-        and has two daughters with him. Her life continues to present her with endless
-        hardships but she just believes that that is \u201Chappiness\u201D. One day
-        her husband falls in love with an attractive divorced woman and demands a
-        divorce from Sun-yi.Sun-yi\u2019s younger sister, Maeng Young-yi, is a successful
-        career woman. She dates her first love Lee Jung-do, who is now married to
-        another woman and who broke up with her for the sake of his career in the
-        past.Finally, Sun-yi\u2019s younger brother, Chul-soo, earns his doctorate
-        degree in the United States and settles down there, completely ignoring his
-        responsibility of taking care of his father.Just to make things worse, Sun-yi
-        is one day diagnosed with cancer, which to her is tantamount to a death sentence.
-        After learning about her disease, her husband reflects on himself and shows
-        her the genuine meaning of marital love.\",\"year\":2005,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":104271,\"slug\":\"my-rosy-life\",\"tvdb\":294625,\"imdb\":\"tt1301845\",\"tmdb\":16715,\"tvrage\":14290}}}]"}
+        Ly Thi Vu and so he went back to work in Hanoi and search for her.\",\"year\":2005,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":99658,\"slug\":\"hanoi-bride\",\"tvdb\":256432,\"imdb\":\"tt8814286\",\"tmdb\":91351,\"tvrage\":null}}}]"
     headers:
-      CF-Cache-Status: [MISS]
-      CF-RAY: [312a165fcf293d19-CPH]
-      Cache-Control: ['public, max-age=28800']
-      Connection: [keep-alive]
-      Content-Type: [application/json; charset=utf-8]
-      Date: ['Sat, 17 Dec 2016 11:38:12 GMT']
-      ETag: [W/"34199412ec122fc194cd2fd33f09ab18"]
-      Expires: ['Sat, 17 Dec 2016 19:38:12 GMT']
-      Server: [cloudflare-nginx]
-      Set-Cookie: ['__cfduid=dd51c66d7990b746cbb718f71b9f619901481974691; expires=Sun,
-          17-Dec-17 11:38:11 GMT; path=/; domain=.trakt.tv; HttpOnly']
-      Vary: [Accept-Encoding]
-      X-Content-Type-Options: [nosniff]
-      X-Frame-Options: [SAMEORIGIN]
-      X-Pagination-Item-Count: ['10']
-      X-Pagination-Limit: ['10']
-      X-Pagination-Page: ['1']
-      X-Pagination-Page-Count: ['1']
-      X-Request-Id: [72443570-f4c2-446d-98d8-e3229eb88da7]
-      X-Runtime: ['0.023135']
-      X-XSS-Protection: [1; mode=block]
-    status: {code: 200, message: OK}
+      CF-Cache-Status:
+      - MISS
+      CF-RAY:
+      - 60caabef78d60da6-IAD
+      Cache-Control:
+      - public, max-age=28800
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Tue, 05 Jan 2021 05:06:43 GMT
+      ETag:
+      - W/"4b19e1be86811a2a45a50083d0c153ec"
+      Expect-CT:
+      - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+      Expires:
+      - Tue, 05 Jan 2021 13:06:43 GMT
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cfduid=daed3d943a59c2522635bb7d614c181011609823203; expires=Thu, 04-Feb-21
+        05:06:43 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Pagination-Item-Count:
+      - '11'
+      X-Pagination-Limit:
+      - '10'
+      X-Pagination-Page:
+      - '1'
+      X-Pagination-Page-Count:
+      - '2'
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Ratelimit:
+      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":994,"until":"2021-01-05T05:10:00Z"}'
+      X-Request-Id:
+      - 84d9365e-dcab-4411-bb08-0b596c3defc3
+      X-Runtime:
+      - '0.020994'
+      X-XSS-Protection:
+      - 1; mode=block
+      cf-request-id:
+      - 077289c9a700000da6b6ae0000000001
+    status:
+      code: 200
+      message: OK
 - request:
     body: null
     headers:
-      Content-Type: [application/json]
-      Cookie: [__cfduid=dd51c66d7990b746cbb718f71b9f619901481974691]
-      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: ['2']
+      Content-Type:
+      - application/json
+      trakt-api-key:
+      - 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af
+      trakt-api-version:
+      - '2'
     method: GET
     uri: https://api.trakt.tv/shows/56872?extended=full
   response:
-    body: {string: "{\"title\":\"Doctor Who\",\"year\":2005,\"ids\":{\"trakt\":56872,\"slug\":\"doctor-who-2005\",\"tvdb\":78804,\"imdb\":\"tt0436992\",\"tmdb\":57243,\"tvrage\":3332},\"overview\":\"The
+    body:
+      string: "{\"title\":\"Doctor Who\",\"year\":2005,\"ids\":{\"trakt\":56872,\"slug\":\"doctor-who-2005\",\"tvdb\":78804,\"imdb\":\"tt0436992\",\"tmdb\":57243,\"tvrage\":3332},\"overview\":\"The
         Doctor is an alien Time Lord from the planet Gallifrey who travels through
-        all of time and space in his TARDIS. He has a long list of friends and companions
-        who have shared journeys with him. Instead of dying, the Doctor is able to
-        \u201Cregenerate\u201D into a new body, taking on a new personality with each
-        regeneration. Twelve actors, plus John Hurt, have played The Doctor thus far.\",\"first_aired\":\"2005-03-26T08:00:00.000Z\",\"airs\":{\"day\":\"Saturday\",\"time\":\"20:30\",\"timezone\":\"Europe/London\"},\"runtime\":45,\"certification\":\"TV-PG\",\"network\":\"BBC
-        One\",\"country\":\"gb\",\"trailer\":null,\"homepage\":\"http://www.bbc.co.uk/programmes/b006q2x0\",\"status\":\"returning
-        series\",\"rating\":9.05669,\"votes\":13425,\"updated_at\":\"2016-12-16T10:43:27.000Z\",\"language\":\"en\",\"available_translations\":[\"bg\",\"bs\",\"ca\",\"cs\",\"da\",\"de\",\"el\",\"en\",\"es\",\"fa\",\"fi\",\"fr\",\"he\",\"hr\",\"hu\",\"id\",\"it\",\"ko\",\"nl\",\"no\",\"pl\",\"pt\",\"ro\",\"ru\",\"sv\",\"tr\",\"uk\",\"vi\",\"zh\"],\"genres\":[\"drama\",\"action\",\"adventure\",\"science-fiction\",\"fantasy\"],\"aired_episodes\":115}"}
+        all of time and space in the TARDIS. The Doctor has a long list of friends
+        and companions who have shared journeys along the way. Instead of dying, the
+        Doctor is able to \u201Cregenerate\u201D into a new body, taking on a new
+        personality with each regeneration.\",\"first_aired\":\"2005-03-26T19:00:00.000Z\",\"airs\":{\"day\":\"Sunday\",\"time\":\"19:00\",\"timezone\":\"Europe/London\"},\"runtime\":45,\"certification\":\"TV-PG\",\"network\":\"BBC
+        One\",\"country\":\"gb\",\"trailer\":\"https://youtube.com/watch?v=RYIu7Qlqh4M\",\"homepage\":\"http://www.bbc.co.uk/programmes/b006q2x0\",\"status\":\"returning
+        series\",\"rating\":8.87308,\"votes\":19177,\"comment_count\":153,\"updated_at\":\"2021-01-03T08:42:51.000Z\",\"language\":\"en\",\"available_translations\":[\"ar\",\"bg\",\"bs\",\"ca\",\"cs\",\"da\",\"de\",\"el\",\"en\",\"es\",\"et\",\"fa\",\"fi\",\"fr\",\"he\",\"hr\",\"hu\",\"id\",\"it\",\"ja\",\"ka\",\"ko\",\"lt\",\"lv\",\"nl\",\"no\",\"pl\",\"pt\",\"ro\",\"ru\",\"sk\",\"sr\",\"sv\",\"th\",\"tr\",\"uk\",\"uz\",\"vi\",\"zh\"],\"genres\":[\"drama\",\"action\",\"adventure\",\"science-fiction\",\"fantasy\"],\"aired_episodes\":147}"
     headers:
-      CF-Cache-Status: [HIT]
-      CF-RAY: [312a16629f723d19-CPH]
-      Cache-Control: ['public, max-age=28800']
-      Connection: [keep-alive]
-      Content-Type: [application/json; charset=utf-8]
-      Date: ['Sat, 17 Dec 2016 11:38:12 GMT']
-      ETag: [W/"9e1d94938bb9c169c5dc9e06272d889e"]
-      Expires: ['Sat, 17 Dec 2016 19:38:12 GMT']
-      Last-Modified: ['Fri, 16 Dec 2016 10:43:27 GMT']
-      Server: [cloudflare-nginx]
-      Vary: [Accept-Encoding]
-      X-Content-Type-Options: [nosniff]
-      X-Frame-Options: [SAMEORIGIN]
-      X-Request-Id: [7e3f2947-d085-4d0f-b1dc-9ae7e16ec1d3]
-      X-Runtime: ['0.018908']
-      X-XSS-Protection: [1; mode=block]
-    status: {code: 200, message: OK}
+      Age:
+      - '619'
+      CF-Cache-Status:
+      - HIT
+      CF-RAY:
+      - 60caabf02c1b0d8e-IAD
+      Cache-Control:
+      - public, max-age=28800
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Tue, 05 Jan 2021 05:06:43 GMT
+      ETag:
+      - W/"8d4c7ab00c3fb006405c97625b1de676"
+      Expect-CT:
+      - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+      Expires:
+      - Tue, 05 Jan 2021 12:56:23 GMT
+      Last-Modified:
+      - Sun, 03 Jan 2021 08:42:51 GMT
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cfduid=da085192987f740dc7c05274d8530e20a1609823203; expires=Thu, 04-Feb-21
+        05:06:43 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Ratelimit:
+      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":984,"until":"2021-01-03T12:40:00Z"}'
+      X-Request-Id:
+      - 0aeb933a-4759-49d0-8875-dde5db4823fa
+      X-Runtime:
+      - '0.007181'
+      X-XSS-Protection:
+      - 1; mode=block
+      cf-request-id:
+      - 077289ca1800000d8ecf19b000000001
+    status:
+      code: 200
+      message: OK
 - request:
     body: null
     headers:
-      Content-Type: [application/json]
-      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: ['2']
+      Content-Type:
+      - application/json
+      trakt-api-key:
+      - 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af
+      trakt-api-version:
+      - '2'
     method: GET
     uri: https://api.trakt.tv/shows/56872/seasons/2/episodes/3/?extended=full
   response:
-    body: {string: "{\"season\":2,\"number\":3,\"title\":\"School Reunion\",\"ids\":{\"trakt\":951447,\"tvdb\":302431,\"imdb\":\"tt0562993\",\"tmdb\":941480,\"tvrage\":0},\"number_abs\":16,\"overview\":\"Location:
-        Deffry Vale High School, London, England, Earth \\nDate: 2007 \\nEnemies:
-        The Krillitanes \\n\\nThere are strange goings-on at a comprehensive school
-        - UFOs, over-intelligent children, and odd-tasting school dinners. This attracts
-        the attention of the Tenth Doctor, Rose and Mickey Smith, as well as a couple
-        of old friends\u2026\",\"rating\":8.028,\"votes\":750,\"first_aired\":\"2006-04-29T19:30:00.000Z\",\"updated_at\":\"2016-12-17T09:53:06.000Z\",\"available_translations\":[\"cs\",\"de\",\"en\",\"es\",\"fi\",\"fr\",\"hu\"]}"}
+    body:
+      string: "{\"season\":2,\"number\":3,\"title\":\"School Reunion\",\"ids\":{\"trakt\":951447,\"tvdb\":302431,\"imdb\":\"tt0562993\",\"tmdb\":941480,\"tvrage\":null},\"number_abs\":17,\"overview\":\"Location:
+        Deffry Vale High School, London, England, Earth \\r\\nDate: 2007 \\r\\nEnemies:
+        The Krillitanes \\r\\n\\r\\nThere are strange goings-on at a comprehensive
+        school - UFOs, over-intelligent children, and odd-tasting school dinners.
+        This attracts the attention of the Tenth Doctor, Rose and Mickey Smith, as
+        well as a couple of old friends\u2026\",\"rating\":7.89708,\"votes\":1302,\"comment_count\":2,\"first_aired\":\"2006-04-29T18:00:00.000Z\",\"updated_at\":\"2021-01-05T00:18:08.000Z\",\"available_translations\":[\"ar\",\"bg\",\"bs\",\"ca\",\"cs\",\"da\",\"de\",\"el\",\"en\",\"es\",\"et\",\"fa\",\"fi\",\"fr\",\"he\",\"hr\",\"hu\",\"id\",\"it\",\"ja\",\"ka\",\"ko\",\"lt\",\"lv\",\"nl\",\"no\",\"pl\",\"pt\",\"ro\",\"ru\",\"sk\",\"sr\",\"sv\",\"th\",\"tr\",\"uk\",\"uz\",\"vi\",\"zh\"],\"runtime\":44}"
     headers:
-      CF-Cache-Status: [HIT]
-      CF-RAY: [312a16632dc73cd7-CPH]
-      Cache-Control: ['public, max-age=28800']
-      Connection: [keep-alive]
-      Content-Type: [application/json; charset=utf-8]
-      Date: ['Sat, 17 Dec 2016 11:38:12 GMT']
-      Expires: ['Sat, 17 Dec 2016 19:38:12 GMT']
-      Last-Modified: ['Sat, 17 Dec 2016 09:53:06 GMT']
-      Server: [cloudflare-nginx]
-      Set-Cookie: ['__cfduid=da53f8fac332109f4deab43b7cc6da9d71481974692; expires=Sun,
-          17-Dec-17 11:38:12 GMT; path=/; domain=.trakt.tv; HttpOnly']
-      Vary: [Accept-Encoding]
-      X-Content-Type-Options: [nosniff]
-      X-Frame-Options: [SAMEORIGIN]
-      X-Request-Id: [00b908b3-d5dc-40fe-b62b-fdd7d68fbf75]
-      X-Runtime: ['0.015278']
-      X-XSS-Protection: [1; mode=block]
-    status: {code: 200, message: OK}
+      CF-Cache-Status:
+      - MISS
+      CF-RAY:
+      - 60caabf10fa973b1-IAD
+      Cache-Control:
+      - public, max-age=28800
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Tue, 05 Jan 2021 05:06:44 GMT
+      Expect-CT:
+      - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+      Expires:
+      - Tue, 05 Jan 2021 13:06:43 GMT
+      Last-Modified:
+      - Tue, 05 Jan 2021 00:18:08 GMT
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cfduid=df67b2cd0f3c564bc9381c0a14c4770ab1609823204; expires=Thu, 04-Feb-21
+        05:06:44 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Ratelimit:
+      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":993,"until":"2021-01-05T05:10:00Z"}'
+      X-Request-Id:
+      - 1f7dca3b-eba8-4146-9252-e869ce5b7b44
+      X-Runtime:
+      - '0.013745'
+      X-XSS-Protection:
+      - 1; mode=block
+      cf-request-id:
+      - 077289caa3000073b139bed000000001
+    status:
+      code: 200
+      message: OK
 version: 1
