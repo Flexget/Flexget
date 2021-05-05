@@ -23,7 +23,7 @@ class WebHookNotify:
         endpoint: <<target endpoint | optional (default flexget/notify)>>
         method: <<method [GET|POST] | optional (default GET)>>
         headers: <<headers | optional>>
-        data: <<data object | otional (default {'title':'notify title','message':'notify message'})
+        send_data: <<data object | otional (default {'title':'notify title','message':'notify message'})
         verify_certificates: <<verify [yes|no] | optional (default yes)>>
 
     Exemple:
@@ -33,7 +33,7 @@ class WebHookNotify:
         method: 'POST'
         headers:
             token: 123_API_TOKEN
-        data:
+        send_data:
             title: '{{title}}'
             imdb: '{{imdb_id}}'
     """
@@ -58,9 +58,9 @@ class WebHookNotify:
 
         logger.debug(self.schema)
         send_webhook = plugin.get_plugin_by_name('hook_framework').instance.send_hook
-        data = {"title": title, "message": message}
+        send_data = {"title": title, "message": message}
         new_config = {WEBHOOK_PLUGIN: {**config}}
-        send_webhook(title, data, new_config)
+        send_webhook(title, send_data, new_config)
 
 
 @event('plugin.register')

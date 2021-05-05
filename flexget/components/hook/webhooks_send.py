@@ -24,7 +24,7 @@ class WebHooksSend:
         endpoint: <<target endpoint | optional>>
         method: <<method [GET|POST] | optional (default GET)>>
         headers: <<headers | optional>>
-        data: <<data object | otional (default 'accepted entry')
+        send_data: <<data object | otional (default 'accepted entry')
 
     Exemple:
       webhooks_send:
@@ -33,7 +33,7 @@ class WebHooksSend:
         method: 'POST'
         headers:
             token: 123_API_TOKEN
-        data:
+        send_data:
             title: '{{title}}'
             imdb: '{{imdb_id}}'
     """
@@ -47,7 +47,7 @@ class WebHooksSend:
 
     def process_config(self, config):
         config = webhooks_config_process(config)
-        config['data'] = hooks_data_process(config.get('data'))
+        config['send_data'] = hooks_data_process(config.get('send_data'))
         config.setdefault('title', '')
         config.setdefault('verify_certificates', True)
         return config
@@ -62,7 +62,7 @@ class WebHooksSend:
         config_params['host'] = config['host']
         config_params['method'] = config['method']
         config_params['headers'] = config['headers']
-        config_params['data'] = config['data']
+        config_params['send_data'] = config['send_data']
         config_params['verify_certificates'] = task.requests.verify
         if 'endpoint' in config:
             config_params['endpoint'] = config['endpoint']

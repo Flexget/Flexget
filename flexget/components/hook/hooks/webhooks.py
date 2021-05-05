@@ -29,7 +29,7 @@ class WebHooks:
         endpoint: <<target endpoint | optional (default 'event'/'name'/'stage')>>
         method: <<method [GET|POST] | optional (default GET)>>
         headers: <<headers | optional>>
-        data: <<data object | otional (default 'task data')
+        send_data: <<data object | otional (default 'task data')
         verify_certificates: <<verify [yes|no] | optional (default yes)>>
 
     Exemple:
@@ -39,7 +39,7 @@ class WebHooks:
         method: 'POST'
         headers:
             token: 123_API_TOKEN
-        data:
+        send_data:
             title: '{{title}}'
             imdb: '{{imdb_id}}'
     """
@@ -58,46 +58,46 @@ class WebHooks:
     def process_config(self, config: dict):
         config = webhooks_config_process(config)
 
-        if 'data' in config:
-            config['data'] = hooks_data_process(config.get('data'))
+        if 'send_data' in config:
+            config['send_data'] = hooks_data_process(config.get('send_data'))
 
         config.setdefault('verify_certificates', True)
 
         return config
 
-    def send_hook(self, title, data, config):
+    def send_hook(self, title, send_data, config):
         config = self.process_config(config)
 
-        event_tree = data.get('event_tree', [])
+        event_tree = send_data.get('event_tree', [])
 
-        data_default = hooks_data_process(data)
+        data_default = hooks_data_process(send_data)
         title_default = title
 
         host = config.get('host')
         endpoint = config.get('endpoint', '/'.join(event_tree))
-        data = config.get('data', data_default)
+        send_data = config.get('send_data', data_default)
         title = config.get('title', title_default)
 
         url = f'{host}/{endpoint}'
 
         try:
             if config['method'] == 'GET':
-                if isinstance(data, (dict, list)):
-                    data = jsonify(data)
+                if isinstance(send_data, (dict, list)):
+                    send_data = jsonify(send_data)
 
                 response = requests.get(
                     url,
-                    params=data,
+                    params=send_data,
                     headers=config['headers'],
                     allow_redirects=True,
                     verify=config['verify_certificates'],
                 )
             elif config['method'] == 'POST':
                 params = {}
-                if isinstance(data, (dict, list)):
-                    params['json'] = data
+                if isinstance(send_data, (dict, list)):
+                    params['json'] = send_data
                 else:
-                    params['data'] = data
+                    params['send_data'] = send_data
 
                 response = requests.post(
                     url,

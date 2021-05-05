@@ -10,7 +10,7 @@ from flexget.task import EntryIterator, EntryContainer
 WEBHOOK_PLUGIN = 'webhooks'
 
 HOOK_SCHEMA_DATA = {
-    'data': {
+    'send_data': {
         'oneOf': [
             {'type': 'object', 'minProperties': 1},
             {'type': 'string'},
@@ -60,20 +60,20 @@ def strisjson(data):
     return False
 
 
-def hooks_data_process(data):
+def hooks_data_process(send_data):
     """
     Process the data object from the Hooks
     """
 
-    if not data:
+    if not send_data:
         return ''
 
-    if isinstance(data, str) and strisjson(data):
-        data = json.loads(data)
+    if isinstance(send_data, str) and strisjson(send_data):
+        send_data = json.loads(send_data)
     else:
-        data = jsonify(data)
+        send_data = jsonify(send_data)
 
-    return data
+    return send_data
 
 
 def webhooks_config_process(config: dict):

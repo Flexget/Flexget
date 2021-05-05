@@ -22,6 +22,7 @@ class Hook:
       stages <<stages to lisen [start|end] optional>>
       tasks  <<tasks to lisen optional>>
       plugins <<plugins to lisen optional>>
+      builtins <<yes|no track bultins>>
       when <<when to trigger [accepted|rejected|failed|no_entries|aborted] optional
       phases <<phases to lisen>>
       via
@@ -38,7 +39,7 @@ class Hook:
                 host: 'https://noderedurl.1880'
                 method: 'get'
                 endpoint: 'flexget/{{event_tree|join('/')}}'
-                data:
+                send_data:
                   task: '{{task_name}}'
 
     """
@@ -60,6 +61,7 @@ class Hook:
                 'stages': one_or_more({'type': 'string', 'enum': ['start', 'end']}),
                 'tasks': one_or_more({'type': 'string'}),
                 'plugins': one_or_more({'type': 'string'}),
+                'builtins': {'type': 'boolean', 'default': False},
                 'when': one_or_more(
                     {
                         'type': 'string',
@@ -97,17 +99,23 @@ class Hook:
     )
 
     @staticmethod
-    def send_hook(title, data: dict, hooks, *args, **kwargs):
+    def send_hook(title, send_data: dict, hooks, *args, **kwargs):
+        """
+        Send a hook out using hook framework
+        param str title: Title for the hook
+        param send_data dict: Data to send
+        param hooks dict: Config hook to send
+        """
         hooks_run = []
         for hook in hooks:
-            if Hook.check_run_hook(hook, data, **kwargs):
+            if Hook.check_run_hook(hook, send_data, **kwargs):
                 hooks_run.append(hook)
 
         if not hooks_run:
             return
 
         send_hook = plugin.get_plugin_by_name('hook_framework').instance.send_hook
-        send_hook(title, data, hooks, *args, **kwargs)
+        send_hook(title, send_data, hooks, *args, **kwargs)
 
     @staticmethod
     def set_config(task: Task, configs: dict):
@@ -213,9 +221,6 @@ class Hook:
         if not config:
             return
 
-        if Hook._is_builtins(plugin_e):
-            return
-
         Hook.send_hook(
             None,
             task_to_dict(self),
@@ -230,9 +235,6 @@ class Hook:
     def on_plugin_ended(self, plugin_e):
         config = Hook.get_config(self)
         if not config:
-            return
-
-        if Hook._is_builtins(plugin_e):
             return
 
         Hook.send_hook(
@@ -278,7 +280,7 @@ class Hook:
         )
 
     @staticmethod
-    def check_run_hook(config: dict, data: dict, **keyarg) -> bool:
+    def check_run_hook(config: dict, send_data: dict, **keyarg) -> bool:
         if not config:
             return False
 
@@ -297,14 +299,15 @@ class Hook:
         config_stage = config.get('stages')
         config_phases = config.get('phases')
         config_plugins = config.get('plugins')
+        config_builtins = config.get('builtins')
         config_when = config.get('when')
 
         conditions = [
-            data.get('accepted') and 'accepted' in config_when,
-            data.get('rejected') and 'rejected' in config_when,
-            data.get('failed') and 'failed' in config_when,
-            data.get('aborted') and 'aborted' in config_when,
-            not data.get('all_entries') and 'no_entries' in config_when,
+            send_data.get('accepted') and 'accepted' in config_when,
+            send_data.get('rejected') and 'rejected' in config_when,
+            send_data.get('failed') and 'failed' in config_when,
+            send_data.get('aborted') and 'aborted' in config_when,
+            not send_data.get('all_entries') and 'no_entries' in config_when,
         ]
         if not any(conditions):
             return False
@@ -325,6 +328,13 @@ class Hook:
             event_name == ENDPOINT['EVENT_PLUGIN']
             and config_plugins
             and name not in config_plugins
+        ):
+            return False
+
+        if (
+            event_name == ENDPOINT['EVENT_PLUGIN']
+            and not config_builtins
+            and Hook._is_builtins(name)
         ):
             return False
 

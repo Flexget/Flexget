@@ -19,7 +19,7 @@ class NotifyHooks:
     Config:
       notifyhooks:
         title: <<title | optional>>
-        data: <<data object | otional (default 'task data')
+        send_data: <<data object | otional (default 'task data')
         verify_certificates: <<verify [yes|no] | optional (default yes)>>
       via
         - <<notify plugin>>
@@ -28,7 +28,7 @@ class NotifyHooks:
     Exemple:
     notifyhooks:
         title: '{{task_name}}'
-        data: Running task {{task_name}} in {{event_type}} {{event_name}} {{event_stage}}, got {{accepted|length}} accepted
+        send_data: Running task {{task_name}} in {{event_type}} {{event_name}} {{event_stage}}, got {{accepted|length}} accepted
         via:
             - telegram:
                 bot_token: "<<token>>"
@@ -64,28 +64,28 @@ class NotifyHooks:
     def process_config(self, config: dict):
         config = webhooks_config_process(config)
 
-        if 'data' in config:
-            config['data'] = hooks_data_process(config.get('data'))
+        if 'send_data' in config:
+            config['send_data'] = hooks_data_process(config.get('send_data'))
 
         config.setdefault('verify_certificates', True)
         config.setdefault('via', [])
 
         return config
 
-    def send_hook(self, title, data, config):
+    def send_hook(self, title, send_data, config):
         config = self.process_config(config)
 
-        if 'data' in config:
-            config['data'] = hooks_data_process(config.get('data'))
+        if 'send_data' in config:
+            config['send_data'] = hooks_data_process(config.get('send_data'))
 
-        data_default = hooks_data_process(data)
+        data_default = hooks_data_process(send_data)
         title_default = title
 
         via = config['via']
-        data = config.get('data', data_default)
+        send_data = config.get('send_data', data_default)
         title = config.get('title', title_default)
 
-        message = data
+        message = send_data
 
         send_notification = plugin.get_plugin_by_name(
             'notification_framework'
