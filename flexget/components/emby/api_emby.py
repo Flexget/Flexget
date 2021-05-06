@@ -8,7 +8,7 @@ import functools
 from requests.exceptions import RequestException, HTTPError
 from loguru import logger
 
-from flexget.utils.tools import get_current_flexget_version  # , split_title_year
+from flexget.utils.tools import get_current_flexget_version, split_title_year
 from flexget.utils import requests
 from flexget.plugin import PluginError
 from flexget.entry import Entry
@@ -119,12 +119,10 @@ class EmbyApiBase(ABC):
 
     @staticmethod
     def strip_year(name: str) -> str:
-        new_name = name
-
-        if not isinstance(name, str):
+        if not name or not isinstance(name, str):
             return name
 
-        new_name = re.sub(r'^(.*) \(\d{4}\)(.*)', r'\1\2', new_name)
+        new_name, new_year = split_title_year(name)
         if not new_name or new_name == "":
             return name
 
