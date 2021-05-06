@@ -4,7 +4,7 @@ from time import time
 from loguru import logger
 from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.orm.query import Query
-from sqlalchemy.sql.expression import ClauseElement, Executable, _literal_as_text
+from sqlalchemy.sql.expression import ClauseElement, Executable
 
 from flexget import manager, options
 from flexget.event import event
@@ -14,7 +14,7 @@ logger = logger.bind(name='explain_sql')
 
 class Explain(Executable, ClauseElement):
     def __init__(self, stmt):
-        self.statement = _literal_as_text(stmt)
+        self.statement = stmt.__clause_element__()
 
 
 @compiles(Explain)
