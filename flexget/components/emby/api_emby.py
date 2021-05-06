@@ -8,7 +8,7 @@ import functools
 from requests.exceptions import RequestException, HTTPError
 from loguru import logger
 
-from flexget.utils.tools import get_current_flexget_version  # , split_title_year
+from flexget.utils.tools import get_current_flexget_version, split_title_year
 from flexget.utils import requests
 from flexget.plugin import PluginError
 from flexget.entry import Entry
@@ -1240,7 +1240,7 @@ class EmbyApiMedia(EmbyApiBase):
         EmbyApi.set_provideres_search_arg(args, **kwargs)
         EmbyApi.set_common_search_arg(args)
 
-        args['SearchTerm'] = kwargs.get('title')
+        args['SearchTerm'] = split_title_year(kwargs.get('title')).title
 
         logger.debug('Search media with: {}', args)
         medias = EmbyApi.resquest_emby(EMBY_ENDPOINT_SEARCH, auth, 'GET', **args)
@@ -1363,7 +1363,7 @@ class EmbyApiSerie(EmbyApiMedia):
         if 'serie_id' in parameters:
             args['Ids'] = parameters.get('serie_id')
         elif not EmbyApi.set_provideres_search_arg(args, **kwargs):
-            args['SearchTerm'] = parameters.get('serie_name')
+            args['SearchTerm'] = split_title_year(kwargs.get('title')).title
 
         EmbyApi.set_common_search_arg(args)
         args['IncludeItemTypes'] = 'Series'
@@ -1908,7 +1908,7 @@ class EmbyApiMovie(EmbyApiMedia):
             args['Ids'] = parameters.get('movie_id')
         else:
             if 'movie_name' in parameters:
-                args['SearchTerm'] = parameters.get('movie_name')
+                args['SearchTerm'] = split_title_year(kwargs.get('title')).title
 
             if 'movie_year' in parameters:
                 args['Years'] = parameters.get('movie_year')
