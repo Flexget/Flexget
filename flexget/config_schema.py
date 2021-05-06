@@ -4,6 +4,7 @@ import re
 from collections import defaultdict
 from typing import Any, Callable, Dict, List, Match, Optional, Pattern, Union
 from urllib.parse import parse_qsl, urlparse
+from json import JSONDecodeError, loads as json_loads
 
 import jsonschema
 from jsonschema import ValidationError
@@ -306,6 +307,19 @@ def is_valid_template(instance) -> bool:
     if not isinstance(instance, str_types):
         return True
     return get_template(instance) is not None
+
+
+@format_checker.checks('json', raises=ValueError)
+def is_json(instance) -> bool:
+    if not isinstance(instance, str):
+        return False
+
+    try:
+        decoded_json = json_loads(instance)
+    except JSONDecodeError as e:
+        raise ValueError('`%s` is not a valid json' % instance)
+
+    return True
 
 
 def set_error_message(error: jsonschema.ValidationError) -> None:
