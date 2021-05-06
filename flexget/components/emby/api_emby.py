@@ -117,6 +117,19 @@ class EmbyApiBase(ABC):
 
                 break
 
+    @staticmethod
+    def strip_year(name: str) -> str:
+        new_name = name
+
+        if not isinstance(name, str):
+            return name
+
+        new_name = re.sub(r'^(.*) \(\d{4}\)(.*)', r'\1\2', new_name)
+        if not new_name or new_name == "":
+            return name
+
+        return new_name
+
 
 class EmbyAuth(EmbyApiBase):
     """
@@ -1240,7 +1253,7 @@ class EmbyApiMedia(EmbyApiBase):
         EmbyApi.set_provideres_search_arg(args, **kwargs)
         EmbyApi.set_common_search_arg(args)
 
-        args['SearchTerm'] = kwargs.get('title')
+        args['SearchTerm'] = EmbyApi.strip_year(kwargs.get('title'))
 
         logger.debug('Search media with: {}', args)
         medias = EmbyApi.resquest_emby(EMBY_ENDPOINT_SEARCH, auth, 'GET', **args)
@@ -1363,7 +1376,7 @@ class EmbyApiSerie(EmbyApiMedia):
         if 'serie_id' in parameters:
             args['Ids'] = parameters.get('serie_id')
         elif not EmbyApi.set_provideres_search_arg(args, **kwargs):
-            args['SearchTerm'] = parameters.get('serie_name')
+            args['SearchTerm'] = EmbyApi.strip_year(parameters.get('serie_name'))
 
         EmbyApi.set_common_search_arg(args)
         args['IncludeItemTypes'] = 'Series'
@@ -1908,7 +1921,7 @@ class EmbyApiMovie(EmbyApiMedia):
             args['Ids'] = parameters.get('movie_id')
         else:
             if 'movie_name' in parameters:
-                args['SearchTerm'] = parameters.get('movie_name')
+                args['SearchTerm'] = EmbyApi.strip_year(parameters.get('movie_name'))
 
             if 'movie_year' in parameters:
                 args['Years'] = parameters.get('movie_year')
