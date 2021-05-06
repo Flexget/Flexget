@@ -21,6 +21,7 @@ from typing import (
     Iterable,
     Iterator,
     List,
+    NamedTuple,
     Optional,
     Pattern,
     Sequence,
@@ -321,17 +322,22 @@ class BufferQueue(queue.Queue):
         self.put(line)
 
 
-def split_title_year(title: str) -> Tuple[str, Optional[int]]:
+class TitleYear(NamedTuple):
+    title: str
+    year: Optional[int]
+
+
+def split_title_year(title: str) -> TitleYear:
     """Splits title containing a year into a title, year pair."""
     if not title:
-        return '', None
+        return TitleYear('', None)
     if not re.search(r'\d{4}', title):
-        return title, None
+        return TitleYear(title, None)
     # We only recognize years from the 2nd and 3rd millennium, FlexGetters from the year 3000 be damned!
     match = re.search(r'(.*?)\(?([12]\d{3})?\)?$', title)
 
     if not match:
-        return title, None
+        return TitleYear(title, None)
     title = match.group(1).strip()
     year_match = match.group(2)
 
@@ -343,7 +349,7 @@ def split_title_year(title: str) -> Tuple[str, Optional[int]]:
         year = None
     else:
         year = int(year_match)
-    return title, year
+    return TitleYear(title, year)
 
 
 def get_latest_flexget_version_number() -> Optional[str]:
