@@ -1779,6 +1779,17 @@ class TestImportSeries:
                   - {title: 'the show', configure_series_alternate_name: 'le show'}
             mock:
               - title: le show s03e03
+          test_manual_config_override:
+            configure_series:
+              from:
+                mock:
+                - title: my show
+              settings:
+                identified_by: ep
+                quality: 720p
+            series:
+            - my show:
+                identified_by: sequence
     """
 
     def test_timeframe_max(self, execute_task):
@@ -1797,6 +1808,15 @@ class TestImportSeries:
         entry = task.find_entry(title='le show s03e03')
         assert entry.accepted, 'entry matching series alternate name should have been accepted.'
         assert entry['series_name'] == 'the show', 'entry series should be set to the main name'
+
+    def test_manual_config_override(self, execute_task):
+        """Settings configued manually in series plugin should override those from configure_series."""
+        task = execute_task('test_manual_config_override')
+        series_config = task.config['series'][0]['my show']
+        assert series_config['quality'] == '720p', 'configure_series settings should be merged in'
+        assert (
+            series_config['identified_by'] == 'sequence'
+        ), 'series plugin settings should override configure_series ones'
 
 
 class TestIDTypes:
