@@ -295,7 +295,7 @@ class PluginTransmission(TransmissionBase):
                     'password': {'type': 'string'},
                     'action': {
                         'type': 'string',
-                        'enum': ['add', 'remove', 'purge', 'pause', 'resume', 'bypass_queue'],
+                        'enum': ['add', 'remove', 'purge', 'pause', 'resume', 'bypass_queue', 'move_data'],
                     },
                     'path': {'type': 'string'},
                     'max_up_speed': {'type': 'number'},
@@ -642,6 +642,9 @@ class PluginTransmission(TransmissionBase):
                 elif config['action'] == 'bypass_queue':
                     start_torrent(bypass_queue=True)
                     logger.info('resumed (bypass queue) {} in transmission', torrent_info.name)
+                elif config['action'] == 'move_data':
+                    self.client.move_torrent_data([torrent_info.id], config['path'])
+                    logger.info('set data location for {} to {} in transmission', torrent_info.name, config['path'])
 
             except TransmissionError as e:
                 logger.opt(exception=True).debug('TransmissionError')
