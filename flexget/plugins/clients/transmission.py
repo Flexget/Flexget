@@ -643,8 +643,11 @@ class PluginTransmission(TransmissionBase):
                     start_torrent(bypass_queue=True)
                     logger.info('resumed (bypass queue) {} in transmission', torrent_info.name)
                 elif config['action'] == 'move_data':
-                    self.client.move_torrent_data([torrent_info.id], config['path'])
-                    logger.info('set data location for {} to {} in transmission', torrent_info.name, config['path'])
+                    try:
+                        self.client.move_torrent_data([torrent_info.id], self._render_path(entry, config['path']))
+                        logger.info('set data location for {} to {} in transmission', torrent_info.name, config['path'])
+                    except RenderError as e:
+                        logger.error('Error setting data location for {}: {}', entry['title'], e)
 
             except TransmissionError as e:
                 logger.opt(exception=True).debug('TransmissionError')
@@ -690,13 +693,9 @@ class PluginTransmission(TransmissionBase):
         add = options['add']
         if opt_dic.get('path'):
             try:
-                path = os.path.expanduser(entry.render(opt_dic['path']))
+                add['download_dir'] = self._render_path(opt_dic['path'])
             except RenderError as e:
                 logger.error('Error setting path for {}: {}', entry['title'], e)
-            else:
-                # Transmission doesn't like it when paths end in a separator
-                path = path.rstrip('\\/')
-                add['download_dir'] = pathscrub(path)
         # make sure we add it paused, will modify status after adding
         add['paused'] = True
 
@@ -756,6 +755,10 @@ class PluginTransmission(TransmissionBase):
         if 'rename_like_files' in opt_dic:
             post['rename_like_files'] = opt_dic['rename_like_files']
         return options
+
+    def _render_path(self, path, entry):
+        # Transmission doesn't like it when paths end in a separator
+        return pathscrub(os.path.expanduser(entry.render(path)).rstrip('\\/'))
 
     def on_task_learn(self, task, config):
         """ Make sure all temp files are cleaned up when entries are learned """
