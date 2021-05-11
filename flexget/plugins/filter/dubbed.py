@@ -247,8 +247,8 @@ class Dubbed:
         if not isinstance(_action, dict):
             _action = {
                 DEFAULT: _action,
-                NATIVE: ACTION_ACCEPT if _action == ACTION_REJECT else ACTION_ACCEPT,
-                UNKNOWN: ACTION_REJECT,
+                NATIVE: ACTION_ACCEPT if _action == ACTION_REJECT else ACTION_REJECT,
+                UNKNOWN: ACTION_ACCEPT if _action == ACTION_ACCEPT else ACTION_REJECT,
             }
 
         _config['action'] = {}
