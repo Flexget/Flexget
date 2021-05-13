@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod, abstractstaticmethod
 from collections.abc import MutableSet
 from datetime import datetime
 import re
+import copy
 from urllib.parse import urlencode
 
 import functools
@@ -16,6 +17,9 @@ from flexget.utils.simple_persistence import SimplePersistence
 from flexget.components.emby.emby_util import get_field_map
 
 persist = SimplePersistence('api_emby')
+
+LOGIN_API = 'api'
+LOGIN_USER = 'user'
 
 EMBY_ENDPOINT_LOGIN = '/emby/Users/AuthenticateByName'
 EMBY_ENDPOINT_SEARCH = '/emby/Users/{userid}/Items'
@@ -50,17 +54,17 @@ class EmbyApiBase(ABC):
 
         allow_new = kwargs.get('allow_new', False)
 
-        destination = dst.copy()
+        destination = copy.deepcopy(dst)
 
         for src in arg:
-            source = src.copy()
+            source = copy.deepcopy(src)
 
             for key in source:
                 if key in destination and isinstance(destination[key], str):
                     destination[key] = [destination[key]]
                 elif key not in destination and not allow_new:
                     continue
-                elif allow_new:
+                elif key not in destination and allow_new:
                     destination[key] = []
 
                 if isinstance(source[key], str):
@@ -153,6 +157,7 @@ class EmbyAuth(EmbyApiBase):
     _wanurl = None
     _lanurl = None
     _can_download = None
+    _login_type = None
 
     def __init__(self, **kwargs):
         if 'server' in kwargs:
@@ -168,9 +173,10 @@ class EmbyAuth(EmbyApiBase):
         userdata = None
 
         if not self._apikey:
-            userdata = self.check_token_data(persist.get('token_data'))
+            self._login_type = LOGIN_USER
+            userdata = self.check_token_data(persist.get('token_data'), LOGIN_USER)
             if not userdata:
-                logger.debug('Login to {} with username {}', self.host, self.username)
+                logger.debug('Login to {} with username {} and password', self.host, self.username)
                 args = {'Username': self._username, 'Pw': self._password}
 
                 login_data = EmbyApi.resquest_emby(EMBY_ENDPOINT_LOGIN, self, 'POST', **args)
@@ -178,16 +184,22 @@ class EmbyAuth(EmbyApiBase):
                 if not login_data and optional:
                     return
                 elif not login_data:
+                    self.logout()
                     raise PluginError('Could not login to Emby')
 
                 userdata = login_data.get('User')
                 self._token = login_data.get('AccessToken')
+            else:
+                allow_retry = True
         else:
+            logger.debug('Login to {} with username {} and apikey', self.host, self.username)
             userdata = self.get_user_by_name(self._username)
+            self._login_type = LOGIN_API
 
         if not userdata and optional:
             return
         elif not userdata:
+            self.logout()
             raise PluginError('Could not login to Emby')
 
         self._username = userdata.get('Name')
@@ -205,6 +217,14 @@ class EmbyAuth(EmbyApiBase):
         if serverinfo:
             self._wanurl = serverinfo.get('WanAddress')
             self._lanurl = serverinfo.get('LocalAddress')
+        elif allow_retry:
+            logger.debug('Try to clean token data to login again')
+            self.logout()
+            self.login()
+            return
+        else:
+            self.logout()
+            raise PluginError('Could not login to Emby')
 
         self.save_token_data()
         EmbyAuth._last_auth = self
@@ -214,7 +234,10 @@ class EmbyAuth(EmbyApiBase):
         self._token = None
         self._logged = False
 
-    def check_token_data(self, token_data):
+        if 'token_data' in persist:
+            persist['token_data']['token'] = None
+
+    def check_token_data(self, token_data, login_type):
         """Checks saved tokens"""
         if not token_data:
             return False
@@ -224,11 +247,14 @@ class EmbyAuth(EmbyApiBase):
             or 'userid' not in token_data
             or token_data.get('username') != self._username
             or token_data.get('host') != self.host
+            or login_type != token_data.get('login_type')
         ):
+            self.logout()
             return False
 
         self._userid = token_data.get('userid')
         self._token = token_data.get('token')
+        self._login_type = token_data.get('type')
         self._logged = True
         endpoint = EMBY_ENDPOINT_USERINFO.format(userid=token_data['userid'])
         response = EmbyApi.resquest_emby(endpoint, self, 'GET')
@@ -252,6 +278,9 @@ class EmbyAuth(EmbyApiBase):
         if self._apikey or not self.host or not self.username:
             return
 
+        if self._login_type == LOGIN_API:
+            return
+
         logger.debug('Saving emby token to database')
 
         persist['token_data'] = {
@@ -260,6 +289,7 @@ class EmbyAuth(EmbyApiBase):
             'userid': self._userid,
             'serverid': self._serverid,
             'token': self._token,
+            'login_type': self._login_type,
         }
 
     @property
@@ -387,9 +417,9 @@ class EmbyApiListBase(EmbyApiBase):
             args['SortOrder'] = self.sort['order']
 
         if not self.types or len(self.types) == 0:
-            args['IncludeItemTypes'] = 'Movie,Episode'
+            args['IncludeItemTypes'] = 'Movie;Episode'
         else:
-            args['IncludeItemTypes'] = ','.join(self.types)
+            args['IncludeItemTypes'] = ';'.join(self.types)
 
     def add(self, entry: Entry):
         """Adds a item to list"""
@@ -844,6 +874,7 @@ class EmbyApiPlayList(EmbyApiListBase):
             return
         self.id = None
         self._internal_items = []
+        self.playlist_bind = {}
 
     def fill_items(self):
         args = {}
@@ -858,6 +889,7 @@ class EmbyApiPlayList(EmbyApiListBase):
         items = EmbyApi.resquest_emby(endpoint, self.auth, 'GET', **args)
         self._internal_items = items['Items'] if items else []
 
+        self.playlist_bind = {}
         for media in self._internal_items:
             self.playlist_bind[media['Id']] = media['PlaylistItemId']
 
@@ -991,19 +1023,14 @@ class EmbyApiMedia(EmbyApiBase):
         if not kwargs:
             return
 
-        myfield_map = EmbyApiMedia.field_map
+        myfield_map = EmbyApiMedia.field_map.copy()
 
         if 'field_map' in kwargs:
             myfield_map = EmbyApiBase.merge_field_map(myfield_map, kwargs.get('field_map'))
 
         EmbyApiBase.update_using_map(self, EmbyApiMedia.field_map, kwargs)
 
-        if 'auth' in kwargs:
-            auth = kwargs.get('auth')
-        else:
-            auth = EmbyAuth()
-
-        self.auth = auth
+        self.auth = EmbyApi.get_auth(**kwargs)
 
         if self.created_date:
             self.created_date = EmbyApi.strtotime(self.created_date)
@@ -1043,11 +1070,18 @@ class EmbyApiMedia(EmbyApiBase):
 
         self.library = self.get_libary()
 
-    def get_libary(self) -> 'EmbyApiLibrary':
+    def _get_parents(self) -> dict:
         args = {'userid': self.auth.uid}
 
         endpoint = EMBY_ENDPOINT_PARENTS.format(itemid=self.id)
         parents = EmbyApi.resquest_emby(endpoint, self.auth, 'GET', **args)
+        if not parents:
+            return
+
+        return parents
+
+    def get_libary(self) -> 'EmbyApiLibrary':
+        parents = self._get_parents()
         if not parents:
             return
 
@@ -1181,6 +1215,9 @@ class EmbyApiMedia(EmbyApiBase):
 
     @property
     def host(self) -> str:
+        if not self.auth:
+            return ''
+
         if self.auth.return_host == 'lan' and self.auth.lanurl:
             host = f'{self.auth.lanurl}@'
         elif self.auth.return_host == 'wan' and self.auth.wanurl:
@@ -1215,6 +1252,19 @@ class EmbyApiMedia(EmbyApiBase):
         )
 
         return f'{self.host}{endpoint}?{qstr}'
+
+    @classmethod
+    def get_from_child(cls, child: "EmbyApiMedia") -> "EmbyApiMedia":
+        parents = cls._get_parents(child)
+        if not parents:
+            return None
+
+        for parent in parents:
+            if not 'Type' in parent or parent['Type'].lower() != cls.TYPE:
+                continue
+            season = cls.cast(**parent)
+            if isinstance(season, cls):
+                return season
 
     @staticmethod
     def cast(**kwargs) -> 'EmbyApiMedia':
@@ -1362,8 +1412,9 @@ class EmbyApiSerie(EmbyApiMedia):
 
         if 'serie_id' in parameters:
             args['Ids'] = parameters.get('serie_id')
-        elif not EmbyApi.set_provideres_search_arg(args, **kwargs):
-            args['SearchTerm'] = split_title_year(kwargs.get('title')).title
+        else:
+            EmbyApi.set_provideres_search_arg(args, **kwargs)
+            args['SearchTerm'] = split_title_year(parameters.get('name')).title
 
         EmbyApi.set_common_search_arg(args)
         args['IncludeItemTypes'] = 'Series'
@@ -1400,8 +1451,8 @@ class EmbyApiSeason(EmbyApiMedia):
 
     TYPE = 'season'
 
+    _serie = None
     season = None
-    serie = None
 
     field_map = {'season': ['season', 'IndexNumber']}
 
@@ -1430,9 +1481,11 @@ class EmbyApiSeason(EmbyApiMedia):
         EmbyApiBase.update_using_map(self, EmbyApiSeason.field_map, kwargs)
 
         if 'api_serie' not in kwargs:
-            self.serie = kwargs.get('api_serie')
+            self._serie = kwargs.get('api_serie')
+        elif self.serie:
+            self._serie = self.serie
         else:
-            self.serie = EmbyApiSerie.search(**kwargs) or EmbyApiSerie(auth=self.auth)
+            self._serie = EmbyApiSerie.search(**kwargs) or EmbyApiSerie(auth=self.auth)
 
     def to_dict(self) -> dict:
         if not self:
@@ -1493,6 +1546,14 @@ class EmbyApiSeason(EmbyApiMedia):
     @property
     def season_page(self) -> str:
         return self.page
+
+    @property
+    def serie(self) -> EmbyApiSerie:
+        if isinstance(self._serie, EmbyApiSerie):
+            return self._serie
+
+        self._serie = EmbyApiSerie.get_from_child(self)
+        return self._serie
 
     @staticmethod
     def is_type(**kwargs) -> bool:
@@ -1580,6 +1641,10 @@ class EmbyApiEpisode(EmbyApiMedia):
 
     TYPE = 'episode'
 
+    _serie = None
+    _season = None
+    episode = None
+
     field_map = {'episode': ['episode', 'IndexNumber']}
 
     field_map_up = {
@@ -1610,14 +1675,18 @@ class EmbyApiEpisode(EmbyApiMedia):
         EmbyApiBase.update_using_map(self, EmbyApiEpisode.field_map, kwargs)
 
         if 'api_serie' in kwargs:
-            self.serie = kwargs.get('api_serie')
+            self._serie = kwargs.get('api_serie')
+        elif self.serie:
+            self._serie = self.serie
         else:
-            self.serie = EmbyApiSerie.search(**kwargs) or EmbyApiSerie(auth=self.auth)
+            self._serie = EmbyApiSerie.search(**kwargs) or EmbyApiSerie(auth=self.auth)
 
         if 'api_season' in kwargs:
-            self.season = kwargs.get('api_season')
+            self._season = kwargs.get('api_season')
+        elif self.season:
+            self._season = self.season
         else:
-            self.season = EmbyApiSeason.search(**kwargs) or EmbyApiSeason(auth=self.auth)
+            self._season = EmbyApiSeason.search(**kwargs) or EmbyApiSeason(auth=self.auth)
 
     def to_dict(self) -> dict:
         if not self:
@@ -1688,6 +1757,22 @@ class EmbyApiEpisode(EmbyApiMedia):
     def ep_aired_date(self) -> 'datetime':
         return self.aired_date
 
+    @property
+    def season(self) -> EmbyApiSeason:
+        if isinstance(self._season, EmbyApiSeason):
+            return self._season
+
+        self._season = EmbyApiSeason.get_from_child(self)
+        return self._season
+
+    @property
+    def serie(self) -> EmbyApiSerie:
+        if isinstance(self._serie, EmbyApiSerie):
+            return self._serie
+
+        self._serie = EmbyApiSerie.get_from_child(self)
+        return self._serie
+
     @staticmethod
     def search(**kwargs) -> 'EmbyApiEpisode':
         episode_serie = None
@@ -1753,7 +1838,10 @@ class EmbyApiEpisode(EmbyApiMedia):
             logger.warning('No episode found')
             return
 
-        target_episode = parameters.get('episode')
+        if 'Ids' in args:
+            target_episode = episodes[0]['IndexNumber']
+        else:
+            target_episode = parameters.get('episode')
 
         episode = []
         episode = list(filter(lambda e: e['IndexNumber'] == target_episode, episodes))
@@ -1908,7 +1996,7 @@ class EmbyApiMovie(EmbyApiMedia):
             args['Ids'] = parameters.get('movie_id')
         else:
             if 'movie_name' in parameters:
-                args['SearchTerm'] = split_title_year(kwargs.get('title')).title
+                args['SearchTerm'] = split_title_year(parameters.get('movie_name')).title
 
             if 'movie_year' in parameters:
                 args['Years'] = parameters.get('movie_year')
@@ -1970,27 +2058,29 @@ class EmbyApi(EmbyApiBase):
     @staticmethod
     def set_common_search_arg(args: dict):
         args['Recursive'] = True
-        args['Fields'] = ','.join(EmbyApi.EMBY_EXTRA_FIELDS)
+        args['Fields'] = ';'.join(EmbyApi.EMBY_EXTRA_FIELDS)
+        args['IsMissing'] = False
 
     @staticmethod
     def set_provideres_search_arg(args: dict, **kwargs):
         providers = []
 
-        if 'imdb_id' in kwargs:
+        if 'imdb_id' in kwargs and kwargs['imdb_id']:
             providers.append(f'imdb.{kwargs.get("imdb_id")}')
-        if 'tmdb_id' in kwargs:
+        if 'tmdb_id' in kwargs and kwargs['tmdb_id']:
             providers.append(f'tmdb.{kwargs.get("tmdb_id")}')
-        if 'tvdb_id' in kwargs:
+        if 'tvdb_id' in kwargs and kwargs['tvdb_id']:
             providers.append(f'tvdb.{kwargs.get("tvdb_id")}')
-        if 'tvrage_id' in kwargs:
+        if 'tvrage_id' in kwargs and kwargs['tvrage_id']:
             providers.append(f'tvrage.{kwargs.get("tvrage_id")}')
-
-        if len(providers) == 0:
-            return
 
         providers = list(dict.fromkeys(providers))
 
-        args['AnyProviderIdEquals'] = ','.join(providers)
+        providers_str = ';'.join(providers)
+        if not providers_str:
+            return
+
+        args['AnyProviderIdEquals'] = providers_str
 
     @staticmethod
     def get_auth(**kwargs) -> EmbyAuth:
@@ -2147,3 +2237,5 @@ class EmbyApi(EmbyApiBase):
                 return response.json()
             except ValueError:
                 return {'code': response.status_code}
+
+        return False
