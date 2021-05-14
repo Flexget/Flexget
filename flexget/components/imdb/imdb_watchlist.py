@@ -178,7 +178,7 @@ class ImdbWatchlist:
         page = self.fetch_page(task, url, params, headers)
         soup = get_soup(page.text)
         try:
-            item_text = soup.find('div', class_='lister-total-num-results').string.split()
+            item_text = soup.find('div', {'class': ['lister-list-length', 'lister-total-num-results']}).text.split()
             total_item_count = int(item_text[0].replace(',', ''))
             logger.verbose('imdb list contains {} items', total_item_count)
         except AttributeError:
