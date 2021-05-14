@@ -34,7 +34,7 @@ class UrlRewriteSolidTorrents:
                     'category': {'type': 'string', 'enum': list(CATEGORIES)},
                     'sort_by': {'type': 'string', 'enum': list(SORT)},
                     'reverse': {'type': 'boolean'},
-                    'potentially_unsafe': {'type': 'boolean'},
+                    'remove_potentially_unsafe': {'type': 'boolean'},
                 },
                 'additionalProperties': False,
             },
