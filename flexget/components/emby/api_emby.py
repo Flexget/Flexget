@@ -1071,6 +1071,9 @@ class EmbyApiMedia(EmbyApiBase):
         self.library = self.get_libary()
 
     def _get_parents(self) -> dict:
+        if not self.id or not self.auth or not self.auth.uid:
+            return
+
         args = {'userid': self.auth.uid}
 
         endpoint = EMBY_ENDPOINT_PARENTS.format(itemid=self.id)
@@ -1269,18 +1272,18 @@ class EmbyApiMedia(EmbyApiBase):
     @staticmethod
     def cast(**kwargs) -> 'EmbyApiMedia':
         if EmbyApiEpisode.is_type(**kwargs):
-            return EmbyApiEpisode(**kwargs)
+            return EmbyApiEpisode.search(**kwargs)
 
         if EmbyApiSeason.is_type(**kwargs):
-            return EmbyApiSeason(**kwargs)
+            return EmbyApiSeason.search(**kwargs)
 
         if EmbyApiSerie.is_type(**kwargs):
-            return EmbyApiSerie(**kwargs)
+            return EmbyApiSerie.search(**kwargs)
 
         if EmbyApiMovie.is_type(**kwargs):
-            return EmbyApiMovie(**kwargs)
+            return EmbyApiMovie.search(**kwargs)
 
-        return EmbyApiMedia(**kwargs)
+        return EmbyApiMedia.search(**kwargs)
 
     @staticmethod
     def search(**kwargs):
@@ -1907,9 +1910,6 @@ class EmbyApiMovie(EmbyApiMedia):
         EmbyApiMedia.__init__(self, field_map=EmbyApiMovie.field_map_up, **kwargs)
         self.mtype = EmbyApiMovie.TYPE
 
-        if not kwargs:
-            return
-
     def to_dict(self) -> dict:
         if not self:
             return {}
@@ -1992,14 +1992,16 @@ class EmbyApiMovie(EmbyApiMedia):
 
         EmbyApi.set_common_search_arg(args)
 
-        if 'movie_id' in parameters:
-            args['Ids'] = parameters.get('movie_id')
+        if 'id' in parameters:
+            args['Ids'] = parameters.get('id')
         else:
-            if 'movie_name' in parameters:
-                args['SearchTerm'] = split_title_year(parameters.get('movie_name')).title
+            if 'name' in parameters:
+                args['SearchTerm'], year = split_title_year(parameters.get('name'))
 
-            if 'movie_year' in parameters:
-                args['Years'] = parameters.get('movie_year')
+            if 'year' in parameters:
+                args['Years'] = parameters.get('year')
+            elif year:
+                args['Years'] = year
 
             EmbyApi.set_provideres_search_arg(args, **kwargs)
 
@@ -2021,7 +2023,6 @@ class EmbyApiMovie(EmbyApiMedia):
         movie = movies['Items'][0]
 
         movie_api = EmbyApiMovie(auth=auth, **movie)
-
         logger.debug('Found movie {} in emby server', movie_api.fullname)
 
         return movie_api
@@ -2058,7 +2059,7 @@ class EmbyApi(EmbyApiBase):
     @staticmethod
     def set_common_search_arg(args: dict):
         args['Recursive'] = True
-        args['Fields'] = ';'.join(EmbyApi.EMBY_EXTRA_FIELDS)
+        args['Fields'] = ','.join(EmbyApi.EMBY_EXTRA_FIELDS)
         args['IsMissing'] = False
 
     @staticmethod
