@@ -26,7 +26,6 @@ from typing import (  # noqa
 )
 
 import sqlalchemy  # noqa
-import yaml  # noqa
 from loguru import logger  # noqa
 from sqlalchemy.engine import Engine
 from sqlalchemy.exc import OperationalError  # noqa
@@ -37,6 +36,7 @@ from sqlalchemy.orm import sessionmaker  # noqa
 from flexget.config_schema import ConfigError
 from flexget.utils.sqlalchemy_utils import ContextSession  # noqa
 from flexget.utils.tools import get_current_flexget_version, io_encoding, pid_exists  # noqa
+from flexget.yaml_helper import YAMLError, load_yaml
 
 Base = declarative_base()
 Session: Type[ContextSession] = sessionmaker(class_=ContextSession)
@@ -540,30 +540,7 @@ class Manager:
     def setup_yaml(self) -> None:
         """Sets up the yaml loader to return unicode objects for strings by default"""
 
-        def construct_yaml_str(self, node):
-            # Override the default string handling function
-            # to always return unicode objects
-            return self.construct_scalar(node)
-
-        yaml.Loader.add_constructor('tag:yaml.org,2002:str', construct_yaml_str)
-        yaml.SafeLoader.add_constructor('tag:yaml.org,2002:str', construct_yaml_str)
-
-        # Set up the dumper to not tag every string with !!python/unicode
-        def unicode_representer(dumper, uni):
-            node = yaml.ScalarNode(tag='tag:yaml.org,2002:str', value=uni)
-            return node
-
-        yaml.add_representer(str, unicode_representer)
-
-        # Set up the dumper to increase the indent for lists
-        def increase_indent_wrapper(func):
-            def increase_indent(self, flow=False, indentless=False):
-                func(self, flow, False)
-
-            return increase_indent
-
-        yaml.Dumper.increase_indent = increase_indent_wrapper(yaml.Dumper.increase_indent)
-        yaml.SafeDumper.increase_indent = increase_indent_wrapper(yaml.SafeDumper.increase_indent)
+        pass
 
     def _init_config(self, create: bool = False) -> None:
         """
@@ -658,8 +635,8 @@ class Manager:
                 raise ValueError('Config file is not UTF-8 encoded')
         try:
             self.config_file_hash = config_file_hash or self.hash_config()
-            config = yaml.safe_load(raw_config) or {}
-        except yaml.YAMLError as e:
+            config = load_yaml(self.config_path)
+        except YAMLError as e:
             msg = str(e).replace('\n', ' ')
             msg = ' '.join(msg.split())
             logger.critical(msg)

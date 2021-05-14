@@ -317,6 +317,9 @@ def set_error_message(error: jsonschema.ValidationError) -> None:
 
     """
     # First, replace default error messages with our custom ones
+    location = (
+        f"at {error.instance.filename} line {error.instance.lc.line} col {error.instance.lc.col}"
+    )
     if error.validator == 'type':
         if isinstance(error.validator_value, str):
             valid_types_list = [error.validator_value]
@@ -358,6 +361,8 @@ def set_error_message(error: jsonschema.ValidationError) -> None:
     custom_error = error.schema.get('error_%s' % error.validator, error.schema.get('error'))
     if custom_error:
         error.message = template.render(custom_error, error.__dict__)
+    if location:
+        error.message = error.message + f"\n{location}"
 
 
 def select_child_errors(validator, errors):
