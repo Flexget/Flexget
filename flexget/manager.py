@@ -617,7 +617,8 @@ class Manager:
             ALLOWED_INCLUDES = ['yml', 'yaml']
 
             # Tag of the inclide
-            tag = node.tag[1:]
+            base_tag = node.tag
+            tag = base_tag[1:]
 
             # Full path to the include
             include_path = os.path.join(caller.config_base, node.value)
@@ -675,7 +676,14 @@ class Manager:
                     include_config_path[file_name] = {}
 
                 # Generate Include config
-                compiled_include = yaml.safe_load(raw_include_config) or {}
+                try:
+                    compiled_include = yaml.safe_load(raw_include_config) or {}
+                except yaml.error.YAMLError as e:
+                    message = (
+                        f'Error including file `{file}` on `{base_tag} {include_path}:\n {str(e)}`'
+                    )
+                    logger.critical(message)
+                    raise ValueError(message)
 
                 # Merge includes
                 includes_merge(compiled_include, include_config_path, file_name, file)
