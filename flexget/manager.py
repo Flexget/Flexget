@@ -590,7 +590,7 @@ class Manager:
                 dst[key].update(src)  # Merge dicts
             elif isinstance(src, dict):
                 # Only merge dicts with dicts
-                message = f'Not possible to merge `{file}` ({type(src).__name__}) to config ({type(dst[key]).__name__}).'
+                message = f'Not possible to merge include `{file}` ({type(src).__name__}) to config ({type(dst[key]).__name__}).'
                 logger.critical(message)
                 raise ValueError(message)
             elif isinstance(src, list):
@@ -602,7 +602,7 @@ class Manager:
                     dst[key] = src
                 else:
                     # Can't merge lists if not list, or dict not empty
-                    message = f'Not possible to merge `{file}` ({type(src).__name__}) to config ({type(dst[key]).__name__}).'
+                    message = f'Not possible to merge include `{file}` ({type(src).__name__}) to config ({type(dst[key]).__name__}).'
                     logger.critical(message)
                     raise ValueError(message)
             else:
