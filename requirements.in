@@ -22,7 +22,7 @@ loguru>=0.4.1
 cherrypy>=18.0.0
 flask>=0.7
 flask-restful>=0.3.3
-flask-restx==0.3.0
+flask-restx==0.4.0
 flask-compress>=1.2.1
 flask-login>=0.4.0
 flask-cors>=2.1.2
