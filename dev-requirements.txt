@@ -68,7 +68,7 @@ execnet==1.8.0
     # via pytest-xdist
 filelock==3.0.12
     # via virtualenv
-flake8==3.9.1
+flake8==3.9.2
     # via -r dev-requirements.in
 gitdb==4.0.7
     # via gitpython
