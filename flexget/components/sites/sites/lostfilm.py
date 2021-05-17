@@ -206,7 +206,7 @@ class LostFilm:
             try:
                 response = task.requests.get(redirect_url, params=params)
             except RequestException as e:
-                logger.error('Failed to get lostfilm download page: {:s}'.format(e))
+                logger.error('Failed to get the redirect page: {}', e)
                 continue
 
             if response.status_code != 200:
@@ -240,7 +240,7 @@ class LostFilm:
             try:
                 response = task.requests.get(redirect_url)
             except RequestException as e:
-                logger.error('Could not connect to redirect url2: {:s}', e)
+                logger.error('Failed to get the download page: {}', e)
                 continue
 
             page = get_soup(response.content)
