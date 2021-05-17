@@ -7,7 +7,7 @@ html5lib>=0.11
 PyRSS2Gen
 pynzb
 rpyc~=5.0
-jinja2~=2.10
+jinja2~=3.0
 # There is a bug in requests 2.4.0 where it leaks urllib3 exceptions
 requests>=2.20.0
 python-dateutil
