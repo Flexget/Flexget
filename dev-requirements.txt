@@ -72,7 +72,7 @@ flake8==3.9.1
     # via -r dev-requirements.in
 gitdb==4.0.7
     # via gitpython
-gitpython==3.1.14
+gitpython==3.1.17
     # via -r dev-requirements.in
 identify==2.2.4
     # via pre-commit
