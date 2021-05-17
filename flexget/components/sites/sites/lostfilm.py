@@ -208,6 +208,9 @@ class LostFilm:
             except RequestException as e:
                 logger.error('Failed to get the redirect page: {}', e)
                 continue
+            except Exception as e:
+                logger.error('Got unexpected exception when trying to get the redirect page: {}', e)
+                continue
 
             if response.status_code != 200:
                 if config.get('lf_session') is not None:
@@ -241,6 +244,9 @@ class LostFilm:
                 response = task.requests.get(redirect_url)
             except RequestException as e:
                 logger.error('Failed to get the download page: {}', e)
+                continue
+            except Exception as e:
+                logger.error('Got unexpected exception when trying to get the download page: {}', e)
                 continue
 
             page = get_soup(response.content)
