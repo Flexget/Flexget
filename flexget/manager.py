@@ -663,14 +663,15 @@ class Manager:
 
                 # Build config path based on file path
                 include_config_path = include_config
-                for path in config_path:
-                    path = path.replace(os.path.sep, '')
-                    if not path:
-                        continue
-                    if not path in include_config_path:
-                        include_config_path[path] = {}
+                if tag == 'include_tree':
+                    for path in config_path:
+                        path = path.replace(os.path.sep, '')
+                        if not path:
+                            continue
+                        if not path in include_config_path:
+                            include_config_path[path] = {}
 
-                    include_config_path = include_config_path[path]
+                        include_config_path = include_config_path[path]
 
                 if not file_name in include_config_path:
                     include_config_path[file_name] = {}
@@ -688,25 +689,45 @@ class Manager:
                 # Merge includes
                 includes_merge(compiled_include, include_config_path, file_name, file)
 
-            if tag == 'include_list':
-                # If its a merge of lists, convert output to list
+            if tag == 'include':
+                # Includes all content of all files
+                new_include_config = {}
+                for _, item in include_config.items():
+                    if isinstance(item, dict):
+                        for conf, properties in item.items():
+                            new_include_config[conf] = properties
+                    else:
+                        new_include_config = item
+
+                include_config = new_include_config
+
+            elif tag == 'include_list':
+                # Includes all content of all files, merged into list
                 if isinstance(include_config, dict):
                     new_include_config = []
                     for key in include_config:
-                        if isinstance(include_config[key], dict):
-                            new_include_config.append(include_config[key])
-                        elif isinstance(include_config[key], list):
+                        if isinstance(include_config[key], list):
                             new_include_config += include_config[key]
                         else:
                             new_include_config.append(include_config[key])
                     include_config = new_include_config
                 elif not isinstance(include_config, list):
                     include_config = [include_config]
+            elif tag == 'include_named_list':
+                new_include_config = []
+                for key, config in include_config.items():
+                    new_include_config.append({key: config})
 
-            if os.path.isfile(include_path):
-                # If we requested a file, we return only that config
-                include_config = include_config[list(include_config.keys())[0]]
+                include_config = new_include_config
 
+            # if os.path.isfile(include_path):
+            #     # If we requested a file, we return only that config
+            #     include_config = include_config[list(include_config.keys())[0]]
+
+            return include_config
+
+        def new_method(self, new_include_config):
+            include_config = new_include_config
             return include_config
 
         def list_files(dirname):
@@ -728,6 +749,9 @@ class Manager:
         INCLUDES_HANLERS = {
             '!include': construct_yaml_includes,
             '!include_list': construct_yaml_includes,
+            '!include_named': construct_yaml_includes,
+            '!include_named_list': construct_yaml_includes,
+            '!include_tree': construct_yaml_includes,
         }
 
         for tag in INCLUDES_HANLERS:
