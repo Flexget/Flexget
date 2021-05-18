@@ -624,6 +624,7 @@ class EmbyApiLibrary(EmbyApiListBase):
         self.set_list_search_args(args)
 
         args['ParentId'] = self.id
+        args['IncludeItemTypes'] = 'Episode,Movie'
 
         logger.debug('Search library list with: {}', args)
         endpoint = EMBY_ENDPOINT_SEARCH.format(userid=self.auth.uid)
@@ -732,6 +733,7 @@ class EmbyApiWatchedList(EmbyApiListBase):
         self.set_list_search_args(args)
 
         args['IsPlayed'] = True
+        args['IncludeItemTypes'] = 'Episode,Movie'
 
         logger.debug('Search watched list with: {}', args)
 
@@ -782,6 +784,7 @@ class EmbyApiFavoriteList(EmbyApiListBase):
         self.set_list_search_args(args)
 
         args['IsFavorite'] = True
+        args['IncludeItemTypes'] = 'Episode,Movie'
 
         logger.debug('Search favorite list with: {}', args)
         endpoint = EMBY_ENDPOINT_SEARCH.format(userid=self.auth.uid)
@@ -883,6 +886,7 @@ class EmbyApiPlayList(EmbyApiListBase):
         self.set_list_search_args(args)
 
         args['ParentId'] = self.id
+        args['IncludeItemTypes'] = 'Episode,Movie'
 
         logger.debug('Search PlayList  with: {}', args)
         endpoint = EMBY_ENDPOINT_SEARCH.format(userid=self.auth.uid)
@@ -1004,6 +1008,7 @@ class EmbyApiMedia(EmbyApiBase):
         'id': ['id', 'Id'],
         'name': ['name', 'Name'],
         'path': ['path', 'Path'],
+        'year': ['ProductionYear'],
         'overview': ['overview', 'Overview'],
         'imdb_id': ['imdb_id', 'ProviderIds.Imdb'],
         'tmdb_id': ['tmdb_id', 'ProviderIds.Tmdb'],
@@ -1418,8 +1423,10 @@ class EmbyApiSerie(EmbyApiMedia):
         else:
             EmbyApi.set_provideres_search_arg(args, **kwargs)
             args['SearchTerm'] = split_title_year(parameters.get('name')).title
+            if 'year' in parameters:
+                args['Years'] = parameters.get('year')
+            EmbyApi.set_common_search_arg(args)
 
-        EmbyApi.set_common_search_arg(args)
         args['IncludeItemTypes'] = 'Series'
 
         logger.debug('Search serie with: {}', args)
@@ -1788,6 +1795,7 @@ class EmbyApiEpisode(EmbyApiMedia):
 
         parameters = {}
         field_map = EmbyApiBase.merge_field_map(
+            EmbyApiEpisode.field_map,
             EmbyApiMedia.field_map,
             EmbyApiEpisode.field_map_up,
             EmbyApiSeason.field_map_up,
