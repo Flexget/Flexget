@@ -1,6 +1,7 @@
 from loguru import logger
 
 from flexget import log, plugin
+from flexget.config_schema import register_config_key
 from flexget.event import event
 
 logger = logger.bind(name='log_filter')
@@ -11,11 +12,47 @@ class MyFilter:
         self.config = config
 
     def __call__(self, record):
-        for plugin_name, filter_strings in self.config.items():
-            for filter_string in filter_strings:
-                if record['name'] == plugin_name and filter_string in record['message']:
-                    return False
+        for filter_config in self.config:
+            if filter_config.get('plugin') and filter_config['plugin'] != record['name']:
+                continue
+            if filter_config.get('task') and filter_config['task'] != record['extra'].get('task'):
+                continue
+            if filter_config.get('message') and filter_config['message'] not in record['message']:
+                continue
+            if (
+                filter_config.get('level')
+                and filter_config['level'].upper() != record['level'].name
+            ):
+                continue
+            return False
         return True
+
+
+SCHEMA = {
+    'type': 'array',
+    'items': {
+        'properties': {
+            'plugin': {'type': 'string'},
+            'message': {'type': 'string'},
+            'task': {'type': 'string'},
+            'level': {
+                'type': 'string',
+                'enum': [
+                    'trace',
+                    'debug',
+                    'verbose',
+                    'info',
+                    'success',
+                    'warning',
+                    'error',
+                    'critical',
+                ],
+            },
+        },
+        'minProperties': 1,
+    },
+    'minItems': 1,
+}
 
 
 class LogFilter(object):
@@ -24,27 +61,20 @@ class LogFilter(object):
 
     Example::
       log_filter:
-        some.context:
-          - in a galaxy
-          - far far away
-        another.context:
-          - whatever text
-          - what the heck?
+      - message: in a galaxy
+      - message: far far away
+      - message: whatever text
+      - message: what the heck?
+        plugin: series
 
     """
 
-    schema = {
-        'type': 'object',
-        'additionalProperties': {
-            'type': 'array',
-            'items': {'type': 'string'},
-            'minItems': 1,
-            'additionalProperties': 'string',
-        },
-    }
+    schema = SCHEMA
 
-    @plugin.priority(255)
+    @plugin.priority(plugin.PRIORITY_FIRST)
     def on_task_start(self, task, config):
+        for filt in config:
+            filt.setdefault('task', task.name)
         task.log_filter = MyFilter(config)
         log.add_filter(task.log_filter)
         logger.debug('Log filter added (config: {})', config)
@@ -61,3 +91,17 @@ class LogFilter(object):
 @event('plugin.register')
 def register_plugin():
     plugin.register(LogFilter, 'log_filter', api_ver=2)
+
+
+@event('manager.startup')
+def install_filters(manager):
+    config = manager.config.get('log_filter')
+    if not config:
+        return
+    logger.debug('Log filter added (config: {})', config)
+    log.add_filter(MyFilter(config))
+
+
+@event('config.register')
+def register_config():
+    register_config_key('log_filter', SCHEMA)
