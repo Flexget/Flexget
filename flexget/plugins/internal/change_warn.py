@@ -11,11 +11,11 @@ found_deprecated = False
 
 class ChangeWarn:
     """
-        Gives warning if user has deprecated / changed configuration in the root level.
+    Gives warning if user has deprecated / changed configuration in the root level.
 
-        Will be replaced by root level validation in the future!
+    Will be replaced by root level validation in the future!
 
-        Contains ugly hacks, better to include all deprecation warnings here during 1.0 BETA phase
+    Contains ugly hacks, better to include all deprecation warnings here during 1.0 BETA phase
     """
 
     def on_task_start(self, task, config):

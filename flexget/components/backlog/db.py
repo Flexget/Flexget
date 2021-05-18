@@ -2,7 +2,7 @@ import pickle
 from datetime import datetime
 
 from loguru import logger
-from sqlalchemy import Column, DateTime, Index, Integer, String, Unicode, select
+from sqlalchemy import Column, DateTime, Index, Integer, String, Unicode, column, select
 
 from flexget import db_schema
 from flexget.entry import Entry
@@ -37,7 +37,7 @@ def upgrade(ver, session):
         # Make sure there is no data we can't load in the backlog table
         backlog_table = table_schema('backlog', session)
         try:
-            for item in session.query('entry').select_from(backlog_table).all():
+            for item in session.query(column('entry')).select_from(backlog_table).all():
                 pickle.loads(item.entry)
         except (ImportError, TypeError):
             # If there were problems, we can drop the data.

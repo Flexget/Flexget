@@ -1,4 +1,4 @@
-FeedParser>=5.2.1
+FeedParser>=6.0.2
 SQLAlchemy >=1.3.10, <1.999
 PyYAML>=4.2b1
 # Beautifulsoup 4.5+ is required to support different versions of html5lib
@@ -6,13 +6,13 @@ beautifulsoup4>=4.5
 html5lib>=0.11
 PyRSS2Gen
 pynzb
-rpyc~=4.0
-jinja2~=2.10
+rpyc~=5.0
+jinja2~=3.0
 # There is a bug in requests 2.4.0 where it leaks urllib3 exceptions
 requests>=2.20.0
 python-dateutil
 jsonschema>=2.0
-guessit==3.1.0
+guessit==3.2.0
 rebulk>=2.0.0
 apscheduler>=3.2.0
 terminaltables>=3.1.0
@@ -22,7 +22,7 @@ loguru>=0.4.1
 cherrypy>=18.0.0
 flask>=0.7
 flask-restful>=0.3.3
-flask-restx==0.2.0
+flask-restx==0.4.0
 flask-compress>=1.2.1
 flask-login>=0.4.0
 flask-cors>=2.1.2
@@ -30,3 +30,4 @@ pyparsing>=2.4.7
 zxcvbn-python
 progressbar==2.5
 more-itertools
+psutil>=5.8.0

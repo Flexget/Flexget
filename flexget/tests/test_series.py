@@ -368,9 +368,11 @@ class TestFilterSeries:
             'accepted', title='Test.Series.with.extra.crap.S01E02.PDTV.XViD-FlexGet'
         )
         assert not entry.get('series_guessed'), 'series plugin should override series_guessed'
-        assert entry['series_name'] == entry['series_parser'].name == 'Test Series', (
-            'Series name should be \'Test Series\', was: entry: %s, parser: %s'
-            % (entry['series_name'], entry['series_parser'].name)
+        assert (
+            entry['series_name'] == entry['series_parser'].name == 'Test Series'
+        ), 'Series name should be \'Test Series\', was: entry: %s, parser: %s' % (
+            entry['series_name'],
+            entry['series_parser'].name,
         )
 
     def test_all_series_mode(self, execute_task):
@@ -1777,6 +1779,17 @@ class TestImportSeries:
                   - {title: 'the show', configure_series_alternate_name: 'le show'}
             mock:
               - title: le show s03e03
+          test_manual_config_override:
+            configure_series:
+              from:
+                mock:
+                - title: my show
+              settings:
+                identified_by: ep
+                quality: 720p
+            series:
+            - my show:
+                identified_by: sequence
     """
 
     def test_timeframe_max(self, execute_task):
@@ -1795,6 +1808,15 @@ class TestImportSeries:
         entry = task.find_entry(title='le show s03e03')
         assert entry.accepted, 'entry matching series alternate name should have been accepted.'
         assert entry['series_name'] == 'the show', 'entry series should be set to the main name'
+
+    def test_manual_config_override(self, execute_task):
+        """Settings configued manually in series plugin should override those from configure_series."""
+        task = execute_task('test_manual_config_override')
+        series_config = task.config['series'][0]['my show']
+        assert series_config['quality'] == '720p', 'configure_series settings should be merged in'
+        assert (
+            series_config['identified_by'] == 'sequence'
+        ), 'series plugin settings should override configure_series ones'
 
 
 class TestIDTypes:
@@ -2493,6 +2515,35 @@ class TestSeriesSeasonPack:
 
         task = execute_task('test_with_dict_config_2')
         assert task.find_entry('accepted', title='bro.s02.720p.HDTV-Flexget')
+
+
+class TestSeriesSeasonPackAdvanced:
+    _config = """
+    tasks:
+      timeframe_and_target:
+        parsing:
+          series: internal
+        mock:
+          - title: "foo S01 720p hdtv h264"
+          - title: "foo S01E01 720p hdtv h264"
+        series:
+          - foo:
+              identified_by: ep
+              quality: 720p|1080p webrip+
+              timeframe: 4 hours
+              target: 720p webrip+ h264+      
+              season_packs: true
+    """
+
+    @pytest.fixture()
+    def config(self):
+        """Overrides outer config fixture since season pack support does not work with guessit parser"""
+        return self._config
+
+    def test_season_pack_with_timeframe_and_target(self, execute_task):
+        task = execute_task('timeframe_and_target')
+        assert task.find_entry('accepted', title="foo S01 720p hdtv h264")
+        assert not task.find_entry('accepted', title="foo S01E01 720p hdtv h264")
 
 
 class TestSeriesDDAudio:

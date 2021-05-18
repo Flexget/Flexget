@@ -10,14 +10,14 @@ logger = logger.bind(name='modify_torrents')
 
 class AddTrackers:
     """
-        Adds tracker URL to torrent files.
+    Adds tracker URL to torrent files.
 
-        Configuration example:
+    Configuration example:
 
-        add_trackers:
-          - uri://tracker_address:port/
+    add_trackers:
+      - uri://tracker_address:port/
 
-        This will add all tracker URL uri://tracker_address:port/.
+    This will add all tracker URL uri://tracker_address:port/.
     """
 
     schema = {'type': 'array', 'items': {'type': 'string', 'format': 'url'}}
@@ -36,14 +36,14 @@ class AddTrackers:
 
 class RemoveTrackers:
     """
-        Removes trackers from torrent files using regexp matching.
+    Removes trackers from torrent files using regexp matching.
 
-        Configuration example:
+    Configuration example:
 
-        remove_trackers:
-          - moviex
+    remove_trackers:
+      - moviex
 
-        This will remove all trackers that contain text moviex in their url.
+    This will remove all trackers that contain text moviex in their url.
     """
 
     schema = {'type': 'array', 'items': {'type': 'string', 'format': 'regex'}}

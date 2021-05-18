@@ -11,13 +11,13 @@ logger = logger.bind(name='interval')
 
 class PluginInterval:
     """
-        Allows specifying minimum interval for task execution.
+    Allows specifying minimum interval for task execution.
 
-        Format: [n] [minutes|hours|days|weeks]
+    Format: [n] [minutes|hours|days|weeks]
 
-        Example:
+    Example:
 
-        interval: 7 days
+    interval: 7 days
     """
 
     schema = {'type': 'string', 'format': 'interval'}

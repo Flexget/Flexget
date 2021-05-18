@@ -1,4 +1,5 @@
 import os
+from json import loads, JSONDecodeError
 
 from loguru import logger
 from requests import Session
@@ -47,6 +48,7 @@ class OutputQBitTorrent:
                     'maxdownspeed': {'type': 'integer'},
                     'fail_html': {'type': 'boolean'},
                     'add_paused': {'type': 'boolean'},
+                    'skip_check': {'type': 'boolean'},
                 },
                 'additionalProperties': False,
             },
@@ -59,6 +61,7 @@ class OutputQBitTorrent:
         self.api_url_login = None
         self.api_url_upload = None
         self.api_url_download = None
+        self.api_url_info = None
         self.url = None
         self.connected = False
 
@@ -80,6 +83,7 @@ class OutputQBitTorrent:
                 self.api_url_login = '/api/v2/auth/login'
                 self.api_url_upload = '/api/v2/torrents/add'
                 self.api_url_download = '/api/v2/torrents/add'
+                self.api_url_info = '/api/v2/torrents/info'
                 return response
 
             url = self.url + "/version/api"
@@ -88,6 +92,7 @@ class OutputQBitTorrent:
                 self.api_url_login = '/login'
                 self.api_url_upload = '/command/upload'
                 self.api_url_download = '/command/download'
+                self.api_url_info = '/query/torrents'
                 return response
 
             msg = 'Failure. URL: {}'.format(url) if not msg_on_fail else msg_on_fail
@@ -119,9 +124,50 @@ class OutputQBitTorrent:
         logger.debug('Successfully connected to qBittorrent')
         self.connected = True
 
+    def check_torrent_exists(self, hash_torrent, verify_cert):
+        if not self.connected:
+            raise plugin.PluginError('Not connected.')
+
+        if not isinstance(hash_torrent, str):
+            logger.error('Error getting torrent info, invalid hash {}', hash_torrent)
+            return False
+
+        hash_torrent = hash_torrent.lower()
+
+        url = f'{self.url}{self.api_url_info}'
+        params = {'hashes': hash_torrent}
+
+        try:
+            respose = self.session.request(
+                'get',
+                url,
+                params=params,
+                verify=verify_cert,
+            )
+        except RequestException as e:
+            logger.error('Error getting torrent info, request to hash {} failed', hash_torrent)
+            return False
+
+        if respose.status_code != 200:
+            logger.error(
+                'Error getting torrent info, hash {} search returned',
+                hash_torrent,
+                respose.status_code,
+            )
+            return False
+
+        check_file = respose.json()
+
+        if isinstance(check_file, list) and check_file:
+            logger.warning('File with hash {} already in qbittorrent', hash_torrent)
+            return True
+
+        return False
+
     def add_torrent_file(self, file_path, data, verify_cert):
         if not self.connected:
             raise plugin.PluginError('Not connected.')
+
         multipart_data = {k: (None, v) for k, v in data.items()}
         with open(file_path, 'rb') as f:
             multipart_data['torrents'] = f
@@ -137,6 +183,7 @@ class OutputQBitTorrent:
     def add_torrent_url(self, url, data, verify_cert):
         if not self.connected:
             raise plugin.PluginError('Not connected.')
+
         data['urls'] = url
         multipart_data = {k: (None, v) for k, v in data.items()}
         self._request(
@@ -165,6 +212,7 @@ class OutputQBitTorrent:
 
     def add_entries(self, task, config):
         for entry in task.accepted:
+
             form_data = {}
             try:
                 save_path = entry.render(entry.get('path', config.get('path', '')))
@@ -181,6 +229,10 @@ class OutputQBitTorrent:
             add_paused = entry.get('add_paused', config.get('add_paused'))
             if add_paused:
                 form_data['paused'] = 'true'
+
+            skip_check = entry.get('skip_check', config.get('skip_check'))
+            if skip_check:
+                form_data['skip_checking'] = 'true'
 
             maxupspeed = entry.get('maxupspeed', config.get('maxupspeed'))
             if maxupspeed:
@@ -202,10 +254,16 @@ class OutputQBitTorrent:
                 logger.info('Save path: {}', form_data.get('savepath'))
                 logger.info('Label: {}', form_data.get('label'))
                 logger.info('Paused: {}', form_data.get('paused', 'false'))
+                logger.info('Skip Hash Check: {}', form_data.get('skip_checking', 'false'))
                 if maxupspeed:
                     logger.info('Upload Speed Limit: {}', form_data.get('upLimit'))
                 if maxdownspeed:
                     logger.info('Download Speed Limit: {}', form_data.get('dlLimit'))
+                continue
+
+            if self.check_torrent_exists(
+                entry.get('torrent_info_hash'), config.get('verify_cert')
+            ):
                 continue
 
             if not is_magnet:

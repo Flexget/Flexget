@@ -13,24 +13,6 @@ with open(torrent_file, 'rb') as tor_file:
     torrent_raw = tor_file.read()
 
 
-def compare_binary(obj1, obj2):
-    # Used to compare xmlrpclib.binary objects within a mocked call
-    if not isinstance(obj1, type(obj2)):
-        return False
-    if obj1.data != obj2.data:
-        return False
-    return True
-
-
-class Matcher:
-    def __init__(self, compare, some_obj):
-        self.compare = compare
-        self.some_obj = some_obj
-
-    def __eq__(self, other):
-        return self.compare(self.some_obj, other)
-
-
 @mock.patch('flexget.plugins.clients.rtorrent.xmlrpc_client.ServerProxy')
 class TestRTorrentClient:
     def test_load(self, mocked_proxy):
@@ -55,12 +37,10 @@ class TestRTorrentClient:
         # Ensure load was called
         assert mocked_proxy.load.raw_start.called
 
-        match_binary = Matcher(compare_binary, xmlrpc_client.Binary(torrent_raw))
-
         called_args = mocked_proxy.load.raw_start.call_args_list[0][0]
         assert len(called_args) == 5
         assert '' == called_args[0]
-        assert match_binary in called_args
+        assert xmlrpc_client.Binary(torrent_raw) in called_args
 
         fields = [p for p in called_args[2:]]
         assert len(fields) == 3

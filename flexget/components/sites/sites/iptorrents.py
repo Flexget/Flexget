@@ -60,22 +60,22 @@ FREE_SEARCH_URL = 'https://iptorrents.com/t?free=on'
 
 class UrlRewriteIPTorrents:
     """
-        IpTorrents urlrewriter and search plugin.
+    IpTorrents urlrewriter and search plugin.
 
-        iptorrents:
-          rss_key: xxxxxxxxx  (required)
-          uid: xxxxxxxx  (required)
-          password: xxxxxxxx  (required)
-          category: HD
+    iptorrents:
+      rss_key: xxxxxxxxx  (required)
+      uid: xxxxxxxx  (required)
+      password: xxxxxxxx  (required)
+      category: HD
 
-          Category is any combination of: Movie-all, Movie-3D, Movie-480p,
-          Movie-4K, Movie-BD-R, Movie-BD-Rip, Movie-Cam, Movie-DVD-R,
-          Movie-HD-Bluray, Movie-Kids, Movie-MP4, Movie-Non-English,
-          Movie-Packs, Movie-Web-DL, Movie-x265, Movie-XviD,
+      Category is any combination of: Movie-all, Movie-3D, Movie-480p,
+      Movie-4K, Movie-BD-R, Movie-BD-Rip, Movie-Cam, Movie-DVD-R,
+      Movie-HD-Bluray, Movie-Kids, Movie-MP4, Movie-Non-English,
+      Movie-Packs, Movie-Web-DL, Movie-x265, Movie-XviD,
 
-          TV-all, TV-Documentaries, TV-Sports, TV-480p, TV-BD, TV-DVD-R,
-          TV-DVD-Rip, TV-MP4, TV-Mobile, TV-Non-English, TV-Packs,
-          TV-Packs-Non-English, TV-SD-x264, TV-x264, TV-x265, TV-XVID, TV-Web-DL
+      TV-all, TV-Documentaries, TV-Sports, TV-480p, TV-BD, TV-DVD-R,
+      TV-DVD-Rip, TV-MP4, TV-Mobile, TV-Non-English, TV-Packs,
+      TV-Packs-Non-English, TV-SD-x264, TV-x264, TV-x265, TV-XVID, TV-Web-DL
     """
 
     schema = {
@@ -157,24 +157,33 @@ class UrlRewriteIPTorrents:
             if '/u/' + str(config['uid']) not in req.text:
                 raise plugin.PluginError("Invalid cookies (user not logged in)...")
 
-            soup = get_soup(req.content, parser="html.parser")
+            soup = get_soup(req.content, parser='html5lib')
             torrents = soup.find('table', {'id': 'torrents'})
+            seeders_idx = None
+            leechers_idx = None
+            for idx, header in enumerate(torrents.thead.find('tr').findAll('th', recursive=False)):
+                header_text = header.text
+                if 'seeders' in header_text:
+                    seeders_idx = idx
+                if 'leechers' in header_text:
+                    leechers_idx = idx
 
             results = torrents.findAll('tr')
-            for torrent in results:
+            for torrent in torrents.tbody.findAll('tr', recursive=False):
                 if torrent.th and 'ac' in torrent.th.get('class'):
                     # Header column
                     continue
-                if torrent.find('td', {'colspan': '99'}):
+                cols = list(torrent.findAll('td', recursive=False))
+                if len(cols) == 1 and 'No Torrents Found' in cols[0].text:
                     logger.debug('No results found for search {}', search_string)
                     break
                 entry = Entry()
                 link = torrent.find('a', href=re.compile('download'))['href']
                 entry['url'] = f"{BASE_URL}{link}?torrent_pass={config.get('rss_key')}"
-                entry['title'] = torrent.find('a', href=re.compile('details')).text
+                entry['title'] = torrent.find('a', href=re.compile('details|/t/[0-9]+$')).text
 
-                seeders = torrent.findNext('td', {'class': 'ac t_seeders'}).text
-                leechers = torrent.findNext('td', {'class': 'ac t_leechers'}).text
+                seeders = cols[seeders_idx].text
+                leechers = cols[leechers_idx].text
                 entry['torrent_seeds'] = int(seeders)
                 entry['torrent_leeches'] = int(leechers)
                 entry['torrent_availability'] = torrent_availability(

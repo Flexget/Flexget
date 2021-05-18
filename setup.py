@@ -1,5 +1,6 @@
 import sys
 from pathlib import Path
+from typing import List
 
 from setuptools import find_packages, setup
 
@@ -14,7 +15,7 @@ if not __version__:
     sys.exit(1)
 
 
-def load_requirements(filename):
+def load_requirements(filename: str) -> List[str]:
     return [
         line.strip()
         for line in Path(filename).read_text().splitlines()
@@ -59,6 +60,7 @@ setup(
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: PyPy",
     ],

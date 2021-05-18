@@ -83,13 +83,13 @@ def upgrade(ver, session):
 
 class FilterDelay:
     """
-        Add delay to a task. This is useful for de-prioritizing expensive / bad-quality tasks.
+    Add delay to a task. This is useful for de-prioritizing expensive / bad-quality tasks.
 
-        Format: n [minutes|hours|days|weeks]
+    Format: n [minutes|hours|days|weeks]
 
-        Example::
+    Example::
 
-          delay: 2 hours
+      delay: 2 hours
     """
 
     schema = {'type': 'string', 'format': 'interval'}

@@ -15,22 +15,22 @@ logger = logger.bind(name='ftp')
 
 class OutputFtp:
     """
-        Ftp Download plugin
+    Ftp Download plugin
 
-        input-url: ftp://<user>:<password>@<host>:<port>/<path to file>
-        Example: ftp://anonymous:anon@my-ftp-server.com:21/torrent-files-dir
+    input-url: ftp://<user>:<password>@<host>:<port>/<path to file>
+    Example: ftp://anonymous:anon@my-ftp-server.com:21/torrent-files-dir
 
-        config:
-            ftp_download:
-              use-ssl: <True/False>
-              ftp_tmp_path: <path>
-              delete_origin: <True/False>
-              download_empty_dirs: <True/False>
+    config:
+        ftp_download:
+          use-ssl: <True/False>
+          ftp_tmp_path: <path>
+          delete_origin: <True/False>
+          download_empty_dirs: <True/False>
 
-        TODO:
-          - Resume downloads
-          - create banlists files
-          - validate connection parameters
+    TODO:
+      - Resume downloads
+      - create banlists files
+      - validate connection parameters
 
     """
 

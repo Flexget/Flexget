@@ -289,11 +289,11 @@ class TestTVDBExpire:
 @pytest.mark.online
 class TestTVDBList:
     """
-        Tests thetvdb list plugin with a test user at thetvdb.
-        Test user info:
-        username: flexget
-        password: flexget
-        Favorites: House, Doctor Who 2005, Penn & Teller: Bullshit, Hawaii Five-0 (2010)
+    Tests thetvdb list plugin with a test user at thetvdb.
+    Test user info:
+    username: flexget
+    password: flexget
+    Favorites: House, Doctor Who 2005, Penn & Teller: Bullshit, Hawaii Five-0 (2010)
     """
 
     config = """
@@ -348,11 +348,11 @@ class TestTVDBList:
 @pytest.mark.online
 class TestTVDBFavorites:
     """
-        Tests thetvdb list plugin with a test user at thetvdb.
-        Test user info:
-        username: flexget
-        password: flexget
-        Favorites: House, Doctor Who 2005, Penn & Teller: Bullshit, Hawaii Five-0 (2010)
+    Tests thetvdb list plugin with a test user at thetvdb.
+    Test user info:
+    username: flexget
+    password: flexget
+    Favorites: House, Doctor Who 2005, Penn & Teller: Bullshit, Hawaii Five-0 (2010)
     """
 
     config = """

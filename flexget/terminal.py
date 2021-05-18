@@ -197,7 +197,7 @@ class TerminalTable:
             drop = self.drop_columns.pop(0)
             self._drop_column(drop)
             wrapped_width = self._calc_wrap()
-            if wrapped_width < self.MIN_WIDTH:
+            if wrapped_width and wrapped_width < self.MIN_WIDTH:
                 continue
             else:
                 return
@@ -223,7 +223,7 @@ class TerminalTable:
                 if col_num in self.wrap_columns:
                     # This probably shouldn't happen, can be caused by wrong parameters sent to drop_columns and
                     # wrap_columns
-                    if wrapped_width <= 0:
+                    if wrapped_width and wrapped_width <= 0:
                         raise TerminalTableError(
                             'Table could not be rendered correctly using it given data'
                         )

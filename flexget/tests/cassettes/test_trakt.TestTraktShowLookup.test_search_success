@@ -2,73 +2,149 @@ interactions:
 - request:
     body: null
     headers:
-      Content-Type: [application/json]
-      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: ['2']
+      Content-Type:
+      - application/json
+      trakt-api-key:
+      - 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af
+      trakt-api-version:
+      - '2'
     method: GET
-    uri: https://api.trakt.tv/search?type=show&query=11-22-63
+    uri: https://api.trakt.tv/search?query=11-22-63&type=show
   response:
-    body: {string: '[{"type":"show","score":12.295875,"show":{"title":"11.22.63","overview":"Jake
-        Epping, a recently divorced English teacher from Maine, is presented with
-        the chance to travel back in time to Dallas, Texas in 1960 by his longtime
-        friend Al Templeton. He is convinced into going and attempts to prevent the
-        assassination of JFK in November 1963. However, he becomes attached to the
-        life he makes in the past and this could be his mission''s undoing.","year":2016,"status":"ended","images":{"poster":{"full":null,"medium":null,"thumb":null},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":102771,"slug":"11-22-63","tvdb":301824,"imdb":"tt2879552","tmdb":64464,"tvrage":45210}}}]'}
+    body:
+      string: '[{"type":"show","score":8.850669,"show":{"title":"11.22.63","overview":"Jake
+        Epping, an ordinary high school teacher, is presented with a chance to change
+        history. When a longtime friend shows Jake how to travel back in time, he
+        tasks Jake with a mission he has been trying in vain to complete: stopping
+        the assassination of John F. Kennedy on Nov. 22, 1963. Jake quickly learns
+        that the past does not want to be changed, and that his attempts to divert
+        the course of history can quickly turn dangerous.","year":2016,"status":"ended","images":{"poster":{"full":null,"medium":null,"thumb":null},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":102771,"slug":"11-22-63","tvdb":301824,"imdb":"tt2879552","tmdb":64464,"tvrage":45210}}}]'
     headers:
-      CF-Cache-Status: [MISS]
-      CF-RAY: [312a166edf283cd7-CPH]
-      Cache-Control: ['public, max-age=28800']
-      Connection: [keep-alive]
-      Content-Type: [application/json; charset=utf-8]
-      Date: ['Sat, 17 Dec 2016 11:38:14 GMT']
-      ETag: [W/"0faccfac9528de024734459a630d55f9"]
-      Expires: ['Sat, 17 Dec 2016 19:38:14 GMT']
-      Server: [cloudflare-nginx]
-      Set-Cookie: ['__cfduid=df3f3300213ef5b57b42ae2db6c63b3901481974694; expires=Sun,
-          17-Dec-17 11:38:14 GMT; path=/; domain=.trakt.tv; HttpOnly']
-      Vary: [Accept-Encoding]
-      X-Content-Type-Options: [nosniff]
-      X-Frame-Options: [SAMEORIGIN]
-      X-Pagination-Item-Count: ['1']
-      X-Pagination-Limit: ['10']
-      X-Pagination-Page: ['1']
-      X-Pagination-Page-Count: ['1']
-      X-Request-Id: [27b18551-89e9-4c9a-a682-fddf11833b34]
-      X-Runtime: ['0.012354']
-      X-XSS-Protection: [1; mode=block]
-    status: {code: 200, message: OK}
+      CF-Cache-Status:
+      - MISS
+      CF-RAY:
+      - 60caabfbfd0c74cb-IAD
+      Cache-Control:
+      - public, max-age=28800
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Tue, 05 Jan 2021 05:06:45 GMT
+      ETag:
+      - W/"7c213018a822e997dad048e269b59f79"
+      Expect-CT:
+      - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+      Expires:
+      - Tue, 05 Jan 2021 13:06:38 GMT
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cfduid=d247ff668329b13d6c7ff7f73dc6d53961609823205; expires=Thu, 04-Feb-21
+        05:06:45 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Pagination-Item-Count:
+      - '1'
+      X-Pagination-Limit:
+      - '10'
+      X-Pagination-Page:
+      - '1'
+      X-Pagination-Page-Count:
+      - '1'
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Ratelimit:
+      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":990,"until":"2021-01-05T05:10:00Z"}'
+      X-Request-Id:
+      - a22dc3b9-b083-4d06-b795-35550d987d29
+      X-Runtime:
+      - '0.010163'
+      X-XSS-Protection:
+      - 1; mode=block
+      cf-request-id:
+      - 077289d17f000074cb9f850000000001
+    status:
+      code: 200
+      message: OK
 - request:
     body: null
     headers:
-      Content-Type: [application/json]
-      Cookie: [__cfduid=df3f3300213ef5b57b42ae2db6c63b3901481974694]
-      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: ['2']
+      Content-Type:
+      - application/json
+      trakt-api-key:
+      - 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af
+      trakt-api-version:
+      - '2'
     method: GET
     uri: https://api.trakt.tv/shows/102771?extended=full
   response:
-    body: {string: '{"title":"11.22.63","year":2016,"ids":{"trakt":102771,"slug":"11-22-63","tvdb":301824,"imdb":"tt2879552","tmdb":64464,"tvrage":45210},"overview":"Jake
-        Epping, a recently divorced English teacher from Maine, is presented with
-        the chance to travel back in time to Dallas, Texas in 1960 by his longtime
-        friend Al Templeton. He is convinced into going and attempts to prevent the
-        assassination of JFK in November 1963. However, he becomes attached to the
-        life he makes in the past and this could be his mission''s undoing.","first_aired":"2016-02-15T08:00:00.000Z","airs":{"day":"Monday","time":"00:01","timezone":"America/New_York"},"runtime":50,"certification":"TV-MA","network":"Hulu","country":"us","trailer":null,"homepage":"http://www.hulu.com/112263","status":"ended","rating":8.17718,"votes":1902,"updated_at":"2016-12-07T10:48:57.000Z","language":"en","available_translations":["bg","bs","cs","da","de","el","en","es","fr","he","hu","it","it","nl","pl","pt","ru","tr","uk"],"genres":["science-fiction","drama","fantasy"],"aired_episodes":8}'}
+    body:
+      string: '{"title":"11.22.63","year":2016,"ids":{"trakt":102771,"slug":"11-22-63","tvdb":301824,"imdb":"tt2879552","tmdb":64464,"tvrage":45210},"overview":"Jake
+        Epping, an ordinary high school teacher, is presented with a chance to change
+        history. When a longtime friend shows Jake how to travel back in time, he
+        tasks Jake with a mission he has been trying in vain to complete: stopping
+        the assassination of John F. Kennedy on Nov. 22, 1963. Jake quickly learns
+        that the past does not want to be changed, and that his attempts to divert
+        the course of history can quickly turn dangerous.","first_aired":"2016-02-15T05:00:00.000Z","airs":{"day":"Monday","time":"00:00","timezone":"America/New_York"},"runtime":50,"certification":"TV-MA","network":"Hulu","country":"us","trailer":"https://youtube.com/watch?v=2QIShmtBdto","homepage":"http://www.hulu.com/112263","status":"ended","rating":8.01426,"votes":4700,"comment_count":35,"updated_at":"2020-11-26T15:02:06.000Z","language":"en","available_translations":["bg","bs","cs","da","de","el","en","es","fa","fr","he","hu","it","ko","nl","no","pl","pt","ru","sk","tr","uk","zh"],"genres":["science-fiction","drama","fantasy"],"aired_episodes":8}'
     headers:
-      CF-Cache-Status: [HIT]
-      CF-RAY: [312a166faf3b3cd7-CPH]
-      Cache-Control: ['public, max-age=28800']
-      Connection: [keep-alive]
-      Content-Type: [application/json; charset=utf-8]
-      Date: ['Sat, 17 Dec 2016 11:38:14 GMT']
-      ETag: [W/"0956eecbabbc538df24b2e269621722a"]
-      Expires: ['Sat, 17 Dec 2016 19:38:14 GMT']
-      Last-Modified: ['Wed, 07 Dec 2016 10:48:57 GMT']
-      Server: [cloudflare-nginx]
-      Vary: [Accept-Encoding]
-      X-Content-Type-Options: [nosniff]
-      X-Frame-Options: [SAMEORIGIN]
-      X-Request-Id: [fb9201a6-e03a-4125-806e-1fc06f9d4a7d]
-      X-Runtime: ['0.010213']
-      X-XSS-Protection: [1; mode=block]
-    status: {code: 200, message: OK}
+      CF-Cache-Status:
+      - REVALIDATED
+      CF-RAY:
+      - 60caabfcb9282550-IAD
+      Cache-Control:
+      - public, max-age=28800
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Tue, 05 Jan 2021 05:06:45 GMT
+      ETag:
+      - W/"87c8d0b45dd5c8b433263fd56b45beae"
+      Expect-CT:
+      - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+      Expires:
+      - Tue, 05 Jan 2021 13:06:46 GMT
+      Last-Modified:
+      - Thu, 26 Nov 2020 15:02:06 GMT
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cfduid=d8d92795b41d6a9429f2a96337694ba571609823205; expires=Thu, 04-Feb-21
+        05:06:45 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Ratelimit:
+      - '{"name":"AUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":998,"until":"2020-12-31T02:45:00Z"}'
+      X-Request-Id:
+      - 7f5c5fcb-d511-4ea5-a43f-49daa039bd18
+      X-Runtime:
+      - '0.006941'
+      X-XSS-Protection:
+      - 1; mode=block
+      cf-request-id:
+      - 077289d1f00000255072383000000001
+    status:
+      code: 200
+      message: OK
 version: 1

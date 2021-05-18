@@ -53,8 +53,7 @@ class DependencyError(Exception):
     def _get_message(self) -> str:
         if self._message:
             return self._message
-        else:
-            return 'Plugin `%s` requires dependency `%s`' % (self.issued_by, self.missing)
+        return f'Plugin `{self.issued_by}` requires dependency `{self.missing}`'
 
     def _set_message(self, message: str) -> None:
         self._message = message
@@ -64,7 +63,7 @@ class DependencyError(Exception):
 
     message = property(_get_message, _set_message)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return '<DependencyError(issued_by=%r,missing=%r,message=%r,silent=%r)>' % (
             self.issued_by,
             self.missing,
@@ -129,12 +128,12 @@ class internet:
                 logger.opt(exception=True).debug(
                     'decorator caught RequestException. handled traceback:'
                 )
-                raise PluginError('RequestException: %s' % e)
+                raise PluginError(f'RequestException: {e}')
             except HTTPError as e:
-                raise PluginError('HTTPError %s' % e.code, self.logger)
+                raise PluginError(f'HTTPError {e.code}', self.logger)
             except URLError as e:
                 logger.opt(exception=True).debug('decorator caught urlerror. handled traceback:')
-                raise PluginError('URLError %s' % e.reason, self.logger)
+                raise PluginError(f'URLError {e.reason}', self.logger)
             except BadStatusLine:
                 logger.opt(exception=True).debug(
                     'decorator caught badstatusline. handled traceback:'
@@ -146,13 +145,13 @@ class internet:
             except OSError as e:
                 logger.opt(exception=True).debug('decorator caught OSError. handled traceback:')
                 if hasattr(e, 'reason'):
-                    raise PluginError('Failed to reach server. Reason: %s' % e.reason, self.logger)
-                elif hasattr(e, 'code'):
+                    raise PluginError(f'Failed to reach server. Reason: {e.reason}', self.logger)
+                if hasattr(e, 'code'):
                     raise PluginError(
-                        'The server couldn\'t fulfill the request. Error code: %s' % e.code,
+                        f"The server couldn't fulfill the request. Error code: {e.code}",
                         self.logger,
                     )
-                raise PluginError('OSError when connecting to server: %s' % e, self.logger)
+                raise PluginError(f'OSError when connecting to server: {e}', self.logger)
 
         return wrapped_func
 
@@ -197,21 +196,19 @@ plugins_loaded = False
 
 _loaded_plugins = {}
 _plugin_options = []
-_new_phase_queue = {}
+_new_phase_queue: Dict[str, List[Optional[str]]] = {}
 
 
 def register_task_phase(name: str, before: str = None, after: str = None):
-    """
-    Adds a new task phase to the available phases.
-    """
+    """Adds a new task phase to the available phases."""
     if before and after:
         raise RegisterException('You can only give either before or after for a phase.')
     if not before and not after:
         raise RegisterException('You must specify either a before or after phase.')
     if name in task_phases or name in _new_phase_queue:
-        raise RegisterException('Phase %s already exists.' % name)
+        raise RegisterException(f'Phase {name} already exists.')
 
-    def add_phase(phase_name, before, after):
+    def add_phase(phase_name: str, before: Optional[str], after: Optional[str]):
         if before is not None and before not in task_phases:
             return False
         if after is not None and after not in task_phases:
@@ -219,9 +216,9 @@ def register_task_phase(name: str, before: str = None, after: str = None):
         # add method name to phase -> method lookup table
         phase_methods[phase_name] = 'on_task_' + phase_name
         # place phase in phase list
-        if before is None:
+        if before is None and after is not None:
             task_phases.insert(task_phases.index(after) + 1, phase_name)
-        if after is None:
+        if after is None and before is not None:
             task_phases.insert(task_phases.index(before), phase_name)
         return True
 
@@ -345,9 +342,7 @@ class PluginInfo(dict):
                     handler_prio = method.priority
                 else:
                     handler_prio = PRIORITY_DEFAULT
-                event = add_phase_handler(
-                    'plugin.%s.%s' % (self.name, phase), method, handler_prio
-                )
+                event = add_phase_handler(f'plugin.{self.name}.{phase}', method, handler_prio)
                 # provides backwards compatibility
                 event.plugin = self
                 self.phase_handlers[phase] = event
@@ -455,11 +450,11 @@ def _load_plugins_from_dirs(dirs: List[str]) -> None:
     :param list dirs: Directories from where plugins are loaded from
     """
 
-    logger.debug('Trying to load plugins from: {}', dirs)
-    dirs = [Path(d) for d in dirs if os.path.isdir(d)]
+    logger.debug(f'Trying to load plugins from: {dirs}')
+    dir_paths = [Path(d) for d in dirs if os.path.isdir(d)]
     # add all dirs to plugins_pkg load path so that imports work properly from any of the plugin dirs
-    plugins_pkg.__path__ = [str(d) for d in dirs]
-    for plugins_dir in dirs:
+    plugins_pkg.__path__ = [str(d) for d in dir_paths]
+    for plugins_dir in dir_paths:
         for plugin_path in plugins_dir.glob('**/*.py'):
             if plugin_path.name == '__init__.py':
                 continue
@@ -480,8 +475,8 @@ def _load_components_from_dirs(dirs: List[str]) -> None:
     :param list dirs: Directories where plugin components are loaded from
     """
     logger.debug('Trying to load components from: {}', dirs)
-    dirs = [Path(d) for d in dirs if os.path.isdir(d)]
-    for component_dir in dirs:
+    dir_paths = [Path(d) for d in dirs if os.path.isdir(d)]
+    for component_dir in dir_paths:
         for component_path in component_dir.glob('**/*.py'):
             if component_path.name == '__init__.py':
                 continue

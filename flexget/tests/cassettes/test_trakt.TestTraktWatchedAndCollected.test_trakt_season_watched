@@ -2,28 +2,19 @@ interactions:
 - request:
     body: null
     headers:
-      Content-Type: [application/json]
-      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: ['2']
+      Content-Type:
+      - application/json
+      trakt-api-key:
+      - 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af
+      trakt-api-version:
+      - '2'
     method: GET
     uri: https://api.trakt.tv/search?query=Into+The+Badlands&type=show
   response:
-    body: {string: "[{\"type\":\"show\",\"score\":71.818184,\"show\":{\"title\":\"Into
-        the Badlands\",\"overview\":\"A mighty warrior and a young boy search for
-        enlightenment in a ruthless territory controlled by feudal barons.\",\"year\":2015,\"status\":\"returning
-        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":82217,\"slug\":\"into-the-badlands\",\"tvdb\":289079,\"imdb\":\"tt3865236\",\"tmdb\":47450,\"tvrage\":49739}}},{\"type\":\"show\",\"score\":5.2921424,\"show\":{\"title\":\"The
-        Sparticle Mystery\",\"overview\":\"The Sparticle Mystery follows a group of
-        ten children left to fend for themselves within modern day earth after a science
-        experiment at 'The Sparticle Project' goes wrong, resulting in all those of
-        age 15 and over disappearing into a parallel universe, at precisely 11:11am.Initially
-        the world becomes their exciting playground. With adults' rules, law and order
-        all removed, the youngsters have great fun fulfilling many wishes, including
-        raiding sweetshops etc. However, as the world's resources start to dwindle
-        and daily survival gets harder, the youngsters resolve to bring the adults
-        back by venturing to the top secret 'Sparticle Project'. They are aided in
-        their quest by a number of clues left before the disappearance by a woman
-        named 'Doomsday' Dora, a scientist who worked on the Sparticle Project. Along
-        the way they have many adventures and learn important life skills.\",\"year\":2011,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":37465,\"slug\":\"the-sparticle-mystery\",\"tvdb\":256458,\"imdb\":\"tt1781715\",\"tmdb\":37623,\"tvrage\":null}}},{\"type\":\"show\",\"score\":2.9854724,\"show\":{\"title\":\"The
+    body:
+      string: "[{\"type\":\"show\",\"score\":70.65783,\"show\":{\"title\":\"Into the
+        Badlands\",\"overview\":\"A mighty warrior and a young boy search for enlightenment
+        in a ruthless territory controlled by feudal barons.\",\"year\":2015,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":82217,\"slug\":\"into-the-badlands\",\"tvdb\":289079,\"imdb\":\"tt3865236\",\"tmdb\":47450,\"tvrage\":49739}}},{\"type\":\"show\",\"score\":3.0133872,\"show\":{\"title\":\"The
         Boneyard With George St Pierre\",\"overview\":\"Mixed martial arts superstar
         Georges St-Pierre is regarded as one of the greatest champions in the history
         of the sport, but there\u2019s something he loves even more than fighting:
@@ -33,7 +24,7 @@ interactions:
         vicious predators to ever walk the earth. Over two exciting half hour specials,
         Georges\u2019 off-grid adventure takes him from the badlands of South Dakota,
         to the swamps of Alabama, to Argentina\u2019s dinosaur graveyard, Patagonia,
-        in order to reveal the truth about prehistoric life.\",\"year\":2016,\"status\":\"\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":110198,\"slug\":\"the-boneyard-with-george-st-pierre\",\"tvdb\":315001,\"imdb\":\"tt5792012\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":0.48866528,\"show\":{\"title\":\"DinoSapien\",\"overview\":\"The
+        in order to reveal the truth about prehistoric life.\",\"year\":2016,\"status\":\"\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":110198,\"slug\":\"the-boneyard-with-george-st-pierre\",\"tvdb\":315001,\"imdb\":\"tt5792012\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":0.5119071,\"show\":{\"title\":\"Dinosapien\",\"overview\":\"The
         program focuses on what would happen if dinosaurs had continued to exist and
         evolve into more intelligent beings (Lauren mentions in the opening credits
         \\\"Everyone thinks dinosaurs are extinct, but what if they're wrong?\\\").
@@ -44,124 +35,273 @@ interactions:
         is, however, the first human to encounter one of the evolved dinosaurs, which
         she eventually gets to know. Throughout the series Dr. Slayton befriends Dr.
         Aikens (who later turns villainous) and Lauren makes lots of friends before
-        finding out more about dinosaurs and her father's disappearance.\",\"year\":2007,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":15218,\"slug\":\"dinosapien\",\"tvdb\":103191,\"imdb\":\"tt0822975\",\"tmdb\":15283,\"tvrage\":null}}}]"}
+        finding out more about dinosaurs and her father's disappearance.\",\"year\":2007,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":15218,\"slug\":\"dinosapien\",\"tvdb\":103191,\"imdb\":\"tt0805825\",\"tmdb\":15283,\"tvrage\":null}}}]"
     headers:
-      CF-Cache-Status: [HIT]
-      CF-RAY: [35437a39ab7d3d07-CPH]
-      Cache-Control: ['public, max-age=28800']
-      Connection: [keep-alive]
-      Content-Type: [application/json; charset=utf-8]
-      Date: ['Sun, 23 Apr 2017 20:12:23 GMT']
-      ETag: [W/"a54a29679b77620fa3b1deb0787cd1ef"]
-      Expires: ['Mon, 24 Apr 2017 04:12:23 GMT']
-      Server: [cloudflare-nginx]
-      Set-Cookie: ['__cfduid=da1bfd821e51859b96e015e9a6573c5aa1492978343; expires=Mon,
-          23-Apr-18 20:12:23 GMT; path=/; domain=.trakt.tv; HttpOnly']
-      Vary: [Accept-Encoding]
-      X-Content-Type-Options: [nosniff]
-      X-Frame-Options: [SAMEORIGIN]
-      X-Pagination-Item-Count: ['4']
-      X-Pagination-Limit: ['10']
-      X-Pagination-Page: ['1']
-      X-Pagination-Page-Count: ['1']
-      X-Request-Id: [3b9135f4-6645-45a0-972d-d3e8c747fc7d]
-      X-Runtime: ['0.036569']
-      X-XSS-Protection: [1; mode=block]
-    status: {code: 200, message: OK}
+      Age:
+      - '3351'
+      CF-Cache-Status:
+      - HIT
+      CF-RAY:
+      - 60caac4bbe9273e5-IAD
+      Cache-Control:
+      - public, max-age=28800
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Tue, 05 Jan 2021 05:06:58 GMT
+      ETag:
+      - W/"b4c4a97108de457da44ba95348d1116e"
+      Expect-CT:
+      - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+      Expires:
+      - Tue, 05 Jan 2021 12:11:06 GMT
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cfduid=dba108037ced8f9733d7448ae7ae4ba6c1609823218; expires=Thu, 04-Feb-21
+        05:06:58 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Pagination-Item-Count:
+      - '3'
+      X-Pagination-Limit:
+      - '10'
+      X-Pagination-Page:
+      - '1'
+      X-Pagination-Page-Count:
+      - '1'
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Ratelimit:
+      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":999,"until":"2021-01-05T04:15:00Z"}'
+      X-Request-Id:
+      - 1fc959b4-32cd-494c-a0f8-a4c1bdef1dda
+      X-Runtime:
+      - '0.014201'
+      X-XSS-Protection:
+      - 1; mode=block
+      cf-request-id:
+      - 07728a0355000073e562ab0000000001
+    status:
+      code: 200
+      message: OK
 - request:
     body: null
     headers:
-      Content-Type: [application/json]
-      Cookie: [__cfduid=da1bfd821e51859b96e015e9a6573c5aa1492978343]
-      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: ['2']
+      Content-Type:
+      - application/json
+      trakt-api-key:
+      - 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af
+      trakt-api-version:
+      - '2'
     method: GET
     uri: https://api.trakt.tv/shows/82217?extended=full
   response:
-    body: {string: '{"title":"Into the Badlands","year":2015,"ids":{"trakt":82217,"slug":"into-the-badlands","tvdb":289079,"imdb":"tt3865236","tmdb":47450,"tvrage":49739},"overview":"A
+    body:
+      string: '{"title":"Into the Badlands","year":2015,"ids":{"trakt":82217,"slug":"into-the-badlands","tvdb":289079,"imdb":"tt3865236","tmdb":47450,"tvrage":49739},"overview":"A
         mighty warrior and a young boy search for enlightenment in a ruthless territory
-        controlled by feudal barons.","first_aired":"2015-11-15T00:00:00.000Z","airs":{"day":"Sunday","time":"22:00","timezone":"America/New_York"},"runtime":45,"certification":"TV-14","network":"AMC","country":"us","trailer":null,"homepage":"http://www.amc.com/shows/into-the-badlands","status":"returning
-        series","rating":8.15742,"votes":1099,"updated_at":"2017-04-23T11:51:22.000Z","language":"en","available_translations":["bg","cs","da","de","el","en","es","fa","fr","he","hu","ko","nl","pl","pt","ro","ru","tr","uk","zh"],"genres":["action","adventure","drama"],"aired_episodes":11}'}
+        controlled by feudal barons.","first_aired":"2015-11-16T03:00:00.000Z","airs":{"day":"Monday","time":"22:00","timezone":"America/New_York"},"runtime":45,"certification":"TV-14","network":"AMC","country":"us","trailer":"https://youtube.com/watch?v=5KyHy4KRvIc","homepage":"http://www.amc.com/shows/into-the-badlands","status":"ended","rating":7.98723,"votes":2818,"comment_count":25,"updated_at":"2020-11-26T16:13:03.000Z","language":"en","available_translations":["bg","cs","da","de","el","en","es","fa","fr","he","hu","id","it","ko","lt","nl","no","pl","pt","ro","ru","tr","uk","vi","zh"],"genres":["action","adventure"],"aired_episodes":32}'
     headers:
-      CF-Cache-Status: [HIT]
-      CF-RAY: [35437a39fb8c3d07-CPH]
-      Cache-Control: ['public, max-age=28800']
-      Connection: [keep-alive]
-      Content-Type: [application/json; charset=utf-8]
-      Date: ['Sun, 23 Apr 2017 20:12:24 GMT']
-      ETag: [W/"13075af7fd5ce3224a898fbb05fca722"]
-      Expires: ['Mon, 24 Apr 2017 04:12:24 GMT']
-      Last-Modified: ['Sun, 23 Apr 2017 11:51:22 GMT']
-      Server: [cloudflare-nginx]
-      Vary: [Accept-Encoding]
-      X-Content-Type-Options: [nosniff]
-      X-Frame-Options: [SAMEORIGIN]
-      X-Request-Id: [b100c237-f315-48b3-bf77-72bde6f0dea6]
-      X-Runtime: ['0.061001']
-      X-XSS-Protection: [1; mode=block]
-    status: {code: 200, message: OK}
+      Age:
+      - '8967'
+      CF-Cache-Status:
+      - HIT
+      CF-RAY:
+      - 60caac4c5efa099c-IAD
+      Cache-Control:
+      - public, max-age=28800
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Tue, 05 Jan 2021 05:06:58 GMT
+      ETag:
+      - W/"6bf1a6632d721cc07a380d192443690e"
+      Expect-CT:
+      - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+      Expires:
+      - Tue, 05 Jan 2021 10:37:29 GMT
+      Last-Modified:
+      - Thu, 26 Nov 2020 16:13:03 GMT
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cfduid=d9580763b14c5bcc42455547f703f93391609823218; expires=Thu, 04-Feb-21
+        05:06:58 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Ratelimit:
+      - '{"name":"AUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":999,"until":"2020-12-16T00:10:00Z"}'
+      X-Request-Id:
+      - dcc308e5-bd38-499f-9432-2ec8bf967e52
+      X-Runtime:
+      - '0.009581'
+      X-XSS-Protection:
+      - 1; mode=block
+      cf-request-id:
+      - 07728a03b50000099cc7103000000001
+    status:
+      code: 200
+      message: OK
 - request:
     body: null
     headers:
-      Content-Type: [application/json]
-      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: ['2']
+      Content-Type:
+      - application/json
+      trakt-api-key:
+      - 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af
+      trakt-api-version:
+      - '2'
     method: GET
     uri: https://api.trakt.tv/shows/82217/seasons/?extended=full
   response:
-    body: {string: '[{"number":0,"ids":{"trakt":121665,"tvdb":null,"tmdb":null,"tvrage":null},"rating":8.875,"votes":8,"episode_count":24,"aired_episodes":3,"title":"Specials","overview":null,"first_aired":"2016-12-10T03:00:00.000Z"},{"number":1,"ids":{"trakt":105051,"tvdb":632067,"tmdb":null,"tvrage":null},"rating":7.94611,"votes":167,"episode_count":6,"aired_episodes":6,"title":"Season
-        1","overview":null,"first_aired":"2015-11-16T03:00:00.000Z"},{"number":2,"ids":{"trakt":118719,"tvdb":null,"tmdb":null,"tvrage":null},"rating":8.33333,"votes":18,"episode_count":10,"aired_episodes":5,"title":"Season
-        2","overview":null,"first_aired":"2017-03-20T02:00:00.000Z"}]'}
+    body:
+      string: '[{"number":0,"ids":{"trakt":121665,"tvdb":605593,"tmdb":null,"tvrage":null},"rating":8.64706,"votes":17,"episode_count":24,"aired_episodes":12,"title":"Specials","overview":null,"first_aired":"2015-07-27T02:00:00.000Z","updated_at":"2021-01-05T02:08:25.000Z","network":"AMC"},{"number":1,"ids":{"trakt":105051,"tvdb":632067,"tmdb":68206,"tvrage":null},"rating":7.86351,"votes":359,"episode_count":6,"aired_episodes":6,"title":"Season
+        1","overview":"","first_aired":"2015-11-16T03:00:00.000Z","updated_at":"2021-01-05T02:15:28.000Z","network":"AMC"},{"number":2,"ids":{"trakt":118719,"tvdb":696341,"tmdb":84645,"tvrage":null},"rating":7.58636,"votes":220,"episode_count":10,"aired_episodes":10,"title":"Season
+        2","overview":"","first_aired":"2017-03-20T02:00:00.000Z","updated_at":"2021-01-05T02:05:20.000Z","network":"AMC"},{"number":3,"ids":{"trakt":151711,"tvdb":731857,"tmdb":101345,"tvrage":null},"rating":7.55039,"votes":129,"episode_count":16,"aired_episodes":16,"title":"Season
+        3","overview":"Season 3 finds Sunny living off the grid, doing his best to
+        provide for his infant son, Henry. It is only when Henry contracts a mysterious
+        illness that Sunny must join forces with Bajie and journey back into the Badlands,
+        where the Widow and Baron Chau are entrenched in a drawn-out war that has
+        destabilized the entire region.","first_aired":"2018-04-23T02:00:00.000Z","updated_at":"2021-01-05T02:20:48.000Z","network":"AMC"}]'
     headers:
-      CF-Cache-Status: [HIT]
-      CF-RAY: [35437a3aebf23d07-CPH]
-      Cache-Control: ['public, max-age=28800']
-      Connection: [keep-alive]
-      Content-Type: [application/json; charset=utf-8]
-      Date: ['Sun, 23 Apr 2017 20:12:24 GMT']
-      ETag: [W/"e451d7fefcaa830cd7ba89ddc8d746bf"]
-      Expires: ['Mon, 24 Apr 2017 04:12:24 GMT']
-      Server: [cloudflare-nginx]
-      Set-Cookie: ['__cfduid=dcfce28225d83b6498e093daaec83d72d1492978344; expires=Mon,
-          23-Apr-18 20:12:24 GMT; path=/; domain=.trakt.tv; HttpOnly']
-      Vary: [Accept-Encoding]
-      X-Content-Type-Options: [nosniff]
-      X-Frame-Options: [SAMEORIGIN]
-      X-Request-Id: [27984166-b6e2-405b-a953-de2a8c718f63]
-      X-Runtime: ['0.061357']
-      X-XSS-Protection: [1; mode=block]
-    status: {code: 200, message: OK}
+      Age:
+      - '3350'
+      CF-Cache-Status:
+      - HIT
+      CF-RAY:
+      - 60caac4cfada0d86-IAD
+      Cache-Control:
+      - public, max-age=28800
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Tue, 05 Jan 2021 05:06:58 GMT
+      ETag:
+      - W/"f385ac42ad3fea3e284a89e66964937d"
+      Expect-CT:
+      - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+      Expires:
+      - Tue, 05 Jan 2021 12:11:05 GMT
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cfduid=da31481fd9d8dab6f9df79b233bea8d7c1609823218; expires=Thu, 04-Feb-21
+        05:06:58 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Ratelimit:
+      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":998,"until":"2021-01-05T04:15:00Z"}'
+      X-Request-Id:
+      - b9be8fd6-eeb7-40ae-8b89-ff44bdf89c54
+      X-Runtime:
+      - '0.008988'
+      X-XSS-Protection:
+      - 1; mode=block
+      cf-request-id:
+      - 07728a041e00000d86250ed000000001
+    status:
+      code: 200
+      message: OK
 - request:
     body: null
     headers:
-      Content-Type: [application/json]
-      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: ['2']
+      Content-Type:
+      - application/json
+      trakt-api-key:
+      - 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af
+      trakt-api-version:
+      - '2'
     method: GET
     uri: https://api.trakt.tv/users/flexgettest/watched/shows
   response:
-    body: {string: '[{"plays":6,"last_watched_at":"2017-04-23T18:45:04.000Z","show":{"title":"Into
-        the Badlands","year":2015,"ids":{"trakt":82217,"slug":"into-the-badlands","tvdb":289079,"imdb":"tt3865236","tmdb":47450,"tvrage":49739}},"seasons":[{"number":1,"episodes":[{"number":1,"plays":1,"last_watched_at":"2017-04-23T18:45:04.000Z"},{"number":2,"plays":1,"last_watched_at":"2017-04-23T18:45:04.000Z"},{"number":3,"plays":1,"last_watched_at":"2017-04-23T18:45:04.000Z"},{"number":4,"plays":1,"last_watched_at":"2017-04-23T18:45:04.000Z"},{"number":5,"plays":1,"last_watched_at":"2017-04-23T18:45:04.000Z"},{"number":6,"plays":1,"last_watched_at":"2017-04-23T18:45:04.000Z"}]}]},{"plays":102,"last_watched_at":"2015-01-02T03:46:38.000Z","show":{"title":"Hawaii
-        Five-0","year":2010,"ids":{"trakt":32657,"slug":"hawaii-five-0","tvdb":164541,"imdb":"tt1600194","tmdb":32798,"tvrage":24840}},"seasons":[{"number":1,"episodes":[{"number":1,"plays":1,"last_watched_at":"2015-01-02T03:46:36.000Z"},{"number":2,"plays":1,"last_watched_at":"2015-01-02T03:46:36.000Z"},{"number":3,"plays":1,"last_watched_at":"2015-01-02T03:46:36.000Z"},{"number":4,"plays":1,"last_watched_at":"2015-01-02T03:46:36.000Z"},{"number":5,"plays":1,"last_watched_at":"2015-01-02T03:46:36.000Z"},{"number":6,"plays":1,"last_watched_at":"2015-01-02T03:46:36.000Z"},{"number":7,"plays":1,"last_watched_at":"2015-01-02T03:46:36.000Z"},{"number":8,"plays":1,"last_watched_at":"2015-01-02T03:46:36.000Z"},{"number":9,"plays":1,"last_watched_at":"2015-01-02T03:46:36.000Z"},{"number":10,"plays":1,"last_watched_at":"2015-01-02T03:46:36.000Z"},{"number":11,"plays":1,"last_watched_at":"2015-01-02T03:46:36.000Z"},{"number":12,"plays":1,"last_watched_at":"2015-01-02T03:46:36.000Z"},{"number":13,"plays":1,"last_watched_at":"2015-01-02T03:46:36.000Z"},{"number":14,"plays":1,"last_watched_at":"2015-01-02T03:46:36.000Z"},{"number":15,"plays":1,"last_watched_at":"2015-01-02T03:46:36.000Z"},{"number":16,"plays":1,"last_watched_at":"2015-01-02T03:46:36.000Z"},{"number":17,"plays":1,"last_watched_at":"2015-01-02T03:46:36.000Z"},{"number":18,"plays":1,"last_watched_at":"2015-01-02T03:46:36.000Z"},{"number":19,"plays":1,"last_watched_at":"2015-01-02T03:46:36.000Z"},{"number":20,"plays":1,"last_watched_at":"2015-01-02T03:46:36.000Z"},{"number":21,"plays":1,"last_watched_at":"2015-01-02T03:46:36.000Z"},{"number":22,"plays":1,"last_watched_at":"2015-01-02T03:46:36.000Z"},{"number":23,"plays":1,"last_watched_at":"2015-01-02T03:46:36.000Z"},{"number":24,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"}]},{"number":2,"episodes":[{"number":1,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":2,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":3,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":4,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":5,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":6,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":7,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":8,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":9,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":10,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":11,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":12,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":13,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":14,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":15,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":16,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":17,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":18,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":19,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":20,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":21,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":22,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":23,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"}]},{"number":3,"episodes":[{"number":1,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":2,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":3,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":4,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":5,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":6,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":7,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":8,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":9,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":10,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":11,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":12,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":13,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":14,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":15,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":16,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":17,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":18,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":19,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":20,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":21,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":22,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":23,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":24,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"}]},{"number":4,"episodes":[{"number":1,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":2,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":3,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":4,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":5,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":6,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":7,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":8,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":9,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":10,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":11,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":12,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":13,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":14,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":15,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":16,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":17,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":18,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":19,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":20,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":21,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":22,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"}]},{"number":5,"episodes":[{"number":1,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":2,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":3,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":4,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":5,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":6,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":7,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":8,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":9,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"}]}]},{"plays":92,"last_watched_at":"2015-01-02T03:40:56.000Z","show":{"title":"Sons
-        of Anarchy","year":2008,"ids":{"trakt":1400,"slug":"sons-of-anarchy","tvdb":82696,"imdb":"tt1124373","tmdb":1409,"tvrage":18174}},"seasons":[{"number":1,"episodes":[{"number":1,"plays":1,"last_watched_at":"2015-01-02T03:40:54.000Z"},{"number":2,"plays":1,"last_watched_at":"2015-01-02T03:40:54.000Z"},{"number":3,"plays":1,"last_watched_at":"2015-01-02T03:40:54.000Z"},{"number":4,"plays":1,"last_watched_at":"2015-01-02T03:40:54.000Z"},{"number":5,"plays":1,"last_watched_at":"2015-01-02T03:40:54.000Z"},{"number":6,"plays":1,"last_watched_at":"2015-01-02T03:40:54.000Z"},{"number":7,"plays":1,"last_watched_at":"2015-01-02T03:40:54.000Z"},{"number":8,"plays":1,"last_watched_at":"2015-01-02T03:40:54.000Z"},{"number":9,"plays":1,"last_watched_at":"2015-01-02T03:40:54.000Z"},{"number":10,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":11,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":12,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":13,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"}]},{"number":2,"episodes":[{"number":1,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":2,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":3,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":4,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":5,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":6,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":7,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":8,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":9,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":10,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":11,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":12,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":13,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"}]},{"number":3,"episodes":[{"number":1,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":2,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":3,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":4,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":5,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":6,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":7,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":8,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":9,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":10,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":11,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":12,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":13,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"}]},{"number":4,"episodes":[{"number":1,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":2,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":3,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":4,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":5,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":6,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":7,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":8,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":9,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":10,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":11,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":12,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":13,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":14,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"}]},{"number":5,"episodes":[{"number":1,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":2,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":3,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":4,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":5,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":6,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":7,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":8,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":9,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":10,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":11,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":12,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":13,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"}]},{"number":6,"episodes":[{"number":1,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":2,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":3,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":4,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":5,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":6,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":7,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":8,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":9,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":10,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":11,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":12,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":13,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"}]},{"number":7,"episodes":[{"number":1,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":2,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":3,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":4,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":5,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":6,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":7,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":8,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":9,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":10,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":11,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":12,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":13,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"}]}]},{"plays":12,"last_watched_at":"2015-01-02T03:40:06.000Z","show":{"title":"Homeland","year":2011,"ids":{"trakt":1398,"slug":"homeland","tvdb":247897,"imdb":"tt1796960","tmdb":1407,"tvrage":27811}},"seasons":[{"number":1,"episodes":[{"number":1,"plays":1,"last_watched_at":"2015-01-02T03:37:34.000Z"},{"number":2,"plays":1,"last_watched_at":"2015-01-02T03:40:06.000Z"},{"number":3,"plays":1,"last_watched_at":"2015-01-02T03:40:06.000Z"},{"number":4,"plays":1,"last_watched_at":"2015-01-02T03:40:06.000Z"},{"number":5,"plays":1,"last_watched_at":"2015-01-02T03:40:06.000Z"},{"number":6,"plays":1,"last_watched_at":"2015-01-02T03:40:06.000Z"},{"number":7,"plays":1,"last_watched_at":"2015-01-02T03:40:06.000Z"},{"number":8,"plays":1,"last_watched_at":"2015-01-02T03:40:06.000Z"},{"number":9,"plays":1,"last_watched_at":"2015-01-02T03:40:06.000Z"},{"number":10,"plays":1,"last_watched_at":"2015-01-02T03:40:06.000Z"},{"number":11,"plays":1,"last_watched_at":"2015-01-02T03:40:06.000Z"},{"number":12,"plays":1,"last_watched_at":"2015-01-02T03:40:06.000Z"}]}]},{"plays":91,"last_watched_at":"2012-01-28T01:00:00.000Z","show":{"title":"Chuck","year":2007,"ids":{"trakt":1395,"slug":"chuck","tvdb":80348,"imdb":"tt0934814","tmdb":1404,"tvrage":15614}},"seasons":[{"number":1,"episodes":[{"number":1,"plays":1,"last_watched_at":"2007-09-25T00:00:00.000Z"},{"number":2,"plays":1,"last_watched_at":"2007-10-02T00:00:00.000Z"},{"number":3,"plays":1,"last_watched_at":"2007-10-09T00:00:00.000Z"},{"number":4,"plays":1,"last_watched_at":"2007-10-16T00:00:00.000Z"},{"number":5,"plays":1,"last_watched_at":"2007-10-23T00:00:00.000Z"},{"number":6,"plays":1,"last_watched_at":"2007-10-30T00:00:00.000Z"},{"number":7,"plays":1,"last_watched_at":"2007-11-06T01:00:00.000Z"},{"number":8,"plays":1,"last_watched_at":"2007-11-13T01:00:00.000Z"},{"number":9,"plays":1,"last_watched_at":"2007-11-20T01:00:00.000Z"},{"number":10,"plays":1,"last_watched_at":"2007-11-27T01:00:00.000Z"},{"number":11,"plays":1,"last_watched_at":"2007-12-04T01:00:00.000Z"},{"number":12,"plays":1,"last_watched_at":"2008-01-25T01:00:00.000Z"},{"number":13,"plays":1,"last_watched_at":"2008-01-25T01:00:00.000Z"}]},{"number":2,"episodes":[{"number":1,"plays":1,"last_watched_at":"2008-09-30T00:00:00.000Z"},{"number":2,"plays":1,"last_watched_at":"2008-10-07T00:00:00.000Z"},{"number":3,"plays":1,"last_watched_at":"2008-10-14T00:00:00.000Z"},{"number":4,"plays":1,"last_watched_at":"2008-10-21T00:00:00.000Z"},{"number":5,"plays":1,"last_watched_at":"2008-10-28T00:00:00.000Z"},{"number":6,"plays":1,"last_watched_at":"2008-11-11T01:00:00.000Z"},{"number":7,"plays":1,"last_watched_at":"2008-11-18T01:00:00.000Z"},{"number":8,"plays":1,"last_watched_at":"2008-11-25T01:00:00.000Z"},{"number":9,"plays":1,"last_watched_at":"2008-12-02T01:00:00.000Z"},{"number":10,"plays":1,"last_watched_at":"2008-12-09T01:00:00.000Z"},{"number":11,"plays":1,"last_watched_at":"2008-12-16T01:00:00.000Z"},{"number":12,"plays":1,"last_watched_at":"2009-02-03T01:00:00.000Z"},{"number":13,"plays":1,"last_watched_at":"2009-02-17T01:00:00.000Z"},{"number":14,"plays":1,"last_watched_at":"2009-02-24T01:00:00.000Z"},{"number":15,"plays":1,"last_watched_at":"2009-03-03T01:00:00.000Z"},{"number":16,"plays":1,"last_watched_at":"2009-03-10T00:00:00.000Z"},{"number":17,"plays":1,"last_watched_at":"2009-03-24T00:00:00.000Z"},{"number":18,"plays":1,"last_watched_at":"2009-03-31T00:00:00.000Z"},{"number":19,"plays":1,"last_watched_at":"2009-04-07T00:00:00.000Z"},{"number":20,"plays":1,"last_watched_at":"2009-04-14T00:00:00.000Z"},{"number":21,"plays":1,"last_watched_at":"2009-04-21T00:00:00.000Z"},{"number":22,"plays":1,"last_watched_at":"2009-04-28T00:00:00.000Z"}]},{"number":3,"episodes":[{"number":1,"plays":1,"last_watched_at":"2010-01-11T01:00:00.000Z"},{"number":2,"plays":1,"last_watched_at":"2010-01-11T01:00:00.000Z"},{"number":3,"plays":1,"last_watched_at":"2010-01-12T01:00:00.000Z"},{"number":4,"plays":1,"last_watched_at":"2010-01-19T01:00:00.000Z"},{"number":5,"plays":1,"last_watched_at":"2010-01-26T01:00:00.000Z"},{"number":6,"plays":1,"last_watched_at":"2010-02-02T01:00:00.000Z"},{"number":7,"plays":1,"last_watched_at":"2010-02-09T01:00:00.000Z"},{"number":8,"plays":1,"last_watched_at":"2010-03-02T01:00:00.000Z"},{"number":9,"plays":1,"last_watched_at":"2010-03-09T01:00:00.000Z"},{"number":10,"plays":1,"last_watched_at":"2010-03-16T00:00:00.000Z"},{"number":11,"plays":1,"last_watched_at":"2010-03-23T00:00:00.000Z"},{"number":12,"plays":1,"last_watched_at":"2010-03-30T00:00:00.000Z"},{"number":13,"plays":1,"last_watched_at":"2010-04-06T00:00:00.000Z"},{"number":14,"plays":1,"last_watched_at":"2010-04-27T00:00:00.000Z"},{"number":15,"plays":1,"last_watched_at":"2010-05-04T00:00:00.000Z"},{"number":16,"plays":1,"last_watched_at":"2010-05-11T00:00:00.000Z"},{"number":17,"plays":1,"last_watched_at":"2010-05-18T00:00:00.000Z"},{"number":18,"plays":1,"last_watched_at":"2010-05-25T00:00:00.000Z"},{"number":19,"plays":1,"last_watched_at":"2010-05-25T00:00:00.000Z"}]},{"number":4,"episodes":[{"number":1,"plays":1,"last_watched_at":"2010-09-21T00:00:00.000Z"},{"number":2,"plays":1,"last_watched_at":"2010-09-28T00:00:00.000Z"},{"number":3,"plays":1,"last_watched_at":"2010-10-05T00:00:00.000Z"},{"number":4,"plays":1,"last_watched_at":"2010-10-12T00:00:00.000Z"},{"number":5,"plays":1,"last_watched_at":"2010-10-19T00:00:00.000Z"},{"number":6,"plays":1,"last_watched_at":"2010-10-26T00:00:00.000Z"},{"number":7,"plays":1,"last_watched_at":"2010-11-02T00:00:00.000Z"},{"number":8,"plays":1,"last_watched_at":"2010-11-16T01:00:00.000Z"},{"number":9,"plays":1,"last_watched_at":"2010-11-23T01:00:00.000Z"},{"number":10,"plays":1,"last_watched_at":"2010-11-30T01:00:00.000Z"},{"number":11,"plays":1,"last_watched_at":"2011-01-18T01:00:00.000Z"},{"number":12,"plays":1,"last_watched_at":"2011-01-25T01:00:00.000Z"},{"number":13,"plays":1,"last_watched_at":"2011-02-01T01:00:00.000Z"},{"number":14,"plays":1,"last_watched_at":"2011-02-08T01:00:00.000Z"},{"number":15,"plays":1,"last_watched_at":"2011-02-15T01:00:00.000Z"},{"number":16,"plays":1,"last_watched_at":"2011-02-22T01:00:00.000Z"},{"number":17,"plays":1,"last_watched_at":"2011-03-01T01:00:00.000Z"},{"number":18,"plays":1,"last_watched_at":"2011-03-15T00:00:00.000Z"},{"number":19,"plays":1,"last_watched_at":"2011-03-22T00:00:00.000Z"},{"number":20,"plays":1,"last_watched_at":"2011-04-12T00:00:00.000Z"},{"number":21,"plays":1,"last_watched_at":"2011-04-19T00:00:00.000Z"},{"number":22,"plays":1,"last_watched_at":"2011-05-03T00:00:00.000Z"},{"number":23,"plays":1,"last_watched_at":"2011-05-10T00:00:00.000Z"},{"number":24,"plays":1,"last_watched_at":"2011-05-17T00:00:00.000Z"}]},{"number":5,"episodes":[{"number":1,"plays":1,"last_watched_at":"2011-10-29T00:00:00.000Z"},{"number":2,"plays":1,"last_watched_at":"2011-11-05T00:00:00.000Z"},{"number":3,"plays":1,"last_watched_at":"2011-11-12T01:00:00.000Z"},{"number":4,"plays":1,"last_watched_at":"2011-11-19T01:00:00.000Z"},{"number":5,"plays":1,"last_watched_at":"2011-12-10T01:00:00.000Z"},{"number":6,"plays":1,"last_watched_at":"2011-12-17T01:00:00.000Z"},{"number":7,"plays":1,"last_watched_at":"2011-12-24T01:00:00.000Z"},{"number":8,"plays":1,"last_watched_at":"2011-12-31T01:00:00.000Z"},{"number":9,"plays":1,"last_watched_at":"2012-01-07T01:00:00.000Z"},{"number":10,"plays":1,"last_watched_at":"2012-01-14T01:00:00.000Z"},{"number":11,"plays":1,"last_watched_at":"2012-01-21T01:00:00.000Z"},{"number":12,"plays":1,"last_watched_at":"2012-01-28T01:00:00.000Z"},{"number":13,"plays":1,"last_watched_at":"2012-01-28T01:00:00.000Z"}]}]}]'}
+    body:
+      string: '[{"plays":6,"last_watched_at":"2017-04-23T18:45:04.000Z","last_updated_at":"2017-04-23T18:45:04.000Z","reset_at":null,"show":{"title":"Into
+        the Badlands","year":2015,"ids":{"trakt":82217,"slug":"into-the-badlands","tvdb":289079,"imdb":"tt3865236","tmdb":47450,"tvrage":49739}},"seasons":[{"number":1,"episodes":[{"number":1,"plays":1,"last_watched_at":"2017-04-23T18:45:04.000Z"},{"number":2,"plays":1,"last_watched_at":"2017-04-23T18:45:04.000Z"},{"number":3,"plays":1,"last_watched_at":"2017-04-23T18:45:04.000Z"},{"number":4,"plays":1,"last_watched_at":"2017-04-23T18:45:04.000Z"},{"number":5,"plays":1,"last_watched_at":"2017-04-23T18:45:04.000Z"},{"number":6,"plays":1,"last_watched_at":"2017-04-23T18:45:04.000Z"}]}]},{"plays":102,"last_watched_at":"2015-01-02T03:46:38.000Z","last_updated_at":"2015-01-02T03:46:38.000Z","reset_at":null,"show":{"title":"Hawaii
+        Five-0","year":2010,"ids":{"trakt":32657,"slug":"hawaii-five-0","tvdb":164541,"imdb":"tt1600194","tmdb":32798,"tvrage":24840}},"seasons":[{"number":1,"episodes":[{"number":1,"plays":1,"last_watched_at":"2015-01-02T03:46:36.000Z"},{"number":2,"plays":1,"last_watched_at":"2015-01-02T03:46:36.000Z"},{"number":3,"plays":1,"last_watched_at":"2015-01-02T03:46:36.000Z"},{"number":4,"plays":1,"last_watched_at":"2015-01-02T03:46:36.000Z"},{"number":5,"plays":1,"last_watched_at":"2015-01-02T03:46:36.000Z"},{"number":6,"plays":1,"last_watched_at":"2015-01-02T03:46:36.000Z"},{"number":7,"plays":1,"last_watched_at":"2015-01-02T03:46:36.000Z"},{"number":8,"plays":1,"last_watched_at":"2015-01-02T03:46:36.000Z"},{"number":9,"plays":1,"last_watched_at":"2015-01-02T03:46:36.000Z"},{"number":10,"plays":1,"last_watched_at":"2015-01-02T03:46:36.000Z"},{"number":11,"plays":1,"last_watched_at":"2015-01-02T03:46:36.000Z"},{"number":12,"plays":1,"last_watched_at":"2015-01-02T03:46:36.000Z"},{"number":13,"plays":1,"last_watched_at":"2015-01-02T03:46:36.000Z"},{"number":14,"plays":1,"last_watched_at":"2015-01-02T03:46:36.000Z"},{"number":15,"plays":1,"last_watched_at":"2015-01-02T03:46:36.000Z"},{"number":16,"plays":1,"last_watched_at":"2015-01-02T03:46:36.000Z"},{"number":17,"plays":1,"last_watched_at":"2015-01-02T03:46:36.000Z"},{"number":18,"plays":1,"last_watched_at":"2015-01-02T03:46:36.000Z"},{"number":19,"plays":1,"last_watched_at":"2015-01-02T03:46:36.000Z"},{"number":20,"plays":1,"last_watched_at":"2015-01-02T03:46:36.000Z"},{"number":21,"plays":1,"last_watched_at":"2015-01-02T03:46:36.000Z"},{"number":22,"plays":1,"last_watched_at":"2015-01-02T03:46:36.000Z"},{"number":23,"plays":1,"last_watched_at":"2015-01-02T03:46:36.000Z"},{"number":24,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"}]},{"number":2,"episodes":[{"number":1,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":2,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":3,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":4,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":5,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":6,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":7,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":8,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":9,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":10,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":11,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":12,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":13,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":14,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":15,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":16,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":17,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":18,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":19,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":20,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":21,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":22,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":23,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"}]},{"number":3,"episodes":[{"number":1,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":2,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":3,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":4,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":5,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":6,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":7,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":8,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":9,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":10,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":11,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":12,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":13,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":14,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":15,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":16,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":17,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":18,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":19,"plays":1,"last_watched_at":"2015-01-02T03:46:37.000Z"},{"number":20,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":21,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":22,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":23,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":24,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"}]},{"number":4,"episodes":[{"number":1,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":2,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":3,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":4,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":5,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":6,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":7,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":8,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":9,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":10,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":11,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":12,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":13,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":14,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":15,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":16,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":17,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":18,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":19,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":20,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":21,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":22,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"}]},{"number":5,"episodes":[{"number":1,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":2,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":3,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":4,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":5,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":6,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":7,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":8,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"},{"number":9,"plays":1,"last_watched_at":"2015-01-02T03:46:38.000Z"}]}]},{"plays":92,"last_watched_at":"2015-01-02T03:40:56.000Z","last_updated_at":"2015-01-02T03:40:56.000Z","reset_at":null,"show":{"title":"Sons
+        of Anarchy","year":2008,"ids":{"trakt":1400,"slug":"sons-of-anarchy","tvdb":82696,"imdb":"tt1124373","tmdb":1409,"tvrage":18174}},"seasons":[{"number":1,"episodes":[{"number":1,"plays":1,"last_watched_at":"2015-01-02T03:40:54.000Z"},{"number":2,"plays":1,"last_watched_at":"2015-01-02T03:40:54.000Z"},{"number":3,"plays":1,"last_watched_at":"2015-01-02T03:40:54.000Z"},{"number":4,"plays":1,"last_watched_at":"2015-01-02T03:40:54.000Z"},{"number":5,"plays":1,"last_watched_at":"2015-01-02T03:40:54.000Z"},{"number":6,"plays":1,"last_watched_at":"2015-01-02T03:40:54.000Z"},{"number":7,"plays":1,"last_watched_at":"2015-01-02T03:40:54.000Z"},{"number":8,"plays":1,"last_watched_at":"2015-01-02T03:40:54.000Z"},{"number":9,"plays":1,"last_watched_at":"2015-01-02T03:40:54.000Z"},{"number":10,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":11,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":12,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":13,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"}]},{"number":2,"episodes":[{"number":1,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":2,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":3,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":4,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":5,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":6,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":7,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":8,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":9,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":10,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":11,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":12,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":13,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"}]},{"number":3,"episodes":[{"number":1,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":2,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":3,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":4,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":5,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":6,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":7,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":8,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":9,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":10,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":11,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":12,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":13,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"}]},{"number":4,"episodes":[{"number":1,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":2,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":3,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":4,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":5,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":6,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":7,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":8,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":9,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":10,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":11,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":12,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":13,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"},{"number":14,"plays":1,"last_watched_at":"2015-01-02T03:40:55.000Z"}]},{"number":5,"episodes":[{"number":1,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":2,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":3,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":4,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":5,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":6,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":7,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":8,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":9,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":10,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":11,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":12,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":13,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"}]},{"number":6,"episodes":[{"number":1,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":2,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":3,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":4,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":5,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":6,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":7,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":8,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":9,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":10,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":11,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":12,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":13,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"}]},{"number":7,"episodes":[{"number":1,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":2,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":3,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":4,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":5,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":6,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":7,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":8,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":9,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":10,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":11,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":12,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"},{"number":13,"plays":1,"last_watched_at":"2015-01-02T03:40:56.000Z"}]}]},{"plays":12,"last_watched_at":"2015-01-02T03:40:06.000Z","last_updated_at":"2015-01-02T03:40:06.000Z","reset_at":null,"show":{"title":"Homeland","year":2011,"ids":{"trakt":1398,"slug":"homeland","tvdb":247897,"imdb":"tt1796960","tmdb":1407,"tvrage":27811}},"seasons":[{"number":1,"episodes":[{"number":1,"plays":1,"last_watched_at":"2015-01-02T03:37:34.000Z"},{"number":2,"plays":1,"last_watched_at":"2015-01-02T03:40:06.000Z"},{"number":3,"plays":1,"last_watched_at":"2015-01-02T03:40:06.000Z"},{"number":4,"plays":1,"last_watched_at":"2015-01-02T03:40:06.000Z"},{"number":5,"plays":1,"last_watched_at":"2015-01-02T03:40:06.000Z"},{"number":6,"plays":1,"last_watched_at":"2015-01-02T03:40:06.000Z"},{"number":7,"plays":1,"last_watched_at":"2015-01-02T03:40:06.000Z"},{"number":8,"plays":1,"last_watched_at":"2015-01-02T03:40:06.000Z"},{"number":9,"plays":1,"last_watched_at":"2015-01-02T03:40:06.000Z"},{"number":10,"plays":1,"last_watched_at":"2015-01-02T03:40:06.000Z"},{"number":11,"plays":1,"last_watched_at":"2015-01-02T03:40:06.000Z"},{"number":12,"plays":1,"last_watched_at":"2015-01-02T03:40:06.000Z"}]}]},{"plays":91,"last_watched_at":"2012-01-28T01:00:00.000Z","last_updated_at":"2016-03-08T21:36:47.000Z","reset_at":null,"show":{"title":"Chuck","year":2007,"ids":{"trakt":1395,"slug":"chuck","tvdb":80348,"imdb":"tt0934814","tmdb":1404,"tvrage":15614}},"seasons":[{"number":1,"episodes":[{"number":1,"plays":1,"last_watched_at":"2007-09-25T00:00:00.000Z"},{"number":2,"plays":1,"last_watched_at":"2007-10-02T00:00:00.000Z"},{"number":3,"plays":1,"last_watched_at":"2007-10-09T00:00:00.000Z"},{"number":4,"plays":1,"last_watched_at":"2007-10-16T00:00:00.000Z"},{"number":5,"plays":1,"last_watched_at":"2007-10-23T00:00:00.000Z"},{"number":6,"plays":1,"last_watched_at":"2007-10-30T00:00:00.000Z"},{"number":7,"plays":1,"last_watched_at":"2007-11-06T01:00:00.000Z"},{"number":8,"plays":1,"last_watched_at":"2007-11-13T01:00:00.000Z"},{"number":9,"plays":1,"last_watched_at":"2007-11-20T01:00:00.000Z"},{"number":10,"plays":1,"last_watched_at":"2007-11-27T01:00:00.000Z"},{"number":11,"plays":1,"last_watched_at":"2007-12-04T01:00:00.000Z"},{"number":12,"plays":1,"last_watched_at":"2008-01-25T01:00:00.000Z"},{"number":13,"plays":1,"last_watched_at":"2008-01-25T01:00:00.000Z"}]},{"number":2,"episodes":[{"number":1,"plays":1,"last_watched_at":"2008-09-30T00:00:00.000Z"},{"number":2,"plays":1,"last_watched_at":"2008-10-07T00:00:00.000Z"},{"number":3,"plays":1,"last_watched_at":"2008-10-14T00:00:00.000Z"},{"number":4,"plays":1,"last_watched_at":"2008-10-21T00:00:00.000Z"},{"number":5,"plays":1,"last_watched_at":"2008-10-28T00:00:00.000Z"},{"number":6,"plays":1,"last_watched_at":"2008-11-11T01:00:00.000Z"},{"number":7,"plays":1,"last_watched_at":"2008-11-18T01:00:00.000Z"},{"number":8,"plays":1,"last_watched_at":"2008-11-25T01:00:00.000Z"},{"number":9,"plays":1,"last_watched_at":"2008-12-02T01:00:00.000Z"},{"number":10,"plays":1,"last_watched_at":"2008-12-09T01:00:00.000Z"},{"number":11,"plays":1,"last_watched_at":"2008-12-16T01:00:00.000Z"},{"number":12,"plays":1,"last_watched_at":"2009-02-03T01:00:00.000Z"},{"number":13,"plays":1,"last_watched_at":"2009-02-17T01:00:00.000Z"},{"number":14,"plays":1,"last_watched_at":"2009-02-24T01:00:00.000Z"},{"number":15,"plays":1,"last_watched_at":"2009-03-03T01:00:00.000Z"},{"number":16,"plays":1,"last_watched_at":"2009-03-10T00:00:00.000Z"},{"number":17,"plays":1,"last_watched_at":"2009-03-24T00:00:00.000Z"},{"number":18,"plays":1,"last_watched_at":"2009-03-31T00:00:00.000Z"},{"number":19,"plays":1,"last_watched_at":"2009-04-07T00:00:00.000Z"},{"number":20,"plays":1,"last_watched_at":"2009-04-14T00:00:00.000Z"},{"number":21,"plays":1,"last_watched_at":"2009-04-21T00:00:00.000Z"},{"number":22,"plays":1,"last_watched_at":"2009-04-28T00:00:00.000Z"}]},{"number":3,"episodes":[{"number":1,"plays":1,"last_watched_at":"2010-01-11T01:00:00.000Z"},{"number":2,"plays":1,"last_watched_at":"2010-01-11T01:00:00.000Z"},{"number":3,"plays":1,"last_watched_at":"2010-01-12T01:00:00.000Z"},{"number":4,"plays":1,"last_watched_at":"2010-01-19T01:00:00.000Z"},{"number":5,"plays":1,"last_watched_at":"2010-01-26T01:00:00.000Z"},{"number":6,"plays":1,"last_watched_at":"2010-02-02T01:00:00.000Z"},{"number":7,"plays":1,"last_watched_at":"2010-02-09T01:00:00.000Z"},{"number":8,"plays":1,"last_watched_at":"2010-03-02T01:00:00.000Z"},{"number":9,"plays":1,"last_watched_at":"2010-03-09T01:00:00.000Z"},{"number":10,"plays":1,"last_watched_at":"2010-03-16T00:00:00.000Z"},{"number":11,"plays":1,"last_watched_at":"2010-03-23T00:00:00.000Z"},{"number":12,"plays":1,"last_watched_at":"2010-03-30T00:00:00.000Z"},{"number":13,"plays":1,"last_watched_at":"2010-04-06T00:00:00.000Z"},{"number":14,"plays":1,"last_watched_at":"2010-04-27T00:00:00.000Z"},{"number":15,"plays":1,"last_watched_at":"2010-05-04T00:00:00.000Z"},{"number":16,"plays":1,"last_watched_at":"2010-05-11T00:00:00.000Z"},{"number":17,"plays":1,"last_watched_at":"2010-05-18T00:00:00.000Z"},{"number":18,"plays":1,"last_watched_at":"2010-05-25T00:00:00.000Z"},{"number":19,"plays":1,"last_watched_at":"2010-05-25T00:00:00.000Z"}]},{"number":4,"episodes":[{"number":1,"plays":1,"last_watched_at":"2010-09-21T00:00:00.000Z"},{"number":2,"plays":1,"last_watched_at":"2010-09-28T00:00:00.000Z"},{"number":3,"plays":1,"last_watched_at":"2010-10-05T00:00:00.000Z"},{"number":4,"plays":1,"last_watched_at":"2010-10-12T00:00:00.000Z"},{"number":5,"plays":1,"last_watched_at":"2010-10-19T00:00:00.000Z"},{"number":6,"plays":1,"last_watched_at":"2010-10-26T00:00:00.000Z"},{"number":7,"plays":1,"last_watched_at":"2010-11-02T00:00:00.000Z"},{"number":8,"plays":1,"last_watched_at":"2010-11-16T01:00:00.000Z"},{"number":9,"plays":1,"last_watched_at":"2010-11-23T01:00:00.000Z"},{"number":10,"plays":1,"last_watched_at":"2010-11-30T01:00:00.000Z"},{"number":11,"plays":1,"last_watched_at":"2011-01-18T01:00:00.000Z"},{"number":12,"plays":1,"last_watched_at":"2011-01-25T01:00:00.000Z"},{"number":13,"plays":1,"last_watched_at":"2011-02-01T01:00:00.000Z"},{"number":14,"plays":1,"last_watched_at":"2011-02-08T01:00:00.000Z"},{"number":15,"plays":1,"last_watched_at":"2011-02-15T01:00:00.000Z"},{"number":16,"plays":1,"last_watched_at":"2011-02-22T01:00:00.000Z"},{"number":17,"plays":1,"last_watched_at":"2011-03-01T01:00:00.000Z"},{"number":18,"plays":1,"last_watched_at":"2011-03-15T00:00:00.000Z"},{"number":19,"plays":1,"last_watched_at":"2011-03-22T00:00:00.000Z"},{"number":20,"plays":1,"last_watched_at":"2011-04-12T00:00:00.000Z"},{"number":21,"plays":1,"last_watched_at":"2011-04-19T00:00:00.000Z"},{"number":22,"plays":1,"last_watched_at":"2011-05-03T00:00:00.000Z"},{"number":23,"plays":1,"last_watched_at":"2011-05-10T00:00:00.000Z"},{"number":24,"plays":1,"last_watched_at":"2011-05-17T00:00:00.000Z"}]},{"number":5,"episodes":[{"number":1,"plays":1,"last_watched_at":"2011-10-29T00:00:00.000Z"},{"number":2,"plays":1,"last_watched_at":"2011-11-05T00:00:00.000Z"},{"number":3,"plays":1,"last_watched_at":"2011-11-12T01:00:00.000Z"},{"number":4,"plays":1,"last_watched_at":"2011-11-19T01:00:00.000Z"},{"number":5,"plays":1,"last_watched_at":"2011-12-10T01:00:00.000Z"},{"number":6,"plays":1,"last_watched_at":"2011-12-17T01:00:00.000Z"},{"number":7,"plays":1,"last_watched_at":"2011-12-24T01:00:00.000Z"},{"number":8,"plays":1,"last_watched_at":"2011-12-31T01:00:00.000Z"},{"number":9,"plays":1,"last_watched_at":"2012-01-07T01:00:00.000Z"},{"number":10,"plays":1,"last_watched_at":"2012-01-14T01:00:00.000Z"},{"number":11,"plays":1,"last_watched_at":"2012-01-21T01:00:00.000Z"},{"number":12,"plays":1,"last_watched_at":"2012-01-28T01:00:00.000Z"},{"number":13,"plays":1,"last_watched_at":"2012-01-28T01:00:00.000Z"}]}]}]'
     headers:
-      CF-RAY: [35437a3bd8473cfb-CPH]
-      Cache-Control: ['max-age=0, private, must-revalidate']
-      Cf-Railgun: [8fc3e86149 0.23 0.566523 0030 e6be]
-      Connection: [keep-alive]
-      Content-Type: [application/json; charset=utf-8]
-      Date: ['Sun, 23 Apr 2017 20:12:24 GMT']
-      Etag: [W/"6b025de6217fcc1eca839ce8ea5b6637"]
-      Last-Modified: ['Sun, 23 Apr 2017 18:45:04 GMT']
-      Server: [cloudflare-nginx]
-      Set-Cookie: ['__cfduid=d60a2043e02462e6a52c16a48982050041492978344; expires=Mon,
-          23-Apr-18 20:12:24 GMT; path=/; domain=.trakt.tv; HttpOnly']
-      Vary: [Accept-Encoding]
-      X-Content-Type-Options: [nosniff]
-      X-Frame-Options: [SAMEORIGIN]
-      X-Private-User: ['false']
-      X-Request-Id: [a02cb69e-8c0f-4554-bba6-95633e65e2a9]
-      X-Runtime: ['0.026198']
-      X-Xss-Protection: [1; mode=block]
-    status: {code: 200, message: OK}
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-RAY:
+      - 60caac4dd9822a7b-IAD
+      Cache-Control:
+      - max-age=0, private, must-revalidate
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Tue, 05 Jan 2021 05:06:58 GMT
+      ETag:
+      - W/"721594fd61235b9211915d2ae9c0803c"
+      Expect-CT:
+      - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+      Last-Modified:
+      - Sun, 23 Apr 2017 18:45:04 GMT
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cfduid=daed4f47a3f48f8c3e7da1ca61ef7f2441609823218; expires=Thu, 04-Feb-21
+        05:06:58 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Private-User:
+      - 'false'
+      X-Ratelimit:
+      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":961,"until":"2021-01-05T05:10:00Z"}'
+      X-Request-Id:
+      - e4981657-5662-46d1-abe8-78798944ff34
+      X-Runtime:
+      - '0.013703'
+      X-XSS-Protection:
+      - 1; mode=block
+      cf-request-id:
+      - 07728a04a700002a7b9b309000000001
+    status:
+      code: 200
+      message: OK
 version: 1

@@ -3,6 +3,7 @@ import os
 import re
 from datetime import datetime, timedelta
 from fnmatch import fnmatch
+from functools import partial
 from netrc import NetrcParseError, netrc
 from time import sleep
 from urllib.parse import urlparse
@@ -18,8 +19,9 @@ from flexget.utils.template import RenderError
 from flexget.utils.tools import parse_timedelta
 
 try:
-    import transmissionrpc
-    from transmissionrpc import HTTPHandlerError, TransmissionError
+    import requests.exceptions
+    import transmission_rpc as transmissionrpc
+    from transmission_rpc import TransmissionError
 except ImportError:
     # If transmissionrpc is not found, errors will be shown later
     pass
@@ -53,27 +55,39 @@ class TransmissionBase:
 
     def create_rpc_client(self, config):
         user, password = config.get('username'), config.get('password')
+        urlo = urlparse(config['host'])
+
+        if urlo.scheme == '':
+            urlo = urlparse('http://' + config['host'])
+
+        protocol = urlo.scheme if urlo.scheme else 'http'
+        port = str(urlo.port) if urlo.port else config['port']
+        path = urlo.path.rstrip('rpc') if urlo.path else '/transmission/'
+
+        logger.debug('Connecting to {}://{}:{}{}', protocol, urlo.hostname, port, path)
 
         try:
-            cli = transmissionrpc.Client(config['host'], config['port'], user, password)
+            cli = transmissionrpc.Client(
+                protocol=protocol,
+                host=urlo.hostname,
+                port=port,
+                path=path,
+                username=user,
+                password=password,
+            )
         except TransmissionError as e:
-            if isinstance(e.original, HTTPHandlerError):
-                if e.original.code == 111:
-                    raise plugin.PluginError("Cannot connect to transmission. Is it running?")
-                elif e.original.code == 401:
-                    raise plugin.PluginError(
-                        "Username/password for transmission is incorrect. Cannot connect."
-                    )
-                elif e.original.code == 110:
-                    raise plugin.PluginError(
-                        "Cannot connect to transmission: Connection timed out."
-                    )
-                else:
-                    raise plugin.PluginError(
-                        "Error connecting to transmission: %s" % e.original.message
-                    )
+            if e.original and e.original.code == 401:
+                raise plugin.PluginError(
+                    "Username/password for transmission is incorrect. Cannot connect."
+                )
             else:
                 raise plugin.PluginError("Error connecting to transmission: %s" % e.message)
+        except requests.exceptions.ConnectTimeout as e:
+            raise plugin.PluginError("Cannot connect to transmission: Connection timed out.")
+        except requests.exceptions.ConnectionError as e:
+            raise plugin.PluginError("Error connecting to transmission: %s" % e.args[0].reason)
+        except ValueError as e:
+            raise plugin.PluginError("Error connecting to transmission")
         return cli
 
     def torrent_info(self, torrent, config):
@@ -122,16 +136,11 @@ class TransmissionBase:
 
     def on_task_start(self, task, config):
         try:
-            import transmissionrpc
-            from transmissionrpc import HTTPHandlerError  # noqa
-            from transmissionrpc import TransmissionError  # noqa
+            import transmission_rpc as transmissionrpc
+            from transmission_rpc import TransmissionError  # noqa
         except:
             raise plugin.PluginError(
-                'Transmissionrpc module version 0.11 or higher required.', logger
-            )
-        if [int(part) for part in transmissionrpc.__version__.split('.')] < [0, 11]:
-            raise plugin.PluginError(
-                'Transmissionrpc module version 0.11 or higher required, please upgrade', logger
+                'transmission-rpc module version 3.0 or higher required.', logger
             )
 
         # Mark rpc client for garbage collector so every task can start
@@ -182,13 +191,6 @@ class PluginTransmissionInput(TransmissionBase):
             self.client = self.create_rpc_client(config)
         entries = []
 
-        # Hack/Workaround for http://flexget.com/ticket/2002
-        # TODO: Proper fix
-        if 'username' in config and 'password' in config:
-            self.client.http_handler.set_authentication(
-                self.client.url, config['username'], config['password']
-            )
-
         session = self.client.get_session()
 
         for torrent in self.client.get_torrents():
@@ -210,9 +212,11 @@ class PluginTransmissionInput(TransmissionBase):
             for attr in [
                 'id',
                 'comment',
+                'desiredAvailable',
                 'downloadDir',
                 'isFinished',
                 'isPrivate',
+                'leftUntilDone',
                 'ratio',
                 'status',
                 'date_active',
@@ -232,6 +236,11 @@ class PluginTransmissionInput(TransmissionBase):
                     logger.opt(exception=True).debug(
                         'error when requesting transmissionrpc attribute {}', attr
                     )
+            # Availability in percent
+            entry['transmission_availability'] = (
+                (torrent.desiredAvailable / torrent.leftUntilDone) if torrent.leftUntilDone else 0
+            )
+
             entry['transmission_trackers'] = [t['announce'] for t in torrent.trackers]
             entry['transmission_seed_ratio_ok'] = seed_ratio_ok
             entry['transmission_idle_limit_ok'] = idle_limit_ok
@@ -286,7 +295,7 @@ class PluginTransmission(TransmissionBase):
                     'password': {'type': 'string'},
                     'action': {
                         'type': 'string',
-                        'enum': ['add', 'remove', 'purge', 'pause', 'resume'],
+                        'enum': ['add', 'remove', 'purge', 'pause', 'resume', 'bypass_queue'],
                     },
                     'path': {'type': 'string'},
                     'max_up_speed': {'type': 'number'},
@@ -326,8 +335,8 @@ class PluginTransmission(TransmissionBase):
     @plugin.priority(120)
     def on_task_download(self, task, config):
         """
-            Call download plugin to generate the temp files we will load
-            into deluge then verify they are valid torrents
+        Call download plugin to generate the temp files we will load
+        into deluge then verify they are valid torrents
         """
         config = self.prepare_config(config)
         if not config['enabled']:
@@ -484,34 +493,34 @@ class PluginTransmission(TransmissionBase):
                     if 'main_file_ratio' in options['post']:
                         main_ratio = options['post']['main_file_ratio']
 
-                    for f in file_list:
+                    for file_id, file in enumerate(file_list):
                         # No need to set main_id if we're not going to need it
-                        if find_main_file and file_list[f]['size'] > total_size * main_ratio:
-                            main_id = f
+                        if find_main_file and file.size > total_size * main_ratio:
+                            main_id = file_id
 
                         if 'include_files' in options['post']:
                             if any(
-                                fnmatch(file_list[f]['name'], mask)
+                                fnmatch(file.name, mask)
                                 for mask in options['post']['include_files']
                             ):
-                                dl_list.append(f)
+                                dl_list.append(file_id)
                             elif options['post'].get('include_subs') and any(
-                                fnmatch(file_list[f]['name'], mask) for mask in ext_list
+                                fnmatch(file.name, mask) for mask in ext_list
                             ):
-                                dl_list.append(f)
+                                dl_list.append(file_id)
 
                         if skip_files:
-                            if any(fnmatch(file_list[f]['name'], mask) for mask in skip_files):
-                                skip_list.append(f)
+                            if any(fnmatch(file.name, mask) for mask in skip_files):
+                                skip_list.append(file_id)
 
                     if main_id is not None:
                         # Look for files matching main ID title but with a different extension
                         if options['post'].get('rename_like_files'):
-                            for f in file_list:
+                            for file_id, file in enumerate(file_list):
                                 # if this filename matches main filename we want to rename it as well
-                                fs = os.path.splitext(file_list[f]['name'])
-                                if fs[0] == os.path.splitext(file_list[main_id]['name'])[0]:
-                                    main_list.append(f)
+                                fs = os.path.splitext(file.name)
+                                if fs[0] == os.path.splitext(file_list[main_id].name)[0]:
+                                    main_list.append(file_id)
                         else:
                             main_list = [main_id]
 
@@ -532,19 +541,16 @@ class PluginTransmission(TransmissionBase):
                             download_dir = options['add']['download_dir']
 
                         # Get new filename without ext
-                        file_ext = os.path.splitext(file_list[main_id]['name'])[1]
+                        file_ext = os.path.splitext(file_list[main_id].name)[1]
                         file_path = os.path.dirname(
-                            os.path.join(download_dir, file_list[main_id]['name'])
+                            os.path.join(download_dir, file_list[main_id].name)
                         )
                         filename = options['post']['content_filename']
                         if config['host'] == 'localhost' or config['host'] == '127.0.0.1':
                             counter = 1
                             while os.path.exists(os.path.join(file_path, filename + file_ext)):
                                 # Try appending a (#) suffix till a unique filename is found
-                                filename = '%s(%s)' % (
-                                    options['post']['content_filename'],
-                                    counter,
-                                )
+                                filename = f'{options["post"]["content_filename"]}({counter})'
                                 counter += 1
                         else:
                             logger.debug(
@@ -552,11 +558,11 @@ class PluginTransmission(TransmissionBase):
                                 'when adding to a remote transmission daemon.'
                             )
 
-                        for index in main_list:
-                            file_ext = os.path.splitext(file_list[index]['name'])[1]
+                        for file_id in main_list:
+                            file_ext = os.path.splitext(file_list[file_id].name)[1]
                             logger.debug(
                                 'File {} renamed to {}',
-                                file_list[index]['name'],
+                                file_list[file_id].name,
                                 filename + file_ext,
                             )
                             # change to below when set_files will allow setting name, more efficient to have one call
@@ -564,7 +570,7 @@ class PluginTransmission(TransmissionBase):
                             try:
                                 self.client.rename_torrent_path(
                                     torrent_info.id,
-                                    file_list[index]['name'],
+                                    file_list[file_id].name,
                                     os.path.basename(str(pathscrub(filename + file_ext))),
                                 )
                             except TransmissionError:
@@ -575,7 +581,7 @@ class PluginTransmission(TransmissionBase):
                     if options['post'].get('main_file_only') and main_id is not None:
                         # Set Unwanted Files
                         options['change']['files_unwanted'] = [
-                            x for x in file_list if x not in dl_list
+                            x for x in range(len(file_list)) if x not in dl_list
                         ]
                         options['change']['files_wanted'] = dl_list
                         logger.debug(
@@ -596,7 +602,7 @@ class PluginTransmission(TransmissionBase):
                         else:
                             options['change']['files_unwanted'] = skip_list
                             options['change']['files_wanted'] = [
-                                x for x in file_list if x not in skip_list
+                                x for x in range(len(file_list)) if x not in skip_list
                             ]
                             logger.debug(
                                 'Downloading {} of {} files in torrent.',
@@ -607,6 +613,8 @@ class PluginTransmission(TransmissionBase):
                 # Set any changed file properties
                 if list(options['change'].keys()):
                     self.client.change_torrent(torrent_info.id, 30, **options['change'])
+
+                start_torrent = partial(self.client.start_torrent, [torrent_info.id])
 
                 if config['action'] == 'add':
                     # if add_paused was defined and set to False start the torrent;
@@ -629,8 +637,11 @@ class PluginTransmission(TransmissionBase):
                     self.client.stop_torrent([torrent_info.id])
                     logger.info('paused {} in transmission', torrent_info.name)
                 elif config['action'] == 'resume':
-                    self.client.start_torrent([torrent_info.id])
+                    start_torrent()
                     logger.info('resumed {} in transmission', torrent_info.name)
+                elif config['action'] == 'bypass_queue':
+                    start_torrent(bypass_queue=True)
+                    logger.info('resumed (bypass queue) {} in transmission', torrent_info.name)
 
             except TransmissionError as e:
                 logger.opt(exception=True).debug('TransmissionError')

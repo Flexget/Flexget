@@ -10,7 +10,7 @@ from flexget.plugin import PluginError, PluginWarning
 
 try:
     import telegram
-    from telegram.error import TelegramError
+    from telegram.error import ChatMigrated, TelegramError
     from telegram.utils.request import NetworkError
 except ImportError:
     telegram = None
@@ -99,14 +99,6 @@ class TelegramNotifier:
                 password: socks-proxy-password
 
 
-    Bootstrapping and testing the bot::
-
-    * Execute: `flexget telegram bootstrap`.
-      Look at the console output and make sure that the operation was successful.
-    * Execute: `flexget telegram test-msg`.
-      This will send a test message for every recipient you've configured.
-
-
     Configuration notes::
 
     You may use any combination of recipients types (`username`, `group` or `fullname`) - 0 or more of each (but you
@@ -192,11 +184,13 @@ class TelegramNotifier:
         """
         Send a Telegram notification
         """
+
+        session = Session()
         chat_ids = self._real_init(Session(), config)
 
         if not chat_ids:
             return
-        self._send_msgs(message, chat_ids)
+        self._send_msgs(message, chat_ids, session)
 
     def _parse_config(self, config):
         """
@@ -288,7 +282,18 @@ class TelegramNotifier:
                 'old python-telegram-bot ({0})'.format(telegram.__version__)
             )
 
-    def _send_msgs(self, msg, chat_ids):
+    def _replace_chat_id(self, old_id, new_id, session):
+        upd_usernames, upd_fullnames, upd_groups = self._get_bot_updates()
+        for group in upd_groups:
+            grp = upd_groups.get(group)
+            if grp.id == new_id:
+                old_data = session.query(ChatIdEntry).filter(ChatIdEntry.id == old_id).first()
+                session.delete(old_data)
+                entry = ChatIdEntry(id=grp.id, group=grp.title)
+                self._update_db(session, [entry])
+                break
+
+    def _send_msgs(self, msg, chat_ids, session):
         kwargs = dict()
         if self._parse_mode == 'markdown':
             kwargs['parse_mode'] = telegram.ParseMode.MARKDOWN
@@ -299,6 +304,14 @@ class TelegramNotifier:
             try:
                 logger.debug('sending msg to telegram servers: {}', msg)
                 self._bot.sendMessage(chat_id=chat_id, text=msg, **kwargs)
+            except ChatMigrated as e:
+                logger.debug("Chat migrated to id {}", e.new_chat_id)
+                try:
+                    self._bot.sendMessage(chat_id=e.new_chat_id, text=msg, **kwargs)
+                    self._replace_chat_id(chat_id, e.new_chat_id, session)
+                except TelegramError as e:
+                    raise PluginWarning(e.message)
+
             except TelegramError as e:
                 if kwargs.get('parse_mode'):
                     logger.warning(
@@ -497,12 +510,13 @@ class TelegramNotifier:
             elif update.channel_post:
                 chat = update.channel_post.chat
             else:
-                raise PluginError('Unknown update type encountered: %s' % update)
+                continue
+                # raise PluginError('Unknown update type encountered: %s' % update)
 
             if chat.type == 'private':
                 usernames[chat.username] = chat
                 fullnames[(chat.first_name, chat.last_name)] = chat
-            elif chat.type in ('group', 'supergroup' or 'channel'):
+            elif chat.type in ('group', 'supergroup', 'channel'):
                 groups[chat.title] = chat
             else:
                 logger.warning('unknown chat type: {}}}', type(chat))

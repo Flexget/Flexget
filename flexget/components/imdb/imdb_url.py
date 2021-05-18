@@ -11,7 +11,7 @@ logger = logger.bind(name='metainfo_imdb_url')
 
 class MetainfoImdbUrl:
     """
-        Scan entry information for imdb url.
+    Scan entry information for imdb url.
     """
 
     schema = {'type': 'boolean'}
