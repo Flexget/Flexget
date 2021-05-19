@@ -15,6 +15,7 @@ from contextlib import contextmanager  # noqa
 from datetime import datetime, timedelta  # noqa
 from typing import (  # noqa
     TYPE_CHECKING,
+    Callable,
     Dict,
     Iterator,
     List,
@@ -23,7 +24,6 @@ from typing import (  # noqa
     Tuple,
     Type,
     Union,
-    Callable,
 )
 
 import sqlalchemy  # noqa
@@ -43,7 +43,7 @@ Base = declarative_base()
 Session: Type[ContextSession] = sessionmaker(class_=ContextSession)
 
 import flexget.log  # noqa
-from flexget import config_schema, db_schema, plugin  # noqa
+from flexget import config_schema, db_schema, plugin, yaml_config  # noqa
 from flexget.event import fire_event  # noqa
 from flexget.ipc import IPCClient, IPCServer  # noqa
 from flexget.options import (  # noqa
@@ -65,44 +65,6 @@ logger = logger.bind(name='manager')
 
 manager: Optional['Manager'] = None
 DB_CLEANUP_INTERVAL = timedelta(days=7)
-
-
-class YamlIncludesLoaderMapper:
-    """
-    Class to map Includes
-    """
-
-    _hadler = None
-    _caller = None
-
-    @staticmethod
-    def construct(tag: str, hadler: Callable, caller: 'Manager'):
-        """Factory
-
-        Args:
-            tag (str): Tag to map
-            hadler (Callable): Tag decoder hadler
-            caller (Manager): Manager caller
-        """
-        mapper = YamlIncludesLoaderMapper(tag, hadler, caller)
-
-    def __init__(self, tag: str, hadler: Callable, caller: 'Manager'):
-        """Constructor
-
-        Args:
-            tag (str): Tag to map
-            hadler (Callable): Tag decoder hadler
-            caller (Manager): Manager caller
-        """
-        self._hadler = hadler
-        self._caller = caller
-
-        yaml.SafeLoader.add_constructor(tag, self._costructor)
-
-    def _costructor(self, other, node):
-        """Internal handler"""
-        data = self._hadler(other, node, self._caller)
-        return data
 
 
 class Manager:
@@ -270,7 +232,6 @@ class Manager:
         self.task_queue = TaskQueue()
         self.ipc_server = IPCServer(self, self.options.ipc_port)
 
-        self.setup_yaml()
         self.init_sqlalchemy()
         fire_event('manager.initialize', self)
         try:
@@ -576,207 +537,6 @@ class Manager:
         logger.info('Got SIGTERM. Shutting down.')
         self.shutdown(finish_queue=False)
 
-    def setup_yaml(self) -> None:
-        """Sets up the yaml loader to return unicode objects for strings by default"""
-
-        def construct_yaml_str(self, node):
-            # Override the default string handling function
-            # to always return unicode objects
-            return self.construct_scalar(node)
-
-        def includes_merge(src, dst, key, file):
-            """Merges src into dst"""
-            if isinstance(src, dict) and isinstance(dst[key], dict):
-                dst[key].update(src)  # Merge dicts
-            elif isinstance(src, dict):
-                # Only merge dicts with dicts
-                message = f'Not possible to merge include `{file}` ({type(src).__name__}) to config ({type(dst[key]).__name__}).'
-                logger.critical(message)
-                raise ValueError(message)
-            elif isinstance(src, list):
-                if isinstance(dst[key], list):
-                    # Merge lists
-                    dst[key] = dst[key] + src
-                elif isinstance(dst[key], dict) and not dst[key]:
-                    # Add list to dict if dict is empty
-                    dst[key] = src
-                else:
-                    # Can't merge lists if not list, or dict not empty
-                    message = f'Not possible to merge include `{file}` ({type(src).__name__}) to config ({type(dst[key]).__name__}).'
-                    logger.critical(message)
-                    raise ValueError(message)
-            else:
-                # Merge the rest of the types
-                dst[key] = src
-
-        def construct_yaml_includes(self, node, caller):
-            """
-            Handles Yaml Includes
-            """
-
-            ALLOWED_INCLUDES = ['yml', 'yaml']
-
-            # Tag of the inclide
-            base_tag = node.tag
-            tag = base_tag[1:]
-
-            # Full path to the include
-            include_path = os.path.join(caller.config_base, node.value)
-
-            # Get the complete icluded tree
-            if os.path.isdir(include_path):
-                flist = list_files(include_path)
-            elif os.path.isfile(include_path):
-                flist = [include_path]
-            else:
-                logger.critical(f'Include `{include_path}` is a invalid path')
-                raise ValueError(f'Include `{include_path}` is a invalid path')
-
-            flist.sort()
-
-            include_config = {}
-            for file in flist:
-
-                # Returns file information
-                file_path = os.path.relpath(file, include_path)
-                file_info = os.path.splitext(file)
-                if len(file_info) != 2:
-                    continue
-
-                file_ext = file_info[1][1:]
-                if file_ext not in ALLOWED_INCLUDES:
-                    continue
-
-                file_name = os.path.split(file_info[0])[-1]
-
-                # Gets the complete dict tree from file tree
-                config_path = file_path.split(os.path.sep)
-                config_path.pop()
-
-                # Reads included file
-                with open(file, 'r', encoding='utf-8') as f:
-                    try:
-                        raw_include_config = f.read()
-                    except UnicodeDecodeError:
-                        logger.critical('Config file must be UTF-8 encoded.')
-                        raise ValueError('Config file is not UTF-8 encoded')
-
-                # Build config path based on file path
-                include_config_path = include_config
-                if tag == 'include_tree':
-                    for path in config_path:
-                        path = path.replace(os.path.sep, '')
-                        if not path:
-                            continue
-                        if not path in include_config_path:
-                            include_config_path[path] = {}
-
-                        include_config_path = include_config_path[path]
-
-                if not file_name in include_config_path:
-                    include_config_path[file_name] = {}
-
-                # Generate Include config
-                try:
-                    compiled_include = yaml.safe_load(raw_include_config) or {}
-                except yaml.error.YAMLError as e:
-                    message = (
-                        f'Error including file `{file}` on `{base_tag} {include_path}:\n {str(e)}`'
-                    )
-                    logger.critical(message)
-                    raise ValueError(message)
-
-                # Merge includes
-                includes_merge(compiled_include, include_config_path, file_name, file)
-
-            if tag == 'include':
-                # Includes all content of all files
-                new_include_config = {}
-                for _, item in include_config.items():
-                    if isinstance(item, dict):
-                        for conf, properties in item.items():
-                            new_include_config[conf] = properties
-                    else:
-                        new_include_config = item
-
-                include_config = new_include_config
-
-            elif tag == 'include_list':
-                # Includes all content of all files, merged into list
-                if isinstance(include_config, dict):
-                    new_include_config = []
-                    for key in include_config:
-                        if isinstance(include_config[key], list):
-                            new_include_config += include_config[key]
-                        else:
-                            new_include_config.append(include_config[key])
-                    include_config = new_include_config
-                elif not isinstance(include_config, list):
-                    include_config = [include_config]
-            elif tag == 'include_named_list':
-                new_include_config = []
-                for key, config in include_config.items():
-                    new_include_config.append({key: config})
-
-                include_config = new_include_config
-
-            # if os.path.isfile(include_path):
-            #     # If we requested a file, we return only that config
-            #     include_config = include_config[list(include_config.keys())[0]]
-
-            return include_config
-
-        def new_method(self, new_include_config):
-            include_config = new_include_config
-            return include_config
-
-        def list_files(dirname):
-            flist = os.listdir(dirname)
-            return_flist = []
-
-            for file in flist:
-                fpath = os.path.join(dirname, file)
-
-                if os.path.isdir(fpath):
-                    return_flist = return_flist + list_files(fpath)
-                elif os.path.isfile(fpath):
-                    return_flist.append(fpath)
-                else:
-                    continue
-
-            return return_flist
-
-        INCLUDES_HANLERS = {
-            '!include': construct_yaml_includes,
-            '!include_list': construct_yaml_includes,
-            '!include_named': construct_yaml_includes,
-            '!include_named_list': construct_yaml_includes,
-            '!include_tree': construct_yaml_includes,
-        }
-
-        for tag in INCLUDES_HANLERS:
-            YamlIncludesLoaderMapper.construct(tag, INCLUDES_HANLERS[tag], self)
-
-        yaml.Loader.add_constructor('tag:yaml.org,2002:str', construct_yaml_str)
-        yaml.SafeLoader.add_constructor('tag:yaml.org,2002:str', construct_yaml_str)
-
-        # Set up the dumper to not tag every string with !!python/unicode
-        def unicode_representer(dumper, uni):
-            node = yaml.ScalarNode(tag='tag:yaml.org,2002:str', value=uni)
-            return node
-
-        yaml.add_representer(str, unicode_representer)
-
-        # Set up the dumper to increase the indent for lists
-        def increase_indent_wrapper(func):
-            def increase_indent(self, flow=False, indentless=False):
-                func(self, flow, False)
-
-            return increase_indent
-
-        yaml.Dumper.increase_indent = increase_indent_wrapper(yaml.Dumper.increase_indent)
-        yaml.SafeDumper.increase_indent = increase_indent_wrapper(yaml.SafeDumper.increase_indent)
-
     def _init_config(self, create: bool = False) -> None:
         """
         Find and load the configuration file.
@@ -828,7 +588,7 @@ class Manager:
             logger.info('Config file {} not found. Creating new config {}', options_config, config)
             with open(config, 'w') as newconfig:
                 # Write empty tasks to the config
-                newconfig.write(yaml.dump({'tasks': {}}))
+                newconfig.write(yaml_config.dump({'tasks': {}}))
         elif not config:
             logger.critical('Failed to find configuration file {}', options_config)
             logger.info('Tried to read from: {}', ', '.join(possible))
@@ -870,7 +630,7 @@ class Manager:
                 raise ValueError('Config file is not UTF-8 encoded')
         try:
             self.config_file_hash = config_file_hash or self.hash_config()
-            config = yaml.safe_load(raw_config) or {}
+            config = yaml_config.load(raw_config, filename=self.config_path) or {}
         except yaml.YAMLError as e:
             msg = str(e).replace('\n', ' ')
             msg = ' '.join(msg.split())
@@ -972,7 +732,7 @@ class Manager:
         except OSError:
             return
         with open(self.config_path, 'w') as config_file:
-            config_file.write(yaml.dump(self.user_config, default_flow_style=False))
+            config_file.write(yaml_config.dump(self.user_config, default_flow_style=False))
 
     def config_changed(self) -> None:
         """Makes sure that all tasks will have the config_modified flag come out true on the next run.
