@@ -83,15 +83,20 @@ class Dubbed:
                     {
                         "type": 'object',
                         'properties': {
-                            'native': {
+                            NATIVE: {
                                 'type': 'string',
                                 'enum': [ACTION_ACCEPT, ACTION_REJECT, ACTION_SKIP],
                                 'default': ACTION_REJECT,
                             },
-                            'default': {
+                            DEFAULT: {
                                 'type': 'string',
                                 'enum': [ACTION_ACCEPT, ACTION_REJECT, ACTION_SKIP],
                                 'default': ACTION_REJECT,
+                            },
+                            UNKNOWN: {
+                                'type': 'string',
+                                'enum': [ACTION_ACCEPT, ACTION_REJECT, ACTION_SKIP],
+                                'default': ACTION_SKIP,
                             },
                         },
                         'additionalProperties': {
@@ -274,6 +279,14 @@ class Dubbed:
             str: Action to preform
         """
 
+        if lang == NATIVE:
+            for stream_language in stream_languages:
+                if not self._is_language(stream_language):
+                    continue
+
+                if stream_language in config['action']:
+                    return config['action'].get(stream_language), stream_language
+
         if config['action'].get(lang):
             return config['action'].get(lang), lang
 
@@ -338,7 +351,7 @@ class Dubbed:
             stream_languages = {}
             for source in my_config['languages']:
                 if self._is_language(source):
-                    logger.debug('Using `{}` as source language', source)
+                    logger.debug('Using `{}` as native language for {}', source, real_title)
                     language = self._get_language(source)
                     stream_languages[language] = True
                     continue

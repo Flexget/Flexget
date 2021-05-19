@@ -2,7 +2,7 @@ from flexget import plugin
 from flexget.entry import Entry
 
 
-class TestLimit:
+class TestDubbed:
     config = """
         tasks:
             dubbed1:
@@ -72,8 +72,9 @@ class TestLimit:
 
     def test_force_native(self, execute_task):
         task = execute_task('dubbed1')
-        assert len(task.accepted) == 1
-        assert task.accepted[0]['title'] == 'Attack on Titan S01E01 720p Japanese'
+        assert len(task.accepted) == 2
+        assert task.accepted[0]['title'] == 'Attack on Titan S01E01 720p WEBRip'
+        assert task.accepted[1]['title'] == 'Attack on Titan S01E01 720p Japanese'
 
     def test_force_synonym(self, execute_task):
         task = execute_task('dubbed2')
