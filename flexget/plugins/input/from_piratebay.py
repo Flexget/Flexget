@@ -7,7 +7,7 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.components.sites.utils import torrent_availability
 
-logger = logger.bind(name='piratebay_list')
+logger = logger.bind(name='from_piratebay')
 
 URL = 'https://apibay.org'
 
@@ -89,7 +89,7 @@ TRACKERS = [
 ]
 
 
-class PirateBayList:
+class FromPirateBay:
     """
     Return torrent listing from piratebay api.
 
@@ -103,11 +103,16 @@ class PirateBayList:
 
     Example::
 
-      PirateBay:
+      from_piratebay:
         url: https://apibay.org
         category: HD - Movies
-        list: top48h
-        rank: vip
+        list: top
+        rank: all
+
+      OR:
+
+      from_piratebay:
+        category: HD - Movies
     """
 
     schema = {
@@ -194,4 +199,4 @@ class PirateBayList:
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(PirateBayList, 'piratebay_list', api_ver=2)
+    plugin.register(FromPirateBay, 'from_piratebay', api_ver=2)
