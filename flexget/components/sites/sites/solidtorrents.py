@@ -62,7 +62,7 @@ class UrlRewriteSolidTorrents:
                 fr'^{escaped_url_scheme}://{escaped_url_netloc}/view/[^/]+/([a-zA-Z0-9]{24})$'
             )
             self.url_search = re.compile(
-                fr'^{escaped_url_scheme}://{escaped_url_netloc})/search\?q=.*$'
+                fr'^{escaped_url_scheme}://{escaped_url_netloc}/search\?q=.*$'
             )
 
     # urlrewriter API
@@ -86,7 +86,7 @@ class UrlRewriteSolidTorrents:
             # TODO: Close matching was taken out of search methods, this may need to be fixed to be more picky
             entry['url'] = results[0]['url']
         else:
-            torrent_id = self.url_match.nve(entry['url']).group(1)
+            torrent_id = self.url_match(entry['url']).group(1)
             url = f"{self.url}/api/v1/torrents/{torrent_id}"
             logger.debug('Getting info for torrent ID {}', torrent_id)
             json_result = task.requests.get(url).json()
