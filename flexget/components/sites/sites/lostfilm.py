@@ -15,6 +15,12 @@ from flexget.utils.requests import RequestException
 from flexget.utils.soup import get_soup
 from flexget.utils import qualities
 from flexget.components.sites.utils import normalize_unicode
+try:
+    from cloudscraper.exceptions import CloudflareException, CaptchaException
+    cf_exceptions = (CloudflareException, CaptchaException)
+except ModuleNotFoundError:
+    cf_exceptions = ()
+    pass # cloudscraper module is optional
 
 __authors__ = 'danfocus, Karlson2k'
 
@@ -119,11 +125,11 @@ class LostFilm:
             proxy_handler = ProxyHandler(task.requests.proxies)
         try:
             rss = feedparser.parse(config['url'], handlers=[proxy_handler])
-        except Exception:
-            raise PluginError('Cannot parse rss feed')
+        except Exception as e:
+            raise PluginError('Cannot parse rss feed: {}', e)
         status = rss.get('status')
         if status != 200:
-            raise PluginError('Received %s status instead of 200 (OK)' % status)
+            raise PluginError('Received %s status instead of 200 (OK) when trying to download the RSS feed' % status)
         entries = []
         for idx, item in enumerate(rss.entries, 1):
             series_name_rus = series_name_org = None
@@ -206,7 +212,14 @@ class LostFilm:
             try:
                 response = task.requests.get(redirect_url, params=params)
             except RequestException as e:
-                logger.error('Failed to get lostfilm download page: {:s}'.format(e))
+                logger.error('Failed to get the redirect page: {}', e)
+                continue
+            except cf_exceptions as e:
+                logger.error('Cannot pass CF page protection to get the redirect page: {}', e)
+                continue
+            except Exception as e:
+                # Catch other errors related to download to avoid crash
+                logger.error('Got unexpected exception when trying to get the redirect page: {}', e)
                 continue
 
             if response.status_code != 200:
@@ -240,7 +253,14 @@ class LostFilm:
             try:
                 response = task.requests.get(redirect_url)
             except RequestException as e:
-                logger.error('Could not connect to redirect url2: {:s}', e)
+                logger.error('Failed to get the download page: {}', e)
+                continue
+            except cf_exceptions as e:
+                logger.error('Cannot pass CF page protection to get the download page: {}', e)
+                continue
+            except Exception as e:
+                # Catch other errors related to download to avoid crash
+                logger.error('Got unexpected exception when trying to get the download page: {}', e)
                 continue
 
             page = get_soup(response.content)
