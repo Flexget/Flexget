@@ -1006,7 +1006,7 @@ class EmbyApiMedia(EmbyApiBase):
     field_map = {
         'mtype': ['mtype', 'Type'],
         'id': ['id', 'Id'],
-        'name': ['name', 'Name'],
+        'name': ['name', 'Name', 'title'],
         'path': ['path', 'Path'],
         'year': ['ProductionYear'],
         'overview': ['overview', 'Overview'],
@@ -1031,7 +1031,7 @@ class EmbyApiMedia(EmbyApiBase):
         myfield_map = EmbyApiMedia.field_map.copy()
 
         if 'field_map' in kwargs:
-            myfield_map = EmbyApiBase.merge_field_map(myfield_map, kwargs.get('field_map'))
+            myfield_map = EmbyApiBase.merge_field_map(kwargs.get('field_map'), myfield_map)
 
         EmbyApiBase.update_using_map(self, EmbyApiMedia.field_map, kwargs)
 
@@ -1295,14 +1295,34 @@ class EmbyApiMedia(EmbyApiBase):
         args = {}
 
         auth = EmbyApi.get_auth(**kwargs)
-        EmbyApi.set_provideres_search_arg(args, **kwargs)
+        kwargs['auth'] = auth
+
+        parameters = {}
+        EmbyApi.update_using_map(parameters, EmbyApiMedia.field_map, kwargs, allow_new=True)
+
         EmbyApi.set_common_search_arg(args)
 
-        args['SearchTerm'] = split_title_year(kwargs.get('title')).title
+        if 'id' in parameters:
+            args['Ids'] = parameters.get('id')
+        else:
+            if EmbyApi.has_provideres_search_arg(**kwargs):
+                EmbyApi.set_provideres_search_arg(args, **kwargs)
+            else:
+                if 'name' in parameters:
+                    args['SearchTerm'], year = split_title_year(parameters.get('name'))
+
+                if parameters.get('year'):
+                    args['Years'] = parameters['year']
+                elif year:
+                    args['Years'] = year
 
         logger.debug('Search media with: {}', args)
         medias = EmbyApi.resquest_emby(EMBY_ENDPOINT_SEARCH, auth, 'GET', **args)
-        if not medias or 'Items' not in medias:
+        if not medias or 'Items' not in medias or not medias['Items']:
+            if EmbyApi.has_provideres_search_arg(**kwargs):
+                EmbyApi.remove_provideres_search(kwargs)
+                return EmbyApiMedia.search(**kwargs)
+
             logger.warning('No media found')
             return
 
@@ -1403,35 +1423,53 @@ class EmbyApiSerie(EmbyApiMedia):
     def serie_year(self) -> int:
         return self.year
 
+    @property
+    def fullname(self) -> str:
+        if self.year:
+            return f'{self.name} ({self.year})'
+
+        return self.name
+
     @staticmethod
-    def search(**kwargs):
+    def search(**kwargs) -> 'EmbyApiSerie':
         args = {}
 
         auth = EmbyApi.get_auth(**kwargs)
 
         parameters = {}
         field_map = EmbyApiBase.merge_field_map(
-            EmbyApiMedia.field_map,
             EmbyApiSerie.field_map_up,
+            EmbyApiMedia.field_map,
             allow_new=True,
         )
 
         EmbyApi.update_using_map(parameters, field_map, kwargs, allow_new=True)
 
+        EmbyApi.set_common_search_arg(args)
+
         if 'serie_id' in parameters:
             args['Ids'] = parameters.get('serie_id')
         else:
-            EmbyApi.set_provideres_search_arg(args, **kwargs)
-            args['SearchTerm'] = split_title_year(parameters.get('name')).title
-            if 'year' in parameters:
-                args['Years'] = parameters.get('year')
-            EmbyApi.set_common_search_arg(args)
+            if EmbyApi.has_provideres_search_arg(**kwargs):
+                EmbyApi.set_provideres_search_arg(args, **kwargs)
+            else:
+                if 'name' in parameters:
+                    args['SearchTerm'], year = split_title_year(parameters.get('name'))
+
+                if parameters.get('year'):
+                    args['Years'] = parameters['year']
+                elif year:
+                    args['Years'] = year
 
         args['IncludeItemTypes'] = 'Series'
 
         logger.debug('Search serie with: {}', args)
         series = EmbyApi.resquest_emby(EMBY_ENDPOINT_SEARCH, auth, 'GET', **args)
-        if not series or 'Items' not in series:
+        if not series or 'Items' not in series or not series['Items']:
+            if EmbyApi.has_provideres_search_arg(**kwargs):
+                EmbyApi.remove_provideres_search(kwargs)
+                return EmbyApiSerie.search(**kwargs)
+
             logger.warning('No serie found')
             return
 
@@ -1439,9 +1477,6 @@ class EmbyApiSerie(EmbyApiMedia):
             serie = series['Items'][0]
         elif len(series['Items']) > 1:
             logger.error('More than one serie found')
-            return
-        else:
-            logger.warning('No serie found')
             return
 
         serie_api = EmbyApiSerie(auth=auth, **serie)
@@ -1584,9 +1619,9 @@ class EmbyApiSeason(EmbyApiMedia):
 
         parameters = {}
         field_map = EmbyApiBase.merge_field_map(
-            EmbyApiMedia.field_map,
             EmbyApiSeason.field_map_up,
             EmbyApiSerie.field_map_up,
+            EmbyApiMedia.field_map,
             allow_new=True,
         )
 
@@ -1615,7 +1650,7 @@ class EmbyApiSeason(EmbyApiMedia):
 
         logger.debug('Search season with: {}', args)
         seasons = EmbyApi.resquest_emby(EMBY_ENDPOINT_SEARCH, auth, 'GET', **args)
-        if not seasons or 'Items' not in seasons:
+        if not seasons or 'Items' not in seasons or not seasons['Items']:
             logger.warning('No season found')
             return
 
@@ -1796,10 +1831,10 @@ class EmbyApiEpisode(EmbyApiMedia):
         parameters = {}
         field_map = EmbyApiBase.merge_field_map(
             EmbyApiEpisode.field_map,
-            EmbyApiMedia.field_map,
             EmbyApiEpisode.field_map_up,
             EmbyApiSeason.field_map_up,
             EmbyApiSerie.field_map_up,
+            EmbyApiMedia.field_map,
             allow_new=True,
         )
 
@@ -1840,7 +1875,7 @@ class EmbyApiEpisode(EmbyApiMedia):
 
         logger.debug('Search episode with: {}', args)
         response = EmbyApi.resquest_emby(EMBY_ENDPOINT_SEARCH, auth, 'GET', **args)
-        if not response or 'Items' not in response:
+        if not response or 'Items' not in response or not response['Items']:
             logger.warning('No episode found')
             return
 
@@ -1991,8 +2026,8 @@ class EmbyApiMovie(EmbyApiMedia):
 
         parameters = {}
         field_map = EmbyApiBase.merge_field_map(
-            EmbyApiMedia.field_map,
             EmbyApiMovie.field_map_up,
+            EmbyApiMedia.field_map,
             allow_new=True,
         )
 
@@ -2003,29 +2038,31 @@ class EmbyApiMovie(EmbyApiMedia):
         if 'id' in parameters:
             args['Ids'] = parameters.get('id')
         else:
-            if 'name' in parameters:
-                args['SearchTerm'], year = split_title_year(parameters.get('name'))
+            if EmbyApi.has_provideres_search_arg(**kwargs):
+                EmbyApi.set_provideres_search_arg(args, **kwargs)
+            else:
+                if 'name' in parameters:
+                    args['SearchTerm'], year = split_title_year(parameters.get('name'))
 
-            if 'year' in parameters:
-                args['Years'] = parameters.get('year')
-            elif year:
-                args['Years'] = year
-
-            EmbyApi.set_provideres_search_arg(args, **kwargs)
+                if parameters.get('year'):
+                    args['Years'] = parameters['year']
+                elif year:
+                    args['Years'] = year
 
         args['IncludeItemTypes'] = 'Movie'
 
         logger.debug('Search movie with: {}', args)
         movies = EmbyApi.resquest_emby(EMBY_ENDPOINT_SEARCH, auth, 'GET', **args)
-        if not movies or 'Items' not in movies:
+        if not movies or 'Items' not in movies or not movies['Items']:
+            if EmbyApi.has_provideres_search_arg(**kwargs):
+                EmbyApi.remove_provideres_search(kwargs)
+                return EmbyApiMovie.search(**kwargs)
+
             logger.warning('No movie found')
             return
 
         if len(movies['Items']) > 1:
             logger.error("More than one movie found")
-            return
-        elif len(movies['Items']) == 0:
-            logger.warning('No movie found')
             return
 
         movie = movies['Items'][0]
@@ -2090,6 +2127,23 @@ class EmbyApi(EmbyApiBase):
             return
 
         args['AnyProviderIdEquals'] = providers_str
+
+    @staticmethod
+    def remove_provideres_search(args: dict):
+        args.pop('imdb_id', None)
+        args.pop('tmdb_id', None)
+        args.pop('tvdb_id', None)
+        args.pop('tvrage_id', None)
+
+    @staticmethod
+    def has_provideres_search_arg(**kwargs) -> bool:
+        providers = {}
+        EmbyApi.set_provideres_search_arg(providers, **kwargs)
+
+        if providers and providers['AnyProviderIdEquals']:
+            return True
+
+        return False
 
     @staticmethod
     def get_auth(**kwargs) -> EmbyAuth:
