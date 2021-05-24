@@ -28,8 +28,6 @@ cherrypy==18.6.0
     # via -r requirements.in
 click==7.1.2
     # via flask
-colorama==0.4.4
-    # via loguru
 colorclass==2.2.0
     # via -r requirements.in
 feedparser==6.0.2
@@ -60,10 +58,6 @@ html5lib==1.1
     # via -r requirements.in
 idna==2.10
     # via requests
-importlib-metadata==4.0.1
-    # via
-    #   jsonschema
-    #   sqlalchemy
 itsdangerous==1.1.0
     # via flask
 jaraco.classes==3.2.1
@@ -89,7 +83,7 @@ loguru==0.5.3
     # via -r requirements.in
 markupsafe==2.0.0
     # via jinja2
-more-itertools==8.7.0
+more-itertools==8.8.0
     # via
     #   -r requirements.in
     #   cheroot
@@ -153,8 +147,6 @@ tempora==4.0.2
     # via portend
 terminaltables==3.1.0
     # via -r requirements.in
-typing-extensions==3.10.0.0
-    # via importlib-metadata
 tzlocal==2.1
     # via apscheduler
 urllib3==1.26.4
@@ -167,8 +159,6 @@ werkzeug==1.0.1
     #   flask-restx
 zc.lockfile==2.0
     # via cherrypy
-zipp==3.4.1
-    # via importlib-metadata
 zxcvbn-python==4.4.24
     # via -r requirements.in
 
