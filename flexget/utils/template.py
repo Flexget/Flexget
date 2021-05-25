@@ -145,12 +145,15 @@ def filter_asciify(text: str) -> str:
 
     # Replace accented chars by their 'normal' couterparts
     result = normalize('NFKD', text)
-    # Symbols that should be converted to white space
+
+    # Symbols that should keeped as white space
     result = re.sub(r'[ \(\)\-_\[\]\.]+', ' ', result)
     # Leftovers
     result = re.sub(r"[^a-zA-Z0-9 ]", "", result)
-    # Replace multiple white spaces with one white space
+
+    # Remove Multiple White Spaces to One
     result = ' '.join(result.split())
+
     return result
 
 
