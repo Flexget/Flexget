@@ -2,6 +2,7 @@ import locale
 import os
 import os.path
 import re
+from unicodedata import normalize
 from contextlib import suppress
 from copy import copy
 from datetime import date, datetime, time
@@ -134,6 +135,23 @@ def filter_to_date(date_time_val):
 def filter_default(value, default_value: str = '', boolean: bool = True) -> str:
     """Override the built-in Jinja default filter to set the `boolean` param to True by default"""
     return jinja2.filters.do_default(value, default_value, boolean)
+
+
+def filter_asciify(text: str) -> str:
+    """ Siplify text """
+
+    if not isinstance(text, str):
+        return text
+
+    # Replace accented chars by their 'normal' couterparts
+    result = normalize('NFKD', text)
+    # Symbols that should be converted to white space
+    result = re.sub(r'[ \(\)\-_\[\]\.]+', ' ', result)
+    # Leftovers
+    result = re.sub(r"[^a-zA-Z0-9 ]", "", result)
+    # Replace multiple white spaces with one white space
+    result = ' '.join(result.split())
+    return result
 
 
 filter_d = filter_default
