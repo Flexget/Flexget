@@ -20,7 +20,8 @@ NATIVE = 'native'
 NONE = 'none'
 ACTION_ACCEPT = 'accept'
 ACTION_REJECT = 'reject'
-ACTION_SKIP = 'do_nothing'
+ACTION_SKIP = 'skip'
+ACTION_NOTHING = 'do_nothing'
 
 Language = babelfish.Language
 
@@ -90,7 +91,7 @@ class Translations:
                         'oneOf': [
                             {
                                 "type": 'string',
-                                'enum': [ACTION_ACCEPT, ACTION_REJECT, ACTION_SKIP],
+                                'enum': [ACTION_ACCEPT, ACTION_REJECT, ACTION_NOTHING],
                                 'default': ACTION_SKIP,
                             },
                             {
@@ -98,23 +99,23 @@ class Translations:
                                 'properties': {
                                     NATIVE: {
                                         'type': 'string',
-                                        'enum': [ACTION_ACCEPT, ACTION_REJECT, ACTION_SKIP],
+                                        'enum': [ACTION_ACCEPT, ACTION_REJECT, ACTION_NOTHING],
                                         'default': ACTION_REJECT,
                                     },
                                     DEFAULT: {
                                         'type': 'string',
-                                        'enum': [ACTION_ACCEPT, ACTION_REJECT, ACTION_SKIP],
+                                        'enum': [ACTION_ACCEPT, ACTION_REJECT, ACTION_NOTHING],
                                         'default': ACTION_REJECT,
                                     },
                                     UNKNOWN: {
                                         'type': 'string',
-                                        'enum': [ACTION_ACCEPT, ACTION_REJECT, ACTION_SKIP],
+                                        'enum': [ACTION_ACCEPT, ACTION_REJECT, ACTION_NOTHING],
                                         'default': ACTION_REJECT,
                                     },
                                 },
                                 'additionalProperties': {
                                     'type': 'string',
-                                    'enum': [ACTION_ACCEPT, ACTION_REJECT, ACTION_SKIP],
+                                    'enum': [ACTION_ACCEPT, ACTION_REJECT, ACTION_NOTHING],
                                 },
                             },
                         ]
@@ -123,7 +124,7 @@ class Translations:
                         'oneOf': [
                             {
                                 "type": 'string',
-                                'enum': [ACTION_ACCEPT, ACTION_REJECT, ACTION_SKIP],
+                                'enum': [ACTION_ACCEPT, ACTION_REJECT, ACTION_NOTHING],
                                 'default': ACTION_SKIP,
                             },
                             {
@@ -131,18 +132,18 @@ class Translations:
                                 'properties': {
                                     DEFAULT: {
                                         'type': 'string',
-                                        'enum': [ACTION_ACCEPT, ACTION_REJECT, ACTION_SKIP],
+                                        'enum': [ACTION_ACCEPT, ACTION_REJECT, ACTION_NOTHING],
                                         'default': ACTION_REJECT,
                                     },
                                     UNKNOWN: {
                                         'type': 'string',
-                                        'enum': [ACTION_ACCEPT, ACTION_REJECT, ACTION_SKIP],
+                                        'enum': [ACTION_ACCEPT, ACTION_REJECT, ACTION_NOTHING],
                                         'default': ACTION_REJECT,
                                     },
                                 },
                                 'additionalProperties': {
                                     'type': 'string',
-                                    'enum': [ACTION_ACCEPT, ACTION_REJECT, ACTION_SKIP],
+                                    'enum': [ACTION_ACCEPT, ACTION_REJECT, ACTION_NOTHING],
                                 },
                             },
                         ]
@@ -395,11 +396,11 @@ class Translations:
             if lang in stream_languages:
                 lang = NATIVE
 
-            action = config.get(lang, config.get(DEFAULT, ACTION_SKIP)), lang
-            if action[0] != ACTION_SKIP:
-                return action
+            action = config.get(lang, None)
+            if action and action != ACTION_SKIP:
+                return action, lang
 
-        return ACTION_SKIP, stream_languages
+        return config.get(DEFAULT, ACTION_SKIP), languages
 
     def on_task_filter(self, task, config):
         guessit_api = GuessItApi()
@@ -499,6 +500,7 @@ class Translations:
 
             accept = ''
             reject = ''
+            nothing = ''
 
             if action == ACTION_SKIP:
                 logger.debug(
@@ -506,6 +508,8 @@ class Translations:
                     title,
                     f_language,
                 )
+            elif action == ACTION_NOTHING:
+                nothing = f'Doing nothing on `{title}` because is in language is `{f_language}`'
             elif action == ACTION_REJECT:
                 reject = f'`{title}` is `{f_language}` language'
             elif action == ACTION_ACCEPT:
@@ -517,9 +521,14 @@ class Translations:
             )
 
             if action == ACTION_SKIP:
-                logger.debug(
-                    'Skiping subbed check on `{}` because is subbed in `{}`', title, f_subtitles
-                )
+                if NONE not in f_subtitles:
+                    logger.debug(
+                        'Skiping subbed check on `{}` because is subbed in `{}`',
+                        title,
+                        f_subtitles,
+                    )
+            elif action == ACTION_NOTHING:
+                nothing += f'Doing nothing on `{title}` because is in subbed in `{f_subtitles}`'
             elif action == ACTION_REJECT:
                 if reject:
                     reject += ' and '
@@ -535,6 +544,8 @@ class Translations:
                 entry.reject(reject)
             elif accept:
                 entry.accept(accept)
+            elif nothing:
+                logger.debug(nothing)
 
 
 @event('plugin.register')

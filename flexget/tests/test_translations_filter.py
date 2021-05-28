@@ -127,6 +127,30 @@ class TestTranslationsFilter:
                 series:
                     - Attack on Titan:
                         identified_by: ep
+
+
+            do_nothing_test:
+                mock:
+                    - {'title':'Movie1.720p.PT.ENG.TEST','url':'mock://teste1'}
+                    - {'title':'Movie2.720p.Portugues.Ingles.TEST','url':'mock://teste2'}
+                    - {'title':'Movie3.1080p.ENG.PT.BluRay.TEST','url':'mock://teste3'}
+                translations:
+                    languages_synonyms:
+                        portuguese:
+                            - tuga
+                            - portuga
+                            - portugues
+                        english:
+                            - ingles
+                            - ing
+                        spanish:
+                            - espanhol
+                        french:
+                            - frances
+                    dubbed:
+                        portuguese: "do_nothing"
+                        default: "reject"
+
     """
 
     def test_force_native(self, execute_task):
@@ -180,3 +204,8 @@ class TestTranslationsFilter:
         assert task.accepted[1]['title'] == 'Attack on Titan S01E01 SubEnglish 720p WEBRip'
         assert task.accepted[2]['title'] == 'Attack on Titan S01E01 720p SubJapanese'
         assert task.accepted[3]['title'] == 'Attack on Titan S01E01 720p Subbed'
+
+    def test_do_nothing_test(self, execute_task):
+        task = execute_task('do_nothing_test')
+        assert len(task.accepted) == 0
+        assert len(task.rejected) == 0
