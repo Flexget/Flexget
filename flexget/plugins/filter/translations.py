@@ -14,14 +14,15 @@ from flexget.config_schema import one_or_more
 PLUGIN_NAME = 'translations'
 logger = logger.bind(name=PLUGIN_NAME)
 
-UNKNOWN = 'unknown'
-DEFAULT = 'default'
-NATIVE = 'native'
-NONE = 'none'
-ACTION_ACCEPT = 'accept'
-ACTION_REJECT = 'reject'
-ACTION_SKIP = 'skip'
-ACTION_NOTHING = 'do_nothing'
+UNKNOWN = 'unknown'  # It's a language but is unknown
+DEFAULT = 'default'  # Default when none applies
+NATIVE = 'native'  # Native language
+NONE = 'none'  # No language
+OTHER = 'other'  # It's a valid language, but not matched
+ACTION_ACCEPT = 'accept'  # Accept entry
+ACTION_REJECT = 'reject'  # Reject entry
+ACTION_SKIP = 'skip'  # Ignore check (internal)
+ACTION_NOTHING = 'do_nothing'  # Mark entry as undecided
 
 Language = babelfish.Language
 
@@ -71,7 +72,7 @@ class Translations:
 
     schema = {
         'oneOf': [
-            {'type': 'string', 'enum': [ACTION_ACCEPT, ACTION_REJECT]},
+            {'type': 'string', 'enum': [ACTION_ACCEPT, ACTION_REJECT, ACTION_NOTHING]},
             {'type': 'boolean'},
             {
                 'type': 'object',
@@ -92,25 +93,25 @@ class Translations:
                             {
                                 "type": 'string',
                                 'enum': [ACTION_ACCEPT, ACTION_REJECT, ACTION_NOTHING],
-                                'default': ACTION_SKIP,
                             },
                             {
                                 "type": 'object',
                                 'properties': {
+                                    OTHER: {
+                                        'type': 'string',
+                                        'enum': [ACTION_ACCEPT, ACTION_REJECT, ACTION_NOTHING],
+                                    },
                                     NATIVE: {
                                         'type': 'string',
                                         'enum': [ACTION_ACCEPT, ACTION_REJECT, ACTION_NOTHING],
-                                        'default': ACTION_REJECT,
                                     },
                                     DEFAULT: {
                                         'type': 'string',
                                         'enum': [ACTION_ACCEPT, ACTION_REJECT, ACTION_NOTHING],
-                                        'default': ACTION_REJECT,
                                     },
                                     UNKNOWN: {
                                         'type': 'string',
                                         'enum': [ACTION_ACCEPT, ACTION_REJECT, ACTION_NOTHING],
-                                        'default': ACTION_REJECT,
                                     },
                                 },
                                 'additionalProperties': {
@@ -125,20 +126,25 @@ class Translations:
                             {
                                 "type": 'string',
                                 'enum': [ACTION_ACCEPT, ACTION_REJECT, ACTION_NOTHING],
-                                'default': ACTION_SKIP,
                             },
                             {
                                 "type": 'object',
                                 'properties': {
+                                    OTHER: {
+                                        'type': 'string',
+                                        'enum': [ACTION_ACCEPT, ACTION_REJECT, ACTION_NOTHING],
+                                    },
+                                    NONE: {
+                                        'type': 'string',
+                                        'enum': [ACTION_ACCEPT, ACTION_REJECT, ACTION_NOTHING],
+                                    },
                                     DEFAULT: {
                                         'type': 'string',
                                         'enum': [ACTION_ACCEPT, ACTION_REJECT, ACTION_NOTHING],
-                                        'default': ACTION_REJECT,
                                     },
                                     UNKNOWN: {
                                         'type': 'string',
                                         'enum': [ACTION_ACCEPT, ACTION_REJECT, ACTION_NOTHING],
-                                        'default': ACTION_REJECT,
                                     },
                                 },
                                 'additionalProperties': {
@@ -185,15 +191,7 @@ class Translations:
         if isinstance(lang, Language):
             return True
 
-        if (
-            not isinstance(lang, str)
-            or lang == ''
-            or lang == 'und'
-            or lang == UNKNOWN
-            or lang == NATIVE
-            or lang == DEFAULT
-            or lang == NONE
-        ):
+        if not isinstance(lang, str) or lang in ['', 'und', UNKNOWN, NATIVE, DEFAULT, NONE, OTHER]:
             return False
 
         try:
@@ -237,7 +235,7 @@ class Translations:
             if isinstance(lang, Language):
                 lang = lang.name
 
-            if not isinstance(lang, str) or lang == '' or lang == 'und' or lang == UNKNOWN:
+            if not isinstance(lang, str) or lang in ['', 'und', UNKNOWN]:
                 languages[key] = UNKNOWN
                 continue
 
@@ -245,12 +243,8 @@ class Translations:
                 languages[key] = NONE
                 continue
 
-            if lang == NATIVE:
-                languages[key] = NATIVE
-                continue
-
-            if lang == DEFAULT:
-                languages[key] = DEFAULT
+            if lang in [NATIVE, DEFAULT, OTHER]:
+                languages[key] = lang
                 continue
 
             try:
@@ -297,7 +291,7 @@ class Translations:
             config = ACTION_ACCEPT if config else ACTION_REJECT
 
         if isinstance(config, str):
-            config = {'dubbed': config, 'subbed': config, 'one_entry': True}
+            config = {'dubbed': config, 'subbed': config}
 
         # Source of the filed to parse
         _config['source'] = config.get('source', 'title')
@@ -320,25 +314,23 @@ class Translations:
         elif not _config['languages']:
             _config['languages'] = [UNKNOWN]
 
-        # Tag as aprove if one is ok
-        _config['one_entry'] = config.get('one_entry', False)
-
         # Actions to dubbed
         _dubbed = config.get('dubbed', ACTION_SKIP)
         if isinstance(_dubbed, str):
-            if _dubbed == ACTION_SKIP:
-                _dubbed = {DEFAULT: ACTION_SKIP, NATIVE: ACTION_SKIP, UNKNOWN: ACTION_SKIP}
+            if _dubbed in [ACTION_SKIP, ACTION_NOTHING]:
+                _dubbed = {DEFAULT: _dubbed, NATIVE: _dubbed, UNKNOWN: _dubbed}
             else:
                 _dubbed = {
-                    DEFAULT: _dubbed,
-                    NATIVE: ACTION_ACCEPT if _dubbed == ACTION_REJECT else ACTION_REJECT,
+                    DEFAULT: ACTION_SKIP,
+                    OTHER: _dubbed,
+                    NATIVE: ACTION_SKIP,
                     UNKNOWN: _dubbed,
                 }
 
         _config['dubbed'] = {}
         for key in _dubbed:
             key = key.lower()
-            if not key in [UNKNOWN, DEFAULT, NATIVE] and not self._is_language(key):
+            if not key in [UNKNOWN, DEFAULT, NATIVE, OTHER] and not self._is_language(key):
                 raise plugin.PluginError(f'`{key}` in dubbed is not a valid language for dubbed')
 
             lang = self._get_language(key)
@@ -347,23 +339,32 @@ class Translations:
         # Subbed traslations
         _subbed = config.get('subbed', ACTION_SKIP)
         if isinstance(_subbed, str):
-            if _subbed == ACTION_SKIP:
-                _subbed = {DEFAULT: ACTION_SKIP, UNKNOWN: ACTION_SKIP, NONE: ACTION_SKIP}
+            if _subbed in [ACTION_SKIP, ACTION_NOTHING]:
+                _subbed = {DEFAULT: _subbed, UNKNOWN: _subbed, NONE: _subbed}
             else:
                 _subbed = {
-                    DEFAULT: _subbed,
+                    DEFAULT: ACTION_SKIP,
+                    OTHER: _subbed,
+                    NONE: ACTION_SKIP,
                     UNKNOWN: _subbed,
-                    NONE: ACTION_ACCEPT if _subbed == ACTION_REJECT else ACTION_REJECT,
                 }
 
         _config['subbed'] = {}
         for key in _subbed:
             key = key.lower()
-            if not key in [UNKNOWN, DEFAULT, NATIVE, NONE] and not self._is_language(key):
+            if not key in [UNKNOWN, DEFAULT, NONE, OTHER] and not self._is_language(key):
                 raise plugin.PluginError(f'`{key}` in subbed is not a valid language for subbed')
 
             lang = self._get_language(key)
             _config['subbed'][lang[0]] = _subbed[key]
+
+        for field in [UNKNOWN, DEFAULT, NATIVE, OTHER]:
+            if field not in _config['dubbed']:
+                _config['dubbed'][field] = ACTION_SKIP
+
+        for field in [UNKNOWN, DEFAULT, NONE, OTHER]:
+            if field not in _config['subbed']:
+                _config['subbed'][field] = ACTION_SKIP
 
         return _config
 
@@ -381,6 +382,9 @@ class Translations:
             str: Action to preform
         """
 
+        if not stream_languages:
+            stream_languages = []
+
         if NATIVE in languages:
             for stream_language in stream_languages:
                 if not self._is_language(stream_language):
@@ -397,8 +401,15 @@ class Translations:
                 lang = NATIVE
 
             action = config.get(lang, None)
+            if not action and self._is_language(lang):
+                # If it's a language and not defined, use OTHER config
+                action = config.get(OTHER, None)
+
             if action and action != ACTION_SKIP:
                 return action, lang
+
+            if self._is_language(lang):
+                action = config.get(OTHER, None)
 
         return config.get(DEFAULT, ACTION_SKIP), languages
 
@@ -517,7 +528,7 @@ class Translations:
 
             # Check Subbed
             action, f_subtitles = self._language_to_action(
-                file_subtitles, stream_languages, my_config['subbed']
+                file_subtitles, None, my_config['subbed']
             )
 
             if action == ACTION_SKIP:
@@ -532,15 +543,13 @@ class Translations:
             elif action == ACTION_REJECT:
                 if reject:
                     reject += ' and '
-                reject = f'`{title}` is `{f_subtitles}` subbed'
+                reject += f'`{title}` is `{f_subtitles}` subbed'
             elif action == ACTION_ACCEPT:
                 if accept:
                     accept += ' and '
                 accept += f'`{title}` is `{f_subtitles}` subbed'
 
-            if accept and my_config['one_entry']:
-                entry.accept(accept)
-            elif reject:
+            if reject:
                 entry.reject(reject)
             elif accept:
                 entry.accept(accept)
