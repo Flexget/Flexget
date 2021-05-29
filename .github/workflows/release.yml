@@ -40,12 +40,27 @@ jobs:
         TWINE_PASSWORD: ${{ secrets.pypi_token }}
       run: |
         ./release.sh
+    - name: Prep Changelog
+      id: changelog
+      run: |
+        previous=$(git tag --sort version:refname | tail -n 2 | head -n 1)
+        if [ "$previous" ]; then
+          changelog=$(git log --oneline --no-decorate $previous..@~2 | grep -v -E "Prepare.*dev")
+        else
+          changelog=$(git log --oneline --no-decorate | grep -v -E "Prepare.*dev")
+        fi
+        echo $changelog
+        changelog="${changelog//'%'/'%25'}"
+        changelog="${changelog//$'\n'/'%0A' - }"
+        changelog=" - ${changelog//$'\r'/'%0D'}"
+        echo ::set-output name=changelog::$changelog
     - uses: ncipollo/release-action@v1
       if: env.release_tag
       with:
         tag: ${{ env.release_tag }}
         artifacts: "dist/*"
         token: ${{ secrets.GITHUB_TOKEN }}
+        body: ${{ steps.changelog.output.changelog }}
     - name: Set Deployment Status Success
       uses: deliverybot/deployment-status@v1
       with:
