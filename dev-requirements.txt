@@ -14,8 +14,6 @@ appdirs==1.4.4
     #   virtualenv
 astroid==2.5.6
     # via pylint
-atomicwrites==1.4.0
-    # via pytest
 attrs==20.3.0
     # via
     #   -c requirements.txt
@@ -26,9 +24,9 @@ black==21.5b1
     # via -r dev-requirements.in
 bleach==3.3.0
     # via readme-renderer
-boto3==1.17.73
+boto3==1.17.84
     # via -r dev-requirements.in
-botocore==1.20.73
+botocore==1.20.84
     # via
     #   boto3
     #   s3transfer
@@ -36,6 +34,8 @@ certifi==2020.12.5
     # via
     #   -c requirements.txt
     #   requests
+cffi==1.14.5
+    # via cryptography
 cfgv==3.2.0
     # via pre-commit
 chardet==4.0.0
@@ -53,14 +53,13 @@ codacy-coverage==1.3.11
 colorama==0.4.4
     # via
     #   -c requirements.txt
-    #   pylint
-    #   pytest
-    #   sphinx
     #   twine
 coverage[toml]==5.5
     # via
     #   -r dev-requirements.in
     #   pytest-cov
+cryptography==3.4.7
+    # via secretstorage
 distlib==0.3.1
     # via virtualenv
 docutils==0.16
@@ -89,20 +88,18 @@ imagesize==1.2.0
 importlib-metadata==4.0.1
     # via
     #   -c requirements.txt
-    #   flake8
     #   keyring
-    #   pep517
-    #   pluggy
-    #   pre-commit
-    #   pytest
     #   twine
-    #   virtualenv
 iniconfig==1.1.1
     # via pytest
 isort==5.8.0
     # via
     #   -r dev-requirements.in
     #   pylint
+jeepney==0.6.0
+    # via
+    #   keyring
+    #   secretstorage
 jinja2==3.0.0
     # via
     #   -c requirements.txt
@@ -156,6 +153,8 @@ py==1.10.0
     #   pytest-forked
 pycodestyle==2.7.0
     # via flake8
+pycparser==2.20
+    # via cffi
 pyflakes==2.3.1
     # via flake8
 pygments==2.8.1
@@ -212,6 +211,8 @@ rfc3986==1.4.0
     # via twine
 s3transfer==0.4.2
     # via boto3
+secretstorage==3.3.1
+    # via keyring
 six==1.15.0
     # via
     #   -c requirements.txt
@@ -253,19 +254,12 @@ tqdm==4.60.0
 twine==3.4.1
     # via -r dev-requirements.in
 typed-ast==1.4.3
-    # via
-    #   astroid
-    #   black
-    #   mypy
+    # via mypy
 typing-extensions==3.10.0.0
     # via
     #   -c requirements.txt
-    #   black
-    #   gitpython
-    #   importlib-metadata
     #   mypy
     #   sqlalchemy-stubs
-    #   yarl
 urllib3==1.26.4
     # via
     #   -c requirements.txt
@@ -291,7 +285,6 @@ zipp==3.4.1
     # via
     #   -c requirements.txt
     #   importlib-metadata
-    #   pep517
 
 # The following packages are considered to be unsafe in a requirements file:
 # pip
