@@ -20,6 +20,13 @@ persist = SimplePersistence('api_emby')
 
 LOGIN_API = 'api'
 LOGIN_USER = 'user'
+LOGIN_CONNECT = 'connect'
+
+EMBY_CONNECT = 'https://connect.emby.media'
+
+EMBY_ENDPOINT_CONNECT_LOGIN = '/service/user/authenticate'
+EMBY_ENDPOINT_CONNECT_SERVERS = '/service/servers'
+EMBY_ENDPOINT_CONNECT_EXCHANGE = '/Connect/Exchange'
 
 EMBY_ENDPOINT_LOGIN = '/emby/Users/AuthenticateByName'
 EMBY_ENDPOINT_SEARCH = '/emby/Users/{userid}/Items'
@@ -149,6 +156,9 @@ class EmbyAuth(EmbyApiBase):
 
     _userid = ''
     _token = ''
+    _connect_token = ''
+    _connect_token_link = ''
+    _connect_username = ''
     _serverid = ''
     _logged = False
     _username = None
@@ -167,30 +177,129 @@ class EmbyAuth(EmbyApiBase):
 
         EmbyApiBase.update_using_map(self, EmbyAuth.field_map, server)
 
+    def is_connect_server(self) -> bool:
+        """Checks if it's a connect server, if it's a url assumed not a emby connect
+
+        Returns:
+            bool: Is emby connect server
+        """
+
+        regexp = (
+            '('
+            + '|'.join(['http', 'https'])
+            + r'):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?'
+        )
+        return not re.match(regexp, self.host)
+
     def login(self, optional=False):
         """Login user to API"""
 
         userdata = None
 
         if not self._apikey:
-            self._login_type = LOGIN_USER
-            userdata = self.check_token_data(persist.get('token_data'), LOGIN_USER)
-            if not userdata:
-                logger.debug('Login to {} with username {} and password', self.host, self.username)
-                args = {'Username': self._username, 'Pw': self._password}
 
-                login_data = EmbyApi.resquest_emby(EMBY_ENDPOINT_LOGIN, self, 'POST', **args)
+            if self.is_connect_server():
+                # Make Emby connect login
+                self._login_type = LOGIN_CONNECT
+                userdata = self.check_token_data(persist.get('token_data'), LOGIN_CONNECT)
+                if not userdata:
+                    logger.debug(
+                        'Login to Emby Connect with username `{}` host `{}`',
+                        self.username,
+                        self.host,
+                    )
 
-                if not login_data and optional:
-                    return
-                elif not login_data:
-                    self.logout()
-                    raise PluginError('Could not login to Emby')
+                    self._connect_username = self._username
 
-                userdata = login_data.get('User')
-                self._token = login_data.get('AccessToken')
+                    # Login to emby connect
+                    args = {'nameOrEmail': self._username, 'rawpw': self._password}
+                    connect_data = EmbyApi.resquest_emby(
+                        EMBY_ENDPOINT_CONNECT_LOGIN, self, 'POST', emby_connect=True, **args
+                    )
+
+                    if (
+                        not connect_data
+                        or not 'AccessToken' in connect_data
+                        or not 'User' in connect_data
+                        or not 'Id' in connect_data['User']
+                    ):
+                        raise PluginError(
+                            f'Could not login to Emby Connect account `{self._connect_username}`'
+                        )
+
+                    self._connect_token = connect_data['AccessToken']
+
+                    # Retrive emby connect servers
+                    args = {'userId': connect_data['User']['Id']}
+                    connect_servers = EmbyApi.resquest_emby(
+                        EMBY_ENDPOINT_CONNECT_SERVERS, self, 'GET', emby_connect=True, **args
+                    )
+                    if not isinstance(connect_servers, list):
+                        raise PluginError(
+                            f'Could not login to Emby Connect account `{self._connect_username}`, no server list'
+                        )
+
+                    for server in connect_servers:
+                        if not 'Name' in server:
+                            raise PluginError(
+                                f'Could not login to Emby Connect account `{self._connect_username}`, no server list'
+                            )
+                        if server['Name'].lower() == self.host.lower():
+                            connect_server = server
+                            break
+                    else:
+                        raise PluginError(
+                            f'No server with name `{self.host}`` on `{self._connect_username}` account'
+                        )
+
+                    if not 'AccessKey' in connect_server or not 'Url' in connect_server:
+                        raise PluginError(
+                            f'Could not login to Emby Connect account `{self._connect_username}`, no server list'
+                        )
+
+                    self._connect_token_link = connect_server['AccessKey']
+                    self.host = connect_server['Url']
+
+                    args = {'format': 'json', 'ConnectUserId': connect_data['User']['Id']}
+                    connect_exchange = EmbyApi.resquest_emby(
+                        EMBY_ENDPOINT_CONNECT_EXCHANGE, self, 'GET', **args
+                    )
+
+                    if (
+                        not 'LocalUserId' in connect_exchange
+                        or not 'AccessToken' in connect_exchange
+                    ):
+                        raise PluginError(
+                            f'Could not login with Emby Connect to server `{self.host}`'
+                        )
+
+                    self._userid = connect_exchange['LocalUserId']
+                    self._token = connect_exchange['AccessToken']
+                    self._logged = True
+                    userdata = EmbyApi.resquest_emby(EMBY_ENDPOINT_USERINFO, self, 'GET', {})
+
             else:
-                allow_retry = True
+                # Make Local user login
+                self._login_type = LOGIN_USER
+                userdata = self.check_token_data(persist.get('token_data'), LOGIN_USER)
+                if not userdata:
+                    logger.debug(
+                        'Login to {} with username {} and password', self.host, self.username
+                    )
+                    args = {'Username': self._username, 'Pw': self._password}
+
+                    login_data = EmbyApi.resquest_emby(EMBY_ENDPOINT_LOGIN, self, 'POST', **args)
+
+                    if not login_data and optional:
+                        return
+                    elif not login_data:
+                        self.logout()
+                        raise PluginError('Could not login to Emby')
+
+                    userdata = login_data.get('User')
+                    self._token = login_data.get('AccessToken')
+                else:
+                    allow_retry = True
         else:
             logger.debug('Login to {} with username {} and apikey', self.host, self.username)
             userdata = self.get_user_by_name(self._username)
@@ -233,6 +342,7 @@ class EmbyAuth(EmbyApiBase):
         """Logout user from API"""
         self._token = None
         self._logged = False
+        self._connect_username = ''
 
         if 'token_data' in persist:
             persist['token_data']['token'] = None
@@ -242,19 +352,32 @@ class EmbyAuth(EmbyApiBase):
         if not token_data:
             return False
 
-        if (
-            'token' not in token_data
-            or 'userid' not in token_data
-            or token_data.get('username') != self._username
-            or token_data.get('host') != self.host
-            or login_type != token_data.get('login_type')
-        ):
-            self.logout()
-            return False
+        if login_type == LOGIN_CONNECT:
+            connect_username = self._connect_username if self._connect_username else self._username
+            if (
+                'token' not in token_data
+                or 'userid' not in token_data
+                or token_data.get('connect_username') != connect_username
+                or login_type != token_data.get('login_type')
+            ):
+                self.logout()
+                return False
+        else:
+            if (
+                'token' not in token_data
+                or 'userid' not in token_data
+                or token_data.get('username') != self._username
+                or token_data.get('host') != self.host
+                or login_type != token_data.get('login_type')
+            ):
+                self.logout()
+                return False
 
         self._userid = token_data.get('userid')
         self._token = token_data.get('token')
         self._login_type = token_data.get('type')
+        self._connect_username = token_data.get('connect_username', '')
+        self.host = token_data.get('host', '')
         self._logged = True
         endpoint = EMBY_ENDPOINT_USERINFO.format(userid=token_data['userid'])
         response = EmbyApi.resquest_emby(endpoint, self, 'GET')
@@ -289,6 +412,7 @@ class EmbyAuth(EmbyApiBase):
             'userid': self._userid,
             'serverid': self._serverid,
             'token': self._token,
+            'connect_username': self._connect_username,
             'login_type': self._login_type,
         }
 
@@ -324,10 +448,17 @@ class EmbyAuth(EmbyApiBase):
     def lanurl(self) -> str:
         return self._lanurl
 
-    def add_token_header(self, header: dict) -> dict:
+    def add_token_header(self, header: dict, emby_connect=False) -> dict:
         """Adds data to request header"""
         if not header:
             header = {}
+
+        if emby_connect:
+            header = {'X-Application': self.EMBY_CLIENT}
+            if self._connect_token:
+                header['X-Connect-UserToken'] = self._connect_token
+
+            return header
 
         if self._apikey:
             header['X-Emby-Token'] = self._apikey
@@ -2240,8 +2371,8 @@ class EmbyApi(EmbyApiBase):
         return EmbyApiMedia.TYPE
 
     @staticmethod
-    def resquest_emby(endpoint: str, auth: 'EmbyAuth', method: str, **kwargs):
-        verify_certificates = False
+    def resquest_emby(endpoint: str, auth: 'EmbyAuth', method: str, emby_connect=False, **kwargs):
+        verify_certificates = True if emby_connect else False
 
         if not auth:
             auth = EmbyApi.get_auth(**kwargs)
@@ -2256,9 +2387,13 @@ class EmbyApi(EmbyApiBase):
         if not auth:
             auth = EmbyApi.get_auth(**kwargs)
 
-        url = f'{auth.host}{endpoint}'
+        url = f'{auth.host}{endpoint}' if not emby_connect else f'{EMBY_CONNECT}{endpoint}'
 
-        request_headers = auth.add_token_header({})
+        if EMBY_ENDPOINT_CONNECT_EXCHANGE in endpoint:
+            request_headers = {}
+            request_headers['X-Emby-Token'] = auth._connect_token_link
+        else:
+            request_headers = auth.add_token_header({}, emby_connect=emby_connect)
 
         try:
             if method == 'POST':
