@@ -1,6 +1,9 @@
 import os
+import re
 import xmlrpc.client
 from socket import error as socket_error
+from urllib.request import urlopen
+import ssl
 
 from loguru import logger
 
@@ -32,6 +35,7 @@ class OutputAria2:
             'password': {'type': 'string', 'default': ''},
             'path': {'type': 'string'},
             'filename': {'type': 'string'},
+            'add_extension': {'type': 'boolean', 'default': 'no'},
             'options': {
                 'type': 'object',
                 'additionalProperties': {'oneOf': [{'type': 'string'}, {'type': 'integer'}]},
@@ -119,11 +123,38 @@ class OutputAria2:
 
         filename = entry.get('content_filename', config.get('filename', None))
         if filename:
+            if config.get('add_extension', False):
+                logger.debug('Getting filename from `{}`', entry['url'])
+                url_info = None
+                try:
+                    ctx = ssl.create_default_context()
+                    ctx.check_hostname = False
+                    ctx.verify_mode = ssl.CERT_NONE
+                    url_info = urlopen(entry['url'], context=ctx)
+                except Exception as e:
+                    logger.warning('Not possible to retrive file info from `{}`', entry['url'])
+
+                if url_info and url_info and 'content-disposition' in url_info.headers:
+                    content_disposition = url_info.headers['content-disposition']
+                    fname_match = re.findall(
+                        r'filename=["\']?([^"\']+)["\']?', content_disposition
+                    )
+                    if fname_match:
+                        fname = fname_match[0]
+                        fname_info = os.path.splitext(fname)
+                        if len(fname_info) == 2:
+                            ext = fname_info[1]
+                            logger.debug(
+                                'Filename from `{}` is {} with ext `{}`', entry['url'], fname, ext
+                            )
+                            filename += ext
+
             try:
                 options['out'] = os.path.expanduser(entry.render(filename))
             except RenderError as e:
                 entry.fail('failed to render \'filename\': %s' % e)
                 return
+
         secret = None
         if config['secret']:
             secret = 'token:%s' % config['secret']
