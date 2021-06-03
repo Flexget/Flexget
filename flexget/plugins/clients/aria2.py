@@ -111,13 +111,16 @@ class OutputAria2:
         """
         options = config['options']
         try:
-            options['dir'] = os.path.expanduser(entry.render(config['path']).rstrip('/'))
+            path = entry.get('path', config.get('path', None))
+            options['dir'] = os.path.expanduser(entry.render(path).rstrip('/'))
         except RenderError as e:
             entry.fail('failed to render \'path\': %s' % e)
             return
-        if 'filename' in config:
+
+        filename = entry.get('filename', config.get('filename', None))
+        if filename:
             try:
-                options['out'] = os.path.expanduser(entry.render(config['filename']))
+                options['out'] = os.path.expanduser(entry.render(filename))
             except RenderError as e:
                 entry.fail('failed to render \'filename\': %s' % e)
                 return
