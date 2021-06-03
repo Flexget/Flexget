@@ -117,7 +117,7 @@ class OutputAria2:
             entry.fail('failed to render \'path\': %s' % e)
             return
 
-        filename = entry.get('filename', config.get('filename', None))
+        filename = entry.get('content_filename', config.get('filename', None))
         if filename:
             try:
                 options['out'] = os.path.expanduser(entry.render(filename))
