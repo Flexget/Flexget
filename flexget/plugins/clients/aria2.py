@@ -133,6 +133,8 @@ class OutputAria2:
                     url_info = urlopen(entry['url'], context=ctx)
                 except Exception as e:
                     logger.warning('Not possible to retrive file info from `{}`', entry['url'])
+                    entry.fail('Not possible to retrive file info from `{}`', entry['url'])
+                    return
 
                 if url_info and url_info and 'content-disposition' in url_info.headers:
                     content_disposition = url_info.headers['content-disposition']
