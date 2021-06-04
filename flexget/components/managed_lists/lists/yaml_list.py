@@ -1,6 +1,7 @@
 from unicodedata import normalize
 from collections.abc import MutableSet
 import re
+from urllib.parse import quote
 
 from loguru import logger
 from yaml import dump as save_yaml, load as load_yaml
@@ -121,7 +122,7 @@ class YamlManagedList(MutableSet):
         output_item.update(item)
 
         if 'url' not in output_item:
-            output_item['url'] = f'mock://{simplify(title).replace(" ","_")}'
+            output_item['url'] = f'mock://{quote(title)}'
 
         return output_item
 
