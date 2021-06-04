@@ -33,7 +33,7 @@ class EmbyLookup:
         try:
             self.auth.login(False)
         except plugin.PluginError as e:
-            logger.debug('Not possible to login to emby: {}', e)
+            logger.error('Not possible to login to emby: {}', e)
 
     @entry.register_lazy_lookup('emby_lookup')
     def lazy_loader(self, entry, auth):

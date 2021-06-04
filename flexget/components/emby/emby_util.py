@@ -1,3 +1,6 @@
+from unicodedata import normalize
+import re
+
 SCHEMA_SERVER = {
     'oneOf': [
         {
@@ -118,6 +121,23 @@ field_map = {
         'tmdb_id': 'movie_tmdb_id',
     },
 }
+
+
+def simplify_text(text: str) -> str:
+    """ Siplify text """
+
+    if not isinstance(text, str):
+        return text
+
+    # Replace accented chars by their 'normal' couterparts
+    result = normalize('NFKD', text)
+
+    # Symbols that should be converted to white space
+    result = re.sub(r'[ \(\)\-_\[\]\.]+', ' ', result)
+    # Leftovers
+    result = re.sub(r"[^a-zA-Z0-9 ]", "", result)
+    # Replace multiple white spaces with one
+    result = ' '.join(result.split())
 
 
 def get_field_map(**kwargs):
