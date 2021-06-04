@@ -18,6 +18,15 @@ class TestJinjaFilters:
             set:
               name: "{{title|strip_year}}"
               year: "{{title|get_year}}"
+
+          split:
+            mock:
+              - {"title":"The Matrix (1999)", "url":"mock://local1", "genres":"action,scifi"}
+            
+            accept_all: yes
+
+            set:
+              genres_list: "{{genres|split(',')}}"
     """
 
     def test_stripyear(self, execute_task):
@@ -41,3 +50,9 @@ class TestJinjaFilters:
 
         assert task.accepted[5]['name'] == 2000
         assert task.accepted[5]['year'] == 2020
+
+    def test_split(self, execute_task):
+        task = execute_task('split')
+
+        assert task.accepted[0]['genres_list'][0] == 'action'
+        assert task.accepted[0]['genres_list'][1] == 'scifi'

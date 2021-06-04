@@ -148,6 +148,10 @@ def filter_get_year(name: str) -> str:
     return split_title_year(name).year
 
 
+def filter_split(string: str, separator: str = " ") -> list:
+    return string.split(separator)
+
+
 def is_fs_file(pathname: Union[str, os.PathLike]) -> bool:
     """Test whether item is existing file in filesystem"""
     return os.path.isfile(pathname)
