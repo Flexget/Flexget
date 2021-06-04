@@ -41,6 +41,22 @@ class TestYamlLists(object):
               remove_on_match: no
               from:
                 - yaml_list: '{{yaml_dir}}/yaml_list1.yaml'
+
+          yaml_list_fields:
+            disable: seen
+            accept_all: yes
+            mock:
+              - {'title':'My Entry 1','url':'mock://myentry1', 'data':'myentry1'}
+              - {'title':'My Entry 2','url':'mock://myentry2', 'data':'myentry2'}
+
+            set:
+              newfield: 'new'
+
+            list_add:
+              - yaml_list: 
+                  path: '{{yaml_dir}}/yaml_list1.yaml'
+                  fields:
+                    - newfield
     """
 
     @pytest.fixture
@@ -91,3 +107,26 @@ class TestYamlLists(object):
         # Checks matched
         assert task.accepted[0]['title'] == 'My Entry 2'
         assert task.accepted[1]['title'] == 'My Entry 3'
+
+    def test_list_limited_fields(self, execute_task):
+        task = execute_task('yaml_list_fields')
+        assert len(task.accepted) == 2
+
+        # Check old field
+        assert 'data' in task.accepted[0]
+        assert 'data' in task.accepted[1]
+
+        task = execute_task('yaml_check_list1')
+        assert len(task.accepted) == 2
+
+        # Checks matched
+        assert task.accepted[0]['title'] == 'My Entry 1'
+        assert task.accepted[1]['title'] == 'My Entry 2'
+
+        # Check no old field
+        assert 'data' not in task.accepted[0]
+        assert 'data' not in task.accepted[1]
+
+        # Check ok field
+        assert task.accepted[0]['newfield'] == 'new'
+        assert task.accepted[1]['newfield'] == 'new'
