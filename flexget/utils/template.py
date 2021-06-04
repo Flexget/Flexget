@@ -25,6 +25,7 @@ from loguru import logger
 from flexget.event import event
 from flexget.utils.lazy_dict import LazyDict
 from flexget.utils.pathscrub import pathscrub
+from flexget.utils.tools import split_title_year
 
 if TYPE_CHECKING:
     from flexget.entry import Entry
@@ -137,6 +138,14 @@ def filter_default(value, default_value: str = '', boolean: bool = True) -> str:
 
 
 filter_d = filter_default
+
+
+def filter_strip_year(name: str) -> str:
+    return split_title_year(name).title
+
+
+def filter_get_year(name: str) -> str:
+    return split_title_year(name).year
 
 
 def is_fs_file(pathname: Union[str, os.PathLike]) -> bool:
