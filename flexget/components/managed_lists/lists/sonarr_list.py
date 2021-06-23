@@ -61,7 +61,7 @@ class SonarrSet(MutableSet):
         base_url = self.config['base_url']
         port = self.config['port']
         base_path = self.config['base_path']
-        url = '{}:{}{}/api/{}'.format(base_url, port, base_path, endpoint)
+        url = '{}:{}{}/api/v3/{}'.format(base_url, port, base_path, endpoint)
         headers = {'X-Api-Key': self.config['api_key']}
         if term:
             url += '?term={}'.format(term)

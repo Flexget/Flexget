@@ -123,7 +123,7 @@ class RadarrAPIService:
         if parsed_base_url.port:
             port = int(parsed_base_url.port)
 
-        self.api_url = "%s://%s:%s%s/api/" % (
+        self.api_url = "%s://%s:%s%s/api/v3/" % (
             parsed_base_url.scheme,
             parsed_base_url.netloc,
             port,
