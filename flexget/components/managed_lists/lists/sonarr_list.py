@@ -12,7 +12,7 @@ logger = logger.bind(name='sonarr_list')
 
 SERIES_ENDPOINT = 'series'
 LOOKUP_ENDPOINT = 'series/lookup'
-PROFILE_ENDPOINT = 'profile'
+PROFILE_ENDPOINT = 'qualityProfile'
 ROOTFOLDER_ENDPOINT = 'Rootfolder'
 DELETE_ENDPOINT = 'series/{}'
 
