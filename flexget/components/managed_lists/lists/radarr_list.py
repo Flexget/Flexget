@@ -528,7 +528,7 @@ class RadarrSet(MutableSet):
 
             # Check if we should add quality requirement
             if self.config.get("include_data"):
-                movie_profile_id = movie["profileId"]
+                movie_profile_id = movie["qualityProfileId"]
                 for profile in profiles:
                     profile_id = profile["id"]
                     if profile_id == movie_profile_id:

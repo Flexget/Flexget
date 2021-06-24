@@ -147,7 +147,7 @@ class SonarrSet(MutableSet):
                 # Checks if to retrieve ended shows
                 if show['status'] == 'ended' and not self.config.get('include_ended'):
                     continue
-            profile = profiles_dict.get(show['profileId'])
+            profile = profiles_dict.get(show['qualityProfileId'])
             if profile:
                 fg_qualities, fg_cutoff = self.quality_requirement_builder(profile)
 
