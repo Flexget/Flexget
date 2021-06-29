@@ -83,7 +83,7 @@ loguru==0.5.3
     # via -r requirements.in
 markupsafe==2.0.0
     # via jinja2
-more-itertools==8.7.0
+more-itertools==8.8.0
     # via
     #   -r requirements.in
     #   cheroot
