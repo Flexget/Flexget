@@ -32,7 +32,15 @@ colorclass==2.2.0
     # via -r requirements.in
 feedparser==6.0.2
     # via -r requirements.in
-flask-compress==1.9.0
+flask==1.1.2
+    # via
+    #   -r requirements.in
+    #   flask-compress
+    #   flask-cors
+    #   flask-login
+    #   flask-restful
+    #   flask-restx
+flask-compress==1.10.1
     # via -r requirements.in
 flask-cors==3.0.10
     # via -r requirements.in
@@ -42,14 +50,6 @@ flask-restful==0.3.9
     # via -r requirements.in
 flask-restx==0.4.0
     # via -r requirements.in
-flask==1.1.2
-    # via
-    #   -r requirements.in
-    #   flask-compress
-    #   flask-cors
-    #   flask-login
-    #   flask-restful
-    #   flask-restx
 greenlet==1.0.0
     # via sqlalchemy
 guessit==3.2.0
