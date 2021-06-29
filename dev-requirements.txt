@@ -158,7 +158,7 @@ pygments==2.8.1
     # via
     #   readme-renderer
     #   sphinx
-pylint==2.8.2
+pylint==2.8.3
     # via -r dev-requirements.in
 pyparsing==2.4.7
     # via
