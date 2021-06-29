@@ -89,7 +89,7 @@ importlib-metadata==4.0.1
     #   twine
 iniconfig==1.1.1
     # via pytest
-isort==5.8.0
+isort==5.9.1
     # via
     #   -r dev-requirements.in
     #   pylint
