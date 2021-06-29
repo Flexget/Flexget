@@ -1,5 +1,5 @@
 -c requirements.txt
-sphinx==3.5.4
+sphinx==4.0.2
 click~=7.1.2
 pylint>=2.6.0 #pylint < 2.6 doesn't work with isort5
 coverage==5.5
