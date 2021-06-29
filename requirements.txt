@@ -30,7 +30,7 @@ click==7.1.2
     # via flask
 colorclass==2.2.0
     # via -r requirements.in
-feedparser==6.0.2
+feedparser==6.0.8
     # via -r requirements.in
 flask==1.1.2
     # via
