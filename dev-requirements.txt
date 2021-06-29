@@ -136,7 +136,7 @@ pathspec==0.8.1
     # via black
 pep517==0.10.0
     # via pip-tools
-pip-tools==6.1.0
+pip-tools==6.2.0
     # via -r dev-requirements.in
 pkginfo==1.7.0
     # via twine
@@ -270,7 +270,9 @@ webencodings==0.5.1
     #   -c requirements.txt
     #   bleach
 wheel==0.36.2
-    # via -r dev-requirements.in
+    # via
+    #   -r dev-requirements.in
+    #   pip-tools
 wrapt==1.12.1
     # via
     #   astroid
