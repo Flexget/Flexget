@@ -82,21 +82,21 @@ class OutputFlood:
         kwargs = {}
 
         url = entry.get('url', None)
-        path = entry.get('path', config.get('path', None))
+        path = entry.render(entry.get('path', config.get('path', None)))
         tags = entry.get('tags', config.get('tags', None))
 
         if url:
             kwargs['urls'] = [ url ]
-        if path: 
+        if path:
             kwargs['destination'] = path
         # Because of the way that Flood wants things
-        # We've gotta check to see if the person has done 
+        # We've gotta check to see if the person has done
         # a list in their config or not.
         if tags:
             if isinstance(tags, list):
-                kwargs['tags'] = tags
+                kwargs['tags'] = [ entry.render(tag) for tag in tags ]
             else:
-                kwargs['tags'] = [ tags ]
+                kwargs['tags'] = [ entry.render(tags) ]
 
         if task.manager.options.test:
             logger.info('Flood Test Mode')
