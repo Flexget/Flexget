@@ -1,130 +1,123 @@
-import os
 from loguru import logger
 from requests import Session
 from requests.exceptions import RequestException
 
 from flexget import plugin
 from flexget.event import event
-from flexget.utils.template import RenderError
-from os import error
 from requests import Session
 from loguru import logger
-import json
-import base64
+
+from flexget.entry import Entry
+from flexget.task import Task
 
 logger = logger.bind(name='flood')
+
+class FloodClient:
+    def __init__(self):
+        self.session = Session()
+        self.connected = False
+
+    def _request(self, method: str, path: str, **kwargs):
+        try:
+            return self.session.request(method, self.url + path, **kwargs)
+        except RequestException as e:
+            raise plugin.PluginError(f'Flood Request Exception: {e}')
+    
+    def authenticate(self, config):
+        self.url = config['url'].strip('/')
+
+        response = self._request('post', '/api/auth/authenticate', data={
+            'username': config['username'],
+            'password': config['password']
+        })
+
+        if response.status_code == 200:
+            self.connected = True
+            logger.debug('Successfully logged into Flood')
+        else:
+            self.connected = False
+            raise plugin.PluginError('Incorrect username or password')
+
+        return self
+    
+    def add_torrent_urls(self, **kwargs):
+        if not self.connected:
+            raise plugin.PluginError('Flood is not connected.')
+
+        # Add's a default 'start': True to the request
+        if not kwargs.get('start'):
+            kwargs['start'] = True
+        
+        response = self._request('post', '/api/torrents/add-urls', json=kwargs)
+
+        if response.status_code == 200:
+            logger.debug('Successfully added torrent(s).')
+        else:
+            # There's no sanity to the codes returned by Flood. 
+            # Both return "code": -32602 and both return status 500.
+            if response.text.find('the input is not a valid.') > 0:
+                raise plugin.PluginError('Not a valid torrent.')
+            elif response.text.find('Info hash already used by another torrent.') > 0:
+                logger.debug('Torrent has already been added to Flood.')
+            else:
+                raise plugin.PluginError(f'Failed to add torrent to Flood. Error {response.status_code}.')
+    
+    def add_torrent_files(self,  **kwargs):
+        return False
 
 class OutputFlood:
     schema = {
        'type': 'object',
         'properties': {
-            'host': {'type': 'string'},
-            'port': {'type': 'integer'},
+            'url': {'type': 'string'},
             'username': {'type': 'string'},
             'password': {'type': 'string'},
-            'directory': {'type': 'string'},
+            'path': {'type': 'string'},
             'tags': {'type': 'array'},
         },
         'additionalProperties': False,
     }
 
-    def __init__(self):
-        self.session = Session()
-        self.connected = False
+    def add_entry(self, config: dict, task: Task, entry: Entry):
+        kwargs = {}
 
-    def _request(self, method, url, **kwargs):
-        try:
-            return self.session.request(method, url, **kwargs)
-        except RequestException as e:
-            raise plugin.PluginError(f'Flood Request Exception: {e}')
-    
-    def authenticate(self, config):
-        response = self._request('post', '{}:{}/api/auth/authenticate'.format(config['host'], config['port']), data={
-            'username': config['username'],
-            'password': config['password']
-        })
+        url = entry.get('url', None)
+        path = entry.get('path', config.get('path', None))
+        tags = entry.get('tags', config.get('tags', None))
 
-        if 'Failed login.' in response.text:
-            raise plugin.PluginError('Incorrect username or password')
+        if url:
+            kwargs['urls'] = [ url ]
+        if path: 
+            kwargs['destination'] = path
+        # Because of the way that Flood wants things
+        # We've gotta check to see if the person has done 
+        # a list in their config or not.
+        if tags:
+            if isinstance(tags, list):
+                kwargs['tags'] = tags
+            else:
+                kwargs['tags'] = [ tags ]
+
+        if task.manager.options.test:
+            logger.info('Flood Test Mode')
+            logger.info('Would add torrent to Flood with:')
+            logger.info('\tPath: {}', path)
+            logger.info('\tTags: {}', tags)
         else:
-            logger.debug('Successfully logged into Flood')
-            self.connected = True
-        return self.connected
-
-    """// POST /api/torrents/add-urls
-    export const addTorrentByURLSchema = object({
-      // URLs to download torrents from
-      urls: array(string()).nonempty(),
-      // Cookies to attach to requests, arrays of strings in the format "name=value" with domain as key
-      cookies: record(array(string())).optional(),
-      // Path of destination
-      destination: string().optional(),
-      // Tags
-      tags: array(string().regex(noComma, TAG_NO_COMMA_MESSAGE)).optional(),
-      // Whether destination is the base path [default: false]
-      isBasePath: boolean().optional(),
-      // Whether destination contains completed contents [default: false]
-      isCompleted: boolean().optional(),
-      // Whether contents of a torrent should be downloaded sequentially [default: false]
-      isSequential: boolean().optional(),
-      // Whether to use initial seeding mode [default: false]
-      isInitialSeeding: boolean().optional(),
-      // Whether to start torrent [default: false]
-      start: boolean().optional(),
-    });"""
-    def add_torrent_urls(self, config, urls):
-        if not self.connected:
-            raise plugin.PluginError('Not connected.')
-
-        response = self._request('post', '{}:{}/api/torrents/add-urls'.format(config['host'], config['port']), json={
-            'urls': urls,
-            'destination': config['directory'],
-            'tags': config['tags'],
-            'start': True
-        })
-
-        if response.status_code == 200:
-            logger.debug('Successfully added torrent to Flood')
-        else:
-            raise plugin.PluginError('Failed to add torrent to Flood. Error {}'.format(response.status_code))
-
-    """// POST /api/torrents/add-files
-    export const addTorrentByFileSchema = object({
-    // Torrent files in base64
-    files: array(string()).nonempty(),
-    // Path of destination
-    destination: string().optional(),
-    // Tags
-    tags: array(string().regex(noComma, TAG_NO_COMMA_MESSAGE)).optional(),
-    // Whether destination is the base path [default: false]
-    isBasePath: boolean().optional(),
-    // Whether destination contains completed contents [default: false]
-    isCompleted: boolean().optional(),
-    // Whether contents of a torrent should be downloaded sequentially [default: false]
-    isSequential: boolean().optional(),
-    // Whether to use initial seeding mode [default: false]
-    isInitialSeeding: boolean().optional(),
-    // Whether to start torrent [default: false]
-    start: boolean().optional(),
-    });"""
-    def add_torrent_files(self, config, data):
-        if not self.connected:
-            raise error('Not connected')
-
-        response = self._request('post', '{}:{}/api/torrents/add-files'.format(config['host'], config['port']), json=data)
-
-        if response.status_code == 200:
-            logger.debug('Successfully added torrent to Flood')
-        else:
-            raise plugin.PluginError('Failed to add torrent to Flood. Error {}'.format(response.status_code))
-
-    #@plugin.priority(120)
-    #def on_task_download(self, task, config):
+            self.flood.add_torrent_urls(**kwargs)
 
     @plugin.priority(135)
-    def on_task_output(self, task, config):
-        if task.accepted and self.authenticate(config):
-            self.add_torrent_urls(config, [entry['url'] for entry in task.accepted])
+    def on_task_output(self, task: Task, config: dict):
+        # If we don't have any accepted entries, then let's just stop (possibly redundant?)
+        if not task.accepted:
+            return
+
+        # We're re-authenticating ourselves every time we output
+        self.flood = FloodClient().authenticate(config)
+
+        # Loop through each accepted entry and send it to Flood
+        for entry in task.accepted:
+            self.add_entry(config, task, entry)
 
 @event('plugin.register')
 def register_plugin():
