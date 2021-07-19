@@ -29,7 +29,7 @@ class OutputSeriesRemove:
                     try:
                         db.remove_series_entity(entry['series_name'], entry['series_id'], forget)
                         logger.info(
-                            'Removed `{}`episode `{}` from series `{}` download history.',
+                            'Removed {}episode `{}` from series `{}` download history.',
                             'and forgot ' if forget else '',
                             entry['series_id'],
                             entry['series_name'],
@@ -44,7 +44,7 @@ class OutputSeriesRemove:
                     try:
                         db.remove_series(entry['series_name'], forget)
                         logger.info(
-                            'Removed `{}`series `{}` download history.',
+                            'Removed {}series `{}` download history.',
                             'and forgot ' if forget else '',
                             entry['series_name'],
                         )
