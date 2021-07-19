@@ -17,22 +17,22 @@ from flexget.components.jellyfin.jellyfin_util import get_field_map
 
 persist = SimplePersistence('api_jellyfin')
 
-JELLYFIN_ENDPOINT_LOGIN = '/Users/AuthenticateByName'
-JELLYFIN_ENDPOINT_SEARCH = '/Users/{userid}/Items'
-JELLYFIN_ENDPOINT_PHOTOS = '/Items/{itemid}/Images/Primary'
-JELLYFIN_ENDPOINT_DOWNLOAD = '/Items/{itemid}/Download'
-JELLYFIN_ENDPOINT_GETUSERS = '/Users'
-JELLYFIN_ENDPOINT_USERINFO = '/Users/{userid}'
-JELLYFIN_ENDPOINT_SERVERINFO = '/System/Info'
-JELLYFIN_ENDPOINT_PARENTS = '/Items/{itemid}/Ancestors'
-JELLYFIN_ENDPOINT_LIBRARY = '/Library/MediaFolders'
-JELLYFIN_ENDPOINT_FAVORITE = '/Users/{userid}/FavoriteItems/{itemid}'
-JELLYFIN_ENDPOINT_ITEMUPD = '/Items/{itemid}'
-JELLYFIN_ENDPOINT_WATCHED = '/Users/{userid}/PlayedItems/{itemid}'
-JELLYFIN_ENDPOINT_NEW_PLAYLIST = '/Playlists'
-JELLYFIN_ENDPOINT_PLAYLIST = '/Playlists/{listid}/Items'
-JELLYFIN_ENDPOINT_DELETE_ITEM = '/Items/{itemid}'
-JELLYFIN_ENDPOINT_LIBRARY_REFRESH = '/Library/Refresh'
+JELLYFIN_ENDPOINT_LOGIN = '/emby/Users/AuthenticateByName'
+JELLYFIN_ENDPOINT_SEARCH = '/emby/Users/{userid}/Items'
+JELLYFIN_ENDPOINT_PHOTOS = '/emby/Items/{itemid}/Images/Primary'
+JELLYFIN_ENDPOINT_DOWNLOAD = '/emby/Items/{itemid}/Download'
+JELLYFIN_ENDPOINT_GETUSERS = '/emby/Users'
+JELLYFIN_ENDPOINT_USERINFO = '/emby/Users/{userid}'
+JELLYFIN_ENDPOINT_SERVERINFO = '/emby/System/Info'
+JELLYFIN_ENDPOINT_PARENTS = '/emby/Items/{itemid}/Ancestors'
+JELLYFIN_ENDPOINT_LIBRARY = '/emby/Library/MediaFolders'
+JELLYFIN_ENDPOINT_FAVORITE = '/emby/Users/{userid}/FavoriteItems/{itemid}'
+JELLYFIN_ENDPOINT_ITEMUPD = '/emby/Items/{itemid}'
+JELLYFIN_ENDPOINT_WATCHED = '/emby/Users/{userid}/PlayedItems/{itemid}'
+JELLYFIN_ENDPOINT_NEW_PLAYLIST = '/emby/Playlists'
+JELLYFIN_ENDPOINT_PLAYLIST = '/emby/Playlists/{listid}/Items'
+JELLYFIN_ENDPOINT_DELETE_ITEM = '/emby/Items/{itemid}'
+JELLYFIN_ENDPOINT_LIBRARY_REFRESH = '/emby/Library/Refresh'
 
 logger = logger.bind(name='api_jellyfin')
 
@@ -173,7 +173,7 @@ class JellyfinAuth(JellyfinApiBase):
                 logger.debug('Login to {} with username {}', self.host, self.username)
                 args = {'Username': self._username, 'Pw': self._password}
 
-                login_data = JellyfinApi.request_jellyfin(JELLYFIN_ENDPOINT_LOGIN, self, 'POST', **args)
+                login_data = JellyfinApi.resquest_jellyfin(JELLYFIN_ENDPOINT_LOGIN, self, 'POST', **args)
 
                 if not login_data and optional:
                     return
@@ -201,7 +201,7 @@ class JellyfinAuth(JellyfinApiBase):
 
         self._logged = True
 
-        serverinfo = JellyfinApi.request_jellyfin(JELLYFIN_ENDPOINT_SERVERINFO, self, 'GET')
+        serverinfo = JellyfinApi.resquest_jellyfin(JELLYFIN_ENDPOINT_SERVERINFO, self, 'GET')
         if serverinfo:
             self._wanurl = serverinfo.get('WanAddress')
             self._lanurl = serverinfo.get('LocalAddress')
@@ -231,7 +231,7 @@ class JellyfinAuth(JellyfinApiBase):
         self._token = token_data.get('token')
         self._logged = True
         endpoint = JELLYFIN_ENDPOINT_USERINFO.format(userid=token_data['userid'])
-        response = JellyfinApi.request_jellyfin(endpoint, self, 'GET')
+        response = JellyfinApi.resquest_jellyfin(endpoint, self, 'GET')
         if not response:
             self.logout()
             return False
@@ -300,31 +300,31 @@ class JellyfinAuth(JellyfinApiBase):
             header = {}
 
         if self._apikey:
-            header['X-Jellyfin-Token'] = self._apikey
+            header['X-Emby-Token'] = self._apikey
             return header
 
         fields = [
-            f'Jellyfin UserId={self._userid}',
+            f'Emby UserId={self._userid}',
             f'Client={self.JELLYFIN_CLIENT}',
             f'Device={self.JELLYFIN_DEVICE}',
             f'DeviceId={self.JELLYFIN_DEVICE_ID}',
             f'Version={self.JELLYFIN_VERSION}',
         ]
 
-        header['X-Jellyfin-Authorization'] = ', '.join(fields)
+        header['X-Emby-Authorization'] = ', '.join(fields)
         header['accept'] = 'application/json'
 
         if not self.logged:
             return header
 
-        header['X-Jellyfin-Token'] = self.token
+        header['X-Emby-Token'] = self.token
         return header
 
     def get_user_by_name(self, name: str) -> dict:
         """Gets user by username"""
 
         args = {'IsDisabled': False}
-        useres = JellyfinApi.request_jellyfin(JELLYFIN_ENDPOINT_GETUSERS, self, 'GET', **args)
+        useres = JellyfinApi.resquest_jellyfin(JELLYFIN_ENDPOINT_GETUSERS, self, 'GET', **args)
         if not useres:
             return
 
@@ -597,7 +597,7 @@ class JellyfinApiLibrary(JellyfinApiListBase):
 
         logger.debug('Search library list with: {}', args)
         endpoint = JELLYFIN_ENDPOINT_SEARCH.format(userid=self.auth.uid)
-        items = JellyfinApi.request_jellyfin(endpoint, self.auth, 'GET', **args)
+        items = JellyfinApi.resquest_jellyfin(endpoint, self.auth, 'GET', **args)
         self._internal_items = items['Items'] if items else []
 
         for media in self._internal_items:
@@ -610,7 +610,7 @@ class JellyfinApiLibrary(JellyfinApiListBase):
         if not auth:
             auth = JellyfinApi.get_auth()
 
-        additem = JellyfinApi.request_jellyfin(JELLYFIN_ENDPOINT_LIBRARY_REFRESH, auth, 'POST')
+        additem = JellyfinApi.resquest_jellyfin(JELLYFIN_ENDPOINT_LIBRARY_REFRESH, auth, 'POST')
         if not additem:
             logger.error('Not possible to refresh jellyfin library')
 
@@ -625,7 +625,7 @@ class JellyfinApiLibrary(JellyfinApiListBase):
         args['IsHidden'] = False
 
         logger.debug('Search Library name list with: {}', args)
-        search_list_data = JellyfinApi.request_jellyfin(JELLYFIN_ENDPOINT_LIBRARY, auth, 'GET', **args)
+        search_list_data = JellyfinApi.resquest_jellyfin(JELLYFIN_ENDPOINT_LIBRARY, auth, 'GET', **args)
         if not search_list_data or not search_list_data['Items']:
             return
 
@@ -684,14 +684,14 @@ class JellyfinApiWatchedList(JellyfinApiListBase):
     def _add(self, item: 'JellyfinApiMedia'):
         args = {}
         endpoint = JELLYFIN_ENDPOINT_WATCHED.format(userid=self.auth.uid, itemid=item.id)
-        additem = JellyfinApi.request_jellyfin(endpoint, self.auth, 'POST', **args)
+        additem = JellyfinApi.resquest_jellyfin(endpoint, self.auth, 'POST', **args)
         if not additem:
             logger.warning('Not possible to add item \'{}\' to watched list', item.fullname)
 
     def _remove(self, item: 'JellyfinApiMedia'):
         args = {}
         endpoint = JELLYFIN_ENDPOINT_WATCHED.format(userid=self.auth.uid, itemid=item.id)
-        additem = JellyfinApi.request_jellyfin(endpoint, self.auth, 'DELETE', **args)
+        additem = JellyfinApi.resquest_jellyfin(endpoint, self.auth, 'DELETE', **args)
         if not additem:
             logger.warning('Not possible to remove item \'{}\' from watched list', item.fullname)
 
@@ -706,7 +706,7 @@ class JellyfinApiWatchedList(JellyfinApiListBase):
         logger.debug('Search watched list with: {}', args)
 
         endpoint = JELLYFIN_ENDPOINT_SEARCH.format(userid=self.auth.uid)
-        items = JellyfinApi.request_jellyfin(endpoint, self.auth, 'GET', **args)
+        items = JellyfinApi.resquest_jellyfin(endpoint, self.auth, 'GET', **args)
         self._internal_items = items['Items'] if items else []
 
         for media in self._internal_items:
@@ -734,14 +734,14 @@ class JellyfinApiFavoriteList(JellyfinApiListBase):
     def _add(self, item: 'JellyfinApiMedia'):
         args = {}
         endpoint = JELLYFIN_ENDPOINT_FAVORITE.format(userid=self.auth.uid, itemid=item.id)
-        additem = JellyfinApi.request_jellyfin(endpoint, self.auth, 'POST', **args)
+        additem = JellyfinApi.resquest_jellyfin(endpoint, self.auth, 'POST', **args)
         if not additem:
             logger.warning('Not possible to add item \'{}\' to favorite list', item.fullname)
 
     def _remove(self, item: 'JellyfinApiMedia'):
         args = {}
         endpoint = JELLYFIN_ENDPOINT_FAVORITE.format(userid=self.auth.uid, itemid=item.id)
-        additem = JellyfinApi.request_jellyfin(endpoint, self.auth, 'DELETE', **args)
+        additem = JellyfinApi.resquest_jellyfin(endpoint, self.auth, 'DELETE', **args)
         if not additem:
             logger.warning('Not possible to remove item \'{}\' from favorite list', item.fullname)
 
@@ -755,7 +755,7 @@ class JellyfinApiFavoriteList(JellyfinApiListBase):
 
         logger.debug('Search favorite list with: {}', args)
         endpoint = JELLYFIN_ENDPOINT_SEARCH.format(userid=self.auth.uid)
-        items = JellyfinApi.request_jellyfin(endpoint, self.auth, 'GET', **args)
+        items = JellyfinApi.resquest_jellyfin(endpoint, self.auth, 'GET', **args)
         self._internal_items = items['Items'] if items else []
 
         for media in self._internal_items:
@@ -799,7 +799,7 @@ class JellyfinApiPlayList(JellyfinApiListBase):
         args['Ids'] = item.id
 
         endpoint = JELLYFIN_ENDPOINT_PLAYLIST.format(listid=self.id)
-        additem = JellyfinApi.request_jellyfin(endpoint, self.auth, 'POST', **args)
+        additem = JellyfinApi.resquest_jellyfin(endpoint, self.auth, 'POST', **args)
         if not additem:
             logger.warning(
                 'Not possible to add item \'{}\' to Playlist \'{}\'', item.fullname, self.name
@@ -823,7 +823,7 @@ class JellyfinApiPlayList(JellyfinApiListBase):
         args['EntryIds'] = self.playlist_bind[item.id]
 
         endpoint = JELLYFIN_ENDPOINT_PLAYLIST.format(listid=self.id)
-        additem = JellyfinApi.request_jellyfin(endpoint, self.auth, 'DELETE', **args)
+        additem = JellyfinApi.resquest_jellyfin(endpoint, self.auth, 'DELETE', **args)
         if not additem:
             logger.warning(
                 'Not possible to remove item \'{}\' from Playlist \'{}\'', item.fullname, self.name
@@ -838,7 +838,7 @@ class JellyfinApiPlayList(JellyfinApiListBase):
     def destroy(self):
         logger.debug('Deleting {}', self.fullname)
         endpoint = JELLYFIN_ENDPOINT_DELETE_ITEM.format(itemid=self.id)
-        additem = JellyfinApi.request_jellyfin(endpoint, self.auth, 'DELETE')
+        additem = JellyfinApi.resquest_jellyfin(endpoint, self.auth, 'DELETE')
         if not additem:
             logger.warning('Not possible to delete {}', self.fullname)
             return
@@ -855,7 +855,7 @@ class JellyfinApiPlayList(JellyfinApiListBase):
 
         logger.debug('Search PlayList  with: {}', args)
         endpoint = JELLYFIN_ENDPOINT_SEARCH.format(userid=self.auth.uid)
-        items = JellyfinApi.request_jellyfin(endpoint, self.auth, 'GET', **args)
+        items = JellyfinApi.resquest_jellyfin(endpoint, self.auth, 'GET', **args)
         self._internal_items = items['Items'] if items else []
 
         for media in self._internal_items:
@@ -884,7 +884,7 @@ class JellyfinApiPlayList(JellyfinApiListBase):
         args['Type'] = 'Playlist'
 
         logger.debug('Search Playlist Name list with: {}', args)
-        search_list_data = JellyfinApi.request_jellyfin(JELLYFIN_ENDPOINT_SEARCH, auth, 'GET', **args)
+        search_list_data = JellyfinApi.resquest_jellyfin(JELLYFIN_ENDPOINT_SEARCH, auth, 'GET', **args)
         if not search_list_data or not search_list_data['Items']:
             return
 
@@ -915,7 +915,7 @@ class JellyfinApiPlayList(JellyfinApiListBase):
         args['Ids'] = item.id
         logger.debug('Creating playlist \'{}\'', list_name)
 
-        items = JellyfinApi.request_jellyfin(JELLYFIN_ENDPOINT_NEW_PLAYLIST, auth, 'POST', **args)
+        items = JellyfinApi.resquest_jellyfin(JELLYFIN_ENDPOINT_NEW_PLAYLIST, auth, 'POST', **args)
         if not items:
             logger.warning('Not possible to create playlist \'{}\'', list_name)
             return
@@ -1047,7 +1047,7 @@ class JellyfinApiMedia(JellyfinApiBase):
         args = {'userid': self.auth.uid}
 
         endpoint = JELLYFIN_ENDPOINT_PARENTS.format(itemid=self.id)
-        parents = JellyfinApi.request_jellyfin(endpoint, self.auth, 'GET', **args)
+        parents = JellyfinApi.resquest_jellyfin(endpoint, self.auth, 'GET', **args)
         if not parents:
             return
 
@@ -1243,7 +1243,7 @@ class JellyfinApiMedia(JellyfinApiBase):
         args['SearchTerm'] = split_title_year(kwargs.get('title')).title
 
         logger.debug('Search media with: {}', args)
-        medias = JellyfinApi.request_jellyfin(JELLYFIN_ENDPOINT_SEARCH, auth, 'GET', **args)
+        medias = JellyfinApi.resquest_jellyfin(JELLYFIN_ENDPOINT_SEARCH, auth, 'GET', **args)
         if not medias or 'Items' not in medias:
             logger.warning('No media found')
             return
@@ -1369,7 +1369,7 @@ class JellyfinApiSerie(JellyfinApiMedia):
         args['IncludeItemTypes'] = 'Series'
 
         logger.debug('Search serie with: {}', args)
-        series = JellyfinApi.request_jellyfin(JELLYFIN_ENDPOINT_SEARCH, auth, 'GET', **args)
+        series = JellyfinApi.resquest_jellyfin(JELLYFIN_ENDPOINT_SEARCH, auth, 'GET', **args)
         if not series or 'Items' not in series:
             logger.warning('No serie found')
             return
@@ -1543,7 +1543,7 @@ class JellyfinApiSeason(JellyfinApiMedia):
         JellyfinApi.set_common_search_arg(args)
 
         logger.debug('Search season with: {}', args)
-        seasons = JellyfinApi.request_jellyfin(JELLYFIN_ENDPOINT_SEARCH, auth, 'GET', **args)
+        seasons = JellyfinApi.resquest_jellyfin(JELLYFIN_ENDPOINT_SEARCH, auth, 'GET', **args)
         if not seasons or 'Items' not in seasons:
             logger.warning('No season found')
             return
@@ -1743,7 +1743,7 @@ class JellyfinApiEpisode(JellyfinApiMedia):
         args['IncludeItemTypes'] = 'Episode'
 
         logger.debug('Search episode with: {}', args)
-        response = JellyfinApi.request_jellyfin(JELLYFIN_ENDPOINT_SEARCH, auth, 'GET', **args)
+        response = JellyfinApi.resquest_jellyfin(JELLYFIN_ENDPOINT_SEARCH, auth, 'GET', **args)
         if not response or 'Items' not in response:
             logger.warning('No episode found')
             return
@@ -1918,7 +1918,7 @@ class JellyfinApiMovie(JellyfinApiMedia):
         args['IncludeItemTypes'] = 'Movie'
 
         logger.debug('Search movie with: {}', args)
-        movies = JellyfinApi.request_jellyfin(JELLYFIN_ENDPOINT_SEARCH, auth, 'GET', **args)
+        movies = JellyfinApi.resquest_jellyfin(JELLYFIN_ENDPOINT_SEARCH, auth, 'GET', **args)
         if not movies or 'Items' not in movies:
             logger.warning('No movie found')
             return
@@ -2087,7 +2087,7 @@ class JellyfinApi(JellyfinApiBase):
         return JellyfinApiMedia.TYPE
 
     @staticmethod
-    def request_jellyfin(endpoint: str, auth: 'JellyfinAuth', method: str, **kwargs):
+    def resquest_jellyfin(endpoint: str, auth: 'JellyfinAuth', method: str, **kwargs):
         verify_certificates = False
 
         if not auth:
