@@ -44,9 +44,9 @@ jobs:
       id: changelog
       if: env.release_tag
       run: |
-        version=$(echo $release_tag | sed -e 's/v//' -e 's/\.//g')
+        version=$(echo ${{ env.release_tag }} | sed -e 's/v//' -e 's/\.//g')
         date=$(date +%Y-%m-%d)
-        link="https://flexget.com/ChangeLog#${version}-${date}"
+        link="${{ env.release_tag }} [Changelog](https://flexget.com/ChangeLog#${version}-${date})"
         echo ::set-output name=changeloglink::$link
     - name: Create GitHub Release
       uses: ncipollo/release-action@v1
