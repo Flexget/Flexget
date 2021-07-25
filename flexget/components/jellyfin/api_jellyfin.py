@@ -17,22 +17,22 @@ from flexget.components.jellyfin.jellyfin_util import get_field_map
 
 persist = SimplePersistence('api_jellyfin')
 
-JELLYFIN_ENDPOINT_LOGIN = '/emby/Users/AuthenticateByName'
-JELLYFIN_ENDPOINT_SEARCH = '/emby/Users/{userid}/Items'
-JELLYFIN_ENDPOINT_PHOTOS = '/emby/Items/{itemid}/Images/Primary'
-JELLYFIN_ENDPOINT_DOWNLOAD = '/emby/Items/{itemid}/Download'
-JELLYFIN_ENDPOINT_GETUSERS = '/emby/Users'
-JELLYFIN_ENDPOINT_USERINFO = '/emby/Users/{userid}'
-JELLYFIN_ENDPOINT_SERVERINFO = '/emby/System/Info'
-JELLYFIN_ENDPOINT_PARENTS = '/emby/Items/{itemid}/Ancestors'
-JELLYFIN_ENDPOINT_LIBRARY = '/emby/Library/MediaFolders'
-JELLYFIN_ENDPOINT_FAVORITE = '/emby/Users/{userid}/FavoriteItems/{itemid}'
-JELLYFIN_ENDPOINT_ITEMUPD = '/emby/Items/{itemid}'
-JELLYFIN_ENDPOINT_WATCHED = '/emby/Users/{userid}/PlayedItems/{itemid}'
-JELLYFIN_ENDPOINT_NEW_PLAYLIST = '/emby/Playlists'
-JELLYFIN_ENDPOINT_PLAYLIST = '/emby/Playlists/{listid}/Items'
-JELLYFIN_ENDPOINT_DELETE_ITEM = '/emby/Items/{itemid}'
-JELLYFIN_ENDPOINT_LIBRARY_REFRESH = '/emby/Library/Refresh'
+JELLYFIN_ENDPOINT_LOGIN = '/Users/AuthenticateByName'
+JELLYFIN_ENDPOINT_SEARCH = '/Users/{userid}/Items'
+JELLYFIN_ENDPOINT_PHOTOS = '/Items/{itemid}/Images/Primary'
+JELLYFIN_ENDPOINT_DOWNLOAD = '/Items/{itemid}/Download'
+JELLYFIN_ENDPOINT_GETUSERS = '/Users'
+JELLYFIN_ENDPOINT_USERINFO = '/Users/{userid}'
+JELLYFIN_ENDPOINT_SERVERINFO = '/System/Info'
+JELLYFIN_ENDPOINT_PARENTS = '/Items/{itemid}/Ancestors'
+JELLYFIN_ENDPOINT_LIBRARY = '/Library/MediaFolders'
+JELLYFIN_ENDPOINT_FAVORITE = '/Users/{userid}/FavoriteItems/{itemid}'
+JELLYFIN_ENDPOINT_ITEMUPD = '/Items/{itemid}'
+JELLYFIN_ENDPOINT_WATCHED = '/Users/{userid}/PlayedItems/{itemid}'
+JELLYFIN_ENDPOINT_NEW_PLAYLIST = '/Playlists'
+JELLYFIN_ENDPOINT_PLAYLIST = '/Playlists/{listid}/Items'
+JELLYFIN_ENDPOINT_DELETE_ITEM = '/Items/{itemid}'
+JELLYFIN_ENDPOINT_LIBRARY_REFRESH = '/Library/Refresh'
 
 logger = logger.bind(name='api_jellyfin')
 
