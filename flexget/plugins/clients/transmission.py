@@ -123,13 +123,13 @@ class TransmissionBase:
 
         if torrent.seedIdleMode == 1:  # use torrent's own idle limit
             idle_limit_ok = (
-                torrent.date_active + timedelta(minutes=torrent.seedIdleLimit) < datetime.now()
+                torrent.date_active + timedelta(minutes=torrent.seedIdleLimit) < datetime.now(torrent.date_active.tzinfo)
             )
         elif torrent.seedIdleMode == 0:  # use global rules
             if session.idle_seeding_limit_enabled:
                 idle_limit_ok = (
                     torrent.date_active + timedelta(minutes=session.idle_seeding_limit)
-                    < datetime.now()
+                    < datetime.now(torrent.date_active.tzinfo)
                 )
 
         return seed_limit_ok, idle_limit_ok
