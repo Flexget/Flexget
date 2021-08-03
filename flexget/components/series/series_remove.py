@@ -5,7 +5,7 @@ from flexget.event import event
 
 from . import db
 
-logger = logger.bind(name='series_forget')
+logger = logger.bind(name='series_remove')
 
 
 class OutputSeriesRemove:
