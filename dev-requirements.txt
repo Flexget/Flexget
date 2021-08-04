@@ -20,7 +20,7 @@ attrs==20.3.0
     #   pytest
 babel==2.9.0
     # via sphinx
-black==21.6b0
+black==21.7b0
     # via -r dev-requirements.in
 bleach==3.3.0
     # via readme-renderer
@@ -240,12 +240,13 @@ sqlalchemy-stubs==0.4
     # via -r dev-requirements.in
 toml==0.10.2
     # via
-    #   black
     #   pep517
     #   pre-commit
     #   pylint
     #   pytest
     #   pytest-cov
+tomli==1.2.0
+    # via black
 tqdm==4.60.0
     # via twine
 twine==3.4.2
