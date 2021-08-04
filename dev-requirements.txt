@@ -248,7 +248,7 @@ toml==0.10.2
     #   pytest-cov
 tqdm==4.60.0
     # via twine
-twine==3.4.1
+twine==3.4.2
     # via -r dev-requirements.in
 typed-ast==1.4.3
     # via mypy
