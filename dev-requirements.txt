@@ -178,7 +178,7 @@ pytest-runner==5.3.1
     # via -r dev-requirements.in
 pytest-xdist==2.3.0
     # via -r dev-requirements.in
-python-dateutil==2.8.1
+python-dateutil==2.8.2
     # via
     #   -c requirements.txt
     #   botocore
