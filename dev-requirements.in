@@ -1,5 +1,5 @@
 -c requirements.txt
-sphinx==4.0.2
+sphinx==4.1.2
 click~=7.1.2
 pylint>=2.6.0 #pylint < 2.6 doesn't work with isort5
 coverage==5.5
@@ -14,7 +14,7 @@ pytest-cov==2.12.1
 gitpython==3.1.18
 codacy-coverage>=1.2.18
 pip-tools==6.2.0
-twine==3.4.1
+twine==3.4.2
 isort>=5.5.1
 black>=18.9b0
 pre-commit>=2.9.0
