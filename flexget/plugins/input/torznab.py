@@ -1,6 +1,7 @@
 from urllib.parse import urlencode
 from xml.etree import ElementTree
 
+import dateutil.parser
 from loguru import logger
 
 from flexget import plugin
@@ -18,6 +19,9 @@ class Torznab:
 
     Handles searching for tv shows and movies, with fallback to simple query strings if these are not available.
     """
+
+    ITEM_TAG_TYPES = dict(category=int, size=int, grabs=int)
+    ITEM_LIST_TAGS = {'category'}
 
     @property
     def schema(self):
@@ -187,11 +191,37 @@ class Torznab:
             self._parse_torznab_attrs(entry, item.findall('torznab:attr', ns))
 
             for child in item.iter():
-                if child.tag in ['{http://torznab.com/schemas/2015/feed}attr', 'enclosure']:
+                if child.tag in {
+                        'item',
+                        'enclosure',
+                        '{http://torznab.com/schemas/2015/feed}attr',
+                }:
                     continue
+
+                # Normalize the item element value
+                value = child.text
+                if value is not None:
+                    # Cleanup leading and trailing whitespace
+                    value = value.strip()
+
+                # Convert to native Python types if possible
+                if child.tag in self.ITEM_TAG_TYPES:
+                    # Convert to native Python types if possible
+                    value = self.ITEM_TAG_TYPES[child.tag](value)
+                elif child.tag.lower().endswith("date"):
+                    try:
+                        value = dateutil.parser.parse(value, ignoretz=True)
+                    except (TypeError, ValueError, OverflowError):
+                        logger.warning(
+                            f'Item {child.tag!r} element is not a valid date: {value}',
+                        )
+
+                # Add item element value to the entry
+                if child.tag in self.ITEM_LIST_TAGS:
+                    entry.setdefault(child.tag, []).append(value)
                 else:
-                    if child.tag in ['description', 'title'] and child.text:
-                        entry[child.tag] = child.text
+                    entry[child.tag] = value
+
             entries.append(entry)
         return entries
 
