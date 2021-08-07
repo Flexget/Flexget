@@ -887,8 +887,82 @@ class PluginTransmissionClean(TransmissionBase):
             self.client.remove_torrent(remove_ids, config.get('delete_files'))
 
 
+class PluginTransmissionSession(TransmissionBase):
+    """
+    Add Transmission session data, such as global settings, to each entry.
+
+    Useful to filter based on transmssion settings.  For example, don't add
+    new entries to transmission when a download limit is enabled.
+
+    Example::
+
+      transmission_session:
+        username: "myusername"
+        password: "mypassword"
+      if:
+        # Don't add items if downloading is paused
+        - "transmission_speed_limit_down_enabled and transmission_speed_limit_down == 0":
+            "reject"
+        - "transmission_alt_speed_enabled and transmission_alt_speed_down == 0":
+            "reject"
+
+    Default values for the config elements::
+
+      transmission_session:
+        host: localhost
+        port: 9091
+        enabled: yes
+        prefix: "transmission"
+    """
+    """
+
+    """
+
+    schema = {
+        'anyOf': [
+            {'type': 'boolean'},
+            {
+                'type': 'object',
+                'properties': {
+                    'host': {'type': 'string'},
+                    'port': {'type': 'integer'},
+                    'netrc': {'type': 'string', 'format': 'file'},
+                    'username': {'type': 'string'},
+                    'password': {'type': 'string'},
+                    'enabled': {'type': 'boolean'},
+                    'prefix': {'type': 'string'},
+                },
+                'additionalProperties': False,
+            },
+        ]
+    }
+
+    def prepare_config(self, config):
+        config = TransmissionBase.prepare_config(self, config)
+        config.setdefault('prefix', "transmission")
+        return config
+
+    def on_task_metainfo(self, task, config):
+        config = self.prepare_config(config)
+        if not config['enabled']:
+            return
+
+        if not self.client:
+            self.client = self.create_rpc_client(config)
+        session = self.client.get_session()
+
+        for entry in task.entries:
+            # It's bad practice to use the "private" `_fields` attribute, but
+            # it's the only way to generalize the list of fields and using a
+            # private attribute to dynamically lookup the list of fields is
+            # less fragile than a hard-coded list of fields.
+            for field_name, field in session._fields.items():
+                entry[f"{config['prefix']}_{field_name}"] = field.value
+
+
 @event('plugin.register')
 def register_plugin():
     plugin.register(PluginTransmission, 'transmission', api_ver=2)
     plugin.register(PluginTransmissionInput, 'from_transmission', api_ver=2)
     plugin.register(PluginTransmissionClean, 'clean_transmission', api_ver=2)
+    plugin.register(PluginTransmissionSession, 'transmission_session', api_ver=2)
