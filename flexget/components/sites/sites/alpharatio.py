@@ -71,7 +71,7 @@ class AlphaRatioCookie(Base):
 
 class SearchAlphaRatio:
     """
-        AlphaRatio search plugin.
+    AlphaRatio search plugin.
     """
 
     schema = {
@@ -213,7 +213,7 @@ class SearchAlphaRatio:
     @plugin.internet(logger)
     def search(self, task, entry, config):
         """
-            Search for entries on AlphaRatio
+        Search for entries on AlphaRatio
         """
         params = {}
 
@@ -295,14 +295,30 @@ class SearchAlphaRatio:
                 e['url'] = url
                 e['torrent_tags'] = torrent_tags
                 if not size:
-                    logger.error(
+                    logger.debug(
                         'No size found! Please create a Github issue. Size received: {}', size_col
                     )
                 else:
                     e['content_size'] = parse_filesize(size.group(0))
-                e['torrent_snatches'] = int(torrent_info[snatches_idx].text)
-                e['torrent_seeds'] = int(torrent_info[seeds_idx].text)
-                e['torrent_leeches'] = int(torrent_info[leeches_idx].text)
+
+                mappings_int = {
+                    'torrent_snatches': snatches_idx,
+                    'torrent_seeds': seeds_idx,
+                    'torrent_leeches': leeches_idx,
+                }
+
+                for dest, src in mappings_int.items():
+                    if not src in torrent_info:
+                        continue
+
+                    # Some values are tagged with a ',' insted of a '.', replace them
+                    value = torrent_info[src].text.replace(',', '.')
+
+                    try:
+                        e[dest] = int(value)
+                    except ValueError as e:
+                        logger.debug('Invalid \'{}\' with \'{}\'', dest, value)
+                        continue
 
                 entries.add(e)
 

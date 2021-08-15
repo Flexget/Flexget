@@ -1,9 +1,10 @@
 import functools
 from datetime import datetime
+from typing import List, Union, Optional, Any
 
 from sqlalchemy import extract, func
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
-from sqlalchemy.orm import synonym
+from sqlalchemy.orm import synonym, SynonymProperty
 
 from flexget.entry import Entry
 from flexget.manager import Session
@@ -11,7 +12,7 @@ from flexget.utils import json, qualities, serialization
 
 
 def with_session(*args, **kwargs):
-    """"
+    """ "
     A decorator which creates a new session if one was not passed via keyword argument to the function.
 
     Automatically commits and closes the session if one was created, caller is responsible for commit if passed in.
@@ -41,15 +42,16 @@ def with_session(*args, **kwargs):
         return decorator
 
 
-def pipe_list_synonym(name):
+def pipe_list_synonym(name: str) -> SynonymProperty:
     """Converts pipe separated text into a list"""
 
-    def getter(self):
+    def getter(self) -> Optional[List[str]]:
         attr = getattr(self, name)
         if attr:
             return attr.strip('|').split('|')
+        return None
 
-    def setter(self, value):
+    def setter(self, value: Union[str, List[str]]) -> None:
         if isinstance(value, str):
             setattr(self, name, value)
         else:
@@ -58,13 +60,13 @@ def pipe_list_synonym(name):
     return synonym(name, descriptor=property(getter, setter))
 
 
-def text_date_synonym(name):
+def text_date_synonym(name: str) -> SynonymProperty:
     """Converts Y-M-D date strings into datetime objects"""
 
-    def getter(self):
+    def getter(self) -> Optional[datetime]:
         return getattr(self, name)
 
-    def setter(self, value):
+    def setter(self, value: Union[str, datetime]) -> None:
         if isinstance(value, str):
             try:
                 setattr(self, name, datetime.strptime(value, '%Y-%m-%d'))
@@ -77,13 +79,13 @@ def text_date_synonym(name):
     return synonym(name, descriptor=property(getter, setter))
 
 
-def entry_synonym(name):
+def entry_synonym(name: str) -> SynonymProperty:
     """Use serialization system to store Entries in db."""
 
-    def getter(self):
+    def getter(self) -> Any:
         return serialization.loads(getattr(self, name))
 
-    def setter(self, entry):
+    def setter(self, entry: Union[dict, Entry]) -> None:
         if isinstance(entry, dict):
             if entry.get('serializer') == 'Entry' and 'version' in entry and 'value' in entry:
                 # This is already a serialized form of entry
@@ -98,13 +100,13 @@ def entry_synonym(name):
     return synonym(name, descriptor=property(getter, setter))
 
 
-def json_synonym(name):
+def json_synonym(name: str) -> SynonymProperty:
     """Use json to serialize python objects for db storage."""
 
-    def getter(self):
+    def getter(self) -> Any:
         return json.loads(getattr(self, name), decode_datetime=True)
 
-    def setter(self, entry):
+    def setter(self, entry: Any) -> None:
         setattr(self, name, json.dumps(entry, encode_datetime=True))
 
     return synonym(name, descriptor=property(getter, setter))
@@ -113,13 +115,13 @@ def json_synonym(name):
 class CaseInsensitiveWord(Comparator):
     """Hybrid value representing a string that compares case insensitively."""
 
-    def __init__(self, word):
+    def __init__(self, word: Union[str, 'CaseInsensitiveWord']):
         if isinstance(word, CaseInsensitiveWord):
-            self.word = word.word
+            self.word: str = word.word
         else:
             self.word = word
 
-    def lower(self):
+    def lower(self) -> str:
         if isinstance(self.word, str):
             return self.word.lower()
         else:
@@ -130,10 +132,10 @@ class CaseInsensitiveWord(Comparator):
             other = CaseInsensitiveWord(other)
         return op(self.lower(), other.lower())
 
-    def __clause_element__(self):
+    def __clause_element__(self) -> str:
         return self.lower()
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.word
 
     def __getattr__(self, item):

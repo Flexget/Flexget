@@ -69,7 +69,7 @@ class FileListCookie(Base):
 
 class SearchFileList:
     """
-        FileList.ro search plugin.
+    FileList.ro search plugin.
     """
 
     schema = {
@@ -148,16 +148,14 @@ class SearchFileList:
             # get validator token
             response = requests.get(BASE_URL + 'login.php')
             soup = get_soup(response.content)
-            
+
             login_validator = soup.find("input", {"name": "validator"})
-            
+
             if not login_validator:
-                raise plugin.PluginError(
-                    'FileList.ro could not get login validator'
-                )
+                raise plugin.PluginError('FileList.ro could not get login validator')
             logger.debug('Login Validator: {}'.format(login_validator.get('value')))
             logger.debug('Attempting to retrieve FileList.ro cookie')
-            
+
             response = requests.post(
                 url,
                 data={
@@ -194,7 +192,7 @@ class SearchFileList:
     @plugin.internet(logger)
     def search(self, task, entry, config):
         """
-            Search for entries on FileList.ro
+        Search for entries on FileList.ro
         """
         entries = list()
 

@@ -25,12 +25,13 @@ def cli_perf_test(manager, options):
 def imdb_query(session):
     import time
 
+    from progressbar import ETA, Bar, Percentage, ProgressBar
+    from sqlalchemy.orm import joinedload_all
+    from sqlalchemy.sql.expression import select
+
     # NOTE: importing other plugins directly is discouraged
     from flexget.components.imdb.db import Movie
     from flexget.plugins.cli.performance import log_query_count
-    from sqlalchemy.sql.expression import select
-    from progressbar import ProgressBar, Percentage, Bar, ETA
-    from sqlalchemy.orm import joinedload_all
 
     imdb_urls = []
 

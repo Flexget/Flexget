@@ -1,7 +1,7 @@
 import copy
 import functools
 import re
-from typing import Dict, Iterator, List, Optional, Tuple, Union
+from typing import Dict, Iterator, List, Optional, Set, Tuple, Union
 
 from loguru import logger
 
@@ -21,10 +21,10 @@ class QualityComponent:
         name: str,
         regexp: Optional[str] = None,
         modifier: Optional[int] = None,
-        defaults: Optional[List[str]] = None,
+        defaults: Optional[List['QualityComponent']] = None,
     ) -> None:
         """
-        :param type: Type of quality component. (resolution, source, codec, or audio)
+        :param type: Type of quality component. (resolution, source, codec, color_range or audio)
         :param value: Value used to sort this component with others of like type.
         :param name: Canonical name for this quality component.
         :param regexp: Regexps used to match this component.
@@ -32,7 +32,7 @@ class QualityComponent:
         :param defaults: An iterable defining defaults for other quality components if this component matches.
         """
 
-        if type not in ['resolution', 'source', 'codec', 'audio']:
+        if type not in ['resolution', 'source', 'codec', 'color_range', 'audio']:
             raise ValueError('%s is not a valid quality component type.' % type)
         self.type = type
         self.value = value
@@ -60,13 +60,13 @@ class QualityComponent:
             text = text[: match.start()] + text[match.end() :]
         return True, text
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash(self.type + str(self.value))
 
-    def __bool__(self):
+    def __bool__(self) -> bool:
         return bool(self.value)
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         if isinstance(other, str):
             other = _registry.get(other)
         if not isinstance(other, QualityComponent):
@@ -76,7 +76,7 @@ class QualityComponent:
         else:
             raise TypeError('Cannot compare %s and %s' % (self.type, other.type))
 
-    def __lt__(self, other):
+    def __lt__(self, other) -> bool:
         if isinstance(other, str):
             other = _registry.get(other)
         if not isinstance(other, QualityComponent):
@@ -104,10 +104,10 @@ class QualityComponent:
             index = 0
         return l[index]
 
-    def __repr__(self):
-        return '<%s(name=%s,value=%s)>' % (self.type.title(), self.name, self.value)
+    def __repr__(self) -> str:
+        return f'<{self.type.title()}(name={self.name},value={self.value})>'
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
     def __deepcopy__(self, memo=None):
@@ -154,8 +154,16 @@ _codecs = [
     QualityComponent('codec', 30, 'h264', '[hx].?264'),
     QualityComponent('codec', 35, 'vp9'),
     QualityComponent('codec', 40, 'h265', '[hx].?265|hevc'),
-    QualityComponent('codec', 50, '10bit', '10.?bit|hi10p'),
 ]
+
+_color_ranges = [
+    QualityComponent('color_range', 10, '8bit', r'8[^\w]?bit|hi8(p)?'),
+    QualityComponent('color_range', 20, '10bit', r'10[^\w]?bit|hi10(p)?'),
+    QualityComponent('color_range', 40, 'hdrplus', r'hdr[^\w]?(\+|p|plus)'),
+    QualityComponent('color_range', 30, 'hdr', r'hdr([^\w]?(10))?'),
+    QualityComponent('color_range', 50, 'dolbyvision', r'(dolby[^\w]?vision|dv)'),
+]
+
 channels = r'(?:(?:[^\w+]?[1-7][\W_]?(?:0|1|ch)))'
 _audios = [
     QualityComponent('audio', 10, 'mp3'),
@@ -166,8 +174,8 @@ _audios = [
     QualityComponent('audio', 45, 'dd+5.1', 'dd[p+]%s' % channels),
     QualityComponent('audio', 50, 'flac', 'flac%s?' % channels),
     # The DTSs are a bit backwards, but the more specific one needs to be parsed first
-    QualityComponent('audio', 60, 'dtshd', r'dts[\W_]?hd(?:[\W_]?ma)?%s?' % channels),
-    QualityComponent('audio', 70, 'dts'),
+    QualityComponent('audio', 70, 'dtshd', r'dts[\W_]?hd(?:[\W_]?ma)?%s?' % channels),
+    QualityComponent('audio', 60, 'dts'),
     QualityComponent('audio', 80, 'truehd', 'truehd%s?' % channels),
 ]
 
@@ -175,19 +183,20 @@ _UNKNOWNS = {
     'resolution': QualityComponent('resolution', 0, 'unknown'),
     'source': QualityComponent('source', 0, 'unknown'),
     'codec': QualityComponent('codec', 0, 'unknown'),
+    'color_range': QualityComponent('color_range', 0, 'unknown'),
     'audio': QualityComponent('audio', 0, 'unknown'),
 }
 
 # For wiki generating help
-'''for type in (_resolutions, _sources, _codecs, _audios):
+'''for type in (_resolutions, _sources, _codecs, _color_ranges, _audios):
     print '{{{#!td style="vertical-align: top"'
     for item in reversed(type):
         print '- ' + item.name
     print '}}}'
 '''
 
-_registry: Dict[str, QualityComponent] = {}
-for items in (_resolutions, _sources, _codecs, _audios):
+_registry: Dict[Union[str, QualityComponent], QualityComponent] = {}
+for items in (_resolutions, _sources, _codecs, _color_ranges, _audios):
     for item in items:
         _registry[item.name] = item
 
@@ -212,9 +221,10 @@ class Quality(Serializer):
             self.resolution = _UNKNOWNS['resolution']
             self.source = _UNKNOWNS['source']
             self.codec = _UNKNOWNS['codec']
+            self.color_range = _UNKNOWNS['color_range']
             self.audio = _UNKNOWNS['audio']
 
-    def parse(self, text: str):
+    def parse(self, text: str) -> None:
         """Parses a string to determine the quality in the four component categories.
 
         :param text: The string to parse
@@ -224,6 +234,7 @@ class Quality(Serializer):
         self.resolution = self._find_best(_resolutions, _UNKNOWNS['resolution'], False)
         self.source = self._find_best(_sources, _UNKNOWNS['source'])
         self.codec = self._find_best(_codecs, _UNKNOWNS['codec'])
+        self.color_range = self._find_best(_color_ranges, _UNKNOWNS['color_range'])
         self.audio = self._find_best(_audios, _UNKNOWNS['audio'])
         # If any of the matched components have defaults, set them now.
         for component in self.components:
@@ -235,7 +246,7 @@ class Quality(Serializer):
     def _find_best(
         self,
         qlist: List[QualityComponent],
-        default: Optional[QualityComponent] = None,
+        default: QualityComponent,
         strip_all: bool = True,
     ) -> QualityComponent:
         """Finds the highest matching quality component from `qlist`"""
@@ -258,13 +269,15 @@ class Quality(Serializer):
     @property
     def name(self) -> str:
         name = ' '.join(
-            str(p) for p in (self.resolution, self.source, self.codec, self.audio) if p.value != 0
+            str(p)
+            for p in (self.resolution, self.source, self.codec, self.color_range, self.audio)
+            if p.value != 0
         )
         return name or 'unknown'
 
     @property
     def components(self) -> List[QualityComponent]:
-        return [self.resolution, self.source, self.codec, self.audio]
+        return [self.resolution, self.source, self.codec, self.color_range, self.audio]
 
     @classmethod
     def serialize(cls, quality: 'Quality') -> str:
@@ -284,16 +297,16 @@ class Quality(Serializer):
             other = Quality(other)
         if not other or not self:
             return False
-        for cat in ('resolution', 'source', 'audio', 'codec'):
+        for cat in ('resolution', 'source', 'audio', 'color_range', 'codec'):
             othercat = getattr(other, cat)
             if othercat and othercat != getattr(self, cat):
                 return False
         return True
 
-    def __bool__(self):
+    def __bool__(self) -> bool:
         return any(self._comparator)
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         if isinstance(other, str):
             other = Quality(other)
         if not isinstance(other, Quality):
@@ -302,25 +315,26 @@ class Quality(Serializer):
             raise TypeError('Cannot compare %r and %r' % (self, other))
         return self._comparator == other._comparator
 
-    def __lt__(self, other):
+    def __lt__(self, other) -> bool:
         if isinstance(other, str):
             other = Quality(other)
         if not isinstance(other, Quality):
             raise TypeError('Cannot compare %r and %r' % (self, other))
         return self._comparator < other._comparator
 
-    def __repr__(self):
-        return '<Quality(resolution=%s,source=%s,codec=%s,audio=%s)>' % (
+    def __repr__(self) -> str:
+        return '<Quality(resolution=%s,source=%s,codec=%s,color_range=%s,audio=%s)>' % (
             self.resolution,
             self.source,
             self.codec,
+            self.color_range,
             self.audio,
         )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         # Make these usable as dict keys
         return hash(self.name)
 
@@ -350,7 +364,10 @@ class RequirementComponent:
 
     def __init__(self, type: str) -> None:
         self.type = type
-        self.reset()
+        self.min: Optional[QualityComponent] = None
+        self.max: Optional[QualityComponent] = None
+        self.acceptable: Set[QualityComponent] = set()
+        self.none_of: Set[QualityComponent] = set()
 
     def reset(self) -> None:
         self.min = None
@@ -379,14 +396,14 @@ class RequirementComponent:
 
     def add_requirement(self, text: str) -> None:
         if '-' in text:
-            min, max = text.split('-')
-            min, max = _registry[min], _registry[max]
-            if min.type != max.type != self.type:
+            min_str, max_str = text.split('-')
+            min_quality, max_quality = _registry[min_str], _registry[max_str]
+            if min_quality.type != max_quality.type != self.type:
                 raise ValueError('Component type mismatch: %s' % text)
-            self.min, self.max = min, max
+            self.min, self.max = min_quality, max_quality
         elif '|' in text:
-            quals = text.split('|')
-            quals = {_registry[qual] for qual in quals}
+            req_quals = text.split('|')
+            quals = {_registry[qual] for qual in req_quals}
             if any(qual.type != self.type for qual in quals):
                 raise ValueError('Component type mismatch: %s' % text)
             self.acceptable |= quals
@@ -408,7 +425,9 @@ class RequirementComponent:
                 elif text[0] == '!':
                     self.none_of.add(qual)
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, RequirementComponent):
+            return False
         return (self.max, self.max, self.acceptable, self.none_of) == (
             other.max,
             other.max,
@@ -416,7 +435,7 @@ class RequirementComponent:
             other.none_of,
         )
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash(
             tuple(
                 [self.min, self.max, tuple(sorted(self.acceptable)), tuple(sorted(self.none_of))]
@@ -432,13 +451,14 @@ class Requirements:
         self.resolution = RequirementComponent('resolution')
         self.source = RequirementComponent('source')
         self.codec = RequirementComponent('codec')
+        self.color_range = RequirementComponent('color_range')
         self.audio = RequirementComponent('audio')
         if req:
             self.parse_requirements(req)
 
     @property
     def components(self) -> List[RequirementComponent]:
-        return [self.resolution, self.source, self.codec, self.audio]
+        return [self.resolution, self.source, self.codec, self.color_range, self.audio]
 
     def parse_requirements(self, text: str) -> None:
         """
@@ -486,16 +506,16 @@ class Requirements:
                 return False
         return True
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         if isinstance(other, str):
             other = Requirements(other)
         return self.components == other.components
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash(tuple(self.components))
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.text or 'any'
 
-    def __repr__(self):
-        return '<Requirements(%s)>' % self
+    def __repr__(self) -> str:
+        return f'<Requirements({self})>'

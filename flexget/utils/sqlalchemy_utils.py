@@ -1,7 +1,7 @@
 """
 Miscellaneous SQLAlchemy helpers.
 """
-from typing import Any, List, Union, Optional
+from typing import Any, List, Optional, Union
 
 from loguru import logger
 from sqlalchemy import ColumnDefault, Index, Sequence

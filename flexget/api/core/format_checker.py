@@ -1,3 +1,6 @@
+from flask import Response
+from sqlalchemy.orm import Session
+
 from flexget.api import APIResource, api
 from flexget.api.app import base_message_schema, success_response
 
@@ -33,7 +36,7 @@ format_checker_schema = api.schema_model('format_checker', ObjectContainer.forma
 class SchemaTest(APIResource):
     @api.validate(format_checker_schema)
     @api.response(200, model=base_message_schema)
-    def post(self, session=None):
+    def post(self, session: Session = None) -> Response:
         """ Validate flexget custom schema"""
         # If validation passed, all is well
         return success_response('payload is valid')

@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 
+from urllib.parse import parse_qs, urlencode, urlparse
+
 from loguru import logger
 from requests.exceptions import RequestException
 
 from flexget import plugin
 from flexget.components.sites.urlrewriting import UrlRewritingError
 from flexget.event import event
-
-from urllib.parse import urlparse, parse_qs, urlencode
-
 
 logger = logger.bind(name='rutracker')
 
@@ -26,7 +25,7 @@ class SiteRutracker:
     @plugin.internet(logger)
     def url_rewrite(self, task, entry):
         """
-            Gets torrent information for topic from rutracker api
+        Gets torrent information for topic from rutracker api
         """
 
         url = entry['url']
@@ -49,7 +48,7 @@ class SiteRutracker:
         magnet = {
             'xt': f"urn:btih:{topic['info_hash']}",
             'tr': [f'http://bt{i}.t-ru.org/ann?magnet' for i in ['', '2', '3', '4']],
-            'dn': topic['topic_title']
+            'dn': topic['topic_title'],
         }
         magnet_qs = urlencode(magnet, doseq=True, safe=':')
         magnet_uri = f"magnet:?{magnet_qs}"

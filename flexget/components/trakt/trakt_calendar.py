@@ -112,7 +112,9 @@ class TraktCalendar:
 
             try:
                 results = (
-                    db.get_session(config.get('account')).get(url, params={'extended': 'full'}).json()
+                    db.get_session(config.get('account'))
+                    .get(url, params={'extended': 'full'})
+                    .json()
                 )
                 logger.debug('Found {} calendar entries', len(results))
             except RequestException as e:

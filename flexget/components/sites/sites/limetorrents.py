@@ -28,7 +28,7 @@ def clean_symbols(text):
 
 class Limetorrents:
     """
-        Limetorrents search plugin.
+    Limetorrents search plugin.
     """
 
     schema = {
@@ -64,7 +64,7 @@ class Limetorrents:
     @plugin.internet(logger)
     def search(self, task, entry, config):
         """
-            Search for entries on Limetorrents
+        Search for entries on Limetorrents
         """
 
         if not isinstance(config, dict):

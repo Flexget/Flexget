@@ -205,6 +205,11 @@ class TVDBSeries(Base):
         self._banner = series['banner']
         self._genres = [TVDBGenre(id=name) for name in series['genre']] if series['genre'] else []
 
+        if not self.name:
+            raise LookupError(
+                f'Not possible to get name to series with id {self.id} in language \'{self.language}\''
+            )
+
         if self.first_aired is None:
             logger.debug(
                 'Falling back to getting first episode aired date for series {}', self.name
@@ -481,7 +486,11 @@ def find_series_id(name, language=None):
             try:
                 s['firstAired'] = datetime.strptime(s['firstAired'], "%Y-%m-%d")
             except ValueError:
-                logger.warning('Invalid firstAired date "{}" when parsing series {} ', s['firstAired'], s['seriesName'])
+                logger.warning(
+                    'Invalid firstAired date "{}" when parsing series {} ',
+                    s['firstAired'],
+                    s['seriesName'],
+                )
                 s['firstAired'] = datetime(1970, 1, 1)
         else:
             s['firstAired'] = datetime(1970, 1, 1)
@@ -570,7 +579,8 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None, lang
             try:
                 updated_series = TVDBSeries(series.id, language)
                 series = session.merge(updated_series)
-                _update_search_strings(series, session, search=name)
+                if series and series.name:
+                    _update_search_strings(series, session, search=name)
             except LookupError as e:
                 logger.warning(
                     'Error while updating from tvdb ({}), using cached data.', e.args[0]

@@ -7,7 +7,7 @@ from . import db
 
 try:
     # NOTE: Importing other plugins is discouraged!
-    from flexget.components.imdb.utils import is_imdb_url, extract_id
+    from flexget.components.imdb.utils import extract_id, is_imdb_url
 except ImportError:
     raise plugin.DependencyError(issued_by=__name__, missing='imdb')
 

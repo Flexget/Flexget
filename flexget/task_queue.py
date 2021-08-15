@@ -13,8 +13,8 @@ logger = logger.bind(name='task_queue')
 
 
 class TaskQueue:
-    """
-    Task processing thread.
+    """Task processing thread.
+
     Only executes one task at a time, if more are requested they are queued up and run in turn.
     """
 
@@ -24,13 +24,14 @@ class TaskQueue:
         self._shutdown_when_finished = False
 
         self.current_task: Optional[Task] = None
-
-        # We don't override `threading.Thread` because debugging this seems unsafe with pydevd.
-        # Overriding __len__(self) seems to cause a debugger deadlock.
-        self._thread = threading.Thread(target=self.run, name='task_queue')
-        self._thread.daemon = True
+        self._thread = None
 
     def start(self) -> None:
+        # We don't override `threading.Thread` because debugging this seems unsafe with pydevd.
+        # Overriding __len__(self) seems to cause a debugger deadlock.
+        # Don't instantiate the Thread() until `start()`, to make sure we have daemonized (forked) first.
+        if not self._thread:
+            self._thread = threading.Thread(target=self.run, name='task_queue', daemon=True)
         self._thread.start()
 
     def run(self) -> None:
@@ -65,7 +66,7 @@ class TaskQueue:
             logger.debug('task queue shut down')
 
     def is_alive(self) -> bool:
-        return self._thread.is_alive()
+        return self._thread and self._thread.is_alive()
 
     def put(self, task: Task):
         """Adds a task to be executed to the queue."""
@@ -75,8 +76,7 @@ class TaskQueue:
         return self.run_queue.qsize()
 
     def shutdown(self, finish_queue: bool = True) -> None:
-        """
-        Request shutdown.
+        """Request shutdown.
 
         :param bool finish_queue: Should all tasks be finished before ending thread.
         """
@@ -92,16 +92,10 @@ class TaskQueue:
             self._shutdown_now = True
 
     def wait(self) -> None:
-        """
-        Waits for the thread to exit.
+        """Waits for the thread to exit.
+
         Allows abortion of task queue with ctrl-c
         """
-        if sys.version_info >= (3, 4):
-            # Due to python bug, Thread.is_alive doesn't seem to work properly under our conditions on python 3.4+
-            # http://bugs.python.org/issue26793
-            # TODO: Is it important to have the clean abortion? Do we need to find a better way?
-            self._thread.join()
-            return
         try:
             while self._thread.is_alive():
                 time.sleep(0.5)

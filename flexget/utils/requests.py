@@ -1,10 +1,11 @@
+import abc
 import logging
 import time
 
 # Allow some request objects to be imported from here instead of requests
 import warnings
 from datetime import datetime, timedelta
-from typing import Dict, Optional, Union
+from typing import Dict, Optional, Union, TYPE_CHECKING
 from urllib.parse import urlparse
 from urllib.request import urlopen
 
@@ -27,6 +28,13 @@ logging.getLogger('urllib3').setLevel(logging.WARNING)
 WAIT_TIME = timedelta(seconds=60)
 # Remembers sites that have timed out
 unresponsive_hosts = TimedDict(WAIT_TIME)
+
+if TYPE_CHECKING:
+    from typing import TypedDict
+
+    StateCacheDict = TypedDict(
+        'StateCacheDict', {'tokens': Union[float, int], 'last_update': datetime}
+    )
 
 
 def is_unresponsive(url: str) -> bool:
@@ -54,13 +62,13 @@ def set_unresponsive(url: str) -> None:
     unresponsive_hosts[host] = True
 
 
-class DomainLimiter:
+class DomainLimiter(abc.ABC):
     def __init__(self, domain: str) -> None:
         self.domain = domain
 
-    def __call__(self):
+    @abc.abstractmethod
+    def __call__(self) -> None:
         """This method will be called once before every request to the domain."""
-        raise NotImplementedError
 
 
 class TokenBucketLimiter(DomainLimiter):
@@ -72,7 +80,7 @@ class TokenBucketLimiter(DomainLimiter):
 
     # This is just an in memory cache right now, it works for the daemon, and across tasks in a single execution
     # but not for multiple executions via cron. Do we need to store this to db?
-    state_cache = {}
+    state_cache: Dict[str, 'StateCacheDict'] = {}
 
     def __init__(
         self,
@@ -134,7 +142,7 @@ class TokenBucketLimiter(DomainLimiter):
 class TimedLimiter(TokenBucketLimiter):
     """Enforces a minimum interval between requests to a given domain."""
 
-    def __init__(self, domain: str, interval: Union[str, timedelta]):
+    def __init__(self, domain: str, interval: Union[str, timedelta]) -> None:
         super().__init__(domain, 1, interval)
 
 
@@ -149,7 +157,7 @@ def _wrap_urlopen(url: str, timeout: Optional[int] = None) -> requests.Response:
     try:
         raw = urlopen(url, timeout=timeout)
     except OSError as e:
-        msg = 'Error getting %s: %s' % (url, e)
+        msg = f'Error getting {url}: {e}'
         logger.error(msg)
         raise RequestException(msg)
     resp = requests.Response()
@@ -162,7 +170,7 @@ def _wrap_urlopen(url: str, timeout: Optional[int] = None) -> requests.Response:
     return resp
 
 
-def limit_domains(url: str, limit_dict: Dict[str, DomainLimiter]):
+def limit_domains(url: str, limit_dict: Dict[str, DomainLimiter]) -> None:
     """
     If this url matches a domain in `limit_dict`, run the limiter.
 
@@ -183,12 +191,12 @@ class Session(requests.Session):
 
     def __init__(self, timeout: int = 30, max_retries: int = 1, **kwargs) -> None:
         """Set some defaults for our session if not explicitly defined."""
-        super().__init__(**kwargs)
+        super().__init__()
         self.timeout = timeout
         self.stream = True
         self.adapters['http://'].max_retries = max_retries
         # Stores min intervals between requests for certain sites
-        self.domain_limiters = {}
+        self.domain_limiters: Dict[str, DomainLimiter] = {}
         self.headers.update({'User-Agent': 'FlexGet/%s (www.flexget.com)' % version})
 
     def add_cookiejar(self, cookiejar):
@@ -235,8 +243,8 @@ class Session(requests.Session):
         # Raise Timeout right away if site is known to timeout
         if is_unresponsive(url):
             raise requests.Timeout(
-                'Requests to this site (%s) have timed out recently. Waiting before trying again.'
-                % urlparse(url).hostname
+                f'Requests to this site ({urlparse(url).hostname}) have timed out recently. '
+                'Waiting before trying again.'
             )
 
         # Run domain limiters for this url
@@ -252,9 +260,7 @@ class Session(requests.Session):
             return _wrap_urlopen(url, timeout=kwargs['timeout'])
 
         try:
-            logger.debug(
-                '{}ing URL {} with args {} and kwargs {}', method.upper(), url, args, kwargs
-            )
+            logger.debug(f'{method.upper()}ing URL {url} with args {args} and kwargs {kwargs}')
             result = super().request(method, url, *args, **kwargs)
         except requests.Timeout:
             # Mark this site in known unresponsive list

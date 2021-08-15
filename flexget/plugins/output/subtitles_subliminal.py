@@ -16,7 +16,16 @@ try:
 
     PROVIDERS = provider_manager.names()
 except ImportError:
-    PROVIDERS = ['opensubtitles', 'thesubdb', 'podnapisi', 'addic7ed', 'tvsubtitles']
+    PROVIDERS = [
+        'argenteam',
+        'legendastv',
+        'opensubtitles',
+        'opensubtitlesvip',
+        'podnapisi',
+        'shooter',
+        'thesubdb',
+        'tvsubtitles',
+    ]
 
 AUTHENTICATION_SCHEMA = dict((provider, {'type': 'object'}) for provider in PROVIDERS)
 
@@ -41,12 +50,12 @@ class PluginSubliminal:
           alternatives:
             - eng
           exact_match: no
-          providers: addic7ed, opensubtitles
+          providers: legendastv, opensubtitles
           single: no
           directory: /disk/subtitles
           hearing_impaired: yes
           authentication:
-            addic7ed:
+            legendastv:
               username: myuser
               passsword: mypassword
     """
@@ -106,15 +115,15 @@ class PluginSubliminal:
         if not task.accepted:
             logger.debug('nothing accepted, aborting')
             return
+        import subliminal
         from babelfish import Language
         from dogpile.cache.exception import RegionAlreadyConfigured
-        import subliminal
-        from subliminal import scan_video, save_subtitles
+        from subliminal import save_subtitles, scan_video
         from subliminal.cli import MutexLock
         from subliminal.core import (
             ARCHIVE_EXTENSIONS,
-            scan_archive,
             refine,
+            scan_archive,
             search_external_subtitles,
         )
         from subliminal.score import episode_scores, movie_scores

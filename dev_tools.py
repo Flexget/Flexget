@@ -86,7 +86,10 @@ def bundle_webui():
             shutil.rmtree(app_path)
         # Just stashed the old webui zip on a random github release for easy hosting.
         # It doesn't get updated anymore, we should probably stop bundling it with releases soon.
-        download_extract('https://github.com/Flexget/Flexget/releases/download/v3.0.6/webui_v1.zip', os.path.join(ui_path, 'v1'))
+        download_extract(
+            'https://github.com/Flexget/Flexget/releases/download/v3.0.6/webui_v1.zip',
+            os.path.join(ui_path, 'v1'),
+        )
     except OSError as e:
         click.echo('Unable to download and extract WebUI v1 due to %e' % str(e))
         raise click.Abort()

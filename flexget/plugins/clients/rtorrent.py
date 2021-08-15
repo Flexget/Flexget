@@ -3,6 +3,7 @@ import re
 import socket
 from io import BytesIO
 from time import sleep
+from datetime import datetime
 from urllib.parse import urljoin, urlparse, urlsplit
 from xmlrpc import client as xmlrpc_client
 
@@ -184,6 +185,7 @@ class RTorrent:
         'ratio',
         'base_path',
         'load_date',
+        'timestamp_finished',
     )
 
     required_fields = ('hash', 'name', 'base_path')
@@ -234,7 +236,7 @@ class RTorrent:
             fields = list(self.default_fields)
 
         if reverse:
-            for field in ['up.total', 'down.total', 'down.rate']:
+            for field in ['up.total', 'down.total', 'down.rate', 'timestamp.finished']:
                 if field in fields:
                     fields[fields.index(field)] = field.replace('.', '_')
             return fields
@@ -243,7 +245,7 @@ class RTorrent:
             if required_field not in fields:
                 fields.insert(0, required_field)
 
-        for field in ['up_total', 'down_total', 'down_rate']:
+        for field in ['up_total', 'down_total', 'down_rate', 'timestamp_finished']:
             if field in fields:
                 fields[fields.index(field)] = field.replace('_', '.')
 
@@ -708,6 +710,9 @@ class RTorrentInputPlugin(RTorrentPluginBase):
 
             for attr, value in torrent.items():
                 entry[attr] = value
+            
+            if 'timestamp_finished' in entry:
+                entry['timestamp_finished'] = datetime.fromtimestamp(entry['timestamp_finished'])
 
             entries.append(entry)
 

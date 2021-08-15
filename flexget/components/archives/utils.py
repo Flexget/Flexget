@@ -149,8 +149,6 @@ class Archive:
         except OSError as error:
             raise FSError(error)
 
-        logger.verbose('Extracted: {}', member)
-
 
 class RarArchive(Archive):
     """
@@ -232,6 +230,7 @@ class ArchiveInfo:
 
         try:
             archive.extract_file(self.info, destination)
+            logger.verbose('Extracted: {} to {}', self.path, destination)
         except Exception as error:
             if os.path.exists(destination):
                 logger.debug('Cleaning up partially extracted file: {}', destination)

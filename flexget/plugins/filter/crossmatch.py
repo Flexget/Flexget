@@ -44,9 +44,9 @@ class CrossMatch:
         all_fields = config['all_fields']
 
         if not task.entries:
-          logger.trace('Stopping crossmatch filter because of no entries to check')
-          return
-        
+            logger.trace('Stopping crossmatch filter because of no entries to check')
+            return
+
         match_entries = aggregate_inputs(task, config['from'])
 
         # perform action on intersecting entries

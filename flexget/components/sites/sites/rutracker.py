@@ -60,7 +60,7 @@ class RutrackerAccount(Base):
 
 class RutrackerAuth(AuthBase):
     """Supports downloading of torrents from 'rutracker' tracker
-       if you pass cookies (CookieJar) to constructor then authentication will be bypassed and cookies will be just set
+    if you pass cookies (CookieJar) to constructor then authentication will be bypassed and cookies will be just set
     """
 
     def update_base_url(self):

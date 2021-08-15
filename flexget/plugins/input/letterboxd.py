@@ -67,7 +67,16 @@ class Letterboxd:
         return config
 
     def tmdb_lookup(self, search):
-        tmdb = plugin.get('api_tmdb', self).lookup(tmdb_id=search)
+        if not search:
+            logger.warning('Can\'t search tmdb, no tmdb_id')
+            return
+
+        try:
+            tmdb = plugin.get('api_tmdb', self).lookup(tmdb_id=search)
+        except LookupError as e:
+            logger.warning('Error searching tmdb: {}', e)
+            return
+
         result = {
             'title': '%s (%s)' % (tmdb.name, tmdb.year),
             'imdb_id': tmdb.imdb_id,
@@ -82,6 +91,8 @@ class Letterboxd:
         url = base_url + film.get(config['f_slug'])
         soup = get_soup(requests.get(url).content)
         result = self.tmdb_lookup(soup.find(attrs={'data-tmdb-id': True}).get('data-tmdb-id'))
+        if not result:
+            return
 
         entry = Entry(result)
         entry['url'] = url
@@ -118,7 +129,10 @@ class Letterboxd:
 
             for film in soup.find_all(attrs={config['f_slug']: True}):
                 if rcount < max_results:
-                    yield self.parse_film(film, config)
+                    result = self.parse_film(film, config)
+                    if not result:
+                        continue
+                    yield result
                     if 'max_results' in config:
                         rcount += 1
 

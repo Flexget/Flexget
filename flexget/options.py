@@ -5,7 +5,7 @@ import sys
 from argparse import _UNRECOGNIZED_ARGS_ATTR, PARSER, REMAINDER, SUPPRESS, Action, ArgumentError
 from argparse import ArgumentParser as ArgParser
 from argparse import Namespace, _SubParsersAction, _VersionAction
-from typing import Any, Callable, List, Optional, TextIO
+from typing import Any, Callable, List, Optional, TextIO, IO
 
 import flexget
 from flexget.entry import Entry
@@ -14,7 +14,7 @@ from flexget.utils.tools import get_current_flexget_version, get_latest_flexget_
 
 _UNSET = object()
 
-core_parser = None
+core_parser: Optional['CoreArgumentParser'] = None
 
 
 def unicode_argv() -> List[str]:
@@ -27,7 +27,7 @@ def unicode_argv() -> List[str]:
     return args
 
 
-def get_parser(command: Optional[str] = None) -> 'ArgumentParser':
+def get_parser(command: str = None) -> 'ArgumentParser':
     global core_parser
     if not core_parser:
         core_parser = CoreArgumentParser()
@@ -59,7 +59,7 @@ def required_length(nmin: int, nmax: int):
     """Generates a custom Action to validate an arbitrary range of arguments."""
 
     class RequiredLength(Action):
-        def __call__(self, parser, args, values, option_string=None):
+        def __call__(self, parser: ArgParser, args, values, option_string=None):
             if not nmin <= len(values) <= nmax:
                 raise ArgumentError(self, 'requires between %s and %s arguments' % (nmin, nmax))
             setattr(args, self.dest, values)
@@ -70,7 +70,7 @@ def required_length(nmin: int, nmax: int):
 class VersionAction(_VersionAction):
     """Action to print the current version. Also checks latest release revision."""
 
-    def __call__(self, parser, namespace, values, option_string=None):
+    def __call__(self, parser: ArgParser, namespace: Namespace, values, option_string=None):
         from flexget.terminal import console
 
         current = get_current_flexget_version()
@@ -212,7 +212,7 @@ class NestedSubparserAction(_SubParsersAction):
         super().__init__(*args, **kwargs)
         self.required = required
 
-    def add_parser(self, name: str, parent_defaults: Optional[dict] = None, **kwargs):
+    def add_parser(self, name: str, parent_defaults: dict = None, **kwargs):
         if parent_defaults:
             self.parent_defaults[name] = parent_defaults
         return super().add_parser(name, **kwargs)
@@ -274,7 +274,7 @@ class ArgumentParser(ArgParser):
     """
 
     # These are created as a class attribute so that we can set it for parser and all subparsers at once
-    file = None
+    file: Optional[IO[str]] = None
     do_help = True
 
     def __init__(self, **kwargs):
@@ -344,10 +344,10 @@ class ArgumentParser(ArgParser):
 
     def parse_args(
         self,
-        args: Optional[List[str]] = None,
-        namespace: Optional[Namespace] = None,
+        args: List[str] = None,
+        namespace: Namespace = None,
         raise_errors: bool = False,
-        file: Optional[TextIO] = None,
+        file: TextIO = None,
     ):  # pylint: disable=W0221
         """
         :param raise_errors: If this is true, errors will be raised as `ParserError`s instead of calling sys.exit
@@ -364,9 +364,9 @@ class ArgumentParser(ArgParser):
 
     def parse_known_args(
         self,
-        args: Optional[List[str]] = None,
-        namespace: Optional[Namespace] = None,
-        do_help: Optional[bool] = None,
+        args: List[str] = None,
+        namespace: Namespace = None,
+        do_help: bool = None,
     ):
         if args is None:
             # Decode all arguments to unicode before parsing

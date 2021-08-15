@@ -16,6 +16,9 @@ class FilterOnlyNew:
         # Raises an error if plugin isn't available
         plugin.get('remember_rejected', self)
 
+    # This should run after other learn plugins, so they know whether entries were _really_ accepted or rejected.
+    # If they run after this, they will think everything has been rejected.
+    @plugin.priority(plugin.PRIORITY_LAST)
     def on_task_learn(self, task, config):
         """Reject all entries so remember_rejected will reject them next time"""
         if not config or not task.entries:
@@ -23,7 +26,7 @@ class FilterOnlyNew:
         logger.verbose(
             'Rejecting entries after the task has run so they are not processed next time.'
         )
-        for entry in task.entries:
+        for entry in task.all_entries:
             entry.reject('Already processed entry', remember=True)
 
 

@@ -41,7 +41,7 @@ def consolidate():
         logger.verbose('Found {} items to migrate, this can be aborted with CTRL-C safely.', count)
 
         # consolidate old data
-        from progressbar import ProgressBar, Percentage, Bar, ETA
+        from progressbar import ETA, Bar, Percentage, ProgressBar
 
         widgets = ['Process - ', ETA(), ' ', Percentage(), ' ', Bar(left='[', right=']')]
         bar = ProgressBar(widgets=widgets, maxval=count).start()

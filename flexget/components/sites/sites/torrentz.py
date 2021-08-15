@@ -44,7 +44,7 @@ class Torrentz:
         if isinstance(config, str):
             config = {'reputation': config}
         if config.get('extra_terms'):
-            config['extra_terms'] = ' ' + config['extra_terms']
+            config['extra_terms'] = ' ' + config['extra_terms'].strip()
         return config
 
     # TODO: The torrent_cache plugin is broken, so urlrewriting has been disabled for this plugin. #2307 #2363
@@ -66,8 +66,8 @@ class Torrentz:
         feed = REPUTATIONS[config['reputation']]
         entries = set()
         for search_string in entry.get('search_strings', [entry['title']]):
-            query = normalize_unicode(search_string + config.get('extra_terms', ''))
-            for domain in ['eu', 'is']:
+            query = normalize_unicode(search_string.strip() + config.get('extra_terms', ''))
+            for domain in ['is', 'pl']:
                 # urllib.quote will crash if the unicode string has non ascii characters, so encode in utf-8 beforehand
                 url = 'http://torrentz2.%s/%s?f=%s' % (domain, feed, quote(query.encode('utf-8')))
                 logger.debug('requesting: {}', url)

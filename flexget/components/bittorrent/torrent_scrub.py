@@ -14,12 +14,12 @@ logger = logger.bind(name='torrent_scrub')
 
 
 class TorrentScrub:
-    """ Scrubs torrents from unwanted keys.
+    """Scrubs torrents from unwanted keys.
 
-        Example:
-            tasks:
-              rutorrent-fast-resume-infected-task:
-                torrent_scrub: resume
+    Example:
+        tasks:
+          rutorrent-fast-resume-infected-task:
+            torrent_scrub: resume
     """
 
     # Scrub at high level, but BELOW "torrent"
@@ -41,8 +41,7 @@ class TorrentScrub:
 
     @plugin.priority(SCRUB_PRIO)
     def on_task_modify(self, task, config):
-        """ Scrub items that are torrents, if they're affected.
-        """
+        """Scrub items that are torrents, if they're affected."""
         if isinstance(config, list):
             mode = "fields"
         else:
@@ -63,7 +62,7 @@ class TorrentScrub:
 
             if mode in ("on", "all", "true"):
                 modified = bittorrent.clean_meta(
-                    metainfo, including_info=(mode == "all"), logger=logger.debug
+                    metainfo, including_info=(mode == "all"), log_func=logger.debug
                 )
             elif mode in ("resume", "rtorrent"):
                 if mode == "resume":

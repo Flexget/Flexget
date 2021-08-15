@@ -1,11 +1,14 @@
 from math import ceil
+from typing import List, Optional, TYPE_CHECKING
 
-from flask import jsonify, request
+from flask import jsonify, request, Response
 from flask_restx import inputs
 from loguru import logger
+from sqlalchemy.orm import Session
 
 from flexget.api import APIResource, api
 from flexget.api.app import BadRequest, NotFoundError, etag, pagination_headers
+from flexget.config_schema import JsonSchema
 from flexget.plugin import DependencyError, get_plugin_by_name, get_plugins
 
 logger = logger.bind(name='plugins')
@@ -58,8 +61,23 @@ plugins_parser.add_argument(
     'phase', case_sensitive=False, help='Show plugins that act on this phase'
 )
 
+if TYPE_CHECKING:
+    from typing import TypedDict
 
-def plugin_to_dict(plugin):
+    _PhaseHandler = TypedDict('_PhaseHandler', {'phase': str, 'priority': int})
+
+    class PluginDict(TypedDict, total=False):
+        name: str
+        api_ver: int
+        builtin: bool
+        category: Optional[str]
+        debug: bool
+        interfaces: Optional[List[str]]
+        phase_handlers: List[_PhaseHandler]
+        schema: Optional[JsonSchema]
+
+
+def plugin_to_dict(plugin) -> 'PluginDict':
     return {
         'name': plugin.name,
         'api_ver': plugin.api_ver,
@@ -81,7 +99,7 @@ class PluginsAPI(APIResource):
     @api.response(BadRequest)
     @api.response(NotFoundError)
     @api.doc(parser=plugins_parser)
-    def get(self, session=None):
+    def get(self, session: Session = None) -> Response:
         """ Get list of registered plugins """
         args = plugins_parser.parse_args()
 
@@ -114,7 +132,7 @@ class PluginsAPI(APIResource):
         total_pages = int(ceil(total_items / float(per_page)))
 
         if page > total_pages and total_pages != 0:
-            raise NotFoundError('page %s does not exist' % page)
+            raise NotFoundError(f'page {page} does not exist')
 
         # Actual results in page
         actual_size = min(per_page, len(sliced_list))
@@ -135,7 +153,7 @@ class PluginAPI(APIResource):
     @api.response(BadRequest)
     @api.response(200, model=plugin_schema)
     @api.doc(parser=plugin_parser, params={'plugin_name': 'Name of the plugin to return'})
-    def get(self, plugin_name, session=None):
+    def get(self, plugin_name: str, session=None):
         """ Return plugin data by name"""
         args = plugin_parser.parse_args()
         try:

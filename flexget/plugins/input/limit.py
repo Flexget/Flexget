@@ -37,11 +37,7 @@ class PluginLimit:
         for input_name, input_config in config['from'].items():
             input = plugin.get_plugin_by_name(input_name)
             method = input.phase_handlers['input']
-            try:
-                result = method(task, input_config)
-            except plugin.PluginError as e:
-                logger.warning('Error during input plugin {}: {}', input_name, e)
-                continue
+            result = method(task, input_config)
             # A 0 or -1 limit means don't limit.
             if config['amount'] < 1:
                 return result

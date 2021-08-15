@@ -17,7 +17,7 @@ logger = logger.bind(name='1337x')
 
 class Site1337x:
     """
-        1337x search plugin.
+    1337x search plugin.
     """
 
     schema = {
@@ -51,7 +51,7 @@ class Site1337x:
 
     def url_rewrite(self, task, entry):
         """
-            Gets the download information for 1337x result
+        Gets the download information for 1337x result
         """
 
         url = entry['url']
@@ -77,7 +77,7 @@ class Site1337x:
     @plugin.internet(logger)
     def search(self, task, entry, config):
         """
-            Search for entries on 1337x
+        Search for entries on 1337x
         """
 
         if not isinstance(config, dict):
