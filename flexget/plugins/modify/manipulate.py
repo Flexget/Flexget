@@ -84,7 +84,7 @@ class Manipulate:
             return
         modified = sum(
             self.process(entry, self.phase_jobs['filter'])
-            for entry in task.entries + task.rejected
+            for entry in task.entries
         )
         logger.verbose('Modified {} entries.', modified)
 
@@ -95,7 +95,7 @@ class Manipulate:
             return
         modified = sum(
             self.process(entry, self.phase_jobs['modify'])
-            for entry in task.entries + task.rejected
+            for entry in task.entries
         )
         logger.verbose('Modified {} entries.', modified)
 
