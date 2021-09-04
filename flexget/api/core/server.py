@@ -258,7 +258,7 @@ class ServerRawConfigAPI(APIResource):
 @server_api.route('/version/')
 @api.doc(
     description='In case of a request error when fetching latest flexget version, '
-                'that value will return as null'
+    'that value will return as null'
 )
 class ServerVersionAPI(APIResource):
     @api.response(200, description='Flexget version', model=version_schema)
@@ -300,9 +300,7 @@ server_log_parser.add_argument('search', help='Search filter support google like
 
 
 def reverse_readline(
-        fh: IO,
-        start_byte: int = 0,
-        buf_size: int = 8192
+    fh: IO, start_byte: int = 0, buf_size: int = 8192
 ) -> Generator[str, None, None]:
     """a generator that returns the lines of a file in reverse order"""
     segment: OptionalType[str] = None

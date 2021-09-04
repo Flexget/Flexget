@@ -1,7 +1,7 @@
 """Logging utilities"""
 import hashlib
 from datetime import datetime, timedelta
-from typing import Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 import loguru
 from loguru import logger
@@ -88,6 +88,7 @@ def log_once(
 
     row = LogMessage(md5sum)
     session.add(row)
+    session.flush()
 
     logger.log(once_level, message)
     return True

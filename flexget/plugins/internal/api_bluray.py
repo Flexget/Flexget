@@ -122,7 +122,10 @@ class BlurayMovie(Base):
             # Used for parsing some more data, sadly with soup
             self.url = result['url']
 
-            movie_info_response = requests.get(self.url).content
+            try:
+                movie_info_response = requests.get(self.url).content
+            except (requests.RequestException, ConnectionError) as e:
+                raise LookupError("Couldn't connect to blu-ray.com. %s" % self.url)
 
             movie_info = get_soup(movie_info_response)
 

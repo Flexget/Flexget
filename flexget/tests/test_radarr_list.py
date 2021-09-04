@@ -83,21 +83,25 @@ class TestRadarrListActions:
                     base_url: %(RADARR_BASE_URL)s
                     api_key: %(RADARR_API_KEY)s
                     port: %(RADARR_PORT)s
-    """ % {'RADARR_API_KEY': RADARR_API_KEY, 'RADARR_BASE_URL': RADARR_BASE_URL, 'RADARR_PORT': RADARR_PORT}
+    """ % {
+        'RADARR_API_KEY': RADARR_API_KEY,
+        'RADARR_BASE_URL': RADARR_BASE_URL,
+        'RADARR_PORT': RADARR_PORT,
+    }
 
     def test_radarr_list_tags(self, execute_task, manager):
         radarr = RadarrAPIService(RADARR_API_KEY, RADARR_BASE_URL, RADARR_PORT)
         tag_by_id = radarr.add_tag('tag_by_id')["id"]
-        manager.config['tasks']['clear_and_add_to_radarr_with_tags']['list_add'][0]['radarr_list']['tags'].append(tag_by_id)
+        manager.config['tasks']['clear_and_add_to_radarr_with_tags']['list_add'][0]['radarr_list'][
+            'tags'
+        ].append(tag_by_id)
 
         execute_task('clear_and_add_to_radarr_with_tags')
         tags = {t["label"].lower(): t["id"] for t in radarr.get_tags()}
         for movie in radarr.get_movies():
-            assert sorted(movie['tags']) == sorted([
-                tag_by_id,
-                tags.get("movies"),
-                tags.get("othertag")
-            ])
+            assert sorted(movie['tags']) == sorted(
+                [tag_by_id, tags.get("movies"), tags.get("othertag")]
+            )
 
     # TODO: each action should be own test case
     def test_radarr_list_actions(self, execute_task):

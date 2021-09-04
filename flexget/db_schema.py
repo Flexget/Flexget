@@ -1,6 +1,7 @@
 from datetime import datetime
-from typing import Callable, Optional, Union, Dict, Any, List
+from typing import Any, Callable, Dict, List, Optional, Union
 
+import sqlalchemy.event
 from loguru import logger
 from sqlalchemy import Column, DateTime, Integer, String, Table
 from sqlalchemy.exc import OperationalError
@@ -256,7 +257,8 @@ def versioned_base(plugin: str, version: int) -> VersionedBaseMeta:
     return VersionedBase
 
 
-def after_table_create(event, target, bind, tables: List[Table] = None, **kw) -> None:
+@sqlalchemy.event.listens_for(Base.metadata, "after_create")
+def after_table_create(target, connection, tables: List[Table] = None, **kw) -> None:
     """Sets the schema version to most recent for a plugin when it's tables are freshly created."""
     if tables:
         # TODO: Detect if any database upgrading is needed and acquire the lock only in one place
@@ -266,7 +268,3 @@ def after_table_create(event, target, bind, tables: List[Table] = None, **kw) ->
                 # Only set the version if all tables for a given plugin are being created
                 if all(table in tables for table in info['tables']):
                     set_version(plugin, info['version'])
-
-
-# Register a listener to call our method after tables are created
-Base.metadata.append_ddl_listener('after-create', after_table_create)

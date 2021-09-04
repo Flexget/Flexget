@@ -86,6 +86,8 @@ class TransmissionBase:
             raise plugin.PluginError("Cannot connect to transmission: Connection timed out.")
         except requests.exceptions.ConnectionError as e:
             raise plugin.PluginError("Error connecting to transmission: %s" % e.args[0].reason)
+        except ValueError as e:
+            raise plugin.PluginError("Error connecting to transmission")
         return cli
 
     def torrent_info(self, torrent, config):
@@ -121,13 +123,13 @@ class TransmissionBase:
 
         if torrent.seedIdleMode == 1:  # use torrent's own idle limit
             idle_limit_ok = (
-                torrent.date_active + timedelta(minutes=torrent.seedIdleLimit) < datetime.now()
+                torrent.date_active + timedelta(minutes=torrent.seedIdleLimit) < datetime.now().astimezone()
             )
         elif torrent.seedIdleMode == 0:  # use global rules
             if session.idle_seeding_limit_enabled:
                 idle_limit_ok = (
                     torrent.date_active + timedelta(minutes=session.idle_seeding_limit)
-                    < datetime.now()
+                    < datetime.now().astimezone()
                 )
 
         return seed_limit_ok, idle_limit_ok
@@ -333,8 +335,8 @@ class PluginTransmission(TransmissionBase):
     @plugin.priority(120)
     def on_task_download(self, task, config):
         """
-            Call download plugin to generate the temp files we will load
-            into deluge then verify they are valid torrents
+        Call download plugin to generate the temp files we will load
+        into deluge then verify they are valid torrents
         """
         config = self.prepare_config(config)
         if not config['enabled']:
@@ -579,7 +581,7 @@ class PluginTransmission(TransmissionBase):
                     if options['post'].get('main_file_only') and main_id is not None:
                         # Set Unwanted Files
                         options['change']['files_unwanted'] = [
-                            x for x in file_list if x not in dl_list
+                            x for x in range(len(file_list)) if x not in dl_list
                         ]
                         options['change']['files_wanted'] = dl_list
                         logger.debug(
@@ -600,7 +602,7 @@ class PluginTransmission(TransmissionBase):
                         else:
                             options['change']['files_unwanted'] = skip_list
                             options['change']['files_wanted'] = [
-                                x for x in file_list if x not in skip_list
+                                x for x in range(len(file_list)) if x not in skip_list
                             ]
                             logger.debug(
                                 'Downloading {} of {} files in torrent.',

@@ -31,6 +31,7 @@ logger = logger.bind(name='api')
 
 if TYPE_CHECKING:
     from typing import TypedDict
+
     _TypeDict = TypedDict('_TypeDict', {'type': str})
 
     class MessageDict(_TypeDict):
@@ -116,7 +117,7 @@ class API(RestxAPI):
         self,
         model: Model,
         schema_override: Dict[str, List[Dict[str, str]]] = None,
-        description=None
+        description=None,
     ):
         """
         When a method is decorated with this, json data submitted to the endpoint will be validated with the given
@@ -168,7 +169,7 @@ class API(RestxAPI):
         parser: RequestParser = None,
         sort_choices: List[str] = None,
         default: str = None,
-        add_sort: bool = None
+        add_sort: bool = None,
     ) -> RequestParser:
         """
         Return a standardized pagination parser, to be used for any endpoint that has pagination.
@@ -326,9 +327,7 @@ class ValidationError(APIError):
     )
 
     def __init__(
-        self,
-        validation_errors: List[SchemaValidationError],
-        message: str = 'validation error'
+        self, validation_errors: List[SchemaValidationError], message: str = 'validation error'
     ) -> None:
         payload = {
             'validation_errors': [self._verror_to_dict(error) for error in validation_errors]
@@ -424,10 +423,7 @@ def etag(method: Callable = None, cache_age: int = 0):
 
 
 def pagination_headers(
-    total_pages: int,
-    total_items: int,
-    page_count: int,
-    request: Request
+    total_pages: int, total_items: int, page_count: int, request: Request
 ) -> 'PaginationHeaders':
     """
     Creates the `Link`. 'Count' and  'Total-Count' headers, to be used for pagination traversing

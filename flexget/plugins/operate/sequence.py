@@ -9,7 +9,7 @@ logger = logger.bind(name='sequence')
 
 
 class PluginSequence:
-    """ Allows the same plugin to be configured multiple times in a task.
+    """Allows the same plugin to be configured multiple times in a task.
 
     Example:
     sequence:

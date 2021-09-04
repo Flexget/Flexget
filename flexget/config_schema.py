@@ -2,7 +2,7 @@ import datetime
 import os
 import re
 from collections import defaultdict
-from typing import Any, Callable, Dict, Optional, Union, List, Pattern, Match
+from typing import Any, Callable, Dict, List, Match, Optional, Pattern, Union
 from urllib.parse import parse_qsl, urlparse
 
 import jsonschema
@@ -47,7 +47,7 @@ _root_config_schema: Optional[JsonSchema] = None
 
 
 def register_config_key(key: str, schema: JsonSchema, required: bool = False):
-    """ Registers a valid root level key for the config.
+    """Registers a valid root level key for the config.
 
     :param string key:
       Name of the root level key being registered.
@@ -86,7 +86,8 @@ def one_or_more(schema: JsonSchema, unique_items: bool = False) -> JsonSchema:
     """
 
     schema.setdefault('title', 'single value')
-    return {
+    default = schema.pop('default', None)
+    result = {
         'oneOf': [
             {
                 'title': 'multiple values',
@@ -98,6 +99,9 @@ def one_or_more(schema: JsonSchema, unique_items: bool = False) -> JsonSchema:
             schema,
         ]
     }
+    if default:
+        result['default'] = default
+    return result
 
 
 def resolve_ref(uri: str) -> JsonSchema:
@@ -115,9 +119,7 @@ def resolve_ref(uri: str) -> JsonSchema:
 
 
 def process_config(
-    config: Any,
-    schema: Optional[JsonSchema] = None,
-    set_defaults: bool = True
+    config: Any, schema: Optional[JsonSchema] = None, set_defaults: bool = True
 ) -> List[ConfigValidationError]:
     """
     Validates the config, and sets defaults within it if `set_defaults` is set.
@@ -276,6 +278,9 @@ def is_path(instance) -> bool:
 @format_checker.checks('url')
 def is_url(instance) -> Union[None, bool, Match]:
     if not isinstance(instance, str_types):
+        return True
+    # Allow looser validation if this appears to start with jinja
+    if instance.startswith('{{') or instance.startswith('{%'):
         return True
     regexp = (
         '('

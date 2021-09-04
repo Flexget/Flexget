@@ -199,7 +199,7 @@ class RadarrAPIService:
         root_folder_path,
         monitored=True,
         add_options=None,
-        tags=()
+        tags=(),
     ):
         """ Adds a movie """
         request_url = self.api_url + "movie"
@@ -213,7 +213,7 @@ class RadarrAPIService:
             "tmdbId": tmdb_id,
             "rootFolderPath": root_folder_path,
             "monitored": monitored,
-            "tags": tags
+            "tags": tags,
         }
 
         if add_options:
@@ -341,7 +341,11 @@ class RadarrSet(MutableSet):
             if isinstance(tag, int):
                 # Handle tags by id
                 if tag not in self._tags.values():
-                    logger.error('Unable to add tag with id {} to entry {} as the tag does not exist in radarr', entry, tag)
+                    logger.error(
+                        'Unable to add tag with id {} to entry {} as the tag does not exist in radarr',
+                        entry,
+                        tag,
+                    )
                     continue
                 tags_ids.append(tag)
             else:
@@ -402,7 +406,7 @@ class RadarrSet(MutableSet):
                     result["tmdbId"],
                     root_folder_path,
                     monitored=self.config.get('monitored', False),
-                    tags=self.get_tag_ids(entry)
+                    tags=self.get_tag_ids(entry),
                 )
                 logger.verbose('Added movie {} to Radarr list', result['title'])
             except RadarrMovieAlreadyExistsError:
@@ -414,7 +418,10 @@ class RadarrSet(MutableSet):
                 logger.error(msg)
                 entry.fail(msg)
         else:
-            msg = 'The lookup for entry %s did not return any results.Can not add the movie in Radarr.' % entry
+            msg = (
+                'The lookup for entry %s did not return any results.Can not add the movie in Radarr.'
+                % entry
+            )
             logger.verbose(msg)
             entry.fail(msg)
 
@@ -594,7 +601,7 @@ class RadarrSet(MutableSet):
                         "Radarr lookup for '{}' returned {:d} results. Using the first result '{}'.",
                         title,
                         len(results),
-                        results[ 0]['title'],
+                        results[0]['title'],
                     )
                     return results[0]
             except RadarrRequestError as ex:

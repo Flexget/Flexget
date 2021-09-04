@@ -508,10 +508,11 @@ class Manager:
 
         elif options.action in ['stop', 'reload-config', 'status']:
             if not self.is_daemon:
-                logger.error('There does not appear to be a daemon running.')
+                console('There does not appear to be a daemon running.')
                 return
             if options.action == 'status':
-                logger.info('Daemon running. (PID: {})', os.getpid())
+                logger.debug('`daemon status` called. Daemon running. (PID: {})', os.getpid())
+                console(f'Daemon running. (PID: {os.getpid()})')
             elif options.action == 'stop':
                 tasks = (
                     'all queued tasks (if any) have'

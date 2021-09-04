@@ -16,7 +16,16 @@ try:
 
     PROVIDERS = provider_manager.names()
 except ImportError:
-    PROVIDERS = ['opensubtitles', 'thesubdb', 'podnapisi', 'addic7ed', 'tvsubtitles']
+    PROVIDERS = [
+        'argenteam',
+        'legendastv',
+        'opensubtitles',
+        'opensubtitlesvip',
+        'podnapisi',
+        'shooter',
+        'thesubdb',
+        'tvsubtitles',
+    ]
 
 AUTHENTICATION_SCHEMA = dict((provider, {'type': 'object'}) for provider in PROVIDERS)
 
@@ -41,12 +50,12 @@ class PluginSubliminal:
           alternatives:
             - eng
           exact_match: no
-          providers: addic7ed, opensubtitles
+          providers: legendastv, opensubtitles
           single: no
           directory: /disk/subtitles
           hearing_impaired: yes
           authentication:
-            addic7ed:
+            legendastv:
               username: myuser
               passsword: mypassword
     """

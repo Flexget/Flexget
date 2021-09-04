@@ -3,7 +3,7 @@ import pytest
 
 class TestOnlyTask:
     """
-        Test --task option
+    Test --task option
     """
 
     config = """
@@ -31,7 +31,7 @@ class TestOnlyTask:
 
 class TestManualAutomatic:
     """
-        Test manual download tasks
+    Test manual download tasks
     """
 
     config = """
@@ -50,7 +50,7 @@ class TestManualAutomatic:
 
 class TestManualOnlytask:
     """
-        Test manual download tasks
+    Test manual download tasks
     """
 
     config = """

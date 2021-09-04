@@ -48,17 +48,17 @@ Index(
 
 class FilterProperMovies:
     """
-        Automatically download proper movies.
+    Automatically download proper movies.
 
-        Configuration:
+    Configuration:
 
-            proper_movies: n <minutes|hours|days|weeks>
+        proper_movies: n <minutes|hours|days|weeks>
 
-        or permanently:
+    or permanently:
 
-            proper_movies: yes
+        proper_movies: yes
 
-        Value no will disable plugin.
+    Value no will disable plugin.
     """
 
     schema = {'oneOf': [{'type': 'boolean'}, {'type': 'string', 'format': 'interval'}]}
