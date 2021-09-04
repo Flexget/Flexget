@@ -21,6 +21,7 @@ from typing import (
     Iterable,
     Iterator,
     List,
+    NamedTuple,
     Optional,
     Pattern,
     Sequence,
@@ -28,6 +29,7 @@ from typing import (
     Union,
 )
 
+import psutil
 import requests
 from loguru import logger
 
@@ -236,45 +238,11 @@ def multiply_timedelta(interval: timedelta, number: Union[int, float]) -> timede
     return timedelta(seconds=interval.total_seconds() * number)
 
 
-if os.name == 'posix':
-
-    def pid_exists(pid: int) -> bool:
-        """Check whether pid exists in the current process table."""
-        import errno
-
-        if pid < 0:
-            return False
-        try:
-            os.kill(pid, 0)
-        except OSError as e:
-            return e.errno == errno.EPERM
-        else:
-            return True
-
-
-else:
-
-    def pid_exists(pid: int) -> bool:
-        import ctypes
-        import ctypes.wintypes
-
-        kernel32 = ctypes.windll.kernel32
-        PROCESS_QUERY_INFORMATION = 0x0400
-        STILL_ACTIVE = 259
-
-        handle = kernel32.OpenProcess(PROCESS_QUERY_INFORMATION, 0, pid)
-        if handle == 0:
-            return False
-
-        # If the process exited recently, a pid may still exist for the handle.
-        # So, check if we can get the exit code.
-        exit_code = ctypes.wintypes.DWORD()
-        is_running = kernel32.GetExitCodeProcess(handle, ctypes.byref(exit_code)) == 0
-        kernel32.CloseHandle(handle)
-
-        # See if we couldn't get the exit code or the exit code indicates that the
-        # process is still running.
-        return is_running or exit_code.value == STILL_ACTIVE
+def pid_exists(pid: int):
+    try:
+        return psutil.Process(pid).status() != psutil.STATUS_STOPPED
+    except psutil.NoSuchProcess:
+        return False
 
 
 _binOps = {
@@ -354,17 +322,22 @@ class BufferQueue(queue.Queue):
         self.put(line)
 
 
-def split_title_year(title: str) -> Tuple[str, Optional[int]]:
+class TitleYear(NamedTuple):
+    title: str
+    year: Optional[int]
+
+
+def split_title_year(title: str) -> TitleYear:
     """Splits title containing a year into a title, year pair."""
     if not title:
-        return '', None
+        return TitleYear('', None)
     if not re.search(r'\d{4}', title):
-        return title, None
+        return TitleYear(title, None)
     # We only recognize years from the 2nd and 3rd millennium, FlexGetters from the year 3000 be damned!
     match = re.search(r'(.*?)\(?([12]\d{3})?\)?$', title)
 
     if not match:
-        return title, None
+        return TitleYear(title, None)
     title = match.group(1).strip()
     year_match = match.group(2)
 
@@ -376,7 +349,7 @@ def split_title_year(title: str) -> Tuple[str, Optional[int]]:
         year = None
     else:
         year = int(year_match)
-    return title, year
+    return TitleYear(title, year)
 
 
 def get_latest_flexget_version_number() -> Optional[str]:

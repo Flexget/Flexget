@@ -24,7 +24,7 @@ class QualityComponent:
         defaults: Optional[List['QualityComponent']] = None,
     ) -> None:
         """
-        :param type: Type of quality component. (resolution, source, codec, or audio)
+        :param type: Type of quality component. (resolution, source, codec, color_range or audio)
         :param value: Value used to sort this component with others of like type.
         :param name: Canonical name for this quality component.
         :param regexp: Regexps used to match this component.
@@ -32,7 +32,7 @@ class QualityComponent:
         :param defaults: An iterable defining defaults for other quality components if this component matches.
         """
 
-        if type not in ['resolution', 'source', 'codec', 'audio']:
+        if type not in ['resolution', 'source', 'codec', 'color_range', 'audio']:
             raise ValueError('%s is not a valid quality component type.' % type)
         self.type = type
         self.value = value
@@ -154,8 +154,16 @@ _codecs = [
     QualityComponent('codec', 30, 'h264', '[hx].?264'),
     QualityComponent('codec', 35, 'vp9'),
     QualityComponent('codec', 40, 'h265', '[hx].?265|hevc'),
-    QualityComponent('codec', 50, '10bit', '10.?bit|hi10p'),
 ]
+
+_color_ranges = [
+    QualityComponent('color_range', 10, '8bit', r'8[^\w]?bit|hi8(p)?'),
+    QualityComponent('color_range', 20, '10bit', r'10[^\w]?bit|hi10(p)?'),
+    QualityComponent('color_range', 40, 'hdrplus', r'hdr[^\w]?(\+|p|plus)'),
+    QualityComponent('color_range', 30, 'hdr', r'hdr([^\w]?(10))?'),
+    QualityComponent('color_range', 50, 'dolbyvision', r'(dolby[^\w]?vision|dv)'),
+]
+
 channels = r'(?:(?:[^\w+]?[1-7][\W_]?(?:0|1|ch)))'
 _audios = [
     QualityComponent('audio', 10, 'mp3'),
@@ -175,11 +183,12 @@ _UNKNOWNS = {
     'resolution': QualityComponent('resolution', 0, 'unknown'),
     'source': QualityComponent('source', 0, 'unknown'),
     'codec': QualityComponent('codec', 0, 'unknown'),
+    'color_range': QualityComponent('color_range', 0, 'unknown'),
     'audio': QualityComponent('audio', 0, 'unknown'),
 }
 
 # For wiki generating help
-'''for type in (_resolutions, _sources, _codecs, _audios):
+'''for type in (_resolutions, _sources, _codecs, _color_ranges, _audios):
     print '{{{#!td style="vertical-align: top"'
     for item in reversed(type):
         print '- ' + item.name
@@ -187,7 +196,7 @@ _UNKNOWNS = {
 '''
 
 _registry: Dict[Union[str, QualityComponent], QualityComponent] = {}
-for items in (_resolutions, _sources, _codecs, _audios):
+for items in (_resolutions, _sources, _codecs, _color_ranges, _audios):
     for item in items:
         _registry[item.name] = item
 
@@ -212,6 +221,7 @@ class Quality(Serializer):
             self.resolution = _UNKNOWNS['resolution']
             self.source = _UNKNOWNS['source']
             self.codec = _UNKNOWNS['codec']
+            self.color_range = _UNKNOWNS['color_range']
             self.audio = _UNKNOWNS['audio']
 
     def parse(self, text: str) -> None:
@@ -224,6 +234,7 @@ class Quality(Serializer):
         self.resolution = self._find_best(_resolutions, _UNKNOWNS['resolution'], False)
         self.source = self._find_best(_sources, _UNKNOWNS['source'])
         self.codec = self._find_best(_codecs, _UNKNOWNS['codec'])
+        self.color_range = self._find_best(_color_ranges, _UNKNOWNS['color_range'])
         self.audio = self._find_best(_audios, _UNKNOWNS['audio'])
         # If any of the matched components have defaults, set them now.
         for component in self.components:
@@ -233,7 +244,10 @@ class Quality(Serializer):
                     setattr(self, default.type, default)
 
     def _find_best(
-        self, qlist: List[QualityComponent], default: QualityComponent, strip_all: bool = True,
+        self,
+        qlist: List[QualityComponent],
+        default: QualityComponent,
+        strip_all: bool = True,
     ) -> QualityComponent:
         """Finds the highest matching quality component from `qlist`"""
         result = None
@@ -255,13 +269,15 @@ class Quality(Serializer):
     @property
     def name(self) -> str:
         name = ' '.join(
-            str(p) for p in (self.resolution, self.source, self.codec, self.audio) if p.value != 0
+            str(p)
+            for p in (self.resolution, self.source, self.codec, self.color_range, self.audio)
+            if p.value != 0
         )
         return name or 'unknown'
 
     @property
     def components(self) -> List[QualityComponent]:
-        return [self.resolution, self.source, self.codec, self.audio]
+        return [self.resolution, self.source, self.codec, self.color_range, self.audio]
 
     @classmethod
     def serialize(cls, quality: 'Quality') -> str:
@@ -281,7 +297,7 @@ class Quality(Serializer):
             other = Quality(other)
         if not other or not self:
             return False
-        for cat in ('resolution', 'source', 'audio', 'codec'):
+        for cat in ('resolution', 'source', 'audio', 'color_range', 'codec'):
             othercat = getattr(other, cat)
             if othercat and othercat != getattr(self, cat):
                 return False
@@ -307,10 +323,11 @@ class Quality(Serializer):
         return self._comparator < other._comparator
 
     def __repr__(self) -> str:
-        return '<Quality(resolution=%s,source=%s,codec=%s,audio=%s)>' % (
+        return '<Quality(resolution=%s,source=%s,codec=%s,color_range=%s,audio=%s)>' % (
             self.resolution,
             self.source,
             self.codec,
+            self.color_range,
             self.audio,
         )
 
@@ -434,13 +451,14 @@ class Requirements:
         self.resolution = RequirementComponent('resolution')
         self.source = RequirementComponent('source')
         self.codec = RequirementComponent('codec')
+        self.color_range = RequirementComponent('color_range')
         self.audio = RequirementComponent('audio')
         if req:
             self.parse_requirements(req)
 
     @property
     def components(self) -> List[RequirementComponent]:
-        return [self.resolution, self.source, self.codec, self.audio]
+        return [self.resolution, self.source, self.codec, self.color_range, self.audio]
 
     def parse_requirements(self, text: str) -> None:
         """

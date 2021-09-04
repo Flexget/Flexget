@@ -25,7 +25,7 @@ class SiteRutracker:
     @plugin.internet(logger)
     def url_rewrite(self, task, entry):
         """
-            Gets torrent information for topic from rutracker api
+        Gets torrent information for topic from rutracker api
         """
 
         url = entry['url']

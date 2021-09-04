@@ -1,12 +1,12 @@
+import collections.abc
 import contextlib
 import copy
-import inspect
 import itertools
 import random
 import string
 import threading
 from functools import total_ordering, wraps
-from typing import Iterable, List, Union, Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING, Iterable, List, Optional, Union
 
 from loguru import logger
 from sqlalchemy import Column, Integer, String, Unicode
@@ -545,8 +545,8 @@ class Task:
         # call the plugin
         try:
             result = method(*args, **kwargs)
-            # We exhaust any generator inputs here to make sure we catch exceptions properly.
-            if inspect.isgenerator(result):
+            # We exhaust any iterator inputs here to make sure we catch exceptions properly.
+            if isinstance(result, collections.abc.Iterator):
                 result = list(result)
             return result
         except TaskAbort:

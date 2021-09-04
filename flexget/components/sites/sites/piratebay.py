@@ -1,11 +1,12 @@
 import re
 from urllib.parse import urlencode, urlparse
+from json import JSONDecodeError
 
 from loguru import logger
 
 from flexget import plugin
 from flexget.components.sites.urlrewriting import UrlRewritingError
-from flexget.components.sites.utils import normalize_unicode, torrent_availability
+from flexget.components.sites.utils import torrent_availability
 from flexget.entry import Entry
 from flexget.event import event
 
@@ -108,23 +109,23 @@ class UrlRewritePirateBay:
     # urlrewriter API
     def url_rewrite(self, task, entry):
         if 'url' not in entry:
-            logger.error("Didn't actually get a URL...")
+            logger.error('Didn\'t actually get a URL...')
         else:
             logger.debug('Got the URL: {}', entry['url'])
         if self.url_search.match(entry['url']):
             # use search
             results = self.search(task, entry)
             if not results:
-                raise UrlRewritingError("No search results found")
+                raise UrlRewritingError('No search results found')
             # TODO: Close matching was taken out of search methods, this may need to be fixed to be more picky
             entry['url'] = results[0]['url']
         else:
             torrent_id = self.url_match.match(entry['url']).group(1)
-            url = f"{self.url}/t.php?id={torrent_id}"
+            url = f'{self.url}/t.php?id={torrent_id}'
             logger.debug('Getting info for torrent ID {}', torrent_id)
             json_result = task.requests.get(url).json()
             if json_result['id'] == '0':
-                raise UrlRewritingError(f"Torrent with ID {torrent_id} does not exist.")
+                raise UrlRewritingError(f'Torrent with ID {torrent_id} does not exist.')
             entry['url'] = self.info_hash_to_magnet(json_result['info_hash'], json_result['name'])
 
     @plugin.internet(logger)
@@ -146,10 +147,16 @@ class UrlRewritePirateBay:
         for search_string in entry.get('search_strings', [entry['title']]):
             # query = normalize_unicode(search_string)
             params = {'q': search_string, 'cat': category}
-            url = f"{self.url}/q.php"
-            json_results = task.requests.get(url, params=params).json()
+            url = f'{self.url}/q.php'
+            try:
+                json_results = task.requests.get(url, params=params).json()
+            except JSONDecodeError as e:
+                raise plugin.PluginError(
+                    f'Error while searching piratebay for {search_string}, invalid json response',
+                )
+
             if not json_results:
-                raise plugin.PluginError("Error while searching piratebay for %s.", search_string)
+                raise plugin.PluginError(f'Error while searching piratebay for {search_string}.')
             for result in json_results:
                 if result['id'] == '0':
                     # JSON when no results found: [{ "id":"0", "name":"No results returned", ... }]
@@ -162,9 +169,9 @@ class UrlRewritePirateBay:
     # convert an info_hash string to a magnet uri
     @staticmethod
     def info_hash_to_magnet(info_hash: str, name: str) -> str:
-        magnet = {'xt': f"urn:btih:{info_hash}", 'dn': name, 'tr': TRACKERS}
+        magnet = {'xt': f'urn:btih:{info_hash}', 'dn': name, 'tr': TRACKERS}
         magnet_qs = urlencode(magnet, doseq=True, safe=':')
-        magnet_uri = f"magnet:?{magnet_qs}"
+        magnet_uri = f'magnet:?{magnet_qs}'
         return magnet_uri
 
     # convert a single json result to an Entry

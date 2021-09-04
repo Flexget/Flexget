@@ -49,7 +49,8 @@ def get_secret(session=None):
     web_secret = session.query(WebSecret).first()
     if not web_secret:
         web_secret = WebSecret(
-            id='1', value=get_random_string(50, 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)')
+            id='1',
+            value=get_random_string(50, 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'),
         )
         session.add(web_secret)
         session.commit()

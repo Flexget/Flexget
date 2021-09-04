@@ -14,7 +14,7 @@ def cached_resource(
     base_dir: str,
     force: bool = False,
     max_size: int = 250,
-    directory: str = 'cached_resources'
+    directory: str = 'cached_resources',
 ) -> Tuple[str, str]:
     """
     Caches a remote resource to local filesystem. Return a tuple of local file name and mime type, use primarily

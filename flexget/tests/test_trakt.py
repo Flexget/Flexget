@@ -94,9 +94,11 @@ class TestTraktShowLookup:
         assert entry['trakt_ep_name'] == 'Paternity', (
             '%s trakt_ep_name should be Paternity' % entry['title']
         )
-        assert entry['trakt_series_status'] == 'ended', (
-            'runtime for %s is %s, should be "ended"'
-            % (entry['title'], entry['trakt_series_status'])
+        assert (
+            entry['trakt_series_status'] == 'ended'
+        ), 'runtime for %s is %s, should be "ended"' % (
+            entry['title'],
+            entry['trakt_series_status'],
         )
         assert entry['afield'] == '73255Paternity', 'afield was not set correctly'
         assert task.find_entry(

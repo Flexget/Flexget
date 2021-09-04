@@ -24,6 +24,8 @@ class FilterContentFilter:
     schema = {
         'type': 'object',
         'properties': {
+            'min_files': {'type': 'integer'},
+            'max_files': {'type': 'integer'},
             # These two properties allow a string or list of strings
             'require': one_or_more({'type': 'string'}),
             'require_all': one_or_more({'type': 'string'}),
@@ -96,6 +98,20 @@ class FilterContentFilter:
                 if (100 * float(best) / float(entry['torrent'].size)) < 90:
                     logger.info('Entry {} does not have a main file, rejecting', entry['title'])
                     entry.reject('does not have a main file', remember=True)
+                    return True
+            if config.get('min_files'):
+                if len(files) < config['min_files']:
+                    logger.info(
+                        f'Entry {entry["title"]} has {len(files)} files. Minimum is {config["min_files"]}. Rejecting.'
+                    )
+                    entry.reject(f'Has less than {config["min_files"]} files', remember=True)
+                    return True
+            if config.get('max_files'):
+                if len(files) > config['max_files']:
+                    logger.info(
+                        f'Entry {entry["title"]} has {len(files)} files. Maximum is {config["max_files"]}. Rejecting.'
+                    )
+                    entry.reject(f'Has more than {config["max_files"]} files', remember=True)
                     return True
 
     @plugin.priority(150)

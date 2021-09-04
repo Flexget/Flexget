@@ -12,7 +12,7 @@ from flexget.utils import json, qualities, serialization
 
 
 def with_session(*args, **kwargs):
-    """"
+    """ "
     A decorator which creates a new session if one was not passed via keyword argument to the function.
 
     Automatically commits and closes the session if one was created, caller is responsible for commit if passed in.

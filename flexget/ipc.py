@@ -4,7 +4,7 @@ import random
 import string
 import sys
 import threading
-from typing import Optional, Callable
+from typing import Callable, Optional
 
 import rpyc
 from loguru import logger
@@ -135,9 +135,8 @@ class ClientService(rpyc.Service):
         logger.patch(lambda r: r.update(record)).log(level, message)
 
 
-class IPCServer(threading.Thread):
+class IPCServer:
     def __init__(self, manager, port=None):
-        super().__init__(name='ipc_server')
         self.daemon = True
         self.manager = manager
         self.host = '127.0.0.1'
@@ -146,6 +145,12 @@ class IPCServer(threading.Thread):
             random.choice(string.ascii_letters + string.digits) for x in range(15)
         )
         self.server = None
+        self._thread = None
+
+    def start(self):
+        if not self._thread:
+            self._thread = threading.Thread(name='ipc_server', target=self.run)
+        self._thread.start()
 
     def authenticator(self, sock):
         channel = rpyc.Channel(rpyc.SocketStream(sock))
