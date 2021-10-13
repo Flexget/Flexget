@@ -15,8 +15,7 @@ jsonschema>=2.0
 guessit==3.2.0
 rebulk>=2.0.0
 apscheduler>=3.2.0
-terminaltables>=3.1.0
-colorclass>=2.2.0
+rich>=9.0.0
 loguru>=0.4.1
 # WebUI Requirements
 cherrypy>=18.0.0

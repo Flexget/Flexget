@@ -24,10 +24,10 @@ ENV_ADD_QUALITY = 'FLEXGET_SERIES_ADD_QUALITY'
 SORT_COLUMN_COLOR = 'yellow'
 NEW_EP_COLOR = 'green'
 FRESH_EP_COLOR = 'yellow'
-OLD_EP_COLOR = 'black'
+OLD_EP_COLOR = 'default'
 BEHIND_EP_COLOR = 'red'
-UNDOWNLOADED_RELEASE_COLOR = 'black'
-DOWNLOADED_RELEASE_COLOR = 'white'
+UNDOWNLOADED_RELEASE_COLOR = 'default'
+DOWNLOADED_RELEASE_COLOR = 'green'
 ERROR_COLOR = 'red'
 
 
@@ -121,7 +121,7 @@ def display_summary(options):
         table = TerminalTable(
             options.table_type, table_data, wrap_columns=[3], drop_columns=[4, 3, 2]
         )
-        console(table.output)
+        console(table)
     except TerminalTableError as e:
         console('ERROR: %s' % str(e))
         return
@@ -231,7 +231,7 @@ def display_details(options):
             return
         # Pick the best matching series
         series = matches[0]
-        table_title = colorize('white', series.name)
+        table_title = series.name
         if len(matches) > 1:
             warning = (
                 colorize('red', ' WARNING: ') + 'Multiple series match to `{}`.\n '
@@ -293,7 +293,7 @@ def display_details(options):
         footer += ' \n See `identified_by` %s for more information.' % begin_text
     try:
         table = TerminalTable(options.table_type, table_data, table_title, drop_columns=[4, 3, 1])
-        console(table.output)
+        console(table)
     except TerminalTableError as e:
         console('ERROR: %s' % str(e))
         return
