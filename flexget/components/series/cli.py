@@ -229,7 +229,7 @@ def display_details(options):
             )
             if not options.table_type == 'porcelain':
                 console(warning)
-        header = ['Identifier', 'Last\nseen', 'Release titles', 'Release\nQuality', 'Proper']
+        header = ['Identifier', 'Last seen', 'Release titles', 'Quality', 'Proper']
         table_data = []
         entities = db.get_all_entities(series, session=session, sort_by=sort_by, reverse=reverse)
         for entity in entities:
