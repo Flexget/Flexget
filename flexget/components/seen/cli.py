@@ -1,6 +1,6 @@
 from flexget import options, plugin
 from flexget.event import event
-from flexget.terminal import TerminalTable, TerminalTableError, console, table_parser
+from flexget.terminal import TerminalTable, console, table_parser
 from flexget.utils.database import with_session
 
 from . import db
@@ -59,29 +59,23 @@ def seen_search(options, session=None):
     else:
         search_term = '%' + options.search_term + '%'
     seen_entries = db.search(value=search_term, status=None, session=session)
-    table_data = []
+    table = TerminalTable(table_type=options.table_type, show_header=False, show_lines=True)
     for se in seen_entries.all():
-        table_data.append(['Title', se.title])
+        inner_table = TerminalTable(
+            table_type=options.table_type, show_header=False, show_edge=False, pad_edge=False
+        )
+        inner_table.add_row('Title', se.title)
         for sf in se.fields:
             if sf.field.lower() == 'title':
                 continue
-            table_data.append(['{}'.format(sf.field.upper()), str(sf.value)])
-        table_data.append(['Task', se.task])
-        table_data.append(['Added', se.added.strftime('%Y-%m-%d %H:%M')])
-        if options.table_type != 'porcelain':
-            table_data.append(['', ''])
-    if not table_data:
+            inner_table.add_row('{}'.format(sf.field.upper()), str(sf.value))
+        inner_table.add_row('Task', se.task)
+        inner_table.add_row('Added', se.added.strftime('%Y-%m-%d %H:%M'))
+        table.add_row(inner_table)
+    if not table.rows:
         console('No results found for search')
         return
-    if options.table_type != 'porcelain':
-        del table_data[-1]
-
-    try:
-        table = TerminalTable(options.table_type, table_data, wrap_columns=[1])
-        table.table.inner_heading_row_border = False
-        console(table.output)
-    except TerminalTableError as e:
-        console('ERROR: %s' % str(e))
+    console(table)
 
 
 @event('options.register')
