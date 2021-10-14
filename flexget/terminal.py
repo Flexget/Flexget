@@ -79,7 +79,13 @@ class TerminalTable(rich.table.Table):
     # TODO: Add other new types
     TABLE_TYPES = {
         'plain': {'box': rich.box.ASCII},
-        'porcelain': {'box': PORCELAIN_BOX, 'show_edge': False, 'pad_edge': False},
+        'porcelain': {
+            'box': PORCELAIN_BOX,
+            'show_edge': False,
+            'pad_edge': False,
+            'title': None,
+            'padding': 0,
+        },
         'single': {'box': rich.box.SQUARE},
         'double': {'box': rich.box.DOUBLE},
         'github': {'box': GITHUB_BOX},
@@ -89,7 +95,7 @@ class TerminalTable(rich.table.Table):
     def __init__(self, *args, table_type: str = None, **kwargs) -> None:
         self.table_type = table_type
         if table_type:
-            kwargs = {**self.TABLE_TYPES[table_type], **kwargs}
+            kwargs = {**kwargs, **self.TABLE_TYPES[table_type]}
         super().__init__(*args, **kwargs)
 
     def __rich_console__(self, console, options):
