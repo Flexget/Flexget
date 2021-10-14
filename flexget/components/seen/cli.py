@@ -59,19 +59,15 @@ def seen_search(options, session=None):
     else:
         search_term = '%' + options.search_term + '%'
     seen_entries = db.search(value=search_term, status=None, session=session)
-    table = TerminalTable(table_type=options.table_type, show_header=False, show_lines=True)
+    table = TerminalTable(table_type=options.table_type, show_header=False)
     for se in seen_entries.all():
-        inner_table = TerminalTable(
-            table_type=options.table_type, show_header=False, show_edge=False, pad_edge=False
-        )
-        inner_table.add_row('Title', se.title)
+        table.add_row('Title', se.title)
         for sf in se.fields:
             if sf.field.lower() == 'title':
                 continue
-            inner_table.add_row('{}'.format(sf.field.upper()), str(sf.value))
-        inner_table.add_row('Task', se.task)
-        inner_table.add_row('Added', se.added.strftime('%Y-%m-%d %H:%M'))
-        table.add_row(inner_table)
+            table.add_row('{}'.format(sf.field.upper()), str(sf.value))
+        table.add_row('Task', se.task)
+        table.add_row('Added', se.added.strftime('%Y-%m-%d %H:%M'), end_section=True)
     if not table.rows:
         console('No results found for search')
         return
