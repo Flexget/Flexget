@@ -229,8 +229,8 @@ def display_details(options):
             )
             if not options.table_type == 'porcelain':
                 console(warning)
-        header = ['Identifier', 'Last seen', 'Release titles', 'Release Quality', 'Proper']
-        table_data = [header]
+        header = ['Identifier', 'Last\nseen', 'Release titles', 'Release\nQuality', 'Proper']
+        table_data = []
         entities = db.get_all_entities(series, session=session, sort_by=sort_by, reverse=reverse)
         for entity in entities:
             if not entity.releases:
@@ -280,12 +280,10 @@ def display_details(options):
             footer += ' \n Begin for `%s` is set to `%s`.' % (series.name, series.begin.identifier)
             begin_text = 'and `begin` options'
         footer += ' \n See `identified_by` %s for more information.' % begin_text
-    try:
-        table = TerminalTable(options.table_type, table_data, table_title, drop_columns=[4, 3, 1])
-        console(table)
-    except TerminalTableError as e:
-        console('ERROR: %s' % str(e))
-        return
+    table = TerminalTable(*header, table_type=options.table_type, title=table_title)
+    for row in table_data:
+        table.add_row(*row)
+    console(table)
     if not options.table_type == 'porcelain':
         console(footer)
 
