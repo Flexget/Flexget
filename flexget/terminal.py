@@ -73,6 +73,9 @@ class TerminalTable(rich.table.Table):
     :param table_type: A string matching TABLE_TYPES keys.
     """
 
+    # Easy access for our plugins without importing rich
+    Column = rich.table.Column
+
     # TODO: Add other new types
     TABLE_TYPES = {
         'plain': {'box': rich.box.ASCII},
