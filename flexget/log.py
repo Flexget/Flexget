@@ -1,7 +1,7 @@
-import codecs
 import collections
 import contextlib
 import functools
+import io
 import logging
 import logging.handlers
 import os
@@ -9,8 +9,9 @@ import sys
 import threading
 import uuid
 import warnings
-from typing import Iterator, Union, List, Deque, Optional
+from typing import Deque, Iterator, List, Optional, Union
 
+import colorama
 import loguru
 from loguru import logger
 
@@ -175,12 +176,18 @@ def start(
             logger.debug("No sys.stdout, can't log to console.")
         else:
             # Make sure we don't send any characters that the current terminal doesn't support printing
-            safe_stdout = codecs.getwriter(io_encoding)(sys.stdout.buffer, 'replace')
-            colorize = None
-            # Auto-detection for colorize doesn't seem to work properly for PyCharm.
-            if "PYCHARM_HOSTED" in os.environ:
-                colorize = True
-            logger.add(safe_stdout, level=level, format=LOG_FORMAT, colorize=colorize)
+            if sys.version_info >= (3, 7):
+                sys.stdout.reconfigure(errors='replace')
+                out = sys.stdout
+            else:
+                out = io.TextIOWrapper(sys.stdout.buffer, encoding=io_encoding, errors='replace')
+                # Loguru only autodetects whether we need to wrap the stream only when it's sys.__stdout__
+                # since we've already wrapped it we need to add the colorama support ourselves
+                if os.name == "nt":
+                    out = colorama.AnsiToWin32(
+                        out, convert=True, strip=False, autoreset=False
+                    ).stream
+            logger.add(out, level=level, format=LOG_FORMAT)
 
     # flush what we have stored from the plugin initialization
     global _startup_buffer, _startup_buffer_id
