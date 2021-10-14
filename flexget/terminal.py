@@ -1,5 +1,4 @@
 import contextlib
-import sys
 import threading
 from textwrap import wrap
 from typing import Iterator, List, Optional, TextIO
@@ -169,6 +168,10 @@ def colorize(color: str, text: str) -> str:
     :return: Colored text or text
     """
     return f'[{color}]{text}[/]'
+
+
+def disable_colors():
+    rich_console.no_color = True
 
 
 @contextlib.contextmanager

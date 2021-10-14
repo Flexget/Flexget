@@ -2,8 +2,6 @@ import argparse
 import os
 from datetime import timedelta
 
-from colorclass.toggles import disable_all_colors
-
 import flexget.components.series.utils
 from flexget import options
 from flexget.event import event
@@ -33,7 +31,7 @@ ERROR_COLOR = 'red'
 
 def do_cli(manager, options):
     if hasattr(options, 'table_type') and options.table_type == 'porcelain':
-        disable_all_colors()
+        flexget.terminal.disable_colors()
     if options.series_action == 'list':
         display_summary(options)
     elif options.series_action == 'show':
