@@ -10,7 +10,7 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.manager import Session
 from flexget.options import ParseExtrasAction, get_parser
-from flexget.terminal import TerminalTable, TerminalTableError, console, table_parser
+from flexget.terminal import TerminalTable, console, table_parser
 from flexget.utils.tools import strip_html
 
 logger = logger.bind(name='archive_cli')
@@ -175,13 +175,10 @@ def cli_search(options):
     if not table_data:
         console('No results found for search')
         return
-
-    try:
-        table = TerminalTable(options.table_type, table_data, wrap_columns=[1])
-        table.table.inner_heading_row_border = False
-        console(table.output)
-    except TerminalTableError as e:
-        console('ERROR: %s' % str(e))
+    table = TerminalTable('Field', 'Value', table_type=options.table_type)
+    for row in table_data:
+        table.add_row(*row)
+    console(table)
 
 
 def cli_inject(manager, options):
