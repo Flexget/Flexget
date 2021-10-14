@@ -1,7 +1,7 @@
 import contextlib
 import threading
 from textwrap import wrap
-from typing import Iterator, List, Optional, TextIO
+from typing import Any, Iterator, Optional, TextIO
 
 import rich
 import rich.box
@@ -44,7 +44,7 @@ GITHUB_BOX: rich.box.Box = rich.box.Box(
 )
 
 
-class TerminalTable:
+class TerminalTable(rich.table.Table):
     """
     A data table suited for CLI output, created via its sent parameters. For example::
 
@@ -70,13 +70,7 @@ class TerminalTable:
                               drop_columns=[4,2])
         print table.output
 
-    :param table_type: A string matching supported_table_types() keys.
-    :param table_data: Table data as a list of lists of strings. See `terminaltables` doc.
-    :param title: Optional title for table
-    :param wrap_columns: A list of column numbers which will can be wrapped.
-        In case of multiple values even split is used.
-    :param drop_columns: A list of column numbers which can be dropped if needed.
-        List in order of priority.
+    :param table_type: A string matching TABLE_TYPES keys.
     """
 
     # TODO: Add other new types
@@ -88,32 +82,17 @@ class TerminalTable:
         'github': {'box': GITHUB_BOX},
     }
 
-    def __init__(
-        self,
-        table_type: str,
-        table_data: List[List[str]],
-        title: Optional[str] = None,
-        wrap_columns: Optional[List[int]] = None,
-        drop_columns: Optional[List[int]] = None,
-    ) -> None:
-        self.title = title
-        self.table_data = table_data
-        self.type = table_type
-        self._init_table()
-
-    def _init_table(self) -> None:
-        """Assigns self.table with the built table based on data."""
-        self.table: rich.table.Table = rich.table.Table(
-            title=self.title, **self.TABLE_TYPES[self.type]
-        )
-        for col in self.table_data[0]:
-            self.table.add_column(col)
-        for row in self.table_data[1:]:
-            self.table.add_row(*row)
+    def __init__(self, *args, table_type: str = None, **kwargs) -> None:
+        self.table_type = table_type
+        if table_type:
+            new_kwargs = self.TABLE_TYPES[table_type]
+            new_kwargs.update(kwargs)
+            kwargs = new_kwargs
+        super().__init__(*args, **kwargs)
 
     def __rich_console__(self, console, options):
-        segments = self.table.__rich_console__(console, options)
-        if self.type not in ['porcelain', 'github']:
+        segments = super().__rich_console__(console, options)
+        if self.table_type not in ['porcelain', 'github']:
             yield from segments
             return
         # Strips out blank lines from our custom types
@@ -197,7 +176,7 @@ def _patchable_console(text, *args, **kwargs):
         rich_console.file = None
 
 
-def console(text: str, *args, **kwargs) -> None:
+def console(text: Any, *args, **kwargs) -> None:
     """
     Print to console safely. Output is able to be captured by different streams in different contexts.
 

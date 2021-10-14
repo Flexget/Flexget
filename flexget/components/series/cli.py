@@ -6,7 +6,7 @@ import flexget.components.series.utils
 from flexget import options
 from flexget.event import event
 from flexget.manager import Session
-from flexget.terminal import TerminalTable, TerminalTableError, colorize, console, table_parser
+from flexget.terminal import TerminalTable, colorize, console, table_parser
 
 from . import db
 
@@ -79,8 +79,8 @@ def display_summary(options):
         for index, value in enumerate(header):
             if value.lower() == options.sort_by:
                 header[index] = colorize(SORT_COLUMN_COLOR, value)
+        table = TerminalTable(*header, table_type=options.table_type)
 
-        table_data = [header]
         for series in query:
             name_column = series.name
 
@@ -112,17 +112,8 @@ def display_summary(options):
                         BEHIND_EP_COLOR, ' {} {} behind'.format(behind[0], behind[1])
                     )
 
-            table_data.append(
-                [name_column, begin, episode_id, age_col, latest_release, identifier_type]
-            )
-    try:
-        table = TerminalTable(
-            options.table_type, table_data, wrap_columns=[3], drop_columns=[4, 3, 2]
-        )
-        console(table)
-    except TerminalTableError as e:
-        console('ERROR: %s' % str(e))
-        return
+            table.add_row(name_column, begin, episode_id, age_col, latest_release, identifier_type)
+    console(table)
     if not porcelain:
         if not query.count():
             console('Use `flexget series list all` to view all known series.')
