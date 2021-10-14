@@ -80,6 +80,7 @@ class TerminalTable(rich.table.Table):
         'single': {'box': rich.box.SQUARE},
         'double': {'box': rich.box.DOUBLE},
         'github': {'box': GITHUB_BOX},
+        'heavy-head': {'box': rich.box.HEAVY_HEAD},
     }
 
     def __init__(self, *args, table_type: str = None, **kwargs) -> None:
@@ -109,7 +110,7 @@ table_parser = ArgumentParser(add_help=False)
 table_parser.add_argument(
     '--table-type',
     choices=list(TerminalTable.TABLE_TYPES),
-    default='single',
+    default='heavy-head',
     help='Select output table style',
 )
 table_parser.add_argument(
