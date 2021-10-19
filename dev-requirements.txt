@@ -10,7 +10,7 @@ apipkg==1.5
     # via execnet
 appdirs==1.4.4
     # via virtualenv
-astroid==2.6.6
+astroid==2.8.3
     # via pylint
 attrs==20.3.0
     # via
@@ -141,7 +141,9 @@ pip-tools==6.2.0
 pkginfo==1.7.0
     # via twine
 platformdirs==2.4.0
-    # via black
+    # via
+    #   black
+    #   pylint
 pluggy==0.13.1
     # via pytest
 pre-commit==2.15.0
@@ -161,7 +163,7 @@ pygments==2.10.0
     #   -c requirements.txt
     #   readme-renderer
     #   sphinx
-pylint==2.9.6
+pylint==2.11.1
     # via -r dev-requirements.in
 pyparsing==2.4.7
     # via
@@ -258,8 +260,10 @@ typed-ast==1.4.3
     # via mypy
 typing-extensions==3.10.0.0
     # via
+    #   astroid
     #   black
     #   mypy
+    #   pylint
     #   sqlalchemy-stubs
 urllib3==1.26.4
     # via
