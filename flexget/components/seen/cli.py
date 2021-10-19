@@ -59,7 +59,7 @@ def seen_search(options, session=None):
     else:
         search_term = '%' + options.search_term + '%'
     seen_entries = db.search(value=search_term, status=None, session=session)
-    table = TerminalTable(table_type=options.table_type, show_header=False)
+    table = TerminalTable('Field', 'Value', table_type=options.table_type)
     for se in seen_entries.all():
         table.add_row('Title', se.title)
         for sf in se.fields:
