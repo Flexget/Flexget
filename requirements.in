@@ -11,7 +11,8 @@ jinja2~=3.0
 # There is a bug in requests 2.4.0 where it leaks urllib3 exceptions
 requests>=2.20.0
 python-dateutil
-jsonschema>=2.0
+# jsonschema 4.0 requires python 3.7+ We can switch to that when we drop 3.6 support
+jsonschema>=2.0, <4.0
 guessit==3.2.0
 rebulk>=2.0.0
 apscheduler>=3.2.0
