@@ -9,9 +9,7 @@ alabaster==0.7.12
 apipkg==1.5
     # via execnet
 appdirs==1.4.4
-    # via
-    #   black
-    #   virtualenv
+    # via virtualenv
 astroid==2.6.6
     # via pylint
 attrs==20.3.0
@@ -20,7 +18,7 @@ attrs==20.3.0
     #   pytest
 babel==2.9.0
     # via sphinx
-black==21.7b0
+black==21.9b0
     # via -r dev-requirements.in
 bleach==3.3.0
     # via readme-renderer
@@ -87,7 +85,6 @@ imagesize==1.2.0
     # via sphinx
 importlib-metadata==4.6.3
     # via
-    #   -c requirements.txt
     #   keyring
     #   twine
 iniconfig==1.1.1
@@ -135,7 +132,7 @@ packaging==20.9
     #   bleach
     #   pytest
     #   sphinx
-pathspec==0.8.1
+pathspec==0.9.0
     # via black
 pep517==0.10.0
     # via pip-tools
@@ -143,6 +140,8 @@ pip-tools==6.2.0
     # via -r dev-requirements.in
 pkginfo==1.7.0
     # via twine
+platformdirs==2.4.0
+    # via black
 pluggy==0.13.1
     # via pytest
 pre-commit==2.13.0
@@ -259,7 +258,7 @@ typed-ast==1.4.3
     # via mypy
 typing-extensions==3.10.0.0
     # via
-    #   -c requirements.txt
+    #   black
     #   mypy
     #   sqlalchemy-stubs
 urllib3==1.26.4
@@ -286,9 +285,7 @@ wrapt==1.12.1
 yarl==1.6.3
     # via vcrpy
 zipp==3.5.0
-    # via
-    #   -c requirements.txt
-    #   importlib-metadata
+    # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:
 # pip
