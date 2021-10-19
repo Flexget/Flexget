@@ -111,10 +111,6 @@ class TerminalTable(rich.table.Table):
                 yield rich.segment.Segment.line()
 
 
-class TerminalTableError(Exception):
-    """A CLI table error"""
-
-
 table_parser = ArgumentParser(add_help=False)
 table_parser.add_argument(
     '--table-type',
