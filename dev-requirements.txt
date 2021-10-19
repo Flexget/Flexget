@@ -22,9 +22,9 @@ black==21.9b0
     # via -r dev-requirements.in
 bleach==3.3.0
     # via readme-renderer
-boto3==1.18.14
+boto3==1.18.64
     # via -r dev-requirements.in
-botocore==1.21.14
+botocore==1.21.64
     # via
     #   boto3
     #   s3transfer
