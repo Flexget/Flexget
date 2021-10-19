@@ -121,7 +121,7 @@ pytz==2021.1
     #   flask-restx
     #   tempora
     #   tzlocal
-pyyaml==5.4.1
+pyyaml==6.0
     # via -r requirements.in
 rebulk==3.0.1
     # via

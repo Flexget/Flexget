@@ -189,7 +189,7 @@ pytz==2021.1
     # via
     #   -c requirements.txt
     #   babel
-pyyaml==5.4.1
+pyyaml==6.0
     # via
     #   -c requirements.txt
     #   pre-commit
