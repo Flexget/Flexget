@@ -145,7 +145,7 @@ pkginfo==1.7.0
     # via twine
 pluggy==0.13.1
     # via pytest
-pre-commit==2.13.0
+pre-commit==2.15.0
     # via -r dev-requirements.in
 py==1.10.0
     # via
