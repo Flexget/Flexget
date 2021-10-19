@@ -2,19 +2,17 @@ import contextlib
 import logging
 import random
 import string
-import sys
 import threading
+import unittest.mock
 from typing import Callable, Optional
 
 import rpyc
 from loguru import logger
 from rpyc.utils.server import ThreadedServer
-from terminaltables.terminal_io import terminal_size
 
 from flexget import terminal
 from flexget.log import capture_logs
 from flexget.options import get_parser
-from flexget.terminal import capture_console, console
 
 logger = logger.bind(name='ipc')
 
@@ -79,27 +77,21 @@ class DaemonService(rpyc.Service):
                 # TODO: Not sure how to properly propagate the exit code back to client
                 logger.debug('Parsing cli args caused system exit with status {}.', e.code)
             return
-        # Saving original terminal size to restore after monkeypatch
-        original_terminal_info = terminal.terminal_info
-        # Monkeypatching terminal_size so it'll work using IPC
-        terminal.terminal_info = self._conn.root.terminal_info
         context_managers = []
         # Don't capture any output when used with --cron
         if not options.cron:
-            context_managers.append(capture_console(self.client_out_stream))
+            # Monkeypatch the console function to be the one from the client
+            # This means decisions about color formatting, and table sizes can be delayed and
+            # decided based on the client terminal capabilities.
+            context_managers.append(
+                unittest.mock.patch('flexget.terminal._patchable_console', self._conn.root.console)
+            )
             if options.loglevel != 'NONE':
                 context_managers.append(capture_logs(self.client_log_sink, level=options.loglevel))
-        try:
-            with contextlib.ExitStack() as stack:
-                for cm in context_managers:
-                    stack.enter_context(cm)
-                self.manager.handle_cli(options)
-        finally:
-            # Restoring original terminal_size value
-            terminal.terminal_info = original_terminal_info
-
-    def client_console(self, text):
-        self._conn.root.console(text)
+        with contextlib.ExitStack() as stack:
+            for cm in context_managers:
+                stack.enter_context(cm)
+            self.manager.handle_cli(options)
 
     @property
     def client_out_stream(self):
@@ -123,10 +115,8 @@ class ClientService(rpyc.Service):
         return IPC_VERSION
 
     def exposed_console(self, text, *args, **kwargs):
-        console(text, *args, **kwargs)
-
-    def exposed_terminal_info(self):
-        return {'size': terminal_size(), 'isatty': sys.stdout.isatty()}
+        text = rpyc.classic.obtain(text)
+        terminal.console(text, *args, **kwargs)
 
     def exposed_log_sink(self, message):
         message = rpyc.classic.obtain(message)

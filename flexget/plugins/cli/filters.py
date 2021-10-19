@@ -2,24 +2,19 @@ import inspect
 
 from flexget import options
 from flexget.event import event
-from flexget.terminal import TerminalTable, TerminalTableError, console, table_parser
+from flexget.terminal import TerminalTable, console, table_parser
 from flexget.utils.template import get_filters
 
 
 def do_cli(manager, options):
     header = ['Name', 'Description']
-    table_data = [header]
+    table = TerminalTable(*header, table_type=options.table_type, show_lines=True)
     for filter_name, filter in get_filters().items():
         if options.name and not options.name in filter_name:
             continue
         filter_doc = inspect.getdoc(filter) or ''
-        table_data.append([filter_name, filter_doc])
-    try:
-        table = TerminalTable(options.table_type, table_data)
-    except TerminalTableError as e:
-        console('ERROR: %s' % str(e))
-    else:
-        console(table.output)
+        table.add_row(filter_name, filter_doc)
+    console(table)
 
 
 @event('options.register')
