@@ -22,9 +22,9 @@ black==21.9b0
     # via -r dev-requirements.in
 bleach==4.1.0
     # via readme-renderer
-boto3==1.18.64
+boto3==1.18.65
     # via -r dev-requirements.in
-botocore==1.21.64
+botocore==1.21.65
     # via
     #   boto3
     #   s3transfer
@@ -55,7 +55,7 @@ colorama==0.4.4
     #   sphinx
     #   tqdm
     #   twine
-coverage==5.5
+coverage[toml]==6.0.2
     # via
     #   -r dev-requirements.in
     #   pytest-cov
@@ -171,7 +171,7 @@ pytest==6.2.5
     #   pytest-cov
     #   pytest-forked
     #   pytest-xdist
-pytest-cov==2.12.1
+pytest-cov==3.0.0
     # via -r dev-requirements.in
 pytest-forked==1.3.0
     # via pytest-xdist
@@ -242,10 +242,10 @@ toml==0.10.2
     #   pre-commit
     #   pylint
     #   pytest
-    #   pytest-cov
 tomli==1.2.1
     # via
     #   black
+    #   coverage
     #   pep517
 tqdm==4.62.3
     # via twine
