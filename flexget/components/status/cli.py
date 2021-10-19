@@ -8,7 +8,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from flexget import options
 from flexget.event import event
 from flexget.manager import Session
-from flexget.terminal import TerminalTable, TerminalTableError, colorize, console, table_parser
+from flexget.terminal import TerminalTable, colorize, console, table_parser
 
 from . import db
 
@@ -24,7 +24,7 @@ def do_cli(manager, options):
 
 def do_cli_task(manager, options):
     header = ['Start', 'Duration', 'Produced', 'Accepted', 'Rejected', 'Failed', 'Abort Reason']
-    table_data = [header]
+    table = TerminalTable(*header, table_type=options.table_type)
     with Session() as session:
         try:
             task = session.query(db.StatusTask).filter(db.StatusTask.name == options.task).one()
@@ -43,23 +43,16 @@ def do_cli_task(manager, options):
                 else:
                     duration = '?'
 
-                table_data.append(
-                    [
-                        start,
-                        duration,
-                        ex.produced,
-                        ex.accepted,
-                        ex.rejected,
-                        ex.failed,
-                        ex.abort_reason if ex.abort_reason is not None else '',
-                    ]
+                table.add_row(
+                    start,
+                    duration,
+                    ex.produced,
+                    str(ex.accepted),
+                    str(ex.rejected),
+                    str(ex.failed),
+                    ex.abort_reason if ex.abort_reason is not None else '',
                 )
-
-    try:
-        table = TerminalTable(options.table_type, table_data)
-        console(table.output)
-    except TerminalTableError as e:
-        console('ERROR: %s' % str(e))
+    console(table)
 
 
 def do_cli_summary(manager, options):
@@ -73,7 +66,7 @@ def do_cli_summary(manager, options):
         'Failed',
         'Duration',
     ]
-    table_data = [header]
+    table = TerminalTable(*header, table_type=options.table_type)
 
     with Session() as session:
         for task in session.query(db.StatusTask).all():
@@ -105,24 +98,18 @@ def do_cli_summary(manager, options):
                 else '-'
             )
 
-            table_data.append(
-                [
-                    task.name,
-                    last_exec,
-                    last_success,
-                    ok.produced if ok is not None else '-',
-                    ok.accepted if ok is not None else '-',
-                    ok.rejected if ok is not None else '-',
-                    ok.failed if ok is not None else '-',
-                    '%1.fs' % duration.total_seconds() if duration is not None else '-',
-                ]
+            table.add_row(
+                task.name,
+                last_exec,
+                last_success,
+                str(ok.produced) if ok is not None else '-',
+                str(ok.accepted) if ok is not None else '-',
+                str(ok.rejected) if ok is not None else '-',
+                str(ok.failed) if ok is not None else '-',
+                '%1.fs' % duration.total_seconds() if duration is not None else '-',
             )
 
-    table = TerminalTable(options.table_type, table_data)
-    try:
-        console(table.output)
-    except TerminalTableError as e:
-        console('ERROR: %s' % str(e))
+    console(table)
 
 
 @event('options.register')
