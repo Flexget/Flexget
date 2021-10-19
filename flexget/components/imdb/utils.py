@@ -296,7 +296,7 @@ class ImdbParser:
                 'IMDB parser needs updating, imdb format changed. Please report on Github.'
             )
 
-        data = json.loads(soup.find('script', {'type': 'application/ld+json'}).text)
+        data = json.loads(soup.find('script', {'type': 'application/ld+json'}).string)
 
         if not data:
             raise plugin.PluginError(
