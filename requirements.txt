@@ -147,7 +147,7 @@ six==1.15.0
     #   python-dateutil
 soupsieve==2.2.1
     # via beautifulsoup4
-sqlalchemy==1.4.22
+sqlalchemy==1.4.25
     # via -r requirements.in
 tempora==4.0.2
     # via portend
