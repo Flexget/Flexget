@@ -104,8 +104,6 @@ plumbum==1.7.0
     # via rpyc
 portend==3.0.0
     # via cherrypy
-progressbar==2.5
-    # via -r requirements.in
 psutil==5.8.0
     # via -r requirements.in
 pygments==2.10.0
