@@ -3,6 +3,7 @@ from collections import defaultdict
 from datetime import datetime
 
 from loguru import logger
+from rich.progress import track
 
 import flexget.components.archive.db
 from flexget import options
@@ -41,18 +42,14 @@ def consolidate():
         logger.verbose('Found {} items to migrate, this can be aborted with CTRL-C safely.', count)
 
         # consolidate old data
-        from progressbar import ETA, Bar, Percentage, ProgressBar
-
-        widgets = ['Process - ', ETA(), ' ', Percentage(), ' ', Bar(left='[', right=']')]
-        bar = ProgressBar(widgets=widgets, maxval=count).start()
-
         # id's for duplicates
         duplicates = []
 
-        for index, orig in enumerate(
-            session.query(flexget.components.archive.db.ArchiveEntry).yield_per(5)
+        for orig in track(
+            session.query(flexget.components.archive.db.ArchiveEntry).yield_per(5),
+            total=count,
+            description='Processing...',
         ):
-            bar.update(index)
 
             # item already processed
             if orig.id in duplicates:

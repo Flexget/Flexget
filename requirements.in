@@ -6,6 +6,8 @@ html5lib>=0.11
 jinja2~=3.0
 jsonschema>=2.0, <4.0  # jsonschema 4.0 requires python 3.7+ We can switch to that when we drop 3.6 support
 loguru>=0.4.1
+more-itertools
+psutil>=5.8.0
 pynzb
 pyrss2gen
 python-dateutil
@@ -23,8 +25,5 @@ flask-login>=0.4.0
 flask-restful>=0.3.3
 flask-restx==0.5.1
 flask>=0.7
-more-itertools
-progressbar==2.5
-psutil>=5.8.0
 pyparsing>=2.4.7
 zxcvbn-python
