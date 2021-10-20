@@ -1,21 +1,20 @@
 import datetime
 from datetime import timedelta
 
-from colorclass.toggles import disable_all_colors
 from sqlalchemy import desc
 from sqlalchemy.orm.exc import NoResultFound
 
 from flexget import options
 from flexget.event import event
 from flexget.manager import Session
-from flexget.terminal import TerminalTable, colorize, console, table_parser
+from flexget.terminal import TerminalTable, colorize, console, disable_colors, table_parser
 
 from . import db
 
 
 def do_cli(manager, options):
     if options.table_type == 'porcelain':
-        disable_all_colors()
+        disable_colors()
     if options.task:
         do_cli_task(manager, options)
     else:

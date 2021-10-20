@@ -1,17 +1,16 @@
-from colorclass.toggles import disable_all_colors
 from loguru import logger
 
 from flexget import options
 from flexget.event import event
 from flexget.plugin import get_plugins
-from flexget.terminal import TerminalTable, colorize, console, table_parser
+from flexget.terminal import TerminalTable, colorize, console, disable_colors, table_parser
 
 logger = logger.bind(name='plugins')
 
 
 def plugins_summary(manager, options):
     if options.table_type == 'porcelain':
-        disable_all_colors()
+        disable_colors()
     header = ['Keyword', 'Interfaces', 'Phases', 'Flags']
     table = TerminalTable(*header, table_type=options.table_type)
     for plugin in sorted(get_plugins(phase=options.phase, interface=options.interface)):

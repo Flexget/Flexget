@@ -1,10 +1,8 @@
 from argparse import ArgumentParser
 
-from colorclass.toggles import disable_all_colors
-
 from flexget import options
 from flexget.event import event
-from flexget.terminal import TerminalTable, colorize, console, table_parser
+from flexget.terminal import TerminalTable, colorize, console, disable_colors, table_parser
 
 try:
     from irc_bot.simple_irc_bot import IRCChannelStatus, SimpleIRCBot
@@ -21,7 +19,7 @@ def do_cli(manager, options):
         return
 
     if hasattr(options, 'table_type') and options.table_type == 'porcelain':
-        disable_all_colors()
+        disable_colors()
 
     action_map = {'status': action_status, 'restart': action_restart, 'stop': action_stop}
 

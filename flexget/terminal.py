@@ -154,6 +154,9 @@ def colorize(color: str, text: str) -> str:
 
 
 def disable_colors():
+    """
+    Disables colors to the terminal.
+    """
     rich_console.no_color = True
 
 
