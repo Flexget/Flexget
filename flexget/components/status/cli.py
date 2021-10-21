@@ -22,7 +22,7 @@ def do_cli(manager, options):
 
 
 def do_cli_task(manager, options):
-    header = ['Start', 'Duration', 'Produced', 'Accepted', 'Rejected', 'Failed', 'Abort Reason']
+    header = ['Start', 'Duration', 'Entries', 'Accepted', 'Rejected', 'Failed', 'Abort Reason']
     table = TerminalTable(*header, table_type=options.table_type)
     with Session() as session:
         try:
@@ -59,7 +59,7 @@ def do_cli_summary(manager, options):
         'Task',
         'Last execution',
         'Last success',
-        'Produced',
+        'Entries',
         'Accepted',
         'Rejected',
         'Failed',
