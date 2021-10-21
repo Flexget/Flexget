@@ -1,4 +1,5 @@
 import difflib
+import html
 import json
 import random
 import re
@@ -304,7 +305,7 @@ class ImdbParser:
             )
 
         # Parse stuff from the title-overview section
-        name_elem = data['name']
+        name_elem = html.unescape(data['name'])
         if name_elem:
             self.name = name_elem.strip()
         else:
