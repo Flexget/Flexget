@@ -76,8 +76,8 @@ class LogFilter(object):
         for filt in config:
             filt.setdefault('task', task.name)
         task.log_filter = MyFilter(config)
-        log.add_filter(task.log_filter)
         logger.debug('Log filter added (config: {})', config)
+        log.add_filter(task.log_filter)
 
     @plugin.priority(-255)
     def on_task_exit(self, task, config):
