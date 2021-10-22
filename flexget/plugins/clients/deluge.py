@@ -229,6 +229,7 @@ class OutputDeluge(DelugePlugin):
                     'hide_sparse_files': {'type': 'boolean'},
                     'enabled': {'type': 'boolean'},
                     'container_directory': {'type': 'string'},
+                    'force_recheck': {'type': 'boolean'},
                 },
                 'additionalProperties': False,
             },
@@ -252,6 +253,7 @@ class OutputDeluge(DelugePlugin):
         config.setdefault(
             'hide_sparse_files', False
         )  # does nothing without 'main_file_only' enabled
+        config.setdefault('force_recheck', False)
         return config
 
     def __init__(self):
@@ -371,6 +373,7 @@ class OutputDeluge(DelugePlugin):
                 ),
                 'keep_subs': entry.get('keep_subs', config.get('keep_subs', True)),
                 'container_directory': config.get('container_directory', ''),
+                'force_recheck': entry.get('force_recheck', config.get('force_recheck')),
             }
             try:
                 label = entry.render(entry.get('label') or config['label'])
@@ -698,6 +701,10 @@ class OutputDeluge(DelugePlugin):
                     'container_directory specified however the torrent {} does not have a directory structure; skipping folder rename',
                     entry['title'],
                 )
+
+        if opts.get('force_recheck'):
+            client.call('core.force_recheck', [torrent_id])
+            logger.debug('Forced a data recheck on {}', entry['title'])
 
 
 @event('plugin.register')

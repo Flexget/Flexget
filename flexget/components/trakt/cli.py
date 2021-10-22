@@ -1,7 +1,7 @@
 from flexget import options, plugin
 from flexget.event import event
 from flexget.manager import Session
-from flexget.terminal import TerminalTable, TerminalTableError, console, table_parser
+from flexget.terminal import TerminalTable, console, table_parser
 
 from . import db
 
@@ -29,22 +29,16 @@ def action_list(options):
                 console('No trakt authorizations stored in database.')
                 return
             header = ['Account', 'Created', 'Expires']
-            table_data = [header]
+            table = TerminalTable(*header, table_type=options.table_type)
 
             for auth in accounts:
-                table_data.append(
-                    [
-                        auth.account,
-                        auth.created.strftime('%Y-%m-%d'),
-                        auth.expires.strftime('%Y-%m-%d'),
-                    ]
+                table.add_row(
+                    auth.account,
+                    auth.created.strftime('%Y-%m-%d'),
+                    auth.expires.strftime('%Y-%m-%d'),
                 )
-            try:
-                table = TerminalTable(options.table_type, table_data)
-                console(table.output)
-                return
-            except TerminalTableError as e:
-                console('ERROR: %s' % str(e))
+            console(table)
+            return
 
         # Show a specific account
         acc = (

@@ -1,7 +1,7 @@
 from flexget import options, plugin
 from flexget.event import event
 from flexget.manager import Session
-from flexget.terminal import TerminalTable, TerminalTableError, console, table_parser
+from flexget.terminal import TerminalTable, console, table_parser
 
 from . import db
 
@@ -23,17 +23,12 @@ def list_rejected(options):
     with Session() as session:
         results = session.query(db.RememberEntry).all()
         header = ['#', 'Title', 'Task', 'Rejected by', 'Reason']
-        table_data = [header]
+        table = TerminalTable(*header, table_type=options.table_type)
         for entry in results:
-            table_data.append(
-                [entry.id, entry.title, entry.task.name, entry.rejected_by, entry.reason or '']
+            table.add_row(
+                str(entry.id), entry.title, entry.task.name, entry.rejected_by, entry.reason or ''
             )
-    try:
-        table = TerminalTable(options.table_type, table_data)
-        table.table.justify_columns[0] = 'center'
-        console(table.output)
-    except TerminalTableError as e:
-        console('ERROR: %s' % str(e))
+    console(table)
 
 
 def clear_rejected(manager):

@@ -30,7 +30,12 @@ class EstimateRelease:
             estimate = estimator(entry)
             # return first successful estimation
             if estimate is not None:
-                return estimate
+                estimation = estimate
+                break
+        else:
+            estimation = {'data_exists': False, 'entity_date': None}
+
+        return estimation
 
 
 @event('plugin.register')

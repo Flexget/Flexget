@@ -1,6 +1,5 @@
 from collections.abc import Iterable
 
-from jsonschema.compat import str_types
 from loguru import logger
 
 from flexget import plugin
@@ -144,11 +143,11 @@ class FromIMDB:
         config.setdefault('max_entries', 200)
         config.setdefault('match_type', 'strict')
 
-        if isinstance(config.get('content_types'), str_types):
+        if isinstance(config.get('content_types'), str):
             logger.debug('Converted content type from string to list.')
             config['content_types'] = [config['content_types']]
 
-        if isinstance(config['job_types'], str_types):
+        if isinstance(config['job_types'], str):
             logger.debug('Converted job type from string to list.')
             config['job_types'] = [config['job_types']]
         # Special case in case user meant to add actress instead of actor (different job types in IMDB)

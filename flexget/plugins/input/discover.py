@@ -87,7 +87,11 @@ class Discover:
             'interval': {'type': 'string', 'format': 'interval', 'default': '5 hours'},
             'release_estimations': {
                 'oneOf': [
-                    {'type': 'string', 'default': 'strict', 'enum': ['loose', 'strict', 'ignore']},
+                    {
+                        'type': 'string',
+                        'default': 'strict',
+                        'enum': ['loose', 'strict', 'ignore', 'smart'],
+                    },
                     {
                         'type': 'object',
                         'properties': {'optimistic': {'type': 'string', 'format': 'interval'}},
@@ -180,12 +184,29 @@ class Discover:
         estimator = plugin.get('estimate_release', self)
         result = []
         for entry in entries:
-            est_date = estimator.estimate(entry)
+            estimation = estimator.estimate(entry)
+
+            est_date = estimation['entity_date']
+            data_exists = estimation['data_exists']
+
             if est_date is None:
-                logger.debug('No release date could be determined for {}', entry['title'])
                 if estimation_mode['mode'] == 'strict':
+                    logger.debug('No release date could be determined for {}', entry['title'])
                     entry.reject('has no release date')
                     entry.complete()
+                elif estimation_mode['mode'] == 'smart' and data_exists:
+                    logger.debug(
+                        'No release date could be determined for {}, but exists data',
+                        entry['title'],
+                    )
+                    entry.reject('exists but has no release date')
+                    entry.complete()
+                elif estimation_mode['mode'] == 'smart' and not data_exists:
+                    logger.debug(
+                        'Discovering because mode is \'{}\' and no data is found for entry',
+                        estimation_mode['mode'],
+                    )
+                    result.append(entry)
                 else:
                     result.append(entry)
                 continue

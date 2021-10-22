@@ -343,6 +343,9 @@ class TraktSet(MutableSet):
                 )
                 if not submit:
                     endpoint += (self.config['type'],)
+                    # Watched shows has a different endpoint for submitting and getting
+                    if self.config['list'] == 'watched' and self.config['type'] == 'shows':
+                        endpoint = ('sync', 'watched', 'shows')
             else:
                 endpoint = (
                     'users',
