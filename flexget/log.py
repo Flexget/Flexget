@@ -1,3 +1,4 @@
+import codecs
 import collections
 import contextlib
 import functools
@@ -9,7 +10,7 @@ import sys
 import threading
 import uuid
 import warnings
-from typing import Deque, Iterator, List, Optional, Union
+from typing import Callable, Deque, Iterator, List, Optional, Union
 
 import colorama
 import loguru
@@ -98,6 +99,22 @@ _startup_buffer_id: Optional[int] = None
 _logging_started = False
 # Stores the last 100 debug messages
 debug_buffer: Deque['loguru.Message'] = collections.deque(maxlen=100)
+_log_filters = []  # Stores filter functions
+
+
+def _log_filterer(record):
+    """This is the function we add to our loguru handlers. It will dynamically use all filters we add later."""
+    return all(f(record) for f in _log_filters)
+
+
+def add_filter(func: Callable[['loguru.Record'], bool]):
+    """Adds a filter function to the log handlers."""
+    _log_filters.append(func)
+
+
+def remove_filter(func: Callable[['loguru.Record'], bool]):
+    """Removes a filter function from the log handlers."""
+    _log_filters.remove(func)
 
 
 def initialize(unit_test: bool = False) -> None:
@@ -168,6 +185,7 @@ def start(
             retention=int(os.environ.get(ENV_MAXCOUNT, 9)),
             encoding='utf-8',
             format=LOG_FORMAT,
+            filter=_log_filterer,
         )
 
     # without --cron we log to console
@@ -187,7 +205,7 @@ def start(
                     out = colorama.AnsiToWin32(
                         out, convert=True, strip=False, autoreset=False
                     ).stream
-            logger.add(out, level=level, format=LOG_FORMAT)
+            logger.add(out, level=level, format=LOG_FORMAT, filter=_log_filterer)
 
     # flush what we have stored from the plugin initialization
     global _startup_buffer, _startup_buffer_id
