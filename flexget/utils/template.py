@@ -5,7 +5,7 @@ import re
 from contextlib import suppress
 from copy import copy
 from datetime import date, datetime, time
-from typing import TYPE_CHECKING, Any, List, Mapping, Optional, Union, AnyStr, Type, cast
+from typing import TYPE_CHECKING, Any, AnyStr, List, Mapping, Optional, Type, Union, cast
 
 import jinja2.filters
 from dateutil import parser as dateutil_parse
@@ -64,6 +64,8 @@ def filter_pathdir(val: Optional[str]) -> str:
 
 def filter_pathscrub(val: str, os_mode: str = None) -> str:
     """Replace problematic characters in a path."""
+    if not isinstance(val, str):
+        return val
     return pathscrub(val, os_mode)
 
 
