@@ -14,7 +14,7 @@ URL = 'https://apibay.org'
 LISTS = ['top', 'top48h', 'recent']
 
 # from lowest to highest, selecting a rank automatically accept higher ranks
-RANKS = ['all', 'member', 'vip', 'trusted', 'supermod']
+RANKS = ['all', 'user', 'trusted', 'vip', 'helper', 'moderator', 'supermod']
 
 CATEGORIES = {
     'All': 0,
