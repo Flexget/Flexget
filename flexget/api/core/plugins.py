@@ -1,7 +1,7 @@
 from math import ceil
-from typing import List, Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING, List, Optional
 
-from flask import jsonify, request, Response
+from flask import Response, jsonify, request
 from flask_restx import inputs
 from loguru import logger
 from sqlalchemy.orm import Session
@@ -100,7 +100,7 @@ class PluginsAPI(APIResource):
     @api.response(NotFoundError)
     @api.doc(parser=plugins_parser)
     def get(self, session: Session = None) -> Response:
-        """ Get list of registered plugins """
+        """Get list of registered plugins"""
         args = plugins_parser.parse_args()
 
         # Pagination and sorting params
@@ -154,7 +154,7 @@ class PluginAPI(APIResource):
     @api.response(200, model=plugin_schema)
     @api.doc(parser=plugin_parser, params={'plugin_name': 'Name of the plugin to return'})
     def get(self, plugin_name: str, session=None):
-        """ Return plugin data by name"""
+        """Return plugin data by name"""
         args = plugin_parser.parse_args()
         try:
             plugin = get_plugin_by_name(plugin_name, issued_by='plugins API')

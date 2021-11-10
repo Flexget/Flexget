@@ -1,4 +1,4 @@
-from flask import jsonify, request, Response
+from flask import Response, jsonify, request
 from flask_login import current_user
 from sqlalchemy.orm import Session
 
@@ -39,7 +39,7 @@ class UserManagementAPI(APIResource):
         'See https://github.com/dropbox/zxcvbn for details'
     )
     def put(self, session: Session = None) -> Response:
-        """ Change user password """
+        """Change user password"""
         user = current_user
         data = request.json
         try:
@@ -61,6 +61,6 @@ class UserManagementTokenAPI(APIResource):
     @api.response(200, 'Successfully changed user token', user_token_response_schema)
     @api.doc(description='Get new user token')
     def put(self, session: Session = None) -> Response:
-        """ Change current user token """
+        """Change current user token"""
         token = generate_token(username=current_user.name, session=session)
         return jsonify({'token': token})
