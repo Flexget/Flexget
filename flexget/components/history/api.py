@@ -49,7 +49,7 @@ class HistoryAPI(APIResource):
     @api.response(NotFoundError)
     @api.response(200, model=history_list_schema)
     def get(self, session=None):
-        """ List of previously accepted entries """
+        """List of previously accepted entries"""
         args = history_parser.parse_args()
 
         # Pagination and sorting params

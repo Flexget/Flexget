@@ -596,8 +596,10 @@ class Task:
         :param str plugin: Plugin name
         :param str reason: Why the rerun is done
         """
-        msg = 'Plugin {0} has requested task to be ran again after execution has completed.'.format(
-            self.current_plugin if plugin is None else plugin
+        msg = (
+            'Plugin {0} has requested task to be ran again after execution has completed.'.format(
+                self.current_plugin if plugin is None else plugin
+            )
         )
         if reason:
             msg += ' Reason: {0}'.format(reason)

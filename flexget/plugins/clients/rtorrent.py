@@ -1,9 +1,9 @@
 import os
 import re
 import socket
+from datetime import datetime
 from io import BytesIO
 from time import sleep
-from datetime import datetime
 from urllib.parse import urljoin, urlparse, urlsplit
 from xmlrpc import client as xmlrpc_client
 
@@ -162,7 +162,7 @@ def create_proxy(url):
 
 
 class RTorrent:
-    """ rTorrent API client """
+    """rTorrent API client"""
 
     default_fields = (
         'hash',
@@ -292,7 +292,7 @@ class RTorrent:
         return self._server.get_directory()
 
     def torrent(self, info_hash, fields=None):
-        """ Get the details of a torrent """
+        """Get the details of a torrent"""
         if not fields:
             fields = list(self.default_fields)
 
@@ -657,7 +657,7 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
             logger.warning('Failed to verify torrent {} loaded: {}', entry['title'], str(e))
 
     def on_task_learn(self, task, config):
-        """ Make sure all temp files are cleaned up when entries are learned """
+        """Make sure all temp files are cleaned up when entries are learned"""
         # If download plugin is enabled, it will handle cleanup.
         if 'download' not in task.config:
             download = plugin.get('download', self)
@@ -710,7 +710,7 @@ class RTorrentInputPlugin(RTorrentPluginBase):
 
             for attr, value in torrent.items():
                 entry[attr] = value
-            
+
             if 'timestamp_finished' in entry:
                 entry['timestamp_finished'] = datetime.fromtimestamp(entry['timestamp_finished'])
 

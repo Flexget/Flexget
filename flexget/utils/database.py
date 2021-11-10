@@ -1,10 +1,10 @@
 import functools
 from datetime import datetime
-from typing import List, Union, Optional, Any
+from typing import Any, List, Optional, Union
 
 from sqlalchemy import extract, func
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
-from sqlalchemy.orm import synonym, SynonymProperty
+from sqlalchemy.orm import SynonymProperty, synonym
 
 from flexget.entry import Entry
 from flexget.manager import Session

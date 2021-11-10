@@ -4,8 +4,8 @@ import re
 from loguru import logger
 from requests.exceptions import HTTPError, RequestException
 
-from flexget.config_schema import one_or_more
 from flexget import plugin
+from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
 
