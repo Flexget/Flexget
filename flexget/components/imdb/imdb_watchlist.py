@@ -30,7 +30,7 @@ TITLE_TYPE_MAP = {
 
 
 class ImdbWatchlist:
-    """"Creates an entry for each movie in your imdb list."""
+    """ "Creates an entry for each movie in your imdb list."""
 
     schema = {
         'type': 'object',
@@ -178,7 +178,9 @@ class ImdbWatchlist:
         page = self.fetch_page(task, url, params, headers)
         soup = get_soup(page.text)
         try:
-            item_text = soup.find('div', {'class': ['lister-list-length', 'lister-total-num-results']}).text.split()
+            item_text = soup.find(
+                'div', {'class': ['lister-list-length', 'lister-total-num-results']}
+            ).text.split()
             total_item_count = int(item_text[0].replace(',', ''))
             logger.verbose('imdb list contains {} items', total_item_count)
         except AttributeError:

@@ -25,7 +25,7 @@ class CachedResource(APIResource):
     @api.response(APIError)
     @api.doc(parser=cached_parser)
     def get(self, session: Session = None) -> Response:
-        """ Cache remote resources """
+        """Cache remote resources"""
         args = cached_parser.parse_args()
         url = args.get('url')
         force = args.get('force')
