@@ -1,4 +1,5 @@
 import pytest
+
 from flexget.components.managed_lists.lists.radarr_list import RadarrAPIService
 
 RADARR_API_KEY = '65e246ce581a426781e1a8645f0a1f2c'

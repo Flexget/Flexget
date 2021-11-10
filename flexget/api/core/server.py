@@ -8,7 +8,7 @@ import threading
 import traceback
 from pathlib import Path
 from time import sleep
-from typing import Dict, IO, Generator
+from typing import IO, Dict, Generator
 from typing import Optional as OptionalType
 
 import cherrypy
@@ -33,7 +33,7 @@ from pyparsing import (
     restOfLine,
 )
 from sqlalchemy.orm import Session
-from yaml.error import YAMLError, MarkedYAMLError
+from yaml.error import MarkedYAMLError, YAMLError
 
 from flexget._version import __version__
 from flexget.api import APIResource, api
@@ -135,7 +135,7 @@ class ServerReloadAPI(APIResource):
     @api.response(502, model=config_validation_schema, description='Config validation error')
     @api.response(200, model=base_message_schema)
     def post(self, session: Session = None) -> Response:
-        """ Manage server operations """
+        """Manage server operations"""
         data = request.json
         if data['operation'] == 'reload':
             try:
@@ -170,7 +170,7 @@ class ServerReloadAPI(APIResource):
 class ServerPIDAPI(APIResource):
     @api.response(200, description='Reloaded config', model=pid_schema)
     def get(self, session: Session = None) -> Response:
-        """ Get server PID """
+        """Get server PID"""
         return jsonify({'pid': os.getpid()})
 
 
@@ -179,7 +179,7 @@ class ServerConfigAPI(APIResource):
     @etag
     @api.response(200, description='Flexget config', model=empty_response)
     def get(self, session: Session = None) -> Response:
-        """ Get Flexget Config in JSON form"""
+        """Get Flexget Config in JSON form"""
         return jsonify(self.manager.config)
 
 
@@ -191,7 +191,7 @@ class ServerRawConfigAPI(APIResource):
         200, model=raw_config_schema, description='Flexget raw YAML config file encoded in Base64'
     )
     def get(self, session: Session = None) -> Response:
-        """ Get raw YAML config file """
+        """Get raw YAML config file"""
         with open(self.manager.config_path, 'r', encoding='utf-8') as f:
             raw_config = base64.b64encode(f.read().encode("utf-8"))
         return jsonify(raw_config=raw_config.decode('utf-8'))
@@ -205,7 +205,7 @@ class ServerRawConfigAPI(APIResource):
         ' be loaded and saved to original file.'
     )
     def post(self, session: Session = None) -> Response:
-        """ Update config """
+        """Update config"""
         config = {}
         data = request.json
         try:
@@ -263,7 +263,7 @@ class ServerRawConfigAPI(APIResource):
 class ServerVersionAPI(APIResource):
     @api.response(200, description='Flexget version', model=version_schema)
     def get(self, session: Session = None) -> Response:
-        """ Flexget Version """
+        """Flexget Version"""
         latest = get_latest_flexget_version_number()
         return jsonify(
             {
@@ -278,7 +278,7 @@ class ServerVersionAPI(APIResource):
 class ServerDumpThreads(APIResource):
     @api.response(200, description='Flexget threads dump', model=dump_threads_schema)
     def get(self, session: Session = None) -> Response:
-        """ Dump Server threads for debugging """
+        """Dump Server threads for debugging"""
         id2name = dict([(th.ident, th.name) for th in threading.enumerate()])
         threads = []
         for threadId, stack in sys._current_frames().items():
@@ -352,7 +352,7 @@ class ServerLogAPI(APIResource):
     @api.doc(parser=server_log_parser)
     @api.response(200, description='Streams as line delimited JSON')
     def get(self, session: Session = None) -> Response:
-        """ Stream Flexget log Streams as line delimited JSON """
+        """Stream Flexget log Streams as line delimited JSON"""
         args = server_log_parser.parse_args()
 
         def follow(lines, search):

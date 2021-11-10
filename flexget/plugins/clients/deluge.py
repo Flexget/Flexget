@@ -484,7 +484,7 @@ class OutputDeluge(DelugePlugin):
         client.disconnect()
 
     def on_task_learn(self, task, config):
-        """ Make sure all temp files are cleaned up when entries are learned """
+        """Make sure all temp files are cleaned up when entries are learned"""
         # If download plugin is enabled, it will handle cleanup.
         if 'download' not in task.config:
             download = plugin.get('download', self)

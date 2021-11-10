@@ -7,7 +7,7 @@ from urllib.parse import quote_plus
 
 from loguru import logger
 from sqlalchemy import Column, DateTime, Integer, String, Table, func, sql
-from sqlalchemy.orm import relation, Session
+from sqlalchemy.orm import Session, relation
 from sqlalchemy.schema import ForeignKey, Index
 
 from flexget import db_schema, plugin
