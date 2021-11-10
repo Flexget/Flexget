@@ -7,7 +7,7 @@ Also allows date and datetime objects to be encoded/decoded.
 import datetime
 from collections.abc import Iterable, Mapping
 from contextlib import suppress
-from typing import Union, Any
+from typing import Any, Union
 
 from flexget.plugin import DependencyError
 

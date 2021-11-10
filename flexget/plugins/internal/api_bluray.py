@@ -1,12 +1,12 @@
 import time
 from datetime import date, datetime, timedelta
-from typing import Dict, Any, Optional
+from typing import Any, Dict, Optional
 
 from dateutil.parser import parse as dateutil_parse
 from loguru import logger
 from sqlalchemy import Column, Date, DateTime, Float, Integer, Table, Unicode, func
 from sqlalchemy.ext.associationproxy import association_proxy
-from sqlalchemy.orm import relation, Session
+from sqlalchemy.orm import Session, relation
 from sqlalchemy.schema import ForeignKey
 
 from flexget import db_schema, plugin

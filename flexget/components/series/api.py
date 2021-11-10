@@ -226,7 +226,7 @@ class SeriesAPI(APIResource):
     @api.response(NotFoundError)
     @api.doc(parser=series_list_parser, description="Get a  list of Flexget's shows in DB")
     def get(self, session=None):
-        """ List existing shows """
+        """List existing shows"""
         args = series_list_parser.parse_args()
 
         # Filter params
@@ -310,7 +310,7 @@ class SeriesAPI(APIResource):
     @api.response(Conflict)
     @api.validate(series_input_schema, description=ep_identifier_doc)
     def post(self, session):
-        """ Create a new show and set its first accepted episode and/or alternate names """
+        """Create a new show and set its first accepted episode and/or alternate names"""
         data = request.json
         series_name = data.get('name')
 
@@ -347,7 +347,7 @@ class SeriesGetShowsAPI(APIResource):
     @api.response(200, 'Show list retrieved successfully', series_list_schema)
     @api.doc(params={'name': 'Name of the show(s) to search'}, parser=base_series_parser)
     def get(self, name, session):
-        """ List of shows matching lookup name """
+        """List of shows matching lookup name"""
         name = normalize_series_name(name)
         matches = db.shows_by_name(name, session=session)
 
@@ -380,7 +380,7 @@ class SeriesShowAPI(APIResource):
     @api.response(200, 'Show information retrieved successfully', show_details_schema)
     @api.doc(description='Get a specific show using its ID', parser=base_series_parser)
     def get(self, show_id, session):
-        """ Get show details by ID """
+        """Get show details by ID"""
         try:
             show = db.show_by_id(show_id, session=session)
         except NoResultFound:
@@ -395,7 +395,7 @@ class SeriesShowAPI(APIResource):
     @api.response(200, 'Removed series from DB', model=base_message_schema)
     @api.doc(description='Delete a specific show using its ID', parser=delete_parser)
     def delete(self, show_id, session):
-        """ Remove series from DB """
+        """Remove series from DB"""
         try:
             show = db.show_by_id(show_id, session=session)
         except NoResultFound:
@@ -417,7 +417,7 @@ class SeriesShowAPI(APIResource):
         'the existing names (if name does not belong to a different show).'
     )
     def put(self, show_id, session):
-        """ Set the initial episode of an existing show """
+        """Set the initial episode of an existing show"""
         try:
             show = db.show_by_id(show_id, session=session)
         except NoResultFound:
@@ -450,7 +450,7 @@ class SeriesSeasonsAPI(APIResource):
     @api.response(200, 'Seasons retrieved successfully for show', season_list_schema)
     @api.doc(description='Get all show seasons via its ID', parser=entity_parser)
     def get(self, show_id, session):
-        """ Get seasons by show ID """
+        """Get seasons by show ID"""
         args = entity_parser.parse_args()
 
         # Pagination and sorting params
@@ -508,7 +508,7 @@ class SeriesSeasonsAPI(APIResource):
         parser=delete_parser,
     )
     def delete(self, show_id, session):
-        """ Deletes all seasons of a show"""
+        """Deletes all seasons of a show"""
         try:
             show = db.show_by_id(show_id, session=session)
         except NoResultFound:
@@ -529,7 +529,7 @@ class SeriesSeasonsAPI(APIResource):
     @api.response(200, 'Season retrieved successfully for show', season_schema)
     @api.doc(description='Get a specific season via its ID and show ID')
     def get(self, show_id, season_id, session):
-        """ Get season by show ID and season ID"""
+        """Get season by show ID and season ID"""
         try:
             db.show_by_id(show_id, session=session)
         except NoResultFound:
@@ -554,7 +554,7 @@ class SeriesSeasonsAPI(APIResource):
         parser=delete_parser,
     )
     def delete(self, show_id, season_id, session):
-        """ Forgets season by show ID and season ID """
+        """Forgets season by show ID and season ID"""
         try:
             show = db.show_by_id(show_id, session=session)
         except NoResultFound:
@@ -585,7 +585,7 @@ class SeriesEpisodesAPI(APIResource):
     @api.response(200, 'Episodes retrieved successfully for show', episode_list_schema)
     @api.doc(description='Get all show episodes via its ID', parser=entity_parser)
     def get(self, show_id, session):
-        """ Get episodes by show ID """
+        """Get episodes by show ID"""
         args = entity_parser.parse_args()
 
         # Pagination and sorting params
@@ -643,7 +643,7 @@ class SeriesEpisodesAPI(APIResource):
         parser=delete_parser,
     )
     def delete(self, show_id, session):
-        """ Deletes all episodes of a show"""
+        """Deletes all episodes of a show"""
         try:
             show = db.show_by_id(show_id, session=session)
         except NoResultFound:
@@ -664,7 +664,7 @@ class SeriesEpisodeAPI(APIResource):
     @api.response(200, 'Episode retrieved successfully for show', episode_schema)
     @api.doc(description='Get a specific episode via its ID and show ID')
     def get(self, show_id, ep_id, session):
-        """ Get episode by show ID and episode ID"""
+        """Get episode by show ID and episode ID"""
         try:
             db.show_by_id(show_id, session=session)
         except NoResultFound:
@@ -689,7 +689,7 @@ class SeriesEpisodeAPI(APIResource):
         parser=delete_parser,
     )
     def delete(self, show_id, ep_id, session):
-        """ Forgets episode by show ID and episode ID """
+        """Forgets episode by show ID and episode ID"""
         try:
             show = db.show_by_id(show_id, session=session)
         except NoResultFound:
@@ -742,7 +742,7 @@ class SeriesSeasonsReleasesAPI(APIResource):
         parser=release_list_parser,
     )
     def get(self, show_id, season_id, session):
-        """ Get all season releases by show ID and season ID """
+        """Get all season releases by show ID and season ID"""
         try:
             db.show_by_id(show_id, session=session)
         except NoResultFound:
@@ -820,7 +820,7 @@ class SeriesSeasonsReleasesAPI(APIResource):
         parser=release_delete_parser,
     )
     def delete(self, show_id, season_id, session):
-        """ Deletes all season releases by show ID and season ID """
+        """Deletes all season releases by show ID and season ID"""
         try:
             db.show_by_id(show_id, session=session)
         except NoResultFound:
@@ -861,7 +861,7 @@ class SeriesSeasonsReleasesAPI(APIResource):
         'again,'
     )
     def put(self, show_id, season_id, session):
-        """ Marks all downloaded season releases as not downloaded """
+        """Marks all downloaded season releases as not downloaded"""
         try:
             db.show_by_id(show_id, session=session)
         except NoResultFound:
@@ -899,7 +899,7 @@ class SeriesSeasonReleaseAPI(APIResource):
         description='Get a specific downloaded release for a specific season of a specific show'
     )
     def get(self, show_id, season_id, rel_id, session):
-        """ Get season release by show ID, season ID and release ID """
+        """Get season release by show ID, season ID and release ID"""
         try:
             db.show_by_id(show_id, session=session)
         except NoResultFound:
@@ -927,7 +927,7 @@ class SeriesSeasonReleaseAPI(APIResource):
         parser=delete_parser,
     )
     def delete(self, show_id, season_id, rel_id, session):
-        """ Delete episode release by show ID, season ID and release ID """
+        """Delete episode release by show ID, season ID and release ID"""
         try:
             db.show_by_id(show_id, session=session)
         except NoResultFound:
@@ -958,7 +958,7 @@ class SeriesSeasonReleaseAPI(APIResource):
         description='Resets the downloaded release status, clearing the quality to be downloaded again'
     )
     def put(self, show_id, season_id, rel_id, session):
-        """ Resets a downloaded release status """
+        """Resets a downloaded release status"""
         try:
             db.show_by_id(show_id, session=session)
         except NoResultFound:
@@ -1002,7 +1002,7 @@ class SeriesEpisodeReleasesAPI(APIResource):
         parser=release_list_parser,
     )
     def get(self, show_id, ep_id, session):
-        """ Get all episodes releases by show ID and episode ID """
+        """Get all episodes releases by show ID and episode ID"""
         try:
             db.show_by_id(show_id, session=session)
         except NoResultFound:
@@ -1078,7 +1078,7 @@ class SeriesEpisodeReleasesAPI(APIResource):
         parser=release_delete_parser,
     )
     def delete(self, show_id, ep_id, session):
-        """ Deletes all episodes releases by show ID and episode ID """
+        """Deletes all episodes releases by show ID and episode ID"""
         try:
             db.show_by_id(show_id, session=session)
         except NoResultFound:
@@ -1119,7 +1119,7 @@ class SeriesEpisodeReleasesAPI(APIResource):
         'again,'
     )
     def put(self, show_id, ep_id, session):
-        """ Marks all downloaded releases as not downloaded """
+        """Marks all downloaded releases as not downloaded"""
         try:
             db.show_by_id(show_id, session=session)
         except NoResultFound:
@@ -1157,7 +1157,7 @@ class SeriesEpisodeReleaseAPI(APIResource):
         description='Get a specific downloaded release for a specific episode of a specific show'
     )
     def get(self, show_id, ep_id, rel_id, session):
-        """ Get episode release by show ID, episode ID and release ID """
+        """Get episode release by show ID, episode ID and release ID"""
         try:
             db.show_by_id(show_id, session=session)
         except NoResultFound:
@@ -1185,7 +1185,7 @@ class SeriesEpisodeReleaseAPI(APIResource):
         parser=delete_parser,
     )
     def delete(self, show_id, ep_id, rel_id, session):
-        """ Delete episode release by show ID, episode ID and release ID """
+        """Delete episode release by show ID, episode ID and release ID"""
         try:
             db.show_by_id(show_id, session=session)
         except NoResultFound:
@@ -1218,7 +1218,7 @@ class SeriesEpisodeReleaseAPI(APIResource):
         description='Resets the downloaded release status, clearing the quality to be downloaded again'
     )
     def put(self, show_id, ep_id, rel_id, session):
-        """ Resets a downloaded release status """
+        """Resets a downloaded release status"""
         try:
             db.show_by_id(show_id, session=session)
         except NoResultFound:

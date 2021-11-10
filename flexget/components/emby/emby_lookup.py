@@ -1,7 +1,7 @@
 from loguru import logger
 
 from flexget import entry, plugin
-from flexget.components.emby.api_emby import EmbyAuth, EmbyApi
+from flexget.components.emby.api_emby import EmbyApi, EmbyAuth
 from flexget.components.emby.emby_util import SCHEMA_SERVER, get_field_map
 from flexget.event import event
 

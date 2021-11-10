@@ -111,4 +111,3 @@ class UrlRewriteAllyoulike:
 @event('plugin.register')
 def register_plugin():
     plugin.register(UrlRewriteAllyoulike, 'allyoulike', interfaces=['urlrewriter'], api_ver=2)
-

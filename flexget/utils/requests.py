@@ -5,7 +5,7 @@ import time
 # Allow some request objects to be imported from here instead of requests
 import warnings
 from datetime import datetime, timedelta
-from typing import Dict, Optional, Union, TYPE_CHECKING
+from typing import TYPE_CHECKING, Dict, Optional, Union
 from urllib.parse import urlparse
 from urllib.request import urlopen
 

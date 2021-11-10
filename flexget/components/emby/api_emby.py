@@ -1,20 +1,20 @@
+import copy
+import functools
+import re
 from abc import ABC, abstractmethod, abstractstaticmethod
 from collections.abc import MutableSet
 from datetime import datetime
-import re
-import copy
 from urllib.parse import urlencode
 
-import functools
-from requests.exceptions import RequestException, HTTPError
 from loguru import logger
+from requests.exceptions import HTTPError, RequestException
 
-from flexget.utils.tools import get_current_flexget_version, split_title_year, str_to_int
-from flexget.utils import requests
-from flexget.plugin import PluginError
-from flexget.entry import Entry
-from flexget.utils.simple_persistence import SimplePersistence
 from flexget.components.emby.emby_util import get_field_map, simplify_text
+from flexget.entry import Entry
+from flexget.plugin import PluginError
+from flexget.utils import requests
+from flexget.utils.simple_persistence import SimplePersistence
+from flexget.utils.tools import get_current_flexget_version, split_title_year, str_to_int
 
 persist = SimplePersistence('api_emby')
 
@@ -1258,7 +1258,7 @@ class EmbyApiPlayList(EmbyApiListBase):
 
 
 class EmbyApiMedia(EmbyApiBase):
-    """ Basic media """
+    """Basic media"""
 
     TYPE = 'unknown'
 
@@ -1589,7 +1589,7 @@ class EmbyApiMedia(EmbyApiBase):
 
     @staticmethod
     def parse_string(string: str):
-        """ Returns Relevante Information from string """
+        """Returns Relevante Information from string"""
         if not string:
             return None, None
 
@@ -1746,7 +1746,7 @@ class EmbyApiSerie(EmbyApiMedia):
 
     @staticmethod
     def parse_string(string: str, force_parse=False):
-        """ Returns Relevante Information from string """
+        """Returns Relevante Information from string"""
         if not string:
             return None, None
 
@@ -1996,7 +1996,7 @@ class EmbyApiSeason(EmbyApiMedia):
 
     @staticmethod
     def parse_string(string: str):
-        """ Returns Relevante Information from string """
+        """Returns Relevante Information from string"""
         if not string:
             return None
 
@@ -2329,7 +2329,7 @@ class EmbyApiEpisode(EmbyApiMedia):
 
     @staticmethod
     def parse_string(string: str):
-        """ Returns Relevante Information from string """
+        """Returns Relevante Information from string"""
         if not string:
             return None
 
@@ -2458,7 +2458,7 @@ class EmbyApiMovie(EmbyApiMedia):
 
     @staticmethod
     def parse_string(string: str):
-        """ Returns Relevante Information from string """
+        """Returns Relevante Information from string"""
         if not string:
             return None, None
 
