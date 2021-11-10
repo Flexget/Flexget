@@ -9,7 +9,8 @@ from urllib.parse import urlencode
 from loguru import logger
 from requests.exceptions import HTTPError, RequestException
 
-from flexget.components.emby.emby_util import get_field_map, simplify_text
+from flexget.components.emby.emby_util import get_field_map
+from flexget.components.thetvdb.api_tvdb import search_for_series
 from flexget.entry import Entry
 from flexget.plugin import PluginError
 from flexget.utils import requests
@@ -1811,6 +1812,20 @@ class EmbyApiSerie(EmbyApiMedia):
             if EmbyApi.has_provideres_search_arg(**parameters):
                 EmbyApi.remove_provideres_search(parameters)
                 return EmbyApiSerie.search(**parameters)
+            elif 'SearchTerm' in args:
+                try:
+                    tvdb_series = search_for_series(args.get('SearchTerm'))
+                except LookupError:
+                    tvdb_series = None
+
+                if tvdb_series and len(tvdb_series) == 1:
+                    if (
+                        'Years' in args
+                        and hasattr(tvdb_series[0], 'first_aired')
+                        and args['Years'] == tvdb_series[0].first_aired.year
+                    ):
+                        parameters['tvdb_id'] = tvdb_series[0].id
+                        return EmbyApiSerie.search(**parameters)
 
             logger.warning('No serie found')
             return
