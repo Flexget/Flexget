@@ -1813,7 +1813,11 @@ class EmbyApiSerie(EmbyApiMedia):
                 EmbyApi.remove_provideres_search(parameters)
                 return EmbyApiSerie.search(**parameters)
             elif 'SearchTerm' in args:
-                tvdb_series = search_for_series(args.get('SearchTerm'))
+                try:
+                    tvdb_series = search_for_series(args.get('SearchTerm'))
+                except LookupError:
+                    tvdb_series = None
+
                 if tvdb_series and len(tvdb_series) == 1:
                     if 'Years' in args and hasattr(tvdb_series[0],'first_aired') and args['Years'] == tvdb_series[0].first_aired.year:
                         parameters['tvdb_id'] = tvdb_series[0].id
