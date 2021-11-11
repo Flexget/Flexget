@@ -46,7 +46,7 @@ jobs:
             }
             console.log(versions)
             for (const version of versions) {
-              const dst = `ghcr.io/${context.actor.toLowerCase()}/flexget:${version}`
+              const dst = `ghcr.io/flexget/flexget:${version}`
               await exec.exec(`docker tag flexget:tmp ${dst}`)
               await exec.exec(`docker push ${dst}`)
             }
