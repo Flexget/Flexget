@@ -13,19 +13,23 @@ class TestYamlLists(object):
           yaml_list_create:
             disable: seen
             mock:
-              - {'title':'My Entry 1','url':'mock://myentry1', 'data':'myentry1'}
-              - {'title':'My Entry 2','url':'mock://myentry2', 'data':'myentry2'}
-              - {'title':'My Entry 3','url':'mock://myentry3', 'data':'myentry3'}
+              - {'title':'My Entry 1 1080p HDTV','url':'mock://myentry1', 'data':'myentry1', 'data2':'trash1'}
+              - {'title':'My Entry 2 1080p HDTV','url':'mock://myentry2', 'data':'myentry2', 'data2':'trash2'}
+              - {'title':'My Entry 3 1080p HDTV','url':'mock://myentry3', 'data':'myentry3', 'data2':'trash3'}
 
             accept_all: yes
             list_add:
-              - yaml_list: '{{yaml_dir}}/yaml_list1.yaml'
+              - yaml_list: 
+                  fields: 
+                    - data
+                    - quality
+                  path: '{{yaml_dir}}/yaml_list1.yaml'
 
 
           yaml_list_remove:  
             disable: seen
             mock:
-              - {'title':'My Entry 1','url':'mock://myentry1'}
+              - {'title':'My Entry 1 1080p HDTV','url':'mock://myentry1'}
 
             accept_all: yes
             list_remove: 
@@ -34,8 +38,8 @@ class TestYamlLists(object):
           yaml_list_match:
             disable: seen
             mock:
-              - {'title':'My Entry 2','url':'mock://myentry2', 'data':'myentry2'}
-              - {'title':'My Entry 3','url':'mock://myentry3', 'data':'myentry3'}
+              - {'title':'My Entry 2 1080p HDTV','url':'mock://myentry2', 'data':'myentry2'}
+              - {'title':'My Entry 3 1080p HDTV','url':'mock://myentry3', 'data':'myentry3'}
 
             list_match:
               remove_on_match: no
@@ -46,8 +50,8 @@ class TestYamlLists(object):
             disable: seen
             accept_all: yes
             mock:
-              - {'title':'My Entry 1','url':'mock://myentry1', 'data':'myentry1'}
-              - {'title':'My Entry 2','url':'mock://myentry2', 'data':'myentry2'}
+              - {'title':'My Entry 1 1080p HDTV','url':'mock://myentry1', 'data':'myentry1'}
+              - {'title':'My Entry 2 1080p HDTV','url':'mock://myentry2', 'data':'myentry2'}
 
             set:
               newfield: 'new'
@@ -94,8 +98,8 @@ class TestYamlLists(object):
         assert len(task.accepted) == 2
 
         # Checks matched
-        assert task.accepted[0]['title'] == 'My Entry 2'
-        assert task.accepted[1]['title'] == 'My Entry 3'
+        assert task.accepted[0]['title'] == 'My Entry 2 1080p HDTV'
+        assert task.accepted[1]['title'] == 'My Entry 3 1080p HDTV'
 
     def test_list_match(self, execute_task):
         task = execute_task('yaml_list_create')
@@ -105,8 +109,8 @@ class TestYamlLists(object):
         assert len(task.accepted) == 2
 
         # Checks matched
-        assert task.accepted[0]['title'] == 'My Entry 2'
-        assert task.accepted[1]['title'] == 'My Entry 3'
+        assert task.accepted[0]['title'] == 'My Entry 2 1080p HDTV'
+        assert task.accepted[1]['title'] == 'My Entry 3 1080p HDTV'
 
     def test_list_limited_fields(self, execute_task):
         task = execute_task('yaml_list_fields')
@@ -120,8 +124,8 @@ class TestYamlLists(object):
         assert len(task.accepted) == 2
 
         # Checks matched
-        assert task.accepted[0]['title'] == 'My Entry 1'
-        assert task.accepted[1]['title'] == 'My Entry 2'
+        assert task.accepted[0]['title'] == 'My Entry 1 1080p HDTV'
+        assert task.accepted[1]['title'] == 'My Entry 2 1080p HDTV'
 
         # Check no old field
         assert 'data' not in task.accepted[0]
