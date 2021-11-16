@@ -62,7 +62,7 @@ class YamlManagedList(MutableSet):
         required_fields = [self.key]
 
         # Title should allways be the first item
-        required_fields.insert(0,'title')
+        required_fields.insert(0, 'title')
 
         if not self.fields:
             fields = [k for k in item if not k.startswith('_') and k not in required_fields]
@@ -123,7 +123,9 @@ class YamlManagedList(MutableSet):
     def add(self, entry: Entry) -> None:
         exists = self.get(entry)
         if exists:
-            logger.warning(f'Can\'t add entry "{self.key}" = "{exists.get(self.key)}", entry already exists in list')
+            logger.warning(
+                f'Can\'t add entry "{self.key}" = "{exists.get(self.key)}", entry already exists in list'
+            )
             return
         self.entries.append(entry)
         self.save_yaml()
