@@ -59,7 +59,6 @@ class YamlManagedList(MutableSet):
             dict: Item with limited keys
         """
 
-
         # Title should allways be the first item
         required_fields = []
         if self.key != 'title':
@@ -126,7 +125,9 @@ class YamlManagedList(MutableSet):
     def add(self, entry: Entry) -> None:
         exists = self.get(entry)
         if exists:
-            logger.warning(f'Can\'t add entry "{self.key}" = "{exists.get(self.key)}", entry already exists in list')
+            logger.warning(
+                f'Can\'t add entry "{self.key}" = "{exists.get(self.key)}", entry already exists in list'
+            )
             return
         self.entries.append(entry)
         self.save_yaml()
