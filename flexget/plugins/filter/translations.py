@@ -1,15 +1,15 @@
 import re
+from typing import List, Union
 from unicodedata import normalize
-from typing import Union, List
-from babelfish.language import LANGUAGES
 
+import babelfish
+from babelfish.language import LANGUAGES
 from guessit.api import GuessItApi, GuessitException
 from loguru import logger
-import babelfish
 
 from flexget import plugin
-from flexget.event import event
 from flexget.config_schema import one_or_more
+from flexget.event import event
 
 PLUGIN_NAME = 'translations'
 logger = logger.bind(name=PLUGIN_NAME)
