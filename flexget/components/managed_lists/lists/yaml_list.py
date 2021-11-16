@@ -59,10 +59,12 @@ class YamlManagedList(MutableSet):
             dict: Item with limited keys
         """
 
-        required_fields = [self.key]
 
         # Title should allways be the first item
-        required_fields.insert(0,'title')
+        if self.key != 'title':
+            required_fields = [self.key]
+
+        required_fields.append('title')
 
         if not self.fields:
             fields = [k for k in item if not k.startswith('_') and k not in required_fields]
