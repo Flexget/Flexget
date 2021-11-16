@@ -18,17 +18,17 @@ logger = logger.bind(name=PLUGIN_NAME)
 
 
 class YamlManagedList(MutableSet):
-    def __init__(self, path: str, fields: list, key: str, encoding: str):
+    def __init__(self, path: str, fields: list, key: str, update: bool, encoding: str):
         self.filename = path
         self.fields = fields
         self.ecoding = encoding
+        self.update = update
         self.key = key
         self.entries = []
         try:
             content = open(self.filename)
         except FileNotFoundError as exc:
             entries = []
-            pass
         else:
             try:
                 # TODO: use the load from our serialization system if that goes in
@@ -124,28 +124,45 @@ class YamlManagedList(MutableSet):
 
     def add(self, entry: Entry) -> None:
         exists = self.get(entry)
-        if exists:
+
+        if exists and self.update:
+            exists.update(self.filter_keys(entry))
+            entry = exists
+            index = self._remove_item(entry)
+            if index >= 0:
+                self.entries.insert(index,entry)
+        elif exists:
             logger.warning(
                 f'Can\'t add entry "{self.key}" = "{exists.get(self.key)}", entry already exists in list'
             )
             return
-        self.entries.append(entry)
+        else:
+            self.entries.append(entry)
+
         self.save_yaml()
 
     def discard(self, item) -> None:
         key = item.get(self.key, None)
         if not key:
-            logger.error(f'Can\'t add entry, no `{key}` field')
+            logger.error(f'Can\'t remove entry, no `{key}` field')
             return
+
+        if self._remove_item(item) < 0:
+            return
+
+        self.save_yaml()
+
+    def _remove_item(self, item) -> int:
+        key = item.get(self.key, None)
+        if not key:
+            return -1
 
         for i, entry in enumerate(self.entries):
             if self.matches(item, entry):
                 self.entries.pop(i)
-                break
-        else:
-            return
+                return i
 
-        self.save_yaml()
+        return -1
 
     @property
     def online(self):
@@ -167,6 +184,7 @@ class YamlList:
                     'fields': {'type': 'array', 'items': {'type': 'string'}},
                     'encoding': {'type': 'string', 'default': 'utf-8'},
                     'key': {'type': 'string', 'default': 'title'},
+                    'update': {'type': 'boolean', 'default': False},
                 },
                 'required': ['path'],
                 'additionalProperties': False,
@@ -180,6 +198,7 @@ class YamlList:
         config.setdefault('fields', [])
         config.setdefault('encoding', 'utf-8')
         config.setdefault('key', 'title')
+        config.setdefault('update', False)
         return config
 
     def get_list(self, config):
