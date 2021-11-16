@@ -18,11 +18,11 @@ logger = logger.bind(name=PLUGIN_NAME)
 
 
 class YamlManagedList(MutableSet):
-    def __init__(self, path: str, fields: list):
+    def __init__(self, path: str, fields: list, key: str, encoding: str):
         self.filename = path
-
         self.fields = fields
-
+        self.ecoding = encoding
+        self.key = key
         self.entries = []
         try:
             content = open(self.filename)
@@ -59,12 +59,25 @@ class YamlManagedList(MutableSet):
             dict: Item with limited keys
         """
         required_fields = ['title']
+        if self.key not in required_fields:
+            required_fields.append(self.key)
+
         if not self.fields:
-            return {k: item[k] for k in item if not k.startswith('_')}
-        return {k: item[k] for k in item if k in self.fields or k in required_fields}
+            fields = [k for k in item if not k.startswith('_') and k not in required_fields]
+        else:
+            fields = [k for k in item if k in self.fields and k not in required_fields]
+
+        fields.sort()
+
+        for field in required_fields:
+            fields.insert(0, field)
+
+        if not self.fields:
+            return {k: item[k] for k in fields if not k.startswith('_')}
+        return {k: item[k] for k in fields if k in self.fields or k in required_fields}
 
     def matches(self, entry1, entry2) -> bool:
-        return entry1['title'] == entry2['title']
+        return entry1[self.key] == entry2[self.key]
 
     def __iter__(self):
         return iter(self.entries)
@@ -88,7 +101,14 @@ class YamlManagedList(MutableSet):
 
         try:
             with open(self.filename, 'w') as outfile:
-                dump_yaml(out, outfile, default_flow_style=False)
+                dump_yaml(
+                    out,
+                    outfile,
+                    default_flow_style=False,
+                    encoding=self.ecoding,
+                    allow_unicode=True,
+                    sort_keys=False,
+                )
         except Exception as e:
             raise PluginError(f'Error writhing data to `{self.filename}`: {e}')
 
@@ -107,9 +127,9 @@ class YamlManagedList(MutableSet):
         self.save_yaml()
 
     def discard(self, item) -> None:
-        title = item.get('title', None)
-        if not title:
-            logger.error('Can\'t add entry, no `title` field')
+        key = item.get(self.key, None)
+        if not key:
+            logger.error(f'Can\'t add entry, no `{key}` field')
             return
 
         for i, entry in enumerate(self.entries):
@@ -139,6 +159,8 @@ class YamlList:
                 'properties': {
                     'path': {'type': 'string'},
                     'fields': {'type': 'array', 'items': {'type': 'string'}},
+                    'encoding': {'type': 'string', 'default': 'utf-8'},
+                    'key': {'type': 'string', 'default': 'title'},
                 },
                 'required': ['path'],
                 'additionalProperties': False,
@@ -150,6 +172,8 @@ class YamlList:
         if isinstance(config, str):
             config = {'path': config}
         config.setdefault('fields', [])
+        config.setdefault('encoding', 'utf-8')
+        config.setdefault('key', 'title')
         return config
 
     def get_list(self, config):
