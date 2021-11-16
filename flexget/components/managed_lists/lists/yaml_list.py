@@ -130,7 +130,7 @@ class YamlManagedList(MutableSet):
             entry = exists
             index = self._remove_item(entry)
             if index >= 0:
-                self.entries.insert(index,entry)
+                self.entries.insert(index, entry)
         elif exists:
             logger.warning(
                 f'Can\'t add entry "{self.key}" = "{exists.get(self.key)}", entry already exists in list'
