@@ -166,6 +166,28 @@ class TestTranslationsFilter:
                         portuguese: "do_nothing"
                         default: "reject"
 
+
+            do_one_language:
+                mock:
+                    - {'title':'Movie1.720p.PT.ENG.TEST','url':'mock://teste1'}
+                    - {'title':'Movie2.720p.Portugues.Ingles.TEST','url':'mock://teste2'}
+                    - {'title':'Movie3.1080p.ENG.PT.BluRay.TEST','url':'mock://teste3'}
+                translations:
+                    languages_synonyms:
+                        portuguese:
+                            - tuga
+                            - portuga
+                            - portugues
+                        english:
+                            - ingles
+                            - ing
+                        spanish:
+                            - espanhol
+                        french:
+                            - frances
+                    dubbed:
+                        portuguese: "accept"
+                        default: "reject"
     """
 
     def test_force_native(self, execute_task):
@@ -261,3 +283,9 @@ class TestTranslationsFilter:
         assert len(task.accepted) == 0
         assert len(task.rejected) == 0
         assert len(task.undecided) == 3
+
+    def test_do_one_language(self, execute_task):
+        task = execute_task('do_one_language')
+        assert len(task.accepted) == 3
+        assert len(task.rejected) == 0
+        assert len(task.undecided) == 0
