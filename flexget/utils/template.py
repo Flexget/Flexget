@@ -2,11 +2,11 @@ import locale
 import os
 import os.path
 import re
-from unicodedata import normalize
 from contextlib import suppress
 from copy import copy
 from datetime import date, datetime, time
-from typing import TYPE_CHECKING, Any, List, Mapping, Optional, Union, AnyStr, Type, cast
+from typing import TYPE_CHECKING, Any, AnyStr, List, Mapping, Optional, Type, Union, cast
+from unicodedata import normalize
 
 import jinja2.filters
 from dateutil import parser as dateutil_parse
@@ -138,18 +138,28 @@ def filter_default(value, default_value: str = '', boolean: bool = True) -> str:
 
 
 def filter_asciify(text: str) -> str:
-    """ Siplify text """
+    """Siplify text"""
 
     if not isinstance(text, str):
         return text
 
-    # Replace accented chars by their 'normal' couterparts
-    result = normalize('NFKD', text)
+    result = normalize('NFD', text)
+    result = result.encode('ascii', 'ignore')
+    result = result.decode("utf-8")
+    result = str(result)
+    return result
+
+
+def filter_strip_symbols(text: str) -> str:
+    """Strip Symbols text"""
+
+    if not isinstance(text, str):
+        return text
 
     # Symbols that should be converted to white space
-    result = re.sub(r'[ \(\)\-_\[\]\.]+', ' ', result)
+    result = re.sub(r'[ \(\)\-_\[\]\.]+', ' ', text)
     # Leftovers
-    result = re.sub(r"[^a-zA-Z0-9 ]", "", result)
+    result = re.sub(r"[^\w\d\s]", "", result, flags=re.UNICODE)
     # Replace multiple white spaces with one
     result = ' '.join(result.split())
 
