@@ -1,3 +1,5 @@
+default_language_version:
+  python: python3
 repos:
 - repo: https://github.com/pycqa/isort
   rev: 5.10.1
@@ -7,3 +9,7 @@ repos:
   rev: 21.10b0
   hooks:
   - id: black
+ci:
+  autofix_prs: true
+  autoupdate_branch: develop
+  autoupdate_schedule: weekly
