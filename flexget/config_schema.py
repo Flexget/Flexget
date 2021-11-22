@@ -2,9 +2,10 @@ import datetime
 import os
 import re
 from collections import defaultdict
+from json import JSONDecodeError
+from json import loads as json_loads
 from typing import Any, Callable, Dict, List, Match, Optional, Pattern, Union
 from urllib.parse import parse_qsl, urlparse
-from json import JSONDecodeError, loads as json_loads
 
 import jsonschema
 from jsonschema import ValidationError
