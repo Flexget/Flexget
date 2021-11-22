@@ -2,7 +2,9 @@ import csv
 import re
 from collections.abc import MutableSet
 from datetime import datetime
-from json import JSONDecodeError, loads as json_loads, load as json_load
+from json import JSONDecodeError
+from json import load as json_load
+from json import loads as json_loads
 from pathlib import Path
 
 from loguru import logger
