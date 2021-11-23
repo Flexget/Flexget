@@ -9,7 +9,7 @@ from urllib.parse import urlencode
 from loguru import logger
 from requests.exceptions import HTTPError, RequestException
 
-from flexget.components.emby.emby_util import get_field_map, simplify_text
+from flexget.components.emby.emby_util import get_field_map
 from flexget.entry import Entry
 from flexget.plugin import PluginError
 from flexget.utils import requests
@@ -552,9 +552,9 @@ class EmbyApiListBase(EmbyApiBase):
             args['SortOrder'] = self.sort['order']
 
         if not self.types or len(self.types) == 0:
-            args['IncludeItemTypes'] = 'Movie;Episode'
+            args['IncludeItemTypes'] = 'Movie,Episode'
         else:
-            args['IncludeItemTypes'] = ';'.join(self.types)
+            args['IncludeItemTypes'] = ','.join(typ.title() for typ in self.types)
 
     def add(self, entry: Entry):
         """Adds a item to list"""
@@ -776,7 +776,6 @@ class EmbyApiLibrary(EmbyApiListBase):
 
         index = 0
         args['ParentId'] = self.id
-        args['IncludeItemTypes'] = 'Episode,Movie'
         endpoint = EMBY_ENDPOINT_SEARCH.format(userid=self.auth.uid)
         logger.debug('Search library with: {}', args)
 
@@ -891,7 +890,6 @@ class EmbyApiRootList(EmbyApiListBase):
 
         index = 0
 
-        args['IncludeItemTypes'] = 'Episode,Movie'
         endpoint = EMBY_ENDPOINT_SEARCH.format(userid=self.auth.uid)
         logger.debug('Search root list with: {}', args)
 
@@ -965,7 +963,6 @@ class EmbyApiWatchedList(EmbyApiListBase):
 
         index = 0
         args['IsPlayed'] = True
-        args['IncludeItemTypes'] = 'Episode,Movie'
         endpoint = EMBY_ENDPOINT_SEARCH.format(userid=self.auth.uid)
         logger.debug('Search watched list with: {}', args)
 
@@ -1039,7 +1036,6 @@ class EmbyApiFavoriteList(EmbyApiListBase):
 
         index = 0
         args['IsFavorite'] = True
-        args['IncludeItemTypes'] = 'Episode,Movie'
         endpoint = EMBY_ENDPOINT_SEARCH.format(userid=self.auth.uid)
         logger.debug('Search favorite list with: {}', args)
 
@@ -1161,8 +1157,6 @@ class EmbyApiPlayList(EmbyApiListBase):
             return
 
         args['ParentId'] = self.id
-        args['IncludeItemTypes'] = 'Episode,Movie'
-
         logger.debug('Search PlayList  with: {}', args)
         endpoint = EMBY_ENDPOINT_SEARCH.format(userid=self.auth.uid)
         items = EmbyApi.resquest_emby(endpoint, self.auth, 'GET', **args)
