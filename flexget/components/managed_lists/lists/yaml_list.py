@@ -173,6 +173,7 @@ class YamlList:
         if isinstance(config, str):
             config = {'path': config}
         config.setdefault('fields', [])
+        config.setdefault('encoding', 'utf-8')
         return config
 
     def get_list(self, config):
