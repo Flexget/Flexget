@@ -61,6 +61,24 @@ class TestYamlLists(object):
                   path: '{{yaml_dir}}/yaml_list1.yaml'
                   fields:
                     - newfield
+
+          yaml_list_update:
+            disable: seen
+            accept_all: yes
+            mock:
+              - {'title':'My Entry 1 1080p HDTV','new':'teste1','trash':'trash1'}
+              - {'title':'My Entry 2 1080p HDTV','new':'teste2','trash':'trash2'}
+
+            list_add:
+              - yaml_list:
+                  path: '{{yaml_dir}}/yaml_list1.yaml'
+                  fields:
+                    - new
+
+          yaml_list_load:
+            disable: seen
+            accept_all: yes
+            yaml_list: '{{yaml_dir}}/yaml_list1.yaml'
     """
 
     @pytest.fixture
@@ -134,3 +152,27 @@ class TestYamlLists(object):
         # Check ok field
         assert task.accepted[0]['newfield'] == 'new'
         assert task.accepted[1]['newfield'] == 'new'
+
+    def test_list_update(self, execute_task):
+        task = execute_task('yaml_list_create')
+        assert len(task.accepted) == 3
+
+        task = execute_task('yaml_list_update')
+        assert len(task.accepted) == 2
+
+        task = execute_task('yaml_list_load')
+        assert len(task.accepted) == 3
+
+        # Checks matched
+        assert task.accepted[0]['title'] == 'My Entry 1 1080p HDTV'
+        assert task.accepted[1]['title'] == 'My Entry 2 1080p HDTV'
+        assert task.accepted[2]['title'] == 'My Entry 3 1080p HDTV'
+
+        # Checks update
+        assert task.accepted[0]['new'] == 'teste1'
+        assert task.accepted[1]['new'] == 'teste2'
+        assert not 'new' in task.accepted[2]
+
+        # Checks not update
+        assert not 'trash' in task.accepted[0]
+        assert not 'trash' in task.accepted[1]
