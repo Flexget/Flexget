@@ -18,12 +18,12 @@ logger = logger.bind(name=PLUGIN_NAME)
 
 
 class YamlManagedList(MutableSet):
-    def __init__(self, path: str, fields: list, key: str, update: bool, encoding: str):
+    def __init__(self, path: str, fields: list, update: bool, encoding: str):
         self.filename = path
         self.fields = fields
         self.ecoding = encoding
         self.update = update
-        self.key = key
+        self.key = 'title'
         self.entries = []
         try:
             content = open(self.filename)
@@ -183,7 +183,6 @@ class YamlList:
                     'path': {'type': 'string'},
                     'fields': {'type': 'array', 'items': {'type': 'string'}},
                     'encoding': {'type': 'string', 'default': 'utf-8'},
-                    'key': {'type': 'string', 'default': 'title'},
                     'update': {'type': 'boolean', 'default': False},
                 },
                 'required': ['path'],
@@ -197,7 +196,6 @@ class YamlList:
             config = {'path': config}
         config.setdefault('fields', [])
         config.setdefault('encoding', 'utf-8')
-        config.setdefault('key', 'title')
         config.setdefault('update', False)
         return config
 
