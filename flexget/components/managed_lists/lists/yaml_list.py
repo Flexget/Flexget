@@ -108,12 +108,14 @@ class YamlManagedList(MutableSet):
                 return entry
         return None
 
-    def add(self, entry: Entry) -> None:
-        exists = self.get(entry)
-        if exists:
-            logger.warning('Can\'t add entry, entry already exists in list')
-            return
-        self.entries.append(entry)
+    def add(self, item: Entry) -> None:
+        for i, entry in enumerate(self.entries):
+            if self.matches(item, entry):
+                self.entries[i] = item
+                break
+        else:
+            self.entries.append(item)
+
         self.save_yaml()
 
     def discard(self, item) -> None:
