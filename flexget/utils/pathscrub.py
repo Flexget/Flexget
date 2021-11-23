@@ -8,8 +8,8 @@ os_mode = None  # Can be 'windows', 'mac', 'linux' or None. None will auto-detec
 platform_replaces = {
     'windows': [
         ['[:*?"<>| ]+', ' '],  # Turn illegal characters into a space
-        [r'[\.\s]+([/\\]|$)', r'\1'],
-    ],  # Dots cannot end file or directory names
+        [r'[\.\s]+([/\\]|$)', r'\1'],  # Dots cannot end file or directory names
+    ],
     'mac': [['[: ]+', ' ']],  # Only colon is illegal here
     'linux': [],  # No illegal chars
 }
@@ -45,12 +45,12 @@ def pathscrub(dirty_path: str, os: Optional[str] = None, filename: bool = False)
 
     if filename:
         path = path.replace('/', ' ').replace('\\', ' ')
+    for search, replace in replaces:
+        path = re.sub(search, replace, path)
     # Remove spaces surrounding path components
     path = '/'.join(comp.strip() for comp in path.split('/'))
     if os == 'windows':
         path = '\\'.join(comp.strip() for comp in path.split('\\'))
-    for search, replace in replaces:
-        path = re.sub(search, replace, path)
     path = path.strip()
     # If we stripped everything from a filename, complain
     if filename and dirty_path and not path:
