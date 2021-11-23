@@ -1,5 +1,6 @@
 import random
 import typing
+from collections import OrderedDict
 from collections.abc import MutableSet
 from typing import Optional
 
@@ -82,10 +83,19 @@ class YamlManagedList(MutableSet):
         Raises:
             PluginError: Error
         """
+        top_fields = ['title', 'url']
+
+        def sort_key(item: typing.Tuple[str, typing.Any]) -> typing.Tuple[int, str]:
+            # Sort important fields first, then the rest of the fields alphabetically
+            try:
+                return top_fields.index(item[0]), ''
+            except ValueError:
+                return len(top_fields), item[0]
 
         out = []
         for entry in self.entries:
-            out.append(json.coerce(self.filter_keys(entry)))
+            filtered_entry = json.coerce(self.filter_keys(entry))
+            out.append(OrderedDict(sorted(filtered_entry.items(), key=sort_key)))
 
         try:
             # By default we try to write strings natively to the file, for nicer manual reading/writing
