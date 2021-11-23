@@ -554,19 +554,7 @@ class EmbyApiListBase(EmbyApiBase):
         if not self.types or len(self.types) == 0:
             args['IncludeItemTypes'] = 'Movie,Episode'
         else:
-            args['IncludeItemTypes'] = []
-            for mtyp in self.types:
-                mtyp = str(mtyp).lower
-                if mtyp in ['movie', 'movies']:
-                    args['IncludeItemTypes'].append('Movie')
-                elif mtyp in ['serie', 'series']:
-                    args['IncludeItemTypes'].append('Series')
-                elif mtyp in ['season', 'seasons']:
-                    args['IncludeItemTypes'].append('Season')
-                elif mtyp in ['episode', 'episode']:
-                    args['IncludeItemTypes'].append('Episode')
-
-            args['IncludeItemTypes'] = ','.join(self.types)
+            args['IncludeItemTypes'] = ','.join(typ.title() for typ in self.types)
 
     def add(self, entry: Entry):
         """Adds a item to list"""
