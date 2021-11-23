@@ -1,4 +1,5 @@
 import random
+import typing
 from collections.abc import MutableSet
 from typing import Optional
 
@@ -18,14 +19,14 @@ logger = logger.bind(name=PLUGIN_NAME)
 
 
 class YamlManagedList(MutableSet):
-    def __init__(self, path: str, fields: list):
+    def __init__(self, path: str, fields: list, encoding: str):
         self.filename = path
-
         self.fields = fields
+        self.encoding = encoding
 
         self.entries = []
         try:
-            content = open(self.filename)
+            content = open(self.filename, encoding=self.encoding)
         except FileNotFoundError as exc:
             entries = []
             pass
@@ -49,7 +50,7 @@ class YamlManagedList(MutableSet):
         else:
             raise PluginError(f'List `{self.filename}` must be a yaml list')
 
-    def filter_keys(self, item: dict) -> dict:
+    def filter_keys(self, item: typing.Mapping) -> dict:
         """Gets items with limited keys
 
         Args:
@@ -87,8 +88,17 @@ class YamlManagedList(MutableSet):
             out.append(json.coerce(self.filter_keys(entry)))
 
         try:
-            with open(self.filename, 'w') as outfile:
-                dump_yaml(out, outfile, default_flow_style=False)
+            # By default we try to write strings natively to the file, for nicer manual reading/writing
+            out_bytes = dump_yaml(
+                out, default_flow_style=False, encoding=self.encoding, allow_unicode=True
+            )
+        except UnicodeEncodeError:
+            # If strings are not representable in the specified file encoding, let yaml use backslash escapes
+            out_bytes = dump_yaml(out, default_flow_style=False, encoding=self.encoding)
+
+        try:
+            with open(self.filename, 'wb') as outfile:
+                outfile.write(out_bytes)
         except Exception as e:
             raise PluginError(f'Error writhing data to `{self.filename}`: {e}')
 
@@ -139,6 +149,7 @@ class YamlList:
                 'properties': {
                     'path': {'type': 'string'},
                     'fields': {'type': 'array', 'items': {'type': 'string'}},
+                    'encoding': {'type': 'string', 'default': 'utf-8'},
                 },
                 'required': ['path'],
                 'additionalProperties': False,
