@@ -45,7 +45,7 @@ def do_cli_task(manager, options):
                 table.add_row(
                     start,
                     duration,
-                    ex.produced,
+                    str(ex.produced),
                     str(ex.accepted),
                     str(ex.rejected),
                     str(ex.failed),
