@@ -23,12 +23,12 @@ def list_failed(options):
             'Reason',
             'Failure time',
         ]
-        table = TerminalTable(*header, options.table_type)
+        table = TerminalTable(*header, table_type=options.table_type)
         for entry in results:
             table.add_row(
-                entry.id,
+                str(entry.id),
                 entry.title,
-                entry.count,
+                str(entry.count),
                 '' if entry.reason == 'None' else entry.reason,
                 entry.tof.strftime('%Y-%m-%d %H:%M'),
             )
