@@ -1,8 +1,12 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
+from loguru import logger
 from sqlalchemy import Column, DateTime, Integer, String, Unicode
 
+from flexget.event import event
 from flexget.manager import Base
+
+logger = logger.bind(name='history.db')
 
 
 class History(Base):
@@ -32,3 +36,13 @@ class History(Base):
             'time': self.time.isoformat(),
             'details': self.details,
         }
+
+
+@event('manager.db_cleanup')
+def db_cleanup(manager, session):
+    # Purge task executions older than 1 year
+    result = (
+        session.query(History).filter(History.time < datetime.now() - timedelta(days=365)).delete()
+    )
+    if result:
+        logger.verbose('Removed {} accepted entries from history older than 1 year', result)
