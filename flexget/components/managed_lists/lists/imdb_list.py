@@ -76,7 +76,7 @@ class ImdbEntrySet(MutableSet):
                         'type': 'object',
                         'properties': {
                             'ubid-main': {'type': 'string'},
-                            'sess-at-main': {'type': 'string'},
+                            'at-main': {'type': 'string'},
                         },
                     },
                 ],
