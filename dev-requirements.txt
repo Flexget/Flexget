@@ -6,7 +6,7 @@
 #
 alabaster==0.7.12
     # via sphinx
-astroid==2.8.3
+astroid==2.9.0
     # via pylint
 atomicwrites==1.4.0
     # via pytest
@@ -22,9 +22,9 @@ black==21.11b1
     # via -r dev-requirements.in
 bleach==4.1.0
     # via readme-renderer
-boto3==1.20.10
+boto3==1.20.15
     # via -r dev-requirements.in
-botocore==1.23.10
+botocore==1.23.15
     # via
     #   boto3
     #   s3transfer
@@ -151,7 +151,7 @@ pygments==2.10.0
     #   -c requirements.txt
     #   readme-renderer
     #   sphinx
-pylint==2.11.1
+pylint==2.12.1
     # via -r dev-requirements.in
 pyparsing==3.0.6
     # via
@@ -212,7 +212,7 @@ smmap==4.0.0
     # via gitdb
 snowballstemmer==2.1.0
     # via sphinx
-sphinx==4.2.0
+sphinx==4.3.1
     # via -r dev-requirements.in
 sphinxcontrib-applehelp==1.0.2
     # via sphinx
@@ -241,7 +241,7 @@ tomli==1.2.1
     #   pep517
 tqdm==4.62.3
     # via twine
-twine==3.4.2
+twine==3.6.0
     # via -r dev-requirements.in
 typing-extensions==3.10.0.2
     # via
