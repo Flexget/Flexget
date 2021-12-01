@@ -40,21 +40,29 @@ class FloodClient:
 
         return self
     
-    def add_torrent_urls(self, **kwargs):
+    def add_torrent_urls(self, urls: list=None, destination: str=None, tags: list=None, start: bool=True):
         if not self.connected:
             raise plugin.PluginError('Flood is not connected.')
-
-        # Add's a default 'start': True to the request
-        if not kwargs.get('start'):
-            kwargs['start'] = True
         
-        response = self._request('post', '/api/torrents/add-urls', json=kwargs)
+        if not urls:
+            raise plugin.PluginError('Parameter urls cannot be empty.')
+
+        data = {
+            'urls': urls, 
+            'destination': destination, 
+            'start': start,
+        }
+
+        if tags:
+            data['tags'] = tags
+        
+        response = self._request('post', '/api/torrents/add-urls', json=data)
 
         if response.status_code == 200:
             logger.debug('Successfully added torrent(s).')
         else:
             # There's no sanity to the codes returned by Flood. 
-            # Both return "code": -32602 and both return status 500.
+            # Both return 'code': -32602 and both return status 500.
             if response.text.find('the input is not a valid.') > 0:
                 raise plugin.PluginError('Not a valid torrent.')
             elif response.text.find('Info hash already used by another torrent.') > 0:
@@ -62,8 +70,6 @@ class FloodClient:
             else:
                 raise plugin.PluginError(f'Failed to add torrent to Flood. Error {response.status_code}.')
     
-    def add_torrent_files(self,  **kwargs):
-        return False
 
 class OutputFlood:
     schema = {
@@ -78,25 +84,13 @@ class OutputFlood:
         'additionalProperties': False,
     }
 
-    def add_entry(self, config: dict, task: Task, entry: Entry):
-        kwargs = {}
-
+    def add_entry(self, client: FloodClient, config: dict, task: Task, entry: Entry):
         url = entry.get('url', None)
         path = entry.render(entry.get('path', config.get('path', None)))
         tags = entry.get('tags', config.get('tags', None))
 
-        if url:
-            kwargs['urls'] = [ url ]
-        if path:
-            kwargs['destination'] = path
-        # Because of the way that Flood wants things
-        # We've gotta check to see if the person has done
-        # a list in their config or not.
-        if tags:
-            if isinstance(tags, list):
-                kwargs['tags'] = [ entry.render(tag) for tag in tags ]
-            else:
-                kwargs['tags'] = [ entry.render(tags) ]
+        if tags and isinstance(tags, list):
+            tags = [ entry.render(tag) for tag in tags ] if isinstance(tags, list) else [ entry.render(tags) ]
 
         if task.manager.options.test:
             logger.info('Flood Test Mode')
@@ -104,7 +98,11 @@ class OutputFlood:
             logger.info('\tPath: {}', path)
             logger.info('\tTags: {}', tags)
         else:
-            self.flood.add_torrent_urls(**kwargs)
+            client.add_torrent_urls(
+                urls=[ url ], 
+                destination=path, 
+                tags=tags
+            )
 
     @plugin.priority(135)
     def on_task_output(self, task: Task, config: dict):
@@ -113,11 +111,12 @@ class OutputFlood:
             return
 
         # We're re-authenticating ourselves every time we output
-        self.flood = FloodClient().authenticate(config)
+        # Need to work out how to save the jwt to Flexget
+        flood = FloodClient().authenticate(config)
 
         # Loop through each accepted entry and send it to Flood
         for entry in task.accepted:
-            self.add_entry(config, task, entry)
+            self.add_entry(flood, config, task, entry)
 
 @event('plugin.register')
 def register_plugin():
