@@ -1,18 +1,20 @@
-from loguru import logger
 from datetime import datetime
+
+from loguru import logger
 from requests import Session
 from requests.exceptions import RequestException
 from sqlalchemy import Column, DateTime, String, Unicode
 
 from flexget import plugin
 from flexget.db_schema import versioned_base, with_session
-from flexget.event import event
-from flexget.utils.database import json_synonym
 from flexget.entry import Entry
+from flexget.event import event
 from flexget.task import Task
+from flexget.utils.database import json_synonym
 
 logger = logger.bind(name='flood')
 Base = versioned_base('flood_session', 0)
+
 
 class FloodSession(Base):
     __tablename__ = 'flood_session'
@@ -24,6 +26,7 @@ class FloodSession(Base):
     cookies = json_synonym('_cookies')
     expires = Column(DateTime)
 
+
 class FloodClient:
     def __init__(self, config: dict):
         self.config = config
@@ -33,7 +36,7 @@ class FloodClient:
     def _request(self, method: str, path: str, **kwargs):
         if not self.connected and path != '/api/auth/authenticate':
             raise plugin.PluginError('Flood is not connected.')
-            
+
         try:
             return self.session.request(method, self.config['url'].strip('/') + path, **kwargs)
         except RequestException as e:
@@ -51,7 +54,7 @@ class FloodClient:
             url=self.config['url'].strip('/'),
             username=self.config['username'],
             cookies=dict(self.session.cookies),
-            expires=datetime.utcfromtimestamp(expires)
+            expires=datetime.utcfromtimestamp(expires),
         )
 
         session.merge(flood_session)
@@ -61,10 +64,10 @@ class FloodClient:
     def _restore_session(self, session=None):
         logger.debug('Looking for saved session')
 
-        flood_session = (session.query(FloodSession)
-            .filter(
+        flood_session = (
+            session.query(FloodSession).filter(
                 FloodSession.url == self.config['url'].strip('/'),
-                FloodSession.username == self.config['username']
+                FloodSession.username == self.config['username'],
             )
         ).one_or_none()
 
@@ -72,19 +75,20 @@ class FloodClient:
             self.session.cookies.update(flood_session.cookies)
             logger.debug('Found saved session')
             return True
-        
+
         logger.debug('Unable to find saved session')
         return False
-    
+
     def authenticate(self):
         if self._restore_session():
             self.connected = True
             return self
 
-        response = self._request('post', '/api/auth/authenticate', data={
-            'username': self.config['username'],
-            'password': self.config['password']
-        })
+        response = self._request(
+            'post',
+            '/api/auth/authenticate',
+            data={'username': self.config['username'], 'password': self.config['password']},
+        )
 
         if response.status_code == 200:
             self._save_session()
@@ -96,12 +100,14 @@ class FloodClient:
 
         return self
 
-    def add_torrent_urls(self, urls: list=None, destination: str=None, tags: list=None, start: bool=True):
+    def add_torrent_urls(
+        self, urls: list = None, destination: str = None, tags: list = None, start: bool = True
+    ):
         if not urls:
             raise plugin.PluginError('Parameter urls cannot be empty.')
 
         data = {
-            'urls': urls, 
+            'urls': urls,
             'start': start,
         }
 
@@ -109,24 +115,27 @@ class FloodClient:
             data['destination'] = destination
         if tags:
             data['tags'] = tags
-        
+
         response = self._request('post', '/api/torrents/add-urls', json=data)
 
         if response.status_code == 200:
             logger.debug('Successfully added torrent(s).')
         else:
-            # There's no sanity to the codes returned by Flood. 
+            # There's no sanity to the codes returned by Flood.
             # Both return 'code': -32602 and both return status 500.
             if response.text.find('the input is not a valid.') > 0:
                 raise plugin.PluginError('Not a valid torrent.')
             elif response.text.find('Info hash already used by another torrent.') > 0:
                 logger.debug('Torrent has already been added to Flood.')
             else:
-                raise plugin.PluginError(f'Failed to add torrent to Flood. Error {response.status_code}.')
+                raise plugin.PluginError(
+                    f'Failed to add torrent to Flood. Error {response.status_code}.'
+                )
+
 
 class OutputFlood:
     schema = {
-       'type': 'object',
+        'type': 'object',
         'properties': {
             'url': {'type': 'string'},
             'username': {'type': 'string'},
@@ -143,7 +152,11 @@ class OutputFlood:
         tags = entry.get('tags', config.get('tags', None))
 
         if tags and isinstance(tags, list):
-            tags = [ entry.render(tag) for tag in tags ] if isinstance(tags, list) else [ entry.render(tags) ]
+            tags = (
+                [entry.render(tag) for tag in tags]
+                if isinstance(tags, list)
+                else [entry.render(tags)]
+            )
 
         if task.manager.options.test:
             logger.info('Flood Test Mode')
@@ -151,11 +164,7 @@ class OutputFlood:
             logger.info('\tPath: {}', path)
             logger.info('\tTags: {}', tags)
         else:
-            client.add_torrent_urls(
-                urls=[ url ], 
-                destination=path, 
-                tags=tags
-            )
+            client.add_torrent_urls(urls=[url], destination=path, tags=tags)
 
     @plugin.priority(135)
     def on_task_output(self, task: Task, config: dict):
@@ -168,6 +177,7 @@ class OutputFlood:
         # Loop through each accepted entry and send it to Flood
         for entry in task.accepted:
             self.add_entry(flood, config, task, entry)
+
 
 @event('plugin.register')
 def register_plugin():
