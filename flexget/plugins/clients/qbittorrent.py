@@ -7,7 +7,7 @@ from requests.exceptions import RequestException
 
 from flexget import plugin
 from flexget.event import event
-from flexget.utils.template import RenderError, render
+from flexget.utils.template import RenderError
 
 logger = logger.bind(name='qbittorrent')
 
@@ -228,7 +228,6 @@ class OutputQBitTorrent:
             if label:
                 form_data['label'] = label  # qBittorrent v3.3.3-
                 form_data['category'] = label  # qBittorrent v3.3.4+
-
             try:
                 tags = entry.render(",".join([
                                     ",".join(config.get('tags', '')),
@@ -324,3 +323,4 @@ class OutputQBitTorrent:
 @event('plugin.register')
 def register_plugin():
     plugin.register(OutputQBitTorrent, 'qbittorrent', api_ver=2)
+    
