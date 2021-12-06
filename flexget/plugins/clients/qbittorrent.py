@@ -223,25 +223,24 @@ class OutputQBitTorrent:
                     form_data['savepath'] = save_path
             except RenderError as e:
                 logger.error('Error setting path for {}: {}', entry['title'], e)
-            
+
             label = entry.render(entry.get('label', config.get('label', '')))
             if label:
                 form_data['label'] = label  # qBittorrent v3.3.3-
                 form_data['category'] = label  # qBittorrent v3.3.4+
             try:
-                tags = entry.render(",".join([
-                                    ",".join(config.get('tags', '')),
-                                    ",".join(entry.get('tags', ''))
-                                    ]).strip(","))
+                tags = entry.render(
+                    ",".join(
+                        [",".join(config.get('tags', '')), ",".join(entry.get('tags', ''))]
+                    ).strip(",")
+                )
                 if tags:
                     form_data['tags'] = tags
             except RenderError as e:
-                logger.error('Error rendering tags for {}: {}',
-                             entry['title'], e)
-                form_data['tags'] = ",".join([
-                    ",".join(config.get('tags', '')),
-                    ",".join(entry.get('tags', ''))
-                    ]).strip(",")
+                logger.error('Error rendering tags for {}: {}', entry['title'], e)
+                form_data['tags'] = ",".join(
+                    [",".join(config.get('tags', '')), ",".join(entry.get('tags', ''))]
+                ).strip(",")
 
             add_paused = entry.get('add_paused', config.get('add_paused'))
             if add_paused:
@@ -323,4 +322,3 @@ class OutputQBitTorrent:
 @event('plugin.register')
 def register_plugin():
     plugin.register(OutputQBitTorrent, 'qbittorrent', api_ver=2)
-    
