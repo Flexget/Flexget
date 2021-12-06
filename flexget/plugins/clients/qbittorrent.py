@@ -7,7 +7,7 @@ from requests.exceptions import RequestException
 
 from flexget import plugin
 from flexget.event import event
-from flexget.utils.template import RenderError
+from flexget.utils.template import RenderError, render
 
 logger = logger.bind(name='qbittorrent')
 
@@ -25,6 +25,7 @@ class OutputQBitTorrent:
         verify_cert: <VERIFY> (default: True)
         path: <OUTPUT_DIR> (default: (none))
         label: <LABEL> (default: (none))
+        tags: <TAGS> (default: (none))
         maxupspeed: <torrent upload speed limit> (default: 0)
         maxdownspeed: <torrent download speed limit> (default: 0)
         add_paused: <ADD_PAUSED> (default: False)
@@ -44,6 +45,7 @@ class OutputQBitTorrent:
                     'verify_cert': {'type': 'boolean'},
                     'path': {'type': 'string'},
                     'label': {'type': 'string'},
+                    'tags': {'type': 'array'},
                     'maxupspeed': {'type': 'integer'},
                     'maxdownspeed': {'type': 'integer'},
                     'fail_html': {'type': 'boolean'},
@@ -205,6 +207,7 @@ class OutputQBitTorrent:
         config.setdefault('use_ssl', False)
         config.setdefault('verify_cert', True)
         config.setdefault('label', '')
+        config.setdefault('tags', '')
         config.setdefault('maxupspeed', 0)
         config.setdefault('maxdownspeed', 0)
         config.setdefault('fail_html', True)
@@ -220,11 +223,26 @@ class OutputQBitTorrent:
                     form_data['savepath'] = save_path
             except RenderError as e:
                 logger.error('Error setting path for {}: {}', entry['title'], e)
-
+            
             label = entry.render(entry.get('label', config.get('label', '')))
             if label:
                 form_data['label'] = label  # qBittorrent v3.3.3-
                 form_data['category'] = label  # qBittorrent v3.3.4+
+
+            try:
+                tags = entry.render(",".join([
+                                    ",".join(config.get('tags', '')),
+                                    ",".join(entry.get('tags', ''))
+                                    ]).strip(","))
+                if tags:
+                    form_data['tags'] = tags
+            except RenderError as e:
+                logger.error('Error rendering tags for {}: {}',
+                             entry['title'], e)
+                form_data['tags'] = ",".join([
+                    ",".join(config.get('tags', '')),
+                    ",".join(entry.get('tags', ''))
+                    ]).strip(",")
 
             add_paused = entry.get('add_paused', config.get('add_paused'))
             if add_paused:
@@ -253,6 +271,7 @@ class OutputQBitTorrent:
                     logger.info('Url: {}', entry.get('url'))
                 logger.info('Save path: {}', form_data.get('savepath'))
                 logger.info('Label: {}', form_data.get('label'))
+                logger.info('Tags: {}', form_data.get('tags'))
                 logger.info('Paused: {}', form_data.get('paused', 'false'))
                 logger.info('Skip Hash Check: {}', form_data.get('skip_checking', 'false'))
                 if maxupspeed:
