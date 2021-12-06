@@ -27,7 +27,6 @@ if TYPE_CHECKING:
         def __init__(self, *args, **kwargs) -> None:
             ...
 
-
 else:
     Base = db_schema.versioned_base('input_cache', 2)
 
