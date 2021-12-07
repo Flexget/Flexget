@@ -223,19 +223,18 @@ class OutputQBitTorrent:
                     form_data['savepath'] = save_path
             except RenderError as e:
                 logger.error('Error setting path for {}: {}', entry['title'], e)
-            
+
             label = entry.render(entry.get('label', config.get('label', '')))
             if label:
                 form_data['label'] = label  # qBittorrent v3.3.3-
                 form_data['category'] = label  # qBittorrent v3.3.4+
-            
+
             tags = entry.get('tags', []) + config.get('tags', [])
             if tags:
                 try:
                     form_data['tags'] = entry.render(",".join(tags))
                 except RenderError as e:
-                    logger.error('Error rendering tags for {}: {}',
-                                entry['title'], e)
+                    logger.error('Error rendering tags for {}: {}', entry['title'], e)
                     form_data['tags'] = ",".join(tags)
 
             add_paused = entry.get('add_paused', config.get('add_paused'))
