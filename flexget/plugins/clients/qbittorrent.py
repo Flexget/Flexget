@@ -207,7 +207,7 @@ class OutputQBitTorrent:
         config.setdefault('use_ssl', False)
         config.setdefault('verify_cert', True)
         config.setdefault('label', '')
-        config.setdefault('tags', '')
+        config.setdefault('tags', [])
         config.setdefault('maxupspeed', 0)
         config.setdefault('maxdownspeed', 0)
         config.setdefault('fail_html', True)
