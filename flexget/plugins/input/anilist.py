@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from loguru import logger
 
 from flexget import plugin
@@ -98,9 +100,9 @@ class AniList(object):
         req_variables = {'user': config['username']}
         req_chunk = 1
         req_fields = (
-            'status, title{ romaji, english }, synonyms, siteUrl, idMal, format, episodes, '
+            'id, status, title{ romaji, english }, synonyms, siteUrl, idMal, format, episodes, '
             'trailer{ site, id }, coverImage{ large }, bannerImage, genres, tags{ name }, '
-            'externalLinks{ site, url }'
+            'externalLinks{ site, url }, startDate{ year, month, day }, endDate{ year, month, day}'
         )
         while req_chunk:
             req_query = (
@@ -142,14 +144,47 @@ class AniList(object):
                                 and anime.get('format').lower() in selected_formats
                             )
                         ) or 'all' in selected_formats
+
                         if has_selected_type and has_selected_release_status:
+                            try:
+                                ids = (
+                                    task.requests.post(
+                                        'https://relations.yuna.moe/api/ids',
+                                        json={'anilist': anime.get('id')},
+                                    ).json()
+                                )
+                            except RequestException as e:
+                                ids = {}
+                                raise plugin.PluginWarning(f'Couldn\'t fetch additional IDs - {e}')
+
                             entry = Entry()
+                            entry['al_id'] = anime.get('id') or ids.get('anilist')
+                            entry['anidb_id'] = ids.get('anidb')
+                            entry['kitsu_id'] = ids.get('kitsu')
+                            entry['mal_id'] = anime.get('idMal') or ids.get('myanimelist')
                             entry['al_banner'] = anime.get('bannerImage')
                             entry['al_cover'] = anime.get('coverImage', {}).get('large')
+                            entry['al_date_end'] = (
+                                datetime(
+                                    year=anime.get('endDate').get('year'),
+                                    month=anime.get('endDate').get('month', 1),
+                                    day=anime.get('endDate').get('day', 1),
+                                )
+                                if anime.get('endDate').get('year')
+                                else None
+                            )
+                            entry['al_date_start'] = (
+                                datetime(
+                                    year=anime.get('startDate').get('year'),
+                                    month=anime.get('startDate').get('month', 1),
+                                    day=anime.get('startDate').get('day', 1),
+                                )
+                                if anime.get('startDate').get('year')
+                                else None
+                            )
                             entry['al_episodes'] = anime.get('episodes')
                             entry['al_format'] = anime.get('format')
                             entry['al_genres'] = anime.get('genres')
-                            entry['al_idMal'] = anime.get('idMal')
                             entry['al_links'] = {
                                 item['site']: item['url'] for item in anime.get('externalLinks')
                             }
