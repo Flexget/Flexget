@@ -147,12 +147,10 @@ class AniList(object):
 
                         if has_selected_type and has_selected_release_status:
                             try:
-                                ids = (
-                                    task.requests.post(
-                                        'https://relations.yuna.moe/api/ids',
-                                        json={'anilist': anime.get('id')},
-                                    ).json()
-                                )
+                                ids = task.requests.post(
+                                    'https://relations.yuna.moe/api/ids',
+                                    json={'anilist': anime.get('id')},
+                                ).json()
                             except RequestException as e:
                                 ids = {}
                                 raise plugin.PluginWarning(f'Couldn\'t fetch additional IDs - {e}')
