@@ -45,7 +45,7 @@ class OutputQBitTorrent:
                     'verify_cert': {'type': 'boolean'},
                     'path': {'type': 'string'},
                     'label': {'type': 'string'},
-                    'tags': {'type': 'array'},
+                    'tags': {'type': 'array', 'items': {'type': 'string'}},
                     'maxupspeed': {'type': 'integer'},
                     'maxdownspeed': {'type': 'integer'},
                     'fail_html': {'type': 'boolean'},
