@@ -156,10 +156,10 @@ class AniList(object):
                                 raise plugin.PluginWarning(f'Couldn\'t fetch additional IDs - {e}')
 
                             entry = Entry()
-                            entry['al_id'] = anime.get('id') or ids.get('anilist')
+                            entry['al_id'] = anime.get('id', ids.get('anilist'))
                             entry['anidb_id'] = ids.get('anidb')
                             entry['kitsu_id'] = ids.get('kitsu')
-                            entry['mal_id'] = anime.get('idMal') or ids.get('myanimelist')
+                            entry['mal_id'] = anime.get('idMal', ids.get('myanimelist'))
                             entry['al_banner'] = anime.get('bannerImage')
                             entry['al_cover'] = anime.get('coverImage', {}).get('large')
                             entry['al_date_end'] = (
