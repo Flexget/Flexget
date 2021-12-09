@@ -1,9 +1,7 @@
 import os
 import re
-import ssl
 import xmlrpc.client
 from socket import error as socket_error
-from urllib.request import urlopen
 
 from loguru import logger
 
@@ -35,7 +33,13 @@ class OutputAria2:
             'password': {'type': 'string', 'default': ''},
             'path': {'type': 'string'},
             'filename': {'type': 'string'},
-            'add_extension': {'type': 'boolean', 'default': 'no'},
+            'add_extension': {
+                'oneOf': [
+                    {'type': 'string'},
+                    {'type': 'boolean'},
+                ],
+                'default': 'no',
+            },
             'options': {
                 'type': 'object',
                 'additionalProperties': {'oneOf': [{'type': 'string'}, {'type': 'integer'}]},
@@ -84,6 +88,7 @@ class OutputAria2:
         config.setdefault('password', '')
         config.setdefault('secret', '')
         config.setdefault('options', {})
+        config.setdefault('add_extension', False)
         return config
 
     def on_task_output(self, task, config):
@@ -99,7 +104,7 @@ class OutputAria2:
                 logger.verbose('Would add `{}` to aria2.', entry['title'])
                 continue
             try:
-                self.add_entry(aria2, entry, config)
+                self.add_entry(aria2, entry, config, task)
             except socket_error as se:
                 entry.fail('Unable to reach Aria2: %s' % se)
             except xmlrpc.client.Fault as err:
@@ -109,7 +114,7 @@ class OutputAria2:
                 logger.opt(exception=True).debug('Exception type {}', type(e))
                 raise
 
-    def add_entry(self, aria2, entry, config):
+    def add_entry(self, aria2, entry, config, task):
         """
         Add entry to Aria2
         """
@@ -122,34 +127,39 @@ class OutputAria2:
             return
 
         filename = entry.get('content_filename', config.get('filename', None))
+        add_extension = config.get('add_extension', False)
         if filename:
-            if config.get('add_extension', False):
-                logger.debug('Getting filename from `{}`', entry['url'])
-                url_info = None
-                try:
-                    ctx = ssl.create_default_context()
-                    ctx.check_hostname = False
-                    ctx.verify_mode = ssl.CERT_NONE
-                    url_info = urlopen(entry['url'], context=ctx)
-                except Exception as e:
-                    logger.warning('Not possible to retrive file info from `{}`', entry['url'])
-                    entry.fail('Not possible to retrive file info from `{}`', entry['url'])
-                    return
+            if add_extension:
+                if isinstance(add_extension, bool):
+                    logger.debug('Getting filename from `{}`', entry['url'])
+                    content_disposition = None
+                    try:
+                        response = task.requests.get(entry['url'], headers=None, stream=True)
+                        content_disposition = response.headers['content-disposition']
+                    except Exception as e:
+                        logger.warning('Not possible to retrive file info from `{}`', entry['url'])
+                        entry.fail('Not possible to retrive file info from `%s`' % entry['url'])
+                        return
 
-                if url_info and url_info and 'content-disposition' in url_info.headers:
-                    content_disposition = url_info.headers['content-disposition']
-                    fname_match = re.findall(
-                        r'filename=["\']?([^"\']+)["\']?', content_disposition
-                    )
-                    if fname_match:
-                        fname = fname_match[0]
-                        fname_info = os.path.splitext(fname)
-                        if len(fname_info) == 2:
-                            ext = fname_info[1]
-                            logger.debug(
-                                'Filename from `{}` is {} with ext `{}`', entry['url'], fname, ext
-                            )
-                            filename += ext
+                    if content_disposition:
+                        fname_match = re.findall(
+                            r'filename=["\']?([^"\']+)["\']?', content_disposition
+                        )
+                        if fname_match:
+                            fname = fname_match[0]
+                            fname_info = os.path.splitext(fname)
+                            if len(fname_info) == 2:
+                                ext = fname_info[1]
+                                logger.debug(
+                                    'Filename from `{}` is {} with ext `{}`',
+                                    entry['url'],
+                                    fname,
+                                    ext,
+                                )
+                                filename += ext
+                else:
+                    ext = config.get('add_extension')
+                    filename += '.' + ext
 
             try:
                 options['out'] = os.path.expanduser(entry.render(filename))
