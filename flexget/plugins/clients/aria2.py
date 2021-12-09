@@ -1,9 +1,9 @@
 import os
 import re
+import ssl
 import xmlrpc.client
 from socket import error as socket_error
 from urllib.request import urlopen
-import ssl
 
 from loguru import logger
 
