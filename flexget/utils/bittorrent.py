@@ -4,7 +4,7 @@
 import binascii
 import re
 from contextlib import suppress
-from typing import Dict, Union, Any, Callable, Match, Generator, Iterator, List
+from typing import Any, Callable, Dict, Generator, Iterator, List, Match, Union
 
 from loguru import logger
 

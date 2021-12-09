@@ -2,6 +2,8 @@ import datetime
 from abc import ABC, abstractmethod
 from typing import Any, Optional, Type
 
+import yaml
+
 from flexget.utils import json
 
 DATE_FMT = '%Y-%m-%d'
@@ -48,7 +50,7 @@ def deserialize(value: Any) -> Any:
 
 
 def dumps(value: Any) -> str:
-    """Dump an object to text using the serialization system."""
+    """Dump an object to JSON text using the serialization system."""
     serialized = serialize(value)
     try:
         return json.dumps(serialized)
@@ -59,6 +61,18 @@ def dumps(value: Any) -> str:
 def loads(value: str) -> Any:
     """Restore an object from JSON text created by `dumps`"""
     return deserialize(json.loads(value))
+
+
+def yaml_dump(data, *args, **kwargs):
+    """Dump an object to YAML text using the serialization system."""
+    data = serialize(data)
+    kwargs['Dumper'] = FGDumper
+    return yaml.dump(data, *args, **kwargs)
+
+
+def yaml_load(stream):
+    """Restore an object from YAML text created by `yaml_dump`"""
+    return yaml.load(stream, Loader=FGLoader)
 
 
 class Serializer(ABC):
@@ -168,3 +182,44 @@ def _deserializer_for(serializer_name: str) -> Type[Serializer]:
         if serializer_name == s.serializer_name():
             return s
     raise ValueError(f'No deserializer for {serializer_name}')
+
+
+def _yaml_representer(dumper, data):
+    if isinstance(data, dict) and all(k in data for k in ('value', 'serializer', 'version')):
+        tag = f"!{data['serializer']}.v{data['version']}"
+        if isinstance(data['value'], dict):
+            return dumper.represent_mapping(tag, data['value'])
+        elif isinstance(data['value'], list):
+            return dumper.represent_sequence(tag, data['value'])
+        else:
+            return dumper.represent_scalar(tag, data['value'])
+    return dumper.represent_dict(data)
+
+
+def _yaml_constructor(loader, node):
+    serializer, version = node.tag.split('.v')
+    serializer = serializer.lstrip('!')
+    version = int(version)
+    if node.id == 'mapping':
+        value = loader.construct_mapping(node, deep=True)
+    elif node.id == 'sequence':
+        value = loader.construct_sequence(node, deep=True)
+    else:
+        value = loader.construct_scalar(node)
+    return _deserializer_for(serializer).deserialize(value, version)
+
+
+class FGDumper(yaml.SafeDumper):
+    pass
+
+
+FGDumper.add_representer(dict, _yaml_representer)
+
+
+class FGLoader(yaml.SafeLoader):
+    def __init__(self, stream):
+        for s in Serializer.__subclasses__():
+            name = s.serializer_name()
+            for v in range(1, s.serializer_version() + 1):
+                self.add_constructor(f"!{name}.v{v}", _yaml_constructor)
+        super().__init__(stream)

@@ -2,12 +2,13 @@ import datetime
 import os
 import re
 from collections import defaultdict
+from json import JSONDecodeError
+from json import loads as json_loads
 from typing import Any, Callable, Dict, List, Match, Optional, Pattern, Union
 from urllib.parse import parse_qsl, urlparse
 
 import jsonschema
 from jsonschema import ValidationError
-from jsonschema.compat import int_types, str_types
 from loguru import logger
 
 from flexget.event import fire_event
@@ -201,49 +202,49 @@ format_checker = jsonschema.FormatChecker(('email',))
 
 @format_checker.checks('quality', raises=ValueError)
 def is_quality(instance):
-    if not isinstance(instance, str_types):
+    if not isinstance(instance, str):
         return True
     return qualities.get(instance)
 
 
 @format_checker.checks('quality_requirements', raises=ValueError)
 def is_quality_req(instance):
-    if not isinstance(instance, str_types):
+    if not isinstance(instance, str):
         return True
     return qualities.Requirements(instance)
 
 
 @format_checker.checks('time', raises=ValueError)
 def is_time(time_string) -> bool:
-    if not isinstance(time_string, str_types):
+    if not isinstance(time_string, str):
         return True
     return parse_time(time_string) is not None
 
 
 @format_checker.checks('interval', raises=ValueError)
 def is_interval(interval_string) -> bool:
-    if not isinstance(interval_string, str_types):
+    if not isinstance(interval_string, str):
         return True
     return parse_interval(interval_string) is not None
 
 
 @format_checker.checks('size', raises=ValueError)
 def is_size(size_string) -> bool:
-    if not isinstance(size_string, (str_types, int_types)):
+    if not isinstance(size_string, (str, int)):
         return True
     return parse_size(size_string) is not None
 
 
 @format_checker.checks('percent', raises=ValueError)
 def is_percent(percent_string) -> bool:
-    if not isinstance(percent_string, str_types):
+    if not isinstance(percent_string, str):
         return True
     return parse_percent(percent_string) is not None
 
 
 @format_checker.checks('regex', raises=ValueError)
 def is_regex(instance) -> Union[bool, Pattern]:
-    if not isinstance(instance, str_types):
+    if not isinstance(instance, str):
         return True
     try:
         return re.compile(instance)
@@ -253,7 +254,7 @@ def is_regex(instance) -> Union[bool, Pattern]:
 
 @format_checker.checks('file', raises=ValueError)
 def is_file(instance) -> bool:
-    if not isinstance(instance, str_types):
+    if not isinstance(instance, str):
         return True
     if os.path.isfile(os.path.expanduser(instance)):
         return True
@@ -262,7 +263,7 @@ def is_file(instance) -> bool:
 
 @format_checker.checks('path', raises=ValueError)
 def is_path(instance) -> bool:
-    if not isinstance(instance, str_types):
+    if not isinstance(instance, str):
         return True
     # Only validate the part of the path before the first identifier to be replaced
     pat = re.compile(r'{[{%].*[}%]}')
@@ -277,7 +278,7 @@ def is_path(instance) -> bool:
 # TODO: jsonschema has a format checker for uri if rfc3987 is installed, perhaps we should use that
 @format_checker.checks('url')
 def is_url(instance) -> Union[None, bool, Match]:
-    if not isinstance(instance, str_types):
+    if not isinstance(instance, str):
         return True
     # Allow looser validation if this appears to start with jinja
     if instance.startswith('{{') or instance.startswith('{%'):
@@ -292,23 +293,36 @@ def is_url(instance) -> Union[None, bool, Match]:
 
 @format_checker.checks('episode_identifier', raises=ValueError)
 def is_episode_identifier(instance) -> bool:
-    if not isinstance(instance, (str_types, int)):
+    if not isinstance(instance, (str, int)):
         return True
     return parse_episode_identifier(instance) is not None
 
 
 @format_checker.checks('episode_or_season_id', raises=ValueError)
 def is_episode_or_season_id(instance):
-    if not isinstance(instance, (str_types, int)):
+    if not isinstance(instance, (str, int)):
         return True
     return parse_episode_identifier(instance, identify_season=True) is not None
 
 
 @format_checker.checks('file_template', raises=ValueError)
 def is_valid_template(instance) -> bool:
-    if not isinstance(instance, str_types):
+    if not isinstance(instance, str):
         return True
     return get_template(instance) is not None
+
+
+@format_checker.checks('json', raises=ValueError)
+def is_json(instance) -> bool:
+    if not isinstance(instance, str):
+        return False
+
+    try:
+        decoded_json = json_loads(instance)
+    except JSONDecodeError as e:
+        raise ValueError('`%s` is not a valid json' % instance)
+
+    return True
 
 
 def set_error_message(error: jsonschema.ValidationError) -> None:

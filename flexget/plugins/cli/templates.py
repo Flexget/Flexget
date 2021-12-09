@@ -1,12 +1,17 @@
 from flexget import options
 from flexget.event import event
-from flexget.terminal import TerminalTable, TerminalTableError, console, table_parser
+from flexget.terminal import TerminalTable, console, table_parser
 from flexget.utils.template import get_template, list_templates
 
 
 def list_file_templates(manager, options):
-    header = ['Name', 'Use with', 'Full Path', 'Contents']
-    table_data = [header]
+    header = [
+        'Name',
+        'Use with',
+        TerminalTable.Column('Full Path', overflow='fold'),
+        TerminalTable.Column('Contents', overflow='ignore'),
+    ]
+    table = TerminalTable(*header, table_type=options.table_type, show_lines=True)
     console('Fetching all file templates, stand by...')
     for template_name in list_templates(extensions=['template']):
         if options.name and not options.name in template_name:
@@ -22,16 +27,9 @@ def list_file_templates(manager, options):
         if len(name) == 2:
             name = name[1]
         with open(template.filename) as contents:
-            table_data.append([name, plugin, template.filename, contents.read()])
+            table.add_row(name, plugin, template.filename, contents.read().strip())
 
-    try:
-        table = TerminalTable(
-            options.table_type, table_data, wrap_columns=[2, 3], drop_columns=[2, 3]
-        )
-    except TerminalTableError as e:
-        console('ERROR: %s' % str(e))
-    else:
-        console(table.output)
+    console(table)
 
 
 @event('options.register')

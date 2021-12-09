@@ -1,10 +1,10 @@
 from loguru import logger
 
-from flexget.components.emby.api_emby import EmbyAuth, EmbyApi
-from flexget.config_schema import one_or_more
 from flexget import plugin
-from flexget.event import event
+from flexget.components.emby.api_emby import EmbyApi, EmbyApiList, EmbyAuth
 from flexget.components.emby.emby_util import SCHEMA_SERVER_TAG, SORT_FIELDS
+from flexget.config_schema import one_or_more
+from flexget.event import event
 
 logger = logger.bind(name='from_emby')
 
@@ -56,7 +56,7 @@ class EmbyInput:
                 ]
             },
         },
-        'required': ['server', 'list'],
+        'required': ['server'],
         'additionalProperties': False,
     }
 
@@ -83,7 +83,33 @@ class EmbyInput:
             entry = s_list.to_entry()
             yield entry
 
+    @plugin.internet(logger)
+    def search(self, task, entry, config=None):
+        self.login(config)
+
+        s_list = EmbyApiList.get_api_list(**config)
+
+        entries = []
+        entries_obj = {}
+
+        for search_string in entry.get('search_strings', [entry['title']]):
+            entry['search_string'] = search_string
+            media = s_list.get(entry)
+            if not media:
+                continue
+
+            new_entry = media.to_entry()
+            if 'emby_id' not in new_entry:
+                continue
+
+            entries_obj[new_entry['emby_id']] = new_entry
+
+        for _, new_entry in entries_obj.items():
+            entries.append(new_entry)
+
+        return entries
+
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(EmbyInput, 'from_emby', api_ver=2)
+    plugin.register(EmbyInput, 'from_emby', interfaces=['search', 'task'], api_ver=2)

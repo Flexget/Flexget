@@ -69,7 +69,7 @@ class SeenSearchAPI(APIResource):
     @api.response(200, 'Successfully retrieved seen objects', seen_search_schema)
     @api.doc(parser=seen_search_parser, description='Get seen entries')
     def get(self, session):
-        """ Search for seen entries """
+        """Search for seen entries"""
         args = seen_search_parser.parse_args()
 
         # Filter params
@@ -138,7 +138,7 @@ class SeenSearchAPI(APIResource):
     @api.response(200, 'Successfully delete all entries', model=base_message_schema)
     @api.doc(parser=seen_base_parser, description='Delete seen entries')
     def delete(self, session):
-        """ Delete seen entries """
+        """Delete seen entries"""
         args = seen_base_parser.parse_args()
         value = args['value']
         local = args['local']
@@ -162,7 +162,7 @@ class SeenSearchIDAPI(APIResource):
     @etag
     @api.response(200, model=seen_object_schema)
     def get(self, seen_entry_id, session):
-        """ Get seen entry by ID """
+        """Get seen entry by ID"""
         try:
             seen_entry = db.get_entry_by_id(seen_entry_id, session=session)
         except NoResultFound:
@@ -171,7 +171,7 @@ class SeenSearchIDAPI(APIResource):
 
     @api.response(200, 'Successfully deleted entry', model=base_message_schema)
     def delete(self, seen_entry_id, session):
-        """ Delete seen entry by ID """
+        """Delete seen entry by ID"""
         try:
             entry = db.get_entry_by_id(seen_entry_id, session=session)
         except NoResultFound:

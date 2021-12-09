@@ -1,6 +1,7 @@
 import argparse  # noqa
 import atexit  # noqa
 import codecs  # noqa
+import collections
 import copy  # noqa
 import errno  # noqa
 import fnmatch  # noqa
@@ -538,22 +539,14 @@ class Manager:
         self.shutdown(finish_queue=False)
 
     def setup_yaml(self) -> None:
-        """Sets up the yaml loader to return unicode objects for strings by default"""
+        """Customize the yaml loader/dumper behavior"""
 
-        def construct_yaml_str(self, node):
-            # Override the default string handling function
-            # to always return unicode objects
-            return self.construct_scalar(node)
-
-        yaml.Loader.add_constructor('tag:yaml.org,2002:str', construct_yaml_str)
-        yaml.SafeLoader.add_constructor('tag:yaml.org,2002:str', construct_yaml_str)
-
-        # Set up the dumper to not tag every string with !!python/unicode
-        def unicode_representer(dumper, uni):
-            node = yaml.ScalarNode(tag='tag:yaml.org,2002:str', value=uni)
-            return node
-
-        yaml.add_representer(str, unicode_representer)
+        # Represent OrderedDict as a regular dict (but don't sort it alphabetically)
+        # This lets us order a dict in a yaml file for easier human consumption
+        represent_dict_order = lambda self, data: self.represent_mapping(
+            'tag:yaml.org,2002:map', data.items()
+        )
+        yaml.add_representer(collections.OrderedDict, represent_dict_order)
 
         # Set up the dumper to increase the indent for lists
         def increase_indent_wrapper(func):

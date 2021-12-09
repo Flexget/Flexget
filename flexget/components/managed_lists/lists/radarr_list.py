@@ -45,7 +45,7 @@ def spec_exception_from_response_ex(radarr_request_ex):
 
 
 def request_get_json(url, headers):
-    """ Makes a GET request and returns the JSON response """
+    """Makes a GET request and returns the JSON response"""
     try:
         response = requests.get(url, headers=headers, timeout=10)  # TODO: HANGS HERE
         if response.status_code == 200:
@@ -59,7 +59,7 @@ def request_get_json(url, headers):
 
 
 def request_delete_json(url, headers):
-    """ Makes a DELETE request and returns the JSON response """
+    """Makes a DELETE request and returns the JSON response"""
     try:
         response = requests.delete(url, headers=headers, timeout=10)
         if response.status_code == 200:
@@ -73,7 +73,7 @@ def request_delete_json(url, headers):
 
 
 def request_post_json(url, headers, data):
-    """ Makes a POST request and returns the JSON response """
+    """Makes a POST request and returns the JSON response"""
     try:
         response = requests.post(url, headers=headers, data=data, timeout=10)
         if response.status_code == 201:
@@ -100,7 +100,7 @@ def request_post_json(url, headers, data):
 
 
 def request_put_json(url, headers):
-    """ Makes a PUT request and returns the JSON response """
+    """Makes a PUT request and returns the JSON response"""
     try:
         response = requests.put(url, headers=headers)
         if response.status_code == 200:
@@ -114,7 +114,7 @@ def request_put_json(url, headers):
 
 
 class RadarrAPIService:
-    """ Handles all communication with the Radarr REST API """
+    """Handles all communication with the Radarr REST API"""
 
     def __init__(self, api_key, base_url, port=None):
         self.api_key = api_key
@@ -131,58 +131,58 @@ class RadarrAPIService:
         )
 
     def get_profiles(self):
-        """ Gets all profiles """
+        """Gets all profiles"""
         request_url = self.api_url + "profile"
         headers = self._default_headers()
         return request_get_json(request_url, headers)
 
     def get_tags(self):
-        """ Gets all tags """
+        """Gets all tags"""
         request_url = self.api_url + "tag"
         headers = self._default_headers()
         return request_get_json(request_url, headers)
 
     def add_tag(self, label):
-        """ Adds a tag """
+        """Adds a tag"""
         request_url = self.api_url + "tag"
         headers = self._default_headers()
         data = {"label": label}
         return request_post_json(request_url, headers, json.dumps(data))
 
     def get_movies(self):
-        """ Gets all movies """
+        """Gets all movies"""
         request_url = self.api_url + "movie"
         headers = self._default_headers()
         return request_get_json(request_url, headers)
 
     def get_root_folders(self):
-        """ Gets the root folders """
+        """Gets the root folders"""
         request_url = self.api_url + "rootfolder"
         headers = self._default_headers()
         return request_get_json(request_url, headers)
 
     def delete_movie(self, movie_id):
-        """ Deletes a movie provided by its id """
+        """Deletes a movie provided by its id"""
         request_url = self.api_url + "movie/" + str(movie_id)
         headers = self._default_headers()
         return request_delete_json(request_url, headers)
 
     def lookup_by_term(self, term):
-        """ Returns all movies that matches the search term """
+        """Returns all movies that matches the search term"""
         term = quote(term)
         request_url = self.api_url + "movie/lookup?term=" + term
         headers = self._default_headers()
         return request_get_json(request_url, headers)
 
     def lookup_by_imdb(self, imdb_id):
-        """ Returns all movies that matches the imdb id """
+        """Returns all movies that matches the imdb id"""
         # TODO: make regexp check that imdb_id really is an IMDB_ID
         request_url = self.api_url + "movie/lookup/imdb?imdbId=" + imdb_id
         headers = self._default_headers()
         return request_get_json(request_url, headers)
 
     def lookup_by_tmdb(self, tmdb_id):
-        """ Returns all movies that matches the tmdb id """
+        """Returns all movies that matches the tmdb id"""
         tmdb_id = int(tmdb_id)
         request_url = self.api_url + "movie/lookup/tmdb?tmdbId=" + str(tmdb_id)
         headers = self._default_headers()
@@ -201,7 +201,7 @@ class RadarrAPIService:
         add_options=None,
         tags=(),
     ):
-        """ Adds a movie """
+        """Adds a movie"""
         request_url = self.api_url + "movie"
         headers = self._default_headers()
         data = {
@@ -231,7 +231,7 @@ class RadarrAPIService:
         return json_response
 
     def _default_headers(self):
-        """ Returns a dictionary with default headers """
+        """Returns a dictionary with default headers"""
         return {"X-Api-Key": self.api_key}
 
 
@@ -310,7 +310,7 @@ def get_flexget_qualities(profile, cutoff_only=False):
 
 
 class RadarrSet(MutableSet):
-    """ Accesses the Radarr movies using the provided the config """
+    """Accesses the Radarr movies using the provided the config"""
 
     def __init__(self, config):
         self.config = config
@@ -440,14 +440,14 @@ class RadarrSet(MutableSet):
 
     @property
     def items(self):
-        """ Property that returns all items and only loads them all items when needed """
+        """Property that returns all items and only loads them all items when needed"""
         if self._movie_entries is None:
             self._movie_entries = self._get_movie_entries()
         return self._movie_entries
 
     @property
     def tags(self):
-        """ Property that returns tag by id """
+        """Property that returns tag by id"""
         tags_ids = []
         if self._tags is None:
             existing = {t["label"].lower(): t["id"] for t in self.service.get_tags()}
@@ -609,7 +609,7 @@ class RadarrSet(MutableSet):
 
 
 class RadarrList:
-    """ List plugin for Radarr that also works as an input plugin """
+    """List plugin for Radarr that also works as an input plugin"""
 
     schema = {
         "type": "object",

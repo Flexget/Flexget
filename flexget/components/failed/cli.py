@@ -1,7 +1,7 @@
 from flexget import options
 from flexget.event import event
 from flexget.manager import Session
-from flexget.terminal import TerminalTable, TerminalTableError, console, table_parser
+from flexget.terminal import TerminalTable, console, table_parser
 
 from . import db
 
@@ -16,25 +16,23 @@ def do_cli(manager, options):
 def list_failed(options):
     with Session() as session:
         results = session.query(db.FailedEntry).all()
-        header = ['#', 'Title', 'Fail count', 'Reason', 'Failure time']
-        table_data = [header]
+        header = [
+            TerminalTable.Column('#', justify='center'),
+            'Title',
+            'Fail count',
+            'Reason',
+            'Failure time',
+        ]
+        table = TerminalTable(*header, table_type=options.table_type)
         for entry in results:
-            table_data.append(
-                [
-                    entry.id,
-                    entry.title,
-                    entry.count,
-                    '' if entry.reason == 'None' else entry.reason,
-                    entry.tof.strftime('%Y-%m-%d %H:%M'),
-                ]
+            table.add_row(
+                str(entry.id),
+                entry.title,
+                str(entry.count),
+                '' if entry.reason == 'None' else entry.reason,
+                entry.tof.strftime('%Y-%m-%d %H:%M'),
             )
-    try:
-        table = TerminalTable(options.table_type, table_data, wrap_columns=[3, 1])
-    except TerminalTableError as e:
-        console('ERROR: %s' % str(e))
-    else:
-        table.table.justify_columns[0] = 'center'
-        console(table.output)
+    console(table)
 
 
 def clear_failed(manager):

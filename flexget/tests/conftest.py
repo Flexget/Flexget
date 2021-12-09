@@ -21,7 +21,9 @@ from vcr import VCR
 from vcr.stubs import VCRHTTPConnection, VCRHTTPSConnection
 
 import flexget.log
+from flexget import plugin
 from flexget.api import api_app
+from flexget.event import event
 from flexget.manager import Manager, Session
 from flexget.plugin import load_plugins
 from flexget.task import Task, TaskAbort
@@ -368,6 +370,31 @@ class MockManager(Manager):
     def shutdown(self, finish_queue=True):
         super().shutdown(finish_queue=finish_queue)
         self._shutdown()
+
+
+# Perhaps this bit should go somewhere else... The way reruns work can be complicated, and was causing issues in
+# some cases. This plugin should run on all tests in the suite, to make sure certain phases aren't getting
+# called twice. https://github.com/Flexget/Flexget/issues/3254
+class DoublePhaseChecker:
+    @staticmethod
+    def on_phase(task, phase):
+        if getattr(task, f'did_{phase}', None):
+            raise Exception(f'{phase} phase should not run twice')
+        setattr(task, f'did_{phase}', True)
+
+    def on_task_start(self, task, config):
+        self.on_phase(task, 'start')
+
+    def on_task_prepare(self, task, config):
+        self.on_phase(task, 'prepare')
+
+    def on_task_exit(self, task, config):
+        self.on_phase(task, 'exit')
+
+
+@event('plugin.register')
+def register_plugin():
+    plugin.register(DoublePhaseChecker, 'test_dobule_phase', api_ver=2, debug=True, builtin=True)
 
 
 class APIClient:

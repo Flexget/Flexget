@@ -18,7 +18,7 @@ except ImportError:
     )
 
 
-logger = logger.bind(name='rlsbb')
+logger = logger.bind(name='allyoulike')
 
 
 class UrlRewriteAllyoulike:
@@ -81,7 +81,7 @@ class UrlRewriteAllyoulike:
         link_re = re.compile(r'rarefile\.net.*\.rar$')
 
         # grab links from the main entry:
-        blog_entry = soup.find('div', class_="entry")
+        blog_entry = soup.find('div', class_="entry-content")
         num_links = 0
         link_list = None
         for paragraph in blog_entry.find_all('p'):

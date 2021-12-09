@@ -7,7 +7,7 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.manager import Session
 from flexget.plugin import DependencyError, PluginError
-from flexget.terminal import TerminalTable, TerminalTableError, console, table_parser
+from flexget.terminal import TerminalTable, console, table_parser
 from flexget.utils.tools import split_title_year
 
 from . import db
@@ -85,18 +85,14 @@ def do_cli(manager, options):
 
 
 def movie_list_lists(options):
-    """ Show all movie lists """
+    """Show all movie lists"""
     lists = db.get_movie_lists()
     header = ['#', 'List Name']
-    table_data = [header]
+    table = TerminalTable(*header, table_type=options.table_type)
     for movie_list in lists:
-        table_data.append([movie_list.id, movie_list.name])
-    try:
-        table = TerminalTable(options.table_type, table_data)
-    except TerminalTableError as e:
-        console('ERROR: {}'.format(e))
-    else:
-        console(table.output)
+        table.add_row(str(movie_list.id), movie_list.name)
+
+    console(table)
 
 
 def movie_list_list(options):
@@ -109,22 +105,17 @@ def movie_list_list(options):
             return
     header = ['#', 'Movie Name', 'Movie year']
     header += db.MovieListBase().supported_ids
-    table_data = [header]
     movies = db.get_movies_by_list_id(
         movie_list.id, order_by='added', descending=True, session=session
     )
-    for movie in movies:
-        movie_row = [movie.id, movie.title, movie.year or '']
-        for identifier in db.MovieListBase().supported_ids:
-            movie_row.append(movie.identifiers.get(identifier, ''))
-        table_data.append(movie_row)
     title = '{} Movies in movie list: `{}`'.format(len(movies), options.list_name)
-    try:
-        table = TerminalTable(options.table_type, table_data, title, drop_columns=[5, 2, 4])
-    except TerminalTableError as e:
-        console('ERROR: {}'.format(e))
-    else:
-        console(table.output)
+    table = TerminalTable(*header, table_type=options.table_type, title=title)
+    for movie in movies:
+        movie_row = [str(movie.id), movie.title, str(movie.year) or '']
+        for identifier in db.MovieListBase().supported_ids:
+            movie_row.append(str(movie.identifiers.get(identifier, '')))
+        table.add_row(*movie_row)
+    console(table)
 
 
 def movie_list_add(options):

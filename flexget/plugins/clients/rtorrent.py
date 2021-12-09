@@ -1,6 +1,7 @@
 import os
 import re
 import socket
+from datetime import datetime
 from io import BytesIO
 from time import sleep
 from urllib.parse import urljoin, urlparse, urlsplit
@@ -161,7 +162,7 @@ def create_proxy(url):
 
 
 class RTorrent:
-    """ rTorrent API client """
+    """rTorrent API client"""
 
     default_fields = (
         'hash',
@@ -184,6 +185,7 @@ class RTorrent:
         'ratio',
         'base_path',
         'load_date',
+        'timestamp_finished',
     )
 
     required_fields = ('hash', 'name', 'base_path')
@@ -234,7 +236,7 @@ class RTorrent:
             fields = list(self.default_fields)
 
         if reverse:
-            for field in ['up.total', 'down.total', 'down.rate']:
+            for field in ['up.total', 'down.total', 'down.rate', 'timestamp.finished']:
                 if field in fields:
                     fields[fields.index(field)] = field.replace('.', '_')
             return fields
@@ -243,7 +245,7 @@ class RTorrent:
             if required_field not in fields:
                 fields.insert(0, required_field)
 
-        for field in ['up_total', 'down_total', 'down_rate']:
+        for field in ['up_total', 'down_total', 'down_rate', 'timestamp_finished']:
             if field in fields:
                 fields[fields.index(field)] = field.replace('_', '.')
 
@@ -290,7 +292,7 @@ class RTorrent:
         return self._server.get_directory()
 
     def torrent(self, info_hash, fields=None):
-        """ Get the details of a torrent """
+        """Get the details of a torrent"""
         if not fields:
             fields = list(self.default_fields)
 
@@ -655,7 +657,7 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
             logger.warning('Failed to verify torrent {} loaded: {}', entry['title'], str(e))
 
     def on_task_learn(self, task, config):
-        """ Make sure all temp files are cleaned up when entries are learned """
+        """Make sure all temp files are cleaned up when entries are learned"""
         # If download plugin is enabled, it will handle cleanup.
         if 'download' not in task.config:
             download = plugin.get('download', self)
@@ -708,6 +710,9 @@ class RTorrentInputPlugin(RTorrentPluginBase):
 
             for attr, value in torrent.items():
                 entry[attr] = value
+
+            if 'timestamp_finished' in entry:
+                entry['timestamp_finished'] = datetime.fromtimestamp(entry['timestamp_finished'])
 
             entries.append(entry)
 

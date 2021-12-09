@@ -31,7 +31,7 @@ class TestFilterSeen:
         task = execute_task('test')
         assert task.find_entry(title='Seen title 1'), 'Test entry missing'
         # run again, should filter
-        task.execute()
+        task = execute_task('test')
         assert not task.find_entry(title='Seen title 1'), 'Seen test entry remains'
 
         # execute another task
@@ -158,7 +158,7 @@ class TestFilterSeenMovies:
         ), 'Movie accepted twice in one run'
 
         # execute again
-        task.execute()
+        task = execute_task('test_1')
         assert not task.find_entry(
             title='Seen movie title 1'
         ), 'Test movie entry 1 should be rejected in second execution'
@@ -188,7 +188,7 @@ class TestFilterSeenMovies:
             'accepted', title='Seen movie title 11'
         ), 'local should have passed movie 11'
         # execute again
-        task.execute()
+        task = execute_task('local')
         msg = 'Test movie entry 12 should be rejected in second execution'
         assert task.find_entry('rejected', title='Seen movie title 12'), msg
         # test a global scope after

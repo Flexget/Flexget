@@ -123,13 +123,14 @@ class TransmissionBase:
 
         if torrent.seedIdleMode == 1:  # use torrent's own idle limit
             idle_limit_ok = (
-                torrent.date_active + timedelta(minutes=torrent.seedIdleLimit) < datetime.now()
+                torrent.date_active + timedelta(minutes=torrent.seedIdleLimit)
+                < datetime.now().astimezone()
             )
         elif torrent.seedIdleMode == 0:  # use global rules
             if session.idle_seeding_limit_enabled:
                 idle_limit_ok = (
                     torrent.date_active + timedelta(minutes=session.idle_seeding_limit)
-                    < datetime.now()
+                    < datetime.now().astimezone()
                 )
 
         return seed_limit_ok, idle_limit_ok
@@ -755,7 +756,7 @@ class PluginTransmission(TransmissionBase):
         return options
 
     def on_task_learn(self, task, config):
-        """ Make sure all temp files are cleaned up when entries are learned """
+        """Make sure all temp files are cleaned up when entries are learned"""
         # If download plugin is enabled, it will handle cleanup.
         if 'download' not in task.config:
             download = plugin.get('download', self)

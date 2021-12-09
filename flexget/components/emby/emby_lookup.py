@@ -1,7 +1,7 @@
 from loguru import logger
 
 from flexget import entry, plugin
-from flexget.components.emby.api_emby import EmbyAuth, EmbyApi
+from flexget.components.emby.api_emby import EmbyApi, EmbyAuth
 from flexget.components.emby.emby_util import SCHEMA_SERVER, get_field_map
 from flexget.event import event
 
@@ -33,7 +33,7 @@ class EmbyLookup:
         try:
             self.auth.login(False)
         except plugin.PluginError as e:
-            logger.debug('Not possible to login to emby: {}', e)
+            logger.error('Not possible to login to emby: {}', e)
 
     @entry.register_lazy_lookup('emby_lookup')
     def lazy_loader(self, entry, auth):

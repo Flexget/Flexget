@@ -5,7 +5,7 @@ import re
 from contextlib import suppress
 from copy import copy
 from datetime import date, datetime, time
-from typing import TYPE_CHECKING, Any, List, Mapping, Optional, Union, AnyStr, Type, cast
+from typing import TYPE_CHECKING, Any, AnyStr, List, Mapping, Optional, Type, Union, cast
 
 import jinja2.filters
 from dateutil import parser as dateutil_parse
@@ -25,6 +25,7 @@ from loguru import logger
 from flexget.event import event
 from flexget.utils.lazy_dict import LazyDict
 from flexget.utils.pathscrub import pathscrub
+from flexget.utils.tools import split_title_year
 
 if TYPE_CHECKING:
     from flexget.entry import Entry
@@ -63,6 +64,8 @@ def filter_pathdir(val: Optional[str]) -> str:
 
 def filter_pathscrub(val: str, os_mode: str = None) -> str:
     """Replace problematic characters in a path."""
+    if not isinstance(val, str):
+        return val
     return pathscrub(val, os_mode)
 
 
@@ -137,6 +140,14 @@ def filter_default(value, default_value: str = '', boolean: bool = True) -> str:
 
 
 filter_d = filter_default
+
+
+def filter_strip_year(name: str) -> str:
+    return split_title_year(name).title
+
+
+def filter_get_year(name: str) -> str:
+    return split_title_year(name).year
 
 
 def is_fs_file(pathname: Union[str, os.PathLike]) -> bool:

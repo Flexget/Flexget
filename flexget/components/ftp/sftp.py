@@ -168,6 +168,13 @@ class SftpDownload:
         to: str = config['to']
 
         try:
+            to = render_from_entry(to, entry)
+        except RenderError as e:
+            logger.error('Could not render path: {}', to)
+            entry.fail(str(e))  # type: ignore
+            return
+
+        try:
             sftp.download(path, to, recursive, delete_origin)
         except SftpError as e:
             entry.fail(e)  # type: ignore

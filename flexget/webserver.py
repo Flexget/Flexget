@@ -2,7 +2,7 @@ import hashlib
 import random
 import socket
 import threading
-from typing import Optional, Dict, Tuple
+from typing import Dict, Optional, Tuple
 
 import cherrypy
 import zxcvbn
@@ -25,7 +25,7 @@ rand = random.SystemRandom()
 
 
 def generate_key():
-    """ Generate key for use to authentication """
+    """Generate key for use to authentication"""
     return str(hashlib.sha224(str(rand.getrandbits(128)).encode('utf-8')).hexdigest())
 
 
@@ -45,7 +45,7 @@ def get_random_string(
 
 @with_session
 def get_secret(session=None):
-    """ Generate a secret key for flask applications and store it in the database. """
+    """Generate a secret key for flask applications and store it in the database."""
     web_secret = session.query(WebSecret).first()
     if not web_secret:
         web_secret = WebSecret(
@@ -76,7 +76,7 @@ class WeakPassword(Exception):
 
 
 class User(Base, UserMixin):
-    """ User class available for flask apps to handle authentication using flask_login """
+    """User class available for flask apps to handle authentication using flask_login"""
 
     __tablename__ = 'users'
 
@@ -93,7 +93,7 @@ class User(Base, UserMixin):
 
 
 class WebSecret(Base):
-    """ Store flask secret in the database """
+    """Store flask secret in the database"""
 
     __tablename__ = 'secret'
 
@@ -115,14 +115,14 @@ def register_home(route):
 
 @_default_app.route('/')
 def start_page():
-    """ Redirect user to registered UI home """
+    """Redirect user to registered UI home"""
     if not _home:
         abort(404)
     return redirect(_home)
 
 
 def setup_server(config):
-    """ Sets up and starts/restarts the web service. """
+    """Sets up and starts/restarts the web service."""
     web_server = WebServer(
         bind=config['bind'],
         port=config['port'],

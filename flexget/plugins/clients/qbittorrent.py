@@ -1,5 +1,5 @@
 import os
-from json import loads, JSONDecodeError
+from json import JSONDecodeError, loads
 
 from loguru import logger
 from requests import Session

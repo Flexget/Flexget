@@ -84,10 +84,7 @@ class Manipulate:
         if not self.phase_jobs['filter']:
             # return if no jobs for this phase
             return
-        modified = sum(
-            self.process(entry, self.phase_jobs['filter'])
-            for entry in task.entries + task.rejected
-        )
+        modified = sum(self.process(entry, self.phase_jobs['filter']) for entry in task.entries)
         logger.verbose('Modified {} entries.', modified)
 
     @plugin.priority(plugin.PRIORITY_FIRST)
@@ -95,10 +92,7 @@ class Manipulate:
         if not self.phase_jobs['modify']:
             # return if no jobs for this phase
             return
-        modified = sum(
-            self.process(entry, self.phase_jobs['modify'])
-            for entry in task.entries + task.rejected
-        )
+        modified = sum(self.process(entry, self.phase_jobs['modify']) for entry in task.entries)
         logger.verbose('Modified {} entries.', modified)
 
     def process(self, entry, jobs):

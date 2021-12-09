@@ -1,4 +1,5 @@
 import pytest
+
 from flexget.components.managed_lists.lists.sonarr_list import SonarrSet
 
 SONARR_API_KEY = '7f0a2ce32a3e43c8a7389e9539c487b4'

@@ -9,7 +9,7 @@ logger = logger.bind(name='free_space')
 
 
 def get_free_space(config, task):
-    """ Return folder/drive free space (in megabytes)"""
+    """Return folder/drive free space (in megabytes)"""
     if 'host' in config:
         import paramiko
 

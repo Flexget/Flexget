@@ -19,16 +19,11 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ env.PYTHON_VERSION }}
-    - name: Set up pip cache
-      uses: actions/cache@v2
-      with:
-        path: pip_cache
-        key: ${{ runner.OS }}-python${{ env.PYTHON_VERSION }}-${{ hashFiles('*requirements*.txt') }}
-        restore-keys: |
-          ${{ runner.OS }}-python${{ env.PYTHON_VERSION }}-
+        cache: 'pip'
+        cache-dependency-path: 'dev-requirements.txt'
     - name: Install dev dependencies
       run: |
-        pip --cache-dir pip_cache install -r dev-requirements.txt
+        pip install -r dev-requirements.txt
     - name: Set Deployment Status Pending
       uses: deliverybot/deployment-status@v1
       with:
@@ -40,12 +35,22 @@ jobs:
         TWINE_PASSWORD: ${{ secrets.pypi_token }}
       run: |
         ./release.sh
-    - uses: ncipollo/release-action@v1
+    - name: Prep Changelog
+      id: changelog
+      if: env.release_tag
+      run: |
+        version=$(echo ${{ env.release_tag }} | sed -e 's/v//' -e 's/\.//g')
+        date=$(date +%Y-%m-%d)
+        link="${{ env.release_tag }} [Changelog](https://flexget.com/ChangeLog#${version}-${date})"
+        echo ::set-output name=changeloglink::$link
+    - name: Create GitHub Release
+      uses: ncipollo/release-action@v1
       if: env.release_tag
       with:
         tag: ${{ env.release_tag }}
         artifacts: "dist/*"
         token: ${{ secrets.GITHUB_TOKEN }}
+        body: ${{ steps.changelog.output.changeloglink }}
     - name: Set Deployment Status Success
       uses: deliverybot/deployment-status@v1
       with:

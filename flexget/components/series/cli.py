@@ -2,13 +2,11 @@ import argparse
 import os
 from datetime import timedelta
 
-from colorclass.toggles import disable_all_colors
-
 import flexget.components.series.utils
 from flexget import options
 from flexget.event import event
 from flexget.manager import Session
-from flexget.terminal import TerminalTable, TerminalTableError, colorize, console, table_parser
+from flexget.terminal import TerminalTable, colorize, console, table_parser
 
 from . import db
 
@@ -24,16 +22,16 @@ ENV_ADD_QUALITY = 'FLEXGET_SERIES_ADD_QUALITY'
 SORT_COLUMN_COLOR = 'yellow'
 NEW_EP_COLOR = 'green'
 FRESH_EP_COLOR = 'yellow'
-OLD_EP_COLOR = 'black'
+OLD_EP_COLOR = 'default'
 BEHIND_EP_COLOR = 'red'
-UNDOWNLOADED_RELEASE_COLOR = 'black'
-DOWNLOADED_RELEASE_COLOR = 'white'
+UNDOWNLOADED_RELEASE_COLOR = 'default'
+DOWNLOADED_RELEASE_COLOR = 'green'
 ERROR_COLOR = 'red'
 
 
 def do_cli(manager, options):
     if hasattr(options, 'table_type') and options.table_type == 'porcelain':
-        disable_all_colors()
+        flexget.terminal.disable_colors()
     if options.series_action == 'list':
         display_summary(options)
     elif options.series_action == 'show':
@@ -81,8 +79,8 @@ def display_summary(options):
         for index, value in enumerate(header):
             if value.lower() == options.sort_by:
                 header[index] = colorize(SORT_COLUMN_COLOR, value)
+        table = TerminalTable(*header, table_type=options.table_type)
 
-        table_data = [header]
         for series in query:
             name_column = series.name
 
@@ -114,17 +112,8 @@ def display_summary(options):
                         BEHIND_EP_COLOR, ' {} {} behind'.format(behind[0], behind[1])
                     )
 
-            table_data.append(
-                [name_column, begin, episode_id, age_col, latest_release, identifier_type]
-            )
-    try:
-        table = TerminalTable(
-            options.table_type, table_data, wrap_columns=[3], drop_columns=[4, 3, 2]
-        )
-        console(table.output)
-    except TerminalTableError as e:
-        console('ERROR: %s' % str(e))
-        return
+            table.add_row(name_column, begin, episode_id, age_col, latest_release, identifier_type)
+    console(table)
     if not porcelain:
         if not query.count():
             console('Use `flexget series list all` to view all known series.')
@@ -231,7 +220,7 @@ def display_details(options):
             return
         # Pick the best matching series
         series = matches[0]
-        table_title = colorize('white', series.name)
+        table_title = series.name
         if len(matches) > 1:
             warning = (
                 colorize('red', ' WARNING: ') + 'Multiple series match to `{}`.\n '
@@ -240,8 +229,8 @@ def display_details(options):
             )
             if not options.table_type == 'porcelain':
                 console(warning)
-        header = ['Identifier', 'Last seen', 'Release titles', 'Release Quality', 'Proper']
-        table_data = [header]
+        header = ['Identifier', 'Last seen', 'Release titles', 'Quality', 'Proper']
+        table_data = []
         entities = db.get_all_entities(series, session=session, sort_by=sort_by, reverse=reverse)
         for entity in entities:
             if not entity.releases:
@@ -291,12 +280,10 @@ def display_details(options):
             footer += ' \n Begin for `%s` is set to `%s`.' % (series.name, series.begin.identifier)
             begin_text = 'and `begin` options'
         footer += ' \n See `identified_by` %s for more information.' % begin_text
-    try:
-        table = TerminalTable(options.table_type, table_data, table_title, drop_columns=[4, 3, 1])
-        console(table.output)
-    except TerminalTableError as e:
-        console('ERROR: %s' % str(e))
-        return
+    table = TerminalTable(*header, table_type=options.table_type, title=table_title)
+    for row in table_data:
+        table.add_row(*row)
+    console(table)
     if not options.table_type == 'porcelain':
         console(footer)
 

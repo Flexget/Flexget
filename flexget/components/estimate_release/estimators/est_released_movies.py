@@ -11,12 +11,16 @@ logger = logger.bind(name='est_movies')
 class EstimatesReleasedMovies:
     @plugin.priority(0)
     def estimate(self, entry):
+
+        entity_data = {'data_exists': True, 'entity_date': None}
         if 'tmdb_released' in entry:
             logger.verbose('Querying release estimation for {}', entry['title'])
-            return entry['tmdb_released']
+            entity_data['entity_date'] = entry['tmdb_released']
+            return entity_data
         elif 'movie_year' in entry and entry['movie_year'] is not None:
             try:
-                return datetime(year=entry['movie_year'], month=1, day=1)
+                entity_data['entity_date'] = datetime(year=entry['movie_year'], month=1, day=1)
+                return entity_data
             except ValueError:
                 pass
         logger.debug(

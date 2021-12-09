@@ -67,7 +67,7 @@ class TestParser:
         assert movie.quality.name == '720p h264'
 
     def test_multiple_property_values(self, parse):
-        """ Test correct parsing for title's with multiple propertie definitions """
+        """Test correct parsing for title's with multiple propertie definitions"""
         movie = parse(
             name='FlexGet',
             data='FlexGet (premiere 2018)(2016/MHD/1080P/AC3 5.1/DUAL/SUB/bluray/Webrip)',

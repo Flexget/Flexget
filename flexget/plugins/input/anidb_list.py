@@ -14,7 +14,7 @@ USER_ID_RE = r'^\d{1,6}$'
 
 
 class AnidbList:
-    """"Creates an entry for each movie or series in your AniDB wishlist."""
+    """ "Creates an entry for each movie or series in your AniDB wishlist."""
 
     anidb_url = 'http://anidb.net/perl-bin/'
 

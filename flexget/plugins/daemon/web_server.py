@@ -116,7 +116,7 @@ def register_web_server(manager):
 
 @event('manager.shutdown')
 def stop_server(manager):
-    """ Sets up and starts/restarts the webui. """
+    """Sets up and starts/restarts the webui."""
     global web_server
 
     if not manager.is_daemon:
