@@ -127,7 +127,8 @@ class OutputAria2:
             return
 
         filename = entry.get('content_filename', config.get('filename', None))
-        add_extension = config.get('add_extension', False)
+        add_extension = entry.get('content_extension', config.get('add_extension', False))
+
         if filename:
             if add_extension:
                 if isinstance(add_extension, bool):
@@ -158,8 +159,8 @@ class OutputAria2:
                                 )
                                 filename += ext
                 else:
-                    ext = config.get('add_extension')
-                    filename += '.' + ext
+                    ext = add_extension if add_extension[0] == '.' else '.' + add_extension
+                    filename += ext
 
             try:
                 options['out'] = os.path.expanduser(entry.render(filename))
