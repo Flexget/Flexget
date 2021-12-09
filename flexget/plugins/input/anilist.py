@@ -118,112 +118,104 @@ class AniList(object):
                     'https://graphql.anilist.co',
                     json={'query': req_query, 'variables': req_variables},
                 )
-            except RequestException as e:
-                raise plugin.PluginError('Error reading list - {url}'.format(url=e))
-
-            try:
                 list_response = list_response.json()['data']
-                logger.debug('JSON output: {}', list_response)
-                for list_status in list_response.get('collection', {}).get('statuses', []):
-                    if selected_list_name and (
-                        list_status.get('name')
-                        and list_status.get('name').lower() not in selected_list_name
-                    ):
-                        continue
-                    for anime in list_status['list']:
-                        anime = anime.get('anime')
-                        has_selected_release_status = (
-                            (
-                                anime.get('status')
-                                and anime.get('status').lower() in selected_release_status
-                            )
-                        ) or 'all' in selected_release_status
-                        has_selected_type = (
-                            (
-                                anime.get('format')
-                                and anime.get('format').lower() in selected_formats
-                            )
-                        ) or 'all' in selected_formats
+            except RequestException as e:
+                raise plugin.PluginError(f'Error reading list - {e}')
+            except ValueError as e:
+                raise plugin.PluginError(f'Invalid JSON response {e}')
 
-                        if has_selected_type and has_selected_release_status:
-                            try:
-                                ids = task.requests.post(
-                                    'https://relations.yuna.moe/api/ids',
-                                    json={'anilist': anime.get('id')},
-                                ).json()
-                            except RequestException as e:
-                                ids = {}
-                                raise plugin.PluginWarning(f'Couldn\'t fetch additional IDs - {e}')
+            logger.debug('JSON output: {}', list_response)
+            for list_status in list_response.get('collection', {}).get('statuses', []):
+                if selected_list_name and (
+                    list_status.get('name')
+                    and list_status.get('name').lower() not in selected_list_name
+                ):
+                    continue
+                for anime in list_status['list']:
+                    anime = anime.get('anime')
+                    has_selected_release_status = (
+                        anime.get('status')
+                        and anime.get('status').lower() in selected_release_status
+                    ) or 'all' in selected_release_status
+                    has_selected_type = (
+                        anime.get('format') and anime.get('format').lower() in selected_formats
+                    ) or 'all' in selected_formats
 
-                            entry = Entry()
-                            entry['al_id'] = anime.get('id', ids.get('anilist'))
-                            entry['anidb_id'] = ids.get('anidb')
-                            entry['kitsu_id'] = ids.get('kitsu')
-                            entry['mal_id'] = anime.get('idMal', ids.get('myanimelist'))
-                            entry['al_banner'] = anime.get('bannerImage')
-                            entry['al_cover'] = anime.get('coverImage', {}).get('large')
-                            entry['al_date_end'] = (
-                                datetime(
-                                    year=anime.get('endDate').get('year'),
-                                    month=anime.get('endDate').get('month', 1),
-                                    day=anime.get('endDate').get('day', 1),
-                                )
-                                if anime.get('endDate').get('year')
-                                else None
-                            )
-                            entry['al_date_start'] = (
-                                datetime(
-                                    year=anime.get('startDate').get('year'),
-                                    month=anime.get('startDate').get('month', 1),
-                                    day=anime.get('startDate').get('day', 1),
-                                )
-                                if anime.get('startDate').get('year')
-                                else None
-                            )
-                            entry['al_episodes'] = anime.get('episodes')
-                            entry['al_format'] = anime.get('format')
-                            entry['al_genres'] = anime.get('genres')
-                            entry['al_links'] = {
-                                item['site']: item['url'] for item in anime.get('externalLinks')
-                            }
-                            entry['al_list'] = list_status.get('name')
-                            entry['al_list_status'] = (
-                                list_status['status'].capitalize()
-                                if list_status.get('status')
-                                else None
-                            )
-                            entry['al_release_status'] = (
-                                anime['status'].capitalize() if anime.get('status') else None
-                            )
-                            entry['al_tags'] = [t.get('name') for t in anime.get('tags')]
-                            entry['al_title'] = anime.get('title')
-                            entry['al_trailer'] = (
-                                TRAILER_SOURCE[anime.get('trailer', {}).get('site')]
-                                + anime.get('trailer', {}).get('id')
-                                if anime.get('trailer')
-                                and anime.get('trailer').get('site') in TRAILER_SOURCE
-                                else None
-                            )
-                            entry['alternate_name'] = anime.get('synonyms', [])
-                            eng_title = anime.get('title', {}).get('english')
-                            if (
-                                eng_title
-                                and eng_title.lower()
-                                != anime.get('title', {}).get('romaji').lower()
-                                and eng_title not in entry['alternate_name']
-                            ):
-                                entry['alternate_name'].insert(0, eng_title)
-                            entry['series_name'] = entry['al_title'].get('romaji') or entry[
-                                'al_title'
-                            ].get('english')
-                            entry['title'] = entry['series_name']
-                            entry['url'] = anime.get('siteUrl')
-                            if entry.isvalid():
-                                yield entry
-                req_chunk = req_chunk + 1 if list_response['collection']['hasNextChunk'] else False
+                    if has_selected_type and has_selected_release_status:
+                        try:
+                            ids = task.requests.post(
+                                'https://relations.yuna.moe/api/ids',
+                                json={'anilist': anime.get('id')},
+                            ).json()
+                        except RequestException as e:
+                            ids = {}
+                            raise plugin.PluginWarning(f'Couldn\'t fetch additional IDs - {e}')
 
-            except ValueError:
-                raise plugin.PluginError('Invalid JSON response')
+                        entry = Entry()
+                        entry['al_id'] = anime.get('id', ids.get('anilist'))
+                        entry['anidb_id'] = ids.get('anidb')
+                        entry['kitsu_id'] = ids.get('kitsu')
+                        entry['mal_id'] = anime.get('idMal', ids.get('myanimelist'))
+                        entry['al_banner'] = anime.get('bannerImage')
+                        entry['al_cover'] = anime.get('coverImage', {}).get('large')
+                        entry['al_date_end'] = (
+                            datetime(
+                                year=anime.get('endDate').get('year'),
+                                month=anime.get('endDate').get('month', 1),
+                                day=anime.get('endDate').get('day', 1),
+                            )
+                            if anime.get('endDate').get('year')
+                            else None
+                        )
+                        entry['al_date_start'] = (
+                            datetime(
+                                year=anime.get('startDate').get('year'),
+                                month=anime.get('startDate').get('month', 1),
+                                day=anime.get('startDate').get('day', 1),
+                            )
+                            if anime.get('startDate').get('year')
+                            else None
+                        )
+                        entry['al_episodes'] = anime.get('episodes')
+                        entry['al_format'] = anime.get('format')
+                        entry['al_genres'] = anime.get('genres')
+                        entry['al_links'] = {
+                            item['site']: item['url'] for item in anime.get('externalLinks')
+                        }
+                        entry['al_list'] = list_status.get('name')
+                        entry['al_list_status'] = (
+                            list_status['status'].capitalize()
+                            if list_status.get('status')
+                            else None
+                        )
+                        entry['al_release_status'] = (
+                            anime['status'].capitalize() if anime.get('status') else None
+                        )
+                        entry['al_tags'] = [t.get('name') for t in anime.get('tags')]
+                        entry['al_title'] = anime.get('title')
+                        entry['al_trailer'] = (
+                            TRAILER_SOURCE[anime.get('trailer', {}).get('site')]
+                            + anime.get('trailer', {}).get('id')
+                            if anime.get('trailer')
+                            and anime.get('trailer').get('site') in TRAILER_SOURCE
+                            else None
+                        )
+                        entry['alternate_name'] = anime.get('synonyms', [])
+                        eng_title = anime.get('title', {}).get('english')
+                        if (
+                            eng_title
+                            and eng_title.lower() != anime.get('title', {}).get('romaji').lower()
+                            and eng_title not in entry['alternate_name']
+                        ):
+                            entry['alternate_name'].insert(0, eng_title)
+                        entry['series_name'] = entry['al_title'].get('romaji') or entry[
+                            'al_title'
+                        ].get('english')
+                        entry['title'] = entry['series_name']
+                        entry['url'] = anime.get('siteUrl')
+                        if entry.isvalid():
+                            yield entry
+            req_chunk = req_chunk + 1 if list_response['collection']['hasNextChunk'] else False
 
 
 @event('plugin.register')
