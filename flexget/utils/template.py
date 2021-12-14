@@ -140,6 +140,9 @@ def filter_default(value, default_value: str = '', boolean: bool = True) -> str:
     return jinja2.filters.do_default(value, default_value, boolean)
 
 
+filter_d = filter_default
+
+
 def filter_asciify(text: str) -> str:
     """Siplify text"""
 
@@ -167,9 +170,6 @@ def filter_strip_symbols(text: str) -> str:
     result = ' '.join(result.split())
 
     return result
-
-
-filter_d = filter_default
 
 
 def filter_strip_year(name: str) -> str:
