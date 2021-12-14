@@ -38,8 +38,6 @@ def init_parsers(manager):
 class PluginParsing:
     """Provides parsing framework"""
 
-    _selected = False
-
     @property
     def schema(self):
         # Create a schema allowing only our registered parsers to be used under the key of each parser type
@@ -56,22 +54,19 @@ class PluginParsing:
     def on_task_start(self, task, config):
         # Set up user selected parsers from config for this task run
         if config:
-            self._selected = True
             selected_parsers.append(config)
+        else:
+            selected_parsers.append({})
 
     def on_task_exit(self, task, config):
         # Restore default parsers for next task run
-        if self._selected:
-            self._selected = False
-            selected_parsers.pop()
+        selected_parsers.pop()
 
     on_task_abort = on_task_exit
 
     @property
     def selected(self) -> dict:
-        if not self._selected:
-            return {}
-        elif selected_parsers:
+        if selected_parsers:
             return selected_parsers[-1]
 
         return {}
