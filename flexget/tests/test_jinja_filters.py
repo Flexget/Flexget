@@ -37,6 +37,8 @@ class TestJinjaFilters:
         'to_date',
         'strip_year',
         'get_year',
+        'asciify',
+        'strip_symbols',
     ]
 
     def test_stripyear(self, execute_task):
