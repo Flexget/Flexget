@@ -25,6 +25,7 @@ class OutputQBitTorrent:
         verify_cert: <VERIFY> (default: True)
         path: <OUTPUT_DIR> (default: (none))
         label: <LABEL> (default: (none))
+        tags: <TAGS> (default: (none))
         maxupspeed: <torrent upload speed limit> (default: 0)
         maxdownspeed: <torrent download speed limit> (default: 0)
         add_paused: <ADD_PAUSED> (default: False)
@@ -44,6 +45,7 @@ class OutputQBitTorrent:
                     'verify_cert': {'type': 'boolean'},
                     'path': {'type': 'string'},
                     'label': {'type': 'string'},
+                    'tags': {'type': 'array', 'items': {'type': 'string'}},
                     'maxupspeed': {'type': 'integer'},
                     'maxdownspeed': {'type': 'integer'},
                     'fail_html': {'type': 'boolean'},
@@ -205,6 +207,7 @@ class OutputQBitTorrent:
         config.setdefault('use_ssl', False)
         config.setdefault('verify_cert', True)
         config.setdefault('label', '')
+        config.setdefault('tags', [])
         config.setdefault('maxupspeed', 0)
         config.setdefault('maxdownspeed', 0)
         config.setdefault('fail_html', True)
@@ -225,6 +228,14 @@ class OutputQBitTorrent:
             if label:
                 form_data['label'] = label  # qBittorrent v3.3.3-
                 form_data['category'] = label  # qBittorrent v3.3.4+
+
+            tags = entry.get('tags', []) + config.get('tags', [])
+            if tags:
+                try:
+                    form_data['tags'] = entry.render(",".join(tags))
+                except RenderError as e:
+                    logger.error('Error rendering tags for {}: {}', entry['title'], e)
+                    form_data['tags'] = ",".join(tags)
 
             add_paused = entry.get('add_paused', config.get('add_paused'))
             if add_paused:
@@ -253,6 +264,7 @@ class OutputQBitTorrent:
                     logger.info('Url: {}', entry.get('url'))
                 logger.info('Save path: {}', form_data.get('savepath'))
                 logger.info('Label: {}', form_data.get('label'))
+                logger.info('Tags: {}', form_data.get('tags'))
                 logger.info('Paused: {}', form_data.get('paused', 'false'))
                 logger.info('Skip Hash Check: {}', form_data.get('skip_checking', 'false'))
                 if maxupspeed:
