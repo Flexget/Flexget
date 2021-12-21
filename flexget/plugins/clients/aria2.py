@@ -1,4 +1,5 @@
 import os
+import re
 import xmlrpc.client
 from socket import error as socket_error
 
@@ -32,6 +33,13 @@ class OutputAria2:
             'password': {'type': 'string', 'default': ''},
             'path': {'type': 'string'},
             'filename': {'type': 'string'},
+            'add_extension': {
+                'oneOf': [
+                    {'type': 'string'},
+                    {'type': 'boolean'},
+                ],
+                'default': 'no',
+            },
             'options': {
                 'type': 'object',
                 'additionalProperties': {'oneOf': [{'type': 'string'}, {'type': 'integer'}]},
@@ -80,6 +88,7 @@ class OutputAria2:
         config.setdefault('password', '')
         config.setdefault('secret', '')
         config.setdefault('options', {})
+        config.setdefault('add_extension', False)
         return config
 
     def on_task_output(self, task, config):
@@ -95,7 +104,7 @@ class OutputAria2:
                 logger.verbose('Would add `{}` to aria2.', entry['title'])
                 continue
             try:
-                self.add_entry(aria2, entry, config)
+                self.add_entry(aria2, entry, config, task)
             except socket_error as se:
                 entry.fail('Unable to reach Aria2: %s' % se)
             except xmlrpc.client.Fault as err:
@@ -105,22 +114,71 @@ class OutputAria2:
                 logger.opt(exception=True).debug('Exception type {}', type(e))
                 raise
 
-    def add_entry(self, aria2, entry, config):
+    def add_entry(self, aria2, entry, config, task):
         """
         Add entry to Aria2
         """
         options = config['options']
         try:
-            options['dir'] = os.path.expanduser(entry.render(config['path']).rstrip('/'))
+            path = entry.get('path', config.get('path', None))
+            options['dir'] = os.path.expanduser(entry.render(path).rstrip('/'))
         except RenderError as e:
             entry.fail('failed to render \'path\': %s' % e)
             return
-        if 'filename' in config:
+
+        filename = entry.get('content_filename', config.get('filename', None))
+        add_extension = entry.get('content_extension', config.get('add_extension', False))
+
+        if filename:
+            if add_extension:
+                ext = None
+                if isinstance(add_extension, bool):
+                    logger.debug('Getting filename from `{}`', entry['url'])
+                    content_disposition = None
+                    try:
+                        with task.requests.get(
+                            entry['url'], headers=None, stream=True
+                        ) as response:
+                            content_disposition = response.headers.get('content-disposition', None)
+                    except Exception as e:
+                        logger.warning('Not possible to retrive file info from `{}`', entry['url'])
+                        entry.fail('Not possible to retrive file info from `%s`' % entry['url'])
+                        return
+
+                    if content_disposition:
+                        fname_match = re.findall(
+                            r'filename=["\']?([^"\']+)["\']?', content_disposition
+                        )
+                        if fname_match:
+                            fname = fname_match[0]
+                            fname_info = os.path.splitext(fname)
+                            if len(fname_info) == 2:
+                                ext = fname_info[1]
+                                logger.debug(
+                                    'Filename from `{}` is {} with ext `{}`',
+                                    entry['url'],
+                                    fname,
+                                    ext,
+                                )
+
+                else:
+                    ext = add_extension if add_extension[0] == '.' else '.' + add_extension
+
+                if not ext:
+                    logger.warning('Not possible to retrive extension')
+                    entry.fail('Not possible to retrive extension')
+                    return
+
+                logger.debug('Adding extension `{}` to file `{}`', ext, filename)
+
+                filename += ext
+
             try:
-                options['out'] = os.path.expanduser(entry.render(config['filename']))
+                options['out'] = os.path.expanduser(entry.render(filename))
             except RenderError as e:
                 entry.fail('failed to render \'filename\': %s' % e)
                 return
+
         secret = None
         if config['secret']:
             secret = 'token:%s' % config['secret']
