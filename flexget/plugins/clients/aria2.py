@@ -131,12 +131,15 @@ class OutputAria2:
 
         if filename:
             if add_extension:
+                ext = None
                 if isinstance(add_extension, bool):
                     logger.debug('Getting filename from `{}`', entry['url'])
                     content_disposition = None
                     try:
-                        response = task.requests.get(entry['url'], headers=None, stream=True)
-                        content_disposition = response.headers['content-disposition']
+                        with task.requests.get(
+                            entry['url'], headers=None, stream=True
+                        ) as response:
+                            content_disposition = response.headers.get('content-disposition', None)
                     except Exception as e:
                         logger.warning('Not possible to retrive file info from `{}`', entry['url'])
                         entry.fail('Not possible to retrive file info from `%s`' % entry['url'])
@@ -157,10 +160,18 @@ class OutputAria2:
                                     fname,
                                     ext,
                                 )
-                                filename += ext
+
                 else:
                     ext = add_extension if add_extension[0] == '.' else '.' + add_extension
-                    filename += ext
+
+                if not ext:
+                    logger.warning('Not possible to retrive extension')
+                    entry.fail('Not possible to retrive extension')
+                    return
+
+                logger.debug('Adding extension `{}` to file `{}`', ext, filename)
+
+                filename += ext
 
             try:
                 options['out'] = os.path.expanduser(entry.render(filename))
