@@ -1,5 +1,6 @@
 import time
 from datetime import date, datetime, timedelta
+from json.decoder import JSONDecodeError
 from typing import Any, Dict, Optional
 
 from dateutil.parser import parse as dateutil_parse
@@ -11,6 +12,7 @@ from sqlalchemy.schema import ForeignKey
 
 from flexget import db_schema, plugin
 from flexget.event import event
+from flexget.plugin import PluginError
 from flexget.utils import requests
 from flexget.utils.database import year_property
 from flexget.utils.soup import get_soup
@@ -34,7 +36,10 @@ def bluray_request(endpoint, **params) -> Any:
     full_url = BASE_URL + endpoint
     response = requests.get(full_url, params=params)
     if response.content:
-        return response.json(strict=False)
+        try:
+            return response.json(strict=False)
+        except JSONDecodeError as e:
+            raise PluginError('Could decode json from response blu-ray api')
 
 
 def extract_release_date(bluray_entry: Dict[str, Any]) -> date:
