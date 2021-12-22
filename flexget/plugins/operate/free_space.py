@@ -3,6 +3,7 @@ import os
 from loguru import logger
 
 from flexget import plugin
+from flexget.config_schema import one_or_more
 from flexget.event import event
 
 logger = logger.bind(name='free_space')
@@ -73,6 +74,14 @@ class PluginFreeSpace:
                     'user': {'type': 'string'},
                     'ssh_key_filepath': {'type': 'string'},
                     'allotment': {'type': 'number', 'default': -1},
+                    'when': one_or_more(
+                        {'type': 'string', 'enum': ['start', 'filter', 'download']}
+                    ),
+                    'action': {
+                        'type': 'string',
+                        'enum': ['abort', 'reject', 'accept', 'fail'],
+                        'default': 'abort',
+                    },
                 },
                 'required': ['space'],
                 'dependencies': {'host': ['user', 'ssh_key_filepath', 'path']},
@@ -82,28 +91,83 @@ class PluginFreeSpace:
     }
 
     @staticmethod
+    def entry_task_handle(task, action):
+        for entry in task.entries:
+            if action == 'accept':
+                entry.accept()
+            elif action == 'reject':
+                entry.reject()
+            elif action == 'fail':
+                entry.fail()
+
+    @staticmethod
     def prepare_config(config, task):
         if isinstance(config, (float, int)):
             config = {'space': config}
         # Use config path if none is specified
         if not config.get('path'):
             config['path'] = task.manager.config_base
+        if not config.get('action'):
+            config['action'] = 'abort'
+
+        if not config.get('when'):
+            config['when'] = ['download']
+        elif not isinstance(config['when'], list):
+            config['when'] = [config['when']]
+
         return config
 
-    @plugin.priority(plugin.PRIORITY_FIRST)
-    def on_task_download(self, task, config):
+    def run_phase(self, task, config):
         config = self.prepare_config(config, task)
-        # Only bother aborting if there were accepted entries this run.
-        if not task.accepted:
+
+        if not task.current_phase in config['when']:
             return
+
+        action = config['action']
 
         free_space = get_free_space(config, task)
         space = config['space']
         path = config['path']
         if free_space < space:
-            logger.error('Less than {} MB of free space in {} aborting task.', space, path)
+
             # backlog plugin will save and restore the task content, if available
-            task.abort(f"Less than {space} MB of free space in {path}")
+            if action == 'abort':
+                logger.error('Less than {} MB of free space in {} aborting task.', space, path)
+                task.abort(f"Less than {space} MB of free space in {path}")
+            else:
+                logger.debug(
+                    'Less than {} MB of free space in {}! {} all entries.',
+                    space,
+                    path,
+                    action.capitalize(),
+                )
+                self.entry_task_handle(task, action)
+
+    @plugin.priority(plugin.PRIORITY_FIRST)
+    def on_task_start(self, task, config):
+        config = self.prepare_config(config, task)
+        action = config['action']
+
+        # Only bother run in action in abort.
+        if action != 'abort':
+            return
+
+        self.run_phase(task, config)
+
+    @plugin.priority(plugin.PRIORITY_FIRST)
+    def on_task_filter(self, task, config):
+        self.run_phase(task, config)
+
+    @plugin.priority(plugin.PRIORITY_FIRST)
+    def on_task_download(self, task, config):
+        config = self.prepare_config(config, task)
+        action = config['action']
+
+        # Only bother aborting in download if there were accepted entries this run.
+        if not task.accepted and action == 'abort':
+            return
+
+        self.run_phase(task, config)
 
 
 @event('plugin.register')
