@@ -151,6 +151,10 @@ class AniList(object):
                             ids = {}
                             raise plugin.PluginWarning(f'Couldn\'t fetch additional IDs - {e}')
 
+                        if not ids:
+                            ids = {}
+                            raise plugin.PluginWarning(f'Additional IDs not available.')
+
                         entry = Entry()
                         entry['al_id'] = anime.get('id', ids.get('anilist'))
                         entry['anidb_id'] = ids.get('anidb')
