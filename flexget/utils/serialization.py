@@ -3,11 +3,15 @@ from abc import ABC, abstractmethod
 from typing import Any, Optional, Type
 
 import yaml
+from loguru import logger
 
 from flexget.utils import json
 
 DATE_FMT = '%Y-%m-%d'
-ISO8601_FMT = '%Y-%m-%dT%H:%M:%SZ'
+DATETIME_FMT = '%Y-%m-%dT%H:%M:%SZ'
+
+
+logger = logger.bind(name='utils.serialization')
 
 
 def serialize(value: Any) -> Any:
@@ -114,6 +118,13 @@ class Serializer(ABC):
         """Returns an instance of the original class, recreated from the serialized form."""
 
 
+# Dates and DateTimes are not always symmetric using strftime and strptime :eyeroll:
+# See:
+# https://bugs.python.org/issue13305
+# https://github.com/Flexget/Flexget/issues/2818
+# https://github.com/Flexget/Flexget/issues/3304
+
+
 class DateTimeSerializer(Serializer):
     @classmethod
     def serializer_handles(cls, value):
@@ -121,11 +132,20 @@ class DateTimeSerializer(Serializer):
 
     @classmethod
     def serialize(cls, value: datetime.datetime):
-        return value.strftime(ISO8601_FMT)
+        result = value.strftime(DATETIME_FMT)
+        # See note above
+        year, rest = result.split('-', maxsplit=1)
+        if len(year) != 4:
+            result = f'{value.year:04}-{rest}'
+        return result
 
     @classmethod
     def deserialize(cls, data: str, version: int) -> datetime.datetime:
-        return datetime.datetime.strptime(data, ISO8601_FMT)
+        try:
+            return datetime.datetime.strptime(data, DATETIME_FMT)
+        except ValueError:
+            logger.error(f'Error deserializing datetime `{data}`')
+            return datetime.datetime.min
 
 
 class DateSerializer(Serializer):
@@ -135,11 +155,20 @@ class DateSerializer(Serializer):
 
     @classmethod
     def serialize(cls, value: datetime.date):
-        return value.strftime(DATE_FMT)
+        result = value.strftime(DATE_FMT)
+        # See note above
+        year, rest = result.split('-', maxsplit=1)
+        if len(year) != 4:
+            result = f'{value.year:04}-{rest}'
+        return result
 
     @classmethod
     def deserialize(cls, data: str, version: int) -> datetime.date:
-        return datetime.datetime.strptime(data, DATE_FMT).date()
+        try:
+            return datetime.datetime.strptime(data, DATE_FMT).date()
+        except ValueError:
+            logger.error(f'Error deserializing date `{data}`')
+            return datetime.date.min
 
 
 class SetSerializer(Serializer):
