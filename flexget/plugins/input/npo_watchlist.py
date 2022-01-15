@@ -108,11 +108,14 @@ class NPOWatchlist:
             password = config.get('password')
 
             npoid_response = requests.post(
-                npoid_login_url, {'button': 'login',
-                                  '__RequestVerificationToken': token,
-                                  'ReturnUrl': return_url,
-                                  'EmailAddress': email,
-                                  'Password': password}
+                npoid_login_url,
+                {
+                    'button': 'login',
+                    '__RequestVerificationToken': token,
+                    'ReturnUrl': return_url,
+                    'EmailAddress': email,
+                    'Password': password,
+                },
             )
 
             npostart_response = requests.get(npoid_base + return_url)
