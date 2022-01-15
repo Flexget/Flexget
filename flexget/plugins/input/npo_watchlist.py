@@ -15,7 +15,8 @@ from flexget.utils.soup import get_soup
 logger = logger.bind(name='search_npo')
 
 requests = RequestSession(max_retries=3)
-requests.add_domain_limiter(TimedLimiter('npostart.nl', '8 seconds'))
+requests.add_domain_limiter(TimedLimiter('npostart.nl', '6 seconds'))
+requests.add_domain_limiter(TimedLimiter('npo.nl', '6 seconds'))
 
 
 class NPOWatchlist:
@@ -90,25 +91,36 @@ class NPOWatchlist:
             logger.debug('Already logged in')
             return
 
-        login_url = 'https://www.npostart.nl/login'
-        login_api_url = 'https://www.npostart.nl/api/login'
+        npostart_login_url = 'https://www.npostart.nl/login'
+        npoid_base = 'https://id.npo.nl'
+        npoid_login_url = 'https://id.npo.nl/account/login'
 
         try:
-            login_response = requests.get(login_url)
-            if login_response.url != login_url:
+            login_response = requests.get(npostart_login_url)
+            if not login_response.url.startswith(npoid_login_url):
                 raise plugin.PluginError('Unexpected login page: {}'.format(login_response.url))
 
             login_page = get_soup(login_response.content)
-            token = login_page.find('input', attrs={'name': '_token'})['value']
+            token = login_page.find('input', attrs={'name': '__RequestVerificationToken'})['value']
+            return_url = login_page.find('input', attrs={'name': 'ReturnUrl'})['value']
 
             email = config.get('email')
             password = config.get('password')
 
-            profile_response = requests.post(
-                login_api_url, {'_token': token, 'username': email, 'password': password}
+            npoid_response = requests.post(
+                npoid_login_url,
+                {
+                    'button': 'login',
+                    '__RequestVerificationToken': token,
+                    'ReturnUrl': return_url,
+                    'EmailAddress': email,
+                    'Password': password,
+                },
             )
 
-            if 'isAuthenticatedUser' not in profile_response.cookies:
+            npostart_response = requests.get(npoid_base + return_url)
+
+            if 'isAuthenticatedUser' not in requests.cookies:
                 raise plugin.PluginError('Failed to login. Check username and password.')
             logger.debug('Succesfully logged in: {}', email)
         except RequestException as e:
