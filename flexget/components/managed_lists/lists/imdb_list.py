@@ -29,7 +29,7 @@ IMMUTABLE_LISTS = ['ratings', 'checkins']
 
 Base = db_schema.versioned_base('imdb_list', 0)
 
-MOVIE_TYPES = ['documentary', 'tvmovie', 'video', 'short', 'movie']
+MOVIE_TYPES = ['documentary', 'tvmovie', 'video', 'short', 'movie', 'tvspecial']
 SERIES_TYPES = ['tvseries', 'tvepisode', 'tvminiseries']
 OTHER_TYPES = ['videogame']
 
