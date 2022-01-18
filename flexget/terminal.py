@@ -6,6 +6,7 @@ from typing import Any, Iterator, Optional, TextIO
 import rich
 import rich.box
 import rich.console
+import rich.rule
 import rich.segment
 import rich.table
 import rich.text
@@ -42,6 +43,19 @@ GITHUB_BOX: rich.box.Box = rich.box.Box(
 """,
     ascii=True,
 )
+
+
+class Rule(rich.rule.Rule):
+    """TODO: This is probably silly, and not worth it.
+    Allows a left align with a little indent. e.g. --- Example ------...
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        text = rich.text.Text()
+        text = text.append(self.characters * 3 + ' ', style=self.style)
+        text.append(self.title, style='rule.text')
+        self.title = text
 
 
 class TerminalTable(rich.table.Table):

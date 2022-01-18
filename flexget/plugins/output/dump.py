@@ -1,8 +1,10 @@
 from loguru import logger
+from rich.highlighter import ReprHighlighter
+from rich.pretty import Pretty, is_expandable
 
 from flexget import options, plugin
 from flexget.event import event
-from flexget.terminal import console
+from flexget.terminal import Rule, TerminalTable, console
 
 logger = logger.bind(name='dump')
 
@@ -28,7 +30,20 @@ def dump(entries, debug=False, eval_lazy=False, trace=False, title_only=False):
             return (2,)
         return 3, field
 
+    highlighter = ReprHighlighter()
+
     for entry in entries:
+        grid = TerminalTable(
+            show_header=False,
+            show_edge=False,
+            pad_edge=False,
+            collapse_padding=True,
+            box=None,
+            padding=0,
+        )
+        grid.add_column()
+        grid.add_column()
+        grid.add_column()
         for field in sorted(entry, key=sort_key):
             if field.startswith('_') and not debug:
                 continue
@@ -41,30 +56,27 @@ def dump(entries, debug=False, eval_lazy=False, trace=False, title_only=False):
                     value = entry[field]
                 except KeyError:
                     value = '<LazyField - lazy lookup failed>'
-            if isinstance(value, str):
-                try:
-                    console('%-17s: %s' % (field, value.replace('\r', '').replace('\n', '')))
-                except Exception:
-                    console('%-17s: %r (warning: unable to print)' % (field, value))
-            elif isinstance(value, list):
-                console('%-17s: %s' % (field, '[%s]' % ', '.join(str(v) for v in value)))
-            elif isinstance(value, (int, float, dict)):
-                console('%-17s: %s' % (field, value))
-            elif value is None:
-                console('%-17s: %s' % (field, value))
+            if field.rsplit('_', maxsplit=1)[-1] == 'url':
+                renderable = f'[link={value}]{value}[/link]'
+            elif isinstance(value, str):
+                renderable = value.replace('\r', '').replace('\n', '')
+            elif is_expandable(value):
+                renderable = Pretty(value)
             else:
                 try:
-                    value = str(entry[field])
-                    console('%-17s: %s' % (field, value.replace('\r', '').replace('\n', '')))
+                    renderable = highlighter(str(value))
                 except Exception:
-                    if debug:
-                        console('%-17s: [not printable] (%r)' % (field, value))
+                    renderable = f'[[i]not printable[/i]] ({repr(value)})'
+            grid.add_row(f'{field}', ': ', renderable)
+        grid.add_row()
         if trace:
             console('-- Processing trace:')
             for item in entry.traces:
                 console('%-10s %-7s %s' % (item[0], '' if item[1] is None else item[1], item[2]))
         if not title_only:
             console('')
+
+        console(grid)
 
 
 class OutputDump:
@@ -90,7 +102,9 @@ class OutputDump:
         undecided = [entry for entry in task.all_entries if entry.undecided]
         if 'undecided' in dumpstates:
             if undecided:
-                console('-- Undecided: --------------------------')
+                rule = Rule(title='Undecided', align='left')
+                # console('-- Undecided: --------------------------')
+                console(rule)
                 dump(undecided, task.options.debug, eval_lazy, trace, title)
             elif specificstates:
                 console('No undecided entries')
