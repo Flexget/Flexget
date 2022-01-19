@@ -34,7 +34,9 @@ def dump(entries, debug=False, eval_lazy=False, trace=False, title_only=False):
 
     for entry in entries:
         entry_table = TerminalTable(
-            'field', ':', 'value',
+            'field',
+            ':',
+            'value',
             show_header=False,
             show_edge=False,
             pad_edge=False,
@@ -48,7 +50,9 @@ def dump(entries, debug=False, eval_lazy=False, trace=False, title_only=False):
             if title_only and field != 'title':
                 continue
             if entry.is_lazy(field) and not eval_lazy:
-                value = '[italic]<LazyField - value will be determined when it is accessed>[/italic]'
+                value = (
+                    '[italic]<LazyField - value will be determined when it is accessed>[/italic]'
+                )
             else:
                 try:
                     value = entry[field]
@@ -70,7 +74,9 @@ def dump(entries, debug=False, eval_lazy=False, trace=False, title_only=False):
         if trace:
             console('── Processing trace:', style='italic')
             trace_table = TerminalTable(
-                'Plugin', 'Operation', 'Message',
+                'Plugin',
+                'Operation',
+                'Message',
                 show_edge=False,
                 pad_edge=False,
             )
