@@ -8,8 +8,8 @@ from flexget.event import event
 
 logger = logger.bind(name='free_space')
 
-ABORT_UNDER = 'below'
-ABORT_OVER = 'above'
+ABORT_BELOW = 'below'
+ABORT_ABOVE = 'above'
 
 
 def get_free_space(config, task):
@@ -73,8 +73,8 @@ class PluginFreeSpace:
                     'space': {'type': 'number'},
                     'abort_if': {
                         'type': 'string',
-                        'enum': [ABORT_UNDER, ABORT_OVER],
-                        'default': ABORT_UNDER,
+                        'enum': [ABORT_BELOW, ABORT_ABOVE],
+                        'default': ABORT_BELOW,
                     },
                     'path': {'type': 'string'},
                     'port': {'type': 'integer', 'default': 22},
@@ -124,11 +124,11 @@ class PluginFreeSpace:
         path = config['path']
         abort_if = config['abort_if']
 
-        if free_space < space and abort_if == ABORT_UNDER:
+        if free_space < space and abort_if == ABORT_BELOW:
             logger.error('Less than {} MB of free space in {} aborting task.', space, path)
             # backlog plugin will save and restore the task content, if available
             task.abort(f"Less than {space} MB of free space in {path}")
-        elif free_space > space and abort_if == ABORT_OVER:
+        elif free_space > space and abort_if == ABORT_ABOVE:
             logger.error('Over than {} MB of free space in {} aborting task.', space, path)
             # backlog plugin will save and restore the task content, if available
             task.abort(f"Over than {space} MB of free space in {path}")
