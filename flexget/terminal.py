@@ -47,7 +47,7 @@ class _Console(rich.console.Console):
         indent: int = 3,
     ) -> None:
         rule = rich.rule.Rule(title, characters=characters, style=style, align=align)
-        if indent:
+        if indent and title:
             if not isinstance(rule.title, rich.text.Text):
                 rule.title = self.render_str(rule.title, style="rule.text")
             text = rich.text.Text()
