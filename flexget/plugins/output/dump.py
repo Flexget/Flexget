@@ -104,7 +104,7 @@ class OutputDump:
         for state in dumpstates:
             console.rule(state.title(), style=states[state])
             if getattr(task, state):
-                dump(task.undecided, task.options.debug, eval_lazy, trace, title)
+                dump(getattr(task, state), task.options.debug, eval_lazy, trace, title)
             else:
                 console(f'No {state} entries', style='italic')
         if not dumpstates:
