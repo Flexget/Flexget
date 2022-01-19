@@ -115,10 +115,9 @@ class PluginFreeSpace:
 
         return config
 
-    def run_phase(self, task, config):
+    @plugin.priority(plugin.PRIORITY_FIRST)
+    def on_task_download(self, task, config):
         config = self.prepare_config(config, task)
-
-        action = config['action']
 
         free_space = get_free_space(config, task)
         space = config['space']
