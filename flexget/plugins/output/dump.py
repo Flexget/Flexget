@@ -48,12 +48,12 @@ def dump(entries, debug=False, eval_lazy=False, trace=False, title_only=False):
             if title_only and field != 'title':
                 continue
             if entry.is_lazy(field) and not eval_lazy:
-                value = '<LazyField - value will be determined when it is accessed>'
+                value = '[italic]<LazyField - value will be determined when it is accessed>[/italic]'
             else:
                 try:
                     value = entry[field]
                 except KeyError:
-                    value = '<LazyField - lazy lookup failed>'
+                    value = '[italic]<LazyField - lazy lookup failed>[/italic]'
             if field.rsplit('_', maxsplit=1)[-1] == 'url':
                 renderable = f'[link={value}][repr.url]{value}[/repr.url][/link]'
             elif isinstance(value, str):
