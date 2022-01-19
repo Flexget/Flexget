@@ -96,36 +96,19 @@ class OutputDump:
         eval_lazy = 'eval' in task.options.dump_entries
         trace = 'trace' in task.options.dump_entries
         title = 'title' in task.options.dump_entries
-        states = ['accepted', 'rejected', 'failed', 'undecided']
-        dumpstates = [s for s in states if s in task.options.dump_entries]
-        specificstates = dumpstates
+        states = {'accepted': 'green', 'rejected': 'red', 'failed': 'yellow', 'undecided': 'none'}
+        dumpstates = [s for s in states if getattr(task, s)]
+        specificstates = [s for s in states if s in task.options.dump_entries]
+        if specificstates:
+            dumpstates = specificstates
+        for state in dumpstates:
+            console.rule(state.title(), style=states[state])
+            if getattr(task, state):
+                dump(task.undecided, task.options.debug, eval_lazy, trace, title)
+            else:
+                console(f'No {state} entries', style='italic')
         if not dumpstates:
-            dumpstates = states
-        undecided = [entry for entry in task.all_entries if entry.undecided]
-        if 'undecided' in dumpstates:
-            console.rule('Undecided', style='gray')
-            if undecided:
-                dump(undecided, task.options.debug, eval_lazy, trace, title)
-            elif specificstates:
-                console('No undecided entries', style='italic')
-        if 'accepted' in dumpstates:
-            console.rule('Accepted', style='green')
-            if task.accepted:
-                dump(task.accepted, task.options.debug, eval_lazy, trace, title)
-            elif specificstates:
-                console('No accepted entries', style='italic')
-        if 'rejected' in dumpstates:
-            console.rule('Rejected', style='red')
-            if task.rejected:
-                dump(task.rejected, task.options.debug, eval_lazy, trace, title)
-            elif specificstates:
-                console('No rejected entries', style='italic')
-        if 'failed' in dumpstates:
-            console.rule('Failed', style='yellow')
-            if task.failed:
-                dump(task.failed, task.options.debug, eval_lazy, trace, title)
-            elif specificstates:
-                console('No failed entries', style='italic')
+            console('No entries were produced', style='italic')
 
 
 @event('plugin.register')
