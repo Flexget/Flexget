@@ -4,7 +4,7 @@ from rich.pretty import Pretty, is_expandable
 
 from flexget import options, plugin
 from flexget.event import event
-from flexget.terminal import Rule, TerminalTable, console
+from flexget.terminal import TerminalTable, console
 
 logger = logger.bind(name='dump')
 
@@ -33,7 +33,8 @@ def dump(entries, debug=False, eval_lazy=False, trace=False, title_only=False):
     highlighter = ReprHighlighter()
 
     for entry in entries:
-        grid = TerminalTable(
+        entry_table = TerminalTable(
+            'field', ':', 'value',
             show_header=False,
             show_edge=False,
             pad_edge=False,
@@ -41,9 +42,6 @@ def dump(entries, debug=False, eval_lazy=False, trace=False, title_only=False):
             box=None,
             padding=0,
         )
-        grid.add_column()
-        grid.add_column()
-        grid.add_column()
         for field in sorted(entry, key=sort_key):
             if field.startswith('_') and not debug:
                 continue
@@ -57,7 +55,7 @@ def dump(entries, debug=False, eval_lazy=False, trace=False, title_only=False):
                 except KeyError:
                     value = '<LazyField - lazy lookup failed>'
             if field.rsplit('_', maxsplit=1)[-1] == 'url':
-                renderable = f'[link={value}]{value}[/link]'
+                renderable = f'[link={value}][repr.url]{value}[/repr.url][/link]'
             elif isinstance(value, str):
                 renderable = value.replace('\r', '').replace('\n', '')
             elif is_expandable(value):
@@ -67,16 +65,20 @@ def dump(entries, debug=False, eval_lazy=False, trace=False, title_only=False):
                     renderable = highlighter(str(value))
                 except Exception:
                     renderable = f'[[i]not printable[/i]] ({repr(value)})'
-            grid.add_row(f'{field}', ': ', renderable)
-        grid.add_row()
+            entry_table.add_row(f'{field}', ': ', renderable)
+        console(entry_table)
         if trace:
-            console('-- Processing trace:')
+            console('── Processing trace:', style='italic')
+            trace_table = TerminalTable(
+                'Plugin', 'Operation', 'Message',
+                show_edge=False,
+                pad_edge=False,
+            )
             for item in entry.traces:
-                console('%-10s %-7s %s' % (item[0], '' if item[1] is None else item[1], item[2]))
+                trace_table.add_row(item[0], '' if item[1] is None else item[1], item[2])
+            console(trace_table)
         if not title_only:
             console('')
-
-        console(grid)
 
 
 class OutputDump:
@@ -101,31 +103,29 @@ class OutputDump:
             dumpstates = states
         undecided = [entry for entry in task.all_entries if entry.undecided]
         if 'undecided' in dumpstates:
+            console.rule('Undecided', style='gray')
             if undecided:
-                rule = Rule(title='Undecided', align='left')
-                # console('-- Undecided: --------------------------')
-                console(rule)
                 dump(undecided, task.options.debug, eval_lazy, trace, title)
             elif specificstates:
-                console('No undecided entries')
+                console('No undecided entries', style='italic')
         if 'accepted' in dumpstates:
+            console.rule('Accepted', style='green')
             if task.accepted:
-                console('-- Accepted: ---------------------------')
                 dump(task.accepted, task.options.debug, eval_lazy, trace, title)
             elif specificstates:
-                console('No accepted entries')
+                console('No accepted entries', style='italic')
         if 'rejected' in dumpstates:
+            console.rule('Rejected', style='red')
             if task.rejected:
-                console('-- Rejected: ---------------------------')
                 dump(task.rejected, task.options.debug, eval_lazy, trace, title)
             elif specificstates:
-                console('No rejected entries')
+                console('No rejected entries', style='italic')
         if 'failed' in dumpstates:
+            console.rule('Failed', style='yellow')
             if task.failed:
-                console('-- Failed: -----------------------------')
                 dump(task.failed, task.options.debug, eval_lazy, trace, title)
             elif specificstates:
-                console('No failed entries')
+                console('No failed entries', style='italic')
 
 
 @event('plugin.register')
@@ -138,7 +138,7 @@ def register_parser_arguments():
     options.get_parser('execute').add_argument(
         '--dump',
         nargs='*',
-        choices=['eval', 'trace', 'accepted', 'rejected', 'undecided', 'title'],
+        choices=['eval', 'trace', 'accepted', 'rejected', 'undecided', 'failed', 'title'],
         dest='dump_entries',
         help=(
             'display all entries in task with fields they contain, '
