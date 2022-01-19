@@ -26,7 +26,17 @@ class _Console(rich.console.Console):
 
         Accepts arguments like the `rich.console.Console.print` function does.
         """
-        _patchable_console(text, *args, **kwargs)
+        self.print(text, *args, **kwargs)
+
+    def print(
+        self, *args, **kwargs
+    ) -> None:
+        # Also capture calls directly to console.print
+        _patchable_console(*args, **kwargs)
+
+    def _print(self, *args, **kwargs):
+        """The real parent print function, which can be called internally."""
+        super().print(*args, **kwargs)
 
     def rule(
         self,
@@ -188,7 +198,6 @@ def colorize(color: str, text: str) -> str:
 
     :param color: Color tag to use
     :param text: Text to color
-    :param auto: Whether to apply auto colors
 
     :return: Colored text or text
     """
@@ -199,7 +208,7 @@ def disable_colors():
     """
     Disables colors to the terminal.
     """
-    rich_console.no_color = True
+    console.no_color = True
 
 
 @contextlib.contextmanager
@@ -216,11 +225,11 @@ def get_console_output() -> Optional[TextIO]:
     return getattr(local_context, 'output', None)
 
 
-def _patchable_console(text, *args, **kwargs):
+def _patchable_console(*args, **kwargs):
     # Nobody will import this directly, so we can monkeypatch it for IPC calls
     console.file = get_console_output()
     try:
-        console.print(text, *args, **kwargs)
+        console._print(*args, **kwargs)
     finally:
         console.file = None
 
