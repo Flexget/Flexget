@@ -151,6 +151,10 @@ class AniList(object):
                             ids = {}
                             raise plugin.PluginWarning(f'Couldn\'t fetch additional IDs - {e}')
 
+                        if not ids:
+                            ids = {}
+                            raise plugin.PluginWarning(f'Additional IDs not available.')
+
                         entry = Entry()
                         entry['al_id'] = anime.get('id', ids.get('anilist'))
                         entry['anidb_id'] = ids.get('anidb')
@@ -161,8 +165,8 @@ class AniList(object):
                         entry['al_date_end'] = (
                             datetime(
                                 year=anime.get('endDate').get('year'),
-                                month=anime.get('endDate').get('month', 1),
-                                day=anime.get('endDate').get('day', 1),
+                                month=(anime.get('endDate').get('month') or 1),
+                                day=(anime.get('endDate').get('day') or 1),
                             )
                             if anime.get('endDate').get('year')
                             else None
@@ -170,8 +174,8 @@ class AniList(object):
                         entry['al_date_start'] = (
                             datetime(
                                 year=anime.get('startDate').get('year'),
-                                month=anime.get('startDate').get('month', 1),
-                                day=anime.get('startDate').get('day', 1),
+                                month=(anime.get('startDate').get('month') or 1),
+                                day=(anime.get('startDate').get('day') or 1),
                             )
                             if anime.get('startDate').get('year')
                             else None
