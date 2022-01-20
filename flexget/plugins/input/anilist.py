@@ -151,7 +151,7 @@ class AniList(object):
                             ).json()
                             logger.debug(f'Additional IDs: {ids}')
                         except RequestException as e:
-                            logger(f'Couldn\'t fetch additional IDs: {e}')
+                            logger.verbose(f'Couldn\'t fetch additional IDs: {e}')
                         if not ids or not isinstance(ids, dict):
                             ids = {}
 
