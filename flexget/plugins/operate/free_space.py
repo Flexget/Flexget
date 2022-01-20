@@ -3,7 +3,6 @@ import os
 from loguru import logger
 
 from flexget import plugin
-from flexget.config_schema import one_or_more
 from flexget.event import event
 
 logger = logger.bind(name='free_space')
@@ -82,14 +81,6 @@ class PluginFreeSpace:
                     'user': {'type': 'string'},
                     'ssh_key_filepath': {'type': 'string'},
                     'allotment': {'type': 'number', 'default': -1},
-                    'when': one_or_more(
-                        {'type': 'string', 'enum': ['start', 'filter', 'download']}
-                    ),
-                    'action': {
-                        'type': 'string',
-                        'enum': ['abort', 'reject', 'accept', 'fail'],
-                        'default': 'abort',
-                    },
                 },
                 'required': ['space'],
                 'dependencies': {'host': ['user', 'ssh_key_filepath', 'path']},
@@ -105,13 +96,6 @@ class PluginFreeSpace:
         # Use config path if none is specified
         if not config.get('path'):
             config['path'] = task.manager.config_base
-        if not config.get('action'):
-            config['action'] = 'abort'
-
-        if not config.get('when'):
-            config['when'] = ['download']
-        elif not isinstance(config['when'], list):
-            config['when'] = [config['when']]
 
         return config
 
