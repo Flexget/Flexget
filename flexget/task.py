@@ -546,7 +546,7 @@ class Task:
         try:
             result = method(*args, **kwargs)
             # We exhaust any iterator inputs here to make sure we catch exceptions properly.
-            if isinstance(result, collections.abc.Iterator):
+            if not isinstance(result, list):
                 result = list(result)
             return result
         except TaskAbort:
