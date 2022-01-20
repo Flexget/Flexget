@@ -93,9 +93,9 @@ class AniList(object):
             selected_list_name = [selected_list_name]
         selected_list_name = [i.lower() for i in selected_list_name]
 
-        logger.debug('Selected List Status: {}', selected_list_status)
-        logger.debug('Selected Release Status: {}', selected_release_status)
-        logger.debug('Selected Formats: {}', selected_formats)
+        logger.debug(f'Selected List Status: {selected_list_status}')
+        logger.debug(f'Selected Release Status: {selected_release_status}')
+        logger.debug(f'Selected Formats: {selected_formats}')
 
         req_variables = {'user': config['username']}
         req_chunk = 1
@@ -120,11 +120,13 @@ class AniList(object):
                 )
                 list_response = list_response.json()['data']
             except RequestException as e:
-                raise plugin.PluginError(f'Error reading list - {e}')
+                logger.error(f'Error reading list: {e}')
+                break
             except ValueError as e:
-                raise plugin.PluginError(f'Invalid JSON response {e}')
+                logger.error(f'Invalid JSON response: {e}')
+                break
 
-            logger.debug('JSON output: {}', list_response)
+            logger.trace(f'JSON output: {list_response}')
             for list_status in list_response.get('collection', {}).get('statuses', []):
                 if selected_list_name and (
                     list_status.get('name')
@@ -147,14 +149,13 @@ class AniList(object):
                                 'https://relations.yuna.moe/api/ids',
                                 json={'anilist': anime.get('id')},
                             ).json()
+                            logger.debug(f'Additional IDs: {ids}')
                         except RequestException as e:
+                            logger.verbose(f'Couldn\'t fetch additional IDs: {e}')
+                        if not ids or not isinstance(ids, dict):
                             ids = {}
-                            raise plugin.PluginWarning(f'Couldn\'t fetch additional IDs - {e}')
 
-                        if not ids:
-                            ids = {}
-                            raise plugin.PluginWarning(f'Additional IDs not available.')
-
+                        logger.debug(f'Anime Entry: {anime}')
                         entry = Entry()
                         entry['al_id'] = anime.get('id', ids.get('anilist'))
                         entry['anidb_id'] = ids.get('anidb')
