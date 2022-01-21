@@ -1,4 +1,5 @@
 import contextlib
+import os
 import threading
 from textwrap import wrap
 from typing import Any, Iterator, Optional, TextIO, Union
@@ -62,7 +63,8 @@ class _Console(rich.console.Console):
 
 # This is used to print (rich) text to the console, as well as expose all the other features of rich's console
 # Unlike rich, can be called directly to print (for backwards compat purposes.)
-console = _Console()
+force_terminal = True if "PYCHARM_HOSTED" in os.environ else None
+console = _Console(force_terminal=force_terminal)
 
 
 PORCELAIN_BOX: rich.box.Box = rich.box.Box(
