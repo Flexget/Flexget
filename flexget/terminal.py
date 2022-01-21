@@ -1,11 +1,12 @@
 import contextlib
 import threading
 from textwrap import wrap
-from typing import Any, Iterator, Optional, TextIO
+from typing import Any, Iterator, Optional, TextIO, Union
 
 import rich
 import rich.box
 import rich.console
+import rich.rule
 import rich.segment
 import rich.table
 import rich.text
@@ -13,7 +14,56 @@ import rich.text
 from flexget.options import ArgumentParser
 
 local_context = threading.local()
-rich_console = rich.console.Console()
+
+
+class _Console(rich.console.Console):
+    def __call__(self, text: Any, *args, **kwargs) -> None:
+        """
+        Print to console safely. Output is able to be captured by different streams in different contexts.
+
+        Any plugin wishing to output to the user's console should use this function instead of print so that
+        output can be redirected when FlexGet is invoked from another process.
+
+        Accepts arguments like the `rich.console.Console.print` function does.
+        """
+        self.print(text, *args, **kwargs)
+
+    def print(self, *args, **kwargs) -> None:
+        # Also capture calls directly to console.print
+        _patchable_console(*args, **kwargs)
+
+    def _print(self, *args, **kwargs):
+        """The real parent print function, which can be called internally."""
+        super().print(*args, **kwargs)
+
+    def rule(
+        self,
+        title: rich.text.TextType = "",
+        *,
+        characters: str = "─",
+        style: Union[str, rich.console.Style] = "rule.line",
+        align: rich.text.AlignMethod = "left",
+        # This is a custom FlexGet argument
+        indent: int = 3,
+    ) -> None:
+        rule = rich.rule.Rule(title, characters=characters, style=style, align=align)
+        if indent and title:
+            if not isinstance(rule.title, rich.text.Text):
+                rule.title = self.render_str(rule.title, style="rule.text")
+            text = rich.text.Text()
+            if rule.align == 'left':
+                text = text.append(rule.characters * indent + ' ', style=rule.style)
+            text.append(rule.title)
+            if rule.align == 'right':
+                text = text.append(' ' + rule.characters * indent, style=rule.style)
+            rule.title = text
+        self.print(rule)
+
+
+# This is used to print (rich) text to the console, as well as expose all the other features of rich's console
+# Unlike rich, can be called directly to print (for backwards compat purposes.)
+console = _Console()
+
 
 PORCELAIN_BOX: rich.box.Box = rich.box.Box(
     """\
@@ -146,7 +196,6 @@ def colorize(color: str, text: str) -> str:
 
     :param color: Color tag to use
     :param text: Text to color
-    :param auto: Whether to apply auto colors
 
     :return: Colored text or text
     """
@@ -157,7 +206,7 @@ def disable_colors():
     """
     Disables colors to the terminal.
     """
-    rich_console.no_color = True
+    console.no_color = True
 
 
 @contextlib.contextmanager
@@ -174,22 +223,10 @@ def get_console_output() -> Optional[TextIO]:
     return getattr(local_context, 'output', None)
 
 
-def _patchable_console(text, *args, **kwargs):
+def _patchable_console(*args, **kwargs):
     # Nobody will import this directly, so we can monkeypatch it for IPC calls
-    rich_console.file = get_console_output()
+    console.file = get_console_output()
     try:
-        rich_console.print(text, *args, **kwargs)
+        console._print(*args, **kwargs)
     finally:
-        rich_console.file = None
-
-
-def console(text: Any, *args, **kwargs) -> None:
-    """
-    Print to console safely. Output is able to be captured by different streams in different contexts.
-
-    Any plugin wishing to output to the user's console should use this function instead of print so that
-    output can be redirected when FlexGet is invoked from another process.
-
-    Accepts arguments like the `rich.console.Console.print` function does.
-    """
-    _patchable_console(text, *args, **kwargs)
+        console.file = None
