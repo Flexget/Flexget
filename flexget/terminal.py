@@ -63,8 +63,8 @@ class _Console(rich.console.Console):
 
 # This is used to print (rich) text to the console, as well as expose all the other features of rich's console
 # Unlike rich, can be called directly to print (for backwards compat purposes.)
-force_terminal = True if "PYCHARM_HOSTED" in os.environ else None
-console = _Console(force_terminal=force_terminal)
+color_system = "truecolor" if "PYCHARM_HOSTED" in os.environ else "auto"
+console = _Console(color_system=color_system)
 
 
 PORCELAIN_BOX: rich.box.Box = rich.box.Box(
