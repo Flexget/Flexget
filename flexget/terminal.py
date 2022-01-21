@@ -18,6 +18,11 @@ local_context = threading.local()
 
 
 class _Console(rich.console.Console):
+    def __init__(self, *args, **kwargs):
+        if "PYCHARM_HOSTED" in os.environ:
+            kwargs.setdefault('color_system', 'truecolor')
+        super().__init__(*args, **kwargs)
+
     def __call__(self, text: Any, *args, **kwargs) -> None:
         """
         Print to console safely. Output is able to be captured by different streams in different contexts.
@@ -63,8 +68,7 @@ class _Console(rich.console.Console):
 
 # This is used to print (rich) text to the console, as well as expose all the other features of rich's console
 # Unlike rich, can be called directly to print (for backwards compat purposes.)
-color_system = "truecolor" if "PYCHARM_HOSTED" in os.environ else "auto"
-console = _Console(color_system=color_system)
+console = _Console()
 
 
 PORCELAIN_BOX: rich.box.Box = rich.box.Box(
