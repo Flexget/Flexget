@@ -1,5 +1,6 @@
 from argparse import SUPPRESS
 
+import yaml
 from loguru import logger
 from rich.syntax import Syntax
 
@@ -18,10 +19,8 @@ class OutputDumpConfig:
     @plugin.priority(plugin.PRIORITY_LAST)
     def on_task_start(self, task, config):
         if task.options.dump_config:
-            import yaml
-
             console.rule(f'config from task: {task.name}')
-            syntax = Syntax(yaml.safe_dump(task.config).strip(), 'yaml')
+            syntax = Syntax(yaml.safe_dump(task.config).strip(), 'yaml+jinja', theme='native')
             console(syntax)
             console.rule()
             task.abort(silent=True)
