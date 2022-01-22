@@ -20,10 +20,12 @@ def get_free_space(config, task):
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         try:
             ssh.connect(
-                config['host'],
-                config['port'],
-                config['user'],
-                config['ssh_key_filepath'],
+                config.get('host'),
+                config.get('port', 22),
+                config.get('user'),
+                config.get('password', None),
+                config.get('pkey', None),
+                config.get('ssh_key_filepath'),
                 timeout=5000,
             )
         except Exception as e:
