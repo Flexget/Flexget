@@ -50,25 +50,26 @@ def dump(entries, debug=False, eval_lazy=False, trace=False, title_only=False):
             if title_only and field != 'title':
                 continue
             if entry.is_lazy(field) and not eval_lazy:
-                value = (
+                renderable = (
                     '[italic]<LazyField - value will be determined when it is accessed>[/italic]'
                 )
             else:
                 try:
                     value = entry[field]
                 except KeyError:
-                    value = '[italic]<LazyField - lazy lookup failed>[/italic]'
-            if field.rsplit('_', maxsplit=1)[-1] == 'url':
-                renderable = f'[link={value}][repr.url]{value}[/repr.url][/link]'
-            elif isinstance(value, str):
-                renderable = value.replace('\r', '').replace('\n', '')
-            elif is_expandable(value):
-                renderable = Pretty(value)
-            else:
-                try:
-                    renderable = highlighter(str(value))
-                except Exception:
-                    renderable = f'[[i]not printable[/i]] ({repr(value)})'
+                    renderable = '[italic]<LazyField - lazy lookup failed>[/italic]'
+                else:
+                    if field.rsplit('_', maxsplit=1)[-1] == 'url':
+                        renderable = f'[link={value}][repr.url]{value}[/repr.url][/link]'
+                    elif isinstance(value, str):
+                        renderable = value.replace('\r', '').replace('\n', '')
+                    elif is_expandable(value):
+                        renderable = Pretty(value)
+                    else:
+                        try:
+                            renderable = highlighter(str(value))
+                        except Exception:
+                            renderable = f'[[i]not printable[/i]] ({repr(value)})'
             entry_table.add_row(f'{field}', ': ', renderable)
         console(entry_table)
         if trace:
