@@ -31,5 +31,4 @@ zxcvbn-python
 progressbar==2.5
 more-itertools
 psutil>=5.8.0
-matrix_client>=0.3.2
 

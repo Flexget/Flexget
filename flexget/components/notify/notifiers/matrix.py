@@ -1,17 +1,24 @@
-import logging
-
 from loguru import logger
+from requests.exceptions import RequestException
 
 from flexget import plugin
-from flexget.config_schema import one_or_more
 from flexget.event import event
-from flexget.plugin import DependencyError, PluginWarning
+from flexget.plugin import PluginWarning
+from flexget.utils.requests import Session as RequestSession
 
+requests = RequestSession(max_retries=3)
 
 plugin_name = 'matrix'
 
 logger = logger.bind(name=plugin_name)
 
+def urljoin(*args):
+    """
+    Author: Rune Kaagaard
+    Joins given arguments into an url. Trailing but not leading slashes are
+    stripped for each argument.
+    """
+    return "/".join(map(lambda x: str(x).rstrip('/'), args))
 
 class MatrixNotifier:
     """
@@ -45,34 +52,23 @@ class MatrixNotifier:
         'additionalProperties': False,
     }
 
-    __version__ = '0.1'
+    __version__ = '0.2'
 
     def notify(self, title, message, config):
+        """
+        Send notification to Matrix Room
+        """
+        notification = {'body': message, 
+                        'msgtype': "m.text"}
+        room = urljoin(config['server'],
+                        "_matrix/client/r0/rooms",
+                        config['roomid'],
+                        "send/m.room.message?access_token="+config['token']
+                        )                        
         try:
-            from matrix_client.api import MatrixHttpApi  # noqa
-        except ImportError as e:
-            logger.debug('Error importing MatrixHttpApi: {}', e)
-            raise DependencyError(
-                plugin_name, 'matrix_client', 'matrix_client module required. ImportError: %s' % e
-            )
-        #TODO: Is dns required to be loaded for the matrix_client module?
-        try:
-            import dns  # noqa
-        except ImportError:
-            try:
-                import dnspython  # noqa
-            except ImportError as e:
-                logger.debug('Error importing dnspython: {}', e)
-                raise DependencyError(
-                    plugin_name, 'dnspython', 'dnspython module required. ImportError: %s' % e
-                )
-
-        message = '%s\n%s' % (title, message)
-        logger.debug('Sending Matrix notification about: {}', message)
-        logging.getLogger('matrix').setLevel(logging.CRITICAL)
-        matrix = MatrixHttpApi(config['server'], token=config['token'])
-        response = matrix.send_message(config['roomid'], message)
-
+            requests.post(room, json=notification)
+        except RequestException as e:
+            raise PluginWarning(e.args[0])
 
 
 @event('plugin.register')
