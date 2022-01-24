@@ -175,8 +175,12 @@ class InputDeluge(DelugePlugin):
                     entry['url'] = 'file://' + torrent_path
                 else:
                     logger.warning('Did not find torrent file at {}', torrent_path)
+            # Pieces is just a really long list, cluttering up the entry and --dump output
+            blacklist_fields = ['pieces']
             for key, value in torrent_dict.items():
-                # All fields provided by deluge get placed under the deluge_ namespace
+                # All fields (except a few) provided by deluge get placed under the deluge_ namespace
+                if key in blacklist_fields:
+                    continue
                 entry['deluge_' + key] = value
                 # Some fields also get special handling
                 if key in self.settings_map:
