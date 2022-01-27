@@ -191,7 +191,7 @@ class OutputQBitTorrent:
         self._request(
             'post',
             self.url + self.api_url_download,
-            msg_on_fail='Failed to add file to qBittorrent',
+            msg_on_fail=f'Failed to add url to qBittorrent: {url}',
             files=multipart_data,
             verify=verify_cert,
         )
