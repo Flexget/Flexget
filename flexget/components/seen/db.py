@@ -185,24 +185,28 @@ def forget(value, tasks=None):
             tasks = None
 
         if tasks:
-            query = (
+            query_se = (
                 session.query(SeenEntry)
                 .filter(SeenEntry.title.like(value))
                 .filter(SeenEntry.task.in_(tasks))
             )
+            query_sf = session.query(SeenField).filter(SeenField.value.like(value))
         else:
-            query = session.query(SeenEntry).filter(
+            query_se = session.query(SeenEntry).filter(
                 or_(SeenEntry.title == value, SeenEntry.task == value)
             )
+            query_sf = session.query(SeenField).filter(SeenField.value == value)
 
-        for se in query.all():
+        for se in query_se.all():
             field_count += len(se.fields)
             count += 1
             logger.debug('forgetting {}', se)
             session.delete(se)
 
-        for sf in session.query(SeenField).filter(SeenField.value == value).all():
+        for sf in query_sf.all():
             se = session.query(SeenEntry).filter(SeenEntry.id == sf.seen_entry_id).first()
+            if tasks and not se.task in tasks:
+                continue
             field_count += len(se.fields)
             count += 1
             logger.debug('forgetting {}', se)
