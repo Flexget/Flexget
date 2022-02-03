@@ -299,23 +299,8 @@ class Manager:
                 logger.error('Reloading config failed: {}', e)
         # Handle --tasks
         if options.tasks:
-            # Consider * the same as not specifying tasks at all (makes sure manual plugin still works)
-            if options.tasks == ['*']:
-                options.tasks = None
-            else:
-                # Create list of tasks to run, preserving order
-                task_names = []
-                for arg in options.tasks:
-                    matches = [
-                        t for t in self.tasks if fnmatch.fnmatchcase(str(t).lower(), arg.lower())
-                    ]
-                    if not matches:
-                        msg = f'`{arg}` does not match any tasks'
-                        logger.error(msg)
-                        continue
-                    task_names.extend(m for m in matches if m not in task_names)
-                # Set the option as a list of matching task names so plugins can use it easily
-                options.tasks = task_names
+            options.tasks = self.tasks_extractor(options.tasks)
+            task_names = options.tasks
         # TODO: 1.2 This is a hack to make task priorities work still, not sure if it's the best one
         task_names = sorted(
             task_names, key=lambda t: self.config['tasks'][t].get('priority', 65535)
@@ -1051,6 +1036,23 @@ class Manager:
                 logger.info('Removed test database')
         global manager
         manager = None
+
+    def tasks_extractor(self, tasks):
+        # Create list of tasks to run, preserving order
+        # Consider * the same as not specifying tasks at all (makes sure manual plugin still works)
+        if not tasks or tasks == ['*']:
+            return None
+
+        task_names = []
+        for arg in tasks:
+            matches = [t for t in self.tasks if fnmatch.fnmatchcase(str(t).lower(), arg.lower())]
+            if not matches:
+                msg = f'`{arg}` does not match any tasks'
+                logger.error(msg)
+                continue
+            task_names.extend(m for m in matches if m not in task_names)
+
+        return task_names
 
     def crash_report(self) -> str:
         """

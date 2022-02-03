@@ -7,6 +7,7 @@ forget (string)
     task name then everything in that task will be forgotten. With title all learned fields from it and the
     title will be forgotten. With field value only that particular field is forgotten.
 """
+import string
 from datetime import datetime
 
 from loguru import logger
@@ -164,7 +165,7 @@ def add(title, task_name, fields, reason=None, local=None, session=None):
 
 
 @event('forget')
-def forget(value):
+def forget(value, tasks=None):
     """
     See module docstring
 
@@ -175,11 +176,26 @@ def forget(value):
         logger.debug('forget called with {}', value)
         count = 0
         field_count = 0
-        for se in (
-            session.query(SeenEntry)
-            .filter(or_(SeenEntry.title == value, SeenEntry.task == value))
-            .all()
-        ):
+
+        if isinstance(tasks, list):
+            pass
+        elif isinstance(tasks, str):
+            tasks = [tasks]
+        else:
+            tasks = None
+
+        if tasks:
+            query = (
+                session.query(SeenEntry)
+                .filter(SeenEntry.title.like(value))
+                .filter(SeenEntry.task.in_(tasks))
+            )
+        else:
+            query = session.query(SeenEntry).filter(
+                or_(SeenEntry.title == value, SeenEntry.task == value)
+            )
+
+        for se in query.all():
             field_count += len(se.fields)
             count += 1
             logger.debug('forgetting {}', se)
@@ -232,6 +248,7 @@ def search(
     status=None,
     start=None,
     stop=None,
+    tasks=None,
     order_by='added',
     descending=False,
     session=None,
@@ -241,6 +258,16 @@ def search(
         query = query.filter(SeenField.value.like(value))
     if status is not None:
         query = query.filter(SeenEntry.local == status)
+
+    if isinstance(tasks, list):
+        pass
+    elif isinstance(tasks, str):
+        tasks = [tasks]
+    else:
+        tasks = None
+
+    if tasks:
+        query = query.filter(SeenEntry.task.in_(tasks))
     if count:
         return query.group_by(SeenEntry).count()
     if descending:
