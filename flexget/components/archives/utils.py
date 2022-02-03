@@ -156,8 +156,7 @@ class RarArchive(Archive):
     """
 
     def __init__(self, path):
-        if not rarfile:
-            raise NeedRarFile('Python module rarfile needed to handle RAR archives')
+        RarArchive.check_import()
 
         try:
             super().__init__(rarfile.RarFile, path)
@@ -178,6 +177,11 @@ class RarArchive(Archive):
             return super().open(member)
         except rarfile.Error as error:
             raise ArchiveError(error)
+
+    @staticmethod
+    def check_import():
+        if not rarfile:
+            raise NeedRarFile('Python module rarfile needed to handle RAR archives')
 
 
 class ZipArchive(Archive):
