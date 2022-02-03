@@ -210,7 +210,9 @@ class NPOWatchlist:
             if series:  # sometimes the NPO page does not return valid content
                 # create a stub to store the common values for all episodes of this series
                 series_info = {
-                    'npo_url': response.url,  # we were redirected to the true URL
+                    'npo_url': response.url.split('?')[
+                        0
+                    ],  # we were redirected to the true URL, drop params
                     'npo_name': series.find('h1').text,
                     'npo_description': series.find('div', id='metaContent').find('p').text,
                     'npo_language': 'nl',  # hard-code the language as if in NL, for lookup plugins

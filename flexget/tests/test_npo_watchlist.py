@@ -30,7 +30,7 @@ class TestNpoWatchlistInfo:
         assert entry['npo_runtime'] == '32'
         assert entry['npo_premium'] is False
         assert (
-            entry['npo_version'] == 'NPO.359549527911d921607d58ac3780ed9306174b23'
+            entry['npo_version'] == 'NPO.6586736ba8ccc16e4f9288118f71dbd3c81e21e8'
         )  # specify for which version of NPO website we did run this unittest
 
         entry = (
