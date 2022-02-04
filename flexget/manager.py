@@ -67,12 +67,6 @@ manager: Optional['Manager'] = None
 DB_CLEANUP_INTERVAL = timedelta(days=7)
 
 
-class TaskNamingError(Exception):
-    """Exception for task naming"""
-
-    pass
-
-
 class Manager:
     """Manager class for FlexGet
 
@@ -309,7 +303,7 @@ class Manager:
             for task in options.tasks:
                 try:
                     task_names.extend(m for m in self.matching_tasks(task) if m not in task_names)
-                except TaskNamingError as e:
+                except ValueError as e:
                     logger.error(e)
                     continue
 
@@ -1059,7 +1053,7 @@ class Manager:
 
         task_names = [t for t in self.tasks if fnmatch.fnmatchcase(str(t).lower(), task.lower())]
         if not task_names:
-            raise TaskNamingError(f'`{task}` does not match any tasks')
+            raise ValueError(f'`{task}` does not match any tasks')
 
         return task_names
 

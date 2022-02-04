@@ -42,7 +42,7 @@ except ImportError:
 logger = logger.bind(name='seen.db')
 Base = db_schema.versioned_base('seen', 4)
 
-ESPCAPE_QUERY = '\\'
+ESCAPE_QUERY = '\\'
 
 
 @db_schema.upgrade('seen')
@@ -190,11 +190,11 @@ def forget(value, tasks=None, test=False):
         if tasks:
             query_se = (
                 session.query(SeenEntry)
-                .filter(SeenEntry.title.like(value, escape=ESPCAPE_QUERY))
+                .filter(SeenEntry.title.like(value, escape=ESCAPE_QUERY))
                 .filter(SeenEntry.task.in_(tasks))
             )
             query_sf = session.query(SeenField).filter(
-                SeenField.value.like(value, escape=ESPCAPE_QUERY)
+                SeenField.value.like(value, escape=ESCAPE_QUERY)
             )
         else:
             query_se = session.query(SeenEntry).filter(
@@ -276,7 +276,7 @@ def search(
 ):
     query = session.query(SeenEntry).join(SeenField)
     if value:
-        query = query.filter(SeenField.value.like(value, escape=ESPCAPE_QUERY))
+        query = query.filter(SeenField.value.like(value, escape=ESCAPE_QUERY))
     if status is not None:
         query = query.filter(SeenEntry.local == status)
 
