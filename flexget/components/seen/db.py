@@ -7,7 +7,9 @@ forget (string)
     task name then everything in that task will be forgotten. With title all learned fields from it and the
     title will be forgotten. With field value only that particular field is forgotten.
 """
+import string
 from datetime import datetime
+from glob import escape
 
 from loguru import logger
 from sqlalchemy import (
@@ -39,6 +41,8 @@ except ImportError:
 
 logger = logger.bind(name='seen.db')
 Base = db_schema.versioned_base('seen', 4)
+
+ESCAPE_QUERY = '\\'
 
 
 @db_schema.upgrade('seen')
@@ -164,7 +168,7 @@ def add(title, task_name, fields, reason=None, local=None, session=None):
 
 
 @event('forget')
-def forget(value):
+def forget(value, tasks=None, test=False):
     """
     See module docstring
 
@@ -175,22 +179,55 @@ def forget(value):
         logger.debug('forget called with {}', value)
         count = 0
         field_count = 0
-        for se in (
-            session.query(SeenEntry)
-            .filter(or_(SeenEntry.title == value, SeenEntry.task == value))
-            .all()
-        ):
-            field_count += len(se.fields)
-            count += 1
-            logger.debug('forgetting {}', se)
-            session.delete(se)
 
-        for sf in session.query(SeenField).filter(SeenField.value == value).all():
-            se = session.query(SeenEntry).filter(SeenEntry.id == sf.seen_entry_id).first()
+        if isinstance(tasks, list):
+            pass
+        elif isinstance(tasks, str):
+            tasks = [tasks]
+        else:
+            tasks = None
+
+        if tasks:
+            query_se = (
+                session.query(SeenEntry)
+                .filter(SeenEntry.title.like(value, escape=ESCAPE_QUERY))
+                .filter(SeenEntry.task.in_(tasks))
+            )
+            query_sf = session.query(SeenField).filter(
+                SeenField.value.like(value, escape=ESCAPE_QUERY)
+            )
+        else:
+            query_se = session.query(SeenEntry).filter(
+                or_(SeenEntry.title == value, SeenEntry.task == value)
+            )
+            query_sf = session.query(SeenField).filter(SeenField.value == value)
+
+        for se in query_se.all():
             field_count += len(se.fields)
             count += 1
-            logger.debug('forgetting {}', se)
-            session.delete(se)
+
+            if test:
+                logger.info(
+                    f'Testing: would forget entry with title `{se.title}` of task `{se.task}`'
+                )
+            else:
+                logger.debug('forgetting {}', se)
+                session.delete(se)
+
+        for sf in query_sf.all():
+            se = session.query(SeenEntry).filter(SeenEntry.id == sf.seen_entry_id).first()
+            if tasks and not se.task in tasks:
+                continue
+            field_count += len(se.fields)
+            count += 1
+
+            if test:
+                logger.info(
+                    f'Testing: would forget entry `{se.title}` of task `{se.task}` based on field `{sf.field}` with value `{sf.value}`'
+                )
+            else:
+                logger.debug('forgetting {}', se)
+                session.delete(se)
     return count, field_count
 
 
@@ -232,15 +269,26 @@ def search(
     status=None,
     start=None,
     stop=None,
+    tasks=None,
     order_by='added',
     descending=False,
     session=None,
 ):
     query = session.query(SeenEntry).join(SeenField)
     if value:
-        query = query.filter(SeenField.value.like(value))
+        query = query.filter(SeenField.value.like(value, escape=ESCAPE_QUERY))
     if status is not None:
         query = query.filter(SeenEntry.local == status)
+
+    if isinstance(tasks, list):
+        pass
+    elif isinstance(tasks, str):
+        tasks = [tasks]
+    else:
+        tasks = None
+
+    if tasks:
+        query = query.filter(SeenEntry.task.in_(tasks))
     if count:
         return query.group_by(SeenEntry).count()
     if descending:

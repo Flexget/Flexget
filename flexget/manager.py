@@ -299,23 +299,15 @@ class Manager:
                 logger.error('Reloading config failed: {}', e)
         # Handle --tasks
         if options.tasks:
-            # Consider * the same as not specifying tasks at all (makes sure manual plugin still works)
-            if options.tasks == ['*']:
-                options.tasks = None
-            else:
-                # Create list of tasks to run, preserving order
-                task_names = []
-                for arg in options.tasks:
-                    matches = [
-                        t for t in self.tasks if fnmatch.fnmatchcase(str(t).lower(), arg.lower())
-                    ]
-                    if not matches:
-                        msg = f'`{arg}` does not match any tasks'
-                        logger.error(msg)
-                        continue
-                    task_names.extend(m for m in matches if m not in task_names)
-                # Set the option as a list of matching task names so plugins can use it easily
-                options.tasks = task_names
+            task_names = []
+            for task in options.tasks:
+                try:
+                    task_names.extend(m for m in self.matching_tasks(task) if m not in task_names)
+                except ValueError as e:
+                    logger.error(e)
+                    continue
+
+            options.tasks = task_names
         # TODO: 1.2 This is a hack to make task priorities work still, not sure if it's the best one
         task_names = sorted(
             task_names, key=lambda t: self.config['tasks'][t].get('priority', 65535)
@@ -1051,6 +1043,19 @@ class Manager:
                 logger.info('Removed test database')
         global manager
         manager = None
+
+    def matching_tasks(self, task: str) -> 'list[str]':
+        """Create list of tasks to run, preserving order"""
+
+        # Consider * the same as not specifying tasks at all (makes sure manual plugin still works)
+        if not task or task == '*':
+            return []
+
+        task_names = [t for t in self.tasks if fnmatch.fnmatchcase(str(t).lower(), task.lower())]
+        if not task_names:
+            raise ValueError(f'`{task}` does not match any tasks')
+
+        return task_names
 
     def crash_report(self) -> str:
         """
