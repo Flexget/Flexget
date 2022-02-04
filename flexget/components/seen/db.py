@@ -9,6 +9,7 @@ forget (string)
 """
 import string
 from datetime import datetime
+from glob import escape
 
 from loguru import logger
 from sqlalchemy import (
@@ -40,6 +41,8 @@ except ImportError:
 
 logger = logger.bind(name='seen.db')
 Base = db_schema.versioned_base('seen', 4)
+
+ESPCAPE_QUERY = '\\'
 
 
 @db_schema.upgrade('seen')
@@ -165,7 +168,7 @@ def add(title, task_name, fields, reason=None, local=None, session=None):
 
 
 @event('forget')
-def forget(value, tasks=None):
+def forget(value, tasks=None, test=False):
     """
     See module docstring
 
@@ -187,10 +190,12 @@ def forget(value, tasks=None):
         if tasks:
             query_se = (
                 session.query(SeenEntry)
-                .filter(SeenEntry.title.like(value))
+                .filter(SeenEntry.title.like(value, escape=ESPCAPE_QUERY))
                 .filter(SeenEntry.task.in_(tasks))
             )
-            query_sf = session.query(SeenField).filter(SeenField.value.like(value))
+            query_sf = session.query(SeenField).filter(
+                SeenField.value.like(value, escape=ESPCAPE_QUERY)
+            )
         else:
             query_se = session.query(SeenEntry).filter(
                 or_(SeenEntry.title == value, SeenEntry.task == value)
@@ -200,8 +205,14 @@ def forget(value, tasks=None):
         for se in query_se.all():
             field_count += len(se.fields)
             count += 1
-            logger.debug('forgetting {}', se)
-            session.delete(se)
+
+            if test:
+                logger.info(
+                    f'Testing: would forget entry with title `{se.title}` of task `{se.task}`'
+                )
+            else:
+                logger.debug('forgetting {}', se)
+                session.delete(se)
 
         for sf in query_sf.all():
             se = session.query(SeenEntry).filter(SeenEntry.id == sf.seen_entry_id).first()
@@ -209,8 +220,14 @@ def forget(value, tasks=None):
                 continue
             field_count += len(se.fields)
             count += 1
-            logger.debug('forgetting {}', se)
-            session.delete(se)
+
+            if test:
+                logger.info(
+                    f'Testing: would forget entry `{se.title}` of task `{se.task}` based on field `{sf.field}` with value `{sf.value}`'
+                )
+            else:
+                logger.debug('forgetting {}', se)
+                session.delete(se)
     return count, field_count
 
 
@@ -259,7 +276,7 @@ def search(
 ):
     query = session.query(SeenEntry).join(SeenField)
     if value:
-        query = query.filter(SeenField.value.like(value))
+        query = query.filter(SeenField.value.like(value, escape=ESPCAPE_QUERY))
     if status is not None:
         query = query.filter(SeenEntry.local == status)
 

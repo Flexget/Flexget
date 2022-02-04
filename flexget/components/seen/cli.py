@@ -1,5 +1,6 @@
 from flexget import options, plugin
 from flexget.event import event
+from flexget.manager import Manager, TaskNamingError
 from flexget.terminal import TerminalTable, console, table_parser
 from flexget.utils.database import with_session
 
@@ -21,25 +22,34 @@ def do_cli(manager, options):
         seen_search(manager, options)
 
 
-def seen_forget(manager, options):
+def seen_forget(manager: Manager, options):
     forget_name = options.forget_value
     if is_imdb_url(forget_name):
         imdb_id = extract_id(forget_name)
         if imdb_id:
             forget_name = imdb_id
 
-    tasks = manager.tasks_extractor(options.tasks)
+    tasks = None
+    if options.tasks:
+        tasks = []
+        for task in options.tasks:
+            try:
+                tasks.extend(m for m in manager.matching_tasks(task) if m not in tasks)
+            except TaskNamingError as e:
+                console(e)
+                continue
 
     # If tasks are specified it should use pattern matching as search
     if tasks:
+        forget_name = forget_name.replace("%", "\\%").replace("_", "\\_")
         forget_name = forget_name.replace("*", "%").replace("?", "_")
 
-    count, fcount = db.forget(forget_name, tasks=tasks)
+    count, fcount = db.forget(forget_name, tasks=tasks, test=options.test_forget)
     console(f'Removed {count} titles ({fcount} fields)')
     manager.config_changed()
 
 
-def seen_add(manager, options):
+def seen_add(manager: Manager, options):
     DEFAULT_TASK = 'cli_add'
 
     seen_name = options.add_value
@@ -69,7 +79,7 @@ def seen_add(manager, options):
 
 
 @with_session
-def seen_search(manager, options, session=None):
+def seen_search(manager: Manager, options, session=None):
     search_term = options.search_term
     if is_imdb_url(search_term):
         console('IMDB url detected, parsing ID')
@@ -79,9 +89,18 @@ def seen_search(manager, options, session=None):
         else:
             console("Could not parse IMDB ID")
     else:
-        search_term = options.search_term.replace("*", "%").replace("?", "_")
+        search_term = search_term.replace("%", "\\%").replace("_", "\\_")
+        search_term = search_term.replace("*", "%").replace("?", "_")
 
-    tasks = manager.tasks_extractor(options.tasks)
+    tasks = None
+    if options.tasks:
+        tasks = []
+        for task in options.tasks:
+            try:
+                tasks.extend(m for m in manager.matching_tasks(task) if m not in tasks)
+            except TaskNamingError as e:
+                console(e)
+                continue
 
     seen_entries = db.search(value=search_term, status=None, tasks=tasks, session=session)
     table = TerminalTable('Field', 'Value', table_type=options.table_type)
@@ -114,9 +133,14 @@ def register_parser_arguments():
         '--tasks',
         nargs='+',
         metavar='TASK',
-        help='forge only in specified task(s), optionally using glob patterns ("tv-*"). '
+        help='forget only in specified task(s), optionally using glob patterns ("tv-*"). '
         'matching is case-insensitive',
     )
+
+    forget_parser.add_argument(
+        '--test-forget', action='store_true', default=False, help='test forget query'
+    )
+
     forget_parser.add_argument(
         'forget_value',
         metavar='<value>',
@@ -137,7 +161,7 @@ def register_parser_arguments():
         '--tasks',
         nargs='+',
         metavar='TASK',
-        help='forge only in specified task(s), optionally using glob patterns ("tv-*"). '
+        help='search only in specified task(s), optionally using glob patterns ("tv-*"). '
         'matching is case-insensitive',
     )
     search_parser.add_argument('search_term', metavar='<search term>')
