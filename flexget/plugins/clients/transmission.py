@@ -32,6 +32,7 @@ logger = logger.bind(name='transmission')
 class TransmissionBase:
     def __init__(self):
         self.client = None
+        self.old_client = None
         self.opener = None
 
     def prepare_config(self, config):
@@ -144,6 +145,11 @@ class TransmissionBase:
                 'transmission-rpc module version 3.0 or higher required.', logger
             )
 
+        # Save preview client to resolve from_task
+        self.old_client = None
+        if self.client:
+            self.old_client = self.client
+
         # Mark rpc client for garbage collector so every task can start
         # a fresh new according its own config - fix to bug #2804
         self.client = None
@@ -156,6 +162,13 @@ class TransmissionBase:
                     logger.info('Successfully connected to transmission.')
                 else:
                     logger.error('It looks like there was a problem connecting to transmission.')
+
+    def on_task_exit(self, task, config):
+        if not self.old_client:
+            return
+
+        self.client = self.old_client
+        self.old_client = None
 
 
 class PluginTransmissionInput(TransmissionBase):
@@ -829,6 +842,7 @@ class PluginTransmissionClean(TransmissionBase):
     def on_task_exit(self, task, config):
         config = self.prepare_config(config)
         if not config['enabled'] or task.options.learn:
+            TransmissionBase.on_task_exit(self, task, config)
             return
         if not self.client:
             self.client = self.create_rpc_client(config)
@@ -886,6 +900,8 @@ class PluginTransmissionClean(TransmissionBase):
             remove_ids.append(torrent.id)
         if remove_ids:
             self.client.remove_torrent(remove_ids, config.get('delete_files'))
+
+        TransmissionBase.on_task_exit(self, task, config)
 
 
 @event('plugin.register')
