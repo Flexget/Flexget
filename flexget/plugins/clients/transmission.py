@@ -165,7 +165,6 @@ class TransmissionBase:
             )
 
         self.transmission_data_reset()
-
         client = None
 
         if config['enabled']:
