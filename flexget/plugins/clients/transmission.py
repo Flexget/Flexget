@@ -31,9 +31,9 @@ logger = logger.bind(name='transmission')
 
 class TransmissionBase:
     def __init__(self):
-        self.client = None
-        self.old_client = None
         self.opener = None
+        self.transmission_data = None
+        self.transmission_data_reset()
 
     def prepare_config(self, config):
         if isinstance(config, bool):
@@ -54,7 +54,7 @@ class TransmissionBase:
                 logger.error('netrc: {}, file: {}, line: {}', e.msg, e.filename, e.lineno)
         return config
 
-    def create_rpc_client(self, config):
+    def create_rpc_client(self, config) -> transmissionrpc.Client:
         user, password = config.get('username'), config.get('password')
         urlo = urlparse(config['host'])
 
@@ -136,7 +136,26 @@ class TransmissionBase:
 
         return seed_limit_ok, idle_limit_ok
 
-    def on_task_start(self, task, config):
+    def transmission_data_reset(self):
+        self.transmission_data = {'config': None, 'client': None}
+
+    def transmission_compare_config(self, config) -> bool:
+
+        # Check Config as Connections
+        if not self.transmission_data.get('config') or not self.transmission_data.get('client'):
+            return False
+
+        # Check old config with new config
+        for conf in ['host', 'port']:
+            if self.transmission_data.get('config', {}).get(conf, None) != config.get(conf):
+                return False
+
+        return True
+
+    def get_client(self, task, config) -> transmissionrpc.Client:
+        if self.transmission_compare_config(config):
+            return self.transmission_data.get('client')
+
         try:
             import transmission_rpc as transmissionrpc
             from transmission_rpc import TransmissionError  # noqa
@@ -145,30 +164,36 @@ class TransmissionBase:
                 'transmission-rpc module version 3.0 or higher required.', logger
             )
 
-        # Save preview client to resolve from_task
-        self.old_client = None
-        if self.client:
-            self.old_client = self.client
+        self.transmission_data_reset()
 
-        # Mark rpc client for garbage collector so every task can start
-        # a fresh new according its own config - fix to bug #2804
-        self.client = None
-        config = self.prepare_config(config)
+        client = None
+
         if config['enabled']:
-            if task.options.test:
-                logger.info('Trying to connect to transmission...')
-                self.client = self.create_rpc_client(config)
-                if self.client:
-                    logger.info('Successfully connected to transmission.')
-                else:
-                    logger.error('It looks like there was a problem connecting to transmission.')
+            logger.info(
+                f'Trying to connect to transmission on `{config.get("host")}:{config.get("port")}`'
+            )
+            client = self.create_rpc_client(config)
+            if client:
+                logger.info(
+                    f'Successfully connected to transmission on `{config.get("host")}:{config.get("port")}`'
+                )
+            elif task.options.test:
+                logger.error(
+                    f'Error connecting to transmission on `{config.get("host")}:{config.get("port")}`'
+                )
+            else:
+                raise plugin.PluginError(
+                    f'Error connecting to transmission on `{config.get("host")}:{config.get("port")}`'
+                )
+
+        if client:
+            self.transmission_data['config'] = config
+            self.transmission_data['client'] = client
+
+        return client
 
     def on_task_exit(self, task, config):
-        if not self.old_client:
-            return
-
-        self.client = self.old_client
-        self.old_client = None
+        self.transmission_data_reset()
 
 
 class PluginTransmissionInput(TransmissionBase):
@@ -201,13 +226,15 @@ class PluginTransmissionInput(TransmissionBase):
         if not config['enabled']:
             return
 
-        if not self.client:
-            self.client = self.create_rpc_client(config)
         entries = []
 
-        session = self.client.get_session()
+        client = self.get_client(task, config)
+        if not client:
+            return
 
-        for torrent in self.client.get_torrents():
+        session = client.get_session()
+
+        for torrent in client.get_torrents():
             seed_ratio_ok, idle_limit_ok = self.check_seed_limits(torrent, session)
             if config['only_complete'] and not (
                 seed_ratio_ok and idle_limit_ok and torrent.progress == 100
@@ -378,13 +405,12 @@ class PluginTransmission(TransmissionBase):
         # Do not run if there is nothing to do
         if not task.accepted:
             return
-        if self.client is None:
-            self.client = self.create_rpc_client(config)
-            if self.client:
-                logger.debug('Successfully connected to transmission.')
-            else:
-                raise plugin.PluginError("Couldn't connect to transmission.")
-        session_torrents = self.client.get_torrents()
+
+        client = self.get_client(task, config)
+        if not client:
+            return
+
+        session_torrents = client.get_torrents()
         for entry in task.accepted:
             if task.options.test:
                 logger.info('Would {} {} in transmission.', config['action'], entry['title'])
@@ -431,11 +457,11 @@ class PluginTransmission(TransmissionBase):
                     if downloaded:
                         with open(entry['file'], 'rb') as f:
                             filedump = base64.b64encode(f.read()).decode('utf-8')
-                        torrent_info = self.client.add_torrent(filedump, 30, **options['add'])
+                        torrent_info = client.add_torrent(filedump, 30, **options['add'])
                     else:
                         if options['post'].get('magnetization_timeout', 0) > 0:
                             options['add']['paused'] = False
-                        torrent_info = self.client.add_torrent(
+                        torrent_info = client.add_torrent(
                             entry['url'], timeout=30, **options['add']
                         )
                 except TransmissionError as e:
@@ -449,7 +475,7 @@ class PluginTransmission(TransmissionBase):
                     continue
                 logger.info('"{}" torrent added to transmission', entry['title'])
                 # The info returned by the add call is incomplete, refresh it
-                torrent_info = self.client.get_torrent(torrent_info.id)
+                torrent_info = client.get_torrent(torrent_info.id)
             else:
                 # Torrent already loaded in transmission
                 if options['add'].get('download_dir'):
@@ -462,9 +488,7 @@ class PluginTransmission(TransmissionBase):
                     # In such case this will kick transmission to really move data.
                     # If data is already located at new location then transmission just ignore
                     # this command.
-                    self.client.move_torrent_data(
-                        torrent_info.id, options['add']['download_dir'], 120
-                    )
+                    client.move_torrent_data(torrent_info.id, options['add']['download_dir'], 120)
 
             try:
                 total_size = torrent_info.totalSize
@@ -475,7 +499,7 @@ class PluginTransmission(TransmissionBase):
                 skip_files = options['post'].get('skip_files')
                 # We need to index the files if any of the following are defined
                 if find_main_file or skip_files:
-                    file_list = self.client.get_files(torrent_info.id)[torrent_info.id]
+                    file_list = client.get_files(torrent_info.id)[torrent_info.id]
 
                     if options['post'].get('magnetization_timeout', 0) > 0 and not file_list:
                         logger.debug(
@@ -485,9 +509,9 @@ class PluginTransmission(TransmissionBase):
                         )
                         for _ in range(options['post']['magnetization_timeout']):
                             sleep(1)
-                            file_list = self.client.get_files(torrent_info.id)[torrent_info.id]
+                            file_list = client.get_files(torrent_info.id)[torrent_info.id]
                             if file_list:
-                                total_size = self.client.get_torrent(
+                                total_size = client.get_torrent(
                                     torrent_info.id, ['id', 'totalSize']
                                 ).totalSize
                                 break
@@ -550,7 +574,7 @@ class PluginTransmission(TransmissionBase):
                     # If we have a main file and want to rename it and associated files
                     if 'content_filename' in options['post'] and main_id is not None:
                         if 'download_dir' not in options['add']:
-                            download_dir = self.client.get_session().download_dir
+                            download_dir = client.get_session().download_dir
                         else:
                             download_dir = options['add']['download_dir']
 
@@ -582,7 +606,7 @@ class PluginTransmission(TransmissionBase):
                             # change to below when set_files will allow setting name, more efficient to have one call
                             # fl[index]['name'] = os.path.basename(pathscrub(filename + file_ext).encode('utf-8'))
                             try:
-                                self.client.rename_torrent_path(
+                                client.rename_torrent_path(
                                     torrent_info.id,
                                     file_list[file_id].name,
                                     os.path.basename(str(pathscrub(filename + file_ext))),
@@ -626,9 +650,9 @@ class PluginTransmission(TransmissionBase):
 
                 # Set any changed file properties
                 if list(options['change'].keys()):
-                    self.client.change_torrent(torrent_info.id, 30, **options['change'])
+                    client.change_torrent(torrent_info.id, 30, **options['change'])
 
-                start_torrent = partial(self.client.start_torrent, [torrent_info.id])
+                start_torrent = partial(client.start_torrent, [torrent_info.id])
 
                 if config['action'] == 'add':
                     # if add_paused was defined and set to False start the torrent;
@@ -636,19 +660,19 @@ class PluginTransmission(TransmissionBase):
                     start_paused = (
                         options['post']['paused']
                         if 'paused' in options['post']
-                        else not self.client.get_session().start_added_torrents
+                        else not client.get_session().start_added_torrents
                     )
                     if start_paused:
-                        self.client.stop_torrent(torrent_info.id)
+                        client.stop_torrent(torrent_info.id)
                     else:
-                        self.client.start_torrent(torrent_info.id)
+                        client.start_torrent(torrent_info.id)
                 elif config['action'] in ('remove', 'purge'):
-                    self.client.remove_torrent(
+                    client.remove_torrent(
                         [torrent_info.id], delete_data=config['action'] == 'purge'
                     )
                     logger.info('{}d {} from transmission', config['action'], torrent_info.name)
                 elif config['action'] == 'pause':
-                    self.client.stop_torrent([torrent_info.id])
+                    client.stop_torrent([torrent_info.id])
                     logger.info('paused {} in transmission', torrent_info.name)
                 elif config['action'] == 'resume':
                     start_torrent()
@@ -844,8 +868,6 @@ class PluginTransmissionClean(TransmissionBase):
         if not config['enabled'] or task.options.learn:
             TransmissionBase.on_task_exit(self, task, config)
             return
-        if not self.client:
-            self.client = self.create_rpc_client(config)
         tracker_re = re.compile(config['tracker'], re.IGNORECASE) if 'tracker' in config else None
         preserve_tracker_re = (
             re.compile(config['preserve_tracker'], re.IGNORECASE)
@@ -853,10 +875,14 @@ class PluginTransmissionClean(TransmissionBase):
             else None
         )
 
-        session = self.client.get_session()
+        client = self.get_client(task, config)
+        if not client:
+            return
+
+        session = client.get_session()
 
         remove_ids = []
-        for torrent in self.client.get_torrents():
+        for torrent in client.get_torrents():
             logger.verbose(
                 'Torrent "{}": status: "{}" - ratio: {} - date added: {}',
                 torrent.name,
@@ -899,7 +925,7 @@ class PluginTransmissionClean(TransmissionBase):
             logger.info('Removing finished torrent `{}` from transmission', torrent.name)
             remove_ids.append(torrent.id)
         if remove_ids:
-            self.client.remove_torrent(remove_ids, config.get('delete_files'))
+            client.remove_torrent(remove_ids, config.get('delete_files'))
 
         TransmissionBase.on_task_exit(self, task, config)
 
