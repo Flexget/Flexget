@@ -54,7 +54,7 @@ class TransmissionBase:
                 logger.error('netrc: {}, file: {}, line: {}', e.msg, e.filename, e.lineno)
         return config
 
-    def create_rpc_client(self, config) -> transmissionrpc.Client:
+    def create_rpc_client(self, config) -> 'transmissionrpc.Client':
         user, password = config.get('username'), config.get('password')
         urlo = urlparse(config['host'])
 
@@ -152,7 +152,7 @@ class TransmissionBase:
 
         return True
 
-    def get_client(self, task, config) -> transmissionrpc.Client:
+    def get_client(self, task, config) -> 'transmissionrpc.Client':
         if self.transmission_compare_config(config):
             return self.transmission_data.get('client')
 
