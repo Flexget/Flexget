@@ -38,7 +38,9 @@ class MagnetDL:
         except ImportError as e:
             logger.debug('Error importing cloudscraper: {}', e)
             raise plugin.DependencyError(
-                'cfscraper', 'cloudscraper', 'cloudscraper module required. ImportError: %s' % e
+                issued_by='cfscraper', 
+                missing='cloudscraper', 
+                message='CLOudscraper module required. ImportError: %s' % e
             )
 
         scraper = cloudscraper.create_scraper()
