@@ -447,9 +447,7 @@ class PluginTransmission(TransmissionBase):
                     # In such case this will kick transmission to really move data.
                     # If data is already located at new location then transmission just ignore
                     # this command.
-                    client.move_torrent_data(
-                        torrent_info.id, options['add']['download_dir'], 120
-                    )
+                    client.move_torrent_data(torrent_info.id, options['add']['download_dir'], 120)
 
             try:
                 total_size = torrent_info.totalSize
