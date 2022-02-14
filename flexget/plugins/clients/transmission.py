@@ -232,11 +232,16 @@ class PluginTransmissionInput(TransmissionBase):
                 'torrentFile',
             ]:
                 try:
-                    entry['transmission_' + attr] = getattr(torrent, attr)
+                    value = getattr(torrent, attr)
                 except Exception:
                     logger.opt(exception=True).debug(
                         'error when requesting transmissionrpc attribute {}', attr
                     )
+                else:
+                    # transmission-rpc adds timezone info to datetimes, which makes them hard to deal with. Strip it.
+                    if isinstance(value, datetime):
+                        value = value.replace(tzinfo=None)
+                    entry['transmission_' + attr] = value
             # Availability in percent
             entry['transmission_availability'] = (
                 (torrent.desiredAvailable / torrent.leftUntilDone) if torrent.leftUntilDone else 0
