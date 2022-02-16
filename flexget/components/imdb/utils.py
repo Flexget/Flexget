@@ -12,6 +12,8 @@ from flexget.utils.requests import Session, TimedLimiter
 from flexget.utils.soup import get_soup
 from flexget.utils.tools import str_to_int
 
+MOVIE_TYPES = ['TV Movie', 'Video', 'TV Special']
+
 logger = logger.bind(name='imdb.utils')
 # IMDb delivers a version of the page which is unparsable to unknown (and some known) user agents, such as requests'
 # Spoof the old urllib user agent to keep results consistent
@@ -199,7 +201,7 @@ class ImdbSearch:
                     movie['year'] = str_to_int(additional[-1])
                 elif len(additional) > 1:
                     movie['year'] = str_to_int(additional[-2])
-                    if additional[-1] not in ['TV Movie', 'Video']:
+                    if additional[-1] not in MOVIE_TYPES:
                         logger.debug('skipping {}', result_text.text)
                         continue
             primary_photo = row.find('td', 'primary_photo')
