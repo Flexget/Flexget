@@ -1,6 +1,7 @@
 import re
 import time
 import random
+from urllib.parse import quote
 
 from loguru import logger
 from requests import RequestException
@@ -27,23 +28,27 @@ class MagnetDL:
     url = 'https://www.magnetdl.com'
 
     schema = {
-        'type': 'object',
-        'properties': {
-            'category': {
-                'type': 'string',
-                'enum': ['software', 'movies', 'games', 'e-books', 'tv', 'music'],
+        'oneOf': [
+            {'type': 'boolean'},
+            {
+                'type': 'object',
+                'properties': {
+                    'category': {
+                        'type': 'string',
+                        'enum': ['software', 'movies', 'games', 'e-books', 'tv', 'music'],
+                    },
+                    'pages': {'type': 'integer', 'minimum': 1, 'maximum': 30, 'default': 5},
+                },
+                'additionalProperties': False,
             },
-            'pages': {'type': 'integer', 'minimum': 1, 'maximum': 30, 'default': 5},
-        },
-        'additionalProperties': False,
+        ]
     }
 
     def _url(self, category, page):
         return self.url + '/download/' + category + '/' + (str(page) if page > 0 else '')
 
-    def parse_page(self, scraper, category: str, page: int):
+    def parse_page(self, scraper, url: str):
         try:
-            url = self._url(category, page)
             logger.debug('page url: {}', url)
             page = scraper.get(url)
         except RequestException as e:
@@ -107,8 +112,10 @@ class MagnetDL:
 
         for page in range(0, config['pages']):
             logger.verbose('Retrieving {} page {}', category, page + 1)
+            url = self._url(category, page)
+            logger.debug('Url: {}', url)
             try:
-                for entry in self.parse_page(scraper, category, page):
+                for entry in self.parse_page(scraper, url):
                     if first_magnet is None:
                         first_magnet = entry['url']
                         logger.debug('Set first_magnet to {}', first_magnet)
@@ -124,7 +131,34 @@ class MagnetDL:
                 return
             time.sleep(random.randint(1, 5))
 
+    # Search API method
+    def search(self, task, entry, config):
+        if not config:
+            return
+        try:
+            import cloudscraper
+        except ImportError as e:
+            logger.debug('Error importing cloudscraper: {}', e)
+            raise plugin.DependencyError(
+                issued_by='cfscraper',
+                missing='cloudscraper',
+                message='CLOudscraper module required. ImportError: %s' % e,
+            )
+        scraper = cloudscraper.create_scraper()
+        entries = []
+        for search_string in entry.get('search_strings', [entry['title']]):
+            logger.debug('Searching `{}`', search_string)
+            try:
+                url = 'https://www.magnetdl.com/b/{}/'.format(quote(search_string.lower()))
+                for entry in self.parse_page(scraper, url):
+                    entries.append(entry)
+            except Page404Error:
+                logger.warning('Url {} returned 404', url)
+                return entries
+            time.sleep(random.randint(1, 5))
+        return entries
+
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(MagnetDL, 'magnetdl', api_ver=2, interfaces=['task'])
+    plugin.register(MagnetDL, 'magnetdl', api_ver=2, interfaces=['task', 'search'])
