@@ -1,6 +1,6 @@
+import random
 import re
 import time
-import random
 from urllib.parse import quote
 
 from loguru import logger
@@ -10,10 +10,9 @@ from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.cached_input import cached
-from flexget.utils.soup import get_soup
 from flexget.utils.simple_persistence import SimplePersistence
+from flexget.utils.soup import get_soup
 from flexget.utils.tools import parse_filesize
-
 
 logger = logger.bind(name='magnetdl')
 
