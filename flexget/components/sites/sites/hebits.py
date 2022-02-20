@@ -109,7 +109,9 @@ class SearchHeBits:
         params['order_by'] = HeBitsSort[config['order_by']].value
         params['order_way'] = 'desc' if config['order_desc'] else 'asc'
 
-        for search_string in entry.get('search_strings', [entry['title'], entry.get('original_title'), entry.get('imdb_id')]):
+        for search_string in entry.get(
+            'search_strings', [entry['title'], entry.get('original_title'), entry.get('imdb_id')]
+        ):
             params['searchstr'] = search_string
             logger.debug('Using search params: {}', params)
             try:
