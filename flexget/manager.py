@@ -299,15 +299,21 @@ class Manager:
                 logger.error('Reloading config failed: {}', e)
         # Handle --tasks
         if options.tasks:
-            task_names = []
-            for task in options.tasks:
-                try:
-                    task_names.extend(m for m in self.matching_tasks(task) if m not in task_names)
-                except ValueError as e:
-                    logger.error(e)
-                    continue
-
-            options.tasks = task_names
+            # Consider '*' the same as not specifying any tasks.
+            # (So manual plugin doesn't consider them explicitly enabled.)
+            if options.tasks == ['*']:
+                options.tasks = None
+            else:
+                task_names = []
+                for task in options.tasks:
+                    try:
+                        task_names.extend(
+                            m for m in self.matching_tasks(task) if m not in task_names
+                        )
+                    except ValueError as e:
+                        logger.error(e)
+                        continue
+                options.tasks = task_names
         # TODO: 1.2 This is a hack to make task priorities work still, not sure if it's the best one
         task_names = sorted(
             task_names, key=lambda t: self.config['tasks'][t].get('priority', 65535)
@@ -1044,13 +1050,8 @@ class Manager:
         global manager
         manager = None
 
-    def matching_tasks(self, task: str) -> 'list[str]':
+    def matching_tasks(self, task: str) -> Optional[List[str]]:
         """Create list of tasks to run, preserving order"""
-
-        # Consider * the same as not specifying tasks at all (makes sure manual plugin still works)
-        if not task or task == '*':
-            return []
-
         task_names = [t for t in self.tasks if fnmatch.fnmatchcase(str(t).lower(), task.lower())]
         if not task_names:
             raise ValueError(f'`{task}` does not match any tasks')
