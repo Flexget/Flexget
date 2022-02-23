@@ -144,6 +144,7 @@ class AniList(object):
                     ) or 'all' in selected_formats
 
                     if has_selected_type and has_selected_release_status:
+                        ids = {}
                         try:
                             ids = task.requests.post(
                                 'https://relations.yuna.moe/api/ids',
@@ -152,7 +153,7 @@ class AniList(object):
                             logger.debug(f'Additional IDs: {ids}')
                         except RequestException as e:
                             logger.verbose(f'Couldn\'t fetch additional IDs: {e}')
-                        if not ids or not isinstance(ids, dict):
+                        if not isinstance(ids, dict):
                             ids = {}
 
                         logger.debug(f'Anime Entry: {anime}')
