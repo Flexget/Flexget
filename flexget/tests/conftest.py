@@ -1,3 +1,4 @@
+import argparse
 import itertools
 import logging
 import os
@@ -7,7 +8,7 @@ import sys
 from contextlib import contextmanager
 from http import client
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional, Union
 from unittest import mock
 
 import flask
@@ -81,11 +82,15 @@ def execute_task(manager: Manager) -> Callable[..., Task]:
     A function that can be used to execute and return a named task in `config` argument.
     """
 
-    def execute(task_name: str, abort: bool = False, options: bool = None) -> Task:
+    def execute(
+        task_name: str, abort: bool = False, options: Union[dict, argparse.Namespace] = None
+    ) -> Task:
         """
         Use to execute one test task from config.
 
+        :param task_name: Name of task to execute.
         :param abort: If `True` expect (and require) this task to abort.
+        :param options: Options for the execution.
         """
         logger.info('********** Running task: {} ********** ', task_name)
         config = manager.config['tasks'][task_name]
