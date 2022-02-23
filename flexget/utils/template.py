@@ -4,7 +4,7 @@ import os.path
 import re
 from contextlib import suppress
 from copy import copy
-from datetime import date, datetime, time
+from datetime import date, datetime, time, timedelta
 from typing import TYPE_CHECKING, Any, AnyStr, List, Mapping, Optional, Type, Union, cast
 from unicodedata import normalize
 
@@ -37,6 +37,12 @@ logger = logger.bind(name='utils.template')
 
 # The environment will be created after the manager has started
 environment: Optional['FlexGetEnvironment'] = None
+
+extra_vars = {
+    'timedelta': timedelta,
+    'utcnow': datetime.utcnow(),
+    'now': datetime.now(),
+}
 
 
 class RenderError(Exception):
@@ -311,7 +317,7 @@ def render_from_entry(
 
     # Make a copy of the Entry so we can add some more fields
     variables = copy(entry.store)
-    variables['now'] = datetime.now()
+    variables.update(extra_vars)
     # Add task name to variables, usually it's there because metainfo_task plugin, but not always
     if hasattr(entry, 'task') and entry.task is not None:
         if 'task' not in variables:
@@ -330,7 +336,8 @@ def render_from_task(template: Union[FlexGetTemplate, str], task: 'Task') -> str
     :param task: Task to render the template from.
     :return: The rendered template text.
     """
-    variables = {'task': task, 'now': datetime.now(), 'task_name': task.name}
+    variables = {'task': task, 'task_name': task.name}
+    variables.update(extra_vars)
     return render(template, variables)
 
 
@@ -346,5 +353,5 @@ def evaluate_expression(expression: str, context: Mapping) -> Any:
         # If we have a LazyDict, grab the underlying store. Our environment supports LazyFields directly
         if isinstance(context, LazyDict):
             context = context.store
-        return compiled_expr(**context)
+        return compiled_expr(**{**context, **extra_vars})
     return None
