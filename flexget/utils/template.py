@@ -38,11 +38,13 @@ logger = logger.bind(name='utils.template')
 # The environment will be created after the manager has started
 environment: Optional['FlexGetEnvironment'] = None
 
-extra_vars = {
-    'timedelta': timedelta,
-    'utcnow': datetime.utcnow(),
-    'now': datetime.now(),
-}
+
+def extra_vars() -> dict:
+    return {
+        'timedelta': timedelta,
+        'utcnow': datetime.utcnow(),
+        'now': datetime.now(),
+    }
 
 
 class RenderError(Exception):
@@ -317,7 +319,7 @@ def render_from_entry(
 
     # Make a copy of the Entry so we can add some more fields
     variables = copy(entry.store)
-    variables.update(extra_vars)
+    variables.update(extra_vars())
     # Add task name to variables, usually it's there because metainfo_task plugin, but not always
     if hasattr(entry, 'task') and entry.task is not None:
         if 'task' not in variables:
@@ -337,7 +339,7 @@ def render_from_task(template: Union[FlexGetTemplate, str], task: 'Task') -> str
     :return: The rendered template text.
     """
     variables = {'task': task, 'task_name': task.name}
-    variables.update(extra_vars)
+    variables.update(extra_vars())
     return render(template, variables)
 
 
@@ -353,5 +355,5 @@ def evaluate_expression(expression: str, context: Mapping) -> Any:
         # If we have a LazyDict, grab the underlying store. Our environment supports LazyFields directly
         if isinstance(context, LazyDict):
             context = context.store
-        return compiled_expr(**{**context, **extra_vars})
+        return compiled_expr(**{**context, **extra_vars()})
     return None
