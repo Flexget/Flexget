@@ -166,6 +166,7 @@ class LostFilm:
 
         site_urls = config['site_urls']
         tried_urls = []
+        rss = None
 
         while site_urls:
             rss_url = site_urls[0] + "rss.xml"  # If RSS url changes, update it here
@@ -191,7 +192,9 @@ class LostFilm:
             tried_urls.append(site_urls.pop(0))
 
         if not rss:
-            raise PluginError('Cannot get the RSS feed')
+            logger.error('Failed to get the RSS feed')
+            return None
+
         # Use failed site locations as the last resot option for the redirect page
         site_urls.extend(tried_urls)
 
