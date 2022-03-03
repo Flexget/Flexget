@@ -51,6 +51,9 @@ quality_map = {
 
 # All URLs must have '/' at the end
 SITE_URLS = [
+    'https://www.lostfilmtv2.site/',
+    'https://www.lostfilm.top/',
+    'https://www.lostfilm.tw/',
     'https://www.lostfilmtv.site/',
     'https://www.lostfilmtv.uno/',
     'https://www.lostfilm.run/',
