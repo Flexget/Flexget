@@ -19,8 +19,11 @@ def list_file_templates(manager, options):
         else:
             plugin = '-'
         name = template_name.replace('.template', '').split('/')
-        if len(name) == 2:
-            name = name[1]
+        if type(name) == list:
+            if len(name) > 0:
+                name = name[-1]
+            else:
+                name = '<ERR>'
         with open(template.filename) as contents:
             table_data.append([name, plugin, template.filename, contents.read()])
 
