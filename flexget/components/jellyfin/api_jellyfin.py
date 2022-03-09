@@ -1,0 +1,2155 @@
+import functools
+import re
+from abc import ABC, abstractmethod, abstractstaticmethod
+from collections.abc import MutableSet
+from datetime import datetime
+from urllib.parse import urlencode
+
+from loguru import logger
+from requests.exceptions import HTTPError, RequestException
+
+from flexget.components.jellyfin.jellyfin_util import get_field_map
+from flexget.entry import Entry
+from flexget.plugin import PluginError
+from flexget.utils import requests
+from flexget.utils.simple_persistence import SimplePersistence
+from flexget.utils.tools import get_current_flexget_version, split_title_year
+
+persist = SimplePersistence('api_jellyfin')
+
+JELLYFIN_ENDPOINT_LOGIN = '/Users/AuthenticateByName'
+JELLYFIN_ENDPOINT_SEARCH = '/Users/{userid}/Items'
+JELLYFIN_ENDPOINT_PHOTOS = '/Items/{itemid}/Images/Primary'
+JELLYFIN_ENDPOINT_DOWNLOAD = '/Items/{itemid}/Download'
+JELLYFIN_ENDPOINT_GETUSERS = '/Users'
+JELLYFIN_ENDPOINT_USERINFO = '/Users/{userid}'
+JELLYFIN_ENDPOINT_SERVERINFO = '/System/Info'
+JELLYFIN_ENDPOINT_PARENTS = '/Items/{itemid}/Ancestors'
+JELLYFIN_ENDPOINT_LIBRARY = '/Library/MediaFolders'
+JELLYFIN_ENDPOINT_FAVORITE = '/Users/{userid}/FavoriteItems/{itemid}'
+JELLYFIN_ENDPOINT_ITEMUPD = '/Items/{itemid}'
+JELLYFIN_ENDPOINT_WATCHED = '/Users/{userid}/PlayedItems/{itemid}'
+JELLYFIN_ENDPOINT_NEW_PLAYLIST = '/Playlists'
+JELLYFIN_ENDPOINT_PLAYLIST = '/Playlists/{listid}/Items'
+JELLYFIN_ENDPOINT_DELETE_ITEM = '/Items/{itemid}'
+JELLYFIN_ENDPOINT_LIBRARY_REFRESH = '/Library/Refresh'
+
+logger = logger.bind(name='api_jellyfin')
+
+
+class JellyfinApiBase(ABC):
+    """
+    Base Class to all API integratios
+    """
+
+    JELLYFIN_PREF = 'jellyfin_'
+
+    @staticmethod
+    def merge_field_map(dst: dict, *arg: dict, **kwargs):
+        """Merge field maps from clild and parent class"""
+
+        allow_new = kwargs.get('allow_new', False)
+
+        destination = dst.copy()
+
+        for src in arg:
+            source = src.copy()
+
+            for key in source:
+                if key in destination and isinstance(destination[key], str):
+                    destination[key] = [destination[key]]
+                elif key not in destination and not allow_new:
+                    continue
+                elif allow_new:
+                    destination[key] = []
+
+                if isinstance(source[key], str):
+                    source[key] = [source[key]]
+
+                if source[key][0] and source[key][0].find(JellyfinApiBase.JELLYFIN_PREF) < 0:
+                    source[key].insert(0, f'{JellyfinApiBase.JELLYFIN_PREF}{source[key][0]}')
+
+                for value_source in source[key]:
+                    if not value_source in destination[key]:
+                        destination[key].append(value_source)
+
+        return destination
+
+    @staticmethod
+    def update_using_map(target, field_map: dict, source_item, **kwargs):
+        """
+        Updates based on field map with source
+        """
+
+        allow_new = kwargs.get('allow_new', False)
+
+        my_field_map = field_map.copy()
+
+        func_get = dict.get if isinstance(source_item, dict) else getattr
+        for field, val in my_field_map.items():
+
+            values = val
+            if not isinstance(values, list):
+                values = [val]
+
+            if values[0] and values[0].find(JellyfinApiBase.JELLYFIN_PREF) < 0:
+                values.insert(0, f'{JellyfinApiBase.JELLYFIN_PREF}{values[0]}')
+
+            for value in values:
+                if isinstance(value, str):
+                    try:
+                        val = functools.reduce(func_get, value.split('.'), source_item)
+                    except TypeError:
+                        continue
+                else:
+                    val = value(source_item)
+
+                if val is None:
+                    continue
+
+                if not hasattr(target, field) and not allow_new:
+                    continue
+
+                if isinstance(target, dict):
+                    target[field] = val
+                else:
+                    setattr(target, field, val)
+
+                break
+
+
+class JellyfinAuth(JellyfinApiBase):
+    """
+    Manage API Authorizations
+    """
+
+    _last_auth = None
+
+    field_map = {
+        'host': 'host',
+        'return_host': 'return_host',
+        '_apikey': 'apikey',
+        '_username': 'username',
+        '_password': 'password',
+    }
+
+    JELLYFIN_DEF_HOST = 'http://localhost:8096'
+
+    JELLYFIN_CLIENT = 'Flexget'
+    JELLYFIN_DEVICE = 'Flexget Plugin'
+    JELLYFIN_DEVICE_ID = 'flexget_plugin'
+    JELLYFIN_VERSION = get_current_flexget_version()
+
+    host = JELLYFIN_DEF_HOST
+    return_host = None
+
+    _userid = ''
+    _token = ''
+    _serverid = ''
+    _logged = False
+    _username = None
+    _password = None
+    _apikey = None
+    _wanurl = None
+    _lanurl = None
+    _can_download = None
+
+    def __init__(self, **kwargs):
+        if 'server' in kwargs:
+            server = kwargs.get('server')
+        else:
+            server = kwargs
+
+        JellyfinApiBase.update_using_map(self, JellyfinAuth.field_map, server)
+
+    def login(self, optional=False):
+        """Login user to API"""
+
+        userdata = None
+
+        if not self._apikey:
+            userdata = self.check_token_data(persist.get('token_data'))
+            if not userdata:
+                logger.debug('Login to {} with username {}', self.host, self.username)
+                args = {'Username': self._username, 'Pw': self._password}
+
+                login_data = JellyfinApi.resquest_jellyfin(
+                    JELLYFIN_ENDPOINT_LOGIN, self, 'POST', **args
+                )
+
+                if not login_data and optional:
+                    return
+                elif not login_data:
+                    raise PluginError('Could not login to Jellyfin')
+
+                userdata = login_data.get('User')
+                self._token = login_data.get('AccessToken')
+        else:
+            userdata = self.get_user_by_name(self._username)
+
+        if not userdata and optional:
+            return
+        elif not userdata:
+            raise PluginError('Could not login to Jellyfin')
+
+        self._username = userdata.get('Name')
+        self._userid = userdata.get('Id')
+        self._serverid = userdata.get('ServerId')
+
+        if 'Policy' in userdata and not self._apikey:
+            self._can_download = userdata['Policy'].get('EnableContentDownloading', False)
+        elif self._apikey:
+            self._can_download = True
+
+        self._logged = True
+
+        serverinfo = JellyfinApi.resquest_jellyfin(JELLYFIN_ENDPOINT_SERVERINFO, self, 'GET')
+        if serverinfo:
+            self._wanurl = serverinfo.get('WanAddress')
+            self._lanurl = serverinfo.get('LocalAddress')
+
+        self.save_token_data()
+        JellyfinAuth._last_auth = self
+
+    def logout(self):
+        """Logout user from API"""
+        self._token = None
+        self._logged = False
+
+    def check_token_data(self, token_data):
+        """Checks saved tokens"""
+        if not token_data:
+            return False
+
+        if (
+            'token' not in token_data
+            or 'userid' not in token_data
+            or token_data.get('username') != self._username
+            or token_data.get('host') != self.host
+        ):
+            return False
+
+        self._userid = token_data.get('userid')
+        self._token = token_data.get('token')
+        self._logged = True
+        endpoint = JELLYFIN_ENDPOINT_USERINFO.format(userid=token_data['userid'])
+        response = JellyfinApi.resquest_jellyfin(endpoint, self, 'GET')
+        if not response:
+            self.logout()
+            return False
+
+        if self._userid != response.get('Id'):
+            self.logout()
+            return False
+
+        response['AccessToken'] = token_data['token']
+
+        logger.debug('Restored jellyfin token from database')
+
+        return response
+
+    def save_token_data(self):
+        """Saves token data to Data Base"""
+
+        if self._apikey or not self.host or not self.username:
+            return
+
+        logger.debug('Saving jellyfin token to database')
+
+        persist['token_data'] = {
+            'host': self.host.lower(),
+            'username': self._username.lower(),
+            'userid': self._userid,
+            'serverid': self._serverid,
+            'token': self._token,
+        }
+
+    @property
+    def uid(self) -> str:
+        return self._userid
+
+    @property
+    def username(self) -> str:
+        return self._username
+
+    @property
+    def logged(self) -> bool:
+        return self._logged
+
+    @property
+    def can_download(self) -> bool:
+        return self._can_download
+
+    @property
+    def token(self) -> str:
+        return self._token
+
+    @property
+    def server_id(self) -> str:
+        return self._serverid
+
+    @property
+    def wanurl(self) -> str:
+        return self._wanurl
+
+    @property
+    def lanurl(self) -> str:
+        return self._lanurl
+
+    def add_token_header(self, header: dict) -> dict:
+        """Adds data to request header"""
+        if not header:
+            header = {}
+
+        if self._apikey:
+            header['X-Emby-Token'] = self._apikey
+            return header
+
+        fields = [
+            f'Emby UserId={self._userid}',
+            f'Client={self.JELLYFIN_CLIENT}',
+            f'Device={self.JELLYFIN_DEVICE}',
+            f'DeviceId={self.JELLYFIN_DEVICE_ID}',
+            f'Version={self.JELLYFIN_VERSION}',
+        ]
+
+        header['X-Emby-Authorization'] = ', '.join(fields)
+        header['accept'] = 'application/json'
+
+        if not self.logged:
+            return header
+
+        header['X-Emby-Token'] = self.token
+        return header
+
+    def get_user_by_name(self, name: str) -> dict:
+        """Gets user by username"""
+
+        args = {'IsDisabled': False}
+        useres = JellyfinApi.resquest_jellyfin(JELLYFIN_ENDPOINT_GETUSERS, self, 'GET', **args)
+        if not useres:
+            return
+
+        for user in useres:
+            if user.get('Name').lower() == name.lower():
+                return user
+
+    @staticmethod
+    def get_last_auth():
+        return JellyfinAuth._last_auth
+
+
+class JellyfinApiListBase(JellyfinApiBase):
+    """Base class to all API Lists"""
+
+    auth = None
+
+    id = None
+    _name = None
+    types = None
+    watched = None
+    favorite = None
+    sort = None
+
+    allow_create = False
+
+    _internal_items = None
+
+    field_map = {
+        'id': ['library_id', 'id', 'Id'],
+        '_name': ['library_name', 'list', 'name', 'Name'],
+        'types': ['types'],
+        'watched': ['watched'],
+        'favorite': ['favorite'],
+        'sort': ['sort'],
+    }
+
+    def __init__(self, **kwargs):
+        self.auth = JellyfinApi.get_auth(**kwargs)
+        JellyfinApiBase.update_using_map(self, JellyfinApiListBase.field_map, kwargs)
+
+        if self.types and not isinstance(self.types, list):
+            self.types = [self.types]
+
+        if isinstance(self.sort, str):
+            self.sort = {'field': self.sort, 'order': 'ascending'}
+
+        if isinstance(self.sort, dict):
+            self.sort['field'] = self.sort['field'].replace('_', '')
+
+    def set_list_search_args(self, args: dict):
+        if self.watched is not None:
+            args['IsPlayed'] = self.watched
+
+        if self.favorite is not None:
+            args['IsFavorite'] = self.favorite
+
+        if self.sort is not None:
+            args['SortBy'] = self.sort['field']
+            args['SortOrder'] = self.sort['order']
+
+        if not self.types or len(self.types) == 0:
+            args['IncludeItemTypes'] = 'Movie,Episode'
+        else:
+            args['IncludeItemTypes'] = ','.join(self.types)
+
+    def add(self, entry: Entry):
+        """Adds a item to list"""
+        item = JellyfinApiMedia.cast(auth=self.auth, **entry)
+        if not item:
+            logger.warning('Not possible to match \'{}\' in jellyfin', item.fullname)
+            return
+
+        if self.contains(item):
+            logger.warning('\'{}\' already in {}', item.fullname, self.fullname)
+            return
+
+        logger.debug('Adding \'{}\' to {}', item.fullname, self.fullname)
+        self._add(item)
+
+    @abstractmethod
+    def _add(self, item: 'JellyfinApiMedia'):
+        pass
+
+    def remove(self, entry: Entry):
+        """Removes a item from list"""
+        item = JellyfinApiMedia.cast(auth=self.auth, **entry)
+        if not item:
+            logger.warning('Not possible to match \'{}\' in jellyfin', item.fullname)
+            return
+
+        if not self.contains(item):
+            logger.warning('\'{}\' not in {}', item.fullname, self.fullname)
+            return
+
+        logger.debug('Removing \'{}\' from {}', item.fullname, self.fullname)
+        self._remove(item)
+
+    @abstractmethod
+    def _remove(self, item: 'JellyfinApiMedia'):
+        pass
+
+    @abstractmethod
+    def get_items(self):
+        pass
+
+    def contains(self, item):
+        """Checks if list contains item"""
+        return bool(self.get(item))
+
+    def get(self, item) -> None:
+        """Get Item from list"""
+
+        if isinstance(item, JellyfinApiMedia):
+            s_item = item
+        else:
+            s_item = JellyfinApiMedia.cast(auth=self.auth, **item)
+
+        if not s_item:
+            return None
+
+        if not self.items_raw:
+            try:
+                next(self.get_items())
+            except StopIteration:
+                return None
+
+        result = filter(lambda i: i['Id'] == s_item.id, self.items_raw)
+        if len(list(result)) > 0:
+            return s_item
+
+        return None
+
+    @property
+    def name(self):
+        return self._name
+
+    @property
+    def fullname(self):
+        return self._name
+
+    @property
+    def len(self):
+        return len(self._internal_items) if self._internal_items else 0
+
+    @property
+    def created(self):
+        return bool(self.id)
+
+    @property
+    def items_raw(self):
+        return self._internal_items
+
+    @property
+    def immutable(self):
+        return
+
+    @abstractstaticmethod
+    def is_type(**kwargs):
+        pass
+
+
+class JellyfinApiList(JellyfinApiBase, MutableSet):
+    """Class to interface lists"""
+
+    auth = None
+    id = None
+    name = None
+    _list = None
+    _items = None
+
+    field_map = {
+        'id': ['library_id', 'id', 'Id'],
+        'name': ['library_name', 'list', 'name', 'Name'],
+    }
+
+    def __init__(self, **kwargs):
+        self.auth = JellyfinApi.get_auth(**kwargs)
+        JellyfinApiBase.update_using_map(self, self.field_map, kwargs)
+
+        self._list = self.get_api_list(**kwargs)
+        if not self._list:
+            raise PluginError('List \'%s\' does not exist' % self.name)
+
+        self._items = self._list.get_items()
+
+    def __contains__(self, item):
+        return self._list.contains
+
+    def __iter__(self):
+        return iter(self._items)
+
+    def __len__(self):
+        return self._list.len
+
+    def add(self, item) -> None:
+        self._list.add(item)
+
+    def discard(self, item) -> None:
+        self._list.remove(item)
+
+    def get(self, item) -> None:
+        item_s = self._list.get(item)
+        if not item_s:
+            return None
+
+        return item_s.to_entry()
+
+    @property
+    def immutable(self):
+        return self._list.immutable
+
+    @staticmethod
+    def get_api_list(**kwargs) -> JellyfinApiListBase:
+        if JellyfinApiWatchedList.is_type(**kwargs):
+            logger.debug('List is a watched list')
+            return JellyfinApiWatchedList(**kwargs)
+        elif JellyfinApiFavoriteList.is_type(**kwargs):
+            logger.debug('List is a favorite list')
+            return JellyfinApiFavoriteList(**kwargs)
+        elif JellyfinApiLibrary.is_type(**kwargs):
+            logger.debug('List is a library')
+            return JellyfinApiLibrary(**kwargs)
+        elif JellyfinApiPlayList.is_type(**kwargs):
+            logger.debug('List is a playlist')
+            return JellyfinApiPlayList(**kwargs)
+
+        if JellyfinApiWatchedList.is_type(**kwargs) or JellyfinApiWatchedList.allow_create:
+            logger.debug('Creating a watched list')
+            return JellyfinApiWatchedList(**kwargs)
+        elif JellyfinApiFavoriteList.is_type(**kwargs) or JellyfinApiFavoriteList.allow_create:
+            logger.debug('Creating a favorite list')
+            return JellyfinApiFavoriteList(**kwargs)
+        elif JellyfinApiLibrary.is_type(**kwargs) or JellyfinApiLibrary.allow_create:
+            logger.debug('Creating a library')
+            return JellyfinApiLibrary(**kwargs)
+        elif JellyfinApiPlayList.is_type(**kwargs) or JellyfinApiPlayList.allow_create:
+            logger.debug('Creating a playlist')
+            return JellyfinApiPlayList(**kwargs)
+
+
+class JellyfinApiLibrary(JellyfinApiListBase):
+    """Library List"""
+
+    def __init__(self, **kwargs):
+        JellyfinApiListBase.__init__(self, **kwargs)
+
+        list_data = JellyfinApiLibrary._get_list_data(self.auth, list=self.name)
+        if not list_data:
+            return
+
+        self.id = list_data['Id']
+
+    def _add(self, item):
+        pass
+
+    def _remove(self, item):
+        pass
+
+    def get_items(self):
+        if not self.created:
+            return []
+
+        args = {}
+
+        JellyfinApi.set_common_search_arg(args)
+        self.set_list_search_args(args)
+
+        args['ParentId'] = self.id
+
+        logger.debug('Search library list with: {}', args)
+        endpoint = JELLYFIN_ENDPOINT_SEARCH.format(userid=self.auth.uid)
+        items = JellyfinApi.resquest_jellyfin(endpoint, self.auth, 'GET', **args)
+        self._internal_items = items['Items'] if items else []
+
+        for media in self._internal_items:
+            media_obj = JellyfinApiMedia.cast(auth=self.auth, **media)
+            if media_obj:
+                yield media_obj
+
+    @staticmethod
+    def library_refresh(auth):
+        if not auth:
+            auth = JellyfinApi.get_auth()
+
+        additem = JellyfinApi.resquest_jellyfin(JELLYFIN_ENDPOINT_LIBRARY_REFRESH, auth, 'POST')
+        if not additem:
+            logger.error('Not possible to refresh jellyfin library')
+
+    @staticmethod
+    def _get_list_data(auth, **kwargs):
+        args = {}
+
+        list_name = kwargs.get('list')
+
+        JellyfinApi.set_common_search_arg(args)
+
+        args['IsHidden'] = False
+
+        logger.debug('Search Library name list with: {}', args)
+        search_list_data = JellyfinApi.resquest_jellyfin(
+            JELLYFIN_ENDPOINT_LIBRARY, auth, 'GET', **args
+        )
+        if not search_list_data or not search_list_data['Items']:
+            return
+
+        for search_list in search_list_data['Items']:
+            if (
+                'Type' not in search_list
+                or 'CollectionType' not in search_list
+                or 'IsFolder' not in search_list
+            ):
+                continue
+
+            if search_list['Type'] != 'CollectionFolder':
+                continue
+            elif (
+                search_list['CollectionType'] != 'tvshows'
+                and search_list['CollectionType'] != 'movies'
+            ):
+                continue
+
+            if search_list['Name'].lower() == list_name.lower():
+                return search_list
+
+    @staticmethod
+    def is_type(**kwargs):
+        auth = JellyfinApi.get_auth(**kwargs)
+
+        list_name = kwargs.get('list')
+
+        list_data = JellyfinApiLibrary._get_list_data(auth, list=list_name)
+        if not list_data:
+            return False
+
+        return True
+
+    @property
+    def fullname(self):
+        return f'Library \'{self.name}\''
+
+    @property
+    def created(self):
+        return bool(self.id)
+
+    @property
+    def immutable(self):
+        return 'Library is not modifiable'
+
+
+class JellyfinApiWatchedList(JellyfinApiListBase):
+    """Watched Media List"""
+
+    def __init__(self, **kwargs):
+        JellyfinApiListBase.__init__(self, **kwargs)
+
+        self._name = 'Watched List'
+
+    def _add(self, item: 'JellyfinApiMedia'):
+        args = {}
+        endpoint = JELLYFIN_ENDPOINT_WATCHED.format(userid=self.auth.uid, itemid=item.id)
+        additem = JellyfinApi.resquest_jellyfin(endpoint, self.auth, 'POST', **args)
+        if not additem:
+            logger.warning('Not possible to add item \'{}\' to watched list', item.fullname)
+
+    def _remove(self, item: 'JellyfinApiMedia'):
+        args = {}
+        endpoint = JELLYFIN_ENDPOINT_WATCHED.format(userid=self.auth.uid, itemid=item.id)
+        additem = JellyfinApi.resquest_jellyfin(endpoint, self.auth, 'DELETE', **args)
+        if not additem:
+            logger.warning('Not possible to remove item \'{}\' from watched list', item.fullname)
+
+    def get_items(self):
+        args = {}
+
+        JellyfinApi.set_common_search_arg(args)
+        self.set_list_search_args(args)
+
+        args['IsPlayed'] = True
+
+        logger.debug('Search watched list with: {}', args)
+
+        endpoint = JELLYFIN_ENDPOINT_SEARCH.format(userid=self.auth.uid)
+        items = JellyfinApi.resquest_jellyfin(endpoint, self.auth, 'GET', **args)
+        self._internal_items = items['Items'] if items else []
+
+        for media in self._internal_items:
+            media_obj = JellyfinApiMedia.cast(auth=self.auth, **media)
+            if media_obj:
+                yield media_obj
+
+    @staticmethod
+    def is_type(**kwargs):
+        return kwargs.get('list') == 'watched'
+
+    @property
+    def created(self):
+        return True
+
+
+class JellyfinApiFavoriteList(JellyfinApiListBase):
+    """Favorite media list"""
+
+    def __init__(self, **kwargs):
+        JellyfinApiListBase.__init__(self, **kwargs)
+
+        self._name = 'Favorite List'
+
+    def _add(self, item: 'JellyfinApiMedia'):
+        args = {}
+        endpoint = JELLYFIN_ENDPOINT_FAVORITE.format(userid=self.auth.uid, itemid=item.id)
+        additem = JellyfinApi.resquest_jellyfin(endpoint, self.auth, 'POST', **args)
+        if not additem:
+            logger.warning('Not possible to add item \'{}\' to favorite list', item.fullname)
+
+    def _remove(self, item: 'JellyfinApiMedia'):
+        args = {}
+        endpoint = JELLYFIN_ENDPOINT_FAVORITE.format(userid=self.auth.uid, itemid=item.id)
+        additem = JellyfinApi.resquest_jellyfin(endpoint, self.auth, 'DELETE', **args)
+        if not additem:
+            logger.warning('Not possible to remove item \'{}\' from favorite list', item.fullname)
+
+    def get_items(self):
+        args = {}
+
+        JellyfinApi.set_common_search_arg(args)
+        self.set_list_search_args(args)
+
+        args['IsFavorite'] = True
+
+        logger.debug('Search favorite list with: {}', args)
+        endpoint = JELLYFIN_ENDPOINT_SEARCH.format(userid=self.auth.uid)
+        items = JellyfinApi.resquest_jellyfin(endpoint, self.auth, 'GET', **args)
+        self._internal_items = items['Items'] if items else []
+
+        for media in self._internal_items:
+            media_obj = JellyfinApiMedia.cast(auth=self.auth, **media)
+            if media_obj:
+                yield media_obj
+
+    @staticmethod
+    def is_type(**kwargs):
+        return kwargs.get('list') == 'favorite'
+
+    @property
+    def created(self):
+        return True
+
+
+class JellyfinApiPlayList(JellyfinApiListBase):
+    """Playlist lists"""
+
+    allow_create = True
+
+    playlist_bind = {}
+
+    def __init__(self, **kwargs):
+        JellyfinApiListBase.__init__(self, **kwargs)
+
+        list_data = JellyfinApiPlayList._get_list_data(self.auth, list=self.name)
+        if not list_data:
+            return
+
+        self.id = list_data['Id']
+
+    def _add(self, item: 'JellyfinApiMedia'):
+        if not self.created:
+            new_list = JellyfinApiPlayList.create(item, auth=self.auth, list=self.name)
+            self.id = new_list.id
+            return
+
+        args = {}
+        args['UserId'] = self.auth.uid
+        args['Ids'] = item.id
+
+        endpoint = JELLYFIN_ENDPOINT_PLAYLIST.format(listid=self.id)
+        additem = JellyfinApi.resquest_jellyfin(endpoint, self.auth, 'POST', **args)
+        if not additem:
+            logger.warning(
+                'Not possible to add item \'{}\' to Playlist \'{}\'', item.fullname, self.name
+            )
+            return
+
+    def _remove(self, item):
+        if not self.playlist_bind:
+            self.fill_items()
+
+        if len(self.playlist_bind) == 1:
+            logger.debug('{} is empty', self.fullname)
+            self.destroy()
+            return
+
+        if item.id not in self.playlist_bind:
+            logger.warning('Can\'t find entry of \'{}\' in {}', item.fullname, self.fullname)
+            return
+
+        args = {}
+        args['EntryIds'] = self.playlist_bind[item.id]
+
+        endpoint = JELLYFIN_ENDPOINT_PLAYLIST.format(listid=self.id)
+        additem = JellyfinApi.resquest_jellyfin(endpoint, self.auth, 'DELETE', **args)
+        if not additem:
+            logger.warning(
+                'Not possible to remove item \'{}\' from Playlist \'{}\'', item.fullname, self.name
+            )
+            return
+
+        self.playlist_bind.pop(item.id, None)
+
+        if not self.playlist_bind:
+            self.destroy()
+
+    def destroy(self):
+        logger.debug('Deleting {}', self.fullname)
+        endpoint = JELLYFIN_ENDPOINT_DELETE_ITEM.format(itemid=self.id)
+        additem = JellyfinApi.resquest_jellyfin(endpoint, self.auth, 'DELETE')
+        if not additem:
+            logger.warning('Not possible to delete {}', self.fullname)
+            return
+        self.id = None
+        self._internal_items = []
+
+    def fill_items(self):
+        args = {}
+
+        JellyfinApi.set_common_search_arg(args)
+        self.set_list_search_args(args)
+
+        args['ParentId'] = self.id
+
+        logger.debug('Search PlayList  with: {}', args)
+        endpoint = JELLYFIN_ENDPOINT_SEARCH.format(userid=self.auth.uid)
+        items = JellyfinApi.resquest_jellyfin(endpoint, self.auth, 'GET', **args)
+        self._internal_items = items['Items'] if items else []
+
+        for media in self._internal_items:
+            self.playlist_bind[media['Id']] = media['PlaylistItemId']
+
+    def get_items(self):
+        if not self.created:
+            return []
+
+        self.fill_items()
+
+        for media in self._internal_items:
+            media_obj = JellyfinApiMedia.cast(auth=self.auth, **media)
+            if media_obj:
+                yield media_obj
+
+    @staticmethod
+    def _get_list_data(auth, **kwargs):
+        args = {}
+
+        list_name = kwargs.get('list')
+
+        JellyfinApi.set_common_search_arg(args)
+
+        args['SearchTerm'] = list_name
+        args['Type'] = 'Playlist'
+
+        logger.debug('Search Playlist Name list with: {}', args)
+        search_list_data = JellyfinApi.resquest_jellyfin(
+            JELLYFIN_ENDPOINT_SEARCH, auth, 'GET', **args
+        )
+        if not search_list_data or not search_list_data['Items']:
+            return
+
+        for search_list in search_list_data['Items']:
+            if search_list['Name'].lower() == list_name.lower():
+                return search_list
+
+    @staticmethod
+    def is_type(**kwargs):
+        auth = JellyfinApi.get_auth(**kwargs)
+
+        list_name = kwargs.get('list')
+
+        list_data = JellyfinApiPlayList._get_list_data(auth, list=list_name)
+        if not list_data:
+            return False
+
+        return True
+
+    @staticmethod
+    def create(item, **kwargs):
+        auth = JellyfinApi.get_auth(**kwargs)
+
+        list_name = kwargs.get('list')
+
+        args = {}
+        args['Name'] = list_name
+        args['Ids'] = item.id
+        logger.debug('Creating playlist \'{}\'', list_name)
+
+        items = JellyfinApi.resquest_jellyfin(JELLYFIN_ENDPOINT_NEW_PLAYLIST, auth, 'POST', **args)
+        if not items:
+            logger.warning('Not possible to create playlist \'{}\'', list_name)
+            return
+
+        logger.debug('Returning information of new playlist \'{}\'', items)
+
+        new_playlist = JellyfinApiPlayList(auth=auth, **items)
+        if not new_playlist.created:
+            logger.warning('Not possible to create playlist \'{}\'', list_name)
+            return
+
+        logger.debug('Created playlist \'{}\' with id {}', new_playlist.name, new_playlist.id)
+
+        return new_playlist
+
+    @property
+    def fullname(self):
+        return f'Playlist \'{self.name}\''
+
+
+class JellyfinApiMedia(JellyfinApiBase):
+    """Basic media"""
+
+    TYPE = 'unknown'
+
+    auth = None
+
+    id = None
+    name = None
+    overview = None
+    imdb_id = None
+    tmdb_id = None
+    tvdb_id = None
+    aired_date = None
+
+    source_id = None
+    mtype = None
+    path = None
+    created_date = None
+    watched = None
+    playcount = None
+    favorite = None
+    media_sources_raw = None
+    format_3d = None
+    audio = None
+    quality = None
+    subtitles = None
+    photo_tag = None
+
+    library = None
+
+    field_map = {
+        'mtype': ['mtype', 'Type'],
+        'id': ['id', 'Id'],
+        'name': ['name', 'Name'],
+        'path': ['path', 'Path'],
+        'overview': ['overview', 'Overview'],
+        'imdb_id': ['imdb_id', 'ProviderIds.Imdb'],
+        'tmdb_id': ['tmdb_id', 'ProviderIds.Tmdb'],
+        'tvdb_id': ['tvdb_id', 'ProviderIds.Tvdb'],
+        'created_date': ['created_date', 'DateCreated'],
+        'aired_date': ['aired_date', 'PremiereDate'],
+        'photo_tag': ['photo_tag', 'ImageTags.Primary'],
+        'watched': ['watched', 'UserData.Played'],
+        'favorite': ['favorite', 'UserData.IsFavorite'],
+        'playcount': ['playcount', 'UserData.PlayCount'],
+        'format_3d': ['format_3d', 'Video3DFormat'],
+    }
+
+    field_to_dic = {}
+
+    def __init__(self, **kwargs):
+        if not kwargs:
+            return
+
+        myfield_map = JellyfinApiMedia.field_map
+
+        if 'field_map' in kwargs:
+            myfield_map = JellyfinApiBase.merge_field_map(myfield_map, kwargs.get('field_map'))
+
+        JellyfinApiBase.update_using_map(self, JellyfinApiMedia.field_map, kwargs)
+
+        if 'auth' in kwargs:
+            auth = kwargs.get('auth')
+        else:
+            auth = JellyfinAuth()
+
+        self.auth = auth
+
+        if self.created_date:
+            self.created_date = JellyfinApi.strtotime(self.created_date)
+
+        if self.aired_date:
+            self.aired_date = JellyfinApi.strtotime(self.aired_date)
+
+        if self.mtype:
+            self.mtype = self.mtype.lower()
+
+        if 'MediaSources' in kwargs:
+            self.media_sources_raw = kwargs.get('MediaSources')
+            for file in self.media_sources_raw:
+                if 'Type' not in file or file.get('Type') != 'Default':
+                    continue
+
+                if 'MediaStreams' not in file:
+                    continue
+
+                self.source_id = file.get('Id')
+
+                for stream in file.get('MediaStreams'):
+                    if stream.get('Type') == 'Video':
+                        self.quality = stream.get('DisplayTitle')
+
+                    if stream.get('Type') == 'Subtitle' and stream.get('Language'):
+                        if not self.subtitles:
+                            self.subtitles = []
+
+                        self.subtitles.append(stream['Language'])
+
+                    if stream.get('Type') == 'Audio' and 'Language' in stream:
+                        if not self.audio:
+                            self.audio = []
+
+                        self.audio.append(stream['Language'])
+
+        self.library = self.get_libary()
+
+    def get_libary(self) -> 'JellyfinApiLibrary':
+        args = {'userid': self.auth.uid}
+
+        endpoint = JELLYFIN_ENDPOINT_PARENTS.format(itemid=self.id)
+        parents = JellyfinApi.resquest_jellyfin(endpoint, self.auth, 'GET', **args)
+        if not parents:
+            return
+
+        if len(parents) < 2:
+            return
+
+        parent = parents[len(parents) - 2]
+
+        library = JellyfinApiLibrary(auth=self.auth, **parent)
+
+        return library
+
+    def to_entry(self) -> Entry:
+        field_map = get_field_map(**self.to_dict())
+        entry = Entry()
+        entry.update_using_map(field_map, self.to_dict(), ignore_none=True)
+
+        if self.auth:
+            entry['jellyfin_server_id'] = self.auth.server_id
+            entry['jellyfin_username'] = self.auth.username
+            entry['jellyfin_user_id'] = self.auth.uid
+
+        entry['title'] = self.fullname
+        entry['url'] = self.page
+        return entry
+
+    def to_dict(self) -> dict:
+        if not self:
+            return {}
+
+        mtype = self.mtype
+        if isinstance(mtype, str):
+            mtype = mtype.lower()
+
+        return {
+            'id': self.id,
+            'name': self.name,
+            'fullname': self.fullname,
+            'type': mtype,
+            'mtype': mtype,
+            'media_type': mtype,
+            'path': self.path,
+            'page': self.page,
+            'filename': self.filename,
+            'file_extension': self.file_extension,
+            'created_date': self.created_date,
+            'watched': self.watched,
+            'year': self.year,
+            'favorite': self.favorite,
+            'playcount': self.playcount,
+            'media_sources_raw': self.media_sources_raw,
+            'format_3d': self.format_3d,
+            'audio': self.audio,
+            'quality': self.quality,
+            'subtitles': self.subtitles,
+            'imdb_id': self.imdb_id,
+            'tmdb_id': self.tmdb_id,
+            'tvdb_id': self.tvdb_id,
+            'imdb_url': self.imdb_url,
+            'executed': True,
+            'source_id': self.source_id,
+            'download_url': self.download_url,
+            'library_name': self.library_name,
+        }
+
+    @staticmethod
+    def get_mtype(**kwargs) -> str:
+        mtype = None
+        if 'mtype' in kwargs:
+            mtype = kwargs.get('mtype')
+        elif 'Type' in kwargs:
+            mtype = kwargs.get('Type')
+        elif 'jellyfin_type' in kwargs:
+            mtype = kwargs.get('jellyfin_type')
+
+        if mtype:
+            mtype = mtype.lower()
+
+        return mtype
+
+    @property
+    def fullname(self) -> str:
+        return self.name
+
+    @property
+    def library_name(self) -> str:
+        if not self.library:
+            return
+
+        return self.library.name
+
+    @property
+    def download_url(self) -> str:
+        if not self.auth or not self.auth.token or not self.id:
+            return
+
+        if not self.auth.can_download:
+            return
+
+        endpoint = JELLYFIN_ENDPOINT_DOWNLOAD.format(itemid=self.id)
+        qstr = urlencode({'api_key': self.auth.token, 'mediaSourceId': self.source_id})
+        return f'{self.host}{endpoint}?{qstr}'
+
+    @property
+    def year(self) -> int:
+        if self.aired_date:
+            return self.aired_date.year
+
+    @property
+    def imdb_url(self) -> str:
+        if self.imdb_id:
+            return f'http://www.imdb.com/title/{self.imdb_id}'
+
+    @property
+    def filename(self) -> str:
+        if not self.path:
+            return
+
+        filename = re.search('([^\\/\\\\]+)$', self.path)
+        if filename:
+            return filename.group(1)
+
+    @property
+    def file_extension(self) -> str:
+        if not self.path:
+            return
+
+        ext = re.search('\\.([^\\/\\\\]+)$', self.path)
+        if ext:
+            return ext.group(1)
+
+    @property
+    def host(self) -> str:
+        if self.auth.return_host == 'lan' and self.auth.lanurl:
+            host = f'{self.auth.lanurl}@'
+        elif self.auth.return_host == 'wan' and self.auth.wanurl:
+            host = f'{self.auth.wanurl}@'
+        else:
+            return f'{self.auth.host}'
+
+        return host.replace(':80@', '').replace(':443@', '').replace('@', '')
+
+    @property
+    def page(self) -> str:
+        if not self.id:
+            return None
+
+        qstr = urlencode({'id': self.id, 'serverId': self.auth.server_id})
+        return f'{self.host}/web/index.html#!/item?{qstr}'
+
+    @property
+    def photo(self) -> str:
+        if not self.photo_tag or not self.id:
+            return None
+
+        endpoint = JELLYFIN_ENDPOINT_PHOTOS.format(itemid=self.id)
+
+        qstr = urlencode(
+            {
+                'Tag': self.photo_tag,
+                'CropWhitespace': 'true',
+                'EnableImageEnhancers': 'false',
+                'Format': 'jpg',
+            }
+        )
+
+        return f'{self.host}{endpoint}?{qstr}'
+
+    @staticmethod
+    def cast(**kwargs) -> 'JellyfinApiMedia':
+        if JellyfinApiEpisode.is_type(**kwargs):
+            return JellyfinApiEpisode(**kwargs)
+
+        if JellyfinApiSeason.is_type(**kwargs):
+            return JellyfinApiSeason(**kwargs)
+
+        if JellyfinApiSerie.is_type(**kwargs):
+            return JellyfinApiSerie(**kwargs)
+
+        if JellyfinApiMovie.is_type(**kwargs):
+            return JellyfinApiMovie(**kwargs)
+
+        return JellyfinApiMedia(**kwargs)
+
+    @staticmethod
+    def search(**kwargs):
+        args = {}
+
+        auth = JellyfinApi.get_auth(**kwargs)
+        JellyfinApi.set_provideres_search_arg(args, **kwargs)
+        JellyfinApi.set_common_search_arg(args)
+
+        args['SearchTerm'] = split_title_year(kwargs.get('title')).title
+
+        logger.debug('Search media with: {}', args)
+        medias = JellyfinApi.resquest_jellyfin(JELLYFIN_ENDPOINT_SEARCH, auth, 'GET', **args)
+        if not medias or 'Items' not in medias:
+            logger.warning('No media found')
+            return
+
+        media = medias['Items'][0]
+
+        media_api = JellyfinApiMedia(auth=auth, **media)
+
+        if media_api.mtype and media_api.mtype != JellyfinApiMedia.TYPE:
+            return JellyfinApi.search(auth=auth, **media_api.to_dict())
+        else:
+            logger.debug('Found media \'{}\' in jellyfin server', media_api.fullname)
+
+        return media_api
+
+
+class JellyfinApiSerie(JellyfinApiMedia):
+    """Series"""
+
+    TYPE = 'series'
+
+    field_map_up = {
+        'id': 'serie_id',
+        'name': ['serie_name', 'series_name', 'SeriesName'],
+        'imdb_id': 'serie_imdb_id',
+        'tmdb_id': 'serie_tmdb_id',
+        'tvdb_id': 'serie_tvdb_id',
+        'page': 'serie_page',
+        'aired_date': 'serie_aired_date',
+        'overview': 'serie_overview',
+        'photo': 'serie_photo',
+        'serie_id': ['serie_id', 'SeriesId'],
+        'serie_name': ['serie_name', 'series_name', 'SeriesName'],
+        'serie_imdb_id': 'serie_imdb_id',
+        'serie_tmdb_id': 'serie_tmdb_id',
+        'serie_tvdb_id': 'serie_tvdb_id',
+    }
+
+    def __init__(self, **kwargs):
+        JellyfinApiMedia.__init__(self, field_map=self.field_map_up, **kwargs)
+
+    def to_dict(self) -> dict:
+        if not self:
+            return {}
+
+        return {
+            **JellyfinApiMedia.to_dict(self),
+            **{
+                'serie_id': self.serie_id,
+                'serie_name': self.serie_name,
+                'serie_imdb_id': self.serie_imdb_id,
+                'serie_tmdb_id': self.serie_tmdb_id,
+                'serie_tvdb_id': self.serie_tvdb_id,
+                'serie_aired_date': self.serie_aired_date,
+                'serie_year': self.serie_year,
+                'serie_overview': self.serie_overview,
+                'serie_photo': self.serie_photo,
+                'serie_page': self.serie_page,
+            },
+        }
+
+    @property
+    def serie_id(self) -> str:
+        return self.id
+
+    @property
+    def serie_name(self) -> str:
+        return self.name
+
+    @property
+    def serie_overview(self) -> str:
+        return self.overview
+
+    @property
+    def serie_photo(self) -> str:
+        return self.photo
+
+    @property
+    def serie_page(self) -> str:
+        return self.page
+
+    @property
+    def serie_imdb_id(self) -> str:
+        return self.imdb_id
+
+    @property
+    def serie_tmdb_id(self) -> str:
+        return self.tmdb_id
+
+    @property
+    def serie_tvdb_id(self) -> str:
+        return self.tvdb_id
+
+    @property
+    def serie_aired_date(self) -> 'datetime':
+        return self.aired_date
+
+    @property
+    def serie_year(self) -> int:
+        return self.year
+
+    @staticmethod
+    def search(**kwargs):
+        args = {}
+
+        auth = JellyfinApi.get_auth(**kwargs)
+
+        parameters = {}
+        field_map = JellyfinApiBase.merge_field_map(
+            JellyfinApiMedia.field_map,
+            JellyfinApiSerie.field_map_up,
+            allow_new=True,
+        )
+
+        JellyfinApi.update_using_map(parameters, field_map, kwargs, allow_new=True)
+
+        if 'serie_id' in parameters:
+            args['Ids'] = parameters.get('serie_id')
+        elif not JellyfinApi.set_provideres_search_arg(args, **kwargs):
+            args['SearchTerm'] = split_title_year(kwargs.get('title')).title
+
+        JellyfinApi.set_common_search_arg(args)
+        args['IncludeItemTypes'] = 'Series'
+
+        logger.debug('Search serie with: {}', args)
+        series = JellyfinApi.resquest_jellyfin(JELLYFIN_ENDPOINT_SEARCH, auth, 'GET', **args)
+        if not series or 'Items' not in series:
+            logger.warning('No serie found')
+            return
+
+        if len(series['Items']) == 1:
+            serie = series['Items'][0]
+        elif len(series['Items']) > 1:
+            logger.error('More than one serie found')
+            return
+        else:
+            logger.warning('No serie found')
+            return
+
+        serie_api = JellyfinApiSerie(auth=auth, **serie)
+
+        logger.debug('Found serie \'{}\' in jellyfin server', serie_api.fullname)
+
+        return serie_api
+
+    @staticmethod
+    def is_type(**kwargs) -> bool:
+        mtype = JellyfinApiMedia.get_mtype(**kwargs)
+        return bool(kwargs.get('series_name') or mtype == JellyfinApiSerie.TYPE)
+
+
+class JellyfinApiSeason(JellyfinApiMedia):
+    """Season"""
+
+    TYPE = 'season'
+
+    season = None
+    serie = None
+
+    field_map = {'season': ['season', 'IndexNumber']}
+
+    field_map_up = {
+        'id': ['season_id', 'SeasonId'],
+        'name': 'season_name',
+        'imdb_id': 'season_imdb_id',
+        'tmdb_id': 'season_tmdb_id',
+        'tvdb_id': 'season_tvdb_id',
+        'photo': 'season_photo',
+        'page': 'season_page',
+        'season_id': ['season_id', 'SeasonId'],
+        'season_name': 'season_name',
+        'season_imdb_id': 'season_imdb_id',
+        'season_tmdb_id': 'season_tmdb_id',
+        'season_tvdb_id': 'season_tvdb_id',
+        'season': ['season', 'series_season'],
+    }
+
+    def __init__(self, **kwargs):
+        JellyfinApiMedia.__init__(self, field_map=self.field_map_up, **kwargs)
+
+        if not kwargs:
+            return
+
+        JellyfinApiBase.update_using_map(self, JellyfinApiSeason.field_map, kwargs)
+
+        if 'api_serie' not in kwargs:
+            self.serie = kwargs.get('api_serie')
+        else:
+            self.serie = JellyfinApiSerie.search(**kwargs) or JellyfinApiSerie(auth=self.auth)
+
+    def to_dict(self) -> dict:
+        if not self:
+            return {}
+
+        return {
+            **JellyfinApiSerie.to_dict(self.serie),
+            **JellyfinApiMedia.to_dict(self),
+            **{
+                'season': self.season,
+                'season_id': self.season_id,
+                'season_name': self.season_name,
+                'season_page': self.season_page,
+                'season_photo': self.season_photo,
+                'season_imdb_id': self.season_imdb_id,
+                'season_tmdb_id': self.season_tmdb_id,
+                'season_tvdb_id': self.season_tvdb_id,
+            },
+        }
+
+    @property
+    def fullname(self) -> str:
+        if not self.serie:
+            return self.name
+        elif not self.season:
+            return f'{self.serie.fullname} Sxx'
+
+        return f'{self.serie.fullname} S{self.season:02d}'
+
+    @property
+    def season_name(self) -> str:
+        return self.name
+
+    @property
+    def season_id(self) -> str:
+        return self.id
+
+    @property
+    def serie_overview(self) -> str:
+        return self.overview
+
+    @property
+    def season_imdb_id(self) -> str:
+        return self.imdb_id
+
+    @property
+    def season_tmdb_id(self) -> str:
+        return self.tmdb_id
+
+    @property
+    def season_tvdb_id(self) -> str:
+        return self.tvdb_id
+
+    @property
+    def season_photo(self) -> str:
+        return self.photo
+
+    @property
+    def season_page(self) -> str:
+        return self.page
+
+    @staticmethod
+    def is_type(**kwargs) -> bool:
+        mtype = JellyfinApiMedia.get_mtype(**kwargs)
+
+        return (
+            JellyfinApiSerie.is_type(**kwargs)
+            and 'series_season' in kwargs
+            and not JellyfinApiEpisode.is_type(**kwargs)
+        ) or mtype == JellyfinApiSeason.TYPE
+
+    @staticmethod
+    def search(**kwargs) -> 'JellyfinApiSeason':
+        args = {}
+
+        auth = JellyfinApi.get_auth(**kwargs)
+        kwargs['auth'] = auth
+
+        parameters = {}
+        field_map = JellyfinApiBase.merge_field_map(
+            JellyfinApiMedia.field_map,
+            JellyfinApiSeason.field_map_up,
+            JellyfinApiSerie.field_map_up,
+            allow_new=True,
+        )
+
+        JellyfinApi.update_using_map(parameters, field_map, kwargs, allow_new=True)
+
+        # We need to have information regarding the series
+        episode_serie = None
+        if 'api_serie' in kwargs:
+            episode_serie = kwargs.get('api_serie')
+
+        if not episode_serie:
+            episode_serie = JellyfinApiSerie.search(**kwargs)
+
+        if not episode_serie:
+            logger.warning('Not possible to determine season, serie not found')
+            return
+
+        if 'season_id' in parameters:
+            args['Ids'] = parameters.get('season_id')
+        else:
+            args['ParentId'] = episode_serie.serie_id
+
+        args['IncludeItemTypes'] = 'Season'
+
+        JellyfinApi.set_common_search_arg(args)
+
+        logger.debug('Search season with: {}', args)
+        seasons = JellyfinApi.resquest_jellyfin(JELLYFIN_ENDPOINT_SEARCH, auth, 'GET', **args)
+        if not seasons or 'Items' not in seasons:
+            logger.warning('No season found')
+            return
+
+        seasons = seasons['Items']
+
+        target_season = parameters.get('season')
+
+        if target_season:
+            seasons_filter = []
+            seasons_filter = list(filter(lambda s: s['IndexNumber'] == target_season, seasons))
+            seasons = seasons_filter
+
+        if len(seasons) == 1:
+            season = seasons[0]
+        elif len(seasons) > 1:
+            logger.error(
+                'More than one season found for {} {}', episode_serie.fullname, target_season
+            )
+            return
+        else:
+            logger.warning('No season found')
+            return
+
+        season_api = JellyfinApiSeason(auth=auth, **season)
+
+        logger.debug('Found season \'{}\' in jellyfin server', season_api.fullname)
+
+        return season_api
+
+
+class JellyfinApiEpisode(JellyfinApiMedia):
+    """Episode"""
+
+    TYPE = 'episode'
+
+    field_map = {'episode': ['episode', 'IndexNumber']}
+
+    field_map_up = {
+        'id': 'ep_id',
+        'name': 'ep_name',
+        'imdb_id': 'ep_imdb_id',
+        'tmdb_id': 'ep_tmdb_id',
+        'tvdb_id': 'ep_tvdb_id',
+        'aired_date': 'ep_aired_date',
+        'photo': 'ep_photo',
+        'page': 'ep_page',
+        'ep_id': 'ep_id',
+        'ep_name': 'ep_name',
+        'ep_imdb_id': 'ep_imdb_id',
+        'ep_tmdb_id': 'ep_tmdb_id',
+        'ep_tvdb_id': 'ep_tvdb_id',
+        'episode': ['episode', 'series_episode'],
+    }
+
+    episode = None
+
+    def __init__(self, **kwargs):
+        JellyfinApiMedia.__init__(self, field_map=self.field_map_up, **kwargs)
+
+        if not kwargs:
+            return
+
+        JellyfinApiBase.update_using_map(self, JellyfinApiEpisode.field_map, kwargs)
+
+        if 'api_serie' in kwargs:
+            self.serie = kwargs.get('api_serie')
+        else:
+            self.serie = JellyfinApiSerie.search(**kwargs) or JellyfinApiSerie(auth=self.auth)
+
+        if 'api_season' in kwargs:
+            self.season = kwargs.get('api_season')
+        else:
+            self.season = JellyfinApiSeason.search(**kwargs) or JellyfinApiSeason(auth=self.auth)
+
+    def to_dict(self) -> dict:
+        if not self:
+            return {}
+
+        return {
+            **JellyfinApiSeason.to_dict(self.season),
+            **JellyfinApiSerie.to_dict(self.serie),
+            **JellyfinApiMedia.to_dict(self),
+            **{
+                'episode': self.episode,
+                'ep_id': self.ep_id,
+                'ep_name': self.ep_name,
+                'ep_page': self.ep_page,
+                'ep_photo': self.ep_photo,
+                'ep_imdb_id': self.ep_imdb_id,
+                'ep_tmdb_id': self.ep_tmdb_id,
+                'ep_tvdb_id': self.ep_tvdb_id,
+                'ep_aired_date': self.ep_aired_date,
+                'ep_overview': self.ep_overview,
+            },
+        }
+
+    @property
+    def fullname(self) -> str:
+        if not self.serie:
+            return self.name
+        elif not self.season:
+            return f'{self.serie.fullname} SxxExx'
+        elif not self.episode:
+            return f'{self.serie.fullname} S{self.season.season:02d}Exx'
+
+        return f'{self.serie.fullname} S{self.season.season:02d}E{self.episode:02d} {self.name}'
+
+    @property
+    def ep_id(self) -> str:
+        return self.id
+
+    @property
+    def ep_name(self) -> str:
+        return self.name
+
+    @property
+    def ep_imdb_id(self) -> str:
+        return self.imdb_id
+
+    @property
+    def ep_tmdb_id(self) -> str:
+        return self.tmdb_id
+
+    @property
+    def ep_tvdb_id(self) -> str:
+        return self.tvdb_id
+
+    @property
+    def ep_photo(self) -> str:
+        return self.photo
+
+    @property
+    def ep_overview(self) -> str:
+        return self.overview
+
+    @property
+    def ep_page(self) -> str:
+        return self.page
+
+    @property
+    def ep_aired_date(self) -> 'datetime':
+        return self.aired_date
+
+    @staticmethod
+    def search(**kwargs) -> 'JellyfinApiEpisode':
+        episode_serie = None
+        episode_season = None
+
+        auth = JellyfinApi.get_auth(**kwargs)
+        kwargs['auth'] = auth
+
+        args = {}
+
+        parameters = {}
+        field_map = JellyfinApiBase.merge_field_map(
+            JellyfinApiMedia.field_map,
+            JellyfinApiEpisode.field_map_up,
+            JellyfinApiSeason.field_map_up,
+            JellyfinApiSerie.field_map_up,
+            allow_new=True,
+        )
+
+        JellyfinApi.update_using_map(parameters, field_map, kwargs, allow_new=True)
+
+        # We need to have information regarding the series
+        if 'api_serie' in kwargs:
+            episode_serie = kwargs.get('api_serie')
+
+        if not episode_serie:
+            episode_serie = JellyfinApiSerie.search(**kwargs)
+
+        if not episode_serie:
+            logger.warning('Not possible to determine episode, serie not found')
+            return
+
+        # We need to have information regarding the season
+        if 'api_season' in kwargs:
+            episode_season = kwargs.get('api_season')
+
+        if not episode_season:
+            episode_season = JellyfinApiSeason.search(api_serie=episode_serie, **kwargs)
+
+        if not episode_season:
+            logger.warning('Not possible to determine episode, season not found')
+            return
+
+        # We need to return all the episodes for that show/season
+        if 'ep_id' in parameters:
+            args['Ids'] = parameters.get('ep_id')
+        elif episode_season and episode_season.season_id:
+            args['ParentId'] = episode_season.season_id
+        elif episode_serie and episode_serie.serie_id:
+            args['ParentId'] = episode_serie.serie_id
+
+        JellyfinApi.set_common_search_arg(args)
+        args['IncludeItemTypes'] = 'Episode'
+
+        logger.debug('Search episode with: {}', args)
+        response = JellyfinApi.resquest_jellyfin(JELLYFIN_ENDPOINT_SEARCH, auth, 'GET', **args)
+        if not response or 'Items' not in response:
+            logger.warning('No episode found')
+            return
+
+        episodes = response['Items']
+        if len(episodes) == 0:
+            logger.warning('No episode found')
+            return
+
+        target_episode = parameters.get('episode')
+
+        episode = []
+        episode = list(filter(lambda e: e['IndexNumber'] == target_episode, episodes))
+
+        if len(episode) > 1:
+            logger.error("More than one episode found")
+            return
+        elif len(episode) == 0:
+            logger.warning(
+                'Episodes found for {} but none matches {}',
+                episode_season.fullname,
+                target_episode,
+            )
+            return
+
+        episode_api = JellyfinApiEpisode(
+            auth=auth,
+            api_serie=episode_serie,
+            api_season=episode_season,
+            **episode[0],
+        )
+
+        logger.debug('Found episode \'{}\' in jellyfin server', episode_api.fullname)
+
+        return episode_api
+
+    @staticmethod
+    def is_type(**kwargs) -> bool:
+        mtype = JellyfinApiMedia.get_mtype(**kwargs)
+
+        return (
+            JellyfinApiSerie.is_type(**kwargs)
+            and 'series_season' in kwargs
+            and 'series_episode' in kwargs
+        ) or mtype == JellyfinApiEpisode.TYPE
+
+
+class JellyfinApiMovie(JellyfinApiMedia):
+    """Movie"""
+
+    TYPE = 'movie'
+
+    field_map_up = {
+        'id': 'movie_id',
+        'name': 'movie_name',
+        'imdb_id': 'movie_imdb_id',
+        'tmdb_id': 'movie_tmdb_id',
+        'tvdb_id': 'movie_tvdb_id',
+        'aired_date': 'movie_aired_date',
+        'year': 'movie_year',
+        'photo': 'movie_photo',
+        'page': 'movie_page',
+        'overview': 'movie_overview',
+        'movie_id': 'movie_id',
+        'movie_name': 'movie_name',
+        'movie_imdb_id': 'movie_imdb_id',
+        'movie_tmdb_id': 'movie_tmdb_id',
+        'movie_tvdb_id': 'movie_tvdb_id',
+        'movie_year': 'movie_year',
+    }
+
+    def __init__(self, **kwargs):
+        JellyfinApiMedia.__init__(self, field_map=JellyfinApiMovie.field_map_up, **kwargs)
+        self.mtype = JellyfinApiMovie.TYPE
+
+        if not kwargs:
+            return
+
+    def to_dict(self) -> dict:
+        if not self:
+            return {}
+
+        return {
+            **JellyfinApiMedia.to_dict(self),
+            **{
+                'movie_id': self.movie_id,
+                'movie_name': self.movie_name,
+                'movie_imdb_id': self.movie_imdb_id,
+                'movie_tmdb_id': self.movie_tmdb_id,
+                'movie_tvdb_id': self.movie_tvdb_id,
+                'movie_aired_date': self.movie_aired_date,
+                'movie_year': self.movie_year,
+                'movie_photo': self.movie_photo,
+                'movie_page': self.movie_page,
+                'movie_overview': self.movie_overview,
+            },
+        }
+
+    @property
+    def fullname(self):
+        return f'{self.name} ({self.year})'
+
+    @property
+    def movie_id(self) -> str:
+        return self.id
+
+    @property
+    def movie_name(self) -> str:
+        return self.name
+
+    @property
+    def movie_page(self) -> str:
+        return self.page
+
+    @property
+    def movie_imdb_id(self) -> str:
+        return self.imdb_id
+
+    @property
+    def movie_tmdb_id(self) -> str:
+        return self.tmdb_id
+
+    @property
+    def movie_tvdb_id(self) -> str:
+        return self.tvdb_id
+
+    @property
+    def movie_overview(self) -> str:
+        return self.overview
+
+    @property
+    def movie_photo(self) -> str:
+        return self.photo
+
+    @property
+    def movie_aired_date(self) -> 'datetime':
+        return self.aired_date
+
+    @property
+    def movie_year(self) -> int:
+        return self.year
+
+    @staticmethod
+    def search(**kwargs) -> 'JellyfinApiMovie':
+        args = {}
+
+        auth = JellyfinApi.get_auth(**kwargs)
+        kwargs['auth'] = auth
+
+        parameters = {}
+        field_map = JellyfinApiBase.merge_field_map(
+            JellyfinApiMedia.field_map,
+            JellyfinApiMovie.field_map_up,
+            allow_new=True,
+        )
+
+        JellyfinApi.update_using_map(parameters, field_map, kwargs, allow_new=True)
+
+        JellyfinApi.set_common_search_arg(args)
+
+        if 'movie_id' in parameters:
+            args['Ids'] = parameters.get('movie_id')
+        else:
+            if 'movie_name' in parameters:
+                args['SearchTerm'] = split_title_year(kwargs.get('title')).title
+
+            if 'movie_year' in parameters:
+                args['Years'] = parameters.get('movie_year')
+
+            JellyfinApi.set_provideres_search_arg(args, **kwargs)
+
+        args['IncludeItemTypes'] = 'Movie'
+
+        logger.debug('Search movie with: {}', args)
+        movies = JellyfinApi.resquest_jellyfin(JELLYFIN_ENDPOINT_SEARCH, auth, 'GET', **args)
+        if not movies or 'Items' not in movies:
+            logger.warning('No movie found')
+            return
+
+        if len(movies['Items']) > 1:
+            logger.error("More than one movie found")
+            return
+        elif len(movies['Items']) == 0:
+            logger.warning('No movie found')
+            return
+
+        movie = movies['Items'][0]
+
+        movie_api = JellyfinApiMovie(auth=auth, **movie)
+
+        logger.debug('Found movie {} in jellyfin server', movie_api.fullname)
+
+        return movie_api
+
+    @staticmethod
+    def is_type(**kwargs) -> bool:
+        mtype = JellyfinApiMedia.get_mtype(**kwargs)
+        return bool(kwargs.get('movie_name') or mtype == JellyfinApiMovie.TYPE.lower())
+
+
+class JellyfinApi(JellyfinApiBase):
+    """
+    Class to interact with Jellyfin API
+    """
+
+    _last_auth = None
+
+    auth = None
+
+    JELLYFIN_EXTRA_FIELDS = [
+        'DateCreated',
+        'Path',
+        'ProviderIds',
+        'PremiereDate',
+        'MediaSources',
+        'Video3DFormat',
+        'Overview',
+    ]
+
+    def __init__(self, auth: 'JellyfinAuth'):
+        self.auth = auth
+        JellyfinApi._last_auth = auth
+
+    @staticmethod
+    def set_common_search_arg(args: dict):
+        args['Recursive'] = True
+        args['Fields'] = ','.join(JellyfinApi.JELLYFIN_EXTRA_FIELDS)
+
+    @staticmethod
+    def set_provideres_search_arg(args: dict, **kwargs):
+        providers = []
+
+        if 'imdb_id' in kwargs:
+            providers.append(f'imdb.{kwargs.get("imdb_id")}')
+        if 'tmdb_id' in kwargs:
+            providers.append(f'tmdb.{kwargs.get("tmdb_id")}')
+        if 'tvdb_id' in kwargs:
+            providers.append(f'tvdb.{kwargs.get("tvdb_id")}')
+        if 'tvrage_id' in kwargs:
+            providers.append(f'tvrage.{kwargs.get("tvrage_id")}')
+
+        if len(providers) == 0:
+            return
+
+        providers = list(dict.fromkeys(providers))
+
+        args['AnyProviderIdEquals'] = ','.join(providers)
+
+    @staticmethod
+    def get_auth(**kwargs) -> JellyfinAuth:
+        if 'auth' in kwargs:
+            return kwargs['auth']
+        elif JellyfinApi._last_auth:
+            return JellyfinApi._last_auth
+        elif JellyfinAuth.get_last_auth():
+            return JellyfinAuth.get_last_auth()
+
+        return JellyfinAuth(**kwargs)
+
+    @staticmethod
+    def search(**kwargs):
+        search_result = None
+
+        if 'auth' not in kwargs:
+            kwargs['auth'] = JellyfinApi.get_auth(**kwargs)
+
+        if JellyfinApiEpisode.is_type(**kwargs):
+            logger.debug("API search episode")
+            search_result = JellyfinApiEpisode.search(**kwargs)
+        elif JellyfinApiSeason.is_type(**kwargs):
+            logger.debug("API search season")
+            search_result = JellyfinApiSeason.search(**kwargs)
+        elif JellyfinApiSerie.is_type(**kwargs):
+            logger.debug("API search serie")
+            search_result = JellyfinApiSerie.search(**kwargs)
+        elif JellyfinApiMovie.is_type(**kwargs):
+            logger.debug("API search movie")
+            search_result = JellyfinApiMovie.search(**kwargs)
+        elif 'executed' not in kwargs:
+            logger.debug("API search unknown media")
+            search_result = JellyfinApiMedia.search(**kwargs)
+
+        if not search_result:
+            return None
+
+        if isinstance(search_result, dict):
+            return search_result
+        elif isinstance(search_result, JellyfinApiMedia):
+            return search_result.to_dict()
+        else:
+            return None
+
+    @staticmethod
+    def search_list(**kwargs):
+        if 'auth' not in kwargs:
+            kwargs['auth'] = JellyfinApi.get_auth(**kwargs)
+
+        mlist = kwargs.get('list')
+
+        list_object = JellyfinApiList.get_api_list(**kwargs)
+        if not list_object:
+            raise PluginError('List \'%s\' does not exist' % mlist)
+
+        mlist = list_object.get_items()
+
+        for list_obj in mlist:
+            yield list_obj
+
+    @staticmethod
+    def strtotime(date) -> 'datetime':
+        # YYYY-MM-DDTHH:MM:SS.0000000+00:00
+
+        if not date:
+            return None
+        elif isinstance(date, datetime):
+            return date
+        elif not isinstance(date, str):
+            return None
+
+        # Normalize date
+        date_py = re.sub(r'^(.*)\.([0-9]{6})[0-9]*\+([0-9]{2})\:([0-9]{2})$', r'\1.\2+\3\4', date)
+
+        try:
+            date = datetime.strptime(date_py, '%Y-%m-%dT%H:%M:%S.%f%z')
+        except ValueError:
+            date = None
+
+        return date
+
+    @staticmethod
+    def get_type(**kwargs) -> bool:
+        if JellyfinApiEpisode.is_type(**kwargs):
+            return JellyfinApiEpisode.TYPE
+        elif JellyfinApiSeason.is_type(**kwargs):
+            return JellyfinApiSeason.TYPE
+        elif JellyfinApiSerie.is_type(**kwargs):
+            return JellyfinApiSerie.TYPE
+        elif JellyfinApiMovie.is_type(**kwargs):
+            return JellyfinApiMovie.TYPE
+
+        return JellyfinApiMedia.TYPE
+
+    @staticmethod
+    def resquest_jellyfin(endpoint: str, auth: 'JellyfinAuth', method: str, **kwargs):
+        verify_certificates = False
+
+        if not auth:
+            auth = JellyfinApi.get_auth(**kwargs)
+            return
+
+        if not auth.host:
+            raise PluginError('No Jellyfin server information')
+
+        if auth:
+            endpoint = endpoint.format(userid=auth.uid)
+
+        if not auth:
+            auth = JellyfinApi.get_auth(**kwargs)
+
+        url = f'{auth.host}{endpoint}'
+
+        request_headers = auth.add_token_header({})
+
+        try:
+            if method == 'POST':
+                response = requests.post(
+                    url,
+                    json=kwargs,
+                    headers=request_headers,
+                    allow_redirects=True,
+                    verify=verify_certificates,
+                )
+            elif method == 'GET':
+                response = requests.get(
+                    url,
+                    params=kwargs,
+                    headers=request_headers,
+                    allow_redirects=True,
+                    verify=verify_certificates,
+                )
+            elif method == 'DELETE':
+                response = requests.request(
+                    'DELETE',
+                    url,
+                    params=kwargs,
+                    headers=request_headers,
+                    allow_redirects=True,
+                    verify=verify_certificates,
+                )
+        except HTTPError as e:  # Autentication Problem
+            if e.response.status_code == 401:
+                logger.error('Autentication Error: {}', str(e))
+                return False
+            else:
+                raise PluginError('Could not connect to Jellyfin Server: %s' % str(e)) from e
+        except RequestException as e:
+            raise PluginError('Could not connect to Jellyfin Server: %s' % str(e)) from e
+
+        if response.status_code == 200 or response.status_code == 204:
+            try:
+                return response.json()
+            except ValueError:
+                return {'code': response.status_code}
