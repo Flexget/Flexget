@@ -1,19 +1,19 @@
+import functools
+import re
 from abc import ABC, abstractmethod, abstractstaticmethod
 from collections.abc import MutableSet
 from datetime import datetime
-import re
 from urllib.parse import urlencode
 
-import functools
-from requests.exceptions import RequestException, HTTPError
 from loguru import logger
+from requests.exceptions import HTTPError, RequestException
 
-from flexget.utils.tools import get_current_flexget_version, split_title_year
-from flexget.utils import requests
-from flexget.plugin import PluginError
-from flexget.entry import Entry
-from flexget.utils.simple_persistence import SimplePersistence
 from flexget.components.jellyfin.jellyfin_util import get_field_map
+from flexget.entry import Entry
+from flexget.plugin import PluginError
+from flexget.utils import requests
+from flexget.utils.simple_persistence import SimplePersistence
+from flexget.utils.tools import get_current_flexget_version, split_title_year
 
 persist = SimplePersistence('api_jellyfin')
 
@@ -173,7 +173,9 @@ class JellyfinAuth(JellyfinApiBase):
                 logger.debug('Login to {} with username {}', self.host, self.username)
                 args = {'Username': self._username, 'Pw': self._password}
 
-                login_data = JellyfinApi.resquest_jellyfin(JELLYFIN_ENDPOINT_LOGIN, self, 'POST', **args)
+                login_data = JellyfinApi.resquest_jellyfin(
+                    JELLYFIN_ENDPOINT_LOGIN, self, 'POST', **args
+                )
 
                 if not login_data and optional:
                     return
@@ -625,7 +627,9 @@ class JellyfinApiLibrary(JellyfinApiListBase):
         args['IsHidden'] = False
 
         logger.debug('Search Library name list with: {}', args)
-        search_list_data = JellyfinApi.resquest_jellyfin(JELLYFIN_ENDPOINT_LIBRARY, auth, 'GET', **args)
+        search_list_data = JellyfinApi.resquest_jellyfin(
+            JELLYFIN_ENDPOINT_LIBRARY, auth, 'GET', **args
+        )
         if not search_list_data or not search_list_data['Items']:
             return
 
@@ -884,7 +888,9 @@ class JellyfinApiPlayList(JellyfinApiListBase):
         args['Type'] = 'Playlist'
 
         logger.debug('Search Playlist Name list with: {}', args)
-        search_list_data = JellyfinApi.resquest_jellyfin(JELLYFIN_ENDPOINT_SEARCH, auth, 'GET', **args)
+        search_list_data = JellyfinApi.resquest_jellyfin(
+            JELLYFIN_ENDPOINT_SEARCH, auth, 'GET', **args
+        )
         if not search_list_data or not search_list_data['Items']:
             return
 
@@ -937,7 +943,7 @@ class JellyfinApiPlayList(JellyfinApiListBase):
 
 
 class JellyfinApiMedia(JellyfinApiBase):
-    """ Basic media """
+    """Basic media"""
 
     TYPE = 'unknown'
 

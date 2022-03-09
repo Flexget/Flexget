@@ -1,10 +1,10 @@
 from loguru import logger
 
-from flexget.components.jellyfin.api_jellyfin import JellyfinAuth, JellyfinApi
-from flexget.config_schema import one_or_more
 from flexget import plugin
-from flexget.event import event
+from flexget.components.jellyfin.api_jellyfin import JellyfinApi, JellyfinAuth
 from flexget.components.jellyfin.jellyfin_util import SCHEMA_SERVER_TAG, SORT_FIELDS
+from flexget.config_schema import one_or_more
+from flexget.event import event
 
 logger = logger.bind(name='from_jellyfin')
 

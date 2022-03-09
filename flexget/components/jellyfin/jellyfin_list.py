@@ -1,9 +1,9 @@
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.components.jellyfin.api_jellyfin import JellyfinApi, JellyfinApiList, JellyfinAuth
 from flexget.components.jellyfin.jellyfin_util import SCHEMA_SERVER_TAG
-from flexget.components.jellyfin.api_jellyfin import JellyfinAuth, JellyfinApi, JellyfinApiList
+from flexget.event import event
 
 logger = logger.bind(name='jellyfin_list')
 

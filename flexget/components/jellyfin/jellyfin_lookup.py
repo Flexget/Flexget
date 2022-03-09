@@ -1,7 +1,7 @@
 from loguru import logger
 
 from flexget import entry, plugin
-from flexget.components.jellyfin.api_jellyfin import JellyfinAuth, JellyfinApi
+from flexget.components.jellyfin.api_jellyfin import JellyfinApi, JellyfinAuth
 from flexget.components.jellyfin.jellyfin_util import SCHEMA_SERVER, get_field_map
 from flexget.event import event
 
