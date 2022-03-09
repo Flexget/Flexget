@@ -3,6 +3,7 @@ import pytest
 
 @pytest.mark.usefixtures('tmpdir')
 @pytest.mark.filecopy('test.torrent', '__tmp__/')
+@pytest.mark.filecopy('multi.torrent', '__tmp__/')
 class TestContentFilter:
     config = """
         tasks:
@@ -68,6 +69,24 @@ class TestContentFilter:
             accept_all: yes
             content_filter:
               reject: ['*.iso']
+              
+          test_min_files:
+            max_reruns: 0
+            mock:
+              - {title: 'onefile', url: 'http://localhost/', file: '__tmp__/test.torrent'}
+              - {title: 'manyfiles', url: 'http://localhost/', file: '__tmp__/multi.torrent'}
+            accept_all: yes
+            content_filter:
+              min_files: 4
+              
+          test_max_files:
+            max_reruns: 0
+            mock:
+              - {title: 'onefile', url: 'http://localhost/', file: '__tmp__/test.torrent'}
+              - {title: 'manyfiles', url: 'http://localhost/', file: '__tmp__/multi.torrent'}
+            accept_all: yes
+            content_filter:
+              max_files: 3
     """
 
     def test_reject1(self, execute_task):
@@ -118,3 +137,15 @@ class TestContentFilter:
         assert task.find_entry(
             'rejected', title='test', rejected_by='remember_rejected'
         ), 'should have rejected, content files present from the cache'
+
+    def test_min_files(self, execute_task):
+        task = execute_task('test_min_files')
+
+        assert task.find_entry('rejected', title='onefile'), 'should have rejected, has <4 files'
+        assert task.find_entry('accepted', title='manyfiles'), 'should have accepted, >= 4 files'
+
+    def test_max_files(self, execute_task):
+        task = execute_task('test_max_files')
+
+        assert task.find_entry('rejected', title='manyfiles'), 'should have rejected, >3 files'
+        assert task.find_entry('accepted', title='onefile'), 'should have accepted, has <=3 files'

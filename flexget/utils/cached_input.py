@@ -2,12 +2,12 @@ import copy
 import pickle
 from datetime import datetime, timedelta
 from functools import partial
-from typing import TYPE_CHECKING, List, Iterable, Callable, Optional
+from typing import TYPE_CHECKING, Callable, Iterable, List, Optional
 
 from loguru import logger
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Unicode, select
-from sqlalchemy.orm import relation
 from sqlalchemy.orm import Session as DBSession
+from sqlalchemy.orm import relation
 
 from flexget import db_schema
 from flexget.entry import Entry
@@ -26,7 +26,6 @@ if TYPE_CHECKING:
     class Base:
         def __init__(self, *args, **kwargs) -> None:
             ...
-
 
 else:
     Base = db_schema.versioned_base('input_cache', 2)
@@ -221,9 +220,9 @@ class IterableCache:
     If `finished_hook` is supplied, it will be called the first time the iterable is run to the end.
     """
 
-    def __init__(self, iterable: Iterable, finished_hook: Callable[[List[str]], None] = None):
+    def __init__(self, iterable: Iterable, finished_hook: Callable[[List], None] = None):
         self.iterable = iter(iterable)
-        self.cache: List[dict] = []
+        self.cache: List = []
         self.finished_hook = finished_hook
 
     def __iter__(self):

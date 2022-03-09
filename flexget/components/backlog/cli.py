@@ -1,7 +1,7 @@
 from flexget import options
 from flexget.event import event
 from flexget.manager import Session
-from flexget.terminal import TerminalTable, TerminalTableError, console, table_parser
+from flexget.terminal import TerminalTable, console, table_parser
 
 from . import db
 
@@ -12,18 +12,17 @@ def do_cli(manager, options):
         console('%s entries cleared from backlog.' % num)
     else:
         header = ['Title', 'Task', 'Expires']
-        table_data = [header]
+        table_data = []
         with Session() as session:
             entries = db.get_entries(options.task, session=session)
             for entry in entries:
                 table_data.append(
                     [entry.title, entry.task, entry.expire.strftime('%Y-%m-%d %H:%M')]
                 )
-        try:
-            table = TerminalTable(options.table_type, table_data, wrap_columns=[0])
-            console(table.output)
-        except TerminalTableError as e:
-            console('ERROR: %s' % str(e))
+        table = TerminalTable(*header, table_type=options.table_type)
+        for row in table_data:
+            table.add_row(*row)
+        console(table)
 
 
 @event('options.register')

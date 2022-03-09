@@ -21,6 +21,7 @@ class TestURLRewriters:
               - {title: 'nyaa', url: 'https://www.nyaa.si/view/15'}
               - {title: 'cinemageddon download', url: 'http://cinemageddon.net/details.php?id=1234'}
               - {title: 'rutracker_topic', url: 'https://rutracker.org/forum/viewtopic.php?t=2455223'}
+              - {title: 'ettv page', url: 'https://www.ettvcentral.com/torrent/1239122/build-a-scraper-software-using-python'}
     """
 
     def get_urlrewriter(self, name):
@@ -81,6 +82,18 @@ class TestURLRewriters:
         assert (
             entry['url']
             == 'magnet:?xt=urn:btih:38527C88CFE76411EF0C20FDF36B84DFE2C2D210&tr=http:%2F%2Fbt.t-ru.org%2Fann%3Fmagnet&tr=http:%2F%2Fbt2.t-ru.org%2Fann%3Fmagnet&tr=http:%2F%2Fbt3.t-ru.org%2Fann%3Fmagnet&tr=http:%2F%2Fbt4.t-ru.org%2Fann%3Fmagnet&dn=%D0%9F%D0%A0%D0%AB%D0%96%D0%9A%D0%98+%D0%9D%D0%90+%D0%9B%D0%AB%D0%96%D0%90%D0%A5+%D0%A1+%D0%A2%D0%A0%D0%90%D0%9C%D0%9F%D0%9B%D0%98%D0%9D%D0%90.+%D0%A1%D0%B5%D0%B7%D0%BE%D0%BD+2008-2009.+%D0%92%D0%A1%D0%95+%D0%A1%D0%9E%D0%A0%D0%95%D0%92%D0%9D%D0%9E%D0%92%D0%90%D0%9D%D0%98%D0%AF.+%D0%A1+%D1%80%D0%B0%D0%B7%D0%BD%D1%8B%D1%85+%D0%BA%D0%B0%D0%BD%D0%B0%D0%BB%D0%BE%D0%B2.%5B%D0%A1%D0%B5%D0%B7%D0%BE%D0%BD+2008-2009%2C+%D1%80%D0%B0%D0%B7%D0%BD%D0%BE%D0%B3%D0%BE+%D0%BA%D0%B0%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B0.%5D'
+        )
+
+    @pytest.mark.online
+    def test_ettv(self, execute_task):
+        task = execute_task('test')
+        entry = task.find_entry(title='ettv page')
+        urlrewriter = self.get_urlrewriter('ettv')
+        assert urlrewriter.url_rewritable(task, entry)
+        urlrewriter.url_rewrite(task, entry)
+        assert (
+            entry['url']
+            == 'magnet:?xt=urn:btih:cf479cde41a2a8c4a65cf963025b525f18932bdc&dn=Build+a+Scraper+Software+Using+Python&xl=2109955281&tr=udp%3A%2F%2Fopen.stealth.si:80/announce&tr=udp%3A%2F%2Ftracker.tiny-vps.com:6969/announce&tr=udp%3A%2F%2Ffasttracker.foreverpirates.co:6969/announce&tr=udp%3A%2F%2Ftracker.opentrackr.org:1337/announce&tr=udp%3A%2F%2Fexplodie.org:6969/announce&tr=udp%3A%2F%2Ftracker.cyberia.is:6969/announce&tr=udp%3A%2F%2Fipv4.tracker.harry.lu:80/announce&tr=udp%3A%2F%2Ftracker.uw0.xyz:6969/announce&tr=udp%3A%2F%2Fopentracker.i2p.rocks:6969/announce&tr=udp%3A%2F%2Ftracker.birkenwald.de:6969/announce&tr=udp%3A%2F%2Ftracker.torrent.eu.org:451/announce&tr=udp%3A%2F%2Ftracker.moeking.me:6969/announce&tr=udp%3A%2F%2Ftracker.dler.org:6969/announce&tr=udp%3A%2F%2F9.rarbg.me:2970/announce'
         )
 
 

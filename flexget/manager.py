@@ -1,6 +1,7 @@
 import argparse  # noqa
 import atexit  # noqa
 import codecs  # noqa
+import collections
 import copy  # noqa
 import errno  # noqa
 import fnmatch  # noqa
@@ -298,22 +299,20 @@ class Manager:
                 logger.error('Reloading config failed: {}', e)
         # Handle --tasks
         if options.tasks:
-            # Consider * the same as not specifying tasks at all (makes sure manual plugin still works)
+            # Consider '*' the same as not specifying any tasks.
+            # (So manual plugin doesn't consider them explicitly enabled.)
             if options.tasks == ['*']:
                 options.tasks = None
             else:
-                # Create list of tasks to run, preserving order
                 task_names = []
-                for arg in options.tasks:
-                    matches = [
-                        t for t in self.tasks if fnmatch.fnmatchcase(str(t).lower(), arg.lower())
-                    ]
-                    if not matches:
-                        msg = f'`{arg}` does not match any tasks'
-                        logger.error(msg)
+                for task in options.tasks:
+                    try:
+                        task_names.extend(
+                            m for m in self.matching_tasks(task) if m not in task_names
+                        )
+                    except ValueError as e:
+                        logger.error(e)
                         continue
-                    task_names.extend(m for m in matches if m not in task_names)
-                # Set the option as a list of matching task names so plugins can use it easily
                 options.tasks = task_names
         # TODO: 1.2 This is a hack to make task priorities work still, not sure if it's the best one
         task_names = sorted(
@@ -538,22 +537,14 @@ class Manager:
         self.shutdown(finish_queue=False)
 
     def setup_yaml(self) -> None:
-        """Sets up the yaml loader to return unicode objects for strings by default"""
+        """Customize the yaml loader/dumper behavior"""
 
-        def construct_yaml_str(self, node):
-            # Override the default string handling function
-            # to always return unicode objects
-            return self.construct_scalar(node)
-
-        yaml.Loader.add_constructor('tag:yaml.org,2002:str', construct_yaml_str)
-        yaml.SafeLoader.add_constructor('tag:yaml.org,2002:str', construct_yaml_str)
-
-        # Set up the dumper to not tag every string with !!python/unicode
-        def unicode_representer(dumper, uni):
-            node = yaml.ScalarNode(tag='tag:yaml.org,2002:str', value=uni)
-            return node
-
-        yaml.add_representer(str, unicode_representer)
+        # Represent OrderedDict as a regular dict (but don't sort it alphabetically)
+        # This lets us order a dict in a yaml file for easier human consumption
+        represent_dict_order = lambda self, data: self.represent_mapping(
+            'tag:yaml.org,2002:map', data.items()
+        )
+        yaml.add_representer(collections.OrderedDict, represent_dict_order)
 
         # Set up the dumper to increase the indent for lists
         def increase_indent_wrapper(func):
@@ -1058,6 +1049,14 @@ class Manager:
                 logger.info('Removed test database')
         global manager
         manager = None
+
+    def matching_tasks(self, task: str) -> Optional[List[str]]:
+        """Create list of tasks to run, preserving order"""
+        task_names = [t for t in self.tasks if fnmatch.fnmatchcase(str(t).lower(), task.lower())]
+        if not task_names:
+            raise ValueError(f'`{task}` does not match any tasks')
+
+        return task_names
 
     def crash_report(self) -> str:
         """

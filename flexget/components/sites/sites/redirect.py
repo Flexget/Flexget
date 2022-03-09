@@ -31,13 +31,27 @@ class UrlRewriteRedirect:
                     entry['title'],
                     entry['download_auth'],
                 )
-            try:
-                r = task.requests.head(entry['url'], auth=auth, allow_redirects=True)
-            except Exception:
-                pass
-            else:
-                if r.status_code < 400 and r.url != entry['url']:
-                    entry['url'] = r.url
+
+            # Jackett uses redirects to redirect to a magnet: uri, which requests will choke on.
+            # Therefore we manually resolve the redirects, rather that letting requests do that for us.
+            # Some providers also don't allow the HEAD method, so we use GET here for maximum compatibility.
+            url = entry['url']
+            while True:
+                try:
+                    # Use 'stream' to make sure we don't download the content. Do the GET with a context manager
+                    # to make sure the connection closes since we aren't getting content.
+                    with task.requests.get(
+                        url, auth=auth, allow_redirects=False, stream=True
+                    ) as r:
+                        if 'location' in r.headers and 300 <= r.status_code < 400:
+                            url = r.headers['location']
+                except Exception:
+                    break
+                if url != r.url:
+                    continue
+                break
+            if url != entry['url']:
+                entry['url'] = url
             # Make sure we don't try to rewrite this url again
             self.processed.add(entry['url'])
 

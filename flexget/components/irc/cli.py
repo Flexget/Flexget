@@ -1,10 +1,8 @@
 from argparse import ArgumentParser
 
-from colorclass.toggles import disable_all_colors
-
 from flexget import options
 from flexget.event import event
-from flexget.terminal import TerminalTable, TerminalTableError, colorize, console, table_parser
+from flexget.terminal import TerminalTable, colorize, console, disable_colors, table_parser
 
 try:
     from irc_bot.simple_irc_bot import IRCChannelStatus, SimpleIRCBot
@@ -21,7 +19,7 @@ def do_cli(manager, options):
         return
 
     if hasattr(options, 'table_type') and options.table_type == 'porcelain':
-        disable_all_colors()
+        disable_colors()
 
     action_map = {'status': action_status, 'restart': action_restart, 'stop': action_stop}
 
@@ -44,7 +42,7 @@ def action_status(options, irc_manager):
         return
 
     header = ['Name', 'Alive', 'Channels', 'Server']
-    table_data = [header]
+    table_data = []
 
     for connection in status:
         for name, info in connection.items():
@@ -58,12 +56,12 @@ def action_status(options, irc_manager):
             table_data.append(
                 [name, alive, ', '.join(channels), '%s:%s' % (info['server'], info['port'])]
             )
-    try:
-        table = TerminalTable(options.table_type, table_data)
-        console(table.output)
-        console(colorize('green', ' * Connected channel'))
-    except TerminalTableError as e:
-        console('ERROR: %s' % e)
+
+    table = TerminalTable(*header, table_type=options.table_type)
+    for row in table_data:
+        table.add_row(*row)
+    console(table)
+    console(colorize('green', ' * Connected channel'))
 
 
 def action_restart(options, irc_manager):

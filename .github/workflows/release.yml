@@ -19,16 +19,11 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ env.PYTHON_VERSION }}
-    - name: Set up pip cache
-      uses: actions/cache@v2
-      with:
-        path: pip_cache
-        key: ${{ runner.OS }}-python${{ env.PYTHON_VERSION }}-${{ hashFiles('*requirements*.txt') }}
-        restore-keys: |
-          ${{ runner.OS }}-python${{ env.PYTHON_VERSION }}-
+        cache: 'pip'
+        cache-dependency-path: 'dev-requirements.txt'
     - name: Install dev dependencies
       run: |
-        pip --cache-dir pip_cache install -r dev-requirements.txt
+        pip install -r dev-requirements.txt
     - name: Set Deployment Status Pending
       uses: deliverybot/deployment-status@v1
       with:

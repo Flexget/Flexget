@@ -1,0 +1,52 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches:
+      - develop
+    tags:
+      - v*.*.*
+  pull_request:
+    branches:
+      - "*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build Base Docker Image
+        run: docker build --tag flexget:tmp .
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        if: github.event_name == 'push'
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+
+      - uses: actions/github-script@v5
+        if: github.event_name == 'push'
+        name: Docker Push
+        with:
+          debug: true
+          script: |
+            const ref = context.ref
+            const versions = []
+            if (ref.startsWith('refs/tags/v')){
+              const tag = ref.substring(11)
+              const [major, minor, _] = tag.split('.')
+              versions.push('latest', tag, `${major}.${minor}`, major)
+            } else if (ref.startsWith('refs/heads/')) {
+              versions.push(ref.substring(11))
+            } else {
+              console.log(ref)
+            }
+            console.log(versions)
+            for (const version of versions) {
+              const dst = `ghcr.io/flexget/flexget:${version}`
+              await exec.exec(`docker tag flexget:tmp ${dst}`)
+              await exec.exec(`docker push ${dst}`)
+            }

@@ -1,6 +1,8 @@
 from argparse import SUPPRESS
 
+import yaml
 from loguru import logger
+from rich.syntax import Syntax
 
 from flexget import options, plugin
 from flexget.event import event
@@ -17,11 +19,10 @@ class OutputDumpConfig:
     @plugin.priority(plugin.PRIORITY_LAST)
     def on_task_start(self, task, config):
         if task.options.dump_config:
-            import yaml
-
-            console('--- config from task: %s' % task.name)
-            console(yaml.safe_dump(task.config))
-            console('---')
+            console.rule(f'config from task: {task.name}')
+            syntax = Syntax(yaml.safe_dump(task.config).strip(), 'yaml+jinja', theme='native')
+            console(syntax)
+            console.rule()
             task.abort(silent=True)
         if task.options.dump_config_python:
             console(task.config)

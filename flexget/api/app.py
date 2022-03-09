@@ -4,16 +4,16 @@ import re
 from collections import deque
 from contextlib import suppress
 from functools import partial, wraps
-from typing import Callable, List, Dict, Union, Mapping, Tuple, TYPE_CHECKING
+from typing import TYPE_CHECKING, Callable, Dict, List, Mapping, Tuple, Union
 
-from jsonschema.exceptions import ValidationError as SchemaValidationError
-from flask import Flask, Response, jsonify, make_response, request, Request
+from flask import Flask, Request, Response, jsonify, make_response, request
 from flask_compress import Compress
 from flask_cors import CORS
 from flask_restx import Api as RestxAPI
-from flask_restx import Resource, Model
+from flask_restx import Model, Resource
 from flask_restx.reqparse import RequestParser
 from jsonschema import RefResolutionError
+from jsonschema.exceptions import ValidationError as SchemaValidationError
 from loguru import logger
 from sqlalchemy.orm import Session
 from werkzeug.http import generate_etag
@@ -85,7 +85,7 @@ class APIEndpoint:
 
 
 def api_version(f: Callable[..., Response]):
-    """ Add the 'API-Version' header to all responses """
+    """Add the 'API-Version' header to all responses"""
 
     @wraps(f)
     def wrapped(*args, **kwargs):

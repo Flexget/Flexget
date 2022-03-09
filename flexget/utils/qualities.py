@@ -119,6 +119,7 @@ _resolutions = [
     QualityComponent('resolution', 10, '360p'),
     QualityComponent('resolution', 20, '368p', '368p?'),
     QualityComponent('resolution', 30, '480p', '480p?'),
+    QualityComponent('resolution', 35, '540p', '540p?'),
     QualityComponent('resolution', 40, '576p', '576p?'),
     QualityComponent('resolution', 45, 'hr'),
     QualityComponent('resolution', 50, '720i'),
@@ -157,11 +158,11 @@ _codecs = [
 ]
 
 _color_ranges = [
-    QualityComponent('color_range', 10, '8bit', r'8[^\w]?bit|hi8(p)?'),
-    QualityComponent('color_range', 20, '10bit', r'10[^\w]?bit|hi10(p)?'),
+    QualityComponent('color_range', 10, '8bit', r'8[^\w]?bits?|hi8p?'),
+    QualityComponent('color_range', 20, '10bit', r'10[^\w]?bits?|hi10p?'),
     QualityComponent('color_range', 40, 'hdrplus', r'hdr[^\w]?(\+|p|plus)'),
-    QualityComponent('color_range', 30, 'hdr', r'hdr([^\w]?(10))?'),
-    QualityComponent('color_range', 50, 'dolbyvision', r'(dolby[^\w]?vision|dv)'),
+    QualityComponent('color_range', 30, 'hdr', r'hdr([^\w]?10)?'),
+    QualityComponent('color_range', 50, 'dolbyvision', r'(dolby[^\w]?vision|dv|dovi)'),
 ]
 
 channels = r'(?:(?:[^\w+]?[1-7][\W_]?(?:0|1|ch)))'

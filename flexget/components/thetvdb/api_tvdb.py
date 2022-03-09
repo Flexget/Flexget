@@ -460,11 +460,11 @@ class TVDBSeriesSearchResult(Base):
 
     @property
     def expired(self):
-        logger.debug('checking series {} for expiration', self.original_name)
+        logger.debug('checking series {} for expiration', self.name)
         if datetime.now() - self.created_at >= timedelta(days=SEARCH_RESULT_EXPIRATION_DAYS):
-            logger.debug('series {} is expires, should re-fetch', self.original_name)
+            logger.debug('series {} is expires, should re-fetch', self.name)
             return True
-        logger.debug('series {} is not expired', self.original_name)
+        logger.debug('series {} is not expired', self.name)
         return False
 
 

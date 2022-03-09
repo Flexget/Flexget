@@ -5,7 +5,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from flexget import options
 from flexget.event import event
 from flexget.manager import Session
-from flexget.terminal import TerminalTable, TerminalTableError, console, table_parser
+from flexget.terminal import TerminalTable, console, table_parser
 
 from . import db
 
@@ -48,18 +48,13 @@ def do_cli(manager, options):
 
 
 def entry_list_lists(options):
-    """ Show all entry lists """
+    """Show all entry lists"""
     with Session() as session:
         lists = db.get_entry_lists(session=session)
-        header = ['#', 'List Name']
-        table_data = [header]
+        table = TerminalTable('#', 'List Name', table_type=options.table_type)
         for entry_list in lists:
-            table_data.append([entry_list.id, entry_list.name])
-    table = TerminalTable(options.table_type, table_data)
-    try:
-        console(table.output)
-    except TerminalTableError as e:
-        console('ERROR: %s' % str(e))
+            table.add_row(str(entry_list.id), entry_list.name)
+    console(table)
 
 
 def entry_list_list(options):
@@ -71,16 +66,12 @@ def entry_list_list(options):
             console('Could not find entry list with name {}'.format(options.list_name))
             return
         header = ['#', 'Title', '# of fields']
-        table_data = [header]
+        table = TerminalTable(*header, table_type=options.table_type)
         for entry in db.get_entries_by_list_id(
             entry_list.id, order_by='added', descending=True, session=session
         ):
-            table_data.append([entry.id, entry.title, len(entry.entry)])
-    try:
-        table = TerminalTable(options.table_type, table_data)
-        console(table.output)
-    except TerminalTableError as e:
-        console('ERROR: %s' % str(e))
+            table.add_row(str(entry.id), entry.title, str(len(entry.entry)))
+    console(table)
 
 
 def entry_list_show(options):
@@ -109,16 +100,10 @@ def entry_list_show(options):
                     )
                 )
                 return
-        header = ['Field name', 'Value']
-        table_data = [header]
+        table = TerminalTable('Field name', 'Value', table_type=options.table_type)
         for k, v in sorted(entry.entry.items()):
-            table_data.append([k, str(v)])
-    try:
-        table = TerminalTable(options.table_type, table_data, wrap_columns=[1])
-        table.table.justify_columns[0] = 'center'
-        console(table.output)
-    except TerminalTableError as e:
-        console('ERROR: %s' % str(e))
+            table.add_row(k, str(v))
+    console(table)
 
 
 def entry_list_add(options):

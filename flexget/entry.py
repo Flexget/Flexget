@@ -2,7 +2,7 @@ import functools
 import types
 import warnings
 from enum import Enum
-from typing import Callable, Iterable, Mapping, Optional, Sequence, Union, Dict
+from typing import Callable, Dict, Iterable, Mapping, Optional, Sequence, Union
 
 from loguru import logger
 

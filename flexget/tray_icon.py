@@ -2,7 +2,7 @@ import logging
 import webbrowser
 from functools import partial, wraps
 from pathlib import Path
-from typing import List, Optional, Callable
+from typing import Callable, List, Optional
 
 from loguru import logger
 

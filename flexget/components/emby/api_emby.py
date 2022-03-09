@@ -1,20 +1,20 @@
+import copy
+import functools
+import re
 from abc import ABC, abstractmethod, abstractstaticmethod
 from collections.abc import MutableSet
 from datetime import datetime
-import re
-import copy
 from urllib.parse import urlencode
 
-import functools
-from requests.exceptions import RequestException, HTTPError
 from loguru import logger
+from requests.exceptions import HTTPError, RequestException
 
-from flexget.utils.tools import get_current_flexget_version, split_title_year, str_to_int
-from flexget.utils import requests
-from flexget.plugin import PluginError
+from flexget.components.emby.emby_util import get_field_map
 from flexget.entry import Entry
+from flexget.plugin import PluginError
+from flexget.utils import requests
 from flexget.utils.simple_persistence import SimplePersistence
-from flexget.components.emby.emby_util import get_field_map, simplify_text
+from flexget.utils.tools import get_current_flexget_version, split_title_year, str_to_int
 
 persist = SimplePersistence('api_emby')
 
@@ -552,9 +552,9 @@ class EmbyApiListBase(EmbyApiBase):
             args['SortOrder'] = self.sort['order']
 
         if not self.types or len(self.types) == 0:
-            args['IncludeItemTypes'] = 'Movie;Episode'
+            args['IncludeItemTypes'] = 'Movie,Episode'
         else:
-            args['IncludeItemTypes'] = ';'.join(self.types)
+            args['IncludeItemTypes'] = ','.join(typ.title() for typ in self.types)
 
     def add(self, entry: Entry):
         """Adds a item to list"""
@@ -776,7 +776,6 @@ class EmbyApiLibrary(EmbyApiListBase):
 
         index = 0
         args['ParentId'] = self.id
-        args['IncludeItemTypes'] = 'Episode,Movie'
         endpoint = EMBY_ENDPOINT_SEARCH.format(userid=self.auth.uid)
         logger.debug('Search library with: {}', args)
 
@@ -891,7 +890,6 @@ class EmbyApiRootList(EmbyApiListBase):
 
         index = 0
 
-        args['IncludeItemTypes'] = 'Episode,Movie'
         endpoint = EMBY_ENDPOINT_SEARCH.format(userid=self.auth.uid)
         logger.debug('Search root list with: {}', args)
 
@@ -965,7 +963,6 @@ class EmbyApiWatchedList(EmbyApiListBase):
 
         index = 0
         args['IsPlayed'] = True
-        args['IncludeItemTypes'] = 'Episode,Movie'
         endpoint = EMBY_ENDPOINT_SEARCH.format(userid=self.auth.uid)
         logger.debug('Search watched list with: {}', args)
 
@@ -1039,7 +1036,6 @@ class EmbyApiFavoriteList(EmbyApiListBase):
 
         index = 0
         args['IsFavorite'] = True
-        args['IncludeItemTypes'] = 'Episode,Movie'
         endpoint = EMBY_ENDPOINT_SEARCH.format(userid=self.auth.uid)
         logger.debug('Search favorite list with: {}', args)
 
@@ -1161,8 +1157,6 @@ class EmbyApiPlayList(EmbyApiListBase):
             return
 
         args['ParentId'] = self.id
-        args['IncludeItemTypes'] = 'Episode,Movie'
-
         logger.debug('Search PlayList  with: {}', args)
         endpoint = EMBY_ENDPOINT_SEARCH.format(userid=self.auth.uid)
         items = EmbyApi.resquest_emby(endpoint, self.auth, 'GET', **args)
@@ -1258,7 +1252,7 @@ class EmbyApiPlayList(EmbyApiListBase):
 
 
 class EmbyApiMedia(EmbyApiBase):
-    """ Basic media """
+    """Basic media"""
 
     TYPE = 'unknown'
 
@@ -1589,7 +1583,7 @@ class EmbyApiMedia(EmbyApiBase):
 
     @staticmethod
     def parse_string(string: str):
-        """ Returns Relevante Information from string """
+        """Returns Relevante Information from string"""
         if not string:
             return None, None
 
@@ -1746,7 +1740,7 @@ class EmbyApiSerie(EmbyApiMedia):
 
     @staticmethod
     def parse_string(string: str, force_parse=False):
-        """ Returns Relevante Information from string """
+        """Returns Relevante Information from string"""
         if not string:
             return None, None
 
@@ -1996,7 +1990,7 @@ class EmbyApiSeason(EmbyApiMedia):
 
     @staticmethod
     def parse_string(string: str):
-        """ Returns Relevante Information from string """
+        """Returns Relevante Information from string"""
         if not string:
             return None
 
@@ -2329,7 +2323,7 @@ class EmbyApiEpisode(EmbyApiMedia):
 
     @staticmethod
     def parse_string(string: str):
-        """ Returns Relevante Information from string """
+        """Returns Relevante Information from string"""
         if not string:
             return None
 
@@ -2458,7 +2452,7 @@ class EmbyApiMovie(EmbyApiMedia):
 
     @staticmethod
     def parse_string(string: str):
-        """ Returns Relevante Information from string """
+        """Returns Relevante Information from string"""
         if not string:
             return None, None
 

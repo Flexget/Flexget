@@ -1,10 +1,10 @@
 from loguru import logger
 
-from flexget.components.emby.api_emby import EmbyAuth, EmbyApiLibrary
-from flexget.config_schema import one_or_more
 from flexget import plugin
-from flexget.event import event
+from flexget.components.emby.api_emby import EmbyApiLibrary, EmbyAuth
 from flexget.components.emby.emby_util import SCHEMA_SERVER_TAG
+from flexget.config_schema import one_or_more
+from flexget.event import event
 
 logger = logger.bind(name='emby_reload')
 

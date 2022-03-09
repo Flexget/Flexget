@@ -3,7 +3,7 @@ from argparse import ArgumentParser, ArgumentTypeError
 
 from flexget import options
 from flexget.event import event
-from flexget.terminal import TerminalTable, TerminalTableError, console, table_parser
+from flexget.terminal import TerminalTable, console, table_parser
 from flexget.utils.database import Session
 
 from . import db
@@ -23,17 +23,13 @@ def do_cli(manager, options):
 
 
 def action_all(options):
-    """ Show all regexp lists """
+    """Show all regexp lists"""
     lists = db.get_regexp_lists()
     header = ['#', 'List Name']
-    table_data = [header]
+    table = TerminalTable(*header, table_type=options.table_type)
     for regexp_list in lists:
-        table_data.append([regexp_list.id, regexp_list.name])
-    table = TerminalTable(options.table_type, table_data)
-    try:
-        console(table.output)
-    except TerminalTableError as e:
-        console('ERROR: %s' % str(e))
+        table.add_row(str(regexp_list.id), regexp_list.name)
+    console(table)
 
 
 def action_list(options):
@@ -43,19 +39,13 @@ def action_list(options):
         if not regexp_list:
             console('Could not find regexp list with name {}'.format(options.list_name))
             return
-        header = ['Regexp']
-        table_data = [header]
+        table = TerminalTable('Regexp', table_type=options.table_type)
         regexps = db.get_regexps_by_list_id(
             regexp_list.id, order_by='added', descending=True, session=session
         )
         for regexp in regexps:
-            regexp_row = [regexp.regexp or '']
-            table_data.append(regexp_row)
-    try:
-        table = TerminalTable(options.table_type, table_data)
-        console(table.output)
-    except TerminalTableError as e:
-        console('ERROR: %s' % str(e))
+            table.add_row(regexp.regexp or '')
+    console(table)
 
 
 def action_add(options):

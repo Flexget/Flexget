@@ -4,8 +4,9 @@ import os.path
 import re
 from contextlib import suppress
 from copy import copy
-from datetime import date, datetime, time
-from typing import TYPE_CHECKING, Any, List, Mapping, Optional, Union, AnyStr, Type, cast
+from datetime import date, datetime, time, timedelta
+from typing import TYPE_CHECKING, Any, AnyStr, List, Mapping, Optional, Type, Union, cast
+from unicodedata import normalize
 
 import jinja2.filters
 from dateutil import parser as dateutil_parse
@@ -38,6 +39,14 @@ logger = logger.bind(name='utils.template')
 environment: Optional['FlexGetEnvironment'] = None
 
 
+def extra_vars() -> dict:
+    return {
+        'timedelta': timedelta,
+        'utcnow': datetime.utcnow(),
+        'now': datetime.now(),
+    }
+
+
 class RenderError(Exception):
     """Error raised when there is a problem with jinja rendering."""
 
@@ -64,6 +73,8 @@ def filter_pathdir(val: Optional[str]) -> str:
 
 def filter_pathscrub(val: str, os_mode: str = None) -> str:
     """Replace problematic characters in a path."""
+    if not isinstance(val, str):
+        return val
     return pathscrub(val, os_mode)
 
 
@@ -138,6 +149,35 @@ def filter_default(value, default_value: str = '', boolean: bool = True) -> str:
 
 
 filter_d = filter_default
+
+
+def filter_asciify(text: str) -> str:
+    """Siplify text"""
+
+    if not isinstance(text, str):
+        return text
+
+    result = normalize('NFD', text)
+    result = result.encode('ascii', 'ignore')
+    result = result.decode("utf-8")
+    result = str(result)
+    return result
+
+
+def filter_strip_symbols(text: str) -> str:
+    """Strip Symbols text"""
+
+    if not isinstance(text, str):
+        return text
+
+    # Symbols that should be converted to white space
+    result = re.sub(r'[ \(\)\-_\[\]\.]+', ' ', text)
+    # Leftovers
+    result = re.sub(r"[^\w\d\s]", "", result, flags=re.UNICODE)
+    # Replace multiple white spaces with one
+    result = ' '.join(result.split())
+
+    return result
 
 
 def filter_strip_year(name: str) -> str:
@@ -279,7 +319,7 @@ def render_from_entry(
 
     # Make a copy of the Entry so we can add some more fields
     variables = copy(entry.store)
-    variables['now'] = datetime.now()
+    variables.update(extra_vars())
     # Add task name to variables, usually it's there because metainfo_task plugin, but not always
     if hasattr(entry, 'task') and entry.task is not None:
         if 'task' not in variables:
@@ -298,7 +338,8 @@ def render_from_task(template: Union[FlexGetTemplate, str], task: 'Task') -> str
     :param task: Task to render the template from.
     :return: The rendered template text.
     """
-    variables = {'task': task, 'now': datetime.now(), 'task_name': task.name}
+    variables = {'task': task, 'task_name': task.name}
+    variables.update(extra_vars())
     return render(template, variables)
 
 
@@ -314,5 +355,5 @@ def evaluate_expression(expression: str, context: Mapping) -> Any:
         # If we have a LazyDict, grab the underlying store. Our environment supports LazyFields directly
         if isinstance(context, LazyDict):
             context = context.store
-        return compiled_expr(**context)
+        return compiled_expr(**{**context, **extra_vars()})
     return None

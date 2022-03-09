@@ -3,7 +3,7 @@ from sqlalchemy import desc
 from flexget import options
 from flexget.event import event
 from flexget.manager import Session
-from flexget.terminal import TerminalTable, TerminalTableError, console, table_parser
+from flexget.terminal import TerminalTable, console, table_parser
 
 from . import db
 
@@ -17,36 +17,28 @@ def do_cli(manager, options):
         if options.task:
             query = query.filter(db.History.task.like('%' + options.task + '%'))
         query = query.order_by(desc(db.History.time)).limit(options.limit)
-        table_data = []
         if options.short:
-            table_data.append(['Time', 'Title'])
+            headers = ['Time', 'Title']
+        else:
+            headers = ['Field', 'Value']
+        title = 'Showing {} entries from History'.format(query.count())
+        table = TerminalTable(*headers, table_type=options.table_type, title=title)
         for item in reversed(query.all()):
             if not options.short:
-                table_data.append(['Task', item.task])
-                table_data.append(['Title', item.title])
-                table_data.append(['URL', item.url])
-                table_data.append(['Time', item.time.strftime("%c")])
-                table_data.append(['Details', item.details])
+                table.add_row('Task', item.task)
+                table.add_row('Title', item.title)
+                table.add_row('URL', item.url)
+                table.add_row('Time', item.time.strftime("%c"))
+                table.add_row('Details', item.details)
                 if item.filename:
-                    table_data.append(['Stored', item.filename])
-                if options.table_type != 'porcelain':
-                    table_data.append([''])
+                    table.add_row('Stored', item.filename)
+                table.rows[-1].end_section = True
             else:
-                table_data.append([item.time.strftime("%c"), item.title])
-    if not table_data:
+                table.add_row(item.time.strftime("%c"), item.title)
+    if not table.row_count:
         console('No history to display')
         return
-    title = 'Showing {} entries from History'.format(query.count())
-    if options.table_type != 'porcelain' and not options.short:
-        del table_data[-1]
-
-    try:
-        table = TerminalTable(options.table_type, table_data, title=title, wrap_columns=[1])
-        if not options.short:
-            table.table.inner_heading_row_border = False
-        console(table.output)
-    except TerminalTableError as e:
-        console('ERROR: %s' % str(e))
+    console(table)
 
 
 @event('options.register')

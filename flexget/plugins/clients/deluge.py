@@ -175,8 +175,12 @@ class InputDeluge(DelugePlugin):
                     entry['url'] = 'file://' + torrent_path
                 else:
                     logger.warning('Did not find torrent file at {}', torrent_path)
+            # Pieces is just a really long list, cluttering up the entry and --dump output
+            blacklist_fields = ['pieces']
             for key, value in torrent_dict.items():
-                # All fields provided by deluge get placed under the deluge_ namespace
+                # All fields (except a few) provided by deluge get placed under the deluge_ namespace
+                if key in blacklist_fields:
+                    continue
                 entry['deluge_' + key] = value
                 # Some fields also get special handling
                 if key in self.settings_map:
@@ -229,6 +233,7 @@ class OutputDeluge(DelugePlugin):
                     'hide_sparse_files': {'type': 'boolean'},
                     'enabled': {'type': 'boolean'},
                     'container_directory': {'type': 'string'},
+                    'force_recheck': {'type': 'boolean'},
                 },
                 'additionalProperties': False,
             },
@@ -252,6 +257,7 @@ class OutputDeluge(DelugePlugin):
         config.setdefault(
             'hide_sparse_files', False
         )  # does nothing without 'main_file_only' enabled
+        config.setdefault('force_recheck', False)
         return config
 
     def __init__(self):
@@ -371,6 +377,7 @@ class OutputDeluge(DelugePlugin):
                 ),
                 'keep_subs': entry.get('keep_subs', config.get('keep_subs', True)),
                 'container_directory': config.get('container_directory', ''),
+                'force_recheck': entry.get('force_recheck', config.get('force_recheck')),
             }
             try:
                 label = entry.render(entry.get('label') or config['label'])
@@ -481,7 +488,7 @@ class OutputDeluge(DelugePlugin):
         client.disconnect()
 
     def on_task_learn(self, task, config):
-        """ Make sure all temp files are cleaned up when entries are learned """
+        """Make sure all temp files are cleaned up when entries are learned"""
         # If download plugin is enabled, it will handle cleanup.
         if 'download' not in task.config:
             download = plugin.get('download', self)
@@ -698,6 +705,10 @@ class OutputDeluge(DelugePlugin):
                     'container_directory specified however the torrent {} does not have a directory structure; skipping folder rename',
                     entry['title'],
                 )
+
+        if opts.get('force_recheck'):
+            client.call('core.force_recheck', [torrent_id])
+            logger.debug('Forced a data recheck on {}', entry['title'])
 
 
 @event('plugin.register')

@@ -91,7 +91,7 @@ class EntryListListsAPI(APIResource):
     @api.doc(parser=entry_list_parser)
     @api.response(200, 'Successfully retrieved entry lists', entry_list_return_lists_schema)
     def get(self, session=None):
-        """ Get entry lists """
+        """Get entry lists"""
         args = entry_list_parser.parse_args()
         name = args.get('name')
 
@@ -104,7 +104,7 @@ class EntryListListsAPI(APIResource):
     @api.response(201, model=entry_list_object_schema)
     @api.response(Conflict)
     def post(self, session=None):
-        """ Create a new entry list """
+        """Create a new entry list"""
         data = request.json
         name = data.get('name')
         new_list = False
@@ -129,7 +129,7 @@ class EntryListListAPI(APIResource):
     @api.response(NotFoundError)
     @api.response(200, model=entry_list_object_schema)
     def get(self, list_id, session=None):
-        """ Get list by ID """
+        """Get list by ID"""
         try:
             list = db.get_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
@@ -139,7 +139,7 @@ class EntryListListAPI(APIResource):
     @api.response(200, description='list successfully deleted', model=base_message_schema)
     @api.response(NotFoundError)
     def delete(self, list_id, session=None):
-        """ Delete list by ID """
+        """Delete list by ID"""
         try:
             db.delete_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
@@ -166,7 +166,7 @@ class EntryListEntriesAPI(APIResource):
     @api.response(200, model=entry_lists_entries_return_schema)
     @api.doc(params={'list_id': 'ID of the list'}, parser=entries_parser)
     def get(self, list_id, session=None):
-        """ Get entries by list ID """
+        """Get entries by list ID"""
         try:
             list = db.get_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
@@ -230,7 +230,7 @@ class EntryListEntriesAPI(APIResource):
     )
     @api.response(Conflict)
     def post(self, list_id, session=None):
-        """ Create a new entry object"""
+        """Create a new entry object"""
         try:
             db.get_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
@@ -255,7 +255,7 @@ class EntryListEntryAPI(APIResource):
     @etag
     @api.response(200, model=entry_list_entry_base_schema)
     def get(self, list_id, entry_id, session=None):
-        """ Get an entry by list ID and entry ID """
+        """Get an entry by list ID and entry ID"""
         try:
             entry = db.get_entry_by_id(list_id=list_id, entry_id=entry_id, session=session)
         except NoResultFound:
@@ -265,7 +265,7 @@ class EntryListEntryAPI(APIResource):
 
     @api.response(200, model=base_message_schema)
     def delete(self, list_id, entry_id, session=None):
-        """ Delete an entry by list ID and entry ID """
+        """Delete an entry by list ID and entry ID"""
         try:
             entry = db.get_entry_by_id(list_id=list_id, entry_id=entry_id, session=session)
         except NoResultFound:
@@ -280,7 +280,7 @@ class EntryListEntryAPI(APIResource):
         description='Sent entry data will override any existing entry data the existed before'
     )
     def put(self, list_id, entry_id, session=None):
-        """ Sets entry object's entry data """
+        """Sets entry object's entry data"""
         try:
             entry = db.get_entry_by_id(list_id=list_id, entry_id=entry_id, session=session)
         except NoResultFound:

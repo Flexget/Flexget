@@ -45,7 +45,6 @@ try:
 
             flexget.main(['daemon', 'start'])
 
-
 except ImportError:
     pass
 
