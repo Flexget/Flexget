@@ -480,7 +480,7 @@ class Task:
                         if phase == 'filter':
                             logger.warning(
                                 'Task does not have any filter plugins to accept entries. '
-                                'You need at least one to accept the entries you  want.'
+                                'You need at least one to accept the entries you want.'
                             )
                         else:
                             logger.warning(
