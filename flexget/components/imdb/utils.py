@@ -298,7 +298,9 @@ class ImdbParser:
             try:
                 self.year = datetime.strptime(data['datePublished'], '%Y-%m-%d').year
             except ValueError:
-                logger.debug('Unable to parse year \'{}\' for {}', self.imdb_id, data.get['datePublished'])
+                logger.debug(
+                    'Unable to parse year \'{}\' for {}', self.imdb_id, data.get['datePublished']
+                )
         else:
             logger.debug('No year found for {}', self.imdb_id)
 
@@ -312,7 +314,11 @@ class ImdbParser:
 
         props_data = json.loads(soup.find('script', {'type': 'application/json'}).string)
 
-        if not props_data or not props_data.get('props') or not props_data.get('props').get('pageProps'):
+        if (
+            not props_data
+            or not props_data.get('props')
+            or not props_data.get('props').get('pageProps')
+        ):
             raise plugin.PluginError(
                 'IMDB parser needs updating, imdb props_data format changed. Please report on Github.'
             )
@@ -342,7 +348,9 @@ class ImdbParser:
         else:
             logger.debug('No score found for {}', self.imdb_id)
 
-        self.meta_score = above_the_fold_data.get('metacritic', {}).get('metascore', {}).get('score')
+        self.meta_score = (
+            above_the_fold_data.get('metacritic', {}).get('metascore', {}).get('score')
+        )
         if not self.meta_score:
             logger.debug('No Metacritic score found for {}', self.imdb_id)
 
