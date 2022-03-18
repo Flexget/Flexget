@@ -1,10 +1,13 @@
+from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+
 import pytest
 
-from flexget.components.imdb.utils import ImdbParser
+from flexget.utils.imdb import ImdbParser
 
 
 @pytest.mark.online
-class TestImdbParser:
+class TestImdbParser(object):
     def test_parsed_data(self):
         parser = ImdbParser()
         parser.parse('tt0114814')
@@ -23,18 +26,15 @@ class TestImdbParser:
             'nm0001629': 'Kevin Pollak',
             'nm0107808': 'Carl Bressler',
             'nm0001125': 'Benicio Del Toro',
-            'nm0000860': 'Paul Bartel',
+            'nm0000860': 'Paul Bartel'
         }, 'Actors not parsed correctly'
         assert parser.directors == {'nm0001741': 'Bryan Singer'}, 'Directors not parsed correctly'
         print(parser.genres)
-        assert len(set(parser.genres).intersection(['crime', 'mystery', 'thriller'])) == len(
-            ['crime', 'mystery', 'thriller']
-        ), 'Genres not parsed correctly'
+        assert len(set(parser.genres).intersection([u'crime', u'mystery', u'thriller'])) == \
+            len([u'crime', u'mystery', u'thriller']), 'Genres not parsed correctly'
         assert parser.imdb_id == 'tt0114814', 'ID not parsed correctly'
-        assert (
-            len(set(parser.languages).intersection(['english', 'hungarian', 'spanish', 'french']))
-            == 4
-        ), 'Languages not parsed correctly'
+        assert len(set(parser.languages).intersection(
+            ['english', 'hungarian', 'spanish', 'french'])) == 4, 'Languages not parsed correctly'
         assert parser.mpaa_rating == 'R', 'Rating not parsed correctly'
         assert parser.name == 'The Usual Suspects', 'Name not parsed correctly'
         assert parser.photo, 'Photo not parsed correctly'
@@ -49,19 +49,6 @@ class TestImdbParser:
         assert parser.url == 'https://www.imdb.com/title/tt0114814/', 'URL not parsed correctly'
         assert 400000 < parser.votes < 1000000, 'Votes not parsed correctly'
         assert parser.year == 1995, 'Year not parsed correctly'
-        expected_keywords = {
-            'criminal',
-            'suspect',
-            'criminal mastermind',
-            'dirty cop',
-            'burying a body',
-        }
-        assert len(expected_keywords.intersection(parser.plot_keywords)) == len(
-            expected_keywords
-        ), 'Parsed plot keywords missing items from the expected result'
-        assert len(expected_keywords) == len(
-            parser.plot_keywords
-        ), 'Parsed plot keyword count does not match expected.'
 
     def test_no_plot(self):
         # Make sure parser doesn't crash for movies with no plot
@@ -83,11 +70,9 @@ class TestImdbParser:
         """Make sure plot doesn't terminate at the first link. GitHub #756"""
         parser = ImdbParser()
         parser.parse('tt2503944')
-        assert parser.plot_outline == (
-            "Chef Adam Jones (Bradley Cooper) had it all - and lost it. A two-star Michelin "
-            "rockstar with the bad habits to match, the former enfant terrible of the Paris "
-            "restaurant scene did everything different every time out, and only ever cared "
-            "about the thrill of creating explosions of taste. To land his own kitchen and "
-            "that third elusive Michelin star though, he'll need the best of the best on "
-            "his side, including the beautiful Helene (Sienna Miller)."
-        )
+        assert parser.plot_outline == ("Chef Adam Jones (Bradley Cooper) had it all - and lost it. A two-star Michelin "
+                                       "rockstar with the bad habits to match, the former enfant terrible of the Paris "
+                                       "restaurant scene did everything different every time out, and only ever cared "
+                                       "about the thrill of creating explosions of taste. To land his own kitchen and "
+                                       "that third elusive Michelin star though, he'll need the best of the best on "
+                                       "his side, including the beautiful Helene (Sienna Miller).")

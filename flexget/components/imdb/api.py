@@ -1,13 +1,15 @@
+from __future__ import unicode_literals, division, absolute_import
+
 from flask import jsonify
 
-from flexget.api import APIResource, api
+from flexget.api import api, APIResource
 from flexget.api.app import etag
-from flexget.components.imdb.utils import ImdbSearch
+from flexget.utils.imdb import ImdbSearch
 
 imdb_api = api.namespace('imdb', description='IMDB lookup endpoint')
 
 
-class ObjectsContainer:
+class ObjectsContainer(object):
     movie_object = {
         'type': 'object',
         'properties': {
@@ -16,10 +18,10 @@ class ObjectsContainer:
             'name': {'type': 'string'},
             'url': {'type': 'string'},
             'year': {'type': 'number'},
-            'thumbnail': {'type': 'string'},
+            'thumbnail': {'type': 'string'}
         },
         'required': ['imdb_id', 'match', 'name', 'url', 'year'],
-        'additionalProperties': False,
+        'additionalProperties': False
     }
 
     return_object = {'type': 'array', 'items': movie_object}
@@ -31,7 +33,6 @@ return_schema = api.schema_model('imdb_search_schema', ObjectsContainer.return_o
 @imdb_api.route('/search/<string:title>/')
 @api.doc(params={'title': 'Movie name or IMDB ID'})
 class IMDBMovieSearch(APIResource):
-    # noinspection PyUnusedLocal
     @etag
     @api.response(200, model=return_schema)
     def get(self, title, session=None):
