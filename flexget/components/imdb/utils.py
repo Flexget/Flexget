@@ -291,7 +291,11 @@ class ImdbParser:
             )
 
         props_data = json.loads(soup.find('script', {'type': 'application/json'}).string)
-        if not props_data or not props_data.get('props') or not props_data.get('props').get('pageProps'):
+        if (
+            not props_data
+            or not props_data.get('props')
+            or not props_data.get('props').get('pageProps')
+        ):
             raise plugin.PluginError(
                 'IMDB parser needs updating, imdb props_data format changed. Please report on Github.'
             )
@@ -336,7 +340,9 @@ class ImdbParser:
         if rating_data:
             rating_count = rating_data.get('ratingCount')
             if rating_count:
-                self.votes = str_to_int(rating_count) if not isinstance(rating_count, int) else rating_count
+                self.votes = (
+                    str_to_int(rating_count) if not isinstance(rating_count, int) else rating_count
+                )
             else:
                 logger.debug('No votes found for {}', self.imdb_id)
 
@@ -404,7 +410,7 @@ class ImdbParser:
             logger.debug('No storyline found for {}', self.imdb_id)
 
         storyline_keywords = main_column_data.get('storylineKeywords') or {}
-        for keyword_node in (storyline_keywords.get('edges') or []):
+        for keyword_node in storyline_keywords.get('edges') or []:
             keyword = keyword_node.get('node') or {}
             if keyword:
                 self.plot_keywords.append(keyword.get('text').lower())
@@ -413,15 +419,15 @@ class ImdbParser:
         self.genres = [g['text'].lower() for g in genres]
 
         # Cast section
-        cast_data = (main_column_data.get('cast', {}) or {})
-        for cast_node in (cast_data.get('edges') or []):
+        cast_data = main_column_data.get('cast', {}) or {}
+        for cast_node in cast_data.get('edges') or []:
             actor_node = (cast_node.get('node') or {}).get('name') or {}
             actor_id = actor_node.get('id')
             actor_name = (actor_node.get('nameText') or {}).get('text')
             if actor_id and actor_name:
                 self.actors[actor_id] = actor_name
 
-        principal_cast_data = (main_column_data.get('principalCast', []) or [])
+        principal_cast_data = main_column_data.get('principalCast', []) or []
         if principal_cast_data:
             for cast_node in principal_cast_data[0].get('credits') or []:
                 actor_node = cast_node.get('name') or {}
