@@ -4,7 +4,6 @@ import random
 import re
 from datetime import datetime
 
-from bs4.element import Tag
 from loguru import logger
 
 from flexget import plugin
@@ -286,20 +285,43 @@ class ImdbParser:
             soup = get_soup(page.text)
 
         data = json.loads(soup.find('script', {'type': 'application/ld+json'}).string)
-
         if not data:
             raise plugin.PluginError(
                 'IMDB parser needs updating, imdb format changed. Please report on Github.'
             )
 
-        self.name = data['name']
+        props_data = json.loads(soup.find('script', {'type': 'application/json'}).string)
+        if not props_data or not props_data.get('props') or not props_data.get('props').get('pageProps'):
+            raise plugin.PluginError(
+                'IMDB parser needs updating, imdb props_data format changed. Please report on Github.'
+            )
 
-        if data.get('datePublished'):
-            try:
-                self.year = datetime.strptime(data['datePublished'], '%Y-%m-%d').year
-            except ValueError:
-                logger.debug('Unable to parse year \'{}\' for {}', self.imdb_id, data.get['datePublished'])
-        else:
+        above_the_fold_data = props_data['props']['pageProps'].get('aboveTheFoldData')
+        if not above_the_fold_data:
+            raise plugin.PluginError(
+                'IMDB parser needs updating, imdb above_the_fold_data format changed. Please report on Github.'
+            )
+
+        title = above_the_fold_data.get('titleText')
+        if title:
+            self.name = title.get('text')
+        if not self.name:
+            raise plugin.PluginError(
+                'IMDB parser needs updating, imdb above_the_fold_data format changed for title. Please report on Github.'
+            )
+
+        original_name = above_the_fold_data.get('originalTitleText')
+        if original_name:
+            self.original_name = original_name.get('text')
+
+        if not self.original_name:
+            logger.debug('No original title found for {}', self.imdb_id)
+
+        # NOTE: We cannot use the get default approach here .(get(x, {}))
+        # as the data returned in imdb has all fields with null values if they do not exist.
+        if above_the_fold_data.get('releaseYear'):
+            self.year = above_the_fold_data['releaseYear'].get('year')
+        if not self.year:
             logger.debug('No year found for {}', self.imdb_id)
 
         self.mpaa_rating = data.get('contentRating')
@@ -310,39 +332,25 @@ class ImdbParser:
         if not self.photo:
             logger.debug('No photo found for {}', self.imdb_id)
 
-        props_data = json.loads(soup.find('script', {'type': 'application/json'}).string)
+        rating_data = data.get('aggregateRating')
+        if rating_data:
+            rating_count = rating_data.get('ratingCount')
+            if rating_count:
+                self.votes = str_to_int(rating_count) if not isinstance(rating_count, int) else rating_count
+            else:
+                logger.debug('No votes found for {}', self.imdb_id)
 
-        if not props_data or not props_data.get('props') or not props_data.get('props').get('pageProps'):
-            raise plugin.PluginError(
-                'IMDB parser needs updating, imdb props_data format changed. Please report on Github.'
-            )
+            score = rating_data.get('ratingValue')
+            if score:
+                self.score = float(score)
+            else:
+                logger.debug('No score found for {}', self.imdb_id)
 
-        above_the_fold_data = props_data['props']['pageProps'].get('aboveTheFoldData')
-
-        if not above_the_fold_data:
-            raise plugin.PluginError(
-                'IMDB parser needs updating, imdb above_the_fold_data format changed. Please report on Github.'
-            )
-
-        if above_the_fold_data:
-            self.original_name = above_the_fold_data.get('originalTitleText', {}).get('text')
-
-        if not self.original_name:
-            logger.debug('No original title found for {}', self.imdb_id)
-
-        votes = data.get('aggregateRating', {}).get('ratingCount')
-        if votes:
-            self.votes = str_to_int(votes) if not isinstance(votes, int) else votes
-        else:
-            logger.debug('No votes found for {}', self.imdb_id)
-
-        score = data.get('aggregateRating', {}).get('ratingValue')
-        if score:
-            self.score = float(score)
-        else:
-            logger.debug('No score found for {}', self.imdb_id)
-
-        self.meta_score = above_the_fold_data.get('metacritic', {}).get('metascore', {}).get('score')
+        meta_critic = above_the_fold_data.get('metacritic')
+        if meta_critic:
+            meta_score = meta_critic.get('metascore')
+            if meta_score:
+                self.meta_score = meta_score.get('score')
         if not self.meta_score:
             logger.debug('No Metacritic score found for {}', self.imdb_id)
 
@@ -377,30 +385,47 @@ class ImdbParser:
                 'IMDB parser needs updating, imdb main_column_data format changed. Please report on Github.'
             )
 
-        for language in main_column_data.get('spokenLanguages', {}).get('spokenLanguages', []):
+        for language in (main_column_data.get('spokenLanguages') or {}).get('spokenLanguages', []):
             self.languages.append(language['text'].lower())
 
         # Storyline section
-        summary = main_column_data.get('summaries', {}).get('edges', {})
-        if summary:
-            self.plot_outline = summary[0].get('node', {}).get('plotText', {}).get('plaidHtml')
+        # NOTE: We cannot use the get default approach here .(get(x, {}))
+        # as the data returned in imdb has all fields with null values if they do not exist.
+        summaries = main_column_data.get('summaries') or {}
+        summary_edges = summaries.get('edges') or []
+        if len(summary_edges) > 0:
+            edge_node = summary_edges[0].get('node') or {}
+            plot_text = edge_node.get('plotText') or {}
+            # Strip out html
+            plot_html = get_soup(plot_text.get('plaidHtml'))
+            if plot_html:
+                self.plot_outline = plot_html.text
         if not self.plot_outline:
             logger.debug('No storyline found for {}', self.imdb_id)
 
-        for keyword_node in main_column_data.get('storylineKeywords', {}).get('edges', []):
-            keyword = keyword_node.get('node', {}).get('text')
+        storyline_keywords = main_column_data.get('storylineKeywords') or {}
+        for keyword_node in (storyline_keywords.get('edges') or []):
+            keyword = keyword_node.get('node') or {}
             if keyword:
-                self.plot_keywords.append(keyword.lower())
+                self.plot_keywords.append(keyword.get('text').lower())
 
-        genres = data.get('genre', [])
-        if not isinstance(genres, list):
-            genres = [genres]
-
-        self.genres = [g.strip().lower() for g in genres]
+        genres = (above_the_fold_data.get('genres', {}) or {}).get('genres')
+        self.genres = [g['text'].lower() for g in genres]
 
         # Cast section
-        for cast_node in main_column_data.get('cast', {}).get('edges', []):
-            actor_id = cast_node.get('node', {}).get('name', {}).get('id')
-            actor_name = cast_node.get('node', {}).get('name', {}).get('nameText', {}).get('text')
+        cast_data = (main_column_data.get('cast', {}) or {})
+        for cast_node in (cast_data.get('edges') or []):
+            actor_node = (cast_node.get('node') or {}).get('name') or {}
+            actor_id = actor_node.get('id')
+            actor_name = (actor_node.get('nameText') or {}).get('text')
             if actor_id and actor_name:
                 self.actors[actor_id] = actor_name
+
+        principal_cast_data = (main_column_data.get('principalCast', []) or [])
+        if principal_cast_data:
+            for cast_node in principal_cast_data[0].get('credits') or []:
+                actor_node = cast_node.get('name') or {}
+                actor_id = actor_node.get('id')
+                actor_name = (actor_node.get('nameText') or {}).get('text')
+                if actor_id and actor_name:
+                    self.actors[actor_id] = actor_name
