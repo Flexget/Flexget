@@ -1,13 +1,12 @@
 import sys
 from argparse import ArgumentParser, ArgumentTypeError
 
-from colorclass.toggles import disable_all_colors
 from sqlalchemy.orm.exc import NoResultFound
 
 from flexget import options
 from flexget.event import event
 from flexget.manager import Session
-from flexget.terminal import TerminalTable, TerminalTableError, colorize, console, table_parser
+from flexget.terminal import TerminalTable, colorize, console, disable_colors, table_parser
 
 from . import db
 
@@ -43,25 +42,17 @@ def list_entries(options):
     with Session() as session:
         entries = db.list_pending_entries(session=session, task_name=task_name, approved=approved)
         header = ['#', 'Task Name', 'Title', 'URL', 'Approved', 'Added']
-        table_data = [header]
+        table = TerminalTable(*header, table_type=options.table_type)
         for entry in entries:
-            table_data.append(
-                [
-                    entry.id,
-                    entry.task_name,
-                    entry.title,
-                    entry.url,
-                    colorize('green', 'Yes') if entry.approved else 'No',
-                    entry.added.strftime("%c"),
-                ]
+            table.add_row(
+                str(entry.id),
+                entry.task_name,
+                entry.title,
+                entry.url,
+                colorize('green', 'Yes') if entry.approved else 'No',
+                entry.added.strftime("%c"),
             )
-    try:
-        table = TerminalTable(
-            options.table_type, table_data, wrap_columns=[1, 2, 3], drop_columns=[5, 1, 3]
-        )
-        console(table.output)
-    except TerminalTableError as e:
-        console('ERROR: %s' % str(e))
+    console(table)
 
 
 def manage_entries(options, selection, approved):

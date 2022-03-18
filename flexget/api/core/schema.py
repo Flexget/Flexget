@@ -1,4 +1,4 @@
-from flask import jsonify, request, Response
+from flask import Response, jsonify, request
 from jsonschema import RefResolutionError
 from sqlalchemy.orm import Session
 
@@ -41,7 +41,7 @@ def rewrite_refs(schema, base_url: str):
 class SchemaAllAPI(APIResource):
     @api.response(200, model=schema_api_list)
     def get(self, session: Session = None) -> Response:
-        """ List all schema definitions """
+        """List all schema definitions"""
         schemas = []
         for path in schema_paths:
             schema = rewrite_refs(resolve_ref(path), request.url_root)
@@ -56,7 +56,7 @@ class SchemaAllAPI(APIResource):
 class SchemaAPI(APIResource):
     @api.response(200, model=schema_api_list)
     def get(self, path: str, session: Session = None) -> Response:
-        """ Get schema definition """
+        """Get schema definition"""
         try:
             schema = resolve_ref(request.full_path)
         except RefResolutionError:

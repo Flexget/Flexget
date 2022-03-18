@@ -58,7 +58,7 @@ class SchedulesAPI(APIResource):
     @etag
     @api.response(200, model=api_schedules_list_schema)
     def get(self, session=None):
-        """ List schedules """
+        """List schedules"""
         schedule_list = []
 
         schedules = self.manager.config.get('schedules', [])
@@ -82,7 +82,7 @@ class SchedulesAPI(APIResource):
     @api.response(201, model=api_schedule_schema)
     @api.response(APIError)
     def post(self, session=None):
-        """ Add new schedule """
+        """Add new schedule"""
         data = request.json
 
         schedules = self.manager.config.get('schedules', [])
@@ -119,7 +119,7 @@ class ScheduleAPI(APIResource):
     @etag
     @api.response(200, model=api_schedule_schema)
     def get(self, schedule_id, session=None):
-        """ Get schedule details """
+        """Get schedule details"""
         schedules = self.manager.config.get('schedules', [])
 
         # Checks for boolean config
@@ -154,7 +154,7 @@ class ScheduleAPI(APIResource):
     @api.validate(base_schedule_schema, description='Updated Schedule Object')
     @api.response(201, model=api_schedule_schema)
     def put(self, schedule_id, session=None):
-        """ Update schedule """
+        """Update schedule"""
         new_schedule = request.json
 
         schedules = self.manager.config.get('schedules', [])
@@ -180,7 +180,7 @@ class ScheduleAPI(APIResource):
 
     @api.response(200, description='Schedule deleted', model=base_message_schema)
     def delete(self, schedule_id, session=None):
-        """ Delete a schedule """
+        """Delete a schedule"""
         schedules = self.manager.config.get('schedules')
 
         # Checks for boolean config

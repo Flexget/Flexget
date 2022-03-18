@@ -3,9 +3,9 @@ from urllib.parse import urlencode
 from loguru import logger
 
 from flexget import plugin
+from flexget.components.sites.utils import torrent_availability
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.components.sites.utils import torrent_availability
 
 logger = logger.bind(name='from_piratebay')
 
@@ -14,18 +14,16 @@ URL = 'https://apibay.org'
 LISTS = ['top', 'top48h', 'recent']
 
 # from lowest to highest, selecting a rank automatically accept higher ranks
-RANKS = ['all', 'member', 'vip', 'trusted', 'supermod']
+RANKS = ['all', 'user', 'trusted', 'vip', 'helper', 'moderator', 'supermod']
 
 CATEGORIES = {
     'All': 0,
-
     'Audio': 100,
     'Music': 101,
     'Audio books': 102,
     'Sound clips': 103,
     'FLAC': 104,
     'Audio Other': 199,
-
     'Video': 200,
     'Movies': 201,
     'Movies DVDR': 202,
@@ -37,7 +35,6 @@ CATEGORIES = {
     'HD - TV shows': 208,
     '3D': 209,
     'Video Other': 299,
-
     'Applications': 300,
     'App Windows': 301,
     'App Mac': 302,
@@ -46,7 +43,6 @@ CATEGORIES = {
     'App IOS (iPad/iPhone)': 305,
     'App Android': 306,
     'App Other OS': 399,
-
     'Games': 400,
     'Game PC': 401,
     'Game Mac': 402,
@@ -57,7 +53,6 @@ CATEGORIES = {
     'Game IOS (iPad/iPhone)': 407,
     'Game Android': 408,
     'Game Other': 499,
-
     'Porn': 500,
     'Porn Movies': 501,
     'Porn Movies DVDR': 502,
@@ -66,7 +61,6 @@ CATEGORIES = {
     'Porn HD - Movies': 505,
     'Porn Movie clips': 506,
     'Porn Other': 599,
-
     'Other': 600,
     'E-books': 601,
     'Comics': 602,
@@ -120,13 +114,13 @@ class FromPirateBay:
         'properties': {
             'url': {'type': 'string', 'default': URL, 'format': 'url'},
             'category': {
-                        'oneOf': [
-                            {'type': 'string', 'enum': list(CATEGORIES)},
-                            {'type': 'integer'},
-                        ]
-                    },
+                'oneOf': [
+                    {'type': 'string', 'enum': list(CATEGORIES)},
+                    {'type': 'integer'},
+                ]
+            },
             'list': {'type': 'string', 'enum': list(LISTS), 'default': 'top'},
-            'rank': {'type': 'string', 'enum': list(RANKS), 'default': 'all'}
+            'rank': {'type': 'string', 'enum': list(RANKS), 'default': 'all'},
         },
         'required': ['list'],
         'additionalProperties': False,
@@ -151,7 +145,7 @@ class FromPirateBay:
                 list_url = f'{url}/precompiled/data_top100_48h_{category}.json'
             else:
                 list_url = f'{url}/precompiled/data_top100_48h.json'
-        else: # list == 'recent'
+        else:  # list == 'recent'
             if category:
                 list_url = f'{url}/q.php?q=category:{category}'
             else:
@@ -167,17 +161,15 @@ class FromPirateBay:
                 break
             if RANKS.index(result['status'].lower()) < rank:
                 # filter by rank/status, useful for recent torrents
-                logger.debug(f"{result['name']} has been dropped due to low rank ({result['status']}).")
+                logger.debug(
+                    f"{result['name']} has been dropped due to low rank ({result['status']})."
+                )
                 continue
             yield self.json_to_entry(result)
 
     @staticmethod
     def info_hash_to_magnet(info_hash: str, name: str) -> str:
-        magnet = {
-            'xt': f"urn:btih:{info_hash}",
-            'dn': name,
-            'tr': TRACKERS
-        }
+        magnet = {'xt': f"urn:btih:{info_hash}", 'dn': name, 'tr': TRACKERS}
         magnet_qs = urlencode(magnet, doseq=True, safe=':')
         magnet_uri = f"magnet:?{magnet_qs}"
         return magnet_uri

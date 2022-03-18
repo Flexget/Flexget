@@ -1,8 +1,9 @@
-name: Nightly Cron
+name: Trigger Deploy
 
 on:
   schedule:
     - cron: 0 15 * * *
+  workflow_dispatch: {}
 
 jobs:
   deploy:

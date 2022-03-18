@@ -22,7 +22,7 @@ def translate_type(type):
 
 
 class FilmwebWatchlist:
-    """"Creates an entry for each movie in your Filmweb list."""
+    """ "Creates an entry for each movie in your Filmweb list."""
 
     schema = {
         'type': 'object',

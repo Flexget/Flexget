@@ -1,9 +1,9 @@
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.components.emby.api_emby import EmbyApi, EmbyApiList, EmbyAuth
 from flexget.components.emby.emby_util import SCHEMA_SERVER_TAG
-from flexget.components.emby.api_emby import EmbyAuth, EmbyApi, EmbyApiList
+from flexget.event import event
 
 logger = logger.bind(name='emby_list')
 

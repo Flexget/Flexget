@@ -5,7 +5,7 @@ import sys
 from argparse import _UNRECOGNIZED_ARGS_ATTR, PARSER, REMAINDER, SUPPRESS, Action, ArgumentError
 from argparse import ArgumentParser as ArgParser
 from argparse import Namespace, _SubParsersAction, _VersionAction
-from typing import Any, Callable, List, Optional, TextIO, IO
+from typing import IO, Any, Callable, List, Optional, TextIO
 
 import flexget
 from flexget.entry import Entry

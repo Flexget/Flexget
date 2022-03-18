@@ -10,7 +10,7 @@ PARSER_TYPES = ['movie', 'series']
 parsers = {}
 # Mapping from parser type to the name of the default/selected parser for that type
 default_parsers = {}
-selected_parsers = {}
+selected_parsers = []
 
 
 # We need to wait until manager startup to access other plugin instances, to make sure they have all been loaded
@@ -54,13 +54,22 @@ class PluginParsing:
     def on_task_start(self, task, config):
         # Set up user selected parsers from config for this task run
         if config:
-            selected_parsers.update(config)
+            selected_parsers.append(config)
+        else:
+            selected_parsers.append({})
 
     def on_task_exit(self, task, config):
         # Restore default parsers for next task run
-        selected_parsers.clear()
+        selected_parsers.pop()
 
     on_task_abort = on_task_exit
+
+    @property
+    def selected(self) -> dict:
+        if selected_parsers:
+            return selected_parsers[-1]
+
+        return {}
 
     def parse_series(self, data, name=None, **kwargs):
         """
@@ -72,7 +81,7 @@ class PluginParsing:
 
         :returns: An object containing the parsed information. The `valid` attribute will be set depending on success.
         """
-        parser = parsers['series'][selected_parsers.get('series', default_parsers.get('series'))]
+        parser = parsers['series'][self.selected.get('series', default_parsers.get('series'))]
         return parser.parse_series(data, name=name, **kwargs)
 
     def parse_movie(self, data, **kwargs):
@@ -83,7 +92,7 @@ class PluginParsing:
 
         :returns: An object containing the parsed information. The `valid` attribute will be set depending on success.
         """
-        parser = parsers['movie'][selected_parsers.get('movie') or default_parsers['movie']]
+        parser = parsers['movie'][self.selected.get('movie') or default_parsers['movie']]
         return parser.parse_movie(data, **kwargs)
 
 

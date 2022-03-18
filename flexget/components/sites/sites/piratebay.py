@@ -1,6 +1,6 @@
 import re
-from urllib.parse import urlencode, urlparse
 from json import JSONDecodeError
+from urllib.parse import urlencode, urlparse
 
 from loguru import logger
 

@@ -1,4 +1,4 @@
-FROM docker.io/python:3-alpine
+FROM docker.io/python:3.9-alpine
 ENV PYTHONUNBUFFERED 1
 
 RUN apk add --no-cache --upgrade \
@@ -25,7 +25,7 @@ RUN wget https://github.com/Flexget/webui/releases/latest/download/dist.zip && \
     unzip dist.zip && \
     rm dist.zip
 
-FROM docker.io/python:3-alpine
+FROM docker.io/python:3.9-alpine
 ENV PYTHONUNBUFFERED 1
 
 RUN apk add --no-cache --upgrade \

@@ -47,6 +47,16 @@ class TestManualAutomatic:
         assert task.aborted
         assert not task.find_entry(title='nodownload'), 'Manual tasks downloaded on automatic run'
 
+    def test_manual_with_startasks(self, execute_task):
+        """
+        Specifying just '*' as the tasks option should be considered
+        the same as not specifying any specific tasks.
+        """
+        execute_task
+        task = execute_task('test', abort=True, options={'tasks': ['*'], 'allow_manual': True})
+        assert task.aborted
+        assert not task.find_entry(title='nodownload'), 'Manual tasks downloaded on automatic run'
+
 
 class TestManualOnlytask:
     """

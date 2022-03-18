@@ -90,7 +90,7 @@ class MovieListMovie(Base):
 
     @property
     def identifiers(self):
-        """ Return a dict of movie identifiers """
+        """Return a dict of movie identifiers"""
         return {identifier.id_name: identifier.id_value for identifier in self.ids}
 
 

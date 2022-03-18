@@ -1006,8 +1006,8 @@ def get_item_from_cache(table, session, title=None, year=None, trakt_ids=None):
             .first()
         )
     elif title:
-        title, y = split_title_year(title)
-        year = year or y
+        if not year:
+            title, year = split_title_year(title)
         query = session.query(table).filter(table.title == title)
         if year:
             query = query.filter(table.year == year)

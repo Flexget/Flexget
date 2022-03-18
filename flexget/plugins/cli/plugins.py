@@ -1,19 +1,18 @@
-from colorclass.toggles import disable_all_colors
 from loguru import logger
 
 from flexget import options
 from flexget.event import event
 from flexget.plugin import get_plugins
-from flexget.terminal import TerminalTable, TerminalTableError, colorize, console, table_parser
+from flexget.terminal import TerminalTable, colorize, console, disable_colors, table_parser
 
 logger = logger.bind(name='plugins')
 
 
 def plugins_summary(manager, options):
     if options.table_type == 'porcelain':
-        disable_all_colors()
+        disable_colors()
     header = ['Keyword', 'Interfaces', 'Phases', 'Flags']
-    table_data = [header]
+    table = TerminalTable(*header, table_type=options.table_type)
     for plugin in sorted(get_plugins(phase=options.phase, interface=options.interface)):
         if options.builtins and not plugin.builtin:
             continue
@@ -35,15 +34,11 @@ def plugins_summary(manager, options):
             roles.append('{0}({1})'.format(phase, priority))
 
         name = colorize('green', plugin.name) if 'builtin' in flags else plugin.name
-        table_data.append([name, ', '.join(plugin.interfaces), ', '.join(roles), ', '.join(flags)])
+        table.add_row(name, ', '.join(plugin.interfaces), ', '.join(roles), ', '.join(flags))
 
-    try:
-        table = TerminalTable(options.table_type, table_data, wrap_columns=[1, 2])
-        console(table.output)
-    except TerminalTableError as e:
-        console('ERROR: %s' % str(e))
-        return
-    console(colorize('green', ' Built-in plugins'))
+    table.caption = colorize('green', ' Built-in plugins')
+    table.caption_justify = 'left'
+    console(table)
 
 
 @event('options.register')

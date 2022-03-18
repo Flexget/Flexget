@@ -36,9 +36,6 @@ class FilterIf:
         eval_locals.update(
             {
                 'has_field': lambda f: f in entry,
-                'timedelta': datetime.timedelta,
-                'utcnow': datetime.datetime.utcnow(),
-                'now': datetime.datetime.now(),
             }
         )
         try:

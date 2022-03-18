@@ -1,3 +1,4 @@
+import argparse
 import itertools
 import logging
 import os
@@ -7,7 +8,7 @@ import sys
 from contextlib import contextmanager
 from http import client
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional, Union
 from unittest import mock
 
 import flask
@@ -21,7 +22,9 @@ from vcr import VCR
 from vcr.stubs import VCRHTTPConnection, VCRHTTPSConnection
 
 import flexget.log
+from flexget import plugin
 from flexget.api import api_app
+from flexget.event import event
 from flexget.manager import Manager, Session
 from flexget.plugin import load_plugins
 from flexget.task import Task, TaskAbort
@@ -79,11 +82,15 @@ def execute_task(manager: Manager) -> Callable[..., Task]:
     A function that can be used to execute and return a named task in `config` argument.
     """
 
-    def execute(task_name: str, abort: bool = False, options: bool = None) -> Task:
+    def execute(
+        task_name: str, abort: bool = False, options: Union[dict, argparse.Namespace] = None
+    ) -> Task:
         """
         Use to execute one test task from config.
 
+        :param task_name: Name of task to execute.
         :param abort: If `True` expect (and require) this task to abort.
+        :param options: Options for the execution.
         """
         logger.info('********** Running task: {} ********** ', task_name)
         config = manager.config['tasks'][task_name]
@@ -368,6 +375,31 @@ class MockManager(Manager):
     def shutdown(self, finish_queue=True):
         super().shutdown(finish_queue=finish_queue)
         self._shutdown()
+
+
+# Perhaps this bit should go somewhere else... The way reruns work can be complicated, and was causing issues in
+# some cases. This plugin should run on all tests in the suite, to make sure certain phases aren't getting
+# called twice. https://github.com/Flexget/Flexget/issues/3254
+class DoublePhaseChecker:
+    @staticmethod
+    def on_phase(task, phase):
+        if getattr(task, f'did_{phase}', None):
+            raise Exception(f'{phase} phase should not run twice')
+        setattr(task, f'did_{phase}', True)
+
+    def on_task_start(self, task, config):
+        self.on_phase(task, 'start')
+
+    def on_task_prepare(self, task, config):
+        self.on_phase(task, 'prepare')
+
+    def on_task_exit(self, task, config):
+        self.on_phase(task, 'exit')
+
+
+@event('plugin.register')
+def register_plugin():
+    plugin.register(DoublePhaseChecker, 'test_dobule_phase', api_ver=2, debug=True, builtin=True)
 
 
 class APIClient:

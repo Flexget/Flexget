@@ -17,7 +17,7 @@ disk_stats_tuple = namedtuple(
 
 
 def os_disk_stats(folder):
-    """ Return drive free, used and total bytes """
+    """Return drive free, used and total bytes"""
     if os.name == 'nt':
         import ctypes
 

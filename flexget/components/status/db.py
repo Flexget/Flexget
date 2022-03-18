@@ -76,16 +76,19 @@ class TaskExecution(Base):
     abort_reason = Column(String, nullable=True)
 
     def __repr__(self):
-        return '<TaskExecution(task_id=%s,start=%s,end=%s,succeeded=%s,p=%s,a=%s,r=%s,f=%s,reason=%s)>' % (
-            self.task_id,
-            self.start,
-            self.end,
-            self.succeeded,
-            self.produced,
-            self.accepted,
-            self.rejected,
-            self.failed,
-            self.abort_reason,
+        return (
+            '<TaskExecution(task_id=%s,start=%s,end=%s,succeeded=%s,p=%s,a=%s,r=%s,f=%s,reason=%s)>'
+            % (
+                self.task_id,
+                self.start,
+                self.end,
+                self.succeeded,
+                self.produced,
+                self.accepted,
+                self.rejected,
+                self.failed,
+                self.abort_reason,
+            )
         )
 
     def to_dict(self):

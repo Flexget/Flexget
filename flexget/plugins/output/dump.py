@@ -1,8 +1,10 @@
 from loguru import logger
+from rich.highlighter import ReprHighlighter
+from rich.pretty import Pretty, is_expandable
 
 from flexget import options, plugin
 from flexget.event import event
-from flexget.terminal import console
+from flexget.terminal import TerminalTable, console
 
 logger = logger.bind(name='dump')
 
@@ -28,41 +30,60 @@ def dump(entries, debug=False, eval_lazy=False, trace=False, title_only=False):
             return (2,)
         return 3, field
 
+    highlighter = ReprHighlighter()
+
     for entry in entries:
+        entry_table = TerminalTable(
+            'field',
+            ':',
+            'value',
+            show_header=False,
+            show_edge=False,
+            pad_edge=False,
+            collapse_padding=True,
+            box=None,
+            padding=0,
+        )
         for field in sorted(entry, key=sort_key):
             if field.startswith('_') and not debug:
                 continue
             if title_only and field != 'title':
                 continue
             if entry.is_lazy(field) and not eval_lazy:
-                value = '<LazyField - value will be determined when it is accessed>'
+                renderable = (
+                    '[italic]<LazyField - value will be determined when it is accessed>[/italic]'
+                )
             else:
                 try:
                     value = entry[field]
                 except KeyError:
-                    value = '<LazyField - lazy lookup failed>'
-            if isinstance(value, str):
-                try:
-                    console('%-17s: %s' % (field, value.replace('\r', '').replace('\n', '')))
-                except Exception:
-                    console('%-17s: %r (warning: unable to print)' % (field, value))
-            elif isinstance(value, list):
-                console('%-17s: %s' % (field, '[%s]' % ', '.join(str(v) for v in value)))
-            elif isinstance(value, (int, float, dict)):
-                console('%-17s: %s' % (field, value))
-            elif value is None:
-                console('%-17s: %s' % (field, value))
-            else:
-                try:
-                    value = str(entry[field])
-                    console('%-17s: %s' % (field, value.replace('\r', '').replace('\n', '')))
-                except Exception:
-                    if debug:
-                        console('%-17s: [not printable] (%r)' % (field, value))
+                    renderable = '[italic]<LazyField - lazy lookup failed>[/italic]'
+                else:
+                    if field.rsplit('_', maxsplit=1)[-1] == 'url':
+                        renderable = f'[link={value}][repr.url]{value}[/repr.url][/link]'
+                    elif isinstance(value, str):
+                        renderable = value.replace('\r', '').replace('\n', '')
+                    elif is_expandable(value):
+                        renderable = Pretty(value)
+                    else:
+                        try:
+                            renderable = highlighter(str(value))
+                        except Exception:
+                            renderable = f'[[i]not printable[/i]] ({repr(value)})'
+            entry_table.add_row(f'{field}', ': ', renderable)
+        console(entry_table)
         if trace:
-            console('-- Processing trace:')
+            console('── Processing trace:', style='italic')
+            trace_table = TerminalTable(
+                'Plugin',
+                'Operation',
+                'Message',
+                show_edge=False,
+                pad_edge=False,
+            )
             for item in entry.traces:
-                console('%-10s %-7s %s' % (item[0], '' if item[1] is None else item[1], item[2]))
+                trace_table.add_row(item[0], '' if item[1] is None else item[1], item[2])
+            console(trace_table)
         if not title_only:
             console('')
 
@@ -82,36 +103,19 @@ class OutputDump:
         eval_lazy = 'eval' in task.options.dump_entries
         trace = 'trace' in task.options.dump_entries
         title = 'title' in task.options.dump_entries
-        states = ['accepted', 'rejected', 'failed', 'undecided']
-        dumpstates = [s for s in states if s in task.options.dump_entries]
-        specificstates = dumpstates
+        states = {'accepted': 'green', 'rejected': 'red', 'failed': 'yellow', 'undecided': 'none'}
+        dumpstates = [s for s in states if getattr(task, s)]
+        specificstates = [s for s in states if s in task.options.dump_entries]
+        if specificstates:
+            dumpstates = specificstates
+        for state in dumpstates:
+            console.rule(state.title(), style=states[state])
+            if getattr(task, state):
+                dump(getattr(task, state), task.options.debug, eval_lazy, trace, title)
+            else:
+                console(f'No {state} entries', style='italic')
         if not dumpstates:
-            dumpstates = states
-        undecided = [entry for entry in task.all_entries if entry.undecided]
-        if 'undecided' in dumpstates:
-            if undecided:
-                console('-- Undecided: --------------------------')
-                dump(undecided, task.options.debug, eval_lazy, trace, title)
-            elif specificstates:
-                console('No undecided entries')
-        if 'accepted' in dumpstates:
-            if task.accepted:
-                console('-- Accepted: ---------------------------')
-                dump(task.accepted, task.options.debug, eval_lazy, trace, title)
-            elif specificstates:
-                console('No accepted entries')
-        if 'rejected' in dumpstates:
-            if task.rejected:
-                console('-- Rejected: ---------------------------')
-                dump(task.rejected, task.options.debug, eval_lazy, trace, title)
-            elif specificstates:
-                console('No rejected entries')
-        if 'failed' in dumpstates:
-            if task.failed:
-                console('-- Failed: -----------------------------')
-                dump(task.failed, task.options.debug, eval_lazy, trace, title)
-            elif specificstates:
-                console('No failed entries')
+            console('No entries were produced', style='italic')
 
 
 @event('plugin.register')
@@ -124,7 +128,7 @@ def register_parser_arguments():
     options.get_parser('execute').add_argument(
         '--dump',
         nargs='*',
-        choices=['eval', 'trace', 'accepted', 'rejected', 'undecided', 'title'],
+        choices=['eval', 'trace', 'accepted', 'rejected', 'undecided', 'failed', 'title'],
         dest='dump_entries',
         help=(
             'display all entries in task with fields they contain, '

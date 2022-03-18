@@ -480,7 +480,7 @@ class Task:
                         if phase == 'filter':
                             logger.warning(
                                 'Task does not have any filter plugins to accept entries. '
-                                'You need at least one to accept the entries you  want.'
+                                'You need at least one to accept the entries you want.'
                             )
                         else:
                             logger.warning(
@@ -546,7 +546,7 @@ class Task:
         try:
             result = method(*args, **kwargs)
             # We exhaust any iterator inputs here to make sure we catch exceptions properly.
-            if isinstance(result, collections.abc.Iterator):
+            if isinstance(result, collections.abc.Iterable):
                 result = list(result)
             return result
         except TaskAbort:
@@ -596,8 +596,10 @@ class Task:
         :param str plugin: Plugin name
         :param str reason: Why the rerun is done
         """
-        msg = 'Plugin {0} has requested task to be ran again after execution has completed.'.format(
-            self.current_plugin if plugin is None else plugin
+        msg = (
+            'Plugin {0} has requested task to be ran again after execution has completed.'.format(
+                self.current_plugin if plugin is None else plugin
+            )
         )
         if reason:
             msg += ' Reason: {0}'.format(reason)
@@ -681,23 +683,26 @@ class Task:
                     continue
                 if phase in ('start', 'prepare') and self.is_rerun:
                     logger.debug('skipping phase {} during rerun', phase)
-                elif phase == 'exit' and self._rerun and self._rerun_count < self.max_reruns:
-                    logger.debug('not running task_exit yet because task will rerun')
-                else:
-                    # run all plugins with this phase
-                    self.__run_task_phase(phase)
-                    if phase == 'start':
-                        # Store a copy of the config state after start phase to restore for reruns
-                        self.prepared_config = copy.deepcopy(self.config)
+                    continue
+                if phase == 'exit':
+                    # Make sure we run the entry complete hook before exit phase. These hooks may call for a rerun,
+                    # which would mean we should skip the exit phase during this run.
+                    for entry in self.all_entries:
+                        entry.complete()
+                    if self._rerun and self._rerun_count < self.max_reruns:
+                        logger.debug('not running task_exit yet because task will rerun')
+                        continue
+                # run all plugins with this phase
+                self.__run_task_phase(phase)
+                if phase == 'start':
+                    # Store a copy of the config state after start phase to restore for reruns
+                    self.prepared_config = copy.deepcopy(self.config)
         except TaskAbort:
             try:
                 self.__run_task_phase('abort')
             except TaskAbort as e:
                 logger.exception('abort handlers aborted: {}', e)
             raise
-        else:
-            for entry in self.all_entries:
-                entry.complete()
 
     @use_task_logging
     def execute(self):

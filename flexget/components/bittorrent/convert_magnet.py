@@ -38,7 +38,11 @@ class ConvertMagnet:
         if lt_version > [0, 16, 13, 0] and lt_version < [1, 1, 3, 0]:
             # for some reason the info_hash needs to be bytes but it's a struct called sha1_hash
             params['info_hash'] = params['info_hash'].to_bytes()
-        params.url = magnet_uri
+        if lt_version < [1, 2]:
+            # for versions < 1.2
+            params['url'] = magnet_uri
+        else:
+            params.url = magnet_uri
         handle = session.add_torrent(params)
         logger.debug('Acquiring torrent metadata for magnet {}', magnet_uri)
         timeout_value = timeout

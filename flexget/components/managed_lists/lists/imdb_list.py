@@ -2,6 +2,10 @@ import csv
 import re
 from collections.abc import MutableSet
 from datetime import datetime
+from json import JSONDecodeError
+from json import load as json_load
+from json import loads as json_loads
+from pathlib import Path
 
 from loguru import logger
 from requests.exceptions import RequestException
@@ -25,7 +29,7 @@ IMMUTABLE_LISTS = ['ratings', 'checkins']
 
 Base = db_schema.versioned_base('imdb_list', 0)
 
-MOVIE_TYPES = ['documentary', 'tvmovie', 'video', 'short', 'movie']
+MOVIE_TYPES = ['documentary', 'tvmovie', 'video', 'short', 'movie', 'tvspecial']
 SERIES_TYPES = ['tvseries', 'tvepisode', 'tvminiseries']
 OTHER_TYPES = ['videogame']
 
@@ -64,12 +68,26 @@ class ImdbEntrySet(MutableSet):
         'type': 'object',
         'properties': {
             'login': {'type': 'string'},
-            'password': {'type': 'string'},
+            'cookies': {
+                'oneOf': [
+                    {'type': 'string', 'format': 'file'},
+                    {'type': 'string', 'format': 'json'},
+                    {
+                        'type': 'object',
+                        'properties': {
+                            'ubid-main': {'type': 'string'},
+                            'at-main': {'type': 'string'},
+                        },
+                        'required': ['ubid-main', 'at-main'],
+                    },
+                ],
+                'error_oneOf': 'Please use a dict with the cookies, a string in json format, or a path to the file',
+            },
             'list': {'type': 'string'},
             'force_language': {'type': 'string', 'default': 'en-us'},
         },
         'additionalProperties': False,
-        'required': ['login', 'password', 'list'],
+        'required': ['login', 'cookies', 'list'],
     }
 
     def __init__(self, config):
@@ -79,10 +97,48 @@ class ImdbEntrySet(MutableSet):
         self._session.headers.update({'Accept-Language': config.get('force_language', 'en-us')})
         self.user_id = None
         self.list_id = None
-        self.cookies = None
+        self.cookies = self.parse_cookies(config.get('cookies', None))
         self.hidden_value = None
         self._items = None
         self._authenticated = False
+
+    def parse_cookies(self, cookies):
+        required_fields = ['ubid-main', 'at-main']
+
+        if not cookies:
+            raise PluginError('Please inform the login cookies')
+
+        if isinstance(cookies, dict):
+            new_cookie = cookies
+        elif isinstance(cookies, str):
+            try:
+                new_cookie = json_loads(cookies)
+            except JSONDecodeError as e:
+                new_cookie = self.parse_cookies_file(cookies)
+
+        if not new_cookie:
+            raise PluginError(
+                'Invalid cookies format, please add a dict, a string in json or a path to a file in json'
+            )
+
+        for field in required_fields:
+            if field not in new_cookie:
+                raise PluginError(f'Invalid cookies format, missing \'{field}\'')
+
+        return new_cookie
+
+    def parse_cookies_file(self, path):
+        file = Path(path)
+        if not file.exists():
+            raise PluginError('Invalid cookies file format, file does not exist')
+
+        with file.open(encoding='utf-8') as data:
+            try:
+                contents = json_load(data)
+            except JSONDecodeError as e:
+                raise PluginError('Invalid cookies file format, file not in json')
+
+        return contents
 
     @property
     def session(self):
@@ -117,21 +173,33 @@ class ImdbEntrySet(MutableSet):
         """Authenticates a session with IMDB, and grabs any IDs needed for getting/modifying list."""
         cached_credentials = False
         with Session() as session:
-            user = (
-                session.query(IMDBListUser)
-                .filter(IMDBListUser.user_name == self.config.get('login'))
-                .one_or_none()
-            )
-            if user and user.cookies and user.user_id:
-                logger.debug('login credentials found in cache, testing')
-                self.user_id = user.user_id
-                if not self.get_user_id_and_hidden_value(cookies=user.cookies):
-                    logger.debug('cache credentials expired')
-                    user.cookies = None
-                    self._session.cookies.clear()
-                else:
-                    self.cookies = user.cookies
-                    cached_credentials = True
+            if self.cookies:
+                if not self.user_id:
+                    self.user_id = self.get_user_id_and_hidden_value(self.cookies)
+                if not self.user_id:
+                    raise PluginError(
+                        'Not possible to retrive userid, please check cookie information'
+                    )
+
+                user = IMDBListUser(self.config['login'], self.user_id, self.cookies)
+                self.cookies = user.cookies
+                cached_credentials = True
+            else:
+                user = (
+                    session.query(IMDBListUser)
+                    .filter(IMDBListUser.user_name == self.config.get('login'))
+                    .one_or_none()
+                )
+                if user and user.cookies and user.user_id:
+                    logger.debug('login credentials found in cache, testing')
+                    self.user_id = user.user_id
+                    if not self.get_user_id_and_hidden_value(cookies=user.cookies):
+                        logger.debug('cache credentials expired')
+                        user.cookies = None
+                        self._session.cookies.clear()
+                    else:
+                        self.cookies = user.cookies
+                        cached_credentials = True
             if not cached_credentials:
                 logger.debug('user credentials not found in cache or outdated, fetching from IMDB')
                 url_credentials = (

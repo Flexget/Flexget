@@ -195,6 +195,13 @@ class Decompress:
             archive.close()
 
     @plugin.priority(plugin.PRIORITY_FIRST)
+    def on_task_start(self, task, config):
+        try:
+            archiveutil.RarArchive.check_import()
+        except archiveutil.NeedRarFile as e:
+            raise plugin.PluginError(e)
+
+    @plugin.priority(plugin.PRIORITY_FIRST)
     def on_task_output(self, task, config):
         """Task handler for archive_extract"""
         if isinstance(config, bool) and not config:

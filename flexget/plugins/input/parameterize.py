@@ -1,11 +1,11 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from __future__ import absolute_import, division, unicode_literals
 
 import logging
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from flexget import plugin
 from flexget.event import event
-from flexget.utils.template import render_from_entry, RenderError
+from flexget.utils.template import RenderError, render_from_entry
 
 log = logging.getLogger('parameterize')
 

@@ -1,5 +1,5 @@
-from unicodedata import normalize
 import re
+from unicodedata import normalize
 
 SCHEMA_SERVER = {
     'oneOf': [
@@ -124,7 +124,7 @@ field_map = {
 
 
 def simplify_text(text: str) -> str:
-    """ Siplify text """
+    """Siplify text"""
 
     if not isinstance(text, str):
         return text

@@ -1,5 +1,4 @@
 import os
-from json import loads, JSONDecodeError
 
 from loguru import logger
 from requests import Session
@@ -25,6 +24,7 @@ class OutputQBitTorrent:
         verify_cert: <VERIFY> (default: True)
         path: <OUTPUT_DIR> (default: (none))
         label: <LABEL> (default: (none))
+        tags: <TAGS> (default: (none))
         maxupspeed: <torrent upload speed limit> (default: 0)
         maxdownspeed: <torrent download speed limit> (default: 0)
         add_paused: <ADD_PAUSED> (default: False)
@@ -44,6 +44,7 @@ class OutputQBitTorrent:
                     'verify_cert': {'type': 'boolean'},
                     'path': {'type': 'string'},
                     'label': {'type': 'string'},
+                    'tags': {'type': 'array', 'items': {'type': 'string'}},
                     'maxupspeed': {'type': 'integer'},
                     'maxdownspeed': {'type': 'integer'},
                     'fail_html': {'type': 'boolean'},
@@ -69,11 +70,12 @@ class OutputQBitTorrent:
         try:
             response = self.session.request(method, url, **kwargs)
             if response.text == "Ok.":
-                return response
+                return True
             msg = msg_on_fail if msg_on_fail else f'Failure. URL: {url}, data: {kwargs}'
         except RequestException as e:
             msg = str(e)
-        raise plugin.PluginError(f'Error when trying to send request to qBittorrent: {msg}')
+        logger.error('Error when trying to send request to qBittorrent: {}', msg)
+        return False
 
     def check_api_version(self, msg_on_fail, verify=True):
         try:
@@ -114,13 +116,14 @@ class OutputQBitTorrent:
         self.check_api_version('Check API version failed.', verify=config['verify_cert'])
         if config.get('username') and config.get('password'):
             data = {'username': config['username'], 'password': config['password']}
-            self._request(
+            if not self._request(
                 'post',
                 self.url + self.api_url_login,
                 data=data,
                 msg_on_fail='Authentication failed.',
                 verify=config['verify_cert'],
-            )
+            ):
+                raise plugin.PluginError('Not connected.')
         logger.debug('Successfully connected to qBittorrent')
         self.connected = True
 
@@ -133,6 +136,8 @@ class OutputQBitTorrent:
             return False
 
         hash_torrent = hash_torrent.lower()
+
+        logger.debug(f'Checking if torrent with hash {repr(hash)} already in session.')
 
         url = f'{self.url}{self.api_url_info}'
         params = {'hashes': hash_torrent}
@@ -164,35 +169,41 @@ class OutputQBitTorrent:
 
         return False
 
-    def add_torrent_file(self, file_path, data, verify_cert):
+    def add_torrent_file(self, entry, data, verify_cert):
+        file_path = entry['file']
         if not self.connected:
             raise plugin.PluginError('Not connected.')
 
         multipart_data = {k: (None, v) for k, v in data.items()}
         with open(file_path, 'rb') as f:
             multipart_data['torrents'] = f
-            self._request(
+            if not self._request(
                 'post',
                 self.url + self.api_url_upload,
                 msg_on_fail='Failed to add file to qBittorrent',
                 files=multipart_data,
                 verify=verify_cert,
-            )
+            ):
+                entry.fail(f'Error adding file `{file_path}` to qBittorrent')
+                return
         logger.debug('Added torrent file {} to qBittorrent', file_path)
 
-    def add_torrent_url(self, url, data, verify_cert):
+    def add_torrent_url(self, entry, data, verify_cert):
+        url = entry['url']
         if not self.connected:
             raise plugin.PluginError('Not connected.')
 
         data['urls'] = url
         multipart_data = {k: (None, v) for k, v in data.items()}
-        self._request(
+        if not self._request(
             'post',
             self.url + self.api_url_download,
-            msg_on_fail='Failed to add file to qBittorrent',
+            msg_on_fail=f'Failed to add url to qBittorrent: {url}',
             files=multipart_data,
             verify=verify_cert,
-        )
+        ):
+            entry.fail(f'Error adding url `{url}` to qBittorrent')
+            return
         logger.debug('Added url {} to qBittorrent', url)
 
     @staticmethod
@@ -205,6 +216,7 @@ class OutputQBitTorrent:
         config.setdefault('use_ssl', False)
         config.setdefault('verify_cert', True)
         config.setdefault('label', '')
+        config.setdefault('tags', [])
         config.setdefault('maxupspeed', 0)
         config.setdefault('maxdownspeed', 0)
         config.setdefault('fail_html', True)
@@ -225,6 +237,14 @@ class OutputQBitTorrent:
             if label:
                 form_data['label'] = label  # qBittorrent v3.3.3-
                 form_data['category'] = label  # qBittorrent v3.3.4+
+
+            tags = entry.get('tags', []) + config.get('tags', [])
+            if tags:
+                try:
+                    form_data['tags'] = entry.render(",".join(tags))
+                except RenderError as e:
+                    logger.error('Error rendering tags for {}: {}', entry['title'], e)
+                    form_data['tags'] = ",".join(tags)
 
             add_paused = entry.get('add_paused', config.get('add_paused'))
             if add_paused:
@@ -253,6 +273,7 @@ class OutputQBitTorrent:
                     logger.info('Url: {}', entry.get('url'))
                 logger.info('Save path: {}', form_data.get('savepath'))
                 logger.info('Label: {}', form_data.get('label'))
+                logger.info('Tags: {}', form_data.get('tags'))
                 logger.info('Paused: {}', form_data.get('paused', 'false'))
                 logger.info('Skip Hash Check: {}', form_data.get('skip_checking', 'false'))
                 if maxupspeed:
@@ -276,9 +297,9 @@ class OutputQBitTorrent:
                     logger.debug('temp: {}', ', '.join(os.listdir(tmp_path)))
                     entry.fail("Downloaded temp file '%s' doesn't exist!?" % entry['file'])
                     continue
-                self.add_torrent_file(entry['file'], form_data, config['verify_cert'])
+                self.add_torrent_file(entry, form_data, config['verify_cert'])
             else:
-                self.add_torrent_url(entry['url'], form_data, config['verify_cert'])
+                self.add_torrent_url(entry, form_data, config['verify_cert'])
 
     @plugin.priority(120)
     def on_task_download(self, task, config):

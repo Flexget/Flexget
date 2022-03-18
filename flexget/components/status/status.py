@@ -1,5 +1,4 @@
 import datetime
-from datetime import timedelta
 
 from loguru import logger
 
@@ -54,24 +53,6 @@ class Status:
             session.merge(self.execution)
 
     on_task_abort = on_task_exit
-
-
-@event('manager.db_cleanup')
-def db_cleanup(manager, session):
-    # Purge all status data for non existing tasks
-    for status_task in session.query(db.StatusTask).all():
-        if status_task.name not in manager.config['tasks']:
-            logger.verbose('Purging obsolete status data for task {}', status_task.name)
-            session.delete(status_task)
-
-    # Purge task executions older than 1 year
-    result = (
-        session.query(db.TaskExecution)
-        .filter(db.TaskExecution.start < datetime.datetime.now() - timedelta(days=365))
-        .delete()
-    )
-    if result:
-        logger.verbose('Removed {} task executions from history older than 1 year', result)
 
 
 @event('plugin.register')

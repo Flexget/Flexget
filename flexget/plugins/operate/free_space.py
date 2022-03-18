@@ -7,9 +7,12 @@ from flexget.event import event
 
 logger = logger.bind(name='free_space')
 
+ABORT_BELOW = 'below'
+ABORT_ABOVE = 'above'
+
 
 def get_free_space(config, task):
-    """ Return folder/drive free space (in megabytes)"""
+    """Return folder/drive free space (in megabytes)"""
     if 'host' in config:
         import paramiko
 
@@ -17,10 +20,12 @@ def get_free_space(config, task):
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         try:
             ssh.connect(
-                config['host'],
-                config['port'],
-                config['user'],
-                config['ssh_key_filepath'],
+                config.get('host'),
+                config.get('port', 22),
+                config.get('user'),
+                config.get('password', None),
+                config.get('pkey', None),
+                config.get('ssh_key_filepath'),
                 timeout=5000,
             )
         except Exception as e:
@@ -67,6 +72,11 @@ class PluginFreeSpace:
                 'type': 'object',
                 'properties': {
                     'space': {'type': 'number'},
+                    'abort_if': {
+                        'type': 'string',
+                        'enum': [ABORT_BELOW, ABORT_ABOVE],
+                        'default': ABORT_BELOW,
+                    },
                     'path': {'type': 'string'},
                     'port': {'type': 'integer', 'default': 22},
                     'host': {'type': 'string'},
@@ -88,22 +98,26 @@ class PluginFreeSpace:
         # Use config path if none is specified
         if not config.get('path'):
             config['path'] = task.manager.config_base
+
         return config
 
     @plugin.priority(plugin.PRIORITY_FIRST)
     def on_task_download(self, task, config):
         config = self.prepare_config(config, task)
-        # Only bother aborting if there were accepted entries this run.
-        if not task.accepted:
-            return
 
         free_space = get_free_space(config, task)
         space = config['space']
         path = config['path']
-        if free_space < space:
+        abort_if = config['abort_if']
+
+        if free_space < space and abort_if == ABORT_BELOW:
             logger.error('Less than {} MB of free space in {} aborting task.', space, path)
             # backlog plugin will save and restore the task content, if available
             task.abort(f"Less than {space} MB of free space in {path}")
+        elif free_space > space and abort_if == ABORT_ABOVE:
+            logger.error('Over than {} MB of free space in {} aborting task.', space, path)
+            # backlog plugin will save and restore the task content, if available
+            task.abort(f"Over than {space} MB of free space in {path}")
 
 
 @event('plugin.register')

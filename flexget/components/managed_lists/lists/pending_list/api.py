@@ -125,7 +125,7 @@ class PendingListListsAPI(APIResource):
     @api.doc(parser=list_parser)
     @api.response(200, 'Successfully retrieved pending lists', pending_list_return_lists_schema)
     def get(self, session=None):
-        """ Get pending lists """
+        """Get pending lists"""
         args = list_parser.parse_args()
         name = args.get('name')
 
@@ -139,7 +139,7 @@ class PendingListListsAPI(APIResource):
     @api.response(201, model=pending_list_object_schema)
     @api.response(Conflict)
     def post(self, session=None):
-        """ Create a new pending list """
+        """Create a new pending list"""
         data = request.json
         name = data.get('name')
 
@@ -166,7 +166,7 @@ class PendingListListAPI(APIResource):
     @api.response(NotFoundError)
     @api.response(200, model=pending_list_object_schema)
     def get(self, list_id, session=None):
-        """ Get pending list by ID """
+        """Get pending list by ID"""
         try:
             list = db.get_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
@@ -176,7 +176,7 @@ class PendingListListAPI(APIResource):
     @api.response(200, description='list successfully deleted', model=base_message_schema)
     @api.response(NotFoundError)
     def delete(self, list_id, session=None):
-        """ Delete pending list by ID """
+        """Delete pending list by ID"""
         try:
             db.delete_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
@@ -204,7 +204,7 @@ class PendingListEntriesAPI(APIResource):
     @etag
     @api.response(200, model=pending_lists_entries_return_schema)
     def get(self, list_id, session=None):
-        """ Get entries by list ID """
+        """Get entries by list ID"""
         try:
             list = db.get_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
@@ -271,7 +271,7 @@ class PendingListEntriesAPI(APIResource):
     )
     @api.response(Conflict)
     def post(self, list_id, session=None):
-        """ Create a new entry object"""
+        """Create a new entry object"""
         try:
             db.get_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
@@ -345,7 +345,7 @@ class PendingListEntryAPI(APIResource):
     @etag
     @api.response(200, model=pending_list_entry_base_schema)
     def get(self, list_id, entry_id, session=None):
-        """ Get an entry by list ID and entry ID """
+        """Get an entry by list ID and entry ID"""
         try:
             entry = db.get_entry_by_id(list_id=list_id, entry_id=entry_id, session=session)
         except NoResultFound:
@@ -355,7 +355,7 @@ class PendingListEntryAPI(APIResource):
 
     @api.response(200, model=base_message_schema)
     def delete(self, list_id, entry_id, session=None):
-        """ Delete an entry by list ID and entry ID """
+        """Delete an entry by list ID and entry ID"""
         try:
             entry = db.get_entry_by_id(list_id=list_id, entry_id=entry_id, session=session)
         except NoResultFound:

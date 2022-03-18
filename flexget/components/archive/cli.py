@@ -3,6 +3,7 @@ from collections import defaultdict
 from datetime import datetime
 
 from loguru import logger
+from rich.progress import track
 
 import flexget.components.archive.db
 from flexget import options
@@ -10,7 +11,7 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.manager import Session
 from flexget.options import ParseExtrasAction, get_parser
-from flexget.terminal import TerminalTable, TerminalTableError, console, table_parser
+from flexget.terminal import TerminalTable, console, table_parser
 from flexget.utils.tools import strip_html
 
 logger = logger.bind(name='archive_cli')
@@ -41,18 +42,14 @@ def consolidate():
         logger.verbose('Found {} items to migrate, this can be aborted with CTRL-C safely.', count)
 
         # consolidate old data
-        from progressbar import ETA, Bar, Percentage, ProgressBar
-
-        widgets = ['Process - ', ETA(), ' ', Percentage(), ' ', Bar(left='[', right=']')]
-        bar = ProgressBar(widgets=widgets, maxval=count).start()
-
         # id's for duplicates
         duplicates = []
 
-        for index, orig in enumerate(
-            session.query(flexget.components.archive.db.ArchiveEntry).yield_per(5)
+        for orig in track(
+            session.query(flexget.components.archive.db.ArchiveEntry).yield_per(5),
+            total=count,
+            description='Processing...',
         ):
-            bar.update(index)
 
             # item already processed
             if orig.id in duplicates:
@@ -175,13 +172,10 @@ def cli_search(options):
     if not table_data:
         console('No results found for search')
         return
-
-    try:
-        table = TerminalTable(options.table_type, table_data, wrap_columns=[1])
-        table.table.inner_heading_row_border = False
-        console(table.output)
-    except TerminalTableError as e:
-        console('ERROR: %s' % str(e))
+    table = TerminalTable('Field', 'Value', table_type=options.table_type)
+    for row in table_data:
+        table.add_row(*row)
+    console(table)
 
 
 def cli_inject(manager, options):

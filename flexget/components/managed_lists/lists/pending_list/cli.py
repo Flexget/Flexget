@@ -1,13 +1,12 @@
 from argparse import ArgumentParser, ArgumentTypeError
 from functools import partial
 
-from colorclass.toggles import disable_all_colors
 from sqlalchemy.orm.exc import NoResultFound
 
 from flexget import options
 from flexget.event import event
 from flexget.manager import Session
-from flexget.terminal import TerminalTable, TerminalTableError, colorize, console, table_parser
+from flexget.terminal import TerminalTable, colorize, console, disable_colors, table_parser
 
 from . import db
 
@@ -26,7 +25,7 @@ def do_cli(manager, options):
     """Handle entry-list subcommand"""
 
     if hasattr(options, 'table_type') and options.table_type == 'porcelain':
-        disable_all_colors()
+        disable_colors()
 
     action_map = {
         'all': pending_list_lists,
@@ -43,18 +42,14 @@ def do_cli(manager, options):
 
 
 def pending_list_lists(options):
-    """ Show all pending lists """
+    """Show all pending lists"""
     with Session() as session:
         lists = db.get_pending_lists(session=session)
         header = ['#', 'List Name']
-        table_data = [header]
+        table = TerminalTable(*header, table_type=options.table_type)
         for entry_list in lists:
-            table_data.append([entry_list.id, entry_list.name])
-    table = TerminalTable(options.table_type, table_data)
-    try:
-        console(table.output)
-    except TerminalTableError as e:
-        console('ERROR: %s' % str(e))
+            table.add_row(str(entry_list.id), entry_list.name)
+    console(table)
 
 
 def pending_list_list(options):
@@ -66,17 +61,13 @@ def pending_list_list(options):
             console('Could not find pending list with name `{}`'.format(options.list_name))
             return
         header = ['#', 'Title', '# of fields', 'Approved']
-        table_data = [header]
+        table = TerminalTable(*header, table_type=options.table_type)
         for entry in db.get_entries_by_list_id(
             pending_list.id, order_by='added', descending=True, session=session
         ):
             approved = colorize('green', entry.approved) if entry.approved else entry.approved
-            table_data.append([entry.id, entry.title, len(entry.entry), approved])
-    table = TerminalTable(options.table_type, table_data)
-    try:
-        console(table.output)
-    except TerminalTableError as e:
-        console('ERROR: %s' % str(e))
+            table.add_row(str(entry.id), entry.title, str(len(entry.entry)), approved)
+    console(table)
 
 
 def pending_list_show(options):
@@ -106,15 +97,10 @@ def pending_list_show(options):
                 )
                 return
         header = ['Field name', 'Value']
-        table_data = [header]
+        table = TerminalTable(*header, table_type=options.table_type)
         for k, v in sorted(entry.entry.items()):
-            table_data.append([k, str(v)])
-    table = TerminalTable(options.table_type, table_data, wrap_columns=[1])
-    table.table.justify_columns[0] = 'center'
-    try:
-        console(table.output)
-    except TerminalTableError as e:
-        console('ERROR: %s' % str(e))
+            table.add_row(k, str(v))
+    console(table)
 
 
 def pending_list_add(options):

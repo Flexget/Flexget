@@ -2,6 +2,7 @@
 import os
 import stat
 import sys
+import time
 
 import pytest
 
@@ -253,6 +254,12 @@ class TestSetPlugin:
             - title: Entry 1
             set:
               int_field: "{{3}}"
+          test_now:
+            disable: [seen]
+            mock:
+            - title: Entry 1
+            set:
+              now: "{{now}}"
     """
 
     def test_set(self, execute_task):
@@ -298,3 +305,13 @@ class TestSetPlugin:
             entry['int_field'], int
         ), 'should allow setting values as integers rather than strings'
         assert entry['int_field'] == 3
+
+    def test_now(self, execute_task):
+        task = execute_task('test_now')
+        entry = task.find_entry('entries', title='Entry 1')
+        now = entry['now']
+        time.sleep(0.01)
+        task = execute_task('test_now')
+        entry = task.find_entry('entries', title='Entry 1')
+        new_now = entry['now']
+        assert now != new_now

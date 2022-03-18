@@ -122,11 +122,14 @@ class TestDiscover:
     def test_estimates(self, execute_task, manager):
         mock_config = manager.config['tasks']['test_estimates']['discover']['what'][0]['mock']
         # It should not be searched before the release date
-        mock_config[0]['est_release'] = datetime.now() + timedelta(days=7)
+        mock_config[0]['est_release'] = {
+            'data_exists': True,
+            'entity_date': (datetime.now() + timedelta(days=7)),
+        }
         task = execute_task('test_estimates')
         assert len(task.entries) == 0
         # It should be searched after the release date
-        mock_config[0]['est_release'] = datetime.now()
+        mock_config[0]['est_release'] = {'data_exists': True, 'entity_date': datetime.now()}
         task = execute_task('test_estimates')
         assert len(task.entries) == 1
 

@@ -2,7 +2,7 @@ import base64
 from contextlib import suppress
 from typing import Optional
 
-from flask import request, Request, Response
+from flask import Request, Response, request
 from flask import session as flask_session
 from flask_login import LoginManager
 from flask_login.utils import current_app, current_user, login_user
@@ -97,7 +97,7 @@ class LoginAPI(APIResource):
     @api.response(200, 'Login successful', model=base_message_schema)
     @api.doc(parser=login_parser)
     def post(self, session: Session = None) -> Response:
-        """ Login with username and password """
+        """Login with username and password"""
         data = request.json
         user_name = data.get('username')
         password = data.get('password')
@@ -123,7 +123,7 @@ class LoginAPI(APIResource):
 class LogoutAPI(APIResource):
     @api.response(200, 'Logout successful', model=base_message_schema)
     def post(self, session: Session = None) -> Response:
-        """ Logout and clear session cookies """
+        """Logout and clear session cookies"""
         flask_session.clear()
         resp = success_response('User logged out')
         resp.set_cookie('flexget.token', '', expires=0)

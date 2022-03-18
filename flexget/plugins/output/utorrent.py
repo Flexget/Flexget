@@ -160,7 +160,7 @@ class PluginUtorrent:
                 entry.fail('Fail to add `%s` to utorrent' % entry['url'])
 
     def on_task_learn(self, task, config):
-        """ Make sure all temp files are cleaned up when entries are learned """
+        """Make sure all temp files are cleaned up when entries are learned"""
         # If download plugin is enabled, it will handle cleanup.
         if 'download' not in task.config:
             plugin.get('download', self).cleanup_temp_files(task)
