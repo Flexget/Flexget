@@ -131,7 +131,7 @@ class RadarrAPIService:
         )
 
     def get_profiles(self):
-        """ Gets all profiles """
+        """Gets all profiles"""
         request_url = self.api_url + "qualityProfile"
         headers = self._default_headers()
         return request_get_json(request_url, headers)
