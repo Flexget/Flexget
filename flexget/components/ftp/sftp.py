@@ -43,6 +43,7 @@ class SftpList:
     get_size:             Indicates whetern to calculate the size of the remote file/directory.
                           WARNING: This can be very slow when computing the size of directories!
     files_only:           Indicates wheter to omit diredtories from the results.
+    dirs_only:            Indicates whether to omit files from the results.
     dirs:                 List of directories to download.
     socket_timeout_sec:   Socket timeout in seconds (default 15 seconds).
     connection_tries:     Number of times to attempt to connect before failing (default 3).
@@ -69,6 +70,7 @@ class SftpList:
             'password': {'type': 'string'},
             'port': {'type': 'integer', 'default': DEFAULT_SFTP_PORT},
             'files_only': {'type': 'boolean', 'default': True},
+            'dirs_only': {'type': 'boolean', 'default': False},
             'recursive': {'type': 'boolean', 'default': False},
             'get_size': {'type': 'boolean', 'default': True},
             'private_key': {'type': 'string'},
@@ -102,6 +104,7 @@ class SftpList:
         config = cls.prepare_config(config)
 
         files_only: bool = config['files_only']
+        dirs_only: bool = config['dirs_only']
         recursive: bool = config['recursive']
         get_size: bool = config['get_size']
         socket_timeout_sec: int = config['socket_timeout_sec']
@@ -116,7 +119,9 @@ class SftpList:
         sftp_config: SftpConfig = task_config_to_sftp_config(config)
         sftp: SftpClient = sftp_connect(sftp_config, socket_timeout_sec, connection_tries)
 
-        entries: List[Entry] = sftp.list_directories(directories, recursive, get_size, files_only)
+        entries: List[Entry] = sftp.list_directories(
+            directories, recursive, get_size, files_only, dirs_only
+        )
         sftp.close()
 
         return entries

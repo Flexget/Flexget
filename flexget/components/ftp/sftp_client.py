@@ -59,7 +59,12 @@ class SftpClient:
         )
 
     def list_directories(
-        self, directories: List[str], recursive: bool, get_size: bool, files_only: bool
+        self,
+        directories: List[str],
+        recursive: bool,
+        get_size: bool,
+        files_only: bool,
+        dirs_only: bool,
     ) -> List[Entry]:
         """
         Build a list of entries from a provided list of directories on an SFTP server
@@ -67,6 +72,7 @@ class SftpClient:
         :param recursive: boolean indicating whether to list recursively
         :param get_size: boolean indicating whether to compute size for each node (potentially slow for directories)
         :param files_only: boolean indicating whether to exclude directories
+        :param dirs_only: boolean indicating whether to exclude files
         :return: a list of entries describing the contents of the provided directories
         """
 
@@ -75,7 +81,9 @@ class SftpClient:
         dir_handler: NodeHandler = self._handler_builder.get_dir_handler(
             get_size, files_only, entries
         )
-        file_handler: NodeHandler = self._handler_builder.get_file_handler(get_size, entries)
+        file_handler: NodeHandler = self._handler_builder.get_file_handler(
+            get_size, dirs_only, entries
+        )
         unknown_handler: NodeHandler = self._handler_builder.get_unknown_handler()
 
         for directory in directories:
@@ -370,11 +378,14 @@ class HandlerBuilder:
         self._private_key = private_key
         self._private_key_pass = private_key_pass
 
-    def get_file_handler(self, get_size: bool, entry_accumulator: list) -> NodeHandler:
+    def get_file_handler(
+        self, get_size: bool, dirs_only: bool, entry_accumulator: list
+    ) -> NodeHandler:
         """
         Builds a file node handler suitable for use with pysftp.Connection.walktree
 
         :param get_size: boolean indicating whether to compute the for each file
+        :param dirs_only: boolean indicating whether to skip files
         :param entry_accumulator: list to add entries to
         """
         return partial(
@@ -382,6 +393,7 @@ class HandlerBuilder:
             self._sftp,
             self._prefix,
             get_size,
+            dirs_only,
             self._private_key,
             self._private_key_pass,
             entry_accumulator,
@@ -428,6 +440,7 @@ class Handlers:
         sftp: 'pysftp.Connection',
         prefix: str,
         get_size: bool,
+        dirs_only: bool,
         private_key: Optional[str],
         private_key_pass: Optional[str],
         entry_accumulator: List[Entry],
@@ -440,11 +453,15 @@ class Handlers:
         :param logger: a logger object
         :param prefix: SFTP URL prefix
         :param get_size: boolean indicating whether to compute the size of each file
+        :param dirs_only: boolean indicating whether to skip files
         :param private_key: private key path
         :param private_key_pass: private key password
         :param entry_accumulator: a list in which to store entries
         :param path: path to handle
         """
+        if dirs_only:
+            return
+
         size_handler = partial(cls._file_size, sftp)
         entry = cls._get_entry(
             sftp, prefix, size_handler, get_size, path, private_key, private_key_pass
