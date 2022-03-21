@@ -9,11 +9,15 @@ class TestImdbParser:
         parser = ImdbParser()
         parser.parse('tt0114814')
         assert parser.actors == {
+            'nm0000228': 'Kevin Spacey',
+            'nm0000286': 'Stephen Baldwin',
+            'nm0000321': 'Gabriel Byrne',
             'nm0000445': 'Dan Hedaya',
             'nm0000592': 'Pete Postlethwaite',
             'nm0000751': 'Suzy Amis',
             'nm0000860': 'Paul Bartel',
             'nm0001125': 'Benicio Del Toro',
+            'nm0001590': 'Chazz Palminteri',
             'nm0001629': 'Kevin Pollak',
             'nm0002064': 'Giancarlo Esposito',
             'nm0107808': 'Carl Bressler',
