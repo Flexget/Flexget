@@ -8,26 +8,28 @@ class TestImdbParser:
     def test_parsed_data(self):
         parser = ImdbParser()
         parser.parse('tt0114814')
-        assert parser.actors == {'nm0000228': 'Kevin Spacey',
-             'nm0000286': 'Stephen Baldwin',
-             'nm0000321': 'Gabriel Byrne',
-             'nm0000445': 'Dan Hedaya',
-             'nm0000592': 'Pete Postlethwaite',
-             'nm0000751': 'Suzy Amis',
-             'nm0000860': 'Paul Bartel',
-             'nm0001125': 'Benicio Del Toro',
-             'nm0001590': 'Chazz Palminteri',
-             'nm0001629': 'Kevin Pollak',
-             'nm0002064': 'Giancarlo Esposito',
-             'nm0107808': 'Carl Bressler',
-             'nm0163988': 'Clark Gregg',
-             'nm0167342': 'Michelle Clunie',
-             'nm0198470': 'Ken Daly',
-             'nm0261452': 'Christine Estabrook',
-             'nm0402974': 'Morgan Hunter',
-             'nm0518385': 'Louis Lombardi',
-             'nm0790436': 'Jack Shearer',
-             'nm0800339': 'Phillipe Simon'}, 'Actors not parsed correctly'
+        assert parser.actors == {
+            'nm0000228': 'Kevin Spacey',
+            'nm0000286': 'Stephen Baldwin',
+            'nm0000321': 'Gabriel Byrne',
+            'nm0000445': 'Dan Hedaya',
+            'nm0000592': 'Pete Postlethwaite',
+            'nm0000751': 'Suzy Amis',
+            'nm0000860': 'Paul Bartel',
+            'nm0001125': 'Benicio Del Toro',
+            'nm0001590': 'Chazz Palminteri',
+            'nm0001629': 'Kevin Pollak',
+            'nm0002064': 'Giancarlo Esposito',
+            'nm0107808': 'Carl Bressler',
+            'nm0163988': 'Clark Gregg',
+            'nm0167342': 'Michelle Clunie',
+            'nm0198470': 'Ken Daly',
+            'nm0261452': 'Christine Estabrook',
+            'nm0402974': 'Morgan Hunter',
+            'nm0518385': 'Louis Lombardi',
+            'nm0790436': 'Jack Shearer',
+            'nm0800339': 'Phillipe Simon',
+        }, 'Actors not parsed correctly'
         assert parser.directors == {'nm0001741': 'Bryan Singer'}, 'Directors not parsed correctly'
         print(parser.genres)
         assert len(set(parser.genres).intersection(['crime', 'drama', 'mystery'])) == len(
