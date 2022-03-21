@@ -95,7 +95,7 @@ class TestNfoLookupWithMovies:
             assert entry['imdb_name'] == 'Beauty and the Beast'
             assert entry['imdb_original_name'] == "La belle et la bête"
             assert entry['imdb_year'] == 2014
-            assert entry['imdb_genres'] == ['drama', 'fantasy', 'romance', 'thriller']
+            assert entry['imdb_genres'] == ['drama', 'family', 'fantasy', 'romance', 'thriller']
 
     def test_nfo_with_id_title(self, execute_task):
         task = execute_task('test_2')
