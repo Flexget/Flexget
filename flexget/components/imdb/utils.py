@@ -107,8 +107,9 @@ class ImdbSearch:
             return None
 
         # remove all movies below min_match, and different year
+        exact = []
+
         for movie in movies[:]:
-            movie['exact'] = False
             if year and movie.get('year'):
                 if movie['year'] != year:
                     logger.debug(
@@ -121,7 +122,7 @@ class ImdbSearch:
                     continue
                 # Look for exact match
                 if movie['year'] == year and movie['name'].lower() == name.lower():
-                    movie['exact'] = True
+                    exact.append(movie)
             if movie['match'] < self.min_match:
                 logger.debug('best_match removing {} (min_match)', movie['name'])
                 movies.remove(movie)
@@ -132,7 +133,6 @@ class ImdbSearch:
             return None
 
         # If we have 1 exact match
-        exact = [m for m in movies if m['exact']]
         if len(exact) == 1:
             logger.debug('SUCCESS: found exact movie match')
             return exact[0]
