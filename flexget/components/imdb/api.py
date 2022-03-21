@@ -1,8 +1,8 @@
-from __future__ import unicode_literals, division, absolute_import
+from __future__ import absolute_import, division, unicode_literals
 
 from flask import jsonify
 
-from flexget.api import api, APIResource
+from flexget.api import APIResource, api
 from flexget.api.app import etag
 from flexget.utils.imdb import ImdbSearch
 
@@ -18,10 +18,10 @@ class ObjectsContainer(object):
             'name': {'type': 'string'},
             'url': {'type': 'string'},
             'year': {'type': 'number'},
-            'thumbnail': {'type': 'string'}
+            'thumbnail': {'type': 'string'},
         },
         'required': ['imdb_id', 'match', 'name', 'url', 'year'],
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
     return_object = {'type': 'array', 'items': movie_object}

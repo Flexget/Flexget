@@ -1,19 +1,19 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
+from __future__ import absolute_import, division, unicode_literals
 
 import difflib
 import json
 import logging
-import re
 import random
+import re
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from bs4.element import Tag
+from past.builtins import basestring
 
-from flexget.utils.soup import get_soup
+from flexget.plugin import PluginError, get_plugin_by_name
 from flexget.utils.requests import Session, TimedLimiter
+from flexget.utils.soup import get_soup
 from flexget.utils.tools import str_to_int
-from flexget.plugin import get_plugin_by_name, PluginError
 
 log = logging.getLogger('utils.imdb')
 # IMDb delivers a version of the page which is unparsable to unknown (and some known) user agents, such as requests'
@@ -24,7 +24,9 @@ requests.headers.update({'User-Agent': 'Python-urllib/2.6'})
 
 # this makes most of the titles to be returned in english translation, but not all of them
 requests.headers.update({'Accept-Language': 'en-US,en;q=0.8'})
-requests.headers.update({'X-Forwarded-For': '24.110.%d.%d' % (random.randint(0, 254), random.randint(0, 254))})
+requests.headers.update(
+    {'X-Forwarded-For': '24.110.%d.%d' % (random.randint(0, 254), random.randint(0, 254))}
+)
 
 # give imdb a little break between requests (see: http://flexget.com/ticket/129#comment:1)
 requests.add_domain_limiter(TimedLimiter('imdb.com', '3 seconds'))
@@ -112,10 +114,10 @@ class ImdbSearch(object):
         for movie in movies[:]:
             if year and movie.get('year'):
                 if movie['year'] != year:
-                    log.debug('best_match removing %s - %s (wrong year: %s)' % (
-                        movie['name'],
-                        movie['url'],
-                        str(movie['year'])))
+                    log.debug(
+                        'best_match removing %s - %s (wrong year: %s)'
+                        % (movie['name'], movie['url'], str(movie['year']))
+                    )
                     movies.remove(movie)
                     continue
             if movie['match'] < self.min_match:
@@ -135,8 +137,10 @@ class ImdbSearch(object):
         # check min difference between best two hits
         diff = movies[0]['match'] - movies[1]['match']
         if diff < self.min_diff:
-            log.debug('unable to determine correct movie, min_diff too small (`%s` <-?-> `%s`)' %
-                      (movies[0], movies[1]))
+            log.debug(
+                'unable to determine correct movie, min_diff too small (`%s` <-?-> `%s`)'
+                % (movies[0], movies[1])
+            )
             for m in movies:
                 log.debug('remain: %s (match: %s) %s' % (m['name'], m['match'], m['url']))
             return None
@@ -148,7 +152,10 @@ class ImdbSearch(object):
         log.debug('Searching: %s', name)
         url = u'https://www.imdb.com/find'
         # This may include Shorts and TV series in the results
-        params = {'q': name, 's': 'tt', }
+        params = {
+            'q': name,
+            's': 'tt',
+        }
 
         log.debug('Search query: %s', repr(url))
         page = requests.get(url, params=params)
@@ -169,7 +176,7 @@ class ImdbSearch(object):
                 'name': movie_parse.name,
                 'imdb_id': imdb_id,
                 'url': make_url(imdb_id),
-                'year': movie_parse.year
+                'year': movie_parse.year,
             }
             movies.append(movie)
             return movies
@@ -224,12 +231,17 @@ class ImdbSearch(object):
                 aka_ratio = seq.ratio()
                 if aka_ratio > ratio:
                     ratio = aka_ratio * self.aka_weight
-                    log.debug('- aka `%s` matches better to `%s` ratio %s (weighted to %s)' %
-                              (aka, name, aka_ratio, ratio))
+                    log.debug(
+                        '- aka `%s` matches better to `%s` ratio %s (weighted to %s)'
+                        % (aka, name, aka_ratio, ratio)
+                    )
 
             # prioritize items by position
             position_ratio = (self.first_weight - 1) / (count + 1) + 1
-            log.debug('- prioritizing based on position %s `%s`: %s' % (count, movie['url'], position_ratio))
+            log.debug(
+                '- prioritizing based on position %s `%s`: %s'
+                % (count, movie['url'], position_ratio)
+            )
             ratio *= position_ratio
 
             # store ratio
@@ -278,7 +290,9 @@ class ImdbParser(object):
         data = json.loads(soup.find('script', {'type': 'application/ld+json'}).text)
 
         if not data:
-            raise PluginError('IMDB parser needs updating, imdb format changed. Please report on Github.')
+            raise PluginError(
+                'IMDB parser needs updating, imdb format changed. Please report on Github.'
+            )
 
         # Parse stuff from the title-overview section
         name_elem = data['name']
@@ -362,8 +376,9 @@ class ImdbParser(object):
         title_details = soup.find('div', attrs={'id': 'titleDetails'})
         if title_details:
             # get languages
-            for link in title_details.find_all('a', href=re.compile('^/search/title\?title_type=feature'
-                                                                    '&primary_language=')):
+            for link in title_details.find_all(
+                'a', href=re.compile('^/search/title\?title_type=feature' '&primary_language=')
+            ):
                 lang = link.text.strip().lower()
                 if lang not in self.languages:
                     self.languages.append(lang.strip())
