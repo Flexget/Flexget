@@ -1,10 +1,9 @@
 import difflib
-import html
 import json
 import random
 import re
+from datetime import datetime
 
-from bs4.element import Tag
 from loguru import logger
 
 from flexget import plugin
@@ -108,6 +107,8 @@ class ImdbSearch:
             return None
 
         # remove all movies below min_match, and different year
+        exact = []
+
         for movie in movies[:]:
             if year and movie.get('year'):
                 if movie['year'] != year:
@@ -119,6 +120,9 @@ class ImdbSearch:
                     )
                     movies.remove(movie)
                     continue
+                # Look for exact match
+                if movie['year'] == year and movie['name'].lower() == name.lower():
+                    exact.append(movie)
             if movie['match'] < self.min_match:
                 logger.debug('best_match removing {} (min_match)', movie['name'])
                 movies.remove(movie)
@@ -127,6 +131,11 @@ class ImdbSearch:
         if not movies:
             logger.debug('FAILURE: no movies remain')
             return None
+
+        # If we have 1 exact match
+        if len(exact) == 1:
+            logger.debug('SUCCESS: found exact movie match')
+            return exact[0]
 
         # if only one remains ..
         if len(movies) == 1:
@@ -285,102 +294,80 @@ class ImdbParser:
             page = requests.get(url)
             soup = get_soup(page.text)
 
-        title_wrapper = soup.find('div', attrs={'class': 'title_wrapper'})
-        if not title_wrapper:
-            # New layout, transitional
-            title_wrapper = soup.find(
-                'div', {"class": re.compile("^TitleBlock__TitleContainer.?")}
-            )
-
-        if not title_wrapper:
-            raise plugin.PluginError(
-                'IMDB parser needs updating, imdb format changed. Please report on Github.'
-            )
-
         data = json.loads(soup.find('script', {'type': 'application/ld+json'}).string)
-
         if not data:
             raise plugin.PluginError(
                 'IMDB parser needs updating, imdb format changed. Please report on Github.'
             )
 
-        # Parse stuff from the title-overview section
-        name_elem = html.unescape(data['name'])
-        if name_elem:
-            self.name = name_elem.strip()
-        else:
-            logger.error('Possible IMDB parser needs updating, Please report on Github.')
+        props_data = json.loads(soup.find('script', {'type': 'application/json'}).string)
+        if (
+            not props_data
+            or not props_data.get('props')
+            or not props_data.get('props').get('pageProps')
+        ):
             raise plugin.PluginError(
-                'Unable to set imdb_name for %s from %s' % (self.imdb_id, self.url)
+                'IMDB parser needs updating, imdb props_data format changed. Please report on Github.'
             )
 
-        year = soup.find('span', attrs={'id': 'titleYear'})
-        if not year:
-            # Test new layout
-            year = title_wrapper.find(
-                'span', {"class": re.compile("^TitleBlockMetaData__ListItemText.?")}
+        above_the_fold_data = props_data['props']['pageProps'].get('aboveTheFoldData')
+        if not above_the_fold_data:
+            raise plugin.PluginError(
+                'IMDB parser needs updating, imdb above_the_fold_data format changed. Please report on Github.'
             )
 
-        if year:
-            m = re.search(r'([0-9]{4})', year.text)
-            if m:
-                self.year = int(m.group(1))
+        title = above_the_fold_data.get('titleText')
+        if title:
+            self.name = title.get('text')
+        if not self.name:
+            raise plugin.PluginError(
+                'IMDB parser needs updating, imdb above_the_fold_data format changed for title. Please report on Github.'
+            )
 
+        original_name = above_the_fold_data.get('originalTitleText')
+        if original_name:
+            self.original_name = original_name.get('text')
+
+        if not self.original_name:
+            logger.debug('No original title found for {}', self.imdb_id)
+
+        # NOTE: We cannot use the get default approach here .(get(x, {}))
+        # as the data returned in imdb has all fields with null values if they do not exist.
+        if above_the_fold_data.get('releaseYear'):
+            self.year = above_the_fold_data['releaseYear'].get('year')
         if not self.year:
             logger.debug('No year found for {}', self.imdb_id)
 
-        mpaa_rating_elem = data.get('contentRating')
-        if mpaa_rating_elem:
-            self.mpaa_rating = mpaa_rating_elem
-        else:
+        self.mpaa_rating = data.get('contentRating')
+        if not self.mpaa_rating:
             logger.debug('No rating found for {}', self.imdb_id)
 
-        photo_elem = data.get('image')
-        if photo_elem:
-            self.photo = photo_elem
-        else:
+        self.photo = data.get('image')
+        if not self.photo:
             logger.debug('No photo found for {}', self.imdb_id)
 
-        strip_pre_text = False
-        original_name_elem = title_wrapper.find('div', {'class': 'originalTitle'})
-        if not original_name_elem:
-            # Test new layout
-            strip_pre_text = True
-            original_name_elem = title_wrapper.find(
-                'div', {"class": re.compile("^OriginalTitle.?")}
-            )
+        rating_data = data.get('aggregateRating')
+        if rating_data:
+            rating_count = rating_data.get('ratingCount')
+            if rating_count:
+                self.votes = (
+                    str_to_int(rating_count) if not isinstance(rating_count, int) else rating_count
+                )
+            else:
+                logger.debug('No votes found for {}', self.imdb_id)
 
-        if original_name_elem:
-            self.name = title_wrapper.find('h1').contents[0].strip()
-            self.original_name = original_name_elem.contents[0].strip().strip('"')
-            if strip_pre_text:
-                striped_text = re.search(r"([^\:]*)\:? (.*)", self.original_name)
-                if len(striped_text.groups()) == 2:
-                    self.original_name = striped_text.group(2)
+            score = rating_data.get('ratingValue')
+            if score:
+                self.score = float(score)
+            else:
+                logger.debug('No score found for {}', self.imdb_id)
 
-        if not original_name_elem:
-            logger.debug('No original title found for {}', self.imdb_id)
-
-        votes_elem = data.get('aggregateRating', {}).get('ratingCount')
-        if votes_elem:
-            self.votes = str_to_int(votes_elem) if not isinstance(votes_elem, int) else votes_elem
-        else:
-            logger.debug('No votes found for {}', self.imdb_id)
-
-        score_elem = data.get('aggregateRating', {}).get('ratingValue')
-        if score_elem:
-            self.score = float(score_elem)
-        else:
-            logger.debug('No score found for {}', self.imdb_id)
-
-        meta_score_elem = soup.find(attrs={'class': 'metacriticScore'})
-        if not meta_score_elem:
-            # Test new layout
-            meta_score_elem = soup.find('span', attrs={'class': 'score-meta'})
-
-        if meta_score_elem:
-            self.meta_score = str_to_int(meta_score_elem.text)
-        else:
+        meta_critic = above_the_fold_data.get('metacritic')
+        if meta_critic:
+            meta_score = meta_critic.get('metascore')
+            if meta_score:
+                self.meta_score = meta_score.get('score')
+        if not self.meta_score:
             logger.debug('No Metacritic score found for {}', self.imdb_id)
 
         # get director(s)
@@ -408,74 +395,53 @@ class ImdbParser:
             self.writers[writer_id] = writer_name
 
         # Details section
-        title_details = soup.find('div', attrs={'id': 'titleDetails'})
-        if not title_details:
-            # Test new layout
-            title_details = soup.find('div', attrs={'data-testid': 'title-details-section'})
+        main_column_data = props_data['props']['pageProps'].get('mainColumnData')
+        if not main_column_data:
+            raise plugin.PluginError(
+                'IMDB parser needs updating, imdb main_column_data format changed. Please report on Github.'
+            )
 
-        if title_details:
-            # get languages
-            for link in title_details.find_all(
-                'a', href=re.compile(r'^/search/title\?title_type=feature' '&primary_language=')
-            ):
-                lang = link.text.strip().lower()
-                if lang not in self.languages:
-                    self.languages.append(lang.strip())
+        for language in (main_column_data.get('spokenLanguages') or {}).get('spokenLanguages', []):
+            self.languages.append(language['text'].lower())
 
         # Storyline section
-        storyline = soup.find('div', attrs={'id': 'titleStoryLine'})
-        if storyline:
-            plot_elem = storyline.find('p')
-            if plot_elem:
-                # Remove the "Written By" part.
-                if plot_elem.em:
-                    plot_elem.em.replace_with('')
-                self.plot_outline = plot_elem.text.strip()
-            else:
-                logger.debug('No storyline found for {}', self.imdb_id)
+        # NOTE: We cannot use the get default approach here .(get(x, {}))
+        # as the data returned in imdb has all fields with null values if they do not exist.
+        summaries = main_column_data.get('summaries') or {}
+        summary_edges = summaries.get('edges') or []
+        if len(summary_edges) > 0:
+            edge_node = summary_edges[0].get('node') or {}
+            plot_text = edge_node.get('plotText') or {}
+            # Strip out html
+            plot_html = get_soup(plot_text.get('plaidHtml'))
+            if plot_html:
+                self.plot_outline = plot_html.text
+        if not self.plot_outline:
+            logger.debug('No storyline found for {}', self.imdb_id)
 
-            keyword_elem = storyline.find('h4').parent
-            if keyword_elem:
-                # The last "a" tag is a link to the full list
-                self.plot_keywords = [
-                    keyword_elem.text.strip() for keyword_elem in keyword_elem.find_all("a")[:-1]
-                ]
-        else:
-            # Test new layout
-            storyline = soup.find('div', attrs={'data-testid': 'storyline-plot-summary'})
-            if storyline:
-                self.plot_outline = storyline.text
+        storyline_keywords = main_column_data.get('storylineKeywords') or {}
+        for keyword_node in storyline_keywords.get('edges') or []:
+            keyword = keyword_node.get('node') or {}
+            if keyword:
+                self.plot_keywords.append(keyword.get('text').lower())
 
-            keyword_elem = soup.find('div', attrs={'data-testid': 'storyline-plot-keywords'})
-            if keyword_elem:
-                self.plot_keywords = [
-                    keyword_elem.text.strip() for keyword_elem in keyword_elem.find_all("a")[:-1]
-                ]
-
-        genres = data.get('genre', [])
-        if not isinstance(genres, list):
-            genres = [genres]
-
-        self.genres = [g.strip().lower() for g in genres]
+        genres = (above_the_fold_data.get('genres', {}) or {}).get('genres')
+        self.genres = [g['text'].lower() for g in genres]
 
         # Cast section
-        cast = soup.find('table', attrs={'class': 'cast_list'})
-        if cast:
-            for actor in cast.select('tr > td:nth-of-type(2) > a'):
-                actor_id = extract_id(actor['href'])
-                actor_name = actor.text.strip()
-                # tag instead of name
-                if isinstance(actor_name, Tag):
-                    actor_name = None
+        cast_data = main_column_data.get('cast', {}) or {}
+        for cast_node in cast_data.get('edges') or []:
+            actor_node = (cast_node.get('node') or {}).get('name') or {}
+            actor_id = actor_node.get('id')
+            actor_name = (actor_node.get('nameText') or {}).get('text')
+            if actor_id and actor_name:
                 self.actors[actor_id] = actor_name
-        else:
-            # Test new layout
-            cast = soup.find_all('a', attrs={'data-testid': 'title-cast-item__actor'})
-            if cast:
-                for actor in cast:
-                    actor_id = extract_id(actor['href'])
-                    actor_name = actor.text.strip()
-                    # tag instead of name
-                    if isinstance(actor_name, Tag):
-                        actor_name = None
+
+        principal_cast_data = main_column_data.get('principalCast', []) or []
+        if principal_cast_data:
+            for cast_node in principal_cast_data[0].get('credits') or []:
+                actor_node = cast_node.get('name') or {}
+                actor_id = actor_node.get('id')
+                actor_name = (actor_node.get('nameText') or {}).get('text')
+                if actor_id and actor_name:
                     self.actors[actor_id] = actor_name
