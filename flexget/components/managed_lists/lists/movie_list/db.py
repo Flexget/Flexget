@@ -8,6 +8,7 @@ from sqlalchemy.sql.elements import and_
 from flexget import plugin
 from flexget.db_schema import versioned_base, with_session
 from flexget.entry import Entry
+from flexget.utils.tools import strip_non_alphanum as strip_non_alphanum_fn
 
 try:
     # NOTE: Importing other plugins is discouraged!
@@ -65,7 +66,7 @@ class MovieListMovie(Base):
             self.list_id,
         )
 
-    def to_entry(self, strip_year=False):
+    def to_entry(self, strip_year=False, strip_non_alphanum=False):
         entry = Entry()
         entry['title'] = entry['movie_name'] = self.title
         entry['url'] = 'mock://localhost/movie_list/%d' % self.id
@@ -76,6 +77,8 @@ class MovieListMovie(Base):
             entry['movie_year'] = self.year
         for movie_list_id in self.ids:
             entry[movie_list_id.id_name] = movie_list_id.id_value
+        if strip_non_alphanum:
+            entry['title'] = strip_non_alphanum_fn(entry['title'])
         return entry
 
     def to_dict(self):

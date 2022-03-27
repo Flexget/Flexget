@@ -318,3 +318,68 @@ class TestMovieListStripYearInterface:
         task = execute_task('test_list_get_strip_year_negative')
         assert len(task.entries) == 1
         assert task.find_entry(title='The Matrix (1999)')
+
+
+class TestMovieListStripNonAlphaNumInterface:
+    config = """
+        templates:
+          global:
+            disable: [seen]
+
+        tasks:
+          test_list_add:
+            mock:
+              - {title: 'Star Wars: Episode IX - The Rise of Skywalker (2019)', imdb_url: 'http://www.imdb.com/title/tt0133093/'}
+            accept_all: yes
+            list_add:
+              - movie_list: test_list
+
+          test_list_get_simple:
+             movie_list: test_list
+
+          test_list_get_list_name:
+             movie_list:
+               list_name: test_list
+
+          test_list_get_strip_non_alphanum:
+             movie_list:
+               list_name: test_list
+               strip_non_alphanum: yes
+
+          test_list_get_strip_non_alphanum_negative:
+             movie_list:
+               list_name: test_list
+               strip_year: no
+    """
+
+    def test_strip_non_alphanum_regression_test(self, execute_task):
+        task = execute_task('test_list_add')
+        assert len(task.entries) == 1
+
+        task = execute_task('test_list_get_simple')
+        assert len(task.entries) == 1
+        assert task.find_entry(title='Star Wars Episode Ix - The Rise Of Skywalker (2019)')
+
+    def test_strip_non_alphanum_just_list_name(self, execute_task):
+        task = execute_task('test_list_add')
+        assert len(task.entries) == 1
+
+        task = execute_task('test_list_get_list_name')
+        assert len(task.entries) == 1
+        assert task.find_entry(title='Star Wars Episode Ix - The Rise Of Skywalker (2019)')
+
+    def test_strip_non_alphanum_positive(self, execute_task):
+        task = execute_task('test_list_add')
+        assert len(task.entries) == 1
+
+        task = execute_task('test_list_get_strip_non_alphanum')
+        assert len(task.entries) == 1
+        assert task.find_entry(title='Star Wars Episode Ix The Rise Of Skywalker 2019')
+
+    def test_strip_non_alphanum_negative(self, execute_task):
+        task = execute_task('test_list_add')
+        assert len(task.entries) == 1
+
+        task = execute_task('test_list_get_strip_non_alphanum_negative')
+        assert len(task.entries) == 1
+        assert task.find_entry(title='Star Wars Episode Ix - The Rise Of Skywalker (2019)')

@@ -50,8 +50,10 @@ class MovieList(MutableSet):
         if not isinstance(config, dict):
             config = {'list_name': config}
         config.setdefault('strip_year', False)
+        config.setdefault('strip_non_alphanum', False)
         self.list_name = config.get('list_name')
         self.strip_year = config.get('strip_year')
+        self.strip_non_alphanum = config.get('strip_non_alphanum')
 
         db_list = self._db_list(session)
         if not db_list:
@@ -60,7 +62,10 @@ class MovieList(MutableSet):
     def __iter__(self):
         with Session() as session:
             return iter(
-                [movie.to_entry(self.strip_year) for movie in self._db_list(session).movies]
+                [
+                    movie.to_entry(self.strip_year, self.strip_non_alphanum)
+                    for movie in self._db_list(session).movies
+                ]
             )
 
     def __len__(self):
@@ -174,7 +179,11 @@ class PluginMovieList:
             {'type': 'string'},
             {
                 'type': 'object',
-                'properties': {'list_name': {'type': 'string'}, 'strip_year': {'type': 'boolean'}},
+                'properties': {
+                    'list_name': {'type': 'string'},
+                    'strip_year': {'type': 'boolean'},
+                    'strip_non_alphanum': {'type': 'boolean'},
+                },
                 'required': ['list_name'],
                 'additionalProperties': False,
             },

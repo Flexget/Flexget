@@ -397,7 +397,7 @@ def parse_filesize(text_size: str, si: bool = True) -> float:
     order = prefix_order[unit]
     amount = float(amount_str.replace(',', '').replace(' ', ''))
     base = 1000 if si else 1024
-    return (amount * (base**order)) / 1024**2
+    return (amount * (base ** order)) / 1024 ** 2
 
 
 def get_config_hash(config: Any) -> str:
@@ -536,3 +536,13 @@ def chunked(seq: Sequence, limit: int = 900) -> Iterator[Sequence]:
     """Helper to divide our expired lists into sizes sqlite can handle in a query. (<1000)"""
     for i in range(0, len(seq), limit):
         yield seq[i : i + limit]
+
+
+# This pattern matches any non-alphanumeric character (ie not a-z, A-Z, 0-9).
+nonwordrepat = re.compile(r'[\W_]+')
+
+
+def strip_non_alphanum(inp: str) -> str:
+    """Removes non-alphanumeric characters from the input string."""
+
+    return nonwordrepat.sub(' ', inp).strip()
