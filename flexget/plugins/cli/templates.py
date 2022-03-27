@@ -23,9 +23,7 @@ def list_file_templates(manager, options):
             plugin = 'notify_task'
         else:
             plugin = '-'
-        name = template_name.replace('.template', '').split('/')
-        if len(name) == 2:
-            name = name[1]
+        name = template_name.replace('.template', '').split('/')[-1]
         with open(template.filename) as contents:
             table.add_row(name, plugin, template.filename, contents.read().strip())
 
