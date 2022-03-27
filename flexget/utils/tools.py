@@ -397,7 +397,7 @@ def parse_filesize(text_size: str, si: bool = True) -> float:
     order = prefix_order[unit]
     amount = float(amount_str.replace(',', '').replace(' ', ''))
     base = 1000 if si else 1024
-    return (amount * (base ** order)) / 1024 ** 2
+    return (amount * (base**order)) / 1024**2
 
 
 def get_config_hash(config: Any) -> str:
