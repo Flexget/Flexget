@@ -111,6 +111,11 @@ class SftpList:
         connection_tries: int = config['connection_tries']
         directories: List[str] = []
 
+        if files_only and dirs_only:
+            logger.warning(
+                "Both files_only and dirs_only are set.  This will result in no entries being discovered."
+            )
+
         if isinstance(config['dirs'], list):
             directories.extend(config['dirs'])
         else:
