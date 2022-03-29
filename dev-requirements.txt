@@ -230,7 +230,7 @@ toml==0.10.2
     # via
     #   pre-commit
     #   pytest
-tomli==2.0.1
+tomli==1.2.3
     # via
     #   black
     #   coverage
