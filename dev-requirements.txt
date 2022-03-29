@@ -268,7 +268,7 @@ wrapt==1.14.0
     #   vcrpy
 yarl==1.7.2
     # via vcrpy
-zipp==3.7.0
+zipp==3.6.0
     # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:
