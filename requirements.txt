@@ -100,7 +100,7 @@ more-itertools==8.12.0
     #   jaraco-functools
 plumbum==1.7.2
     # via rpyc
-portend==3.1.0
+portend==3.0.0
     # via cherrypy
 psutil==5.9.0
     # via -r requirements.in
