@@ -92,7 +92,7 @@ isort==5.10.1
     # via
     #   -r dev-requirements.in
     #   pylint
-jinja2==3.1.1
+jinja2==3.0.3
     # via
     #   -c requirements.txt
     #   sphinx
