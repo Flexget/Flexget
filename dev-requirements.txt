@@ -53,7 +53,7 @@ colorama==0.4.4
     #   sphinx
     #   tqdm
     #   twine
-coverage[toml]==6.3.2
+coverage[toml]==6.2
     # via
     #   -r dev-requirements.in
     #   pytest-cov
