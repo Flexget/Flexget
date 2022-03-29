@@ -136,7 +136,7 @@ requests==2.27.1
     # via -r requirements.in
 rich==12.0.1
     # via -r requirements.in
-rpyc==5.1.0
+rpyc==5.0.1
     # via -r requirements.in
 sgmllib3k==1.0.0
     # via feedparser
