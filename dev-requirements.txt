@@ -195,7 +195,7 @@ requests==2.27.1
     #   twine
 requests-toolbelt==0.9.1
     # via twine
-rfc3986==2.0.0
+rfc3986==1.5.0
     # via twine
 s3transfer==0.5.2
     # via boto3
