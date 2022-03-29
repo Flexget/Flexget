@@ -154,7 +154,7 @@ soupsieve==2.3.1
     # via beautifulsoup4
 sqlalchemy==1.4.32
     # via -r requirements.in
-tempora==5.0.1
+tempora==4.1.2
     # via portend
 tzdata==2022.1
     # via
