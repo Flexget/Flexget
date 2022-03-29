@@ -67,7 +67,7 @@ docutils==0.17.1
     #   sphinx
 execnet==1.9.0
     # via pytest-xdist
-filelock==3.6.0
+filelock==3.4.1
     # via virtualenv
 gitdb==4.0.9
     # via gitpython
