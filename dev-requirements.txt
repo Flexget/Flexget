@@ -96,7 +96,7 @@ jinja2==3.0.3
     # via
     #   -c requirements.txt
     #   sphinx
-jmespath==1.0.0
+jmespath==0.10.0
     # via
     #   boto3
     #   botocore
