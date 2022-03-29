@@ -110,7 +110,7 @@ markupsafe==2.0.1
     #   jinja2
 mccabe==0.7.0
     # via pylint
-multidict==6.0.2
+multidict==5.2.0
     # via yarl
 mypy==0.942
     # via sqlalchemy-stubs
