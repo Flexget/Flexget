@@ -164,8 +164,9 @@ urllib3==1.26.9
     # via requests
 webencodings==0.5.1
     # via html5lib
-werkzeug==2.1.0
+werkzeug==2.0.3
     # via
+    #   -r requirements.in
     #   flask
     #   flask-restx
 zc-lockfile==2.0
