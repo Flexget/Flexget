@@ -133,7 +133,7 @@ pip-tools==6.4.0
     # via -r dev-requirements.in
 pkginfo==1.8.2
     # via twine
-platformdirs==2.5.1
+platformdirs==2.4.0
     # via
     #   black
     #   pylint
