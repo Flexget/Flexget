@@ -68,7 +68,7 @@ itsdangerous==2.0.1
     # via flask
 jaraco-classes==3.2.1
     # via jaraco-collections
-jaraco-collections==3.5.1
+jaraco-collections==3.4.0
     # via cherrypy
 jaraco-context==4.1.1
     # via jaraco-text
