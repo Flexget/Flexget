@@ -64,7 +64,7 @@ html5lib==1.1
     # via -r requirements.in
 idna==3.3
     # via requests
-itsdangerous==2.1.2
+itsdangerous==2.0.1
     # via flask
 jaraco-classes==3.2.1
     # via jaraco-collections
