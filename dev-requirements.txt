@@ -100,7 +100,7 @@ jmespath==0.10.0
     # via
     #   boto3
     #   botocore
-keyring==23.5.0
+keyring==23.4.1
     # via twine
 lazy-object-proxy==1.7.1
     # via astroid
