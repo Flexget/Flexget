@@ -66,18 +66,18 @@ idna==3.3
     # via requests
 itsdangerous==2.0.1
     # via flask
-jaraco-classes==3.2.1
+jaraco.classes==3.2.1
     # via jaraco-collections
-jaraco-collections==3.4.0
+jaraco.collections==3.4.0
     # via cherrypy
-jaraco-context==4.1.1
+jaraco.context==4.1.1
     # via jaraco-text
-jaraco-functools==3.4.0
+jaraco.functools==3.4.0
     # via
     #   cheroot
     #   jaraco-text
     #   tempora
-jaraco-text==3.7.0
+jaraco.text==3.7.0
     # via jaraco-collections
 jinja2==3.0.3
     # via
