@@ -6,7 +6,7 @@ codacy-coverage>=1.2.18
 coverage~=6.0, <=6.2  # After 6.2 requires python 3.7+
 gitpython~=3.1.18, <3.1.24  # Starting with 3.1.24, python 3.7 is required
 isort>=5.5.1
-pip-tools~=6.4.0
+pip-tools~=6.6.0
 pre-commit>=2.9.0
 pylint>=2.6.0  # pylint < 2.6 doesn't work with isort5
 pytest-cov~=3.0.0
