@@ -5,8 +5,13 @@ on:
     branches:
     - develop
 
+permissions:
+  contents: read
+
 jobs:
   update-changelog:
+    permissions:
+      contents: write  # for Git to git push
     name: Update Changelog
     runs-on: ubuntu-latest
     env:

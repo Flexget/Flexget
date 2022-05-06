@@ -5,8 +5,13 @@ on:
     branches:
       - 'master'
 
+permissions:
+  contents: read
+
 jobs:
   fail:
+    permissions:
+      contents: none
     runs-on: ubuntu-latest
     name: Please make them to develop
     steps:
