@@ -425,7 +425,7 @@ class ImdbParser:
             if keyword:
                 self.plot_keywords.append(keyword.get('text').lower())
 
-        genres = (above_the_fold_data.get('genres', {}) or {}).get('genres')
+        genres = (above_the_fold_data.get('genres', {}) or {}).get('genres', [])
         self.genres = [g['text'].lower() for g in genres]
 
         # Cast section
