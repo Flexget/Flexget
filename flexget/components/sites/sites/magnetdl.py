@@ -55,12 +55,19 @@ class MagnetDL:
         if page.status_code == 404:
             raise Page404Error()
         if page.status_code != 200:
-            raise plugin.PluginError(f'HTTP Request failed {page.status_code}')
+            raise plugin.PluginError(f'HTTP Request failed {page.status_code}. Url: {url}')
 
         soup = get_soup(page.text)
-        soup_table = soup.find('table', class_='download').find('tbody')
+        soup_table = soup.find('table', class_='download')
+        if not soup_table:
+            # very likely no result
+            return
+        table_tbody = soup_table.find('tbody')
+        if not table_tbody:
+            raise plugin.PluginError('Parsing crashed, no tbody, please report the issue')
 
-        trs = soup_table.find_all('tr')
+
+        trs = table_tbody.find_all('tr')
         if not trs:
             logger.critical('Nothing to parse')
             return
@@ -87,7 +94,7 @@ class MagnetDL:
                     content_size=content_size,
                 )
             except AttributeError as e:
-                raise plugin.PluginError('Parsing error occured, please report the issue') from e
+                raise plugin.PluginError('Parsing crashed, please report the issue') from e
 
     @cached('magnetdl', persist='4 minutes')
     def on_task_input(self, task, config):
@@ -148,7 +155,10 @@ class MagnetDL:
         for search_string in entry.get('search_strings', [entry['title']]):
             logger.debug('Searching `{}`', search_string)
             try:
-                url = 'https://www.magnetdl.com/b/{}/'.format(quote(search_string.lower()))
+                term = search_string.lower().replace(' ', '-')
+                # note: weird url convention, uses first letter of search term
+                slash = term[0]
+                url = 'https://www.magnetdl.com/{}/{}/'.format(slash, term)
                 for entry in self.parse_page(scraper, url):
                     entries.append(entry)
             except Page404Error:
