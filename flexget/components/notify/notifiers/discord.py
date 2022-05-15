@@ -1,14 +1,18 @@
+from datetime import datetime
+
+from dateutil.parser import ParserError, isoparse
 from loguru import logger
-from requests.exceptions import RequestException
 
 from flexget import plugin
 from flexget.event import event
 from flexget.plugin import PluginWarning
-from flexget.utils import requests
+from flexget.utils.requests import RequestException, Session, TimedLimiter
 
 plugin_name = 'discord'
 
 logger = logger.bind(name=plugin_name)
+session = Session()
+session.add_domain_limiter(TimedLimiter('discord.com', '3 seconds'))
 
 
 class DiscordNotifier:
@@ -66,6 +70,7 @@ class DiscordNotifier:
                             },
                             'additionalProperties': False,
                         },
+                        'timestamp': {'type': 'string'},
                         'provider': {
                             'type': 'object',
                             'properties': {
@@ -115,15 +120,39 @@ class DiscordNotifier:
         :param dict config: discord plugin config
         """
 
-        web_hook = {
-            'content': message,
-            'username': config.get('username'),
-            'avatar_url': config.get('avatar_url'),
-            'embeds': config.get('embeds'),
-        }
+        for embed in config.get('embeds', []):
+            ts = embed.get('timestamp')
+            if ts:
+                if isinstance(ts, str):
+                    if ts.isdigit():
+                        try:
+                            ts = datetime.utcfromtimestamp(int(ts))
+                        except (ValueError, OverflowError):
+                            logger.info(
+                                f"Value provided for 'timestamp' ({embed['timestamp']}) "
+                                f"is not a timestamp ({int(datetime.now().timestamp())})."
+                            )
+                    else:
+                        try:
+                            ts = isoparse(ts)
+                            embed['timestamp'] = ts
+                        except (ParserError, ValueError) as e:
+                            logger.info(f"'timestamp' is in an invalid format: {e}")
+                if not isinstance(ts, datetime):
+                    embed.pop('timestamp', None)
+                    logger.warning("'timestamp' is invalid, dropping it")
+                else:
+                    embed['timestamp'] = datetime.strftime(ts, r'%Y-%m-%dT%H:%M:%S%z')
+
+            web_hook = {
+                'content': message,
+                'username': config.get('username'),
+                'avatar_url': config.get('avatar_url'),
+                'embeds': config.get('embeds'),
+            }
 
         try:
-            requests.post(config['web_hook_url'], json=web_hook)
+            session.post(config['web_hook_url'], json=web_hook)
         except RequestException as e:
             raise PluginWarning(e.args[0])
 
