@@ -66,7 +66,6 @@ class MagnetDL:
         if not table_tbody:
             raise plugin.PluginError('Parsing crashed, no tbody, please report the issue')
 
-
         trs = table_tbody.find_all('tr')
         if not trs:
             logger.critical('Nothing to parse')
