@@ -144,12 +144,12 @@ class DiscordNotifier:
                 else:
                     embed['timestamp'] = datetime.strftime(ts, r'%Y-%m-%dT%H:%M:%S%z')
 
-            web_hook = {
-                'content': message,
-                'username': config.get('username'),
-                'avatar_url': config.get('avatar_url'),
-                'embeds': config.get('embeds'),
-            }
+        web_hook = {
+            'content': message,
+            'username': config.get('username'),
+            'avatar_url': config.get('avatar_url'),
+            'embeds': config.get('embeds'),
+        }
 
         try:
             session.post(config['web_hook_url'], json=web_hook)
