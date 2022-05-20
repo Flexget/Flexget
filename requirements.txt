@@ -108,7 +108,7 @@ pygments==2.11.2
     # via rich
 pynzb==0.1.0
     # via -r requirements.in
-pyparsing==3.0.7
+pyparsing==2.4.7
     # via -r requirements.in
 pyrsistent==0.18.0
     # via jsonschema
