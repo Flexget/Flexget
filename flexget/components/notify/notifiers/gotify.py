@@ -33,7 +33,11 @@ class GotifyNotifier(object):
             'url': {'format': 'url'},
             'token': {'type': 'string'},
             'priority': {'type': 'integer', 'default': 4},
-            'content_type': {'type': 'string', 'enum': ['text/plain', 'text/markdown'], 'default': 'text/plain'},
+            'content_type': {
+                'type': 'string',
+                'enum': ['text/plain', 'text/markdown'],
+                'default': 'text/plain',
+            },
         },
         'required': ['token', 'url'],
         'additionalProperties': False,
