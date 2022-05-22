@@ -33,6 +33,11 @@ class GotifyNotifier(object):
             'url': {'format': 'url'},
             'token': {'type': 'string'},
             'priority': {'type': 'integer', 'default': 4},
+            'content_type': {
+                'type': 'string',
+                'enum': ['text/plain', 'text/markdown'],
+                'default': 'text/plain',
+            },
         },
         'required': ['token', 'url'],
         'additionalProperties': False,
@@ -48,8 +53,14 @@ class GotifyNotifier(object):
         params = {'token': config['token']}
 
         priority = config['priority']
+        content_type = config['content_type']
 
-        notification = {'title': title, 'message': message, 'priority': priority}
+        notification = {
+            'title': title,
+            'message': message,
+            'priority': priority,
+            'extras': {'client::display': {'contentType': content_type}},
+        }
         # Make the request
         try:
             response = requests.post(url, params=params, json=notification)
