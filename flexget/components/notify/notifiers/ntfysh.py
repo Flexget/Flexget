@@ -22,9 +22,7 @@ class NtfyshNotifier(object):
       entries:
         via:
           - ntfysh:
-              url: <NTFY_SERVER_URL>
               topic: <NTFY_TOPIC>
-              priority: <PRIORITY>
 
     Configuration parameters are also supported from entries (eg. through set).
     """
@@ -32,7 +30,7 @@ class NtfyshNotifier(object):
     schema = {
         'type': 'object',
         'properties': {
-            'url': {'format': 'url'},
+            'url': {'format': 'url', 'default': 'https://ntfy.sh/'},
             'topic': {'type': 'string'},
             'priority': {'type': 'integer', 'default': 3},
             'delay': {'type': 'string'},
