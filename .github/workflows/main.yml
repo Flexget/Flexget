@@ -18,12 +18,12 @@ jobs:
       fail-fast: false
     steps:
     - uses: actions/checkout@v2
-    # Can we cache the apt-get stuff somehow?
     - name: Install unrar  # used by some flexget tests
       if: matrix.operating-system == 'ubuntu-latest'
-      run: |
-        sudo apt-get update
-        sudo apt-get install -qy unrar
+      uses: awalsh128/cache-apt-pkgs-action@v1
+      with:
+        packages: unrar
+        version: 1.0
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
