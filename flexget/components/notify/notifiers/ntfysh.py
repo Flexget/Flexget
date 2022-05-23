@@ -1,8 +1,8 @@
 from http import HTTPStatus
 from urllib.parse import urljoin
 
-from requests.exceptions import RequestException
 from requests.auth import HTTPBasicAuth
+from requests.exceptions import RequestException
 
 from flexget import plugin
 from flexget.event import event
