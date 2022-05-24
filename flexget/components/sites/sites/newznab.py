@@ -73,7 +73,7 @@ class Newznab:
             rss = feedparser.parse(r.content)
             logger.debug('Raw RSS: {}', rss)
 
-            if rss.entries:
+            if not rss.entries:
                 logger.info('No results returned')
 
             for rss_entry in rss.entries:
