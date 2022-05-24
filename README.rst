@@ -52,11 +52,11 @@ To get a sense of the many things that can be done with FlexGet you can take a l
 
 **ChangeLog:** https://flexget.com/ChangeLog
 
-**Help:** https://discuss.flexget.com/
+**Help:** https://github.com/Flexget/Flexget/discussions
 
 **Chat:** https://flexget.com/Chat
 
-**Bugs:** https://github.com/Flexget/Flexget/issues
+**Bugs & Feature Requests:** https://github.com/Flexget/Flexget/issues
 
 Install
 -------
@@ -68,11 +68,6 @@ FlexGet is installable via pip with the command::
 For more detailed instructions see the `installation guide`_.
 
 .. _installation guide: https://flexget.com/Install
-
-Feature requests
-----------------
-.. image:: http://feathub.com/Flexget/Flexget?format=svg
-   :target: http://feathub.com/Flexget/Flexget
 
 How to use GIT checkout
 -----------------------
