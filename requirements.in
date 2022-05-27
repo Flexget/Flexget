@@ -26,6 +26,7 @@ flask-login>=0.4.0
 flask-restful>=0.3.3
 flask-restx==0.5.1
 flask>=0.7
+packaging~=21.3
 pyparsing==2.4.7
 werkzeug<2.1.0  # Flask-login incompatibility https://github.com/maxcountryman/flask-login/issues/636
 zxcvbn-python
