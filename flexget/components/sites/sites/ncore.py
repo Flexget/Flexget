@@ -7,14 +7,14 @@ from flexget.components.sites.urlrewriting import UrlRewritingError
 from flexget.components.sites.utils import torrent_availability
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.utils.soup import get_soup
 from flexget.utils.requests import TokenBucketLimiter
+from flexget.utils.soup import get_soup
 
 logger = logger.bind(name='nCore')
 
 URL = 'https://ncore.pro'
 
-HEADERS={'Content-type': 'application/x-www-form-urlencoded'}
+HEADERS = {'Content-type': 'application/x-www-form-urlencoded'}
 
 PASSKEY = ''
 
@@ -33,7 +33,7 @@ CATEGORIES = {
     "dvdser_hun",
     "dvdser",
     "hdser_hun",
-    "hdser"
+    "hdser",
 }
 
 SORT = {
@@ -42,8 +42,9 @@ SORT = {
     'size': 'size',
     'seeds': 'seeders',
     'leechers': 'leechers',
-    'downloads': 'times_completed'
+    'downloads': 'times_completed',
 }
+
 
 class UrlRewriteNcore:
     """nCore urlrewriter."""
@@ -53,14 +54,18 @@ class UrlRewriteNcore:
         'properties': {
             'username': {'type': 'string'},
             'password': {'type': 'string'},
-            'category': {'type': 'array', 'items': { 'type': 'string', 'enum': list(CATEGORIES)}, 'default': []},
-            'sort_by' : {'type': 'string', 'default': 'default', 'enum': list(SORT)},
-            'sort_reverse': {'type': 'boolean', 'default': False} 
+            'category': {
+                'type': 'array',
+                'items': {'type': 'string', 'enum': list(CATEGORIES)},
+                'default': [],
+            },
+            'sort_by': {'type': 'string', 'default': 'default', 'enum': list(SORT)},
+            'sort_reverse': {'type': 'boolean', 'default': False},
         },
         'required': ['username', 'password'],
         'additionalProperties': False,
     }
-    
+
     request_limiter = TokenBucketLimiter('ncore.pro/', 100, '5 seconds')
 
     @plugin.internet(logger)
@@ -69,27 +74,29 @@ class UrlRewriteNcore:
         Search for name from ncore.
         """
 
-        data="set_lang=hu&submitted=1&nev={}&pass={}&ne_leptessen_ki=0".format(config["username"], config["password"])
+        data = "set_lang=hu&submitted=1&nev={}&pass={}&ne_leptessen_ki=0".format(
+            config["username"], config["password"]
+        )
         page = task.requests.post(URL + "/login.php", data=data, headers=HEADERS)
         soup = get_soup(page.content)
         passkeyLine = str(soup.find('link', href=re.compile(r'rss\.php\?key=')))
-        PASSKEY = passkeyLine[passkeyLine.find("key="): passkeyLine.find('"', 20,90)]
+        PASSKEY = passkeyLine[passkeyLine.find("key=") : passkeyLine.find('"', 20, 90)]
 
         entries = set()
-        
+
         for search_string in entry.get('search_strings', [entry['title']]):
-            data="mire="+search_string+"&miben=name"
+            data = "mire=" + search_string + "&miben=name"
 
             if len(config['category']) > 0:
                 for cat in config['category']:
-                    data += "&kivalasztott_tipus%5B%5D="+cat
+                    data += "&kivalasztott_tipus%5B%5D=" + cat
                 data += '&tipus=kivalasztottak_kozott'
             else:
                 data += '&tipus=all_own'
-        
+
             data += '&miszerint=' + SORT[config['sort_by']]
 
-            if config['sort_reverse'] :
+            if config['sort_reverse']:
                 data += '&hogyan=DESC'
             page = task.requests.post(URL + "/torrents.php", data=data, headers=HEADERS)
 
@@ -99,7 +106,7 @@ class UrlRewriteNcore:
                     e = Entry()
 
                     href = a.get('href')
-                    id = href[href.find("id=")+3:]
+                    id = href[href.find("id=") + 3 :]
 
                     e['title'] = a.text
                     e['url'] = URL + '/torrents.php?action=download&id={0}&'.format(id) + PASSKEY
@@ -113,12 +120,10 @@ class UrlRewriteNcore:
                         e['torrent_seeds'], e['torrent_leeches']
                     )
                     entries.add(e)
-        
+
         return entries
 
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(
-        UrlRewriteNcore, 'ncore', interfaces=['search'], api_ver=2
-    )
+    plugin.register(UrlRewriteNcore, 'ncore', interfaces=['search'], api_ver=2)
