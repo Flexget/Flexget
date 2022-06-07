@@ -1,5 +1,6 @@
 import os
 import re
+import ssl
 import xmlrpc.client
 from socket import error as socket_error
 
@@ -28,6 +29,7 @@ class OutputAria2:
         'properties': {
             'server': {'type': 'string', 'default': 'localhost'},
             'port': {'type': 'integer', 'default': 6800},
+            'use_ssl': {'type': 'boolean', 'default': False},
             'secret': {'type': 'string', 'default': ''},
             'username': {'type': 'string', 'default': ''},  # NOTE: To be deprecated by aria2
             'password': {'type': 'string', 'default': ''},
@@ -49,16 +51,18 @@ class OutputAria2:
         'additionalProperties': False,
     }
 
-    def aria2_connection(self, server, port, username=None, password=None):
+    def aria2_connection(self, server, port, use_ssl, username=None, password=None):
         if username and password:
             userpass = '%s:%s@' % (username, password)
         else:
             userpass = ''
-        url = 'http://%s%s:%s/rpc' % (userpass, server, port)
+        scheme = 'https' if use_ssl else 'http'
+        context = ssl.SSLContext() if scheme == 'https' else None
+        url = '%s://%s%s:%s/rpc' % (scheme, userpass, server, port)
         logger.debug('aria2 url: {}', url)
         logger.info('Connecting to daemon at {}', url)
         try:
-            return xmlrpc.client.ServerProxy(url).aria2
+            return xmlrpc.client.ServerProxy(url, context=context).aria2
         except xmlrpc.client.ProtocolError as err:
             raise plugin.PluginError(
                 'Could not connect to aria2 at %s. Protocol error %s: %s'
@@ -97,7 +101,7 @@ class OutputAria2:
             return
         config = self.prepare_config(config)
         aria2 = self.aria2_connection(
-            config['server'], config['port'], config['username'], config['password']
+            config['server'], config['port'], config['use_ssl'], config['username'], config['password']
         )
         for entry in task.accepted:
             if task.options.test:
