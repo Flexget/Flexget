@@ -74,9 +74,14 @@ class UrlRewriteNcore:
         Search for name from ncore.
         """
 
-        data = "set_lang=hu&submitted=1&nev={}&pass={}&ne_leptessen_ki=0".format(
-            config["username"], config["password"]
-        )
+        data = {
+            "set_lang": "hu",
+            "submitted": "1",
+            "nev": config["username"],
+            "pass": config["password"],
+            "ne_leptessen_ki": 0
+        }
+
         page = task.requests.post(URL + "/login.php", data=data, headers=HEADERS)
         soup = get_soup(page.content)
         passkeyLine = str(soup.find('link', href=re.compile(r'rss\.php\?key=')))
@@ -85,21 +90,22 @@ class UrlRewriteNcore:
         entries = set()
 
         for search_string in entry.get('search_strings', [entry['title']]):
-            data = "mire=" + search_string + "&miben=name"
+            data = {
+                "mire": search_string,
+                "miben": "name",
+                "miszerint": SORT[config['sort_by']]
+            }
 
             if len(config['category']) > 0:
-                for cat in config['category']:
-                    data += "&kivalasztott_tipus%5B%5D=" + cat
-                data += '&tipus=kivalasztottak_kozott'
+                data["kivalasztott_tipus[]"] = config['category']
+                data["tipus"] = "kivalasztottak_kozott"
             else:
-                data += '&tipus=all_own'
-
-            data += '&miszerint=' + SORT[config['sort_by']]
+                data["tipus"] = "all_own"
 
             if config['sort_reverse']:
-                data += '&hogyan=DESC'
-            page = task.requests.post(URL + "/torrents.php", data=data, headers=HEADERS)
+                data["hogyan"] = "DESC"
 
+            page = task.requests.post(URL + "/torrents.php", data=data, headers=HEADERS)
             soup = get_soup(page.content)
             for a in soup.findAll('a', title=re.compile(".+")):
                 if 'details' in a.get('href'):
