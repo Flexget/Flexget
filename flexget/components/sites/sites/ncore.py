@@ -119,7 +119,7 @@ class UrlRewriteNcore:
                     e['torrent_availability'] = torrent_availability(
                         e['torrent_seeds'], e['torrent_leeches']
                     )
-                    
+
                     yield e
 
 
