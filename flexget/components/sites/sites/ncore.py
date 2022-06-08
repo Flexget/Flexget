@@ -79,7 +79,7 @@ class UrlRewriteNcore:
             "submitted": "1",
             "nev": config["username"],
             "pass": config["password"],
-            "ne_leptessen_ki": 0
+            "ne_leptessen_ki": 0,
         }
 
         page = task.requests.post(URL + "/login.php", data=data, headers=HEADERS)
@@ -90,11 +90,7 @@ class UrlRewriteNcore:
         entries = set()
 
         for search_string in entry.get('search_strings', [entry['title']]):
-            data = {
-                "mire": search_string,
-                "miben": "name",
-                "miszerint": SORT[config['sort_by']]
-            }
+            data = {"mire": search_string, "miben": "name", "miszerint": SORT[config['sort_by']]}
 
             if config['category']:
                 data["kivalasztott_tipus[]"] = config['category']
