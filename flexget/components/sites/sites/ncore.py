@@ -84,8 +84,8 @@ class UrlRewriteNcore:
 
         page = task.requests.post(URL + "/login.php", data=data, headers=HEADERS)
         soup = get_soup(page.content)
-        passkeyLine = str(soup.find('link', href=re.compile(r'rss\.php\?key=')))
-        PASSKEY = passkeyLine[passkeyLine.find("key=") : passkeyLine.find('"', 20, 90)]
+        passkey_line = str(soup.find('link', href=re.compile(r'rss\.php\?key=')))
+        PASSKEY = passkey_line[passkey_line.find("key=") : passkey_line.find('"', 20, 90)]
 
         entries = set()
 
@@ -96,7 +96,7 @@ class UrlRewriteNcore:
                 "miszerint": SORT[config['sort_by']]
             }
 
-            if len(config['category']) > 0:
+            if config['category']:
                 data["kivalasztott_tipus[]"] = config['category']
                 data["tipus"] = "kivalasztottak_kozott"
             else:
