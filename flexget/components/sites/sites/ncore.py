@@ -92,13 +92,13 @@ class UrlRewriteNcore:
         for search_string in entry.get('search_strings', [entry['title']]):
             data = {"mire": search_string, "miben": "name", "miszerint": SORT[config['sort_by']]}
 
-            if config['category']:
+            if config.get('category'):
                 data["kivalasztott_tipus[]"] = config['category']
                 data["tipus"] = "kivalasztottak_kozott"
             else:
                 data["tipus"] = "all_own"
 
-            if config['sort_reverse']:
+            if config.get('sort_reverse'):
                 data["hogyan"] = "DESC"
 
             page = task.requests.post(URL + "/torrents.php", data=data, headers=HEADERS)
