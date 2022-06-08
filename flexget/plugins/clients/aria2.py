@@ -101,7 +101,11 @@ class OutputAria2:
             return
         config = self.prepare_config(config)
         aria2 = self.aria2_connection(
-            config['server'], config['port'], config['use_ssl'], config['username'], config['password']
+            config['server'],
+            config['port'],
+            config['use_ssl'],
+            config['username'],
+            config['password'],
         )
         for entry in task.accepted:
             if task.options.test:
