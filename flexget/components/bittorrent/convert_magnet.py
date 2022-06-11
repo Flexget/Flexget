@@ -1,5 +1,6 @@
 import os
 import time
+from urllib.parse import quote
 
 from loguru import logger
 
@@ -114,7 +115,7 @@ class ConvertMagnet:
                 entry['url'] = torrent_file
                 entry['file'] = torrent_file
                 # make sure it's first in the list because of how download plugin works
-                entry['urls'].insert(0, 'file://{}'.format(torrent_file))
+                entry['urls'].insert(0, 'file://{}'.format(quote(torrent_file)))
 
 
 @event('plugin.register')
