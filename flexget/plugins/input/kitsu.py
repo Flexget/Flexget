@@ -18,6 +18,7 @@ class KitsuAnime:
 
     kitsu:
       username: <value>
+      user_id: <value>
       lists:
         - <current|planned|completed|on_hold|dropped>
         - <current|planned|completed|on_hold|dropped>
@@ -32,6 +33,7 @@ class KitsuAnime:
         'type': 'object',
         'properties': {
             'username': {'type': 'string'},
+            'user_id': {'type': 'string'},
             'lists': one_or_more(
                 {
                     'type': 'string',
@@ -44,37 +46,29 @@ class KitsuAnime:
             'latest': {'type': 'boolean', 'default': False},
             'status': {'type': 'string', 'enum': ['airing', 'finished']},
         },
-        'required': ['username'],
+        'oneOf': [
+            {'required': ['username']},
+            {'required': ['user_id']}
+        ],
         'additionalProperties': False,
     }
 
     @cached('kitsu', persist='2 hours')
     def on_task_input(self, task, config):
-        user_payload = {'filter[name]': config['username']}
-        try:
-            user_response = task.requests.get(
-                'https://kitsu.io/api/edge/users', params=user_payload
-            )
-        except RequestException as e:
-            error_message = 'Error finding User url: {url}'.format(url=e.request.url)
-            if hasattr(e, 'response'):
-                error_message += ' status: {status}'.format(status=e.response.status_code)
-            logger.opt(exception=True).debug(error_message)
-            raise plugin.PluginError(error_message)
-        user = user_response.json()
-        if not len(user['data']):
-            raise plugin.PluginError(
-                'no such username found "{name}"'.format(name=config['username'])
-            )
-        next_url = 'https://kitsu.io/api/edge/users/{id}/library-entries'.format(
-            id=user['data'][0]['id']
+        user_id = self._resolve_user_id(task, config)
+        next_url = 'https://kitsu.io/api/edge/users/{user_id}/library-entries'.format(
+            user_id=user_id
         )
+
         payload = {
             'filter[status]': ','.join(config['lists']),
-            'filter[media_type]': 'Anime',
-            'include': 'media',
+            'filter[kind]': 'anime',
+            'include': 'anime',
+            'fields[anime]': 'canonicalTitle,titles,endDate,subtype',
+            'fields[libraryEntries]': 'anime',
             'page[limit]': 20,
         }
+
         try:
             response = task.requests.get(next_url, params=payload)
         except RequestException as e:
@@ -83,18 +77,18 @@ class KitsuAnime:
                 error_message += ' status: {status}'.format(status=e.response.status_code)
             logger.opt(exception=True).debug(error_message)
             raise plugin.PluginError(error_message)
-
         json_data = response.json()
 
         while json_data:
+            anime_dict = {relation['id']: relation for relation in json_data['included'] if relation['type'] == 'anime'}
 
-            for item, anime in zip(json_data['data'], json_data['included']):
-                if item['relationships']['media']['data']['id'] != anime['id']:
-                    raise ValueError(
-                        'Anime IDs {id1} and {id2} do not match'.format(
-                            id1=item['relationships']['media']['data']['id'], id2=anime['id']
-                        )
-                    )
+            for item in json_data['data']:
+                if item['relationships']['anime']['data'] is None:
+                    logger.opt(exception=True).debug('Anime relation missing')
+                    continue
+
+                anime = anime_dict[item['relationships']['anime']['data']['id']]
+
                 status = config.get('status')
                 if status is not None:
                     if status == 'airing' and anime['attributes']['endDate'] is not None:
@@ -143,6 +137,29 @@ class KitsuAnime:
             else:
                 break
 
+    def _resolve_user_id(self, task, config):
+        user_id = config.get('user_id')
+
+        if user_id is None:
+            user_payload = {'filter[name]': config['username']}
+            try:
+                user_response = task.requests.get(
+                    'https://kitsu.io/api/edge/users', params=user_payload
+                )
+            except RequestException as e:
+                error_message = 'Error finding User url: {url}'.format(url=e.request.url)
+                if hasattr(e, 'response'):
+                    error_message += ' status: {status}'.format(status=e.response.status_code)
+                logger.opt(exception=True).debug(error_message)
+                raise plugin.PluginError(error_message)
+            user = user_response.json()
+            if not len(user['data']):
+                raise plugin.PluginError(
+                    'no such username found "{name}"'.format(name=config['username'])
+                )
+            user_id = user['data'][0]['id']
+
+        return user_id
 
 @event('plugin.register')
 def register_plugin():
