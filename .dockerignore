@@ -42,3 +42,6 @@ flexget/ui/app/
 docs/
 tests/
 .*
+
+.devcontainer
+.venv

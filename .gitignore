@@ -48,3 +48,4 @@ flexget/ui/v1/app
 .mypy_cache/
 .tool-versions
 .devcontainer/
+.venv
