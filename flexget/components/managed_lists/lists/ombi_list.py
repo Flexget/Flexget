@@ -2,7 +2,7 @@ from __future__ import absolute_import, division, unicode_literals
 
 import logging
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from collections import MutableSet
+from collections.abc import MutableSet
 from urllib.parse import urlparse
 
 from flexget import plugin
