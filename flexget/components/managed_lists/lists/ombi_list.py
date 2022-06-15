@@ -137,13 +137,15 @@ class OmbiSet(MutableSet):
             raise plugin.PluginError('Unable to connect to Ombi at %s. Error: %s' % (url, e))
 
     def generate_movie_entry(self, parent_request):
-        entry = Entry()
+
         log.debug('Found: %s', parent_request.get('title'))
+
+        # If we dont have an imdb id, maybe we should get it from the title?
         if not parent_request.get('imdbId'):
             simdburl = ''
         else:
             simdburl = 'http://www.imdb.com/title/' + parent_request.get('imdbId') + '/'
-        entry = Entry(
+        return Entry(
             title=self.generate_title(parent_request),
             url=simdburl,
             imdb_id=parent_request.get('imdbId'),
@@ -157,17 +159,16 @@ class OmbiSet(MutableSet):
             ombi_available=parent_request.get('available'),
             ombi_denied=parent_request.get('denied'),
         )
-        return entry
 
     def generate_tv_entry(self, parent_request, child_request=None, season=None, episode=None):
-        entry = Entry()
+
         if self.config.get('type') == 'shows':
             log.debug('Found: %s', parent_request.get('title'))
             if not parent_request.get('imdbId'):
                 simdburl = ''
             else:
                 simdburl = 'http://www.imdb.com/title/' + parent_request.get('imdbId') + '/'
-            entry = Entry(
+            return Entry(
                 title=self.generate_title(parent_request),
                 url=simdburl,
                 series_name=self.generate_title(parent_request),
@@ -182,7 +183,7 @@ class OmbiSet(MutableSet):
                 simdburl = ''
             else:
                 simdburl = 'http://www.imdb.com/title/' + parent_request.get('imdbId') + '/'
-            entry = Entry(
+            return Entry(
                 title=self.generate_title(parent_request, season),
                 url=simdburl,
                 series_name=self.generate_title(parent_request),
@@ -202,7 +203,7 @@ class OmbiSet(MutableSet):
                 season.get('seasonNumber'),
                 episode.get('episodeNumber'),
             )
-            entry = Entry(
+            return Entry(
                 title=self.generate_title(parent_request, season, episode),
                 url=episode.get('url'),
                 series_name=self.generate_title(parent_request),
@@ -221,8 +222,6 @@ class OmbiSet(MutableSet):
             )
         else:
             raise plugin.PluginError('Error: Unknown list type %s.' % (self.config.get('type')))
-
-        return entry
 
     @property
     def items(self):
