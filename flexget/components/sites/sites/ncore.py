@@ -77,8 +77,8 @@ class UrlRewriteNcore:
         data = {
             "set_lang": "hu",
             "submitted": "1",
-            "nev": config["username"],
-            "pass": config["password"],
+            "nev": config.get("username"),
+            "pass": config.get("password"),
             "ne_leptessen_ki": 0,
         }
 
@@ -90,10 +90,10 @@ class UrlRewriteNcore:
         entries = set()
 
         for search_string in entry.get('search_strings', [entry['title']]):
-            data = {"mire": search_string, "miben": "name", "miszerint": SORT[config['sort_by']]}
+            data = {"mire": search_string, "miben": "name", "miszerint": SORT[config.get('sort_by')]}
 
             if config.get('category'):
-                data["kivalasztott_tipus[]"] = config['category']
+                data["kivalasztott_tipus[]"] = config.get('category')
                 data["tipus"] = "kivalasztottak_kozott"
             else:
                 data["tipus"] = "all_own"
