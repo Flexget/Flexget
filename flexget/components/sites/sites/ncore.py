@@ -90,7 +90,11 @@ class UrlRewriteNcore:
         entries = set()
 
         for search_string in entry.get('search_strings', [entry['title']]):
-            data = {"mire": search_string, "miben": "name", "miszerint": SORT[config.get('sort_by')]}
+            data = {
+                "mire": search_string,
+                "miben": "name",
+                "miszerint": SORT[config.get('sort_by')],
+            }
 
             if config.get('category'):
                 data["kivalasztott_tipus[]"] = config.get('category')
