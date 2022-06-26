@@ -364,19 +364,29 @@ class OmbiSet(MutableSet):
             raise plugin.PluginError('Ombi username and password login failed: %s' % e)
 
     def ombi_auth(self) -> Dict[str, str]:
-        if self.config.get('api_key'):
+        """Returns a dictionary that contains authrization headers for the OMBI API.
+
+        Raises:
+            plugin.PluginError: If the api_key or username/password are not defined.
+
+        Returns:
+            Dict[str, str]: Authorization headers.
+        """
+
+        if "api_key" in self.config:
             log.debug('Authenticating via api_key')
-            api_key = self.config.get('api_key')
+            api_key = self.config['api_key']
             header = {'ApiKey': api_key}
             return header
-        elif self.config.get('username') and self.config.get('password'):
+
+        if self.config.get('username') and self.config.get('password'):
             log.debug('Authenticating via username: %s', self.config.get('username'))
             access_token = self.get_access_token()
             return {"Authorization": "Bearer %s" % access_token}
-        else:
-            raise plugin.PluginError(
-                'Error: an api_key or username and password must be configured'
-            )
+
+        raise plugin.PluginError(
+            'Error: an api_key or username and password must be configured'
+        )
 
     def _get_base_url(self):
         url = urlparse(self.config.get('base_url'))
