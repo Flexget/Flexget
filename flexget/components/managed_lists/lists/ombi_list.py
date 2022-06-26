@@ -1,6 +1,5 @@
 from __future__ import absolute_import, division, unicode_literals
 
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from collections.abc import MutableSet
 from typing import Any, Callable, Dict, List, Optional
 from urllib.parse import urlparse
@@ -252,6 +251,7 @@ class OmbiSet(MutableSet):
             log.warning(
                 f"{entry['title']} is missing the tmdb_id, consider using tmdb_lookup plugin."
             )
+            return None
 
         for item in self.items:
             if item['tmdb_id'] == entry['tmdb_id']:
@@ -342,6 +342,7 @@ class OmbiSet(MutableSet):
             log.warning(
                 f"{entry['title']} is missing the tmdb_id, consider using tmdb_lookup plugin."
             )
+            return None
 
         entry_type: str = self.config['type']
 
