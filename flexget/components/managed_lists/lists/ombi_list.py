@@ -20,7 +20,9 @@ class OmbiEntry:
     # This is just a type hint for the IDE and will be set by the child class.
     entry_type: str
 
-    def __init__(self, base_url: str, auth: Callable[[], Dict[str, str]], data: Dict[str, Any]) -> None:
+    def __init__(
+        self, base_url: str, auth: Callable[[], Dict[str, str]], data: Dict[str, Any]
+    ) -> None:
         self.base_url = base_url
         self.auth = auth
         self.data = data
@@ -384,9 +386,7 @@ class OmbiSet(MutableSet):
             access_token = self.get_access_token()
             return {"Authorization": "Bearer %s" % access_token}
 
-        raise plugin.PluginError(
-            'Error: an api_key or username and password must be configured'
-        )
+        raise plugin.PluginError('Error: an api_key or username and password must be configured')
 
     def _get_base_url(self):
         url = urlparse(self.config.get('base_url'))
