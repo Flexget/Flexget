@@ -17,15 +17,9 @@ log = logger.bind(name='ombi_list')
 
 
 class OmbiEntry:
-    # This is just a type hint for the IDE and will be set by the child class.
-    entry_type: str
-
-    def __init__(
-        self, base_url: str, auth: Callable[[], Dict[str, str]], data: Dict[str, Any]
-    ) -> None:
+    def __init__(self, base_url: str, auth: Callable[[], Dict[str, str]]) -> None:
         self.base_url = base_url
         self.auth = auth
-        self.data = data
 
     def _post_data(self, api_endpoint: str, json: Dict[str, Any]) -> Optional[Dict[str, Any]]:
 
@@ -100,17 +94,23 @@ class OmbiEntry:
 
         log.verbose(f"{self.data['title']} has been marked available.")
 
-    @classmethod
-    def from_tmdb_id(cls, base_url: str, tmdb_id: str, auth: Callable[[], Dict[str, str]]):
+
+class OmbiMovie(OmbiEntry):
+    entry_type = 'movie'
+
+    def __init__(
+        self, base_url: str, auth: Callable[[], Dict[str, str]], data: Dict[str, Any]
+    ) -> None:
+        super().__init__(base_url, auth)
+        self.data = data
+
+    @staticmethod
+    def from_imdb_id(base_url: str, tmdb_id: str, auth: Callable[[], Dict[str, str]]):
 
         headers = {'Content-Type': 'application/json', 'Accept': 'application/json'}
         headers.update(auth())
 
-        url = (
-            f"{base_url}/api/v2/Search/{cls.entry_type}/{tmdb_id}"
-            if cls.entry_type == 'movie'
-            else f"{base_url}/api/v2/Search/{cls.entry_type}/moviedb/{tmdb_id}"
-        )
+        url = f"{base_url}/api/v2/Search/{OmbiMovie.entry_type}/{tmdb_id}"
 
         response = requests.get(url, headers=headers)
 
@@ -125,15 +125,40 @@ class OmbiEntry:
         # then the theMovieDbId field will be blank for some reason...
         data['theMovieDbId'] = tmdb_id
 
-        return cls(base_url, auth, data)
-
-
-class OmbiMovie(OmbiEntry):
-    entry_type = 'movie'
+        return OmbiMovie(base_url, auth, data)
 
 
 class OmbiTv(OmbiEntry):
     entry_type = 'tv'
+
+    def __init__(
+        self, base_url: str, auth: Callable[[], Dict[str, str]], data: Dict[str, Any]
+    ) -> None:
+        super().__init__(base_url, auth)
+        self.data = data
+
+    @staticmethod
+    def from_tvdb_id(base_url: str, tmdb_id: str, auth: Callable[[], Dict[str, str]]):
+
+        headers = {'Content-Type': 'application/json', 'Accept': 'application/json'}
+        headers.update(auth())
+
+        url = f"{base_url}/api/v2/Search/{OmbiTv.entry_type}/moviedb/{tmdb_id}"
+
+        response = requests.get(url, headers=headers)
+
+        if not response.ok:
+            log.error(f"{url} return {response.reason}")
+            # Do I throw an exception here? Is that allowed from a plugin?
+            return None
+
+        data = response.json()
+
+        # Their is a bug in OMBI where if you get a movie by its TMDB ID
+        # then the theMovieDbId field will be blank for some reason...
+        data['theMovieDbId'] = tmdb_id
+
+        return OmbiTv(base_url, auth, data)
 
 
 class OmbiSet(MutableSet):
@@ -322,9 +347,9 @@ class OmbiSet(MutableSet):
         entry_type: str = self.config['type']
 
         if entry_type == 'movies':
-            return OmbiMovie.from_tmdb_id(self._get_base_url(), entry['tmdb_id'], self.ombi_auth)
+            return OmbiMovie.from_imdb_id(self._get_base_url(), entry['tmdb_id'], self.ombi_auth)
 
-        return OmbiTv.from_tmdb_id(self._get_base_url(), entry['tmdb_id'], self.ombi_auth)
+        return OmbiTv.from_tvdb_id(self._get_base_url(), entry['tmdb_id'], self.ombi_auth)
 
     def generate_series_id(self, season, episode=None):
         tempid = 'S' + str(season.get('seasonNumber')).zfill(2)
