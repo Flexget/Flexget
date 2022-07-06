@@ -44,7 +44,7 @@ class OutputAria2:
             },
             'options': {
                 'type': 'object',
-                'additionalProperties': {'oneOf': [{'type': 'string'}, {'type': 'integer'}]},
+                'additionalProperties': {'oneOf': [{'type': 'string'}]},
             },
         },
         'required': ['path'],
