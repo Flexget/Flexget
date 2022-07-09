@@ -1,6 +1,5 @@
-from distutils.version import LooseVersion
-
 from loguru import logger
+from packaging import version
 from sqlalchemy import Column, Integer, String
 
 from flexget import db_schema, plugin
@@ -277,7 +276,7 @@ class TelegramNotifier:
             raise plugin.PluginWarning('missing python-telegram-bot pkg')
         elif not hasattr(telegram, str('__version__')):
             raise plugin.PluginWarning('invalid or old python-telegram-bot pkg')
-        elif LooseVersion(telegram.__version__) < _MIN_TELEGRAM_VER:
+        elif version.parse(telegram.__version__) < version.parse(_MIN_TELEGRAM_VER):
             raise plugin.PluginWarning(
                 'old python-telegram-bot ({0})'.format(telegram.__version__)
             )
