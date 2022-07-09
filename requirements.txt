@@ -52,6 +52,8 @@ flask-restful==0.3.9
     # via -r requirements.in
 flask-restx==0.5.1
     # via -r requirements.in
+greenlet==1.1.2
+    # via sqlalchemy
 guessit==3.4.3
     # via -r requirements.in
 html5lib==1.1
@@ -60,24 +62,24 @@ idna==3.3
     # via requests
 itsdangerous==2.0.1
     # via flask
-jaraco.classes==3.2.1
+jaraco-classes==3.2.1
     # via jaraco-collections
-jaraco.collections==3.4.0
+jaraco-collections==3.4.0
     # via cherrypy
-jaraco.context==4.1.1
+jaraco-context==4.1.1
     # via jaraco-text
-jaraco.functools==3.4.0
+jaraco-functools==3.4.0
     # via
     #   cheroot
     #   jaraco-text
     #   tempora
-jaraco.text==3.7.0
+jaraco-text==3.7.0
     # via jaraco-collections
 jinja2==3.0.3
     # via
     #   -r requirements.in
     #   flask
-jsonschema==3.2.0
+jsonschema==4.6.2
     # via
     #   -r requirements.in
     #   flask-restx
@@ -146,7 +148,6 @@ six==1.16.0
     #   flask-restful
     #   flask-restx
     #   html5lib
-    #   jsonschema
     #   python-dateutil
 soupsieve==2.3.1
     # via beautifulsoup4
@@ -167,7 +168,7 @@ werkzeug==2.0.3
     #   -r requirements.in
     #   flask
     #   flask-restx
-zc.lockfile==2.0
+zc-lockfile==2.0
     # via cherrypy
 zxcvbn-python==4.4.24
     # via -r requirements.in
