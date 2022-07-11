@@ -42,7 +42,9 @@ class OutputAria2:
             },
             'options': {
                 'type': 'object',
-                'additionalProperties': {'oneOf': [{'type': 'string'}, {'type': 'number'}, {'type': 'boolean'}]},
+                'additionalProperties': {
+                    'oneOf': [{'type': 'string'}, {'type': 'number'}, {'type': 'boolean'}]
+                },
             },
         },
         'required': ['path'],
