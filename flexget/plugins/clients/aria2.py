@@ -42,7 +42,7 @@ class OutputAria2:
             },
             'options': {
                 'type': 'object',
-                'additionalProperties': {'oneOf': [{'type': 'string'}]},
+                'additionalProperties': {'oneOf': [{'type': 'string'}, {'type': 'number'}, {'type': 'boolean'}]},
             },
         },
         'required': ['path'],
@@ -89,6 +89,12 @@ class OutputAria2:
         config.setdefault('secret', '')
         config.setdefault('options', {})
         config.setdefault('add_extension', False)
+        options = config['options']
+        for key in options:
+            if isinstance(options[key], bool):
+                options[key] = str(options[key]).lower()
+            elif not isinstance(options[key], str):
+                options[key] = str(options[key])
         return config
 
     def on_task_output(self, task, config):
