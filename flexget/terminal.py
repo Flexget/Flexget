@@ -21,6 +21,7 @@ class _Console(rich.console.Console):
     def __init__(self, *args, **kwargs):
         if "PYCHARM_HOSTED" in os.environ:
             kwargs.setdefault('color_system', 'truecolor')
+        kwargs.setdefault("markup", True)
         super().__init__(*args, **kwargs)
 
     def __call__(self, text: Any, *args, **kwargs) -> None:

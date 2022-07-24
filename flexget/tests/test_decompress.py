@@ -8,6 +8,7 @@ except ImportError:
     rarfile = None
 
 
+@pytest.mark.skipif(rarfile is None, reason='rarfile module required')
 @pytest.mark.usefixtures('tmpdir')
 class TestExtract:
     config = """
@@ -93,7 +94,6 @@ class TestExtract:
     error_not_local = 'Entry does not appear to represent a local file.'
     error_not_exists = 'File no longer exists:'
 
-    @pytest.mark.skipif(rarfile is None, reason='rarfile module required')
     @pytest.mark.filecopy(rar_path, '__tmp__')
     def test_rar(self, execute_task, tmpdir):
         """Test basic RAR extraction"""
@@ -104,7 +104,6 @@ class TestExtract:
         ).exists(), 'Output file does not exist at the correct path.'
         assert tmpdir.join(self.rar_name).exists(), 'RAR archive should still exist.'
 
-    @pytest.mark.skipif(rarfile is None, reason='rarfile module required')
     @pytest.mark.filecopy(rar_path, '__tmp__')
     def test_delete_rar(self, execute_task, tmpdir):
         """Test RAR deletion after extraction"""

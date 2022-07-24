@@ -1,6 +1,7 @@
 apscheduler>=3.2.0
 beautifulsoup4>=4.5  # Beautifulsoup 4.5+ is required to support different versions of html5lib
 click<=8.0.4  # Restriction can be dropped when we drop python 3.6
+colorama>=0.4.4
 feedparser>=6.0.2
 guessit~=3.4
 html5lib>=0.11
@@ -26,6 +27,7 @@ flask-login>=0.4.0
 flask-restful>=0.3.3
 flask-restx==0.5.1
 flask>=0.7
+packaging~=21.3
 pyparsing==2.4.7
 werkzeug<2.1.0  # Flask-login incompatibility https://github.com/maxcountryman/flask-login/issues/636
 zxcvbn-python
