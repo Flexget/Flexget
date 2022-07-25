@@ -28,7 +28,7 @@ CATEGORIES = {
     "dvd9",
     "hd_hun",
     "hd",
-    "vidser_hun",
+    "xvidser_hun",
     "xvidser",
     "dvdser_hun",
     "dvdser",
