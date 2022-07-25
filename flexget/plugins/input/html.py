@@ -110,7 +110,7 @@ class InputHtml:
             base_url = config['url']
             entries_count = increment.get('entries_count', 500)
             stop_when_empty = increment.get('stop_when_empty', True)
-            stop_when_404 = increment.get('stop_when_404', False)
+            stop_when_404 = increment.get('stop_when_404', True)
             increment_name = increment.get('name', 'i')
 
             template_url = Template(base_url)
