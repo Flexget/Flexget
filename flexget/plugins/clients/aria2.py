@@ -1,12 +1,11 @@
+import json
 import os
 import re
 import ssl
 import xmlrpc.client
-import json
 from socket import error as socket_error
+
 import requests
-
-
 from loguru import logger
 
 from flexget import plugin
@@ -46,7 +45,7 @@ class JSONRPC(object):
             'jsonrpc': JSONRPC.RPC_VERSION,
             'id': JSONRPC.RPC_ID,
             'method': method,
-            'params': params
+            'params': params,
         }
         if self._token:
             req_params['params'].insert(0, self._token)
@@ -56,14 +55,14 @@ class JSONRPC(object):
 
     def _default_error_handle(code, message):
         logger.critical('Fault code {} message {}', code, message)
-        raise plugin.PluginError(
-            'Fault code %s message %s' % (code, message), logger
-        )
+        raise plugin.PluginError('Fault code %s message %s' % (code, message), logger)
 
     def _default_success_handle(response):
         return response.text
 
-    def _post(self, method, params, on_success=_default_success_handle, on_fail=_default_error_handle):
+    def _post(
+        self, method, params, on_success=_default_success_handle, on_fail=_default_error_handle
+    ):
         _params = self._get_req_params(method, params)
         resp = requests.post(self._url, data=json.dumps(_params))
         result = resp.json()
@@ -83,7 +82,7 @@ class JSONRPC(object):
 
     def get_global_stat(self):
         # https://aria2.github.io/manual/en/html/aria2c.html#aria2.getGlobalStat
-        return self._post(JSONRPC.GETGLOBALSTAT_METHOD,params=[])
+        return self._post(JSONRPC.GETGLOBALSTAT_METHOD, params=[])
 
 
 class XMLRPC(object):
@@ -96,18 +95,14 @@ class XMLRPC(object):
             userpass = '%s:%s@' % (username, password)
         else:
             userpass = ''
-        _schemes = {
-            'http': None,
-            'https': ssl.SSLContext()
-        }
+        _schemes = {'http': None, 'https': ssl.SSLContext()}
         if scheme not in _schemes:
             raise plugin.PluginError('Unknown scheme: %s' % (scheme), logger)
         url = '%s://%s%s:%s/%s' % (scheme, userpass, server, port, rpc_path)
         logger.debug('aria2 url: {}', url)
         logger.info('Connecting to daemon at {}', url)
         try:
-            self._aria2 = xmlrpc.client.ServerProxy(
-                url, context=_schemes(scheme)).aria2
+            self._aria2 = xmlrpc.client.ServerProxy(url, context=_schemes(scheme)).aria2
         except xmlrpc.client.ProtocolError as err:
             raise plugin.PluginError(
                 'Could not connect to aria2 at %s. Protocol error %s: %s'
@@ -122,12 +117,10 @@ class XMLRPC(object):
             )
         except socket_error as e:
             raise plugin.PluginError(
-                'Socket connection issue with aria2 daemon at %s: %s' % (
-                    url, e), logger
+                'Socket connection issue with aria2 daemon at %s: %s' % (url, e), logger
             )
         except:
-            logger.opt(exception=True).debug(
-                'Unexpected error during aria2 connection')
+            logger.opt(exception=True).debug('Unexpected error during aria2 connection')
             raise plugin.PluginError(
                 'Unidentified error during connection to aria2 daemon', logger
             )
@@ -211,14 +204,18 @@ class OutputAria2:
         if task.options.learn:
             return
         config = self.prepare_config(config)
-        _rpc = {
-            'xml': XMLRPC,
-            'json': JSONRPC
-        }
+        _rpc = {'xml': XMLRPC, 'json': JSONRPC}
         if config['rpc_mode'] not in _rpc:
             entry.fail('Unknown rpc_mode: %s' % config['rpc_mode'])
         aria2 = _rpc[config['rpc_mode']](
-            config['server'], config['port'], config['scheme'], config['rpc_path'], config['username'], config['password'], config['secret'])
+            config['server'],
+            config['port'],
+            config['scheme'],
+            config['rpc_path'],
+            config['username'],
+            config['password'],
+            config['secret'],
+        )
 
         for entry in task.accepted:
             if task.options.test:
@@ -229,8 +226,7 @@ class OutputAria2:
             except socket_error as se:
                 entry.fail('Unable to reach Aria2: %s' % se)
             except xmlrpc.client.Fault as err:
-                logger.critical('Fault code {} message {}',
-                                err.faultCode, err.faultString)
+                logger.critical('Fault code {} message {}', err.faultCode, err.faultString)
                 entry.fail('Aria2 communication Fault')
             except Exception as e:
                 logger.opt(exception=True).debug('Exception type {}', type(e))
@@ -249,8 +245,7 @@ class OutputAria2:
             return
 
         filename = entry.get('content_filename', config.get('filename', None))
-        add_extension = entry.get(
-            'content_extension', config.get('add_extension', False))
+        add_extension = entry.get('content_extension', config.get('add_extension', False))
 
         if filename:
             if add_extension:
@@ -262,13 +257,10 @@ class OutputAria2:
                         with task.requests.get(
                             entry['url'], headers=None, stream=True
                         ) as response:
-                            content_disposition = response.headers.get(
-                                'content-disposition', None)
+                            content_disposition = response.headers.get('content-disposition', None)
                     except Exception as e:
-                        logger.warning(
-                            'Not possible to retrive file info from `{}`', entry['url'])
-                        entry.fail(
-                            'Not possible to retrive file info from `%s`' % entry['url'])
+                        logger.warning('Not possible to retrive file info from `{}`', entry['url'])
+                        entry.fail('Not possible to retrive file info from `%s`' % entry['url'])
                         return
 
                     if content_disposition:
@@ -288,16 +280,14 @@ class OutputAria2:
                                 )
 
                 else:
-                    ext = add_extension if add_extension[0] == '.' else '.' + \
-                        add_extension
+                    ext = add_extension if add_extension[0] == '.' else '.' + add_extension
 
                 if not ext:
                     logger.warning('Not possible to retrive extension')
                     entry.fail('Not possible to retrive extension')
                     return
 
-                logger.debug(
-                    'Adding extension `{}` to file `{}`', ext, filename)
+                logger.debug('Adding extension `{}` to file `{}`', ext, filename)
 
                 filename += ext
 
@@ -318,8 +308,7 @@ class OutputAria2:
                 entry.fail('Cannot find torrent file')
                 return
             return aria2.add_torrent(
-                xmlrpc.client.Binary(
-                    open(torrent_file, mode='rb').read()), options
+                xmlrpc.client.Binary(open(torrent_file, mode='rb').read()), options
             )
         # handle everything else (except metalink -- which is unsupported)
         # so magnets, https, http, ftp .. etc
