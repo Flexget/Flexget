@@ -57,7 +57,7 @@ class BarkNotifier:
             'icon': {'type': 'string'},
             'group': {'type': 'string'},
             'isArchive': {'type': 'string'},
-            'url': {'type': 'string'}
+            'url': {'type': 'string'},
         },
         'required': ['server', 'device_key'],
         'additionalProperties': False,
@@ -82,5 +82,4 @@ class BarkNotifier:
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(BarkNotifier, plugin_name,
-                    api_ver=2, interfaces=['notifiers'])
+    plugin.register(BarkNotifier, plugin_name, api_ver=2, interfaces=['notifiers'])
