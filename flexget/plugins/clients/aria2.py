@@ -102,7 +102,7 @@ class XMLRPC(object):
         logger.debug('aria2 url: {}', url)
         logger.info('Connecting to daemon at {}', url)
         try:
-            self._aria2 = xmlrpc.client.ServerProxy(url, context=_schemes(scheme)).aria2
+            self._aria2 = xmlrpc.client.ServerProxy(url, context=_schemes[scheme]).aria2
         except xmlrpc.client.ProtocolError as err:
             raise plugin.PluginError(
                 'Could not connect to aria2 at %s. Protocol error %s: %s'
