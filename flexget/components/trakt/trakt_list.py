@@ -285,7 +285,7 @@ class TraktSet(MutableSet):
                             raise plugin.PluginError(
                                 'Could not retrieve movie translation from trakt: %s' % str(e)
                             )
-                        if not translation:
+                        if not translation[0]['title']:
                             logger.warning(
                                 'No translation data returned from trakt for movie {}.',
                                 entry['title'],
