@@ -69,11 +69,6 @@ For more detailed instructions see the `installation guide`_.
 
 .. _installation guide: https://flexget.com/Install
 
-Feature requests
-----------------
-.. image:: http://feathub.com/Flexget/Flexget?format=svg
-   :target: http://feathub.com/Flexget/Flexget
-
 How to use GIT checkout
 -----------------------
 
