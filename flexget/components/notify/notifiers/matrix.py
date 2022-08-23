@@ -12,6 +12,7 @@ plugin_name = 'matrix'
 
 logger = logger.bind(name=plugin_name)
 
+
 def urljoin(*args):
     """
     Author: Rune Kaagaard
@@ -19,6 +20,7 @@ def urljoin(*args):
     stripped for each argument.
     """
     return "/".join(map(lambda x: str(x).rstrip('/'), args))
+
 
 class MatrixNotifier:
     """
@@ -58,13 +60,13 @@ class MatrixNotifier:
         """
         Send notification to Matrix Room
         """
-        notification = {'body': message, 
-                        'msgtype': "m.text"}
-        room = urljoin(config['server'],
-                        "_matrix/client/r0/rooms",
-                        config['roomid'],
-                        "send/m.room.message?access_token="+config['token']
-                        )                        
+        notification = {'body': message, 'msgtype': "m.text"}
+        room = urljoin(
+            config['server'],
+            "_matrix/client/r0/rooms",
+            config['roomid'],
+            "send/m.room.message?access_token=" + config['token'],
+        )
         try:
             requests.post(room, json=notification)
         except RequestException as e:
