@@ -1,7 +1,7 @@
-from loguru import logger
-
-from hashlib import sha256
 import ssl
+from hashlib import sha256
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
