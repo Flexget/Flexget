@@ -29,7 +29,7 @@ class JSONRPC(object):
         if token:
             self._token = 'token:' + token
         else:
-            self._token = token
+            self._token = ''
         if username and password:
             userpass = '%s:%s@' % (username, password)
         else:
@@ -90,7 +90,7 @@ class XMLRPC(object):
         if token:
             self._token = 'token:' + token
         else:
-            self._token = token
+            self._token = ''
         if username and password:
             userpass = '%s:%s@' % (username, password)
         else:
