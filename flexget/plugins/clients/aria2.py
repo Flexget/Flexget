@@ -15,8 +15,27 @@ from flexget.utils.template import RenderError
 logger = logger.bind(name='aria2')
 
 
-class JSONRPC(object):
+class RpcClient():
+    def __init__(self, server, port, scheme, rpc_path, username, password, token):
+        if token:
+            self._token = 'token:' + token
+        else:
+            self._token = ''
+        if username and password:
+            userpass = '%s:%s@' % (username, password)
+        else:
+            userpass = ''
+        self._url = '%s://%s%s:%s/%s' % (scheme, userpass, server, port, rpc_path)
+        logger.debug('aria2 url: {}', self._url)
 
+    def add_uri(self, uris, options):
+        raise plugin.PluginError('Unsupported Operation')
+
+    def add_torrent(self, torrent, options):
+        raise plugin.PluginError('Unsupported Operation')
+
+
+class JsonRpcClient(RpcClient):
     RPC_ID = 'FLEXGET'
     RPC_VERSION = '2.0'
 
@@ -26,24 +45,15 @@ class JSONRPC(object):
     ADDMETALINK_METHOD = 'aria2.addMetalink'
 
     def __init__(self, server, port, scheme, rpc_path, username=None, password=None, token=None):
-        if token:
-            self._token = 'token:' + token
-        else:
-            self._token = ''
-        if username and password:
-            userpass = '%s:%s@' % (username, password)
-        else:
-            userpass = ''
-        url = '%s://%s%s:%s/%s' % (scheme, userpass, server, port, rpc_path)
-        self._url = url
-        logger.debug('aria2 url: {}', url)
-        logger.info('Connecting to daemon at {}', url)
+        super(JsonRpcClient, self).__init__(server, port,
+              scheme, rpc_path, username, password, token)
+        # trigger _default_error_handle on failure
         self.get_global_stat()
 
     def _get_req_params(self, method, params=[]):
         req_params = {
-            'jsonrpc': JSONRPC.RPC_VERSION,
-            'id': JSONRPC.RPC_ID,
+            'jsonrpc': JsonRpcClient.RPC_VERSION,
+            'id': JsonRpcClient.RPC_ID,
             'method': method,
             'params': params,
         }
@@ -73,51 +83,42 @@ class JSONRPC(object):
 
     def add_uri(self, uris, options):
         # https://aria2.github.io/manual/en/html/aria2c.html#aria2.addUri
-        return self._post(JSONRPC.ADDURI_METHOD, params=[[uris], options])
+        return self._post(JsonRpcClient.ADDURI_METHOD, params=[[uris], options])
 
     def add_torrent(self, torrent, options):
         # https://aria2.github.io/manual/en/html/aria2c.html#aria2.addTorrent
         params = [torrent]
-        return self._post(JSONRPC.ADDTORRENT_METHOD, params=[torrent, options])
+        return self._post(JsonRpcClient.ADDTORRENT_METHOD, params=[torrent, options])
 
     def get_global_stat(self):
         # https://aria2.github.io/manual/en/html/aria2c.html#aria2.getGlobalStat
-        return self._post(JSONRPC.GETGLOBALSTAT_METHOD, params=[])
+        return self._post(JsonRpcClient.GETGLOBALSTAT_METHOD, params=[])
 
 
-class XMLRPC(object):
+class XmlRpcClient(RpcClient):
     def __init__(self, server, port, scheme, rpc_path, username=None, password=None, token=None):
-        if token:
-            self._token = 'token:' + token
-        else:
-            self._token = ''
-        if username and password:
-            userpass = '%s:%s@' % (username, password)
-        else:
-            userpass = ''
         _schemes = {'http': None, 'https': ssl.SSLContext()}
         if scheme not in _schemes:
             raise plugin.PluginError('Unknown scheme: %s' % (scheme), logger)
-        url = '%s://%s%s:%s/%s' % (scheme, userpass, server, port, rpc_path)
-        logger.debug('aria2 url: {}', url)
-        logger.info('Connecting to daemon at {}', url)
+        super(JsonRpcClient, self).__init__(server, port,
+              scheme, rpc_path, username, password, token)
         try:
-            self._aria2 = xmlrpc.client.ServerProxy(url, context=_schemes[scheme]).aria2
+            self._aria2 = xmlrpc.client.ServerProxy(self._url, context=_schemes[scheme]).aria2
         except xmlrpc.client.ProtocolError as err:
             raise plugin.PluginError(
                 'Could not connect to aria2 at %s. Protocol error %s: %s'
-                % (url, err.errcode, err.errmsg),
+                % (self._url, err.errcode, err.errmsg),
                 logger,
             )
         except xmlrpc.client.Fault as err:
             raise plugin.PluginError(
                 'XML-RPC fault: Unable to connect to aria2 daemon at %s: %s'
-                % (url, err.faultString),
+                % (self._url, err.faultString),
                 logger,
             )
         except socket_error as e:
             raise plugin.PluginError(
-                'Socket connection issue with aria2 daemon at %s: %s' % (url, e), logger
+                'Socket connection issue with aria2 daemon at %s: %s' % (self._url, e), logger
             )
         except:
             logger.opt(exception=True).debug('Unexpected error during aria2 connection')
@@ -204,7 +205,7 @@ class OutputAria2:
         if task.options.learn:
             return
         config = self.prepare_config(config)
-        _rpc = {'xml': XMLRPC, 'json': JSONRPC}
+        _rpc = {'xml': XmlRpcClient, 'json': JsonRpcClient}
         if config['rpc_mode'] not in _rpc:
             entry.fail('Unknown rpc_mode: %s' % config['rpc_mode'])
         aria2 = _rpc[config['rpc_mode']](
@@ -232,7 +233,7 @@ class OutputAria2:
                 logger.opt(exception=True).debug('Exception type {}', type(e))
                 raise
 
-    def add_entry(self, aria2, entry, config, task):
+    def add_entry(self, aria2: RpcClient, entry, config, task):
         """
         Add entry to Aria2
         """
