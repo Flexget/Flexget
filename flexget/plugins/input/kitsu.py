@@ -46,10 +46,7 @@ class KitsuAnime:
             'latest': {'type': 'boolean', 'default': False},
             'status': {'type': 'string', 'enum': ['airing', 'finished']},
         },
-        'oneOf': [
-            {'required': ['username']},
-            {'required': ['user_id']}
-        ],
+        'oneOf': [{'required': ['username']}, {'required': ['user_id']}],
         'additionalProperties': False,
     }
 
@@ -80,7 +77,11 @@ class KitsuAnime:
         json_data = response.json()
 
         while json_data:
-            anime_dict = {relation['id']: relation for relation in json_data['included'] if relation['type'] == 'anime'}
+            anime_dict = {
+                relation['id']: relation
+                for relation in json_data['included']
+                if relation['type'] == 'anime'
+            }
 
             for item in json_data['data']:
                 if item['relationships']['anime']['data'] is None:
@@ -160,6 +161,7 @@ class KitsuAnime:
             user_id = user['data'][0]['id']
 
         return user_id
+
 
 @event('plugin.register')
 def register_plugin():
