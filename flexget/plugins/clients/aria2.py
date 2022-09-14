@@ -15,7 +15,7 @@ from flexget.utils.template import RenderError
 logger = logger.bind(name='aria2')
 
 
-class RpcClient():
+class RpcClient:
     def __init__(self, server, port, scheme, rpc_path, username, password, token):
         if token:
             self._token = 'token:' + token
@@ -45,8 +45,9 @@ class JsonRpcClient(RpcClient):
     ADDMETALINK_METHOD = 'aria2.addMetalink'
 
     def __init__(self, server, port, scheme, rpc_path, username=None, password=None, token=None):
-        super(JsonRpcClient, self).__init__(server, port,
-              scheme, rpc_path, username, password, token)
+        super(JsonRpcClient, self).__init__(
+            server, port, scheme, rpc_path, username, password, token
+        )
         # trigger _default_error_handle on failure
         self.get_global_stat()
 
@@ -100,8 +101,9 @@ class XmlRpcClient(RpcClient):
         _schemes = {'http': None, 'https': ssl.SSLContext()}
         if scheme not in _schemes:
             raise plugin.PluginError('Unknown scheme: %s' % (scheme), logger)
-        super(JsonRpcClient, self).__init__(server, port,
-              scheme, rpc_path, username, password, token)
+        super(JsonRpcClient, self).__init__(
+            server, port, scheme, rpc_path, username, password, token
+        )
         try:
             self._aria2 = xmlrpc.client.ServerProxy(self._url, context=_schemes[scheme]).aria2
         except xmlrpc.client.ProtocolError as err:
