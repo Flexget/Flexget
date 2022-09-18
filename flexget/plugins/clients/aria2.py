@@ -101,7 +101,7 @@ class XmlRpcClient(RpcClient):
         _schemes = {'http': None, 'https': ssl.SSLContext()}
         if scheme not in _schemes:
             raise plugin.PluginError('Unknown scheme: %s' % (scheme), logger)
-        super(JsonRpcClient, self).__init__(
+        super(XmlRpcClient, self).__init__(
             server, port, scheme, rpc_path, username, password, token
         )
         try:
