@@ -188,14 +188,6 @@ _UNKNOWNS = {
     'audio': QualityComponent('audio', 0, 'unknown'),
 }
 
-# For wiki generating help
-'''for type in (_resolutions, _sources, _codecs, _color_ranges, _audios):
-    print '{{{#!td style="vertical-align: top"'
-    for item in reversed(type):
-        print '- ' + item.name
-    print '}}}'
-'''
-
 _registry: Dict[str, QualityComponent] = {}
 for items in (_resolutions, _sources, _codecs, _color_ranges, _audios):
     for item in items:
