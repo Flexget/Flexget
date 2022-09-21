@@ -1,6 +1,8 @@
+from itertools import zip_longest
+
 from flexget import options
 from flexget.event import event
-from flexget.terminal import console
+from flexget.terminal import TerminalTable, console
 from flexget.utils.qualities import all_components
 
 
@@ -9,20 +11,13 @@ def do_cli(manager, options):
     for component in all_components():
         cat = components_by_cat.setdefault(component.type.title().replace('_', ' '), [])
         cat.append(component)
+    for cat_list in components_by_cat.values():
+        cat_list.sort(reverse=True)
     header = list(components_by_cat.keys())
-    row = []
-    for cat in header:
-        row.append("<br>".join(str(v) for v in components_by_cat[cat]))
-    console("|" + "|".join(header) + "|")
-    console("|" + "|".join("---" for h in header) + "|")
-    console(
-        "|"
-        + "|".join(
-            "<br>".join(str(comp) for comp in sorted(comps, reverse=True))
-            for comps in components_by_cat.values()
-        )
-        + "|"
-    )
+    table = TerminalTable(*header, table_type='github')
+    for row in zip_longest(*components_by_cat.values(), fillvalue=""):
+        table.add_row(*[str(i) for i in row])
+    console(table)
 
 
 @event('options.register')
