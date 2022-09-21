@@ -196,7 +196,7 @@ _UNKNOWNS = {
     print '}}}'
 '''
 
-_registry: Dict[Union[str, QualityComponent], QualityComponent] = {}
+_registry: Dict[str, QualityComponent] = {}
 for items in (_resolutions, _sources, _codecs, _color_ranges, _audios):
     for item in items:
         _registry[item.name] = item
