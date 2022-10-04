@@ -237,13 +237,13 @@ class ParserGuessit:
             valid = False
 
         name = kwargs.get('name')
-        country = guess_result.get('country')
+        country = str(guess_result.get('country', ''))
         if not name:
             name = guess_result.get('title', '')
             if not name:
                 valid = False
-            elif country and hasattr(country, 'alpha2'):
-                name += ' (%s)' % country.alpha2
+            elif country:
+                name += ' (%s)' % country
         elif guess_result.matches['title']:
             # Make sure the name match is up to FlexGet standards
             # Check there is no unmatched cruft before the matched name
@@ -291,6 +291,7 @@ class ParserGuessit:
             valid = False
         season = guess_result.get('season')
         episode = guess_result.get('episode')
+        disc = guess_result.get('disc')
         if episode is None and 'part' in guess_result:
             episode = guess_result['part']
         if isinstance(episode, list):
@@ -303,26 +304,41 @@ class ParserGuessit:
         # Validate group with from_group
         if not self._is_valid_groups(group, guessit_options.get('allow_groups', [])):
             valid = False
-        # Validate country, TODO: LEGACY
-        if country and name.endswith(')'):
-            p_start = name.rfind('(')
-            if p_start != -1:
-                parenthetical = re.escape(name[p_start + 1 : -1])
-                if parenthetical and parenthetical.lower() != str(country).lower():
+
+        if country:
+            try:
+                serie_result = guessit_api.guessit(name)
+                serie_country = str(serie_result.get('country', ''))
+                allowed_countries = guessit_options.get('allowed_countries', [])
+
+                if country != serie_country:
                     valid = False
+                elif not serie_country and allowed_countries and country.lower() not in allowed_countries:
+                    valid = False
+            except GuessitException:
+                logger.warning('Parsing {} serie with guessit failed.', name)
+
         # Check the full list of 'episode_details' for special,
         # since things like 'pilot' and 'unaired' can also show up there
         special = any(
             v.lower() == 'special' for v in guess_result.values_list.get('episode_details', [])
         )
+
         if 'episode' not in guess_result.values_list:
             episodes = len(guess_result.values_list.get('part', []))
         else:
             episodes = len(guess_result.values_list['episode'])
+
         if episodes > 3:
             valid = False
+        if 'season' in guess_result.values_list and len(guess_result.values_list['season']) > 1:
+            valid = False
+        if disc is not None:
+            # Disc's are not supported
+            valid = False
+
         identified_by = kwargs.get('identified_by', 'auto')
-        identifier_type, identifier = None, None
+        identifier_type, identifier, season_pack = None, None, False
         if identified_by in ['date', 'auto']:
             if date:
                 identifier_type = 'date'
@@ -341,6 +357,11 @@ class ParserGuessit:
                 if season is not None:
                     identifier_type = 'ep'
                     identifier = (season, episode)
+            elif season is not None and not special:
+                season_pack = True
+                episodes = 1
+                identifier_type = 'ep'
+                identifier = (season, 0)
 
         if not identifier_type and identified_by in ['id', 'auto']:
             if guess_result.matches['regexpId']:
@@ -358,7 +379,7 @@ class ParserGuessit:
         if not identifier_type:
             valid = False
         # TODO: Legacy - Complete == invalid
-        if 'complete' in normalize_component(guess_result.get('other')):
+        if not season_pack and 'complete' in normalize_component(guess_result.get('other')):
             valid = False
 
         parsed = SeriesParseResult(
@@ -372,6 +393,7 @@ class ParserGuessit:
             proper_count=proper_count,
             special=special,
             group=group,
+            season_pack=season_pack,
             valid=valid,
         )
 
