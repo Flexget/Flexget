@@ -268,21 +268,29 @@ class TestSeriesParser:
     def test_ignore_seasonpacks_by_default(self, parse, parse_valid, parse_invalid):
         """SeriesParser: ignoring season packs by default"""
         assert parse_valid(name='The Foo', data='The.Foo.S04.1080p.FlexGet.5.1').season_pack
-        assert parse_valid(name='The Foo', data='The Foo S05 720p BluRay DTS x264-FlexGet').season_pack
-        assert parse_valid(name='The Foo', data='The Foo S05 720p BluRay DTS x264-FlexGet').season_pack
-        assert parse_valid(name='Something', data='Something S02 Pack 720p WEB-DL-FlexGet').season_pack
+        assert parse_valid(
+            name='The Foo', data='The Foo S05 720p BluRay DTS x264-FlexGet'
+        ).season_pack
+        assert parse_valid(
+            name='The Foo', data='The Foo S05 720p BluRay DTS x264-FlexGet'
+        ).season_pack
+        assert parse_valid(
+            name='Something', data='Something S02 Pack 720p WEB-DL-FlexGet'
+        ).season_pack
         assert parse_valid(name='Something', data='Something S06 AC3-CRAPL3SS').season_pack
         assert parse_valid(
             name='Something',
             data='Something SEASON 1 2010 540p BluRay QEBS AAC ANDROID IPAD MP4 FASM',
-            identified_by='ep'
+            identified_by='ep',
         ).season_pack
-        assert parse_valid(name='Something', data='Something.1xAll.Season.Complete-FlexGet').season_pack
+        assert parse_valid(
+            name='Something', data='Something.1xAll.Season.Complete-FlexGet'
+        ).season_pack
         assert parse_valid(name='Something', data='Something - Season 10 - FlexGet').season_pack
-        
+
         # Multi season and multi episode are not allowed
         parse_invalid(name='Something', data='Something S6 E1-4')
-        
+
         # Make sure no false positives
         parse_invalid(name='Something', data='Something.1x0.Complete.Season-FlexGet')
         parse_invalid(name='Something', data='Something_Season_1_Full_Season_2_EP_1-7_HD')
@@ -290,28 +298,48 @@ class TestSeriesParser:
 
     def test_allow_seasonpacks_by_ep(self, parse, parse_valid, parse_invalid):
         """SeriesParser: allowing season packs by ep"""
-        assert parse_valid(name='The Foo', data='The.Foo.S04.1080p.FlexGet.5.1', identified_by='ep').season_pack
-        assert parse_valid(name='The Foo', data='The Foo S05 720p BluRay DTS x264-FlexGet', identified_by='ep').season_pack
-        assert parse_valid(name='The Foo', data='The Foo S05 720p BluRay DTS x264-FlexGet', identified_by='ep').season_pack
-        assert parse_valid(name='Something', data='Something S02 Pack 720p WEB-DL-FlexGet', identified_by='ep').season_pack
-        assert parse_valid(name='Something', data='Something S06 AC3-CRAPL3SS', identified_by='ep').season_pack
+        assert parse_valid(
+            name='The Foo', data='The.Foo.S04.1080p.FlexGet.5.1', identified_by='ep'
+        ).season_pack
+        assert parse_valid(
+            name='The Foo', data='The Foo S05 720p BluRay DTS x264-FlexGet', identified_by='ep'
+        ).season_pack
+        assert parse_valid(
+            name='The Foo', data='The Foo S05 720p BluRay DTS x264-FlexGet', identified_by='ep'
+        ).season_pack
+        assert parse_valid(
+            name='Something', data='Something S02 Pack 720p WEB-DL-FlexGet', identified_by='ep'
+        ).season_pack
+        assert parse_valid(
+            name='Something', data='Something S06 AC3-CRAPL3SS', identified_by='ep'
+        ).season_pack
         assert parse_valid(
             name='Something',
             data='Something SEASON 1 2010 540p BluRay QEBS AAC ANDROID IPAD MP4 FASM',
-            identified_by='ep'
+            identified_by='ep',
         ).season_pack
-        assert parse_valid(name='Something', data='Something.1xAll.Season.Complete-FlexGet', identified_by='ep').season_pack
-        assert parse_valid(name='Something', data='Something - Season 10 - FlexGet', identified_by='ep').season_pack
-        
+        assert parse_valid(
+            name='Something', data='Something.1xAll.Season.Complete-FlexGet', identified_by='ep'
+        ).season_pack
+        assert parse_valid(
+            name='Something', data='Something - Season 10 - FlexGet', identified_by='ep'
+        ).season_pack
+
         # Season pack by episode group are not allowed
         parse_invalid(name='Something', data='Something S6 E1-4', identified_by='ep')
-        
-        # Make sure no false positives
-        parse_invalid(name='Something', data='Something.1x0.Complete.Season-FlexGet', identified_by='ep')
-        parse_invalid(name='Something', data='Something_Season_1_Full_Season_2_EP_1-7_HD', identified_by='ep')
-        parse_invalid(name='Something', data='Something_ S01D2 MANofKENT INVICTA RG', identified_by='ep')
 
-    @pytest.mark.parametrize( 
+        # Make sure no false positives
+        parse_invalid(
+            name='Something', data='Something.1x0.Complete.Season-FlexGet', identified_by='ep'
+        )
+        parse_invalid(
+            name='Something', data='Something_Season_1_Full_Season_2_EP_1-7_HD', identified_by='ep'
+        )
+        parse_invalid(
+            name='Something', data='Something_ S01D2 MANofKENT INVICTA RG', identified_by='ep'
+        )
+
+    @pytest.mark.parametrize(
         "parse",
         [(ParserGuessit)],
         ids=["guessit"],
@@ -319,15 +347,21 @@ class TestSeriesParser:
     )
     def test_ignore_multi_seasonpacks(self, parse, parse_valid, parse_invalid):
         """SeriesParser: ignore multi season and multi episode (only supported by guessit)"""
-        parse_invalid(name='Something', data='Something Seasons 1 & 2 - Complete', identified_by='ep')
+        parse_invalid(
+            name='Something', data='Something Seasons 1 & 2 - Complete', identified_by='ep'
+        )
         parse_invalid(name='Something', data='Something Seasons 1 2 3 4', identified_by='ep')
         parse_invalid(name='Something', data='Something S01-03 Full Throttle', identified_by='ep')
         parse_invalid(name='Something', data='Something S6 E1-4', identified_by='ep')
-        
+
         # Make sure no false positives
-        assert parse_valid(name='The Foo', data='The.Foo.S04.1080p.FlexGet.5.1', identified_by='ep').season_pack
-        assert parse_valid(name='Something', data='Something Seasons 4 Complete', identified_by='ep').season_pack
-        
+        assert parse_valid(
+            name='The Foo', data='The.Foo.S04.1080p.FlexGet.5.1', identified_by='ep'
+        ).season_pack
+        assert parse_valid(
+            name='Something', data='Something Seasons 4 Complete', identified_by='ep'
+        ).season_pack
+
     def test_similar(self, parse):
         s = parse(
             name='Foo Bar', data='Foo.Bar:Doppelganger.S02E04.HDTV.FlexGet', strict_name=True

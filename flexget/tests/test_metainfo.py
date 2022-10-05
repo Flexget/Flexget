@@ -185,7 +185,7 @@ class TestMetainfoSeries:
             quality='1080p',
             media_id='something s04e00',
         ), 'Failed to parse series pack info'
-       
+
     def test_false_positives(self, execute_task):
         """Metainfo series: check for false positives"""
         task = execute_task('false_positives')

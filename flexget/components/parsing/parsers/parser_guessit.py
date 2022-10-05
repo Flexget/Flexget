@@ -313,7 +313,11 @@ class ParserGuessit:
 
                 if country != serie_country:
                     valid = False
-                elif not serie_country and allowed_countries and country.lower() not in allowed_countries:
+                elif (
+                    not serie_country
+                    and allowed_countries
+                    and country.lower() not in allowed_countries
+                ):
                     valid = False
             except GuessitException:
                 logger.warning('Parsing {} serie with guessit failed.', name)
