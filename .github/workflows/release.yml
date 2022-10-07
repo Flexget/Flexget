@@ -1,8 +1,13 @@
 name: Build and release to PyPI
 on:
   deployment: {}
+permissions: {}
 jobs:
   release:
+    permissions:
+      contents: write # for git push
+      deployments: write # to create a deployment status
+
     runs-on: ubuntu-latest
     env:
       PYTHON_VERSION: "3.7"

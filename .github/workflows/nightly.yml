@@ -5,8 +5,14 @@ on:
     - cron: 0 15 * * *
   workflow_dispatch: {}
 
+permissions: {}
+
 jobs:
   deploy:
+    permissions:
+      contents: read # to fetch code (actions/checkout)
+      deployments: write # to create deployment
+
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
