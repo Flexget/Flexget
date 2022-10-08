@@ -31,7 +31,7 @@ class BarkNotifier:
               server: <string>
               device_key: <string>
               [level: <string>]
-              [badge: <int>]
+              [badge: <integer>]
               [automaticallyCopy: <string>]
               [copy: <string>]
               [sound: <string>]
@@ -50,7 +50,7 @@ class BarkNotifier:
             'server': {'type': 'string'},
             'device_key': {'type': 'string'},
             'level': {'type': 'string'},
-            'badge': {'type': 'int'},
+            'badge': {'type': 'integer'},
             'automaticallyCopy': {'type': 'string'},
             'copy': {'type': 'string'},
             'sound': {'type': 'string'},
