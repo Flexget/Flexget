@@ -30,17 +30,9 @@ class BarkNotifier:
             webpost:
               server: <string>
               device_key: <string>
-              [level: <string>]
-              [badge: <integer>]
-              [automaticallyCopy: <string>]
-              [copy: <string>]
-              [sound: <string>]
-              [icon: <string>]
-              [group: <string>]
-              [isArchive: <string>]
-              [url: <string>]
-
-    # https://github.com/Finb/bark-server/blob/master/docs/API_V2.md
+              options:
+                key: value
+              # https://github.com/Finb/bark-server/blob/master/docs/API_V2.md
 
     """
 
@@ -49,15 +41,12 @@ class BarkNotifier:
         'properties': {
             'server': {'type': 'string'},
             'device_key': {'type': 'string'},
-            'level': {'type': 'string'},
-            'badge': {'type': 'integer'},
-            'automaticallyCopy': {'type': 'string'},
-            'copy': {'type': 'string'},
-            'sound': {'type': 'string'},
-            'icon': {'type': 'string'},
-            'group': {'type': 'string'},
-            'isArchive': {'type': 'string'},
-            'url': {'type': 'string'},
+            'options': {
+                'type': 'object',
+                'additionalProperties': {
+                    'oneOf': [{'type': 'string'}, {'type': 'integer'}]
+                },
+            },
         },
         'required': ['server', 'device_key'],
         'additionalProperties': False,
@@ -71,9 +60,9 @@ class BarkNotifier:
             'title': title,
             'body': message,
         }
-        options = config.copy()
-        server = options.pop('server')
-        notification.update(options)
+        server = config.get('server')
+        notification['device_key'] = config.get('device_key')
+        notification.update(config.get('options', {}))
         try:
             requests.post(server, json=notification)
         except RequestException as e:
