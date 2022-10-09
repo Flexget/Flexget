@@ -407,15 +407,9 @@ class ImdbParser:
         # Storyline section
         # NOTE: We cannot use the get default approach here .(get(x, {}))
         # as the data returned in imdb has all fields with null values if they do not exist.
-        summaries = main_column_data.get('summaries') or {}
-        summary_edges = summaries.get('edges') or []
-        if len(summary_edges) > 0:
-            edge_node = summary_edges[0].get('node') or {}
-            plot_text = edge_node.get('plotText') or {}
-            # Strip out html
-            plot_html = get_soup(plot_text.get('plaidHtml'))
-            if plot_html:
-                self.plot_outline = plot_html.text
+        plot = above_the_fold_data.get('plot') or {}
+        plot_text = plot.get('plotText') or {}
+        self.plot_outline = plot_text.get('plainText')
         if not self.plot_outline:
             logger.debug('No storyline found for {}', self.imdb_id)
 
