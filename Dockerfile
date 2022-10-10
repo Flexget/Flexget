@@ -30,7 +30,8 @@ ENV PYTHONUNBUFFERED 1
 
 RUN apk add --no-cache --upgrade \
         ca-certificates \
-        nodejs && \
+        nodejs \
+        tzdata && \
     rm -rf /var/cache/apk/*
 
 COPY --from=0 /wheels /wheels
