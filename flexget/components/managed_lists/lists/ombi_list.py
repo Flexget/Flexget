@@ -166,8 +166,7 @@ class OmbiSet(MutableSet):
     schema = {
         'type': 'object',
         'properties': {
-            'base_url': {'type': 'string'},
-            'port': {'type': 'number', 'default': 3579},
+            'url': {'type': 'string'},
             'api_key': {'type': 'string'},
             'username': {'type': 'string'},
             'password': {'type': 'string'},
@@ -178,7 +177,7 @@ class OmbiSet(MutableSet):
             'include_ep_title': {'type': 'boolean', 'default': False},
         },
         'oneOf': [{'required': ['username', 'password']}, {'required': ['api_key']}],
-        'required': ['base_url', 'type'],
+        'required': ['url', 'type'],
         'additionalProperties': False,
     }
 
@@ -347,9 +346,9 @@ class OmbiSet(MutableSet):
         entry_type: str = self.config['type']
 
         if entry_type == 'movies':
-            return OmbiMovie.from_imdb_id(self._get_base_url(), entry['tmdb_id'], self.ombi_auth)
+            return OmbiMovie.from_imdb_id(self.config.get('url'), entry['tmdb_id'], self.ombi_auth)
 
-        return OmbiTv.from_tvdb_id(self._get_base_url(), entry['tmdb_id'], self.ombi_auth)
+        return OmbiTv.from_tvdb_id(self.config.get('url'), entry['tmdb_id'], self.ombi_auth)
 
     def generate_series_id(self, season, episode=None):
         tempid = 'S' + str(season.get('seasonNumber')).zfill(2)
@@ -373,13 +372,7 @@ class OmbiSet(MutableSet):
         return temptitle
 
     def get_access_token(self):
-        parsedurl = urlparse(self.config.get('base_url'))
-        url = '%s://%s:%s%s/api/v1/Token' % (
-            parsedurl.scheme,
-            parsedurl.netloc,
-            self.config.get('port'),
-            parsedurl.path,
-        )
+        url = f"{self.config.get('url')}/api/v1/Token"
         data = {'username': self.config.get('username'), 'password': self.config.get('password')}
         headers = {'Content-Type': 'application/json', 'Accept': 'application/json'}
         try:
@@ -413,38 +406,24 @@ class OmbiSet(MutableSet):
 
         raise plugin.PluginError('Error: an api_key or username and password must be configured')
 
-    def _get_base_url(self):
-        url = urlparse(self.config.get('base_url'))
-        port = self.config.get('port')
-
-        return f"{url.scheme}://{url.netloc}:{port}{url.path}"
-
     def get_request_list(self):
         auth_header = self.ombi_auth()
 
-        parsedurl = urlparse(self.config.get('base_url'))
-        url = ''
+        base_url = self.config.get('url')
+
         if self.config.get('type') in ['movies']:
-            url = '%s://%s:%s%s/api/v1/Request/movie' % (
-                parsedurl.scheme,
-                parsedurl.netloc,
-                self.config.get('port'),
-                parsedurl.path,
-            )
+            url = f"{base_url}/api/v1/Request/movie"
         elif self.config.get('type') in ['shows', 'seasons', 'episodes']:
-            url = '%s://%s:%s%s/api/v1/Request/tv' % (
-                parsedurl.scheme,
-                parsedurl.netloc,
-                self.config.get('port'),
-                parsedurl.path,
-            )
+            url = f"{base_url}/api/v1/Request/tv"
         else:
             raise plugin.PluginError('Error: Unknown list type %s.' % (self.config.get('type')))
+
         log.debug('Connecting to Ombi to retrieve request type : %s', self.config.get('type'))
+
         try:
             return requests.get(url, headers=auth_header).json()
-        except (RequestException, ValueError) as e:
-            raise plugin.PluginError('Unable to connect to Ombi at %s. Error: %s' % (url, e))
+        except (RequestException, ValueError) as error:
+            raise plugin.PluginError(f"Unable to connect to Ombi at {url}. Error: {error}")
 
     def generate_movie_entry(self, parent_request):
 
