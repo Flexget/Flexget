@@ -273,59 +273,59 @@ class OmbiSet(MutableSet):
 
     @property
     def items(self) -> List[Entry]:
-        if not self._items:
 
-            json = self.get_request_list()
+        if self._items:
+            return self.items
 
-            self._items = []
+        json = self.get_request_list()
 
-            for parent_request in json:
-                if self.config.get('type') == 'movies':
-                    # check that the request is approved unless user has selected to include everything
+        self._items = []
+
+        for parent_request in json:
+            if self.config.get('type') == 'movies':
+                # check that the request is approved unless user has selected to include everything
+                if (
+                    self.config.get('only_approved')
+                    and not parent_request.get('approved')
+                    or parent_request.get('approved')
+                ):
+                    # Always include items that are not available and only include available items if user has selected to do so
                     if (
-                        self.config.get('only_approved')
-                        and not parent_request.get('approved')
-                        or parent_request.get('approved')
+                        self.config.get('include_available')
+                        and parent_request.get('available')
+                        or not parent_request.get('available')
                     ):
-                        # Always include items that are not available and only include available items if user has selected to do so
-                        if (
-                            self.config.get('include_available')
-                            and parent_request.get('available')
-                            or not parent_request.get('available')
-                        ):
-                            entry = self.generate_movie_entry(parent_request)
-                            self._items.append(entry)
-                elif self.config.get('type') == 'shows':
-                    # Shows do not have approvals or available flags so include them all
-                    entry = self.generate_tv_entry(parent_request)
-                    self._items.append(entry)
-                else:
-                    for child_request in parent_request["childRequests"]:
-                        for season in child_request["seasonRequests"]:
-                            # Seasons do not have approvals or available flags so include them all
-                            if self.config.get('type') == 'seasons':
-                                entry = self.generate_tv_entry(
-                                    parent_request, child_request, season
-                                )
-                                if entry:
-                                    self._items.append(entry)
-                            else:
-                                for episode in season['episodes']:
-                                    # check that the request is approved unless user has selected to include everything
+                        entry = self.generate_movie_entry(parent_request)
+                        self._items.append(entry)
+            elif self.config.get('type') == 'shows':
+                # Shows do not have approvals or available flags so include them all
+                entry = self.generate_tv_entry(parent_request)
+                self._items.append(entry)
+            else:
+                for child_request in parent_request["childRequests"]:
+                    for season in child_request["seasonRequests"]:
+                        # Seasons do not have approvals or available flags so include them all
+                        if self.config.get('type') == 'seasons':
+                            entry = self.generate_tv_entry(parent_request, child_request, season)
+                            if entry:
+                                self._items.append(entry)
+                        else:
+                            for episode in season['episodes']:
+                                # check that the request is approved unless user has selected to include everything
+                                if (
+                                    self.config.get('only_approved')
+                                    and not episode.get('approved')
+                                    or episode.get('approved')
+                                ):
+                                    # Always include items that are not available and only include available items if user has selected to do so
                                     if (
-                                        self.config.get('only_approved')
-                                        and not episode.get('approved')
-                                        or episode.get('approved')
-                                    ):
-                                        # Always include items that are not available and only include available items if user has selected to do so
-                                        if (
-                                            self.config.get('include_available')
-                                            and episode.get('available')
-                                        ) or not episode.get('available'):
-                                            entry = self.generate_tv_entry(
-                                                parent_request, child_request, season, episode
-                                            )
-                                            self._items.append(entry)
+                                        self.config.get('include_available')
+                                        and episode.get('available')
+                                    ) or not episode.get('available'):
+                                        entry = self.generate_tv_entry(
+                                            parent_request, child_request, season, episode
+                                        )
+                                        self._items.append(entry)
         return self._items
 
     @property
