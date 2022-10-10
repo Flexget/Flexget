@@ -49,10 +49,7 @@ class BarkNotifier:
         'properties': {
             'server': {'type': 'string'},
             'device_key': {'type': 'string'},
-            'level': {
-                'type': 'string',
-                'enum': ['active', 'timeSensitive', 'passive']
-            },
+            'level': {'type': 'string', 'enum': ['active', 'timeSensitive', 'passive']},
             'badge': {'type': 'integer'},
             'automatically_copy': {'type': 'boolean'},
             'copy': {'type': 'string'},
@@ -69,9 +66,9 @@ class BarkNotifier:
     def prepare_config(self, config):
         options = config.copy()
         server = options.pop('server')
-        if (options.pop('automatically_copy', False)):
+        if options.pop('automatically_copy', False):
             options['automaticallyCopy'] = '1'
-        if (options.pop('is_archive', False)):
+        if options.pop('is_archive', False):
             options['isArchive'] = '1'
         return server, options
 
