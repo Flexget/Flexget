@@ -104,7 +104,7 @@ class OmbiMovie(OmbiEntry):
         super().__init__(base_url, auth)
         self.data = data
 
-    @staticmethod
+    @classmethod
     def from_imdb_id(base_url: str, tmdb_id: str, auth: Callable[[], Dict[str, str]]):
 
         headers = {'Content-Type': 'application/json', 'Accept': 'application/json'}
@@ -137,7 +137,7 @@ class OmbiTv(OmbiEntry):
         super().__init__(base_url, auth)
         self.data = data
 
-    @staticmethod
+    @classmethod
     def from_tvdb_id(base_url: str, tmdb_id: str, auth: Callable[[], Dict[str, str]]):
 
         headers = {'Content-Type': 'application/json', 'Accept': 'application/json'}
