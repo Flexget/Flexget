@@ -1,8 +1,9 @@
+"""Create a Ombi managed list.
+"""
 from __future__ import absolute_import, division, unicode_literals
 
 from collections.abc import MutableSet
 from typing import Any, Callable, Dict, List, Optional
-from urllib.parse import urlparse
 
 from loguru import logger
 
@@ -10,18 +11,28 @@ from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils import requests
-from flexget.utils.database import with_session
 from flexget.utils.requests import RequestException
 
 log = logger.bind(name='ombi_list')
 
 
 class OmbiEntry:
-    def __init__(self, base_url: str, auth: Callable[[], Dict[str, str]]) -> None:
+    """Represents a Generic entry returned from the Ombi API."""
+
+    def __init__(
+        self,
+        base_url: str,
+        auth: Callable[[], Dict[str, str]],
+        entry_type: str,
+        data: Dict[str, Any],
+    ) -> None:
         self.base_url = base_url
         self.auth = auth
+        self.entry_type = entry_type
+        self.data = data
 
     def _post_data(self, api_endpoint: str, json: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        """Post API data to Ombi."""
 
         req_url = f"{self.base_url}/{api_endpoint}"
 
@@ -37,6 +48,7 @@ class OmbiEntry:
         return response.json()
 
     def mark_requested(self):
+        """Mark an entry in Ombi as being requested."""
 
         if self.data['requested']:
             log.verbose(f"{self.data['title']} already requested in Ombi.")
@@ -66,6 +78,7 @@ class OmbiEntry:
         log.verbose(f"{self.data['title']} has been requested.")
 
     def mark_available(self):
+        """Mark an entry in Ombi as avaliable."""
 
         if self.data['available']:
             log.verbose(f"{self.data['title']} already available in Ombi.")
@@ -96,21 +109,23 @@ class OmbiEntry:
 
 
 class OmbiMovie(OmbiEntry):
+    """Manage a Movie entry in Ombi."""
+
     entry_type = 'movie'
 
     def __init__(
         self, base_url: str, auth: Callable[[], Dict[str, str]], data: Dict[str, Any]
     ) -> None:
-        super().__init__(base_url, auth)
-        self.data = data
+        super().__init__(base_url, auth, self.entry_type, data)
 
     @classmethod
-    def from_imdb_id(base_url: str, tmdb_id: str, auth: Callable[[], Dict[str, str]]):
+    def from_imdb_id(cls, base_url: str, tmdb_id: str, auth: Callable[[], Dict[str, str]]):
+        """Create a Ombi Entry from an IMDB ID."""
 
         headers = {'Content-Type': 'application/json', 'Accept': 'application/json'}
         headers.update(auth())
 
-        url = f"{base_url}/api/v2/Search/{OmbiMovie.entry_type}/{tmdb_id}"
+        url = f"{base_url}/api/v2/Search/{cls.entry_type}/{tmdb_id}"
 
         response = requests.get(url, headers=headers)
 
@@ -128,22 +143,25 @@ class OmbiMovie(OmbiEntry):
         return OmbiMovie(base_url, auth, data)
 
 
+# In the future this might need split out into 3 classes (Show, Season, Episode)
 class OmbiTv(OmbiEntry):
+    """Manage a TV entry in Ombi."""
+
     entry_type = 'tv'
 
     def __init__(
         self, base_url: str, auth: Callable[[], Dict[str, str]], data: Dict[str, Any]
     ) -> None:
-        super().__init__(base_url, auth)
-        self.data = data
+        super().__init__(base_url, auth, self.entry_type, data)
 
     @classmethod
-    def from_tvdb_id(base_url: str, tmdb_id: str, auth: Callable[[], Dict[str, str]]):
+    def from_tvdb_id(cls, base_url: str, tmdb_id: str, auth: Callable[[], Dict[str, str]]):
+        """Create a Ombi Entry from an TVDB ID."""
 
         headers = {'Content-Type': 'application/json', 'Accept': 'application/json'}
         headers.update(auth())
 
-        url = f"{base_url}/api/v2/Search/{OmbiTv.entry_type}/moviedb/{tmdb_id}"
+        url = f"{base_url}/api/v2/Search/{cls.entry_type}/moviedb/{tmdb_id}"
 
         response = requests.get(url, headers=headers)
 
@@ -162,6 +180,8 @@ class OmbiTv(OmbiEntry):
 
 
 class OmbiSet(MutableSet):
+    """The schema for the Ombi managed list."""
+
     supported_ids = ['imdb_id', 'tmdb_id', 'ombi_id']
     schema = {
         'type': 'object',
