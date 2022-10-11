@@ -61,6 +61,11 @@ twine = ">=3.6.0,<3.7.0"
 vcrpy = ">=4.1.1,<4.2.0"
 wheel = ">=0.37.0,<0.38.0"
 
+[tool.poetry.group.plugin-test.dependencies]
+# These are optional dependencies for plugins that have tests in the test suite
+subliminal = ">= 2.0rc1"
+importlib-metadata = "<5.0.0"  # subliminal breaks on python 3.7 right now without this upper bound
+
 [build-system]
 requires = ["setuptools", "wheel"]
 
