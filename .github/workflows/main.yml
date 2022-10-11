@@ -20,7 +20,7 @@ jobs:
         operating-system: [ubuntu-latest] # TODO: Fix a couple tests and enable windows. windows-latest
       fail-fast: false
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     # Can we cache the apt-get stuff somehow?
     - name: Install unrar  # used by some flexget tests
       if: matrix.operating-system == 'ubuntu-latest'
@@ -28,7 +28,7 @@ jobs:
         sudo apt-get update
         sudo apt-get install -qy unrar
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
         cache: 'pip'

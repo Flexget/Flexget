@@ -12,7 +12,7 @@ jobs:
     env:
       PYTHON_VERSION: "3.7"
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         token: ${{ secrets.flexgetbot_pat }}
         fetch-depth: 0
@@ -21,7 +21,7 @@ jobs:
         git config user.email ${{ secrets.git_email }}
         git config user.name ${{ secrets.git_user }}
     - name: Set up Python ${{ env.PYTHON_VERSION }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ env.PYTHON_VERSION }}
         cache: 'pip'

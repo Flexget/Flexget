@@ -15,8 +15,8 @@ jobs:
 
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/github-script@0.9.0
+      - uses: actions/checkout@v3
+      - uses: actions/github-script@v6
         name: Create Deployment
         with:
           github-token: ${{ secrets.flexgetbot_pat }}

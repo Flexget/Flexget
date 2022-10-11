@@ -17,7 +17,7 @@ jobs:
       pull-requests: write  # for actions/stale to close stale PRs
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/stale@v3
+      - uses: actions/stale@v6
         with:
           stale-issue-message: 'This issue is stale because it has been open ${{ env.DAYS_BEFORE_ISSUE_STALE }} days with no activity. Remove stale label or comment or this will be closed in ${{ env.DAYS_BEFORE_ISSUE_CLOSE }} days.'
           close-issue-message: 'This issue has been stale for ${{ env.DAYS_BEFORE_ISSUE_CLOSE }} days and is being closed.'
