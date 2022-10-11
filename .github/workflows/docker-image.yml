@@ -31,7 +31,6 @@ jobs:
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
-            latest
       
       - name: Setup QEMU
         uses: docker/setup-qemu-action@v2
@@ -73,6 +72,6 @@ jobs:
           platforms: linux/amd64
           tags: ghcr.io/flexget/flexget:develop
           labels: ${{ steps.meta.output.labels }}
-          cache-form: type=gha, scope=${{ github.workflow }}
+          cache-from: type=gha, scope=${{ github.workflow }}
           cache-to: type=gha, scope=${{ github.workflow }}
 
