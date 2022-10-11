@@ -1,8 +1,8 @@
 version: 2
 updates:
-- package-ecosystem: pip
+- package-ecosystem: poetry
   directory: "/"
   schedule:
       interval: weekly
   open-pull-requests-limit: 10
-
+  versioning-strategy: increase-if-necessary
