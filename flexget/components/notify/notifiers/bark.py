@@ -32,12 +32,12 @@ class BarkNotifier:
               device_key: <string>
               [level: <string>]
               [badge: <integer>]
-              [automaticallyCopy: <string>]
+              [automatically_copy: <boolean>]
               [copy: <string>]
               [sound: <string>]
               [icon: <string>]
               [group: <string>]
-              [isArchive: <string>]
+              [is_archive: <boolean>]
               [url: <string>]
 
     # https://github.com/Finb/bark-server/blob/master/docs/API_V2.md
@@ -49,19 +49,28 @@ class BarkNotifier:
         'properties': {
             'server': {'type': 'string'},
             'device_key': {'type': 'string'},
-            'level': {'type': 'string'},
+            'level': {'type': 'string', 'enum': ['active', 'timeSensitive', 'passive']},
             'badge': {'type': 'integer'},
-            'automaticallyCopy': {'type': 'string'},
+            'automatically_copy': {'type': 'boolean'},
             'copy': {'type': 'string'},
             'sound': {'type': 'string'},
             'icon': {'type': 'string'},
             'group': {'type': 'string'},
-            'isArchive': {'type': 'string'},
+            'is_archive': {'type': 'boolean'},
             'url': {'type': 'string'},
         },
         'required': ['server', 'device_key'],
         'additionalProperties': False,
     }
+
+    def prepare_config(self, config):
+        options = config.copy()
+        server = options.pop('server')
+        if options.pop('automatically_copy', False):
+            options['automaticallyCopy'] = '1'
+        if options.pop('is_archive', False):
+            options['isArchive'] = '1'
+        return server, options
 
     def notify(self, title, message, config):
         """
@@ -71,8 +80,7 @@ class BarkNotifier:
             'title': title,
             'body': message,
         }
-        options = config.copy()
-        server = options.pop('server')
+        server, options = self.prepare_config(config)
         notification.update(options)
         try:
             requests.post(server, json=notification)
