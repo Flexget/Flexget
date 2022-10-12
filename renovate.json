@@ -1,9 +1,11 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:base"
+    "config:base",
+    ":preserveSemverRanges"
   ],
   "pip-compile": {
     "fileMatch": ["(^|/)(dev-)?requirements\\.in$"]
-  }
+  },
+  "enabled": false
 }
