@@ -25,3 +25,4 @@ ci:
   autofix_prs: true
   autoupdate_branch: develop
   autoupdate_schedule: weekly
+  skip: [poetry-lock]  # No network access from the pre-commit CI
