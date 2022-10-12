@@ -1,10 +1,17 @@
 [tool.poetry]
 name = "flexget"
-version = "3.3.34.dev"
-description = ""
-authors = ["Your Name <you@example.com>"]
+version = "3.3.35.dev"
+description = """FlexGet is a program aimed to automate downloading or processing content (torrents, podcasts, etc.) \
+from different sources like RSS-feeds, html-pages, various sites and more."""
+authors = [
+    "Marko Koivusalo <marko.koivusalo@gmail.com>",
+    "Chase Sterling <chase.sterling@gmail.com"
+]
 license = "MIT"
 readme = "README.rst"
+exclude = [
+    "flexget/tests"
+]
 
 [tool.poetry.dependencies]
 python = "^3.7"
