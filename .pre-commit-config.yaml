@@ -13,14 +13,10 @@ repos:
   rev: '1.2.2'
   hooks:
     - id: poetry-check
-    # Since poetry-lock is disabled on the CI, run this so that we still fail if needed on the CI
-    - id: poetry-check
-      name: poetry-lock-check
-      entry: poetry lock --check
-      files: ^pyproject\.toml|poetry\.lock$
     - id: poetry-lock
+      name: poetry-lock-check
       files: ^pyproject\.toml|poetry\.lock$
-      args: ["--no-update"]
+      args: ["--check"]
     - id: poetry-export
       args: ["-f", "requirements.txt", "-o", "requirements.txt", "--without-hashes"]
     - id: poetry-export
@@ -31,4 +27,3 @@ ci:
   autofix_prs: true
   autoupdate_branch: develop
   autoupdate_schedule: weekly
-  skip: [poetry-lock]  # No network access from the pre-commit CI
