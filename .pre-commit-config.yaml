@@ -13,6 +13,11 @@ repos:
   rev: '1.2.2'
   hooks:
     - id: poetry-check
+    # Since poetry-lock is disabled on the CI, run this so that we still fail if needed on the CI
+    - id: poetry-check
+      name: poetry-lock-check
+      entry: poetry lock --check
+      files: ^pyproject\.toml|poetry\.lock$
     - id: poetry-lock
       files: ^pyproject\.toml|poetry\.lock$
       args: ["--no-update"]
