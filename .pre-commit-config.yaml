@@ -20,9 +20,9 @@ repos:
     - id: poetry-export
       args: ["-f", "requirements.txt", "-o", "requirements.txt", "--without-hashes"]
     - id: poetry-export
-      args: ["--with", "dev", "-f", "requirements.txt", "-o", "dev-requirements.txt", "--without-hashes"]
+      args: ["--only", "dev", "-f", "requirements.txt", "-o", "dev-requirements.txt", "--without-hashes"]
     - id: poetry-export
-      args: ["--with", "dev,plugin-test", "-f", "requirements.txt", "-o", "dev-requirements-extras.txt", "--without-hashes"]
+      args: ["--only", "plugin-test", "-f", "requirements.txt", "-o", "dev-requirements-extras.txt", "--without-hashes"]
 ci:
   autofix_prs: true
   autoupdate_branch: develop
