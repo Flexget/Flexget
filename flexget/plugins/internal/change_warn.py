@@ -39,6 +39,15 @@ def register_plugin():
     plugin.register(ChangeWarn, 'change_warn', builtin=True, api_ver=2)
 
 
+@event('manager.startup')
+def startup_warnings():
+    if sys.version_info < (3, 7):
+        logger.warning(
+            "Python 3.6 is EOL as of December 2021. FlexGet will remove support for it soon. "
+            "Please upgrade to python 3.7 or later."
+        )
+
+
 # check that no old plugins are in pre-compiled form (pyc)
 try:
     import os.path
