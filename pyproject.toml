@@ -73,6 +73,9 @@ wheel = ">=0.37.0,<0.38.0"
 subliminal = ">= 2.0rc1"
 importlib-metadata = "<5.0.0"  # subliminal breaks on python 3.7 right now without this upper bound
 
+[tool.poetry.scripts]
+flexget = 'flexget:main'
+
 [build-system]
 requires = ["setuptools", "wheel"]
 
