@@ -29,6 +29,9 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -qy unrar
+    # There is some poetry caching built in to setup-python, but there seems to be some confusion
+    # about whether it works well when using a matrix of different python versions. Doing caching
+    # manually for now, until there is more info.
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4
       with:
