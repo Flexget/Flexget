@@ -34,7 +34,7 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - name: cache poetry install
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: ~/.local
         key: poetry-${{ matrix.python-version }}-${{ env.POETRY_VERSION }}-0  # increment last number to reset cache
