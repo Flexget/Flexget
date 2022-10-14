@@ -40,7 +40,7 @@ def register_plugin():
 
 
 @event('manager.startup')
-def startup_warnings():
+def startup_warnings(manager):
     if sys.version_info < (3, 7):
         logger.warning(
             "Python 3.6 is EOL as of December 2021. FlexGet will remove support for it soon. "
