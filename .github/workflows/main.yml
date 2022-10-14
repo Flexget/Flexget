@@ -56,4 +56,4 @@ jobs:
       run: poetry install --no-interaction
     - name: Test with pytest
       run: |
-        pytest -n auto
+        poetry run pytest -n auto
