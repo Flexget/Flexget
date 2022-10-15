@@ -53,10 +53,11 @@ jobs:
         if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
         with:
           context: ./
+          file: ./Dockerfile
           builder: ${{ steps.buildx.output.name }}
           push: true
           platforms: linux/amd64
-          tags: ${{ steps.meta.output.tags }}
+          tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.output.labels }}
           cache-from: type=gha, scope=${{ github.workflow }}
           cache-to: type=gha, scope=${{ github.workflow }}
@@ -67,6 +68,7 @@ jobs:
         if: github.event_name == 'push' && startsWith(github.ref, 'refs/heads/develop')
         with:
           context: ./
+          file: ./Dockerfile
           builder: ${{ steps.buildx.output.name }}
           push: true
           platforms: linux/amd64
