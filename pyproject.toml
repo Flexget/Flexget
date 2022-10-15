@@ -76,8 +76,6 @@ importlib-metadata = "<5.0.0"  # subliminal breaks on python 3.7 right now witho
 [tool.poetry.scripts]
 flexget = 'flexget:main'
 
-[tool.poetry_bumpversion.file."flexget/_version.py"]
-
 [build-system]
 requires = ["setuptools", "wheel"]
 
