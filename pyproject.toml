@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "flexget"
-version = "3.3.35.dev"
+version = "0.0.0"  # This is not managed here at the moment, since we are still building with setuptools
 description = """FlexGet is a program aimed to automate downloading or processing content (torrents, podcasts, etc.) \
 from different sources like RSS-feeds, html-pages, various sites and more."""
 authors = [
@@ -75,6 +75,8 @@ importlib-metadata = "<5.0.0"  # subliminal breaks on python 3.7 right now witho
 
 [tool.poetry.scripts]
 flexget = 'flexget:main'
+
+[tool.poetry_bumpversion.file."flexget/_version.py"]
 
 [build-system]
 requires = ["setuptools", "wheel"]
