@@ -67,7 +67,7 @@ def required_length(nmin: int, nmax: int):
     return RequiredLength
 
 
-class VersionAction(_VersionAction):
+class VersionAction(Action):
     """Action to print the current version. Also checks latest release revision."""
 
     def __call__(self, parser: ArgParser, namespace: Namespace, values, option_string=None):
@@ -442,7 +442,6 @@ manager_parser.add_argument(
     '-V',
     '--version',
     action=VersionAction,
-    version=flexget.__version__,
     help='Print FlexGet version and exit.',
 )
 manager_parser.add_argument(

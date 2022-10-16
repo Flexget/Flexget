@@ -13,7 +13,7 @@ import requests
 from loguru import logger
 from requests import RequestException
 
-from flexget import __version__ as version
+import flexget
 from flexget.utils.tools import TimedDict, parse_timedelta
 
 # If we use just 'requests' here, we'll get the logger created by requests, rather than our own
@@ -197,7 +197,7 @@ class Session(requests.Session):
         self.adapters['http://'].max_retries = max_retries
         # Stores min intervals between requests for certain sites
         self.domain_limiters: Dict[str, DomainLimiter] = {}
-        self.headers.update({'User-Agent': 'FlexGet/%s (www.flexget.com)' % version})
+        self.headers.update({'User-Agent': 'FlexGet/%s (www.flexget.com)' % flexget.__version__})
 
     def add_cookiejar(self, cookiejar):
         """

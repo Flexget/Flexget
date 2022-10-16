@@ -16,7 +16,7 @@ import colorama
 import loguru
 from loguru import logger
 
-from flexget import __version__
+import flexget
 from flexget.utils.tools import io_encoding
 
 # A level more detailed than INFO
@@ -126,7 +126,7 @@ def initialize(unit_test: bool = False) -> None:
     if _logging_configured:
         return
 
-    if 'dev' in __version__:
+    if 'dev' in flexget.__version__:
         warnings.filterwarnings('always', category=DeprecationWarning, module='flexget.*')
     warnings.simplefilter('once', append=True)
 

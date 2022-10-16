@@ -26,9 +26,14 @@ jobs:
         python-version: ${{ env.PYTHON_VERSION }}
         cache: 'pip'
         cache-dependency-path: 'dev-requirements.txt'
+    - uses: snok/install-poetry@v1
+      with:
+        version: "1.2"
+    - name: Install poetry plugins
+      run: poetry self add poeblix poetry-bumpversion
     - name: Install dev dependencies
       run: |
-        pip install -r dev-requirements.txt
+        poetry install --only dev --no-root
     - name: Set Deployment Status Pending
       uses: deliverybot/deployment-status@v1
       with:
@@ -36,8 +41,7 @@ jobs:
         token: ${{ github.token }}
     - name: Run release script
       env:
-        TWINE_USERNAME: "__token__"
-        TWINE_PASSWORD: ${{ secrets.pypi_token }}
+        POETRY_PYPI_TOKEN_PYPI: ${{ secrets.pypi_token }}
       run: |
         ./release.sh
     - name: Prep Changelog

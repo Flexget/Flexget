@@ -3,12 +3,13 @@ import os
 import sys
 from typing import Sequence
 
-# __version__ import need to be first in order to avoid circular import within logger
-from ._version import __version__  # noqa
+from flexget import log
+from flexget.manager import Manager
 
-# isort: split
-from flexget import log  # noqa
-from flexget.manager import Manager  # noqa
+# This should not need to be edited manually. It is normally handled by the CI during release cycle.
+# Manual version changes can be handled through poetry, with the poetry-bumpversion plugin installed.
+# If this is edited manually, it _must_ remain in sync with the version in pyproject.toml
+__version__ = '3.3.35a0'
 
 
 def main(args: Sequence = None):

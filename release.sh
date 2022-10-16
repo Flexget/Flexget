@@ -19,18 +19,18 @@ fi
 if git log --skip 1 origin/master..origin/develop|grep '^commit '; then
 
   # Bump to new release version
-  python dev_tools.py bump-version release
-  export VERSION=`python dev_tools.py version`
+  poetry version patch
+  export VERSION=`poetry version --short`
 
   # Package WebUI
   python dev_tools.py bundle-webui
 
   # Build and upload to pypi.
-  python setup.py sdist bdist_wheel
-  twine upload dist/*
+  poetry blixbuild --only-lock --no-interaction
+  poetry publish
 
   # Commit and tag released version
-  git add flexget/_version.py
+  git add flexget/__init__.py
   git commit -m "v${VERSION}"
   git tag -a -f "v${VERSION}" -m "v${VERSION} release"
 
@@ -38,9 +38,9 @@ if git log --skip 1 origin/master..origin/develop|grep '^commit '; then
   echo "release_tag=v${VERSION}" >> $GITHUB_ENV
 
   # Bump to new dev version, then commit again
-  python dev_tools.py bump-version dev
-  git add flexget/_version.py
-  git commit -m "Prepare v`python dev_tools.py version`"
+  poetry version prerelease
+  git add flexget/__init__.py
+  git commit -m "Prepare v`poetry version --short`"
 
   # master branch should be at the release we tagged
   git branch -f master v${VERSION}

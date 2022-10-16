@@ -17,12 +17,6 @@ repos:
       name: poetry-lock-check
       files: ^pyproject\.toml|poetry\.lock$
       args: ["--check"]
-    - id: poetry-export
-      args: ["-f", "requirements.txt", "-o", "requirements.txt", "--without-hashes"]
-    - id: poetry-export
-      args: ["--only", "dev", "-f", "requirements.txt", "-o", "dev-requirements.txt", "--without-hashes"]
-    - id: poetry-export
-      args: ["--only", "plugin-test", "-f", "requirements.txt", "-o", "dev-requirements-extras.txt", "--without-hashes"]
 ci:
   autofix_prs: true
   autoupdate_branch: develop

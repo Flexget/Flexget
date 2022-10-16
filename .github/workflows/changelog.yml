@@ -34,9 +34,12 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ env.PYTHON_VERSION }}
+    - uses: snok/install-poetry@v1
+      with:
+        version: "1.2"
     - name: Install dev dependencies
       run: |
-        pip --cache-dir pip_cache install -r dev-requirements.txt
+        poetry install --only dev --no-root
     - name: Update the Changelog
       run: |
         set -x
