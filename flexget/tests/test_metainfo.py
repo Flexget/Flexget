@@ -228,7 +228,7 @@ class TestMetainfoMovie:
             id='flexget3 2004',
         )
 
-    @pytest.mark.skip(msg='Parsers have been simplified')
+    @pytest.mark.skip(reason='Parsers have been simplified')
     def test_metainfo_movie_with_guessit(self, execute_task):
         task = execute_task('test_guessit')
         assert task.find_entry(
