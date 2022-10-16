@@ -20,15 +20,14 @@ jobs:
       run: |
         git config user.email ${{ secrets.git_email }}
         git config user.name ${{ secrets.git_user }}
-    - name: Set up Python ${{ env.PYTHON_VERSION }}
-      uses: actions/setup-python@v4
+    - uses: pdm-project/setup-pdm@main
+      name: Setup PDM
       with:
         python-version: ${{ env.PYTHON_VERSION }}
-        cache: 'pip'
-        cache-dependency-path: 'dev-requirements.txt'
+        version: 2.1.5
     - name: Install dev dependencies
       run: |
-        pip install -r dev-requirements.txt
+        pdm install --dev -G release --no-default --no-self
     - name: Set Deployment Status Pending
       uses: deliverybot/deployment-status@v1
       with:
@@ -36,10 +35,10 @@ jobs:
         token: ${{ github.token }}
     - name: Run release script
       env:
-        TWINE_USERNAME: "__token__"
-        TWINE_PASSWORD: ${{ secrets.pypi_token }}
+        PDM_PUBLISH_USERNAME: "__token__"
+        PDM_PUBLISH_PASSWORD: ${{ secrets.pypi_token }}
       run: |
-        ./release.sh
+        pdm run ./release.sh
     - name: Prep Changelog
       id: changelog
       if: env.release_tag

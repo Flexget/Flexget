@@ -58,12 +58,10 @@ flexget-headless = "flexget:main"  # This is useful on Windows to avoid a cmd po
 version = { source = "file", path = "flexget/_version.py" }
 [tool.pdm.dev-dependencies]
 dev = [
-    "click>=8.0.0",
     "black>=18.9b0",
     "pytest>=7.1.3",
     "codacy-coverage>=1.2.18",
     "coverage~=6.0",
-    "gitpython~=3.1.18",
     "isort>=5.5.1",
     "pre-commit>=2.9.0",
     "pylint>=2.6.0",
@@ -77,6 +75,11 @@ dev = [
 plugin-tests = [
     "boto3>=1.24.91",
     "subliminal>=2.0rc1",
+]
+release = [
+    "click>=8.0.0",
+    "gitpython~=3.1.18",
+    "requests",
 ]
 
 [tool.pdm.build]

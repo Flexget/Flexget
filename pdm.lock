@@ -1155,7 +1155,7 @@ summary = ""
 
 [metadata]
 lock_version = "4.0"
-content_hash = "sha256:0f1c7ce671e702fad07acd08458f8c86eb7c2f3f7f2e01c9ae36f8370b409e5a"
+content_hash = "sha256:7b85f336986b6b2d46c712944b954d7a50e3cb985146bc582efeb57db6c37506"
 
 [metadata.files]
 "alabaster 0.7.12" = [
