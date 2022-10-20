@@ -40,10 +40,16 @@ jobs:
     - name: Update the Changelog
       run: |
         set -x
-        python update-changelog.py wiki/ChangeLog.md
+        python update-changelog.py wiki/ChangeLog.md ChangeLog.md
         cd wiki
         git add ChangeLog.md
         if ! git diff --cached --exit-code; then
             git commit -m "Automated ChangeLog update"
             git push origin main
+        fi
+        cd ..
+        git add ChangeLog.md
+        if ! git diff --cached --exit-code; then
+            git commit -m "Automated ChangeLog update"
+            git push origin develop
         fi

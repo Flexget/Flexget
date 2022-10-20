@@ -98,6 +98,7 @@ def isplit(
 if __name__ == '__main__':
     try:
         filename = sys.argv[1]
+        mainfile = sys.argv[2]
     except IndexError:
         print('No filename specified, using changelog.md')
         filename = 'changelog.md'
@@ -160,5 +161,7 @@ if __name__ == '__main__':
             for ver in released_vers:
                 logfile.writelines(ver.to_md_lines())
             logfile.writelines(post_lines)
+        with open(mainfile, 'w', encoding='utf-8') as changefile:
+            changefile.writelines(cur_ver.to_md_lines())
     else:
         print('No updates to write.')
