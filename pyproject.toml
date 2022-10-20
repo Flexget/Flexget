@@ -77,9 +77,11 @@ plugin-tests = [
     "subliminal>=2.0rc1",
 ]
 release = [
+    # For dev_tools.py
     "click>=8.0.0",
-    "gitpython~=3.1.18",
     "requests",
+    # For update-changelog.py
+    "gitpython~=3.1.18",
 ]
 
 [tool.pdm.build]

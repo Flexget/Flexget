@@ -26,8 +26,8 @@ if git log --skip 1 origin/master..origin/develop|grep '^commit '; then
   python dev_tools.py bundle-webui
 
   # Build and upload to pypi.
-  python setup.py sdist bdist_wheel
-  twine upload dist/*
+  pdm build --locked
+  pdm publish --no-build
 
   # Commit and tag released version
   git add flexget/_version.py

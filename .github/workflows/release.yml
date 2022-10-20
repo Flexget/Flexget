@@ -10,7 +10,7 @@ jobs:
 
     runs-on: ubuntu-latest
     env:
-      PYTHON_VERSION: "3.7"
+      PYTHON_VERSION: "3.10"
     steps:
     - uses: actions/checkout@v3
       with:
@@ -25,6 +25,11 @@ jobs:
       with:
         python-version: ${{ env.PYTHON_VERSION }}
         version: 2.1.5
+    - name: Install pdm plugins
+      # TODO: Is this the best place and way to install pdm plugins?
+      # Some way to require them in the pyproject.toml?
+      run: |
+        pdm plugin add pdm-buildlocked
     - name: Install dev dependencies
       run: |
         pdm install --dev -G release --no-default --no-self
