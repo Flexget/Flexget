@@ -43,9 +43,8 @@ jobs:
     - name: Build Changelog
       id: changelog
       if: env.release_tag
-      uses: mikepenz/release-changelog-builder-action@v3
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run:
+        echo "CHANGELOG_BODY=$(python dev_tools.py get-changelog ${{ env.release_tag }})" >> $GITHUB_ENV
     - name: Create GitHub Release
       uses: ncipollo/release-action@v1
       if: env.release_tag
@@ -53,7 +52,7 @@ jobs:
         tag: ${{ env.release_tag }}
         artifacts: "dist/*"
         token: ${{ secrets.GITHUB_TOKEN }}
-        body: ${{ steps.changelog.outputs.changelog }}
+        body: ${{ env.CHANGELOG_BODY }}
     - name: Set Deployment Status Success
       uses: deliverybot/deployment-status@v1
       with:
