@@ -35,11 +35,15 @@ CherryPy is only used for WSGI server.
 How do I get started?
 ---------------------
 
-Set up development environment, which is basically just three steps:
+Using `PDM`_ is the recommended way to set up a development environment:
 
+#. `Install PDM`_
 #. Git clone `our repository`_.
-#. Create a virtual environment in your clone dir (``python3 -m venv <venv-dir>``).
-#. Run ``<venv-dir>/bin/pip install -e .`` from your checkout directory.
+#. Run ``pdm install`` in the checkout directory to create a virtual environment
+   and install Flexget in it.
+
+.. _PDM: https://pdm.fming.dev/latest/
+.. _Install PDM: https://pdm.fming.dev/latest/#recommended-installation-method
 
 For easier collaboration we recommend forking us on github and sending pull
 request. Once we see any semi-serious input from a developer we will grant
@@ -50,26 +54,26 @@ If you are new to Git there are several interactive tutorials you can try to get
 you started including `try Git`_ and `Learn Git Branching`_.
 
 .. _our repository: https://github.com/Flexget/Flexget
-.. _try Git: http://try.github.io
-.. _Learn Git Branching: http://pcottle.github.io/learnGitBranching/
+.. _try Git: https://try.github.io
+.. _Learn Git Branching: https://pcottle.github.io/learnGitBranching/
 
 Environment
 -----------
 
-Once you have bootstrapped the environment you have fully functional FlexGet in
+Once you have done a ``pdm install``, you have a fully functional FlexGet in
 a `virtual environment`_ in your clone directory. You can easily add or modify
 existing plugins in here and it will not mess your other FlexGet instances in
 any way. The commands in the documentation expect the virtual environment to be
-activated. If you don't activate it you must run commands explicitly from the
-environment's ``bin`` directory or ``scripts`` in windows. E.g. ``flexget`` would
-be ``bin/flexget`` relative to the root of the unactivated `virtual environment`_.
+activated. If you don't activate it you must run commands explicitly using
+PDM E.g. ``flexget`` would be ``pdm run flexget``.
 
-How to activate virtual environment under linux::
+How to `activate virtual environment`_::
 
-  source bin/activate
+  eval $(pdm venv activate in-project)
 
 
-.. _virtual environment: https://docs.python.org/3/library/venv.html
+.. _virtual environment: https://python-poetry.org/docs/basic-usage#using-your-virtual-environment
+.. _activate virtual environment: https://pdm.fming.dev/latest/usage/venv/#activate-a-virtualenv
 
 Code quality
 ------------
@@ -78,53 +82,56 @@ Unit tests
 ~~~~~~~~~~
 
 There are currently over 250 unit tests ensuring that existing functionality
-is not accidentally broken. Unit tests can be invoked with the installation
-of additional requirements::
+is not accidentally broken. Additional requirements to run unit tests are
+installed automatically during a PDM installation.::
 
-  pip install -r dev-requirements.txt
+We use the `pytest`_ framework for testing. Easiest way to run tests is just::
 
-We use the `py.test`_ framework for testing. Easiest way to run tests is just::
-
-  py.test
+  pytest
 
 Run single test file via py.test::
 
-  py.test -v test_file.py
+  pytest -v test_file.py
 
 Run single test suite (class)::
 
-  py.test -v test_file.py::TestClass
+  pytest -v test_file.py::TestClass
 
 Run single test case from suite::
 
-  py.test test_file.py::TestClass::test_method
+  pytest test_file.py::TestClass::test_method
 
 Live example::
 
-  py.test tests/test_seriesparser.py::TestSeriesParser::test_basic
+  pytest tests/test_seriesparser.py::TestSeriesParser::test_basic
 
 
-Project has `Jenkins CI server`_ which polls master branch and makes runs tests
-and makes new build if they pass.
+Project has `GitHub Actions`_ set up, which will run all the tests on
+PRs and the main development branch. Releases will be made automatically
+daily if the tests are all passing.
 
 Unit tests are not mandatory for a plugin to be included in the FlexGet
 distribution but it makes maintaining our code trough project life and
-refactoring so much easier.
+refactoring so much easier. As such, contributions are much more likely
+to be accepted if they are included.
 
-.. _Jenkins CI server: http://ci.flexget.com
+.. _GitHub Actions: https://github.com/Flexget/Flexget/actions
 
 Code Style
 ~~~~~~~~~~
 
 All code should be formatted according to `Python PEP8`_ recommendations. With
 the exception of line length limit at 79 characters. FlexGet uses 120 characters
-instead.
+instead. We use `black`_ and `isort`_ to enforce our code style. The easiest
+way to run these tools, is to install our `pre-commit`_ hooks, which will run our
+tools every time you do a git commit, and fix the style for you.
 
-To run PEP8 checker::
+To install the pre-commit hooks::
 
-  flake8
+  pre-commit install
 
-We do have some violations in our codebase, but new code should not add any.
-
-.. _py.test: https://pytest.org/latest/
+.. _black: https://black.readthedocs.io/en/stable/
+.. _isort: https://pycqa.github.io/isort/
+.. _pre-commit: https://pre-commit.com/
+.. _pytest: https://docs.pytest.org/en/latest/
 .. _Python PEP8: http://www.python.org/dev/peps/pep-0008/
