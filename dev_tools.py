@@ -150,6 +150,7 @@ def autoformat(files):
 @cli.command()
 @click.argument('version')
 def get_changelog(version):
+    version = version.lstrip("v")
     changelog_lines = []
     with requests.get("https://raw.githubusercontent.com/Flexget/wiki/main/ChangeLog.md", stream=True) as resp:
         lines = resp.iter_lines(decode_unicode=True)
