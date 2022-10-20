@@ -43,7 +43,7 @@ jobs:
     - name: Build Changelog
       id: changelog
       if: env.release_tag
-      run:
+      run: |
         echo "CHANGELOG_BODY=$(python dev_tools.py get-changelog ${{ env.release_tag }})" >> $GITHUB_ENV
     - name: Create GitHub Release
       uses: ncipollo/release-action@v1
