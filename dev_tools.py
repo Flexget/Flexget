@@ -155,7 +155,7 @@ def get_changelog(version):
     with requests.get("https://raw.githubusercontent.com/Flexget/wiki/main/ChangeLog.md", stream=True) as resp:
         lines = resp.iter_lines(decode_unicode=True)
         for line in lines:
-            if line.startswith(f"## {version} "):
+            if line.startswith(f"## {version}"):
                 break
         else:
             click.echo(f"Could not find version {version} in changelog", err=True)
