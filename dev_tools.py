@@ -163,7 +163,7 @@ def get_changelog(version):
             click.echo(f"Could not find version {version} in changelog", err=True)
             return
         for line in lines:
-            if line.startswith("## "):
+            if line.startswith("## ") or line.startswith("<!---"):
                 break
             changelog_lines.append(line)
     click.echo("\n".join(changelog_lines).strip())
