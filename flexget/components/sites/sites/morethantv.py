@@ -17,12 +17,15 @@ from flexget.utils.requests import TimedLimiter
 from flexget.utils.soup import get_soup
 from flexget.utils.tools import parse_filesize
 
+SITE_DOMAIN = 'morethantv.me'
+SITE_URL = f'https://www.{SITE_DOMAIN}/'
+
 logger = logger.bind(name='morethantv')
 Base = db_schema.versioned_base('morethantv', 0)
 
 requests = RequestSession()
 requests.add_domain_limiter(
-    TimedLimiter('morethan.tv', '5 seconds')
+    TimedLimiter(SITE_DOMAIN, '5 seconds')
 )  # TODO find out if they want a delay
 
 CATEGORIES = {'Movies': 'filter_cat[1]', 'TV': 'filter_cat[2]', 'Other': 'filter_cat[3]'}
@@ -129,7 +132,6 @@ class SearchMoreThanTV:
         'additionalProperties': False,
     }
 
-    base_url = 'https://www.morethan.tv/'
     errors = False
 
     def get(self, url, params, username, password, force=False):
@@ -148,7 +150,7 @@ class SearchMoreThanTV:
 
         try:
             response = requests.get(url, params=params, cookies=cookies)
-            if self.base_url + 'login.php' in response.url:
+            if SITE_URL + 'login.php' in response.url:
                 invalid_cookie = True
         except TooManyRedirects:
             # Apparently it endlessly redirects if the cookie is invalid?
@@ -192,7 +194,7 @@ class SearchMoreThanTV:
                     logger.debug('Found valid login cookie')
                     return saved_cookie.cookie
 
-        url = self.base_url + 'login.php'
+        url = SITE_URL + 'login.php'
         try:
             logger.debug('Attempting to retrieve MoreThanTV cookie')
             response = requests.post(
@@ -266,7 +268,7 @@ class SearchMoreThanTV:
             logger.debug('Using search params: {}', params)
             try:
                 page = self.get(
-                    self.base_url + 'torrents.php', params, config['username'], config['password']
+                    SITE_URL + 'torrents.php', params, config['username'], config['password']
                 )
                 logger.debug('requesting: {}', page.url)
             except RequestException as e:
@@ -281,7 +283,7 @@ class SearchMoreThanTV:
                 # TODO: compiling regexp within loop achieves nothing
                 title = group_info.find('a', href=re.compile(r'torrents.php\?id=\d+')).text
                 url = (
-                    self.base_url
+                    SITE_URL
                     + group_info.find('a', href=re.compile(r'torrents.php\?action=download'))[
                         'href'
                     ]
