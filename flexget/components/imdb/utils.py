@@ -2,7 +2,7 @@ import difflib
 import json
 import random
 import re
-from datetime import datetime
+from urllib.parse import quote
 
 from loguru import logger
 
@@ -75,7 +75,7 @@ class ImdbSearch:
         # de-prioritize aka matches a bit
         self.aka_weight = 0.95
         # prioritize first
-        self.first_weight = 1.1
+        self.first_weight = 1.3
         self.min_match = 0.7
         self.min_diff = 0.01
         self.debug = False
@@ -100,7 +100,7 @@ class ImdbSearch:
 
     def best_match(self, name, year=None, single_match=True):
         """Return single movie that best matches name criteria or None"""
-        movies = self.search(name)
+        movies = self.search(name, year)
 
         if not movies:
             logger.debug('search did not return any movies')
@@ -156,94 +156,44 @@ class ImdbSearch:
         else:
             return movies[0] if single_match else movies
 
-    def search(self, name):
+    def search(self, name, year=None):
         """Return array of movie details (dict)"""
         logger.debug('Searching: {}', name)
-        url = 'https://www.imdb.com/find'
         # This may include Shorts and TV series in the results
-        params = {'q': name, 's': 'tt'}
+        # It is using the live search suggestions api that populates movies as you type in the search bar
+        search = name
+        if year:
+            search += f" {year}"
+        url = f'https://v3.sg.media-imdb.com/suggestion/titles/x/{quote(search, safe="")}.json'
+        params = {'includeVideos': 1}
 
         logger.debug('Search query: {}', repr(url))
         page = requests.get(url, params=params)
-        actual_url = page.url
+        rows = page.json()['d']
 
         movies = []
-        soup = get_soup(page.text)
-        # in case we got redirected to movie page (perfect match)
-        re_m = re.match(r'.*\.imdb\.com/title/tt\d+/', actual_url)
-        if re_m:
-            actual_url = re_m.group(0)
-            imdb_id = extract_id(actual_url)
-            movie_parse = ImdbParser()
-            movie_parse.parse(imdb_id, soup=soup)
-            logger.debug('Perfect hit. Search got redirected to {}', actual_url)
-            movie = {
-                'match': 1.0,
-                'name': movie_parse.name,
-                'imdb_id': imdb_id,
-                'url': make_url(imdb_id),
-                'year': movie_parse.year,
-            }
-            movies.append(movie)
-            return movies
 
-        section_table = soup.find('table', 'findList')
-        if not section_table:
-            logger.debug('results table not found')
-            return
-
-        rows = section_table.find_all('tr')
-        if not rows:
-            logger.debug('Titles section does not have links')
-        for count, row in enumerate(rows):
+        for count, result in enumerate(rows):
             # Title search gives a lot of results, only check the first ones
             if count > self.max_results:
                 break
 
-            result_text = row.find('td', 'result_text')
-            movie = {}
-            additional = re.findall(r'\((.*?)\)', result_text.text)
-            if len(additional) > 0:
-                if re.match(r'^\d{4}$', additional[-1]):
-                    movie['year'] = str_to_int(additional[-1])
-                elif len(additional) > 1:
-                    movie['year'] = str_to_int(additional[-2])
-                    if additional[-1] not in ['TV Movie', 'Video']:
-                        logger.debug('skipping {}', result_text.text)
-                        continue
-            primary_photo = row.find('td', 'primary_photo')
-            movie['thumbnail'] = primary_photo.find('a').find('img').get('src')
+            if result['qid'] not in ['tvMovie', 'movie', 'video']:
+                logger.debug('skipping {}', result['l'])
+                continue
 
-            link = result_text.find_next('a')
-            movie['name'] = link.text
-            movie['imdb_id'] = extract_id(link.get('href'))
-            movie['url'] = make_url(movie['imdb_id'])
+            movie = {
+                'name': result['l'],
+                'year': result.get('y'),
+                'imdb_id': result['id'],
+                'url': make_url(result['id']),
+                'thumbnail': result.get('i', {}).get('imageUrl'),
+            }
             logger.debug('processing name: {} url: {}', movie['name'], movie['url'])
 
             # calc & set best matching ratio
             seq = difflib.SequenceMatcher(lambda x: x == ' ', movie['name'].title(), name.title())
             ratio = seq.ratio()
-
-            # check if some of the akas have better ratio
-            for aka in link.parent.find_all('i'):
-                aka = aka.next.string
-                match = re.search(r'".*"', aka)
-                if not match:
-                    logger.debug('aka `{}` is invalid', aka)
-                    continue
-                aka = match.group(0).replace('"', '')
-                logger.trace('processing aka {}', aka)
-                seq = difflib.SequenceMatcher(lambda x: x == ' ', aka.title(), name.title())
-                aka_ratio = seq.ratio()
-                if aka_ratio > ratio:
-                    ratio = aka_ratio * self.aka_weight
-                    logger.debug(
-                        '- aka `{}` matches better to `{}` ratio {} (weighted to {})',
-                        aka,
-                        name,
-                        aka_ratio,
-                        ratio,
-                    )
 
             # prioritize items by position
             position_ratio = (self.first_weight - 1) / (count + 1) + 1
