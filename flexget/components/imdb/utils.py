@@ -162,7 +162,9 @@ class ImdbSearch:
         # This may include Shorts and TV series in the results
         # It is using the live search suggestions api that populates movies as you type in the search bar
         search = name
-        if year:
+        # Adding the year to the search normally improves the results, except in the case that the
+        # title of the movie is a number e.g. 1917 (2009)
+        if year and not name.isdigit():
             search += f" {year}"
         url = f'https://v3.sg.media-imdb.com/suggestion/titles/x/{quote(search, safe="")}.json'
         params = {'includeVideos': 1}
