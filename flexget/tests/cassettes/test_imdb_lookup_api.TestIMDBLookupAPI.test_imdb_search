@@ -13,18 +13,15 @@ interactions:
       User-Agent:
       - Python-urllib/2.6
       X-Forwarded-For:
-      - 24.110.0.37
+      - 24.110.121.240
     method: GET
-    uri: https://v3.sg.media-imdb.com/suggestion/titles/x/saw.json?includeVideos=1
+    uri: https://v3.sg.media-imdb.com/suggestion/titles/x/saw.json?includeVideos=0
   response:
     body:
       string: '{"d":[{"i":{"height":947,"imageUrl":"https://m.media-amazon.com/images/M/MV5BM2M1MzI1MWYtYmM2ZC00OWY3LTk0ZGMtNmRkNzU1NzEzMWE5XkEyXkFqcGdeQXVyODUwOTkwODk@._V1_.jpg","width":640},"id":"tt0387564","l":"Saw","q":"feature","qid":"movie","rank":630,"s":"Cary
-        Elwes, Leigh Whannell","v":[{"i":{"height":480,"imageUrl":"https://m.media-amazon.com/images/M/MV5BMTA1MDc0NzE3NDBeQTJeQWpwZ15BbWU4MDk2NTEyODIx._V1_.jpg","width":640},"id":"vi8957721","l":"10th
-        Anniversary Trailer","s":"1:07"},{"i":{"height":228,"imageUrl":"https://m.media-amazon.com/images/M/MV5BMTUzNjI4ODA0Ml5BMl5BanBnXkFtZTcwMzE4OTY2MQ@@._V1_.jpg","width":304},"id":"vi1704001817","l":"Saw","s":"1:35"}],"vt":4,"y":2004},{"i":{"height":935,"imageUrl":"https://m.media-amazon.com/images/M/MV5BZDI3OWE0ZWMtNGJjOS00N2E4LWFiOTAtZjQ4OTNiNzIwN2NkXkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_.jpg","width":631},"id":"tt0072271","l":"The
+        Elwes, Leigh Whannell","y":2004},{"i":{"height":935,"imageUrl":"https://m.media-amazon.com/images/M/MV5BZDI3OWE0ZWMtNGJjOS00N2E4LWFiOTAtZjQ4OTNiNzIwN2NkXkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_.jpg","width":631},"id":"tt0072271","l":"The
         Texas Chain Saw Massacre","q":"feature","qid":"movie","rank":571,"s":"Marilyn
-        Burns, Edwin Neal","v":[{"i":{"height":360,"imageUrl":"https://m.media-amazon.com/images/M/MV5BYTM1ODNhNTItMGRkZS00MWFiLTkzMDEtNzU1MjAyMmJmYmM4XkEyXkFqcGdeQXVyNzU1NzE3NTg@._V1_.jpg","width":480},"id":"vi1118680345","l":"The
-        Texas Chainsaw Massacre: 40th Anniversary","s":"1:40"},{"i":{"height":360,"imageUrl":"https://m.media-amazon.com/images/M/MV5BYWI0NmM0ZTItZjZmYi00MmM4LTg3OWItMTVlZTc1OGIxZjQ3XkEyXkFqcGdeQXVyNzU1NzE3NTg@._V1_.jpg","width":480},"id":"vi183828761","l":"The
-        Texas Chainsaw Massacre","s":"0:31"}],"vt":2,"y":1974},{"i":{"height":1500,"imageUrl":"https://m.media-amazon.com/images/M/MV5BOTRjMDNmNjctNjg4ZC00N2ZkLThkMzMtOWRmYTFhMzA1ZDZlXkEyXkFqcGdeQXVyNTIzOTk5ODM@._V1_.jpg","width":1013},"id":"tt0432348","l":"Saw
+        Burns, Edwin Neal","y":1974},{"i":{"height":1500,"imageUrl":"https://m.media-amazon.com/images/M/MV5BOTRjMDNmNjctNjg4ZC00N2ZkLThkMzMtOWRmYTFhMzA1ZDZlXkEyXkFqcGdeQXVyNTIzOTk5ODM@._V1_.jpg","width":1013},"id":"tt0432348","l":"Saw
         II","q":"feature","qid":"movie","rank":3204,"s":"Donnie Wahlberg, Beverley
         Mitchell","y":2005},{"i":{"height":1500,"imageUrl":"https://m.media-amazon.com/images/M/MV5BNWVjMzgwMTctZmZjNC00ZmE0LThiNTUtYzkyM2RkYWIzY2Y2XkEyXkFqcGdeQXVyNjEyNDAyMzI@._V1_.jpg","width":1012},"id":"tt0489270","l":"Saw
         III","q":"feature","qid":"movie","rank":4202,"s":"Tobin Bell, Shawnee Smith","y":2006},{"i":{"height":1183,"imageUrl":"https://m.media-amazon.com/images/M/MV5BYjRhNWIwNzYtODEyYS00YzcxLWEzMmQtZmFhZTJjYjhkYjA3XkEyXkFqcGdeQXVyNTIzOTk5ODM@._V1_.jpg","width":800},"id":"tt1477076","l":"Saw
@@ -37,23 +34,23 @@ interactions:
       Connection:
       - keep-alive
       Content-Length:
-      - '3170'
+      - '2273'
       Content-Type:
       - application/json
       Date:
-      - Wed, 26 Oct 2022 04:56:09 GMT
+      - Wed, 26 Oct 2022 22:09:45 GMT
       Server:
       - awselb/2.0
       Via:
-      - 1.1 33aa60037dccf2345c8ade9dffbf1192.cloudfront.net (CloudFront)
+      - 1.1 3d84bfab616d594edc9340870455ee6a.cloudfront.net (CloudFront)
       X-Amz-Cf-Id:
-      - gnowrdhlEESONETIaMEtwM7YYeu3GhYmsZmwO4ceetHmZljsTd17ng==
+      - jJpgsOmgC-2mbxUWnqyW_mCH9KE62fCDeHbz4EAbCFJX7rDdy-JxQw==
       X-Amz-Cf-Pop:
-      - IAD12-P2
+      - JFK50-P1
       X-Cache:
       - Miss from cloudfront
       x-imdb-graphql-request-id:
-      - 588d4856-2f29-418c-88a4-17ba75fe8dd6
+      - 014ecb47-8e02-4f98-9d75-828251073b3b
     status:
       code: 200
       message: OK
@@ -71,37 +68,79 @@ interactions:
       User-Agent:
       - Python-urllib/2.6
       X-Forwarded-For:
-      - 24.110.0.37
+      - 24.110.121.240
     method: GET
-    uri: https://v3.sg.media-imdb.com/suggestion/titles/x/tt0234215.json?includeVideos=1
+    uri: https://v3.sg.media-imdb.com/suggestion/titles/x/tt0234215.json?includeVideos=0
   response:
     body:
       string: '{"d":[{"i":{"height":1200,"imageUrl":"https://m.media-amazon.com/images/M/MV5BODE0MzZhZTgtYzkwYi00YmI5LThlZWYtOWRmNWE5ODk0NzMxXkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_.jpg","width":800},"id":"tt0234215","l":"The
         Matrix Reloaded","q":"feature","qid":"movie","rank":3260,"s":"Keanu Reeves,
-        Laurence Fishburne","v":[{"i":{"height":360,"imageUrl":"https://m.media-amazon.com/images/M/MV5BNWM3OGI1OTctNDVjNC00NzE1LThkOTYtMDllZGJiOTQ2Mzc4XkEyXkFqcGdeQXVyNzU1NzE3NTg@._V1_.jpg","width":480},"id":"vi3086352665","l":"The
-        Matrix Reloaded","s":"0:28"},{"i":{"height":1080,"imageUrl":"https://m.media-amazon.com/images/M/MV5BNTBhZGE4NzUtNDRhMi00MTlmLWIwY2UtODUwMzA4MWM3Nzc1XkEyXkFqcGdeQWFsZWxvZw@@._V1_.jpg","width":1920},"id":"vi1674429209","l":"Keanu
-        Reeves: See ''The Matrix Resurrections'' 3 Times to Understand It","s":"2:46"}],"vt":5,"y":2003}],"q":"tt0234215","v":1}'
+        Laurence Fishburne","y":2003}],"q":"tt0234215","v":1}'
     headers:
       Connection:
       - keep-alive
       Content-Length:
-      - '852'
+      - '333'
       Content-Type:
       - application/json
       Date:
-      - Wed, 26 Oct 2022 04:56:12 GMT
+      - Wed, 26 Oct 2022 22:09:48 GMT
       Server:
       - awselb/2.0
       Via:
-      - 1.1 33aa60037dccf2345c8ade9dffbf1192.cloudfront.net (CloudFront)
+      - 1.1 3d84bfab616d594edc9340870455ee6a.cloudfront.net (CloudFront)
       X-Amz-Cf-Id:
-      - W0qHb4F56K_dw6SVucjK-8dLnH9bCBUybXxCrsIzjui5wcrSE6_U7A==
+      - ZLR-scMvNAhZcXdDe5jaEkOKCSbw_pkLx1TKGbXmQshUX6r-9j8Xhw==
       X-Amz-Cf-Pop:
-      - IAD12-P2
+      - JFK50-P1
       X-Cache:
       - Miss from cloudfront
       x-imdb-graphql-request-id:
-      - 119d57d8-36a5-46ee-87f7-9d55b665ed72
+      - d0e3cb2a-bd23-430f-a047-b8cab73e0753
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate, br
+      Accept-Language:
+      - en-US,en;q=0.8
+      Connection:
+      - keep-alive
+      User-Agent:
+      - Python-urllib/2.6
+      X-Forwarded-For:
+      - 24.110.121.240
+    method: GET
+    uri: https://v3.sg.media-imdb.com/suggestion/titles/x/sdfgsdfgsdfgsdfg.json?includeVideos=0
+  response:
+    body:
+      string: '{"d":[],"q":"sdfgsdfgsdfgsdfg","v":1}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '37'
+      Content-Type:
+      - application/json
+      Date:
+      - Wed, 26 Oct 2022 22:09:52 GMT
+      Server:
+      - awselb/2.0
+      Via:
+      - 1.1 3d84bfab616d594edc9340870455ee6a.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - gapUmmHtaXxNjG11No8Gn2sHkAm8O8lJDrdtPd7HrvWdAatKuygfRg==
+      X-Amz-Cf-Pop:
+      - JFK50-P1
+      X-Cache:
+      - Miss from cloudfront
+      x-imdb-graphql-request-id:
+      - c2b0050b-c06e-4e24-bfb5-97b3935e7cfe
     status:
       code: 200
       message: OK

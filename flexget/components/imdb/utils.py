@@ -161,6 +161,7 @@ class ImdbSearch:
         logger.debug('Searching: {}', name)
         # This may include Shorts and TV series in the results
         # It is using the live search suggestions api that populates movies as you type in the search bar
+        search_imdb_id = extract_id(name)
         search = name
         # Adding the year to the search normally improves the results, except in the case that the
         # title of the movie is a number e.g. 1917 (2009)
@@ -191,6 +192,9 @@ class ImdbSearch:
                 'url': make_url(result['id']),
                 'thumbnail': result.get('i', {}).get('imageUrl'),
             }
+            if search_imdb_id and movie['imdb_id'] == search_imdb_id:
+                movie['match'] = 1.0
+                return [movie]
             logger.debug('processing name: {} url: {}', movie['name'], movie['url'])
 
             # calc & set best matching ratio
