@@ -75,8 +75,8 @@ class ImdbSearch:
         # de-prioritize aka matches a bit
         self.aka_weight = 0.95
         # prioritize first
-        self.first_weight = 1.3
-        self.min_match = 0.7
+        self.first_weight = 1.5
+        self.min_match = 0.6
         self.min_diff = 0.01
         self.debug = False
 
@@ -167,7 +167,7 @@ class ImdbSearch:
         if year and not name.isdigit():
             search += f" {year}"
         url = f'https://v3.sg.media-imdb.com/suggestion/titles/x/{quote(search, safe="")}.json'
-        params = {'includeVideos': 1}
+        params = {'includeVideos': 0}
 
         logger.debug('Search query: {}', repr(url))
         page = requests.get(url, params=params)
