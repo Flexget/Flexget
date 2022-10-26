@@ -55,7 +55,7 @@ To get a sense of the many things that can be done with FlexGet you can take a l
 
 **ChangeLog:** https://flexget.com/ChangeLog
 
-**Help:** https://discuss.flexget.com/
+**Help:** https://github.com/Flexget/Flexget/discussions
 
 **Chat:** https://flexget.com/Chat
 
