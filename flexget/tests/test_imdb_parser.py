@@ -66,8 +66,8 @@ class TestImdbParser:
     def test_no_plot(self):
         # Make sure parser doesn't crash for movies with no plot
         parser = ImdbParser()
-        parser.parse('tt1300562')
-        assert parser.name == 'Adieu mères'
+        parser.parse('tt1300570')
+        assert parser.name == 'Cuckold 1'
         # There is no plot
         assert not parser.plot_outline
 
@@ -84,10 +84,7 @@ class TestImdbParser:
         parser = ImdbParser()
         parser.parse('tt2503944')
         assert parser.plot_outline == (
-            "Chef Adam Jones (Bradley Cooper) had it all - and lost it. A two-star Michelin "
-            "rockstar with the bad habits to match, the former enfant terrible of the Paris "
-            "restaurant scene did everything different every time out, and only ever cared "
-            "about the thrill of creating explosions of taste. To land his own kitchen and "
-            "that third elusive Michelin star though, he'll need the best of the best on "
-            "his side, including the beautiful Helene (Sienna Miller)."
+            'Adam Jones is a chef who destroyed his career with drugs and diva behavior. '
+            'He cleans up and returns to London, determined to redeem himself by '
+            'spearheading a top restaurant that can gain three Michelin stars.'
         )

@@ -13,7 +13,7 @@ interactions:
       User-Agent:
       - Python-urllib/2.6
       X-Forwarded-For:
-      - 24.110.121.240
+      - 24.110.31.118
     method: GET
     uri: https://v3.sg.media-imdb.com/suggestion/titles/x/saw.json?includeVideos=0
   response:
@@ -38,19 +38,19 @@ interactions:
       Content-Type:
       - application/json
       Date:
-      - Wed, 26 Oct 2022 22:09:45 GMT
+      - Thu, 27 Oct 2022 01:10:26 GMT
       Server:
       - awselb/2.0
       Via:
-      - 1.1 3d84bfab616d594edc9340870455ee6a.cloudfront.net (CloudFront)
+      - 1.1 7e2fab32e11703f7384de4d8fef36848.cloudfront.net (CloudFront)
       X-Amz-Cf-Id:
-      - jJpgsOmgC-2mbxUWnqyW_mCH9KE62fCDeHbz4EAbCFJX7rDdy-JxQw==
+      - SU0YSXgaWpbai7eMzAzNl2l3eORAkC3zl3PETrUp0h_trEkofK-K4A==
       X-Amz-Cf-Pop:
-      - JFK50-P1
+      - IAD12-P2
       X-Cache:
       - Miss from cloudfront
       x-imdb-graphql-request-id:
-      - 014ecb47-8e02-4f98-9d75-828251073b3b
+      - d1842684-7300-4a06-b565-84245058bcde
     status:
       code: 200
       message: OK
@@ -68,7 +68,7 @@ interactions:
       User-Agent:
       - Python-urllib/2.6
       X-Forwarded-For:
-      - 24.110.121.240
+      - 24.110.31.118
     method: GET
     uri: https://v3.sg.media-imdb.com/suggestion/titles/x/tt0234215.json?includeVideos=0
   response:
@@ -84,19 +84,19 @@ interactions:
       Content-Type:
       - application/json
       Date:
-      - Wed, 26 Oct 2022 22:09:48 GMT
+      - Thu, 27 Oct 2022 01:10:29 GMT
       Server:
       - awselb/2.0
       Via:
-      - 1.1 3d84bfab616d594edc9340870455ee6a.cloudfront.net (CloudFront)
+      - 1.1 7e2fab32e11703f7384de4d8fef36848.cloudfront.net (CloudFront)
       X-Amz-Cf-Id:
-      - ZLR-scMvNAhZcXdDe5jaEkOKCSbw_pkLx1TKGbXmQshUX6r-9j8Xhw==
+      - WsG-cfrh_I2xKVgulNN5tA3UxpzCjvtRH_Bug6V1I4R7-jCV_GgQxw==
       X-Amz-Cf-Pop:
-      - JFK50-P1
+      - IAD12-P2
       X-Cache:
       - Miss from cloudfront
       x-imdb-graphql-request-id:
-      - d0e3cb2a-bd23-430f-a047-b8cab73e0753
+      - 0b7a8d4f-266b-4624-938e-e127fd3f0695
     status:
       code: 200
       message: OK
@@ -114,7 +114,7 @@ interactions:
       User-Agent:
       - Python-urllib/2.6
       X-Forwarded-For:
-      - 24.110.121.240
+      - 24.110.31.118
     method: GET
     uri: https://v3.sg.media-imdb.com/suggestion/titles/x/sdfgsdfgsdfgsdfg.json?includeVideos=0
   response:
@@ -128,19 +128,19 @@ interactions:
       Content-Type:
       - application/json
       Date:
-      - Wed, 26 Oct 2022 22:09:52 GMT
+      - Thu, 27 Oct 2022 01:10:32 GMT
       Server:
       - awselb/2.0
       Via:
-      - 1.1 3d84bfab616d594edc9340870455ee6a.cloudfront.net (CloudFront)
+      - 1.1 7e2fab32e11703f7384de4d8fef36848.cloudfront.net (CloudFront)
       X-Amz-Cf-Id:
-      - gapUmmHtaXxNjG11No8Gn2sHkAm8O8lJDrdtPd7HrvWdAatKuygfRg==
+      - FG2F29VUDl_DP85_W0X6tdbenyJLubm2GwHfyVt9rEQ7q-7AmnSFDw==
       X-Amz-Cf-Pop:
-      - JFK50-P1
+      - IAD12-P2
       X-Cache:
       - Miss from cloudfront
       x-imdb-graphql-request-id:
-      - c2b0050b-c06e-4e24-bfb5-97b3935e7cfe
+      - 070b0645-5c51-4839-977a-09cef3f8a778
     status:
       code: 200
       message: OK
