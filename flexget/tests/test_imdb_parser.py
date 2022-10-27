@@ -22,11 +22,9 @@ class TestImdbParser:
             'nm0002064': 'Giancarlo Esposito',
             'nm0107808': 'Carl Bressler',
             'nm0163988': 'Clark Gregg',
-            'nm0167342': 'Michelle Clunie',
             'nm0198470': 'Ken Daly',
             'nm0261452': 'Christine Estabrook',
             'nm0402974': 'Morgan Hunter',
-            'nm0518385': 'Louis Lombardi',
             'nm0790436': 'Jack Shearer',
             'nm0800339': 'Phillipe Simon',
         }, 'Actors not parsed correctly'
@@ -44,13 +42,8 @@ class TestImdbParser:
         assert parser.name == 'The Usual Suspects', 'Name not parsed correctly'
         assert parser.photo, 'Photo not parsed correctly'
         assert parser.plot_outline == (
-            'Following a truck hijack in New York, five criminals are arrested and '
-            'brought together for questioning. As none of them are guilty, they plan a '
-            'revenge operation against the police. The operation goes well, but then the '
-            'influence of a legendary mastermind criminal called Keyser Söze is felt. It '
-            'becomes clear that each one of them has wronged Söze at some point and must '
-            'pay back now. The payback job leaves 27 men dead in a boat explosion, but '
-            'the real question arises now: Who actually is Keyser Söze?'
+            'A sole survivor tells of the twisty events leading up to a horrific gun battle on a boat, which began '
+            'when five criminals met at a seemingly random police lineup.'
         ), 'Plot outline not parsed correctly'
         assert 8.0 < parser.score < 9.0, 'Score not parsed correctly'
         assert parser.url == 'https://www.imdb.com/title/tt0114814/', 'URL not parsed correctly'

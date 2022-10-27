@@ -371,11 +371,9 @@ class ImdbParser:
         if not self.plot_outline:
             logger.debug('No storyline found for {}', self.imdb_id)
 
-        storyline_keywords = main_column_data.get('storylineKeywords') or {}
-        for keyword_node in storyline_keywords.get('edges') or []:
-            keyword = keyword_node.get('node') or {}
-            if keyword:
-                self.plot_keywords.append(keyword.get('text').lower())
+        storyline_keywords = data.get('keywords') or ''
+        if storyline_keywords:
+            self.plot_keywords = storyline_keywords.split(',')
 
         genres = (above_the_fold_data.get('genres', {}) or {}).get('genres', [])
         self.genres = [g['text'].lower() for g in genres]
