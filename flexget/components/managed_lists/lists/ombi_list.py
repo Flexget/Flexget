@@ -119,13 +119,13 @@ class OmbiMovie(OmbiEntry):
         super().__init__(base_url, auth, self.entry_type, data)
 
     @classmethod
-    def from_imdb_id(cls, base_url: str, tmdb_id: str, auth: Callable[[], Dict[str, str]]):
+    def from_imdb_id(cls, base_url: str, imdb_id: str, auth: Callable[[], Dict[str, str]]):
         """Create a Ombi Entry from an IMDB ID."""
 
         headers = {'Content-Type': 'application/json', 'Accept': 'application/json'}
         headers.update(auth())
 
-        url = f"{base_url}/api/v2/Search/{cls.entry_type}/{tmdb_id}"
+        url = f"{base_url}/api/v2/Search/{cls.entry_type}/imdb/{imdb_id}"
 
         response = requests.get(url, headers=headers)
 
@@ -138,7 +138,7 @@ class OmbiMovie(OmbiEntry):
 
         # Their is a bug in OMBI where if you get a movie by its TMDB ID
         # then the theMovieDbId field will be blank for some reason...
-        data['theMovieDbId'] = tmdb_id
+        # data['theMovieDbId'] = tmdb_id
 
         return OmbiMovie(base_url, auth, data)
 
@@ -266,14 +266,14 @@ class OmbiSet(MutableSet):
 
     def _find_entry(self, entry: Entry):
 
-        if "tmdb_id" not in entry:
+        if "imdb_id" not in entry:
             log.warning(
-                f"{entry['title']} is missing the tmdb_id, consider using tmdb_lookup plugin."
+                f"{entry['title']} is missing the imdb_id, consider using tmdb_lookup plugin."
             )
             return None
 
         for item in self.items:
-            if item['tmdb_id'] == entry['tmdb_id']:
+            if item['imdb_id'] == entry['imdb_id']:
                 return item
 
         return None
@@ -294,7 +294,7 @@ class OmbiSet(MutableSet):
     def items(self) -> List[Entry]:
 
         if self._items:
-            return self.items
+            return self._items
 
         json = self.get_request_list()
 
@@ -357,16 +357,16 @@ class OmbiSet(MutableSet):
 
     def _get_ombi_entry(self, entry: Entry) -> Optional[OmbiEntry]:
 
-        if "tmdb_id" not in entry:
+        if "imdb_id" not in entry:
             log.warning(
-                f"{entry['title']} is missing the tmdb_id, consider using tmdb_lookup plugin."
+                f"{entry['title']} is missing the imdb_id, consider using tmdb_lookup plugin."
             )
             return None
 
         entry_type: str = self.config['type']
 
         if entry_type == 'movies':
-            return OmbiMovie.from_imdb_id(self.config.get('url'), entry['tmdb_id'], self.ombi_auth)
+            return OmbiMovie.from_imdb_id(self.config.get('url'), entry['imdb_id'], self.ombi_auth)
 
         return OmbiTv.from_tvdb_id(self.config.get('url'), entry['tmdb_id'], self.ombi_auth)
 
