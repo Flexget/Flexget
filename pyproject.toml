@@ -16,7 +16,7 @@ dependencies = [
     "guessit~=3.4",
     "html5lib>=0.11",
     "jinja2~=3.0",
-    "jsonschema<4.0,>=2.0",
+    "jsonschema>=2.0",
     "loguru>=0.4.1",
     "more-itertools",
     "psutil>=5.8.0",
@@ -39,7 +39,7 @@ dependencies = [
     "packaging~=21.3",
     "pyparsing==2.4.7",
     "werkzeug<2.1.0",  # flask-restx 0.5.1 is holding this back
-    "zxcvbn-python"
+    "zxcvbn-python",
 ]
 requires-python = ">=3.7"
 readme = "README.rst"

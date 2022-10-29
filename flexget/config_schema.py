@@ -132,13 +132,17 @@ def process_config(
     if schema is None:
         schema = get_schema()
     resolver = RefResolver.from_schema(schema)
-    validator = SchemaValidator(schema, resolver=resolver, format_checker=format_checker)
+    # Use the jsonschema 'validates' decorator to make sure our custom behavior continues across $refs
+    # which declare a $schema. https://github.com/python-jsonschema/jsonschema/issues/994
     if set_defaults:
-        validator.VALIDATORS['properties'] = validate_properties_w_defaults
-    try:
-        errors: List[ValidationError] = list(validator.iter_errors(config))
-    finally:
-        validator.VALIDATORS['properties'] = jsonschema.Draft4Validator.VALIDATORS['properties']
+        jsonschema.validators.validates(CURRENT_SCHEMA_VERSION)(SchemaValidatorWDefaults)
+        validator = SchemaValidatorWDefaults(
+            schema, resolver=resolver, format_checker=format_checker
+        )
+    else:
+        jsonschema.validators.validates(CURRENT_SCHEMA_VERSION)(SchemaValidator)
+        validator = SchemaValidator(schema, resolver=resolver, format_checker=format_checker)
+    errors: List[ValidationError] = list(validator.iter_errors(config))
     # Customize the error messages
     for e in errors:
         set_error_message(e)
@@ -447,3 +451,6 @@ def validate_deprecated(validator, message, instance, schema):
 validators = {'anyOf': validate_anyOf, 'oneOf': validate_oneOf, 'deprecated': validate_deprecated}
 
 SchemaValidator = jsonschema.validators.extend(jsonschema.Draft4Validator, validators)
+SchemaValidatorWDefaults = jsonschema.validators.extend(
+    SchemaValidator, {'properties': validate_properties_w_defaults}
+)
