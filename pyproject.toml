@@ -37,7 +37,7 @@ dependencies = [
     "flask-restx>=0.5.1",
     "flask>=0.7",
     "packaging~=21.3",
-    "pyparsing==2.4.7",
+    "pyparsing>=3.0.0",
     "werkzeug<2.1.0",  # flask-restx 0.5.1 is holding this back
     "zxcvbn-python",
 ]
@@ -88,6 +88,10 @@ release = [
 excludes = [
     "flexget/tests/*"
 ]
+
+[tool.pdm.scripts]
+# Can be called from dev environment like `pdm dev-tools --help`
+dev-tools = {call = "dev_tools:cli"}
 
 [build-system]
 requires = ["pdm-pep517>=1.0.0"]
