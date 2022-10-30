@@ -85,6 +85,7 @@ release = [
 ]
 
 [tool.pdm.build]
+buildlocked = true
 excludes = [
     "flexget/tests/*"
 ]
