@@ -102,7 +102,7 @@ plumbum==1.7.2
     # via rpyc
 portend==3.0.0
     # via cherrypy
-psutil==5.9.0
+psutil==5.9.3
     # via -r requirements.in
 pygments==2.11.2
     # via rich
