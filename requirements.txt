@@ -34,7 +34,7 @@ colorama==0.4.5
     # via -r requirements.in
 commonmark==0.9.1
     # via rich
-feedparser==6.0.8
+feedparser==6.0.10
     # via -r requirements.in
 flask==2.0.3
     # via
