@@ -80,6 +80,9 @@ flexget = 'flexget:main'
 [build-system]
 requires = ["setuptools", "wheel"]
 
+[tool.pytest.ini_options]
+testpaths = ["flexget/tests"]
+
 [tool.black]
 line-length = 99
 skip-string-normalization = true
@@ -102,3 +105,6 @@ exclude = '''
 profile = 'black'
 line_length = 99
 known_first_party = ['flexget']
+
+[tool.mypy]
+plugins = ["sqlmypy"]
