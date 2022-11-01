@@ -1,11 +1,10 @@
 # Feature requests
 
-Use [feathub](http://feathub.com/Flexget/Flexget) for feature requests. 
+Use GitHub issues for feature requests. 
 
 # Issues
 
-
-If you are looking for help, rather than reporting a problem, please use the [forum.](http://discuss.flexget.com)
+If you are looking for help, rather than reporting a problem, please use the [forum.](https://github.com/Flexget/Flexget/discussions)
 
 Before submitting an issue, make sure you:
 
@@ -34,10 +33,11 @@ When submitting pull requests:
   [UpgradeActions](http://flexget.com/wiki/UpgradeActions) page upon merging anyway.
 - Make separate PRs for separate ideas. The smaller each PR is the easier it is to get it reviewed and merged.
   You don't want a bugfix to get held up by a new feature you also added.
-  
+
 # Commit messages
 
-If you want a commit to automatically create an entry in the [changelog](http://flexget.com/ChangeLog) you need to prefix with with square brackets and one of the following tags, followed by plugin name:
+If you want a commit to automatically create an entry in the [changelog](http://flexget.com/ChangeLog) you need to 
+prefix with with square brackets and one of the following tags, followed by plugin name:
 - `add`, `added` or `feature` for the `Added` category
 - `change`, `changed` or `update` for the `Changed` category
 - `fix` or `fixed` for the `Fixed` category

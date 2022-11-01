@@ -22,11 +22,9 @@ class TestImdbParser:
             'nm0002064': 'Giancarlo Esposito',
             'nm0107808': 'Carl Bressler',
             'nm0163988': 'Clark Gregg',
-            'nm0167342': 'Michelle Clunie',
             'nm0198470': 'Ken Daly',
             'nm0261452': 'Christine Estabrook',
             'nm0402974': 'Morgan Hunter',
-            'nm0518385': 'Louis Lombardi',
             'nm0790436': 'Jack Shearer',
             'nm0800339': 'Phillipe Simon',
         }, 'Actors not parsed correctly'
@@ -44,13 +42,8 @@ class TestImdbParser:
         assert parser.name == 'The Usual Suspects', 'Name not parsed correctly'
         assert parser.photo, 'Photo not parsed correctly'
         assert parser.plot_outline == (
-            'Following a truck hijack in New York, five criminals are arrested and '
-            'brought together for questioning. As none of them are guilty, they plan a '
-            'revenge operation against the police. The operation goes well, but then the '
-            'influence of a legendary mastermind criminal called Keyser Söze is felt. It '
-            'becomes clear that each one of them has wronged Söze at some point and must '
-            'pay back now. The payback job leaves 27 men dead in a boat explosion, but '
-            'the real question arises now: Who actually is Keyser Söze?'
+            'A sole survivor tells of the twisty events leading up to a horrific gun battle on a boat, which began '
+            'when five criminals met at a seemingly random police lineup.'
         ), 'Plot outline not parsed correctly'
         assert 8.0 < parser.score < 9.0, 'Score not parsed correctly'
         assert parser.url == 'https://www.imdb.com/title/tt0114814/', 'URL not parsed correctly'
@@ -73,8 +66,8 @@ class TestImdbParser:
     def test_no_plot(self):
         # Make sure parser doesn't crash for movies with no plot
         parser = ImdbParser()
-        parser.parse('tt1300562')
-        assert parser.name == 'Adieu mères'
+        parser.parse('tt1300570')
+        assert parser.name == 'Cuckold 1'
         # There is no plot
         assert not parser.plot_outline
 
@@ -91,10 +84,7 @@ class TestImdbParser:
         parser = ImdbParser()
         parser.parse('tt2503944')
         assert parser.plot_outline == (
-            "Chef Adam Jones (Bradley Cooper) had it all - and lost it. A two-star Michelin "
-            "rockstar with the bad habits to match, the former enfant terrible of the Paris "
-            "restaurant scene did everything different every time out, and only ever cared "
-            "about the thrill of creating explosions of taste. To land his own kitchen and "
-            "that third elusive Michelin star though, he'll need the best of the best on "
-            "his side, including the beautiful Helene (Sienna Miller)."
+            'Adam Jones is a chef who destroyed his career with drugs and diva behavior. '
+            'He cleans up and returns to London, determined to redeem himself by '
+            'spearheading a top restaurant that can gain three Michelin stars.'
         )

@@ -21,16 +21,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-
-      - name: Docker metadata
-        id: meta
-        uses: docker/metadata-action@v4
-        with:
-          images: ghcr.io/flexget/flexget
-          tags: |
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=semver,pattern={{major}}
       
       - name: Setup QEMU
         uses: docker/setup-qemu-action@v2
@@ -38,6 +28,12 @@ jobs:
       - name: Setup Docker Buildx
         id: buildx
         uses: docker/setup-buildx-action@v2
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v2
@@ -47,31 +43,30 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ github.token }}
 
+      - name: Docker metadata
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: |
+            flexget/flexget
+            ghcr.io/flexget/flexget
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            type=ref,event=branch
+
       - name: Build Base Docker Image
         id: docker_build
         uses: docker/build-push-action@v3
-        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+        if: github.event_name == 'push' && github.ref != 'refs/heads/master'
         with:
           context: ./
+          file: ./Dockerfile
           builder: ${{ steps.buildx.output.name }}
           push: true
           platforms: linux/amd64
-          tags: ${{ steps.meta.output.tags }}
-          labels: ${{ steps.meta.output.labels }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha, scope=${{ github.workflow }}
           cache-to: type=gha, scope=${{ github.workflow }}
-
-      - name: Build Base Docker Image develop
-        id: docker_build_develop
-        uses: docker/build-push-action@v3
-        if: github.event_name == 'push' && startsWith(github.ref, 'refs/heads/develop')
-        with:
-          context: ./
-          builder: ${{ steps.buildx.output.name }}
-          push: true
-          platforms: linux/amd64
-          tags: ghcr.io/flexget/flexget:develop
-          labels: ${{ steps.meta.output.labels }}
-          cache-from: type=gha, scope=${{ github.workflow }}
-          cache-to: type=gha, scope=${{ github.workflow }}
-

@@ -138,17 +138,17 @@ if __name__ == '__main__':
                 released_vers.insert(0, cur_ver)
                 cur_ver = MDChangeSet()
                 oldestref = commit.hexsha
-            if cur_ver.sections:
-                verfile = repo.tree('HEAD')['flexget/_version.py'].data_stream.read()
-                __version__: Optional[str] = None
-                try:
-                    exec(verfile)  # pylint: disable=W0122
-                except Exception:
-                    pass
-                new_version_header = f'## {__version__} (unreleased)\n'
-                if new_version_header != cur_ver.version_header:
-                    cur_ver.version_header = new_version_header
-                    modified = True
+
+            verfile = repo.tree('HEAD')['flexget/_version.py'].data_stream.read()
+            __version__: Optional[str] = None
+            try:
+                exec(verfile)  # pylint: disable=W0122
+            except Exception:
+                pass
+            new_version_header = f'## {__version__} (unreleased)\n'
+            if new_version_header != cur_ver.version_header:
+                cur_ver.version_header = new_version_header
+                modified = True
 
     if modified:
         print('Writing modified changelog.')

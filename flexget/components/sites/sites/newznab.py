@@ -73,7 +73,7 @@ class Newznab:
             rss = feedparser.parse(r.content)
             logger.debug('Raw RSS: {}', rss)
 
-            if rss.entries:
+            if not rss.entries:
                 logger.info('No results returned')
 
             for rss_entry in rss.entries:
@@ -113,7 +113,17 @@ class Newznab:
             or 'series_episode' not in arg_entry
         ):
             return []
-        if arg_entry.get('tvrage_id'):
+        if arg_entry.get('tvdb_id'):
+            config['params']['tvdbid'] = arg_entry.get('tvdb_id')
+        elif arg_entry.get('trakt_id'):
+            config['params']['traktid'] = arg_entry.get('trakt_id')
+        elif arg_entry.get('tvmaze_series_id'):
+            config['params']['tvmazeid'] = arg_entry.get('tvmaze_series_id')
+        elif arg_entry.get('tmdb_id'):
+            config['params']['tmdbid'] = arg_entry.get('tmdb_id')
+        elif arg_entry.get('imdb_id'):
+            config['params']['imdbid'] = arg_entry.get('imdb_id')
+        elif arg_entry.get('tvrage_id'):
             config['params']['rid'] = arg_entry.get('tvrage_id')
         else:
             config['params']['q'] = arg_entry['series_name']
