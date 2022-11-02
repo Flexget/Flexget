@@ -1,4 +1,4 @@
-FROM docker.io/python:3.9-alpine
+FROM docker.io/python:3.10-alpine
 ENV PYTHONUNBUFFERED 1
 
 RUN apk add --no-cache --upgrade \
@@ -25,12 +25,13 @@ RUN wget https://github.com/Flexget/webui/releases/latest/download/dist.zip && \
     unzip dist.zip && \
     rm dist.zip
 
-FROM docker.io/python:3.9-alpine
+FROM docker.io/python:3.10-alpine
 ENV PYTHONUNBUFFERED 1
 
 RUN apk add --no-cache --upgrade \
         ca-certificates \
-        nodejs && \
+        nodejs \
+        tzdata && \
     rm -rf /var/cache/apk/*
 
 COPY --from=0 /wheels /wheels
@@ -45,9 +46,9 @@ RUN pip install -U pip && \
                 cloudscraper && \
     rm -rf /wheels
 
-COPY --from=0 /flexget-ui-v2 /usr/local/lib/python3.9/site-packages/flexget/ui/v2/
+COPY --from=0 /flexget-ui-v2 /usr/local/lib/python3.10/site-packages/flexget/ui/v2/
 
-RUN mkdir /root/.flexget
-VOLUME /root/.flexget
+VOLUME /config
+WORKDIR /config
 
 ENTRYPOINT ["flexget"]

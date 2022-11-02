@@ -101,6 +101,7 @@ class TestMetainfoSeries(object):
               - {title: 'Something.Season.2.1of4.Ep.Title.HDTV.torrent'}
               - {title: 'Show-A (US) - Episode Title S02E09 hdtv'}
               - {title: "Jack's.Show.S03E01.blah.1080p"}
+              - {title: 'Something S04 1080p'}
           false_positives:
             mock:
               - {title: 'FlexGet.epic'}
@@ -109,7 +110,7 @@ class TestMetainfoSeries(object):
               - {title: 'FlexGet.Step1'}
               - {title: 'Something.1x0.Complete.Season-FlexGet'}
               - {title: 'Something Seasons 1 & 2 - Complete'}
-              - {title: 'Something Seasons 4 Complete'}
+              - {title: 'Something Seasons 4-10 Complete'}
               - {title: 'Something.S01D2.DVDR-FlexGet'}
     """
 
@@ -173,6 +174,14 @@ class TestMetainfoSeries(object):
             quality='1080p',
             id='jack\'s show s03e01',
         ), 'Failed to parse series info'
+        # Test season pack
+        assert task.find_entry(
+            series_name='Something',
+            series_season=4,
+            season_pack=True,
+            quality='1080p',
+            media_id='something s04e00',
+        ), 'Failed to parse series pack info'
 
     def test_false_positives(self, execute_task):
         """Metainfo series: check for false positives"""
@@ -220,7 +229,7 @@ class TestMetainfoMovie(object):
             id='flexget3 2004',
         )
 
-    @pytest.mark.skip(msg='Parsers have been simplified')
+    @pytest.mark.skip(reason='Parsers have been simplified')
     def test_metainfo_movie_with_guessit(self, execute_task):
         task = execute_task('test_guessit')
         assert task.find_entry(

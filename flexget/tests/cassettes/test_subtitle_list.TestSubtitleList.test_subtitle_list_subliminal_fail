@@ -1,0 +1,110 @@
+interactions:
+- request:
+    body: '<?xml version=''1.0''?>
+
+      <methodCall>
+
+      <methodName>LogIn</methodName>
+
+      <params>
+
+      <param>
+
+      <value><string></string></value>
+
+      </param>
+
+      <param>
+
+      <value><string></string></value>
+
+      </param>
+
+      <param>
+
+      <value><string>eng</string></value>
+
+      </param>
+
+      <param>
+
+      <value><string>subliminal v2.1</string></value>
+
+      </param>
+
+      </params>
+
+      </methodCall>
+
+      '
+    headers:
+      Accept-Encoding:
+      - gzip
+      Content-Length:
+      - '317'
+      Content-Type:
+      - text/xml
+      User-Agent:
+      - Python-xmlrpc/3.10
+    method: POST
+    uri: https://api.opensubtitles.org/xml-rpc
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA2WPSw7CMAxEr1JlT50iFizc9A5IHCBtDFRqnCqfCnF6AkoRlJU1ntGzB7u7naqF
+        fBgdt6KppaiIB2dGvrYixcvuKDqFluLNmROF2XEghbP22oYyFS56Snkbok9DfKVtT14ha0sqRB1T
+        QHiLr2Q+oA6yqc6sU4b78UEGoRgIJQgr65dJg2OzhRqX+omUrKXcIxT1T4L1zY9TWsDaCjZ1n9+9
+        AnIlAQAA
+    headers:
+      Accept-Ranges:
+      - bytes
+      Access-Control-Allow-Headers:
+      - Origin,X-Requested-With,Content-Type,Accept,DNT,Keep-Alive,User-Agent,If-Modified-Since,Cache-Control
+      Access-Control-Allow-Methods:
+      - GET, POST, OPTIONS
+      Access-Control-Allow-Origin:
+      - '*'
+      Age:
+      - '0'
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-RAY:
+      - 760076449abcb3bf-MIA
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Length:
+      - '177'
+      Content-Type:
+      - text/xml;charset=UTF-8
+      Date:
+      - Wed, 26 Oct 2022 04:31:22 GMT
+      NEL:
+      - '{"success_fraction":0,"report_to":"cf-nel","max_age":604800}'
+      Report-To:
+      - '{"endpoints":[{"url":"https:\/\/a.nel.cloudflare.com\/report\/v3?s=3yKNp6cxg3eHXNBoe7ZqCis7vDHTf%2FrjKKyY2%2BHS%2F5h7URdb0TD1WFxdoyMMyjcGEOicleoFYh7xwdWhAdDlyzAu2B%2BsBM9nOi7X1w4I5t7PrXvAJ9YVlbZiVjnz79cSdxnsfEtd%2Fzylxqlu6%2FMUBi1Bkys%3D"}],"group":"cf-nel","max_age":604800}'
+      Server:
+      - cloudflare
+      Vary:
+      - Accept-Encoding
+      X-Cache-Backend:
+      - web3
+      X-Compressed-Content-Length:
+      - '177'
+      X-Content-Encoding:
+      - gzip
+      X-RateLimit-Remaining:
+      - '39'
+      X-Uncompressed-Content-Length:
+      - '293'
+      X-Var-Cache:
+      - MISS
+      X-Via:
+      - fw2
+      alt-svc:
+      - h3=":443"; ma=86400, h3-29=":443"; ma=86400
+    status:
+      code: 200
+      message: OK
+version: 1

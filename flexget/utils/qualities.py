@@ -160,7 +160,7 @@ _codecs = [
 _color_ranges = [
     QualityComponent('color_range', 10, '8bit', r'8[^\w]?bits?|hi8p?'),
     QualityComponent('color_range', 20, '10bit', r'10[^\w]?bits?|hi10p?'),
-    QualityComponent('color_range', 40, 'hdrplus', r'hdr[^\w]?(\+|p|plus)'),
+    QualityComponent('color_range', 40, 'hdrplus', r'hdr(10)?[^\w]?(\+|p|plus)'),
     QualityComponent('color_range', 30, 'hdr', r'hdr([^\w]?10)?'),
     QualityComponent('color_range', 50, 'dolbyvision', r'(dolby[^\w]?vision|dv|dovi)'),
 ]
@@ -188,15 +188,7 @@ _UNKNOWNS = {
     'audio': QualityComponent('audio', 0, 'unknown'),
 }
 
-# For wiki generating help
-'''for type in (_resolutions, _sources, _codecs, _color_ranges, _audios):
-    print '{{{#!td style="vertical-align: top"'
-    for item in reversed(type):
-        print '- ' + item.name
-    print '}}}'
-'''
-
-_registry: Dict[Union[str, QualityComponent], QualityComponent] = {}
+_registry: Dict[str, QualityComponent] = {}
 for items in (_resolutions, _sources, _codecs, _color_ranges, _audios):
     for item in items:
         _registry[item.name] = item

@@ -5,6 +5,7 @@ from urllib import parse
 
 from jinja2 import Template
 from loguru import logger
+from requests.exceptions import HTTPError
 
 from flexget import plugin
 from flexget.entry import Entry
@@ -52,6 +53,7 @@ class InputHtml:
                                     'name': {'type': 'string'},
                                     'step': {'type': 'integer'},
                                     'stop_when_empty': {'type': 'boolean'},
+                                    'stop_when_404': {'type': 'boolean'},
                                     'entries_count': {'type': 'integer'},
                                 },
                                 'additionalProperties': False,
@@ -108,6 +110,7 @@ class InputHtml:
             base_url = config['url']
             entries_count = increment.get('entries_count', 500)
             stop_when_empty = increment.get('stop_when_empty', True)
+            stop_when_404 = increment.get('stop_when_404', True)
             increment_name = increment.get('name', 'i')
 
             template_url = Template(base_url)
@@ -123,7 +126,12 @@ class InputHtml:
                 dump_name = None
                 if template_dump:
                     dump_name = template_dump.render(**render_ctx)
-                new_entries = self._request_url(task, config, url, auth, dump_name)
+                try:
+                    new_entries = self._request_url(task, config, url, auth, dump_name)
+                except HTTPError as e:
+                    if stop_when_404 and e.response.status_code == 404:
+                        break
+                    raise e
                 if not entries:
                     entries = new_entries
                 else:

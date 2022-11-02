@@ -3,11 +3,8 @@
 ### Detailed changes:
 - 
 
-### Addressed issues:
+### Addressed issues/feature requests:
 - Fixes # .
-
-### Implemented feature requests:
-- Feathub #[XX](https://feathub.com/Flexget/Flexget/+XX).
 
 ### Config usage if relevant (new plugin or updated schema):
 ```

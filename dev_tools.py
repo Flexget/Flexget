@@ -147,5 +147,27 @@ def autoformat(files):
     )
 
 
+@cli.command()
+@click.argument('version')
+def get_changelog(version):
+    version = version.lstrip("v")
+    changelog_lines = []
+    with requests.get(
+        "https://raw.githubusercontent.com/Flexget/wiki/main/ChangeLog.md", stream=True
+    ) as resp:
+        lines = resp.iter_lines(decode_unicode=True)
+        for line in lines:
+            if line.startswith(f"## {version}"):
+                break
+        else:
+            click.echo(f"Could not find version {version} in changelog", err=True)
+            return
+        for line in lines:
+            if line.startswith("## ") or line.startswith("<!---"):
+                break
+            changelog_lines.append(line)
+    click.echo("\n".join(changelog_lines).strip())
+
+
 if __name__ == '__main__':
     cli()

@@ -73,7 +73,7 @@ class Medusa:
             'token'
         ]
 
-        headers = {'authorization': 'Bearer ' + api_key}
+        headers = {'x-auth': 'Bearer ' + api_key}
 
         params = {'limit': 1000}
 

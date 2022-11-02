@@ -10,43 +10,63 @@ on:
     branches:
       - "*"
 
+permissions: {}
+
 jobs:
   build:
+    permissions:
+      contents: read # to fetch code (actions/checkout)
+      packages: write # to push to ghcr.io
+
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+      
+      - name: Setup QEMU
+        uses: docker/setup-qemu-action@v2
 
-      - name: Build Base Docker Image
-        run: docker build --tag flexget:tmp .
+      - name: Setup Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         if: github.event_name == 'push'
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ github.token }}
 
-      - uses: actions/github-script@v5
-        if: github.event_name == 'push'
-        name: Docker Push
+      - name: Docker metadata
+        id: meta
+        uses: docker/metadata-action@v4
         with:
-          debug: true
-          script: |
-            const ref = context.ref
-            const versions = []
-            if (ref.startsWith('refs/tags/v')){
-              const tag = ref.substring(11)
-              const [major, minor, _] = tag.split('.')
-              versions.push('latest', tag, `${major}.${minor}`, major)
-            } else if (ref.startsWith('refs/heads/')) {
-              versions.push(ref.substring(11))
-            } else {
-              console.log(ref)
-            }
-            console.log(versions)
-            for (const version of versions) {
-              const dst = `ghcr.io/flexget/flexget:${version}`
-              await exec.exec(`docker tag flexget:tmp ${dst}`)
-              await exec.exec(`docker push ${dst}`)
-            }
+          images: |
+            flexget/flexget
+            ghcr.io/flexget/flexget
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            type=ref,event=branch
+
+      - name: Build Base Docker Image
+        id: docker_build
+        uses: docker/build-push-action@v3
+        if: github.event_name == 'push' && github.ref != 'refs/heads/master'
+        with:
+          context: ./
+          file: ./Dockerfile
+          builder: ${{ steps.buildx.output.name }}
+          push: true
+          platforms: linux/amd64
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha, scope=${{ github.workflow }}
+          cache-to: type=gha, scope=${{ github.workflow }}

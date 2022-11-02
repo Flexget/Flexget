@@ -1,19 +1,22 @@
 FlexGet
 =======
-.. image:: https://github.com/Flexget/Flexget/workflows/Main%20Workflow/badge.svg?branch=develop&event=schedule
-    :target: https://github.com/Flexget/Flexget/actions?query=workflow%3A%22Main+Workflow%22+branch%3Adevelop+event%3Aschedule
+.. image:: https://github.com/Flexget/Flexget/actions/workflows/main.yml/badge.svg?branch=develop
+    :target: https://github.com/Flexget/Flexget/actions/workflows/main.yml?query=branch%3Adevelop
 
 .. image:: https://img.shields.io/pypi/v/Flexget.svg
     :target: https://pypi.python.org/pypi/Flexget
+    
+..
+    Commenting these out for now, as they seem to be broken.
+    .. image:: https://api.codacy.com/project/badge/Grade/86bb847efe984c12948bdeccabcbccad
+        :target: https://www.codacy.com/app/Flexget/Flexget?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Flexget/Flexget&amp;utm_campaign=Badge_Grade
 
-.. image:: https://api.codacy.com/project/badge/Grade/86bb847efe984c12948bdeccabcbccad
-    :target: https://www.codacy.com/app/Flexget/Flexget?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Flexget/Flexget&amp;utm_campaign=Badge_Grade
+    .. image:: https://api.codacy.com/project/badge/Coverage/86bb847efe984c12948bdeccabcbccad
+        :target: https://www.codacy.com/app/Flexget/Flexget?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Flexget/Flexget&amp;utm_campaign=Badge_Coverage
 
-.. image:: https://api.codacy.com/project/badge/Coverage/86bb847efe984c12948bdeccabcbccad
-    :target: https://www.codacy.com/app/Flexget/Flexget?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Flexget/Flexget&amp;utm_campaign=Badge_Coverage
 
-.. image:: https://img.shields.io/gitter/room/nwjs/nw.js.svg
-    :target: https://gitter.im/Flexget/Flexget
+.. image:: https://img.shields.io/discord/536690097056120833?label=discord
+    :target: https://discord.gg/W6CQrJx
 
 .. image:: http://isitmaintained.com/badge/resolution/Flexget/Flexget.svg
     :target: http://isitmaintained.com/project/Flexget/Flexget
@@ -52,7 +55,7 @@ To get a sense of the many things that can be done with FlexGet you can take a l
 
 **ChangeLog:** https://flexget.com/ChangeLog
 
-**Help:** https://discuss.flexget.com/
+**Help:** https://github.com/Flexget/Flexget/discussions
 
 **Chat:** https://flexget.com/Chat
 
@@ -68,11 +71,6 @@ FlexGet is installable via pip with the command::
 For more detailed instructions see the `installation guide`_.
 
 .. _installation guide: https://flexget.com/Install
-
-Feature requests
-----------------
-.. image:: http://feathub.com/Flexget/Flexget?format=svg
-   :target: http://feathub.com/Flexget/Flexget
 
 How to use GIT checkout
 -----------------------
@@ -96,9 +94,10 @@ python and this fails. Please install `python3-virtualenv` package and retry
 
 .. _virtualenv: https://pypi.python.org/pypi/virtualenv
 
-Upgrading pip to latest version is highly advisable and can de done with::
+Upgrading pip and setuptools to latest version is highly advisable if not mandatory
+for working installation and can de done with::
 
-    bin/pip install --upgrade pip
+    bin/pip install --upgrade pip setuptools
 
 Next we need to install dependencies and FlexGet itself, this can be done simply::
 

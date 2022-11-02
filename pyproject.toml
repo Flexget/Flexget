@@ -4,8 +4,7 @@ requires = ["setuptools", "wheel"]
 [tool.black]
 line-length = 99
 skip-string-normalization = true
-# TODO: Add 3.10 once black supports it
-target-version = ['py36', 'py37', 'py38', 'py39']
+target-version = ['py36', 'py37', 'py38', 'py39', 'py310']
 # Only include files in /flexget/, or directly in project root
 include = '^/(flexget/.*)?[^/]*\.pyi?$'
 exclude = '''
