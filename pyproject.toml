@@ -111,7 +111,6 @@ vcrpy = ">=4.1.1"
 # These are optional dependencies for plugins that have tests in the test suite
 boto3 = ">=1.24.89"
 subliminal = ">= 2.0rc1"
-importlib-metadata = "<5.0.0"  # subliminal breaks on python 3.7 right now without this upper bound
 
 [tool.poetry.scripts]
 flexget = 'flexget:main'
