@@ -1,5 +1,5 @@
 alabaster==0.7.12 ; python_version >= "3.7" and python_version < "4.0"
-astroid==2.11.7 ; python_version >= "3.7" and python_version < "4.0"
+astroid==2.12.12 ; python_version >= "3.7" and python_version < "4.0"
 attrs==22.1.0 ; python_version >= "3.7" and python_version < "4.0"
 babel==2.11.0 ; python_version >= "3.7" and python_version < "4.0"
 black==22.10.0 ; python_version >= "3.7" and python_version < "4.0"
