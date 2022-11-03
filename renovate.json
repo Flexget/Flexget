@@ -1,9 +1,9 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:base",
-    ":preserveSemverRanges"
+    "config:base"
   ],
+  "rangeStrategy": "widen",
   "lockFileMaintenance": {
     "enabled": true
   },
