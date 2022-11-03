@@ -3,9 +3,5 @@
   "extends": [
     "config:base",
     ":preserveSemverRanges"
-  ],
-  "pip-compile": {
-    "fileMatch": ["(^|/)(dev-)?requirements\\.in$"]
-  },
-  "enabled": false
+  ]
 }

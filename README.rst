@@ -75,10 +75,10 @@ For more detailed instructions see the `installation guide`_.
 How to use GIT checkout
 -----------------------
 
-Check that you have Python 3.6 or newer available with command ``python -V``.
+Check that you have Python 3.7 or newer available with command ``python -V``.
 
 In some environments newer python might be available under another name like
-'python3.6' or 'python3' in which case you need to use that one instead of
+'python3.7' or 'python3' in which case you need to use that one instead of
 plain 'python'.
 
 To start using FlexGet from this directory::

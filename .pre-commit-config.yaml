@@ -9,6 +9,20 @@ repos:
   rev: 22.10.0
   hooks:
   - id: black
+- repo: https://github.com/python-poetry/poetry
+  rev: '1.2.2'
+  hooks:
+    - id: poetry-check
+    - id: poetry-lock
+      name: poetry-lock-check
+      files: ^pyproject\.toml|poetry\.lock$
+      args: ["--check"]
+    - id: poetry-export
+      args: ["-f", "requirements.txt", "-o", "requirements.txt", "--without-hashes"]
+    - id: poetry-export
+      args: ["--only", "dev", "-f", "requirements.txt", "-o", "dev-requirements.txt", "--without-hashes"]
+    - id: poetry-export
+      args: ["--only", "plugin-test", "-f", "requirements.txt", "-o", "dev-requirements-extras.txt", "--without-hashes"]
 ci:
   autofix_prs: true
   autoupdate_branch: develop
