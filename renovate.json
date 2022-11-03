@@ -6,5 +6,8 @@
   ],
   "pip_requirements": {
     "enabled": false
+  },
+  "npm": {
+    "enabled": false
   }
 }
