@@ -33,6 +33,7 @@ jobs:
     # about whether it works well when using a matrix of different python versions. Doing caching
     # manually for now, until there is more info.
     - name: Set up Python ${{ matrix.python-version }}
+      id: setup-python
       uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
