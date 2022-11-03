@@ -16,7 +16,7 @@ jobs:
     runs-on: ${{ matrix.operating-system }}
     strategy:
       matrix:
-        python-version: ["3.7", "3.8", "3.9", "3.10"]
+        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11"]
         operating-system: [ubuntu-latest] # TODO: Fix a couple tests and enable windows. windows-latest
       fail-fast: false
     env:
