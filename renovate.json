@@ -3,5 +3,8 @@
   "extends": [
     "config:base",
     ":preserveSemverRanges"
-  ]
+  ],
+  "pip_requirements": {
+    "enabled": false
+  }
 }
