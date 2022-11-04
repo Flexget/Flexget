@@ -7,4 +7,4 @@ The version should always be set to the <next release version>.dev
 The github actions release job will automatically strip the .dev for release,
 and update the version again for continued development.
 """
-__version__ = '3.5.2.dev'
+__version__ = '3.5.2'
