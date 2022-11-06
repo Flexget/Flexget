@@ -1,5 +1,6 @@
 from loguru import logger
 from rich.highlighter import ReprHighlighter
+from rich.markup import escape
 from rich.pretty import Pretty, is_expandable
 
 from flexget import options, plugin
@@ -62,7 +63,7 @@ def dump(entries, debug=False, eval_lazy=False, trace=False, title_only=False):
                     if field.rsplit('_', maxsplit=1)[-1] == 'url':
                         renderable = f'[link={value}][repr.url]{value}[/repr.url][/link]'
                     elif isinstance(value, str):
-                        renderable = value.replace('\r', '').replace('\n', '')
+                        renderable = escape(value.replace('\r', '').replace('\n', ''))
                     elif is_expandable(value):
                         renderable = Pretty(value)
                     else:
