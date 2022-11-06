@@ -1,3 +1,5 @@
+from urllib.parse import quote
+
 from loguru import logger
 from rich.highlighter import ReprHighlighter
 from rich.markup import escape
@@ -61,7 +63,8 @@ def dump(entries, debug=False, eval_lazy=False, trace=False, title_only=False):
                     renderable = '[italic]<LazyField - lazy lookup failed>[/italic]'
                 else:
                     if field.rsplit('_', maxsplit=1)[-1] == 'url':
-                        renderable = f'[link={value}][repr.url]{value}[/repr.url][/link]'
+                        url = quote(value, safe=":/")
+                        renderable = f'[link={url}][repr.url]{escape(value)}[/repr.url][/link]'
                     elif isinstance(value, str):
                         renderable = escape(value.replace('\r', '').replace('\n', ''))
                     elif is_expandable(value):
