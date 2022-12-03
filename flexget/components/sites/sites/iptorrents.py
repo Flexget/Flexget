@@ -94,7 +94,7 @@ class UrlRewriteIPTorrents:
                 {'oneOf': [{'type': 'integer'}, {'type': 'string', 'enum': list(CATEGORIES)}]}
             ),
             'free': {'type': 'boolean', 'default': False},
-            'search_delay': {'type': 'string', 'default': '1 seconds'}
+            'search_delay': {'type': 'string', 'default': '1 seconds'},
         },
         'required': ['rss_key', 'uid', 'password'],
         'additionalProperties': False,
