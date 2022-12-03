@@ -146,10 +146,11 @@ class UrlRewriteIPTorrents:
 
         entries = set()
 
-        delay = config.get('search_delay')
-        logger.debug('limiting requests with a delay of {}', delay)
-        rate_limiter = requests.TimedLimiter(DOMAIN, delay)
-        task.requests.add_domain_limiter(rate_limiter)
+        if task.requests.domain_limiters.get(DOMAIN, None) is None:
+            delay = config.get('search_delay')
+            logger.debug('limiting requests with a delay of {}', delay)
+            rate_limiter = requests.TimedLimiter(DOMAIN, delay)
+            task.requests.add_domain_limiter(rate_limiter)
 
         for search_string in entry.get('search_strings', [entry['title']]):
             search_params = {key: value for (key, value) in category_params.items()}
