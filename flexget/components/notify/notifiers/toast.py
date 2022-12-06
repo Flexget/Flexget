@@ -64,7 +64,7 @@ class NotifyToast:
         try:
             import flexget.ui
 
-            icon_path = os.path.join(flexget.ui.__path__[0], 'src', 'favicon.ico')
+            icon_path = os.path.join(flexget.ui.__path__[0], 'v1', 'app', 'favicon.ico')
         except Exception as e:
             logger.debug('Error trying to get flexget icon from webui folder: {}', e)
 
@@ -168,7 +168,7 @@ class NotifyToast:
         try:
             import flexget.ui
 
-            icon_path = os.path.join(flexget.ui.__path__[0], 'src', 'favicon.ico')
+            icon_path = os.path.join(flexget.ui.__path__[0], 'v1', 'app', 'favicon.ico')
             hicon = LoadImage(hinst, icon_path, IMAGE_ICON, 0, 0, icon_flags)
         except Exception as e:
             logger.debug('Error trying to get flexget icon from webui folder: {}', e)
