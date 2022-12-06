@@ -77,10 +77,7 @@ class NotifyToast:
         if config.get('url'):
             notify_kwargs['open'] = config.get('url')
         try:
-            Notifier.notify(
-                message,
-                **notify_kwargs
-            )
+            Notifier.notify(message, **notify_kwargs)
         except Exception as e:
             raise PluginWarning('Cannot send a notification: %s' % e)
 
