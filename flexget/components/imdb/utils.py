@@ -15,7 +15,10 @@ logger = logger.bind(name='imdb.utils')
 # IMDb delivers a version of the page which is unparsable to unknown (and some known) user agents, such as requests'
 # Spoof the old urllib user agent to keep results consistent
 requests = Session()
-requests.headers.update({'User-Agent': 'Python-urllib/2.6'})
+requests.headers.update(
+    {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0'}
+)
+# the above line stating Firefox user agent is because imdb requests fail with 403 when bots query the site. Requesting with the right User-Agent seems to solve the issue
 # requests.headers.update({'User-Agent': random.choice(USERAGENTS)})
 
 # this makes most of the titles to be returned in english translation, but not all of them
