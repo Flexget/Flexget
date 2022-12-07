@@ -29,8 +29,9 @@ class MatrixNotifier:
 
     All fields are required.
 
-    token: Is available in Element under Help/About.
-    roomId: Is available in Element under room settings.
+    server: Matrix hostname to integrate to (required)
+    token: Is available in Element under Help/About. (required)
+    room_id: Is available in Element under room settings. (required)
 
     Example::
 
@@ -40,7 +41,7 @@ class MatrixNotifier:
             - matrix:
                 server: "https://matrix.org"
                 token: sender's token
-                roomid: room identifier
+                room_id: room identifier
     """
 
     schema = {
@@ -48,13 +49,13 @@ class MatrixNotifier:
         'properties': {
             'server': {'type': 'string'},
             'token': {'type': 'string'},
-            'roomid': {'type': 'string'},
+            'room_id': {'type': 'string'},
         },
-        'required': ['server', 'token', 'roomid'],
+        'required': ['server', 'token', 'room_id'],
         'additionalProperties': False,
     }
 
-    __version__ = '0.2'
+    __version__ = '0.3'
 
     def notify(self, title, message, config):
         """
@@ -64,13 +65,13 @@ class MatrixNotifier:
         room = urljoin(
             config['server'],
             "_matrix/client/r0/rooms",
-            config['roomid'],
+            config['room_id'],
             "send/m.room.message?access_token=" + config['token'],
         )
         try:
             requests.post(room, json=notification)
         except RequestException as e:
-            raise PluginWarning(e.args[0])
+            raise PluginWarning(e.args[0]) from e
 
 
 @event('plugin.register')
