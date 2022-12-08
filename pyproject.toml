@@ -86,6 +86,7 @@ packaging = ">=21.3"
 pyparsing = ">=2.4.7"
 werkzeug = ">=2.0.3"
 zxcvbn-python = "^4.4.24"
+plexapi = "^4.13.1"
 
 [tool.poetry.group.dev.dependencies]
 black = ">=18.9b0"
