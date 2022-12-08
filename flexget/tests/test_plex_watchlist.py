@@ -4,7 +4,6 @@ import logging
 PLEX_USERNAME = 'flexget_flexget'
 PLEX_PASSWORD = 'flexget_flexget'
 
-
 @pytest.mark.online
 class TestPlex:
     config = """

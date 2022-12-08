@@ -75,10 +75,13 @@ class PlexManagedWatchlist(MutableSet):
         self.type = type
         self.filter = filter
         self._items: Optional[List[Entry]] = None
+        self._account: Optional[MyPlexAccount] = None
 
     @property
     def account(self) -> "MyPlexAccount":
-        return MyPlexAccount(self.username, self.password, self.token)
+        if self._account is None:
+            self._account = MyPlexAccount(self.username, self.password, self.token)
+        return self._account
 
     @property
     def items(self) -> List[Entry]:
