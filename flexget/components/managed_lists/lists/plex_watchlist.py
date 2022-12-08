@@ -28,8 +28,6 @@ def create_entry(plex_item: "Union[Movie, Show]") -> Entry:
         url=plex_item.guid,
     )
 
-    entry['plex_guid'] = plex_item.guid
-
     if plex_item.TYPE == 'movie':
         entry['movie_name'] = plex_item.title
         entry['movie_year'] = plex_item.year
@@ -37,6 +35,13 @@ def create_entry(plex_item: "Union[Movie, Show]") -> Entry:
         entry['series_name'] = plex_item.title
         entry['series_year'] = plex_item.year
 
+    entry.update(get_supported_ids_from_plex_object(plex_item))
+
+    return entry
+
+
+def get_supported_ids_from_plex_object(plex_item):
+    ids = {'plex_guid': plex_item.guid}
     for guid in plex_item.guids:
         x = guid.id.split("://")
         try:
@@ -46,9 +51,8 @@ def create_entry(plex_item: "Union[Movie, Show]") -> Entry:
 
         media_id = f'{x[0]}_id'
         if media_id in SUPPORTED_IDS:
-            entry[media_id] = value
-
-    return entry
+            ids[media_id] = value
+    return ids
 
 
 class VideoStub:
@@ -102,15 +106,27 @@ class PlexManagedWatchlist(MutableSet):
 
         if 'plex_guid' in entry:
             item = self._create_stub_from_entry(entry)
-        elif 'movie_year' in entry and 'movie_name' in entry:  # try to find by name and year TODO: what about series?
-            logger.debug('Searching for {} with discover', entry['movie_name'])
-            results = self.account.searchDiscover(entry['movie_name'], libtype=self.type)
+        else:
+            logger.debug('Searching for {} with discover', entry['title'])
+            results = self.account.searchDiscover(entry['title'], libtype=self.type)
             for result in results:
                 logger.trace('found {}', result.title)
-                if (
+                ids = get_supported_ids_from_plex_object(result)
+
+                # match on supported ids
+                if any(entry.get(id) is not None and entry[id] == ids[id] for id in SUPPORTED_IDS):
+                    item = result
+                    break
+
+                # title matching sucks but lets try
+                if ('movie_year' in entry and 'movie_name' in entry) and (
                     result.title == entry['movie_name']
                     and result.originallyAvailableAt.year == entry['movie_year']
                 ):
+                    item = result
+                    break
+
+                if entry.get('title').lower() == result.title.lower():
                     item = result
                     break
 
