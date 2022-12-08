@@ -29,3 +29,4 @@ flask>=0.7
 pyparsing==2.4.7
 werkzeug<2.1.0  # Flask-login incompatibility https://github.com/maxcountryman/flask-login/issues/636
 zxcvbn-python
+plexapi
