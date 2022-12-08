@@ -1,4 +1,5 @@
 import typing
+import re
 from collections.abc import MutableSet
 from typing import List, Optional, Type, Union
 
@@ -9,21 +10,16 @@ from flexget.entry import Entry
 from flexget.event import event
 
 PLUGIN_NAME = 'plex_watchlist'
-SUPPORTED_IDS = ['imdb_id', 'tmdb_id', 'tvdb_id']
+SUPPORTED_IDS = ['imdb_id', 'tmdb_id', 'tvdb_id', 'plex_guid']
 
 logger = logger.bind(name=PLUGIN_NAME)
 
-if typing.TYPE_CHECKING:
+
+try:
     from plexapi.myplex import MyPlexAccount
-    from plexapi.video import Movie, Show
-
-
-def import_plexaccount() -> "Type[MyPlexAccount]":
-    try:
-        from plexapi.myplex import MyPlexAccount  # noqa
-    except ImportError:
-        raise plugin.DependencyError('plex_watchlist', 'plexapi', 'plexapi package required')
-    return MyPlexAccount
+    from plexapi.video import Movie, Show, Video
+except ImportError:
+    raise plugin.DependencyError('plex_watchlist', 'plexapi', 'plexapi package required')
 
 
 def create_entry(plex_item: "Union[Movie, Show]") -> Entry:
@@ -31,6 +27,9 @@ def create_entry(plex_item: "Union[Movie, Show]") -> Entry:
         title=f"{plex_item.title} ({plex_item.year})" if plex_item.year else plex_item.title,
         url=plex_item.guid,
     )
+
+    entry['plex_guid'] = plex_item.guid
+
     if plex_item.TYPE == 'movie':
         entry['movie_name'] = plex_item.title
         entry['movie_year'] = plex_item.year
@@ -52,6 +51,11 @@ def create_entry(plex_item: "Union[Movie, Show]") -> Entry:
     return entry
 
 
+class VideoStub:
+    guid: str
+    title: str
+
+
 class PlexManagedWatchlist(MutableSet):
     def __init__(
         self,
@@ -70,7 +74,6 @@ class PlexManagedWatchlist(MutableSet):
 
     @property
     def account(self) -> "MyPlexAccount":
-        MyPlexAccount = import_plexaccount()
         return MyPlexAccount(self.username, self.password, self.token)
 
     @property
@@ -95,21 +98,51 @@ class PlexManagedWatchlist(MutableSet):
         return self._find_entry(entry)
 
     def add(self, entry: Entry) -> None:
-        raise NotImplemented
-        self.account.addToWatchlist()
+        item = None
+
+        if 'plex_guid' in entry:
+            item = self._create_stub_from_entry(entry)
+        elif 'movie_year' in entry and 'movie_name' in entry:  # try to find by name and year TODO: what about series?
+            logger.debug('Searching for {} with discover', entry['movie_name'])
+            results = self.account.searchDiscover(entry['movie_name'], libtype=self.type)
+            for result in results:
+                logger.trace('found {}', result.title)
+                if (
+                    result.title == entry['movie_name']
+                    and result.originallyAvailableAt.year == entry['movie_year']
+                ):
+                    item = result
+                    break
+
+        if item:
+            if self.account.onWatchlist(item):
+                logger.debug(f'"{item.title}" is already on the watchlist')
+                return
+
+            logger.debug(f'Adding "{item.title}" to the watchlist')
+            self.account.addToWatchlist(item)
 
     def discard(self, entry) -> None:
-        raise NotImplemented
-        self.account.removeFromWatchlist()
+        entry = self._find_entry(entry)
+        if entry:
+            item = self._create_stub_from_entry(entry)
+            logger.debug('Removing {} from watchlist', entry['title'])
+            self.account.removeFromWatchlist(item)
 
     @property
     def online(self) -> bool:
         return True
 
     @property
-    def immutable(self) -> bool:
-        # TODO: Turn this true after the editing is implemented
-        return True
+    def immutable(self):
+        return False
+
+    def _create_stub_from_entry(self, entry):
+        # item = self.account._buildItemOrNone(entry + {'attrib': {}}, cls=Movie)
+        item = VideoStub()
+        item.guid = entry['plex_guid']
+        item.title = entry['title']
+        return item
 
     def _find_entry(self, entry):
         for item in self.items:
@@ -130,10 +163,6 @@ class PlexWatchlist:
         },
         'anyOf': [{'required': ['token']}, {'required': ['username', 'password']}],
     }
-
-    @plugin.priority(plugin.PRIORITY_FIRST)
-    def on_task_start(self, task, config):
-        import_plexaccount()
 
     def get_list(self, config):
         return PlexManagedWatchlist(**config)
