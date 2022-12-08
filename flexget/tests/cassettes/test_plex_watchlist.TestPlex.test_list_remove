@@ -15,7 +15,7 @@ interactions:
       User-Agent:
       - python-requests/2.27.1
       X-Plex-Client-Identifier:
-      - '0x6045bd9f437d'
+      - '0x6045bdf2f360'
       X-Plex-Device:
       - Linux
       X-Plex-Device-Name:
@@ -41,8 +41,8 @@ interactions:
       string: "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<user email=\"polka_gill0i@icloud.com\"
         id=\"187797645\" uuid=\"d0df38378404ccb3\" mailing_list_status=\"active\"
         thumb=\"https://plex.tv/users/d0df38378404ccb3/avatar?c=1670500132\" username=\"flexget_flexget\"
-        title=\"flexget_flexget\" cloudSyncDevice=\"\" locale=\"\" authenticationToken=\"zztjLDsTqRXJr8qS4ooM\"
-        authToken=\"zztjLDsTqRXJr8qS4ooM\" scrobbleTypes=\"\" restricted=\"0\" home=\"0\"
+        title=\"flexget_flexget\" cloudSyncDevice=\"\" locale=\"\" authenticationToken=\"my9V3p6rsyRFTtgmpDvD\"
+        authToken=\"my9V3p6rsyRFTtgmpDvD\" scrobbleTypes=\"\" restricted=\"0\" home=\"0\"
         guest=\"0\" queueEmail=\"queue+9awhZbapS3smCMyLLL_k@save.plex.tv\" queueUid=\"\"
         hasPassword=\"true\" homeSize=\"1\" maxHomeSize=\"15\" rememberMe=\"false\"
         secure=\"1\" certificateVersion=\"3\">\n  <subscription active=\"0\" status=\"Inactive\"
@@ -102,16 +102,16 @@ interactions:
         token=\"CFlmhH676IvrFij0l4BR1YNRtyHjz+9EAH+GU5ZgncfJ3ufdmzWK/3giK1Ovei7u\"
         status=\"online\"/>\n  </services>\n  <username>flexget_flexget</username>\n
         \ <email>polka_gill0i@icloud.com</email>\n  <joined-at type=\"datetime\">2022-12-08
-        11:48:15 UTC</joined-at>\n  <authentication-token>zztjLDsTqRXJr8qS4ooM</authentication-token>\n</user>\n"
+        11:48:15 UTC</joined-at>\n  <authentication-token>my9V3p6rsyRFTtgmpDvD</authentication-token>\n</user>\n"
     headers:
       Cache-Control:
       - max-age=0, private, must-revalidate
       Content-Type:
       - application/xml; charset=utf-8
       Date:
-      - Thu, 08 Dec 2022 15:17:05 GMT
+      - Thu, 08 Dec 2022 17:56:10 GMT
       Etag:
-      - W/"ed6d9169d09fedc31a6f720661f1aef4"
+      - W/"cf801708afda37ef2170f1e325478f1c"
       Location:
       - /
       Referrer-Policy:
@@ -127,9 +127,9 @@ interactions:
       X-Frame-Options:
       - SAMEORIGIN
       X-Request-Id:
-      - 5ff8e699-385b-422a-88cb-90eb8dec5291
+      - d1e96427-afa5-4b85-bb1f-9b2cbbb86b36
       X-Runtime:
-      - '0.126366'
+      - '0.115652'
       X-Xss-Protection:
       - 1; mode=block
     status:
@@ -147,7 +147,7 @@ interactions:
       User-Agent:
       - python-requests/2.27.1
       X-Plex-Client-Identifier:
-      - '0x6045bd9f437d'
+      - '0x6045bdf2f360'
       X-Plex-Device:
       - Linux
       X-Plex-Device-Name:
@@ -165,7 +165,7 @@ interactions:
       X-Plex-Sync-Version:
       - '2'
       X-Plex-Token:
-      - zztjLDsTqRXJr8qS4ooM
+      - my9V3p6rsyRFTtgmpDvD
       X-Plex-Version:
       - 4.13.1
     method: GET
@@ -173,36 +173,42 @@ interactions:
   response:
     body:
       string: !!binary |
-        H4sIAAAAAAAAA8VX23LbNhD9FQ7fJeIOshMlo9iNm9ZOVTuxk77hKrOhSIWEZMtf36VoxZJjxVSa
-        mc54NAYI7J7ds4sDvHh1OyuipaubvCpHMR6i+NXLF2fO5uqoKoPKS1dHRa5rVa8unAmw6u3xKL5R
-        wVwXeRPiRx/f56Fwo/jq4XvlfePCKEZxFKqgiov8DhaQOMqtK0Puc1eP4rAczgt3O5zX1RLm6+HM
-        BWVVUHHU3K9/+eISvlSRqsHYdQjz5pckyWdq6oZhZvWwqqdJSOZJVefTvFRFIrOJ+TiZ6+OrL4Vk
-        1+knhGbvbvSnM30x/Gc+jSOtyrJ1vjGmGgDaDL0qwccwLJPuv2QGmFyTCMGYyLpRtzVRsya42qrZ
-        QFDhDBM2U8b6zvx0kdtR3IYFtte7Eu4ZSr0QiGCENUIM/hjJfBx9dqtRnNznMtlE/50N8xpir1e/
-        3oZa/XHY5sS1myAgYrgn1CtOKWaCE4Kk1ZLHUa1CXk5HMR3SzWDtYz+cJixsXo3id+4mOndTV5pV
-        NKkru1hXRQPcr+ZA4zoNMLhezHQ/FkXzu7m8Ozm6qY+PXp9douMPwp3fjcmH27MuzcpaZ8dQExgI
-        ykiKEFSaXbSo24pOW5Dt1Hyhi9xMwFPz4fz0wfm6lLvqA8o7nhZQmFDHdmDzpnSrQZEv3UCtQxkQ
-        RMgA0tIUC8hQn5Vfm2WDUyKOCSUsjsDZzVEFRtb90Y7+3GqXrpfGmyKLIwMtCU1zfk/POXTXfZ6K
-        1Xip8kLpwrU+1q4xGiAgc+VU3c1AsoAl4MZtLIjhN5NvWzJGcV2F1lU1U6FyDyR1xTBcQPlNr8Om
-        OHrt6b5C3wPPnav7yEmGMIb+XluJVBF2Yu4KRyvzeVrDehtHi7p4oG9T7YMmgE3zlUiSTGtlXFkF
-        lxBGPLVMC8qcSqkVxqWO0UwwQS2xbl1IyXMA2o5/5PznnhjPIDAFEHlaTasrOAd/CMi1XY8LsLED
-        hHBjOFUI1gzn5fNAKtCLcR16MoG2mEDKsZTQlKWISIuwyGDIPGPKS2KE7JWH1v2kamd7IqBbCCgm
-        LNMSvKXcOYjaCy60VFJzZzXux0SL4OLLQtWPediHgG0hYA57CJpLrzExDBmfIWozyVPjlGGsD4Km
-        VPPmuupLwU4z4MwqrazJFMeWcaOxY5nUFmnqucw27pO13B6suvqvj+Mv57fkzRSKe3F0eTWtJnf8
-        lB+H+odUl1FBJNrpIV3AYTBQXe1KYzJOnTY43S+7VkphlMyU5gzkgGCOM4h8v+zu3dBHdvdsfpBd
-        hZFOnUWKIMw8tjTVTult2c12ZXcvnG3ZPYW7WnQEPzP143I7f1Oo6rf3f7vVu88nKV3eNuPf85M7
-        f9Gob+VWYCrFrtxKjg6X2wdCN7K6PfOkfCIuUT/5fN2aisZP6efkZIDpsxqKs+9raNqy9X9rKOaU
-        iXRXRLcj/xkq6h3NvE494jolilK4OSLQVScszJOnTs6nEBwuo4ceAc9h+A9Ceg9lW0i3oMD1mGMM
-        t1CsqXhCSZ+AcpiU7tCRedBQDrfxlGhDoBONQ5KqVGSEcmL6peJgLd1Rc4odnEmUYSmsoowon+ks
-        9QrmpBD9KuJwMd2Rc9Bu6h3y8BBRon29GBAxAzdKuFpRRHpBOFBNd1JgnaY8ozZFTluriLbwMBJE
-        Oy+1k/yxmia7T+uX/wIiGg7ggA8AAA==
+        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
     headers:
       Access-Control-Allow-Origin:
       - '*'
       CF-Cache-Status:
       - BYPASS
       CF-RAY:
-      - 77667745287c41c8-AMS
+      - 776760507cdb0e2f-AMS
       Cache-Control:
       - no-store
       Connection:
@@ -216,9 +222,9 @@ interactions:
       Cross-Origin-Resource-Policy:
       - cross-origin
       Date:
-      - Thu, 08 Dec 2022 15:17:05 GMT
+      - Thu, 08 Dec 2022 17:56:11 GMT
       Etag:
-      - W/"f80-BTT9ft7C1NsB60F9GmpkRZ1ehQQ"
+      - W/"15d9-Nx6lwKzJc1BsQJpFkA/qmOFAS/Q"
       Origin-Agent-Cluster:
       - ?1
       Referrer-Policy:
@@ -246,11 +252,11 @@ interactions:
       X-Plex-Container-Start:
       - '0'
       X-Plex-Container-Total-Size:
-      - '2'
+      - '3'
       X-Plex-Timestamp:
-      - '1670512625'
+      - '1670522171'
       X-Plex-Version:
-      - 636d0531a
+      - 629eb4e1b
       X-Xss-Protection:
       - '0'
     status:
@@ -268,7 +274,7 @@ interactions:
       User-Agent:
       - python-requests/2.27.1
       X-Plex-Client-Identifier:
-      - '0x6045bd9f437d'
+      - '0x6045bdf2f360'
       X-Plex-Device:
       - Linux
       X-Plex-Device-Name:
@@ -286,7 +292,7 @@ interactions:
       X-Plex-Sync-Version:
       - '2'
       X-Plex-Token:
-      - zztjLDsTqRXJr8qS4ooM
+      - my9V3p6rsyRFTtgmpDvD
       X-Plex-Version:
       - 4.13.1
     method: GET
@@ -294,16 +300,16 @@ interactions:
   response:
     body:
       string: !!binary |
-        H4sIAAAAAAAAA13KsQrCMBAA0F8J9wExdW7aQRcHpxacz+aCB2lSLkesfr3gIji/14/7mkwjqVyy
-        h846GIf+SoHxVLIiZxKT+C4or4kW5ZIvZw9P1OWRuCr84cyayMPt5yXGSuqhcw6MFsU08Zs8HMFw
-        oKwcmcSDNrsl2u0mpXEgsSspBlQEU7/fwWH4AN+ZQFuuAAAA
+        H4sIAAAAAAAAA13KsQrCMBAA0F8J9wExxbVpB10cnFpwPpsLHqRJuRyx+vWCi+D8Xj/uazKNpHLJ
+        HjrrYBz6KwXGU8mKnElM4rugvCZalEu+nD08UZdH4qrwhzNrIg+3n5cYK6mHzjkwWhTTxG/ycATD
+        gbJyZBIP2uyWaLeblMaBxK6kGFARTP1+B4fhA9JljDKuAAAA
     headers:
       Access-Control-Allow-Origin:
       - '*'
       CF-Cache-Status:
       - BYPASS
       CF-RAY:
-      - 776677481b1341c8-AMS
+      - 77676053da080e2f-AMS
       Cache-Control:
       - no-store
       Connection:
@@ -317,9 +323,9 @@ interactions:
       Cross-Origin-Resource-Policy:
       - cross-origin
       Date:
-      - Thu, 08 Dec 2022 15:17:06 GMT
+      - Thu, 08 Dec 2022 17:56:11 GMT
       Etag:
-      - W/"ae-8oxLwoCIJJnaAL7sEg1GIMttEVw"
+      - W/"ae-e7hLvq2FOsBOhIkPdxqipfo5Rwc"
       Origin-Agent-Cluster:
       - ?1
       Referrer-Policy:
@@ -347,11 +353,11 @@ interactions:
       X-Plex-Container-Start:
       - '100'
       X-Plex-Container-Total-Size:
-      - '2'
+      - '3'
       X-Plex-Timestamp:
-      - '1670512626'
+      - '1670522171'
       X-Plex-Version:
-      - 636d0531a
+      - 629eb4e1b
       X-Xss-Protection:
       - '0'
     status:
@@ -369,7 +375,7 @@ interactions:
       User-Agent:
       - python-requests/2.27.1
       X-Plex-Client-Identifier:
-      - '0x6045bd9f437d'
+      - '0x6045bdf2f360'
       X-Plex-Device:
       - Linux
       X-Plex-Device-Name:
@@ -387,7 +393,7 @@ interactions:
       X-Plex-Sync-Version:
       - '2'
       X-Plex-Token:
-      - zztjLDsTqRXJr8qS4ooM
+      - my9V3p6rsyRFTtgmpDvD
       X-Plex-Version:
       - 4.13.1
     method: GET
@@ -407,11 +413,11 @@ interactions:
       Access-Control-Allow-Origin:
       - '*'
       Age:
-      - '69397'
+      - '78942'
       CF-Cache-Status:
       - HIT
       CF-RAY:
-      - 7766774a59b1d0c5-AMS
+      - 776760562b70b914-AMS
       Cache-Control:
       - max-age=0,stale-while-revalidate=86400
       Cdn-Cache-Control:
@@ -427,7 +433,7 @@ interactions:
       Cross-Origin-Resource-Policy:
       - cross-origin
       Date:
-      - Thu, 08 Dec 2022 15:17:06 GMT
+      - Thu, 08 Dec 2022 17:56:11 GMT
       Etag:
       - W/"442-DDWuWd+WC7lM/D4F3pNScFnwlVw"
       Origin-Agent-Cluster:
@@ -475,7 +481,7 @@ interactions:
       User-Agent:
       - python-requests/2.27.1
       X-Plex-Client-Identifier:
-      - '0x6045bd9f437d'
+      - '0x6045bdf2f360'
       X-Plex-Device:
       - Linux
       X-Plex-Device-Name:
@@ -493,7 +499,469 @@ interactions:
       X-Plex-Sync-Version:
       - '2'
       X-Plex-Token:
-      - zztjLDsTqRXJr8qS4ooM
+      - my9V3p6rsyRFTtgmpDvD
+      X-Plex-Version:
+      - 4.13.1
+    method: GET
+    uri: https://metadata.provider.plex.tv/library/metadata/5d7768ba96b655001fdc0408?checkFiles=1&includeAllConcerts=1&includeBandwidths=1&includeChapters=1&includeChildren=1&includeConcerts=1&includeExternalMedia=1&includeExtras=1&includeGeolocation=1&includeLoudnessRamps=1&includeMarkers=1&includeOnDeck=1&includePopularLeaves=1&includePreferences=1&includeRelated=1&includeRelatedCount=1&includeReviews=1&includeStations=1&includeUserState=1
+  response:
+    body:
+      string: !!binary |
+        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
+        APj3MidYoa//P8X8/L+0XYvyT2YAAA==
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      CF-Cache-Status:
+      - BYPASS
+      CF-RAY:
+      - 776760565babb914-AMS
+      Cache-Control:
+      - no-store
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Language:
+      - en
+      Content-Type:
+      - application/xml; charset=utf-8
+      Cross-Origin-Resource-Policy:
+      - cross-origin
+      Date:
+      - Thu, 08 Dec 2022 17:56:12 GMT
+      Etag:
+      - W/"664f-Mt6Ygz6fWTJu0plU4a45knqGWww"
+      Origin-Agent-Cluster:
+      - ?1
+      Referrer-Policy:
+      - no-referrer
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Dns-Prefetch-Control:
+      - 'off'
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Plex-Cache:
+      - miss
+      X-Plex-Container-Start:
+      - '0'
+      X-Plex-Container-Total-Size:
+      - '1'
+      X-Plex-Timestamp:
+      - '1670522172'
+      X-Plex-Version:
+      - 629eb4e1b
+      X-Xss-Protection:
+      - '0'
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate, br
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.27.1
+      X-Plex-Client-Identifier:
+      - '0x6045bdf2f360'
+      X-Plex-Device:
+      - Linux
+      X-Plex-Device-Name:
+      - codespaces-a97850
+      X-Plex-Features:
+      - external-media
+      X-Plex-Platform:
+      - Linux
+      X-Plex-Platform-Version:
+      - 5.4.0-1094-azure
+      X-Plex-Product:
+      - PlexAPI
+      X-Plex-Provides:
+      - controller
+      X-Plex-Sync-Version:
+      - '2'
+      X-Plex-Token:
+      - my9V3p6rsyRFTtgmpDvD
+      X-Plex-Version:
+      - 4.13.1
+    method: GET
+    uri: https://metadata.provider.plex.tv/library/metadata/5d776ca79ab544002151945c?checkFiles=1&includeAllConcerts=1&includeBandwidths=1&includeChapters=1&includeChildren=1&includeConcerts=1&includeExternalMedia=1&includeExtras=1&includeGeolocation=1&includeLoudnessRamps=1&includeMarkers=1&includeOnDeck=1&includePopularLeaves=1&includePreferences=1&includeRelated=1&includeRelatedCount=1&includeReviews=1&includeStations=1&includeUserState=1
+  response:
+    body:
+      string: !!binary |
+        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
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      CF-Cache-Status:
+      - BYPASS
+      CF-RAY:
+      - 7767605a48f2b914-AMS
+      Cache-Control:
+      - no-store
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Language:
+      - en
+      Content-Type:
+      - application/xml; charset=utf-8
+      Cross-Origin-Resource-Policy:
+      - cross-origin
+      Date:
+      - Thu, 08 Dec 2022 17:56:12 GMT
+      Etag:
+      - W/"6a5f-tPs3qD2sQ20Z9rnPC1VNuv3WwbE"
+      Origin-Agent-Cluster:
+      - ?1
+      Referrer-Policy:
+      - no-referrer
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Dns-Prefetch-Control:
+      - 'off'
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Plex-Cache:
+      - miss
+      X-Plex-Container-Start:
+      - '0'
+      X-Plex-Container-Total-Size:
+      - '1'
+      X-Plex-Timestamp:
+      - '1670522172'
+      X-Plex-Version:
+      - 629eb4e1b
+      X-Xss-Protection:
+      - '0'
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate, br
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.27.1
+      X-Plex-Client-Identifier:
+      - '0x6045bdf2f360'
+      X-Plex-Device:
+      - Linux
+      X-Plex-Device-Name:
+      - codespaces-a97850
+      X-Plex-Features:
+      - external-media
+      X-Plex-Platform:
+      - Linux
+      X-Plex-Platform-Version:
+      - 5.4.0-1094-azure
+      X-Plex-Product:
+      - PlexAPI
+      X-Plex-Provides:
+      - controller
+      X-Plex-Sync-Version:
+      - '2'
+      X-Plex-Token:
+      - my9V3p6rsyRFTtgmpDvD
       X-Plex-Version:
       - 4.13.1
     method: GET
@@ -675,7 +1143,7 @@ interactions:
       CF-Cache-Status:
       - BYPASS
       CF-RAY:
-      - 7766774a79e7d0c5-AMS
+      - 7767605d4d23b914-AMS
       Cache-Control:
       - no-store
       Connection:
@@ -689,7 +1157,7 @@ interactions:
       Cross-Origin-Resource-Policy:
       - cross-origin
       Date:
-      - Thu, 08 Dec 2022 15:17:06 GMT
+      - Thu, 08 Dec 2022 17:56:13 GMT
       Etag:
       - W/"8c34-mnX+pCwtpsuYRR6uwcBTmB9b73I"
       Origin-Agent-Cluster:
@@ -721,9 +1189,9 @@ interactions:
       X-Plex-Container-Total-Size:
       - '1'
       X-Plex-Timestamp:
-      - '1670512626'
+      - '1670522173'
       X-Plex-Version:
-      - 636d0531a
+      - 629eb4e1b
       X-Xss-Protection:
       - '0'
     status:
@@ -741,7 +1209,7 @@ interactions:
       User-Agent:
       - python-requests/2.27.1
       X-Plex-Client-Identifier:
-      - '0x6045bd9f437d'
+      - '0x6045bdf2f360'
       X-Plex-Device:
       - Linux
       X-Plex-Device-Name:
@@ -759,393 +1227,7 @@ interactions:
       X-Plex-Sync-Version:
       - '2'
       X-Plex-Token:
-      - zztjLDsTqRXJr8qS4ooM
-      X-Plex-Version:
-      - 4.13.1
-    method: GET
-    uri: https://metadata.provider.plex.tv/library/metadata/5d776ca79ab544002151945c?checkFiles=1&includeAllConcerts=1&includeBandwidths=1&includeChapters=1&includeChildren=1&includeConcerts=1&includeExternalMedia=1&includeExtras=1&includeGeolocation=1&includeLoudnessRamps=1&includeMarkers=1&includeOnDeck=1&includePopularLeaves=1&includePreferences=1&includeRelated=1&includeRelatedCount=1&includeReviews=1&includeStations=1&includeUserState=1
-  response:
-    body:
-      string: !!binary |
-        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
-    headers:
-      Access-Control-Allow-Origin:
-      - '*'
-      CF-Cache-Status:
-      - BYPASS
-      CF-RAY:
-      - 7766774d2e18d0c5-AMS
-      Cache-Control:
-      - no-store
-      Connection:
-      - keep-alive
-      Content-Encoding:
-      - gzip
-      Content-Language:
-      - en
-      Content-Type:
-      - application/xml; charset=utf-8
-      Cross-Origin-Resource-Policy:
-      - cross-origin
-      Date:
-      - Thu, 08 Dec 2022 15:17:07 GMT
-      Etag:
-      - W/"6a5f-Ywo7/nd91VcbjqnFtcCqRAWN9JQ"
-      Origin-Agent-Cluster:
-      - ?1
-      Referrer-Policy:
-      - no-referrer
-      Server:
-      - cloudflare
-      Strict-Transport-Security:
-      - max-age=31536000; includeSubDomains; preload
-      Transfer-Encoding:
-      - chunked
-      Vary:
-      - Accept-Encoding
-      X-Content-Type-Options:
-      - nosniff
-      X-Dns-Prefetch-Control:
-      - 'off'
-      X-Download-Options:
-      - noopen
-      X-Frame-Options:
-      - SAMEORIGIN
-      X-Permitted-Cross-Domain-Policies:
-      - none
-      X-Plex-Cache:
-      - miss
-      X-Plex-Container-Start:
-      - '0'
-      X-Plex-Container-Total-Size:
-      - '1'
-      X-Plex-Timestamp:
-      - '1670512626'
-      X-Plex-Version:
-      - 636d0531a
-      X-Xss-Protection:
-      - '0'
-    status:
-      code: 200
-      message: OK
-- request:
-    body: null
-    headers:
-      Accept:
-      - '*/*'
-      Accept-Encoding:
-      - gzip, deflate, br
-      Authorization:
-      - Basic ZmxleGdldF9mbGV4Z2V0OmZsZXhnZXRfZmxleGdldA==
-      Connection:
-      - keep-alive
-      Content-Length:
-      - '0'
-      User-Agent:
-      - python-requests/2.27.1
-      X-Plex-Client-Identifier:
-      - '0x6045bd9f437d'
-      X-Plex-Device:
-      - Linux
-      X-Plex-Device-Name:
-      - codespaces-a97850
-      X-Plex-Features:
-      - external-media
-      X-Plex-Platform:
-      - Linux
-      X-Plex-Platform-Version:
-      - 5.4.0-1094-azure
-      X-Plex-Product:
-      - PlexAPI
-      X-Plex-Provides:
-      - controller
-      X-Plex-Sync-Version:
-      - '2'
-      X-Plex-Version:
-      - 4.13.1
-    method: POST
-    uri: https://plex.tv/users/sign_in.xml
-  response:
-    body:
-      string: "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<user email=\"polka_gill0i@icloud.com\"
-        id=\"187797645\" uuid=\"d0df38378404ccb3\" mailing_list_status=\"active\"
-        thumb=\"https://plex.tv/users/d0df38378404ccb3/avatar?c=1670500132\" username=\"flexget_flexget\"
-        title=\"flexget_flexget\" cloudSyncDevice=\"\" locale=\"\" authenticationToken=\"zztjLDsTqRXJr8qS4ooM\"
-        authToken=\"zztjLDsTqRXJr8qS4ooM\" scrobbleTypes=\"\" restricted=\"0\" home=\"0\"
-        guest=\"0\" queueEmail=\"queue+9awhZbapS3smCMyLLL_k@save.plex.tv\" queueUid=\"\"
-        hasPassword=\"true\" homeSize=\"1\" maxHomeSize=\"15\" rememberMe=\"false\"
-        secure=\"1\" certificateVersion=\"3\">\n  <subscription active=\"0\" status=\"Inactive\"
-        plan=\"\">\n    <feature id=\"guided-upgrade\"/>\n    <feature id=\"upgrade-3ds2\"/>\n
-        \   <feature id=\"ad-countdown-timer\"/>\n    <feature id=\"adaptive_bitrate\"/>\n
-        \   <feature id=\"amazon-loop-debug\"/>\n    <feature id=\"Android - Dolby
-        Vision\"/>\n    <feature id=\"Android - PiP\"/>\n    <feature id=\"avod-new-media\"/>\n
-        \   <feature id=\"CU Sunset\"/>\n    <feature id=\"client-radio-stations\"/>\n
-        \   <feature id=\"companions_sonos\"/>\n    <feature id=\"custom-home-removal\"/>\n
-        \   <feature id=\"drm_support\"/>\n    <feature id=\"federated-auth\"/>\n
-        \   <feature id=\"home\"/>\n    <feature id=\"ios14-privacy-banner\"/>\n    <feature
-        id=\"iterable-notification-tokens\"/>\n    <feature id=\"join-discover-together-as-friend\"/>\n
-        \   <feature id=\"kevin-bacon\"/>\n    <feature id=\"lets_encrypt\"/>\n    <feature
-        id=\"lightning-dvr-pivot\"/>\n    <feature id=\"livetv\"/>\n    <feature id=\"live-tv-support-incomplete-segments\"/>\n
-        \   <feature id=\"tuner-sharing\"/>\n    <feature id=\"metadata_search\"/>\n
-        \   <feature id=\"vod_cloudflare\"/>\n    <feature id=\"news-provider-sunset-modal\"/>\n
-        \   <feature id=\"photos-favorites\"/>\n    <feature id=\"photos-metadata-edition\"/>\n
-        \   <feature id=\"scrobbling-service-plex-tv\"/>\n    <feature id=\"collections\"/>\n
-        \   <feature id=\"radio\"/>\n    <feature id=\"exclude restrictions\"/>\n
-        \   <feature id=\"signin_with_apple\"/>\n    <feature id=\"spring_serve_ad_provider\"/>\n
-        \   <feature id=\"transcoder_cache\"/>\n    <feature id=\"TREBLE-show-features\"/>\n
-        \   <feature id=\"two-factor-authentication\"/>\n    <feature id=\"unsupportedtuners\"/>\n
-        \   <feature id=\"watch-together-invite\"/>\n    <feature id=\"web_server_dashboard\"/>\n
-        \ </subscription>\n  <entitlements all=\"0\">\n  </entitlements>\n  <profile_settings
-        default_audio_language=\"\" default_subtitle_language=\"\" auto_select_subtitle=\"1\"
-        auto_select_audio=\"1\" default_subtitle_accessibility=\"0\" default_subtitle_forced=\"0\"/>\n
-        \ <services>\n    <service identifier=\"epg\" endpoint=\"https://epg.provider.plex.tv\"
-        token=\"RkHIzgbqTjP2giDabsWdbBB9o4YNyhS6CqbTgwfKAOc=\" status=\"online\"/>\n
-        \   <service identifier=\"epg-staging\" endpoint=\"https://epg-staging.provider.plex.tv\"
-        token=\"RkHIzgbqTjP2giDabsWdbBB9o4YNyhS6CqbTgwfKAOc=\" status=\"online\"/>\n
-        \   <service identifier=\"epg-dev\" endpoint=\"https://epg-dev.provider.plex.tv\"
-        token=\"RkHIzgbqTjP2giDabsWdbBB9o4YNyhS6CqbTgwfKAOc=\" status=\"online\"/>\n
-        \   <service identifier=\"eyeq\" endpoint=\"https://c4412416.ipg.web.cddbp.net/webapi/xml/1.0/\"
-        token=\"6iUU7VrBzA/Hz5nsS9o65Yz77qvh63pYmUN+TaVHeonhsQWlzYGcsik1opEU3toj\"
-        status=\"online\"/>\n    <service identifier=\"eyeq-channel-icons\" endpoint=\"http://akamai-b.cdn.cddbp.net/cds/2.0/image\"
-        status=\"online\"/>\n    <service identifier=\"graph-dev\" endpoint=\"https://community-dev.plex.tv\"
-        status=\"online\"/>\n    <service identifier=\"graph-staging\" endpoint=\"https://community-staging.plex.tv\"
-        status=\"online\"/>\n    <service identifier=\"community-dev\" endpoint=\"https://community-dev.plex.tv\"
-        status=\"online\"/>\n    <service identifier=\"community-staging\" endpoint=\"https://community-staging.plex.tv\"
-        status=\"online\"/>\n    <service identifier=\"community\" endpoint=\"https://community.plex.tv\"
-        status=\"online\"/>\n    <service identifier=\"metadata\" endpoint=\"https://metadata.provider.plex.tv\"
-        token=\"1vme2aaK6G8fZFtFyKeSmInEvdjpjsHEto45VgX1K0c=\" status=\"online\"/>\n
-        \   <service identifier=\"metadata-dev\" endpoint=\"https://metadata-dev.provider.plex.tv\"
-        token=\"1vme2aaK6G8fZFtFyKeSmInEvdjpjsHEto45VgX1K0c=\" status=\"online\"/>\n
-        \   <service identifier=\"metadata-provider\" endpoint=\"https://mpm.plex.tv/\"
-        status=\"online\"/>\n    <service identifier=\"tmsapi\" endpoint=\"https://tmsapi.plex.tv/v1.1/\"
-        token=\"a0VC3zjGN7FmzvlZKIuRRUjLCRoQkgY2jwJsLgi8+OQ=\" status=\"online\"/>\n
-        \   <service identifier=\"subtitles-search\" endpoint=\"https://metadata.provider.plex.tv/library/metadata/matches\"
-        token=\"1vme2aaK6G8fZFtFyKeSmInEvdjpjsHEto45VgX1K0c=\" status=\"online\"/>\n
-        \   <service identifier=\"acoustid\" endpoint=\"https://acoustid.plex.tv/\"
-        token=\"XxQtK3u05uaxTaZ6Y6jcrw==\" status=\"online\"/>\n    <service identifier=\"lyricfind\"
-        endpoint=\"https://lyricfind.plex.tv/\" token=\"X46ofmSoyOTWjBU4oEx0Rb0ATQjYW31IgFeXw3+/n5hMfGoF7PLEMPrLT9v/zqV1\"
-        secret=\"H8q1AfgeOcf8+wx2ODos1mLBkmsSE4PMCJkkdx27xNwpzzKVV3up6gZJb+teyIOw\"
-        status=\"online\"/>\n    <service identifier=\"lyricfind-search\" endpoint=\"https://lyricfind.plex.tv/\"
-        token=\"4HRR+YgScsy+71q8J31KgROAuPkWvsus8XQuVFjYUiTjw5f+LesQ8MAgEcjnuYxW\"
-        status=\"online\"/>\n    <service identifier=\"tvdb\" endpoint=\"https://api4.thetvdb.com/\"
-        token=\"CFlmhH676IvrFij0l4BR1YNRtyHjz+9EAH+GU5ZgncfJ3ufdmzWK/3giK1Ovei7u\"
-        status=\"online\"/>\n  </services>\n  <username>flexget_flexget</username>\n
-        \ <email>polka_gill0i@icloud.com</email>\n  <joined-at type=\"datetime\">2022-12-08
-        11:48:15 UTC</joined-at>\n  <authentication-token>zztjLDsTqRXJr8qS4ooM</authentication-token>\n</user>\n"
-    headers:
-      Cache-Control:
-      - max-age=0, private, must-revalidate
-      Content-Type:
-      - application/xml; charset=utf-8
-      Date:
-      - Thu, 08 Dec 2022 15:17:07 GMT
-      Etag:
-      - W/"ed6d9169d09fedc31a6f720661f1aef4"
-      Location:
-      - /
-      Referrer-Policy:
-      - origin-when-cross-origin
-      Strict-Transport-Security:
-      - max-age=31536000; includeSubDomains; preload
-      Transfer-Encoding:
-      - chunked
-      Vary:
-      - Origin
-      X-Content-Type-Options:
-      - nosniff
-      X-Frame-Options:
-      - SAMEORIGIN
-      X-Request-Id:
-      - 579491c3-c9cb-4e63-adcd-c238adf2a42f
-      X-Runtime:
-      - '0.121644'
-      X-Xss-Protection:
-      - 1; mode=block
-    status:
-      code: 201
-      message: Created
-- request:
-    body: null
-    headers:
-      Accept:
-      - '*/*'
-      Accept-Encoding:
-      - gzip, deflate, br
-      Connection:
-      - keep-alive
-      User-Agent:
-      - python-requests/2.27.1
-      X-Plex-Client-Identifier:
-      - '0x6045bd9f437d'
-      X-Plex-Device:
-      - Linux
-      X-Plex-Device-Name:
-      - codespaces-a97850
-      X-Plex-Features:
-      - external-media
-      X-Plex-Platform:
-      - Linux
-      X-Plex-Platform-Version:
-      - 5.4.0-1094-azure
-      X-Plex-Product:
-      - PlexAPI
-      X-Plex-Provides:
-      - controller
-      X-Plex-Sync-Version:
-      - '2'
-      X-Plex-Token:
-      - zztjLDsTqRXJr8qS4ooM
+      - my9V3p6rsyRFTtgmpDvD
       X-Plex-Version:
       - 4.13.1
     method: GET
@@ -1153,17 +1235,17 @@ interactions:
   response:
     body:
       string: !!binary |
-        H4sIAAAAAAAAA1XOO47CMBAA0KtYc4BgoxgLKQ5ClGhFgfYAQzyBkRI7smfN5/QUS0P5utftHvOk
-        KuXCKXowjYZd3/1QYDykKMiRsuJAUXhkyh6kNstEj2bJqXKg3MwkGFAQVOEXeTDQd7+F8llQSN1R
-        htvERSjsxYPZOG2Ntk6Dqkz3Q/qL4uGj0zgW+mdG4Xg90tODDc5tBnRbvNi21XptrNm2dgAlz4U8
-        zKkywarvVt/t/g3D2kfc3AAAAA==
+        H4sIAAAAAAAAA1XOO47CMBAA0KtYc4Bgh5gIKU60olytKBAHGOIJjJTYkT1rPqenoKJ83euGxzKr
+        QilzDA5MpWHouz/yjIcYBDlQUuwpCE9MyYGUap3pUa0pFvaUqoUEPQqCyvwiBwb67pwpnQSF1B1l
+        vM2chfyPODC7Vtu6NnYLqjDdD/E/iAP90XGaMn2YUDhcf+npwPq23Y3Y7vFim0br2lizb+wISp4r
+        OVhiYYJN322+2/0bDQ5ENtwAAAA=
     headers:
       Access-Control-Allow-Origin:
       - '*'
       CF-Cache-Status:
       - BYPASS
       CF-RAY:
-      - 776677514a2db932-AMS
+      - 776760611dfe0e2f-AMS
       Cache-Control:
       - no-store
       Connection:
@@ -1177,9 +1259,9 @@ interactions:
       Cross-Origin-Resource-Policy:
       - cross-origin
       Date:
-      - Thu, 08 Dec 2022 15:17:07 GMT
+      - Thu, 08 Dec 2022 17:56:14 GMT
       Etag:
-      - W/"dc-ALlP+LZomgxRNCzLggwV/EqRGJA"
+      - W/"dc-LhMYLmuqM26YL4iVgNuvL6wkI80"
       Origin-Agent-Cluster:
       - ?1
       Referrer-Policy:
@@ -1209,9 +1291,9 @@ interactions:
       X-Plex-Container-Total-Size:
       - '1'
       X-Plex-Timestamp:
-      - '1670512627'
+      - '1670522173'
       X-Plex-Version:
-      - 636d0531a
+      - 629eb4e1b
       X-Xss-Protection:
       - '0'
     status:
@@ -1231,7 +1313,7 @@ interactions:
       User-Agent:
       - python-requests/2.27.1
       X-Plex-Client-Identifier:
-      - '0x6045bd9f437d'
+      - '0x6045bdf2f360'
       X-Plex-Device:
       - Linux
       X-Plex-Device-Name:
@@ -1249,7 +1331,7 @@ interactions:
       X-Plex-Sync-Version:
       - '2'
       X-Plex-Token:
-      - zztjLDsTqRXJr8qS4ooM
+      - my9V3p6rsyRFTtgmpDvD
       X-Plex-Version:
       - 4.13.1
     method: PUT
@@ -1263,7 +1345,7 @@ interactions:
       CF-Cache-Status:
       - DYNAMIC
       CF-RAY:
-      - 77667753de07b932-AMS
+      - 77676063a9810e2f-AMS
       Cache-Control:
       - no-store
       Connection:
@@ -1277,7 +1359,7 @@ interactions:
       Cross-Origin-Resource-Policy:
       - cross-origin
       Date:
-      - Thu, 08 Dec 2022 15:17:08 GMT
+      - Thu, 08 Dec 2022 17:56:14 GMT
       Etag:
       - W/"2f-YbDylU+ETaVctM/AYzE3u53kgZE"
       Origin-Agent-Cluster:
@@ -1301,9 +1383,203 @@ interactions:
       X-Permitted-Cross-Domain-Policies:
       - none
       X-Plex-Timestamp:
-      - '1670512627'
+      - '1670522174'
       X-Plex-Version:
-      - 636d0531a
+      - 629eb4e1b
+      X-Xss-Protection:
+      - '0'
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate, br
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.27.1
+      X-Plex-Client-Identifier:
+      - '0x6045bdf2f360'
+      X-Plex-Device:
+      - Linux
+      X-Plex-Device-Name:
+      - codespaces-a97850
+      X-Plex-Features:
+      - external-media
+      X-Plex-Platform:
+      - Linux
+      X-Plex-Platform-Version:
+      - 5.4.0-1094-azure
+      X-Plex-Product:
+      - PlexAPI
+      X-Plex-Provides:
+      - controller
+      X-Plex-Sync-Version:
+      - '2'
+      X-Plex-Token:
+      - my9V3p6rsyRFTtgmpDvD
+      X-Plex-Version:
+      - 4.13.1
+    method: GET
+    uri: https://metadata.provider.plex.tv/library/metadata/5d7768ba96b655001fdc0408/userState
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA1XOQU7DMBAF0KtYc4DUrnBSpDgV6hIhFogDTOsfGCmxI3twW07PoiuWb/fG421d
+        TEOpklMg11k6TuMbovApJ2VJKEYiksosKIG0dduCW7eV3CSidCuUIyuTqfKLQI6m8bOifCgrzJX1
+        8r1IVcQXDeT6wfr93vmBTBNcT/knaSD70Ps8VzxYWCV9veIeyMdh6A9nfu7PvffWujle7JM9kNH7
+        hkBrbgLaTePuf3v6A3/6NzDcAAAA
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      CF-Cache-Status:
+      - BYPASS
+      CF-RAY:
+      - 776760659c7a0e2f-AMS
+      Cache-Control:
+      - no-store
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Language:
+      - en
+      Content-Type:
+      - application/xml; charset=utf-8
+      Cross-Origin-Resource-Policy:
+      - cross-origin
+      Date:
+      - Thu, 08 Dec 2022 17:56:14 GMT
+      Etag:
+      - W/"dc-bT7sA5WGVK/zFayXcQrGkaBH7w8"
+      Origin-Agent-Cluster:
+      - ?1
+      Referrer-Policy:
+      - no-referrer
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Dns-Prefetch-Control:
+      - 'off'
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Plex-Cache:
+      - miss
+      X-Plex-Container-Start:
+      - '0'
+      X-Plex-Container-Total-Size:
+      - '1'
+      X-Plex-Timestamp:
+      - '1670522174'
+      X-Plex-Version:
+      - 629eb4e1b
+      X-Xss-Protection:
+      - '0'
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate, br
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '0'
+      User-Agent:
+      - python-requests/2.27.1
+      X-Plex-Client-Identifier:
+      - '0x6045bdf2f360'
+      X-Plex-Device:
+      - Linux
+      X-Plex-Device-Name:
+      - codespaces-a97850
+      X-Plex-Features:
+      - external-media
+      X-Plex-Platform:
+      - Linux
+      X-Plex-Platform-Version:
+      - 5.4.0-1094-azure
+      X-Plex-Product:
+      - PlexAPI
+      X-Plex-Provides:
+      - controller
+      X-Plex-Sync-Version:
+      - '2'
+      X-Plex-Token:
+      - my9V3p6rsyRFTtgmpDvD
+      X-Plex-Version:
+      - 4.13.1
+    method: PUT
+    uri: https://metadata.provider.plex.tv/actions/removeFromWatchlist?ratingKey=5d7768ba96b655001fdc0408
+  response:
+    body:
+      string: <?xml version="1.0"?><MediaContainer size="0"/>
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-RAY:
+      - 7767606849210e2f-AMS
+      Cache-Control:
+      - no-store
+      Connection:
+      - keep-alive
+      Content-Language:
+      - en
+      Content-Length:
+      - '47'
+      Content-Type:
+      - application/xml; charset=utf-8
+      Cross-Origin-Resource-Policy:
+      - cross-origin
+      Date:
+      - Thu, 08 Dec 2022 17:56:15 GMT
+      Etag:
+      - W/"2f-YbDylU+ETaVctM/AYzE3u53kgZE"
+      Origin-Agent-Cluster:
+      - ?1
+      Referrer-Policy:
+      - no-referrer
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Dns-Prefetch-Control:
+      - 'off'
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Plex-Timestamp:
+      - '1670522174'
+      X-Plex-Version:
+      - 629eb4e1b
       X-Xss-Protection:
       - '0'
     status:
@@ -1325,7 +1601,7 @@ interactions:
       User-Agent:
       - python-requests/2.27.1
       X-Plex-Client-Identifier:
-      - '0x6045bd9f437d'
+      - '0x6045bdf2f360'
       X-Plex-Device:
       - Linux
       X-Plex-Device-Name:
@@ -1351,8 +1627,8 @@ interactions:
       string: "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<user email=\"polka_gill0i@icloud.com\"
         id=\"187797645\" uuid=\"d0df38378404ccb3\" mailing_list_status=\"active\"
         thumb=\"https://plex.tv/users/d0df38378404ccb3/avatar?c=1670500132\" username=\"flexget_flexget\"
-        title=\"flexget_flexget\" cloudSyncDevice=\"\" locale=\"\" authenticationToken=\"zztjLDsTqRXJr8qS4ooM\"
-        authToken=\"zztjLDsTqRXJr8qS4ooM\" scrobbleTypes=\"\" restricted=\"0\" home=\"0\"
+        title=\"flexget_flexget\" cloudSyncDevice=\"\" locale=\"\" authenticationToken=\"my9V3p6rsyRFTtgmpDvD\"
+        authToken=\"my9V3p6rsyRFTtgmpDvD\" scrobbleTypes=\"\" restricted=\"0\" home=\"0\"
         guest=\"0\" queueEmail=\"queue+9awhZbapS3smCMyLLL_k@save.plex.tv\" queueUid=\"\"
         hasPassword=\"true\" homeSize=\"1\" maxHomeSize=\"15\" rememberMe=\"false\"
         secure=\"1\" certificateVersion=\"3\">\n  <subscription active=\"0\" status=\"Inactive\"
@@ -1412,16 +1688,16 @@ interactions:
         token=\"CFlmhH676IvrFij0l4BR1YNRtyHjz+9EAH+GU5ZgncfJ3ufdmzWK/3giK1Ovei7u\"
         status=\"online\"/>\n  </services>\n  <username>flexget_flexget</username>\n
         \ <email>polka_gill0i@icloud.com</email>\n  <joined-at type=\"datetime\">2022-12-08
-        11:48:15 UTC</joined-at>\n  <authentication-token>zztjLDsTqRXJr8qS4ooM</authentication-token>\n</user>\n"
+        11:48:15 UTC</joined-at>\n  <authentication-token>my9V3p6rsyRFTtgmpDvD</authentication-token>\n</user>\n"
     headers:
       Cache-Control:
       - max-age=0, private, must-revalidate
       Content-Type:
       - application/xml; charset=utf-8
       Date:
-      - Thu, 08 Dec 2022 15:17:08 GMT
+      - Thu, 08 Dec 2022 17:56:15 GMT
       Etag:
-      - W/"ed6d9169d09fedc31a6f720661f1aef4"
+      - W/"cf801708afda37ef2170f1e325478f1c"
       Location:
       - /
       Referrer-Policy:
@@ -1437,9 +1713,9 @@ interactions:
       X-Frame-Options:
       - SAMEORIGIN
       X-Request-Id:
-      - ced07e1f-5495-46aa-a302-f33afcc6f831
+      - ca580d3c-5894-4297-a795-1d9d36a0d86a
       X-Runtime:
-      - '0.133523'
+      - '0.116775'
       X-Xss-Protection:
       - 1; mode=block
     status:
@@ -1457,7 +1733,7 @@ interactions:
       User-Agent:
       - python-requests/2.27.1
       X-Plex-Client-Identifier:
-      - '0x6045bd9f437d'
+      - '0x6045bdf2f360'
       X-Plex-Device:
       - Linux
       X-Plex-Device-Name:
@@ -1475,7 +1751,7 @@ interactions:
       X-Plex-Sync-Version:
       - '2'
       X-Plex-Token:
-      - zztjLDsTqRXJr8qS4ooM
+      - my9V3p6rsyRFTtgmpDvD
       X-Plex-Version:
       - 4.13.1
     method: GET
@@ -1505,7 +1781,7 @@ interactions:
       CF-Cache-Status:
       - BYPASS
       CF-RAY:
-      - 776677571e890eac-AMS
+      - 7767606bcb17b902-AMS
       Cache-Control:
       - no-store
       Connection:
@@ -1519,7 +1795,7 @@ interactions:
       Cross-Origin-Resource-Policy:
       - cross-origin
       Date:
-      - Thu, 08 Dec 2022 15:17:08 GMT
+      - Thu, 08 Dec 2022 17:56:15 GMT
       Etag:
       - W/"832-VGhCHYZu/tBR+OLVXCIWw0psHY4"
       Origin-Agent-Cluster:
@@ -1551,9 +1827,9 @@ interactions:
       X-Plex-Container-Total-Size:
       - '1'
       X-Plex-Timestamp:
-      - '1670512628'
+      - '1670522175'
       X-Plex-Version:
-      - 636d0531a
+      - 629eb4e1b
       X-Xss-Protection:
       - '0'
     status:
@@ -1571,7 +1847,7 @@ interactions:
       User-Agent:
       - python-requests/2.27.1
       X-Plex-Client-Identifier:
-      - '0x6045bd9f437d'
+      - '0x6045bdf2f360'
       X-Plex-Device:
       - Linux
       X-Plex-Device-Name:
@@ -1589,7 +1865,7 @@ interactions:
       X-Plex-Sync-Version:
       - '2'
       X-Plex-Token:
-      - zztjLDsTqRXJr8qS4ooM
+      - my9V3p6rsyRFTtgmpDvD
       X-Plex-Version:
       - 4.13.1
     method: GET
@@ -1606,7 +1882,7 @@ interactions:
       CF-Cache-Status:
       - BYPASS
       CF-RAY:
-      - 7766775acbed0eac-AMS
+      - 7767606e5fc4b902-AMS
       Cache-Control:
       - no-store
       Connection:
@@ -1620,7 +1896,7 @@ interactions:
       Cross-Origin-Resource-Policy:
       - cross-origin
       Date:
-      - Thu, 08 Dec 2022 15:17:09 GMT
+      - Thu, 08 Dec 2022 17:56:16 GMT
       Etag:
       - W/"ae-XfT0AeHLS+OCp1JTIsxi9pltAkg"
       Origin-Agent-Cluster:
@@ -1652,9 +1928,9 @@ interactions:
       X-Plex-Container-Total-Size:
       - '1'
       X-Plex-Timestamp:
-      - '1670512629'
+      - '1670522175'
       X-Plex-Version:
-      - 636d0531a
+      - 629eb4e1b
       X-Xss-Protection:
       - '0'
     status:
@@ -1672,7 +1948,7 @@ interactions:
       User-Agent:
       - python-requests/2.27.1
       X-Plex-Client-Identifier:
-      - '0x6045bd9f437d'
+      - '0x6045bdf2f360'
       X-Plex-Device:
       - Linux
       X-Plex-Device-Name:
@@ -1690,7 +1966,7 @@ interactions:
       X-Plex-Sync-Version:
       - '2'
       X-Plex-Token:
-      - zztjLDsTqRXJr8qS4ooM
+      - my9V3p6rsyRFTtgmpDvD
       X-Plex-Version:
       - 4.13.1
     method: GET
@@ -1710,11 +1986,11 @@ interactions:
       Access-Control-Allow-Origin:
       - '*'
       Age:
-      - '69400'
+      - '78008'
       CF-Cache-Status:
       - HIT
       CF-RAY:
-      - 7766775f0d93b918-AMS
+      - 776760709accb872-AMS
       Cache-Control:
       - max-age=0,stale-while-revalidate=86400
       Cdn-Cache-Control:
@@ -1730,7 +2006,7 @@ interactions:
       Cross-Origin-Resource-Policy:
       - cross-origin
       Date:
-      - Thu, 08 Dec 2022 15:17:09 GMT
+      - Thu, 08 Dec 2022 17:56:16 GMT
       Etag:
       - W/"442-DDWuWd+WC7lM/D4F3pNScFnwlVw"
       Origin-Agent-Cluster:
@@ -1778,7 +2054,7 @@ interactions:
       User-Agent:
       - python-requests/2.27.1
       X-Plex-Client-Identifier:
-      - '0x6045bd9f437d'
+      - '0x6045bdf2f360'
       X-Plex-Device:
       - Linux
       X-Plex-Device-Name:
@@ -1796,7 +2072,7 @@ interactions:
       X-Plex-Sync-Version:
       - '2'
       X-Plex-Token:
-      - zztjLDsTqRXJr8qS4ooM
+      - my9V3p6rsyRFTtgmpDvD
       X-Plex-Version:
       - 4.13.1
     method: GET
@@ -1978,7 +2254,7 @@ interactions:
       CF-Cache-Status:
       - BYPASS
       CF-RAY:
-      - 7766775f3db8b918-AMS
+      - 77676070bae8b872-AMS
       Cache-Control:
       - no-store
       Connection:
@@ -1992,7 +2268,7 @@ interactions:
       Cross-Origin-Resource-Policy:
       - cross-origin
       Date:
-      - Thu, 08 Dec 2022 15:17:10 GMT
+      - Thu, 08 Dec 2022 17:56:16 GMT
       Etag:
       - W/"8c34-mnX+pCwtpsuYRR6uwcBTmB9b73I"
       Origin-Agent-Cluster:
@@ -2024,9 +2300,9 @@ interactions:
       X-Plex-Container-Total-Size:
       - '1'
       X-Plex-Timestamp:
-      - '1670512629'
+      - '1670522176'
       X-Plex-Version:
-      - 636d0531a
+      - 629eb4e1b
       X-Xss-Protection:
       - '0'
     status:
