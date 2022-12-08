@@ -113,11 +113,11 @@ class PlexManagedWatchlist(MutableSet):
 
     def _find_entry(self, entry):
         for item in self.items:
-            for sid in SUPPORTED_IDS:
-                if sid in item and sid in entry:
-                    if item[sid] == entry[sid]:
-                        return item
-                    break
+            if any(entry.get(id) is not None and entry[id] == item[id] for id in SUPPORTED_IDS):
+                return item
+            if entry.get('title').lower() == item.get('title').lower():
+                return item
+
 
 class PlexWatchlist:
     schema = {
