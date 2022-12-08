@@ -9,6 +9,7 @@ from flexget.entry import Entry
 from flexget.event import event
 
 PLUGIN_NAME = 'plex_watchlist'
+SUPPORTED_IDS = ['imdb_id', 'tmdb_id', 'tvdb_id']
 
 logger = logger.bind(name=PLUGIN_NAME)
 
@@ -36,7 +37,18 @@ def create_entry(plex_item: "Union[Movie, Show]") -> Entry:
     elif plex_item.TYPE == 'show':
         entry['series_name'] = plex_item.title
         entry['series_year'] = plex_item.year
-    # TODO: Can we get imdb/tmdb ids?
+
+    for guid in plex_item.guids:
+        x = guid.id.split("://")
+        try:
+            value = int(x[1])
+        except ValueError:
+            value = x[1]
+
+        media_id = f'{x[0]}_id'
+        if media_id in SUPPORTED_IDS:
+            entry[media_id] = value
+
     return entry
 
 
@@ -76,19 +88,17 @@ class PlexManagedWatchlist(MutableSet):
     def __len__(self) -> int:
         return len(self.items)
 
-    def __contains__(self, item) -> bool:
-        raise NotImplemented
-        return self.account.onWatchlist()
+    def __contains__(self, entry) -> bool:
+        return self._find_entry(entry) is not None
 
-    def get(self, item) -> Optional[Entry]:
-        # TODO: Implement
-        raise NotImplemented
+    def get(self, entry) -> Optional[Entry]:
+        return self._find_entry(entry)
 
-    def add(self, item: Entry) -> None:
+    def add(self, entry: Entry) -> None:
         raise NotImplemented
         self.account.addToWatchlist()
 
-    def discard(self, item) -> None:
+    def discard(self, entry) -> None:
         raise NotImplemented
         self.account.removeFromWatchlist()
 
@@ -101,6 +111,13 @@ class PlexManagedWatchlist(MutableSet):
         # TODO: Turn this true after the editing is implemented
         return True
 
+    def _find_entry(self, entry):
+        for item in self.items:
+            for sid in SUPPORTED_IDS:
+                if sid in item and sid in entry:
+                    if item[sid] == entry[sid]:
+                        return item
+                    break
 
 class PlexWatchlist:
     schema = {
