@@ -65,6 +65,14 @@ class VideoStub:
     title: str
 
 
+# plexapi objects are build fomr XML. So we create a simple stub that works for watchlist calls
+def to_plex_item(entry):
+    item = VideoStub()
+    item.guid = entry['plex_guid']
+    item.title = entry['title']
+    return item
+
+
 class PlexManagedWatchlist(MutableSet):
     def __init__(
         self,
@@ -114,13 +122,13 @@ class PlexManagedWatchlist(MutableSet):
         item = None
 
         if 'plex_guid' in entry:
-            item = self._create_stub_from_entry(entry)
+            item = to_plex_item(entry)
         else:
             logger.debug('Searching for {} with discover', entry['title'])
             results = self.account.searchDiscover(entry['title'], libtype=self.type)
             matched_entry = self._match_entry(entry, [to_entry(result) for result in results])
             if matched_entry:
-                item = self._create_stub_from_entry(matched_entry)
+                item = to_plex_item(matched_entry)
 
         if item:
             if self.account.onWatchlist(item):
@@ -133,7 +141,7 @@ class PlexManagedWatchlist(MutableSet):
     def discard(self, entry) -> None:
         entry = self._find_entry(entry)
         if entry:
-            item = self._create_stub_from_entry(entry)
+            item = to_plex_item(entry)
             logger.debug('Removing {} from watchlist', entry['title'])
             self.account.removeFromWatchlist(item)
 
@@ -144,13 +152,6 @@ class PlexManagedWatchlist(MutableSet):
     @property
     def immutable(self):
         return False
-
-    # plexapi objects are build fomr XML. So we create a simple stub that works for watchlist calls
-    def _create_stub_from_entry(self, entry):
-        item = VideoStub()
-        item.guid = entry['plex_guid']
-        item.title = entry['title']
-        return item
 
     def _find_entry(self, entry):
         return self._match_entry(entry, self.items)
