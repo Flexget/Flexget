@@ -27,7 +27,7 @@ def import_plexaccount() -> "Type[MyPlexAccount]":
         raise plugin.DependencyError('plex_watchlist', 'plexapi', 'plexapi package required')
 
 
-def create_entry(plex_item: "Union[Movie, Show]") -> Entry:
+def to_entry(plex_item: "Union[Movie, Show]") -> Entry:
     entry = Entry(
         title=f"{plex_item.title} ({plex_item.year})" if plex_item.year else plex_item.title,
         url=plex_item.guid,
@@ -95,7 +95,7 @@ class PlexManagedWatchlist(MutableSet):
             watchlist = self.account.watchlist(filter=self.filter, libtype=self.type)
             self._items = []
             for item in watchlist:
-                self._items.append(create_entry(item))
+                self._items.append(to_entry(item))
         return self._items
 
     def __iter__(self):
@@ -118,27 +118,9 @@ class PlexManagedWatchlist(MutableSet):
         else:
             logger.debug('Searching for {} with discover', entry['title'])
             results = self.account.searchDiscover(entry['title'], libtype=self.type)
-            for result in results:
-                logger.trace('found {}', result.title)
-                ids = get_supported_ids_from_plex_object(result)
-
-                # match on supported ids
-                if any(entry.get(id) is not None and entry[id] == ids[id] for id in SUPPORTED_IDS):
-                    item = result
-                    break
-
-                name = entry.get('movie_name', None) or entry.get('series_name', None)
-                year = entry.get('movie_year', None) or entry.get('series_year', None)
-                if (name and year) and (
-                    result.title == name and result.originallyAvailableAt.year == year
-                ):
-                    item = result
-                    break
-
-                # title matching sucks but lets try as last resort
-                if entry.get('title').lower() == result.title.lower():
-                    item = result
-                    break
+            matched_entry = self._match_entry(entry, [to_entry(result) for result in results])
+            if matched_entry:
+                item = self._create_stub_from_entry(matched_entry)
 
         if item:
             if self.account.onWatchlist(item):
@@ -163,18 +145,31 @@ class PlexManagedWatchlist(MutableSet):
     def immutable(self):
         return False
 
+    # plexapi objects are build fomr XML. So we create a simple stub that works for watchlist calls
     def _create_stub_from_entry(self, entry):
-        # item = self.account._buildItemOrNone(entry + {'attrib': {}}, cls=Movie)
         item = VideoStub()
         item.guid = entry['plex_guid']
         item.title = entry['title']
         return item
 
     def _find_entry(self, entry):
-        for item in self.items:
+        return self._match_entry(entry, self.items)
+
+    def _match_entry(self, entry: Entry, entries: List[Entry]):
+        for item in entries:
+            # match on supported ids
             if any(entry.get(id) is not None and entry[id] == item[id] for id in SUPPORTED_IDS):
                 return item
-            if entry.get('title').lower() == item.get('title').lower():
+
+            name = entry.get('movie_name', None) or entry.get('series_name', None)
+            year = entry.get('movie_year', None) or entry.get('series_year', None)
+            _name = item.get('movie_name', None) or item.get('series_name', None)
+            _year = item.get('movie_year', None) or item.get('series_year', None)
+            if (name and year) and (_name == name and _year == year):
+                return item
+
+            # title matching sucks but lets try as last resort
+            if entry.get('title').lower() == item['title'].lower():
                 return item
 
 
