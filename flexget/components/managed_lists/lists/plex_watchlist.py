@@ -127,14 +127,15 @@ class PlexManagedWatchlist(MutableSet):
                     item = result
                     break
 
-                # title matching sucks but lets try
-                if ('movie_year' in entry and 'movie_name' in entry) and (
-                    result.title == entry['movie_name']
-                    and result.originallyAvailableAt.year == entry['movie_year']
+                name = entry.get('movie_name', None) or entry.get('series_name', None)
+                year = entry.get('movie_year', None) or entry.get('series_year', None)
+                if (name and year) and (
+                    result.title == name and result.originallyAvailableAt.year == year
                 ):
                     item = result
                     break
 
+                # title matching sucks but lets try as last resort
                 if entry.get('title').lower() == result.title.lower():
                     item = result
                     break
