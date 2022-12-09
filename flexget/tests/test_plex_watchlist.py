@@ -1,8 +1,10 @@
-import pytest
 import logging
+
+import pytest
 
 PLEX_USERNAME = 'flexget_flexget'
 PLEX_PASSWORD = 'flexget_flexget'
+
 
 @pytest.mark.online
 class TestPlex:
