@@ -1,5 +1,4 @@
 import typing
-import re
 from collections.abc import MutableSet
 from typing import List, Optional, Type, Union
 
@@ -14,12 +13,18 @@ SUPPORTED_IDS = ['imdb_id', 'tmdb_id', 'tvdb_id', 'plex_guid']
 
 logger = logger.bind(name=PLUGIN_NAME)
 
-
-try:
+if typing.TYPE_CHECKING:
     from plexapi.myplex import MyPlexAccount
-    from plexapi.video import Movie, Show, Video
-except ImportError:
-    raise plugin.DependencyError('plex_watchlist', 'plexapi', 'plexapi package required')
+    from plexapi.video import Movie, Show
+
+
+def import_plexaccount() -> "Type[MyPlexAccount]":
+    try:
+        from plexapi.myplex import MyPlexAccount  # noqa
+
+        return MyPlexAccount
+    except ImportError:
+        raise plugin.DependencyError('plex_watchlist', 'plexapi', 'plexapi package required')
 
 
 def create_entry(plex_item: "Union[Movie, Show]") -> Entry:
@@ -79,6 +84,7 @@ class PlexManagedWatchlist(MutableSet):
 
     @property
     def account(self) -> "MyPlexAccount":
+        MyPlexAccount = import_plexaccount()
         if self._account is None:
             self._account = MyPlexAccount(self.username, self.password, self.token)
         return self._account
@@ -182,6 +188,10 @@ class PlexWatchlist:
         },
         'anyOf': [{'required': ['token']}, {'required': ['username', 'password']}],
     }
+
+    @plugin.priority(plugin.PRIORITY_FIRST)
+    def on_task_start(self, task, config):
+        import_plexaccount()
 
     def get_list(self, config):
         return PlexManagedWatchlist(**config)
