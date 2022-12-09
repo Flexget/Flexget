@@ -105,6 +105,7 @@ sphinx = ">=5.0.0"
 sqlalchemy-stubs = "^0.4"
 twine = ">=3.6.0"
 vcrpy = ">=4.1.1"
+plexapi = "^4.13.1"
 
 [tool.poetry.group.plugin-test.dependencies]
 # These are optional dependencies for plugins that have tests in the test suite
