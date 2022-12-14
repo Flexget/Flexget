@@ -146,7 +146,7 @@ class UrlRewriteIPTorrents:
 
         entries = set()
 
-        if task.requests.domain_limiters.get(DOMAIN, None) is None:
+        if not task.requests.domain_limiters.get(DOMAIN, None):
             logger.debug('limiting requests with a delay of {}', DELAY)
             rate_limiter = requests.TokenBucketLimiter(DOMAIN, 1, DELAY, True)
             task.requests.add_domain_limiter(rate_limiter)
