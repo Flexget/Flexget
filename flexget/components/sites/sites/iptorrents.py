@@ -57,6 +57,7 @@ DOMAIN = "iptorrents.com"
 BASE_URL = f"https://{DOMAIN}"
 SEARCH_URL = f"https://{DOMAIN}/t?"
 FREE_SEARCH_URL = f"https://{DOMAIN}/t?free=on"
+DELAY = "2 seconds"
 
 
 class UrlRewriteIPTorrents:
@@ -94,7 +95,6 @@ class UrlRewriteIPTorrents:
                 {'oneOf': [{'type': 'integer'}, {'type': 'string', 'enum': list(CATEGORIES)}]}
             ),
             'free': {'type': 'boolean', 'default': False},
-            'search_delay': {'type': 'string', 'default': '1 seconds'},
         },
         'required': ['rss_key', 'uid', 'password'],
         'additionalProperties': False,
@@ -147,9 +147,8 @@ class UrlRewriteIPTorrents:
         entries = set()
 
         if task.requests.domain_limiters.get(DOMAIN, None) is None:
-            delay = config.get('search_delay')
-            logger.debug('limiting requests with a delay of {}', delay)
-            rate_limiter = requests.TimedLimiter(DOMAIN, delay)
+            logger.debug('limiting requests with a delay of {}', DELAY)
+            rate_limiter = requests.TokenBucketLimiter(DOMAIN, 1, DELAY, True)
             task.requests.add_domain_limiter(rate_limiter)
 
         for search_string in entry.get('search_strings', [entry['title']]):
