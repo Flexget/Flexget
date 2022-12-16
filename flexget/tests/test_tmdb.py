@@ -11,7 +11,7 @@ class TestTmdbLookup:
           test:
             mock:
               - {title: '[Group] Taken 720p', imdb_url: 'http://www.imdb.com/title/tt0936501/'}
-              - {title: 'The Matrix'}
+              - {title: 'The Matrix Resurrections'}
             tmdb_lookup: yes
     """
 
@@ -22,9 +22,8 @@ class TestTmdbLookup:
             tmdb_name='Taken', tmdb_year=2008
         ), 'Didn\'t populate tmdb info for Taken'
         assert task.find_entry(
-            tmdb_name='The Matrix', tmdb_year=1999
-        ), 'Didn\'t populate tmdb info for The Matrix'
-
+            tmdb_name='The Matrix Resurrections', tmdb_year=2021
+        ), 'Didn\'t populate tmdb info for The Matrix Resurrections'
 
 @pytest.mark.online
 class TestTmdbUnicodeLookup:

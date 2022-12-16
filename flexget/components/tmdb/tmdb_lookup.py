@@ -32,6 +32,7 @@ class PluginTmdbLookup:
         # Make sure we don't stor the db association proxy directly on the entry
         'tmdb_genres': lambda movie: list(movie.genres),
         'tmdb_released': 'released',
+        'tmdb_release_dates': 'release_dates',
         'tmdb_votes': 'votes',
         # Just grab the top 5 posters
         'tmdb_posters': lambda movie: [poster.url('original') for poster in movie.posters[:5]],

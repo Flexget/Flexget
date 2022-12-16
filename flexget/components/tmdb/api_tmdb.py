@@ -184,6 +184,20 @@ class TMDBMovie(Base):
             self.get_images()
         return self._backdrops
 
+    _release_dates = []
+
+    @property
+    def release_dates(self):
+        if not self._release_dates:
+            logger.debug(
+                'release dates for movie {} not found in DB, fetching from TMDB', self.name
+            )
+            try:
+                self._release_dates = tmdb_request('movie/{}/release_dates'.format(self.id))
+            except requests.RequestException as e:
+                raise LookupError('Error updating data from tmdb: %s' % e)
+        return self._release_dates
+
     def to_dict(self):
         return {
             'id': self.id,

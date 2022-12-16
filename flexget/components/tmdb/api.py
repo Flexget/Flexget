@@ -107,6 +107,9 @@ tmdb_parser.add_argument(
 tmdb_parser.add_argument(
     'include_backdrops', type=inputs.boolean, default=False, help='Include backdrops in response'
 )
+tmdb_parser.add_argument(
+    'include_release_dates', type=inputs.boolean, default=False, help='Include release dates in response'
+)
 
 
 @tmdb_api.route('/movies/')
@@ -126,6 +129,7 @@ class TMDBMoviesAPI(APIResource):
 
         posters = args.pop('include_posters', False)
         backdrops = args.pop('include_backdrops', False)
+        release_dates = args.pop('include_release_dates', False)
 
         if not (title or tmdb_id or imdb_id):
             raise BadRequest(description)
@@ -144,5 +148,8 @@ class TMDBMoviesAPI(APIResource):
 
         if backdrops:
             return_movie['backdrops'] = [p.to_dict() for p in movie.backdrops]
+
+        if release_dates:
+            return_movie['release_dates'] = [movie.release_dates]
 
         return jsonify(return_movie)
