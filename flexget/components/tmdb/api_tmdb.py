@@ -93,6 +93,15 @@ genres_table = Table(
 )
 Base.register_table(genres_table)
 
+RELEASE_DATE_TYPE_MAPPING = {
+    1: 'premiere',
+    2: 'theatrical_limited',
+    3: 'theatrical',
+    4: 'digital',
+    5: 'physical',
+    6: 'tv',
+}
+
 
 class TMDBMovie(Base):
     __tablename__ = 'tmdb_movies'
@@ -193,7 +202,13 @@ class TMDBMovie(Base):
                 'release dates for movie {} not found in DB, fetching from TMDB', self.name
             )
             try:
-                self._release_dates = tmdb_request('movie/{}/release_dates'.format(self.id))
+                results = tmdb_request('movie/{}/release_dates'.format(self.id))['results']
+                for iso in results:
+                    for release in iso['release_dates']:
+                        release['type'] = RELEASE_DATE_TYPE_MAPPING[release['type']]
+
+                self._release_dates = results
+
             except requests.RequestException as e:
                 raise LookupError('Error updating data from tmdb: %s' % e)
         return self._release_dates

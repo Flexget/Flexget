@@ -25,6 +25,7 @@ class TestTmdbLookup:
             tmdb_name='The Matrix Resurrections', tmdb_year=2021
         ), 'Didn\'t populate tmdb info for The Matrix Resurrections'
 
+
 @pytest.mark.online
 class TestTmdbUnicodeLookup:
     config = """
