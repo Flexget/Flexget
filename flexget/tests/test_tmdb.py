@@ -25,10 +25,10 @@ class TestTmdbLookup:
             tmdb_name='The Matrix Resurrections',
             tmdb_year=2021,
             tmdb_release_dates={
-                'premiere': '2021-12-18T00:00:00.000Z',
-                'theatrical': '2021-12-22T00:00:00.000Z',
+                'theatrical': '2021-12-16T00:00:00.000Z',
                 'digital': '2021-12-22T00:00:00.000Z',
                 'physical': '2022-03-08T00:00:00.000Z',
+                'premiere': '2021-12-18T00:00:00.000Z',
             },
         ), 'Didn\'t populate tmdb info for The Matrix Resurrections'
 
