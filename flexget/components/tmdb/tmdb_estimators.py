@@ -20,7 +20,6 @@ class EstimatesMoviesDigitalTMDB:
                 if iso['iso_3166_1'] not in ['US', 'GB']:
                     continue
                 for release in iso['release_dates']:
-
                     if release['type'] == 'digital':
                         entity_data['entity_date'] = entry['tmdb_released']
             return entity_data
