@@ -95,7 +95,7 @@ python and this fails. Please install `python3-virtualenv` package and retry
 .. _virtualenv: https://pypi.python.org/pypi/virtualenv
 
 Upgrading pip and setuptools to latest version is highly advisable if not mandatory
-for working installation and can de done with::
+for working installation and can be done with::
 
     bin/pip install --upgrade pip setuptools
 
