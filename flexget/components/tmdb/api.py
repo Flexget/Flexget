@@ -150,6 +150,6 @@ class TMDBMoviesAPI(APIResource):
             return_movie['backdrops'] = [p.to_dict() for p in movie.backdrops]
 
         if release_dates:
-            return_movie['release_dates'] = [movie.release_dates]
+            return_movie['release_dates'] = movie.release_dates
 
         return jsonify(return_movie)
