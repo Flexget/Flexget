@@ -203,8 +203,9 @@ class TMDBMovie(Base):
             )
             try:
                 results = tmdb_request('movie/{}/release_dates'.format(self.id))['results']
-                
+
                 release_dates = {}
+                lookup_language = self.lookup_language or self.language
                 for iso in results:
                     # TODO: Filter on language not fixed regions. Fallback on movie spoken language if not defined in tmdb?
                     if iso['iso_3166_1'] not in ['US', 'GB']:
@@ -214,6 +215,11 @@ class TMDBMovie(Base):
                     for release in iso['release_dates']:
                         release_type = RELEASE_DATE_TYPE_MAPPING[release['type']]
                         release_date = release['release_date']
+                        release_language = release['iso_639_1'] or self.language
+
+                        if release_language != lookup_language:
+                            continue
+
                         if release_type not in release_dates or (
                             release_dates.get(release_type) >= release_date
                         ):
