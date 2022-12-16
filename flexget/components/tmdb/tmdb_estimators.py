@@ -15,13 +15,9 @@ class EstimatesMoviesDigitalTMDB:
         entity_data = {'data_exists': True, 'entity_date': None}
         if 'tmdb_release_dates' in entry:
             logger.verbose('Querying release estimation for {}', entry['title'])
-            for iso in entry['tmdb_release_dates']:
-                # TODO: Filter on language not fixed countries. Fallback on movie spoken language if not defined in tmdb? how dow we get the wanted language?
-                if iso['iso_3166_1'] not in ['US', 'GB']:
-                    continue
-                for release in iso['release_dates']:
-                    if release['type'] == 'digital':
-                        entity_data['entity_date'] = entry['tmdb_released']
+            for release in entry['tmdb_release_dates']:
+                if release['type'] == 'digital':
+                    entity_data['entity_date'] = entry['tmdb_released']
             return entity_data
 
         logger.debug(
