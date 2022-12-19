@@ -108,7 +108,10 @@ tmdb_parser.add_argument(
     'include_backdrops', type=inputs.boolean, default=False, help='Include backdrops in response'
 )
 tmdb_parser.add_argument(
-    'include_release_dates', type=inputs.boolean, default=False, help='Include release dates in response'
+    'include_release_dates',
+    type=inputs.boolean,
+    default=False,
+    help='Include release dates in response',
 )
 
 

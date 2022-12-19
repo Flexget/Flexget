@@ -22,9 +22,9 @@ from sqlalchemy.schema import ForeignKey
 from flexget import db_schema, plugin
 from flexget.event import event
 from flexget.manager import Session
-from flexget.utils import requests, json
+from flexget.utils import json, requests
 from flexget.utils.database import json_synonym, with_session, year_property
-from flexget.utils.serialization import serialize, deserialize
+from flexget.utils.serialization import deserialize, serialize
 
 logger = logger.bind(name='api_tmdb')
 Base = db_schema.versioned_base('api_tmdb', 6)
