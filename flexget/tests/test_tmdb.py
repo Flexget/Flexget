@@ -1,5 +1,6 @@
-import pytest
+import datetime
 
+import pytest
 from flexget.components.tmdb.api_tmdb import TMDBSearchResult
 from flexget.manager import Session
 
@@ -25,10 +26,10 @@ class TestTmdbLookup:
             tmdb_name='The Matrix Resurrections',
             tmdb_year=2021,
             tmdb_release_dates={
-                'theatrical': '2021-12-16T00:00:00.000Z',
-                'digital': '2021-12-22T00:00:00.000Z',
-                'physical': '2022-03-08T00:00:00.000Z',
-                'premiere': '2021-12-18T00:00:00.000Z',
+                'theatrical': datetime.date(2021, 12, 16),
+                'digital': datetime.date(2021, 12, 22),
+                'physical': datetime.date(2022, 3, 8),
+                'premiere': datetime.date(2021, 12, 18),
             },
         ), 'Didn\'t populate tmdb info for The Matrix Resurrections'
 

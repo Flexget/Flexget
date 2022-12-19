@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from functools import lru_cache
 
 from dateutil.parser import parse as dateutil_parse
 from loguru import logger
@@ -22,9 +23,9 @@ from sqlalchemy.schema import ForeignKey
 from flexget import db_schema, plugin
 from flexget.event import event
 from flexget.manager import Session
-from flexget.utils import json, requests
+from flexget.utils import requests
+from flexget.utils.cache import timed_lru_cache
 from flexget.utils.database import json_synonym, with_session, year_property
-from flexget.utils.serialization import deserialize, serialize
 
 logger = logger.bind(name='api_tmdb')
 Base = db_schema.versioned_base('api_tmdb', 6)
@@ -94,6 +95,7 @@ genres_table = Table(
 )
 Base.register_table(genres_table)
 
+
 RELEASE_DATE_TYPE_MAPPING = {
     1: 'premiere',
     2: 'theatrical_limited',
@@ -102,6 +104,33 @@ RELEASE_DATE_TYPE_MAPPING = {
     5: 'physical',
     6: 'tv',
 }
+
+
+@timed_lru_cache("1 days", maxsize=10000)
+def get_release_dates(id, name, lookup_language):
+    logger.debug('release dates for movie {} not found in DB, fetching from TMDB', name)
+    try:
+        release_dates = {}
+        results = tmdb_request('movie/{}/release_dates'.format(id))['results']
+        for iso in results:
+            # loop and get the first release per type
+            for release in iso['release_dates']:
+                release_type = RELEASE_DATE_TYPE_MAPPING[release['type']]
+                release_date = dateutil_parse(release['release_date']).date()
+                release_language = release['iso_639_1'] or lookup_language
+
+                if release_language != lookup_language:
+                    continue
+
+                if release_type not in release_dates or (
+                    release_dates.get(release_type) >= release_date
+                ):
+                    release_dates[release_type] = release_date
+
+        return release_dates
+
+    except requests.RequestException as e:
+        raise LookupError('Error updating data from tmdb: %s' % e)
 
 
 class TMDBMovie(Base):
@@ -130,7 +159,6 @@ class TMDBMovie(Base):
     _posters = relation('TMDBPoster', backref='movie', cascade='all, delete, delete-orphan')
     _backdrops = relation('TMDBBackdrop', backref='movie', cascade='all, delete, delete-orphan')
     _genres = relation('TMDBGenre', secondary=genres_table, backref='movies')
-    _release_dates = Column('release_dates', Unicode)
     genres = association_proxy('_genres', 'name')
     updated = Column(DateTime, default=datetime.now, nullable=False)
 
@@ -197,38 +225,11 @@ class TMDBMovie(Base):
 
     @property
     def release_dates(self):
-        if not self._release_dates:
-            logger.debug(
-                'release dates for movie {} not found in DB, fetching from TMDB', self.name
-            )
-            try:
-                results = tmdb_request('movie/{}/release_dates'.format(self.id))['results']
-
-                release_dates = {}
-                lookup_language = self.lookup_language or self.language
-                for iso in results:
-                    # loop and get the first release per type
-                    for release in iso['release_dates']:
-                        release_type = RELEASE_DATE_TYPE_MAPPING[release['type']]
-                        release_date = release['release_date']
-                        release_language = release['iso_639_1'] or self.language
-
-                        if release_language != lookup_language:
-                            continue
-
-                        if release_type not in release_dates or (
-                            release_dates.get(release_type) >= release_date
-                        ):
-                            release_dates[
-                                release_type
-                            ] = release_date  # TODO: convert to datetime?
-
-                self._release_dates = json.dumps(serialize(release_dates), encode_datetime=True)
-                return self.release_dates
-
-            except requests.RequestException as e:
-                raise LookupError('Error updating data from tmdb: %s' % e)
-        return json.loads(deserialize(self._release_dates), decode_datetime=True)
+        return get_release_dates(
+            id=self.id,
+            name=self.name,
+            lookup_language=self.lookup_language or self.language,
+        )
 
     def to_dict(self):
         return {
