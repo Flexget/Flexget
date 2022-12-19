@@ -22,8 +22,9 @@ from sqlalchemy.schema import ForeignKey
 from flexget import db_schema, plugin
 from flexget.event import event
 from flexget.manager import Session
-from flexget.utils import requests
+from flexget.utils import requests, json
 from flexget.utils.database import json_synonym, with_session, year_property
+from flexget.utils.serialization import serialize, deserialize
 
 logger = logger.bind(name='api_tmdb')
 Base = db_schema.versioned_base('api_tmdb', 6)
@@ -129,6 +130,7 @@ class TMDBMovie(Base):
     _posters = relation('TMDBPoster', backref='movie', cascade='all, delete, delete-orphan')
     _backdrops = relation('TMDBBackdrop', backref='movie', cascade='all, delete, delete-orphan')
     _genres = relation('TMDBGenre', secondary=genres_table, backref='movies')
+    _release_dates = Column('release_dates', Unicode)
     genres = association_proxy('_genres', 'name')
     updated = Column(DateTime, default=datetime.now, nullable=False)
 
@@ -193,8 +195,6 @@ class TMDBMovie(Base):
             self.get_images()
         return self._backdrops
 
-    _release_dates = []
-
     @property
     def release_dates(self):
         if not self._release_dates:
@@ -223,11 +223,12 @@ class TMDBMovie(Base):
                                 release_type
                             ] = release_date  # TODO: convert to datetime?
 
-                self._release_dates = release_dates
+                self._release_dates = json.dumps(serialize(release_dates), encode_datetime=True)
+                return self.release_dates
 
             except requests.RequestException as e:
                 raise LookupError('Error updating data from tmdb: %s' % e)
-        return self._release_dates
+        return json.loads(deserialize(self._release_dates), decode_datetime=True)
 
     def to_dict(self):
         return {
