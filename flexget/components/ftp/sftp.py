@@ -80,7 +80,7 @@ class SftpList:
             'dirs': one_or_more({'type': 'string'}),
             'socket_timeout_sec': {'type': 'integer', 'default': DEFAULT_SOCKET_TIMEOUT_SEC},
             'connection_tries': {'type': 'integer', 'default': DEFAULT_CONNECT_TRIES},
-            'ssh_key': {
+            'host_key': {
                 'type': 'object',
                 'properties': {
                     'key-type': {'type': 'string', 'enum': HOST_KEY_TYPES.keys()},
@@ -309,7 +309,7 @@ class SftpUpload:
             'private_key_pass': {'type': 'string'},
             'to': {'type': 'string'},
             'delete_origin': {'type': 'boolean', 'default': False},
-            'ssh_key': {
+            'host_key': {
                 'type': 'object',
                 'properties': {
                     'key-type': {'type': 'string', 'enum': HOST_KEY_TYPES.keys()},
