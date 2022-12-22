@@ -206,6 +206,7 @@ def caplog(pytestconfig, _caplog):
     yield _caplog
     logger.remove(handler_id)
 
+
 @pytest.fixture
 def sftp_root(tmp_path: Path):
     sftp_root = tmp_path / 'sftp_root'
@@ -218,6 +219,7 @@ def sftp(sftp_root: Path):
     test_server = TestSFTPServerController(sftp_root)
     yield test_server
     test_server.kill()
+
 
 # --- End Public Fixtures ---
 
