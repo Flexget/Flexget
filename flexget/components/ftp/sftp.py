@@ -48,7 +48,7 @@ class SftpList:
     dirs:                 List of directories to download.
     socket_timeout_sec:   Socket timeout in seconds (default 15 seconds).
     connection_tries:     Number of times to attempt to connect before failing (default 3).
-    host_key:             Specify a host key not already in known_hosts
+    host_key:             Specifies a host key not already in known_hosts
 
     Example:
 
@@ -83,10 +83,10 @@ class SftpList:
             'host_key': {
                 'type': 'object',
                 'properties': {
-                    'key-type': {'type': 'string', 'enum': HOST_KEY_TYPES.keys()},
-                    'public-key': {'type': 'stirng'},
+                    'key_type': {'type': 'string', 'enum': HOST_KEY_TYPES.keys()},
+                    'public_key': {'type': 'string'},
                 },
-                'required': ['key-type', 'public-key'],
+                'required': ['key_type', 'public_key'],
                 'additionalProperties': False,
             },
         },
@@ -287,6 +287,7 @@ class SftpUpload:
                           upload.
     socket_timeout_sec:   Socket timeout in seconds
     connection_tries:     Number of times to attempt to connect before failing (default 3).
+    host_key:             Specifies a host key not already in known_hosts
 
     Example:
 
@@ -312,10 +313,10 @@ class SftpUpload:
             'host_key': {
                 'type': 'object',
                 'properties': {
-                    'key-type': {'type': 'string', 'enum': HOST_KEY_TYPES.keys()},
-                    'public-key': {'type': 'stirng'},
+                    'key_type': {'type': 'string', 'enum': HOST_KEY_TYPES.keys()},
+                    'public_key': {'type': 'string'},
                 },
-                'required': ['key-type', 'public-key'],
+                'required': ['key_type', 'public_key'],
                 'additionalProperties': False,
             },
             'socket_timeout_sec': {'type': 'integer', 'default': DEFAULT_SOCKET_TIMEOUT_SEC},
