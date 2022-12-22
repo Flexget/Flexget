@@ -83,7 +83,7 @@ class SftpList:
             'host_key': {
                 'type': 'object',
                 'properties': {
-                    'key_type': {'type': 'string', 'enum': HOST_KEY_TYPES.keys()},
+                    'key_type': {'type': 'string', 'enum': list(HOST_KEY_TYPES.keys())},
                     'public_key': {'type': 'string'},
                 },
                 'required': ['key_type', 'public_key'],
@@ -313,7 +313,7 @@ class SftpUpload:
             'host_key': {
                 'type': 'object',
                 'properties': {
-                    'key_type': {'type': 'string', 'enum': HOST_KEY_TYPES.keys()},
+                    'key_type': {'type': 'string', 'enum': list(HOST_KEY_TYPES.keys())},
                     'public_key': {'type': 'string'},
                 },
                 'required': ['key_type', 'public_key'],
