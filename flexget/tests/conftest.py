@@ -30,6 +30,8 @@ from flexget.plugin import load_plugins
 from flexget.task import Task, TaskAbort
 from flexget.webserver import User
 
+from .test_sftp_server import TestSFTPServerController
+
 logger = logger.bind(name='tests')
 
 VCR_CASSETTE_DIR = os.path.join(os.path.dirname(__file__), 'cassettes')
@@ -204,6 +206,18 @@ def caplog(pytestconfig, _caplog):
     yield _caplog
     logger.remove(handler_id)
 
+@pytest.fixture
+def sftp_root(tmp_path: Path):
+    sftp_root = tmp_path / 'sftp_root'
+    sftp_root.mkdir()
+    return sftp_root
+
+
+@pytest.fixture
+def sftp(sftp_root: Path):
+    test_server = TestSFTPServerController(sftp_root)
+    yield test_server
+    test_server.kill()
 
 # --- End Public Fixtures ---
 
