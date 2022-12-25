@@ -112,6 +112,10 @@ boto3 = ">=1.24.89"
 plexapi = ">=4.13.1"
 subliminal = ">= 2.0rc1"
 
+
+[tool.poetry.group.plugin-tests.dependencies]
+pysftp = "^0.2.9"
+
 [tool.poetry.scripts]
 flexget = 'flexget:main'
 
