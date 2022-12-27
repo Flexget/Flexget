@@ -5,6 +5,7 @@ from base64 import b64decode
 from dataclasses import dataclass
 from functools import partial
 from pathlib import Path, PurePath, PurePosixPath
+from stat import S_ISLNK
 from typing import Callable, List, Optional
 from urllib.parse import quote, urljoin
 
@@ -134,21 +135,29 @@ class SftpClient:
         if not self.path_exists(source):
             raise SftpError(f'Remote path does not exist: {source}')
 
+        # If the entry represents a symlink and delete_origin is true, only the symlink
+        # should be removed, rather than it's target.
+        is_symlink: bool = self.is_symlink(source)
         if self.is_file(source):
             source_file: str = parsed_path.name
             source_dir: str = parsed_path.parent.as_posix()
             try:
                 self._sftp.cwd(source_dir)
-                self._download_file(to, delete_origin, source_file)
+                self._download_file(to, delete_origin and not self.is_symlink(source), source_file)
             except Exception as e:
                 raise SftpError(f'Failed to download file {source} ({str(e)})')
 
             if delete_origin:
+                if is_symlink:
+                    self.remove_symlink(source)
                 self.remove_dir(source_dir)
+
         elif self.is_dir(source):
             base_path: str = parsed_path.joinpath('..').as_posix()
             dir_name: str = parsed_path.name
-            handle_file: NodeHandler = partial(self._download_file, to, delete_origin)
+            handle_file: NodeHandler = partial(
+                self._download_file, to, delete_origin and not is_symlink
+            )
 
             try:
                 self._sftp.cwd(base_path)
@@ -157,7 +166,10 @@ class SftpClient:
                 raise SftpError(f'Failed to download directory {source} ({str(e)})')
 
             if delete_origin:
-                self.remove_dir(source)
+                if is_symlink:
+                    self.remove_symlink(source)
+                else:
+                    self.remove_dir(source)
         else:
             logger.warning('Skipping unknown file: {}', source)
 
@@ -196,6 +208,14 @@ class SftpClient:
             logger.error('Failed to delete file {} ({})', path, str(e))
             return
 
+    def remove_symlink(self, path: str) -> None:
+        logger.debug('Deleting remote symlink {}', path)
+        try:
+            self._sftp.unlink(path)
+        except Exception as e:
+            logger.error('Failed to delete symlink {} ({})', path, str(e))
+            return
+
     def is_file(self, path: str) -> bool:
         """
         Check if the node at a given path is a file
@@ -211,6 +231,14 @@ class SftpClient:
         :return: boolean indicating if the path is a directory
         """
         return self._sftp.isdir(path)
+
+    def is_symlink(self, path: str) -> bool:
+        """
+        Check if a node at a given path is a symplink
+        :param path: path to check
+        :return: boolean indicating if the path is a directory
+        """
+        return S_ISLNK(self._sftp.lstat(path).st_mode)
 
     def path_exists(self, path: str) -> bool:
         """
