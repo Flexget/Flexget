@@ -153,8 +153,11 @@ class MagnetDL:
         entries = []
         for search_string in entry.get('search_strings', [entry['title']]):
             logger.debug('Searching `{}`', search_string)
-            try:
-                term = search_string.lower().replace(' ', '-')
+            try:                
+                # magnetdl.com search path accepts only [a-z0-9] and dashes/-
+                normalized_string = ''.join(c for c in unicodedata.normalize('NFD', search_string) if unicodedata.category(c) != 'Mn')
+                term = re.sub('[^a-z0-9]', '-', normalized_string.lower())
+                term = re.sub('-+', '-', term).strip('-')
                 # note: weird url convention, uses first letter of search term
                 slash = term[0]
                 url = 'https://www.magnetdl.com/{}/{}/'.format(slash, term)
