@@ -1,13 +1,13 @@
 import hashlib
 import os
-from functools import lru_cache, wraps
 from datetime import datetime, timedelta
+from functools import lru_cache, wraps
 from typing import Tuple
 
-
 import requests
-from flexget.utils.tools import parse_timedelta
 from loguru import logger
+
+from flexget.utils.tools import parse_timedelta
 
 logger = logger.bind(name='utils.cache')
 
@@ -100,6 +100,7 @@ def timed_lru_cache(timeout: str, maxsize: int = 128):
     maxsize: max size
 
     """
+
     def wrapper_cache(func):
         func = lru_cache(maxsize=maxsize)(func)
         func.timeout = parse_timedelta(timeout)
