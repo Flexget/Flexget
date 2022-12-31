@@ -2,7 +2,7 @@
 import time, os, base64
 
 from loguru import logger
-from requests import post
+from requests import post, get
 from requests.exceptions import RequestException
 
 from flexget import plugin
@@ -125,6 +125,95 @@ class FloodClient:
             return False
         except RequestException as e:
             raise PluginError(f"An error occurred while attempting to add torrent files to Flood: {e}")
+
+    def list_torrents(self, config: dict) -> dict:
+        """
+        List all torrents in Flood.
+        Will only attempt to list torrents if the JWT token is not expired or unset.
+        """
+
+        if self.is_jwt_expired():
+            raise PluginError("Not authenticated with Flood.")
+
+        try:
+            response = get(f"{config['url']}/api/torrents", cookies={"jwt": self.jwt})
+
+            if response.status_code == 200:
+                return response.json().get("torrents", {})
+
+            logger.debug(f"Failed to list torrents in Flood. (status={response.status_code})")
+            return {}
+        except RequestException as e:
+            raise PluginError(f"An error occurred while attempting to list torrents in Flood: {e}")
+
+    def start_torrents(self, config: dict, hashes: list) -> bool:
+        """
+        Start a list of torrents in Flood.
+        Will only attempt to start torrents if the JWT token is not expired or unset.
+        """
+
+        if not hashes:
+            raise PluginError("Parameter 'hashes' cannot be empty.")
+        if self.is_jwt_expired():
+            raise PluginError("Not authenticated with Flood.")
+
+        try:
+            response = post(f"{config['url']}/api/torrents/start", data={"hashes": hashes }, cookies={ "jwt": self.jwt})
+
+            if response.status_code == 200:
+                logger.debug(f"Successfully started {len(hashes)} torrents in Flood.")
+                return True
+
+            logger.debug(f"Failed to start {len(hashes)} torrents in Flood. (status={response.status_code})")
+            return False
+        except RequestException as e:
+            raise PluginError(f"An error occurred while attempting to start torrents in Flood: {e}")
+
+    def stop_torrents(self, config: dict, hashes: list) -> bool:
+        """
+        Stop a list of torrents in Flood.
+        Will only attempt to stop torrents if the JWT token is not expired or unset.
+        """
+
+        if not hashes:
+            raise PluginError("Parameter 'hashes' cannot be empty.")
+        if self.is_jwt_expired():
+            raise PluginError("Not authenticated with Flood.")
+
+        try:
+            response = post(f"{config['url']}/api/torrents/stop", data={"hashes": hashes }, cookies={ "jwt": self.jwt})
+
+            if response.status_code == 200:
+                logger.debug(f"Successfully stopped {len(hashes)} torrents in Flood.")
+                return True
+
+            logger.debug(f"Failed to stop {len(hashes)} torrents in Flood. (status={response.status_code})")
+            return False
+        except RequestException as e:
+            raise PluginError(f"An error occurred while attempting to stop torrents in Flood: {e}")
+
+    def delete_torrents(self, config: dict, hashes: list, deleteData: bool = False) -> bool:
+        """
+        Delete a list of torrents in Flood.
+        Will only attempt to delete torrents if the JWT token is not expired or unset.
+        """
+
+        if not hashes:
+            raise PluginError("Parameter 'hashes' cannot be empty.")
+        if self.is_jwt_expired():
+            raise PluginError("Not authenticated with Flood.")
+
+        try:
+            response = post(f"{config['url']}/api/torrents/delete", data={"hashes": hashes, 'deleteData': deleteData}, cookies={"jwt": self.jwt})
+
+            if response.status_code == 200:
+                logger.debug(f"Successfully deleted {len(hashes)} torrents from Flood.")
+                return True
+
+            logger.debug(f"Failed to delete {len(hashes)} torrents from Flood. (status={response.status_code})")
+            return False
+        except RequestException as e:
+            raise PluginError(f"An error occurred while attempting to delete torrents from Flood: {e}")
     
 class OutputFlood:
     schema = {
@@ -133,7 +222,7 @@ class OutputFlood:
             'url': {'type': 'string'},
             'username': {'type': 'string'},
             'password': {'type': 'string'},
-            'action': {'type': 'string', 'enum': ['add', 'update', 'remove', 'delete']},
+            'action': {'type': 'string', 'enum': ['add', 'remove', 'delete']},
             'path': {'type': 'string'},
             'tags': {'type': 'array', 'items': {'type': 'string'}},
         },
