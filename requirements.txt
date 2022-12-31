@@ -74,4 +74,3 @@ win32-setctime==1.1.0 ; python_version >= "3.7" and python_version < "4.0" and s
 zc-lockfile==2.0 ; python_version >= "3.7" and python_version < "4.0"
 zipp==3.11.0 ; python_version >= "3.7" and python_version < "3.10"
 zxcvbn-python==4.4.24 ; python_version >= "3.7" and python_version < "4.0"
-pyjwt==2.6.0 ; python_version >= "3.7" and python_version < "4.0"
