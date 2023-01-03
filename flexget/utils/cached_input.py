@@ -207,7 +207,7 @@ class cached:
             db_cache = db_cache.first()
             if db_cache:
                 entries = [ent.entry for ent in db_cache.entries]
-                logger.verbose(f'Restored {len(entries)} entries from db cache')
+                logger.verbose(f'Restored {len(entries)} entries from db cache for {self.name}')
                 # Store to in memory cache
                 self.cache[self.cache_name] = copy.deepcopy(entries)
                 return entries
