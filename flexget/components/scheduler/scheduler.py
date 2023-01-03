@@ -1,4 +1,3 @@
-import datetime
 import hashlib
 import logging
 import os
@@ -126,7 +125,6 @@ def setup_scheduler(manager):
     scheduler = BackgroundScheduler(
         jobstores=jobstores,
         job_defaults=job_defaults,
-        timezone=datetime.datetime.now().astimezone().tzinfo,
     )
     setup_jobs(manager)
 

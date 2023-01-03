@@ -27,10 +27,11 @@ from pyparsing import (
     White,
     Word,
     alphanums,
+    alphas,
     nums,
-    oneOf,
+    one_of,
     printables,
-    restOfLine,
+    rest_of_line,
 )
 from sqlalchemy.orm import Session
 from yaml.error import MarkedYAMLError, YAMLError
@@ -489,7 +490,7 @@ class LogParser:
                 Group(
                     operator_not + Suppress(Keyword('and', caseless=True)) + operator_and
                 ).setResultsName('and')
-                | Group(operator_not + OneOrMore(~oneOf('and or') + operator_and)).setResultsName(
+                | Group(operator_not + OneOrMore(~one_of('and or') + operator_and)).setResultsName(
                     'and'
                 )
                 | operator_not
@@ -506,26 +507,22 @@ class LogParser:
         else:
             self._query_parser = False
 
-        time_cmpnt = Word(nums).setParseAction(lambda t: t[0].zfill(2))
+        integer = Word(nums)
         date = Combine(
-            (time_cmpnt + '-' + time_cmpnt + '-' + time_cmpnt)
-            + ' '
-            + time_cmpnt
-            + ':'
-            + time_cmpnt
-            + Optional(':' + time_cmpnt)
+            Combine(integer + '-' + integer + '-' + integer)
+            + White(' ')
+            + Combine(integer + ':' + integer + Optional(':' + integer))
         )
-        word = Word(printables)
 
         self._log_parser = (
-            date.setResultsName('timestamp')
-            + word.setResultsName('log_level')
-            + word.setResultsName('plugin')
+            date.set_results_name('timestamp')
+            + Word(alphas).set_results_name('log_level')
+            + Word(printables).set_results_name('plugin')
             + (
-                White(min=16).setParseAction(lambda s, l, t: [t[0].strip()]).setResultsName('task')
-                | (White(min=1).suppress() & word.setResultsName('task'))
-            )
-            + restOfLine.setResultsName('message')
+                White(' ', min=16).set_parse_action(lambda t: ['']).set_results_name('task')
+                | White(' ', max=15) + Word(alphas).set_results_name('task')
+            ).leave_whitespace()
+            + rest_of_line.set_parse_action(lambda t: [t[0].strip()]).set_results_name('message')
         )
 
     def evaluate_and(self, argument):

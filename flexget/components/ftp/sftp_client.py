@@ -1,5 +1,8 @@
+import importlib
 import logging
 import time
+from base64 import b64decode
+from dataclasses import dataclass
 from functools import partial
 from pathlib import Path, PurePath, PurePosixPath
 from typing import Callable, List, Optional
@@ -9,10 +12,15 @@ from loguru import logger
 
 from flexget import plugin
 from flexget.entry import Entry
+from flexget.task import TaskAbort
 
 # retry configuration constants
 RETRY_INTERVAL_SEC: int = 15
 RETRY_STEP_SEC: int = 5
+HOST_KEY_TYPES: dict = {
+    'ssh-rsa': 'RSAKey',
+    'ssh-ed25519': 'Ed25519Key',
+}
 
 try:
     import pysftp
@@ -26,6 +34,16 @@ NodeHandler = Callable[[str], None]
 logger = logger.bind(name='sftp_client')
 
 
+@dataclass
+class HostKey:
+    """
+    Host key used to connect to a SFTP server if not defined in known_hosts.
+    """
+
+    key_type: str
+    public_key: str
+
+
 class SftpClient:
     def __init__(
         self,
@@ -35,6 +53,7 @@ class SftpClient:
         password: Optional[str] = None,
         private_key: Optional[str] = None,
         private_key_pass: Optional[str] = None,
+        host_key: Optional[HostKey] = None,
         connection_tries: int = 3,
     ):
 
@@ -51,11 +70,12 @@ class SftpClient:
         self.password: Optional[str] = password
         self.private_key: Optional[str] = private_key
         self.private_key_pass: Optional[str] = private_key_pass
+        self.host_key: Optional[HostKey] = host_key
 
         self.prefix: str = self._get_prefix()
         self._sftp: 'pysftp.Connection' = self._connect(connection_tries)
         self._handler_builder: HandlerBuilder = HandlerBuilder(
-            self._sftp, self.prefix, self.private_key, self.private_key_pass
+            self._sftp, self.prefix, self.private_key, self.private_key_pass, self.host_key
         )
 
     def list_directories(
@@ -245,12 +265,14 @@ class SftpClient:
                     password=self.password,
                     port=self.port,
                     private_key_pass=self.private_key_pass,
+                    cnopts=self._get_cnopts(),
                 )
                 logger.verbose('Connected to {}', self.host)  # type: ignore
             except Exception as e:
                 tries -= 1
+                logger.debug('Caught exception: {}', e)
                 if not tries:
-                    raise e
+                    raise TaskAbort(f'Failed to connect to {self.host}')
                 else:
                     logger.debug('Caught exception: {}', e)
                     logger.warning(
@@ -262,6 +284,17 @@ class SftpClient:
                     retry_interval += RETRY_STEP_SEC
 
         return sftp
+
+    def _get_cnopts(self) -> Optional['pysftp.CnOpts']:
+        if not self.host_key:
+            return None
+        KeyClass = getattr(
+            importlib.import_module("paramiko"), HOST_KEY_TYPES[self.host_key.key_type]
+        )
+        key = KeyClass(data=b64decode(self.host_key.public_key))
+        cnopts = pysftp.CnOpts()
+        cnopts.hostkeys.add(self.host, self.host_key.key_type, key)
+        return cnopts
 
     def _upload_file(self, source: str, to: str) -> None:
         if not Path(source).exists():
@@ -372,11 +405,13 @@ class HandlerBuilder:
         url_prefix: str,
         private_key: Optional[str],
         private_key_pass: Optional[str],
+        host_key: Optional[HostKey],
     ):
         self._sftp = sftp
         self._prefix = url_prefix
         self._private_key = private_key
         self._private_key_pass = private_key_pass
+        self._host_key = host_key
 
     def get_file_handler(
         self, get_size: bool, dirs_only: bool, entry_accumulator: list
@@ -396,6 +431,7 @@ class HandlerBuilder:
             dirs_only,
             self._private_key,
             self._private_key_pass,
+            self._host_key,
             entry_accumulator,
         )
 
@@ -417,6 +453,7 @@ class HandlerBuilder:
             files_only,
             self._private_key,
             self._private_key_pass,
+            self._host_key,
             entry_accumulator,
         )
 
@@ -443,6 +480,7 @@ class Handlers:
         dirs_only: bool,
         private_key: Optional[str],
         private_key_pass: Optional[str],
+        host_key: Optional[HostKey],
         entry_accumulator: List[Entry],
         path: str,
     ) -> None:
@@ -456,6 +494,7 @@ class Handlers:
         :param dirs_only: boolean indicating whether to skip files
         :param private_key: private key path
         :param private_key_pass: private key password
+        :param host_key: Host key for the remote server if not in known_hosts
         :param entry_accumulator: a list in which to store entries
         :param path: path to handle
         """
@@ -464,7 +503,7 @@ class Handlers:
 
         size_handler = partial(cls._file_size, sftp)
         entry = cls._get_entry(
-            sftp, prefix, size_handler, get_size, path, private_key, private_key_pass
+            sftp, prefix, size_handler, get_size, path, private_key, private_key_pass, host_key
         )
         entry_accumulator.append(entry)
 
@@ -477,6 +516,7 @@ class Handlers:
         files_only: bool,
         private_key: Optional[str],
         private_key_pass: Optional[str],
+        host_key: Optional[HostKey],
         entry_accumulator: List[Entry],
         path: str,
     ) -> None:
@@ -491,6 +531,7 @@ class Handlers:
         :param entry_accumulator: a list in which to store entries
         :param private_key: private key path
         :param private_key_pass: private key password
+        :param host_key: Host key for the remote server if not in known_hosts
         :param path: path to handle
         """
         if files_only:
@@ -498,7 +539,7 @@ class Handlers:
 
         dir_size: Callable[[str], int] = partial(cls._dir_size, sftp)
         entry: Entry = cls._get_entry(
-            sftp, prefix, dir_size, get_size, path, private_key, private_key_pass
+            sftp, prefix, dir_size, get_size, path, private_key, private_key_pass, host_key
         )
         entry_accumulator.append(entry)
 
@@ -532,6 +573,7 @@ class Handlers:
         path: str,
         private_key: Optional[str],
         private_key_pass: Optional[str],
+        host_key: Optional[HostKey],
     ) -> Entry:
 
         url = urljoin(prefix, quote(sftp.normalize(path)))
@@ -549,6 +591,11 @@ class Handlers:
 
         entry['private_key'] = private_key
         entry['private_key_pass'] = private_key_pass
+        if host_key:
+            entry['host_key'] = {
+                'key_type': host_key.key_type,
+                'public_key': host_key.public_key,
+            }
 
         return entry
 

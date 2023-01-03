@@ -193,7 +193,6 @@ class Session(requests.Session):
         """Set some defaults for our session if not explicitly defined."""
         super().__init__()
         self.timeout = timeout
-        self.stream = True
         self.adapters['http://'].max_retries = max_retries
         # Stores min intervals between requests for certain sites
         self.domain_limiters: Dict[str, DomainLimiter] = {}
