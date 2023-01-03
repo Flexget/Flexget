@@ -290,7 +290,62 @@ class OutputFlood:
         'required': ['url', 'action'],
     }
 
-    def _add_entry(self, task: Task, config: dict, entry: Entry) -> None:
+    def _add_entry_file(
+        self, 
+        task: Task, 
+        config: dict, 
+        entry: Entry, 
+        destination: str,
+        tags: list,
+        start: bool
+    ) -> None:
+        """
+        Process an entry to add to Flood by file.
+        """
+
+        if not os.path.exists(entry['file']):
+            return entry.fail('Temp file not found.')
+
+        with open(entry['file'], 'rb') as fs:
+            encoded_file = base64.b64encode(fs.read()).decode('utf-8')
+
+            try:
+                FloodClient.add_torrent_files(task, config, [encoded_file], destination, tags, start)
+            except PluginError as e:
+                return entry.fail(e)
+    
+    def _add_entry_url(
+        self,
+        task: Task,
+        config: dict,
+        entry: Entry,
+        destination: str,
+        tags: list,
+        start: bool
+    ) -> None:
+        """
+        Process an entry to add to Flood by URL.
+        """
+
+        try:
+            FloodClient.add_torrent_urls(task, config, [entry['url']], destination, tags, start)
+        except PluginError as e:
+            return entry.fail(e)
+
+    def _process_accepted_entry(self, task: Task, config: dict, entry: Entry) -> None:
+        if config['action'] == 'add':
+            self.add_entry(task, config, entry)
+        elif 'flood_hash' in entry:
+            if config['action'] == 'remove':
+                FloodClient.delete_torrents(task, config, [entry['flood_hash']], False)
+            elif config['action'] == 'delete':
+                FloodClient.delete_torrents(task, config, [entry['flood_hash']], True)
+            elif config['action'] == 'start':
+                FloodClient.start_torrents(task, config, [entry['flood_hash']])
+            elif config['action'] == 'stop':
+                FloodClient.stop_torrents(task, config, [entry['flood_hash']])
+
+    def add_entry(self, task: Task, config: dict, entry: Entry) -> None:
         """
         Add an entry to Flood.
         Will only attempt to add torrents if the JWT token is not expired or unset.
@@ -324,22 +379,9 @@ class OutputFlood:
             return
 
         if entry.get('file'):
-            if not os.path.exists(entry['file']):
-                return entry.fail('Temp file not found.')
-
-            with open(entry['file'], 'rb') as fs:
-                encoded_file = base64.b64encode(fs.read()).decode('utf-8')
-
-                try:
-                    FloodClient.add_torrent_files(task, config, [encoded_file], destination, tags, start)
-                except PluginError as e:
-                    return entry.fail(e)
-
+            self._add_entry_file(task, config, entry, destination, tags, start)
         elif entry.get('url'):
-            try:
-                FloodClient.add_torrent_urls(task, config, [entry['url']], destination, tags, start)
-            except PluginError as e:
-                return entry.fail(e)
+            self._add_entry_url(task, config, entry, destination, tags, start)
         else:
             return entry.fail('No URL or File found.')
 
@@ -368,17 +410,7 @@ class OutputFlood:
             FloodClient.authenticate(task, config)
 
         for entry in task.accepted:
-            if config['action'] == 'add':
-                self._add_entry(task, config, entry)
-            elif 'flood_hash' in entry:
-                if config['action'] == 'remove':
-                    FloodClient.delete_torrents(task, config, [entry['flood_hash']], False)
-                elif config['action'] == 'delete':
-                    FloodClient.delete_torrents(task, config, [entry['flood_hash']], True)
-                elif config['action'] == 'start':
-                    FloodClient.start_torrents(task, config, [entry['flood_hash']])
-                elif config['action'] == 'stop':
-                    FloodClient.stop_torrents(task, config, [entry['flood_hash']])
+            self._process_accepted_entry(task, config, entry)
 
 
 @event('plugin.register')
