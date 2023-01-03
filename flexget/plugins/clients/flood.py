@@ -305,7 +305,7 @@ class OutputFlood:
 
     Example:
         flood:
-            url: http://localhost:3000  # Required. Url for Flexget to connect to Flood. 
+            url: http://localhost:3000  # Required. Url for Flexget to connect to Flood.
             username: flexget           # Required. Username for authentication with Flood.
             password: password          # Required. Password for authentication with Flood.
             action: add                 # Required. The action to perform. Can be 'add', 'remove', 'delete', 'start', or 'stop'.
