@@ -1,9 +1,10 @@
 import base64
 import os
 import time
+import urllib.parse
 
 from loguru import logger
-from requests import get, post
+from requests import Response
 from requests.exceptions import RequestException
 
 from flexget import plugin
@@ -23,56 +24,66 @@ logger = logger.bind(name='flood')
 
 
 class FloodClient:
-    def __init__(self) -> None:
-        self.jwt = ""
+    @staticmethod
+    def request(task: Task, config: dict, method: str, url: str, success_list: list, **kwargs) -> Response:
+        """
+        Send a request to Flood.
+        Returns None if the response status_code is not in the success_list.
+        """
 
-    def is_jwt_expired(self) -> bool:
+        try:
+            response = task.requests.request(method, urllib.parse.urljoin(config["url"], url), **kwargs)
+        except RequestException as e:
+            raise PluginError(f"An error occurred while attempting to send a request to Flood: {e}")
+
+        if not response.status_code in success_list:
+            raise PluginError(f"Failed to send request to Flood. Received status {response.status_code} expected one of {success_list}.")
+        
+        return response
+
+    @staticmethod
+    def is_jwt_expired(task: Task) -> bool:
         """
         Check if the JWT token is expired.
         Returns True if the JWT token is expired or if the JWT token is not set.
         """
 
-        if not self.jwt:
+        jwt = task.requests.cookies.get('jwt')
+
+        if not jwt:
             return True
 
         try:
-            decoded_jwt = decode(self.jwt, algorithms="HS256", options={"verify_signature": False})
+            decoded_jwt = decode(jwt, algorithms="HS256", options={"verify_signature": False})
         except:
             return True
 
         return decoded_jwt.get("exp", 0) <= time.time()
 
-    def authenticate(self, config: dict) -> None:
+    @staticmethod
+    def authenticate(task: Task, config: dict) -> None:
         """
         Authenticate with Flood and obtain a JWT token.
         """
 
-        try:
-            response = post(
-                f"{config['url']}/api/auth/authenticate",
-                json={"username": config["username"], "password": config["password"]},
-            )
+        # Attempt to authenticate with Flood.
+        FloodClient.request(task, config, "post", "api/auth/authenticate", success_list=[200], json={"username": config["username"], "password": config["password"]})
 
-            if response.status_code == 200 and response.cookies.get("jwt"):
-                self.jwt = response.cookies.get("jwt")
-                logger.debug("Successfully authenticated with Flood.")
-            else:
-                raise PluginError(
-                    f"Failed to authenticate with Flood. (status={response.status_code})"
-                )
-        except RequestException as e:
-            raise PluginError(
-                f"An error occurred while attempting to authenticate with Flood: {e}"
-            )
+        # Check if the JWT token is expired or unset.
+        if FloodClient.is_jwt_expired(task):
+            raise PluginError("Failed to authenticate with Flood. No valid JWT was found.")
+        
+        logger.debug("Successfully authenticated with Flood.")
 
+    @staticmethod
     def add_torrent_urls(
-        self,
+        task: Task,
         config: dict,
         urls: list,
         destination: str = None,
         tags: list = None,
         start: bool = True,
-    ) -> bool:
+    ) -> None:
         """
         Add a list of torrent URLs to Flood.
         Will only attempt to add torrents if the JWT token is not expired or unset.
@@ -80,7 +91,7 @@ class FloodClient:
 
         if not urls:
             raise PluginError("Parameter 'urls' cannot be empty.")
-        if self.is_jwt_expired():
+        if FloodClient.is_jwt_expired(task):
             raise PluginError("Not authenticated with Flood.")
 
         data = {"urls": urls, "start": start}
@@ -90,32 +101,24 @@ class FloodClient:
         if tags:
             data["tags"] = tags
 
-        try:
-            response = post(
-                f"{config['url']}/api/torrents/add-urls", json=data, cookies={"jwt": self.jwt}
-            )
+        # Attempt to add the torrent URLs to Flood.
+        response = FloodClient.request(task, config, "post", "api/torrents/add-urls", success_list=[200, 202], json=data)
+        
+        # Check if the number of hashes returned by Flood matches the number of URLs.
+        if len(response.json()) != len(urls):
+            raise PluginError("Failed to add torrent URLs to Flood. Received a different number of hashes than the number of URLs.")
 
-            if response.status_code == 200:
-                logger.debug(f"Successfully added {len(urls)} urls to Flood.")
-                return True
+        logger.debug("Successfully added urls to Flood.")
 
-            logger.debug(
-                f"Failed to add {len(urls)} urls to Flood. (status={response.status_code})"
-            )
-            return False
-        except RequestException as e:
-            raise PluginError(
-                f"An error occurred while attempting to add torrent urls to Flood: {e}"
-            )
-
+    @staticmethod
     def add_torrent_files(
-        self,
+        task: Task,
         config: dict,
         files: list,
         destination: str = None,
         tags: list = None,
         start: bool = True,
-    ) -> bool:
+    ) -> None:
         """
         Add a list of torrent files to Flood.
         Each file must be in base64 encoded format.
@@ -124,7 +127,7 @@ class FloodClient:
 
         if not files:
             raise PluginError("Parameter 'urls' cannot be empty.")
-        if self.is_jwt_expired():
+        if FloodClient.is_jwt_expired(task):
             raise PluginError("Not authenticated with Flood.")
 
         data = {"files": files, "start": start}
@@ -134,45 +137,39 @@ class FloodClient:
         if tags:
             data["tags"] = tags
 
-        try:
-            response = post(
-                f"{config['url']}/api/torrents/add-files", json=data, cookies={"jwt": self.jwt}
-            )
+        # Attempt to add the torrent files to Flood.
+        response = FloodClient.request(task, config, "post", "api/torrents/add-files", success_list=[200, 202], json=data)
 
-            if response.status_code == 200:
-                logger.debug(f"Successfully added {len(files)} files to Flood.")
-                return True
+        # Check if the number of hashes returned by Flood matches the number of files.
+        if len(response.json()) != len(files):
+            raise PluginError("Failed to add torrent files to Flood. Received a different number of hashes than the number of files.")
+        
+        logger.debug("Successfully added files to Flood.")
 
-            logger.debug(
-                f"Failed to add {len(files)} files to Flood. (status={response.status_code})"
-            )
-            return False
-        except RequestException as e:
-            raise PluginError(
-                f"An error occurred while attempting to add torrent files to Flood: {e}"
-            )
-
-    def list_torrents(self, config: dict) -> dict:
+    @staticmethod
+    def list_torrents(task: Task, config: dict) -> dict:
         """
         List all torrents in Flood.
         Will only attempt to list torrents if the JWT token is not expired or unset.
         """
 
-        if self.is_jwt_expired():
+        if FloodClient.is_jwt_expired(task):
             raise PluginError("Not authenticated with Flood.")
 
-        try:
-            response = get(f"{config['url']}/api/torrents", cookies={"jwt": self.jwt})
+        # Attempt to list torrents in Flood.
+        response = FloodClient.request(task, config, "get", "api/torrents", success_list=[200])
 
-            if response.status_code == 200:
-                return response.json().get("torrents", {})
+        data = response.json()
 
-            logger.debug(f"Failed to list torrents in Flood. (status={response.status_code})")
-            return {}
-        except RequestException as e:
-            raise PluginError(f"An error occurred while attempting to list torrents in Flood: {e}")
+        # Check if the response contains a 'torrents' key.
+        if 'torrents' not in data:
+            raise PluginError("Failed to list torrents in Flood. Unable to find 'torrents' key in response.")
+        
+        logger.debug("Successfully listed torrents in Flood.")
+        return data.get("torrents")
 
-    def start_torrents(self, config: dict, hashes: list) -> bool:
+    @staticmethod
+    def start_torrents(task: Task, config: dict, hashes: list) -> None:
         """
         Start a list of torrents in Flood.
         Will only attempt to start torrents if the JWT token is not expired or unset.
@@ -180,30 +177,14 @@ class FloodClient:
 
         if not hashes:
             raise PluginError("Parameter 'hashes' cannot be empty.")
-        if self.is_jwt_expired():
+        if FloodClient.is_jwt_expired(task):
             raise PluginError("Not authenticated with Flood.")
 
-        try:
-            response = post(
-                f"{config['url']}/api/torrents/start",
-                json={"hashes": hashes},
-                cookies={"jwt": self.jwt},
-            )
+        FloodClient.request(task, config, "post", "api/torrents/start", success_list=[200], json={"hashes": hashes})
+        logger.debug(f"Successfully started torrents in Flood.")
 
-            if response.status_code == 200:
-                logger.debug(f"Successfully started {len(hashes)} torrents in Flood.")
-                return True
-
-            logger.debug(
-                f"Failed to start {len(hashes)} torrents in Flood. (status={response.status_code})"
-            )
-            return False
-        except RequestException as e:
-            raise PluginError(
-                f"An error occurred while attempting to start torrents in Flood: {e}"
-            )
-
-    def stop_torrents(self, config: dict, hashes: list) -> bool:
+    @staticmethod
+    def stop_torrents(task: Task, config: dict, hashes: list) -> None:
         """
         Stop a list of torrents in Flood.
         Will only attempt to stop torrents if the JWT token is not expired or unset.
@@ -211,28 +192,14 @@ class FloodClient:
 
         if not hashes:
             raise PluginError("Parameter 'hashes' cannot be empty.")
-        if self.is_jwt_expired():
+        if FloodClient.is_jwt_expired(task):
             raise PluginError("Not authenticated with Flood.")
 
-        try:
-            response = post(
-                f"{config['url']}/api/torrents/stop",
-                json={"hashes": hashes},
-                cookies={"jwt": self.jwt},
-            )
+        FloodClient.request(task, config, "post", "api/torrents/stop", success_list=[200], json={"hashes": hashes})
+        logger.debug(f"Successfully stopped torrents in Flood.")
 
-            if response.status_code == 200:
-                logger.debug(f"Successfully stopped {len(hashes)} torrents in Flood.")
-                return True
-
-            logger.debug(
-                f"Failed to stop {len(hashes)} torrents in Flood. (status={response.status_code})"
-            )
-            return False
-        except RequestException as e:
-            raise PluginError(f"An error occurred while attempting to stop torrents in Flood: {e}")
-
-    def delete_torrents(self, config: dict, hashes: list, deleteData: bool = False) -> bool:
+    @staticmethod
+    def delete_torrents(task: Task, config: dict, hashes: list, deleteData: bool = False) -> None:
         """
         Delete a list of torrents in Flood.
         Will only attempt to delete torrents if the JWT token is not expired or unset.
@@ -240,29 +207,11 @@ class FloodClient:
 
         if not hashes:
             raise PluginError("Parameter 'hashes' cannot be empty.")
-        if self.is_jwt_expired():
+        if FloodClient.is_jwt_expired(task):
             raise PluginError("Not authenticated with Flood.")
 
-        try:
-            response = post(
-                f"{config['url']}/api/torrents/delete",
-                json={"hashes": hashes, "deleteData": deleteData},
-                cookies={"jwt": self.jwt},
-            )
-
-            if response.status_code == 200:
-                logger.debug(f"Successfully deleted {len(hashes)} torrents from Flood.")
-                return True
-
-            logger.debug(
-                f"Failed to delete {len(hashes)} torrents from Flood. (status={response.status_code})"
-            )
-            return False
-        except RequestException as e:
-            raise PluginError(
-                f"An error occurred while attempting to delete torrents from Flood: {e}"
-            )
-
+        FloodClient.request(task, config, "post", "api/torrents/delete", success_list=[200], json={"hashes": hashes, "deleteData": deleteData})
+        logger.debug(f"Successfully deleted torrents in Flood.")
 
 class InputFlood:
     """Creates entries from torrents in Flood based
@@ -285,9 +234,6 @@ class InputFlood:
         'required': ['url'],
     }
 
-    def __init__(self) -> None:
-        self.flood = FloodClient()
-
     def generate_entry(self, config: dict, torrent: dict) -> Entry:
         """
         Generate a task entry from a torrent in Flood.
@@ -301,12 +247,12 @@ class InputFlood:
         return entry
 
     def on_task_input(self, task: Task, config: dict):
-        if self.flood.is_jwt_expired():
+        if FloodClient.is_jwt_expired(task):
             logger.debug("JWT token is expired. Re-authenticating with Flood.")
-            self.flood.authenticate(config)
+            FloodClient.authenticate(task, config)
 
         entries = []
-        torrents = self.flood.list_torrents(config)
+        torrents = FloodClient.list_torrents(task, config)
 
         for hash, torrent in torrents.items():
             entry = self.generate_entry(config, torrent)
@@ -344,16 +290,13 @@ class OutputFlood:
         'required': ['url', 'action'],
     }
 
-    def __init__(self) -> None:
-        self.flood = FloodClient()
-
-    def add_entry(self, config: dict, task: Task, entry: Entry) -> None:
+    def _add_entry(self, task: Task, config: dict, entry: Entry) -> None:
         """
         Add an entry to Flood.
         Will only attempt to add torrents if the JWT token is not expired or unset.
         """
 
-        if self.flood.is_jwt_expired():
+        if FloodClient.is_jwt_expired(task):
             raise PluginError("Not authenticated with Flood.")
 
         destination: str = entry.render(entry.get('path', ''), config.get('path', ''))
@@ -386,15 +329,17 @@ class OutputFlood:
 
             with open(entry['file'], 'rb') as fs:
                 encoded_file = base64.b64encode(fs.read()).decode('utf-8')
-                if not self.flood.add_torrent_files(
-                    config, files=[encoded_file], destination=destination, tags=tags, start=start
-                ):
-                    return entry.fail('Failed to add file(s) to Flood.')
+
+                try:
+                    FloodClient.add_torrent_files(task, config, [encoded_file], destination, tags, start)
+                except PluginError as e:
+                    return entry.fail(e)
+
         elif entry.get('url'):
-            if not self.flood.add_torrent_urls(
-                config, urls=[entry['url']], destination=destination, tags=tags, start=start
-            ):
-                return entry.fail('Failed to add url(s) to Flood.')
+            try:
+                FloodClient.add_torrent_urls(task, config, [entry['url']], destination, tags, start)
+            except PluginError as e:
+                return entry.fail(e)
         else:
             return entry.fail('No URL or File found.')
 
@@ -418,22 +363,22 @@ class OutputFlood:
             return
 
         # Authenticate with Flood if not already authenticated.
-        if self.flood.is_jwt_expired():
+        if FloodClient.is_jwt_expired(task):
             logger.debug("JWT token is expired. Re-authenticating with Flood.")
-            self.flood.authenticate(config)
+            FloodClient.authenticate(task, config)
 
         for entry in task.accepted:
             if config['action'] == 'add':
-                self.add_entry(config, task, entry)
+                self._add_entry(task, config, entry)
             elif 'flood_hash' in entry:
                 if config['action'] == 'remove':
-                    self.flood.delete_torrents(config, [entry['flood_hash']], False)
+                    FloodClient.delete_torrents(task, config, [entry['flood_hash']], False)
                 elif config['action'] == 'delete':
-                    self.flood.delete_torrents(config, [entry['flood_hash']], True)
+                    FloodClient.delete_torrents(task, config, [entry['flood_hash']], True)
                 elif config['action'] == 'start':
-                    self.flood.start_torrents(config, [entry['flood_hash']])
+                    FloodClient.start_torrents(task, config, [entry['flood_hash']])
                 elif config['action'] == 'stop':
-                    self.flood.stop_torrents(config, [entry['flood_hash']])
+                    FloodClient.stop_torrents(task, config, [entry['flood_hash']])
 
 
 @event('plugin.register')
