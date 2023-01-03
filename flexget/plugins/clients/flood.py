@@ -218,9 +218,9 @@ class InputFlood:
 
     Example:
         from_flood:
-            url: http://localhost:3000
-            username: username
-            password: password
+            url: http://localhost:3000  # Required. Url for Flexget to connect to Flood.
+            username: flexget           # Required. Username for authentication with Flood.
+            password: password          # Required. Password for authentication with Flood.
     """
 
     schema = {
@@ -231,7 +231,7 @@ class InputFlood:
             'password': {'type': 'string'},
         },
         'additionalProperties': False,
-        'required': ['url'],
+        'required': ['url', 'username', 'password'],
     }
 
     def generate_entry(self, config: dict, torrent: dict) -> Entry:
@@ -268,12 +268,12 @@ class OutputFlood:
 
     Example:
         flood:
-            url: http://localhost:3000
-            username: username
-            password: password
-            path: /downloads/Flexget
-            tags: Flexget
-            action: add
+            url: http://localhost:3000  # Required. Url for Flexget to connect to Flood. 
+            username: flexget           # Required. Username for authentication with Flood.
+            password: password          # Required. Password for authentication with Flood.
+            action: add                 # Required. The action to perform. Can be 'add', 'remove', 'delete', 'start', or 'stop'.
+            path: /downloads            # If the action is set to 'add', the path is relative to the Flood download directory.
+            tags: [ 'Flexget' ]         # If the action is set to 'add', the tags to add to the torrent.
     """
 
     schema = {
@@ -287,7 +287,7 @@ class OutputFlood:
             'tags': {'type': 'array', 'items': {'type': 'string'}},
         },
         'additionalProperties': False,
-        'required': ['url', 'action'],
+        'required': ['url', 'username', 'password', 'action'],
     }
 
     def _add_entry_file(
