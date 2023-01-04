@@ -445,8 +445,11 @@ class OutputFlood:
             entry.fail('No flood_hash found for entry.')
 
         path: str = entry.render(entry.get('path', config.get('path', '')))
-
-        FloodClient.download_torrent_contents(task, config, entry['flood_hash'], path)
+        
+        try:
+            FloodClient.download_torrent_contents(task, config, entry['flood_hash'], path)
+        except PluginError as e:
+            entry.fail(e)
 
     def add_entry(self, task: Task, config: dict, entry: Entry) -> None:
         """
