@@ -394,6 +394,8 @@ class OutputFlood:
                 FloodClient.stop_torrents(task, config, [entry['flood_hash']])
             elif config['action'] == 'download':
                 self._download_entry(task, config, entry)
+        else:
+            return entry.fail('Entry does not have a flood_hash field.')
 
     def _add_entry_file(
         self, task: Task, config: dict, entry: Entry, destination: str, tags: list, start: bool
@@ -474,9 +476,6 @@ class OutputFlood:
         Requires a 'path' to be set on the config or on the entry.
         Requires a 'jwt' cookie on the tasks requests session to be valid.
         """
-
-        if not 'flood_hash' in entry:
-            entry.fail('No flood_hash found for entry.')
 
         if FloodClient.is_jwt_invalid(task):
             raise PluginError("Not authenticated with Flood.")
