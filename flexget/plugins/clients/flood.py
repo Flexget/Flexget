@@ -330,7 +330,12 @@ class InputFlood:
         Generate a task entry from a torrent in Flood.
         """
 
-        entry = Entry(url=urllib.parse.urljoin(config['url'], f"api/torrents/{torrent['hash']}/contents/all/data"), title=torrent['name'])
+        entry = Entry(
+            url=urllib.parse.urljoin(
+                config['url'], f"api/torrents/{torrent['hash']}/contents/all/data"
+            ),
+            title=torrent['name'],
+        )
 
         for key, value in torrent.items():
             entry['flood_' + key.lower()] = value
@@ -374,7 +379,10 @@ class OutputFlood:
             'url': {'type': 'string'},
             'username': {'type': 'string'},
             'password': {'type': 'string'},
-            'action': {'type': 'string', 'enum': ['add', 'remove', 'delete', 'download', 'start', 'stop']},
+            'action': {
+                'type': 'string',
+                'enum': ['add', 'remove', 'delete', 'download', 'start', 'stop'],
+            },
             'path': {'type': 'string'},
             'tags': {'type': 'array', 'items': {'type': 'string'}},
         },
