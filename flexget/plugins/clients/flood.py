@@ -494,6 +494,7 @@ class OutputFlood:
     def on_task_download(self, task: Task, config: dict):
         """
         Use the download plugin to get temp files for entry URLs.
+        Priority is lower than the on_task_output method so that the temp files are available for the add action
         """
 
         if config['action'] == 'add' and 'download' not in task.config:
@@ -502,6 +503,11 @@ class OutputFlood:
 
     @plugin.priority(135)
     def on_task_output(self, task: Task, config: dict):
+        """
+        Process entries on task output.
+        Priority is higher than the on_task_download method so that the temp files are available for the add action
+        """
+
         if not imported:
             raise DependencyError('pyjwt', 'pyjwt', 'pyjwt is required for this plugin')
 
