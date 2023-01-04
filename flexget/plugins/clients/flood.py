@@ -91,6 +91,40 @@ class FloodClient:
         logger.debug("Successfully authenticated with Flood.")
 
     @staticmethod
+    def download_torrent_contents(task: Task, config: dict, hash: str, to_path: str) -> None:
+        """
+        Download a torrents contents from Flood.
+        Will only attempt to download the torrent if the JWT token is not expired or unset.
+        """
+
+        if FloodClient.is_jwt_expired(task):
+            raise PluginError("Not authenticated with Flood.")
+
+        for file in FloodClient.list_torrent_contents(task, config, hash):
+            full_path = os.path.join(to_path, file['path'])
+            base_path = os.path.dirname(full_path)
+
+            if not os.path.exists(base_path):
+                os.makedirs(base_path)
+
+            if os.path.exists(full_path):
+                logger.warning(f"File {full_path} already exists. Skipping...")
+                continue
+
+            response = FloodClient.request(
+                task,
+                config,
+                "get",
+                f"api/torrents/{hash}/contents/{file['index']}/data",
+                success_list=[200],
+                stream=True,
+            )
+
+            with open(full_path, "wb") as fs:
+                for chunk in response.iter_content(chunk_size=1024):
+                    fs.write(chunk)
+
+    @staticmethod
     def add_torrent_urls(
         task: Task,
         config: dict,
@@ -168,6 +202,26 @@ class FloodClient:
             )
 
         logger.debug("Successfully added files to Flood.")
+
+    @staticmethod
+    def list_torrent_contents(task: Task, config: dict, hash: str) -> list:
+        """
+        List the contents of a torrent in Flood.
+        Will only attempt to list the torrent contents if the JWT token is not expired or unset.
+        """
+
+        if FloodClient.is_jwt_expired(task):
+            raise PluginError("Not authenticated with Flood.")
+
+        # Attempt to list the torrent contents in Flood.
+        response = FloodClient.request(
+            task, config, "get", f"api/torrents/{hash}/contents", success_list=[200]
+        )
+
+        data = response.json()
+
+        logger.debug("Successfully listed torrent contents.")
+        return data
 
     @staticmethod
     def list_torrents(task: Task, config: dict) -> dict:
@@ -276,7 +330,7 @@ class InputFlood:
         Generate a task entry from a torrent in Flood.
         """
 
-        entry = Entry(url='', title=torrent['name'])
+        entry = Entry(url=urllib.parse.urljoin(config['url'], f"api/torrents/{torrent['hash']}/contents/all/data"), title=torrent['name'])
 
         for key, value in torrent.items():
             entry['flood_' + key.lower()] = value
@@ -301,15 +355,16 @@ class InputFlood:
 
 
 class OutputFlood:
-    """Add, remove, delete, start, or stop torrents in Flood.
+    """Add, remove, delete, download, start, or stop torrents in Flood.
 
     Example:
         flood:
             url: http://localhost:3000  # Required. Url for Flexget to connect to Flood.
             username: flexget           # Required. Username for authentication with Flood.
             password: password          # Required. Password for authentication with Flood.
-            action: add                 # Required. The action to perform. Can be 'add', 'remove', 'delete', 'start', or 'stop'.
+            action: add                 # Required. The action to perform. Can be 'add', 'remove', 'delete', 'download', 'start', or 'stop'.
             path: /downloads            # If the action is set to 'add', the path is relative to the Flood download directory.
+                                        # If the action is set to 'download', the path is on the local filesystem.
             tags: [ 'Flexget' ]         # If the action is set to 'add', the tags to add to the torrent.
     """
 
@@ -319,7 +374,7 @@ class OutputFlood:
             'url': {'type': 'string'},
             'username': {'type': 'string'},
             'password': {'type': 'string'},
-            'action': {'type': 'string', 'enum': ['add', 'remove', 'delete', 'start', 'stop']},
+            'action': {'type': 'string', 'enum': ['add', 'remove', 'delete', 'download', 'start', 'stop']},
             'path': {'type': 'string'},
             'tags': {'type': 'array', 'items': {'type': 'string'}},
         },
@@ -371,6 +426,19 @@ class OutputFlood:
                 FloodClient.start_torrents(task, config, [entry['flood_hash']])
             elif config['action'] == 'stop':
                 FloodClient.stop_torrents(task, config, [entry['flood_hash']])
+            elif config['action'] == 'download':
+                if 'path' not in config:
+                    raise PluginError('Path is required for action download.')
+
+                self._process_download_entry(task, config, entry)
+
+    def _process_download_entry(self, task: Task, config: dict, entry: Entry) -> None:
+        if not 'flood_hash' in entry:
+            entry.fail('No flood_hash found for entry.')
+
+        path: str = entry.render(entry.get('path', config.get('path', '')))
+
+        FloodClient.download_torrent_contents(task, config, entry['flood_hash'], path)
 
     def add_entry(self, task: Task, config: dict, entry: Entry) -> None:
         """
