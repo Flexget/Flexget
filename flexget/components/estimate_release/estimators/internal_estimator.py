@@ -4,11 +4,10 @@ from loguru import logger
 from sqlalchemy import desc, func
 
 from flexget import plugin
+from flexget.components.series import db
 from flexget.event import event
 from flexget.manager import Session
 from flexget.utils.tools import multiply_timedelta
-
-from . import db
 
 logger = logger.bind(name='est_series_internal')
 
