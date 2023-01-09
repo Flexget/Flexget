@@ -122,6 +122,16 @@ class TestSftpDownload:
         execute_task('sftp_download_file_delete_origin_true')
         assert not remote_file.exists()
 
+    def test_sftp_download_file_and_delete_when_symlink_deletes_symlink_only(
+        self, execute_task, download_path: Path, sftp_fs: TestSFTPFileSystem
+    ):
+        remote_file: Path = sftp_fs.create_file('/target.mkv', 100)
+        remote_link: Path = sftp_fs.create_symlink('file.mkv', remote_file)
+
+        execute_task('sftp_download_file_delete_origin_true')
+        assert remote_file.exists(), '/target.mkv should not have been deleted.'
+        assert not remote_link.exists(), 'file.mkv should have been deleted.'
+
     @pytest.mark.skip(
         reason='No attempt is made by the sftp_download plugin to remove the directories)'
     )
