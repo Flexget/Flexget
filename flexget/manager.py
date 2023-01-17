@@ -1075,7 +1075,7 @@ class Manager:
                 'An unexpected crash has occurred. Writing crash report to {}. '
                 'Please verify you are running the latest version of flexget by using "flexget -V" '
                 'from CLI or by using version_checker plugin'
-                ' at http://flexget.com/wiki/Plugins/version_checker. '
+                ' at https://flexget.com/Plugins/version_checker. '
                 'You are currently using version {}',
                 filename,
                 get_current_flexget_version(),
