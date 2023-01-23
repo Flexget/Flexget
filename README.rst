@@ -32,7 +32,7 @@ Flexget uses a `YAML`_ based configuration file.
 The following example will look in the RSS feed in the link, will match any item that match the series names and download it::
 
     tasks:
-      tv_task:
+      tv:
         rss: http://example.com/torrents.xml
         series:
         - some series
