@@ -28,7 +28,14 @@ requests.add_domain_limiter(
     TimedLimiter(SITE_DOMAIN, '5 seconds')
 )  # TODO find out if they want a delay
 
-CATEGORIES = {'Movies': 'filter_cat[1]', 'TV': 'filter_cat[2]', 'Other': 'filter_cat[3]'}
+CATEGORIES = {
+           'HD Episode': 'filter_cat[3]', 
+           'HD Movies': 'filter_cat[1]', 
+           'HD Season': 'filter_cat[5]', 
+           'SD Epiosde': 'filter_cat[4]', 
+           'SD Movies': 'filter_cat[2]', 
+           'SD Season': 'filter_cat[6]'
+}
 
 TAGS = [
     'action',
