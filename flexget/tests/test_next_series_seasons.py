@@ -254,7 +254,7 @@ class TestNextSeriesSeasonSeasonsPack:
     def inject_series(self, execute_task, release_name):
         execute_task(
             'inject_series',
-            options={'inject': [Entry(title=release_name, url='')], 'disable_tracking': True},
+            options={'inject': [Entry(title=release_name, url='')]},
         )
 
     @pytest.mark.parametrize(

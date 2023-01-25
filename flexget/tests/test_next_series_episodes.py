@@ -133,7 +133,7 @@ class TestNextSeriesEpisodes:
     def inject_series(self, execute_task, release_name):
         execute_task(
             'inject_series',
-            options={'inject': [Entry(title=release_name, url='')], 'disable_tracking': True},
+            options={'inject': [Entry(title=release_name, url='')]},
         )
 
     def test_next_series_episodes_backfill(self, execute_task):
@@ -472,7 +472,7 @@ class TestNextSeriesEpisodesSeasonPack:
     def inject_series(self, execute_task, release_name):
         execute_task(
             'inject_series',
-            options={'inject': [Entry(title=release_name, url='')], 'disable_tracking': True},
+            options={'inject': [Entry(title=release_name, url='')]},
         )
 
     @pytest.mark.parametrize(

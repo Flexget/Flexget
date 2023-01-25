@@ -115,7 +115,11 @@ class Series(Base):
         return self._name_normalized
 
     def __str__(self):
-        return '<Series(id=%s,name=%s)>' % (self.id, self.name)
+        return '<Series(id=%s,name=%s,identified_by=%s)>' % (
+            self.id,
+            self.name,
+            self.identified_by,
+        )
 
     def __repr__(self):
         return str(self).encode('ascii', 'replace')
@@ -339,11 +343,12 @@ class Episode(Base):
         )[0]
 
     def __str__(self):
-        return '<Episode(id=%s,identifier=%s,season=%s,number=%s)>' % (
+        return '<Episode(id=%s,identifier=%s,season=%s,number=%s,identified_by=%s)>' % (
             self.id,
             self.identifier,
             self.season,
             self.number,
+            self.identified_by,
         )
 
     def __repr__(self):
@@ -1222,7 +1227,7 @@ def set_series_begin(series: Series, ep_id: Union[str, int]) -> Tuple[str, str]:
             episode.number = int(match.group(2))
         elif identified_by == 'sequence':
             episode.season = 0
-            episode.number = ep_id
+            episode.number = int(ep_id)
         series.episodes.append(episode)
         # Need to flush to get an id on new Episode before assigning it as series begin
         session.flush()
