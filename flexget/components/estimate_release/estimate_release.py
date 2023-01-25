@@ -39,7 +39,7 @@ class EstimateRelease:
 
     @property
     def schema(self) -> Dict[str, Any]:
-        """Create schema for that allows configuring estimator providers and
+        """Create schema that allows configuring estimator providers and
         related settings.
         """
 
