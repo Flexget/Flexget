@@ -86,18 +86,9 @@ class Discover:
             },
             'interval': {'type': 'string', 'format': 'interval', 'default': '5 hours'},
             'release_estimations': {
-                'oneOf': [
-                    {
-                        'type': 'string',
-                        'default': 'strict',
-                        'enum': ['loose', 'strict', 'ignore', 'smart'],
-                    },
-                    {
-                        'type': 'object',
-                        'properties': {'optimistic': {'type': 'string', 'format': 'interval'}},
-                        'required': ['optimistic'],
-                    },
-                ]
+                'type': 'string',
+                'default': 'strict',
+                'enum': ['loose', 'strict', 'ignore', 'smart'],
             },
             'limit': {'type': 'integer', 'minimum': 1},
         },
@@ -190,21 +181,21 @@ class Discover:
             data_exists = estimation['data_exists']
 
             if est_date is None:
-                if estimation_mode['mode'] == 'strict':
+                if estimation_mode == 'strict':
                     logger.debug('No release date could be determined for {}', entry['title'])
                     entry.reject('has no release date')
                     entry.complete()
-                elif estimation_mode['mode'] == 'smart' and data_exists:
+                elif estimation_mode == 'smart' and data_exists:
                     logger.debug(
-                        'No release date could be determined for {}, but exists data',
+                        'No release date could be determined for {}, but data exists',
                         entry['title'],
                     )
                     entry.reject('exists but has no release date')
                     entry.complete()
-                elif estimation_mode['mode'] == 'smart' and not data_exists:
+                elif estimation_mode == 'smart' and not data_exists:
                     logger.debug(
                         'Discovering because mode is \'{}\' and no data is found for entry',
-                        estimation_mode['mode'],
+                        estimation_mode,
                     )
                     result.append(entry)
                 else:
@@ -215,16 +206,6 @@ class Discover:
                 est_date = datetime.datetime.combine(est_date, datetime.time())
             if datetime.datetime.now() >= est_date:
                 logger.debug('{} has been released at {}', entry['title'], est_date)
-                result.append(entry)
-            elif datetime.datetime.now() >= est_date - parse_timedelta(
-                estimation_mode['optimistic']
-            ):
-                logger.debug(
-                    '{} will be released at {}. Ignoring release estimation because estimated release date is in less than {}',
-                    entry['title'],
-                    est_date,
-                    estimation_mode['optimistic'],
-                )
                 result.append(entry)
             else:
                 entry.reject('has not been released')
@@ -292,13 +273,6 @@ class Discover:
         return result
 
     def on_task_input(self, task, config):
-        config.setdefault('release_estimations', {})
-        if not isinstance(config['release_estimations'], dict):
-            config['release_estimations'] = {'mode': config['release_estimations']}
-
-        config['release_estimations'].setdefault('mode', 'strict')
-        config['release_estimations'].setdefault('optimistic', '0 days')
-
         task.no_entries_ok = True
         entries = aggregate_inputs(task, config['what'])
         logger.verbose('Discovering {} titles ...', len(entries))
@@ -310,7 +284,7 @@ class Discover:
         # TODO: the entries that are estimated should be given priority over expiration
         entries = self.interval_expired(config, task, entries)
         estimation_mode = config['release_estimations']
-        if estimation_mode['mode'] != 'ignore':
+        if estimation_mode != 'ignore':
             entries = self.estimated(entries, estimation_mode)
         return self.execute_searches(config, entries, task)
 

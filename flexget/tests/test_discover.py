@@ -1,4 +1,7 @@
 from datetime import datetime, timedelta
+from unittest.mock import MagicMock, patch
+
+import pytest
 
 from flexget import plugin
 from flexget.entry import Entry
@@ -30,14 +33,14 @@ class SearchPlugin:
 plugin.register(SearchPlugin, 'test_search', interfaces=['search'], api_ver=2)
 
 
-class EstRelease:
+class FakeEstimator:
     """Fake release estimate plugin. Just returns 'est_release' entry field."""
 
     def estimate(self, entry):
         return entry.get('est_release')
 
 
-plugin.register(EstRelease, 'test_release', interfaces=['estimate_release'], api_ver=2)
+plugin.register(FakeEstimator, 'fake_estimator', interfaces=['estimate_release'], api_ver=2)
 
 
 class TestDiscover:
@@ -225,7 +228,7 @@ class TestEmitSeriesInDiscover:
                 begin: s02e01
                 identified_by: ep
                 season_packs: yes
-            max_reruns: 0          
+            max_reruns: 0
     """
 
     def test_next_series_episodes_rerun(self, execute_task):
@@ -282,3 +285,94 @@ class TestEmitSeriesInDiscover:
         )
         task = execute_task('test_next_series_seasons')
         assert task.find_entry(title='My Show 2 S03')
+
+
+class TestEstimateReleaseViaDiscover:
+    """Suite of tests focusing on the configuration of the estimate_release
+    plugin.
+    """
+
+    config = """
+        tasks:
+          test_estimates:
+            discover:
+              interval: 0 seconds
+              what:
+              - mock:
+                - title: Foo
+              from:
+              - test_search: yes
+    """
+
+    def test_default_release_date_modifier(self, execute_task, manager):
+        """Test that the default release_date_modifier value of '0 days'
+        results in only matching entries released in the past.
+        """
+        mock_config = manager.config['tasks']['test_estimates']['discover']['what'][0]['mock']
+        # It should not be searched before the release date
+        mock_config[0]['est_release'] = {
+            'data_exists': True,
+            'entity_date': (datetime.now() + timedelta(days=1)),
+        }
+        task = execute_task('test_estimates')
+        assert len(task.entries) == 0
+        # It should be searched after the release date
+        mock_config[0]['est_release'] = {'data_exists': True, 'entity_date': datetime.now()}
+        task = execute_task('test_estimates')
+        assert len(task.entries) == 1
+
+    def test_release_date_modifier_positive(self, execute_task, manager):
+        """Test that providing a 'positive' offset value for the
+        estimate_release config results in matching entries that have been
+        released far enough in the past.
+        """
+        manager.config['tasks']['test_estimates']['estimate_release'] = {"offset": '7 days'}
+        discover_config = manager.config['tasks']['test_estimates']['discover']
+        mock_config = discover_config['what'][0]['mock']
+        mock_config[0]['est_release'] = {
+            'data_exists': True,
+            'entity_date': datetime.now(),
+        }
+        task = execute_task('test_estimates')
+        assert len(task.entries) == 0
+        mock_config[0]['est_release'] = {
+            'data_exists': True,
+            'entity_date': (datetime.now() - timedelta(days=7)),
+        }
+        task = execute_task('test_estimates')
+        assert len(task.entries) == 1
+
+    def test_release_date_modifier_negative(self, execute_task, manager):
+        """Test that providing a 'negative' offset value for the
+        estimate_release config results in matching entries that have a release
+        date in the future.
+        """
+        manager.config['tasks']['test_estimates']['estimate_release'] = {"offset": '-7 days'}
+        discover_config = manager.config['tasks']['test_estimates']['discover']
+        mock_config = discover_config['what'][0]['mock']
+        mock_config[0]['est_release'] = {
+            'data_exists': True,
+            'entity_date': datetime.now() + timedelta(days=5),
+        }
+        task = execute_task('test_estimates')
+        assert len(task.entries) == 1
+        mock_config[0]['est_release'] = {
+            'data_exists': True,
+            'entity_date': (datetime.now() + timedelta(days=9)),
+        }
+        task = execute_task('test_estimates')
+        assert len(task.entries) == 0
+
+    def test_provider_override_invalid(self, execute_task, manager):
+        """Test that an invalid provider results in an exception being raised."""
+        manager.config['tasks']['test_estimates']['estimate_release'] = {
+            "providers": ['does-not-exist']
+        }
+        discover_config = manager.config['tasks']['test_estimates']['discover']
+        mock_config = discover_config['what'][0]['mock']
+        mock_config[0]['est_release'] = {
+            'data_exists': True,
+            'entity_date': datetime.now() + timedelta(days=5),
+        }
+        with pytest.raises(Exception):
+            execute_task('test_estimates')

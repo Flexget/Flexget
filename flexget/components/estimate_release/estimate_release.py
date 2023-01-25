@@ -22,9 +22,8 @@ task_estimate_config: Dict[str, Any] = {}
 def init_estimators(manager) -> None:
     """Prepare the list of available estimator plugins."""
 
-    estimators = {
-        p.name.replace('est_', ''): p for p in plugin.get_plugins(interface=ESTIMATOR_INTERFACE)
-    }
+    for provider in plugin.get_plugins(interface=ESTIMATOR_INTERFACE):
+        estimators[provider.name.replace('est_', '')] = provider
 
     logger.debug('setting default estimators to {}', list(estimators.keys()))
 
@@ -34,6 +33,9 @@ class EstimateRelease:
     Front-end for estimator plugins that estimate release times
     for various things (series, movies).
     """
+
+    def __init__(self):
+        self.task_estimate_config = {}
 
     @property
     def schema(self) -> Dict[str, Any]:
@@ -83,12 +85,16 @@ class EstimateRelease:
         """
         if "providers" in self.task_estimate_config:
             # Map task configured providers to plugin instance map
-            task_estimators = [
-                estimators[p].instance.estimate for p in self.task_estimate_config['providers']
-            ]
+            try:
+                task_estimators = [
+                    estimators[p].instance.estimate for p in self.task_estimate_config['providers']
+                ]
+            except KeyError as error:
+                logger.error(f"invalid provider plugin given: {error}")
+                raise
         else:
             # Use all loaded estimator plugins
-            task_estimators = [e.instance.estimate for e in estimators]
+            task_estimators = [e.instance.estimate for e in estimators.values()]
 
         return sorted(
             task_estimators,
