@@ -206,11 +206,13 @@ class PluginTransmissionInput(TransmissionBase):
                 entry['url'] = 'file://' + torrent.torrentFile
             for attr in [
                 'id',
+                'activityDate',
                 'comment',
                 'desiredAvailable',
                 'downloadDir',
                 'isFinished',
                 'isPrivate',
+                'isStalled',
                 'leftUntilDone',
                 'ratio',
                 'status',

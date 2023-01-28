@@ -2,13 +2,27 @@ default_language_version:
   python: python3
 repos:
 - repo: https://github.com/pycqa/isort
-  rev: 5.10.1
+  rev: 5.11.4
   hooks:
   - id: isort
 - repo: https://github.com/psf/black
-  rev: 22.8.0
+  rev: 22.12.0
   hooks:
   - id: black
+- repo: https://github.com/python-poetry/poetry
+  rev: '1.3.0'
+  hooks:
+    - id: poetry-check
+    - id: poetry-lock
+      name: poetry-lock-check
+      files: ^pyproject\.toml|poetry\.lock$
+      args: ["--check"]
+    - id: poetry-export
+      args: ["-f", "requirements.txt", "-o", "requirements.txt", "--without-hashes"]
+    - id: poetry-export
+      args: ["--only", "dev", "-f", "requirements.txt", "-o", "dev-requirements.txt", "--without-hashes"]
+    - id: poetry-export
+      args: ["--only", "plugin-test", "-f", "requirements.txt", "-o", "dev-requirements-extras.txt", "--without-hashes"]
 ci:
   autofix_prs: true
   autoupdate_branch: develop

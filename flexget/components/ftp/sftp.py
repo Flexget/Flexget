@@ -7,7 +7,7 @@ from urllib.parse import unquote, urlparse
 from loguru import logger
 
 from flexget import plugin
-from flexget.components.ftp.sftp_client import SftpClient, SftpError
+from flexget.components.ftp.sftp_client import HOST_KEY_TYPES, HostKey, SftpClient, SftpError
 from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
@@ -23,7 +23,8 @@ DEFAULT_SOCKET_TIMEOUT_SEC: int = 15
 
 
 SftpConfig = namedtuple(
-    'SftpConfig', ['host', 'port', 'username', 'password', 'private_key', 'private_key_pass']
+    'SftpConfig',
+    ['host', 'port', 'username', 'password', 'private_key', 'private_key_pass', 'host_key'],
 )
 
 
@@ -47,6 +48,7 @@ class SftpList:
     dirs:                 List of directories to download.
     socket_timeout_sec:   Socket timeout in seconds (default 15 seconds).
     connection_tries:     Number of times to attempt to connect before failing (default 3).
+    host_key:             Specifies a host key not already in known_hosts
 
     Example:
 
@@ -78,6 +80,15 @@ class SftpList:
             'dirs': one_or_more({'type': 'string'}),
             'socket_timeout_sec': {'type': 'integer', 'default': DEFAULT_SOCKET_TIMEOUT_SEC},
             'connection_tries': {'type': 'integer', 'default': DEFAULT_CONNECT_TRIES},
+            'host_key': {
+                'type': 'object',
+                'properties': {
+                    'key_type': {'type': 'string', 'enum': list(HOST_KEY_TYPES.keys())},
+                    'public_key': {'type': 'string'},
+                },
+                'required': ['key_type', 'public_key'],
+                'additionalProperties': False,
+            },
         },
         'additionProperties': False,
         'required': ['host', 'username'],
@@ -91,6 +102,7 @@ class SftpList:
         config.setdefault('password', None)
         config.setdefault('private_key', None)
         config.setdefault('private_key_pass', None)
+        config.setdefault('host_key', None)
         config.setdefault('dirs', ['.'])
 
         return config
@@ -238,10 +250,19 @@ class SftpDownload:
         private_key: str = entry.get('private_key')
         private_key_pass: str = entry.get('private_key_pass')
 
+        entry_host_key_config: dict = entry.get('host_key')
+        host_key: Optional[HostKey] = None
+        if entry_host_key_config:
+            host_key = HostKey(
+                entry_host_key_config['key_type'], entry_host_key_config['public_key']
+            )
+
         config: Optional[SftpConfig] = None
 
         if parsed.scheme == 'sftp':
-            config = SftpConfig(host, port, username, password, private_key, private_key_pass)
+            config = SftpConfig(
+                host, port, username, password, private_key, private_key_pass, host_key
+            )
         else:
             logger.warning('Scheme does not match SFTP: {}', entry['url'])
 
@@ -266,6 +287,7 @@ class SftpUpload:
                           upload.
     socket_timeout_sec:   Socket timeout in seconds
     connection_tries:     Number of times to attempt to connect before failing (default 3).
+    host_key:             Specifies a host key not already in known_hosts
 
     Example:
 
@@ -288,6 +310,15 @@ class SftpUpload:
             'private_key_pass': {'type': 'string'},
             'to': {'type': 'string'},
             'delete_origin': {'type': 'boolean', 'default': False},
+            'host_key': {
+                'type': 'object',
+                'properties': {
+                    'key_type': {'type': 'string', 'enum': list(HOST_KEY_TYPES.keys())},
+                    'public_key': {'type': 'string'},
+                },
+                'required': ['key_type', 'public_key'],
+                'additionalProperties': False,
+            },
             'socket_timeout_sec': {'type': 'integer', 'default': DEFAULT_SOCKET_TIMEOUT_SEC},
             'connection_tries': {'type': 'integer', 'default': DEFAULT_CONNECT_TRIES},
         },
@@ -365,7 +396,11 @@ def task_config_to_sftp_config(config: dict) -> SftpConfig:
     private_key: str = config['private_key']
     private_key_pass: str = config['private_key_pass']
 
-    return SftpConfig(host, port, username, password, private_key, private_key_pass)
+    host_key: Optional[HostKey] = None
+    if 'host_key' in config:
+        host_key = HostKey(config['host_key']['key_type'], config['host_key']['public_key'])
+
+    return SftpConfig(host, port, username, password, private_key, private_key_pass, host_key)
 
 
 def sftp_connect(
@@ -378,6 +413,7 @@ def sftp_connect(
         password=sftp_config.password,
         port=sftp_config.port,
         private_key_pass=sftp_config.private_key_pass,
+        host_key=sftp_config.host_key,
         connection_tries=connection_tries,
     )
     sftp_client.set_socket_timeout(socket_timeout_sec)

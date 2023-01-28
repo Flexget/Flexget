@@ -32,7 +32,7 @@ Flexget uses a `YAML`_ based configuration file.
 The following example will look in the RSS feed in the link, will match any item that match the series names and download it::
 
     tasks:
-      tv_task:
+      tv:
         rss: http://example.com/torrents.xml
         series:
         - some series
@@ -55,7 +55,7 @@ To get a sense of the many things that can be done with FlexGet you can take a l
 
 **ChangeLog:** https://flexget.com/ChangeLog
 
-**Help:** https://discuss.flexget.com/
+**Help:** https://github.com/Flexget/Flexget/discussions
 
 **Chat:** https://flexget.com/Chat
 
@@ -75,43 +75,9 @@ For more detailed instructions see the `installation guide`_.
 How to use GIT checkout
 -----------------------
 
-Check that you have Python 3.6 or newer available with command ``python -V``.
+Refer to `development guide`_.
 
-In some environments newer python might be available under another name like
-'python3.6' or 'python3' in which case you need to use that one instead of
-plain 'python'.
-
-To start using FlexGet from this directory::
-
-    python3 -m venv .
-
-This will initialize python virtualenv. This doesn't need to be directly in
-your checkout directory, but these instructions assume that's where it is.
-
-On some linux distributions (eg. debian, ubuntu) venv module is not included with
-python and this fails. Please install `python3-virtualenv` package and retry
-(or use the separate `virtualenv`_ python package).
-
-.. _virtualenv: https://pypi.python.org/pypi/virtualenv
-
-Upgrading pip and setuptools to latest version is highly advisable if not mandatory
-for working installation and can de done with::
-
-    bin/pip install --upgrade pip setuptools
-
-Next we need to install dependencies and FlexGet itself, this can be done simply::
-
-    bin/pip install -e .
-
-This does an editable (`-e`) development install of the current directory (`.`).
-
-After that FlexGet is usable via ``<checkout directory>/bin/flexget``. Verify
-installation by running::
-
-    bin/flexget -V
-
-You may place the config file in your checkout directory, or in ``~/.flexget``
-(Unix, Mac OS X) or ``C:\Documents and Setting\<username>\flexget`` (Windows).
+.. _development guide: https://flexget.readthedocs.io/en/latest/develop/index.html#how-do-i-get-started
 
 If you don't want to use virtualenv there's ``flexget_vanilla.py`` file which
 can be used to run FlexGet without virtualenv, note that you will need to

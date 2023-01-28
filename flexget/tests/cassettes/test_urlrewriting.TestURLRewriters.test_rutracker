@@ -1,0 +1,38 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate, br
+      Connection:
+      - keep-alive
+      User-Agent:
+      - FlexGet/3.3.0.dev (www.flexget.com)
+    method: GET
+    uri: https://api.t-ru.org/v1/get_tor_topic_data?by=topic_id&val=2455223
+  response:
+    body:
+      string: "{\"result\":{\"2455223\":{\"info_hash\":\"38527C88CFE76411EF0C20FDF36B84DFE2C2D210\",\"forum_id\":486,\"poster_id\":3138653,\"size\":41884872138.0,\"reg_time\":1259104286,\"tor_status\":2,\"seeders\":1,\"topic_title\":\"\u041F\u0420\u042B\u0416\u041A\u0418
+        \u041D\u0410 \u041B\u042B\u0416\u0410\u0425 \u0421 \u0422\u0420\u0410\u041C\u041F\u041B\u0418\u041D\u0410.
+        \u0421\u0435\u0437\u043E\u043D 2008-2009. \u0412\u0421\u0415 \u0421\u041E\u0420\u0415\u0412\u041D\u041E\u0412\u0410\u041D\u0418\u042F.
+        \u0421 \u0440\u0430\u0437\u043D\u044B\u0445 \u043A\u0430\u043D\u0430\u043B\u043E\u0432.[\u0421\u0435\u0437\u043E\u043D
+        2008-2009, \u0440\u0430\u0437\u043D\u043E\u0433\u043E \u043A\u0430\u0447\u0435\u0441\u0442\u0432\u0430.]\",\"seeder_last_seen\":1644718861,\"dl_count\":536}}}"
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '440'
+      Content-Type:
+      - application/json; charset=UTF-8
+      Date:
+      - Mon, 14 Feb 2022 02:15:26 GMT
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+version: 1

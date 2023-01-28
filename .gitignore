@@ -46,3 +46,6 @@ pip-wheel-metadata
 flexget/ui/v1/app
 .dmypy.json
 .mypy_cache/
+.tool-versions
+.devcontainer/
+.venv

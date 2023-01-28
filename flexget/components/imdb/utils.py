@@ -2,7 +2,7 @@ import difflib
 import json
 import random
 import re
-from datetime import datetime
+from urllib.parse import quote
 
 from loguru import logger
 
@@ -12,10 +12,12 @@ from flexget.utils.soup import get_soup
 from flexget.utils.tools import str_to_int
 
 logger = logger.bind(name='imdb.utils')
-# IMDb delivers a version of the page which is unparsable to unknown (and some known) user agents, such as requests'
-# Spoof the old urllib user agent to keep results consistent
+
 requests = Session()
-requests.headers.update({'User-Agent': 'Python-urllib/2.6'})
+# Declare browser user agent to avoid being classified as a bot and getting a 403
+requests.headers.update(
+    {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0'}
+)
 # requests.headers.update({'User-Agent': random.choice(USERAGENTS)})
 
 # this makes most of the titles to be returned in english translation, but not all of them
@@ -75,8 +77,8 @@ class ImdbSearch:
         # de-prioritize aka matches a bit
         self.aka_weight = 0.95
         # prioritize first
-        self.first_weight = 1.1
-        self.min_match = 0.7
+        self.first_weight = 1.5
+        self.min_match = 0.6
         self.min_diff = 0.01
         self.debug = False
 
@@ -100,7 +102,7 @@ class ImdbSearch:
 
     def best_match(self, name, year=None, single_match=True):
         """Return single movie that best matches name criteria or None"""
-        movies = self.search(name)
+        movies = self.search(name, year)
 
         if not movies:
             logger.debug('search did not return any movies')
@@ -156,94 +158,50 @@ class ImdbSearch:
         else:
             return movies[0] if single_match else movies
 
-    def search(self, name):
+    def search(self, name, year=None):
         """Return array of movie details (dict)"""
         logger.debug('Searching: {}', name)
-        url = 'https://www.imdb.com/find'
         # This may include Shorts and TV series in the results
-        params = {'q': name, 's': 'tt'}
+        # It is using the live search suggestions api that populates movies as you type in the search bar
+        search_imdb_id = extract_id(name)
+        search = name
+        # Adding the year to the search normally improves the results, except in the case that the
+        # title of the movie is a number e.g. 1917 (2009)
+        if year and not name.isdigit():
+            search += f" {year}"
+        url = f'https://v3.sg.media-imdb.com/suggestion/titles/x/{quote(search, safe="")}.json'
+        params = {'includeVideos': 0}
 
         logger.debug('Search query: {}', repr(url))
         page = requests.get(url, params=params)
-        actual_url = page.url
+        rows = page.json()['d']
 
         movies = []
-        soup = get_soup(page.text)
-        # in case we got redirected to movie page (perfect match)
-        re_m = re.match(r'.*\.imdb\.com/title/tt\d+/', actual_url)
-        if re_m:
-            actual_url = re_m.group(0)
-            imdb_id = extract_id(actual_url)
-            movie_parse = ImdbParser()
-            movie_parse.parse(imdb_id, soup=soup)
-            logger.debug('Perfect hit. Search got redirected to {}', actual_url)
-            movie = {
-                'match': 1.0,
-                'name': movie_parse.name,
-                'imdb_id': imdb_id,
-                'url': make_url(imdb_id),
-                'year': movie_parse.year,
-            }
-            movies.append(movie)
-            return movies
 
-        section_table = soup.find('table', 'findList')
-        if not section_table:
-            logger.debug('results table not found')
-            return
-
-        rows = section_table.find_all('tr')
-        if not rows:
-            logger.debug('Titles section does not have links')
-        for count, row in enumerate(rows):
+        for count, result in enumerate(rows):
             # Title search gives a lot of results, only check the first ones
             if count > self.max_results:
                 break
 
-            result_text = row.find('td', 'result_text')
-            movie = {}
-            additional = re.findall(r'\((.*?)\)', result_text.text)
-            if len(additional) > 0:
-                if re.match(r'^\d{4}$', additional[-1]):
-                    movie['year'] = str_to_int(additional[-1])
-                elif len(additional) > 1:
-                    movie['year'] = str_to_int(additional[-2])
-                    if additional[-1] not in ['TV Movie', 'Video']:
-                        logger.debug('skipping {}', result_text.text)
-                        continue
-            primary_photo = row.find('td', 'primary_photo')
-            movie['thumbnail'] = primary_photo.find('a').find('img').get('src')
+            if result['qid'] not in ['tvMovie', 'movie', 'video']:
+                logger.debug('skipping {}', result['l'])
+                continue
 
-            link = result_text.find_next('a')
-            movie['name'] = link.text
-            movie['imdb_id'] = extract_id(link.get('href'))
-            movie['url'] = make_url(movie['imdb_id'])
+            movie = {
+                'name': result['l'],
+                'year': result.get('y'),
+                'imdb_id': result['id'],
+                'url': make_url(result['id']),
+                'thumbnail': result.get('i', {}).get('imageUrl'),
+            }
+            if search_imdb_id and movie['imdb_id'] == search_imdb_id:
+                movie['match'] = 1.0
+                return [movie]
             logger.debug('processing name: {} url: {}', movie['name'], movie['url'])
 
             # calc & set best matching ratio
             seq = difflib.SequenceMatcher(lambda x: x == ' ', movie['name'].title(), name.title())
             ratio = seq.ratio()
-
-            # check if some of the akas have better ratio
-            for aka in link.parent.find_all('i'):
-                aka = aka.next.string
-                match = re.search(r'".*"', aka)
-                if not match:
-                    logger.debug('aka `{}` is invalid', aka)
-                    continue
-                aka = match.group(0).replace('"', '')
-                logger.trace('processing aka {}', aka)
-                seq = difflib.SequenceMatcher(lambda x: x == ' ', aka.title(), name.title())
-                aka_ratio = seq.ratio()
-                if aka_ratio > ratio:
-                    ratio = aka_ratio * self.aka_weight
-                    logger.debug(
-                        '- aka `{}` matches better to `{}` ratio {} (weighted to {})',
-                        aka,
-                        name,
-                        aka_ratio,
-                        ratio,
-                    )
 
             # prioritize items by position
             position_ratio = (self.first_weight - 1) / (count + 1) + 1
@@ -407,23 +365,17 @@ class ImdbParser:
         # Storyline section
         # NOTE: We cannot use the get default approach here .(get(x, {}))
         # as the data returned in imdb has all fields with null values if they do not exist.
-        summaries = main_column_data.get('summaries') or {}
-        summary_edges = summaries.get('edges') or []
-        if len(summary_edges) > 0:
-            edge_node = summary_edges[0].get('node') or {}
-            plot_text = edge_node.get('plotText') or {}
-            # Strip out html
-            plot_html = get_soup(plot_text.get('plaidHtml'))
-            if plot_html:
-                self.plot_outline = plot_html.text
+        plot = above_the_fold_data['plot'] or {}
+        plot_text = plot.get('plotText') or {}
+        plot_plain_text = plot_text.get('plainText')
+        if plot_plain_text:
+            self.plot_outline = plot_plain_text
         if not self.plot_outline:
             logger.debug('No storyline found for {}', self.imdb_id)
 
-        storyline_keywords = main_column_data.get('storylineKeywords') or {}
-        for keyword_node in storyline_keywords.get('edges') or []:
-            keyword = keyword_node.get('node') or {}
-            if keyword:
-                self.plot_keywords.append(keyword.get('text').lower())
+        storyline_keywords = data.get('keywords') or ''
+        if storyline_keywords:
+            self.plot_keywords = storyline_keywords.split(',')
 
         genres = (above_the_fold_data.get('genres', {}) or {}).get('genres', [])
         self.genres = [g['text'].lower() for g in genres]

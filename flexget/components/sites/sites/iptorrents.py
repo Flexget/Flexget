@@ -53,9 +53,11 @@ CATEGORIES = {
     'TV-Web-DL': 22,
 }
 
-BASE_URL = 'https://iptorrents.com'
-SEARCH_URL = 'https://iptorrents.com/t?'
-FREE_SEARCH_URL = 'https://iptorrents.com/t?free=on'
+DOMAIN = "iptorrents.com"
+BASE_URL = f"https://{DOMAIN}"
+SEARCH_URL = f"https://{DOMAIN}/t?"
+FREE_SEARCH_URL = f"https://{DOMAIN}/t?free=on"
+DELAY = "2 seconds"
 
 
 class UrlRewriteIPTorrents:
@@ -67,15 +69,20 @@ class UrlRewriteIPTorrents:
       uid: xxxxxxxx  (required)
       password: xxxxxxxx  (required)
       category: HD
+      free: False
+      search_delay: "1 seconds"
 
       Category is any combination of: Movie-all, Movie-3D, Movie-480p,
       Movie-4K, Movie-BD-R, Movie-BD-Rip, Movie-Cam, Movie-DVD-R,
       Movie-HD-Bluray, Movie-Kids, Movie-MP4, Movie-Non-English,
       Movie-Packs, Movie-Web-DL, Movie-x265, Movie-XviD,
-
       TV-all, TV-Documentaries, TV-Sports, TV-480p, TV-BD, TV-DVD-R,
       TV-DVD-Rip, TV-MP4, TV-Mobile, TV-Non-English, TV-Packs,
       TV-Packs-Non-English, TV-SD-x264, TV-x264, TV-x265, TV-XVID, TV-Web-DL
+
+      free is a boolean to control search result filtering for freeleach torrents only.
+
+      search_delay is a timedelta string that configures rate limit for requests to iptorrents.com.
     """
 
     schema = {
@@ -95,6 +102,9 @@ class UrlRewriteIPTorrents:
 
     # urlrewriter API
     def url_rewritable(self, task, entry):
+        """
+        Determines if the entry's URL is rewriteable (not pointing at a downloadable torrent).
+        """
         url = entry['url']
         if url.startswith(BASE_URL + '/download.php/'):
             return False
@@ -104,6 +114,9 @@ class UrlRewriteIPTorrents:
 
     # urlrewriter API
     def url_rewrite(self, task, entry):
+        """
+        Resets the entry's url to one pointing directly at a torrent.
+        """
         if 'url' not in entry:
             logger.error("Didn't actually get a URL...")
         else:
@@ -119,7 +132,7 @@ class UrlRewriteIPTorrents:
     @plugin.internet(logger)
     def search(self, task, entry, config=None):
         """
-        Search for name from iptorrents
+        Search for name from iptorrents.
         """
 
         categories = config.get('category', 'All')
@@ -133,6 +146,11 @@ class UrlRewriteIPTorrents:
 
         entries = set()
 
+        if not task.requests.domain_limiters.get(DOMAIN, None):
+            logger.debug('limiting requests with a delay of {}', DELAY)
+            rate_limiter = requests.TokenBucketLimiter(DOMAIN, 1, DELAY, True)
+            task.requests.add_domain_limiter(rate_limiter)
+
         for search_string in entry.get('search_strings', [entry['title']]):
             search_params = {key: value for (key, value) in category_params.items()}
 
@@ -141,13 +159,13 @@ class UrlRewriteIPTorrents:
 
             logger.debug('searching with params: {}', search_params)
             if config.get('free'):
-                req = requests.get(
+                req = task.requests.get(
                     FREE_SEARCH_URL,
                     params=search_params,
                     cookies={'uid': str(config['uid']), 'pass': config['password']},
                 )
             else:
-                req = requests.get(
+                req = task.requests.get(
                     SEARCH_URL,
                     params=search_params,
                     cookies={'uid': str(config['uid']), 'pass': config['password']},
@@ -168,7 +186,6 @@ class UrlRewriteIPTorrents:
                 if 'leechers' in header_text:
                     leechers_idx = idx
 
-            results = torrents.findAll('tr')
             for torrent in torrents.tbody.findAll('tr', recursive=False):
                 if torrent.th and 'ac' in torrent.th.get('class'):
                     # Header column
@@ -202,6 +219,9 @@ class UrlRewriteIPTorrents:
 
 @event('plugin.register')
 def register_plugin():
+    """
+    Registers the plugin with FlexGet's plugin system.
+    """
     plugin.register(
         UrlRewriteIPTorrents, 'iptorrents', interfaces=['urlrewriter', 'search'], api_ver=2
     )
