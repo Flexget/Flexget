@@ -345,8 +345,6 @@ class IRCConnection(SimpleIRCBot):
                 )
                 for t in trackers:
                     name = t.get('path', '')
-                    if not name.startswith('trackers/'):
-                        continue
                     if not name.endswith('.tracker') or name.lower() != 'trackers/' + tracker_name.lower():
                         continue
                     tracker = requests.get(base_url + name)
