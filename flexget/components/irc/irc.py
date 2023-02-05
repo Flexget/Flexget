@@ -284,7 +284,7 @@ class IRCConnection(SimpleIRCBot):
         :param tracker_config_file: URL or path to .tracker file
         :return: parsed XML
         """
-        base_url = 'https://raw.githubusercontent.com/autodl-community/autodl-trackers/master/'
+        base_url = 'https://raw.githubusercontent.com/autodl-community/autodl-trackers/master/trackers/'
         tracker_config_file = os.path.expanduser(tracker_config_file)
 
         # First we attempt to find the file locally as-is
@@ -345,7 +345,7 @@ class IRCConnection(SimpleIRCBot):
                 )
                 for t in trackers:
                     name = t.get('path', '')
-                    if not name.endswith('.tracker') or name.lower() != tracker_name.lower():
+                    if not name.endswith('.tracker') or name.lower() != 'trackers/' + tracker_name.lower():
                         continue
                     tracker = requests.get(base_url + name)
                     tracker_name = name
