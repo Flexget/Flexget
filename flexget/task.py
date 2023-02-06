@@ -745,6 +745,7 @@ class Task:
             fire_event('task.execute.completed', self)
         finally:
             self.finished_event.set()
+            self.requests.close()
 
     @staticmethod
     def validate_config(config):
