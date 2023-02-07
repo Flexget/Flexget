@@ -16,7 +16,8 @@ logger = logger.bind(name='if')
 class FilterIf:
     """Can run actions on entries that satisfy a given condition.
 
-    Actions include accept, reject, and fail, as well as the ability to run other filter plugins on the entries."""
+    Actions include accept, reject, and fail, as well as the ability to run other filter plugins on the entries.
+    """
 
     schema = {
         'type': 'array',

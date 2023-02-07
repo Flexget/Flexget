@@ -38,7 +38,6 @@ class CrossMatch:
     }
 
     def on_task_filter(self, task, config):
-
         fields = config['fields']
         action = config['action']
         all_fields = config['all_fields']

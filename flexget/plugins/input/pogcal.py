@@ -39,7 +39,6 @@ class InputPogDesign:
         soup = get_soup(page.text)
         entries = []
         for row in soup.find_all('li', {'class': 'selectgrp checked'}):
-
             # Get name
             t = row.find('strong')
 

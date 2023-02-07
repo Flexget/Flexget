@@ -50,7 +50,6 @@ def consolidate():
             total=count,
             description='Processing...',
         ):
-
             # item already processed
             if orig.id in duplicates:
                 continue

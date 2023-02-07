@@ -12,7 +12,7 @@ logger = logger.bind(name='movieparser')
 
 def diff_pos(string1, string2):
     """Returns first position where string1 and string2 differ."""
-    for (count, c) in enumerate(string1):
+    for count, c in enumerate(string1):
         if len(string2) <= count:
             return count
         if string2[count] != c:

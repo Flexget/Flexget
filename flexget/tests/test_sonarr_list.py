@@ -6,6 +6,7 @@ SONARR_API_KEY = '7f0a2ce32a3e43c8a7389e9539c487b4'
 SONARR_BASE_URL = 'http://127.0.0.1'
 SONARRR_PORT = 8989
 
+
 # Load up a sonarr container and put VCR in record mode to record.
 # NOTE: You'll need to reset sonarr during runs otherwise the tags generated will have a different id. You'll also need to setup a root folder
 # docker run -d --name=sonarr-tmp -p 8989:8989 linuxserver/sonarr:preview

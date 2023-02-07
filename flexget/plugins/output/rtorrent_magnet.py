@@ -47,7 +47,6 @@ class PluginRtorrentMagnet:
     # Run after download plugin to only pick up entries it did not already handle
     @plugin.priority(0)
     def on_task_output(self, task, config):
-
         for entry in task.accepted:
             if 'output' in entry:
                 logger.debug(

@@ -122,7 +122,6 @@ class UrlRewriteTorrentday:
 
         entries = set()
         for search_string in entry.get('search_strings', [entry['title']]):
-
             url = 'https://www.torrentday.com/t'
             params['q'] = normalize_unicode(search_string).replace(':', '')
             cookies = {

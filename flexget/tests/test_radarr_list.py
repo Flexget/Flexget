@@ -6,6 +6,7 @@ RADARR_API_KEY = '65e246ce581a426781e1a8645f0a1f2c'
 RADARR_BASE_URL = 'http://127.0.0.1'
 RADARR_PORT = 7878
 
+
 # Load up a radarr container and put VCR in record mode to record.
 # NOTE: You'll need to reset radarr during runs otherwise the tags generated will have a different id. You'll also need to setup a root folder
 # docker run -d --name=radarr-tmp -p 7878:7878 linuxserver/radarr:nightly

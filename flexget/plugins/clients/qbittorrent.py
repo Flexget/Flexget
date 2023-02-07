@@ -224,7 +224,6 @@ class OutputQBitTorrent:
 
     def add_entries(self, task, config):
         for entry in task.accepted:
-
             form_data = {}
             try:
                 save_path = entry.render(entry.get('path', config.get('path', '')))

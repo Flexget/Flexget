@@ -74,7 +74,6 @@ class InputTail:
             entry[k] = v % entry
 
     def on_task_input(self, task, config):
-
         # Let details plugin know that it is ok if this task doesn't produce any entries
         task.no_entries_ok = True
 

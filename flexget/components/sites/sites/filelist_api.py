@@ -68,7 +68,6 @@ class SearchFileList:
     }
 
     def get(self, url, params):
-
         try:
             response = requests.get(url, params=params, raise_status=False)
         except RequestException as e:
@@ -116,7 +115,6 @@ class SearchFileList:
             params['season'] = entry.get('series_season')
 
         for search_title in entry.get('search_strings', [entry.get('title')]):
-
             if entry.get('imdb_id'):
                 params['type'] = 'imdb'
                 params['query'] = entry.get('imdb_id')

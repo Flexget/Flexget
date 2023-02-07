@@ -171,10 +171,8 @@ class IRCConnection(SimpleIRCBot):
 
         channel_list = []
         if self.tracker_config is not None:
-
             # Validate config with the settings in the torrent file
             for param in self.tracker_config.find('settings'):
-
                 # Handle textbox entries
                 if param.tag == 'textbox':
                     value_name = param.get('name')
@@ -284,7 +282,9 @@ class IRCConnection(SimpleIRCBot):
         :param tracker_config_file: URL or path to .tracker file
         :return: parsed XML
         """
-        base_url = 'https://raw.githubusercontent.com/autodl-community/autodl-trackers/master/trackers/'
+        base_url = (
+            'https://raw.githubusercontent.com/autodl-community/autodl-trackers/master/trackers/'
+        )
         tracker_config_file = os.path.expanduser(tracker_config_file)
 
         # First we attempt to find the file locally as-is
@@ -345,7 +345,10 @@ class IRCConnection(SimpleIRCBot):
                 )
                 for t in trackers:
                     name = t.get('path', '')
-                    if not name.endswith('.tracker') or name.lower() != 'trackers/' + tracker_name.lower():
+                    if (
+                        not name.endswith('.tracker')
+                        or name.lower() != 'trackers/' + tracker_name.lower()
+                    ):
                         continue
                     tracker = requests.get(base_url + name)
                     tracker_name = name

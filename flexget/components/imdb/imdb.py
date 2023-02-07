@@ -105,12 +105,10 @@ class FilterImdb:
     # Run later to avoid unnecessary lookups
     @plugin.priority(120)
     def on_task_filter(self, task, config):
-
         lookup = plugin.get('imdb_lookup', self).lookup
 
         # since the plugin does not reject anything, no sense going trough accepted
         for entry in task.undecided:
-
             force_accept = False
 
             try:

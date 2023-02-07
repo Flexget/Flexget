@@ -179,7 +179,7 @@ def encode_dictionary(data: dict) -> bytes:
     encoded = b'd'
     items = list(data.items())
     items.sort()
-    for (key, value) in items:
+    for key, value in items:
         encoded += bencode(key)
         encoded += bencode(value)
     encoded += b'e'

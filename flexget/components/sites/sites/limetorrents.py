@@ -104,7 +104,6 @@ class Limetorrents:
             soup = get_soup(page.content)
             if soup.find('a', attrs={'class': 'csprite_dl14'}) is not None:
                 for link in soup.findAll('a', attrs={'class': 'csprite_dl14'}):
-
                     row = link.find_parent('tr')
                     info_url = str(link.get('href'))
 
