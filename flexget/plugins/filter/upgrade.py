@@ -63,7 +63,6 @@ class FilterUpgrade:
         return config
 
     def filter_entries(self, entries, existing, target, action_on_lower):
-
         target_requirement = qualities.Requirements(target) if target else None
         filtered = []
 

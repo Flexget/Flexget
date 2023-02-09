@@ -125,7 +125,6 @@ class FilterTvdb:
 
     @plugin.priority(126)
     def on_task_filter(self, task, config):
-
         lookup = plugin.get('thetvdb_lookup', self).lookup
 
         for entry in task.entries:

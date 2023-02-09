@@ -373,7 +373,6 @@ def lookup_movie(
 
                         # Remove all movies below MIN_MATCH, and different year
                         for movie_res in results[:]:
-
                             if year and movie_res.get('year'):
                                 movie_res['year'] = int(movie_res['year'])
                                 if movie_res['year'] != year:

@@ -98,7 +98,6 @@ class EmbyApiBase(ABC):
 
         func_get = dict.get if isinstance(source_item, dict) else getattr
         for field, val in my_field_map.items():
-
             values = val
             if not isinstance(values, list):
                 values = [val]
@@ -197,7 +196,6 @@ class EmbyAuth(EmbyApiBase):
         userdata = None
 
         if not self._apikey:
-
             if self.is_connect_server():
                 # Make Emby connect login
                 self._login_type = LOGIN_CONNECT
@@ -703,7 +701,6 @@ class EmbyApiList(EmbyApiBase, MutableSet):
 
     @staticmethod
     def get_api_list(**kwargs) -> EmbyApiListBase:
-
         if EmbyApiRootList.is_type(**kwargs):
             logger.debug('List is a root list')
             return EmbyApiRootList(**kwargs)

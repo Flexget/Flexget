@@ -340,7 +340,6 @@ class SftpUpload:
 
     @classmethod
     def handle_entry(cls, entry: Entry, sftp: SftpClient, config: dict):
-
         to: str = config['to']
         location: str = entry['location']
         delete_origin: bool = config['delete_origin']

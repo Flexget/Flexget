@@ -11,7 +11,6 @@ log = logging.getLogger('parameterize')
 
 
 class Parameterize(object):
-
     schema = {
         'type': 'object',
         'properties': {

@@ -252,7 +252,6 @@ class RTorrent:
         return fields
 
     def load(self, raw_torrent, fields=None, start=False, mkdir=True):
-
         if fields is None:
             fields = {}
         # First param is empty 'target'
@@ -451,7 +450,6 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
 
     @plugin.priority(135)
     def on_task_output(self, task, config):
-
         client = RTorrent(
             os.path.expanduser(config['uri']),
             username=config.get('username'),
@@ -566,7 +564,6 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
             return
 
     def add_entry(self, client, entry, options, start=True, mkdir=False, fast_resume=False):
-
         if 'torrent_info_hash' not in entry:
             entry.fail('missing torrent_info_hash')
             return

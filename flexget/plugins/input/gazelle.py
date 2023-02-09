@@ -238,7 +238,6 @@ class InputGazelle:
         try:
             json_response = r.json()
             if json_response['status'] != "success":
-
                 # Try to deal with errors returned by the API
                 error = json_response.get('error', json_response.get('status'))
                 if not error or error == "failure":

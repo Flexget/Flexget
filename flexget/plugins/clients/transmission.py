@@ -652,7 +652,6 @@ class PluginTransmission(TransmissionBase):
                 continue
 
     def _make_torrent_options_dict(self, config, entry):
-
         opt_dic = {}
 
         for opt_key in (

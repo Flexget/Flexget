@@ -190,7 +190,6 @@ class InputRSS:
         in_cdata_block = False
 
         for idx, char in enumerate(bytes(content)):
-
             char = bytes([char])
             if not in_cdata_block and char == b'&':
                 if not content[idx : idx + 7].startswith(valid_escapes):
@@ -413,7 +412,6 @@ class InputRSS:
         # default value is auto but for example guid is used in some feeds
         ignored = 0
         for entry in rss.entries:
-
             # Check if title field is overridden in config
             title_field = config.get('title', 'title')
             # ignore entries without title

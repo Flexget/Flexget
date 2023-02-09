@@ -93,7 +93,6 @@ class Site1337x:
         entries = set()
 
         for search_string in entry.get('search_strings', [entry['title']]):
-
             query = '{0}search/{1}{2}/1/'.format(
                 sort_order, quote(search_string.encode('utf8')), order_by
             )

@@ -11,7 +11,6 @@ logger = logger.bind(name='symlink')
 
 
 class Symlink:
-
     schema = {
         'oneOf': [
             {

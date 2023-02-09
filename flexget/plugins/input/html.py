@@ -183,7 +183,6 @@ class InputHtml:
         return parse.unquote_plus(name)
 
     def create_entries(self, page_url, soup, config):
-
         queue = []
         duplicates = {}
         duplicate_limit = 4

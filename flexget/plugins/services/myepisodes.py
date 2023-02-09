@@ -129,7 +129,6 @@ class MyEpisodes:
             or 'series_episode' not in entry
             or 'series_name' not in entry
         ):
-
             raise plugin.PluginWarning(
                 'Can\'t mark entry `%s` in myepisodes without series_season, series_episode and series_name '
                 'fields' % entry['title'],

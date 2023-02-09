@@ -56,7 +56,6 @@ class SftpClient:
         host_key: Optional[HostKey] = None,
         connection_tries: int = 3,
     ):
-
         if not pysftp:
             raise plugin.DependencyError(
                 issued_by='sftp_client',
@@ -248,7 +247,6 @@ class SftpClient:
         self._sftp.timeout = socket_timeout_sec
 
     def _connect(self, connection_tries: int) -> 'pysftp.Connection':
-
         tries: int = connection_tries
         retry_interval: int = RETRY_INTERVAL_SEC
 
@@ -322,7 +320,6 @@ class SftpClient:
             raise SftpError(f'Failed to upload {source} ({str(e)})')
 
     def _download_file(self, destination: str, delete_origin: bool, source: str) -> None:
-
         destination_path: str = self._get_download_path(source, destination)
         destination_dir: str = Path(destination_path).parent.as_posix()
 
@@ -575,7 +572,6 @@ class Handlers:
         private_key_pass: Optional[str],
         host_key: Optional[HostKey],
     ) -> Entry:
-
         url = urljoin(prefix, quote(sftp.normalize(path)))
         title = PurePosixPath(path).name
 
