@@ -156,8 +156,8 @@ class PluginPyLoad:
         for entry in task.accepted:
             # bunch of urls now going to check
             contents = []
-            description = entry.get('description', '')
-            if description != '':
+            description = entry.get('description')
+            if description is not None:
                 contents.append(description)
             contents.append(quote(entry['url']))
             content = " ".join(contents)
