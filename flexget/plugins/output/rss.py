@@ -198,7 +198,7 @@ class OutputRSS:
                 )
                 rss.title = entry['title']
             for field in config['link']:
-                if field in entry and entry[field] is not None:
+                if entry.get(field) is not None:
                     rss.link = entry[field]
                     break
 
