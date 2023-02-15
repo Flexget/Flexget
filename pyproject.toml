@@ -8,8 +8,8 @@ description = """\
 readme = "README.rst"
 requires-python = ">=3.7"
 authors = [
-    { name = "Marko Koivusalo", email = "marko.koivusalo@gmail.com" },
-    { name = "Chase Sterling", email = "chase.sterling@gmail.com" },
+  { name = "Marko Koivusalo", email = "marko.koivusalo@gmail.com" },
+  { name = "Chase Sterling", email = "chase.sterling@gmail.com" },
 ]
 license = { file = "LICENSE" }
 dynamic = ["version", "dependencies"]
@@ -24,7 +24,7 @@ dynamic = ["version", "dependencies"]
 flexget = "flexget:main"
 
 [project.gui-scripts]
-flexget-headless = "flexget:main"  # This is useful on Windows to avoid a cmd popup
+flexget-headless = "flexget:main" # This is useful on Windows to avoid a cmd popup
 
 [build-system]
 requires = ["setuptools"]
@@ -40,9 +40,8 @@ exclude = ["flexget.tests*"]
 "*" = ["*.*"]
 
 [tool.setuptools.dynamic]
-version = {attr = "flexget._version.__version__"}
-dependencies = {file = "requirements.txt"}
-
+version = { attr = "flexget._version.__version__" }
+dependencies = { file = "requirements.txt" }
 
 ## Dependency settings
 # Poetry is only being used for dependency managment. The other metadata in this section is not used, and just
@@ -72,7 +71,7 @@ pyyaml = ">=4.2b1"
 rebulk = ">=2.0.0"
 requests = ">=2.20.0"
 rich = ">=9.0.0"
-rpyc = ">=5.0,<5.2.0"  # 5.2.1 is causing a hang right now https://github.com/Flexget/Flexget/issues/3601
+rpyc = ">=5.0,<5.2.0" # 5.2.1 is causing a hang right now https://github.com/Flexget/Flexget/issues/3601
 sqlalchemy = ">=1.3.10,<1.999"
 # WebUI/API Deps
 cherrypy = ">=18.0.0"
@@ -84,7 +83,7 @@ flask-restx = ">=0.5.1"
 flask = ">=0.7"
 packaging = ">=21.3"
 pyparsing = ">=2.4.7"
-werkzeug = ">=2.0.3"
+werkzeug = ">=2.2.3"
 zxcvbn-python = "^4.4.24"
 
 [tool.poetry.group.dev.dependencies]
@@ -112,16 +111,13 @@ boto3 = ">=1.24.89"
 plexapi = ">=4.13.1"
 subliminal = ">= 2.0rc1"
 
-
 [tool.poetry.group.plugin-tests.dependencies]
 pysftp = "^0.2.9"
 
 [tool.poetry.scripts]
 flexget = 'flexget:main'
 
-
 ## Other tool settings
-
 [tool.pytest.ini_options]
 testpaths = ["flexget/tests"]
 
