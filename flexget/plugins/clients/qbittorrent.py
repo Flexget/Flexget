@@ -348,7 +348,7 @@ class FromQBitTorrent:
         try:
             import qbittorrentapi
         except ImportError:
-            raise plugin.DependencyError(issued_by='from_qbittorrent', missing='qbittorrentapi')
+            raise plugin.DependencyError(issued_by='from_qbittorrent', missing='qbittorrent-api')
 
         return qbittorrentapi.Client(host=host, port=port, username=username, password=password)
 
