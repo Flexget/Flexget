@@ -1,10 +1,12 @@
 import os
+from datetime import datetime
 
 from loguru import logger
 from requests import Session
 from requests.exceptions import RequestException
 
 from flexget import plugin
+from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.template import RenderError
 
@@ -323,6 +325,86 @@ class OutputQBitTorrent:
             self.add_entries(task, config)
 
 
+class FromQBitTorrent:
+
+    schema = {
+        'type': 'object',
+        'properties': {
+            'category': {'type': 'string'},
+            'completed': {'type': 'boolean'},
+            'username': {'type': 'string'},
+            'password': {'type': 'string'},
+            'host': {'type': 'string'},
+            'port': {'type': 'integer'},
+        },
+        'additionalProperties': False,
+        'required': ['username', 'password', 'host', 'port']
+    }
+
+    @staticmethod
+    def client(host: str, port: int, username: str, password: str):
+        """
+        Import client or abort task
+        """
+        try:
+            import qbittorrentapi
+        except ImportError:
+            raise plugin.DependencyError(
+                issued_by='from_qbittorrent', missing='qbittorrentapi'
+            )
+
+        return qbittorrentapi.Client(
+            host=host,
+            port=port,
+            username=username,
+            password=password
+        )
+
+    def on_task_input(self, task, config):
+        client = self.client(config['host'], int(config['port']), config['username'], config['password'])
+
+        for torrent in client.torrents_info():
+            if 'category' in config:
+                logger.debug("filtered `%s` by wrong category" % torrent['name'])
+                if torrent['category'] != config['category']:
+                    continue
+
+            if 'completed' in config:
+                if not torrent.state_enum.is_complete:
+                    logger.debug("filtered `%s` by not completed" % torrent['name'])
+                    continue
+
+            yield Entry(
+                title=torrent['name'],
+                url=torrent['magnet_uri'],
+                content_files=[f['name'] for f in torrent.files],
+                content_size=torrent['size'] // 1024 // 1024,
+                torrent_info_hash=torrent['infohash_v1'],
+                torrent_info_hash_v2=torrent['infohash_v2'],
+                torrent_seeds=torrent['num_seeds'],
+                torrent_peers=torrent['num_leechs'],
+                qbittorrent_ratio=torrent['ratio'],
+                qbittorrent_category=torrent['category'],
+                qbittorrent_state=torrent['state'],
+                qbittorrent_eta=torrent['eta'],
+                qbittorrent_added_on=datetime.fromtimestamp(torrent['added_on']),
+                qbittorrent_completion_on=datetime.fromtimestamp(torrent['completion_on']),
+                qbittorrent_completed_path=torrent['content_path'],
+                qbittorrent_download_path=torrent['download_path'],
+                qbittorrent_save_path=torrent['save_path'],
+                qbittorrent_size=torrent['size'],
+                qbittorrent_dl_speed=torrent['dlspeed'],
+                qbittorrent_up_speed=torrent['upspeed'],
+                qbittorrent_is_checking=torrent.state_enum.is_checking,
+                qbittorrent_is_complete=torrent.state_enum.is_complete,
+                qbittorrent_is_downloading=torrent.state_enum.is_downloading,
+                qbittorrent_is_errored=torrent.state_enum.is_errored,
+                qbittorrent_is_paused=torrent.state_enum.is_paused,
+                qbittorrent_is_uploading=torrent.state_enum.is_uploading,
+            )
+
+
 @event('plugin.register')
 def register_plugin():
     plugin.register(OutputQBitTorrent, 'qbittorrent', api_ver=2)
+    plugin.register(FromQBitTorrent, 'from_qbittorrent', api_ver=2)
