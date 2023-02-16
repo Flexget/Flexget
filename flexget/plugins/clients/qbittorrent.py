@@ -326,7 +326,6 @@ class OutputQBitTorrent:
 
 
 class FromQBitTorrent:
-
     schema = {
         'type': 'object',
         'properties': {
@@ -338,7 +337,7 @@ class FromQBitTorrent:
             'port': {'type': 'integer'},
         },
         'additionalProperties': False,
-        'required': ['username', 'password', 'host', 'port']
+        'required': ['username', 'password', 'host', 'port'],
     }
 
     @staticmethod
@@ -349,19 +348,14 @@ class FromQBitTorrent:
         try:
             import qbittorrentapi
         except ImportError:
-            raise plugin.DependencyError(
-                issued_by='from_qbittorrent', missing='qbittorrentapi'
-            )
+            raise plugin.DependencyError(issued_by='from_qbittorrent', missing='qbittorrentapi')
 
-        return qbittorrentapi.Client(
-            host=host,
-            port=port,
-            username=username,
-            password=password
-        )
+        return qbittorrentapi.Client(host=host, port=port, username=username, password=password)
 
     def on_task_input(self, task, config):
-        client = self.client(config['host'], int(config['port']), config['username'], config['password'])
+        client = self.client(
+            config['host'], int(config['port']), config['username'], config['password']
+        )
 
         for torrent in client.torrents_info():
             if 'category' in config:
