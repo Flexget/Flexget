@@ -226,6 +226,7 @@ class PluginTransmissionInput(TransmissionBase):
                 'secondsDownloading',
                 'secondsSeeding',
                 'torrentFile',
+                'labels',
             ]:
                 try:
                     value = getattr(torrent, attr)
@@ -317,6 +318,7 @@ class PluginTransmission(TransmissionBase):
                     'skip_files': one_or_more({'type': 'string'}),
                     'rename_like_files': {'type': 'boolean'},
                     'queue_position': {'type': 'integer'},
+                    'labels': {'type': 'array', 'items': {'type': 'string'}},
                 },
                 'additionalProperties': False,
             },
@@ -672,6 +674,7 @@ class PluginTransmission(TransmissionBase):
             'skip_files',
             'rename_like_files',
             'queue_position',
+            'labels',
         ):
             # Values do not merge config with task
             # Task takes priority then config is used
@@ -722,6 +725,9 @@ class PluginTransmission(TransmissionBase):
 
         if 'queue_position' in opt_dic:
             change['queuePosition'] = opt_dic['queue_position']
+
+        if 'labels' in opt_dic:
+            change['labels'] = opt_dic['labels']
 
         post = options['post']
         # set to modify paused status after
