@@ -396,7 +396,7 @@ def task_config_to_sftp_config(config: dict) -> SftpConfig:
     private_key_pass: str = config['private_key_pass']
 
     host_key: Optional[HostKey] = None
-    if 'host_key' in config:
+    if config.get('host_key') is not None:
         host_key = HostKey(config['host_key']['key_type'], config['host_key']['public_key'])
 
     return SftpConfig(host, port, username, password, private_key, private_key_pass, host_key)
