@@ -46,12 +46,17 @@ def on_manager_shutdown(manager):
     if not manager.options.mem_usage:
         return
 
-    import resource
+    try:
+        import resource
+        console(
+            'Resource Module memory usage: %s (kb)'
+            % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+        )
+    except ImportError:
+        console(
+            'Resource Module memory usage:'
+        )
 
-    console(
-        'Resource Module memory usage: %s (kb)'
-        % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
-    )
     global heapy
     console('Heapy module calculating memory usage:')
     console(heapy.heap())
