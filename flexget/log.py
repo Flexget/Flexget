@@ -165,9 +165,14 @@ def start(
     filename: str = None, level: str = 'INFO', to_console: bool = True, to_file: bool = True
 ) -> None:
     """After initialization, start file logging."""
-    global _logging_started
+    global _logging_started, _startup_buffer, _startup_buffer_id
 
     assert _logging_configured
+
+    if _startup_buffer_id:
+        logger.remove(_startup_buffer_id)
+        _startup_buffer_id = None
+
     if _logging_started:
         return
 
@@ -198,12 +203,9 @@ def start(
             logger.add(sys.stdout, level=level, format=LOG_FORMAT, filter=_log_filterer)
 
     # flush what we have stored from the plugin initialization
-    global _startup_buffer, _startup_buffer_id
-    if _startup_buffer_id:
-        logger.remove(_startup_buffer_id)
+    if _startup_buffer:
         for record in _startup_buffer:
             level, message = record['level'].name, record['message']
             logger.patch(lambda r: r.update(record)).log(level, message)
         _startup_buffer = []
-        _startup_buffer_id = None
     _logging_started = True
