@@ -22,8 +22,6 @@ def main(args: Sequence[str] = None):
         try:
             manager = Manager(args)
         except (OSError, ValueError) as e:
-            options = Manager.parse_initial_options(args)
-            log.start(level=options.loglevel, to_file=False)
             if _is_debug():
                 import traceback
 
@@ -35,9 +33,13 @@ def main(args: Sequence[str] = None):
             log.start(
                 manager.log_filename,
                 manager.options.loglevel,
-                to_file=manager.check_ipc_info() is not None,
+                to_file=manager.check_ipc_info() is None,
                 to_console=not manager.options.cron,
             )
+        finally:
+            # If we already ran due to no errors, the extra call to log.start won't do anything
+            options = Manager.parse_initial_options(args)
+            log.start(level=options.loglevel, to_file=False)
 
         try:
             if manager.options.profile:
