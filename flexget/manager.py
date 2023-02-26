@@ -156,6 +156,8 @@ class Manager:
             self.lockfile = os.path.join(self.config_base, f'.test-{self.config_name}-lock')
         self._init_logging()
 
+        manager = self
+
         logger.debug('sys.defaultencoding: {}', sys.getdefaultencoding())
         logger.debug('sys.getfilesystemencoding: {}', sys.getfilesystemencoding())
         logger.debug('flexget detected io encoding: {}', io_encoding)
