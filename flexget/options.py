@@ -17,16 +17,6 @@ _UNSET = object()
 core_parser: Optional['CoreArgumentParser'] = None
 
 
-def unicode_argv() -> List[str]:
-    """Like sys.argv, but decodes all arguments."""
-    args = []
-    for arg in sys.argv:
-        if isinstance(arg, bytes):
-            arg = arg.decode(sys.getfilesystemencoding())
-        args.append(arg)
-    return args
-
-
 def get_parser(command: str = None) -> 'ArgumentParser':
     global core_parser
     if not core_parser:
@@ -283,7 +273,7 @@ class ArgumentParser(ArgParser):
             this attribute name in the root parser's namespace
         """
         # Do this early, so even option processing stuff is caught
-        if '--bugreport' in unicode_argv():
+        if '--bugreport' in sys.argv:
             self._debug_tb_callback()
 
         self.subparsers = None
@@ -369,8 +359,7 @@ class ArgumentParser(ArgParser):
         do_help: bool = None,
     ):
         if args is None:
-            # Decode all arguments to unicode before parsing
-            args = unicode_argv()[1:]
+            args = sys.argv[1:]
         if namespace is None:
             namespace = ScopedNamespace()
         old_do_help = ArgumentParser.do_help
