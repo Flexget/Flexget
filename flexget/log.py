@@ -119,12 +119,10 @@ def remove_filter(func: Callable[['loguru.Record'], bool]):
 @event("manager.initialize")
 @event("manager.execute.started")
 def logging_stats(*args):
-    logger.info(
-        f"{_startup_buffer=} {_startup_buffer_id=} {_logging_started=} {_logging_configured=}"
+    print(
+        f"startup_buffer_id={_startup_buffer_id} logging_started={_logging_started} logging_configured={_logging_configured}"
     )
-    logger.info(
-        f"startup buffer len: {len(_startup_buffer) if _startup_buffer else _startup_buffer}"
-    )
+    print(f"startup buffer len: {len(_startup_buffer) if _startup_buffer else _startup_buffer}")
 
 
 def initialize(unit_test: bool = False) -> None:
@@ -157,7 +155,7 @@ def initialize(unit_test: bool = False) -> None:
     _startup_buffer_id = logger.add(
         lambda message: _startup_buffer.append(message.record), level='DEBUG', format=LOG_FORMAT
     )
-    logger.bind(startup=True).info("Added startup buffer handler.")
+    print(f"Added startup buffer handler. {_startup_buffer_id}")
 
     # Add a handler that sores the last 100 debug lines to `debug_buffer` for use in crash reports
     logger.add(
@@ -210,7 +208,7 @@ def start(
             logger.add(sys.stdout, level=level, format=LOG_FORMAT, filter=_log_filterer)
 
     if _startup_buffer_id:
-        logger.info("Removing startup buffer handler.")
+        print(f"Removing startup buffer handler. {_startup_buffer_id}")
         logger.remove(_startup_buffer_id)
         _startup_buffer_id = None
 
