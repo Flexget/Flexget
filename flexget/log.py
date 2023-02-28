@@ -1,8 +1,6 @@
-import codecs
 import collections
 import contextlib
 import functools
-import io
 import logging
 import logging.handlers
 import os
@@ -12,11 +10,12 @@ import uuid
 import warnings
 from typing import Callable, Deque, Iterator, List, Optional, Union
 
-import colorama
 import loguru
 from loguru import logger
 
+import flexget
 from flexget import __version__
+from flexget.event import event
 from flexget.utils.tools import io_encoding
 
 # A level more detailed than INFO
@@ -117,6 +116,17 @@ def remove_filter(func: Callable[['loguru.Record'], bool]):
     _log_filters.remove(func)
 
 
+@event("manager.initialize")
+@event("manager.execute.started")
+def logging_stats(*args):
+    logger.info(
+        f"{_startup_buffer=} {_startup_buffer_id=} {_logging_started=} {_logging_configured=}"
+    )
+    logger.info(
+        f"startup buffer len: {len(_startup_buffer) if _startup_buffer else _startup_buffer}"
+    )
+
+
 def initialize(unit_test: bool = False) -> None:
     """Prepare logging."""
     # Remove default loguru sinks
@@ -147,6 +157,7 @@ def initialize(unit_test: bool = False) -> None:
     _startup_buffer_id = logger.add(
         lambda message: _startup_buffer.append(message.record), level='DEBUG', format=LOG_FORMAT
     )
+    logger.bind(startup=True).info("Added startup buffer handler.")
 
     # Add a handler that sores the last 100 debug lines to `debug_buffer` for use in crash reports
     logger.add(
@@ -168,10 +179,6 @@ def start(
     global _logging_started, _startup_buffer, _startup_buffer_id
 
     assert _logging_configured
-
-    if _startup_buffer_id:
-        logger.remove(_startup_buffer_id)
-        _startup_buffer_id = None
 
     if _logging_started:
         return
@@ -201,6 +208,11 @@ def start(
             # Make sure we don't send any characters that the current terminal doesn't support printing
             sys.stdout.reconfigure(errors='replace')
             logger.add(sys.stdout, level=level, format=LOG_FORMAT, filter=_log_filterer)
+
+    if _startup_buffer_id:
+        logger.info("Removing startup buffer handler.")
+        logger.remove(_startup_buffer_id)
+        _startup_buffer_id = None
 
     # flush what we have stored from the plugin initialization
     if _startup_buffer:
