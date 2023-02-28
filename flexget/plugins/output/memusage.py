@@ -48,14 +48,13 @@ def on_manager_shutdown(manager):
 
     try:
         import resource
+
         console(
             'Resource Module memory usage: %s (kb)'
             % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
         )
     except ImportError:
-        console(
-            'Resource Module memory usage:'
-        )
+        console('Resource Module memory usage:')
 
     global heapy
     console('Heapy module calculating memory usage:')
