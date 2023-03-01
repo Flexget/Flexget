@@ -46,13 +46,7 @@ import flexget.log  # noqa
 from flexget import config_schema, db_schema, plugin  # noqa
 from flexget.event import fire_event  # noqa
 from flexget.ipc import IPCClient, IPCServer  # noqa
-from flexget.options import (  # noqa
-    CoreArgumentParser,
-    ParserError,
-    get_parser,
-    manager_parser,
-    unicode_argv,
-)
+from flexget.options import CoreArgumentParser, ParserError, get_parser, manager_parser  # noqa
 from flexget.task import Task  # noqa
 from flexget.task_queue import TaskQueue  # noqa
 from flexget.terminal import console, get_console_output  # noqa
@@ -124,7 +118,7 @@ class Manager:
     unit_test = False
     options: argparse.Namespace
 
-    def __init__(self, args: Optional[List[str]]) -> None:
+    def __init__(self, args: List[str]) -> None:
         """
         :param args: CLI args
         """
@@ -134,9 +128,6 @@ class Manager:
         elif manager:
             logger.info('last manager was not torn down correctly')
 
-        if args is None:
-            # Decode all arguments to unicode before parsing
-            args = unicode_argv()[1:]
         self.args = args
         self.autoreload_config = False
         self.config_file_hash: Optional[str] = None
@@ -158,12 +149,12 @@ class Manager:
 
         self.config: Dict = {}
 
-        self.options = self._init_options(self.args)
-        try:
-            self._init_config(create=False)
-        except Exception:
-            flexget.log.start(level=self.options.loglevel, to_file=False)
-            raise
+        self.options = self.parse_initial_options(args)
+        self._init_config(create=False)
+        # When we are in test mode, we use a different lock file and db
+        if self.options.test:
+            self.lockfile = os.path.join(self.config_base, f'.test-{self.config_name}-lock')
+        self._init_logging()
 
         manager = self
 
@@ -187,8 +178,8 @@ class Manager:
         tray_icon.add_menu_separator(index=4)
 
     @staticmethod
-    def _init_options(args: List[str]) -> argparse.Namespace:
-        """Initialize argument parsing"""
+    def parse_initial_options(args: List[str]) -> argparse.Namespace:
+        """Parse what we can from cli args before plugins are loaded."""
         try:
             options = CoreArgumentParser().parse_known_args(args, do_help=False)[0]
         except ParserError as exc:
@@ -202,16 +193,13 @@ class Manager:
                 sys.exit(1)
         return options
 
-    def _init_logging(self, to_file: bool = True) -> None:
-        """Initialize logging facilities"""
+    def _init_logging(self) -> None:
+        """Initialize logging variables"""
         log_file = os.path.expanduser(self.options.logfile)
         # If an absolute path is not specified, use the config directory.
         if not os.path.isabs(log_file):
             log_file = os.path.join(self.config_base, log_file)
         self.log_filename = log_file
-        flexget.log.start(
-            log_file, self.options.loglevel, to_file=to_file, to_console=not self.options.cron
-        )
 
     def initialize(self) -> None:
         """
@@ -342,14 +330,10 @@ class Manager:
         and results will be streamed back.
         If not, this will attempt to obtain a lock, initialize the manager, and run the command here.
         """
-        # When we are in test mode, we use a different lock file and db
-        if self.options.test:
-            self.lockfile = os.path.join(self.config_base, f'.test-{self.config_name}-lock')
         # If another process is started, send the execution to the running process
         ipc_info = self.check_ipc_info()
         # If we are connecting to a running daemon, we don't want to log to the log file,
         # the daemon is already handling that.
-        self._init_logging(to_file=not ipc_info)
         if ipc_info:
             console(
                 'There is a FlexGet process already running for this config, sending execution there.'
