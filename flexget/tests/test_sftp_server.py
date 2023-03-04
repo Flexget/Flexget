@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 import os
 import socket
+import stat
 import threading
 import time
 from logging import Logger
@@ -178,9 +179,9 @@ class TestSFTPFileSystem:
         canonicalized: Path
         if Path(path).is_absolute():
             path = path[1:]
-            canonicalized = (self.__root / path).resolve()
+            canonicalized = (self.__root / path).absolute()
         else:
-            canonicalized = ((self.__cwd or self.__home) / path).resolve()
+            canonicalized = ((self.__cwd or self.__home) / path).absolute()
 
         if self.__root == canonicalized or self.__root in canonicalized.parents:
             return canonicalized
