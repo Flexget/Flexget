@@ -107,8 +107,15 @@ class SftpClient:
 
         for directory in directories:
             try:
+                # Always normalize the root path so it's not necessary to normalised
+                # nodes as there are discovered, which means that symlinks will appear
+                # in the entry paths raw rather than been resolved to their target.
                 self._sftp.walktree(
-                    directory, file_handler, dir_handler, unknown_handler, recursive
+                    self._sftp.normalize(directory),
+                    file_handler,
+                    dir_handler,
+                    unknown_handler,
+                    recursive,
                 )
             except OSError as e:
                 logger.warning('Failed to open {} ({})', directory, str(e))
@@ -572,7 +579,7 @@ class Handlers:
         private_key_pass: Optional[str],
         host_key: Optional[HostKey],
     ) -> Entry:
-        url = urljoin(prefix, quote(sftp.normalize(path)))
+        url = urljoin(prefix, quote(path))
         title = PurePosixPath(path).name
 
         entry = Entry(title, url)

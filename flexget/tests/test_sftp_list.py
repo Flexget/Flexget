@@ -201,7 +201,24 @@ class TestSftpList:
 
         assert_entries(
             execute_task('sftp_list'),
-            {'title': 'file.mkv', 'url': 'sftp://test_user:test_pass@127.0.0.1:40022/target.mkv'},
+            {
+                'title': 'file.mkv',
+                'url': 'sftp://test_user:test_pass@127.0.0.1:40022/home/test_user/file.mkv',
+            },
+        )
+        
+    def test_sftp_list_symlink_dir(
+        self, execute_task: Callable[..., Task], sftp_fs: TestSFTPFileSystem
+    ):
+        sftp_fs.create_symlink('dir', sftp_fs.create_dir('/target_dir'))
+        sftp_fs.create_file('/target_dir/file.mkv')
+
+        assert_entries(
+            execute_task('sftp_list_recursive_true'),
+            {
+                'title': 'file.mkv',
+                'url': 'sftp://test_user:test_pass@127.0.0.1:40022/home/test_user/dir/file.mkv',
+            },
         )
 
     def test_sftp_list_uses_private_key_auth(
