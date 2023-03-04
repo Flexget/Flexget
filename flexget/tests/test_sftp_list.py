@@ -206,7 +206,7 @@ class TestSftpList:
                 'url': 'sftp://test_user:test_pass@127.0.0.1:40022/home/test_user/file.mkv',
             },
         )
-        
+
     def test_sftp_list_symlink_dir(
         self, execute_task: Callable[..., Task], sftp_fs: TestSFTPFileSystem
     ):
