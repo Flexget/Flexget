@@ -1,5 +1,6 @@
 import importlib
 import logging
+import os
 import time
 from base64 import b64decode
 from dataclasses import dataclass
@@ -7,7 +8,6 @@ from functools import partial
 from pathlib import Path, PurePath, PurePosixPath
 from typing import Callable, List, Optional
 from urllib.parse import quote, urljoin
-import os
 
 from loguru import logger
 
@@ -24,8 +24,8 @@ HOST_KEY_TYPES: dict = {
 }
 
 try:
-    import pysftp
     import paramiko
+    import pysftp
 
     logging.getLogger("paramiko").setLevel(logging.ERROR)
 except ImportError:
@@ -34,6 +34,7 @@ except ImportError:
 NodeHandler = Callable[[str], None]
 
 logger = logger.bind(name='sftp_client')
+
 
 def _set_authentication_patch(self, password, private_key, private_key_pass):
     """
@@ -61,11 +62,13 @@ def _set_authentication_patch(self, password, private_key, private_key_pass):
             for key in [paramiko.RSAKey, paramiko.DSSKey, paramiko.Ed25519Key, paramiko.ECDSAKey]:
                 try:  # try all the keys
                     self._tconnect['pkey'] = key.from_private_key_file(
-                        private_key_file, private_key_pass)
+                        private_key_file, private_key_pass
+                    )
                     return
-                except paramiko.SSHException:   # if it fails, try dss
+                except paramiko.SSHException:  # if it fails, try dss
                     pass
             raise paramiko.SSHException(f'Unknown key type: {private_key}')
+
 
 @dataclass
 class HostKey:
