@@ -71,6 +71,7 @@ class TransmissionBase:
                 path=path,
                 username=user,
                 password=password,
+                timeout=30,
             )
         except TransmissionError as e:
             if e.original and e.original.code == 401:
@@ -420,16 +421,12 @@ class PluginTransmission(TransmissionBase):
                 try:
                     if downloaded:
                         torrent_info = client.add_torrent(
-                            pathlib.Path(entry['file']).read_bytes(),
-                            timeout=30,
-                            **options['add'],
+                            pathlib.Path(entry['file']).read_bytes(), **options['add']
                         )
                     else:
                         if options['post'].get('magnetization_timeout', 0) > 0:
                             options['add']['paused'] = False
-                        torrent_info = client.add_torrent(
-                            entry['url'], timeout=30, **options['add']
-                        )
+                        torrent_info = client.add_torrent(entry['url'], **options['add'])
                 except TransmissionError as e:
                     logger.opt(exception=True).debug('TransmissionError')
                     logger.debug('Failed options dict: {}', options['add'])
@@ -616,7 +613,7 @@ class PluginTransmission(TransmissionBase):
 
                 # Set any changed file properties
                 if list(options['change'].keys()):
-                    client.change_torrent(torrent_info.id, 30, **options['change'])
+                    client.change_torrent(torrent_info.id, **options['change'])
 
                 start_torrent = partial(client.start_torrent, [torrent_info.id])
 
