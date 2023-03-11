@@ -836,7 +836,7 @@ class PluginTransmissionClean(TransmissionBase):
 
         remove_ids = []
         for torrent in client.get_torrents():
-            logger.verbose(
+            logger.trace(
                 'Torrent "{}": status: "{}" - ratio: {} - date added: {}',
                 torrent.name,
                 torrent.status,
@@ -858,9 +858,7 @@ class PluginTransmissionClean(TransmissionBase):
                 started_seeding = max(torrent.added_date, torrent.done_date)
                 if started_seeding + parse_timedelta(config['finished_for']) > datetime.now():
                     continue
-            tracker_hosts = (
-                urlparse(tracker['announce']).hostname for tracker in torrent.trackers
-            )
+            tracker_hosts = [urlparse(tracker.announce).hostname for tracker in torrent.trackers]
             if 'tracker' in config:
                 if not any(tracker_re.search(tracker) for tracker in tracker_hosts):
                     continue
