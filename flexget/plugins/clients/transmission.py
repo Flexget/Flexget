@@ -419,8 +419,7 @@ class PluginTransmission(TransmissionBase):
                 try:
                     if downloaded:
                         with open(entry['file'], 'rb') as f:
-                            filedump = base64.b64encode(f.read()).decode('utf-8')
-                        torrent_info = client.add_torrent(filedump, 30, **options['add'])
+                            torrent_info = client.add_torrent(f, 30, **options['add'])
                     else:
                         if options['post'].get('magnetization_timeout', 0) > 0:
                             options['add']['paused'] = False
