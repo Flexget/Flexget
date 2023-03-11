@@ -1,5 +1,6 @@
 import base64
 import os
+import pathlib
 import re
 from datetime import datetime, timedelta
 from fnmatch import fnmatch
@@ -418,8 +419,11 @@ class PluginTransmission(TransmissionBase):
 
                 try:
                     if downloaded:
-                        with open(entry['file'], 'rb') as f:
-                            torrent_info = client.add_torrent(f, 30, **options['add'])
+                        torrent_info = client.add_torrent(
+                            pathlib.Path(entry['file']).read_bytes(),
+                            timeout=30,
+                            **options['add'],
+                        )
                     else:
                         if options['post'].get('magnetization_timeout', 0) > 0:
                             options['add']['paused'] = False
