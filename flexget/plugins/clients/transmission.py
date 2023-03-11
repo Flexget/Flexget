@@ -431,7 +431,7 @@ class PluginTransmission(TransmissionBase):
             else:
                 # Torrent already loaded in transmission
                 if options['add'].get('download_dir'):
-                    logger.verbose(
+                    logger.trace(
                         'Moving {} to "{}"', torrent_info.name, options['add']['download_dir']
                     )
                     # Move data even if current reported torrent location matches new location
