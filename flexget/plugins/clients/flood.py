@@ -62,8 +62,7 @@ class FloodClient:
             return False
 
         try:
-            decoded_jwt = decode(jwt, algorithms="HS256", options={
-                                 "verify_signature": False})
+            decoded_jwt = decode(jwt, algorithms="HS256", options={"verify_signature": False})
         except:
             return False
 
@@ -81,14 +80,12 @@ class FloodClient:
             config,
             "post",
             "api/auth/authenticate",
-            json={"username": config["username"],
-                  "password": config["password"]},
+            json={"username": config["username"], "password": config["password"]},
         )
 
         # Check if the JWT token is expired or unset.
         if not FloodClient.is_jwt_valid(task):
-            raise PluginError(
-                "Failed to authenticate with Flood. No valid JWT was found.")
+            raise PluginError("Failed to authenticate with Flood. No valid JWT was found.")
 
         logger.debug("Successfully authenticated with Flood.")
 
@@ -152,8 +149,7 @@ class FloodClient:
             data["tags"] = tags
 
         # Attempt to add the torrent URLs to Flood.
-        response = FloodClient.request(
-            task, config, "post", "api/torrents/add-urls", json=data)
+        response = FloodClient.request(task, config, "post", "api/torrents/add-urls", json=data)
 
         # Check if the number of hashes returned by Flood matches the number of URLs.
         if len(response.json()) != len(urls):
@@ -191,8 +187,7 @@ class FloodClient:
             data["tags"] = tags
 
         # Attempt to add the torrent files to Flood.
-        response = FloodClient.request(
-            task, config, "post", "api/torrents/add-files", json=data)
+        response = FloodClient.request(task, config, "post", "api/torrents/add-files", json=data)
 
         # Check if the number of hashes returned by Flood matches the number of files.
         if len(response.json()) != len(files):
@@ -213,8 +208,7 @@ class FloodClient:
             raise PluginError("Not authenticated with Flood.")
 
         # Attempt to list the torrent contents in Flood.
-        response = FloodClient.request(
-            task, config, "get", f"api/torrents/{hash}/contents")
+        response = FloodClient.request(task, config, "get", f"api/torrents/{hash}/contents")
 
         data = response.json()
 
@@ -257,8 +251,7 @@ class FloodClient:
         if not FloodClient.is_jwt_valid(task):
             raise PluginError("Not authenticated with Flood.")
 
-        FloodClient.request(task, config, "post",
-                            "api/torrents/start", json={"hashes": hashes})
+        FloodClient.request(task, config, "post", "api/torrents/start", json={"hashes": hashes})
         logger.debug(f"Successfully started torrents in Flood.")
 
     @staticmethod
@@ -273,8 +266,7 @@ class FloodClient:
         if not FloodClient.is_jwt_valid(task):
             raise PluginError("Not authenticated with Flood.")
 
-        FloodClient.request(task, config, "post",
-                            "api/torrents/stop", json={"hashes": hashes})
+        FloodClient.request(task, config, "post", "api/torrents/stop", json={"hashes": hashes})
         logger.debug(f"Successfully stopped torrents in Flood.")
 
     @staticmethod
@@ -339,8 +331,7 @@ class InputFlood:
 
     def on_task_input(self, task: Task, config: dict):
         if not FloodClient.is_jwt_valid(task):
-            logger.debug(
-                "'jwt' cookie is invalid. Re-authenticating with Flood.")
+            logger.debug("'jwt' cookie is invalid. Re-authenticating with Flood.")
             FloodClient.authenticate(task, config)
 
         entries = []
@@ -394,11 +385,9 @@ class OutputFlood:
             self._add_entry(task, config, entry)
         elif 'flood_hash' in entry:
             if config['action'] == 'remove':
-                FloodClient.delete_torrents(
-                    task, config, [entry['flood_hash']], False)
+                FloodClient.delete_torrents(task, config, [entry['flood_hash']], False)
             elif config['action'] == 'delete':
-                FloodClient.delete_torrents(
-                    task, config, [entry['flood_hash']], True)
+                FloodClient.delete_torrents(task, config, [entry['flood_hash']], True)
             elif config['action'] == 'start':
                 FloodClient.start_torrents(task, config, [entry['flood_hash']])
             elif config['action'] == 'stop':
@@ -436,8 +425,7 @@ class OutputFlood:
         """
 
         try:
-            FloodClient.add_torrent_urls(
-                task, config, [entry['url']], destination, tags, start)
+            FloodClient.add_torrent_urls(task, config, [entry['url']], destination, tags, start)
         except PluginError as e:
             return entry.fail(e)
 
@@ -450,8 +438,7 @@ class OutputFlood:
         if not FloodClient.is_jwt_valid(task):
             raise PluginError("Not authenticated with Flood.")
 
-        destination: str = entry.render(
-            entry.get('path', config.get('path', '')))
+        destination: str = entry.render(entry.get('path', config.get('path', '')))
         # Combines the tags from the entry and the config.
         # The tags from the entry will be prioritized.
         tags: list = entry.get('tags', []) + [
@@ -499,8 +486,7 @@ class OutputFlood:
             return entry.fail('No path found for entry or config')
 
         try:
-            FloodClient.download_torrent_contents(
-                task, config, entry['flood_hash'], path)
+            FloodClient.download_torrent_contents(task, config, entry['flood_hash'], path)
         except PluginError as e:
             entry.fail(e)
 
@@ -523,8 +509,7 @@ class OutputFlood:
         """
 
         if not imported:
-            raise DependencyError(
-                'pyjwt', 'pyjwt', 'pyjwt is required for this plugin')
+            raise DependencyError('pyjwt', 'pyjwt', 'pyjwt is required for this plugin')
 
         # Don't do anything if no config provided
         if not isinstance(config, dict):
@@ -532,8 +517,7 @@ class OutputFlood:
 
         # Authenticate with Flood if not already authenticated.
         if not FloodClient.is_jwt_valid(task):
-            logger.debug(
-                "'jwt' cookie is invalid. Re-authenticating with Flood.")
+            logger.debug("'jwt' cookie is invalid. Re-authenticating with Flood.")
             FloodClient.authenticate(task, config)
 
         # Process entries
