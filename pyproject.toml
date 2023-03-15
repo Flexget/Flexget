@@ -1,0 +1,152 @@
+## Build settings
+[project]
+name = "FlexGet"
+description = """\
+    FlexGet is a program aimed to automate downloading or processing content (torrents, podcasts, etc.) from \
+    different sources like RSS-feeds, html-pages, various sites and more.\
+"""
+readme = "README.rst"
+requires-python = ">=3.7"
+authors = [
+    { name = "Marko Koivusalo", email = "marko.koivusalo@gmail.com" },
+    { name = "Chase Sterling", email = "chase.sterling@gmail.com" },
+]
+license = { file = "LICENSE" }
+dynamic = ["version", "dependencies"]
+
+[project.urls]
+"Homepage" = "https://flexget.com"
+"Issue Tracker" = "https://github.com/Flexget/Flexget/issues"
+"Repository" = "https://github.com/Flexget/Flexget"
+"Forum" = "https://github.com/Flexget/Flexget/discussions"
+
+[project.scripts]
+flexget = "flexget:main"
+
+[project.gui-scripts]
+flexget-headless = "flexget:main"  # This is useful on Windows to avoid a cmd popup
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+namespaces = true
+include = ["flexget*"]
+exclude = ["flexget.tests*"]
+
+[tool.setuptools.package-data]
+# Everything in our package directory should go in the dist
+"*" = ["*.*"]
+
+[tool.setuptools.dynamic]
+version = {attr = "flexget._version.__version__"}
+dependencies = {file = "requirements.txt"}
+
+
+## Dependency settings
+# Poetry is only being used for dependency managment. The other metadata in this section is not used, and just
+# here to fulfil poetry's requirements.
+[tool.poetry]
+name = "flexget"
+version = "0.0.0"
+description = ""
+authors = []
+
+[tool.poetry.dependencies]
+python = "^3.7"
+apscheduler = ">=3.2.0"
+beautifulsoup4 = ">=4.5"
+colorama = ">=0.4.4"
+feedparser = ">=6.0.2"
+guessit = ">=3.4,<4.0"
+html5lib = ">=0.11"
+jinja2 = ">=3.0,<4.0"
+jsonschema = ">=2.0"
+loguru = ">=0.4.1"
+psutil = ">=5.8.0"
+pynzb = "^0.1.0"
+pyrss2gen = "^1.1"
+python-dateutil = "^2.8.2"
+pyyaml = ">=4.2b1"
+rebulk = ">=2.0.0"
+requests = ">=2.20.0"
+rich = ">=9.0.0"
+rpyc = ">=5.0,!=5.2.*,!=5.3.0"  # 5.2.1-5.3.0 cause a hang https://github.com/Flexget/Flexget/issues/3601
+sqlalchemy = ">=1.3.10,<1.999"
+# WebUI/API Deps
+cherrypy = ">=18.0.0"
+flask-compress = ">=1.2.1"
+flask-cors = ">=2.1.2"
+flask-login = ">=0.4.0"
+flask-restful = ">=0.3.3"
+flask-restx = ">=0.5.1"
+flask = ">=0.7"
+packaging = ">=21.3"
+pyparsing = ">=2.4.7"
+werkzeug = ">=2.2.3"
+zxcvbn-python = "^4.4.24"
+
+[tool.poetry.group.dev.dependencies]
+black = ">=18.9b0"
+build = ">=0.9.0"
+click = ">=8.1.3"
+codacy-coverage = ">=1.2.18"
+coverage = ">=6.0"
+gitpython = ">=3.1.18"
+isort = ">=5.5.1"
+pre-commit = ">=2.9.0"
+pylint = ">=2.6.0"
+pytest-cov = ">=3.0.0"
+pytest-runner = "^6.0.0"
+pytest-xdist = ">=2.4.0"
+pytest = ">=6.2.4"
+sphinx = ">=5.0.0"
+sqlalchemy-stubs = "^0.4"
+twine = ">=3.6.0"
+vcrpy = ">=4.1.1"
+
+[tool.poetry.group.plugin-test.dependencies]
+# These are optional dependencies for plugins that have tests in the test suite
+boto3 = ">=1.24.89"
+plexapi = ">=4.13.1"
+subliminal = ">= 2.0rc1"
+
+
+[tool.poetry.group.plugin-tests.dependencies]
+pysftp = "^0.2.9"
+
+[tool.poetry.scripts]
+flexget = 'flexget:main'
+
+
+## Other tool settings
+
+[tool.pytest.ini_options]
+testpaths = ["flexget/tests"]
+
+[tool.black]
+line-length = 99
+skip-string-normalization = true
+target-version = ['py36', 'py37', 'py38', 'py39', 'py310']
+# Only include files in /flexget/, or directly in project root
+include = '^/(flexget/.*)?[^/]*\.pyi?$'
+exclude = '''
+(
+  /(
+      \.git
+    | \.venv
+    | \.idea
+    | dist
+    | flexget/ui
+  )/
+)
+'''
+
+[tool.isort]
+profile = 'black'
+line_length = 99
+known_first_party = ['flexget']
+
+[tool.mypy]
+plugins = ["sqlmypy"]

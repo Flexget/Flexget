@@ -1,12 +1,9 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
+from flexget.components.managed_lists.lists.entry_list.db import EntryListEntry, EntryListList
 from flexget.entry import Entry
 from flexget.manager import Session
-from flexget.plugins.list.entry_list import EntryListList, EntryListEntry
 
 
-class TestEntryListSearch(object):
+class TestEntryListSearch:
     config = """
             tasks:
               entry_list_discover:
@@ -65,3 +62,27 @@ class TestEntryListSearch(object):
 
         task = execute_task('entry_list_with_series')
         assert task.find_entry('accepted', title='foo.s01e01.720p.hdtv-flexget')
+
+
+class TestEntryListQuality:
+    config = """
+        templates:
+          global:
+            disable: seen
+        tasks:
+          verify_quality_1:
+            mock:
+            - title: foo.bar.720p.hdtv-Flexget
+            accept_all: yes
+            list_add:
+            - entry_list: qual
+          verify_quality_2:
+            disable: builtins
+            entry_list: qual
+    """
+
+    def test_quality_in_entry_list(self, execute_task):
+        execute_task('verify_quality_1')
+        task = execute_task('verify_quality_2')
+        entry = task.find_entry(title='foo.bar.720p.hdtv-Flexget')
+        assert entry['quality'] == '720p hdtv'

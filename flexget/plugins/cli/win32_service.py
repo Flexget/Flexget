@@ -1,18 +1,16 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import argparse
-import logging
 import os
 import socket
 import sys
+
+from loguru import logger
 
 import flexget
 from flexget import options
 from flexget.event import event
 from flexget.terminal import console
 
-log = logging.getLogger('win32_service')
+logger = logger.bind(name='win32_service')
 
 try:
     import servicemanager
@@ -34,13 +32,16 @@ try:
         def SvcStop(self):
             self.ReportServiceStatus(win32service.SERVICE_STOP_PENDING)
             from flexget.manager import manager
+
             manager.shutdown(finish_queue=False)
             self.ReportServiceStatus(win32service.SERVICE_STOPPED)
 
         def SvcDoRun(self):
-            servicemanager.LogMsg(servicemanager.EVENTLOG_INFORMATION_TYPE,
-                                  servicemanager.PYS_SERVICE_STARTED,
-                                  (self._svc_name_, ''))
+            servicemanager.LogMsg(
+                servicemanager.EVENTLOG_INFORMATION_TYPE,
+                servicemanager.PYS_SERVICE_STARTED,
+                (self._svc_name_, ''),
+            )
 
             flexget.main(['daemon', 'start'])
 
@@ -56,8 +57,10 @@ def do_cli(manager, options):
         # We are in a virtualenv, there is some special setup
         if not os.path.exists(os.path.join(sys.prefix, 'python.exe')):
             console('Creating a hard link to virtualenv python.exe in root of virtualenv')
-            win32file.CreateHardLink(os.path.join(sys.prefix, 'python.exe'),
-                                     os.path.join(sys.prefix, 'Scripts', 'python.exe'))
+            win32file.CreateHardLink(
+                os.path.join(sys.prefix, 'python.exe'),
+                os.path.join(sys.prefix, 'Scripts', 'python.exe'),
+            )
 
     argv = options.args
     if options.help:
@@ -73,7 +76,10 @@ def register_parser_arguments():
     if not sys.platform.startswith('win'):
         return
     # Still not fully working. Hidden for now.
-    parser = options.register_command('service', do_cli,  # help='set up or control a windows service for the daemon',
-                                      add_help=False)
+    parser = options.register_command(
+        'service',
+        do_cli,  # help='set up or control a windows service for the daemon',
+        add_help=False,
+    )
     parser.add_argument('--help', '-h', action='store_true')
     parser.add_argument('args', nargs=argparse.REMAINDER)

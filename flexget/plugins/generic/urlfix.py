@@ -1,29 +1,28 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 from flexget.utils.log import log_once
 
-log = logging.getLogger('urlfix')
+logger = logger.bind(name='urlfix')
 
 
-class UrlFix(object):
+class UrlFix:
     """
     Automatically fix broken urls.
     """
 
     schema = {'type': 'boolean'}
 
-    @plugin.priority(-255)
+    @plugin.priority(plugin.PRIORITY_LAST)
     def on_task_input(self, task, config):
         if config is False:
             return
         for entry in task.entries:
             if '&amp;' in entry['url']:
-                log_once('Corrected `%s` url (replaced &amp; with &)' % entry['title'], logger=log)
+                log_once(
+                    'Corrected `%s` url (replaced &amp; with &)' % entry['title'], logger=logger
+                )
                 entry['url'] = entry['url'].replace('&amp;', '&')
 
 

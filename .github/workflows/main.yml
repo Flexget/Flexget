@@ -1,0 +1,63 @@
+name: Main Workflow
+
+on:
+  push:
+    branches:
+    - develop
+  pull_request:
+    branches:
+    - "*"
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    name: Run Tests
+    runs-on: ${{ matrix.operating-system }}
+    strategy:
+      matrix:
+        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11"]
+        operating-system: [ubuntu-latest] # TODO: Fix a couple tests and enable windows. windows-latest
+      fail-fast: false
+    env:
+      POETRY_VERSION: "1.2.2"
+    steps:
+    - uses: actions/checkout@v3
+    # Can we cache the apt-get stuff somehow?
+    - name: Install unrar  # used by some flexget tests
+      if: matrix.operating-system == 'ubuntu-latest'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -qy unrar
+    # There is some poetry caching built in to setup-python, but there seems to be some confusion
+    # about whether it works well when using a matrix of different python versions. Doing caching
+    # manually for now, until there is more info.
+    - name: Set up Python ${{ matrix.python-version }}
+      id: setup-python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: cache poetry install
+      uses: actions/cache@v3
+      with:
+        path: ~/.local
+        key: poetry-${{ matrix.python-version }}-${{ env.POETRY_VERSION }}-0  # increment last number to reset cache
+    - uses: snok/install-poetry@v1
+      with:
+        version: ${{ env.POETRY_VERSION }}
+        virtualenvs-create: true
+        virtualenvs-in-project: true
+    - name: Load cached venv
+      id: cached-poetry-dependencies
+      uses: actions/cache@v3
+      with:
+        path: .venv
+        key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
+    - name: Install dependencies
+      if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+      run: poetry install --no-interaction --no-root
+    - name: Install project
+      run: poetry install --no-interaction
+    - name: Test with pytest
+      run: |
+        poetry run pytest -n auto

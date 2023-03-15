@@ -1,21 +1,19 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import codecs
-import re
-import logging
 import os
+import re
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.cached_input import cached
 
-log = logging.getLogger('regexp_parse')
+logger = logger.bind(name='regexp_parse')
 
 
-class RegexpParse(object):
-    """This plugin is designed to take input from a web resource or a file.
+class RegexpParse:
+    r"""This plugin is designed to take input from a web resource or a file.
     It then parses the text via regexps supplied in the config file.
 
     source: is a file or url to get the data from. You can specify a username:password
@@ -43,6 +41,7 @@ class RegexpParse(object):
 
     regexp_parse:
       source: http://username:password@ezrss.it/feed/
+      encoding: "utf-8"
       sections:
         - {regexp: "(?<=<item>).*?(?=</item>)", flags: "DOTALL,IGNORECASE"}
 
@@ -55,7 +54,7 @@ class RegexpParse(object):
             - {regexp: "magnet:.*?(?=])"}
         custom_field:
           regexps:
-            - {regexp: "custom regexps", flags: "comma seperated list of flags (see python regex docs)"}
+            - {regexp: "custom regexps", flags: "comma separated list of flags (see python regex docs)"}
           required: False
         custom_field2:
           regexps:
@@ -64,64 +63,73 @@ class RegexpParse(object):
     """
 
     # dict used to convert string values of regexp flags to int
-    FLAG_VALUES = {'DEBUG': re.DEBUG,
-                   'I': re.I,
-                   'IGNORECASE': re.IGNORECASE,
-                   'L': re.L,
-                   'LOCALE': re.LOCALE,
-                   'M': re.M,
-                   'MULTILINE': re.MULTILINE,
-                   'S': re.S,
-                   'DOTALL': re.DOTALL,
-                   'U': re.U,
-                   'UNICODE': re.UNICODE,
-                   'X': re.X,
-                   'VERBOSE': re.VERBOSE
-                   }
+    FLAG_VALUES = {
+        'DEBUG': re.DEBUG,
+        'I': re.I,
+        'IGNORECASE': re.IGNORECASE,
+        'L': re.L,
+        'LOCALE': re.LOCALE,
+        'M': re.M,
+        'MULTILINE': re.MULTILINE,
+        'S': re.S,
+        'DOTALL': re.DOTALL,
+        'U': re.U,
+        'UNICODE': re.UNICODE,
+        'X': re.X,
+        'VERBOSE': re.VERBOSE,
+    }
+
+    FLAG_REGEX = r'^(\s?({})\s?(,|$))+$'.format('|'.join(FLAG_VALUES))
+
+    schema = {
+        'definitions': {
+            'regex_list': {
+                'type': 'array',
+                'items': {
+                    'type': 'object',
+                    'properties': {
+                        'regexp': {'type': 'string', 'format': 'regex'},
+                        'flags': {
+                            'type': 'string',
+                            'pattern': FLAG_REGEX,
+                            'error_pattern': 'Must be a comma separated list of flags. See python regex docs.',
+                        },
+                    },
+                    'required': ['regexp'],
+                    'additionalProperties': False,
+                },
+            }
+        },
+        'type': 'object',
+        'properties': {
+            'source': {
+                'anyOf': [
+                    {'type': 'string', 'format': 'url'},
+                    {'type': 'string', 'format': 'file'},
+                ]
+            },
+            'encoding': {'type': 'string'},
+            'sections': {'$ref': '#/definitions/regex_list'},
+            'keys': {
+                'type': 'object',
+                'additionalProperties': {
+                    'type': 'object',
+                    'properties': {
+                        'required': {'type': 'boolean'},
+                        'regexps': {'$ref': '#/definitions/regex_list'},
+                    },
+                    'required': ['regexps'],
+                    'additionalProperties': False,
+                },
+                'required': ['title', 'url'],
+            },
+        },
+        'required': ['source', 'keys'],
+        'additionalProperties': False,
+    }
 
     def __init__(self):
         self.required = []
-
-    def validator(self):
-        from flexget import validator
-        root = validator.factory('dict')
-
-        root.accept('url', key='source', required=True)
-        root.accept('file', key='source', required=True)
-
-        # sections to divied source into
-        sections_regexp_lists = root.accept('list', key='sections')
-        section_regexp_list = sections_regexp_lists.accept('dict', required=True)
-        section_regexp_list.accept('regexp', key='regexp', required=True)
-        section_regexp_list.accept('text', key='flags')
-
-        keys = root.accept('dict', key='keys', required=True)
-
-        # required key need to specify for validator
-        title = keys.accept('dict', key='title', required=True)
-        title.accept('boolean', key='required')
-        regexp_list = title.accept('list', key='regexps', required=True)
-        regexp = regexp_list.accept('dict', required=True)
-        regexp.accept('regexp', key='regexp', required=True)
-        regexp.accept('text', key='flags')
-
-        # required key need to specify for validator
-        url = keys.accept_any_key('dict', key='url', required=True)
-        url.accept('boolean', key='required')
-        regexp_list = url.accept('list', key='regexps', required=True)
-        regexp = regexp_list.accept('dict', required=True)
-        regexp.accept('regexp', key='regexp', required=True)
-        regexp.accept('text', key='flags')
-
-        # accept any other key the user wants to use
-        key = keys.accept_any_key('dict')
-        key.accept('boolean', key='required')
-        regexp_list = key.accept('list', key='regexps', required=True)
-        regexp = regexp_list.accept('dict', required=True)
-        regexp.accept('regexp', key='regexp', required=True)
-        regexp.accept('text', key='flags')
-
-        return root
 
     def flagstr_to_flags(self, flag_str):
         """turns a comma seperated list of flags into the int value."""
@@ -149,16 +157,20 @@ class RegexpParse(object):
         return entry.isvalid()
 
     @cached('regexp_parse')
-    @plugin.internet(log)
+    @plugin.internet(logger)
     def on_task_input(self, task, config):
         url = config['source']
+        encoding = config.get('encoding')
 
         # if it's a file open it and read into content (assume utf-8 encoding)
         if os.path.isfile(os.path.expanduser(url)):
-            content = codecs.open(url, 'r', encoding='utf-8').read()
+            content = codecs.open(url, 'r', encoding=encoding or 'utf-8').read()
         # else use requests to get the data
         else:
-            content = task.requests.get(url).text
+            resp = task.requests.get(url)
+            if encoding:
+                resp.encoding = encoding
+            content = resp.text
 
         sections = []
         seperators = config.get('sections')

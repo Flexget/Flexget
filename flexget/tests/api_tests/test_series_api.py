@@ -1,21 +1,26 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import pytest
-from datetime import datetime, timedelta
-
-from flexget.plugins.filter.seen import SeenEntry
 
 from flexget.api.app import base_message
-from flexget.api.plugins.series import ObjectsContainer as OC
-from flexget.api.plugins.tvdb_lookup import ObjectsContainer as tvdb
-from flexget.api.plugins.tvmaze_lookup import ObjectsContainer as tvmaze
+from flexget.components.seen.db import SeenEntry
+from flexget.components.series.api import ObjectsContainer as OC
+
+# TODO: would be nicer to import db module
+from flexget.components.series.db import (
+    AlternateNames,
+    Episode,
+    EpisodeRelease,
+    Season,
+    SeasonRelease,
+    Series,
+    SeriesTask,
+)
+from flexget.components.thetvdb.api import ObjectsContainer as tvdb
+from flexget.components.tvmaze.api import ObjectsContainer as tvmaze
 from flexget.manager import Session
-from flexget.plugins.filter.series import Series, SeriesTask, Episode, Release, AlternateNames
 from flexget.utils import json
 
 
-class TestSeriesRootAPI(object):
+class TestSeriesRootAPI:
     config = """
         tasks: {}
     """
@@ -135,7 +140,7 @@ class TestSeriesRootAPI(object):
             episode.series_id = series.id
             series.episodes.append(episode)
 
-            release = Release()
+            release = EpisodeRelease()
             release.title = 'test release'
             release.downloaded = True
 
@@ -177,135 +182,13 @@ class TestSeriesRootAPI(object):
             episode.number = 1
             series.episodes.append(episode)
 
-            release = Release()
+            release = EpisodeRelease()
             release.title = 'test release 2'
             release.downloaded = True
             episode.releases = [release]
 
         # Get only just premieres
         rsp = api_client.get('/series/?premieres=true')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
-        data = json.loads(rsp.get_data(as_text=True))
-
-        errors = schema_match(OC.series_list_schema, data)
-        assert not errors
-
-        assert len(data) == 1
-
-    def test_series_status_param(self, api_client, schema_match):
-        # Add an episode with a release created now
-        with Session() as session:
-            series = Series()
-            series.name = 'test series'
-            session.add(series)
-
-            task = SeriesTask('test task')
-            series.in_tasks = [task]
-
-            episode = Episode()
-            episode.identifier = 'S02E05'
-            episode.identified_by = 'ep'
-            episode.season = 2
-            episode.number = 5
-            episode.series_id = series.id
-            series.episodes.append(episode)
-
-            release = Release()
-            release.title = 'test release'
-            release.downloaded = True
-
-            episode.releases = [release]
-
-        # Add an episode with a release created 8 days ago
-        with Session() as session:
-            series = Series()
-            series.name = 'test series 2'
-            session.add(series)
-
-            task = SeriesTask('test task')
-            series.in_tasks = [task]
-
-            episode = Episode()
-            episode.identifier = 'S01E01'
-            episode.identified_by = 'ep'
-            episode.season = 1
-            episode.number = 1
-            episode.series_id = series.id
-            series.episodes.append(episode)
-
-            release = Release()
-            release.title = 'test release 2'
-            release.downloaded = True
-            release.first_seen = datetime.now() - timedelta(days=8)
-
-            episode.releases = [release]
-
-        # Default all, not just status = new
-        rsp = api_client.get('/series/')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
-        data = json.loads(rsp.get_data(as_text=True))
-
-        errors = schema_match(OC.series_list_schema, data)
-        assert not errors
-
-        assert len(data) == 2
-
-        # Just new
-        rsp = api_client.get('/series/?status=new')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
-        data = json.loads(rsp.get_data(as_text=True))
-
-        errors = schema_match(OC.series_list_schema, data)
-        assert not errors
-
-        assert len(data) == 1
-
-        # New with days param
-        rsp = api_client.get('/series/?status=new&days=9')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
-        data = json.loads(rsp.get_data(as_text=True))
-
-        errors = schema_match(OC.series_list_schema, data)
-        assert not errors
-
-        assert len(data) == 2
-
-        # Just stale
-        rsp = api_client.get('/series/?status=stale')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
-        data = json.loads(rsp.get_data(as_text=True))
-
-        errors = schema_match(OC.series_list_schema, data)
-        assert not errors
-
-        assert len(data) == 0
-
-        # Add an episode with a release created over a year ago
-        with Session() as session:
-            series = Series()
-            series.name = 'test series 3'
-            session.add(series)
-
-            task = SeriesTask('test task')
-            series.in_tasks = [task]
-
-            episode = Episode()
-            episode.identifier = 'S01E01'
-            episode.identified_by = 'ep'
-            episode.season = 1
-            episode.number = 1
-            episode.series_id = series.id
-            series.episodes.append(episode)
-
-            release = Release()
-            release.title = 'test release 3'
-            release.downloaded = True
-            release.first_seen = datetime.now() - timedelta(days=366)
-
-            episode.releases = [release]
-
-        # Just stale
-        rsp = api_client.get('/series/?status=stale')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
 
@@ -365,8 +248,7 @@ class TestSeriesRootAPI(object):
         errors = schema_match(base_message, data)
         assert not errors
 
-        payload2 = {'name': 'test series 2',
-                    'begin_episode': 'bla'}
+        payload2 = {'name': 'test series 2', 'begin_episode': 'bla'}
 
         # Invalid begin episode
         rsp = api_client.json_post('/series/', data=json.dumps(payload2))
@@ -376,11 +258,11 @@ class TestSeriesRootAPI(object):
         errors = schema_match(base_message, data)
         assert not errors
 
-        payload3 = {'name': 'test series 2',
-                    'begin_episode': 's01e01',
-                    'alternate_names': [
-                        'show1', 'show2'
-                    ]}
+        payload3 = {
+            'name': 'test series 2',
+            'begin_episode': 's01e01',
+            'alternate_names': ['show1', 'show2'],
+        }
 
         # Maximal payload
         rsp = api_client.json_post('/series/', data=json.dumps(payload3))
@@ -394,8 +276,7 @@ class TestSeriesRootAPI(object):
         assert data['alternate_names'] == payload3['alternate_names']
         assert data['begin_episode']['identifier'].lower() == payload3['begin_episode']
 
-        payload4 = {'name': 'test series 3',
-                    'alternate_names': ['show1']}
+        payload4 = {'name': 'test series 3', 'alternate_names': ['show1']}
 
         # Alternate name already added to different show
         rsp = api_client.json_post('/series/', data=json.dumps(payload4))
@@ -406,7 +287,7 @@ class TestSeriesRootAPI(object):
         assert not errors
 
 
-class TestSeriesSearchAPI(object):
+class TestSeriesSearchAPI:
     config = """
         tasks: {}
     """
@@ -449,7 +330,7 @@ class TestSeriesSearchAPI(object):
         assert len(data) == 0
 
 
-class TestSeriesSingleAPI(object):
+class TestSeriesSingleAPI:
     config = """
         tasks: {}
     """
@@ -514,8 +395,7 @@ class TestSeriesSingleAPI(object):
         errors = schema_match(base_message, data)
         assert not errors
 
-        payload1 = {'begin_episode': 's01e01',
-                    'alternate_names': ['show1']}
+        payload1 = {'begin_episode': 's01e01', 'alternate_names': ['show1']}
 
         rsp = api_client.json_put('/series/1/', data=json.dumps(payload1))
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
@@ -554,7 +434,392 @@ class TestSeriesSingleAPI(object):
         assert not errors
 
 
-class TestSeriesEpisodesAPI(object):
+class TestSeriesSeasonsAPI:
+    config = """
+        tasks: {}
+    """
+
+    def test_seasons_get(self, api_client, schema_match):
+        with Session() as session:
+            series = Series()
+            series.name = 'test series 1'
+            session.add(series)
+
+            task = SeriesTask('test task')
+            series.in_tasks = [task]
+
+            season1 = Season()
+            season1.identifier = 'S01'
+            season1.identified_by = 'ep'
+            season1.season = 1
+            season1.series_id = series.id
+
+            season2 = Season()
+            season2.identifier = 'S02'
+            season2.identified_by = 'ep'
+            season2.season = 2
+            season2.series_id = series.id
+
+            release = SeasonRelease()
+            release.title = 'test release'
+            release.downloaded = True
+
+            season1.releases = [release]
+
+            series.seasons.append(season1)
+            series.seasons.append(season2)
+
+        # No series
+        rsp = api_client.get('/series/10/seasons/')
+        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
+        rsp = api_client.get('/series/1/seasons/')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.seasons_list_schema, data)
+        assert not errors
+
+        assert len(data) == 2
+
+        # Delete all episodes
+        rsp = api_client.delete('/series/1/seasons/')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
+        rsp = api_client.get('/series/1/seasons/')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.seasons_list_schema, data)
+        assert not errors
+
+        assert len(data) == 0
+
+
+class TestSeriesSeasonAPI:
+    config = """
+        tasks: {}
+    """
+
+    def test_season(self, api_client, schema_match):
+        with Session() as session:
+            series = Series()
+            series.name = 'test series 1'
+            session.add(series)
+
+            task = SeriesTask('test task')
+            series.in_tasks = [task]
+
+            season1 = Season()
+            season1.identifier = 'S01'
+            season1.identified_by = 'ep'
+            season1.season = 1
+            season1.series_id = series.id
+
+            season2 = Season()
+            season2.identifier = 'S02'
+            season2.identified_by = 'ep'
+            season2.season = 2
+            season2.series_id = series.id
+
+            release = SeasonRelease()
+            release.title = 'test release'
+            release.downloaded = True
+
+            season1.releases = [release]
+
+            series.seasons.append(season1)
+            series.seasons.append(season2)
+
+            series2 = Series()
+            series2.name = 'test series 2'
+            session.add(series2)
+
+        rsp = api_client.get('/series/1/seasons/1/')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.season_object, data)
+        assert not errors
+
+        assert data['identifier'] == 'S01'
+        assert data['identified_by'] == 'ep'
+        assert data['season'] == 1
+
+        # No series ID
+        rsp = api_client.get('/series/10/seasons/1/')
+        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
+        # No season ID
+        rsp = api_client.get('/series/1/seasons/10/')
+        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
+        # season does not belong to series
+        rsp = api_client.get('/series/2/seasons/1/')
+        assert rsp.status_code == 400, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
+        # Delete
+        rsp = api_client.delete('/series/1/seasons/1/')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
+        rsp = api_client.get('/series/1/seasons/1/')
+        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
+        rsp = api_client.delete('/series/1/seasons/1/')
+        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
+        rsp = api_client.delete('/series/10/seasons/1/')
+        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
+
+class TestSeriesSeasonReleasesAPI:
+    config = """
+        tasks: {}
+    """
+
+    def create_data(self):
+        with Session() as session:
+            series = Series()
+            series.name = 'test series 1'
+            session.add(series)
+
+            season1 = Season()
+            season1.identifier = 'S01'
+            season1.identified_by = 'ep'
+            season1.season = 1
+            season1.series_id = series.id
+
+            release1 = SeasonRelease()
+            release1.title = 'downloaded release'
+            release1.downloaded = True
+
+            release2 = SeasonRelease()
+            release2.title = 'un-downloaded release'
+            release2.downloaded = False
+
+            season1.releases = [release1, release2]
+            series.seasons.append(season1)
+
+            series2 = Series()
+            series2.name = 'test series 2'
+            session.add(series2)
+
+            season2 = Season()
+            season2.identifier = 'S02'
+            season2.identified_by = 'ep'
+            season2.season = 2
+            season2.series_id = series2.id
+
+            series2.seasons.append(season2)
+
+    def test_season_releases_get(self, api_client, schema_match):
+        self.create_data()
+
+        rsp = api_client.get('/series/1/seasons/1/releases/')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.season_release_list_schema, data)
+        assert not errors
+
+        assert len(data) == 2
+
+        # Just downloaded releases
+        rsp = api_client.get('/series/1/seasons/1/releases/?downloaded=true')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.season_release_list_schema, data)
+        assert not errors
+
+        assert len(data) == 1
+        assert data[0]['title'] == 'downloaded release'
+
+        # Just un-downloaded releases
+        rsp = api_client.get('/series/1/seasons/1/releases/?downloaded=false')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.season_release_list_schema, data)
+        assert not errors
+
+        assert len(data) == 1
+        assert data[0]['title'] == 'un-downloaded release'
+
+        # No series
+        rsp = api_client.get('/series/10/seasons/1/releases/?downloaded=false')
+        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
+        # No episode for series
+        rsp = api_client.get('/series/1/seasons/10/releases/?downloaded=false')
+        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
+        # Episode does not belong to series
+        rsp = api_client.get('/series/2/seasons/1/releases/?downloaded=false')
+        assert rsp.status_code == 400, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
+    def test_releases_delete(self, api_client, schema_match):
+        self.create_data()
+
+        rsp = api_client.delete('/series/1/seasons/1/releases/?downloaded=true')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
+        rsp = api_client.get('/series/1/seasons/1/releases/')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.season_release_list_schema, data)
+        assert not errors
+
+        assert len(data) == 1
+        assert data[0]['title'] == 'un-downloaded release'
+
+        rsp = api_client.delete('/series/1/seasons/1/releases/?downloaded=false')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
+        rsp = api_client.get('/series/1/seasons/1/releases/')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.season_release_list_schema, data)
+        assert not errors
+
+        assert len(data) == 0
+
+        # No series
+        rsp = api_client.delete('/series/10/seasons/1/releases/?downloaded=false')
+        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
+        # No episode for series
+        rsp = api_client.delete('/series/1/seasons/10/releases/?downloaded=false')
+        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
+        # Episode does not belong to series
+        rsp = api_client.delete('/series/2/seasons/1/releases/?downloaded=false')
+        assert rsp.status_code == 400, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
+    def test_releases_put(self, api_client, schema_match):
+        self.create_data()
+
+        rsp = api_client.json_put('/series/1/seasons/1/releases/')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
+        rsp = api_client.get('/series/1/seasons/1/releases/?downloaded=true')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.season_release_list_schema, data)
+        assert not errors
+
+        assert len(data) == 0
+
+        rsp = api_client.get('/series/1/seasons/1/releases/?downloaded=false')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.season_release_list_schema, data)
+        assert not errors
+
+        assert len(data) == 2
+
+        # No series
+        rsp = api_client.json_put('/series/10/seasons/1/releases/')
+        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
+        # No episode for series
+        rsp = api_client.json_put('/series/1/seasons/10/releases/')
+        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
+        # Episode does not belong to series
+        rsp = api_client.json_put('/series/2/seasons/1/releases/')
+        assert rsp.status_code == 400, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
+
+class TestSeriesEpisodesAPI:
     config = """
         tasks: {}
     """
@@ -582,7 +847,7 @@ class TestSeriesEpisodesAPI(object):
             episode2.number = 1
             episode2.series_id = series.id
 
-            release = Release()
+            release = EpisodeRelease()
             release.title = 'test release'
             release.downloaded = True
 
@@ -626,7 +891,7 @@ class TestSeriesEpisodesAPI(object):
         assert len(data) == 0
 
 
-class TestSeriesEpisodeAPI(object):
+class TestSeriesEpisodeAPI:
     config = """
         tasks: {}
     """
@@ -654,7 +919,7 @@ class TestSeriesEpisodeAPI(object):
             episode2.number = 1
             episode2.series_id = series.id
 
-            release = Release()
+            release = EpisodeRelease()
             release.title = 'test release'
             release.downloaded = True
 
@@ -742,7 +1007,7 @@ class TestSeriesEpisodeAPI(object):
         assert not errors
 
 
-class TestSeriesReleasesAPI(object):
+class TestSeriesEpisodeReleasesAPI:
     config = """
         tasks: {}
     """
@@ -760,11 +1025,11 @@ class TestSeriesReleasesAPI(object):
             episode1.number = 1
             episode1.series_id = series.id
 
-            release1 = Release()
+            release1 = EpisodeRelease()
             release1.title = 'downloaded release'
             release1.downloaded = True
 
-            release2 = Release()
+            release2 = EpisodeRelease()
             release2.title = 'un-downloaded release'
             release2.downloaded = False
 
@@ -788,7 +1053,7 @@ class TestSeriesReleasesAPI(object):
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
 
-        errors = schema_match(OC.release_list_schema, data)
+        errors = schema_match(OC.episode_release_list_schema, data)
         assert not errors
 
         assert len(data) == 2
@@ -798,7 +1063,7 @@ class TestSeriesReleasesAPI(object):
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
 
-        errors = schema_match(OC.release_list_schema, data)
+        errors = schema_match(OC.episode_release_list_schema, data)
         assert not errors
 
         assert len(data) == 1
@@ -809,7 +1074,7 @@ class TestSeriesReleasesAPI(object):
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
 
-        errors = schema_match(OC.release_list_schema, data)
+        errors = schema_match(OC.episode_release_list_schema, data)
         assert not errors
 
         assert len(data) == 1
@@ -852,11 +1117,11 @@ class TestSeriesReleasesAPI(object):
             episode1.number = 1
             episode1.series_id = series.id
 
-            release1 = Release()
+            release1 = EpisodeRelease()
             release1.title = 'downloaded release'
             release1.downloaded = True
 
-            release2 = Release()
+            release2 = EpisodeRelease()
             release2.title = 'un-downloaded release'
             release2.downloaded = False
 
@@ -887,7 +1152,7 @@ class TestSeriesReleasesAPI(object):
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
 
-        errors = schema_match(OC.release_list_schema, data)
+        errors = schema_match(OC.episode_release_list_schema, data)
         assert not errors
 
         assert len(data) == 1
@@ -904,7 +1169,7 @@ class TestSeriesReleasesAPI(object):
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
 
-        errors = schema_match(OC.release_list_schema, data)
+        errors = schema_match(OC.episode_release_list_schema, data)
         assert not errors
 
         assert len(data) == 0
@@ -946,11 +1211,11 @@ class TestSeriesReleasesAPI(object):
             episode1.number = 1
             episode1.series_id = series.id
 
-            release1 = Release()
+            release1 = EpisodeRelease()
             release1.title = 'downloaded release'
             release1.downloaded = True
 
-            release2 = Release()
+            release2 = EpisodeRelease()
             release2.title = 'un-downloaded release'
             release2.downloaded = False
 
@@ -981,7 +1246,7 @@ class TestSeriesReleasesAPI(object):
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
 
-        errors = schema_match(OC.release_list_schema, data)
+        errors = schema_match(OC.episode_release_list_schema, data)
         assert not errors
 
         assert len(data) == 0
@@ -990,7 +1255,7 @@ class TestSeriesReleasesAPI(object):
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
 
-        errors = schema_match(OC.release_list_schema, data)
+        errors = schema_match(OC.episode_release_list_schema, data)
         assert not errors
 
         assert len(data) == 2
@@ -1020,7 +1285,7 @@ class TestSeriesReleasesAPI(object):
         assert not errors
 
 
-class TestSeriesReleaseAPI(object):
+class TestSeriesEpisodeReleaseAPI:
     config = """
         tasks: {}
     """
@@ -1045,15 +1310,15 @@ class TestSeriesReleaseAPI(object):
             episode2.number = 2
             episode2.series_id = series.id
 
-            release1 = Release()
+            release1 = EpisodeRelease()
             release1.title = 'downloaded release'
             release1.downloaded = True
 
-            release2 = Release()
+            release2 = EpisodeRelease()
             release2.title = 'un-downloaded release'
             release2.downloaded = False
 
-            release3 = Release()
+            release3 = EpisodeRelease()
             release3.title = 'downloaded release'
             release3.downloaded = True
 
@@ -1079,7 +1344,7 @@ class TestSeriesReleaseAPI(object):
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
 
-        errors = schema_match(OC.release_object, data)
+        errors = schema_match(OC.episode_release_object, data)
         assert not errors
 
         assert data['downloaded'] is True
@@ -1089,7 +1354,7 @@ class TestSeriesReleaseAPI(object):
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
 
-        errors = schema_match(OC.release_object, data)
+        errors = schema_match(OC.episode_release_object, data)
         assert not errors
 
         assert data['downloaded'] is False
@@ -1155,15 +1420,15 @@ class TestSeriesReleaseAPI(object):
             episode2.number = 2
             episode2.series_id = series.id
 
-            release1 = Release()
+            release1 = EpisodeRelease()
             release1.title = 'downloaded release'
             release1.downloaded = True
 
-            release2 = Release()
+            release2 = EpisodeRelease()
             release2.title = 'un-downloaded release'
             release2.downloaded = False
 
-            release3 = Release()
+            release3 = EpisodeRelease()
             release3.title = 'downloaded release'
             release3.downloaded = True
 
@@ -1197,7 +1462,7 @@ class TestSeriesReleaseAPI(object):
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
 
-        errors = schema_match(OC.release_object, data)
+        errors = schema_match(OC.episode_release_object, data)
         assert not errors
 
         # Cannot reset if already downloaded
@@ -1260,15 +1525,15 @@ class TestSeriesReleaseAPI(object):
             episode2.number = 2
             episode2.series_id = series.id
 
-            release1 = Release()
+            release1 = EpisodeRelease()
             release1.title = 'downloaded release'
             release1.downloaded = True
 
-            release2 = Release()
+            release2 = EpisodeRelease()
             release2.title = 'un-downloaded release'
             release2.downloaded = False
 
-            release3 = Release()
+            release3 = EpisodeRelease()
             release3.title = 'downloaded release'
             release3.downloaded = True
 
@@ -1288,7 +1553,7 @@ class TestSeriesReleaseAPI(object):
             episode3.number = 2
             episode3.series_id = series2.id
 
-            release4 = Release()
+            release4 = EpisodeRelease()
             release4.title = 'downloaded release'
             release4.downloaded = True
 
@@ -1352,7 +1617,7 @@ class TestSeriesReleaseAPI(object):
         assert not errors
 
 
-class TestSeriesForgetFlag(object):
+class TestSeriesForgetFlag:
     config = """
             tasks:
               series_data:
@@ -1474,7 +1739,7 @@ class TestSeriesForgetFlag(object):
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
 
-        errors = schema_match(OC.release_object, data)
+        errors = schema_match(OC.episode_release_object, data)
         assert not errors
 
         # Get seen object
@@ -1501,7 +1766,7 @@ class TestSeriesForgetFlag(object):
             assert len(seen) == 3
 
 
-class TestSeriesPagination(object):
+class TestSeriesPagination:
     config = 'tasks: {}'
 
     def test_series_pagination(self, api_client, link_headers):
@@ -1636,7 +1901,7 @@ class TestSeriesPagination(object):
             series.episodes.append(episode)
 
             for i in range(number_of_releases):
-                release = Release()
+                release = EpisodeRelease()
                 release.title = 'test release {}'.format(i)
                 release.downloaded = True
 

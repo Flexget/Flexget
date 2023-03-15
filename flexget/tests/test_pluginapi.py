@@ -1,8 +1,5 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import os
 import glob
+import os
 
 import pytest
 
@@ -10,8 +7,7 @@ from flexget import plugin, plugins
 from flexget.event import event, fire_event
 
 
-@pytest.mark.chdir
-class TestPluginApi(object):
+class TestPluginApi:
     """
     Contains plugin api related tests
     """
@@ -22,6 +18,10 @@ class TestPluginApi(object):
         with pytest.raises(plugin.DependencyError):
             plugin.get_plugin_by_name('nonexisting_plugin')
 
+    def test_unknown_plugin(self):
+        with pytest.raises(plugin.DependencyError):
+            plugin.get('nonexisting_plugin', 'test')
+
     def test_no_dupes(self):
         plugin.load_plugins()
 
@@ -30,22 +30,22 @@ class TestPluginApi(object):
     def test_load(self):
         plugin.load_plugins()
         plugin_path = os.path.dirname(plugins.__file__)
-        plugin_modules = set(os.path.basename(i)
-                             for k in ("/*.py", "/*/*.py")
-                             for i in glob.glob(plugin_path + k))
+        plugin_modules = set(
+            os.path.basename(i) for k in ("/*.py", "/*/*.py") for i in glob.glob(plugin_path + k)
+        )
         assert len(plugin_modules) >= 10, "Less than 10 plugin modules looks fishy"
         # Hmm, this test isn't good, because we have plugin modules that don't register a class (like cli ones)
         # and one module can load multiple plugins TODO: Maybe consider some replacement
         # assert len(plugin.plugins) >= len(plugin_modules) - 1, "Less plugins than plugin modules"
 
     def test_register_by_class(self, execute_task):
-        class TestPlugin(object):
+        class TestPlugin:
             pass
 
-        class Oneword(object):
+        class Oneword:
             pass
 
-        class TestHTML(object):
+        class TestHTML:
             pass
 
         assert 'test_plugin' not in plugin.plugins
@@ -63,16 +63,18 @@ class TestPluginApi(object):
         assert 'test_html' in plugin.plugins
 
 
-class TestExternalPluginLoading(object):
+class TestExternalPluginLoading:
     _config = """
         tasks:
           ext_plugin:
             external_plugin: yes
     """
 
-    @pytest.yield_fixture()
+    @pytest.fixture()
     def config(self, request):
-        os.environ['FLEXGET_PLUGIN_PATH'] = request.fspath.dirpath().join('external_plugins').strpath
+        os.environ['FLEXGET_PLUGIN_PATH'] = (
+            request.fspath.dirpath().join('external_plugins').strpath
+        )
         plugin.load_plugins()
         # fire the config register event again so that task schema is rebuilt with new plugin
         fire_event('config.register')

@@ -1,12 +1,9 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import pytest
 
 
-class TestOnlyTask(object):
+class TestOnlyTask:
     """
-        Test --task option
+    Test --task option
     """
 
     config = """
@@ -32,9 +29,9 @@ class TestOnlyTask(object):
         assert not task.find_entry(title='nodownload'), 'task should not have been executed'
 
 
-class TestManualAutomatic(object):
+class TestManualAutomatic:
     """
-        Test manual download tasks
+    Test manual download tasks
     """
 
     config = """
@@ -50,10 +47,20 @@ class TestManualAutomatic(object):
         assert task.aborted
         assert not task.find_entry(title='nodownload'), 'Manual tasks downloaded on automatic run'
 
+    def test_manual_with_startasks(self, execute_task):
+        """
+        Specifying just '*' as the tasks option should be considered
+        the same as not specifying any specific tasks.
+        """
+        execute_task
+        task = execute_task('test', abort=True, options={'tasks': ['*'], 'allow_manual': True})
+        assert task.aborted
+        assert not task.find_entry(title='nodownload'), 'Manual tasks downloaded on automatic run'
 
-class TestManualOnlytask(object):
+
+class TestManualOnlytask:
     """
-        Test manual download tasks
+    Test manual download tasks
     """
 
     config = """

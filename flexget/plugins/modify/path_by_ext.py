@@ -1,24 +1,22 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
 import mimetypes
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('path_by_ext')
+logger = logger.bind(name='path_by_ext')
 
 
-class PluginPathByExt(object):
+class PluginPathByExt:
     """
-        Allows specifying path based on content-type
+    Allows specifying path based on content-type
 
-        Example:
+    Example:
 
-        path_by_ext:
-          torrent: ~/watch/torrent/
-          nzb: ~/watch/nzb/
+    path_by_ext:
+      torrent: ~/watch/torrent/
+      nzb: ~/watch/nzb/
     """
 
     schema = {'type': 'object'}
@@ -27,7 +25,7 @@ class PluginPathByExt(object):
         self.ext(task, config, self.set_path)
 
     def set_path(self, entry, path):
-        log.debug('Setting %s path to %s' % (entry['title'], path))
+        logger.debug('Setting {} path to {}', entry['title'], path)
         entry['path'] = path
 
     def ext(self, task, config, callback):
@@ -42,7 +40,7 @@ class PluginPathByExt(object):
                 if path:
                     callback(entry, path)
                 else:
-                    log.debug('Unknown mimetype %s' % entry['mime-type'])
+                    logger.debug('Unknown mimetype {}', entry['mime-type'])
             else:
                 # try to find from url
                 for ext, path in config.items():

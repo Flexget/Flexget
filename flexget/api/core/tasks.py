@@ -1,48 +1,52 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import argparse
 import cgi
 import copy
 from datetime import datetime, timedelta
 from json import JSONEncoder
+from queue import Empty, Queue
+from typing import TYPE_CHECKING, Any, Dict
 
-from flask import jsonify, Response, request
-from flask_restplus import inputs
-from queue import Queue, Empty
+from flask import Response, jsonify, request
+from flask_restx import inputs
+from sqlalchemy.orm import Session
 
-from flexget.api import api, APIResource
-from flexget.api.app import APIError, NotFoundError, Conflict, BadRequest, success_response, \
-    base_message_schema, etag
+from flexget.api import APIResource, api
+from flexget.api.app import (
+    APIError,
+    BadRequest,
+    Conflict,
+    NotFoundError,
+    base_message_schema,
+    etag,
+    success_response,
+)
 from flexget.config_schema import process_config
 from flexget.entry import Entry
 from flexget.event import event
+from flexget.log import capture_logs
 from flexget.options import get_parser
 from flexget.task import task_phases
-from flexget.utils import json
-from flexget.utils import requests
+from flexget.terminal import capture_console
+from flexget.utils import json, requests
 from flexget.utils.lazy_dict import LazyLookup
 
 # Tasks API
 tasks_api = api.namespace('tasks', description='Manage Tasks')
 
 
-class ObjectsContainer(object):
-    tasks_list_object = {'oneOf': [
-        {'type': 'array',
-         'items': {'$ref': '#/definitions/tasks.task'}},
-        {'type': 'array', 'items': {'type': 'string'}}
-    ]
+class ObjectsContainer:
+    tasks_list_object = {
+        'oneOf': [
+            {'type': 'array', 'items': {'$ref': '#/definitions/tasks.task'}},
+            {'type': 'array', 'items': {'type': 'string'}},
+        ]
     }
 
     task_input_object = {
         'type': 'object',
-        'properties': {
-            'name': {'type': 'string'},
-            'config': {'$ref': '/schema/plugins'}
-        },
+        'properties': {'name': {'type': 'string'}, 'config': {'$ref': '/schema/plugins'}},
         'required': ['name', 'config'],
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
     task_return_object = copy.deepcopy(task_input_object)
@@ -57,7 +61,8 @@ class ObjectsContainer(object):
                 'name': {'type': 'string'},
                 'current_phase': {'type': ['string', 'null']},
                 'current_plugin': {'type': ['string', 'null']},
-            }}
+            },
+        },
     }
 
     task_execution_results_schema = {
@@ -74,11 +79,14 @@ class ObjectsContainer(object):
                             'progress': {
                                 'type': 'object',
                                 'properties': {
-                                    'status': {'type': 'string', 'enum': ['pending', 'running', 'complete']},
+                                    'status': {
+                                        'type': 'string',
+                                        'enum': ['pending', 'running', 'complete'],
+                                    },
                                     'phase': {'type': 'string', 'enum': task_phases},
                                     'plugin': {'type': 'string'},
-                                    'percent': {'type': 'float'}
-                                }
+                                    'percent': {'type': 'float'},
+                                },
                             },
                             'summary': {
                                 'type': 'object',
@@ -89,81 +97,101 @@ class ObjectsContainer(object):
                                     'undecided': {'type': 'integer'},
                                     'aborted': {'type': 'boolean'},
                                     'abort_reason': {'type': 'string'},
-                                }
+                                },
                             },
                             'entry_dump': {'type': 'array', 'items': {'type': 'object'}},
-                            'log': {'type': 'string'}
-                        }
-                    }
-                }
+                            'log': {'type': 'string'},
+                        },
+                    },
+                },
             }
-        }
+        },
     }
 
     inject_input = {
         'type': 'object',
         'properties': {
-            'title': {'type': 'string',
-                      'description': 'Title of the entry. If not supplied it will be attempted to retrieve it from '
-                                     'URL headers'},
-            'url': {'type': 'string',
-                    'format': 'url',
-                    'description': 'URL of the entry'},
-            'force': {'type': 'boolean',
-                      'description': 'Prevent any plugins from rejecting this entry'},
-            'accept': {'type': 'boolean',
-                       'description': 'Accept this entry immediately upon injection (disregard task filters)'},
-            'fields': {'type': 'object',
-                       'description': 'A array of objects that can contain any other value for the entry'}
+            'title': {
+                'type': 'string',
+                'description': 'Title of the entry. If not supplied it will be attempted to retrieve it from '
+                'URL headers',
+            },
+            'url': {'type': 'string', 'format': 'url', 'description': 'URL of the entry'},
+            'force': {
+                'type': 'boolean',
+                'description': 'Prevent any plugins from rejecting this entry',
+            },
+            'accept': {
+                'type': 'boolean',
+                'description': 'Accept this entry immediately upon injection (disregard task filters)',
+            },
+            'fields': {
+                'type': 'object',
+                'description': 'A array of objects that can contain any other value for the entry',
+            },
         },
-        'required': ['url']
+        'required': ['url'],
     }
 
     task_execution_input = {
         'type': 'object',
         'properties': {
-            'tasks': {'type': 'array',
-                      'items': {'type': 'string'},
-                      'minItems': 1,
-                      'uniqueItems': True},
+            'tasks': {
+                'type': 'array',
+                'items': {'type': 'string'},
+                'minItems': 1,
+                'uniqueItems': True,
+            },
             'progress': {
                 'type': 'boolean',
                 'default': True,
-                'description': 'Include task progress updates'},
-            'summary': {
-                'type': 'boolean',
-                'default': True,
-                'description': 'Include task summary'},
+                'description': 'Include task progress updates',
+            },
+            'summary': {'type': 'boolean', 'default': True, 'description': 'Include task summary'},
             'entry_dump': {
                 'type': 'boolean',
                 'default': True,
-                'description': 'Include dump of entries including fields'},
-            'inject': {'type': 'array',
-                       'items': inject_input,
-                       'description': 'A List of entry objects'},
-            'loglevel': {'type': 'string',
-                         'description': 'Specify log level',
-                         'enum': ['critical', 'error', 'warning', 'info', 'verbose', 'debug', 'trace']}
+                'description': 'Include dump of entries including fields',
+            },
+            'inject': {
+                'type': 'array',
+                'items': inject_input,
+                'description': 'A List of entry objects',
+            },
+            'loglevel': {
+                'type': 'string',
+                'description': 'Specify log level',
+                'enum': ['critical', 'error', 'warning', 'info', 'verbose', 'debug', 'trace'],
+            },
         },
-        'required': ['tasks']
-
+        'required': ['tasks'],
     }
 
     params_return_schema = {'type': 'array', 'items': {'type': 'object'}}
 
 
-tasks_list_schema = api.schema('tasks.list', ObjectsContainer.tasks_list_object)
-task_input_schema = api.schema('tasks.task', ObjectsContainer.task_input_object)
-task_return_schema = api.schema('tasks.task', ObjectsContainer.task_return_object)
-task_api_queue_schema = api.schema('task.queue', ObjectsContainer.task_queue_schema)
-task_api_execute_schema = api.schema('task.execution', ObjectsContainer.task_execution_results_schema)
-task_execution_schema = api.schema('task_execution_input', ObjectsContainer.task_execution_input)
-task_execution_params = api.schema('tasks.execution_params', ObjectsContainer.params_return_schema)
+tasks_list_schema = api.schema_model('tasks.list', ObjectsContainer.tasks_list_object)
+task_input_schema = api.schema_model('tasks.task', ObjectsContainer.task_input_object)
+task_return_schema = api.schema_model('tasks.task', ObjectsContainer.task_return_object)
+task_api_queue_schema = api.schema_model('task.queue', ObjectsContainer.task_queue_schema)
+task_api_execute_schema = api.schema_model(
+    'task.execution', ObjectsContainer.task_execution_results_schema
+)
+task_execution_schema = api.schema_model(
+    'task_execution_input', ObjectsContainer.task_execution_input
+)
+task_execution_params = api.schema_model(
+    'tasks.execution_params', ObjectsContainer.params_return_schema
+)
 
-task_api_desc = 'Task config schema too large to display, you can view the schema using the schema API'
+task_api_desc = (
+    'Task config schema too large to display, you can view the schema using the schema API'
+)
 
 tasks_parser = api.parser()
-tasks_parser.add_argument('include_config', type=inputs.boolean, default=True, help='Include task config')
+tasks_parser.add_argument(
+    'include_config', type=inputs.boolean, default=True, help='Include task config'
+)
 
 
 @tasks_api.route('/')
@@ -172,24 +200,28 @@ class TasksAPI(APIResource):
     @etag
     @api.response(200, model=tasks_list_schema)
     @api.doc(parser=tasks_parser)
-    def get(self, session=None):
-        """ List all tasks """
+    def get(self, session: Session = None) -> Response:
+        """List all tasks"""
+
+        active_tasks = {
+            task: task_data
+            for task, task_data in self.manager.user_config.get('tasks', {}).items()
+            if not task.startswith('_')
+        }
 
         args = tasks_parser.parse_args()
         if not args.get('include_config'):
-            return jsonify(list(self.manager.user_config.get('tasks', {})))
+            return jsonify(list(active_tasks))
 
-        tasks = []
-        for name, config in self.manager.user_config.get('tasks', {}).items():
-            tasks.append({'name': name, 'config': config})
+        tasks = [{'name': name, 'config': config} for name, config in active_tasks.items()]
         return jsonify(tasks)
 
     @api.validate(task_input_schema, description='New task object')
     @api.response(201, description='Newly created task', model=task_return_schema)
     @api.response(Conflict)
     @api.response(APIError)
-    def post(self, session=None):
-        """ Add new task """
+    def post(self, session: Session = None) -> Response:
+        """Add new task"""
         data = request.json
 
         task_name = data['name']
@@ -203,7 +235,9 @@ class TasksAPI(APIResource):
             self.manager.config['tasks'] = {}
 
         task_schema_processed = copy.deepcopy(data)
-        errors = process_config(task_schema_processed, schema=task_input_schema.__schema__, set_defaults=True)
+        errors = process_config(
+            task_schema_processed, schema=task_input_schema.__schema__, set_defaults=True
+        )
 
         if errors:
             raise APIError('problem loading config, raise a BUG as this should not happen!')
@@ -225,10 +259,10 @@ class TaskAPI(APIResource):
     @etag
     @api.response(200, model=task_return_schema)
     @api.response(NotFoundError, description='task not found')
-    def get(self, task, session=None):
-        """ Get task config """
+    def get(self, task, session: Session = None) -> Response:
+        """Get task config"""
         if task not in self.manager.user_config.get('tasks', {}):
-            raise NotFoundError('task `%s` not found' % task)
+            raise NotFoundError(f'task `{task}` not found')
 
         return jsonify({'name': task, 'config': self.manager.user_config['tasks'][task]})
 
@@ -236,14 +270,14 @@ class TaskAPI(APIResource):
     @api.response(200, model=task_return_schema)
     @api.response(NotFoundError)
     @api.response(BadRequest)
-    def put(self, task, session=None):
-        """ Update tasks config """
+    def put(self, task, session: Session = None) -> Response:
+        """Update tasks config"""
         data = request.json
 
         new_task_name = data['name']
 
         if task not in self.manager.user_config.get('tasks', {}):
-            raise NotFoundError('task `%s` not found' % task)
+            raise NotFoundError(f'task `{task}` not found')
 
         if 'tasks' not in self.manager.user_config:
             self.manager.user_config['tasks'] = {}
@@ -260,7 +294,9 @@ class TaskAPI(APIResource):
 
         # Process the task config
         task_schema_processed = copy.deepcopy(data)
-        errors = process_config(task_schema_processed, schema=task_return_schema.__schema__, set_defaults=True)
+        errors = process_config(
+            task_schema_processed, schema=task_return_schema.__schema__, set_defaults=True
+        )
 
         if errors:
             raise APIError('problem loading config, raise a BUG as this should not happen!')
@@ -271,14 +307,16 @@ class TaskAPI(APIResource):
         self.manager.save_config()
         self.manager.config_changed()
 
-        rsp = jsonify({'name': new_task_name, 'config': self.manager.user_config['tasks'][new_task_name]})
+        rsp = jsonify(
+            {'name': new_task_name, 'config': self.manager.user_config['tasks'][new_task_name]}
+        )
         rsp.status_code = 200
         return rsp
 
     @api.response(200, model=base_message_schema, description='deleted task')
     @api.response(NotFoundError)
-    def delete(self, task, session=None):
-        """ Delete a task """
+    def delete(self, task, session: Session = None) -> Response:
+        """Delete a task"""
         try:
             self.manager.config['tasks'].pop(task)
             self.manager.user_config['tasks'].pop(task)
@@ -293,15 +331,33 @@ class TaskAPI(APIResource):
 default_start_date = (datetime.now() - timedelta(weeks=1)).strftime('%Y-%m-%d')
 
 status_parser = api.parser()
-status_parser.add_argument('succeeded', type=inputs.boolean, default=True, help='Filter by success status')
-status_parser.add_argument('produced', type=inputs.boolean, default=True, store_missing=False,
-                           help='Filter by tasks that produced entries')
-status_parser.add_argument('start_date', type=inputs.datetime_from_iso8601, default=default_start_date,
-                           help='Filter by minimal start date. Example: \'2012-01-01\'')
-status_parser.add_argument('end_date', type=inputs.datetime_from_iso8601,
-                           help='Filter by maximal end date. Example: \'2012-01-01\'')
-status_parser.add_argument('limit', default=100, type=int,
-                           help='Limit return of executions per task, as that number can be huge')
+status_parser.add_argument(
+    'succeeded', type=inputs.boolean, default=True, help='Filter by success status'
+)
+status_parser.add_argument(
+    'produced',
+    type=inputs.boolean,
+    default=True,
+    store_missing=False,
+    help='Filter by tasks that produced entries',
+)
+status_parser.add_argument(
+    'start_date',
+    type=inputs.datetime_from_iso8601,
+    default=default_start_date,
+    help='Filter by minimal start date. Example: \'2012-01-01\'',
+)
+status_parser.add_argument(
+    'end_date',
+    type=inputs.datetime_from_iso8601,
+    help='Filter by maximal end date. Example: \'2012-01-01\'',
+)
+status_parser.add_argument(
+    'limit',
+    default=100,
+    type=int,
+    help='Limit return of executions per task, as that number can be huge',
+)
 
 
 def _task_info_dict(task):
@@ -316,8 +372,8 @@ def _task_info_dict(task):
 @tasks_api.route('/queue/')
 class TaskQueueAPI(APIResource):
     @api.response(200, model=task_api_queue_schema)
-    def get(self, session=None):
-        """ List task(s) in queue for execution """
+    def get(self, session: Session = None) -> Response:
+        """List task(s) in queue for execution"""
         tasks = [_task_info_dict(task) for task in self.manager.task_queue.run_queue.queue]
 
         if self.manager.task_queue.current_task:
@@ -327,12 +383,19 @@ class TaskQueueAPI(APIResource):
 
 
 class ExecuteLog(Queue):
-    """ Supports task log streaming by acting like a file object """
+    """Supports task log streaming by acting like a file object"""
 
     def write(self, s):
         self.put(json.dumps({'log': s}))
 
 
+if TYPE_CHECKING:
+    from typing import TypedDict
+
+    StreamTaskDict = TypedDict(
+        'StreamTaskDict', {'queue': ExecuteLog, 'last_update': datetime, 'args': Dict[str, Any]}
+    )
+    _streams: Dict[str, StreamTaskDict]
 _streams = {}
 
 # Another namespace for the same endpoint
@@ -343,10 +406,10 @@ inject_api = api.namespace('inject', description='Entry injection API')
 @tasks_api.route('/execute/params/')
 @api.doc(description='Available payload parameters for task execute')
 class TaskExecutionParams(APIResource):
-    @etag
+    @etag(cache_age=3600)
     @api.response(200, model=task_execution_params)
-    def get(self, session=None):
-        """ Execute payload parameters """
+    def get(self, session: Session = None) -> Response:
+        """Execute payload parameters"""
         return jsonify(ObjectsContainer.task_execution_input)
 
 
@@ -358,23 +421,37 @@ class TaskExecutionAPI(APIResource):
     @api.response(BadRequest)
     @api.response(200, model=task_api_execute_schema)
     @api.validate(task_execution_schema)
-    def post(self, session=None):
-        """ Execute task and stream results """
+    def post(self, session: Session = None) -> Response:
+        """Execute task and stream results"""
         data = request.json
         for task in data.get('tasks'):
-            if task.lower() not in [t.lower() for t in self.manager.user_config.get('tasks', {}).keys()]:
-                raise NotFoundError('task %s does not exist' % task)
+            if task.lower() not in [
+                t.lower() for t in self.manager.user_config.get('tasks', {}).keys()
+            ]:
+                raise NotFoundError(f'task {task} does not exist')
 
         queue = ExecuteLog()
         output = queue if data.get('loglevel') else None
-        stream = True if any(
-            arg[0] in ['progress', 'summary', 'loglevel', 'entry_dump'] for arg in data.items() if arg[1]) else False
+        stream = (
+            True
+            if any(
+                arg[0] in ['progress', 'summary', 'loglevel', 'entry_dump']
+                for arg in data.items()
+                if arg[1]
+            )
+            else False
+        )
         loglevel = data.pop('loglevel', None)
 
+        if loglevel:
+            loglevel = loglevel.upper()
+
         # This emulates the CLI command of using `--now` and `no-cache`
-        options = {'interval_ignore': data.pop('now', None),
-                   'nocache': data.pop('no_cache', None),
-                   'allow_manual': True}
+        options = {
+            'interval_ignore': data.pop('now', None),
+            'nocache': data.pop('no_cache', None),
+            'allow_manual': True,
+        }
 
         for option, value in data.items():
             options[option] = value
@@ -386,10 +463,14 @@ class TaskExecutionAPI(APIResource):
                 entry['url'] = item['url']
                 if not item.get('title'):
                     try:
-                        value, params = cgi.parse_header(requests.head(item['url']).headers['Content-Disposition'])
+                        value, params = cgi.parse_header(
+                            requests.head(item['url']).headers['Content-Disposition']
+                        )
                         entry['title'] = params['filename']
                     except KeyError:
-                        raise BadRequest('No title given, and couldn\'t get one from the URL\'s HTTP response')
+                        raise BadRequest(
+                            'No title given, and couldn\'t get one from the URL\'s HTTP response'
+                        )
 
                 else:
                     entry['title'] = item.get('title')
@@ -403,25 +484,29 @@ class TaskExecutionAPI(APIResource):
                 entries.append(entry)
             options['inject'] = entries
 
-        executed_tasks = self.manager.execute(options=options, output=output, loglevel=loglevel)
+        if output:
+            with capture_console(output), capture_logs(output, level=loglevel):
+                executed_tasks = self.manager.execute(options=options)
+        else:
+            executed_tasks = self.manager.execute(options=options)
 
         tasks_queued = []
 
         for task_id, task_name, task_event in executed_tasks:
             tasks_queued.append({'id': task_id, 'name': task_name, 'event': task_event})
-            _streams[task_id] = {
-                'queue': queue,
-                'last_update': datetime.now(),
-                'args': data
-            }
+            _streams[task_id] = {'queue': queue, 'last_update': datetime.now(), 'args': data}
 
         if not stream:
-            return jsonify({'tasks': [{'id': task['id'], 'name': task['name']} for task in tasks_queued]})
+            return jsonify(
+                {'tasks': [{'id': task['id'], 'name': task['name']} for task in tasks_queued]}
+            )
 
         def stream_response():
             # First return the tasks to execute
             yield '{"stream": ['
-            yield json.dumps({'tasks': [{'id': task['id'], 'name': task['name']} for task in tasks_queued]}) + ',\n'
+            yield json.dumps(
+                {'tasks': [{'id': task['id'], 'name': task['name']} for task in tasks_queued]}
+            ) + ',\n'
 
             while True:
                 try:
@@ -495,7 +580,7 @@ _phase_percents = {
 }
 
 
-def update_stream(task, status='pending'):
+def update_stream(task, status: str = 'pending') -> None:
     if task.current_phase in _phase_percents:
         task.stream['percent'] = _phase_percents[task.current_phase]
 
@@ -503,10 +588,10 @@ def update_stream(task, status='pending'):
         'status': status,
         'phase': task.current_phase,
         'plugin': task.current_plugin,
-        'percent': task.stream.get('percent', 0)
+        'percent': task.stream.get('percent', 0),
     }
 
-    task.stream['queue'].put(json.dumps({'progress': progress}))
+    task.stream['queue'].put(json.dumps({'progress': progress, 'task_id': task.id}))
 
 
 @event('task.execute.started')
@@ -525,22 +610,29 @@ def finish_task(task):
 
         if task.stream['args'].get('entry_dump'):
             entries = [entry.store for entry in task.entries]
-            task.stream['queue'].put(EntryDecoder().encode({'entry_dump': entries}))
+            task.stream['queue'].put(
+                EntryDecoder().encode({'entry_dump': entries, 'task_id': task.id})
+            )
 
         if task.stream['args'].get('summary'):
-            task.stream['queue'].put(json.dumps({
-                'summary': {
-                    'accepted': len(task.accepted),
-                    'rejected': len(task.rejected),
-                    'failed': len(task.failed),
-                    'undecided': len(task.undecided),
-                    'aborted': task.aborted,
-                    'abort_reason': task.abort_reason,
-                }
-            }))
+            task.stream['queue'].put(
+                json.dumps(
+                    {
+                        'summary': {
+                            'accepted': len(task.accepted),
+                            'rejected': len(task.rejected),
+                            'failed': len(task.failed),
+                            'undecided': len(task.undecided),
+                            'aborted': task.aborted,
+                            'abort_reason': task.abort_reason,
+                        },
+                        'task_id': task.id,
+                    }
+                )
+            )
 
 
 @event('task.execute.before_plugin')
-def track_progress(task, plugin_name):
+def track_progress(task, plugin_name: str):
     if task.stream and task.stream['args'].get('progress'):
         update_stream(task, status='running')

@@ -2,20 +2,22 @@ interactions:
 - request:
     body: null
     headers:
-      Content-Type: [application/json]
-      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: ['2']
+      Content-Type:
+      - application/json
+      trakt-api-key:
+      - 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af
+      trakt-api-version:
+      - '2'
     method: GET
-    uri: https://api.trakt.tv/search?type=show&query=House
+    uri: https://api.trakt.tv/search?query=House&type=show
   response:
-    body: {string: "[{\"type\":\"show\",\"score\":61.689377,\"show\":{\"title\":\"House\",\"overview\":\"Go
-        deeper into the medical mysteries of House, TV's most compelling drama. Hugh
-        Laurie stars as the brilliant but sarcastic Dr. Gregory House, a maverick
-        physician who is devoid of bedside manner. While his behavior can border on
-        antisocial, Dr. House thrives on the challenge of solving the medical puzzles
-        that other doctors give up on. Together with his hand-picked team of young
-        medical experts, he'll do whatever it takes in the race against the clock
-        to solve the case.\",\"year\":2004,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":1399,\"slug\":\"house\",\"tvdb\":73255,\"imdb\":\"tt0412142\",\"tmdb\":1408,\"tvrage\":3908}}},{\"type\":\"show\",\"score\":49.852543,\"show\":{\"title\":\"House
+    body:
+      string: "[{\"type\":\"show\",\"score\":61.29207,\"show\":{\"title\":\"House\",\"overview\":\"Dr.
+        Gregory House is a maverick physician who is devoid of bedside manner. While
+        his behavior can border on antisocial, Dr. House thrives on the challenge
+        of solving the medical puzzles that other doctors give up on. Together with
+        his hand-picked team of young medical experts, he'll do whatever it takes
+        in the race against the clock to solve the case.\",\"year\":2004,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":1399,\"slug\":\"house\",\"tvdb\":73255,\"imdb\":\"tt0412142\",\"tmdb\":1408,\"tvrage\":3908}}},{\"type\":\"show\",\"score\":49.53147,\"show\":{\"title\":\"House
         vs. House\",\"overview\":\"House vs. House is a new home makeover competition
         series where amateur and experienced renovation teams compete for the chance
         to win $10,000 by proving they can create the better DIY projects in their
@@ -23,238 +25,1037 @@ interactions:
         each episode features two teams will go head-to-head in grueling challenges.
         Tanya McQueen, a DIY design expert, and David Brian Sanders, an architect
         and designer, will determine which team completes the most impressive transformation
-        and award the cash prize.\",\"year\":1969,\"status\":\"\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":93965,\"slug\":\"house-vs-house\",\"tvdb\":287378,\"imdb\":\"tt4097428\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":44.06384,\"show\":{\"title\":\"Full
+        and award the cash prize.\",\"year\":1969,\"status\":\"\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":93965,\"slug\":\"house-vs-house\",\"tvdb\":287378,\"imdb\":\"tt4097428\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":43.780052,\"show\":{\"title\":\"Full
         House\",\"overview\":\"Full House is an American sitcom created by Jeff Franklin
         for ABC. The show chronicles a widowed father, who enlists his best friend
         and his brother-in-law to help raise his three daughters. It aired from September
-        22, 1987, to May 23, 1995, broadcasting eight seasons and 192 episodes.\",\"year\":1987,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":4289,\"slug\":\"full-house-1987\",\"tvdb\":70500,\"imdb\":\"tt0092359\",\"tmdb\":4313,\"tvrage\":3622}}},{\"type\":\"show\",\"score\":44.06384,\"show\":{\"title\":\"House
+        22, 1987, to May 23, 1995, broadcasting eight seasons and 192 episodes.\",\"year\":1987,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":4289,\"slug\":\"full-house-1987\",\"tvdb\":70500,\"imdb\":\"tt0092359\",\"tmdb\":4313,\"tvrage\":3622}}},{\"type\":\"show\",\"score\":43.780052,\"show\":{\"title\":\"House
         Hunters\",\"overview\":\"House Hunters takes viewers behind the scenes as
         individuals, couples and families learn what to look for and decide whether
         or not a home is meant for them. Focusing on the emotional experience of finding
         and purchasing a new home, each episode follows a prospective buyer and real
         estate agent through the home-buying process, from start to finish.\",\"year\":1999,\"status\":\"returning
-        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":6441,\"slug\":\"house-hunters\",\"tvdb\":73182,\"imdb\":\"tt0369117\",\"tmdb\":6480,\"tvrage\":null}}},{\"type\":\"show\",\"score\":44.06384,\"show\":{\"title\":\"Fuller
+        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":6441,\"slug\":\"house-hunters\",\"tvdb\":73182,\"imdb\":\"tt0369117\",\"tmdb\":6480,\"tvrage\":null}}},{\"type\":\"show\",\"score\":43.780052,\"show\":{\"title\":\"Fuller
         House\",\"overview\":\"Recently widowed D.J. Tanner-Fuller gets help from
         her sister Stephanie and best friend Kimmy when the women move in with their
-        families to help D.J. raise her children in this spin-off series.\",\"year\":2016,\"status\":\"returning
-        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":102424,\"slug\":\"fuller-house\",\"tvdb\":301236,\"imdb\":\"tt3986586\",\"tmdb\":63623,\"tvrage\":48701}}},{\"type\":\"show\",\"score\":44.06384,\"show\":{\"title\":\"Alpha
+        families to help D.J. raise her children in this spin-off series filled with
+        familiar faces.\",\"year\":2016,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":102424,\"slug\":\"fuller-house\",\"tvdb\":301236,\"imdb\":\"tt3986586\",\"tmdb\":63623,\"tvrage\":48701}}},{\"type\":\"show\",\"score\":43.780052,\"show\":{\"title\":\"Alpha
         House\",\"overview\":\"Alpha House follows four senators who live together
         in a rented house in Washington DC.Re-election battles, looming indictments,
-        parties, their Party... these senators need a drink. And a new housemate.\",\"year\":2013,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":60285,\"slug\":\"alpha-house\",\"tvdb\":269008,\"imdb\":\"tt3012160\",\"tmdb\":60719,\"tvrage\":34454}}},{\"type\":\"show\",\"score\":44.06384,\"show\":{\"title\":\"Playing
+        parties, their Party... these senators need a drink. And a new housemate.\",\"year\":2013,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":60285,\"slug\":\"alpha-house\",\"tvdb\":269008,\"imdb\":\"tt3012160\",\"tmdb\":60719,\"tvrage\":34454}}},{\"type\":\"show\",\"score\":43.780052,\"show\":{\"title\":\"Playing
         House\",\"overview\":\"A single-camera buddy comedy about what happens when
         two best friends come back together, just when they need each other most.Inspired
         by the ultra-close friendship between the series' creators and stars, \\\"Playing
         House\\\" centers on mother to-be Maggie who asks her single and career-driven
         best friend Emma to return home from her job overseas to attend her baby shower,
-        having no idea what\u2019s truly in store.\",\"year\":2014,\"status\":\"returning
-        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":73385,\"slug\":\"playing-house\",\"tvdb\":269898,\"imdb\":\"tt2750182\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":44.06384,\"show\":{\"title\":\"House
+        having no idea what\u2019s truly in store.\",\"year\":2014,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":73385,\"slug\":\"playing-house\",\"tvdb\":269898,\"imdb\":\"tt2750182\",\"tmdb\":61762,\"tvrage\":35945}}},{\"type\":\"show\",\"score\":43.780052,\"show\":{\"title\":\"Summer
+        House\",\"overview\":\"Summer House takes the beach town of Montauk, New York
+        by storm, while following a group of nine friends who make the exclusive enclave
+        their go-to party spot between Memorial Day and Labor Day \u2014 that is,
+        when they're not hustling at their day jobs. You could say they work hard
+        and party way harder.\",\"year\":2017,\"status\":\"returning series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":113867,\"slug\":\"summer-house\",\"tvdb\":321121,\"imdb\":\"tt6645582\",\"tmdb\":69720,\"tvrage\":null}}},{\"type\":\"show\",\"score\":43.780052,\"show\":{\"title\":\"House
         Husbands\",\"overview\":\"House Husbands centres around four families with
-        one thing in common, the husbands stay home to raise the children.\",\"year\":2012,\"status\":\"returning
-        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":43830,\"slug\":\"house-husbands\",\"tvdb\":262026,\"imdb\":\"tt2402807\",\"tmdb\":44072,\"tvrage\":null}}},{\"type\":\"show\",\"score\":44.06384,\"show\":{\"title\":\"Bleak
-        House\",\"overview\":\"In this star-studded adaptation of a literary classic,
-        acclaimed writer Andrew Davies turns his talents to one of Charles Dickens'
-        most brilliant novels \u2014 arguably the greatest-ever depiction of Victorian
-        London. Fresh and imaginative, yet faithful to the original, this thrilling
-        fast-paced adaptation is shot with a contemporary edge. At its heart is the
-        story of the icily beautiful Lady Dedlock, who nurses a dark secret, and the
-        merciless lawyer Tulkinghorn, who seeks to uncover it. The generous John Jarndyce,
-        struggling with his own past, and his two young wards Richard and Ada, are
-        all caught up, like Lady Dedlock, in the infamous case of Jarndyce vs. Jarndyce,
-        which will make one of them rich beyond imagination if it can ever be brought
-        to a conclusion. As Tulkinghorn digs deeper into Lady Dedlock's past, he unearths
-        a secret that will change their lives forever, and which is almost as astounding
-        as the final outcome of the Jarndyce case.\",\"year\":2005,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":2474,\"slug\":\"bleak-house\",\"tvdb\":73558,\"imdb\":\"tt0442632\",\"tmdb\":2489,\"tvrage\":null}}},{\"type\":\"show\",\"score\":44.06384,\"show\":{\"title\":\"Full
-        House\",\"overview\":\"Han Ji Eun is a naive writer who got swindled out of
-        everything she owned including her house by her best friends. Stranded in
-        China, She managed to borrow money from an actor Lee Young Jae to return to
-        Korea. On her return, she found out that her house was bought by Lee Young
-        Jae. In an attempt to get her possessions back, she entered in a contract
-        marriage with Young Jae for one year. In spite of losing all, Ji Eun manages
-        to be cheerful and takes things in strike and the business relationship between
-        the two becomes personal as they start to rely and care for each other. \",\"year\":2004,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":3482,\"slug\":\"full-house\",\"tvdb\":84928,\"imdb\":\"tt0464625\",\"tmdb\":3504,\"tvrage\":null}}}]"}
+        one thing in common, the husbands stay home to raise the children.\",\"year\":2012,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":43830,\"slug\":\"house-husbands\",\"tvdb\":262026,\"imdb\":\"tt2402807\",\"tmdb\":44072,\"tvrage\":null}}},{\"type\":\"show\",\"score\":43.780052,\"show\":{\"title\":\"Safe
+        House\",\"overview\":\"A married couple, former detective Robert and teacher
+        Katy, are asked by close friend and police officer Mark, to turn their remote
+        Guest House into a Safe House.\",\"year\":2015,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":97962,\"slug\":\"safe-house\",\"tvdb\":294195,\"imdb\":\"tt4567314\",\"tmdb\":62452,\"tvrage\":42379}}}]"
     headers:
-      CF-Cache-Status: [HIT]
-      CF-RAY: [312a167bcba33d07-CPH]
-      Cache-Control: ['public, max-age=28800']
-      Connection: [keep-alive]
-      Content-Type: [application/json; charset=utf-8]
-      Date: ['Sat, 17 Dec 2016 11:38:16 GMT']
-      ETag: [W/"bd88943cc0ddc14f3315697ac3a632ef"]
-      Expires: ['Sat, 17 Dec 2016 19:38:16 GMT']
-      Server: [cloudflare-nginx]
-      Set-Cookie: ['__cfduid=d4b923f26f908952a37ed705bde9fbd821481974696; expires=Sun,
-          17-Dec-17 11:38:16 GMT; path=/; domain=.trakt.tv; HttpOnly']
-      Vary: [Accept-Encoding]
-      X-Content-Type-Options: [nosniff]
-      X-Frame-Options: [SAMEORIGIN]
-      X-Pagination-Item-Count: ['1737']
-      X-Pagination-Limit: ['10']
-      X-Pagination-Page: ['1']
-      X-Pagination-Page-Count: ['174']
-      X-Request-Id: [736fd637-8769-45e7-bd06-fab2e44bbc94]
-      X-Runtime: ['0.018501']
-      X-XSS-Protection: [1; mode=block]
-    status: {code: 200, message: OK}
+      Age:
+      - '5'
+      CF-Cache-Status:
+      - HIT
+      CF-RAY:
+      - 60caac07ef88f46c-IAD
+      Cache-Control:
+      - public, max-age=28800
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Tue, 05 Jan 2021 05:06:47 GMT
+      ETag:
+      - W/"0cf3d4a9f1312e6c842e9909cbe57074"
+      Expect-CT:
+      - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+      Expires:
+      - Tue, 05 Jan 2021 13:06:41 GMT
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cfduid=ddaf86b014cc94d944a832f9f9f84ffbe1609823207; expires=Thu, 04-Feb-21
+        05:06:47 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Pagination-Item-Count:
+      - '2771'
+      X-Pagination-Limit:
+      - '10'
+      X-Pagination-Page:
+      - '1'
+      X-Pagination-Page-Count:
+      - '278'
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Ratelimit:
+      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":996,"until":"2021-01-05T05:10:00Z"}'
+      X-Request-Id:
+      - c49b1d72-4730-4d30-bb32-9a94a15128fa
+      X-Runtime:
+      - '0.021687'
+      X-XSS-Protection:
+      - 1; mode=block
+      cf-request-id:
+      - 077289d8f30000f46c1ab01000000001
+    status:
+      code: 200
+      message: OK
 - request:
     body: null
     headers:
-      Content-Type: [application/json]
-      Cookie: [__cfduid=d4b923f26f908952a37ed705bde9fbd821481974696]
-      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: ['2']
+      Content-Type:
+      - application/json
+      trakt-api-key:
+      - 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af
+      trakt-api-version:
+      - '2'
     method: GET
     uri: https://api.trakt.tv/shows/1399?extended=full
   response:
-    body: {string: '{"title":"House","year":2004,"ids":{"trakt":1399,"slug":"house","tvdb":73255,"imdb":"tt0412142","tmdb":1408,"tvrage":3908},"overview":"Go
-        deeper into the medical mysteries of House, TV''s most compelling drama. Hugh
-        Laurie stars as the brilliant but sarcastic Dr. Gregory House, a maverick
-        physician who is devoid of bedside manner. While his behavior can border on
-        antisocial, Dr. House thrives on the challenge of solving the medical puzzles
-        that other doctors give up on. Together with his hand-picked team of young
-        medical experts, he''ll do whatever it takes in the race against the clock
-        to solve the case.","first_aired":"2004-11-16T08:00:00.000Z","airs":{"day":null,"time":null,"timezone":"America/New_York"},"runtime":44,"certification":"TV-14","network":"FOX
-        (US)","country":"us","trailer":null,"homepage":"http://www.fox.com/house/index.htm","status":"ended","rating":8.78719,"votes":17579,"updated_at":"2016-12-14T09:35:37.000Z","language":"en","available_translations":["ar","bg","bs","cs","da","de","el","en","es","fr","he","hu","it","ko","lt","nl","pl","pt","ro","ru","sk","sr","tr","uk","zh"],"genres":["comedy","drama","mystery"],"aired_episodes":176}'}
+    body:
+      string: '{"title":"House","year":2004,"ids":{"trakt":1399,"slug":"house","tvdb":73255,"imdb":"tt0412142","tmdb":1408,"tvrage":3908},"overview":"Dr.
+        Gregory House is a maverick physician who is devoid of bedside manner. While
+        his behavior can border on antisocial, Dr. House thrives on the challenge
+        of solving the medical puzzles that other doctors give up on. Together with
+        his hand-picked team of young medical experts, he''ll do whatever it takes
+        in the race against the clock to solve the case.","first_aired":"2004-11-17T02:00:00.000Z","airs":{"day":"Monday","time":"21:00","timezone":"America/New_York"},"runtime":45,"certification":"TV-14","network":"FOX","country":"us","trailer":"https://youtube.com/watch?v=MczMB8nU1sY","homepage":"http://www.fox.com/house/index.htm","status":"ended","rating":8.67064,"votes":27790,"comment_count":78,"updated_at":"2021-01-04T10:06:30.000Z","language":"en","available_translations":["ar","bg","bs","cs","da","de","el","en","es","fi","fr","he","hr","hu","it","ja","ko","lt","lv","nl","no","pl","pt","ro","ru","sk","sr","sv","tr","uk","zh"],"genres":["comedy","drama","mystery"],"aired_episodes":176}'
     headers:
-      CF-Cache-Status: [HIT]
-      CF-RAY: [312a167bfba73d07-CPH]
-      Cache-Control: ['public, max-age=28800']
-      Connection: [keep-alive]
-      Content-Type: [application/json; charset=utf-8]
-      Date: ['Sat, 17 Dec 2016 11:38:16 GMT']
-      ETag: [W/"6cabdad3b0db0c728ee72f8827a38aa5"]
-      Expires: ['Sat, 17 Dec 2016 19:38:16 GMT']
-      Last-Modified: ['Wed, 14 Dec 2016 09:35:37 GMT']
-      Server: [cloudflare-nginx]
-      Vary: [Accept-Encoding]
-      X-Content-Type-Options: [nosniff]
-      X-Frame-Options: [SAMEORIGIN]
-      X-Request-Id: [33446abf-9aaa-4f6d-a5bc-f192b686fdcf]
-      X-Runtime: ['0.013575']
-      X-XSS-Protection: [1; mode=block]
-    status: {code: 200, message: OK}
+      Age:
+      - '6532'
+      CF-Cache-Status:
+      - HIT
+      CF-RAY:
+      - 60caac088ac273ad-IAD
+      Cache-Control:
+      - public, max-age=28800
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Tue, 05 Jan 2021 05:06:47 GMT
+      ETag:
+      - W/"827bab8d052f204657fcd14b08b642e9"
+      Expect-CT:
+      - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+      Expires:
+      - Tue, 05 Jan 2021 11:17:54 GMT
+      Last-Modified:
+      - Mon, 04 Jan 2021 10:06:30 GMT
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cfduid=dcb144ea8453ac3ec6c61c56c6d4e12ad1609823207; expires=Thu, 04-Feb-21
+        05:06:47 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Ratelimit:
+      - '{"name":"AUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":977,"until":"2021-01-04T11:15:00Z"}'
+      X-Request-Id:
+      - e566eda7-88e1-448d-a4e2-63f5974c15bd
+      X-Runtime:
+      - '0.009825'
+      X-XSS-Protection:
+      - 1; mode=block
+      cf-request-id:
+      - 077289d950000073ad1d36e000000001
+    status:
+      code: 200
+      message: OK
 - request:
     body: null
     headers:
-      Content-Type: [application/json]
-      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: ['2']
+      Content-Type:
+      - application/json
+      trakt-api-key:
+      - 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af
+      trakt-api-version:
+      - '2'
     method: GET
     uri: https://api.trakt.tv/shows/1399/people?extended=full
   response:
-    body: {string: "{\"cast\":[{\"character\":\"Dr. Gregory House\",\"person\":{\"name\":\"Hugh
-        Laurie\",\"ids\":{\"trakt\":297390,\"slug\":\"hugh-laurie\",\"imdb\":\"nm0491402\",\"tmdb\":41419,\"tvrage\":30836},\"biography\":\"James
-        Hugh Calum Laurie better known as Hugh Laurie, is an English actor, voice
-        artist, comedian, writer, musician, recording artist, and director. He first
-        became known as one half of the Fry and Laurie double act, along with his
-        friend and comedy partner Stephen Fry, whom he joined in the cast of Blackadder
-        and Jeeves and Wooster from 1987 until 1999. Since 2004, he has played the
-        lead as Dr. Gregory House, the protagonist of House, for which he received
-        two Golden Globe awards and several Emmy nominations. As of August 2010, he
-        is the highest paid actor in a drama series on US television.\\n\\nDescription
-        above from the Wikipedia article Hugh Laurie, licensed under CC-BY-SA, full
-        list of contributors on Wikipedia.\",\"birthday\":\"1959-06-11\",\"death\":null,\"birthplace\":\"Oxford,
-        Oxfordshire, England UK\",\"homepage\":\"http://hughlaurieblues.com/\"}},{\"character\":\"Dr.
-        Eric Foreman\",\"person\":{\"name\":\"Omar Epps\",\"ids\":{\"trakt\":412476,\"slug\":\"omar-epps\",\"imdb\":\"nm0004898\",\"tmdb\":4987,\"tvrage\":null},\"biography\":\"Omar
+    body:
+      string: "{\"cast\":[{\"character\":\"Gregory House\",\"characters\":[\"Gregory
+        House\"],\"episode_count\":176,\"person\":{\"name\":\"Hugh Laurie\",\"ids\":{\"trakt\":297390,\"slug\":\"hugh-laurie\",\"imdb\":\"nm0491402\",\"tmdb\":41419,\"tvrage\":30836},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"James
+        Hugh Calum Laurie CBE is an English actor, director, singer, musician, comedian
+        and author. Laurie is known for portraying the title character on the Fox
+        medical drama series House (2004\u20132012), for which he received two Golden
+        Globe Awards and nominations for numerous other awards. He was listed in the
+        2011 Guinness World Records as the most watched leading man on television
+        and was one of the highest-paid actors in a television drama, earning \xA3250,000
+        ($409,000) per episode of House. His other television credits include arms
+        dealer Richard Onslow Roper in the miniseries The Night Manager (2016), for
+        which he won his third Golden Globe Award, and Senator Tom James in the HBO
+        sitcom Veep (2012\u20132019), for which he received his 10th Emmy Award nomination.\\n\\nForced
+        to abandon rowing during a bout of glandular fever, Laurie joined the Cambridge
+        Footlights, a university dramatic club that has produced many well-known actors
+        and comedians. There he met Emma Thompson, with whom he had a romantic relationship.
+        The two remain good friends. She introduced him to his future comedy partner,
+        Stephen Fry. Laurie, Fry and Thompson later parodied themselves as the University
+        Challenge representatives of \\\"Footlights College, Oxbridge\\\" in \\\"Bambi\\\",
+        an episode of The Young Ones, with the series' co-writer Ben Elton completing
+        their team.  This page is based on a Wikipedia article written by contributors.
+        Text is available under the CC BY-SA 4.0 license; additional terms may apply.\",\"birthday\":\"1959-06-11\",\"death\":null,\"birthplace\":\"Oxford,
+        Oxfordshire, England, UK\",\"homepage\":\"https://hughlaurieblues.com/\"}},{\"character\":\"Eric
+        Foreman\",\"characters\":[\"Eric Foreman\"],\"episode_count\":176,\"person\":{\"name\":\"Omar
+        Epps\",\"ids\":{\"trakt\":412476,\"slug\":\"omar-epps\",\"imdb\":\"nm0004898\",\"tmdb\":4987,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"Omar
         Hashim Epps (born July 20, 1973) is an American actor, singer, songwriter,
-        and record producer. His film roles include Juice, Major League II, Higher
+        and record producer.\\n\\nHis film roles include Juice, Major League II, Higher
         Learning, Scream 2, The Wood, In Too Deep, and Love and Basketball. Epps'
-        television work includes the role of Dr. Dennis Gant on the US medical drama
-        series ER, and since 2004 Dr. Eric Foreman on the Fox medical drama series
-        House which earned him a NAACP Image Award in 2007 and 2008 for Outstanding
-        Supporting Actor in a Drama Series.\",\"birthday\":\"1973-07-20\",\"death\":null,\"birthplace\":\"Brooklyn,
-        New York, USA\",\"homepage\":\"\"}},{\"character\":\"Dr. James Wilson\",\"person\":{\"name\":\"Robert
-        Sean Leonard\",\"ids\":{\"trakt\":411888,\"slug\":\"robert-sean-leonard\",\"imdb\":\"nm0000494\",\"tmdb\":2692,\"tvrage\":31687},\"biography\":\"\u200BFrom
-        Wikipedia, the free encyclopedia\\n\\nRobert Sean Leonard (born February 28,
-        1969) is an award-winning American actor, who has regularly starred in Broadway
-        and off-Broadway productions. Since 2004 he has played the role of Dr. James
-        Wilson on the TV series House. He played Neil Perry in the 1989 movie Dead
-        Poets Society.\\n\\nDescription above from the Wikipedia article Robert Sean
-        Leonard, licensed under CC-BY-SA, full list of contributors on Wikipedia.\",\"birthday\":\"1969-02-28\",\"death\":null,\"birthplace\":\"Westwood,
-        New Jersey, USA\",\"homepage\":\"\"}},{\"character\":\"Dr. Allison Cameron\",\"person\":{\"name\":\"Jennifer
-        Morrison\",\"ids\":{\"trakt\":414513,\"slug\":\"jennifer-morrison\",\"imdb\":\"nm0607185\",\"tmdb\":41421,\"tvrage\":28684},\"biography\":\"Jennifer
-        Marie Morrison (born April 12, 1979, height 5' 5\xBC\\\" (1,66 m)) is an American
-        actress, model and film producer. She is best known for her role as Dr. Allison
-        Cameron in House, whom she played for over five years, and also as Zoey Pierson
-        in the sixth season of How I Met Your Mother.\\n\\nJennifer Morrison was born
-        in Chicago, Illinois, and raised in Arlington Heights, Illinois. She is the
-        eldest of three children with a sister, Julia, and a brother, Daniel. Her
-        father, David L. Morrison, is a retired music teacher who was named teacher
-        of the year by the Illinois State Board of Education in 2003. Morrison's mother,
-        Judy Morrison, is also a retired teacher.\\n\\nMorrison attended South Middle
-        School then graduated from Prospect High School in 1997 where her parents
-        worked. She played clarinet in the school's marching band, sang in the choir
-        and was a cheerleader with the school's pep squad. She attended Loyola University
-        Chicago where she majored in Theatre and minored in English, graduating in
-        2000. She studied with the Steppenwolf Theatre Company before moving to Los
-        Angeles to pursue a career in film and television.\\n\\nMorrison started dating
-        her House co-star Jesse Spencer in July 2004. Spencer proposed to Morrison
-        on December 23, 2006, at the Eiffel Tower and the two had planned to marry
-        later in 2007. In August 2007, Morrison and Spencer called off their engagement.\\n\\nDescription
-        above from the Wikipedia article Jennifer Morrison, licensed under CC-BY-SA,
-        full list of contributors on Wikipedia.\",\"birthday\":\"1979-04-12\",\"death\":null,\"birthplace\":\"Chicago
-        - Illinois - USA\",\"homepage\":\"\"}},{\"character\":\"Dr. Robert Chase\",\"person\":{\"name\":\"Jesse
-        Spencer\",\"ids\":{\"trakt\":429766,\"slug\":\"jesse-spencer-5ede7178-b889-4092-bdc8-08a1e57de572\",\"imdb\":\"nm0817980\",\"tmdb\":41422,\"tvrage\":31685},\"biography\":\"\u200BFrom
-        Wikipedia, the free encyclopedia. \_\\n\\nJesse Gordon Spencer (born 12 February
-        1979) is an Australian actor and musician. He is best known for his current
-        portrayal of Dr. Robert Chase on the medical drama House and for playing Billy
-        Kennedy in the Australian soap-opera Neighbours.\",\"birthday\":\"1979-02-12\",\"death\":null,\"birthplace\":\"Melbourne
-        - Victoria - Australia\",\"homepage\":\"\"}},{\"character\":\"\u041A\u0440\u0438\u0441
-        \u0422\u0430\u0443\u0431\",\"person\":{\"name\":\"Peter Jacobson\",\"ids\":{\"trakt\":418546,\"slug\":\"peter-jacobson\",\"imdb\":\"nm0414907\",\"tmdb\":31514,\"tvrage\":4259},\"biography\":\"From
-        Wikipedia, the free encyclopedia\\n\\nPeter S. Jacobson (born March 24, 1965)
-        is an American film and television actor.\",\"birthday\":\"1965-03-24\",\"death\":null,\"birthplace\":\"Chicago
-        - Illinois - USA\",\"homepage\":\"\"}},{\"character\":\"Thirteen\",\"person\":{\"name\":\"Olivia
-        Wilde\",\"ids\":{\"trakt\":421662,\"slug\":\"olivia-wilde\",\"imdb\":\"nm1312575\",\"tmdb\":59315,\"tvrage\":51856},\"biography\":\"Olivia
-        Wilde (born Olivia Jane Cockburn; March 10, 1984) is an American actress and
-        model. She began acting in the early 2000s, and has since appeared in a number
-        of film and television parts, including roles in the serial-drama The O.C.
-        and The Black Donnellys. She portrays Dr. Remy \\\"Thirteen\\\" Hadley in
-        the TV drama House, and in 2010 starred as Quorra in Tron: Legacy.\\n\\nDescription
-        above from the Wikipedia article Olivia Wilde, licensed under CC-BY-SA, full
-        list of contributors on Wikipedia.\",\"birthday\":\"1984-03-10\",\"death\":null,\"birthplace\":\"New
-        York City, New York, USA\",\"homepage\":\"\"}}],\"crew\":{\"production\":[{\"job\":\"Casting\",\"person\":{\"name\":\"Amy
-        Lippens\",\"ids\":{\"trakt\":1995,\"slug\":\"amy-lippens\",\"imdb\":\"nm0513591\",\"tmdb\":2151,\"tvrage\":null},\"biography\":null,\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Executive
-        Producer\",\"person\":{\"name\":\"Paul Attanasio\",\"ids\":{\"trakt\":2009,\"slug\":\"paul-attanasio\",\"imdb\":\"nm0001921\",\"tmdb\":45543,\"tvrage\":71428},\"biography\":null,\"birthday\":\"1959-11-14\",\"death\":null,\"birthplace\":\"\",\"homepage\":null}},{\"job\":\"Co-Executive
-        Producer\",\"person\":{\"name\":\"Gerrit van der Meer\",\"ids\":{\"trakt\":9787,\"slug\":\"gerrit-van-der-meer\",\"imdb\":\"nm0576182\",\"tmdb\":12256,\"tvrage\":null},\"biography\":null,\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Unit
-        Production Manager\",\"person\":{\"name\":\"Gerrit van der Meer\",\"ids\":{\"trakt\":9787,\"slug\":\"gerrit-van-der-meer\",\"imdb\":\"nm0576182\",\"tmdb\":12256,\"tvrage\":null},\"biography\":null,\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Executive
-        Producer\",\"person\":{\"name\":\"Garrett Lerner\",\"ids\":{\"trakt\":106206,\"slug\":\"garrett-lerner\",\"imdb\":\"nm1068424\",\"tmdb\":114407,\"tvrage\":null},\"biography\":null,\"birthday\":null,\"death\":null,\"birthplace\":\"\",\"homepage\":null}},{\"job\":\"Executive
-        Producer\",\"person\":{\"name\":\"Peter Blake\",\"ids\":{\"trakt\":399346,\"slug\":\"peter-blake-5cd380a9-d696-46d4-84cc-b862c5b2e6b3\",\"imdb\":\"nm0086694\",\"tmdb\":1223964,\"tvrage\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":\"\"}},{\"job\":\"Executive
-        Producer\",\"person\":{\"name\":\"Thomas L. Moran\",\"ids\":{\"trakt\":399347,\"slug\":\"thomas-l-moran\",\"imdb\":\"nm0602981\",\"tmdb\":1223966,\"tvrage\":31719},\"biography\":null,\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Executive
-        Producer\",\"person\":{\"name\":\"Russel Friend\",\"ids\":{\"trakt\":399348,\"slug\":\"russel-friend\",\"imdb\":\"nm1068423\",\"tmdb\":1213567,\"tvrage\":null},\"biography\":null,\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Producer\",\"person\":{\"name\":\"Marcy
-        G. Kaplan\",\"ids\":{\"trakt\":399357,\"slug\":\"marcy-g-kaplan\",\"imdb\":\"nm0438309\",\"tmdb\":1224008,\"tvrage\":null},\"biography\":null,\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Executive
-        Producer\",\"person\":{\"name\":\"Bryan Singer\",\"ids\":{\"trakt\":413922,\"slug\":\"bryan-singer\",\"imdb\":\"nm0001741\",\"tmdb\":9032,\"tvrage\":31688},\"biography\":\"Bryan
-        Singer (born September 17, 1965) is an American film director and film producer.
+        television work includes ER and House.\",\"birthday\":\"1973-07-20\",\"death\":null,\"birthplace\":\"Brooklyn,
+        New York, USA\",\"homepage\":null}},{\"character\":\"James Wilson\",\"characters\":[\"James
+        Wilson\"],\"episode_count\":176,\"person\":{\"name\":\"Robert Sean Leonard\",\"ids\":{\"trakt\":411888,\"slug\":\"robert-sean-leonard\",\"imdb\":\"nm0000494\",\"tmdb\":2692,\"tvrage\":31687},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\u200BRobert
+        Sean Leonard (born February 28, 1969) is an award-winning American actor.\\n\\nHe
+        has regularly starred in Broadway and off-Broadway productions, but is most
+        known for his roles on House and in Dead Poets Society.\",\"birthday\":\"1969-02-28\",\"death\":null,\"birthplace\":\"Westwood,
+        New Jersey, USA\",\"homepage\":null}},{\"character\":\"Robert Chase\",\"characters\":[\"Robert
+        Chase\"],\"episode_count\":176,\"person\":{\"name\":\"Jesse Spencer\",\"ids\":{\"trakt\":429766,\"slug\":\"jesse-spencer-5ede7178-b889-4092-bdc8-08a1e57de572\",\"imdb\":\"nm0817980\",\"tmdb\":41422,\"tvrage\":31685},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"Jesse
+        Spencer (born 12 February 1979) is an Australian actor and musician. He is
+        best known for portraying firefighter Matthew Casey on Chicago Fire, Dr. Robert
+        Chase on the medical drama House and Billy Kennedy on the Australian soap-opera
+        Neighbours.\",\"birthday\":\"1979-02-12\",\"death\":null,\"birthplace\":\"
+        Melbourne, Victoria, Australia\",\"homepage\":null}},{\"character\":\"Lisa
+        Cuddy\",\"characters\":[\"Lisa Cuddy\"],\"episode_count\":154,\"person\":{\"name\":\"Lisa
+        Edelstein\",\"ids\":{\"trakt\":418925,\"slug\":\"lisa-edelstein\",\"imdb\":\"nm0249046\",\"tmdb\":41420,\"tvrage\":31684},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"Lisa
+        Edelstein\_(born May 21, 1966)\_is an American actress best known for her
+        role as Dr. Lisa Cuddy on the medical drama series House.\",\"birthday\":\"1966-05-21\",\"death\":null,\"birthplace\":\"Boston,
+        Massachusetts, USA\",\"homepage\":null}},{\"character\":\"Allison Cameron\",\"characters\":[\"Allison
+        Cameron\"],\"episode_count\":131,\"person\":{\"name\":\"Jennifer Morrison\",\"ids\":{\"trakt\":414513,\"slug\":\"jennifer-morrison\",\"imdb\":\"nm0607185\",\"tmdb\":41421,\"tvrage\":28684},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"Jennifer
+        Morrison (born April 12, 1979) is an American actress, model and film producer.
+        She is best known for her roles on House and Once Upon A Time as well as How
+        I Met Your Mother.\",\"birthday\":\"1979-04-12\",\"death\":null,\"birthplace\":\"Chicago,
+        Illinois, USA\",\"homepage\":null}},{\"character\":\"Chris Taub\",\"characters\":[\"Chris
+        Taub\"],\"episode_count\":90,\"person\":{\"name\":\"Peter Jacobson\",\"ids\":{\"trakt\":418546,\"slug\":\"peter-jacobson\",\"imdb\":\"nm0414907\",\"tmdb\":31514,\"tvrage\":4259},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"Peter
+        S. Jacobson (born March 24, 1965) is an American film and television actor.\",\"birthday\":\"1965-03-24\",\"death\":null,\"birthplace\":\"Chicago,
+        Illinois, U.S.\",\"homepage\":null}},{\"character\":\"Remy \\\"Thirteen\\\"
+        Hadley\",\"characters\":[\"Remy \\\"Thirteen\\\" Hadley\"],\"episode_count\":68,\"person\":{\"name\":\"Olivia
+        Wilde\",\"ids\":{\"trakt\":421662,\"slug\":\"olivia-wilde\",\"imdb\":\"nm1312575\",\"tmdb\":59315,\"tvrage\":51856},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"Olivia
+        Wilde is an American film and television actress, model, activist and director,
+        best known for playing recurring television characters Alex Kelly on The O.C.,
+        and Dr. Remy \\\"Thirteen\\\" Hadley on the medical-drama House. She also
+        starred as and gave her voice to Quorra in the feature film science fiction
+        franchise Tron.\",\"birthday\":\"1984-03-10\",\"death\":null,\"birthplace\":\"New
+        York City, New York, USA\",\"homepage\":null}},{\"character\":\"Nurse\",\"characters\":[\"Nurse\"],\"episode_count\":23,\"person\":{\"name\":\"Bobbin
+        Bergstrom\",\"ids\":{\"trakt\":399343,\"slug\":\"bobbin-bergstrom\",\"imdb\":null,\"tmdb\":1224001,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"character\":\"Chi
+        Park\",\"characters\":[\"Chi Park\"],\"episode_count\":22,\"person\":{\"name\":\"Charlyne
+        Yi\",\"ids\":{\"trakt\":419887,\"slug\":\"charlyne-yi\",\"imdb\":\"nm2304722\",\"tmdb\":93285,\"tvrage\":182394},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"From
+        Wikipedia, the free encyclopedia.\\n\\nCharlyne Amanda Yi (born January 4,
+        1986) is an American actress, comedian, musician, writer, and painter. Her
+        performances do not always include joke-telling as in standup comedy; instead,
+        she uses different tactics such as music, magic, games, and often audience
+        participation. Her screenwriting debut, the feature film Paper Heart, won
+        the Waldo Salt Screenwriting Award at the 2009 Sundance Film Festival.\\n\\nDescription
+        above from the Wikipedia article Charlyne Yi, licensed under CC-BY-SA, full
+        list of contributors on Wikipedia.\",\"birthday\":\"1986-01-04\",\"death\":null,\"birthplace\":\"Los
+        Angeles, California, U.S.\",\"homepage\":null}},{\"character\":\"Jessica Adams\",\"characters\":[\"Jessica
+        Adams\"],\"episode_count\":22,\"person\":{\"name\":\"Odette Annable\",\"ids\":{\"trakt\":421384,\"slug\":\"odette-annable\",\"imdb\":\"nm0951148\",\"tmdb\":51992,\"tvrage\":57233},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"Odette
+        Annable is an American film and television actress.\",\"birthday\":\"1985-05-10\",\"death\":null,\"birthplace\":\"Los
+        Angeles, California, USA\",\"homepage\":null}}],\"crew\":{\"sound\":[{\"job\":\"Original
+        Music Composer\",\"jobs\":[\"Original Music Composer\"],\"episode_count\":176,\"person\":{\"name\":\"Jason
+        Derlatka\",\"ids\":{\"trakt\":618364,\"slug\":\"jason-derlatka\",\"imdb\":\"nm1628706\",\"tmdb\":1604953,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Foley
+        Artist\",\"jobs\":[\"Foley Artist\"],\"episode_count\":176,\"person\":{\"name\":\"Michael
+        Lyle\",\"ids\":{\"trakt\":568779,\"slug\":\"michael-lyle-329b40a3-a14a-4af5-9584-01a0fcfab1db\",\"imdb\":null,\"tmdb\":1577074,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Original
+        Music Composer\",\"jobs\":[\"Original Music Composer\"],\"episode_count\":176,\"person\":{\"name\":\"Jon
+        Ehrlich\",\"ids\":{\"trakt\":580789,\"slug\":\"jon-ehrlich\",\"imdb\":\"nm0251363\",\"tmdb\":1493983,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Music
+        Editor\",\"jobs\":[\"Music Editor\"],\"episode_count\":176,\"person\":{\"name\":\"Michael
+        Baber\",\"ids\":{\"trakt\":632779,\"slug\":\"michael-baber\",\"imdb\":null,\"tmdb\":1622443,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Original
+        Music Composer\",\"jobs\":[\"Original Music Composer\"],\"episode_count\":1,\"person\":{\"name\":\"Christopher
+        Hoag\",\"ids\":{\"trakt\":1490772,\"slug\":\"christopher-hoag\",\"imdb\":\"nm0387426\",\"tmdb\":1604954,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}}],\"production\":[{\"job\":\"Associate
+        Producer, Co-Producer, Producer\",\"jobs\":[\"Associate Producer\",\"Co-Producer\",\"Producer\"],\"episode_count\":176,\"person\":{\"name\":\"Marcy
+        G. Kaplan\",\"ids\":{\"trakt\":399357,\"slug\":\"marcy-g-kaplan\",\"imdb\":\"nm0438309\",\"tmdb\":1224008,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Executive
+        Producer\",\"jobs\":[\"Executive Producer\"],\"episode_count\":176,\"person\":{\"name\":\"Bryan
+        Singer\",\"ids\":{\"trakt\":413922,\"slug\":\"bryan-singer\",\"imdb\":\"nm0001741\",\"tmdb\":9032,\"tvrage\":31688},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"Bryan
+        Singer (born September 17, 1965) is an American film director and producer.
         Singer won critical acclaim for his work on The Usual Suspects, and is especially
         well-known among fans of the science fiction and comic book genres for his
         work on the first two X-Men films and Superman Returns.\\n\\nDescription above
         from the Wikipedia article Bryan Singer, licensed under CC-BY-SA, full list
         of contributors on Wikipedia.\",\"birthday\":\"1965-09-17\",\"death\":null,\"birthplace\":\"New
-        York City, New York, USA\",\"homepage\":\"\"}},{\"job\":\"Executive Producer\",\"person\":{\"name\":\"David
-        Shore\",\"ids\":{\"trakt\":434876,\"slug\":\"david-shore\",\"imdb\":\"nm0794914\",\"tmdb\":169061,\"tvrage\":17176},\"biography\":null,\"birthday\":\"1959-07-03\",\"death\":null,\"birthplace\":null,\"homepage\":\"\"}},{\"job\":\"Executive
-        Producer\",\"person\":{\"name\":\"Katie Jacobs\",\"ids\":{\"trakt\":436235,\"slug\":\"katie-jacobs\",\"imdb\":\"nm0414498\",\"tmdb\":41424,\"tvrage\":null},\"biography\":null,\"birthday\":null,\"death\":null,\"birthplace\":\"\",\"homepage\":null}}],\"directing\":[{\"job\":\"Script
-        Supervisor\",\"person\":{\"name\":\"Ira Hurvitz\",\"ids\":{\"trakt\":572489,\"slug\":\"ira-hurvitz\",\"imdb\":\"nm0403779\",\"tmdb\":1533790,\"tvrage\":null},\"biography\":null,\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Script
-        Coordinator\",\"person\":{\"name\":\"Dustin Paddock\",\"ids\":{\"trakt\":618367,\"slug\":\"dustin-paddock\",\"imdb\":null,\"tmdb\":1223981,\"tvrage\":null},\"biography\":null,\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}}],\"sound\":[{\"job\":\"Original
-        Music Composer\",\"person\":{\"name\":\"Jon Ehrlich\",\"ids\":{\"trakt\":580789,\"slug\":\"jon-ehrlich\",\"imdb\":\"nm0251363\",\"tmdb\":1493983,\"tvrage\":null},\"biography\":null,\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Original
-        Music Composer\",\"person\":{\"name\":\"Jason Derlatka\",\"ids\":{\"trakt\":618364,\"slug\":\"jason-derlatka\",\"imdb\":\"nm1628706\",\"tmdb\":1604953,\"tvrage\":null},\"biography\":null,\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":\"\"}}],\"costume
-        & make-up\":[{\"job\":\"Costume Design\",\"person\":{\"name\":\"Cathy Crandall\",\"ids\":{\"trakt\":618365,\"slug\":\"cathy-crandall\",\"imdb\":\"nm0186285\",\"tmdb\":1604955,\"tvrage\":null},\"biography\":null,\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}}],\"visual
-        effects\":[{\"job\":\"Visual Effects Supervisor\",\"person\":{\"name\":\"Elan
-        Soltes\",\"ids\":{\"trakt\":618366,\"slug\":\"elan-soltes\",\"imdb\":null,\"tmdb\":1488571,\"tvrage\":null},\"biography\":null,\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}}]}}"}
+        York City, New York, USA\",\"homepage\":null}},{\"job\":\"Executive Producer\",\"jobs\":[\"Executive
+        Producer\"],\"episode_count\":176,\"person\":{\"name\":\"David Shore\",\"ids\":{\"trakt\":434876,\"slug\":\"david-shore\",\"imdb\":\"nm0794914\",\"tmdb\":169061,\"tvrage\":17176},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"A
+        Canadian television writer, director and producer. He is known for creating
+        the critically acclaimed series House and more recently, Battle Creek, Sneaky
+        Pete and The Good Doctor. Shore worked on Family Law, NYPD Blue and Due South,
+        also producing many episodes of the latter.\",\"birthday\":\"1959-07-03\",\"death\":null,\"birthplace\":\"London,
+        Ontario, Canada\",\"homepage\":null}},{\"job\":\"Executive Producer\",\"jobs\":[\"Executive
+        Producer\"],\"episode_count\":176,\"person\":{\"name\":\"Katie Jacobs\",\"ids\":{\"trakt\":436235,\"slug\":\"katie-jacobs\",\"imdb\":\"nm0414498\",\"tmdb\":41424,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Co-Executive
+        Producer, Consulting Producer, Supervising Producer, Executive Producer\",\"jobs\":[\"Co-Executive
+        Producer\",\"Consulting Producer\",\"Supervising Producer\",\"Executive Producer\"],\"episode_count\":176,\"person\":{\"name\":\"Peter
+        Blake\",\"ids\":{\"trakt\":399346,\"slug\":\"peter-blake-5cd380a9-d696-46d4-84cc-b862c5b2e6b3\",\"imdb\":\"nm0086694\",\"tmdb\":1223964,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Executive
+        Producer, Co-Executive Producer\",\"jobs\":[\"Executive Producer\",\"Co-Executive
+        Producer\"],\"episode_count\":176,\"person\":{\"name\":\"Garrett Lerner\",\"ids\":{\"trakt\":106206,\"slug\":\"garrett-lerner\",\"imdb\":\"nm1068424\",\"tmdb\":114407,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Unit
+        Production Manager, Producer, Co-Executive Producer\",\"jobs\":[\"Unit Production
+        Manager\",\"Producer\",\"Co-Executive Producer\"],\"episode_count\":176,\"person\":{\"name\":\"Gerrit
+        van der Meer\",\"ids\":{\"trakt\":9787,\"slug\":\"gerrit-van-der-meer\",\"imdb\":\"nm0576182\",\"tmdb\":12256,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Executive
+        Producer\",\"jobs\":[\"Executive Producer\"],\"episode_count\":176,\"person\":{\"name\":\"Paul
+        Attanasio\",\"ids\":{\"trakt\":2009,\"slug\":\"paul-attanasio\",\"imdb\":\"nm0001921\",\"tmdb\":45543,\"tvrage\":71428},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":\"1959-11-14\",\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Casting\",\"jobs\":[\"Casting\"],\"episode_count\":176,\"person\":{\"name\":\"Amy
+        Lippens\",\"ids\":{\"trakt\":1995,\"slug\":\"amy-lippens\",\"imdb\":\"nm0513591\",\"tmdb\":2151,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Co-Executive
+        Producer, Supervising Producer, Executive Producer\",\"jobs\":[\"Co-Executive
+        Producer\",\"Supervising Producer\",\"Executive Producer\"],\"episode_count\":176,\"person\":{\"name\":\"Thomas
+        L. Moran\",\"ids\":{\"trakt\":399347,\"slug\":\"thomas-l-moran\",\"imdb\":\"nm0602981\",\"tmdb\":1223966,\"tvrage\":31719},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Executive
+        Producer, Co-Executive Producer\",\"jobs\":[\"Executive Producer\",\"Co-Executive
+        Producer\"],\"episode_count\":176,\"person\":{\"name\":\"Russel Friend\",\"ids\":{\"trakt\":399348,\"slug\":\"russel-friend\",\"imdb\":\"nm1068423\",\"tmdb\":1213567,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Casting,
+        Casting Associate\",\"jobs\":[\"Casting\",\"Casting Associate\"],\"episode_count\":154,\"person\":{\"name\":\"Stephanie
+        Laffin\",\"ids\":{\"trakt\":1001139,\"slug\":\"stephanie-laffin\",\"imdb\":\"nm0480817\",\"tmdb\":1604957,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Producer,
+        Consulting Producer, Co-Executive Producer\",\"jobs\":[\"Producer\",\"Consulting
+        Producer\",\"Co-Executive Producer\"],\"episode_count\":116,\"person\":{\"name\":\"Lawrence
+        Kaplow\",\"ids\":{\"trakt\":399356,\"slug\":\"lawrence-kaplow\",\"imdb\":\"nm0438432\",\"tmdb\":1223963,\"tvrage\":31697},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Co-Executive
+        Producer, Consulting Producer\",\"jobs\":[\"Co-Executive Producer\",\"Consulting
+        Producer\"],\"episode_count\":110,\"person\":{\"name\":\"Doris Egan\",\"ids\":{\"trakt\":92689,\"slug\":\"doris-egan\",\"imdb\":\"nm0250668\",\"tmdb\":169466,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Associate
+        Producer, Co-Producer\",\"jobs\":[\"Associate Producer\",\"Co-Producer\"],\"episode_count\":86,\"person\":{\"name\":\"Steven
+        Heth\",\"ids\":{\"trakt\":1490763,\"slug\":\"steven-heth\",\"imdb\":\"nm0381727\",\"tmdb\":1535825,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Co-Executive
+        Producer, Consulting Producer, Executive Producer\",\"jobs\":[\"Co-Executive
+        Producer\",\"Consulting Producer\",\"Executive Producer\"],\"episode_count\":70,\"person\":{\"name\":\"Daniel
+        Sackheim\",\"ids\":{\"trakt\":414782,\"slug\":\"daniel-sackheim\",\"imdb\":\"nm0755261\",\"tmdb\":12632,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"From
+        Wikipedia, the free encyclopedia.\\n\\nDaniel Sackheim is an American TV and
+        film director. He has directed several episodes of the TV show The X-Files,
+        3 episodes of Harsh Realm, House, and Life, the last two of which he also
+        served on as an executive producer.\",\"birthday\":null,\"death\":null,\"birthplace\":\"USA\",\"homepage\":null}},{\"job\":\"Executive
+        In Charge Of Production\",\"jobs\":[\"Executive In Charge Of Production\"],\"episode_count\":70,\"person\":{\"name\":\"Alex
+        Garcia\",\"ids\":{\"trakt\":84696,\"slug\":\"alex-garcia\",\"imdb\":\"nm1247503\",\"tmdb\":90281,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":\"1979-01-06\",\"death\":null,\"birthplace\":\"Philadelphia,
+        Pennsylvania, USA\",\"homepage\":null}},{\"job\":\"Supervising Producer\",\"jobs\":[\"Supervising
+        Producer\"],\"episode_count\":46,\"person\":{\"name\":\"Matt Witten\",\"ids\":{\"trakt\":399358,\"slug\":\"matt-witten\",\"imdb\":\"nm0936976\",\"tmdb\":1212236,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Executive
+        In Charge Of Production\",\"jobs\":[\"Executive In Charge Of Production\"],\"episode_count\":46,\"person\":{\"name\":\"Brian
+        Pines\",\"ids\":{\"trakt\":748019,\"slug\":\"brian-pines\",\"imdb\":null,\"tmdb\":1255866,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Consulting
+        Producer, Co-Executive Producer\",\"jobs\":[\"Consulting Producer\",\"Co-Executive
+        Producer\"],\"episode_count\":46,\"person\":{\"name\":\"John Mankiewicz\",\"ids\":{\"trakt\":399129,\"slug\":\"john-mankiewicz\",\"imdb\":\"nm0542535\",\"tmdb\":1222278,\"tvrage\":31715},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Consulting
+        Producer\",\"jobs\":[\"Consulting Producer\"],\"episode_count\":22,\"person\":{\"name\":\"Sara
+        B. Cooper\",\"ids\":{\"trakt\":402190,\"slug\":\"sara-b-cooper-4c1b91aa-e873-40bb-a28d-dbbcc1889c03\",\"imdb\":\"nm0153384\",\"tmdb\":1222910,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Production
+        Coordinator\",\"jobs\":[\"Production Coordinator\"],\"episode_count\":22,\"person\":{\"name\":\"Tammi
+        Campbell\",\"ids\":{\"trakt\":1490764,\"slug\":\"tammi-campbell\",\"imdb\":\"nm0132880\",\"tmdb\":1604956,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Co-Producer\",\"jobs\":[\"Co-Producer\"],\"episode_count\":1,\"person\":{\"name\":\"Todd
+        London\",\"ids\":{\"trakt\":301701,\"slug\":\"todd-london\",\"imdb\":\"nm0518791\",\"tmdb\":1227669,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Production
+        Coordinator\",\"jobs\":[\"Production Coordinator\"],\"episode_count\":1,\"person\":{\"name\":\"Jill
+        Christensen\",\"ids\":{\"trakt\":577333,\"slug\":\"jill-christensen\",\"imdb\":null,\"tmdb\":1562800,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Associate
+        Producer\",\"jobs\":[\"Associate Producer\"],\"episode_count\":1,\"person\":{\"name\":\"Bruce
+        Nachbar\",\"ids\":{\"trakt\":302526,\"slug\":\"bruce-nachbar\",\"imdb\":\"nm0618659\",\"tmdb\":1036098,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}}],\"art\":[{\"job\":\"Production
+        Design\",\"jobs\":[\"Production Design\"],\"episode_count\":48,\"person\":{\"name\":\"Derek
+        R. Hill\",\"ids\":{\"trakt\":9856,\"slug\":\"derek-r-hill\",\"imdb\":\"nm0384192\",\"tmdb\":12131,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"Derek
+        Hill is an American production designer. Hill has designed and provided art
+        direction on films and television including, Into the Wild, House, M.D., What
+        About Brian, Pirates of the Caribbean: The Curse of the Black Pearl, Any Given
+        Sunday, Three Kings, Hurlyburly, The Postman, and JFK.\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Set
+        Decoration\",\"jobs\":[\"Set Decoration\"],\"episode_count\":22,\"person\":{\"name\":\"Cindy
+        Carr\",\"ids\":{\"trakt\":1992,\"slug\":\"cindy-carr\",\"imdb\":\"nm0139649\",\"tmdb\":11079,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Art
+        Direction\",\"jobs\":[\"Art Direction\"],\"episode_count\":22,\"person\":{\"name\":\"Robert
+        W. Henderson\",\"ids\":{\"trakt\":1104219,\"slug\":\"robert-w-henderson\",\"imdb\":\"nm0376581\",\"tmdb\":1541652,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Production
+        Design\",\"jobs\":[\"Production Design\"],\"episode_count\":22,\"person\":{\"name\":\"Mark
+        Hutman\",\"ids\":{\"trakt\":85315,\"slug\":\"mark-hutman\",\"imdb\":\"nm0404510\",\"tmdb\":1172659,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Set
+        Decoration\",\"jobs\":[\"Set Decoration\"],\"episode_count\":1,\"person\":{\"name\":\"K.J.
+        Johnson\",\"ids\":{\"trakt\":47041,\"slug\":\"k-j-johnson\",\"imdb\":\"nm0425476\",\"tmdb\":41444,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Art
+        Direction\",\"jobs\":[\"Art Direction\"],\"episode_count\":1,\"person\":{\"name\":\"Kendelle
+        Elliott\",\"ids\":{\"trakt\":63663,\"slug\":\"kendelle-elliott\",\"imdb\":\"nm0254521\",\"tmdb\":1328137,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}}],\"directing\":[{\"job\":\"Script
+        Supervisor\",\"jobs\":[\"Script Supervisor\"],\"episode_count\":176,\"person\":{\"name\":\"Ira
+        Hurvitz\",\"ids\":{\"trakt\":572489,\"slug\":\"ira-hurvitz\",\"imdb\":\"nm0403779\",\"tmdb\":1533790,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Script
+        Coordinator\",\"jobs\":[\"Script Coordinator\"],\"episode_count\":176,\"person\":{\"name\":\"Dustin
+        Paddock\",\"ids\":{\"trakt\":618367,\"slug\":\"dustin-paddock\",\"imdb\":null,\"tmdb\":1223981,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Director\",\"jobs\":[\"Director\"],\"episode_count\":30,\"person\":{\"name\":\"Greg
+        Yaitanes\",\"ids\":{\"trakt\":439884,\"slug\":\"greg-yaitanes-226537de-a271-4415-8fc8-95460cac403d\",\"imdb\":\"nm0944981\",\"tmdb\":157730,\"tvrage\":8433},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"Greg
+        Yaitanes\_is an\_American\_television\_and\_film director. He is also an\_angel
+        investor\_in Twitter.  Emmy Award-winning television and film director Greg
+        Yaitanes is one of the most recognized names in Hollywood, directing and producing
+        top shows including\_Damages,\_Lost,\_Prison Break,\_Heroes\_and\_Grey's Anatomy.
+        His Emmy Award came in 2008 as result of his work on\_House, M.D., the most
+        popular show worldwide.  Yaitanes grew up in Wellesley, Massachusetts, where
+        he directed his very first film,\_Salad Bar: The Movie. At the age of 18,
+        Yaitanes moved to Los Angeles and attended the University of Southern California
+        Film School. By 23, he landed his first directorial job. Yaitanes was so persistent
+        that he once waited seven hours for a 10-minute meeting with action film producer
+        Joel Silver. After screening Yaitanes' work, Silver signed him for his second
+        feature. Since then, Yaitanes' artistic talent and dedication have led him
+        to a successful career in the director's chair in television.  Though he is
+        well known in Hollywood for his work on several top-watched shows, his technological
+        entrepreneurship has also made him a respected name in Silicon Valley. His
+        investments in start-up companies such as Twitter have earned him a reputation
+        for foresight in technology. Yaitanes is one of Twitter's original investors
+        and a frequent guest speaker at the company.  Active in the Greek community,
+        Yaitanes helped produce Greek America Foundation's Gabby Awards and directed
+        the opening of the 2011 Gabby Awards on Ellis Island.  Greg resides between
+        New York and Los Angeles and has two boy.\",\"birthday\":\"1970-06-18\",\"death\":null,\"birthplace\":\"Wellesley,
+        Massachusetts, USA\",\"homepage\":\"http://gregyaitanes.com\"}},{\"job\":\"Director\",\"jobs\":[\"Director\"],\"episode_count\":22,\"person\":{\"name\":\"Deran
+        Sarafian\",\"ids\":{\"trakt\":423098,\"slug\":\"deran-sarafian\",\"imdb\":\"nm0764776\",\"tmdb\":45645,\"tvrage\":25344},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"From
+        Wikipedia, the free encyclopedia. Deran Sarafian (born January 17, 1968) is
+        an Armenian-American actor, film and television director.\\n\\nSarafian has
+        directed several episodes of the FOX series House and was made a co-executive
+        producer of the show for the 2007/08 season. He also directed a Season 2 Lost
+        episode, titled \\\"?\\\", and has directed for CSI: Crime Scene Investigation,
+        CSI: Miami, CSI: NY, Cold Case, The District, Without a Trace, Buffy the Vampire
+        Slayer, The Cape, Nash Bridges, and Fringe.\\n\\nSarafian is the son of film
+        director, Richard C. Sarafian and the brother of Tedi Sarafian, Damon B. Sarafian,
+        and Richard Sarafian, Jr. Sarafian is also the nephew of director Robert Altman.
+        Sarafian is married to actress Laurie Fortier, with whom he has two children.\",\"birthday\":\"1968-01-17\",\"death\":null,\"birthplace\":\"Los
+        Angeles, California, USA\",\"homepage\":null}},{\"job\":\"Director\",\"jobs\":[\"Director\"],\"episode_count\":16,\"person\":{\"name\":\"David
+        Straiton\",\"ids\":{\"trakt\":919683,\"slug\":\"david-straiton\",\"imdb\":\"nm0833191\",\"tmdb\":1215383,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":\"https://www.davidhstraiton.com/\"}},{\"job\":\"Director\",\"jobs\":[\"Director\"],\"episode_count\":8,\"person\":{\"name\":\"Daniel
+        Attias\",\"ids\":{\"trakt\":74012,\"slug\":\"daniel-attias\",\"imdb\":\"nm0003733\",\"tmdb\":1223735,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"Daniel
+        Attias is director, producer and assistant director.\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Director\",\"jobs\":[\"Director\"],\"episode_count\":7,\"person\":{\"name\":\"Daniel
+        Sackheim\",\"ids\":{\"trakt\":414782,\"slug\":\"daniel-sackheim\",\"imdb\":\"nm0755261\",\"tmdb\":12632,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"From
+        Wikipedia, the free encyclopedia.\\n\\nDaniel Sackheim is an American TV and
+        film director. He has directed several episodes of the TV show The X-Files,
+        3 episodes of Harsh Realm, House, and Life, the last two of which he also
+        served on as an executive producer.\",\"birthday\":null,\"death\":null,\"birthplace\":\"USA\",\"homepage\":null}},{\"job\":\"Director\",\"jobs\":[\"Director\"],\"episode_count\":6,\"person\":{\"name\":\"Miguel
+        Sapochnik\",\"ids\":{\"trakt\":438600,\"slug\":\"miguel-sapochnik\",\"imdb\":\"nm0764601\",\"tmdb\":114404,\"tvrage\":349527},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"Miguel
+        Sapochnik\_is an English\_film\_and\_television director\_and former\_storyboard
+        artist. He is best known as the director of the feature\_Repo Men\_and\_HBO\_series\_Game
+        of Thrones, as well as for his work on several other U.S. television series
+        (Awake,\_Fringe,\_House, Mind Games).\",\"birthday\":\"1974-01-07\",\"death\":null,\"birthplace\":\"Hammersmith,
+        London, England\",\"homepage\":null}},{\"job\":\"Director\",\"jobs\":[\"Director\"],\"episode_count\":5,\"person\":{\"name\":\"David
+        Platt\",\"ids\":{\"trakt\":453453,\"slug\":\"david-platt-650c425f-975d-4037-8917-039357b70570\",\"imdb\":\"nm0686853\",\"tmdb\":1223983,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Director\",\"jobs\":[\"Director\"],\"episode_count\":5,\"person\":{\"name\":\"Katie
+        Jacobs\",\"ids\":{\"trakt\":436235,\"slug\":\"katie-jacobs\",\"imdb\":\"nm0414498\",\"tmdb\":41424,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Director\",\"jobs\":[\"Director\"],\"episode_count\":5,\"person\":{\"name\":\"Matt
+        Shakman\",\"ids\":{\"trakt\":441331,\"slug\":\"matt-shakman\",\"imdb\":\"nm0787687\",\"tmdb\":1212522,\"tvrage\":23982},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"Matt
+        Shakman was born on August 8, 1975. He is a director and actor.\",\"birthday\":\"1975-08-08\",\"death\":null,\"birthplace\":\"Ventura
+        - California - USA\",\"homepage\":null}},{\"job\":\"Director\",\"jobs\":[\"Director\"],\"episode_count\":5,\"person\":{\"name\":\"Andrew
+        Bernstein\",\"ids\":{\"trakt\":701588,\"slug\":\"andrew-bernstein-793ebeb4-8337-4d9c-bcb4-49ee5b202edb\",\"imdb\":\"nm0076997\",\"tmdb\":1215659,\"tvrage\":48407},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"Andrew
+        Bernstein is an assistant director and director. He is the son of Academy
+        Award-nominated screenwriter Walter Bernstein.\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Director\",\"jobs\":[\"Director\"],\"episode_count\":5,\"person\":{\"name\":\"Sanford
+        Bookstaver\",\"ids\":{\"trakt\":445974,\"slug\":\"sanford-bookstaver-20bffb03-0d1a-4768-9c8d-1d73fb1d6a19\",\"imdb\":\"nm0095424\",\"tmdb\":1213618,\"tvrage\":28695},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"From
+        Wikipedia, the free encyclopedia.\\n\\nSanford Bookstaver (born September
+        1, 1973 in New York City, New York) is an American film/television director
+        and television producer.\",\"birthday\":\"1973-09-01\",\"death\":null,\"birthplace\":\"New
+        York City - New York - USA\",\"homepage\":null}},{\"job\":\"Director\",\"jobs\":[\"Director\"],\"episode_count\":4,\"person\":{\"name\":\"Peter
+        O'Fallon\",\"ids\":{\"trakt\":50973,\"slug\":\"peter-o-fallon\",\"imdb\":\"nm0640964\",\"tmdb\":41472,\"tvrage\":31696},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"From
+        Wikipedia, the free encyclopedia.\\n\\nPeter O'Fallon is an American director,
+        producer and writer for commercial, television and film productions.\\n\\nO'Fallon
+        grew up in Colorado and graduated from the University of Colorado at Boulder
+        with a degree in Film Studies. He began his career in the industry by making
+        small T.V. spots for local radio stations, funded and created completely on
+        his own. The success of these small commercials allowed him to relocate to
+        Chicago and co-found one of the most prolific production companies in Chicago
+        at that time. His first commercial was Michael Jordan's first commercial.
+        Peter has directed over two thousand commercials and has won multiple awards
+        for his work including Clio Awards, DNAD's and Golden Pencil Awards.\\n\\nHe
+        began his career in television with the hit series Thirtysomething. With Thirtysomething
+        he directed a ground breaking portrayal of a homosexual relationship. Peter's
+        television directing career continued with Northern Exposure, Party of Five,
+        Profiler, Las Vegas, Prison Break, House, Ghost Whisperer, Eureka, Pushing
+        Daises and the cult TV series pilot American Gothic. He also created the series
+        Mysterious Ways, which ran for 44 episodes on NBC.\\n\\nPeter has also directed
+        some of TV's most memorable pilots, including American Gothic, Mysterious
+        Ways (created and executive produced), Odd Jobs (produced), Prey (produced),
+        That Was Then, Blade, Eureka, and The Riches, which he also served as an executive
+        producer.\\n\\nHe directed the cult film Suicide Kings, starring Christopher
+        Walken and Denis Leary. He also directed and produced A Rumor of Angels (MGM),
+        starring Vanessa Redgrave, Ray Liotta, Catherine McCormack and Ron Livingston.\\n\\nO'Fallon
+        just completed two pilots; \\\"The Glades\\\" for A\\u0026E and \\\"Exit 19\\\"
+        for Lifetime, both of which were picked up for series. He is currently developing
+        \\\"Sucide Kings 2\\\".\\n\\nDescription above from the Wikipedia article
+        Peter O'Fallon, licensed under CC-BY-SA, full list of contributors on Wikipedia.\",\"birthday\":null,\"death\":null,\"birthplace\":\"Denver,
+        Colorado, United States\",\"homepage\":null}},{\"job\":\"Director\",\"jobs\":[\"Director\"],\"episode_count\":3,\"person\":{\"name\":\"Lesli
+        Linka Glatter\",\"ids\":{\"trakt\":423226,\"slug\":\"lesli-linka-glatter\",\"imdb\":\"nm0322128\",\"tmdb\":15798,\"tvrage\":10684},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"Lesli
+        Linka Glatter is an American film and television director and producer. She
+        began her directing career through American Film Institute's Directing Workshop
+        for Women; her first (short) film \\\"Tales of Meeting and Parting\\\" was
+        nominated for an Academy Award in 1984.\",\"birthday\":\"1953-01-01\",\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Director\",\"jobs\":[\"Director\"],\"episode_count\":3,\"person\":{\"name\":\"Fred
+        Gerber\",\"ids\":{\"trakt\":54637,\"slug\":\"fred-gerber\",\"imdb\":\"nm0314104\",\"tmdb\":45642,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"Fred
+        Gerber is a director and producer.\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Director\",\"jobs\":[\"Director\"],\"episode_count\":3,\"person\":{\"name\":\"David
+        Semel\",\"ids\":{\"trakt\":431170,\"slug\":\"david-semel\",\"imdb\":\"nm0783751\",\"tmdb\":17272,\"tvrage\":2478},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"From
+        Wikipedia, the free encyclopedia.\\n\\nDavid Semel is an American director
+        and television producer.\\n\\nDescription above from the Wikipedia article
+        David Semel, licensed under CC-BY-SA, full list of contributors on Wikipedia\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Director\",\"jobs\":[\"Director\"],\"episode_count\":2,\"person\":{\"name\":\"Bryan
+        Singer\",\"ids\":{\"trakt\":413922,\"slug\":\"bryan-singer\",\"imdb\":\"nm0001741\",\"tmdb\":9032,\"tvrage\":31688},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"Bryan
+        Singer (born September 17, 1965) is an American film director and producer.
+        Singer won critical acclaim for his work on The Usual Suspects, and is especially
+        well-known among fans of the science fiction and comic book genres for his
+        work on the first two X-Men films and Superman Returns.\\n\\nDescription above
+        from the Wikipedia article Bryan Singer, licensed under CC-BY-SA, full list
+        of contributors on Wikipedia.\",\"birthday\":\"1965-09-17\",\"death\":null,\"birthplace\":\"New
+        York City, New York, USA\",\"homepage\":null}},{\"job\":\"Director\",\"jobs\":[\"Director\"],\"episode_count\":2,\"person\":{\"name\":\"Newton
+        Thomas Sigel\",\"ids\":{\"trakt\":7392,\"slug\":\"newton-thomas-sigel\",\"imdb\":\"nm0005875\",\"tmdb\":9040,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Director\",\"jobs\":[\"Director\"],\"episode_count\":2,\"person\":{\"name\":\"Bryan
+        Spicer\",\"ids\":{\"trakt\":42339,\"slug\":\"bryan-spicer\",\"imdb\":\"nm0818465\",\"tmdb\":42111,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"From
+        Wikipedia, the free encyclopedia\\n\\nBryan Spicer is a director on numerous
+        television series including Castle and 24. He has also directed episodes of
+        Day Break, Bones, House, Heroes, Killer Instinct, Vanished, Prison Break,
+        Invasion, CSI: Crime Scene Investigation, The X-Files, The Lone Gunmen, In
+        Plain Sight and V.\\n\\nSpicer also directed feature films For Richer or Poorer,
+        McHale's Navy and Mighty Morphin Power Rangers: The Movie.\",\"birthday\":null,\"death\":null,\"birthplace\":\"
+        Los Angeles, California, USA\",\"homepage\":null}},{\"job\":\"Director\",\"jobs\":[\"Director\"],\"episode_count\":2,\"person\":{\"name\":\"Frederick
+        King Keller\",\"ids\":{\"trakt\":454450,\"slug\":\"frederick-king-keller\",\"imdb\":\"nm0445631\",\"tmdb\":1223968,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"Frederick
+        King Keller is a director and producer.\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Director\",\"jobs\":[\"Director\"],\"episode_count\":2,\"person\":{\"name\":\"James
+        Hayman\",\"ids\":{\"trakt\":425149,\"slug\":\"james-hayman\",\"imdb\":\"nm0371348\",\"tmdb\":64171,\"tvrage\":29407},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"From
+        Wikipedia, the free encyclopedia.\\n\\nJames Hayman is a Welsh television
+        producer, director and cinematographer.\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Director\",\"jobs\":[\"Director\"],\"episode_count\":2,\"person\":{\"name\":\"Martha
+        Mitchell\",\"ids\":{\"trakt\":745844,\"slug\":\"martha-mitchell\",\"imdb\":\"nm0593576\",\"tmdb\":1214045,\"tvrage\":26291},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"Martha
+        Mitchell is an American television director.\\n\\nShe has directed for a number
+        of notable television series. Prior to directing, Mitchell worked as a script
+        supervisor on numerous films, the pilot episode of New York Undercover and
+        episodes of Law \\u0026 Order from 1990 to 1996.\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":\"http://marthamitchell.com/\"}},{\"job\":\"Director\",\"jobs\":[\"Director\"],\"episode_count\":2,\"person\":{\"name\":\"David
+        Shore\",\"ids\":{\"trakt\":434876,\"slug\":\"david-shore\",\"imdb\":\"nm0794914\",\"tmdb\":169061,\"tvrage\":17176},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"A
+        Canadian television writer, director and producer. He is known for creating
+        the critically acclaimed series House and more recently, Battle Creek, Sneaky
+        Pete and The Good Doctor. Shore worked on Family Law, NYPD Blue and Due South,
+        also producing many episodes of the latter.\",\"birthday\":\"1959-07-03\",\"death\":null,\"birthplace\":\"London,
+        Ontario, Canada\",\"homepage\":null}},{\"job\":\"Director\",\"jobs\":[\"Director\"],\"episode_count\":2,\"person\":{\"name\":\"Hugh
+        Laurie\",\"ids\":{\"trakt\":297390,\"slug\":\"hugh-laurie\",\"imdb\":\"nm0491402\",\"tmdb\":41419,\"tvrage\":30836},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"James
+        Hugh Calum Laurie CBE is an English actor, director, singer, musician, comedian
+        and author. Laurie is known for portraying the title character on the Fox
+        medical drama series House (2004\u20132012), for which he received two Golden
+        Globe Awards and nominations for numerous other awards. He was listed in the
+        2011 Guinness World Records as the most watched leading man on television
+        and was one of the highest-paid actors in a television drama, earning \xA3250,000
+        ($409,000) per episode of House. His other television credits include arms
+        dealer Richard Onslow Roper in the miniseries The Night Manager (2016), for
+        which he won his third Golden Globe Award, and Senator Tom James in the HBO
+        sitcom Veep (2012\u20132019), for which he received his 10th Emmy Award nomination.\\n\\nForced
+        to abandon rowing during a bout of glandular fever, Laurie joined the Cambridge
+        Footlights, a university dramatic club that has produced many well-known actors
+        and comedians. There he met Emma Thompson, with whom he had a romantic relationship.
+        The two remain good friends. She introduced him to his future comedy partner,
+        Stephen Fry. Laurie, Fry and Thompson later parodied themselves as the University
+        Challenge representatives of \\\"Footlights College, Oxbridge\\\" in \\\"Bambi\\\",
+        an episode of The Young Ones, with the series' co-writer Ben Elton completing
+        their team.  This page is based on a Wikipedia article written by contributors.
+        Text is available under the CC BY-SA 4.0 license; additional terms may apply.\",\"birthday\":\"1959-06-11\",\"death\":null,\"birthplace\":\"Oxford,
+        Oxfordshire, England, UK\",\"homepage\":\"https://hughlaurieblues.com/\"}},{\"job\":\"Director\",\"jobs\":[\"Director\"],\"episode_count\":2,\"person\":{\"name\":\"Tucker
+        Gates\",\"ids\":{\"trakt\":630452,\"slug\":\"tucker-gates\",\"imdb\":\"nm0003163\",\"tmdb\":1212609,\"tvrage\":604},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"Tucker
+        Gates is an American television director and producer. He has directed several
+        episodes of the ABC series Alias and Lost.\",\"birthday\":null,\"death\":null,\"birthplace\":\"USA\",\"homepage\":null}},{\"job\":\"Director\",\"jobs\":[\"Director\"],\"episode_count\":2,\"person\":{\"name\":\"Tim
+        Southam\",\"ids\":{\"trakt\":461651,\"slug\":\"tim-southam\",\"imdb\":\"nm0816074\",\"tmdb\":537105,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"Tim
+        Southam has  directed dramas, comedies and documentaries exploring life on
+        the land,  life in politics and life in the arts. He has also worked as a
+        director  on several of the world's most-watched series.\",\"birthday\":\"1961-10-01\",\"death\":null,\"birthplace\":null,\"homepage\":\"http://www.timsoutham.com/\"}},{\"job\":\"Director\",\"jobs\":[\"Director\"],\"episode_count\":1,\"person\":{\"name\":\"Nick
+        Gomez\",\"ids\":{\"trakt\":415969,\"slug\":\"nick-gomez\",\"imdb\":\"nm0327064\",\"tmdb\":17278,\"tvrage\":28713},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"Nick
+        Gomez (born April 13, 1963) is an American film director and actor. He has
+        directed for a number of television and film studios. He has also acted in
+        a few minor films. In February 1998, Gomez and his film Illtown were given
+        the Minami Toshiko Award at the 9th Yubari International Fantastic Film Festival.\",\"birthday\":\"1963-04-13\",\"death\":null,\"birthplace\":\"Somerville,
+        Massachusetts, USA\",\"homepage\":null}},{\"job\":\"Director\",\"jobs\":[\"Director\"],\"episode_count\":1,\"person\":{\"name\":\"S.J.
+        Clarkson\",\"ids\":{\"trakt\":445698,\"slug\":\"s-j-clarkson\",\"imdb\":\"nm1237416\",\"tmdb\":223551,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"SJ
+        Clarkson is an accomplished TV director working in both the UK and US. Her
+        credits include Life On Mars, Ashes to Ashes, Hustle, Mistresses, Heroes,
+        Dexter, House, Toast, Vinyl, Love Nina, Jessica Jones and Collateral.\",\"birthday\":null,\"death\":null,\"birthplace\":\"United
+        Kingdom\",\"homepage\":null}},{\"job\":\"Director\",\"jobs\":[\"Director\"],\"episode_count\":1,\"person\":{\"name\":\"Kate
+        Woods\",\"ids\":{\"trakt\":435744,\"slug\":\"kate-woods\",\"imdb\":\"nm0940668\",\"tmdb\":93120,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Director\",\"jobs\":[\"Director\"],\"episode_count\":1,\"person\":{\"name\":\"Colin
+        Bucksey\",\"ids\":{\"trakt\":446278,\"slug\":\"colin-bucksey\",\"imdb\":\"nm0118778\",\"tmdb\":1212287,\"tvrage\":79319},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":\"1946-01-01\",\"death\":null,\"birthplace\":\"Camberwell,
+        London, England, UK\",\"homepage\":null}},{\"job\":\"Director\",\"jobs\":[\"Director\"],\"episode_count\":1,\"person\":{\"name\":\"Julian
+        Higgins\",\"ids\":{\"trakt\":568951,\"slug\":\"julian-higgins-bf995d0c-6abf-43e3-a976-278346058d72\",\"imdb\":\"nm2282844\",\"tmdb\":1578144,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":\"1985-12-28\",\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Director\",\"jobs\":[\"Director\"],\"episode_count\":1,\"person\":{\"name\":\"Stefan
+        Schwartz\",\"ids\":{\"trakt\":436040,\"slug\":\"stefan-schwartz\",\"imdb\":\"nm0777447\",\"tmdb\":94155,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\u200BFrom
+        Wikipedia, the free encyclopedia.\\n\\nStefan Schwartz (born 1963 in London,
+        UK) is an English/Canadian film and television director/writer plus a former
+        actor, most known for the feature film Shooting Fish and his work for the
+        BBC on Spooks and Luther\",\"birthday\":\"1963-05-01\",\"death\":null,\"birthplace\":\"London
+        - England - UK\",\"homepage\":null}},{\"job\":\"Director\",\"jobs\":[\"Director\"],\"episode_count\":1,\"person\":{\"name\":\"Peter
+        Weller\",\"ids\":{\"trakt\":296021,\"slug\":\"peter-weller\",\"imdb\":\"nm0000693\",\"tmdb\":27811,\"tvrage\":36061},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"Peter
+        Frederick Weller (born June 24, 1947) is an American film and stage actor,
+        director and lecturer.\\n\\nHe is best known for his roles as the title character
+        in the first two RoboCop films and Buckaroo Banzai in the cult classic The
+        Adventures of Buckaroo Banzai Across the 8th Dimension. He received an Academy
+        Award nomination for his direction for the 1993 short Partners, in which he
+        also acted. He also hosted the show Engineering an Empire on the History channel.
+        He played Stan Liddy in the 5th Season of the Showtime original series, Dexter.\",\"birthday\":\"1947-06-24\",\"death\":null,\"birthplace\":\"Stevens
+        Point, Wisconsin, USA\",\"homepage\":null}},{\"job\":\"Director\",\"jobs\":[\"Director\"],\"episode_count\":1,\"person\":{\"name\":\"Tony
+        To\",\"ids\":{\"trakt\":301594,\"slug\":\"tony-to\",\"imdb\":\"nm0864789\",\"tmdb\":166291,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Director\",\"jobs\":[\"Director\"],\"episode_count\":1,\"person\":{\"name\":\"Elodie
+        Keene\",\"ids\":{\"trakt\":454949,\"slug\":\"elodie-keene\",\"imdb\":\"nm0444709\",\"tmdb\":154528,\"tvrage\":10002},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"Elodie
+        Keene is an American film and television director.\",\"birthday\":\"1949-04-10\",\"death\":null,\"birthplace\":\"Paso
+        Robles, California, USA\",\"homepage\":null}},{\"job\":\"Director\",\"jobs\":[\"Director\"],\"episode_count\":1,\"person\":{\"name\":\"Paul
+        McCrane\",\"ids\":{\"trakt\":418653,\"slug\":\"paul-mccrane\",\"imdb\":\"nm0005204\",\"tmdb\":32393,\"tvrage\":27308},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"Paul
+        McCrane (born January 19, 1961) is an American actor, director and singer.\",\"birthday\":\"1961-01-19\",\"death\":null,\"birthplace\":\"Philadelphia,
+        Pennsylvania, USA \",\"homepage\":null}},{\"job\":\"Director\",\"jobs\":[\"Director\"],\"episode_count\":1,\"person\":{\"name\":\"Matthew
+        Penn\",\"ids\":{\"trakt\":441396,\"slug\":\"matthew-penn\",\"imdb\":\"nm0671992\",\"tmdb\":123895,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"Matthew
+        Penn is producer, director and actor.\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Script
+        Supervisor\",\"jobs\":[\"Script Supervisor\"],\"episode_count\":1,\"person\":{\"name\":\"Christine
+        Wilson\",\"ids\":{\"trakt\":457937,\"slug\":\"christine-wilson-93ecd92b-9ed8-4e8e-a7d2-a6c46f20a154\",\"imdb\":\"nm0933181\",\"tmdb\":1384398,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Script
+        Coordinator\",\"jobs\":[\"Script Coordinator\"],\"episode_count\":1,\"person\":{\"name\":\"Adrian
+        Salpeter\",\"ids\":{\"trakt\":658580,\"slug\":\"adrian-salpeter\",\"imdb\":\"nm1210726\",\"tmdb\":1493848,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Director\",\"jobs\":[\"Director\"],\"episode_count\":1,\"person\":{\"name\":\"Peter
+        Medak\",\"ids\":{\"trakt\":3335,\"slug\":\"peter-medak\",\"imdb\":\"nm0575389\",\"tmdb\":21377,\"tvrage\":3214},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"From
+        Wikipedia, the free encyclopedia.\\n\\nPeter Medak (born 23 December 1937)
+        is a Hungarian-born film director of British and American films.\\n\\nDescription
+        above from the Wikipedia article Peter Medak, licensed under CC-BY-SA, full
+        list of contributors on Wikipedia\",\"birthday\":\"1937-12-23\",\"death\":null,\"birthplace\":\"Budapest,
+        Hungary\",\"homepage\":null}},{\"job\":\"Director\",\"jobs\":[\"Director\"],\"episode_count\":1,\"person\":{\"name\":\"Guy
+        Ferland\",\"ids\":{\"trakt\":425873,\"slug\":\"guy-ferland\",\"imdb\":\"nm0272704\",\"tmdb\":43468,\"tvrage\":20015},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"From
+        Wikipedia, the free encyclopedia.\\n\\nGuy Ferland (born 18 February 1966)
+        is an American film and television director.\",\"birthday\":\"1966-02-18\",\"death\":null,\"birthplace\":\"Beverly
+        - Massachusetts - USA\",\"homepage\":null}},{\"job\":\"Director\",\"jobs\":[\"Director\"],\"episode_count\":1,\"person\":{\"name\":\"Nelson
+        McCormick\",\"ids\":{\"trakt\":422478,\"slug\":\"nelson-mccormick\",\"imdb\":\"nm1879589\",\"tmdb\":45627,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"Nelson
+        McCormick is an American director and producer for film and television.\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":\"http://nelsonmccormick.com/\"}},{\"job\":\"Director\",\"jobs\":[\"Director\"],\"episode_count\":1,\"person\":{\"name\":\"Keith
+        Gordon\",\"ids\":{\"trakt\":413455,\"slug\":\"keith-gordon-a33159d0-c5d2-4f06-9b95-f6ddbdd2d73f\",\"imdb\":\"nm0330360\",\"tmdb\":33054,\"tvrage\":24897},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"Keith
+        Gordon is an American actor and film director.\",\"birthday\":\"1961-02-03\",\"death\":null,\"birthplace\":\"New
+        York City, New York, USA\",\"homepage\":null}},{\"job\":\"Director\",\"jobs\":[\"Director\"],\"episode_count\":1,\"person\":{\"name\":\"Randall
+        Zisk\",\"ids\":{\"trakt\":464224,\"slug\":\"randall-zisk\",\"imdb\":\"nm0957198\",\"tmdb\":1214368,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"Randall
+        Zisk is a producer and director.\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Director\",\"jobs\":[\"Director\"],\"episode_count\":1,\"person\":{\"name\":\"Tim
+        Hunter\",\"ids\":{\"trakt\":420822,\"slug\":\"tim-hunter-b3f4e55e-a017-4d9b-812a-094fbfe8ea7a\",\"imdb\":\"nm0006853\",\"tmdb\":15858,\"tvrage\":17780},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"From
+        Wikipedia, the free encyclopedia. Tim Hunter (June 15, 1947 in Los Angeles,
+        California) is an American television and film director. Since the late 1980s
+        he has mostly worked on television, directing episodes for dozens of televisions
+        series including Breaking Bad, Carniv\xE0le, Chicago Hope, Crossing Jordan,
+        Deadwood, Falcon Crest, Homicide: Life on the Street, House M.D., Law \\u0026amp;
+        Order, Lie to Me, Mad Men, and Twin Peaks. During the early-to-mid 1980s,
+        Hunter directed feature films, including 1986's River's Edge, which won that
+        year's award for best picture at the Independent Spirit Awards.\",\"birthday\":\"1947-06-15\",\"death\":null,\"birthplace\":\"Los
+        Angeles, California, USA\",\"homepage\":null}},{\"job\":\"Director\",\"jobs\":[\"Director\"],\"episode_count\":1,\"person\":{\"name\":\"Bill
+        Johnson\",\"ids\":{\"trakt\":420204,\"slug\":\"bill-johnson-1815d9cd-07b2-4c11-b176-7031d6fc3de8\",\"imdb\":\"nm0424594\",\"tmdb\":41563,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"Bill
+        Johnson is an editor and director.\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Director\",\"jobs\":[\"Director\"],\"episode_count\":1,\"person\":{\"name\":\"Paris
+        Barclay\",\"ids\":{\"trakt\":425750,\"slug\":\"paris-barclay\",\"imdb\":\"nm0054077\",\"tmdb\":45649,\"tvrage\":11171},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"Paris
+        Barclay is an American producer, writer and director for film and television.
+        He is also the current President of the Directors Guild of America since 2013.\",\"birthday\":\"1956-06-30\",\"death\":null,\"birthplace\":\"Chicago
+        Heights, Illinois, USA\",\"homepage\":null}},{\"job\":\"Director\",\"jobs\":[\"Director\"],\"episode_count\":1,\"person\":{\"name\":\"Gloria
+        Muzio\",\"ids\":{\"trakt\":737614,\"slug\":\"gloria-muzio\",\"imdb\":\"nm0616254\",\"tmdb\":1211947,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"Gloria
+        Muzio is an American director and producer for theatre, film and television
+        productions. She graduated from the Florida State University School of Theatre
+        with an MFA in Directing.\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Director\",\"jobs\":[\"Director\"],\"episode_count\":1,\"person\":{\"name\":\"Jace
+        Alexander\",\"ids\":{\"trakt\":16504,\"slug\":\"jace-alexander\",\"imdb\":\"nm0003167\",\"tmdb\":20833,\"tvrage\":10141},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"Jace
+        Alexander is a director and producer.\",\"birthday\":\"1964-04-07\",\"death\":null,\"birthplace\":\"New
+        York City - New York - USA\",\"homepage\":null}},{\"job\":\"Director\",\"jobs\":[\"Director\"],\"episode_count\":1,\"person\":{\"name\":\"F\xE9lix
+        Enr\xEDquez Alcal\xE1\",\"ids\":{\"trakt\":429567,\"slug\":\"felix-enriquez-alcala\",\"imdb\":\"nm0258066\",\"tmdb\":77211,\"tvrage\":24794},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"F\xE9lix
+        Enr\xEDquez Alcal\xE1 is an American television and movie director, cinematographer,
+        producer and painter. He graduated with a fine arts degree from SMU and followed
+        that up by attending the Art Center School of Design, Los Angeles.\",\"birthday\":\"1951-03-07\",\"death\":null,\"birthplace\":\"Bakersfield,
+        California, USA\",\"homepage\":\"http://felixalcala.com/\"}},{\"job\":\"Director\",\"jobs\":[\"Director\"],\"episode_count\":1,\"person\":{\"name\":\"John
+        F. Showalter\",\"ids\":{\"trakt\":1386708,\"slug\":\"john-f-showalter\",\"imdb\":\"nm0795288\",\"tmdb\":1288953,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Director\",\"jobs\":[\"Director\"],\"episode_count\":1,\"person\":{\"name\":\"Laura
+        Innes\",\"ids\":{\"trakt\":418059,\"slug\":\"laura-innes\",\"imdb\":\"nm0005041\",\"tmdb\":454973,\"tvrage\":29738},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"Laura
+        Innes was born August 16, 1957 in Pontiac, Michigan. She was introduced to
+        professional theater by her father, who often took the family to the Stratford
+        Festival of Canada in Stratford, Ontario. With the support of her father,
+        she attended Northwestern University and earned a degree in theater. She went
+        on to appeared in several theater productions before her film debut in Brian
+        De Palma's The Fury (1978), played the role of Jody. She then played the daughter
+        to Jerry Stiller and Anne Meara in the short-lived television sitcom The Stiller
+        \\u0026 Meara Show (1986). In the Fall of 1995, she joined the medical drama
+        sitcom ER (1994) in its second season. She played the part of the experienced
+        but abrasive Dr. Kerry Weaver, Her performance earned her three Primetime
+        Emmy nominations.\",\"birthday\":\"1957-08-16\",\"death\":null,\"birthplace\":\"Pontiac,
+        Michigan, USA\",\"homepage\":null}}],\"costume \\u0026 make-up\":[{\"job\":\"Costume
+        Design\",\"jobs\":[\"Costume Design\"],\"episode_count\":176,\"person\":{\"name\":\"Cathy
+        Crandall\",\"ids\":{\"trakt\":618365,\"slug\":\"cathy-crandall\",\"imdb\":\"nm0186285\",\"tmdb\":1604955,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Costume
+        Supervisor\",\"jobs\":[\"Costume Supervisor\"],\"episode_count\":86,\"person\":{\"name\":\"Karen
+        Bellamy\",\"ids\":{\"trakt\":1490765,\"slug\":\"karen-bellamy\",\"imdb\":\"nm0068703\",\"tmdb\":1604958,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Makeup
+        Department Head\",\"jobs\":[\"Makeup Department Head\"],\"episode_count\":46,\"person\":{\"name\":\"Vivian
+        Baker\",\"ids\":{\"trakt\":183623,\"slug\":\"vivian-baker\",\"imdb\":\"nm0049004\",\"tmdb\":1095271,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Hair
+        Department Head\",\"jobs\":[\"Hair Department Head\"],\"episode_count\":22,\"person\":{\"name\":\"Karl
+        Wesson\",\"ids\":{\"trakt\":94368,\"slug\":\"karl-wesson\",\"imdb\":\"nm0921885\",\"tmdb\":548413,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Costume
+        Design\",\"jobs\":[\"Costume Design\"],\"episode_count\":1,\"person\":{\"name\":\"Louise
+        Mingenbach\",\"ids\":{\"trakt\":1875,\"slug\":\"louise-mingenbach\",\"imdb\":\"nm0591281\",\"tmdb\":9043,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Makeup
+        Artist\",\"jobs\":[\"Makeup Artist\"],\"episode_count\":1,\"person\":{\"name\":\"Rita
+        Ciccozzi\",\"ids\":{\"trakt\":20889,\"slug\":\"rita-ciccozzi\",\"imdb\":\"nm0162016\",\"tmdb\":25020,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Costume
+        Supervisor\",\"jobs\":[\"Costume Supervisor\"],\"episode_count\":1,\"person\":{\"name\":\"Susan
+        O'Hara\",\"ids\":{\"trakt\":40238,\"slug\":\"susan-o-hara\",\"imdb\":\"nm0088803\",\"tmdb\":1327186,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}}],\"visual
+        effects\":[{\"job\":\"Visual Effects Supervisor\",\"jobs\":[\"Visual Effects
+        Supervisor\"],\"episode_count\":176,\"person\":{\"name\":\"Elan Soltes\",\"ids\":{\"trakt\":618366,\"slug\":\"elan-soltes\",\"imdb\":null,\"tmdb\":1488571,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Visual
+        Effects Supervisor\",\"jobs\":[\"Visual Effects Supervisor\"],\"episode_count\":1,\"person\":{\"name\":\"James
+        Lima\",\"ids\":{\"trakt\":920433,\"slug\":\"james-lima\",\"imdb\":\"nm0510666\",\"tmdb\":1475961,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}}],\"crew\":[{\"job\":\"Transportation
+        Coordinator\",\"jobs\":[\"Transportation Coordinator\"],\"episode_count\":176,\"person\":{\"name\":\"Steve
+        De Leon\",\"ids\":{\"trakt\":664994,\"slug\":\"steve-de-leon\",\"imdb\":null,\"tmdb\":1646234,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Fight
+        Choreographer\",\"jobs\":[\"Fight Choreographer\"],\"episode_count\":98,\"person\":{\"name\":\"Jim
+        Vickers\",\"ids\":{\"trakt\":514162,\"slug\":\"jim-vickers\",\"imdb\":\"nm0006687\",\"tmdb\":1433735,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunts\",\"jobs\":[\"Stunts\"],\"episode_count\":37,\"person\":{\"name\":\"Shaun
+        Vickers\",\"ids\":{\"trakt\":929505,\"slug\":\"shaun-vickers\",\"imdb\":\"nm1977376\",\"tmdb\":1844763,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunts\",\"jobs\":[\"Stunts\"],\"episode_count\":22,\"person\":{\"name\":\"Michael
+        Gaines\",\"ids\":{\"trakt\":928015,\"slug\":\"michael-gaines\",\"imdb\":\"nm0301339\",\"tmdb\":1843395,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunt
+        Double\",\"jobs\":[\"Stunt Double\"],\"episode_count\":18,\"person\":{\"name\":\"Tom
+        McComas\",\"ids\":{\"trakt\":564310,\"slug\":\"tom-mccomas\",\"imdb\":\"nm0566176\",\"tmdb\":1551776,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunt
+        Double\",\"jobs\":[\"Stunt Double\"],\"episode_count\":5,\"person\":{\"name\":\"Horace
+        Knight\",\"ids\":{\"trakt\":792942,\"slug\":\"horace-knight\",\"imdb\":\"nm0460925\",\"tmdb\":1746960,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunt
+        Double\",\"jobs\":[\"Stunt Double\"],\"episode_count\":5,\"person\":{\"name\":\"Glenn
+        Goldstein\",\"ids\":{\"trakt\":1592203,\"slug\":\"glenn-goldstein\",\"imdb\":null,\"tmdb\":2409990,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunts\",\"jobs\":[\"Stunts\"],\"episode_count\":4,\"person\":{\"name\":\"Debbie
+        Evans\",\"ids\":{\"trakt\":488905,\"slug\":\"debbie-evans\",\"imdb\":\"nm0262700\",\"tmdb\":1279727,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunt
+        Coordinator\",\"jobs\":[\"Stunt Coordinator\"],\"episode_count\":4,\"person\":{\"name\":\"Ray
+        Lykins\",\"ids\":{\"trakt\":3316,\"slug\":\"ray-lykins\",\"imdb\":\"nm0510140\",\"tmdb\":4608,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunts\",\"jobs\":[\"Stunts\"],\"episode_count\":4,\"person\":{\"name\":\"Gregory
+        J. Barnett\",\"ids\":{\"trakt\":496400,\"slug\":\"gregory-j-barnett\",\"imdb\":\"nm0055897\",\"tmdb\":1417685,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"Gregory
+        J. Barnett is a stuntman, actor, second unit director and assistant director.\\n\\nHis
+        stunt work includes, The Fifth Floor, Grease, The Guardian. As stunt coordinator
+        he worked on Lime Street in 1986, Designing Women in 1990, The Butcher's Wife
+        in 1991 and the television series Castle that starred Nathan Fillion as Richard
+        Castle, a mystery-thriller writer who assists the NYPD in investigating murders.
+        In 1986 the television serves Airwolf gained a Stuntman Association of Motion
+        Picture Award for his work on the Annie Oakley. The award was for \\\"Most
+        spectacular sequence. For his work as stunt coordinator for the series 24,
+        the show received a Primetime Emmy Awards for Outstanding Stunt Coordination.\\n\\nAs
+        an actor, he played the part of Sergeant Williger in The Ultimate Impostor,
+        a 1979 science fiction / espionage film directed by Paul Stanley that starred
+        Keith Andes, Macon McCalman, Erin Gray and Rosalind Chao. In 1984, he played
+        the part of Andre in the series Hawaiian Heat that starred Robert Ginty and
+        Jeff McCracken. In recurring acting roles he has had an ongoing role in the
+        television series Baywatch playing the part of Jim Barnett and in that role
+        he appeared in more than thirty episodes. Another recurring role he had was
+        that of Jesper Isberg on the TV series 24.\\n\\nFrom Wikipedia, the free encyclopedia\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":\"https://stuntsunlimited.com/artist/greg-barnett/\"}},{\"job\":\"Utility
+        Stunts\",\"jobs\":[\"Utility Stunts\"],\"episode_count\":3,\"person\":{\"name\":\"Rene
+        Mousseux\",\"ids\":{\"trakt\":84936,\"slug\":\"rene-mousseux\",\"imdb\":\"nm1532479\",\"tmdb\":90042,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":\"1974-11-25\",\"death\":null,\"birthplace\":\"Phoenix,
+        Arizona, USA\",\"homepage\":null}},{\"job\":\"Stunts\",\"jobs\":[\"Stunts\"],\"episode_count\":3,\"person\":{\"name\":\"Jessica
+        Harbeck\",\"ids\":{\"trakt\":583450,\"slug\":\"jessica-harbeck\",\"imdb\":\"nm2076536\",\"tmdb\":1583701,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"Based
+        out of Los Angeles, Jess has a combined love for stunt performing and stunt
+        coordinating. With a background rooted in a lifetime of athletic competition,
+        working as a team on set is a natural fit. She is an avid climber, surfer,
+        and lover of nature. Most importantly, a life experiencer.\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Utility
+        Stunts\",\"jobs\":[\"Utility Stunts\"],\"episode_count\":3,\"person\":{\"name\":\"Lamont
+        Holmes\",\"ids\":{\"trakt\":1580236,\"slug\":\"lamont-holmes\",\"imdb\":null,\"tmdb\":2394797,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunt
+        Double\",\"jobs\":[\"Stunt Double\"],\"episode_count\":3,\"person\":{\"name\":\"Craig
+        Dabbs\",\"ids\":{\"trakt\":37664,\"slug\":\"craig-dabbs\",\"imdb\":\"nm3129665\",\"tmdb\":1205132,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunt
+        Double\",\"jobs\":[\"Stunt Double\"],\"episode_count\":3,\"person\":{\"name\":\"Alina
+        Andrei\",\"ids\":{\"trakt\":586782,\"slug\":\"alina-andrei\",\"imdb\":\"nm1273940\",\"tmdb\":1513185,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":\"1978-03-25\",\"death\":null,\"birthplace\":\"Brasov,
+        Transylvania, Romania\",\"homepage\":null}},{\"job\":\"Stunts\",\"jobs\":[\"Stunts\"],\"episode_count\":3,\"person\":{\"name\":\"Jerry
+        T. Adams\",\"ids\":{\"trakt\":934687,\"slug\":\"jerry-t-adams\",\"imdb\":\"nm1931382\",\"tmdb\":1849384,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":\"1974-08-18\",\"death\":null,\"birthplace\":\"St.
+        Louis, Missouri, USA\",\"homepage\":null}},{\"job\":\"Utility Stunts\",\"jobs\":[\"Utility
+        Stunts\"],\"episode_count\":3,\"person\":{\"name\":\"Chad Guerrero\",\"ids\":{\"trakt\":155893,\"slug\":\"chad-guerrero\",\"imdb\":\"nm2326268\",\"tmdb\":209349,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunt
+        Double\",\"jobs\":[\"Stunt Double\"],\"episode_count\":3,\"person\":{\"name\":\"Shauna
+        Galligan\",\"ids\":{\"trakt\":933923,\"slug\":\"shauna-galligan\",\"imdb\":\"nm3158441\",\"tmdb\":1848821,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunt
+        Driver\",\"jobs\":[\"Stunt Driver\"],\"episode_count\":3,\"person\":{\"name\":\"Ed
+        McDermott II\",\"ids\":{\"trakt\":652630,\"slug\":\"ed-mcdermott-ii\",\"imdb\":null,\"tmdb\":1634437,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunt
+        Double\",\"jobs\":[\"Stunt Double\"],\"episode_count\":3,\"person\":{\"name\":\"Carl
+        Paoli\",\"ids\":{\"trakt\":63277,\"slug\":\"carl-paoli\",\"imdb\":\"nm0660013\",\"tmdb\":173938,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunts\",\"jobs\":[\"Stunts\"],\"episode_count\":3,\"person\":{\"name\":\"Kanin
+        Howell\",\"ids\":{\"trakt\":55957,\"slug\":\"kanin-howell\",\"imdb\":\"nm0397940\",\"tmdb\":179851,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":\"1981-06-20\",\"death\":null,\"birthplace\":\"Austin,
+        Texas, USA\",\"homepage\":null}},{\"job\":\"Stunt Coordinator\",\"jobs\":[\"Stunt
+        Coordinator\"],\"episode_count\":3,\"person\":{\"name\":\"Peewee Piemonte\",\"ids\":{\"trakt\":445309,\"slug\":\"peewee-piemonte\",\"imdb\":\"nm0682201\",\"tmdb\":1270921,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunt
+        Coordinator\",\"jobs\":[\"Stunt Coordinator\"],\"episode_count\":2,\"person\":{\"name\":\"Jimmy
+        N. Roberts\",\"ids\":{\"trakt\":75130,\"slug\":\"jimmy-n-roberts\",\"imdb\":\"nm0731243\",\"tmdb\":83093,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunts\",\"jobs\":[\"Stunts\"],\"episode_count\":2,\"person\":{\"name\":\"Mark
+        Hicks\",\"ids\":{\"trakt\":429755,\"slug\":\"mark-hicks-58865f7f-1a45-4c93-a804-c3c563af60b9\",\"imdb\":\"nm0382911\",\"tmdb\":80242,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunts\",\"jobs\":[\"Stunts\"],\"episode_count\":2,\"person\":{\"name\":\"Shawn
+        Crowder\",\"ids\":{\"trakt\":1020234,\"slug\":\"shawn-crowder\",\"imdb\":null,\"tmdb\":1929310,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunt
+        Double\",\"jobs\":[\"Stunt Double\"],\"episode_count\":2,\"person\":{\"name\":\"Joey
+        Anaya\",\"ids\":{\"trakt\":14447,\"slug\":\"joey-anaya\",\"imdb\":\"nm0025739\",\"tmdb\":1120542,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunt
+        Double\",\"jobs\":[\"Stunt Double\"],\"episode_count\":2,\"person\":{\"name\":\"Tarah
+        Paige\",\"ids\":{\"trakt\":424943,\"slug\":\"tarah-paige\",\"imdb\":\"nm1395985\",\"tmdb\":63680,\"tvrage\":61101},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":\"1982-07-08\",\"death\":null,\"birthplace\":\"Phoenix,
+        Arizona, USA\",\"homepage\":null}},{\"job\":\"Utility Stunts\",\"jobs\":[\"Utility
+        Stunts\"],\"episode_count\":2,\"person\":{\"name\":\"Marco Morales\",\"ids\":{\"trakt\":289792,\"slug\":\"marco-morales\",\"imdb\":\"nm2798940\",\"tmdb\":1182547,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunts\",\"jobs\":[\"Stunts\"],\"episode_count\":2,\"person\":{\"name\":\"Mark
+        Kubr\",\"ids\":{\"trakt\":48450,\"slug\":\"mark-kubr\",\"imdb\":\"nm0473578\",\"tmdb\":193946,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"Raised
+        by Czech parents in America, Mark Kubr was taught to be disciplined in arts,
+        culture, athletics and religion. Kubr's unique world-view gives him a talent
+        for maintaining lasting friendships with people from diverse cultures.\\n\\nHis
+        career began just out of high school. While bagging groceries at the local
+        market, an actress neighbor told Mark he had what it takes for entertainment
+        and drove him to her agency in Los Angeles. Kubr signed with the agent and
+        immediately began working as a print model and commercial actor, booking campaigns
+        for Marlboro, Versace, Gucci and Ralph Lauren traveling the world. He always
+        brought his cameras with him to build his photography portfolio. His photography
+        has been published in Vogue, Cosmopolitan and Bride magazines.\\n\\nHe continued
+        modeling and acting while pursuing his education after being awarded a full
+        athletic scholarship. His acting and athletic ability was a perfect fit for
+        stuntwork. Kubr is Mickey Rourke's stunt double.\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunts\",\"jobs\":[\"Stunts\"],\"episode_count\":2,\"person\":{\"name\":\"Michael
+        H. Barnett\",\"ids\":{\"trakt\":614413,\"slug\":\"michael-h-barnett\",\"imdb\":\"nm2200795\",\"tmdb\":1608452,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunts\",\"jobs\":[\"Stunts\"],\"episode_count\":2,\"person\":{\"name\":\"Hugh
+        Aodh O'Brien\",\"ids\":{\"trakt\":952968,\"slug\":\"hugh-aodh-o-brien\",\"imdb\":\"nm0639586\",\"tmdb\":1866406,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":\"1964-06-13\",\"death\":null,\"birthplace\":\"New
+        York City, New York, USA\",\"homepage\":null}},{\"job\":\"Stunt Double\",\"jobs\":[\"Stunt
+        Double\"],\"episode_count\":2,\"person\":{\"name\":\"Gianni Biasetti Sr.\",\"ids\":{\"trakt\":1433172,\"slug\":\"gianni-biasetti-sr\",\"imdb\":null,\"tmdb\":2252003,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunt
+        Double\",\"jobs\":[\"Stunt Double\"],\"episode_count\":2,\"person\":{\"name\":\"Dailyn
+        Matthews\",\"ids\":{\"trakt\":1575766,\"slug\":\"dailyn-matthews\",\"imdb\":null,\"tmdb\":2389996,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunt
+        Double\",\"jobs\":[\"Stunt Double\"],\"episode_count\":2,\"person\":{\"name\":\"Vanessa
+        Motta\",\"ids\":{\"trakt\":544779,\"slug\":\"vanessa-motta\",\"imdb\":\"nm1906778\",\"tmdb\":1463679,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":\"1981-09-04\",\"death\":null,\"birthplace\":\"Caracas,
+        Venezuela\",\"homepage\":null}},{\"job\":\"Stunts\",\"jobs\":[\"Stunts\"],\"episode_count\":2,\"person\":{\"name\":\"Mark
+        Rayner\",\"ids\":{\"trakt\":534990,\"slug\":\"mark-rayner\",\"imdb\":\"nm0713472\",\"tmdb\":1453673,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":\"1974-02-13\",\"death\":null,\"birthplace\":\"Melbourne,
+        Victoria, Australia\",\"homepage\":null}},{\"job\":\"Stunts\",\"jobs\":[\"Stunts\"],\"episode_count\":2,\"person\":{\"name\":\"Richard
+        King\",\"ids\":{\"trakt\":457091,\"slug\":\"richard-king-dfbe1d0a-3d69-4570-a688-d06362103d86\",\"imdb\":\"nm1831414\",\"tmdb\":1172813,\"tvrage\":322741},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Utility
+        Stunts\",\"jobs\":[\"Utility Stunts\"],\"episode_count\":2,\"person\":{\"name\":\"Ann
+        Coccagnia\",\"ids\":{\"trakt\":1637688,\"slug\":\"ann-coccagnia\",\"imdb\":null,\"tmdb\":2442679,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunt
+        Double\",\"jobs\":[\"Stunt Double\"],\"episode_count\":2,\"person\":{\"name\":\"Anthony
+        Molinari\",\"ids\":{\"trakt\":200398,\"slug\":\"anthony-molinari\",\"imdb\":\"nm1190376\",\"tmdb\":202930,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":\"1974-05-09\",\"death\":null,\"birthplace\":\"Worcester,
+        Massachusetts, United States\",\"homepage\":null}},{\"job\":\"Stunt Double\",\"jobs\":[\"Stunt
+        Double\"],\"episode_count\":2,\"person\":{\"name\":\"Nancy McCrumb\",\"ids\":{\"trakt\":372511,\"slug\":\"nancy-mccrumb\",\"imdb\":\"nm1847089\",\"tmdb\":1251373,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":\"1984-01-02\",\"death\":null,\"birthplace\":\"Ft.
+        Collins, Colorado, USA\",\"homepage\":null}},{\"job\":\"Stunts\",\"jobs\":[\"Stunts\"],\"episode_count\":2,\"person\":{\"name\":\"Kelli
+        Barksdale\",\"ids\":{\"trakt\":549877,\"slug\":\"kelli-barksdale\",\"imdb\":\"nm1471740\",\"tmdb\":1467989,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunts\",\"jobs\":[\"Stunts\"],\"episode_count\":2,\"person\":{\"name\":\"Damien
+        Bray\",\"ids\":{\"trakt\":261390,\"slug\":\"damien-bray\",\"imdb\":\"nm3830587\",\"tmdb\":1110109,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunt
+        Double\",\"jobs\":[\"Stunt Double\"],\"episode_count\":2,\"person\":{\"name\":\"Marc
+        Scizak\",\"ids\":{\"trakt\":571771,\"slug\":\"marc-scizak\",\"imdb\":\"nm1465966\",\"tmdb\":1549741,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":\"1978-01-10\",\"death\":null,\"birthplace\":\"Walnut
+        Creek, California, USA\",\"homepage\":null}},{\"job\":\"Stunts\",\"jobs\":[\"Stunts\"],\"episode_count\":2,\"person\":{\"name\":\"Lauren
+        Mary Kim\",\"ids\":{\"trakt\":434366,\"slug\":\"lauren-mary-kim\",\"imdb\":\"nm1830387\",\"tmdb\":96754,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"Lauren
+        Mary Kim has always had a passion for the  arts. Her first love was dance
+        which she has been doing ever since she  can remember. Since living in Los
+        Angeles she has developed new passions  for acting, martial arts, gymnastics,
+        aerial arts, yoga, art, and the  list goes on.  Born and raised in Stockton,
+        California her parents  guided her into the world of entertainment; performing
+        in dance  recitals, plays, and competitions. After high school she moved to
+        \ Sacramento, California to attend California State University,  Sacramento.
+        She had the opportunity to perform with several dance  companies and the NBA
+        Sacramento Kings as a Royal Court Dancer. The year  after, she danced for
+        the NBA Golden State Warriors. Lauren was ready  to move to Los Angeles to
+        pursue her dreams further.  http://www.laurenmarykim.com/\",\"birthday\":\"1981-02-01\",\"death\":null,\"birthplace\":\"Stockton,
+        California, USA\",\"homepage\":\"http://www.laurenmarykim.com/\"}},{\"job\":\"Stunts\",\"jobs\":[\"Stunts\"],\"episode_count\":2,\"person\":{\"name\":\"Henry
+        Kingi Jr.\",\"ids\":{\"trakt\":570593,\"slug\":\"henry-kingi-jr\",\"imdb\":\"nm0455436\",\"tmdb\":1513690,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":\"1970-06-03\",\"death\":null,\"birthplace\":\"Los
+        Angeles, California, USA\",\"homepage\":null}},{\"job\":\"Stunt Driver\",\"jobs\":[\"Stunt
+        Driver\"],\"episode_count\":1,\"person\":{\"name\":\"Olivia Summers\",\"ids\":{\"trakt\":1490352,\"slug\":\"olivia-summers-a6cd4d6a-5b31-4f5b-b6f6-7a3a57d64348\",\"imdb\":null,\"tmdb\":1448943,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":\"Toronto,
+        Ontario,  Canada\",\"homepage\":null}},{\"job\":\"Stunts\",\"jobs\":[\"Stunts\"],\"episode_count\":1,\"person\":{\"name\":\"Jonathan
+        Arthur\",\"ids\":{\"trakt\":1318214,\"slug\":\"jonathan-arthur\",\"imdb\":\"nm2209096\",\"tmdb\":2157276,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":\"1980-07-01\",\"death\":null,\"birthplace\":\"Morristown,
+        New Jersey, USA\",\"homepage\":null}},{\"job\":\"Fight Choreographer\",\"jobs\":[\"Fight
+        Choreographer\"],\"episode_count\":1,\"person\":{\"name\":\"Thomas DuPont\",\"ids\":{\"trakt\":423733,\"slug\":\"thomas-dupont\",\"imdb\":\"nm0243345\",\"tmdb\":169691,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunts\",\"jobs\":[\"Stunts\"],\"episode_count\":1,\"person\":{\"name\":\"Daniel
+        Leavitt\",\"ids\":{\"trakt\":536946,\"slug\":\"daniel-leavitt\",\"imdb\":\"nm2513187\",\"tmdb\":1455500,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunts\",\"jobs\":[\"Stunts\"],\"episode_count\":1,\"person\":{\"name\":\"Mario
+        Perez\",\"ids\":{\"trakt\":578637,\"slug\":\"mario-perez\",\"imdb\":\"nm1928456\",\"tmdb\":1452087,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunts\",\"jobs\":[\"Stunts\"],\"episode_count\":1,\"person\":{\"name\":\"Kortney
+        Manns\",\"ids\":{\"trakt\":537632,\"slug\":\"kortney-manns\",\"imdb\":null,\"tmdb\":1455903,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunts\",\"jobs\":[\"Stunts\"],\"episode_count\":1,\"person\":{\"name\":\"Robbie
+        Alexander\",\"ids\":{\"trakt\":961515,\"slug\":\"robbie-alexander\",\"imdb\":\"nm2427318\",\"tmdb\":1873889,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunts\",\"jobs\":[\"Stunts\"],\"episode_count\":1,\"person\":{\"name\":\"Jackie
+        Backer\",\"ids\":{\"trakt\":1637692,\"slug\":\"jackie-backer\",\"imdb\":null,\"tmdb\":2446698,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunt
+        Double\",\"jobs\":[\"Stunt Double\"],\"episode_count\":1,\"person\":{\"name\":\"Chris
+        Gann\",\"ids\":{\"trakt\":332736,\"slug\":\"chris-gann\",\"imdb\":\"nm1035414\",\"tmdb\":154837,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":\"1972-04-13\",\"death\":null,\"birthplace\":\"
+        Reno, Nevada, USA\",\"homepage\":null}},{\"job\":\"Stunts\",\"jobs\":[\"Stunts\"],\"episode_count\":1,\"person\":{\"name\":\"Keenen
+        Bray\",\"ids\":{\"trakt\":1038183,\"slug\":\"keenen-bray\",\"imdb\":null,\"tmdb\":1946697,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Utility
+        Stunts\",\"jobs\":[\"Utility Stunts\"],\"episode_count\":1,\"person\":{\"name\":\"Sean
+        A. Rosales\",\"ids\":{\"trakt\":1277490,\"slug\":\"sean-a-rosales\",\"imdb\":null,\"tmdb\":2133918,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":\"1989-09-21\",\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunts\",\"jobs\":[\"Stunts\"],\"episode_count\":1,\"person\":{\"name\":\"Austin
+        Michael Coleman\",\"ids\":{\"trakt\":913835,\"slug\":\"austin-michael-coleman\",\"imdb\":null,\"tmdb\":1569177,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunt
+        Driver\",\"jobs\":[\"Stunt Driver\"],\"episode_count\":1,\"person\":{\"name\":\"Allan
+        Padelford\",\"ids\":{\"trakt\":652631,\"slug\":\"allan-padelford\",\"imdb\":null,\"tmdb\":1634438,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunts\",\"jobs\":[\"Stunts\"],\"episode_count\":1,\"person\":{\"name\":\"Darryl
+        Reeves\",\"ids\":{\"trakt\":1637711,\"slug\":\"darryl-reeves\",\"imdb\":null,\"tmdb\":2451620,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunt
+        Driver\",\"jobs\":[\"Stunt Driver\"],\"episode_count\":1,\"person\":{\"name\":\"Donny
+        Bailey\",\"ids\":{\"trakt\":876742,\"slug\":\"donny-bailey\",\"imdb\":null,\"tmdb\":1809715,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunt
+        Double\",\"jobs\":[\"Stunt Double\"],\"episode_count\":1,\"person\":{\"name\":\"Paul
+        E. Short\",\"ids\":{\"trakt\":886,\"slug\":\"paul-e-short\",\"imdb\":\"nm0795093\",\"tmdb\":1331794,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunts\",\"jobs\":[\"Stunts\"],\"episode_count\":1,\"person\":{\"name\":\"Tim
+        Sitarz\",\"ids\":{\"trakt\":15078,\"slug\":\"tim-sitarz\",\"imdb\":\"nm0803192\",\"tmdb\":37010,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":\"1967-09-19\",\"death\":null,\"birthplace\":\"Big
+        Spring, Texas, USA\",\"homepage\":null}},{\"job\":\"Stunts\",\"jobs\":[\"Stunts\"],\"episode_count\":1,\"person\":{\"name\":\"Douglas
+        Tait\",\"ids\":{\"trakt\":37047,\"slug\":\"douglas-tait\",\"imdb\":\"nm1408752\",\"tmdb\":51301,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":\"1978-12-17\",\"death\":null,\"birthplace\":\"Tarzana,
+        Los Angeles, California, USA\",\"homepage\":null}},{\"job\":\"Stunts\",\"jobs\":[\"Stunts\"],\"episode_count\":1,\"person\":{\"name\":\"Eric
+        Norris\",\"ids\":{\"trakt\":115585,\"slug\":\"eric-norris\",\"imdb\":\"nm0635800\",\"tmdb\":119846,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":\"1965-05-20\",\"death\":null,\"birthplace\":\"Redondo
+        Beach, California, USA\",\"homepage\":null}},{\"job\":\"Stunts\",\"jobs\":[\"Stunts\"],\"episode_count\":1,\"person\":{\"name\":\"Manny
+        Perry\",\"ids\":{\"trakt\":571223,\"slug\":\"manny-perry\",\"imdb\":\"nm0675189\",\"tmdb\":1502517,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunts\",\"jobs\":[\"Stunts\"],\"episode_count\":1,\"person\":{\"name\":\"Casey
+        O'Neill\",\"ids\":{\"trakt\":54148,\"slug\":\"casey-o-neill\",\"imdb\":\"nm0642110\",\"tmdb\":92499,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"Casey
+        O\u2019Neill is an Emmy Nominated Stunt Coordinator and five-time Taurus World
+        Stunt Awards Nominee and winner 2012 Hardest Hit and 2015 for Best Stunt Coordinator.
+        His skills have also earned him four Screen Actors Guild awards nominations
+        and membership to the elite \u201CBrand X Action Specialists.\u201D\\n\\nDoubles:
+        Tom Cruise, Colin Farrell.\",\"birthday\":\"1970-06-23\",\"death\":null,\"birthplace\":\"New
+        York City, New York, USA\",\"homepage\":\"http://www.caseyoneill.com/\"}},{\"job\":\"Stunts\",\"jobs\":[\"Stunts\"],\"episode_count\":1,\"person\":{\"name\":\"Alex
+        Chansky\",\"ids\":{\"trakt\":556066,\"slug\":\"alex-chansky\",\"imdb\":\"nm1058072\",\"tmdb\":1502957,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunt
+        Double\",\"jobs\":[\"Stunt Double\"],\"episode_count\":1,\"person\":{\"name\":\"Cat
+        Hannah\",\"ids\":{\"trakt\":1637721,\"slug\":\"cat-hannah\",\"imdb\":null,\"tmdb\":2442622,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunts\",\"jobs\":[\"Stunts\"],\"episode_count\":1,\"person\":{\"name\":\"Tammie
+        Baird\",\"ids\":{\"trakt\":666224,\"slug\":\"tammie-baird\",\"imdb\":\"nm1941679\",\"tmdb\":1647187,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":\"Livermore,
+        California, USA\",\"homepage\":null}},{\"job\":\"Stunts\",\"jobs\":[\"Stunts\"],\"episode_count\":1,\"person\":{\"name\":\"Tim
+        James\",\"ids\":{\"trakt\":856016,\"slug\":\"tim-james-eb7acf94-cd02-4b1d-b2c5-ded056a17e17\",\"imdb\":null,\"tmdb\":1790012,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":\"1987-03-12\",\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunts\",\"jobs\":[\"Stunts\"],\"episode_count\":1,\"person\":{\"name\":\"Kym
+        Stys\",\"ids\":{\"trakt\":622377,\"slug\":\"kym-stys\",\"imdb\":\"nm1889999\",\"tmdb\":1614183,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":\"1973-12-08\",\"death\":null,\"birthplace\":\"Honolulu,
+        Hawaii, USA\",\"homepage\":null}},{\"job\":\"Stunt Driver\",\"jobs\":[\"Stunt
+        Driver\"],\"episode_count\":1,\"person\":{\"name\":\"Clay Cullen\",\"ids\":{\"trakt\":45895,\"slug\":\"clay-cullen\",\"imdb\":\"nm1247999\",\"tmdb\":60536,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"Working
+        in the stunt buisness since 1996.\\n\\nDoubles: Charlie Hunnam, Frank Grillo,
+        Kim Coats, Martin Henderson, Peter Facinelli, Robert Carradine.\\n\\nAwards
+        \\u0026 Achievements:\\n\\n\u2014 Red Bull Watercraft Surf Challenge Champion
+        (Ranked One Of Top Surf Riders Worldwide)\\n\\n\u2014 Pro Jet Ski Rookie Of
+        The Year\\n\\n\u2014 Taurus Award For Best Specialty Stunt (2004; Boat Work
+        Itailian Job)\\n\\n\u2014 Inductee Internatinal Jet Ski Boating Association
+        Hall Of Fame (2008)\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":\"http://www.brandxstunts.org/members/ccullen\"}},{\"job\":\"Utility
+        Stunts\",\"jobs\":[\"Utility Stunts\"],\"episode_count\":1,\"person\":{\"name\":\"Ross
+        Scharphorn\",\"ids\":{\"trakt\":1160472,\"slug\":\"ross-scharphorn\",\"imdb\":null,\"tmdb\":2059837,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":\"1982-08-20\",\"death\":null,\"birthplace\":\"Grand
+        Rapids, Michigan, USA \",\"homepage\":null}},{\"job\":\"Stunts\",\"jobs\":[\"Stunts\"],\"episode_count\":1,\"person\":{\"name\":\"Patrick
+        O'Brien Demsey\",\"ids\":{\"trakt\":64133,\"slug\":\"patrick-o-brien-demsey\",\"imdb\":\"nm1379739\",\"tmdb\":84341,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":\"1978-12-14\",\"death\":null,\"birthplace\":\"Danvers,
+        Massachusetts, USA\",\"homepage\":null}},{\"job\":\"Utility Stunts\",\"jobs\":[\"Utility
+        Stunts\"],\"episode_count\":1,\"person\":{\"name\":\"Nico Coucke\",\"ids\":{\"trakt\":1529361,\"slug\":\"nico-coucke\",\"imdb\":\"nm4234852\",\"tmdb\":2344893,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Utility
+        Stunts\",\"jobs\":[\"Utility Stunts\"],\"episode_count\":1,\"person\":{\"name\":\"Candace
+        Hollinger\",\"ids\":{\"trakt\":1630994,\"slug\":\"candace-hollinger\",\"imdb\":null,\"tmdb\":2459058,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunts\",\"jobs\":[\"Stunts\"],\"episode_count\":1,\"person\":{\"name\":\"Daniel
+        Issac Alamary\",\"ids\":{\"trakt\":933308,\"slug\":\"daniel-issac-alamary\",\"imdb\":\"nm5552019\",\"tmdb\":1848103,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunts\",\"jobs\":[\"Stunts\"],\"episode_count\":1,\"person\":{\"name\":\"Greg
+        Dela Riva\",\"ids\":{\"trakt\":1630991,\"slug\":\"greg-dela-riva\",\"imdb\":null,\"tmdb\":2459062,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunt
+        Double\",\"jobs\":[\"Stunt Double\"],\"episode_count\":1,\"person\":{\"name\":\"Sonja
+        Munsterman\",\"ids\":{\"trakt\":1571593,\"slug\":\"sonja-munsterman\",\"imdb\":null,\"tmdb\":2386120,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunt
+        Double\",\"jobs\":[\"Stunt Double\"],\"episode_count\":1,\"person\":{\"name\":\"Chrissy
+        Weathersby Ball\",\"ids\":{\"trakt\":933907,\"slug\":\"chrissy-weathersby-ball\",\"imdb\":\"nm1996769\",\"tmdb\":1848787,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunt
+        Double\",\"jobs\":[\"Stunt Double\"],\"episode_count\":1,\"person\":{\"name\":\"Mark
+        Vanselow\",\"ids\":{\"trakt\":495517,\"slug\":\"mark-vanselow\",\"imdb\":\"nm0889342\",\"tmdb\":1416819,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunt
+        Double\",\"jobs\":[\"Stunt Double\"],\"episode_count\":1,\"person\":{\"name\":\"Lori
+        Seaman\",\"ids\":{\"trakt\":1571768,\"slug\":\"lori-seaman\",\"imdb\":null,\"tmdb\":2386841,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunts\",\"jobs\":[\"Stunts\"],\"episode_count\":1,\"person\":{\"name\":\"Jeffrey
+        G. Barnett\",\"ids\":{\"trakt\":908912,\"slug\":\"jeffrey-g-barnett\",\"imdb\":null,\"tmdb\":1826530,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunt
+        Coordinator\",\"jobs\":[\"Stunt Coordinator\"],\"episode_count\":1,\"person\":{\"name\":\"Felipe
+        Savahge\",\"ids\":{\"trakt\":54153,\"slug\":\"felipe-savahge\",\"imdb\":\"nm0767412\",\"tmdb\":92503,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunts\",\"jobs\":[\"Stunts\"],\"episode_count\":1,\"person\":{\"name\":\"Justin
+        Sundquist\",\"ids\":{\"trakt\":581790,\"slug\":\"justin-sundquist\",\"imdb\":null,\"tmdb\":1565490,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunts\",\"jobs\":[\"Stunts\"],\"episode_count\":1,\"person\":{\"name\":\"Bevin
+        Kaye\",\"ids\":{\"trakt\":929517,\"slug\":\"bevin-kaye\",\"imdb\":\"nm1508744\",\"tmdb\":1844809,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunt
+        Double\",\"jobs\":[\"Stunt Double\"],\"episode_count\":1,\"person\":{\"name\":\"Sam
+        Situmorang\",\"ids\":{\"trakt\":469663,\"slug\":\"sam-situmorang\",\"imdb\":\"nm2217041\",\"tmdb\":1386328,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunt
+        Double\",\"jobs\":[\"Stunt Double\"],\"episode_count\":1,\"person\":{\"name\":\"Samuel
+        Reynolds\",\"ids\":{\"trakt\":1264257,\"slug\":\"samuel-reynolds\",\"imdb\":null,\"tmdb\":2120416,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunt
+        Driver\",\"jobs\":[\"Stunt Driver\"],\"episode_count\":1,\"person\":{\"name\":\"Carl
+        Rice\",\"ids\":{\"trakt\":1637670,\"slug\":\"carl-rice-d35d478a-0f31-41f3-9204-47aceb07b069\",\"imdb\":null,\"tmdb\":2394781,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":\"1971-12-09\",\"death\":null,\"birthplace\":\"Concord,
+        New Hampshire, USA\",\"homepage\":null}},{\"job\":\"Stunts\",\"jobs\":[\"Stunts\"],\"episode_count\":1,\"person\":{\"name\":\"Crystal
+        Santos\",\"ids\":{\"trakt\":307605,\"slug\":\"crystal-santos\",\"imdb\":\"nm1806813\",\"tmdb\":1282218,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunts\",\"jobs\":[\"Stunts\"],\"episode_count\":1,\"person\":{\"name\":\"Nancy
+        Thurston\",\"ids\":{\"trakt\":933897,\"slug\":\"nancy-thurston\",\"imdb\":\"nm0862260\",\"tmdb\":1848777,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunt
+        Double\",\"jobs\":[\"Stunt Double\"],\"episode_count\":1,\"person\":{\"name\":\"Tracey
+        Ruggiero\",\"ids\":{\"trakt\":1581947,\"slug\":\"tracey-ruggiero\",\"imdb\":\"nm1497521\",\"tmdb\":2396665,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunts\",\"jobs\":[\"Stunts\"],\"episode_count\":1,\"person\":{\"name\":\"Jeff
+        Wolfe\",\"ids\":{\"trakt\":421206,\"slug\":\"jeff-wolfe\",\"imdb\":\"nm0004178\",\"tmdb\":51303,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunt
+        Double\",\"jobs\":[\"Stunt Double\"],\"episode_count\":1,\"person\":{\"name\":\"Justin
+        Gant\",\"ids\":{\"trakt\":1125849,\"slug\":\"justin-gant\",\"imdb\":\"nm2420971\",\"tmdb\":2025827,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunt
+        Double\",\"jobs\":[\"Stunt Double\"],\"episode_count\":1,\"person\":{\"name\":\"Walker
+        Haynes\",\"ids\":{\"trakt\":120335,\"slug\":\"walker-haynes\",\"imdb\":\"nm0371565\",\"tmdb\":121890,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":\"1974-09-30\",\"death\":null,\"birthplace\":\"
+        Atlanta, Georgia, USA\",\"homepage\":null}},{\"job\":\"Stunts\",\"jobs\":[\"Stunts\"],\"episode_count\":1,\"person\":{\"name\":\"Brian
+        Robert Munce\",\"ids\":{\"trakt\":1433519,\"slug\":\"brian-robert-munce\",\"imdb\":null,\"tmdb\":2253266,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunts\",\"jobs\":[\"Stunts\"],\"episode_count\":1,\"person\":{\"name\":\"Heather
+        Arthur\",\"ids\":{\"trakt\":1592127,\"slug\":\"heather-arthur\",\"imdb\":null,\"tmdb\":2409966,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Utility
+        Stunts\",\"jobs\":[\"Utility Stunts\"],\"episode_count\":1,\"person\":{\"name\":\"Gabriel
+        Nunez\",\"ids\":{\"trakt\":1401498,\"slug\":\"gabriel-nunez\",\"imdb\":null,\"tmdb\":2212799,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunt
+        Driver\",\"jobs\":[\"Stunt Driver\"],\"episode_count\":1,\"person\":{\"name\":\"Kyle
+        Shaw\",\"ids\":{\"trakt\":1592109,\"slug\":\"kyle-shaw\",\"imdb\":null,\"tmdb\":2409997,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunt
+        Double\",\"jobs\":[\"Stunt Double\"],\"episode_count\":1,\"person\":{\"name\":\"Oliver
+        Keller\",\"ids\":{\"trakt\":133236,\"slug\":\"oliver-keller\",\"imdb\":\"nm1044413\",\"tmdb\":1029261,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":\"1975-09-15\",\"death\":null,\"birthplace\":\"Switzerland\",\"homepage\":\"https://www.istunt.com/oliver-keller\"}},{\"job\":\"Stunt
+        Coordinator\",\"jobs\":[\"Stunt Coordinator\"],\"episode_count\":1,\"person\":{\"name\":\"Phil
+        Culotta\",\"ids\":{\"trakt\":166785,\"slug\":\"phil-culotta\",\"imdb\":\"nm0191622\",\"tmdb\":237920,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"Phil
+        Culotta is a stunt performer and actor.\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunt
+        Double\",\"jobs\":[\"Stunt Double\"],\"episode_count\":1,\"person\":{\"name\":\"Erik
+        Betts\",\"ids\":{\"trakt\":563167,\"slug\":\"erik-betts\",\"imdb\":\"nm0079430\",\"tmdb\":1348580,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":\"1967-11-22\",\"death\":null,\"birthplace\":\"Boston
+        - Massachusetts - USA\",\"homepage\":null}},{\"job\":\"Stunt Double\",\"jobs\":[\"Stunt
+        Double\"],\"episode_count\":1,\"person\":{\"name\":\"Dina L. Margolin\",\"ids\":{\"trakt\":577559,\"slug\":\"dina-l-margolin\",\"imdb\":null,\"tmdb\":1554923,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunts\",\"jobs\":[\"Stunts\"],\"episode_count\":1,\"person\":{\"name\":\"Tod
+        Nakamura\",\"ids\":{\"trakt\":783817,\"slug\":\"tod-nakamura\",\"imdb\":null,\"tmdb\":1738941,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":\"1969-06-13\",\"death\":null,\"birthplace\":\"
+        Los Angeles, California, USA\",\"homepage\":null}},{\"job\":\"Stunt Driver\",\"jobs\":[\"Stunt
+        Driver\"],\"episode_count\":1,\"person\":{\"name\":\"Ann Scott\",\"ids\":{\"trakt\":933906,\"slug\":\"ann-scott-72b69ca6-db0d-46f0-8289-6ff9eccb39da\",\"imdb\":\"nm1171240\",\"tmdb\":1848783,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":\"Los
+        Angeles, California, USA\",\"homepage\":null}},{\"job\":\"Stunts\",\"jobs\":[\"Stunts\"],\"episode_count\":1,\"person\":{\"name\":\"Malosi
+        Leonard\",\"ids\":{\"trakt\":750911,\"slug\":\"malosi-leonard\",\"imdb\":\"nm0502696\",\"tmdb\":1648329,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":\"1979-01-01\",\"death\":null,\"birthplace\":null,\"homepage\":\"http://www.brandxstunts.org/members/malosileonard\"}},{\"job\":\"Stunts\",\"jobs\":[\"Stunts\"],\"episode_count\":1,\"person\":{\"name\":\"Jacob
+        Chambers\",\"ids\":{\"trakt\":544760,\"slug\":\"jacob-chambers\",\"imdb\":\"nm0150345\",\"tmdb\":1463660,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunts\",\"jobs\":[\"Stunts\"],\"episode_count\":1,\"person\":{\"name\":\"Paul
+        Eliopoulos\",\"ids\":{\"trakt\":782609,\"slug\":\"paul-eliopoulos\",\"imdb\":\"nm0253639\",\"tmdb\":1737945,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunt
+        Double\",\"jobs\":[\"Stunt Double\"],\"episode_count\":1,\"person\":{\"name\":\"Brooklynne
+        James\",\"ids\":{\"trakt\":1261415,\"slug\":\"brooklynne-james\",\"imdb\":null,\"tmdb\":2116890,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":\"1981-01-29\",\"death\":null,\"birthplace\":\"
+        Los Angeles, California, USA\",\"homepage\":null}},{\"job\":\"Stunt Double\",\"jobs\":[\"Stunt
+        Double\"],\"episode_count\":1,\"person\":{\"name\":\"Bill Leaman\",\"ids\":{\"trakt\":805779,\"slug\":\"bill-leaman\",\"imdb\":null,\"tmdb\":1758241,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}}],\"camera\":[{\"job\":\"Director
+        of Photography\",\"jobs\":[\"Director of Photography\"],\"episode_count\":119,\"person\":{\"name\":\"Gale
+        Tattersall\",\"ids\":{\"trakt\":31105,\"slug\":\"gale-tattersall\",\"imdb\":\"nm0851320\",\"tmdb\":42119,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Director
+        of Photography\",\"jobs\":[\"Director of Photography\"],\"episode_count\":31,\"person\":{\"name\":\"Roy
+        H. Wagner\",\"ids\":{\"trakt\":18033,\"slug\":\"roy-h-wagner\",\"imdb\":\"nm0906096\",\"tmdb\":21362,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Director
+        of Photography\",\"jobs\":[\"Director of Photography\"],\"episode_count\":12,\"person\":{\"name\":\"Anthony
+        Gaudioz\",\"ids\":{\"trakt\":479277,\"slug\":\"anthony-gaudioz\",\"imdb\":\"nm0309980\",\"tmdb\":1404540,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":\"1949-09-12\",\"death\":null,\"birthplace\":\"Thanet,
+        Kent, England, UK\",\"homepage\":null}},{\"job\":\"Director of Photography\",\"jobs\":[\"Director
+        of Photography\"],\"episode_count\":9,\"person\":{\"name\":\"Walt Lloyd\",\"ids\":{\"trakt\":8373,\"slug\":\"walt-lloyd\",\"imdb\":\"nm0516162\",\"tmdb\":10418,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"Walt
+        Lloyd is known for his work on\_The Santa Clause\_(1994),\_Sex, Lies, and
+        Videotape(1989) and\_Short Cuts\_(1993).\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Director
+        of Photography\",\"jobs\":[\"Director of Photography\"],\"episode_count\":1,\"person\":{\"name\":\"Cort
+        Fey\",\"ids\":{\"trakt\":277516,\"slug\":\"cort-fey\",\"imdb\":\"nm0275475\",\"tmdb\":1141676,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Director
+        of Photography\",\"jobs\":[\"Director of Photography\"],\"episode_count\":1,\"person\":{\"name\":\"James
+        Dillinger\",\"ids\":{\"trakt\":577437,\"slug\":\"james-dillinger\",\"imdb\":null,\"tmdb\":1548636,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Director
+        of Photography\",\"jobs\":[\"Director of Photography\"],\"episode_count\":1,\"person\":{\"name\":\"Newton
+        Thomas Sigel\",\"ids\":{\"trakt\":7392,\"slug\":\"newton-thomas-sigel\",\"imdb\":\"nm0005875\",\"tmdb\":9040,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}}],\"editing\":[{\"job\":\"Editor\",\"jobs\":[\"Editor\"],\"episode_count\":35,\"person\":{\"name\":\"Dorian
+        Harris\",\"ids\":{\"trakt\":62348,\"slug\":\"dorian-harris\",\"imdb\":\"nm0364643\",\"tmdb\":75626,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Editor\",\"jobs\":[\"Editor\"],\"episode_count\":33,\"person\":{\"name\":\"Chris
+        Brookshire\",\"ids\":{\"trakt\":653003,\"slug\":\"chris-brookshire\",\"imdb\":\"nm0112325\",\"tmdb\":1634606,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Editor\",\"jobs\":[\"Editor\"],\"episode_count\":26,\"person\":{\"name\":\"Amy
+        Fleming\",\"ids\":{\"trakt\":989644,\"slug\":\"amy-fleming\",\"imdb\":null,\"tmdb\":1900557,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Editor\",\"jobs\":[\"Editor\"],\"episode_count\":20,\"person\":{\"name\":\"Kimberly
+        Ray\",\"ids\":{\"trakt\":41268,\"slug\":\"kimberly-ray\",\"imdb\":\"nm0712896\",\"tmdb\":56594,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Editor\",\"jobs\":[\"Editor\"],\"episode_count\":17,\"person\":{\"name\":\"Lawrence
+        Curtis\",\"ids\":{\"trakt\":1592166,\"slug\":\"lawrence-curtis\",\"imdb\":\"nm1067980\",\"tmdb\":2409989,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Editor\",\"jobs\":[\"Editor\"],\"episode_count\":11,\"person\":{\"name\":\"Zeborah
+        Tidwell\",\"ids\":{\"trakt\":1566281,\"slug\":\"zeborah-tidwell\",\"imdb\":null,\"tmdb\":2381105,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Editor\",\"jobs\":[\"Editor\"],\"episode_count\":8,\"person\":{\"name\":\"Chad
+        Mochrie\",\"ids\":{\"trakt\":1132390,\"slug\":\"chad-mochrie\",\"imdb\":null,\"tmdb\":2032091,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Editor\",\"jobs\":[\"Editor\"],\"episode_count\":6,\"person\":{\"name\":\"Marta
+        Evry\",\"ids\":{\"trakt\":1323756,\"slug\":\"marta-evry\",\"imdb\":\"nm0263822\",\"tmdb\":1481553,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Editor\",\"jobs\":[\"Editor\"],\"episode_count\":6,\"person\":{\"name\":\"Bonnie
+        Koehler\",\"ids\":{\"trakt\":53072,\"slug\":\"bonnie-koehler\",\"imdb\":\"nm0462732\",\"tmdb\":68127,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Editor\",\"jobs\":[\"Editor\"],\"episode_count\":5,\"person\":{\"name\":\"Bill
+        Johnson\",\"ids\":{\"trakt\":420204,\"slug\":\"bill-johnson-1815d9cd-07b2-4c11-b176-7031d6fc3de8\",\"imdb\":\"nm0424594\",\"tmdb\":41563,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"Bill
+        Johnson is an editor and director.\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Editor\",\"jobs\":[\"Editor\"],\"episode_count\":5,\"person\":{\"name\":\"Sue
+        Blainey\",\"ids\":{\"trakt\":22092,\"slug\":\"sue-blainey\",\"imdb\":\"nm0086180\",\"tmdb\":31858,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Editor\",\"jobs\":[\"Editor\"],\"episode_count\":3,\"person\":{\"name\":\"Christopher
+        Nelson\",\"ids\":{\"trakt\":514557,\"slug\":\"christopher-nelson\",\"imdb\":\"nm0625243\",\"tmdb\":1434060,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Editor\",\"jobs\":[\"Editor\"],\"episode_count\":3,\"person\":{\"name\":\"Tatiana
+        S. Riegel\",\"ids\":{\"trakt\":3527,\"slug\":\"tatiana-s-riegel\",\"imdb\":\"nm0726186\",\"tmdb\":33685,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Editor\",\"jobs\":[\"Editor\"],\"episode_count\":2,\"person\":{\"name\":\"Deborah
+        Moran\",\"ids\":{\"trakt\":1535921,\"slug\":\"deborah-moran\",\"imdb\":null,\"tmdb\":2351151,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Editor\",\"jobs\":[\"Editor\"],\"episode_count\":2,\"person\":{\"name\":\"Arge
+        O'Neal\",\"ids\":{\"trakt\":1535922,\"slug\":\"arge-o-neal\",\"imdb\":null,\"tmdb\":2351157,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Editor\",\"jobs\":[\"Editor\"],\"episode_count\":2,\"person\":{\"name\":\"Jo
+        Francis\",\"ids\":{\"trakt\":37403,\"slug\":\"jo-francis\",\"imdb\":\"nm1308201\",\"tmdb\":51692,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Editor\",\"jobs\":[\"Editor\"],\"episode_count\":1,\"person\":{\"name\":\"David
+        Post\",\"ids\":{\"trakt\":989057,\"slug\":\"david-post-ed4bac14-7d81-4932-9bac-97ddbc43f8d8\",\"imdb\":null,\"tmdb\":1900112,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Editor\",\"jobs\":[\"Editor\"],\"episode_count\":1,\"person\":{\"name\":\"Stephen
+        Semel\",\"ids\":{\"trakt\":34662,\"slug\":\"stephen-semel\",\"imdb\":\"nm0002377\",\"tmdb\":48070,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Editor\",\"jobs\":[\"Editor\"],\"episode_count\":1,\"person\":{\"name\":\"Scott
+        Boyd\",\"ids\":{\"trakt\":52414,\"slug\":\"scott-boyd\",\"imdb\":\"nm0101910\",\"tmdb\":34400,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Editor\",\"jobs\":[\"Editor\"],\"episode_count\":1,\"person\":{\"name\":\"Seth
+        Clark\",\"ids\":{\"trakt\":529561,\"slug\":\"seth-clark\",\"imdb\":\"nm0164499\",\"tmdb\":1448111,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Editor\",\"jobs\":[\"Editor\"],\"episode_count\":1,\"person\":{\"name\":\"Elliot
+        Graham\",\"ids\":{\"trakt\":48384,\"slug\":\"elliot-graham\",\"imdb\":\"nm0971680\",\"tmdb\":11017,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":\"1976-06-08\",\"death\":null,\"birthplace\":\"Claremont,
+        California, USA\",\"homepage\":null}},{\"job\":\"Editor\",\"jobs\":[\"Editor\"],\"episode_count\":1,\"person\":{\"name\":\"Anthony
+        Pinker\",\"ids\":{\"trakt\":793962,\"slug\":\"anthony-pinker\",\"imdb\":null,\"tmdb\":1747701,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}}],\"writing\":[{\"job\":\"Writer\",\"jobs\":[\"Writer\"],\"episode_count\":23,\"person\":{\"name\":\"Peter
+        Blake\",\"ids\":{\"trakt\":399346,\"slug\":\"peter-blake-5cd380a9-d696-46d4-84cc-b862c5b2e6b3\",\"imdb\":\"nm0086694\",\"tmdb\":1223964,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Writer\",\"jobs\":[\"Writer\"],\"episode_count\":20,\"person\":{\"name\":\"David
+        Shore\",\"ids\":{\"trakt\":434876,\"slug\":\"david-shore\",\"imdb\":\"nm0794914\",\"tmdb\":169061,\"tvrage\":17176},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"A
+        Canadian television writer, director and producer. He is known for creating
+        the critically acclaimed series House and more recently, Battle Creek, Sneaky
+        Pete and The Good Doctor. Shore worked on Family Law, NYPD Blue and Due South,
+        also producing many episodes of the latter.\",\"birthday\":\"1959-07-03\",\"death\":null,\"birthplace\":\"London,
+        Ontario, Canada\",\"homepage\":null}},{\"job\":\"Writer\",\"jobs\":[\"Writer\"],\"episode_count\":20,\"person\":{\"name\":\"Lawrence
+        Kaplow\",\"ids\":{\"trakt\":399356,\"slug\":\"lawrence-kaplow\",\"imdb\":\"nm0438432\",\"tmdb\":1223963,\"tvrage\":31697},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Writer\",\"jobs\":[\"Writer\"],\"episode_count\":20,\"person\":{\"name\":\"David
+        Foster\",\"ids\":{\"trakt\":849393,\"slug\":\"david-foster-25471842-2533-42ae-b7fd-9c56bb47668a\",\"imdb\":\"nm1844375\",\"tmdb\":1365869,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Writer\",\"jobs\":[\"Writer\"],\"episode_count\":17,\"person\":{\"name\":\"Thomas
+        L. Moran\",\"ids\":{\"trakt\":399347,\"slug\":\"thomas-l-moran\",\"imdb\":\"nm0602981\",\"tmdb\":1223966,\"tvrage\":31719},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Writer\",\"jobs\":[\"Writer\"],\"episode_count\":17,\"person\":{\"name\":\"Garrett
+        Lerner\",\"ids\":{\"trakt\":106206,\"slug\":\"garrett-lerner\",\"imdb\":\"nm1068424\",\"tmdb\":114407,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Writer\",\"jobs\":[\"Writer\"],\"episode_count\":17,\"person\":{\"name\":\"Russel
+        Friend\",\"ids\":{\"trakt\":399348,\"slug\":\"russel-friend\",\"imdb\":\"nm1068423\",\"tmdb\":1213567,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Writer\",\"jobs\":[\"Writer\"],\"episode_count\":17,\"person\":{\"name\":\"Sara
+        Hess\",\"ids\":{\"trakt\":1389175,\"slug\":\"sara-hess\",\"imdb\":\"nm1802607\",\"tmdb\":1223926,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Writer\",\"jobs\":[\"Writer\"],\"episode_count\":17,\"person\":{\"name\":\"Liz
+        Friedman\",\"ids\":{\"trakt\":436909,\"slug\":\"liz-friedman\",\"imdb\":\"nm0295286\",\"tmdb\":1218783,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"Liz
+        Friedman is a producer and writer.\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Writer\",\"jobs\":[\"Writer\"],\"episode_count\":15,\"person\":{\"name\":\"Doris
+        Egan\",\"ids\":{\"trakt\":92689,\"slug\":\"doris-egan\",\"imdb\":\"nm0250668\",\"tmdb\":169466,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Writer\",\"jobs\":[\"Writer\"],\"episode_count\":13,\"person\":{\"name\":\"David
+        Hoselton\",\"ids\":{\"trakt\":36334,\"slug\":\"david-hoselton\",\"imdb\":\"nm0395924\",\"tmdb\":52873,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"From
+        Wikipedia, the free encyclopedia.\\n\\nDavid Hoselton is a Canadian screenwriter
+        and television producer, best known for his work on the television series
+        House and the animated films Over the Hedge and Brother Bear.\\n\\nHoselton
+        attended the University of Toronto Law School where he met and befriended
+        David Shore, the creator of House. Hoselton began his Hollywood career in
+        1987, as a writer for the film Like Father Like Son, and wrote or co-wrote
+        several other films. In 2006, during the third season of House,  Shore hired
+        Hoselton as a writer for the show. In 2007, at the  beginning of season four,
+        Hoselton became one of the show's producers.\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Writer\",\"jobs\":[\"Writer\"],\"episode_count\":12,\"person\":{\"name\":\"Eli
+        Attie\",\"ids\":{\"trakt\":398540,\"slug\":\"eli-attie\",\"imdb\":\"nm1108368\",\"tmdb\":1219508,\"tvrage\":48322},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"Eli
+        Attie is a television writer and producer. He previously worked in politics
+        as a special assistant to President Bill Clinton and chief speechwriter for
+        Vice President Al Gore.\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Writer\",\"jobs\":[\"Writer\"],\"episode_count\":7,\"person\":{\"name\":\"John
+        C. Kelley\",\"ids\":{\"trakt\":1389124,\"slug\":\"john-c-kelley\",\"imdb\":\"nm0445931\",\"tmdb\":1223989,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Writer\",\"jobs\":[\"Writer\"],\"episode_count\":6,\"person\":{\"name\":\"Leonard
+        Dick\",\"ids\":{\"trakt\":399350,\"slug\":\"leonard-dick\",\"imdb\":\"nm0225272\",\"tmdb\":1223984,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Writer\",\"jobs\":[\"Writer\"],\"episode_count\":6,\"person\":{\"name\":\"Pam
+        Davis\",\"ids\":{\"trakt\":709832,\"slug\":\"pam-davis-757e9a93-e25c-4518-b491-ccd0bbfd42d5\",\"imdb\":null,\"tmdb\":1223977,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Writer\",\"jobs\":[\"Writer\"],\"episode_count\":5,\"person\":{\"name\":\"John
+        Mankiewicz\",\"ids\":{\"trakt\":399129,\"slug\":\"john-mankiewicz\",\"imdb\":\"nm0542535\",\"tmdb\":1222278,\"tvrage\":31715},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Writer\",\"jobs\":[\"Writer\"],\"episode_count\":5,\"person\":{\"name\":\"Matt
+        Witten\",\"ids\":{\"trakt\":399358,\"slug\":\"matt-witten\",\"imdb\":\"nm0936976\",\"tmdb\":1212236,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Writer\",\"jobs\":[\"Writer\"],\"episode_count\":5,\"person\":{\"name\":\"Matthew
+        V. Lewis\",\"ids\":{\"trakt\":1490782,\"slug\":\"matthew-v-lewis\",\"imdb\":null,\"tmdb\":1223979,\"tvrage\":128774},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Writer\",\"jobs\":[\"Writer\"],\"episode_count\":5,\"person\":{\"name\":\"Seth
+        Hoffman\",\"ids\":{\"trakt\":180461,\"slug\":\"seth-hoffman\",\"imdb\":\"nm2397756\",\"tmdb\":204847,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Writer\",\"jobs\":[\"Writer\"],\"episode_count\":4,\"person\":{\"name\":\"Kath
+        Lingenfelter\",\"ids\":{\"trakt\":399359,\"slug\":\"kath-lingenfelter\",\"imdb\":\"nm1964417\",\"tmdb\":1224003,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Writer\",\"jobs\":[\"Writer\"],\"episode_count\":2,\"person\":{\"name\":\"Sara
+        B. Cooper\",\"ids\":{\"trakt\":402190,\"slug\":\"sara-b-cooper-4c1b91aa-e873-40bb-a28d-dbbcc1889c03\",\"imdb\":\"nm0153384\",\"tmdb\":1222910,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Writer\",\"jobs\":[\"Writer\"],\"episode_count\":2,\"person\":{\"name\":\"Dustin
+        Paddock\",\"ids\":{\"trakt\":618367,\"slug\":\"dustin-paddock\",\"imdb\":null,\"tmdb\":1223981,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Writer\",\"jobs\":[\"Writer\"],\"episode_count\":2,\"person\":{\"name\":\"Marqui
+        Jackson\",\"ids\":{\"trakt\":399345,\"slug\":\"marqui-jackson\",\"imdb\":null,\"tmdb\":1224004,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Teleplay\",\"jobs\":[\"Teleplay\"],\"episode_count\":1,\"person\":{\"name\":\"Danny
+        Weiss\",\"ids\":{\"trakt\":961451,\"slug\":\"danny-weiss-d4b61707-24ee-4768-8d7d-ac6e05b4a527\",\"imdb\":\"nm3838536\",\"tmdb\":1873705,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Writer\",\"jobs\":[\"Writer\"],\"episode_count\":1,\"person\":{\"name\":\"Jamie
+        Conway\",\"ids\":{\"trakt\":1631121,\"slug\":\"jamie-conway\",\"imdb\":null,\"tmdb\":2458763,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Writer\",\"jobs\":[\"Writer\"],\"episode_count\":1,\"person\":{\"name\":\"Sean
+        Whitesell\",\"ids\":{\"trakt\":104256,\"slug\":\"sean-whitesell\",\"imdb\":\"nm0925878\",\"tmdb\":1213612,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"Sean
+        Whitesell is a producer and writer.\",\"birthday\":\"1963-03-11\",\"death\":\"2015-12-28\",\"birthplace\":\"Iowa
+        Falls, Iowa, USA\",\"homepage\":null}},{\"job\":\"Writer\",\"jobs\":[\"Writer\"],\"episode_count\":1,\"person\":{\"name\":\"Carol
+        Green\",\"ids\":{\"trakt\":1490788,\"slug\":\"carol-green-645db4cd-8942-41fb-a36d-782a40ff9008\",\"imdb\":\"nm0337692\",\"tmdb\":1223982,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Writer\",\"jobs\":[\"Writer\"],\"episode_count\":1,\"person\":{\"name\":\"Joel
+        Anderson Thompson\",\"ids\":{\"trakt\":1158055,\"slug\":\"joel-anderson-thompson\",\"imdb\":null,\"tmdb\":1223971,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Writer\",\"jobs\":[\"Writer\"],\"episode_count\":1,\"person\":{\"name\":\"Michael
+        R. Perry\",\"ids\":{\"trakt\":125839,\"slug\":\"michael-r-perry\",\"imdb\":\"nm0675219\",\"tmdb\":1214473,\"tvrage\":33992},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"Michael
+        R. Perry is an American television producer, television writer and screenwriter.
+        He is a graduate of Thomas Worthington High School and the USC School of Cinematic
+        Arts.\\n\\nHis television credits include Eerie, Indiana, New York Undercover,
+        American Gothic, The Practice, Millennium, Law \\u0026 Order: Special Victims
+        Unit (including the episode \\\"Limitations\\\" for which he won the Edgar
+        Allan Poe Award for Best Episode in a TV Series), FreakyLinks, The Guardian,
+        The Dead Zone, House M.D., Persons Unknown, The River (a series he co-created)
+        and NYPD Blue for which he won a Primetime Emmy Award for Outstanding Writing
+        for a Drama Series.\\n\\nAs a screenwriter he wrote the film The Voices[2]
+        and co-wrote the film Paranormal Activity 2.[3]\",\"birthday\":\"1963-04-15\",\"death\":null,\"birthplace\":\"Columbus,
+        Ohio, USA\",\"homepage\":null}},{\"job\":\"Story\",\"jobs\":[\"Story\"],\"episode_count\":1,\"person\":{\"name\":\"Charles
+        M. Duncan\",\"ids\":{\"trakt\":1565699,\"slug\":\"charles-m-duncan\",\"imdb\":null,\"tmdb\":2380306,\"tvrage\":null},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}}],\"created
+        by\":[{\"job\":\"Creator\",\"jobs\":[\"Creator\"],\"episode_count\":176,\"person\":{\"name\":\"David
+        Shore\",\"ids\":{\"trakt\":434876,\"slug\":\"david-shore\",\"imdb\":\"nm0794914\",\"tmdb\":169061,\"tvrage\":17176},\"social_ids\":{\"twitter\":null,\"facebook\":null,\"instagram\":null,\"wikipedia\":null},\"biography\":\"A
+        Canadian television writer, director and producer. He is known for creating
+        the critically acclaimed series House and more recently, Battle Creek, Sneaky
+        Pete and The Good Doctor. Shore worked on Family Law, NYPD Blue and Due South,
+        also producing many episodes of the latter.\",\"birthday\":\"1959-07-03\",\"death\":null,\"birthplace\":\"London,
+        Ontario, Canada\",\"homepage\":null}}]}}"
     headers:
-      CF-Cache-Status: [MISS]
-      CF-RAY: [312a167c8e173d49-CPH]
-      Cache-Control: ['public, max-age=28800']
-      Connection: [keep-alive]
-      Content-Type: [application/json; charset=utf-8]
-      Date: ['Sat, 17 Dec 2016 11:38:16 GMT']
-      ETag: [W/"7fcc137b45389ea34735f87179f82163"]
-      Expires: ['Sat, 17 Dec 2016 19:38:16 GMT']
-      Server: [cloudflare-nginx]
-      Set-Cookie: ['__cfduid=d704c28dcce197c9f9bb900c078457ec71481974696; expires=Sun,
-          17-Dec-17 11:38:16 GMT; path=/; domain=.trakt.tv; HttpOnly']
-      Vary: [Accept-Encoding]
-      X-Content-Type-Options: [nosniff]
-      X-Frame-Options: [SAMEORIGIN]
-      X-Request-Id: [2f3cd843-4bb0-4004-b8ef-f003f193ce50]
-      X-Runtime: ['0.075454']
-      X-XSS-Protection: [1; mode=block]
-    status: {code: 200, message: OK}
+      CF-Cache-Status:
+      - EXPIRED
+      CF-RAY:
+      - 60caac092b532abc-IAD
+      Cache-Control:
+      - public, max-age=28800
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Tue, 05 Jan 2021 05:06:47 GMT
+      ETag:
+      - W/"513e838b7caefe0d85408ac2c22e2695"
+      Expect-CT:
+      - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+      Expires:
+      - Tue, 05 Jan 2021 13:06:47 GMT
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cfduid=d944acadc3e7927fa5a356c4bcd9bc01e1609823207; expires=Thu, 04-Feb-21
+        05:06:47 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Ratelimit:
+      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":986,"until":"2021-01-05T05:10:00Z"}'
+      X-Request-Id:
+      - 14935ec5-74e4-4f44-9575-5584f08ced0d
+      X-Runtime:
+      - '0.057424'
+      X-XSS-Protection:
+      - 1; mode=block
+      cf-request-id:
+      - 077289d9bc00002abce90e2000000001
+    status:
+      code: 200
+      message: OK
 version: 1

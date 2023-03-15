@@ -2,33 +2,81 @@ interactions:
 - request:
     body: null
     headers:
-      Content-Type: [application/json]
-      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: ['2']
+      Content-Type:
+      - application/json
+      trakt-api-key:
+      - 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af
+      trakt-api-version:
+      - '2'
     method: GET
-    uri: https://api.trakt.tv/users/flexgettest/watchlist/movies
+    uri: https://api.trakt.tv/users/flexgettest/watchlist/movies?limit=1000&page=1
   response:
-    body: {string: '[{"rank":1,"listed_at":"2015-01-02T02:37:24.000Z","type":"movie","movie":{"title":"12
-        Angry Men","year":1957,"ids":{"trakt":309,"slug":"12-angry-men-1957","imdb":"tt0050083","tmdb":389}}}]'}
+    body:
+      string: '[{"rank":1,"id":8121063,"listed_at":"2015-01-02T02:37:24.000Z","notes":null,"type":"movie","movie":{"title":"12
+        Angry Men","year":1957,"ids":{"trakt":309,"slug":"12-angry-men-1957","imdb":"tt0050083","tmdb":389}}}]'
     headers:
-      CF-RAY: [312a16898c473c95-CPH]
-      Cache-Control: ['max-age=0, private, must-revalidate']
-      Cf-Railgun: [f951ba0dab stream 0.000000 0200 e6be]
-      Connection: [keep-alive]
-      Content-Type: [application/json; charset=utf-8]
-      Date: ['Sat, 17 Dec 2016 11:38:18 GMT']
-      Etag: [W/"83e44940852d5e12779f8e481af80224"]
-      Server: [cloudflare-nginx]
-      Set-Cookie: ['__cfduid=d2ddb53442ca3100bc9fccb28e53e8af71481974698; expires=Sun,
-          17-Dec-17 11:38:18 GMT; path=/; domain=.trakt.tv; HttpOnly']
-      Vary: [Accept-Encoding]
-      X-Content-Type-Options: [nosniff]
-      X-Frame-Options: [SAMEORIGIN]
-      X-Private-User: ['false']
-      X-Request-Id: [dd7ea314-4b1d-4f13-8cea-66441a2b8f61]
-      X-Runtime: ['0.025321']
-      X-Sort-By: [rank]
-      X-Sort-How: [asc]
-      X-Xss-Protection: [1; mode=block]
-    status: {code: 200, message: OK}
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-RAY:
+      - 60caac15ee42e112-IAD
+      Cache-Control:
+      - max-age=0, private, must-revalidate
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Tue, 05 Jan 2021 05:06:49 GMT
+      ETag:
+      - W/"afc4b8ff71bcdb7ded68a9ff380abae8"
+      Expect-CT:
+      - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cfduid=d180d80c93a362b1b02e2908d4228508a1609823209; expires=Thu, 04-Feb-21
+        05:06:49 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      Vary:
+      - Accept-Encoding
+      X-Applied-Sort-By:
+      - rank
+      X-Applied-Sort-How:
+      - asc
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Pagination-Item-Count:
+      - '1'
+      X-Pagination-Limit:
+      - '1000'
+      X-Pagination-Page:
+      - '1'
+      X-Pagination-Page-Count:
+      - '1'
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Private-User:
+      - 'false'
+      X-Ratelimit:
+      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":981,"until":"2021-01-05T05:10:00Z"}'
+      X-Request-Id:
+      - 56c2abc5-1874-45d3-aa45-917b3b45f6ea
+      X-Runtime:
+      - '0.018713'
+      X-Sort-By:
+      - rank
+      X-Sort-How:
+      - asc
+      X-XSS-Protection:
+      - 1; mode=block
+      cf-request-id:
+      - 077289e1b60000e112b2b9e000000001
+    status:
+      code: 200
+      message: OK
 version: 1

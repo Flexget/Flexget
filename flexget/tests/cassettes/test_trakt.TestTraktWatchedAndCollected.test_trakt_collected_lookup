@@ -2,20 +2,19 @@ interactions:
 - request:
     body: null
     headers:
-      Content-Type: [application/json]
-      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: ['2']
+      Content-Type:
+      - application/json
+      trakt-api-key:
+      - 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af
+      trakt-api-version:
+      - '2'
     method: GET
-    uri: https://api.trakt.tv/search?type=show&year=2011&query=Homeland
+    uri: https://api.trakt.tv/search?query=Homeland&type=show&year=2011
   response:
-    body: {string: "[{\"type\":\"show\",\"score\":104.575424,\"show\":{\"title\":\"Homeland\",\"overview\":\"When
-        Marine Nicolas Brody is hailed as a hero after he returns home from eight
-        years of captivity in Iraq, intelligence officer Carrie Mathison is the only
-        one who suspects that he may have been turned.\",\"year\":2011,\"status\":\"returning
-        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":1398,\"slug\":\"homeland\",\"tvdb\":247897,\"imdb\":\"tt1796960\",\"tmdb\":1407,\"tvrage\":27811}}},{\"type\":\"show\",\"score\":0.8664195,\"show\":{\"title\":\"To
-        Catch a Smuggler\",\"overview\":\"This NatGeo series follows Homeland Security
-        officers at New York City's John F. Kennedy International Airport as they
-        deal with cases ranging from fraudulent visas to human trafficking.\",\"year\":2011,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":68989,\"slug\":\"to-catch-a-smuggler\",\"tvdb\":264244,\"imdb\":\"tt2562174\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":0.2527057,\"show\":{\"title\":\"Return
+    body:
+      string: "[{\"type\":\"show\",\"score\":103.00026,\"show\":{\"title\":\"Homeland\",\"overview\":\"A
+        bipolar CIA operative becomes convinced a prisoner of war has been turned
+        by al-Qaeda and is planning to carry out a terrorist attack on American soil.\",\"year\":2011,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":1398,\"slug\":\"homeland\",\"tvdb\":247897,\"imdb\":\"tt1796960\",\"tmdb\":1407,\"tvrage\":27811}}},{\"type\":\"show\",\"score\":0.25720808,\"show\":{\"title\":\"Return
         to Tuscany\",\"overview\":\"Join Giancarlo Caldesi as he sets out to fulfil
         his dream - a cookery school in his Tuscan homeland. But there\u2019s a lot
         of hard work to do before he gets there\u2026After 30 years in the UK, successful
@@ -36,162 +35,301 @@ interactions:
         flamboyance turn up the temperature? Can the cool breath of fresh air Katie
         take the heat?Return to Tuscany is an endearing story of emotion, a celebration
         and feast of Italian food, and a humorous account of a chaotic summer in Tuscany.
-        Prepare to meet the Caldesi\u2019s!\",\"year\":2011,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":61349,\"slug\":\"return-to-tuscany\",\"tvdb\":222661,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}}]"}
+        Prepare to meet the Caldesi\u2019s!\",\"year\":2011,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":61349,\"slug\":\"return-to-tuscany\",\"tvdb\":222661,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}}]"
     headers:
-      CF-Cache-Status: [MISS]
-      CF-RAY: [312a169b0a353d49-CPH]
-      Cache-Control: ['public, max-age=28800']
-      Connection: [keep-alive]
-      Content-Type: [application/json; charset=utf-8]
-      Date: ['Sat, 17 Dec 2016 11:38:21 GMT']
-      ETag: [W/"6d84d7f9a2e8c139f9d723405c8e19ac"]
-      Expires: ['Sat, 17 Dec 2016 19:38:21 GMT']
-      Server: [cloudflare-nginx]
-      Set-Cookie: ['__cfduid=d56675e0b22d444ca91a7134d0ea86c8c1481974701; expires=Sun,
-          17-Dec-17 11:38:21 GMT; path=/; domain=.trakt.tv; HttpOnly']
-      Vary: [Accept-Encoding]
-      X-Content-Type-Options: [nosniff]
-      X-Frame-Options: [SAMEORIGIN]
-      X-Pagination-Item-Count: ['3']
-      X-Pagination-Limit: ['10']
-      X-Pagination-Page: ['1']
-      X-Pagination-Page-Count: ['1']
-      X-Request-Id: [28bdc6e7-e67f-40d5-b0db-0fa6b176a468]
-      X-Runtime: ['0.017397']
-      X-XSS-Protection: [1; mode=block]
-    status: {code: 200, message: OK}
+      CF-Cache-Status:
+      - MISS
+      CF-RAY:
+      - 60caac21ad5229de-IAD
+      Cache-Control:
+      - public, max-age=28800
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Tue, 05 Jan 2021 05:06:51 GMT
+      ETag:
+      - W/"5961a9abca25370c9e19435483f01969"
+      Expect-CT:
+      - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+      Expires:
+      - Tue, 05 Jan 2021 13:06:51 GMT
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cfduid=d5db413490cb804e510636ad40b04521e1609823211; expires=Thu, 04-Feb-21
+        05:06:51 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Pagination-Item-Count:
+      - '2'
+      X-Pagination-Limit:
+      - '10'
+      X-Pagination-Page:
+      - '1'
+      X-Pagination-Page-Count:
+      - '1'
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Ratelimit:
+      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":975,"until":"2021-01-05T05:10:00Z"}'
+      X-Request-Id:
+      - 9d0f6d29-2bec-47b6-9fd1-24e42af18847
+      X-Runtime:
+      - '0.015531'
+      X-XSS-Protection:
+      - 1; mode=block
+      cf-request-id:
+      - 077289e90b000029de42117000000001
+    status:
+      code: 200
+      message: OK
 - request:
     body: null
     headers:
-      Content-Type: [application/json]
-      Cookie: [__cfduid=d56675e0b22d444ca91a7134d0ea86c8c1481974701]
-      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: ['2']
+      Content-Type:
+      - application/json
+      trakt-api-key:
+      - 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af
+      trakt-api-version:
+      - '2'
     method: GET
     uri: https://api.trakt.tv/shows/1398?extended=full
   response:
-    body: {string: '{"title":"Homeland","year":2011,"ids":{"trakt":1398,"slug":"homeland","tvdb":247897,"imdb":"tt1796960","tmdb":1407,"tvrage":27811},"overview":"When
-        Marine Nicolas Brody is hailed as a hero after he returns home from eight
-        years of captivity in Iraq, intelligence officer Carrie Mathison is the only
-        one who suspects that he may have been turned.","first_aired":"2011-10-02T07:00:00.000Z","airs":{"day":"Sunday","time":"21:00","timezone":"America/New_York"},"runtime":50,"certification":"TV-MA","network":"Showtime","country":"us","trailer":"http://youtube.com/watch?v=KyFmS3wRPCQ","homepage":"http://www.sho.com/sho/homeland/home","status":"returning
-        series","rating":8.46563,"votes":18375,"updated_at":"2016-12-15T10:58:54.000Z","language":"en","available_translations":["bg","bs","cs","da","de","el","en","es","fr","he","hr","hu","it","lb","lt","nl","pl","pt","ro","ru","sr","sv","tr","uk","zh"],"genres":["drama","mystery","thriller","crime","suspense"],"aired_episodes":60}'}
+    body:
+      string: '{"title":"Homeland","year":2011,"ids":{"trakt":1398,"slug":"homeland","tvdb":247897,"imdb":"tt1796960","tmdb":1407,"tvrage":27811},"overview":"A
+        bipolar CIA operative becomes convinced a prisoner of war has been turned
+        by al-Qaeda and is planning to carry out a terrorist attack on American soil.","first_aired":"2011-10-03T01:00:00.000Z","airs":{"day":"Sunday","time":"21:00","timezone":"America/New_York"},"runtime":50,"certification":"TV-MA","network":"Showtime","country":"us","trailer":"https://youtube.com/watch?v=KyFmS3wRPCQ","homepage":"http://www.sho.com/sho/homeland/home","status":"ended","rating":8.34671,"votes":25416,"comment_count":131,"updated_at":"2021-01-03T09:16:43.000Z","language":"en","available_translations":["bg","bs","cs","da","de","el","en","es","fa","fi","fr","he","hr","hu","it","ja","ko","lb","lt","nl","no","pl","pt","ro","ru","sk","sr","sv","th","tr","uk","zh"],"genres":["drama","action","crime","adventure","war"],"aired_episodes":96}'
     headers:
-      CF-Cache-Status: [HIT]
-      CF-RAY: [312a169bea5a3d49-CPH]
-      Cache-Control: ['public, max-age=28800']
-      Connection: [keep-alive]
-      Content-Type: [application/json; charset=utf-8]
-      Date: ['Sat, 17 Dec 2016 11:38:21 GMT']
-      ETag: [W/"75d99fc5673179777ccfd39849a3dca8"]
-      Expires: ['Sat, 17 Dec 2016 19:38:21 GMT']
-      Last-Modified: ['Thu, 15 Dec 2016 10:58:54 GMT']
-      Server: [cloudflare-nginx]
-      Vary: [Accept-Encoding]
-      X-Content-Type-Options: [nosniff]
-      X-Frame-Options: [SAMEORIGIN]
-      X-Request-Id: [aacc72c9-0c39-4b65-9711-e285107d95b6]
-      X-Runtime: ['0.013077']
-      X-XSS-Protection: [1; mode=block]
-    status: {code: 200, message: OK}
+      Age:
+      - '3971'
+      CF-Cache-Status:
+      - HIT
+      CF-RAY:
+      - 60caac228ded2739-IAD
+      Cache-Control:
+      - public, max-age=28800
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Tue, 05 Jan 2021 05:06:51 GMT
+      ETag:
+      - W/"de8dcc7d107b089498fea082a1e5d031"
+      Expect-CT:
+      - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+      Expires:
+      - Tue, 05 Jan 2021 12:00:37 GMT
+      Last-Modified:
+      - Sun, 03 Jan 2021 09:16:43 GMT
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cfduid=d5b20eedf3051198ce46adf628ca195231609823211; expires=Thu, 04-Feb-21
+        05:06:51 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Ratelimit:
+      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":964,"until":"2021-01-03T11:55:00Z"}'
+      X-Request-Id:
+      - c1d6d516-36c7-4447-afed-ccf57cb24cd4
+      X-Runtime:
+      - '0.007505'
+      X-XSS-Protection:
+      - 1; mode=block
+      cf-request-id:
+      - 077289e99600002739611a6000000001
+    status:
+      code: 200
+      message: OK
 - request:
     body: null
     headers:
-      Content-Type: [application/json]
-      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: ['2']
+      Content-Type:
+      - application/json
+      trakt-api-key:
+      - 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af
+      trakt-api-version:
+      - '2'
     method: GET
     uri: https://api.trakt.tv/shows/1398/seasons/2/episodes/1/?extended=full
   response:
-    body: {string: '{"season":2,"number":1,"title":"The Smile","ids":{"trakt":74308,"tvdb":4303747,"imdb":null,"tmdb":63712,"tvrage":0},"number_abs":13,"overview":"Months
+    body:
+      string: '{"season":2,"number":1,"title":"The Smile","ids":{"trakt":74308,"tvdb":4303747,"imdb":"tt2100961","tmdb":63712,"tvrage":null},"number_abs":13,"overview":"Months
         after undergoing Electroconvulsive Therapy, former CIA case officer Carrie
         Mathison has found a modicum of peace in her family''s suburban embrace. But
         the strides she''s made towards mental health are threatened when an asset
         from her former life comes in from the cold. Meanwhile, freshman Congressman
         Nick Brody discovers that Abu Nazir may not be content with his nonviolent
         approach to affecting change in American foreign policy. Brody''s daughter
-        Dana lets a vital secret slip.","rating":7.93808,"votes":1938,"first_aired":"2012-10-01T01:00:00.000Z","updated_at":"2016-12-17T11:24:23.000Z","available_translations":["bg","bs","cs","da","de","el","en","es","fr","he","hr","hu","it","lb","lt","nl","pl","pt","ro","ru","sr","sv","tr","uk","zh"]}'}
+        Dana lets a vital secret slip.","rating":7.7834,"votes":3024,"comment_count":0,"first_aired":"2012-10-01T01:00:00.000Z","updated_at":"2021-01-04T19:21:43.000Z","available_translations":["bg","bs","cs","da","de","el","en","es","fa","fi","fr","he","hr","hu","it","ja","ko","lb","lt","nl","no","pl","pt","ro","ru","sk","sr","sv","th","tr","uk","zh"],"runtime":55}'
     headers:
-      CF-Cache-Status: [MISS]
-      CF-RAY: [312a169c7cd13d2b-CPH]
-      Cache-Control: ['public, max-age=28800']
-      Connection: [keep-alive]
-      Content-Type: [application/json; charset=utf-8]
-      Date: ['Sat, 17 Dec 2016 11:38:21 GMT']
-      Expires: ['Sat, 17 Dec 2016 19:38:21 GMT']
-      Last-Modified: ['Sat, 17 Dec 2016 11:24:23 GMT']
-      Server: [cloudflare-nginx]
-      Set-Cookie: ['__cfduid=da01cdb46d4004707be2fe08852918b421481974701; expires=Sun,
-          17-Dec-17 11:38:21 GMT; path=/; domain=.trakt.tv; HttpOnly']
-      Vary: [Accept-Encoding]
-      X-Content-Type-Options: [nosniff]
-      X-Frame-Options: [SAMEORIGIN]
-      X-Request-Id: [84ee5ac1-d7a1-45de-9f9d-1271a915886e]
-      X-Runtime: ['0.020900']
-      X-XSS-Protection: [1; mode=block]
-    status: {code: 200, message: OK}
+      CF-Cache-Status:
+      - MISS
+      CF-RAY:
+      - 60caac235a660db6-IAD
+      Cache-Control:
+      - public, max-age=28800
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Tue, 05 Jan 2021 05:06:52 GMT
+      Expect-CT:
+      - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+      Expires:
+      - Tue, 05 Jan 2021 13:06:49 GMT
+      Last-Modified:
+      - Mon, 04 Jan 2021 19:21:43 GMT
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cfduid=d5264e791d5ddcd28879f6596beba13171609823212; expires=Thu, 04-Feb-21
+        05:06:52 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Ratelimit:
+      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":974,"until":"2021-01-05T05:10:00Z"}'
+      X-Request-Id:
+      - dbc09311-b28f-4598-a458-a9eb82264856
+      X-Runtime:
+      - '0.006573'
+      X-XSS-Protection:
+      - 1; mode=block
+      cf-request-id:
+      - 077289ea1b00000db682908000000001
+    status:
+      code: 200
+      message: OK
 - request:
     body: null
     headers:
-      Content-Type: [application/json]
-      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: ['2']
+      Content-Type:
+      - application/json
+      trakt-api-key:
+      - 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af
+      trakt-api-version:
+      - '2'
     method: GET
     uri: https://api.trakt.tv/users/flexgettest/collection/shows
   response:
-    body: {string: '[{"last_collected_at":"2016-03-08T21:36:33.000Z","show":{"title":"White
-        Collar","year":2009,"ids":{"trakt":21410,"slug":"white-collar","tvdb":108611,"imdb":"tt1358522","tmdb":21510,"tvrage":20720}},"seasons":[{"number":1,"episodes":[{"number":1,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":2,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":3,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":4,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":5,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":6,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":7,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":8,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":9,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":10,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":11,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":12,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":13,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":14,"collected_at":"2016-03-08T21:36:33.000Z"}]},{"number":2,"episodes":[{"number":1,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":2,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":3,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":4,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":5,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":6,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":7,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":8,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":9,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":10,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":11,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":12,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":13,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":14,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":15,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":16,"collected_at":"2016-03-08T21:36:33.000Z"}]},{"number":3,"episodes":[{"number":1,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":2,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":3,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":4,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":5,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":6,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":7,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":8,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":9,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":10,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":11,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":12,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":13,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":14,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":15,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":16,"collected_at":"2016-03-08T21:36:33.000Z"}]},{"number":4,"episodes":[{"number":1,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":2,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":3,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":4,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":5,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":6,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":7,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":8,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":9,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":10,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":11,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":12,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":13,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":14,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":15,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":16,"collected_at":"2016-03-08T21:36:33.000Z"}]},{"number":5,"episodes":[{"number":1,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":2,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":3,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":4,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":5,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":6,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":7,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":8,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":9,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":10,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":11,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":12,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":13,"collected_at":"2016-03-08T21:36:33.000Z"}]},{"number":6,"episodes":[{"number":1,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":2,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":3,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":4,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":5,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":6,"collected_at":"2016-03-08T21:36:33.000Z"}]}]},{"last_collected_at":"2012-10-01T02:00:00.000Z","show":{"title":"Homeland","year":2011,"ids":{"trakt":1398,"slug":"homeland","tvdb":247897,"imdb":"tt1796960","tmdb":1407,"tvrage":27811}},"seasons":[{"number":2,"episodes":[{"number":1,"collected_at":"2012-10-01T02:00:00.000Z"}]}]}]'}
+    body:
+      string: '[{"last_collected_at":"2017-04-23T18:44:42.000Z","last_updated_at":"2017-04-23T18:44:42.000Z","show":{"title":"The
+        Expanse","year":2015,"ids":{"trakt":77199,"slug":"the-expanse","tvdb":280619,"imdb":"tt3230854","tmdb":63639,"tvrage":41967}},"seasons":[{"number":1,"episodes":[{"number":1,"collected_at":"2017-04-23T18:44:42.000Z"},{"number":2,"collected_at":"2017-04-23T18:44:42.000Z"},{"number":3,"collected_at":"2017-04-23T18:44:42.000Z"},{"number":4,"collected_at":"2017-04-23T18:44:42.000Z"},{"number":5,"collected_at":"2017-04-23T18:44:42.000Z"},{"number":6,"collected_at":"2017-04-23T18:44:42.000Z"},{"number":7,"collected_at":"2017-04-23T18:44:42.000Z"},{"number":8,"collected_at":"2017-04-23T18:44:42.000Z"},{"number":9,"collected_at":"2017-04-23T18:44:42.000Z"},{"number":10,"collected_at":"2017-04-23T18:44:42.000Z"}]}]},{"last_collected_at":"2016-03-08T21:36:33.000Z","last_updated_at":"2016-03-08T21:36:33.000Z","show":{"title":"White
+        Collar","year":2009,"ids":{"trakt":21410,"slug":"white-collar","tvdb":108611,"imdb":"tt1358522","tmdb":21510,"tvrage":20720}},"seasons":[{"number":1,"episodes":[{"number":1,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":2,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":3,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":4,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":5,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":6,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":7,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":8,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":9,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":10,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":11,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":12,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":13,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":14,"collected_at":"2016-03-08T21:36:33.000Z"}]},{"number":2,"episodes":[{"number":1,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":2,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":3,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":4,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":5,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":6,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":7,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":8,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":9,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":10,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":11,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":12,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":13,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":14,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":15,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":16,"collected_at":"2016-03-08T21:36:33.000Z"}]},{"number":3,"episodes":[{"number":1,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":2,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":3,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":4,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":5,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":6,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":7,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":8,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":9,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":10,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":11,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":12,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":13,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":14,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":15,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":16,"collected_at":"2016-03-08T21:36:33.000Z"}]},{"number":4,"episodes":[{"number":1,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":2,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":3,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":4,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":5,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":6,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":7,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":8,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":9,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":10,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":11,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":12,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":13,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":14,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":15,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":16,"collected_at":"2016-03-08T21:36:33.000Z"}]},{"number":5,"episodes":[{"number":1,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":2,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":3,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":4,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":5,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":6,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":7,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":8,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":9,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":10,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":11,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":12,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":13,"collected_at":"2016-03-08T21:36:33.000Z"}]},{"number":6,"episodes":[{"number":1,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":2,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":3,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":4,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":5,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":6,"collected_at":"2016-03-08T21:36:33.000Z"}]}]},{"last_collected_at":"2012-10-01T02:00:00.000Z","last_updated_at":"2015-11-08T18:53:52.000Z","show":{"title":"Homeland","year":2011,"ids":{"trakt":1398,"slug":"homeland","tvdb":247897,"imdb":"tt1796960","tmdb":1407,"tvrage":27811}},"seasons":[{"number":2,"episodes":[{"number":1,"collected_at":"2012-10-01T02:00:00.000Z"}]}]}]'
     headers:
-      CF-RAY: [312a169dda843d49-CPH]
-      Cache-Control: ['max-age=0, private, must-revalidate']
-      Cf-Railgun: [dd4985d191 stream 0.000000 0200 e6be]
-      Connection: [keep-alive]
-      Content-Type: [application/json; charset=utf-8]
-      Date: ['Sat, 17 Dec 2016 11:38:21 GMT']
-      Etag: [W/"0a59b022ff08be26596c6fb0426361a5"]
-      Server: [cloudflare-nginx]
-      Set-Cookie: ['__cfduid=d56675e0b22d444ca91a7134d0ea86c8c1481974701; expires=Sun,
-          17-Dec-17 11:38:21 GMT; path=/; domain=.trakt.tv; HttpOnly']
-      Vary: [Accept-Encoding]
-      X-Content-Type-Options: [nosniff]
-      X-Frame-Options: [SAMEORIGIN]
-      X-Private-User: ['false']
-      X-Request-Id: [e4f2a8ff-0aed-42e1-981c-3d3d05369055]
-      X-Runtime: ['0.017696']
-      X-Xss-Protection: [1; mode=block]
-    status: {code: 200, message: OK}
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-RAY:
+      - 60caac24295573d5-IAD
+      Cache-Control:
+      - max-age=0, private, must-revalidate
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Tue, 05 Jan 2021 05:06:52 GMT
+      ETag:
+      - W/"67b6fbf4def62161df9f8932b764eaf3"
+      Expect-CT:
+      - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+      Last-Modified:
+      - Sun, 23 Apr 2017 18:44:42 GMT
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cfduid=dec6ec675e633c792c40242c49573ddfd1609823212; expires=Thu, 04-Feb-21
+        05:06:52 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Private-User:
+      - 'false'
+      X-Ratelimit:
+      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":973,"until":"2021-01-05T05:10:00Z"}'
+      X-Request-Id:
+      - 8ddd36ef-ee2b-4995-905d-43a6fb9568a2
+      X-Runtime:
+      - '0.007492'
+      X-XSS-Protection:
+      - 1; mode=block
+      cf-request-id:
+      - 077289ea94000073d5618dc000000001
+    status:
+      code: 200
+      message: OK
 - request:
     body: null
     headers:
-      Content-Type: [application/json]
-      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: ['2']
+      Content-Type:
+      - application/json
+      trakt-api-key:
+      - 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af
+      trakt-api-version:
+      - '2'
     method: GET
-    uri: https://api.trakt.tv/search?type=show&year=2014&query=The+Flash
+    uri: https://api.trakt.tv/search?query=The+Flash&type=show&year=2014
   response:
-    body: {string: "[{\"type\":\"show\",\"score\":67.69906,\"show\":{\"title\":\"The
-        Flash\",\"overview\":\"Barry Allen wakes up nine months after he was struck
-        by lightning and discovers that the bolt gave him the power of super speed.
-        With his new team and powers, Barry becomes \\\"The Flash\\\" and fights crime
-        in Central City.\",\"year\":2014,\"status\":\"returning series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":60300,\"slug\":\"the-flash-2014\",\"tvdb\":279121,\"imdb\":\"tt3107288\",\"tmdb\":60735,\"tvrage\":36939}}},{\"type\":\"show\",\"score\":0.5177861,\"show\":{\"title\":\"Tornado
+    body:
+      string: "[{\"type\":\"show\",\"score\":66.17269,\"show\":{\"title\":\"The Flash\",\"overview\":\"After
+        being struck by lightning, Barry Allen wakes up from his coma to discover
+        he's been given the power of super speed, becoming the Flash, fighting crime
+        in Central City.\",\"year\":2014,\"status\":\"returning series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":60300,\"slug\":\"the-flash-2014\",\"tvdb\":279121,\"imdb\":\"tt3107288\",\"tmdb\":60735,\"tvrage\":36939}}},{\"type\":\"show\",\"score\":0.5474538,\"show\":{\"title\":\"Tornado
         Hunters\",\"overview\":\"Greg Johnson, Chris Chittick, and Ricky Forbes are
         the Tornado Hunters.Outfitted with their truck Flash and the best equipment
         money can buy, they target the biggest tornadoes in North America. From Regina
         to Mexico, there\u2019s nowhere they won\u2019t go as they risk life, limb
         and a lot of windshields to chase their passion for the world\u2019s worst
         weather. - See more at: http://www.cmt.ca/show/tornado-hunters/#sthash.FtuhY0T3.dpuf\",\"year\":2014,\"status\":\"returning
-        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":81448,\"slug\":\"tornado-hunters\",\"tvdb\":287638,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":0.379554,\"show\":{\"title\":\"Stop
-        Skeletons From Fighting\",\"overview\":\"Hello, I'm Derek Alexander, and I've
-        been producing video reviews of retro (and sometimes modern) video games for
-        over 7 years.When I started producing reviews in 2007, I was known as the
-        Happy Video Game Nerd (HVGN). In late-2014 I dropped the HVGN name and established
-        Stop Skeletons From Fighting, a new outlet for video reviews (and other future
-        projects). Even though I\u2019ve dropped the HVGN name, I still strive to
-        set myself apart from the typical review show by using a positive spin to
-        highlight lesser-known or underrated games and occasionally entire series.
-        Some of the titles I've covered include:-Earthbound-Jumping Flash!-Gargoyle's
-        Quest-Splatterhouse-Parasite Eve-Sweet Home-Wild Guns-IllbleedHaven't heard
-        of some of these games? That's the point! \",\"year\":2014,\"status\":\"returning
-        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":101605,\"slug\":\"stop-skeletons-from-fighting\",\"tvdb\":300088,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":0.28316355,\"show\":{\"title\":\"Lucia's
+        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":81448,\"slug\":\"tornado-hunters\",\"tvdb\":287638,\"imdb\":\"tt4355258\",\"tmdb\":69391,\"tvrage\":null}}},{\"type\":\"show\",\"score\":0.5474538,\"show\":{\"title\":\"Tornado
+        Hunters\",\"overview\":\"Greg Johnson, Chris Chittick, and Ricky Forbes are
+        the Tornado Hunters.Outfitted with their truck Flash and the best equipment
+        money can buy, they target the biggest tornadoes in North America. From Regina
+        to Mexico, there\u2019s nowhere they won\u2019t go as they risk life, limb
+        and a lot of windshields to chase their passion for the world\u2019s worst
+        weather. - See more at: http://www.cmt.ca/show/tornado-hunters/#sthash.FtuhY0T3.dpuf\",\"year\":2014,\"status\":\"returning
+        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":152880,\"slug\":\"tornado-hunters-2014\",\"tvdb\":287638,\"imdb\":\"tt4355258\",\"tmdb\":69391,\"tvrage\":null}}},{\"type\":\"show\",\"score\":0.30103868,\"show\":{\"title\":\"Lucia's
         Secrets\",\"overview\":\"In a hostile, urban world brimming with violence
         and inhabited by ruthless people, the beautiful Luc\xEDa is running for her
         life and doesn't know who she is running from. A mysterious event has left
@@ -213,74 +351,152 @@ interactions:
         the chance to redeem herself. Luc\xEDa and Miguel will face countless challenges
         during the dangerous adventure that awaits them\u2014an adventure that will
         throw them into unimaginable situations. Situations in which death is always
-        one step behind them.\",\"year\":2014,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":111509,\"slug\":\"lucia-s-secrets\",\"tvdb\":317415,\"imdb\":\"tt2738004\",\"tmdb\":null,\"tvrage\":null}}}]"}
+        one step behind them.\",\"year\":2014,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":111509,\"slug\":\"lucia-s-secrets\",\"tvdb\":317415,\"imdb\":\"tt2738004\",\"tmdb\":null,\"tvrage\":null}}}]"
     headers:
-      CF-Cache-Status: [HIT]
-      CF-RAY: [312a169f1d9e3cfb-CPH]
-      Cache-Control: ['public, max-age=28800']
-      Connection: [keep-alive]
-      Content-Type: [application/json; charset=utf-8]
-      Date: ['Sat, 17 Dec 2016 11:38:21 GMT']
-      ETag: [W/"e42b365535ec64f334e1eeed99c1d61e"]
-      Expires: ['Sat, 17 Dec 2016 19:38:21 GMT']
-      Server: [cloudflare-nginx]
-      Set-Cookie: ['__cfduid=df8d41f74cb8f8d002d6c5b8eb6b2caca1481974701; expires=Sun,
-          17-Dec-17 11:38:21 GMT; path=/; domain=.trakt.tv; HttpOnly']
-      Vary: [Accept-Encoding]
-      X-Content-Type-Options: [nosniff]
-      X-Frame-Options: [SAMEORIGIN]
-      X-Pagination-Item-Count: ['4']
-      X-Pagination-Limit: ['10']
-      X-Pagination-Page: ['1']
-      X-Pagination-Page-Count: ['1']
-      X-Request-Id: [9c928efa-7fd5-4d97-8849-df2e84aa3e5f]
-      X-Runtime: ['0.020358']
-      X-XSS-Protection: [1; mode=block]
-    status: {code: 200, message: OK}
+      Age:
+      - '1'
+      CF-Cache-Status:
+      - HIT
+      CF-RAY:
+      - 60caac24dab7eaaa-IAD
+      Cache-Control:
+      - public, max-age=28800
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Tue, 05 Jan 2021 05:06:52 GMT
+      ETag:
+      - W/"674cea35afd9dae9daa92e63132e590e"
+      Expect-CT:
+      - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+      Expires:
+      - Tue, 05 Jan 2021 13:06:49 GMT
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cfduid=de0d68bc07c210d264d01e00ac96d4a7b1609823212; expires=Thu, 04-Feb-21
+        05:06:52 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Pagination-Item-Count:
+      - '4'
+      X-Pagination-Limit:
+      - '10'
+      X-Pagination-Page:
+      - '1'
+      X-Pagination-Page-Count:
+      - '1'
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Ratelimit:
+      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":977,"until":"2021-01-05T05:10:00Z"}'
+      X-Request-Id:
+      - 59ffe598-c3a7-4c36-846c-83c55ec2db49
+      X-Runtime:
+      - '0.020609'
+      X-XSS-Protection:
+      - 1; mode=block
+      cf-request-id:
+      - 077289eb0a0000eaaafa20b000000001
+    status:
+      code: 200
+      message: OK
 - request:
     body: null
     headers:
-      Content-Type: [application/json]
-      Cookie: [__cfduid=df8d41f74cb8f8d002d6c5b8eb6b2caca1481974701]
-      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: ['2']
+      Content-Type:
+      - application/json
+      trakt-api-key:
+      - 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af
+      trakt-api-version:
+      - '2'
     method: GET
     uri: https://api.trakt.tv/shows/60300?extended=full
   response:
-    body: {string: '{"title":"The Flash","year":2014,"ids":{"trakt":60300,"slug":"the-flash-2014","tvdb":279121,"imdb":"tt3107288","tmdb":60735,"tvrage":36939},"overview":"Barry
-        Allen wakes up nine months after he was struck by lightning and discovers
-        that the bolt gave him the power of super speed. With his new team and powers,
-        Barry becomes \"The Flash\" and fights crime in Central City.","first_aired":"2014-10-08T00:00:00.000Z","airs":{"day":"Tuesday","time":"20:00","timezone":"America/New_York"},"runtime":44,"certification":"TV-PG","network":"The
-        CW","country":"us","trailer":"http://youtube.com/watch?v=aZxhA_Jihmw","homepage":"http://www.cwtv.com/shows/the-flash/","status":"returning
-        series","rating":8.31138,"votes":12114,"updated_at":"2016-12-15T11:24:21.000Z","language":"en","available_translations":["ar","bg","bs","cs","da","de","el","en","es","fa","fr","he","hr","hu","id","it","ko","lb","lb","lt","ml","ms","nl","pl","pt","ro","ru","sk","sr","sv","te","th","tr","uk","vi","za","zh"],"genres":["drama","fantasy","science-fiction"],"aired_episodes":55}'}
+    body:
+      string: '{"title":"The Flash","year":2014,"ids":{"trakt":60300,"slug":"the-flash-2014","tvdb":279121,"imdb":"tt3107288","tmdb":60735,"tvrage":36939},"overview":"After
+        being struck by lightning, Barry Allen wakes up from his coma to discover
+        he''s been given the power of super speed, becoming the Flash, fighting crime
+        in Central City.","first_aired":"2014-10-08T00:00:00.000Z","airs":{"day":"Tuesday","time":"20:00","timezone":"America/New_York"},"runtime":45,"certification":"TV-PG","network":"The
+        CW","country":"us","trailer":"https://youtube.com/watch?v=Yj0l7iGKh8g","homepage":"http://www.cwtv.com/shows/the-flash/","status":"returning
+        series","rating":8.01263,"votes":22717,"comment_count":129,"updated_at":"2021-01-04T10:33:13.000Z","language":"en","available_translations":["ar","be","bg","bs","cs","da","de","el","en","es","fa","fr","he","hr","hu","id","it","ja","ka","ko","lb","lt","lv","ml","ms","ng","nl","no","pl","pt","ro","ru","sk","sr","sv","te","th","tr","uk","uz","vi","za","zh"],"genres":["drama","fantasy","science-fiction","superhero"],"aired_episodes":133}'
     headers:
-      CF-Cache-Status: [HIT]
-      CF-RAY: [312a169f4da33cfb-CPH]
-      Cache-Control: ['public, max-age=28800']
-      Connection: [keep-alive]
-      Content-Type: [application/json; charset=utf-8]
-      Date: ['Sat, 17 Dec 2016 11:38:21 GMT']
-      ETag: [W/"8e835f41af0610ff3561129f65477ae1"]
-      Expires: ['Sat, 17 Dec 2016 19:38:21 GMT']
-      Last-Modified: ['Thu, 15 Dec 2016 11:24:21 GMT']
-      Server: [cloudflare-nginx]
-      Vary: [Accept-Encoding]
-      X-Content-Type-Options: [nosniff]
-      X-Frame-Options: [SAMEORIGIN]
-      X-Request-Id: [3ca13e1f-fa04-45e4-a386-42d74de015f6]
-      X-Runtime: ['0.023394']
-      X-XSS-Protection: [1; mode=block]
-    status: {code: 200, message: OK}
+      Age:
+      - '14000'
+      CF-Cache-Status:
+      - HIT
+      CF-RAY:
+      - 60caac2569bc74bf-IAD
+      Cache-Control:
+      - public, max-age=28800
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Tue, 05 Jan 2021 05:06:52 GMT
+      ETag:
+      - W/"f66fd84823f78afc909bf9300dc855d3"
+      Expect-CT:
+      - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+      Expires:
+      - Tue, 05 Jan 2021 09:13:31 GMT
+      Last-Modified:
+      - Mon, 04 Jan 2021 10:33:13 GMT
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cfduid=db7480be5a194173e9b49077027b44bd41609823212; expires=Thu, 04-Feb-21
+        05:06:52 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Ratelimit:
+      - '{"name":"AUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":992,"until":"2021-01-04T17:15:00Z"}'
+      X-Request-Id:
+      - 683fd129-162e-4219-80a9-bc38a71ca7fa
+      X-Runtime:
+      - '0.007417'
+      X-XSS-Protection:
+      - 1; mode=block
+      cf-request-id:
+      - 077289eb64000074bfb0254000000001
+    status:
+      code: 200
+      message: OK
 - request:
     body: null
     headers:
-      Content-Type: [application/json]
-      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: ['2']
+      Content-Type:
+      - application/json
+      trakt-api-key:
+      - 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af
+      trakt-api-version:
+      - '2'
     method: GET
     uri: https://api.trakt.tv/shows/60300/seasons/1/episodes/10/?extended=full
   response:
-    body: {string: "{\"season\":1,\"number\":10,\"title\":\"Revenge of the Rogues\",\"ids\":{\"trakt\":999431,\"tvdb\":5052260,\"imdb\":\"tt4016102\",\"tmdb\":1018355,\"tvrage\":1065644215},\"number_abs\":10,\"overview\":\"Leonard
+    body:
+      string: "{\"season\":1,\"number\":10,\"title\":\"Revenge of the Rogues\",\"ids\":{\"trakt\":999431,\"tvdb\":5052260,\"imdb\":\"tt4016102\",\"tmdb\":1018355,\"tvrage\":1065644215},\"number_abs\":10,\"overview\":\"Leonard
         Snart AKA Captain Cold returns to Central City with a new hotheaded partner
         in tow \u2013 Mick Rory AKA Heat Wave. The duo plan to steal a multi-million
         dollar painting, but Cold has another agenda while in town \u2013 to set a
@@ -290,24 +506,56 @@ interactions:
         that happened the last time they fought. Meanwhile, Barry asks Dr. Wells,
         Caitlin and Cisco to help him double his training efforts so he\u2019s ready
         for the Reverse Flash when he returns to Central City. Iris deals with the
-        aftermath of Barry\u2019s confession, and Cisco makes the CCPD a new shield.\",\"rating\":7.71059,\"votes\":2201,\"first_aired\":\"2015-01-21T01:00:00.000Z\",\"updated_at\":\"2016-12-17T04:58:02.000Z\",\"available_translations\":[\"ar\",\"bg\",\"bs\",\"cs\",\"da\",\"de\",\"el\",\"en\",\"es\",\"fa\",\"fr\",\"he\",\"hr\",\"hu\",\"id\",\"it\",\"ko\",\"lb\",\"lt\",\"ml\",\"ms\",\"nl\",\"pl\",\"pt\",\"ro\",\"ru\",\"sk\",\"sr\",\"sv\",\"th\",\"tr\",\"uk\",\"vi\",\"za\",\"zh\"]}"}
+        aftermath of Barry\u2019s confession, and Cisco makes the CCPD a new shield.\",\"rating\":7.74217,\"votes\":3223,\"comment_count\":7,\"first_aired\":\"2015-01-21T01:00:00.000Z\",\"updated_at\":\"2021-01-04T17:43:18.000Z\",\"available_translations\":[\"ar\",\"be\",\"bg\",\"bs\",\"cs\",\"da\",\"de\",\"el\",\"en\",\"es\",\"fa\",\"fr\",\"he\",\"hr\",\"hu\",\"id\",\"it\",\"ja\",\"ka\",\"ko\",\"lb\",\"lt\",\"lv\",\"ml\",\"ms\",\"ng\",\"nl\",\"no\",\"pl\",\"pt\",\"ro\",\"ru\",\"sk\",\"sr\",\"sv\",\"th\",\"tr\",\"uk\",\"uz\",\"vi\",\"za\",\"zh\"],\"runtime\":42}"
     headers:
-      CF-Cache-Status: [HIT]
-      CF-RAY: [312a169fedad3cd7-CPH]
-      Cache-Control: ['public, max-age=28800']
-      Connection: [keep-alive]
-      Content-Type: [application/json; charset=utf-8]
-      Date: ['Sat, 17 Dec 2016 11:38:22 GMT']
-      Expires: ['Sat, 17 Dec 2016 19:38:22 GMT']
-      Last-Modified: ['Sat, 17 Dec 2016 04:58:02 GMT']
-      Server: [cloudflare-nginx]
-      Set-Cookie: ['__cfduid=dcb5771fc805e71220c802617c8064d871481974702; expires=Sun,
-          17-Dec-17 11:38:22 GMT; path=/; domain=.trakt.tv; HttpOnly']
-      Vary: [Accept-Encoding]
-      X-Content-Type-Options: [nosniff]
-      X-Frame-Options: [SAMEORIGIN]
-      X-Request-Id: [c51bf1ca-03ed-4e6d-bb62-b6d974162691]
-      X-Runtime: ['0.019375']
-      X-XSS-Protection: [1; mode=block]
-    status: {code: 200, message: OK}
+      Age:
+      - '1'
+      CF-Cache-Status:
+      - HIT
+      CF-RAY:
+      - 60caac262d547451-IAD
+      Cache-Control:
+      - public, max-age=28800
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Tue, 05 Jan 2021 05:06:52 GMT
+      Expect-CT:
+      - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+      Expires:
+      - Tue, 05 Jan 2021 13:06:52 GMT
+      Last-Modified:
+      - Mon, 04 Jan 2021 17:43:18 GMT
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cfduid=daadf639b99b31b2ebfc62d75ca6bd2661609823212; expires=Thu, 04-Feb-21
+        05:06:52 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Ratelimit:
+      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":976,"until":"2021-01-05T05:10:00Z"}'
+      X-Request-Id:
+      - 06b32e25-d861-4a76-bb8b-830a638fd1f4
+      X-Runtime:
+      - '0.011499'
+      X-XSS-Protection:
+      - 1; mode=block
+      cf-request-id:
+      - 077289ebd60000745172923000000001
+    status:
+      code: 200
+      message: OK
 version: 1

@@ -1,8 +1,4 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-
-class TestTemplate(object):
+class TestTemplate:
     config = """
         templates:
           global:
@@ -59,7 +55,7 @@ class TestTemplate(object):
         assert len(task.entries) == 2, 'Should only have been 2 entries created'
 
 
-class TestTemplateMerge(object):
+class TestTemplateMerge:
     config = """
         templates:
           movies:
@@ -89,7 +85,7 @@ class TestTemplateMerge(object):
         assert 'comedy' in task.config['imdb']['reject_genres'], 'list merge failed'
 
 
-class TestTemplateRerun(object):
+class TestTemplateRerun:
     config = """
         templates:
           a:
@@ -104,3 +100,26 @@ class TestTemplateRerun(object):
     def test_rerun(self, execute_task):
         task = execute_task('test_rerun')
         assert len(task.config['series']) == 1
+
+
+class TestTemplateChange:
+    config = """
+        templates:
+          a:
+            mock:
+            - title: foo
+        tasks:
+          test_config_change:
+            mock:
+            - title: bar
+            template: a
+    """
+
+    def test_template_change_trigger_config_change(self, execute_task, manager):
+        task = execute_task('test_config_change')
+        assert len(task.all_entries) == 2
+
+        manager.config['templates']['a']['mock'].append({'title': 'baz}'})
+        task = execute_task('test_config_change')
+        assert task.config_modified
+        assert len(task.all_entries) == 3

@@ -1,7 +1,4 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.entry import Entry
@@ -9,37 +6,39 @@ from flexget.event import event
 from flexget.utils import requests
 from flexget.utils.soup import get_soup
 
-log = logging.getLogger('pogcal')
+logger = logger.bind(name='pogcal')
 
 
-class InputPogDesign(object):
+class InputPogDesign:
     schema = {
         'type': 'object',
-        'properties': {
-            'username': {'type': 'string'},
-            'password': {'type': 'string'}
-        },
+        'properties': {'username': {'type': 'string'}, 'password': {'type': 'string'}},
         'required': ['username', 'password'],
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
-    name_map = {'The Tonight Show [Leno]': 'The Tonight Show With Jay Leno',
-                'Late Show [Letterman]': 'David Letterman'}
+    name_map = {
+        'The Tonight Show [Leno]': 'The Tonight Show With Jay Leno',
+        'Late Show [Letterman]': 'David Letterman',
+    }
 
     def on_task_input(self, task, config):
         session = requests.Session()
-        data = {'username': config['username'], 'password': config['password'], 'sub_login': 'Account Login'}
+        data = {
+            'username': config['username'],
+            'password': config['password'],
+            'sub_login': 'Account Login',
+        }
         try:
-            r = session.post('http://www.pogdesign.co.uk/cat/login', data=data)
-            if 'U / P Invalid' in r.text:
+            r = session.post('https://www.pogdesign.co.uk/cat/login', data=data)
+            if 'Login to Your Account' in r.text:
                 raise plugin.PluginError('Invalid username/password for pogdesign.')
-            page = session.get('http://www.pogdesign.co.uk/cat/show-select')
+            page = session.get('https://www.pogdesign.co.uk/cat/show-select')
         except requests.RequestException as e:
             raise plugin.PluginError('Error retrieving source: %s' % e)
         soup = get_soup(page.text)
         entries = []
         for row in soup.find_all('li', {'class': 'selectgrp checked'}):
-
             # Get name
             t = row.find('strong')
 
@@ -60,7 +59,9 @@ class InputPogDesign(object):
 
             e = Entry()
             e['title'] = t
-            e['url'] = 'http://www.pogdesign.co.uk/{0}'.format(row.find_next('a')['href'].lstrip('/'))
+            e['url'] = 'https://www.pogdesign.co.uk/{0}'.format(
+                row.find_next('a')['href'].lstrip('/')
+            )
             entries.append(e)
 
         return entries

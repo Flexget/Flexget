@@ -1,28 +1,25 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
 from math import ceil
+from typing import TYPE_CHECKING, List, Optional
 
-from flask import jsonify, request
-from flask_restplus import inputs
+from flask import Response, jsonify, request
+from flask_restx import inputs
+from loguru import logger
+from sqlalchemy.orm import Session
 
-from flexget.plugin import get_plugins, get_plugin_by_name, DependencyError
-from flexget.api import api, APIResource
+from flexget.api import APIResource, api
 from flexget.api.app import BadRequest, NotFoundError, etag, pagination_headers
+from flexget.config_schema import JsonSchema
+from flexget.plugin import DependencyError, get_plugin_by_name, get_plugins
 
-log = logging.getLogger('plugins')
+logger = logger.bind(name='plugins')
 
 plugins_api = api.namespace('plugins', description='Get Flexget plugins')
 
 
-class ObjectsContainer(object):
+class ObjectsContainer:
     phase_object = {
         'type': 'object',
-        'properties': {
-            'phase': {'type': 'string'},
-            'priority': {'type': 'integer'}
-        }
+        'properties': {'phase': {'type': 'string'}, 'priority': {'type': 'integer'}},
     }
 
     plugin_object = {
@@ -35,27 +32,52 @@ class ObjectsContainer(object):
             'contexts': {'type': 'array', 'items': {'type': 'string'}},
             'debug': {'type': 'boolean'},
             'interfaces': {'type': 'array', 'items': {'type': 'string'}},
-            'phase_handlers': {'type': 'array', 'items': phase_object}
-        }
+            'phase_handlers': {'type': 'array', 'items': phase_object},
+        },
     }
 
     plugin_list_reply = {'type': 'array', 'items': plugin_object}
 
 
-plugin_schema = api.schema('plugin_object', ObjectsContainer.plugin_object)
-plugin_list_reply_schema = api.schema('plugin_list_reply', ObjectsContainer.plugin_list_reply)
+plugin_schema = api.schema_model('plugin_object', ObjectsContainer.plugin_object)
+plugin_list_reply_schema = api.schema_model(
+    'plugin_list_reply', ObjectsContainer.plugin_list_reply
+)
 
 plugin_parser = api.parser()
-plugin_parser.add_argument('include_schema', type=inputs.boolean, default=False,
-                           help='Include plugin schema. This will increase response size')
+plugin_parser.add_argument(
+    'include_schema',
+    type=inputs.boolean,
+    default=False,
+    help='Include plugin schema. This will increase response size',
+)
 
 plugins_parser = api.pagination_parser(plugin_parser)
 
-plugins_parser.add_argument('interface', case_sensitive=False, help='Show plugins which implement this interface')
-plugins_parser.add_argument('phase', case_sensitive=False, help='Show plugins that act on this phase')
+plugins_parser.add_argument(
+    'interface', case_sensitive=False, help='Show plugins which implement this interface'
+)
+plugins_parser.add_argument(
+    'phase', case_sensitive=False, help='Show plugins that act on this phase'
+)
+
+if TYPE_CHECKING:
+    from typing import TypedDict
+
+    _PhaseHandler = TypedDict('_PhaseHandler', {'phase': str, 'priority': int})
+
+    class PluginDict(TypedDict, total=False):
+        name: str
+        api_ver: int
+        builtin: bool
+        category: Optional[str]
+        debug: bool
+        interfaces: Optional[List[str]]
+        phase_handlers: List[_PhaseHandler]
+        schema: Optional[JsonSchema]
 
 
-def plugin_to_dict(plugin):
+def plugin_to_dict(plugin) -> 'PluginDict':
     return {
         'name': plugin.name,
         'api_ver': plugin.api_ver,
@@ -63,20 +85,22 @@ def plugin_to_dict(plugin):
         'category': plugin.category,
         'debug': plugin.debug,
         'interfaces': plugin.interfaces,
-        'phase_handlers': [dict(phase=handler, priority=event.priority) for handler, event in
-                           plugin.phase_handlers.items()]
+        'phase_handlers': [
+            dict(phase=handler, priority=event.priority)
+            for handler, event in plugin.phase_handlers.items()
+        ],
     }
 
 
 @plugins_api.route('/')
 class PluginsAPI(APIResource):
-    @etag
+    @etag(cache_age=3600)
     @api.response(200, model=plugin_list_reply_schema)
     @api.response(BadRequest)
     @api.response(NotFoundError)
     @api.doc(parser=plugins_parser)
-    def get(self, session=None):
-        """ Get list of registered plugins """
+    def get(self, session: Session = None) -> Response:
+        """Get list of registered plugins"""
         args = plugins_parser.parse_args()
 
         # Pagination and sorting params
@@ -108,7 +132,7 @@ class PluginsAPI(APIResource):
         total_pages = int(ceil(total_items / float(per_page)))
 
         if page > total_pages and total_pages != 0:
-            raise NotFoundError('page %s does not exist' % page)
+            raise NotFoundError(f'page {page} does not exist')
 
         # Actual results in page
         actual_size = min(per_page, len(sliced_list))
@@ -125,12 +149,12 @@ class PluginsAPI(APIResource):
 
 @plugins_api.route('/<string:plugin_name>/')
 class PluginAPI(APIResource):
-    @etag
+    @etag(cache_age=3600)
     @api.response(BadRequest)
     @api.response(200, model=plugin_schema)
     @api.doc(parser=plugin_parser, params={'plugin_name': 'Name of the plugin to return'})
-    def get(self, plugin_name, session=None):
-        """ Return plugin data by name"""
+    def get(self, plugin_name: str, session=None):
+        """Return plugin data by name"""
         args = plugin_parser.parse_args()
         try:
             plugin = get_plugin_by_name(plugin_name, issued_by='plugins API')

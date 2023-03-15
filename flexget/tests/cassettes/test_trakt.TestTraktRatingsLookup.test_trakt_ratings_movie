@@ -1,0 +1,238 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Content-Type:
+      - application/json
+      trakt-api-key:
+      - 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af
+      trakt-api-version:
+      - '2'
+    method: GET
+    uri: https://api.trakt.tv/search?query=Doctor+Strange&type=movie&year=2016
+  response:
+    body:
+      string: "[{\"type\":\"movie\",\"score\":84.28938,\"movie\":{\"title\":\"Doctor
+        Strange\",\"overview\":\"After his career is destroyed, a brilliant but arrogant
+        surgeon gets a new lease on life when a sorcerer takes him under her wing
+        and trains him to defend the world against evil.\",\"year\":2016,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":181311,\"slug\":\"doctor-strange-2016\",\"imdb\":\"tt1211837\",\"tmdb\":284052}}},{\"type\":\"movie\",\"score\":0.6041735,\"movie\":{\"title\":\"Nekro\",\"overview\":\"\u0130hsan
+        is a maintenance worker at a hospital. He seems to be a colourless, introverted,
+        dull guy, who never raises his voice to anyone. As anger mounts inside him,
+        he maintains his silent, awkward, weak appearance. Life goes by, boring and
+        monotonous. Ihsan carries test tubes and x-rays to doctors, counts needles,
+        finishes work and leaves the hospital to go home. He buys food, ignores the
+        local guys who taunt him, obediently listens to his landlady who lives in
+        the same building and who always has something to say, and eats a TV dinner
+        thus completing another day. However, just as everyone, he has his dirty little
+        secrets as well. The doctor is cheating on his wife, the nurse is doing drugs
+        and Ihsan is involved in unusual activities at the morgue. This is a strange
+        film about strange people doing strange things. 18 - Contains sexually explicit
+        scenes that may be inappropriate for younger viewers.\",\"year\":2016,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":567737,\"slug\":\"nekro-2016\",\"imdb\":\"tt5389854\",\"tmdb\":725326}}},{\"type\":\"movie\",\"score\":0.53700733,\"movie\":{\"title\":\"My
+        Future Love\",\"overview\":\"In 1973, the 20-year-old Svante has a heart condition
+        that the doctors cannot fix. When he has a breakdown on a subway platform,
+        a strange train suddenly appears. He steps into the subway car filled with
+        wonder, without knowing that the destination is the future. In the future
+        he meets Elsa and together they must solve Svante's problems and figure out
+        how to live together when they are from two different eras.\",\"year\":2016,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":280281,\"slug\":\"my-future-love-2016\",\"imdb\":\"tt5194446\",\"tmdb\":425553}}},{\"type\":\"movie\",\"score\":0.46029204,\"movie\":{\"title\":\"Ranmaru:
+        The Man with the God Tongue\",\"overview\":\"Ranmaru is a shy, dorky guy with
+        a tongue that can analyze any element simply by licking an object, a skill
+        that allows him to solve all manner of crimes. With his cute, but annoying
+        sidekick Hikaru, plus the steadying hand of friend Kanji, Ranmaru solves a
+        series of strange events at a failing hot spring resort deep in the mountains.
+        Ranmaru falls in love with a doctor who saves his life. The loveable, endearing
+        Ranmaru and his band of quirky pals team up to solve a nasty murder mystery
+        that devastates the village.\",\"year\":2016,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":330862,\"slug\":\"ranmaru-the-man-with-the-god-tongue-2016\",\"imdb\":\"tt6299262\",\"tmdb\":455660}}}]"
+    headers:
+      CF-Cache-Status:
+      - MISS
+      CF-RAY:
+      - 60caac7a2c103865-IAD
+      Cache-Control:
+      - public, max-age=28800
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Tue, 05 Jan 2021 05:07:05 GMT
+      ETag:
+      - W/"290fb5b5adf79e57f0fc1cbcd0d955f3"
+      Expect-CT:
+      - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+      Expires:
+      - Tue, 05 Jan 2021 13:07:03 GMT
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cfduid=d9628bd276a9dc9e04b4c5684edce28e71609823225; expires=Thu, 04-Feb-21
+        05:07:05 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Pagination-Item-Count:
+      - '4'
+      X-Pagination-Limit:
+      - '10'
+      X-Pagination-Page:
+      - '1'
+      X-Pagination-Page-Count:
+      - '1'
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Ratelimit:
+      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":949,"until":"2021-01-05T05:10:00Z"}'
+      X-Request-Id:
+      - 249cc7af-9399-43ea-8339-91671af4805c
+      X-Runtime:
+      - '0.020905'
+      X-XSS-Protection:
+      - 1; mode=block
+      cf-request-id:
+      - 07728a20570000386565889000000001
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Content-Type:
+      - application/json
+      trakt-api-key:
+      - 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af
+      trakt-api-version:
+      - '2'
+    method: GET
+    uri: https://api.trakt.tv/movies/181311?extended=full
+  response:
+    body:
+      string: '{"title":"Doctor Strange","year":2016,"ids":{"trakt":181311,"slug":"doctor-strange-2016","imdb":"tt1211837","tmdb":284052},"tagline":"Open
+        your mind. Change your reality.","overview":"After his career is destroyed,
+        a brilliant but arrogant surgeon gets a new lease on life when a sorcerer
+        takes him under her wing and trains him to defend the world against evil.","released":"2016-11-04","runtime":115,"country":"us","trailer":"http://youtube.com/watch?v=HSzx-zryEgM","homepage":"http://marvel.com/doctorstrange","status":"released","rating":7.85492,"votes":58465,"comment_count":123,"updated_at":"2020-12-31T08:11:41.000Z","language":"en","available_translations":["bg","bs","cs","da","de","el","en","es","fa","fi","fr","he","hr","hu","id","it","ja","ka","ko","lt","lv","nl","no","pl","pt","ro","ru","sk","sl","sr","sv","th","tr","uk","uz","vi","zh"],"genres":["action","adventure","science-fiction","fantasy","superhero"],"certification":"PG-13"}'
+    headers:
+      Age:
+      - '20104'
+      CF-Cache-Status:
+      - HIT
+      CF-RAY:
+      - 60caac7aee53ea18-IAD
+      Cache-Control:
+      - public, max-age=28800
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Tue, 05 Jan 2021 05:07:06 GMT
+      ETag:
+      - W/"d92e862a13509d602a42d600920d4085"
+      Expect-CT:
+      - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+      Expires:
+      - Tue, 05 Jan 2021 07:32:00 GMT
+      Last-Modified:
+      - Thu, 31 Dec 2020 08:11:41 GMT
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cfduid=d0ee1771217ca114dbdd8010d0c9772b91609823226; expires=Thu, 04-Feb-21
+        05:07:06 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Ratelimit:
+      - '{"name":"AUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":797,"until":"2020-12-31T12:05:00Z"}'
+      X-Request-Id:
+      - d26622a0-bd18-4a15-893f-6f94a45acdbb
+      X-Runtime:
+      - '0.006545'
+      X-XSS-Protection:
+      - 1; mode=block
+      cf-request-id:
+      - 07728a20d00000ea18d40d1000000001
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Content-Type:
+      - application/json
+      trakt-api-key:
+      - 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af
+      trakt-api-version:
+      - '2'
+    method: GET
+    uri: https://api.trakt.tv/users/flexgettest/ratings/movies
+  response:
+    body:
+      string: '[{"rated_at":"2017-04-23T19:37:42.000Z","rating":9,"type":"movie","movie":{"title":"Doctor
+        Strange","year":2016,"ids":{"trakt":181311,"slug":"doctor-strange-2016","imdb":"tt1211837","tmdb":284052}}}]'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-RAY:
+      - 60caac7bbe12cecc-IAD
+      Cache-Control:
+      - max-age=0, private, must-revalidate
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Tue, 05 Jan 2021 05:07:06 GMT
+      ETag:
+      - W/"af6b83c0eae2b5a74e1db3223c36d0f9"
+      Expect-CT:
+      - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+      Last-Modified:
+      - Sun, 23 Apr 2017 19:37:42 GMT
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cfduid=dff5e702453b51c7ac1d60d11387462c51609823226; expires=Thu, 04-Feb-21
+        05:07:06 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Private-User:
+      - 'false'
+      X-Ratelimit:
+      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":948,"until":"2021-01-05T05:10:00Z"}'
+      X-Request-Id:
+      - 02d9a6d2-875d-4a67-81f9-0ba6f85de8f0
+      X-Runtime:
+      - '0.012806'
+      X-XSS-Protection:
+      - 1; mode=block
+      cf-request-id:
+      - 07728a21560000cecc2eb32000000001
+    status:
+      code: 200
+      message: OK
+version: 1

@@ -1,13 +1,10 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 from datetime import timedelta
 
 from flexget.manager import Session
 from flexget.plugins.filter.delay import DelayedEntry
 
 
-class TestDelay(object):
+class TestDelay:
     config = """
         tasks:
           test:

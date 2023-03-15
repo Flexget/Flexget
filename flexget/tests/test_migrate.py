@@ -1,12 +1,9 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import pytest
 
 from .conftest import MockManager
 
 
-class TestMigrate(object):
+class TestMigrate:
     config = """
         tasks:
           test:

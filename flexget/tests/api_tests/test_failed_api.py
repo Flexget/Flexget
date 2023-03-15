@@ -1,16 +1,13 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import copy
 
 from flexget.api.app import base_message
-from flexget.api.plugins.failed import ObjectsContainer as OC
+from flexget.components.failed.api import ObjectsContainer as OC
+from flexget.components.failed.db import FailedEntry
 from flexget.manager import Session
-from flexget.plugins.filter.retry_failed import FailedEntry
 from flexget.utils import json
 
 
-class TestRetryFailedAPI(object):
+class TestRetryFailedAPI:
     config = "{'tasks': {}}"
 
     def test_retry_failed_all(self, api_client, schema_match):
@@ -21,11 +18,19 @@ class TestRetryFailedAPI(object):
         errors = schema_match(OC.retry_entries_list_object, data)
         assert not errors
 
-        failed_entry_dict_1 = dict(title='Failed title1', url='http://123.com', reason='Test reason1')
-        failed_entry_dict_2 = dict(title='Failed title2', url='http://124.com', reason='Test reason2')
-        failed_entry_dict_3 = dict(title='Failed title3', url='http://125.com', reason='Test reason3')
-        failed_entries = sorted([failed_entry_dict_1, failed_entry_dict_2, failed_entry_dict_3],
-                                key=lambda x: x['title'])
+        failed_entry_dict_1 = dict(
+            title='Failed title1', url='http://123.com', reason='Test reason1'
+        )
+        failed_entry_dict_2 = dict(
+            title='Failed title2', url='http://124.com', reason='Test reason2'
+        )
+        failed_entry_dict_3 = dict(
+            title='Failed title3', url='http://125.com', reason='Test reason3'
+        )
+        failed_entries = sorted(
+            [failed_entry_dict_1, failed_entry_dict_2, failed_entry_dict_3],
+            key=lambda x: x['title'],
+        )
 
         with Session() as session:
             failed_entry1 = FailedEntry(**failed_entry_dict_1)
@@ -67,7 +72,9 @@ class TestRetryFailedAPI(object):
         errors = schema_match(base_message, data)
         assert not errors
 
-        failed_entry_dict_1 = dict(title='Failed title1', url='http://123.com', reason='Test reason1')
+        failed_entry_dict_1 = dict(
+            title='Failed title1', url='http://123.com', reason='Test reason1'
+        )
 
         with Session() as session:
             failed_entry = FailedEntry(**failed_entry_dict_1)
@@ -105,11 +112,13 @@ class TestRetryFailedAPI(object):
         assert not errors
 
 
-class TestFailedPaginationAPI(object):
+class TestFailedPaginationAPI:
     config = 'tasks: {}'
 
     def add_failed_entries(self):
-        base_failed_entry = dict(title='Failed title_', url='http://123.com/', reason='Test reason_')
+        base_failed_entry = dict(
+            title='Failed title_', url='http://123.com/', reason='Test reason_'
+        )
         num_of_entries = 200
 
         with Session() as session:
@@ -163,9 +172,15 @@ class TestFailedPaginationAPI(object):
         assert links['prev']['page'] == 1
 
     def test_failed_sorting(self, api_client):
-        failed_entry_dict_1 = dict(title='Failed title_1', url='http://jhb.com', reason='Test reason_3')
-        failed_entry_dict_2 = dict(title='Failed title_2', url='http://def.com', reason='Test reason_1')
-        failed_entry_dict_3 = dict(title='Failed title_3', url='http://abc.com', reason='Test reason_2')
+        failed_entry_dict_1 = dict(
+            title='Failed title_1', url='http://jhb.com', reason='Test reason_3'
+        )
+        failed_entry_dict_2 = dict(
+            title='Failed title_2', url='http://def.com', reason='Test reason_1'
+        )
+        failed_entry_dict_3 = dict(
+            title='Failed title_3', url='http://abc.com', reason='Test reason_2'
+        )
 
         with Session() as session:
             failed_entry1 = FailedEntry(**failed_entry_dict_1)

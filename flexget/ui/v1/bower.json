@@ -1,0 +1,65 @@
+{
+  "name": "FlexgetUI",
+  "dependencies": {
+    "angular": "~1.5.6",
+    "angular-material": "~1.1.0",
+    "angular-ui-router": "~1.0.0-alpha.5",
+    "angular-filter": "~0.5.8",
+    "angular-sanitize": "~1.5.8",
+    "angular-schema-form": "~0.8.13",
+    "font-awesome": "~4.6.3",
+    "angular-ui-grid": "~3.1.1",
+    "bootstrap-sass": "bootstrap-sass-official#~3.3.5",
+    "angular-cookies": "~1.5.6",
+    "please-wait": "~0.0.5",
+    "oboe": "~2.1.2",
+    "angular-spinkit": "~0.3.4",
+    "angular-loading-bar": "~0.9.0",
+    "ui-grid-auto-scroll": "~1.0.1",
+    "animate.css-scss": "~3.1.0",
+    "jquery": "~2.2.4",
+    "angular-ui-ace": "~0.2.3",
+    "angular-utf8-base64": "~0.0.5",
+    "angular-messages": "~1.5.6",
+    "ngclipboard": "~1.1.1",
+    "angular-http-etag": "git://github.com/shaungrady/angular-http-etag.git#c047ec6",
+    "angular-link-header-parser": "~1.0.2",
+    "angular-cache": "~4.6.0",
+    "md-data-table": "~2.1.0",
+    "yaml.js": "^0.2.8",
+    "angular-aria": "~1.5.8"
+  },
+  "devDependencies": {
+    "angular-mocks": "^1.5.5",
+    "bardjs": "^0.1.8"
+  },
+  "overrides": {
+    "please-wait": {
+      "ignore": true
+    },
+    "font-awesome": {
+      "main": [
+        "css/font-awesome.css",
+        "fonts/*"
+      ]
+    },
+    "ace-builds": {
+      "main": [
+        "src-min-noconflict/ace.js",
+        "src-min-noconflict/ext-themelist.js",
+        "src-min-noconflict/ext-searchbox.js",
+        "src-min-noconflict/mode-yaml.js",
+        "src-min-noconflict/theme*"
+      ]
+    },
+    "angular-link-header-parser": {
+      "main": [
+        "release/angular-link-header-parser.js"
+      ]
+    }
+  },
+  "resolutions": {
+    "jquery": "~2.2.4",
+    "angular": "~1.5.8"
+  }
+}

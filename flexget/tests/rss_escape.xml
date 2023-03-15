@@ -1,0 +1,51 @@
+<?xml version = "1.0" encoding = "utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>NewStudio</title>
+        <link>http://newstudio.tv/</link>
+        <description>NewStudio Tracker</description>
+        <language>en-us</language>
+        <atom:link href="http://newstudio.tv/rss.php" rel="self" type="application/rss+xml"/>
+
+        <item>
+            <title>Snatch</title>
+            <guid isPermaLink="true">http://newstudio.tv/viewtopic.php?t=1</guid>
+            <pubDate>Sun, 07 Oct 2018 22:10:55 +0300</pubDate>
+            <link>http://newstudio.tv/viewtopic.php?t=1</link>
+            <description>Snatch s02e07</description>
+            <enclosure url="http://wrong&url2" length="0" type="application/x-bittorrent" />
+        </item>
+        <item>
+            <title>Snatch &2</title>
+            <guid isPermaLink="true">http://newstudio.tv/viewtopic.php?t=2</guid>
+            <pubDate>Sun, 07 Oct 2018 22:10:55 +0300</pubDate>
+            <link>http://newstudio.tv/viewtopic.php?t=2</link>
+            <description>Snatch s02e07</description>
+            <enclosure url="http://some/url" length="0" type="application/x-bittorrent" />
+        </item>
+        <item>
+            <title>Snatch &amp;4</title>
+            <guid isPermaLink="true">http://newstudio.tv/viewtopic.php?t=3</guid>
+            <pubDate>Sun, 07 Oct 2018 22:10:55 +0300</pubDate>
+            <link>http://newstudio.tv/viewtopic.php?t=3</link>
+            <description>Snatch s02e07</description>
+            <enclosure url="http://correct&amp;url3" length="0" type="application/x-bittorrent" />
+        </item>
+        <item>
+            <title><![CDATA[Snatch &5]]></title>
+            <guid isPermaLink="true">http://newstudio.tv/viewtopic.php?t=4</guid>
+            <pubDate>Sun, 07 Oct 2018 22:10:55 +0300</pubDate>
+            <link>http://newstudio.tv/viewtopic.php?t=4</link>
+            <description>Snatch s02e07</description>
+            <enclosure url="http://correct&amp;url4" length="0" type="application/x-bittorrent" />
+        </item>
+        <item>
+            <title><![CDATA[Cyrillic &тест]]></title>
+            <guid isPermaLink="true">http://newstudio.tv/viewtopic.php?t=5</guid>
+            <pubDate>Sun, 07 Oct 2018 22:10:55 +0300</pubDate>
+            <link>http://newstudio.tv/viewtopic.php?t=4</link>
+            <description>Snatch s02e07</description>
+            <enclosure url="http://correct&amp;url5" length="0" type="application/x-bittorrent" />
+        </item>
+    </channel>
+</rss>

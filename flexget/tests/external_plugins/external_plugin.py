@@ -1,12 +1,9 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 
 
-class ExternalPlugin(object):
+class ExternalPlugin:
     schema = {'type': 'boolean'}
 
     def on_task_input(self, task, config):

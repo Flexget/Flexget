@@ -1,28 +1,25 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
 from datetime import datetime
+
+from dateutil.parser import parse as dateutil_parse
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 from flexget.utils.tools import parse_timedelta
 
-from dateutil.parser import parse as dateutil_parse
-
-log = logging.getLogger('age')
+logger = logger.bind(name='age')
 
 
-class Age(object):
+class Age:
     """
-        Rejects/accepts entries based on date in specified entry field
+    Rejects/accepts entries based on date in specified entry field
 
-        Example:
+    Example:
 
-          age:
-            field: 'accessed'  # 'accessed' is a field set from filesystem plugin
-            age: '7 days'
-            action: 'accept'
+      age:
+        field: 'accessed'  # 'accessed' is a field set from filesystem plugin
+        age: '7 days'
+        action: 'accept'
     """
 
     schema = {
@@ -30,10 +27,10 @@ class Age(object):
         'properties': {
             'field': {'type': 'string'},
             'action': {'type': 'string', 'enum': ['accept', 'reject']},
-            'age': {'type': 'string', 'format': 'interval'}
+            'age': {'type': 'string', 'format': 'interval'},
         },
         'required': ['field', 'action', 'age'],
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
     def on_task_filter(self, task, config):
@@ -53,10 +50,14 @@ class Age(object):
                 try:
                     field_date = dateutil_parse(entry[field])
                 except ValueError:
-                    log.warning('Entry %s ignored: %s is not a valid date', entry['title'], field_value)
+                    logger.warning(
+                        'Entry {} ignored: {} is not a valid date', entry['title'], field_value
+                    )
                     continue
             else:
-                log.warning('Entry %s ignored: %s is not a valid date', entry['title'], field_value)
+                logger.warning(
+                    'Entry {} ignored: {} is not a valid date', entry['title'], field_value
+                )
                 continue
 
             age_cutoff = datetime.now() - parse_timedelta(config['age'])
@@ -67,8 +68,13 @@ class Age(object):
                     entry.accept(info_string)
                 else:
                     entry.reject(info_string)
-                log.debug('Entry %s was %sed because date in field `%s` is older than %s', entry['title'],
-                          config['action'], field, config['age'])
+                logger.debug(
+                    'Entry {} was {}ed because date in field `{}` is older than {}',
+                    entry['title'],
+                    config['action'],
+                    field,
+                    config['age'],
+                )
 
 
 @event('plugin.register')

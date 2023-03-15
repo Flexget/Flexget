@@ -1,38 +1,69 @@
 interactions:
-- request:
-    body: null
-    headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.8.12.dev (www.flexget.com)]
-    method: GET
-    uri: http://api.tvmaze.com/singlesearch/shows?q=Shameless
-  response:
-    body:
-      string: !!binary |
-        H4sIAAAAAAAAA41UXW8bNxD8Kwu+9OV6p7variwYBlr3460PdYMgKAKDEldHVjyS4IfOiuH/nuFJ
-        KYIgQAIYMrkc7s7MLu9FGCU2/fWqESVasRE657Dpunme23yc5Adud37qkvZz6gDDSk5sOSXRCIcl
-        rjx+FsqnsIR20YTMCiAr3VjkWKO/u9GapBEc2UVOYvOv+C3KSSLy4CdWJ/G+ESnLXHAm/i7OGTfi
-        MBaXTa11A54h8mQ4IvlGDKu+/3GFv1ug0k6zKhawF3GGi6HfrFY4UvK0VHssDkvx/hU5Za7JgZVH
-        jgvBdbvGwcxm1Bmm3EAh59nHQ0VVn24/0+znpUYjdh7s4qliLoa8cQba6RFCILIiVJX/5hHreumD
-        d3X/y8TR7GT3F89P72qV16X69kFL5xjNcMXaRvBz5uikhQDoOp6pDtd9/zOyac5Hta1ke0QaYaa6
-        Ezn31+ubm/VKIKWZFnUvAg6bMuH40uRzg3fKLT0uwXqpUrfAU3cGPwUfc5Qmd1fXXd9frW9X7X+h
-        9sRHMxrQ+s50n+BPMMuX2qkvMoJoKtMkq5PiLtzfpRy9G+//n6677hIhk0jSHjOwY3sidqMEk5Gk
-        U7RnGet0Ip5nk2obElzm1NKDhtmjl47+iNId6E9prRw1x5oPRlKIvgCOVJZJSUV+j90zJZDKDRmn
-        ChgYX9Ky4cBOsct0MAqRWXuaTda+ZNJmotkXq2jLbdtS4KhlSNhl9BJ59y291Xxh8kMi5zPJvLDY
-        ykippq6SZo2oNTmD0YSpgSqNH42RbUgzbgaZEkTWqt4tCfbW+9jSr4hUVZXdcoH2GFRFM54CZU9j
-        9DOVAFkoh3mtasG7pX9qhUmeFlJbRvkDw9sT7eVk4OvJFzo4Pze0PZeoaECcJxm89SPcRq0ItVUC
-        P8tdxrXqz0JeRm7vunCPGSpB4YnUD9DVehiGn4Zh3Ygna9xhGfbEdl+HXkfG/09TK4P56qepjjq+
-        DcfaIA4mLY/uG5cvuNTdDuurYcALfP0INK0WGBIFAAA=
-    headers:
-      access-control-allow-origin: ['*']
-      cache-control: ['public, max-age=3600']
-      connection: [keep-alive]
-      content-encoding: [gzip]
-      content-type: [application/json; charset=UTF-8]
-      date: ['Sun, 25 Dec 2016 09:56:58 GMT']
-      server: [nginx/1.10.0 (Ubuntu)]
-      vary: [Accept-Encoding]
-    status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [FlexGet/2.10.20.dev (www.flexget.com)]
+      method: GET
+      uri: https://api.tvmaze.com/singlesearch/shows?embed=seasons&q=Shameless
+    response:
+      body:
+        string: !!binary |
+          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
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['public, max-age=3600']
+        Connection: [keep-alive]
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=UTF-8]
+        Date: ['Sun, 26 Mar 2017 11:10:43 GMT']
+        Server: [nginx/1.10.0 (Ubuntu)]
+        Vary: [Accept-Encoding]
+      status: {code: 200, message: OK}
 version: 1

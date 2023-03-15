@@ -1,13 +1,10 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import copy
 from datetime import datetime
 
 from flexget.api.app import base_message
-from flexget.api.plugins.rejected import ObjectsContainer as OC
+from flexget.components.rejected.api import ObjectsContainer as OC
+from flexget.components.rejected.db import RememberEntry, RememberTask
 from flexget.manager import Session
-from flexget.plugins.filter.remember_rejected import RememberEntry, RememberTask
 from flexget.utils import json
 from flexget.utils.tools import parse_timedelta
 
@@ -20,14 +17,26 @@ def add_rejected_entry(entry):
 
         expires = datetime.now() + parse_timedelta('1 hours')
         session.add(
-            RememberEntry(title=entry['test_title'], url=entry['test_url'], task_id=task.id,
-                          rejected_by=entry['rejected_by'], reason=entry['reason'], expires=expires))
+            RememberEntry(
+                title=entry['test_title'],
+                url=entry['test_url'],
+                task_id=task.id,
+                rejected_by=entry['rejected_by'],
+                reason=entry['reason'],
+                expires=expires,
+            )
+        )
 
 
-class TestRejectedAPI(object):
+class TestRejectedAPI:
     config = "{'tasks': {}}"
 
-    entry = dict(test_title='test_title', test_url='test_url', rejected_by='rejected API test', reason='test_reason')
+    entry = dict(
+        test_title='test_title',
+        test_url='test_url',
+        rejected_by='rejected API test',
+        reason='test_reason',
+    )
 
     def test_rejected_get_all_empty(self, api_client, schema_match):
         rsp = api_client.get('/rejected/')
@@ -57,7 +66,7 @@ class TestRejectedAPI(object):
             'title': self.entry['test_title'],
             'url': self.entry['test_url'],
             'rejected_by': self.entry['rejected_by'],
-            'reason': self.entry['reason']
+            'reason': self.entry['reason'],
         }
 
         for field, value in values.items():
@@ -79,9 +88,11 @@ class TestRejectedAPI(object):
 
         data = json.loads(rsp.get_data(as_text=True))
 
-        assert data == {'status': 'success',
-                        'status_code': 200,
-                        'message': 'successfully deleted 1 rejected entries'}
+        assert data == {
+            'status': 'success',
+            'status_code': 200,
+            'message': 'successfully deleted 1 rejected entries',
+        }
 
     def test_rejected_get_entry(self, api_client, schema_match):
         add_rejected_entry(self.entry)
@@ -99,7 +110,7 @@ class TestRejectedAPI(object):
             'title': self.entry['test_title'],
             'url': self.entry['test_url'],
             'rejected_by': self.entry['rejected_by'],
-            'reason': self.entry['reason']
+            'reason': self.entry['reason'],
         }
 
         for field, value in values.items():
@@ -145,11 +156,13 @@ class TestRejectedAPI(object):
         assert not errors
 
 
-class TestRejectedPagination(object):
+class TestRejectedPagination:
     config = 'tasks: {}'
 
     def test_rejected_pagination(self, api_client, link_headers):
-        base_reject_entry = dict(title='test_title_', url='test_url_', rejected_by='rejected_by_', reason='reason_')
+        base_reject_entry = dict(
+            title='test_title_', url='test_url_', rejected_by='rejected_by_', reason='reason_'
+        )
         number_of_entries = 200
 
         with Session() as session:
@@ -209,12 +222,27 @@ class TestRejectedPagination(object):
         expires_2 = datetime.now() + parse_timedelta('2 hours')
         expires_3 = datetime.now() + parse_timedelta('3 hours')
 
-        reject_entry_1 = dict(title='test_title_1', url='test_url_c', rejected_by='rejected_by_2', reason='reason_3',
-                              expires=expires_1)
-        reject_entry_2 = dict(title='test_title_2', url='test_url_a', rejected_by='rejected_by_3', reason='reason_2',
-                              expires=expires_2)
-        reject_entry_3 = dict(title='test_title_3', url='test_url_b', rejected_by='rejected_by_1', reason='reason_1',
-                              expires=expires_3)
+        reject_entry_1 = dict(
+            title='test_title_1',
+            url='test_url_c',
+            rejected_by='rejected_by_2',
+            reason='reason_3',
+            expires=expires_1,
+        )
+        reject_entry_2 = dict(
+            title='test_title_2',
+            url='test_url_a',
+            rejected_by='rejected_by_3',
+            reason='reason_2',
+            expires=expires_2,
+        )
+        reject_entry_3 = dict(
+            title='test_title_3',
+            url='test_url_b',
+            rejected_by='rejected_by_1',
+            reason='reason_1',
+            expires=expires_3,
+        )
 
         with Session() as session:
             task = RememberTask(name='rejected API test')

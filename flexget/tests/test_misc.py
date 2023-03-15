@@ -1,20 +1,17 @@
 # pylint: disable=no-self-use
-
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.utils import text_type
-
 import os
 import stat
+import sys
+import time
 
 import pytest
 
-from flexget.entry import EntryUnicodeError, Entry
+from flexget.entry import Entry, EntryUnicodeError
 
 
-class TestDisableBuiltins(object):
+class TestDisableBuiltins:
     """
-        Quick a hack, test disable functionality by checking if seen filtering (builtin) is working
+    Quick a hack, test disable functionality by checking if seen filtering (builtin) is working
     """
 
     config = """
@@ -41,19 +38,21 @@ class TestDisableBuiltins(object):
         # Execute the task once, then we'll make sure seen plugin isn't rejecting on future executions
         execute_task('test')
         task = execute_task('test')
-        assert task.find_entry('accepted', title='dupe1') and task.find_entry('accepted', title='dupe2'), \
-            'disable is not working?'
+        assert task.find_entry('accepted', title='dupe1') and task.find_entry(
+            'accepted', title='dupe2'
+        ), 'disable is not working?'
         task = execute_task('test2')
-        assert task.find_entry(title='dupe1').accepted and task.find_entry('accepted', title='dupe2'), \
-            'disable is not working?'
+        assert task.find_entry(title='dupe1').accepted and task.find_entry(
+            'accepted', title='dupe2'
+        ), 'disable is not working?'
 
 
 @pytest.mark.online
-class TestInputHtml(object):
+class TestInputHtml:
     config = """
         tasks:
           test:
-            html: http://download.flexget.com/
+            html: http://google.com/
     """
 
     def test_parsing(self, execute_task):
@@ -61,7 +60,7 @@ class TestInputHtml(object):
         assert task.entries, 'did not produce entries'
 
 
-class TestPriority(object):
+class TestPriority:
     config = """
         tasks:
           test:
@@ -91,12 +90,14 @@ class TestPriority(object):
 
     def test_smoke(self, execute_task):
         task = execute_task('test')
-        assert task.accepted, 'set plugin should have changed quality before quality plugin was run'
+        assert (
+            task.accepted
+        ), 'set plugin should have changed quality before quality plugin was run'
         task = execute_task('test2')
         assert task.rejected, 'quality plugin should have rejected Smoke as hdtv'
 
 
-class TestImmortal(object):
+class TestImmortal:
     config = """
         tasks:
           test:
@@ -115,13 +116,13 @@ class TestImmortal(object):
 
 
 @pytest.mark.online
-class TestDownload(object):
+class TestDownload:
     config = """
         tasks:
           test:
             mock:
               - title: README
-                url: https://github.com/Flexget/Flexget/raw/master/README.rst
+                url: https://github.com/Flexget/Flexget/raw/develop/README.MD
                 filename: flexget_test_data
             accept_all: true
             download:
@@ -129,10 +130,8 @@ class TestDownload(object):
               fail_html: no
     """
 
+    @pytest.mark.skipif(sys.platform.startswith('win'), reason="doesn't work on windows")
     def test_download(self, execute_task, tmpdir):
-        # NOTE: what the hell is .obj and where it comes from?
-        # Re: seems to come from python mimetype detection in download plugin ...
-        # Re Re: Implemented in such way that extension does not matter?
         # A little convoluted, but you have to set the umask in order to have
         # the current value returned to you
         curr_umask = os.umask(0)
@@ -143,28 +142,26 @@ class TestDownload(object):
         testfile = task.entries[0]['location']
         assert os.path.exists(testfile), 'download file does not exists'
         testfile_stat = os.stat(testfile)
-        modes_equal = 0o666 & ~curr_umask == stat.S_IMODE(testfile_stat.st_mode)
-        assert modes_equal, 'download file mode not honoring umask'
+        assert 0o666 & ~curr_umask == stat.S_IMODE(
+            testfile_stat.st_mode
+        ), 'download file mode not honoring umask'
 
 
-class TestEntryUnicodeError(object):
+class TestEntryUnicodeError:
     def test_encoding(self):
         e = Entry('title', 'url')
         with pytest.raises(EntryUnicodeError):
             e['invalid'] = b'\x8e'
 
 
-class TestEntryStringCoercion(object):
+class TestEntryStringCoercion:
     def test_coercion(self):
-        class EnrichedString(text_type):
-            pass
-
         e = Entry('title', 'url')
-        e['test'] = EnrichedString("test")
-        assert type(e['test']) == text_type  # pylint: disable=unidiomatic-typecheck
+        e['test'] = str("test")
+        assert type(e['test']) == str  # pylint: disable=unidiomatic-typecheck
 
 
-class TestFilterRequireField(object):
+class TestFilterRequireField:
     config = """
         tasks:
           test:
@@ -181,35 +178,41 @@ class TestFilterRequireField(object):
 
     def test_field_required(self, execute_task):
         task = execute_task('test')
-        assert not task.find_entry('rejected', title='Taken[2008]DvDrip[Eng]-FOO'), \
-            'Taken should NOT have been rejected'
-        assert task.find_entry('rejected', title='ASDFASDFASDF'), \
-            'ASDFASDFASDF should have been rejected'
+        assert not task.find_entry(
+            'rejected', title='Taken[2008]DvDrip[Eng]-FOO'
+        ), 'Taken should NOT have been rejected'
+        assert task.find_entry(
+            'rejected', title='ASDFASDFASDF'
+        ), 'ASDFASDFASDF should have been rejected'
 
         task = execute_task('test2')
-        assert not task.find_entry('rejected', title='Entry.S01E05.720p'), \
-            'Entry should NOT have been rejected'
-        assert task.find_entry('rejected', title='Entry2.is.a.Movie'), \
-            'Entry2 should have been rejected'
+        assert not task.find_entry(
+            'rejected', title='Entry.S01E05.720p'
+        ), 'Entry should NOT have been rejected'
+        assert task.find_entry(
+            'rejected', title='Entry2.is.a.Movie'
+        ), 'Entry2 should have been rejected'
 
 
-class TestHtmlUtils(object):
+class TestHtmlUtils:
     def test_decode_html(self):
         """utils decode_html"""
         from flexget.utils.tools import decode_html
-        assert decode_html('&lt;&#51;') == u'<3'
-        assert decode_html('&#x2500;') == u'\u2500'
+
+        assert decode_html('&lt;&#51;') == '<3'
+        assert decode_html('&#x2500;') == '\u2500'
 
     @pytest.mark.skip(reason='FAILS - DISABLED')
     def test_encode_html(self):
         """utils encode_html (FAILS - DISABLED)"""
         # why this does not encode < ?
         from flexget.utils.tools import encode_html
+
         print(encode_html('<3'))
         assert encode_html('<3') == '&lt;3'
 
 
-class TestSetPlugin(object):
+class TestSetPlugin:
     config = """
         templates:
           global:
@@ -246,6 +249,17 @@ class TestSetPlugin(object):
             set:
               title: "{{ao"
               other: "{{eaeou}"
+          test_native_types:
+            mock:
+            - title: Entry 1
+            set:
+              int_field: "{{3}}"
+          test_now:
+            disable: [seen]
+            mock:
+            - title: Entry 1
+            set:
+              now: "{{now}}"
     """
 
     def test_set(self, execute_task):
@@ -258,11 +272,10 @@ class TestSetPlugin(object):
         task = execute_task('test_jinja')
         entry = task.find_entry('entries', title='Entry 1')
         assert entry['field'] == 'The VALUE'
-        assert entry['otherfield'] == ''
+        assert not entry['otherfield']
         assert entry['alu'] == 'alu'
         entry = task.find_entry('entries', title='Entry 2')
-        assert entry['field'] is None, \
-            '`field` should be None when jinja rendering fails'
+        assert entry['field'] is None, '`field` should be None when jinja rendering fails'
         assert entry['otherfield'] == 'no series'
 
     def test_non_string(self, execute_task):
@@ -280,5 +293,25 @@ class TestSetPlugin(object):
     def test_lazy_err(self, execute_task):
         task = execute_task('test_lazy_err')
         entry = task.find_entry('entries', title='Entry 1')
-        assert entry['title'] == 'Entry 1', 'should fall back to original value when template fails'
+        assert (
+            entry['title'] == 'Entry 1'
+        ), 'should fall back to original value when template fails'
         assert entry['other'] is None
+
+    def test_native_types(self, execute_task):
+        task = execute_task('test_native_types')
+        entry = task.find_entry('entries', title='Entry 1')
+        assert isinstance(
+            entry['int_field'], int
+        ), 'should allow setting values as integers rather than strings'
+        assert entry['int_field'] == 3
+
+    def test_now(self, execute_task):
+        task = execute_task('test_now')
+        entry = task.find_entry('entries', title='Entry 1')
+        now = entry['now']
+        time.sleep(0.01)
+        task = execute_task('test_now')
+        entry = task.find_entry('entries', title='Entry 1')
+        new_now = entry['now']
+        assert now != new_now

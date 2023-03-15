@@ -1,22 +1,18 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring, long, unicode
-
 import functools
-from collections import Mapping
 from datetime import datetime
+from typing import Any, List, Optional, Union
 
 from sqlalchemy import extract, func
-from sqlalchemy.orm import synonym
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
+from sqlalchemy.orm import SynonymProperty, synonym
 
-from flexget.manager import Session
-from flexget.utils import qualities, json
 from flexget.entry import Entry
+from flexget.manager import Session
+from flexget.utils import json, qualities, serialization
 
 
 def with_session(*args, **kwargs):
-    """"
+    """ "
     A decorator which creates a new session if one was not passed via keyword argument to the function.
 
     Automatically commits and closes the session if one was created, caller is responsible for commit if passed in.
@@ -46,15 +42,16 @@ def with_session(*args, **kwargs):
         return decorator
 
 
-def pipe_list_synonym(name):
+def pipe_list_synonym(name: str) -> SynonymProperty:
     """Converts pipe separated text into a list"""
 
-    def getter(self):
+    def getter(self) -> Optional[List[str]]:
         attr = getattr(self, name)
         if attr:
             return attr.strip('|').split('|')
+        return None
 
-    def setter(self, value):
+    def setter(self, value: Union[str, List[str]]) -> None:
         if isinstance(value, str):
             setattr(self, name, value)
         else:
@@ -63,14 +60,14 @@ def pipe_list_synonym(name):
     return synonym(name, descriptor=property(getter, setter))
 
 
-def text_date_synonym(name):
+def text_date_synonym(name: str) -> SynonymProperty:
     """Converts Y-M-D date strings into datetime objects"""
 
-    def getter(self):
+    def getter(self) -> Optional[datetime]:
         return getattr(self, name)
 
-    def setter(self, value):
-        if isinstance(value, basestring):
+    def setter(self, value: Union[str, datetime]) -> None:
+        if isinstance(value, str):
             try:
                 setattr(self, name, datetime.strptime(value, '%Y-%m-%d'))
             except ValueError:
@@ -82,64 +79,35 @@ def text_date_synonym(name):
     return synonym(name, descriptor=property(getter, setter))
 
 
-def entry_synonym(name):
-    """Use json to serialize python objects for db storage."""
+def entry_synonym(name: str) -> SynonymProperty:
+    """Use serialization system to store Entries in db."""
 
-    def only_builtins(item):
-        supported_types = (str, unicode, int, float, long, bool, datetime)
-        # dict, list, tuple and set are also supported, but handled separately
+    def getter(self) -> Any:
+        return serialization.loads(getattr(self, name))
 
-        if isinstance(item, supported_types):
-            return item
-        elif isinstance(item, Mapping):
-            result = {}
-            for key, value in item.items():
-                try:
-                    result[key] = only_builtins(value)
-                except TypeError:
-                    continue
-            return result
-        elif isinstance(item, (list, tuple, set)):
-            result = []
-            for value in item:
-                try:
-                    result.append(only_builtins(value))
-                except ValueError:
-                    continue
-            if isinstance(item, list):
-                return result
-            elif isinstance(item, tuple):
-                return tuple(result)
-            else:
-                return set(result)
+    def setter(self, entry: Union[dict, Entry]) -> None:
+        if isinstance(entry, dict):
+            if entry.get('serializer') == 'Entry' and 'version' in entry and 'value' in entry:
+                # This is already a serialized form of entry
+                setattr(self, name, json.dumps(entry))
+                return
+            entry = Entry(entry)
+        if isinstance(entry, Entry):
+            setattr(self, name, serialization.dumps(entry))
         else:
-            for s_type in supported_types:
-                if isinstance(item, s_type):
-                    return s_type(item)
-
-        # If item isn't a subclass of a builtin python type, raise ValueError.
-        raise TypeError('%r is not of type Entry.' % type(item))
-
-    def getter(self):
-        return Entry(json.loads(getattr(self, name), decode_datetime=True))
-
-    def setter(self, entry):
-        if isinstance(entry, Entry) or isinstance(entry, dict):
-            setattr(self, name, unicode(json.dumps(only_builtins(dict(entry)), encode_datetime=True)))
-        else:
-            raise TypeError('%r is not of type Entry or dict.' % type(entry))
+            raise TypeError(f'{type(entry)!r} is not type Entry or dict.')
 
     return synonym(name, descriptor=property(getter, setter))
 
 
-def json_synonym(name):
+def json_synonym(name: str) -> SynonymProperty:
     """Use json to serialize python objects for db storage."""
 
-    def getter(self):
+    def getter(self) -> Any:
         return json.loads(getattr(self, name), decode_datetime=True)
 
-    def setter(self, entry):
-        setattr(self, name, unicode(json.dumps(entry, encode_datetime=True)))
+    def setter(self, entry: Any) -> None:
+        setattr(self, name, json.dumps(entry, encode_datetime=True))
 
     return synonym(name, descriptor=property(getter, setter))
 
@@ -147,13 +115,13 @@ def json_synonym(name):
 class CaseInsensitiveWord(Comparator):
     """Hybrid value representing a string that compares case insensitively."""
 
-    def __init__(self, word):
+    def __init__(self, word: Union[str, 'CaseInsensitiveWord']):
         if isinstance(word, CaseInsensitiveWord):
-            self.word = word.word
+            self.word: str = word.word
         else:
             self.word = word
 
-    def lower(self):
+    def lower(self) -> str:
         if isinstance(self.word, str):
             return self.word.lower()
         else:
@@ -164,10 +132,10 @@ class CaseInsensitiveWord(Comparator):
             other = CaseInsensitiveWord(other)
         return op(self.lower(), other.lower())
 
-    def __clause_element__(self):
+    def __clause_element__(self) -> str:
         return self.lower()
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.word
 
     def __getattr__(self, item):
@@ -186,7 +154,6 @@ def quality_property(text_attr):
             setattr(self, text_attr, value.name)
 
     class QualComparator(Comparator):
-
         def operate(self, op, other):
             if isinstance(other, qualities.Quality):
                 other = other.name
@@ -196,7 +163,7 @@ def quality_property(text_attr):
         return QualComparator(getattr(self, text_attr))
 
     prop = hybrid_property(getter, setter)
-    prop.comparator(comparator)
+    prop = prop.comparator(comparator)
     return prop
 
 

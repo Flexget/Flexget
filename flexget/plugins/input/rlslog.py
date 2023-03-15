@@ -1,27 +1,31 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
 import re
 import time
 
+from loguru import logger
 from requests import RequestException
 
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.utils.imdb import extract_id
+from flexget.utils.cached_input import cached
 from flexget.utils.log import log_once
 from flexget.utils.soup import get_soup
-from flexget.utils.cached_input import cached
 
-log = logging.getLogger('rlslog')
+try:
+    # NOTE: Importing other plugins is discouraged!
+    from flexget.components.imdb.utils import extract_id
+except ImportError:
+    raise plugin.DependencyError(issued_by=__name__, missing='imdb')
 
 
-class RlsLog(object):
+logger = logger.bind(name='rlslog')
+
+
+class RlsLog:
     """
     Adds support for rlslog.net as a feed.
     """
+
     schema = {'type': 'string', 'format': 'url'}
 
     def parse_rlslog(self, rlslog_url, task):
@@ -39,15 +43,15 @@ class RlsLog(object):
             release = {}
             h3 = entry.find('h3', attrs={'class': 'entrytitle'})
             if not h3:
-                log.debug('FAIL: No h3 entrytitle')
+                logger.debug('FAIL: No h3 entrytitle')
                 continue
             release['title'] = h3.a.contents[0].strip()
             entrybody = entry.find('div', attrs={'class': 'entrybody'})
             if not entrybody:
-                log.debug('FAIL: No entrybody')
+                logger.debug('FAIL: No entrybody')
                 continue
 
-            log.trace('Processing title %s' % (release['title']))
+            logger.trace('Processing title {}', release['title'])
 
             # find imdb url
             link_imdb = entrybody.find('a', text=re.compile(r'imdb', re.IGNORECASE))
@@ -61,12 +65,15 @@ class RlsLog(object):
                 release['url'] = google['href']
                 releases.append(release)
             else:
-                log_once('%s skipped due to missing or unsupported download link' % (release['title']), log)
+                log_once(
+                    '%s skipped due to missing or unsupported download link' % (release['title']),
+                    logger,
+                )
 
         return releases
 
     @cached('rlslog')
-    @plugin.internet(log)
+    @plugin.internet(logger)
     def on_task_input(self, task, config):
         url = config
         if url.endswith('feed/'):
@@ -84,7 +91,11 @@ class RlsLog(object):
                 if number == 1:
                     raise
                 else:
-                    log.verbose('Error receiving content, retrying in 5s. Try [%s of 2]. Error: %s' % (number + 1, e))
+                    logger.verbose(
+                        'Error receiving content, retrying in 5s. Try [{} of 2]. Error: {}',
+                        number + 1,
+                        e,
+                    )
                     time.sleep(5)
 
         # Construct entry from release

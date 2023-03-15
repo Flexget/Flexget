@@ -1,0 +1,171 @@
+interactions:
+  - request:
+      body: '{"apikey": "4D297D8CFDE0E105"}'
+      headers:
+        Accept:
+          - '*/*'
+        Accept-Encoding:
+          - gzip, deflate
+        Connection:
+          - keep-alive
+        Content-Length:
+          - '30'
+        Content-Type:
+          - application/json
+        User-Agent:
+          - FlexGet/3.0.27.dev (www.flexget.com)
+      method: POST
+      uri: https://api.thetvdb.com/login
+    response:
+      body:
+        string: '{"token":"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NzgyMjAxODIsImlkIjoiRmxleEdldCIsIm9yaWdfaWF0IjoxNTc3NjE1MzgyfQ.p0QmJkb0WWNV0yzCvoEZoHi29wlZgYSavhrR69lYDdeqSjZMxlEn1JcxHl3Cw1gLuikzzMR41o12sDtK2mKM5Fgc6ivCfZZH_Zc6shZk0mXP1LQShbNr8ADuwvUriOfb1SqgAUD16Rcky4C1zYIzp4p5LZO-HKbDzO3CWsYBlKR4j_bz_aje3y6U7yWiBAesQ7JzWmd3CkbGVSyVkQOeaxwPp_-bwN_VHEKFOU74ieXrG2UqE880wAwbH1Apf7lRvePryVXBeDCB_3ceQ04ibsvKrpmy9fM34nKiS5MYI_BTGkFB5LlaGPe1vr9SlInzvzYTgvkC6GFcR4phUp1lfQ"}'
+      headers:
+        Connection:
+          - keep-alive
+        Content-Length:
+          - '466'
+        Content-Type:
+          - application/json; charset=utf-8
+        Date:
+          - Sun, 29 Dec 2019 10:29:42 GMT
+        Vary:
+          - Accept-Language
+        Via:
+          - 1.1 c0f81b73b25f5689e5357fd24a5fcb0d.cloudfront.net (CloudFront)
+        X-Amz-Cf-Id:
+          - GngEBj8YFm5QhkNItK03NPGE3Y-e6NXxWwRKwv7HAJCGaRkFgiQT4w==
+        X-Amz-Cf-Pop:
+          - CPH50-C1
+        X-Cache:
+          - Miss from cloudfront
+        X-Powered-By:
+          - Thundar!
+        X-Thetvdb-Api-Version:
+          - 3.0.0
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers:
+        Accept:
+          - '*/*'
+        Accept-Encoding:
+          - gzip, deflate
+        Accept-Language:
+          - en
+        Authorization:
+          - Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NzgyMjAxODIsImlkIjoiRmxleEdldCIsIm9yaWdfaWF0IjoxNTc3NjE1MzgyfQ.p0QmJkb0WWNV0yzCvoEZoHi29wlZgYSavhrR69lYDdeqSjZMxlEn1JcxHl3Cw1gLuikzzMR41o12sDtK2mKM5Fgc6ivCfZZH_Zc6shZk0mXP1LQShbNr8ADuwvUriOfb1SqgAUD16Rcky4C1zYIzp4p5LZO-HKbDzO3CWsYBlKR4j_bz_aje3y6U7yWiBAesQ7JzWmd3CkbGVSyVkQOeaxwPp_-bwN_VHEKFOU74ieXrG2UqE880wAwbH1Apf7lRvePryVXBeDCB_3ceQ04ibsvKrpmy9fM34nKiS5MYI_BTGkFB5LlaGPe1vr9SlInzvzYTgvkC6GFcR4phUp1lfQ
+        Connection:
+          - keep-alive
+        User-Agent:
+          - FlexGet/3.0.27.dev (www.flexget.com)
+      method: GET
+      uri: https://api.thetvdb.com/search/series?name=Westworld
+    response:
+      body:
+        string: '{"data":[{"aliases":[],"banner":"/banners/posters/296762-3.jpg","firstAired":"2016-10-2","id":296762,"network":"HBO","overview":"Westworld
+          is a dark odyssey about the dawn of artificial consciousness and the evolution
+          of sin. Set at the intersection of the near future and the reimagined past,
+          it explores a world in which every human appetite, no matter how noble or
+          depraved, can be indulged.","seriesName":"Westworld","slug":"westworld","status":"Continuing"},{"aliases":[],"banner":"/banners/posters/77993-2.jpg","firstAired":"1980-3-5","id":77993,"network":"CBS","overview":"Beyond
+          Westworld was a short-lived 1980 television series that carried on the stories
+          of the two feature films, Westworld and Futureworld. It featured Jim McMullan
+          as Security Chief John Moore of the Delos Corporation. The story revolved
+          around John Moore having to stop the evil scientist, Quaid, as he planned
+          to use the robots in Delos to try to take over the world. Despite being
+          nominated for two Emmys (Outstanding Achievement In Makeup, and Outstanding
+          Art Direction For A Series), only five episodes were produced, and only
+          three of them were aired before cancellation.","seriesName":"Beyond Westworld","slug":"beyond-westworld","status":"Ended"},{"aliases":[],"banner":"/banners/posters/5daa4b060618d.jpg","firstAired":"2018-7-18","id":371131,"network":"Tencent
+          Video","seriesName":"The Westward","slug":"the-westward","status":"Continuing"},{"aliases":["Discovery
+          Next World","Discovery NextWorld","Next World"],"banner":"/banners/posters/82754-1.jpg","firstAired":"2008-8-6","id":82754,"network":null,"overview":"The
+          science fiction of today will be science fact of the future. The Discovery
+          Channel series NextWorld reveals the science, the inventions and the innovations
+          that seem impossible now, but will be a reality in our lifetimes. Imagine
+          cities under the oceans, bionic suits, space tourism, superspeed trains,
+          cyborg moths, windships, hoverbikes, somatic sensors, virtual reality, people
+          living to 150 years old -- these may be just the dreams of today but they
+          will shape the NextWorld. ","seriesName":"NextWorld","slug":"nextworld","status":"Ended"}]}'
+      headers:
+        Cache-Control:
+          - private, max-age=86400
+        Connection:
+          - keep-alive
+        Content-Type:
+          - application/json; charset=utf-8
+        Date:
+          - Sun, 29 Dec 2019 10:29:43 GMT
+        Vary:
+          - Accept-Language
+        Via:
+          - 1.1 0326fbaba639f5673ce3c647a7884df0.cloudfront.net (CloudFront)
+        X-Amz-Cf-Id:
+          - VqkXSwwMZLDmxAz-hQUXl5cKKP65cMLSD1T8JJTRLLXslCVFhNX6YQ==
+        X-Amz-Cf-Pop:
+          - CPH50-C1
+        X-Cache:
+          - Miss from cloudfront
+        X-Powered-By:
+          - Thundar!
+        X-Thetvdb-Api-Version:
+          - 3.0.0
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers:
+        Accept:
+          - '*/*'
+        Accept-Encoding:
+          - gzip, deflate
+        Accept-Language:
+          - en
+        Authorization:
+          - Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NzgyMjAxODIsImlkIjoiRmxleEdldCIsIm9yaWdfaWF0IjoxNTc3NjE1MzgyfQ.p0QmJkb0WWNV0yzCvoEZoHi29wlZgYSavhrR69lYDdeqSjZMxlEn1JcxHl3Cw1gLuikzzMR41o12sDtK2mKM5Fgc6ivCfZZH_Zc6shZk0mXP1LQShbNr8ADuwvUriOfb1SqgAUD16Rcky4C1zYIzp4p5LZO-HKbDzO3CWsYBlKR4j_bz_aje3y6U7yWiBAesQ7JzWmd3CkbGVSyVkQOeaxwPp_-bwN_VHEKFOU74ieXrG2UqE880wAwbH1Apf7lRvePryVXBeDCB_3ceQ04ibsvKrpmy9fM34nKiS5MYI_BTGkFB5LlaGPe1vr9SlInzvzYTgvkC6GFcR4phUp1lfQ
+        Connection:
+          - keep-alive
+        User-Agent:
+          - FlexGet/3.0.27.dev (www.flexget.com)
+      method: GET
+      uri: https://api.thetvdb.com/series/296762
+    response:
+      body:
+        string: '{"data":{"id":296762,"seriesId":"194892","seriesName":"Westworld","aliases":[],"season":"2","poster":"posters/296762-3.jpg","banner":"graphical/296762-g3.jpg","fanart":"fanart/original/296762-7.jpg","status":"Continuing","firstAired":"2016-10-02","network":"HBO","networkId":"333","runtime":"60","language":"en","genre":["Adventure","Drama","Science
+          Fiction","Western"],"overview":"Westworld is a dark odyssey about the dawn
+          of artificial consciousness and the evolution of sin. Set at the intersection
+          of the near future and the reimagined past, it explores a world in which
+          every human appetite, no matter how noble or depraved, can be indulged.","lastUpdated":1577073800,"airsDayOfWeek":"Sunday","airsTime":"9:00
+          PM","rating":"TV-MA","imdbId":"tt0475784","zap2itId":"SH02476964","added":"2015-06-10
+          14:07:01","addedBy":67309,"siteRating":8.9,"siteRatingCount":3255,"slug":"westworld"}}'
+      headers:
+        Cache-Control:
+          - private, max-age=86400
+        Connection:
+          - keep-alive
+        Content-Length:
+          - '888'
+        Content-Type:
+          - application/json; charset=utf-8
+        Date:
+          - Sat, 28 Dec 2019 22:09:52 GMT
+        Last-Modified:
+          - Mon, 23 Dec 2019 04:03:20 GMT
+        Vary:
+          - Accept-Language
+        Via:
+          - 1.1 4bade328d3b2aa91384925c67cd91548.cloudfront.net (CloudFront)
+        X-Amz-Cf-Id:
+          - LpXZok7IkG27pfHuLhAk9EQw94ft-HPwIXXR_qANGYMBbNyM-G5big==
+        X-Amz-Cf-Pop:
+          - CPH50-C1
+        X-Cache:
+          - Hit from cloudfront
+        X-Powered-By:
+          - Thundar!
+        X-Thetvdb-Api-Version:
+          - 3.0.0
+      status:
+        code: 200
+        message: OK
+version: 1

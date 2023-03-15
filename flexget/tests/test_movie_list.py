@@ -1,8 +1,4 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-
-class TestListInterface(object):
+class TestListInterface:
     config = """
         templates:
           global:
@@ -259,7 +255,7 @@ class TestListInterface(object):
         assert len(task.accepted) == 1
 
 
-class TestMovieListStripYearInterface(object):
+class TestMovieListStripYearInterface:
     config = """
         templates:
           global:

@@ -1,27 +1,22 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import os
-import logging
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
-from flexget.utils.template import render_from_task, get_template, RenderError
+from flexget.utils.template import RenderError, get_template, render_from_task
 
 PLUGIN_NAME = 'make_html'
 
-log = logging.getLogger(PLUGIN_NAME)
+logger = logger.bind(name=PLUGIN_NAME)
 
 
-class OutputHtml(object):
+class OutputHtml:
     schema = {
         'type': 'object',
-        'properties': {
-            'template': {'type': 'string'},
-            'file': {'type': 'string'}
-        },
+        'properties': {'template': {'type': 'string'}, 'file': {'type': 'string'}},
         'required': ['file'],
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
     def on_task_output(self, task, config):
@@ -38,11 +33,11 @@ class OutputHtml(object):
         # create the template
         try:
             template = render_from_task(get_template(filename), task)
-            log.verbose('Writing output html to %s', output)
+            logger.verbose('Writing output html to {}', output)
             with open(output, 'wb') as f:
                 f.write(template.encode('utf-8'))
         except RenderError as e:
-            log.error('Error while rendering task %s, Error: %s', task, e)
+            logger.error('Error while rendering task {}, Error: {}', task, e)
             raise plugin.PluginError('There was an error rendering the specified template')
 
 

@@ -1,16 +1,13 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import pytest
-from flexget.api.app import base_message
 
-from flexget.api.plugins.trakt_lookup import ObjectsContainer as oc
+from flexget.api.app import base_message
+from flexget.components.trakt.api import ObjectsContainer as oc
 from flexget.utils import json
 
 
 @pytest.mark.online
-class TestTraktSeriesLookupAPI(object):
+class TestTraktSeriesLookupAPI:
     config = 'tasks: {}'
 
     def test_trakt_series_lookup_no_params(self, api_client, schema_match):
@@ -18,7 +15,7 @@ class TestTraktSeriesLookupAPI(object):
         rsp = api_client.get('/trakt/series/')
         assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
 
-        rsp = api_client.get('/trakt/series/the x-files/')
+        rsp = api_client.get('/trakt/series/?title=the x-files')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
         data = json.loads(rsp.get_data(as_text=True))
@@ -34,7 +31,7 @@ class TestTraktSeriesLookupAPI(object):
             'tmdb_id': 4087,
             'tvdb_id': 77398,
             'tvrage_id': 6312,
-            'year': 1993
+            'year': 1993,
         }
 
         for field, value in values.items():
@@ -49,10 +46,10 @@ class TestTraktSeriesLookupAPI(object):
             'tmdb_id': 236,
             'tvdb_id': 78650,
             'tvrage_id': 5781,
-            'year': 1990
+            'year': 1990,
         }
 
-        rsp = api_client.get('/trakt/series/the flash/?year=1990')
+        rsp = api_client.get('/trakt/series/?title=the flash&year=1990')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
         data = json.loads(rsp.get_data(as_text=True))
@@ -63,14 +60,9 @@ class TestTraktSeriesLookupAPI(object):
             assert data.get(field) == value
 
     def test_trakt_series_lookup_with_trakt_slug_id_param(self, api_client, schema_match):
-        values = {
-            'id': 75481,
-            'title': 'The Flash',
-            'tvdb_id': 272094,
-            'year': 1967
-        }
+        values = {'id': 75481, 'title': 'The Flash', 'tvdb_id': 272094, 'year': 1967}
 
-        rsp = api_client.get('/trakt/series/the flash/?trakt_slug=the-flash-1967')
+        rsp = api_client.get('/trakt/series/?title=the flash&trakt_slug=the-flash-1967')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
         data = json.loads(rsp.get_data(as_text=True))
@@ -89,10 +81,10 @@ class TestTraktSeriesLookupAPI(object):
             'tmdb_id': 60735,
             'tvdb_id': 279121,
             'tvrage_id': 36939,
-            'year': 2014
+            'year': 2014,
         }
 
-        rsp = api_client.get('/trakt/series/the flash/?tmdb_id=60735')
+        rsp = api_client.get('/trakt/series/?title=the flash&tmdb_id=60735')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
         data = json.loads(rsp.get_data(as_text=True))
@@ -110,10 +102,10 @@ class TestTraktSeriesLookupAPI(object):
             'tmdb_id': 60735,
             'tvdb_id': 279121,
             'tvrage_id': 36939,
-            'year': 2014
+            'year': 2014,
         }
 
-        rsp = api_client.get('/trakt/series/the flash/?imdb_id=tt3107288')
+        rsp = api_client.get('/trakt/series/?title=the flash&imdb_id=tt3107288')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
         data = json.loads(rsp.get_data(as_text=True))
@@ -128,10 +120,10 @@ class TestTraktSeriesLookupAPI(object):
             'tmdb_id': 60735,
             'tvdb_id': 279121,
             'tvrage_id': 36939,
-            'year': 2014
+            'year': 2014,
         }
 
-        rsp = api_client.get('/trakt/series/the flash/?tvdb_id=279121')
+        rsp = api_client.get('/trakt/series/?title=the flash&tvdb_id=279121')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
         data = json.loads(rsp.get_data(as_text=True))
@@ -149,10 +141,10 @@ class TestTraktSeriesLookupAPI(object):
             'tmdb_id': 60735,
             'tvdb_id': 279121,
             'tvrage_id': 36939,
-            'year': 2014
+            'year': 2014,
         }
 
-        rsp = api_client.get('/trakt/series/the flash/?tvrage_id=36939')
+        rsp = api_client.get('/trakt/series/?title=the flash&tvrage_id=36939')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
         data = json.loads(rsp.get_data(as_text=True))
@@ -163,13 +155,9 @@ class TestTraktSeriesLookupAPI(object):
             assert data.get(field) == value
 
     def test_trakt_series_lookup_with_trakt_id_param(self, api_client, schema_match):
-        values = {
-            'id': 75481,
-            'title': 'The Flash',
-            'year': 1967
-        }
+        values = {'id': 75481, 'title': 'The Flash', 'year': 1967}
 
-        rsp = api_client.get('/trakt/series/the flash/?trakt_id=75481')
+        rsp = api_client.get('/trakt/series/?title=the flash&trakt_id=75481')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
         data = json.loads(rsp.get_data(as_text=True))
@@ -180,7 +168,7 @@ class TestTraktSeriesLookupAPI(object):
             assert data.get(field) == value
 
     def test_trakt_series_lookup_with_actors_param(self, api_client, schema_match):
-        rsp = api_client.get('/trakt/series/the x-files/?include_actors=true')
+        rsp = api_client.get('/trakt/series/?title=the x-files&include_actors=true')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
         data = json.loads(rsp.get_data(as_text=True))
@@ -191,7 +179,7 @@ class TestTraktSeriesLookupAPI(object):
         assert len(data['actors']) > 0
 
     def test_trakt_series_lookup_with_translations_param(self, api_client, schema_match):
-        rsp = api_client.get('/trakt/series/game of thrones/?include_translations=true')
+        rsp = api_client.get('/trakt/series/?title=game of thrones&include_translations=true')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
         data = json.loads(rsp.get_data(as_text=True))
@@ -201,7 +189,7 @@ class TestTraktSeriesLookupAPI(object):
         assert 'translations' in data
 
     def test_trakt_series_lookup_error(self, api_client, schema_match):
-        rsp = api_client.get('/trakt/series/sdfgsdfgsdfgsdfgsdfg/')
+        rsp = api_client.get('/trakt/series/?title=sdfgsdfgsdfgsdfgsdfg')
         assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
 
         data = json.loads(rsp.get_data(as_text=True))
@@ -210,7 +198,7 @@ class TestTraktSeriesLookupAPI(object):
 
 
 @pytest.mark.online
-class TestTraktMovieLookupAPI(object):
+class TestTraktMovieLookupAPI:
     config = 'tasks: {}'
 
     def test_trakt_movies_lookup_no_params(self, api_client, schema_match):
@@ -218,7 +206,7 @@ class TestTraktMovieLookupAPI(object):
         rsp = api_client.get('/trakt/movies/')
         assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
 
-        rsp = api_client.get('/trakt/movies/the matrix/')
+        rsp = api_client.get('/trakt/movies/?title=the matrix')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
         data = json.loads(rsp.get_data(as_text=True))
@@ -230,13 +218,13 @@ class TestTraktMovieLookupAPI(object):
             'title': 'The Matrix',
             'year': 1999,
             'tmdb_id': 603,
-            'imdb_id': 'tt0133093'
+            'imdb_id': 'tt0133093',
         }
         for field, value in values.items():
             assert data.get(field) == value
 
     def test_trakt_movies_lookup_year_param(self, api_client, schema_match):
-        rsp = api_client.get('/trakt/movies/the matrix/?year=2003')
+        rsp = api_client.get('/trakt/movies/?title=the matrix&year=2003')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
         data = json.loads(rsp.get_data(as_text=True))
@@ -248,13 +236,13 @@ class TestTraktMovieLookupAPI(object):
             'title': 'The Matrix Revolutions',
             'year': 2003,
             'tmdb_id': 605,
-            'imdb_id': 'tt0242653'
+            'imdb_id': 'tt0242653',
         }
         for field, value in values.items():
             assert data.get(field) == value
 
     def test_trakt_movies_lookup_slug_param(self, api_client, schema_match):
-        rsp = api_client.get('/trakt/movies/the matrix/?trakt_slug=the-matrix-reloaded-2003')
+        rsp = api_client.get('/trakt/movies/?title=the matrix&trakt_slug=the-matrix-reloaded-2003')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
         data = json.loads(rsp.get_data(as_text=True))
@@ -266,13 +254,13 @@ class TestTraktMovieLookupAPI(object):
             'title': 'The Matrix Reloaded',
             'year': 2003,
             'tmdb_id': 604,
-            'imdb_id': 'tt0234215'
+            'imdb_id': 'tt0234215',
         }
         for field, value in values.items():
             assert data.get(field) == value
 
     def test_trakt_movies_lookup_actors_params(self, api_client, schema_match):
-        rsp = api_client.get('/trakt/movies/the matrix/?include_actors=true')
+        rsp = api_client.get('/trakt/movies/?title=the matrix&include_actors=true')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
         data = json.loads(rsp.get_data(as_text=True))
@@ -284,7 +272,7 @@ class TestTraktMovieLookupAPI(object):
             'title': 'The Matrix',
             'year': 1999,
             'tmdb_id': 603,
-            'imdb_id': 'tt0133093'
+            'imdb_id': 'tt0133093',
         }
         for field, value in values.items():
             assert data.get(field) == value
@@ -293,7 +281,7 @@ class TestTraktMovieLookupAPI(object):
         assert len(data['actors']) > 0
 
     def test_trakt_movies_lookup_translations_params(self, api_client, schema_match):
-        rsp = api_client.get('/trakt/movies/the matrix/?include_translations=true')
+        rsp = api_client.get('/trakt/movies/?title=the matrix&include_translations=true')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
         data = json.loads(rsp.get_data(as_text=True))
@@ -305,7 +293,7 @@ class TestTraktMovieLookupAPI(object):
             'title': 'The Matrix',
             'year': 1999,
             'tmdb_id': 603,
-            'imdb_id': 'tt0133093'
+            'imdb_id': 'tt0133093',
         }
         for field, value in values.items():
             assert data.get(field) == value
@@ -314,7 +302,7 @@ class TestTraktMovieLookupAPI(object):
         assert len(data['translations']) > 0
 
     def test_trakt_movies_lookup_error(self, api_client, schema_match):
-        rsp = api_client.get('/trakt/movies/sdfgsdfgsdfgsdfgsdfg/')
+        rsp = api_client.get('/trakt/movies/?title=sdfgsdfgsdfgsdfgsdfg')
         assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
 
         data = json.loads(rsp.get_data(as_text=True))

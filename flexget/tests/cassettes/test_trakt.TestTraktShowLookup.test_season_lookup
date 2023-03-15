@@ -1,0 +1,264 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Content-Type:
+      - application/json
+      trakt-api-key:
+      - 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af
+      trakt-api-version:
+      - '2'
+    method: GET
+    uri: https://api.trakt.tv/search?query=Fargo&type=show
+  response:
+    body:
+      string: "[{\"type\":\"show\",\"score\":146.79428,\"show\":{\"title\":\"Fargo\",\"overview\":\"Over
+        the course of several decades, murder and mayhem is visited across the residents
+        of small rural towns in the Midwest, proving that organized crime can infiltrate
+        even the sleepiest areas of America.\",\"year\":2014,\"status\":\"returning
+        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":60203,\"slug\":\"fargo\",\"tvdb\":269613,\"imdb\":\"tt2802850\",\"tmdb\":60622,\"tvrage\":35276}}},{\"type\":\"show\",\"score\":73.39714,\"show\":{\"title\":\"Tales
+        of Wells Fargo\",\"overview\":\"Agent Jim Hardie shifts over its history from
+        being mostly an agent helping Wells Fargo cope with badguys to being the owner
+        of a ranch near San Francisco who still does some agent work.\",\"year\":1858,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":13735,\"slug\":\"tales-of-wells-fargo\",\"tvdb\":76545,\"imdb\":\"tt0050066\",\"tmdb\":13795,\"tvrage\":5456}}},{\"type\":\"show\",\"score\":0.9751811,\"show\":{\"title\":\"Fighting
+        with Kit Carson\",\"overview\":\"A pack train led by Kit Carson is attacked
+        by Kraft and his Mystery Riders, who want a government shipment of gold carried
+        by the wagons. Matt Fargo manages to hide the gold, but Carson must confront
+        the Mystery Riders time after time in order to prevent them from finding and
+        carrying away the treasure.\",\"year\":1933,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":144506,\"slug\":\"fighting-with-kit-carson\",\"tvdb\":360084,\"imdb\":\"tt0024012\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":0.85328346,\"show\":{\"title\":\"Heavy
+        Metal Monsters\",\"overview\":\"\u201CHeavy Metal Monsters\u201D combines
+        the power of incredible machines and extreme conditions to show how people
+        survive and work in the world\u2019s worst weather environments \u2013 weather
+        so bad, no sane person would dare to brave it unless they had to. From ice-breaking
+        in the Arctic to saving a community from floods in Fargo, ND, to making desperate
+        repairs to a pipeline in the Gulf of Mexico\u2014it\u2019s engineering on
+        the edge of reason, in the most extreme weather.\",\"year\":2013,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":79533,\"slug\":\"heavy-metal-monsters\",\"tvdb\":279743,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":0.6094882,\"show\":{\"title\":\"It's
+        Bad for Ya\",\"overview\":\"It's Bad for Ya is the 19th and final album, and
+        14th and final HBO stand-up comedy special by stand-up comedian George Carlin.
+        It was televised live on March 1, 2008 on HBO, less than four months before
+        he died of heart failure at age 71.The album is the follow-up to the 2005
+        HBO special Life Is Worth Losing. Carlin worked on this material since ending
+        his \\\"Life Is Worth Losing\\\" Tour. The working title for this show was
+        The Parade of Useless Bullshit. Filmed in the Wells Fargo Center for the Arts
+        in Santa Rosa, California, the show's stage behind Carlin was designed to
+        represent a cozy living room theme. The CD was released July 29, and the DVD
+        and Blu-ray Disc on November 25.It's Bad For Ya received the Grammy Award
+        for Best Comedy Album, awarded posthumously.\",\"year\":null,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":95312,\"slug\":\"it-s-bad-for-ya\",\"tvdb\":null,\"imdb\":\"tt0963207\",\"tmdb\":20579,\"tvrage\":null}}}]"
+    headers:
+      CF-Cache-Status:
+      - MISS
+      CF-RAY:
+      - 60caac11ccb4c1e3-IAD
+      Cache-Control:
+      - public, max-age=28800
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Tue, 05 Jan 2021 05:06:49 GMT
+      ETag:
+      - W/"643e445c57b2f0262e4a751cbfe466f0"
+      Expect-CT:
+      - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+      Expires:
+      - Tue, 05 Jan 2021 13:06:48 GMT
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cfduid=d7be70f30c076c7bc8dcb519e4796390a1609823209; expires=Thu, 04-Feb-21
+        05:06:49 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Pagination-Item-Count:
+      - '5'
+      X-Pagination-Limit:
+      - '10'
+      X-Pagination-Page:
+      - '1'
+      X-Pagination-Page-Count:
+      - '1'
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Ratelimit:
+      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":983,"until":"2021-01-05T05:10:00Z"}'
+      X-Request-Id:
+      - 25b13b3d-a95f-46ba-be3c-0011dab47efe
+      X-Runtime:
+      - '0.010596'
+      X-XSS-Protection:
+      - 1; mode=block
+      cf-request-id:
+      - 077289df1e0000c1e3d7303000000001
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Content-Type:
+      - application/json
+      trakt-api-key:
+      - 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af
+      trakt-api-version:
+      - '2'
+    method: GET
+    uri: https://api.trakt.tv/shows/60203?extended=full
+  response:
+    body:
+      string: '{"title":"Fargo","year":2014,"ids":{"trakt":60203,"slug":"fargo","tvdb":269613,"imdb":"tt2802850","tmdb":60622,"tvrage":35276},"overview":"Over
+        the course of several decades, murder and mayhem is visited across the residents
+        of small rural towns in the Midwest, proving that organized crime can infiltrate
+        even the sleepiest areas of America.","first_aired":"2014-04-16T02:00:00.000Z","airs":{"day":"Sunday","time":"22:00","timezone":"America/New_York"},"runtime":50,"certification":"TV-MA","network":"FX","country":"us","trailer":"https://youtube.com/watch?v=gKs8DzjPDMU","homepage":"http://www.fxnetworks.com/fargo","status":"returning
+        series","rating":8.74405,"votes":13077,"comment_count":54,"updated_at":"2021-01-04T09:32:05.000Z","language":"en","available_translations":["ar","bg","bs","cs","da","de","el","en","es","fa","fi","fr","he","hr","hu","it","ja","ko","lv","nb","nl","no","pl","pt","ro","ru","sk","sv","tr","uk","zh"],"genres":["drama","crime"],"aired_episodes":41}'
+    headers:
+      Age:
+      - '28209'
+      CF-Cache-Status:
+      - HIT
+      CF-RAY:
+      - 60caac12982573c5-IAD
+      Cache-Control:
+      - public, max-age=28800
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Tue, 05 Jan 2021 05:06:49 GMT
+      ETag:
+      - W/"16dec912cb3e5fa50d00e3fd5656a1b2"
+      Expect-CT:
+      - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+      Expires:
+      - Tue, 05 Jan 2021 05:16:40 GMT
+      Last-Modified:
+      - Mon, 04 Jan 2021 09:32:05 GMT
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cfduid=dd8b79830787c891d169a2fde4fb778311609823209; expires=Thu, 04-Feb-21
+        05:06:49 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Ratelimit:
+      - '{"name":"AUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":965,"until":"2021-01-04T13:15:00Z"}'
+      X-Request-Id:
+      - 01dc2484-d131-4bde-af15-ad22702c46ed
+      X-Runtime:
+      - '0.007798'
+      X-XSS-Protection:
+      - 1; mode=block
+      cf-request-id:
+      - 077289df9b000073c5310c6000000001
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Content-Type:
+      - application/json
+      trakt-api-key:
+      - 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af
+      trakt-api-version:
+      - '2'
+    method: GET
+    uri: https://api.trakt.tv/shows/60203/seasons/?extended=full
+  response:
+    body:
+      string: "[{\"number\":1,\"ids\":{\"trakt\":61286,\"tvdb\":526126,\"tmdb\":60040,\"tvrage\":null},\"rating\":8.88767,\"votes\":2012,\"episode_count\":10,\"aired_episodes\":10,\"title\":\"Season
+        1\",\"overview\":\"In January 2006, Lorne Malvo passes through Bemidji, Minnesota
+        and influences put-upon insurance salesman Lester Nygaard with his malice
+        and violence. Meanwhile, Deputy Molly Solverson and Duluth police officer
+        Gus Grimly team up to solve a series of murders they believe may be linked
+        to Malvo and Nygaard.\",\"first_aired\":\"2014-04-16T02:00:00.000Z\",\"updated_at\":\"2021-01-05T01:04:37.000Z\",\"network\":\"FX\"},{\"number\":2,\"ids\":{\"trakt\":61287,\"tvdb\":634389,\"tmdb\":62204,\"tvrage\":null},\"rating\":8.54834,\"votes\":1386,\"episode_count\":10,\"aired_episodes\":10,\"title\":\"Season
+        2\",\"overview\":\"Season two's chapter takes you back to 1979 in Sioux Falls,
+        South Dakota and Luverne, Minnesota. Lou Solverson, a young State Police Officer
+        recently back from Vietnam, investigates a case involving a local crime gang,
+        a major mob syndicate and small town beautician Peggy Blumquist along with
+        her husband Ed, the local butcher\u2019s assistant. Helping Lou piece things
+        together is his father-in-law, Sheriff Hank Larsson. The investigation will
+        lead them to a colorful cast of characters that includes Karl Weathers, the
+        town lawyer of Luverne, Minnesota; Joe Bulo, the front man for the northern
+        expansion of a Kansas City crime syndicate with his number two, Mike Milligan;
+        and the Gerhardt crime family currently led by matriarch Floyd Gerhardt.\",\"first_aired\":\"2015-10-13T02:00:00.000Z\",\"updated_at\":\"2021-01-05T03:18:08.000Z\",\"network\":\"FX\"},{\"number\":3,\"ids\":{\"trakt\":140080,\"tvdb\":701224,\"tmdb\":83007,\"tvrage\":null},\"rating\":7.7484,\"votes\":779,\"episode_count\":10,\"aired_episodes\":10,\"title\":\"Season
+        3\",\"overview\":\"December 2010, Minnesota. Emmit Stussy, the Parking Lot
+        King of Minnesota, is a handsome, self-made, real estate mogul and family
+        man - an American success story. His slightly younger brother, Ray Stussy,
+        on the other hand is more of a cautionary tale. Balding, pot-bellied, Ray
+        is the kind of guy who peaked in high school. Now a parole officer, Ray has
+        a huge chip on his shoulder about the hand he's been dealt, and he blames
+        his brother, until the arrival of a mysterious personality changes everything.\",\"first_aired\":\"2017-04-20T02:00:00.000Z\",\"updated_at\":\"2021-01-05T01:00:37.000Z\",\"network\":\"FX\"},{\"number\":4,\"ids\":{\"trakt\":225496,\"tvdb\":1860066,\"tmdb\":128208,\"tvrage\":null},\"rating\":6.6701,\"votes\":194,\"episode_count\":11,\"aired_episodes\":11,\"title\":\"Season
+        4\",\"overview\":\"In 1950s Kansas City, Missouri, two criminal syndicates
+        have struck an uneasy peace. One Italian, one African-American. Together they
+        control an alternate economy \u2014 that of exploitation, graft and drugs.
+        This too is the history of America.  To cement their peace, the heads of both
+        families have traded their youngest sons.\",\"first_aired\":\"2020-09-28T02:00:00.000Z\",\"updated_at\":\"2021-01-05T04:10:45.000Z\",\"network\":\"FX\"}]"
+    headers:
+      CF-Cache-Status:
+      - MISS
+      CF-RAY:
+      - 60caac13585c0dde-IAD
+      Cache-Control:
+      - public, max-age=28800
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Tue, 05 Jan 2021 05:06:49 GMT
+      ETag:
+      - W/"b213946ceef8f3f2f0bc7dda63d272e9"
+      Expect-CT:
+      - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+      Expires:
+      - Tue, 05 Jan 2021 13:06:44 GMT
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cfduid=d69ea47a671edfa9dee4130b075ee41f11609823209; expires=Thu, 04-Feb-21
+        05:06:49 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Ratelimit:
+      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":982,"until":"2021-01-05T05:10:00Z"}'
+      X-Request-Id:
+      - e18e7b1a-2ce2-454c-b0de-25c7e3f4fcf7
+      X-Runtime:
+      - '0.008210'
+      X-XSS-Protection:
+      - 1; mode=block
+      cf-request-id:
+      - 077289e01c00000ddeadb7a000000001
+    status:
+      code: 200
+      message: OK
+version: 1

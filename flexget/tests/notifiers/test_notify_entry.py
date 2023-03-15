@@ -1,10 +1,4 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import mock
-
-
-class TestNotifyEntry(object):
+class TestNotifyEntry:
     config = """
         tasks:
           test_basic_notify:
@@ -22,8 +16,10 @@ class TestNotifyEntry(object):
         """
 
     def test_basic_notify(self, debug_notifications, execute_task):
-        expected = [('foo', 'http://bla.com', {'api_key': 'apikey'}),
-                    ('bar', 'http://bla2.com', {'api_key': 'apikey'})]
+        expected = [
+            ('foo', 'http://bla.com', {'api_key': 'apikey'}),
+            ('bar', 'http://bla2.com', {'api_key': 'apikey'}),
+        ]
         task = execute_task('test_basic_notify')
 
         assert len(task.accepted) == 2

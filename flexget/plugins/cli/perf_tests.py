@@ -1,14 +1,11 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
+from loguru import logger
 
 from flexget import options
 from flexget.event import event
-from flexget.terminal import console
 from flexget.manager import Session
+from flexget.terminal import console
 
-log = logging.getLogger('perftests')
+logger = logger.bind(name='perftests')
 
 TESTS = ['imdb_query']
 
@@ -27,50 +24,55 @@ def cli_perf_test(manager, options):
 
 def imdb_query(session):
     import time
-    from flexget.plugins.metainfo.imdb_lookup import Movie
-    from flexget.plugins.cli.performance import log_query_count
+
+    from rich.progress import track
+    from sqlalchemy.orm import joinedload
     from sqlalchemy.sql.expression import select
-    from progressbar import ProgressBar, Percentage, Bar, ETA
-    from sqlalchemy.orm import joinedload_all
+
+    # NOTE: importing other plugins directly is discouraged
+    from flexget.components.imdb.db import Movie
+    from flexget.plugins.cli.performance import log_query_count
 
     imdb_urls = []
 
-    log.info('Getting imdb_urls ...')
+    logger.info('Getting imdb_urls ...')
     # query so that we avoid loading whole object (maybe cached?)
     for _, url in session.execute(select([Movie.id, Movie.url])):
         imdb_urls.append(url)
-    log.info('Got %i urls from database' % len(imdb_urls))
+    logger.info('Got {} urls from database', len(imdb_urls))
     if not imdb_urls:
-        log.info('so .. aborting')
+        logger.info('so .. aborting')
         return
 
     # commence testing
 
-    widgets = ['Benchmarking - ', ETA(), ' ', Percentage(), ' ', Bar(left='[', right=']')]
-    bar = ProgressBar(widgets=widgets, maxval=len(imdb_urls)).start()
-
     log_query_count('test')
     start_time = time.time()
-    for index, url in enumerate(imdb_urls):
-        bar.update(index)
-
+    for url in track(imdb_urls, description='Benchmarking...'):
         # movie = session.query(Movie).filter(Movie.url == url).first()
         # movie = session.query(Movie).options(subqueryload(Movie.genres)).filter(Movie.url == url).one()
 
-        movie = session.query(Movie). \
-            options(joinedload_all(Movie.genres, Movie.languages,
-                                   Movie.actors, Movie.directors)). \
-            filter(Movie.url == url).first()
+        movie = (
+            session.query(Movie)
+            .options(
+                joinedload(Movie.genres),
+                joinedload(Movie.languages),
+                joinedload(Movie.actors),
+                joinedload(Movie.directors),
+            )
+            .filter(Movie.url == url)
+            .first()
+        )
 
         # access it's members so they're loaded
         [x.name for x in movie.genres]
         [x.name for x in movie.directors]
         [x.name for x in movie.actors]
-        [x.name for x in movie.languages]
+        [x.language for x in movie.languages]
 
     log_query_count('test')
     took = time.time() - start_time
-    log.debug('Took %.2f seconds to query %i movies' % (took, len(imdb_urls)))
+    logger.debug('Took %.2f seconds to query %i movies' % (took, len(imdb_urls)))
 
 
 @event('options.register')

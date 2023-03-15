@@ -1,15 +1,12 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('disable_phases')
+logger = logger.bind(name='disable_phases')
 
 
-class PluginDisablePhases(object):
+class PluginDisablePhases:
     """Disables phases from task execution.
 
     Mainly meant for advanced users and development.

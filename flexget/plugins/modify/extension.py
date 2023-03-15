@@ -1,21 +1,18 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('extension')
+logger = logger.bind(name='extension')
 
 
-class ModifyExtension(object):
+class ModifyExtension:
     """
-        Allows specifying file extension explicitly when all other built-in detection mechanisms fail.
+    Allows specifying file extension explicitly when all other built-in detection mechanisms fail.
 
-        Example:
+    Example:
 
-        extension: nzb
+    extension: nzb
     """
 
     schema = {'type': ['string', 'number']}
@@ -26,9 +23,9 @@ class ModifyExtension(object):
             ext = ext[1:]
 
         for entry in task.entries:
-            log.debug('`%s` filename is `%s`' % (entry['title'], entry.get('filename', 'N/A')))
+            logger.debug('`{}` filename is `{}`', entry['title'], entry.get('filename', 'N/A'))
             entry['filename'] = '%s.%s' % (entry.get('filename', entry['title']), ext)
-            log.debug('filename is now `%s`' % entry['filename'])
+            logger.debug('filename is now `{}`', entry['filename'])
 
 
 @event('plugin.register')

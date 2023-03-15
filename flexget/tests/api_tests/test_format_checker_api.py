@@ -1,12 +1,8 @@
-from __future__ import unicode_literals, division, absolute_import
-
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 from flexget.api.app import base_message
 from flexget.utils import json
 
 
-class TestFormatChecker(object):
+class TestFormatChecker:
     config = 'tasks: {}'
 
     def test_quality(self, api_client, schema_match):
@@ -210,6 +206,25 @@ class TestFormatChecker(object):
         assert not errors
 
         payload2 = {'episode_identifier': 'bla'}
+
+        rsp = api_client.json_post('/format_check/', data=json.dumps(payload2))
+        assert rsp.status_code == 422, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
+    def test_episode_or_season_id(self, api_client, schema_match):
+        payload1 = {'episode_or_season_id': 's01'}
+
+        rsp = api_client.json_post('/format_check/', data=json.dumps(payload1))
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
+        payload2 = {'episode_or_season_id': 'bla'}
 
         rsp = api_client.json_post('/format_check/', data=json.dumps(payload2))
         assert rsp.status_code == 422, 'Response code is %s' % rsp.status_code

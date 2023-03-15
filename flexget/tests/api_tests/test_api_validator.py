@@ -1,10 +1,7 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import json
 
 
-class TestValidator(object):
+class TestValidator:
     config = '{tasks: {}}'
 
     def test_invalid_payload(self, api_client):
@@ -12,8 +9,8 @@ class TestValidator(object):
             'name': 'new_task',
             'config': {
                 'invalid_plugin': [{'title': 'entry 1'}],
-                'fake_plugin2': {'url': 'http://test/rss'}
-            }
+                'fake_plugin2': {'url': 'http://test/rss'},
+            },
         }
 
         rsp = api_client.json_post('/tasks/', data=json.dumps(new_task))

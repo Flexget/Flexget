@@ -1,13 +1,15 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from flask import Response
+from sqlalchemy.orm import Session
 
-from flexget.api import api, APIResource
+from flexget.api import APIResource, api
 from flexget.api.app import base_message_schema, success_response
 
-schema_api = api.namespace('format_check', description='Test Flexget custom schema format validations')
+schema_api = api.namespace(
+    'format_check', description='Test Flexget custom schema format validations'
+)
 
 
-class ObjectContainer(object):
+class ObjectContainer:
     format_checker_input = {
         'type': 'object',
         'properties': {
@@ -21,19 +23,20 @@ class ObjectContainer(object):
             'file': {'type': 'string', 'format': 'file'},
             'path': {'type': 'string', 'format': 'path'},
             'url': {'type': 'string', 'format': 'url'},
-            'episode_identifier': {'type': 'string', 'format': 'episode_identifier'}
-        }
+            'episode_identifier': {'type': 'string', 'format': 'episode_identifier'},
+            'episode_or_season_id': {'type': 'string', 'format': 'episode_or_season_id'},
+        },
     }
 
 
-format_checker_schema = api.schema('format_checker', ObjectContainer.format_checker_input)
+format_checker_schema = api.schema_model('format_checker', ObjectContainer.format_checker_input)
 
 
 @schema_api.route('/', doc=False)
 class SchemaTest(APIResource):
     @api.validate(format_checker_schema)
     @api.response(200, model=base_message_schema)
-    def post(self, session=None):
-        """ Validate flexget custom schema"""
+    def post(self, session: Session = None) -> Response:
+        """Validate flexget custom schema"""
         # If validation passed, all is well
         return success_response('payload is valid')

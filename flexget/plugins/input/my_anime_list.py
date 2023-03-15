@@ -1,8 +1,4 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
-import xml.etree.ElementTree as ET
+from loguru import logger
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
@@ -11,34 +7,28 @@ from flexget.event import event
 from flexget.utils.cached_input import cached
 from flexget.utils.requests import RequestException
 
-log = logging.getLogger('my_anime_list')
-STATUS = {
-    '1': 'watching',
-    '2': 'completed',
-    '3': 'on_hold',
-    '4': 'dropped',
-    '6': 'plan_to_watch',
-}
+logger = logger.bind(name='my_anime_list')
 
-ANIME_TYPE = {
-    '0': 'unknown',
-    '1': 'series',
-    '2': 'ova',
-    '3': 'movie',
-    '4': 'special',
-    '5': 'ona',
-    '6': 'music'
-}
+STATUS = {'watching': 1, 'completed': 2, 'on_hold': 3, 'dropped': 4, 'plan_to_watch': 6, 'all': 7}
+
+AIRING_STATUS = {'airing': 1, 'finished': 2, 'planned': 3, 'all': 6}
+
+ANIME_TYPE = ['all', 'tv', 'ova', 'movie', 'special', 'ona', 'music', 'unknown']
 
 
-class MyAnimeList(object):
-    """" Creates entries for series and movies from MyAnimeList list
+class MyAnimeList:
+    """ " Creates entries for series and movies from MyAnimeList list
+
     Syntax:
     my_anime_list:
       username: <value>
       status:
         - <watching|completed|on_hold|dropped|plan_to_watch>
         - <watching|completed|on_hold|dropped|plan_to_watch>
+        ...
+      airing_status:
+        - <airing|finished|planned>
+        - <airing|finished|planned>
         ...
       type:
         - <series|ova...>
@@ -48,78 +38,83 @@ class MyAnimeList(object):
         'type': 'object',
         'properties': {
             'username': {'type': 'string'},
-            'status': one_or_more({'type': 'string', 'enum': list(STATUS.values())}, unique_items=True),
-            'type': one_or_more({'type': 'string', 'enum': list(ANIME_TYPE.values())}, unique_items=True)
+            'status': one_or_more(
+                {'type': 'string', 'enum': list(STATUS.keys()), 'default': 'all'},
+                unique_items=True,
+            ),
+            'airing_status': one_or_more(
+                {'type': 'string', 'enum': list(AIRING_STATUS.keys()), 'default': 'all'},
+                unique_items=True,
+            ),
+            'type': one_or_more(
+                {'type': 'string', 'enum': list(ANIME_TYPE), 'default': 'all'}, unique_items=True
+            ),
         },
         'required': ['username'],
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
     @cached('my_anime_list', persist='2 hours')
     def on_task_input(self, task, config):
-        entries = []
-        parameters = {'u': config['username'], 'status': 'all', 'type': 'anime'}
-        selected_status = config.get('status', list(STATUS.values()))
-        selected_types = config.get('type', list(ANIME_TYPE.values()))
-
+        selected_status = config.get('status', ['all'])
         if not isinstance(selected_status, list):
             selected_status = [selected_status]
 
+        selected_airing_status = config.get('airing_status', ['all'])
+        if not isinstance(selected_airing_status, list):
+            selected_airing_status = [selected_airing_status]
+
+        selected_types = config.get('type', ['all'])
         if not isinstance(selected_types, list):
             selected_types = [selected_types]
 
-        try:
-            list_response = task.requests.get('https://myanimelist.net/malappinfo.php', params=parameters)
-        except RequestException as e:
-            raise plugin.PluginError('Error finding list on url: {url}'.format(url=e.request.url))
+        selected_status = [STATUS[s] for s in selected_status]
+        selected_airing_status = [AIRING_STATUS[s] for s in selected_airing_status]
+        list_json = []
 
-        try:
-            tree = ET.fromstring(list_response.text.encode('utf-8'))
-            list_items = tree.findall('anime')
-        except ET.ParseError:
-            raise plugin.PluginError('Bad XML')
+        for status in selected_status:
+            # JSON pages are limited to 300 entries
+            offset = 0
+            results = 300
+            while results == 300:
+                try:
+                    list_json += task.requests.get(
+                        f'https://myanimelist.net/animelist/{config.get("username")}/load.json',
+                        params={'status': status, 'offset': offset},
+                    ).json()
+                except RequestException as e:
+                    logger.error(f'Error finding list on url: {e.request.url}')
+                    break
+                except (ValueError, TypeError):
+                    logger.error('Invalid JSON response')
+                    break
+                results = len(list_json) or 1
+                offset += len(list_json)
 
-        for item in list_items:
-            my_anime_list_id = item.findtext('series_animedb_id')
-            title = item.findtext('series_title').strip()
-            anime_type = ANIME_TYPE[item.findtext('series_type', 1)]
-            my_status = STATUS[item.findtext('my_status')]
-
-            my_tags = []
-            alternate_names = []
-            is_exact = False
-
-            for name in item.findtext('series_synonyms', '').split('; '):
-                stripped = name.strip()
-                if stripped and stripped is not title:
-                    alternate_names.append(name)
-
-            for tag in item.findtext('my_tags', '').split(','):
-                stripped = tag.strip()
-                if stripped:
-                    my_tags.append(stripped)
-                    if stripped is 'exact':
-                        is_exact = True
-
-            # if user has chosen a status or a type, match strictly, otherwise let it all through
-            wanted_status = not selected_status or my_status in selected_status
-            wanted_type = not selected_types or anime_type in selected_types
-
-            if wanted_status and wanted_type:
-                entry = Entry(title=title,
-                              url='https://myanimelist.net/anime/{}'.format(my_anime_list_id),
-                              configure_series_alternate_name=alternate_names,
-                              my_anime_list_type=anime_type,
-                              my_anime_list_status=my_status,
-                              my_anime_list_tags=my_tags)
-
-                if is_exact:
-                    entry['configure_series_exact'] = True
-
-                if entry.isvalid():
-                    entries.append(entry)
-
-        return entries
+            for anime in list_json:
+                has_selected_status = (
+                    anime["status"] in selected_status or config['status'] == 'all'
+                )
+                has_selected_airing_status = (
+                    anime["anime_airing_status"] in selected_airing_status
+                    or config['airing_status'] == 'all'
+                )
+                has_selected_type = (
+                    anime["anime_media_type_string"].lower() in selected_types
+                    or config['type'] == 'all'
+                )
+                if has_selected_status and has_selected_type and has_selected_airing_status:
+                    # MAL sometimes returns title as an integer
+                    anime['anime_title'] = str(anime['anime_title'])
+                    entry = Entry()
+                    entry['title'] = anime['anime_title']
+                    entry['url'] = f'https://myanimelist.net{anime["anime_url"]}'
+                    entry['mal_name'] = anime['anime_title']
+                    entry['mal_poster'] = anime['anime_image_path']
+                    entry['mal_type'] = anime['anime_media_type_string']
+                    entry['mal_tags'] = anime['tags']
+                    if entry.isvalid():
+                        yield entry
 
 
 @event('plugin.register')

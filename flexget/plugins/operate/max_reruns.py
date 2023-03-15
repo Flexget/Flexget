@@ -1,16 +1,13 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 from flexget.task import Task
 
-log = logging.getLogger('max_reruns')
+logger = logger.bind(name='max_reruns')
 
 
-class MaxReRuns(object):
+class MaxReRuns:
     """Overrides the maximum amount of re-runs allowed by a task."""
 
     schema = {'type': 'integer'}
@@ -21,14 +18,14 @@ class MaxReRuns(object):
     def reset(self, task):
         task.unlock_reruns()
         task.max_reruns = self.default
-        log.debug('changing max task rerun variable back to: %s' % self.default)
+        logger.debug('changing max task rerun variable back to: {}', self.default)
 
     def on_task_start(self, task, config):
         self.default = task.max_reruns
-        log.debug('saving old max task rerun value: %s', self.default)
+        logger.debug('saving old max task rerun value: {}', self.default)
         task.max_reruns = int(config)
         task.lock_reruns()
-        log.debug('changing max task rerun variable to: %s' % config)
+        logger.debug('changing max task rerun variable to: {}', config)
 
     def on_task_exit(self, task, config):
         if task.rerun_count > task.max_reruns:

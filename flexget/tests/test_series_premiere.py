@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import pytest
 from jinja2 import Template
 
@@ -11,7 +8,7 @@ def config(request):
     return Template(request.cls.config).render({'parser': request.param})
 
 
-class TestSeriesPremiere(object):
+class TestSeriesPremiere:
     config = """
         templates:
           global:
@@ -64,6 +61,20 @@ class TestSeriesPremiere(object):
               - title: theshow s01e01
               - title: theshow s01e02
             series_premiere: yes
+            rerun: 1
+          test_no_rerun_with_series:
+            mock:
+              - title: theshow s01e01
+              - title: theshow s01e02
+            series_premiere: yes
+            series:
+              - theshow
+            rerun: 0
+          test_no_rerun:
+            mock:
+              - title: theshow s01e01
+              - title: theshow s01e02
+            series_premiere: yes
             rerun: 0
           test_no_configured_1:
             series:
@@ -78,8 +89,9 @@ class TestSeriesPremiere(object):
     def test_only_one(self, execute_task):
         task = execute_task('test_only_one')
         assert len(task.accepted) == 1, 'should only have accepted one'
-        assert not task.find_entry('accepted', title='Foos and Bars 2009 S01E02 HDTV Xvid-2HD[AOEU]'), \
-            'Non premiere accepted'
+        assert not task.find_entry(
+            'accepted', title='Foos and Bars 2009 S01E02 HDTV Xvid-2HD[AOEU]'
+        ), 'Non premiere accepted'
 
     def test_dupes_across_tasks(self, execute_task):
         task = execute_task('test_dupes_across_tasks_1')
@@ -106,6 +118,14 @@ class TestSeriesPremiere(object):
 
     def test_rerun(self, execute_task):
         task = execute_task('test_rerun')
+        assert not task.find_entry('accepted', title='theshow s01e02'), 'accepted non-premiere'
+
+    def test_no_rerun_with_series(self, execute_task):
+        task = execute_task('test_no_rerun_with_series')
+        assert task.find_entry('accepted', title='theshow s01e02'), 'should be accepted by series'
+
+    def test_no_rerun(self, execute_task):
+        task = execute_task('test_no_rerun')
         assert not task.find_entry('accepted', title='theshow s01e02'), 'accepted non-premiere'
 
     def test_no_configured_shows(self, execute_task):

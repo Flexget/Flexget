@@ -1,19 +1,15 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from loguru import logger
 
-import logging
-
-from flexget import plugin
+from flexget import entry, plugin
 from flexget.event import event
 from flexget.manager import Session
-from flexget.plugin import get_plugin_by_name
-from flexget.utils.tools import split_title_year
 from flexget.utils.log import log_once
+from flexget.utils.tools import split_title_year
 
-log = logging.getLogger('bluray_lookup')
+logger = logger.bind(name='bluray_lookup')
 
 
-class PluginBlurayLookup(object):
+class PluginBlurayLookup:
     """Retrieves bluray information for entries.
 
     Example:
@@ -35,33 +31,32 @@ class PluginBlurayLookup(object):
         'bluray_url': 'url',
         # Generic fields filled by all movie lookup plugins:
         'movie_name': 'name',
-        'movie_year': 'year'
+        'movie_year': 'year',
     }
 
     schema = {'type': 'boolean'}
 
+    @entry.register_lazy_lookup('bluray_lookup')
     def lazy_loader(self, entry):
         """Does the lookup for this entry and populates the entry fields."""
-        lookup = get_plugin_by_name('api_bluray').instance.lookup
+        lookup = plugin.get('api_bluray', self).lookup
 
         try:
             with Session() as session:
                 title, year = split_title_year(entry['title'])
-                movie = lookup(title=title,
-                               year=year,
-                               session=session)
+                movie = lookup(title=title, year=year, session=session)
                 entry.update_using_map(self.field_map, movie)
         except LookupError:
-            log_once('Bluray lookup failed for %s' % entry['title'], log, logging.WARN)
+            log_once('Bluray lookup failed for %s' % entry['title'], logger, 'WARNING')
 
     def lookup(self, entry):
         """
         Populates all lazy fields to an Entry. May be called by other plugins
-        requiring tmdb info on an Entry
+        requiring bluray info on an Entry
 
         :param entry: Entry instance
         """
-        entry.register_lazy_func(self.lazy_loader, self.field_map)
+        entry.add_lazy_fields(self.lazy_loader, self.field_map)
 
     def on_task_metainfo(self, task, config):
         if not config:
@@ -77,4 +72,6 @@ class PluginBlurayLookup(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(PluginBlurayLookup, 'bluray_lookup', api_ver=2, interfaces=['task', 'movie_metainfo'])
+    plugin.register(
+        PluginBlurayLookup, 'bluray_lookup', api_ver=2, interfaces=['task', 'movie_metainfo']
+    )

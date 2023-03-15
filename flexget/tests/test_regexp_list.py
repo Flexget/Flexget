@@ -1,9 +1,5 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-
-class TestRegexpList(object):
-    config = """
+class TestRegexpList:
+    config = r"""
         tasks:
           regexp_list_add:
             mock:
@@ -25,7 +21,7 @@ class TestRegexpList(object):
               - title:
                   replace:
                     regexp: '$'
-                    format: ' s\d{2}e\d{2}'
+                    format: ' s\\d{2}e\\d{2}'
               - title:
                   replace:
                     regexp: ' '

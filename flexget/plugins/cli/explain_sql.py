@@ -1,24 +1,20 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
-from time import time
 from argparse import SUPPRESS
+from time import time
 
-from sqlalchemy.orm.query import Query
+from loguru import logger
 from sqlalchemy.ext.compiler import compiles
-from sqlalchemy.sql.expression import Executable, ClauseElement, _literal_as_text
+from sqlalchemy.orm.query import Query
+from sqlalchemy.sql.expression import ClauseElement, Executable
 
 from flexget import manager, options
 from flexget.event import event
 
-log = logging.getLogger('explain_sql')
+logger = logger.bind(name='explain_sql')
 
 
 class Explain(Executable, ClauseElement):
-
     def __init__(self, stmt):
-        self.statement = _literal_as_text(stmt)
+        self.statement = stmt.__clause_element__()
 
 
 @compiles(Explain)
@@ -28,14 +24,13 @@ def explain(element, compiler, **kw):
 
 
 class ExplainQuery(Query):
-
     def __iter__(self):
-        log.info('Query:\n\t%s' % str(self).replace('\n', '\n\t'))
+        logger.info('Query:\n\t{}', str(self).replace('\n', '\n\t'))
         explain = self.session.execute(Explain(self)).fetchall()
         text = '\n\t'.join('|'.join(str(x) for x in line) for line in explain)
         before = time()
         result = Query.__iter__(self)
-        log.info('Query Time: %0.3f Explain Query Plan:\n\t%s' % (time() - before, text))
+        logger.info('Query Time: {:0.3f} Explain Query Plan: {}', time() - before, text)
         return result
 
 
@@ -53,5 +48,6 @@ def deregister_sql_explain(man, options):
 
 @event('options.register')
 def register_parser_arguments():
-    options.get_parser('execute').add_argument('--explain-sql', action='store_true', dest='explain_sql',
-                                               default=False, help=SUPPRESS)
+    options.get_parser('execute').add_argument(
+        '--explain-sql', action='store_true', dest='explain_sql', default=False, help=SUPPRESS
+    )

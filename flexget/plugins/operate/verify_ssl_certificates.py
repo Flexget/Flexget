@@ -1,16 +1,13 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
+from loguru import logger
 from requests.packages import urllib3
 
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('verify_ssl')
+logger = logger.bind(name='verify_ssl')
 
 
-class VerifySSLCertificates(object):
+class VerifySSLCertificates:
     """
     Plugin that can off SSL certificate verification.
 

@@ -1,14 +1,13 @@
-from __future__ import unicode_literals, division, absolute_import
-import logging
+from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
 from flexget.config_schema import one_or_more
+from flexget.event import event
 
-log = logging.getLogger('unique')
+logger = logger.bind(name='unique')
 
 
-class Unique(object):
+class Unique:
     """
     Take action on entries with duplicate fields, except for the first item
 
@@ -28,7 +27,7 @@ class Unique(object):
             'action': {'enum': ['accept', 'reject']},
         },
         'required': ['field'],
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
     def prepare_config(self, config):
@@ -40,7 +39,7 @@ class Unique(object):
         return config
 
     def extract_fields(self, entry, field_names):
-        return [ entry[field] for field in field_names ]
+        return [entry[field] for field in field_names]
 
     def should_ignore(self, item, action):
         return item.accepted and action == 'accept' or item.rejected and action == 'reject'
@@ -54,23 +53,24 @@ class Unique(object):
             if self.should_ignore(entry, config['action']):
                 continue
             try:
-                entry_fields = self.extract_fields(entry,field_names)
+                entry_fields = self.extract_fields(entry, field_names)
             # Ignore if a field is missing
             except KeyError:
                 continue
             # Iterate over next items, try to find a similar item
-            for prospect in entries[i+1:]:
+            for prospect in entries[i + 1 :]:
                 # Ignore processed prospects
                 if self.should_ignore(prospect, config['action']):
                     continue
                 try:
-                    prospect_fields = self.extract_fields(prospect,field_names)
+                    prospect_fields = self.extract_fields(prospect, field_names)
                 # Ignore if a field is missing
                 except KeyError:
                     continue
                 if entry_fields and entry_fields == prospect_fields:
                     msg = 'Field {} value {} equals on {} and {}'.format(
-                        field_names, entry_fields, entry['title'], prospect['title'])
+                        field_names, entry_fields, entry['title'], prospect['title']
+                    )
                     # Mark prospect
                     if config['action'] == 'accept':
                         prospect.accept(msg)

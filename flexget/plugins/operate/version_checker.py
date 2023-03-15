@@ -1,18 +1,14 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
-
-import logging
 from datetime import datetime
 
+from loguru import logger
 from sqlalchemy import Column, DateTime
 
 from flexget import db_schema, plugin
 from flexget.event import event
 from flexget.manager import Session
-from flexget.utils.tools import get_latest_flexget_version_number, get_current_flexget_version
+from flexget.utils.tools import get_current_flexget_version, get_latest_flexget_version_number
 
-log = logging.getLogger('version_checker')
+logger = logger.bind(name='version_checker')
 Base = db_schema.versioned_base('version_checker', 0)
 
 
@@ -32,19 +28,20 @@ schema = {
     'oneOf': [
         {'type': 'boolean'},
         {'type': 'string', 'enum': ['always', 'by_interval']},
-        {'type': 'object',
-         'properties': {
-             'lookup': {'type': 'string', 'enum': ['always', 'by_interval']},
-             'check_for_dev_version': {'type': 'boolean'},
-             'interval': {'type': 'integer'}
-         },
-         'additionalProperties': False}
-
+        {
+            'type': 'object',
+            'properties': {
+                'lookup': {'type': 'string', 'enum': ['always', 'by_interval']},
+                'check_for_dev_version': {'type': 'boolean'},
+                'interval': {'type': 'integer'},
+            },
+            'additionalProperties': False,
+        },
     ]
 }
 
 
-class VersionChecker(object):
+class VersionChecker:
     """
     A plugin that checks whether user is running the latest flexget version and place a log warning if not.
     Checks via interval to avoid hammering, default is 1 day.
@@ -57,7 +54,7 @@ class VersionChecker(object):
     def prepare_config(self, config):
         if isinstance(config, bool) and config is True:
             config = {'lookup': 'by_interval'}
-        elif isinstance(config, basestring):
+        elif isinstance(config, str):
             config = {'lookup': config}
 
         config.setdefault('lookup', 'by_interval')
@@ -74,7 +71,7 @@ class VersionChecker(object):
         current_version = get_current_flexget_version()
 
         if config.get('check_for_dev_version') is False and current_version.endswith('dev'):
-            log.debug('dev version detected, skipping check')
+            logger.debug('dev version detected, skipping check')
             return
 
         always_check = bool(config.get('lookup') == 'always')
@@ -90,22 +87,25 @@ class VersionChecker(object):
                 should_poll = True
 
             if not should_poll:
-                log.debug('version check interval not met, skipping check')
+                logger.debug('version check interval not met, skipping check')
                 return
 
         latest_version = get_latest_flexget_version_number()
         if not latest_version:
-            log.warning('Could not get latest version of flexget')
+            logger.warning('Could not get latest version of flexget')
             return
         elif latest_version != current_version:
-            log.warning('You are not running latest Flexget Version. Current is %s and latest is %s',
-                        current_version, latest_version)
+            logger.warning(
+                'You are not running latest Flexget Version. Current is {} and latest is {}',
+                current_version,
+                latest_version,
+            )
         if last_check:
-            log.debug('updating last check time')
+            logger.debug('updating last check time')
             last_check.update()
         else:
             last_check = LastVersionCheck()
-            log.debug('creating instance of last version check in DB')
+            logger.debug('creating instance of last version check in DB')
             session.add(last_check)
 
 

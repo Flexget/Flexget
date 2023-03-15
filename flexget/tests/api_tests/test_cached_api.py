@@ -1,12 +1,9 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import pytest
 import requests
 
 
 @pytest.mark.online
-class TestCachedAPI(object):
+class TestCachedAPI:
     config = 'tasks: {}'
 
     def test_cached_api(self, api_client):

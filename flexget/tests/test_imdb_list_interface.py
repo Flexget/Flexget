@@ -1,16 +1,16 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import pytest
 
-from flexget.plugins.list.imdb_list import ImdbEntrySet
+from flexget.components.managed_lists.lists.imdb_list import ImdbEntrySet
 
 
+@pytest.mark.skip(reason="It rarely works")
 @pytest.mark.online
-class TestIMDBListTypes(object):
-    imdb_config = {'login': 'siysbijz@sharklasers.com',
-                   'password': 'flexget16',
-                   'list': 'watchlist'}
+class TestIMDBListTypes:
+    imdb_config = {
+        'login': 'siysbijz@sharklasers.com',
+        'password': 'flexget16',
+        'list': 'watchlist',
+    }
 
     config = """
         tasks:

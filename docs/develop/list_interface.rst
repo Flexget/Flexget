@@ -23,7 +23,7 @@ Init
 
     class ListInterfaceClass(MutableSet):
         def __init__(self, config):
-            self.config.config
+            self.config = config
 
 The init method should pass the config to a class variable, that will be used by other class methods. Also, any other
 global data that is need for the class operation to work should be retrieved. For example, from ``trakt_list``:
@@ -186,7 +186,7 @@ After creating the base class, the plugin class itself need to be created.
 
 .. code-block:: python
 
-    class EntryList(object):
+    class EntryList:
         schema = {'type': 'string'}
 
         @staticmethod

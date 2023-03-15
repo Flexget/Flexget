@@ -1,16 +1,18 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import copy
 
-from flexget.api.app import empty_response, base_message
-from flexget.api.plugins.movie_list import ObjectsContainer as OC
+from flexget.api.app import base_message
+from flexget.components.managed_lists.lists.movie_list.api import ObjectsContainer as OC
+from flexget.components.managed_lists.lists.movie_list.db import (
+    MovieListBase,
+    MovieListList,
+    MovieListMovie,
+)
+from flexget.components.managed_lists.lists.movie_list.movie_list import MovieListBase
 from flexget.manager import Session
-from flexget.plugins.list.movie_list import MovieListBase, MovieListList, MovieListMovie
 from flexget.utils import json
 
 
-class TestMovieListAPI(object):
+class TestMovieListAPI:
     config = 'tasks: {}'
 
     def test_movie_list_list(self, api_client, schema_match):
@@ -40,10 +42,7 @@ class TestMovieListAPI(object):
         errors = schema_match(OC.list_object, data)
         assert not errors
 
-        values = {
-            'name': 'test',
-            'id': 1
-        }
+        values = {'name': 'test', 'id': 1}
         for field, value in values.items():
             assert data.get(field) == value
 
@@ -74,10 +73,7 @@ class TestMovieListAPI(object):
         errors = schema_match(OC.list_object, data)
         assert not errors
 
-        values = {
-            'name': 'test',
-            'id': 1
-        }
+        values = {'name': 'test', 'id': 1}
         for field, value in values.items():
             assert data.get(field) == value
 
@@ -88,10 +84,7 @@ class TestMovieListAPI(object):
         errors = schema_match(OC.list_object, data)
         assert not errors
 
-        values = {
-            'name': 'test',
-            'id': 1
-        }
+        values = {'name': 'test', 'id': 1}
         for field, value in values.items():
             assert data.get(field) == value
 
@@ -156,8 +149,7 @@ class TestMovieListAPI(object):
         assert rsp.status_code == 201, 'Response code is %s' % rsp.status_code
 
         identifier = {'imdb_id': 'tt1234567'}
-        movie_data = {'movie_name': 'title',
-                      'movie_identifiers': [identifier]}
+        movie_data = {'movie_name': 'title', 'movie_identifiers': [identifier]}
 
         # Add movie to list
         rsp = api_client.json_post('/movie_list/1/movies/', data=json.dumps(movie_data))
@@ -174,7 +166,9 @@ class TestMovieListAPI(object):
         assert not errors
 
         returned_identifier = data[0]['movies_list_ids'][0]
-        assert returned_identifier['id_name'], returned_identifier['id_value'] == identifier.items()[0]
+        assert returned_identifier['id_name'], (
+            returned_identifier['id_value'] == identifier.items()[0]
+        )
 
         # Add movie to non-existent list
         rsp = api_client.json_post('/movie_list/10/movies/', data=json.dumps(movie_data))
@@ -184,8 +178,7 @@ class TestMovieListAPI(object):
         assert not errors
 
         non_valid_identifier = {'bla': 'tt1234567'}
-        movie_data = {'movie_name': 'title2',
-                      'movie_identifiers': [non_valid_identifier]}
+        movie_data = {'movie_name': 'title2', 'movie_identifiers': [non_valid_identifier]}
 
         # Add movie with invalid identifier to list
         rsp = api_client.json_post('/movie_list/1/movies/', data=json.dumps(movie_data))
@@ -202,8 +195,7 @@ class TestMovieListAPI(object):
         assert rsp.status_code == 201, 'Response code is %s' % rsp.status_code
 
         identifier = {'imdb_id': 'tt1234567'}
-        movie_data = {'movie_name': 'title',
-                      'movie_identifiers': [identifier]}
+        movie_data = {'movie_name': 'title', 'movie_identifiers': [identifier]}
 
         # Add movie to list
         rsp = api_client.json_post('/movie_list/1/movies/', data=json.dumps(movie_data))
@@ -218,7 +210,9 @@ class TestMovieListAPI(object):
         assert not errors
 
         returned_identifier = data['movies_list_ids'][0]
-        assert returned_identifier['id_name'], returned_identifier['id_value'] == identifier.items()[0]
+        assert returned_identifier['id_name'], (
+            returned_identifier['id_value'] == identifier.items()[0]
+        )
 
         identifiers = [{'trakt_movie_id': '12345'}]
 
@@ -231,7 +225,9 @@ class TestMovieListAPI(object):
         assert not errors
 
         returned_identifier = data['movies_list_ids'][0]
-        assert returned_identifier['id_name'], returned_identifier['id_value'] == identifiers[0].items()
+        assert returned_identifier['id_name'], (
+            returned_identifier['id_value'] == identifiers[0].items()
+        )
 
         # PUT non-existent movie from list
         rsp = api_client.json_put('/movie_list/1/movies/10/', data=json.dumps(identifiers))
@@ -255,7 +251,7 @@ class TestMovieListAPI(object):
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
         data = json.loads(rsp.get_data(as_text=True))
-        errors = schema_match(empty_response, data)
+        errors = schema_match({'type': 'object'}, data)
         assert not errors
 
         # Get non existent movie from list
@@ -267,7 +263,7 @@ class TestMovieListAPI(object):
         assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
 
 
-class TestMovieListUseCases(object):
+class TestMovieListUseCases:
     config = 'tasks: {}'
 
     def test_adding_same_movie(self, api_client, schema_match):
@@ -280,8 +276,7 @@ class TestMovieListUseCases(object):
         errors = schema_match(OC.list_object, data)
         assert not errors
 
-        movie = {'movie_name': 'test movie',
-                 'movie_year': 2000}
+        movie = {'movie_name': 'test movie', 'movie_year': 2000}
 
         # Add movie to list
         rsp = api_client.json_post('/movie_list/1/movies/', data=json.dumps(movie))
@@ -327,8 +322,42 @@ class TestMovieListUseCases(object):
         identifiers = MovieListBase().supported_ids
         assert data == identifiers
 
+    def test_movie_list_movies_batch_remove(self, api_client, schema_match):
+        payload = {'name': 'test_list'}
 
-class TestMovieListPagination(object):
+        # Create list
+        api_client.json_post('/movie_list/', data=json.dumps(payload))
+
+        # Add 3 entries to list
+        for i in range(3):
+            payload = {'movie_name': f'movie {i}', 'movie_year': 2000 + i}
+            rsp = api_client.json_post('/movie_list/1/movies/', data=json.dumps(payload))
+            assert rsp.status_code == 201
+
+        # get entries is correct
+        rsp = api_client.get('/movie_list/1/movies/')
+        assert rsp.status_code == 200
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.return_movies, data)
+        assert not errors
+        assert len(data) == 3
+
+        payload = {'ids': [1, 2, 3]}
+
+        rsp = api_client.json_delete('movie_list/1/movies/batch', data=json.dumps(payload))
+        assert rsp.status_code == 204
+
+        rsp = api_client.get('/movie_list/1/movies/')
+        assert rsp.status_code == 200
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.return_movies, data)
+        assert not errors
+        assert not data
+
+
+class TestMovieListPagination:
     config = 'tasks: {}'
 
     def test_movie_list_pagination(self, api_client, link_headers):

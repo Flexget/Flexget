@@ -1,11 +1,12 @@
-from __future__ import print_function
-
 import fileinput
+import io
 import os
 import shutil
 import subprocess
+import zipfile
 
 import click
+import requests
 
 
 def _get_version():
@@ -66,29 +67,106 @@ def bump_version(bump_type):
 
 
 @cli.command()
-def build_webui():
-    """Build webui for release packaging"""
-    cwd = os.path.join('flexget', 'ui')
+def bundle_webui():
+    """Bundle webui for release packaging"""
+    ui_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'flexget', 'ui')
 
-    # Cleanup previous builds
-    click.echo('cleaning previous builds')
-    for folder in ['bower_components' 'node_modules']:
-        folder = os.path.join(cwd, folder)
-        if os.path.exists(folder):
-            click.echo('Deleting recursively {}'.format(folder))
-            shutil.rmtree(folder)
+    def download_extract(url, dest_path):
+        print(dest_path)
+        r = requests.get(url)
+        z = zipfile.ZipFile(io.BytesIO(r.content))
+        z.extractall(dest_path)
 
-    # Install npm packages
-    click.echo('running `npm install`')
-    subprocess.check_call('npm install', cwd=cwd, shell=True)
+    # WebUI V1
+    click.echo('Bundle WebUI v1...')
+    try:
+        # Remove existing
+        app_path = os.path.join(ui_path, 'v1', 'app')
+        if os.path.exists(app_path):
+            shutil.rmtree(app_path)
+        # Just stashed the old webui zip on a random github release for easy hosting.
+        # It doesn't get updated anymore, we should probably stop bundling it with releases soon.
+        download_extract(
+            'https://github.com/Flexget/Flexget/releases/download/v3.0.6/webui_v1.zip',
+            os.path.join(ui_path, 'v1'),
+        )
+    except OSError as e:
+        click.echo('Unable to download and extract WebUI v1 due to %e' % str(e))
+        raise click.Abort()
 
-    # Build the ui
-    click.echo('running `bower install`')
-    subprocess.check_call('bower install -p', cwd=cwd, shell=True)
+    # WebUI V2
+    try:
+        click.echo('Bundle WebUI v2...')
+        # Remove existing
+        app_path = os.path.join(ui_path, 'v2', 'dist')
+        if os.path.exists(app_path):
+            shutil.rmtree(app_path)
 
-    # Build the ui
-    click.echo('running `gulp buildapp`')
-    subprocess.check_call('gulp buildapp', cwd=cwd, shell=True)
+        release = requests.get('https://api.github.com/repos/Flexget/webui/releases/latest').json()
+
+        v2_package = None
+        for asset in release['assets']:
+            if asset['name'] == 'dist.zip':
+                v2_package = asset['browser_download_url']
+                break
+
+        if not v2_package:
+            click.echo('Unable to find dist.zip in assets')
+            raise click.Abort()
+        download_extract(v2_package, os.path.join(ui_path, 'v2'))
+    except (OSError, ValueError) as e:
+        click.echo('Unable to download and extract WebUI v2 due to %s' % str(e))
+        raise click.Abort()
+
+
+@cli.command()
+@click.argument('files', nargs=-1)
+def autoformat(files):
+    """Reformat code with black and isort"""
+    if not files:
+        project_root = os.path.dirname(os.path.realpath(__file__))
+        files = (project_root,)
+    venv_path = os.environ['VIRTUAL_ENV']
+    if not venv_path:
+        raise Exception('Virtualenv and activation required')
+
+    # black and isort config are in pyproject.toml
+    subprocess.call(('black',) + files)
+    subprocess.call(
+        (
+            'isort',
+            '--virtual-env',
+            venv_path,
+            '-rc',
+            '--skip',
+            'flexget/__init__.py',
+            '--skip',
+            'flexget/manager.py',
+        )
+        + files
+    )
+
+
+@cli.command()
+@click.argument('version')
+def get_changelog(version):
+    version = version.lstrip("v")
+    changelog_lines = []
+    with requests.get(
+        "https://raw.githubusercontent.com/Flexget/wiki/main/ChangeLog.md", stream=True
+    ) as resp:
+        lines = resp.iter_lines(decode_unicode=True)
+        for line in lines:
+            if line.startswith(f"## {version}"):
+                break
+        else:
+            click.echo(f"Could not find version {version} in changelog", err=True)
+            return
+        for line in lines:
+            if line.startswith("## ") or line.startswith("<!---"):
+                break
+            changelog_lines.append(line)
+    click.echo("\n".join(changelog_lines).strip())
 
 
 if __name__ == '__main__':

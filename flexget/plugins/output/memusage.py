@@ -1,6 +1,4 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-import logging
+from loguru import logger
 
 from flexget import options, plugin
 from flexget.event import event
@@ -10,9 +8,9 @@ try:
     from guppy import hpy
 except ImportError:
     # this will leave the plugin unloaded
-    raise plugin.DependencyError(issued_by='memusage', missing='ext lib `guppy`', silent=True)
+    raise plugin.DependencyError(issued_by='memusage', missing='guppy3', silent=True)
 
-log = logging.getLogger('mem_usage')
+logger = logger.bind(name='mem_usage')
 
 """
 http://blog.mfabrik.com/2008/03/07/debugging-django-memory-leak-with-trackrefs-and-guppy/
@@ -48,8 +46,16 @@ def on_manager_shutdown(manager):
     if not manager.options.mem_usage:
         return
 
-    import resource
-    console('Resource Module memory usage: %s (kb)' % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
+    try:
+        import resource
+
+        console(
+            'Resource Module memory usage: %s (kb)'
+            % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+        )
+    except ImportError:
+        console('Resource Module memory usage:')
+
     global heapy
     console('Heapy module calculating memory usage:')
     console(heapy.heap())
@@ -61,5 +67,10 @@ def on_manager_shutdown(manager):
 
 @event('options.register')
 def register_parser_arguments():
-    options.get_parser().add_argument('--mem-usage', action='store_true', dest='mem_usage', default=False,
-                                      help='display memory usage debug information')
+    options.get_parser().add_argument(
+        '--mem-usage',
+        action='store_true',
+        dest='mem_usage',
+        default=False,
+        help='display memory usage debug information',
+    )

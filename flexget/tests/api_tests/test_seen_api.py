@@ -1,23 +1,22 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import copy
 
 from flexget.api.app import base_message
-from flexget.api.plugins.seen import ObjectsContainer as OC
+from flexget.components.seen.api import ObjectsContainer as OC
+from flexget.components.seen.db import SeenEntry, SeenField
 from flexget.manager import Session
-from flexget.plugins.filter.seen import SeenEntry, SeenField
 from flexget.utils import json
 
 
-class TestSeenAPI(object):
+class TestSeenAPI:
     config = "{'tasks': {}}"
 
     def add_seen_entries(self):
         seen_entry_1 = dict(title='test_title', reason='test_reason', task='test_task')
         field_1 = dict(field='test_field_1', value='test_value_1')
         field_2 = dict(field='test_field_2', value='test_value_2')
-        seen_entry_2 = dict(title='test_title_2', reason='test_reason_2', task='test_task_2', local=True)
+        seen_entry_2 = dict(
+            title='test_title_2', reason='test_reason_2', task='test_task_2', local=True
+        )
         field_3 = dict(field='test_field_3', value='test_value_3')
         field_4 = dict(field='test_field_4', value='test_value_4')
 
@@ -182,7 +181,7 @@ class TestSeenAPI(object):
         assert not errors
 
 
-class TestSeenPagination(object):
+class TestSeenPagination:
     config = 'tasks: {}'
 
     def test_seen_pagination(self, api_client, link_headers):
@@ -246,13 +245,19 @@ class TestSeenPagination(object):
         assert links['prev']['page'] == 1
 
     def test_seen_sorting(self, api_client):
-        seen_entry_1 = dict(title='test_title_1', reason='test_reason_c', task='test_task_2', local=True)
+        seen_entry_1 = dict(
+            title='test_title_1', reason='test_reason_c', task='test_task_2', local=True
+        )
         field_1 = dict(field='test_field_1', value='test_value_1')
         field_2 = dict(field='test_field_2', value='test_value_2')
-        seen_entry_2 = dict(title='test_title_2', reason='test_reason_b', task='test_task_3', local=True)
+        seen_entry_2 = dict(
+            title='test_title_2', reason='test_reason_b', task='test_task_3', local=True
+        )
         field_3 = dict(field='test_field_3', value='test_value_3')
         field_4 = dict(field='test_field_4', value='test_value_4')
-        seen_entry_3 = dict(title='test_title_3', reason='test_reason_a', task='test_task_1', local=False)
+        seen_entry_3 = dict(
+            title='test_title_3', reason='test_reason_a', task='test_task_1', local=False
+        )
         field_5 = dict(field='test_field_3', value='test_value_3')
         field_6 = dict(field='test_field_4', value='test_value_4')
 

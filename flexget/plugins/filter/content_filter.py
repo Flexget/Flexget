@@ -1,18 +1,15 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
-
-import logging
 from fnmatch import fnmatch
 
+from loguru import logger
+
 from flexget import plugin
-from flexget.event import event
 from flexget.config_schema import one_or_more
+from flexget.event import event
 
-log = logging.getLogger('content_filter')
+logger = logger.bind(name='content_filter')
 
 
-class FilterContentFilter(object):
+class FilterContentFilter:
     """
     Rejects entries based on the filenames in the content. Torrent files only right now.
 
@@ -27,20 +24,22 @@ class FilterContentFilter(object):
     schema = {
         'type': 'object',
         'properties': {
+            'min_files': {'type': 'integer'},
+            'max_files': {'type': 'integer'},
             # These two properties allow a string or list of strings
             'require': one_or_more({'type': 'string'}),
             'require_all': one_or_more({'type': 'string'}),
             'reject': one_or_more({'type': 'string'}),
             'require_mainfile': {'type': 'boolean', 'default': False},
-            'strict': {'type': 'boolean', 'default': False}
+            'strict': {'type': 'boolean', 'default': False},
         },
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
     def prepare_config(self, config):
         for key in ['require', 'require_all', 'reject']:
             if key in config:
-                if isinstance(config[key], basestring):
+                if isinstance(config[key], str):
                     config[key] = [config[key]]
         return config
 
@@ -54,7 +53,7 @@ class FilterContentFilter(object):
         """
         if 'content_files' in entry:
             files = entry['content_files']
-            log.debug('%s files: %s' % (entry['title'], files))
+            logger.debug('{} files: {}', entry['title'], files)
 
             def matching_mask(files, masks):
                 """Returns matching mask if any files match any of the masks, false otherwise"""
@@ -68,19 +67,27 @@ class FilterContentFilter(object):
             # download plugin has already printed a downloading message.
             if config.get('require'):
                 if not matching_mask(files, config['require']):
-                    log.info('Entry %s does not have any of the required filetypes, rejecting' % entry['title'])
+                    logger.info(
+                        'Entry {} does not have any of the required filetypes, rejecting',
+                        entry['title'],
+                    )
                     entry.reject('does not have any of the required filetypes', remember=True)
                     return True
             if config.get('require_all'):
                 # Make sure each mask matches at least one of the contained files
-                if not all(any(fnmatch(file, mask) for file in files) for mask in config['require_all']):
-                    log.info('Entry %s does not have all of the required filetypes, rejecting' % entry['title'])
+                if not all(
+                    any(fnmatch(file, mask) for file in files) for mask in config['require_all']
+                ):
+                    logger.info(
+                        'Entry {} does not have all of the required filetypes, rejecting',
+                        entry['title'],
+                    )
                     entry.reject('does not have all of the required filetypes', remember=True)
                     return True
             if config.get('reject'):
                 mask = matching_mask(files, config['reject'])
                 if mask:
-                    log.info('Entry %s has banned file %s, rejecting' % (entry['title'], mask))
+                    logger.info('Entry {} has banned file {}, rejecting', entry['title'], mask)
                     entry.reject('has banned file %s' % mask, remember=True)
                     return True
             if config.get('require_mainfile') and len(files) > 1:
@@ -89,15 +96,31 @@ class FilterContentFilter(object):
                     if not best or f['size'] > best:
                         best = f['size']
                 if (100 * float(best) / float(entry['torrent'].size)) < 90:
-                    log.info('Entry %s does not have a main file, rejecting' % (entry['title']))
+                    logger.info('Entry {} does not have a main file, rejecting', entry['title'])
                     entry.reject('does not have a main file', remember=True)
+                    return True
+            if config.get('min_files'):
+                if len(files) < config['min_files']:
+                    logger.info(
+                        f'Entry {entry["title"]} has {len(files)} files. Minimum is {config["min_files"]}. Rejecting.'
+                    )
+                    entry.reject(f'Has less than {config["min_files"]} files', remember=True)
+                    return True
+            if config.get('max_files'):
+                if len(files) > config['max_files']:
+                    logger.info(
+                        f'Entry {entry["title"]} has {len(files)} files. Maximum is {config["max_files"]}. Rejecting.'
+                    )
+                    entry.reject(f'Has more than {config["max_files"]} files', remember=True)
                     return True
 
     @plugin.priority(150)
     def on_task_modify(self, task, config):
         if task.options.test or task.options.learn:
-            log.info('Plugin is partially disabled with --test and --learn '
-                     'because content filename information may not be available')
+            logger.info(
+                'Plugin is partially disabled with --test and --learn '
+                'because content filename information may not be available'
+            )
             # return
 
         config = self.prepare_config(config)

@@ -1,8 +1,6 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+import os.path
 
 import pytest
-import os.path
 
 try:
     import rarfile
@@ -10,8 +8,9 @@ except ImportError:
     rarfile = None
 
 
+@pytest.mark.skipif(rarfile is None, reason='rarfile module required')
 @pytest.mark.usefixtures('tmpdir')
-class TestExtract(object):
+class TestExtract:
     config = """
         templates:
             global:
@@ -22,6 +21,15 @@ class TestExtract(object):
             zip_file:
                 mock:
                     - {title: 'test', location: '__tmp__/test_zip.zip'}
+            empty_path:
+                mock:
+                    - {title: 'test', location: ''}
+            file_not_exists:
+                mock:
+                    - {title: 'test', location: '__tmp__/nothing_here.zip'}
+            no_path:
+                mock:
+                    - {title: 'test'}
         tasks:
             test_rar:
                 template: rar_file
@@ -50,7 +58,23 @@ class TestExtract(object):
                     to: '__tmp__'
                     keep_dirs: no
                     delete_archive: yes
-                    
+            test_empty_path:
+                template: empty_path
+                decompress:
+                    to: '__tmp__'
+                    keep_dirs: no
+            test_no_path:
+                template: no_path
+                decompress:
+                    to: '__tmp__'
+                    keep_dirs: no
+                    delete_archive: yes
+            test_file_not_exists:
+                template: file_not_exists
+                decompress:
+                    to: '__tmp__'
+                    keep_dirs: no
+                    delete_archive: yes
         """
 
     # Files
@@ -66,16 +90,20 @@ class TestExtract(object):
     rar_path = os.path.join(source_dir, rar_name)
     zip_path = os.path.join(source_dir, zip_name)
 
-    @pytest.mark.skipif(rarfile is None, reason='rarfile module required')
+    # Error messages
+    error_not_local = 'Entry does not appear to represent a local file.'
+    error_not_exists = 'File no longer exists:'
+
     @pytest.mark.filecopy(rar_path, '__tmp__')
     def test_rar(self, execute_task, tmpdir):
         """Test basic RAR extraction"""
         execute_task('test_rar')
 
-        assert tmpdir.join(self.out_file).exists(), 'Output file does not exist at the correct path.'
+        assert tmpdir.join(
+            self.out_file
+        ).exists(), 'Output file does not exist at the correct path.'
         assert tmpdir.join(self.rar_name).exists(), 'RAR archive should still exist.'
 
-    @pytest.mark.skipif(rarfile is None, reason='rarfile module required')
     @pytest.mark.filecopy(rar_path, '__tmp__')
     def test_delete_rar(self, execute_task, tmpdir):
         """Test RAR deletion after extraction"""
@@ -86,17 +114,40 @@ class TestExtract(object):
     def test_zip(self, execute_task, tmpdir):
         """Test basic Zip extraction"""
         execute_task('test_zip')
-        assert tmpdir.join(self.out_file).exists(), 'Output file does not exist at the correct path.'
+        assert tmpdir.join(
+            self.out_file
+        ).exists(), 'Output file does not exist at the correct path.'
         assert tmpdir.join(self.zip_name).exists(), 'Zip archive should still exist.'
 
     @pytest.mark.filecopy(zip_path, '__tmp__')
     def test_keep_dirs(self, execute_task, tmpdir):
         """Test directory creation"""
         execute_task('test_keep_dirs')
-        assert tmpdir.join(self.out_dir, self.out_file).exists(), 'Output file does not exist at the correct path.'
+        assert tmpdir.join(
+            self.out_dir, self.out_file
+        ).exists(), 'Output file does not exist at the correct path.'
 
     @pytest.mark.filecopy(zip_path, '__tmp__')
     def test_delete_zip(self, execute_task, tmpdir):
         """Test Zip deletion after extraction"""
         execute_task('test_delete_zip')
         assert not tmpdir.join(self.zip_name).exists(), 'Zip archive was not deleted.'
+
+    def test_empty_path(self, execute_task, caplog):
+        """Test when an empty location is provided"""
+        execute_task('test_empty_path')
+        assert (
+            self.error_not_local in caplog.text
+        ), 'Plugin logs an error when entry has an empty path.'
+
+    def test_no_path(self, execute_task, caplog):
+        """Test when no location is provided"""
+        execute_task('test_no_path')
+        assert self.error_not_local in caplog.text, 'Plugin logs an error when entry has no path.'
+
+    def test_not_a_file(self, execute_task, caplog):
+        """Test when a non-existent path is provided"""
+        execute_task('test_file_not_exists')
+        assert (
+            self.error_not_exists in caplog.text
+        ), 'Plugin logs an error when file does not exist.'

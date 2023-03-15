@@ -1,18 +1,17 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 import os
 import tempfile
 
+from loguru import logger
+
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('subtitles')
+logger = logger.bind(name='subtitles')
 
 
-class PluginPeriscope(object):
-    """
+class PluginPeriscope:
+    r"""
     Search and download subtitles using Periscope by Patrick Dessalle
     (http://code.google.com/p/periscope/).
 
@@ -39,18 +38,23 @@ class PluginPeriscope(object):
             'languages': {'type': 'array', 'items': {'type': 'string'}, 'minItems': 1},
             'alternatives': {'type': 'array', 'items': {'type': 'string'}},
             'overwrite': {'type': 'boolean', 'default': False},
-            'subexts': {'type': 'array', 'items': {'type': 'string'}, 'default': ['srt', 'stp', 'sub', 'stl', 'ssa']},
+            'subexts': {
+                'type': 'array',
+                'items': {'type': 'string'},
+                'default': ['srt', 'stp', 'sub', 'stl', 'ssa'],
+            },
         },
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
     def on_task_start(self, task, config):
         try:
             import periscope  # noqa
         except ImportError as e:
-            log.debug('Error importing Periscope: %s' % e)
-            raise plugin.DependencyError('periscope', 'periscope',
-                                         'Periscope module required. ImportError: %s' % e)
+            logger.debug('Error importing Periscope: {}', e)
+            raise plugin.DependencyError(
+                'periscope', 'periscope', 'Periscope module required. ImportError: %s' % e
+            )
 
     def subbed(self, filename):
         for ext in self.exts:
@@ -69,9 +73,10 @@ class PluginPeriscope(object):
                     Default: srt, stp, sub, stl, ssa.
         """
         if not task.accepted:
-            log.debug('nothing accepted, aborting')
+            logger.debug('nothing accepted, aborting')
             return
         import periscope
+
         psc = periscope.Periscope(tempfile.gettempdir())
         logging.getLogger('periscope').setLevel(logging.CRITICAL)  # LOT of messages otherwise
         langs = [s.encode('utf8') for s in config['languages']]  # avoid unicode warnings
@@ -80,17 +85,17 @@ class PluginPeriscope(object):
             self.exts = ['.' + s for s in config['subexts']]
         for entry in task.accepted:
             if 'location' not in entry:
-                log.warning('Cannot act on entries that do not represent a local file.')
+                logger.warning('Cannot act on entries that do not represent a local file.')
             elif not os.path.exists(entry['location']):
                 entry.fail('file not found: %s' % entry['location'])
             elif '$RECYCLE.BIN' in entry['location']:
                 continue  # ignore deleted files in Windows shares
             elif not config['overwrite'] and self.subbed(entry['location']):
-                log.warning('cannot overwrite existing subs for %s' % entry['location'])
+                logger.warning('cannot overwrite existing subs for {}', entry['location'])
             else:
                 try:
                     if psc.downloadSubtitle(entry['location'].encode("utf8"), langs):
-                        log.info('Subtitles found for %s' % entry['location'])
+                        logger.info('Subtitles found for {}', entry['location'])
                     elif alts and psc.downloadSubtitle(entry['location'].encode('utf8'), alts):
                         entry.fail('subtitles found for a second-choice language.')
                     else:

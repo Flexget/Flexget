@@ -1,15 +1,12 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('limit_new')
+logger = logger.bind(name='limit_new')
 
 
-class FilterLimitNew(object):
+class FilterLimitNew:
     """
     Limit number of new items.
 
@@ -24,34 +21,26 @@ class FilterLimitNew(object):
     FlexGet is executed.
     """
 
-    schema = {
-        'type': 'integer',
-        'minimum': 1
-    }
+    schema = {'type': 'integer', 'minimum': 1}
 
-    def __init__(self):
-        try:
-            self.backlog = plugin.get_plugin_by_name('backlog')
-        except plugin.DependencyError:
-            log.warning('Unable utilize backlog plugin, entries may slip trough limit_new in some rare cases')
-
-    @plugin.priority(-255)
+    @plugin.priority(plugin.PRIORITY_LAST)
     def on_task_filter(self, task, config):
         if task.options.learn:
-            log.info('Plugin limit_new is disabled with --learn')
+            logger.info('Plugin limit_new is disabled with --learn')
             return
 
         amount = config
         for index, entry in enumerate(task.accepted):
             if index < amount:
-                log.verbose('Allowed %s (%s)' % (entry['title'], entry['url']))
+                logger.verbose('Allowed {} ({})', entry['title'], entry['url'])
             else:
                 entry.reject('limit exceeded')
                 # Also save this in backlog so that it can be accepted next time.
-                if self.backlog:
-                    self.backlog.instance.add_backlog(task, entry)
+                plugin.get('backlog', self).add_backlog(task, entry)
 
-        log.debug('Rejected: %s Allowed: %s' % (len(task.accepted[amount:]), len(task.accepted[:amount])))
+        logger.debug(
+            'Rejected: {} Allowed: {}', len(task.accepted[amount:]), len(task.accepted[:amount])
+        )
 
 
 @event('plugin.register')

@@ -1,11 +1,8 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 from flexget import options
 from flexget.event import event
 from flexget.terminal import console
 from flexget.utils.database import with_session
-from flexget.webserver import change_password, generate_token, WeakPassword, get_user
+from flexget.webserver import WeakPassword, change_password, generate_token, get_user
 
 
 @with_session

@@ -1,20 +1,16 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
+from loguru import logger
 
-import logging
-from functools import partial
-
-from flexget import plugin
+from flexget import entry, plugin
 from flexget.event import event
 from flexget.utils.template import RenderError
 
-log = logging.getLogger('set')
+logger = logger.bind(name='set')
 
-UNSET = object()
+# Use a string for this sentinel, so it survives serialization
+UNSET = '__unset__'
 
 
-class ModifySet(object):
+class ModifySet:
     """Allows adding information to a task entry for use later.
 
     Example:
@@ -23,10 +19,7 @@ class ModifySet(object):
       path: ~/download/path/
     """
 
-    schema = {
-        'type': 'object',
-        "minProperties": 1
-    }
+    schema = {'type': 'object', "minProperties": 1}
 
     def on_task_metainfo(self, task, config):
         """Adds the set dict to all accepted entries."""
@@ -37,7 +30,7 @@ class ModifySet(object):
         """This can be called from a plugin to add set values to an entry"""
         for field in config:
             # If this doesn't appear to be a jinja template, just set it right away.
-            if not isinstance(config[field], basestring) or '{' not in config[field]:
+            if not isinstance(config[field], str) or '{' not in config[field]:
                 entry[field] = config[field]
             # Store original values before overwriting with a lazy field, so that set directives can reference
             # themselves.
@@ -47,17 +40,26 @@ class ModifySet(object):
                     del entry[field]
                 except KeyError:
                     pass
-                entry.register_lazy_func(
-                    partial(self.lazy_set, config, field, orig_value, errors=errors), config)
+                entry.add_lazy_fields(
+                    self.lazy_set,
+                    [field],
+                    kwargs={
+                        'config': config,
+                        'field': field,
+                        'orig_field_value': orig_value,
+                        'errors': errors,
+                    },
+                )
 
-    def lazy_set(self, config, field, orig_field_value, entry, errors=True):
-        logger = log.error if errors else log.debug
+    @entry.register_lazy_lookup('set_field')
+    def lazy_set(self, entry, config, field, orig_field_value, errors=True):
+        level = 'ERROR' if errors else 'DEBUG'
         if orig_field_value is not UNSET:
             entry[field] = orig_field_value
         try:
-            entry[field] = entry.render(config[field])
+            entry[field] = entry.render(config[field], native=True)
         except RenderError as e:
-            logger('Could not set %s for %s: %s' % (field, entry['title'], e))
+            logger.log(level, 'Could not set {} for {}: {}', field, entry['title'], e)
 
 
 @event('plugin.register')

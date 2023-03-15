@@ -1,0 +1,505 @@
+interactions:
+  - request:
+      body: '{"label": "tag_by_id"}'
+      headers:
+        Accept:
+          - '*/*'
+        Accept-Encoding:
+          - gzip, deflate
+        Connection:
+          - keep-alive
+        Content-Length:
+          - '22'
+        Content-Type:
+          - application/json
+        User-Agent:
+          - FlexGet/3.1.88.dev (www.flexget.com)
+        X-Api-Key:
+          - 7f0a2ce32a3e43c8a7389e9539c487b4
+      method: POST
+      uri: http://127.0.0.1:8989/api/tag
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA6vmUlBQyklMSs1RslJQKklMj0+qjM9MUdIBiQNpKwVDrloAHFmyviUAAAA=
+      headers:
+        Access-Control-Allow-Origin:
+          - '*'
+        Cache-Control:
+          - no-cache, no-store, must-revalidate, max-age=0
+        Content-Encoding:
+          - gzip
+        Content-Type:
+          - application/json; charset=utf-8
+        Date:
+          - Wed, 11 Nov 2020 07:55:37 GMT
+        Expires:
+          - '0'
+        Keep-Alive:
+          - timeout=15,max=100
+        Pragma:
+          - no-cache
+        Server:
+          - Mono-HTTPAPI/1.0
+        Vary:
+          - Accept
+        X-Application-Version:
+          - 3.0.4.994
+        X-ApplicationVersion:
+          - 3.0.4.994
+      status:
+        code: 201
+        message: Created
+  - request:
+      body: null
+      headers:
+        Accept:
+          - '*/*'
+        Accept-Encoding:
+          - gzip, deflate
+        Connection:
+          - keep-alive
+        User-Agent:
+          - FlexGet/3.1.88.dev (www.flexget.com)
+        X-Api-Key:
+          - 7f0a2ce32a3e43c8a7389e9539c487b4
+      method: GET
+      uri: http://127.0.0.1:8989/api/series
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA4uOBQApu0wNAgAAAA==
+      headers:
+        Access-Control-Allow-Origin:
+          - '*'
+        Cache-Control:
+          - no-cache, no-store, must-revalidate, max-age=0
+        Content-Encoding:
+          - gzip
+        Content-Type:
+          - application/json; charset=utf-8
+        Date:
+          - Wed, 11 Nov 2020 07:55:37 GMT
+        Expires:
+          - '0'
+        Keep-Alive:
+          - timeout=15,max=100
+        Pragma:
+          - no-cache
+        Server:
+          - Mono-HTTPAPI/1.0
+        Vary:
+          - Accept
+        X-Application-Version:
+          - 3.0.4.994
+        X-ApplicationVersion:
+          - 3.0.4.994
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers:
+        Accept:
+          - '*/*'
+        Accept-Encoding:
+          - gzip, deflate
+        Connection:
+          - keep-alive
+        User-Agent:
+          - FlexGet/3.1.88.dev (www.flexget.com)
+        X-Api-Key:
+          - 7f0a2ce32a3e43c8a7389e9539c487b4
+      method: GET
+      uri: http://127.0.0.1:8989/api/series
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA4uOBQApu0wNAgAAAA==
+      headers:
+        Access-Control-Allow-Origin:
+          - '*'
+        Cache-Control:
+          - no-cache, no-store, must-revalidate, max-age=0
+        Content-Encoding:
+          - gzip
+        Content-Type:
+          - application/json; charset=utf-8
+        Date:
+          - Wed, 11 Nov 2020 07:55:37 GMT
+        Expires:
+          - '0'
+        Keep-Alive:
+          - timeout=15,max=100
+        Pragma:
+          - no-cache
+        Server:
+          - Mono-HTTPAPI/1.0
+        Vary:
+          - Accept
+        X-Application-Version:
+          - 3.0.4.994
+        X-ApplicationVersion:
+          - 3.0.4.994
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers:
+        Accept:
+          - '*/*'
+        Accept-Encoding:
+          - gzip, deflate
+        Connection:
+          - keep-alive
+        User-Agent:
+          - FlexGet/3.1.88.dev (www.flexget.com)
+        X-Api-Key:
+          - 7f0a2ce32a3e43c8a7389e9539c487b4
+      method: GET
+      uri: http://127.0.0.1:8989/api/series/lookup?term=tvdb:121361
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA61VS2/bRhC++1cseMlFD1KWY0s3t4XTHpIGtdAADXIYkUNyk+WuOjuUoBT9751d
+          krKlNE3sCpAg7Ty+/eaxM+8vlPpLvkolrNlgslTJK2hQuVKtanIWfTLq9N4RrwabKtjwiQGCd/ZH
+          11oWk5tBysCtDz5oCywGY7dF2mrcBcU9btEq69YGVQmNNhq9KnVVsyodqdxZJmcCJa5RNXuudQ5G
+          GbBFEL5Dz0jOT9Qd6Zy1s2qNvEPBDPa1a73gGYTCK3aqbI0ZewFAtQOaqFtj1K7WcgQlpPYKbK7R
+          ssKtNgp28AmtV7oDK4Hkx7OwlT/i3OhCTkElYCOBsFgZzBkLFQJhEEBHBVJg2mhfavajaP8mBPjC
+          q3fAeT1S2isQJlwDK8mZFbKPoyAE0/gIIpIQeZDqfC/xETkK1ntni8mQYCvOjj6F/P78w6+DFDSt
+          dBNLOMuWaTrIdQMVhiq9j+ehKaIuD7Va7TfRaw3WIvVuUd2SCYqaeeOX06kkKNzrJ8KPt8V6krtm
+          2nn5aUWwicWbZrPs8mU2rrLF5OOmSnq4v0ffuH7jQq2fe33n7YfL50+6ugQr4M+9uvOeOtKVtg/x
+          n4Qffz/0NSFsHOPbLuL/FeLRA/1KlTvlm7ZZx9vSR3E2zmp2JI93KQ/AePyPlJ3AZF+BYWqfgDI7
+          C8rlWVDmZ0G5OgvKy7OgXJ8F5eY7UI7ae48Qa5tmfa8lG3KlzOFfiof+S2TIV63Mprf/ousY3DlT
+          RAaxNXvVKYNeLJvgPkeLHWttqxM3kt3VjcerPitJeGHx1u5FHaS/Cakon83ni8uD+DV87sQ3fdMm
+          pSbPt7rjkoRwx9lsnF6t0nQZP388vE+SzTfMm7gEgA4bM5cNZo8W8Mn+1U3PNGFOF8Jqfj2o4m6/
+          N201uI5dOT5xz5FYlzKcwwYNdqvfx69vB22Flo4WRHJbyNbmlvAwEpOfCBp4ON6BZfD75KjsDFWE
+          Gc5QFF1m0jTNxvHzZWZISNnoNzRgspXZGATz69ni0MHJFkwb8rOYXF08atzkzxZkGe+PuugidOSH
+          fwCuJdpDAgkAAA==
+      headers:
+        Access-Control-Allow-Origin:
+          - '*'
+        Cache-Control:
+          - no-cache, no-store, must-revalidate, max-age=0
+        Content-Encoding:
+          - gzip
+        Content-Type:
+          - application/json; charset=utf-8
+        Date:
+          - Wed, 11 Nov 2020 07:55:39 GMT
+        Expires:
+          - '0'
+        Keep-Alive:
+          - timeout=15,max=100
+        Pragma:
+          - no-cache
+        Server:
+          - Mono-HTTPAPI/1.0
+        Vary:
+          - Accept
+        X-Application-Version:
+          - 3.0.4.994
+        X-ApplicationVersion:
+          - 3.0.4.994
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers:
+        Accept:
+          - '*/*'
+        Accept-Encoding:
+          - gzip, deflate
+        Connection:
+          - keep-alive
+        User-Agent:
+          - FlexGet/3.1.88.dev (www.flexget.com)
+        X-Api-Key:
+          - 7f0a2ce32a3e43c8a7389e9539c487b4
+      method: GET
+      uri: http://127.0.0.1:8989/api/Rootfolder
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA4vmUlCoBmIFBaWCxJIMJSsFJf2S3AIlHYhYWlFqanBBYnIqUMLMyMLS3MgcSJhB
+          ZUvySxJzYNJGBgYmZoZAYGQJky/Ny00sKEhNccvPSUktKgYqio6FSmWmAHmGQHYtVywABi+avoQA
+          AAA=
+      headers:
+        Access-Control-Allow-Origin:
+          - '*'
+        Cache-Control:
+          - no-cache, no-store, must-revalidate, max-age=0
+        Content-Encoding:
+          - gzip
+        Content-Type:
+          - application/json; charset=utf-8
+        Date:
+          - Wed, 11 Nov 2020 07:55:39 GMT
+        Expires:
+          - '0'
+        Keep-Alive:
+          - timeout=15,max=100
+        Pragma:
+          - no-cache
+        Server:
+          - Mono-HTTPAPI/1.0
+        Vary:
+          - Accept
+        X-Application-Version:
+          - 3.0.4.994
+        X-ApplicationVersion:
+          - 3.0.4.994
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers:
+        Accept:
+          - '*/*'
+        Accept-Encoding:
+          - gzip, deflate
+        Connection:
+          - keep-alive
+        User-Agent:
+          - FlexGet/3.1.88.dev (www.flexget.com)
+        X-Api-Key:
+          - 7f0a2ce32a3e43c8a7389e9539c487b4
+      method: GET
+      uri: http://127.0.0.1:8989/api/tag
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA4vmUlCoBmIFBaWcxKTUHCUrBaX8kozUopLEdCUdiERmClDUGMiu1cGiGqgwPqky
+          HqgIWbkhTuVlKOqMQOq4YgG7c3zXhwAAAA==
+      headers:
+        Access-Control-Allow-Origin:
+          - '*'
+        Cache-Control:
+          - no-cache, no-store, must-revalidate, max-age=0
+        Content-Encoding:
+          - gzip
+        Content-Type:
+          - application/json; charset=utf-8
+        Date:
+          - Wed, 11 Nov 2020 07:55:39 GMT
+        Expires:
+          - '0'
+        Keep-Alive:
+          - timeout=15,max=100
+        Pragma:
+          - no-cache
+        Server:
+          - Mono-HTTPAPI/1.0
+        Vary:
+          - Accept
+        X-Application-Version:
+          - 3.0.4.994
+        X-ApplicationVersion:
+          - 3.0.4.994
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: '{"title": "Game of Thrones", "sortTitle": "game thrones", "seasonCount":
+        8, "status": "ended", "overview": "Seven noble families fight for control
+        of the mythical land of Westeros. Friction between the houses leads to full-scale
+        war. All while a very ancient evil awakens in the farthest north. Amidst the
+        war, a neglected military order of misfits, the Night''s Watch, is all that
+        stands between the realms of men and the icy horrors beyond.", "network":
+        "HBO", "airTime": "21:00", "images": [{"coverType": "banner", "url": "https://artworks.thetvdb.com/banners/graphical/121361-g19.jpg"},
+        {"coverType": "poster", "url": "https://artworks.thetvdb.com/banners/posters/121361-4.jpg"},
+        {"coverType": "fanart", "url": "https://artworks.thetvdb.com/banners/fanart/original/121361-19.jpg"}],
+        "remotePoster": "https://artworks.thetvdb.com/banners/posters/121361-4.jpg",
+        "seasons": [{"seasonNumber": 0, "monitored": false}, {"seasonNumber": 1, "monitored":
+        true}, {"seasonNumber": 2, "monitored": true}, {"seasonNumber": 3, "monitored":
+        true}, {"seasonNumber": 4, "monitored": true}, {"seasonNumber": 5, "monitored":
+        true}, {"seasonNumber": 6, "monitored": true}, {"seasonNumber": 7, "monitored":
+        true}, {"seasonNumber": 8, "monitored": true}], "year": 2010, "profileId":
+        1, "languageProfileId": 0, "seasonFolder": false, "monitored": true, "useSceneNumbering":
+        false, "runtime": 57, "tvdbId": 121361, "tvRageId": 24493, "tvMazeId": 82,
+        "firstAired": "2010-12-05T00:00:00Z", "seriesType": "standard", "cleanTitle":
+        "gamethrones", "imdbId": "tt0944947", "titleSlug": "game-of-thrones", "certification":
+        "TV-MA", "genres": ["Adventure", "Drama", "Fantasy"], "tags": [2, 3, 1], "added":
+        "0001-01-01T00:00:00Z", "ratings": {"votes": 47297, "value": 9.5}, "qualityProfileId":
+        1, "rootFolderPath": "/tmp", "addOptions": {"ignoreEpisodesWithFiles": false,
+        "ignoreEpisodesWithoutFiles": false, "searchForMissingEpisodes": true}}'
+      headers:
+        Accept:
+          - '*/*'
+        Accept-Encoding:
+          - gzip, deflate
+        Connection:
+          - keep-alive
+        Content-Length:
+          - '1912'
+        Content-Type:
+          - application/json
+        User-Agent:
+          - FlexGet/3.1.88.dev (www.flexget.com)
+        X-Api-Key:
+          - 7f0a2ce32a3e43c8a7389e9539c487b4
+      method: POST
+      uri: http://127.0.0.1:8989/api/series
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA6VWTW/bOBC991cQuuzFtiR/1LFv2XTd9pBmsXE3wC56oKWRxA1FquTIhlvkv++Q
+          lBw7NZoCBgLHmnlv/GY4nNH3N4xFKFBCtGTRe14D0wVbV0YrsNHAeblEMIojrB3MEu7fL95htcF1
+          Ty0dFY95FrjV6ka3Cglw5W2okcs/GmF1Dr0n8R74iXEl5AuHFd/gTr0T9vHZhBxbpy4ClUMeNOgt
+          mK2AnTPfwxYUU3ojgRW8FlKAZYUoK2SFNizTCo2WLn2sgNV7rETGJZNc5c74AJbqoO2IrYzIUGjF
+          NoA7oJgOX+nWUjwJPLcMNStaKYeWAgDbcTNi11KyXUWJMM5I1J5xlQlQyGArJOM7/gjKMhGCFdzQ
+          P4uklr4QuRY5PTkXBRtQCAWlhAwhZy4R5BRQmxyMU1oLWwi0A4//5BL8zbIHjlk1YMIyTkqw4sio
+          YorEHmdhgMva+iBkcZk7q8j2lJ8x2jj0Xqt8FMqriKqNO4Pow+93XbsIsxa174lxukySYBU1L0Pv
+          0BNj3/0n2TN3Qut94/EbrhQYT/DO1khnjm8hF/zGIePxJA6o0X9N+Yw0UGuEzwFfITZ2GcdURKfO
+          jigH3OabUabrjm3j0vDGH3CcjtPJ23RYpgsf04d8GvxEZqNdJ7wmM6AulRmi2F7k9BclFlxR2Nck
+          BtSlEkOUWBtRCvVcz5Ny0ueXo6FwphGC41Nbb6i03Z32jlorgdrQjV7SvZAWzmb/gp6epaNpf4k9
+          vog9uYg9vYg9u4j99iL2/CL21SvsQwftgfszStIw9xuOle9trJv47AJrjC5o8H7M+8aIaKaXLQ2k
+          P3/wBFUrLXOvyjecd7xU5Y008u8zUBCyEKo8oRjaWGESzuZh+9HVCb/lr0hn+4uEeOt4Ol1MOuMt
+          /xaMV74Zo0IYi9ci/H7kkh+m42EyWyfJ0v/90y9dQ2utHwN+wnPTLcOMlpM6Wdgn+1rUnboIMVmQ
+          luk8OPzrwb1sy5421MXwhJqBQVHQNHVr0aHWfw9vr4OvBGWOJn90ndMaxtZAN3Oid4bXvH9YcYXc
+          7qPDcSMvn8ndxexuWHoA8TzvCzOmwtDwSdfJfDmbLafpKE3mV9NJVx9C3jVOpQsaetGducmqlTa3
+          wlo6xO79xB6d9DHqpkVdFJ8Vle8IeTh2V8mS9jb0zgeBlXuDeR2lWzwH7FrP5deqR6V3ypXnKfQY
+          lVyVR8lsaXq7x+l8vOhuZLTlsnVnvhjNDsSvLaf3hv2PN0D4Vpy8efofn1oYOxsKAAA=
+      headers:
+        Access-Control-Allow-Origin:
+          - '*'
+        Cache-Control:
+          - no-cache, no-store, must-revalidate, max-age=0
+        Content-Encoding:
+          - gzip
+        Content-Type:
+          - application/json; charset=utf-8
+        Date:
+          - Wed, 11 Nov 2020 07:55:41 GMT
+        Expires:
+          - '0'
+        Keep-Alive:
+          - timeout=15,max=100
+        Pragma:
+          - no-cache
+        Server:
+          - Mono-HTTPAPI/1.0
+        Vary:
+          - Accept
+        X-Application-Version:
+          - 3.0.4.994
+        X-ApplicationVersion:
+          - 3.0.4.994
+      status:
+        code: 201
+        message: Created
+  - request:
+      body: null
+      headers:
+        Accept:
+          - '*/*'
+        Accept-Encoding:
+          - gzip, deflate
+        Connection:
+          - keep-alive
+        User-Agent:
+          - FlexGet/3.1.88.dev (www.flexget.com)
+        X-Api-Key:
+          - 7f0a2ce32a3e43c8a7389e9539c487b4
+      method: GET
+      uri: http://127.0.0.1:8989/api/tag
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA4vmUlCoBmIFBaWcxKTUHCUrBaX8kozUopLEdCUdiERmClDUGMiu1cGiGqgwPqky
+          HqgIWbkhTuVlKOqMQOq4YgG7c3zXhwAAAA==
+      headers:
+        Access-Control-Allow-Origin:
+          - '*'
+        Cache-Control:
+          - no-cache, no-store, must-revalidate, max-age=0
+        Content-Encoding:
+          - gzip
+        Content-Type:
+          - application/json; charset=utf-8
+        Date:
+          - Wed, 11 Nov 2020 07:55:41 GMT
+        Expires:
+          - '0'
+        Keep-Alive:
+          - timeout=15,max=100
+        Pragma:
+          - no-cache
+        Server:
+          - Mono-HTTPAPI/1.0
+        Vary:
+          - Accept
+        X-Application-Version:
+          - 3.0.4.994
+        X-ApplicationVersion:
+          - 3.0.4.994
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers:
+        Accept:
+          - '*/*'
+        Accept-Encoding:
+          - gzip, deflate
+        Connection:
+          - keep-alive
+        User-Agent:
+          - FlexGet/3.1.88.dev (www.flexget.com)
+        X-Api-Key:
+          - 7f0a2ce32a3e43c8a7389e9539c487b4
+      method: GET
+      uri: http://127.0.0.1:8989/api/series
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA61WS2/bOBC+91cQuuzFD8mPOvYtm13v9pC22LgN0CIHWhpJ3FCkSo5suEX/+w6p
+          hy0j2bSogQS2Zr75/M1whqPPrxj7Rv+MBShQQrBiwV+8AKZTtsmNVmCDQe3nEsEojrBxQEvIzw+N
+          y2qDmzY8c+HYj7XArVY3ulJIkKvWihwrRxSASiBpwXoHZidg7xx3sAPFlN5KYCkvhBRgWSqyHFmq
+          DYu1QqOlU4s5sOKAuYi5ZJKrxBnvwZJobUdsbUSMQiu2BdwDcTp8ritLfBJ4YhlqllZSDi0RANtz
+          M2LXUrJ9LuiRMxJ1YFzFAhQy2AnJ+J4/grJM1GQpN/RhkdTSFwouREJPzkVkA6JQkEmIERLmEkFO
+          hNokYJzSQthUoB14/FuX4G+W3XOM8wETlnFSgjlHRjVTJPY0CwNcFtaTkMVl7qwiPlB+xmjj0Aet
+          klFbYEXB2jy6+v79+7vufIXZiMIf4SRahWFrFwXP6uP2z22/eF/szmpzKH3UlisFpgnz7spI5xjf
+          QiL4jcOOJ9NxjRv9W2anWAOFRvhQR+SIpV2Nx1RSp9SOKCPcJdtRrIsm3o4zw0t/3ONoEk1fR8Ms
+          WnrWhvT74AXBpXbd8bLgGvfrgmse28qd/ZTYlCsif1lsjft1sTXPWBuRCXWs8VmJ/edDb8qfaZXa
+          +bYqtlTyFQtPxBVaCdSGboAVTZG08D81OaOJnqFBU/0Ey+QiLNOLsMwuwjK/CMvri7AsLsJy9QMs
+          vW48APdnG0ZNrwUlx9xPDBbl+JktVxqd0oX/Jjk2V0DbJKvoEnz/hK9WudYy8Sp9+zauc5WNmVbO
+          XQwK6syEys7CDC3J+h6eN5UL3HDWv+qHsLP+Q6K8fTKbLaed+ZZ/rc1XTWMHqTAWr0WtJXAlGUaT
+          YTjfhOHK/306bmpDK7a9dPy24aZbzTGtStXb9GeLXhSN0gAxXJKq2aJ1+feLO1llbehQp8Oz8BgM
+          ipTudLeqHW7zcXh73XozUKa3iYLrhF4PsDLQ3XXBH4YX/Pi45gq5PQS91kCendJ0499NcNSD8yRp
+          CzehwtElGG3CxWo+X82iURQurmbTrn6EfVc69e4H2m52XWLifK3NrbCWjvzPUlid+FyOnXGKu6lQ
+          p+kHRQU+wZ60iat1Rm8a0LrvBeZrIX8Ipyt8Gtq0rMu1Uo9K71VduO9tb9LBqKyX2o72ijPMFpNl
+          N+nBjsvK9chyNO8RfKk4vfkcnpok4Rt5+srN8cN/mbwuO5gKAAA=
+      headers:
+        Access-Control-Allow-Origin:
+          - '*'
+        Cache-Control:
+          - no-cache, no-store, must-revalidate, max-age=0
+        Content-Encoding:
+          - gzip
+        Content-Type:
+          - application/json; charset=utf-8
+        Date:
+          - Wed, 11 Nov 2020 07:55:41 GMT
+        Expires:
+          - '0'
+        Keep-Alive:
+          - timeout=15,max=100
+        Pragma:
+          - no-cache
+        Server:
+          - Mono-HTTPAPI/1.0
+        Vary:
+          - Accept
+        X-Application-Version:
+          - 3.0.4.994
+        X-ApplicationVersion:
+          - 3.0.4.994
+      status:
+        code: 200
+        message: OK
+version: 1

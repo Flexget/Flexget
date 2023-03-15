@@ -1,0 +1,121 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [!!python/unicode 'FlexGet/2.10.39.dev (www.flexget.com)']
+      method: GET
+      uri: https://httpbin.org/digest-auth/auth/user/passwd/MD5
+    response:
+      body: {string: !!python/unicode ''}
+      headers:
+        access-control-allow-credentials: ['true']
+        access-control-allow-origin: ['*']
+        connection: [keep-alive]
+        content-length: ['0']
+        content-type: [text/html; charset=utf-8]
+        date: ['Thu, 27 Apr 2017 09:15:43 GMT']
+        server: [gunicorn/19.7.1]
+        set-cookie: [fake=fake_value]
+        via: [1.1 vegur]
+        www-authenticate: ['Digest realm="me@kennethreitz.com", nonce="e10ceded18adcdaa498bfa1f69a735f4",
+            algorithm=MD5, qop="auth", opaque="0ade88773fd3a104a4f13b11ceaa0377"']
+      status: {code: 401, message: UNAUTHORIZED}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [!!python/unicode 'FlexGet/2.10.39.dev (www.flexget.com)']
+      method: GET
+      uri: https://httpbin.org/basic-auth/user/passwd
+    response:
+      body: {string: !!python/unicode ''}
+      headers:
+        access-control-allow-credentials: ['true']
+        access-control-allow-origin: ['*']
+        connection: [keep-alive]
+        content-length: ['0']
+        date: ['Thu, 27 Apr 2017 09:15:43 GMT']
+        server: [gunicorn/19.7.1]
+        via: [1.1 vegur]
+        www-authenticate: [Basic realm="Fake Realm"]
+      status: {code: 401, message: UNAUTHORIZED}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [!!python/unicode 'FlexGet/2.10.39.dev (www.flexget.com)']
+      method: GET
+      uri: https://httpbin.org/digest-auth/auth/user/passwd/MD5
+    response:
+      body: {string: !!python/unicode ''}
+      headers:
+        access-control-allow-credentials: ['true']
+        access-control-allow-origin: ['*']
+        connection: [keep-alive]
+        content-length: ['0']
+        content-type: [text/html; charset=utf-8]
+        date: ['Thu, 27 Apr 2017 09:15:44 GMT']
+        server: [gunicorn/19.7.1]
+        set-cookie: [fake=fake_value]
+        via: [1.1 vegur]
+        www-authenticate: ['Digest algorithm=MD5, qop="auth", nonce="90f0fb894a49f0ab99791daa5084c813",
+            opaque="5facaa3ec10d661665be9d75e4ee6e29", realm="me@kennethreitz.com"']
+      status: {code: 401, message: UNAUTHORIZED}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Authorization: [!!python/unicode 'Digest username="user", realm="me@kennethreitz.com",
+            nonce="90f0fb894a49f0ab99791daa5084c813", uri="/digest-auth/auth/user/passwd/MD5",
+            response="ec7aadb65af8e9fa610ca640a68f8246", opaque="5facaa3ec10d661665be9d75e4ee6e29",
+            algorithm="MD5", qop="auth", nc=00000001, cnonce="7342fef9bdcebaa3"']
+        Connection: [keep-alive]
+        Cookie: [fake=fake_value]
+        User-Agent: [!!python/unicode 'FlexGet/2.10.39.dev (www.flexget.com)']
+      method: GET
+      uri: https://httpbin.org/digest-auth/auth/user/passwd/MD5
+    response:
+      body: {string: !!python/unicode "{\n  \"authenticated\": true, \n  \"user\"\
+          : \"user\"\n}\n"}
+      headers:
+        access-control-allow-credentials: ['true']
+        access-control-allow-origin: ['*']
+        connection: [keep-alive]
+        content-length: ['47']
+        content-type: [application/json]
+        date: ['Thu, 27 Apr 2017 09:15:44 GMT']
+        server: [gunicorn/19.7.1]
+        via: [1.1 vegur]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Authorization: [Basic dXNlcjpwYXNzd2Q=]
+        Connection: [keep-alive]
+        User-Agent: [!!python/unicode 'FlexGet/2.10.39.dev (www.flexget.com)']
+      method: GET
+      uri: https://httpbin.org/basic-auth/user/passwd
+    response:
+      body: {string: !!python/unicode "{\n  \"authenticated\": true, \n  \"user\"\
+          : \"user\"\n}\n"}
+      headers:
+        access-control-allow-credentials: ['true']
+        access-control-allow-origin: ['*']
+        connection: [keep-alive]
+        content-length: ['47']
+        content-type: [application/json]
+        date: ['Thu, 27 Apr 2017 09:15:44 GMT']
+        server: [gunicorn/19.7.1]
+        via: [1.1 vegur]
+      status: {code: 200, message: OK}
+version: 1

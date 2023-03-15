@@ -1,0 +1,404 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Content-Type:
+      - application/json
+      trakt-api-key:
+      - 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af
+      trakt-api-version:
+      - '2'
+    method: GET
+    uri: https://api.trakt.tv/search?query=The+Expanse&type=show
+  response:
+    body:
+      string: "[{\"type\":\"show\",\"score\":66.39412,\"show\":{\"title\":\"The Expanse\",\"overview\":\"Two
+        hundred years in the future, in a fully colonized solar system, police detective
+        Josephus Miller is given the assignment to find a missing young woman, Julie
+        Mao. Joining his task is James Holden, former first officer of an ice freighter
+        who is involved in an incident caused by the tense relationship between Earth,
+        Mars and the Belt. Far from their struggles in space, United Nations executive
+        Chrisjen Avasarala works to prevent war between Earth and Mars. Soon the three
+        find out that the missing woman is connected to a vast conspiracy that threatens
+        all humanity.\",\"year\":2015,\"status\":\"returning series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":77199,\"slug\":\"the-expanse\",\"tvdb\":280619,\"imdb\":\"tt3230854\",\"tmdb\":63639,\"tvrage\":41967}}},{\"type\":\"show\",\"score\":53.115295,\"show\":{\"title\":\"Bridging
+        the Expanse\",\"overview\":\"Whether arch, beam or suspension bridge: For
+        thousands of years, people have been building connections for pedestrians,
+        cars or trains over natural obstacles such as water or gorges. In the past
+        it was simple stone buildings, today gigantic steel structures like the \xD6rsesund
+        Bridge are created to connect Denmark with Sweden. In each episode one of
+        these modern buildings is presented.\",\"year\":null,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":158340,\"slug\":\"bridging-the-expanse\",\"tvdb\":377147,\"imdb\":\"\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":5.5201473,\"show\":{\"title\":\"The
+        Loch\",\"overview\":\"In a community nourished and sustained by myth and bordered
+        by untamed nature, the search for a serial killer becomes a matter of life
+        and death for local detective Annie Redford, who is trying to cope with her
+        first murder case. When the body of local man Niall Swift is found at the
+        foot of Carn Mohr Mountain and an isolated human heart on the loch shore,
+        the town\u2019s normality is shattered and the nightmare begins. Chillingly,
+        the beautiful scenery, undulating Highlands and vast, expansive loch becomes
+        a character in its own right, adding a haunting depth to the community\u2019s
+        plight.\",\"year\":2017,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":119228,\"slug\":\"the-loch\",\"tvdb\":328807,\"imdb\":\"tt6734482\",\"tmdb\":72061,\"tvrage\":null}}},{\"type\":\"show\",\"score\":5.5201473,\"show\":{\"title\":\"The
+        Normans\",\"overview\":\"In this major series, Professor Robert Bartlett examines
+        the extraordinary expansion and unchecked ambition of the Normans, and shows
+        how they transformed the history of Europe.A Quote from Ralph, Bishop of Orkney\u2018Most
+        famous Normans, as you go into battle, remember your name and your ancestry.
+        No one has resisted you and been unscathed. Bold France melted away in front
+        of you. You conquered and subjugated fertile England. Rich Apulia flourished
+        again when she received you. The celebrated city of Jerusalem and the renowned
+        city of Antioch both submitted to you\u2019 (Ralph, Bishop of Orkney, as recounted
+        by Henry of Huntingdon).\",\"year\":2010,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":37591,\"slug\":\"the-normans\",\"tvdb\":181371,\"imdb\":null,\"tmdb\":37749,\"tvrage\":null}}},{\"type\":\"show\",\"score\":4.494437,\"show\":{\"title\":\"The
+        Vikings Uncovered\",\"overview\":\"Dan Snow uncovers the lost Vikings in America
+        with space archaeologist Dr Sarah Parcak. Sarah uses satellites 383 miles
+        above the earth to spot ruins as small as 30cm buried beneath the surface.
+        As Sarah searches for Viking sites from Britain to America, Dan explores how
+        they voyaged thousands of miles when most ships never left the shoreline.
+        He also tracks their expansion west, first as raiders and then as settlers
+        and traders throughout Britain and beyond to Iceland and Greenland. In North
+        America they excavate what could be the most westerly Viking settlement ever
+        discovered.\",\"year\":2016,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":159812,\"slug\":\"the-vikings-uncovered-2016\",\"tvdb\":379160,\"imdb\":\"\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":4.494437,\"show\":{\"title\":\"The
+        Invisible Photograph\",\"overview\":\"The Invisible Photograph, a five-part
+        documentary series, investigates the expansive realm of photographic production,
+        distribution, and consumption by way of the hidden side of photography, whether
+        guarded, stashed away, barely recognizable, or simply forgotten. From as far
+        back as the drawings made within the dark interiors of caves, visual images
+        have, from time to time, become \\\"invisible.\\\" The Invisible Photograph
+        unveils rare or never-before-seen aspects of the photographic image through
+        a series of episodes that will be released throughout the year. These documentaries,
+        screenings, and discussions will demonstrate the unexpected challenges in
+        the seemingly simple act of making, retrieving, and looking at an image. \",\"year\":2014,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":139722,\"slug\":\"the-invisible-photograph\",\"tvdb\":355290,\"imdb\":\"\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":4.363905,\"show\":{\"title\":\"The
+        Jewish Americans\",\"overview\":\"Emmy award-winning filmmaker David Grubin
+        explores the struggle of a tiny minority to integrate itself into the American
+        mainstream while remaining true to their roots in this documentary that begins
+        as 17th Century Jews arrive in New Amsterdam, and traces their journey as
+        they contend with racism and suspicion in a fledgling republic. Ever since
+        the first Jews arrived in America, their efforts to embrace the new culture
+        while simultaneously maintaining tradition has often found them frequently
+        branded as outsiders. When the first Jews landed on American shores in 1654,
+        New Amsterdam governor Peter Stuyvesant attempted to reject them to no avail.
+        Overruled by his superiors in the Netherlands - who claimed that Jews could
+        contribute to the growth of the newly founded colony as well as anyone else
+        - Stuyvesant relented, and a new era was underway. Over the course of the
+        next few centuries, the Jews would play prominent roles in such important
+        phases of United States history as the Civil War and westward expansion. From
+        politics to entertainment, the Jews would continue to display their unique
+        talent for innovation and adaptation in a wide variety of arenas. Yet despite
+        the fact that the separation of church and state would open up a wide world
+        of opportunities for them, the American Jew continued to endure anti-Semitism
+        at the behest of such powerful figures as automotive magnate Henry Ford. Through
+        it all, however, their spirits remained eternally hopeful, and forever unbroken.\",\"year\":2008,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":33989,\"slug\":\"the-jewish-americans\",\"tvdb\":97361,\"imdb\":null,\"tmdb\":34136,\"tvrage\":18215}}},{\"type\":\"show\",\"score\":4.0468483,\"show\":{\"title\":\"Secrets
+        of the Wild\",\"overview\":\"The wide open spaces -- home to some of the most
+        spectacular wildlife in the world. Across the endless plains of the Serengeti,
+        the crisp white expanses of the Arctic and the windswept, breathtaking Himalayan
+        Plateaux, innovative techniques allow us to access remote habitats and capture
+        rare animal behavior, without disrupting the animals\u2019 daily struggle
+        for survival. We spy on wolves and foxes as they employ novel hunting techniques;
+        on hippos foraging at night; on polar bears courting. \",\"year\":null,\"status\":\"returning
+        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":78743,\"slug\":\"secrets-of-the-wild\",\"tvdb\":283235,\"imdb\":\"\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":3.9815822,\"show\":{\"title\":\"Canada
+        Over the Edge\",\"overview\":\"This series explores the features that define
+        Canada: the most expansive coastline in the world and the world's longest
+        undefended border. It's a never-before-seen view of Canada, rising up and
+        bearing witness to our nation's diversity and beauty. The meeting place of
+        the ocean and land is birthplace of this country's history and the frontline
+        of climate change. Shot in breathtaking HD, Canada: Over the Edge will capture
+        Canada's vast geographical and cultural panorama. It is a testament to our
+        history and a time capsule for our future.\",\"year\":2012,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":79576,\"slug\":\"canada-over-the-edge\",\"tvdb\":284528,\"imdb\":\"\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":3.9527638,\"show\":{\"title\":\"The
+        Rise and Fall of the Japanese Empire\",\"overview\":\"Explores Japan's ambitious
+        but destructive attempts to lead the whole of Asia out from the shadow of
+        European and American dominance. Recounting the events of the most significant
+        global conflict in the history of mankind and its equally dramatic aftermath,
+        this two-part special investigates new and challenging insights into a battle
+        that shaped the Asia-Pacific region. From the expansion its sphere of influence
+        in 1895, with the installation of a puppet government in Korea, to the destruction
+        of Pearl Harbour, discover how Japan's burgeoning power in Asia soon brought
+        it into direct conflict with the West culminating in the atomic bomb attacks
+        on Hiroshima and Nagasaki. Focusing on the traumas suffered by the Korean,
+        Chinese, South East Asian and Japanese people as they lived through four decades
+        of bloody conflict, this compelling documentary tells the dramatic story of
+        a proud and ambitious warrior nation, which ultimately paid a terrible price
+        for its audacity.\",\"year\":2011,\"status\":\"\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":72417,\"slug\":\"the-rise-and-fall-of-the-japanese-empire\",\"tvdb\":272418,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}}]"
+    headers:
+      Age:
+      - '7'
+      CF-Cache-Status:
+      - HIT
+      CF-RAY:
+      - 60caac710d4dc1cf-IAD
+      Cache-Control:
+      - public, max-age=28800
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Tue, 05 Jan 2021 05:07:04 GMT
+      ETag:
+      - W/"37500e91d4e6c3dc235712bccc030198"
+      Expect-CT:
+      - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+      Expires:
+      - Tue, 05 Jan 2021 13:06:58 GMT
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cfduid=d7a595ea0c67dc819304ba96d7bd12ff31609823224; expires=Thu, 04-Feb-21
+        05:07:04 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Pagination-Item-Count:
+      - '81'
+      X-Pagination-Limit:
+      - '10'
+      X-Pagination-Page:
+      - '1'
+      X-Pagination-Page-Count:
+      - '9'
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Ratelimit:
+      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":964,"until":"2021-01-05T05:10:00Z"}'
+      X-Request-Id:
+      - c0e331ba-bcc7-4b53-a734-baa999828b62
+      X-Runtime:
+      - '0.017969'
+      X-XSS-Protection:
+      - 1; mode=block
+      cf-request-id:
+      - 07728a1aa80000c1cf271d2000000001
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Content-Type:
+      - application/json
+      trakt-api-key:
+      - 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af
+      trakt-api-version:
+      - '2'
+    method: GET
+    uri: https://api.trakt.tv/shows/77199?extended=full
+  response:
+    body:
+      string: '{"title":"The Expanse","year":2015,"ids":{"trakt":77199,"slug":"the-expanse","tvdb":280619,"imdb":"tt3230854","tmdb":63639,"tvrage":41967},"overview":"Two
+        hundred years in the future, in a fully colonized solar system, police detective
+        Josephus Miller is given the assignment to find a missing young woman, Julie
+        Mao. Joining his task is James Holden, former first officer of an ice freighter
+        who is involved in an incident caused by the tense relationship between Earth,
+        Mars and the Belt. Far from their struggles in space, United Nations executive
+        Chrisjen Avasarala works to prevent war between Earth and Mars. Soon the three
+        find out that the missing woman is connected to a vast conspiracy that threatens
+        all humanity.","first_aired":"2015-12-08T05:00:00.000Z","airs":{"day":"Wednesday","time":"00:00","timezone":"America/New_York"},"runtime":44,"certification":"TV-14","network":"Amazon","country":"us","trailer":"https://youtube.com/watch?v=ydKmedH336Q","homepage":"https://www.amazon.com/dp/B018BZ3SCM","status":"returning
+        series","rating":8.55425,"votes":7899,"comment_count":69,"updated_at":"2021-01-04T07:06:16.000Z","language":"en","available_translations":["ar","bg","bs","cs","da","de","el","en","es","fa","fi","fr","he","hr","hu","id","it","ko","lt","nl","no","pl","pt","ro","ru","sk","sv","tr","uk","zh"],"genres":["fantasy","science-fiction","mystery","drama"],"aired_episodes":51}'
+    headers:
+      Age:
+      - '11376'
+      CF-Cache-Status:
+      - HIT
+      CF-RAY:
+      - 60caac71bdba2a03-IAD
+      Cache-Control:
+      - public, max-age=28800
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Tue, 05 Jan 2021 05:07:04 GMT
+      ETag:
+      - W/"ca5fd013cbe96505f99784a091bff071"
+      Expect-CT:
+      - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+      Expires:
+      - Tue, 05 Jan 2021 09:57:29 GMT
+      Last-Modified:
+      - Mon, 04 Jan 2021 07:06:16 GMT
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cfduid=de49b9a3cfdcb2c084f9ee601b36af5b71609823224; expires=Thu, 04-Feb-21
+        05:07:04 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Ratelimit:
+      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":982,"until":"2021-01-04T09:55:00Z"}'
+      X-Request-Id:
+      - cada0458-1da7-473e-b437-ea3499675493
+      X-Runtime:
+      - '0.007486'
+      X-XSS-Protection:
+      - 1; mode=block
+      cf-request-id:
+      - 07728a1b1200002a03beb8d000000001
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Content-Type:
+      - application/json
+      trakt-api-key:
+      - 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af
+      trakt-api-version:
+      - '2'
+    method: GET
+    uri: https://api.trakt.tv/shows/77199/seasons/?extended=full
+  response:
+    body:
+      string: '[{"number":0,"ids":{"trakt":121210,"tvdb":582574,"tmdb":73651,"tvrage":null},"rating":8.3871,"votes":31,"episode_count":35,"aired_episodes":24,"title":"Specials","overview":"","first_aired":"2015-12-14T05:00:00.000Z","updated_at":"2021-01-05T02:13:38.000Z","network":"Amazon"},{"number":1,"ids":{"trakt":83179,"tvdb":582849,"tmdb":69635,"tvrage":null},"rating":8.16144,"votes":1053,"episode_count":10,"aired_episodes":10,"title":"Season
+        1","overview":"In season one, the disappearance of rich-girl-turned-political-activist
+        Julie Mao linked the lives of Ceres'' detective Joe Miller, accidental ship
+        captain James Holden and U.N. politician Chrisjen Avasarala. Amidst political
+        tension between Earth, Mars and the Asteroid Belt, these three individuals
+        unravel the single greatest conspiracy of all time.","first_aired":"2015-12-08T05:00:00.000Z","updated_at":"2021-01-05T03:03:02.000Z","network":"Syfy"},{"number":2,"ids":{"trakt":123109,"tvdb":669028,"tmdb":79720,"tvrage":null},"rating":8.47301,"votes":704,"episode_count":13,"aired_episodes":13,"title":"Season
+        2","overview":"Season 2 kicks off with interplanetary tensions at an all-time
+        high, the cold war between Earth and Mars is on the brink of an all-out battle.","first_aired":"2017-02-01T05:00:00.000Z","updated_at":"2021-01-05T04:33:07.000Z","network":"Syfy"},{"number":3,"ids":{"trakt":152369,"tvdb":750521,"tmdb":99857,"tvrage":null},"rating":8.7045,"votes":555,"episode_count":13,"aired_episodes":13,"title":"Season
+        3","overview":"As the Rocinante crew digs deeper into the search for Prax''s
+        missing daughter, the war between Earth and Mars turns deadly in ways the
+        solar system has never seen. But a new threat in the outer reaches of the
+        Belt could prove much more dangerous, threatening to test the very future
+        of humanity.","first_aired":"2018-04-11T04:00:00.000Z","updated_at":"2021-01-05T04:11:07.000Z","network":"Syfy"},{"number":4,"ids":{"trakt":173376,"tvdb":781304,"tmdb":110408,"tvrage":null},"rating":8.13636,"votes":462,"episode_count":10,"aired_episodes":10,"title":"Season
+        4","overview":"With the Ring Gates now open to thousands of new planets, a
+        blood-soaked gold rush begins, igniting new conflicts between Earth, Mars,
+        and the Belt. Meanwhile, on one unexplored planet, the Rocinante crew gets
+        caught in a violent clash between an Earth mining corporation and desperate
+        Belter settlers as deadly, new threats from the protomolecule emerge.","first_aired":"2019-12-13T05:00:00.000Z","updated_at":"2021-01-05T04:34:32.000Z","network":"Amazon"},{"number":5,"ids":{"trakt":230724,"tvdb":1872568,"tmdb":165228,"tvrage":null},"rating":8.84,"votes":25,"episode_count":10,"aired_episodes":5,"title":"Season
+        5","overview":"In different parts of the Solar System, the crew of the Rocinante
+        and their allies confront the sins of their past, while Marco Inaros unleashes
+        an attack that will alter the future of Earth, Mars, the Belt, and the worlds
+        beyond the Ring.","first_aired":"2020-12-16T05:00:00.000Z","updated_at":"2021-01-05T04:34:13.000Z","network":"Amazon"}]'
+    headers:
+      Age:
+      - '7'
+      CF-Cache-Status:
+      - HIT
+      CF-RAY:
+      - 60caac726d00e0d6-IAD
+      Cache-Control:
+      - public, max-age=28800
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Tue, 05 Jan 2021 05:07:04 GMT
+      ETag:
+      - W/"5901981ba6d7728cacd56ed678b62f6c"
+      Expect-CT:
+      - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+      Expires:
+      - Tue, 05 Jan 2021 13:06:55 GMT
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cfduid=d4e57629083b27f8c869d023b5c3af6d61609823224; expires=Thu, 04-Feb-21
+        05:07:04 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Ratelimit:
+      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":963,"until":"2021-01-05T05:10:00Z"}'
+      X-Request-Id:
+      - 963efe3b-23d0-4b9e-a829-2d243be7cae3
+      X-Runtime:
+      - '0.009114'
+      X-XSS-Protection:
+      - 1; mode=block
+      cf-request-id:
+      - 07728a1b7d0000e0d600be4000000001
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Content-Type:
+      - application/json
+      trakt-api-key:
+      - 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af
+      trakt-api-version:
+      - '2'
+    method: GET
+    uri: https://api.trakt.tv/users/flexgettest/ratings/seasons
+  response:
+    body:
+      string: '[{"rated_at":"2017-04-23T19:35:14.000Z","rating":10,"type":"season","season":{"number":1,"ids":{"trakt":83179,"tvdb":582849,"tmdb":69635,"tvrage":null}},"show":{"title":"The
+        Expanse","year":2015,"ids":{"trakt":77199,"slug":"the-expanse","tvdb":280619,"imdb":"tt3230854","tmdb":63639,"tvrage":41967}}}]'
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-RAY:
+      - 60caac731862cf60-IAD
+      Cache-Control:
+      - max-age=0, private, must-revalidate
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Tue, 05 Jan 2021 05:07:04 GMT
+      ETag:
+      - W/"34369a2eb4ebf851058ac70cdd565114"
+      Expect-CT:
+      - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+      Last-Modified:
+      - Sun, 23 Apr 2017 19:35:14 GMT
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cfduid=d1200bc1187873f952e91d6ba5eeae76e1609823224; expires=Thu, 04-Feb-21
+        05:07:04 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Private-User:
+      - 'false'
+      X-Ratelimit:
+      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":952,"until":"2021-01-05T05:10:00Z"}'
+      X-Request-Id:
+      - d8de735f-57fd-48e7-8b8c-539aba480d34
+      X-Runtime:
+      - '0.013125'
+      X-XSS-Protection:
+      - 1; mode=block
+      cf-request-id:
+      - 07728a1bf00000cf60fbbd7000000001
+    status:
+      code: 200
+      message: OK
+version: 1

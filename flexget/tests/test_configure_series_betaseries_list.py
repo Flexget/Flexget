@@ -1,25 +1,27 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from unittest import mock
 
-import mock
 import pytest
 
 
 def assert_mock_calls(expected_calls, mock_object):
-    assert expected_calls == mock_object.mock_calls, "expecting calls %r, got %r instead" % \
-                                                     (expected_calls, mock_object.mock_calls)
+    assert expected_calls == mock_object.mock_calls, "expecting calls %r, got %r instead" % (
+        expected_calls,
+        mock_object.mock_calls,
+    )
 
 
 def assert_series_count_in_db(expected_count):
-    from flexget.plugins.filter.series import Series
+    from flexget.components.series.db import Series
     from flexget.manager import Session
+
     session = Session()
     actual_series_count = session.query(Series).count()
-    assert expected_count == actual_series_count, "expecting %s series stored in db, got %s instead" % \
-                                                  (expected_count, actual_series_count)
+    assert (
+        expected_count == actual_series_count
+    ), "expecting %s series stored in db, got %s instead" % (expected_count, actual_series_count)
 
 
-class TestConfigureSeriesBetaSeriesList(object):
+class TestConfigureSeriesBetaSeriesList:
     config = """
         tasks:
           test_no_members:
@@ -82,13 +84,15 @@ class TestConfigureSeriesBetaSeriesList(object):
 
         assert_series_count_in_db(3)
         assert_mock_calls([mock.call('api_key_foo', 'user_foo', 'passwd_foo')], create_token_mock)
-        assert_mock_calls([mock.call('api_key_foo', 'token_foo', 'other_member_1')], query_series_mock)
+        assert_mock_calls(
+            [mock.call('api_key_foo', 'token_foo', 'other_member_1')], query_series_mock
+        )
 
     def test_with_two_members(self, execute_task, create_token_mock, query_series_mock):
-        return_values_generator = (val for val in [
-            ["Family guy", "The Simpsons"],
-            ["Breaking Bad", "Dexter", "The Simpsons"],
-        ])
+        return_values_generator = (
+            val
+            for val in [["Family guy", "The Simpsons"], ["Breaking Bad", "Dexter", "The Simpsons"]]
+        )
         query_series_mock.side_effect = lambda *args: next(return_values_generator)
 
         execute_task('test_with_two_members')
@@ -98,5 +102,7 @@ class TestConfigureSeriesBetaSeriesList(object):
         assert_mock_calls(
             [
                 mock.call('api_key_foo', 'token_foo', 'other_member_1'),
-                mock.call('api_key_foo', 'token_foo', 'other_member_2')
-            ], query_series_mock)
+                mock.call('api_key_foo', 'token_foo', 'other_member_2'),
+            ],
+            query_series_mock,
+        )

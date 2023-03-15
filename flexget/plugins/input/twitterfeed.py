@@ -1,14 +1,12 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
 import re
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 
-log = logging.getLogger('twitterfeed')
+logger = logger.bind(name='twitterfeed')
 
 # Size of the chunks when fetching a timeline
 CHUNK_SIZE = 200
@@ -18,7 +16,7 @@ CHUNK_SIZE = 200
 MAX_TWEETS = 1000
 
 
-class TwitterFeed(object):
+class TwitterFeed:
     """Parses a twitter feed
 
     Example::
@@ -57,61 +55,75 @@ class TwitterFeed(object):
             'access_token_key': {'type': 'string'},
             'access_token_secret': {'type': 'string'},
             'all_entries': {'type': 'boolean', 'default': True},
-            'tweets': {'type': 'number', 'default': 50}
+            'tweets': {'type': 'number', 'default': 50},
         },
-        'required': ['account', 'consumer_key', 'consumer_secret', 'access_token_secret', 'access_token_key'],
-        'additionalProperties': False
+        'required': [
+            'account',
+            'consumer_key',
+            'consumer_secret',
+            'access_token_secret',
+            'access_token_key',
+        ],
+        'additionalProperties': False,
     }
 
     def on_task_start(self, task, config):
         try:
             import twitter  # noqa
         except ImportError:
-            raise plugin.PluginError('twitter module required', logger=log)
+            raise plugin.PluginError('twitter module required', logger=logger)
 
     def on_task_input(self, task, config):
         import twitter
 
         account = config['account']
-        log.debug('Looking at twitter account `%s`', account)
+        logger.debug('Looking at twitter account `{}`', account)
 
         try:
-            self.api = twitter.Api(consumer_key=config['consumer_key'],
-                                   consumer_secret=config['consumer_secret'],
-                                   access_token_key=config['access_token_key'],
-                                   access_token_secret=config['access_token_secret'])
+            self.api = twitter.Api(
+                consumer_key=config['consumer_key'],
+                consumer_secret=config['consumer_secret'],
+                access_token_key=config['access_token_key'],
+                access_token_secret=config['access_token_secret'],
+            )
         except twitter.TwitterError as ex:
-            raise plugin.PluginError('Unable to authenticate to twitter for task %s: %s' %
-                                     (task.name, ex))
+            raise plugin.PluginError(
+                'Unable to authenticate to twitter for task %s: %s' % (task.name, ex)
+            )
 
         if config['all_entries']:
-            log.debug('Fetching %d last tweets from %s timeline' %
-                      (config['tweets'], config['account']))
+            logger.debug(
+                'Fetching {} last tweets from {} timeline', config['tweets'], config['account']
+            )
             tweets = self.get_tweets(account, number=config['tweets'])
         else:
             # Fetching from where we left off last time
             since_id = task.simple_persistence.get('since_id', None)
             if since_id:
-                log.debug('Fetching from tweet id %d from %s timeline' % (since_id, config['account']))
+                logger.debug(
+                    'Fetching from tweet id {} from {} timeline', since_id, config['account']
+                )
                 kwargs = {'since_id': since_id}
             else:
-                log.debug('No since_id, fetching last %d tweets' % config['tweets'])
+                logger.debug('No since_id, fetching last {} tweets', config['tweets'])
                 kwargs = {'number': config['tweets']}
 
             tweets = self.get_tweets(account, **kwargs)
             if task.config_modified and len(tweets) < config['tweets']:
-                log.debug('Configuration modified; fetching at least %d tweets' % config['tweets'])
+                logger.debug(
+                    'Configuration modified; fetching at least {} tweets', config['tweets']
+                )
                 max_id = tweets[-1].id if tweets else None
                 remaining_tweets = config['tweets'] - len(tweets)
                 tweets = tweets + self.get_tweets(account, max_id=max_id, number=remaining_tweets)
             if tweets:
                 last_tweet = tweets[0]
-                log.debug('New last tweet id: %d' % last_tweet.id)
+                logger.debug('New last tweet id: {}', last_tweet.id)
                 task.simple_persistence['since_id'] = last_tweet.id
 
-        log.debug('%d tweets fetched' % len(tweets))
+        logger.debug('{} tweets fetched', len(tweets))
         for t in tweets:
-            log.debug('id:%d' % t.id)
+            logger.debug('id:{}', t.id)
 
         return [self.entry_from_tweet(e) for e in tweets]
 
@@ -122,12 +134,14 @@ class TwitterFeed(object):
         all_tweets = []
         while number > 0:
             try:
-                tweets = self.api.GetUserTimeline(screen_name=account,
-                                                  include_rts=False,
-                                                  exclude_replies=True,
-                                                  count=min(number, CHUNK_SIZE),
-                                                  since_id=since_id,
-                                                  max_id=max_id)
+                tweets = self.api.GetUserTimeline(
+                    screen_name=account,
+                    include_rts=False,
+                    exclude_replies=True,
+                    count=min(number, CHUNK_SIZE),
+                    since_id=since_id,
+                    max_id=max_id,
+                )
             except twitter.TwitterError as e:
                 raise plugin.PluginError('Unable to fetch timeline %s for %s' % (account, e))
 

@@ -1,8 +1,4 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-
-class TestFilterSeen(object):
+class TestFilterSeen:
     config = """
         templates:
           global:
@@ -35,22 +31,27 @@ class TestFilterSeen(object):
         task = execute_task('test')
         assert task.find_entry(title='Seen title 1'), 'Test entry missing'
         # run again, should filter
-        task.execute()
+        task = execute_task('test')
         assert not task.find_entry(title='Seen title 1'), 'Seen test entry remains'
 
         # execute another task
         task = execute_task('test2')
         # should not contain since fields seen in previous task
-        assert not task.find_entry(title='Seen title 1'), 'Seen test entry 1 remains in second task'
-        assert not task.find_entry(title='Seen title 2'), 'Seen test entry 2 remains in second task'
+        assert not task.find_entry(
+            title='Seen title 1'
+        ), 'Seen test entry 1 remains in second task'
+        assert not task.find_entry(
+            title='Seen title 2'
+        ), 'Seen test entry 2 remains in second task'
         # new item in task should exists
         assert task.find_entry(title='Seen title 3'), 'Unseen test entry 3 not in second task'
 
         # test that we don't filter reject on non-string fields (ie, seen same imdb_score)
 
         task = execute_task('test_number')
-        assert task.find_entry(title='New title 1') and task.find_entry(title='New title 2'), \
-            'Item should not have been rejected because of number field'
+        assert task.find_entry(title='New title 1') and task.find_entry(
+            title='New title 2'
+        ), 'Item should not have been rejected because of number field'
 
     def test_learn(self, execute_task):
         task = execute_task('test_learn', options={'learn': True})
@@ -60,7 +61,7 @@ class TestFilterSeen(object):
         assert len(task.rejected) == 1, 'Seen plugin should have rejected on second run'
 
 
-class TestSeenLocal(object):
+class TestSeenLocal:
     config = """
       templates:
         global:
@@ -113,7 +114,7 @@ class TestSeenLocal(object):
         assert task.find_entry('rejected', title='item 2'), 'item 2 should be seen'
 
 
-class TestFilterSeenMovies(object):
+class TestFilterSeenMovies:
     config = """
         tasks:
           test_1:
@@ -151,15 +152,19 @@ class TestFilterSeenMovies(object):
 
     def test_seen_movies(self, execute_task):
         task = execute_task('test_1')
-        assert not (task.find_entry(title='Seen movie title 1') and task.find_entry(
-            title='Seen movie title 2')), 'Movie accepted twice in one run'
+        assert not (
+            task.find_entry(title='Seen movie title 1')
+            and task.find_entry(title='Seen movie title 2')
+        ), 'Movie accepted twice in one run'
 
         # execute again
-        task.execute()
+        task = execute_task('test_1')
         assert not task.find_entry(
-            title='Seen movie title 1'), 'Test movie entry 1 should be rejected in second execution'
+            title='Seen movie title 1'
+        ), 'Test movie entry 1 should be rejected in second execution'
         assert not task.find_entry(
-            title='Seen movie title 2'), 'Test movie entry 2 should be rejected in second execution'
+            title='Seen movie title 2'
+        ), 'Test movie entry 2 should be rejected in second execution'
 
         # execute another task
         task = execute_task('test_2')
@@ -173,13 +178,17 @@ class TestFilterSeenMovies(object):
     def test_seen_movies_strict(self, execute_task):
         task = execute_task('strict')
         assert len(task.rejected) == 1, 'Too many movies were rejected'
-        assert not task.find_entry(title='Seen movie title 10'), 'strict should not have passed movie 10'
+        assert not task.find_entry(
+            title='Seen movie title 10'
+        ), 'strict should not have passed movie 10'
 
     def test_seen_movies_local(self, execute_task):
         task = execute_task('local')
-        assert task.find_entry('accepted', title='Seen movie title 11'), 'local should have passed movie 11'
+        assert task.find_entry(
+            'accepted', title='Seen movie title 11'
+        ), 'local should have passed movie 11'
         # execute again
-        task.execute()
+        task = execute_task('local')
         msg = 'Test movie entry 12 should be rejected in second execution'
         assert task.find_entry('rejected', title='Seen movie title 12'), msg
         # test a global scope after

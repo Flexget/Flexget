@@ -1,18 +1,16 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
 import os
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('proxy')
+logger = logger.bind(name='proxy')
 
-PROTOCOLS = ['http', 'https', 'ftp', 'socks5']
+PROTOCOLS = ['http', 'https']
 
 
-class Proxy(object):
+class Proxy:
     """Adds a proxy to the requests session."""
 
     schema = {
@@ -20,14 +18,16 @@ class Proxy(object):
             {'type': 'string', 'format': 'url'},
             {
                 'type': 'object',
-                'properties': dict((prot, {'type': 'string', 'format': 'url'}) for prot in PROTOCOLS),
-                'additionalProperties': False
-            }
+                'properties': dict(
+                    (prot, {'type': 'string', 'format': 'url'}) for prot in PROTOCOLS
+                ),
+                'additionalProperties': False,
+            },
         ]
     }
 
-    @plugin.priority(255)
-    def on_task_start(self, task, config):
+    @plugin.priority(plugin.PRIORITY_FIRST)
+    def on_task_prepare(self, task, config):
         if not config:
             # If no configuration is provided, see if there are any proxy env variables
             proxies = {}
@@ -42,7 +42,7 @@ class Proxy(object):
         else:
             # Map all protocols to the configured proxy
             proxies = dict((prot, config) for prot in PROTOCOLS)
-        log.verbose('Setting proxy to %s', proxies)
+        logger.verbose('Setting proxy to {}', proxies)
         task.requests.proxies = proxies
 
 

@@ -1,17 +1,14 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
+from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
 from flexget.config_schema import one_or_more
+from flexget.event import event
 from flexget.utils import qualities
 
-log = logging.getLogger('quality')
+logger = logger.bind(name='quality')
 
 
-class FilterQuality(object):
+class FilterQuality:
     """
     Rejects all entries that don't have one of the specified qualities
 
@@ -34,7 +31,10 @@ class FilterQuality(object):
                 entry.reject('Entry doesn\'t have a quality')
                 continue
             if not any(req.allows(entry['quality']) for req in reqs):
-                entry.reject('%s does not match quality requirement %s' % (entry['quality'], reqs))
+                text_reqs = ', '.join(f'`{req}`' for req in reqs)
+                entry.reject(
+                    f'`{entry["quality"]}` does not match any of quality requirements: {text_reqs}'
+                )
 
 
 @event('plugin.register')

@@ -1,15 +1,12 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import json
+from unittest.mock import patch
 
 from flexget.api.app import base_message
 from flexget.api.core.tasks import ObjectsContainer as OC
 from flexget.manager import Manager
-from mock import patch
 
 
-class TestTaskAPI(object):
+class TestTaskAPI:
     config = """
         tasks:
           test:
@@ -32,12 +29,13 @@ class TestTaskAPI(object):
                 'config': {
                     'mock': [{'title': 'entry 1'}],
                     'rss': {
-                        'url': u'http://test/rss',
+                        'url': 'http://test/rss',
                         'group_links': False,
                         'ascii': False,
+                        'escape': False,
                         'silent': False,
-                        'all_entries': True
-                    }
+                        'all_entries': True,
+                    },
                 },
             }
         ]
@@ -46,10 +44,7 @@ class TestTaskAPI(object):
     def test_add_task(self, mocked_save_config, api_client, manager, schema_match):
         new_task = {
             'name': 'new_task',
-            'config': {
-                'mock': [{'title': 'entry 1'}],
-                'rss': {'url': 'http://test/rss'}
-            }
+            'config': {'mock': [{'title': 'entry 1'}], 'rss': {'url': 'http://test/rss'}},
         }
 
         return_task = {
@@ -57,12 +52,13 @@ class TestTaskAPI(object):
             'config': {
                 'mock': [{'title': 'entry 1'}],
                 'rss': {
-                    'url': u'http://test/rss',
+                    'url': 'http://test/rss',
                     'group_links': False,
                     'ascii': False,
+                    'escape': False,
                     'silent': False,
-                    'all_entries': True
-                }
+                    'all_entries': True,
+                },
             },
         }
 
@@ -79,12 +75,7 @@ class TestTaskAPI(object):
         assert manager.config['tasks']['new_task'] == return_task['config']
 
     def test_add_task_existing(self, api_client, schema_match):
-        new_task = {
-            'name': 'test',
-            'config': {
-                'mock': [{'title': 'entry 1'}]
-            }
-        }
+        new_task = {'name': 'test', 'config': {'mock': [{'title': 'entry 1'}]}}
 
         rsp = api_client.json_post('/tasks/', data=json.dumps(new_task))
         assert rsp.status_code == 409
@@ -106,12 +97,13 @@ class TestTaskAPI(object):
             'config': {
                 'mock': [{'title': 'entry 1'}],
                 'rss': {
-                    'url': u'http://test/rss',
+                    'url': 'http://test/rss',
                     'group_links': False,
                     'ascii': False,
+                    'escape': False,
                     'silent': False,
-                    'all_entries': True
-                }
+                    'all_entries': True,
+                },
             },
         }
 
@@ -127,10 +119,7 @@ class TestTaskAPI(object):
     def test_update_task(self, mocked_save_config, api_client, manager, schema_match):
         same_task = {
             'name': 'test',
-            'config': {
-                'mock': [{'title': 'entry 1'}],
-                'rss': {'url': 'http://newurl/rss'}
-            }
+            'config': {'mock': [{'title': 'entry 1'}], 'rss': {'url': 'http://newurl/rss'}},
         }
 
         rsp = api_client.json_put('/tasks/test/', data=json.dumps(same_task))
@@ -141,10 +130,7 @@ class TestTaskAPI(object):
 
         updated_task = {
             'name': 'test',
-            'config': {
-                'mock': [{'title': 'entry 1'}],
-                'rss': {'url': 'http://newurl/rss'}
-            }
+            'config': {'mock': [{'title': 'entry 1'}], 'rss': {'url': 'http://newurl/rss'}},
         }
 
         rsp = api_client.json_put('/tasks/test/', data=json.dumps(updated_task))
@@ -169,10 +155,7 @@ class TestTaskAPI(object):
     def test_rename_task(self, mocked_save_config, api_client, manager, schema_match):
         updated_task = {
             'name': 'new_test',
-            'config': {
-                'mock': [{'title': 'entry 1'}],
-                'rss': {'url': 'http://newurl/rss'}
-            }
+            'config': {'mock': [{'title': 'entry 1'}], 'rss': {'url': 'http://newurl/rss'}},
         }
 
         rsp = api_client.json_put('/tasks/test/', data=json.dumps(updated_task))
@@ -209,7 +192,7 @@ class TestTaskAPI(object):
         assert not errors
 
 
-class TestTaskQueue(object):
+class TestTaskQueue:
     config = """
             tasks:
               test_task:
@@ -228,13 +211,10 @@ class TestTaskQueue(object):
             'title': "injected",
             'url': 'http://test.com',
             'accept': True,
-            'tasks': ['test_task']
+            'tasks': ['test_task'],
         }
 
-        payload = {
-            "inject": [entry],
-            'tasks': ['test_task']
-        }
+        payload = {"inject": [entry], 'tasks': ['test_task']}
 
         rsp = api_client.json_post('/tasks/execute/', data=json.dumps(payload))
         assert rsp.status_code == 200
@@ -266,3 +246,22 @@ class TestTaskQueue(object):
         assert not errors
 
         assert data == []
+
+
+class TestDisabledTasks:
+    config = """
+        tasks:
+          live_task:
+            mock:
+            - title: foo
+          _disabled_task:
+            mock:
+            - title: bar
+    """
+
+    def test_only_active_tasks_return(self, api_client):
+        rsp = api_client.get('/tasks/')
+        data = json.loads(rsp.get_data(as_text=True))
+
+        assert len(data) == 1
+        assert not data[0].get('name') == '_disabled_task'

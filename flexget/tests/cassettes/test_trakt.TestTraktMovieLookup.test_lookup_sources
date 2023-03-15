@@ -2,34 +2,71 @@ interactions:
 - request:
     body: null
     headers:
-      Content-Type: [application/json]
-      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: ['2']
+      Content-Type:
+      - application/json
+      trakt-api-key:
+      - 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af
+      trakt-api-version:
+      - '2'
     method: GET
     uri: https://api.trakt.tv/movies/481?extended=full
   response:
-    body: {string: '{"title":"The Matrix","year":1999,"ids":{"trakt":481,"slug":"the-matrix-1999","imdb":"tt0133093","tmdb":603},"tagline":"Welcome
+    body:
+      string: '{"title":"The Matrix","year":1999,"ids":{"trakt":481,"slug":"the-matrix-1999","imdb":"tt0133093","tmdb":603},"tagline":"Welcome
         to the Real World.","overview":"Set in the 22nd century, The Matrix tells
         the story of a computer hacker who joins a group of underground insurgents
-        fighting the vast and powerful computers who now rule the earth.","released":"1999-03-30","runtime":136,"trailer":"http://youtube.com/watch?v=m8e-FF8MsqU","homepage":"http://www.warnerbros.com/matrix","rating":8.89357,"votes":22878,"updated_at":"2016-12-16T08:41:42.000Z","language":"en","available_translations":["bg","bs","cs","da","de","el","en","es","fa","fi","fr","he","hu","id","it","ja","ko","mk","nl","no","pl","pt","ro","ru","sk","sr","sv","th","tr","uk","zh"],"genres":["action","science-fiction"],"certification":"R"}'}
+        fighting the vast and powerful computers who now rule the earth.","released":"1999-03-30","runtime":136,"country":"us","trailer":"http://youtube.com/watch?v=m8e-FF8MsqU","homepage":"http://www.warnerbros.com/matrix","status":"released","rating":8.8059,"votes":49800,"comment_count":82,"updated_at":"2020-12-24T08:17:34.000Z","language":"en","available_translations":["ar","bg","bs","cs","da","de","el","en","es","fa","fi","fr","gl","he","hr","hu","id","it","ja","ka","ko","lt","lv","mk","nl","no","pl","pt","ro","ru","sk","sl","sr","sv","th","tr","uk","uz","vi","zh"],"genres":["action","science-fiction"],"certification":"R"}'
     headers:
-      CF-Cache-Status: [HIT]
-      CF-RAY: [312a16b949ea3cd7-CPH]
-      Cache-Control: ['public, max-age=28800']
-      Connection: [keep-alive]
-      Content-Type: [application/json; charset=utf-8]
-      Date: ['Sat, 17 Dec 2016 11:38:26 GMT']
-      ETag: [W/"71bb837d0fdf4e85d8cd6fc76a31fc09"]
-      Expires: ['Sat, 17 Dec 2016 19:38:26 GMT']
-      Last-Modified: ['Fri, 16 Dec 2016 08:41:42 GMT']
-      Server: [cloudflare-nginx]
-      Set-Cookie: ['__cfduid=da5ea6ed59003324c1d089786af91f7301481974706; expires=Sun,
-          17-Dec-17 11:38:26 GMT; path=/; domain=.trakt.tv; HttpOnly']
-      Vary: [Accept-Encoding]
-      X-Content-Type-Options: [nosniff]
-      X-Frame-Options: [SAMEORIGIN]
-      X-Request-Id: [9c974a27-c920-4e4d-971c-06e48254afab]
-      X-Runtime: ['0.012982']
-      X-XSS-Protection: [1; mode=block]
-    status: {code: 200, message: OK}
+      Age:
+      - '11310'
+      CF-Cache-Status:
+      - HIT
+      CF-RAY:
+      - 60caac59f8d83848-IAD
+      Cache-Control:
+      - public, max-age=28800
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Tue, 05 Jan 2021 05:07:00 GMT
+      ETag:
+      - W/"134bf11f5ee3c5229a0124b41a8181d0"
+      Expect-CT:
+      - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+      Expires:
+      - Tue, 05 Jan 2021 09:58:30 GMT
+      Last-Modified:
+      - Thu, 24 Dec 2020 08:17:34 GMT
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cfduid=daa139f4354fc44d8a5c5dcbb5fe59b6a1609823220; expires=Thu, 04-Feb-21
+        05:07:00 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Ratelimit:
+      - '{"name":"AUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":983,"until":"2020-12-31T02:45:00Z"}'
+      X-Request-Id:
+      - 487d3be1-c34d-4e77-a8e0-a1574175974c
+      X-Runtime:
+      - '0.008323'
+      X-XSS-Protection:
+      - 1; mode=block
+      cf-request-id:
+      - 07728a0c3800003848ed82d000000001
+    status:
+      code: 200
+      message: OK
 version: 1

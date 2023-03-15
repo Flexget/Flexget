@@ -1,16 +1,13 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
+from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
 from flexget.entry import Entry
+from flexget.event import event
 
-log = logging.getLogger(__name__.rsplit('.')[-1])
+logger = logger.bind(name='generate')
 
 
-class Generate(object):
+class Generate:
     """Generates n number of random entries. Used for debugging purposes."""
 
     schema = {'type': 'integer'}
@@ -20,13 +17,21 @@ class Generate(object):
         entries = []
         for i in range(amount):
             entry = Entry()
-            import string
             import random
+            import string
+
             entry['url'] = 'http://localhost/generate/%s/%s' % (
                 i,
-                ''.join([random.choice(string.ascii_letters + string.digits) for x in range(1, 30)]))
-            entry['title'] = ''.join([random.choice(string.ascii_letters + string.digits) for x in range(1, 30)])
-            entry['description'] = ''.join([random.choice(string.ascii_letters + string.digits) for x in range(1, 1000)])
+                ''.join(
+                    [random.choice(string.ascii_letters + string.digits) for x in range(1, 30)]
+                ),
+            )
+            entry['title'] = ''.join(
+                [random.choice(string.ascii_letters + string.digits) for x in range(1, 30)]
+            )
+            entry['description'] = ''.join(
+                [random.choice(string.ascii_letters + string.digits) for x in range(1, 1000)]
+            )
             entries.append(entry)
         return entries
 

@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import pytest
 from jinja2 import Template
 
@@ -8,7 +5,7 @@ import flexget.utils.qualities as qualities
 from flexget.task import TaskAbort
 
 
-class TestAssumeQuality(object):
+class TestAssumeQuality:
     _config = """
         templates:
           global:
@@ -111,12 +108,16 @@ class TestAssumeQuality(object):
     def test_default(self, execute_task):
         task = execute_task('test_default')
         entry = task.find_entry('entries', title='Testfile.noquality')
-        assert entry.get('quality') == qualities.Quality('720p h264'), 'Testfile.noquality quality not \'720p h264\''
+        assert entry.get('quality') == qualities.Quality(
+            '720p h264'
+        ), 'Testfile.noquality quality not \'720p h264\''
 
     def test_simple(self, execute_task):
         task = execute_task('test_simple')
         entry = task.find_entry('entries', title='Testfile.noquality')
-        assert entry.get('quality') == qualities.Quality('720p h264'), 'Testfile.noquality quality not \'720p h264\''
+        assert entry.get('quality') == qualities.Quality(
+            '720p h264'
+        ), 'Testfile.noquality quality not \'720p h264\''
 
     def test_priority(self, execute_task):
         task = execute_task('test_priority')

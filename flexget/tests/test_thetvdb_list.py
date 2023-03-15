@@ -1,23 +1,25 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from time import sleep
 
 import pytest
 
+from flexget.components.managed_lists.lists.thetvdb_list import TheTVDBSet
 from flexget.entry import Entry
-from flexget.plugins.list.thetvdb_list import TheTVDBSet
 
 
 @pytest.mark.online
-class TestTheTVDBList(object):
+class TestTheTVDBList:
     config = """
       tasks: {}
     """
 
-    tvdb_config = {'username': 'flexget2',
-                   'account_id': 'D3405F10B200C4DB'}
+    tvdb_config = {
+        'username': 'flexget2',
+        'account_id': 'D3405F10B200C4DB',
+        'api_key': '4D297D8CFDE0E105',
+    }
 
-    def test_thetvdb_list_add(self):
+    def test_thetvdb_list_add(self, manager):
+        # manager fixture is requested so that the database is spun up
         tvdb_set = TheTVDBSet(self.tvdb_config)
         # Clearing existing list
         tvdb_set.clear()

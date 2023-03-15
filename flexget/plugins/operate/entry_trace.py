@@ -1,12 +1,9 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('entry_trace')
+logger = logger.bind(name='entry_trace')
 
 
 def on_entry_action(entry, act=None, task=None, reason=None, **kwargs):
@@ -16,7 +13,7 @@ def on_entry_action(entry, act=None, task=None, reason=None, **kwargs):
         entry['reason'] = reason
 
 
-class EntryOperations(object):
+class EntryOperations:
     """
     Records accept, reject and fail metainfo into entries.
 
@@ -29,7 +26,7 @@ class EntryOperations(object):
       reason: <given message by plugin>
     """
 
-    @plugin.priority(-255)
+    @plugin.priority(plugin.PRIORITY_LAST)
     def on_task_input(self, task, config):
         for entry in task.all_entries:
             entry.on_accept(on_entry_action, act='accepted', task=task)

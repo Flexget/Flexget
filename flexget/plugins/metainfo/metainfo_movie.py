@@ -1,17 +1,18 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from loguru import logger
 
-import logging
-
-from flexget.plugins.parsers.parser_common import normalize_name, remove_dirt
 from flexget import plugin
 from flexget.event import event
-from flexget.plugin import get_plugin_by_name
 
-log = logging.getLogger('metainfo_movie')
+try:
+    # NOTE: Importing other plugins is discouraged!
+    from flexget.components.parsing.parsers import parser_common as plugin_parser_common
+except ImportError:
+    raise plugin.DependencyError(issued_by=__name__, missing='parser_common')
+
+logger = logger.bind(name='metainfo_movie')
 
 
-class MetainfoMovie(object):
+class MetainfoMovie:
     """
     Check if entry appears to be a movie, and populate movie info if so.
     """
@@ -38,10 +39,14 @@ class MetainfoMovie(object):
         if entry.get('movie_guessed'):
             # Return true if we already parsed this
             return True
-        parser = get_plugin_by_name('parsing').instance.parse_movie(data=entry['title'])
+        parser = plugin.get('parsing', 'metainfo_movie').parse_movie(data=entry['title'])
         if parser and parser.valid:
-            parser.name = normalize_name(remove_dirt(parser.name))
-            entry.update(parser.fields)
+            parser.name = plugin_parser_common.normalize_name(
+                plugin_parser_common.remove_dirt(parser.name)
+            )
+            for field, value in parser.fields.items():
+                if not entry.is_lazy(field) and not entry.get(field):
+                    entry[field] = value
             return True
         return False
 

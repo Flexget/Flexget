@@ -1,15 +1,21 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import hashlib
-import io
 import os
+from typing import Tuple
 
 import requests
-from flexget.utils.tools import log
+from loguru import logger
+
+logger = logger.bind(name='utils.cache')
 
 
-def cached_resource(url, base_dir, force=False, max_size=250, directory='cached_resources'):
+# TODO refactor this to use lru_cache
+def cached_resource(
+    url: str,
+    base_dir: str,
+    force: bool = False,
+    max_size: int = 250,
+    directory: str = 'cached_resources',
+) -> Tuple[str, str]:
     """
     Caches a remote resource to local filesystem. Return a tuple of local file name and mime type, use primarily
     for API/WebUI.
@@ -26,7 +32,7 @@ def cached_resource(url, base_dir, force=False, max_size=250, directory='cached_
     directory = os.path.dirname(file_path)
 
     if not os.path.exists(file_path) or force:
-        log.debug('caching %s', url)
+        logger.debug(f'caching {url}')
         response = requests.get(url)
         response.raise_for_status()
         mime_type = response.headers.get('content-type')
@@ -38,16 +44,18 @@ def cached_resource(url, base_dir, force=False, max_size=250, directory='cached_
         size = dir_size(directory) / (1024 * 1024.0)
         if not force:
             while size >= max_size:
-                log.debug('directory %s size is over the allowed limit of %s, trimming', size, max_size)
+                logger.debug(
+                    f'directory {size} size is over the allowed limit of {max_size}, trimming'
+                )
                 trim_dir(directory)
                 size = dir_size(directory) / (1024 * 1024.0)
 
-        with io.open(file_path, 'wb') as file:
+        with open(file_path, 'wb') as file:
             file.write(content)
     return file_path, mime_type
 
 
-def dir_size(directory):
+def dir_size(directory: str) -> int:
     """
     Sums the size of all files in a given dir. Not recursive.
 
@@ -61,17 +69,17 @@ def dir_size(directory):
     return size
 
 
-def trim_dir(directory):
+def trim_dir(directory: str) -> None:
     """
     Removed the least accessed file on a given dir
 
     :param directory: Directory to check
     """
 
-    def access_time(f):
+    def access_time(f: str) -> float:
         return os.stat(os.path.join(directory, f)).st_atime
 
     files = sorted(os.listdir(directory), key=access_time)
     file_name = os.path.join(directory, files[0])
-    log.debug('removing least accessed file: %s', file_name)
+    logger.debug('removing least accessed file: {}', file_name)
     os.remove(file_name)

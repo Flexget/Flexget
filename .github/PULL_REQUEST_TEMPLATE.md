@@ -1,11 +1,9 @@
 ### Motivation for changes:
 
 ### Detailed changes:
-
 - 
 
-### Addressed issues:
-
+### Addressed issues/feature requests:
 - Fixes # .
 
 ### Config usage if relevant (new plugin or updated schema):

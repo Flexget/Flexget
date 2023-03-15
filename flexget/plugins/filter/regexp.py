@@ -1,45 +1,41 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
-
-import logging
 import re
+from urllib.parse import unquote
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
 
-from future.moves.urllib.parse import unquote
-
-log = logging.getLogger('regexp')
+logger = logger.bind(name='regexp')
 
 
-class FilterRegexp(object):
+class FilterRegexp:
     """
-        All possible forms.
+    All possible forms.
 
-        regexp:
-          [operation]:           # operation to perform on matches
-            - [regexp]           # simple regexp
-            - [regexp]: <path>   # override path
-            - [regexp]:
-                [path]: <path>   # override path
-                [not]: <regexp>  # not match
-                [from]: <field>  # search from given entry field
-            - [regexp]:
-                [path]: <path>   # override path
-                [not]:           # list of not match regexps
-                  - <regexp>
-                [from]:          # search only from these fields
-                  - <field>
-          [operation]:
-            - <regexp>
-          [rest]: <operation>    # non matching entries are
-          [from]:                # search only from these fields for all regexps
-            - <field>
+    regexp:
+      [operation]:           # operation to perform on matches
+        - [regexp]           # simple regexp
+        - [regexp]: <path>   # override path
+        - [regexp]:
+            [path]: <path>   # override path
+            [not]: <regexp>  # not match
+            [from]: <field>  # search from given entry field
+        - [regexp]:
+            [path]: <path>   # override path
+            [not]:           # list of not match regexps
+              - <regexp>
+            [from]:          # search only from these fields
+              - <field>
+      [operation]:
+        - <regexp>
+      [rest]: <operation>    # non matching entries are
+      [from]:                # search only from these fields for all regexps
+        - <field>
 
-        Possible operations: accept, reject, accept_excluding, reject_excluding
+    Possible operations: accept, reject, accept_excluding, reject_excluding
     """
 
     schema = {
@@ -50,7 +46,7 @@ class FilterRegexp(object):
             'accept_excluding': {'$ref': '#/definitions/regex_list'},
             'reject_excluding': {'$ref': '#/definitions/regex_list'},
             'rest': {'type': 'string', 'enum': ['accept', 'reject']},
-            'from': one_or_more({'type': 'string'})
+            'from': one_or_more({'type': 'string'}),
         },
         'additionalProperties': False,
         'definitions': {
@@ -74,18 +70,20 @@ class FilterRegexp(object):
                                         'properties': {
                                             'path': {'type': 'string', 'format': 'path'},
                                             'set': {'type': 'object'},
-                                            'not': one_or_more({'type': 'string', 'format': 'regex'}),
-                                            'from': one_or_more({'type': 'string'})
+                                            'not': one_or_more(
+                                                {'type': 'string', 'format': 'regex'}
+                                            ),
+                                            'from': one_or_more({'type': 'string'}),
                                         },
-                                        'additionalProperties': False
-                                    }
+                                        'additionalProperties': False,
+                                    },
                                 ]
-                            }
-                        }
+                            },
+                        },
                     ]
-                }
+                },
             }
-        }
+        },
     }
 
     def prepare_config(self, config):
@@ -122,14 +120,16 @@ class FilterRegexp(object):
                 if config.get('from'):
                     opts.setdefault('from', config['from'])
                 # Put plain strings into list form for `from` and `not` options
-                if 'from' in opts and isinstance(opts['from'], basestring):
+                if 'from' in opts and isinstance(opts['from'], str):
                     opts['from'] = [opts['from']]
-                if 'not' in opts and isinstance(opts['not'], basestring):
+                if 'not' in opts and isinstance(opts['not'], str):
                     opts['not'] = [opts['not']]
 
                 # compile `not` option regexps
                 if 'not' in opts:
-                    opts['not'] = [re.compile(not_re, re.IGNORECASE | re.UNICODE) for not_re in opts['not']]
+                    opts['not'] = [
+                        re.compile(not_re, re.IGNORECASE | re.UNICODE) for not_re in opts['not']
+                    ]
 
                 # compile regexp and make sure regexp is a string for series like '24'
                 try:
@@ -145,21 +145,19 @@ class FilterRegexp(object):
     def on_task_filter(self, task, config):
         # TODO: what if accept and accept_excluding configured? Should raise error ...
         config = self.prepare_config(config)
-        rest = []
+        # Keep track of all entries which have not matched any regexp
+        rest = set(task.entries)
         for operation, regexps in config.items():
             if operation == 'rest':
                 continue
-            leftovers = self.filter(task, operation, regexps)
-            if not rest:
-                rest = leftovers
-            else:
-                # If there is already something in rest, take the intersection with r (entries no operations matched)
-                rest = [entry for entry in leftovers if entry in rest]
+            matched = self.filter(task.entries, operation, regexps)
+            # Remove any entries from rest which matched this regexp
+            rest -= matched
 
         if 'rest' in config:
             rest_method = Entry.accept if config['rest'] == 'accept' else Entry.reject
             for entry in rest:
-                log.debug('Rest method %s for %s' % (config['rest'], entry['title']))
+                logger.debug('Rest method {} for {}', config['rest'], entry['title'])
                 rest_method(entry, 'regexp `rest`')
 
     def matches(self, entry, regexp, find_from=None, not_regexps=None):
@@ -182,7 +180,7 @@ class FilterRegexp(object):
             if not isinstance(values, list):
                 values = [values]
             for value in values:
-                if not isinstance(value, basestring):
+                if not isinstance(value, str):
                     value = str(value)
                 if field in unquote_fields:
                     value = unquote(value)
@@ -196,20 +194,20 @@ class FilterRegexp(object):
                     else:  # None of the not_regexps matched
                         return field
 
-    def filter(self, task, operation, regexps):
+    def filter(self, entries, operation, regexps):
         """
-        :param task: Task instance
+        :param entries: entries to filter
         :param operation: one of 'accept' 'reject' 'accept_excluding' and 'reject_excluding'
-                          accept and reject will be called on the entry if any of the regxps match
+                          accept and reject will be called on the entry if any of the regexps match
                           *_excluding operations will be called if any of the regexps don't match
         :param regexps: list of {compiled_regexp: options} dictionaries
-        :return: Return list of entries that didn't match regexps
+        :return: Return set of entries that matched regexps
         """
-        rest = []
+        matched = set()
         method = Entry.accept if 'accept' in operation else Entry.reject
         match_mode = 'excluding' not in operation
-        for entry in task.entries:
-            log.trace('testing %i regexps to %s' % (len(regexps), entry['title']))
+        for entry in entries:
+            logger.trace('testing {} regexps to {}', len(regexps), entry['title'])
             for regexp_opts in regexps:
                 regexp, opts = list(regexp_opts.items())[0]
 
@@ -219,25 +217,27 @@ class FilterRegexp(object):
                 # Run if we are in match mode and have a hit, or are in non-match mode and don't have a hit
                 if match_mode == bool(field):
                     # Creates the string with the reason for the hit
-                    matchtext = 'regexp \'%s\' ' % regexp.pattern + ('matched field \'%s\'' %
-                                                                     field if match_mode else 'didn\'t match')
-                    log.debug('%s for %s' % (matchtext, entry['title']))
+                    matchtext = 'regexp \'%s\' ' % regexp.pattern + (
+                        'matched field \'%s\'' % field if match_mode else 'didn\'t match'
+                    )
+                    logger.debug('{} for {}', matchtext, entry['title'])
                     # apply settings to entry and run the method on it
                     if opts.get('path'):
                         entry['path'] = opts['path']
                     if opts.get('set'):
                         # invoke set plugin with given configuration
-                        log.debug('adding set: info to entry:"%s" %s' % (entry['title'], opts['set']))
-                        set = plugin.get_plugin_by_name('set')
-                        set.instance.modify(entry, opts['set'])
+                        logger.debug(
+                            'adding set: info to entry:"{}" {}', entry['title'], opts['set']
+                        )
+                        plugin.get('set', self).modify(entry, opts['set'])
                     method(entry, matchtext)
+                    matched.add(entry)
                     # We had a match so break out of the regexp loop.
                     break
             else:
                 # We didn't run method for any of the regexps, add this entry to rest
                 entry.trace('None of configured %s regexps matched' % operation)
-                rest.append(entry)
-        return rest
+        return matched
 
 
 @event('plugin.register')

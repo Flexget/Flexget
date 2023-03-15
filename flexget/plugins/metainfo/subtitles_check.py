@@ -1,17 +1,16 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import os
 import logging
+import os
 import tempfile
 
-from flexget import plugin
+from loguru import logger
+
+from flexget import entry, plugin
 from flexget.event import event
 
-log = logging.getLogger('check_subtitles')
+logger = logger.bind(name='check_subtitles')
 
 
-class MetainfoSubs(object):
+class MetainfoSubs:
     """
     Set 'subtitles' field for entries, if they are local video files with subs.
     The field is a list of language codes (3-letter ISO-639-3) for each subtitles
@@ -26,15 +25,21 @@ class MetainfoSubs(object):
         try:
             import subliminal
         except ImportError as e:
-            log.debug('Error importing Subliminal: %s' % e)
-            raise plugin.DependencyError('subliminal', 'subliminal',
-                                         'Subliminal module required. ImportError: %s' % e)
-        from subliminal.cli import MutexLock
+            logger.debug('Error importing Subliminal: {}', e)
+            raise plugin.DependencyError(
+                'subliminal', 'subliminal', 'Subliminal module required. ImportError: %s' % e
+            )
         from dogpile.cache.exception import RegionAlreadyConfigured
+        from subliminal.cli import MutexLock
+
         try:
-            subliminal.region.configure('dogpile.cache.dbm',
-                                        arguments={'filename': os.path.join(tempfile.gettempdir(), 'cachefile.dbm'),
-                                                   'lock_factory': MutexLock})
+            subliminal.region.configure(
+                'dogpile.cache.dbm',
+                arguments={
+                    'filename': os.path.join(tempfile.gettempdir(), 'cachefile.dbm'),
+                    'lock_factory': MutexLock,
+                },
+            )
         except RegionAlreadyConfigured:
             pass
         logging.getLogger("subliminal").setLevel(logging.CRITICAL)
@@ -45,14 +50,20 @@ class MetainfoSubs(object):
         if config is False:
             return
         for entry in task.entries:
-            entry.register_lazy_func(self.get_subtitles, ['subtitles'])
+            entry.add_lazy_fields(self.get_subtitles, ['subtitles'])
 
+    @entry.register_lazy_lookup('subtitles_check')
     def get_subtitles(self, entry):
-        if entry.get('subtitles', eval_lazy=False) or not ('location' in entry) or \
-                ('$RECYCLE.BIN' in entry['location']) or not os.path.exists(entry['location']):
+        if (
+            entry.get('subtitles', eval_lazy=False)
+            or not ('location' in entry)
+            or ('$RECYCLE.BIN' in entry['location'])
+            or not os.path.exists(entry['location'])
+        ):
             return
         from subliminal import scan_video
-        from subliminal.core import search_external_subtitles, refine
+        from subliminal.core import refine, search_external_subtitles
+
         try:
             video = scan_video(entry['location'])
             # grab external and internal subtitles
@@ -64,9 +75,9 @@ class MetainfoSubs(object):
                 # convert to human-readable strings
                 subtitles = [str(l) for l in subtitles]
                 entry['subtitles'] = subtitles
-                log.debug('Found subtitles %s for %s', '/'.join(subtitles), entry['title'])
+                logger.debug('Found subtitles {} for {}', '/'.join(subtitles), entry['title'])
         except Exception as e:
-            log.error('Error checking local subtitles for %s: %s', entry['title'], e)
+            logger.error('Error checking local subtitles for {}: {}', entry['title'], e)
 
 
 @event('plugin.register')

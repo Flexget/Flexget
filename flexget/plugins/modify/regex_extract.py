@@ -1,20 +1,17 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
-
-import logging
 import re
 
+from loguru import logger
+
 from flexget import plugin
+from flexget.config_schema import one_or_more
 from flexget.event import event
 from flexget.utils.tools import ReList
-from flexget.config_schema import one_or_more
 
-log = logging.getLogger('regex_extract')
+logger = logger.bind(name='regex_extract')
 
 
-class RegexExtract(object):
-    """
+class RegexExtract:
+    r"""
     Updates an entry with the values of regex matched named groups
 
     Usage:
@@ -47,7 +44,7 @@ class RegexExtract(object):
 
     def on_task_start(self, task, config):
         regex = config.get('regex')
-        if isinstance(regex, basestring):
+        if isinstance(regex, str):
             regex = [regex]
         self.regex_list = ReList(regex)
 
@@ -59,30 +56,29 @@ class RegexExtract(object):
             raise plugin.PluginError('Error compiling regex: %s' % str(e))
 
     def on_task_modify(self, task, config):
-
         prefix = config.get('prefix')
         modified = 0
 
         for entry in task.entries:
             for rx in self.regex_list:
                 entry_field = entry.get('title')
-                log.debug('Matching %s with regex: %s' % (entry_field, rx))
+                logger.debug('Matching {} with regex: {}', entry_field, rx)
                 try:
                     match = rx.match(entry_field)
                 except re.error as e:
                     raise plugin.PluginError('Error encountered processing regex: %s' % str(e))
                 if match:
-                    log.debug('Successfully matched %s' % entry_field)
+                    logger.debug('Successfully matched {}', entry_field)
                     data = match.groupdict()
                     if prefix:
                         for key in list(data.keys()):
                             data[prefix + key] = data[key]
                             del data[key]
-                    log.debug('Values added to entry: %s' % data)
+                    logger.debug('Values added to entry: {}', data)
                     entry.update(data)
                     modified += 1
 
-        log.info('%d entries matched and modified' % modified)
+        logger.info('{} entries matched and modified', modified)
 
 
 @event('plugin.register')

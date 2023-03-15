@@ -1,16 +1,12 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import pytest
-from flexget.api.app import base_message
 
-from flexget.api.plugins.tvdb_lookup import ObjectsContainer as OC
+from flexget.api.app import base_message
+from flexget.components.thetvdb.api import ObjectsContainer as OC
 from flexget.utils import json
 
 
 @pytest.mark.online
-class TestTVDBSeriesLookupAPI(object):
+class TestTVDBSeriesLookupAPI:
     config = 'tasks: {}'
 
     def test_tvdb_series_lookup(self, api_client, schema_match):
@@ -19,7 +15,7 @@ class TestTVDBSeriesLookupAPI(object):
             'imdb_id': 'tt0106179',
             'language': 'en',
             'series_name': 'The X-Files',
-            'zap2it_id': 'EP00080955'
+            'zap2it_id': 'EP00080955',
         }
 
         rsp = api_client.get('/tvdb/series/The X-Files/')
@@ -39,7 +35,7 @@ class TestTVDBSeriesLookupAPI(object):
             'imdb_id': 'tt0106179',
             'language': 'en',
             'series_name': 'The X-Files',
-            'zap2it_id': 'EP00080955'
+            'zap2it_id': 'EP00080955',
         }
 
         rsp = api_client.get('/tvdb/series/77398/')
@@ -62,7 +58,7 @@ class TestTVDBSeriesLookupAPI(object):
 
 
 @pytest.mark.online
-class TestTVDBSeriesActorsLookupAPI(object):
+class TestTVDBSeriesActorsLookupAPI:
     config = 'tasks: {}'
 
     def test_tvdb_series_lookup_with_actors(self, api_client, schema_match):
@@ -71,7 +67,7 @@ class TestTVDBSeriesActorsLookupAPI(object):
             'imdb_id': 'tt0106179',
             'language': 'en',
             'series_name': 'The X-Files',
-            'zap2it_id': 'EP00080955'
+            'zap2it_id': 'EP00080955',
         }
 
         rsp = api_client.get('/tvdb/series/The X-Files/?include_actors=true')
@@ -87,7 +83,7 @@ class TestTVDBSeriesActorsLookupAPI(object):
 
 
 @pytest.mark.online
-class TestTVDBEpisodeLookupAPI(object):
+class TestTVDBEpisodeLookupAPI:
     config = 'tasks: {}'
 
     def test_tvdb_episode_lookup_season_and_ep_number(self, api_client, schema_match):
@@ -99,7 +95,7 @@ class TestTVDBEpisodeLookupAPI(object):
             'id': 5313345,
             'season_number': 10,
             'series_id': 77398,
-            'absolute_number': None
+            'absolute_number': None,
         }
 
         rsp = api_client.get('/tvdb/episode/77398/?season_number=10&ep_number=6')
@@ -114,7 +110,7 @@ class TestTVDBEpisodeLookupAPI(object):
 
 
 @pytest.mark.online
-class TestTVDBEpisodeABSLookupAPI(object):
+class TestTVDBEpisodeABSLookupAPI:
     config = 'tasks: {}'
 
     def test_tvdb_episode_lookup_by_absolute_number(self, api_client, schema_match):
@@ -123,7 +119,7 @@ class TestTVDBEpisodeABSLookupAPI(object):
             'id': 5598674,
             'season_number': 2,
             'series_id': 279121,
-            'absolute_number': 46
+            'absolute_number': 46,
         }
 
         rsp = api_client.get('/tvdb/episode/279121/?absolute_number=46')
@@ -138,7 +134,7 @@ class TestTVDBEpisodeABSLookupAPI(object):
 
 
 @pytest.mark.online
-class TestTVDBEpisodeAirDateLookupAPI(object):
+class TestTVDBEpisodeAirDateLookupAPI:
     config = 'tasks: {}'
 
     def test_tvdb_episode_lookup_by_air_date(self, api_client, schema_match):
@@ -147,7 +143,7 @@ class TestTVDBEpisodeAirDateLookupAPI(object):
             'id': 5598674,
             'season_number': 2,
             'series_id': 279121,
-            'absolute_number': 46
+            'absolute_number': 46,
         }
 
         rsp = api_client.get('/tvdb/episode/279121/?air_date=2016-05-24')
@@ -162,7 +158,7 @@ class TestTVDBEpisodeAirDateLookupAPI(object):
 
 
 @pytest.mark.online
-class TestTVDSearchNameLookupAPI(object):
+class TestTVDSearchNameLookupAPI:
     config = 'tasks: {}'
 
     def test_tvdb_search_results_by_name(self, api_client, schema_match):
@@ -174,17 +170,14 @@ class TestTVDSearchNameLookupAPI(object):
         errors = schema_match(OC.search_results_object, data)
         assert not errors
 
-        values = {
-            'series_name': "Supernatural",
-            'tvdb_id': 78901
-        }
+        values = {'series_name': "Supernatural", 'tvdb_id': 78901}
 
         for field, value in values.items():
             assert data[0].get(field) == value
 
 
 @pytest.mark.online
-class TestTVDSearchIMDBLookupAPI(object):
+class TestTVDSearchIMDBLookupAPI:
     config = 'tasks: {}'
 
     def test_tvdb_search_results_by_imdb_id(self, api_client, schema_match):
@@ -195,17 +188,14 @@ class TestTVDSearchIMDBLookupAPI(object):
         errors = schema_match(OC.search_results_object, data)
         assert not errors
 
-        values = {
-            'series_name': "Game of Thrones",
-            'tvdb_id': 121361
-        }
+        values = {'series_name': "Game of Thrones", 'tvdb_id': 121361}
 
         for field, value in values.items():
             assert data[0].get(field) == value
 
 
 @pytest.mark.online
-class TestTVDSearchZAP2ITLookupAPI(object):
+class TestTVDSearchZAP2ITLookupAPI:
     config = 'tasks: {}'
 
     def test_tvdb_search_results_by_zap2it_id(self, api_client, schema_match):
@@ -216,17 +206,14 @@ class TestTVDSearchZAP2ITLookupAPI(object):
         errors = schema_match(OC.search_results_object, data)
         assert not errors
 
-        values = {
-            'series_name': "The Flash (2014)",
-            'tvdb_id': 279121
-        }
+        values = {'series_name': "The Flash (2014)", 'tvdb_id': 279121}
 
         for field, value in values.items():
             assert data[0].get(field) == value
 
 
 @pytest.mark.online
-class TestTVDSearchAPIErrors(object):
+class TestTVDSearchAPIErrors:
     config = 'tasks: {}'
 
     def test_tvdb_search_bad_request(self, api_client, schema_match):
@@ -247,7 +234,7 @@ class TestTVDSearchAPIErrors(object):
 
 
 @pytest.mark.online
-class TestTVDBLanguages(object):
+class TestTVDBLanguages:
     config = 'tasks: {}'
 
     def test_series_lookup_with_language(self, api_client, schema_match):
@@ -256,7 +243,7 @@ class TestTVDBLanguages(object):
             'imdb_id': 'tt0913290',
             'language': 'nl',
             'series_name': 'Tegenlicht',
-            'network': 'VPRO'
+            'network': 'VPRO',
         }
 
         rsp = api_client.get('/tvdb/series/Tegenlicht/?language=nl')
@@ -276,7 +263,7 @@ class TestTVDBLanguages(object):
             'id': 4532248,
             'season_number': 10,
             'series_id': 252712,
-            'episode_name': 'Gasland'
+            'episode_name': 'Gasland',
         }
 
         rsp = api_client.get('/tvdb/episode/252712/?season_number=10&ep_number=1&language=nl')
@@ -297,10 +284,7 @@ class TestTVDBLanguages(object):
         errors = schema_match(OC.search_results_object, data)
         assert not errors
 
-        values = {
-            'series_name': "Tegenlicht",
-            'tvdb_id': 252712
-        }
+        values = {'series_name': "Tegenlicht", 'tvdb_id': 252712}
 
         for field, value in values.items():
             assert data[0].get(field) == value

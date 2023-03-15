@@ -1,11 +1,8 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 from flexget import plugin
 from flexget.event import event
 
 
-class AbortPlugin(object):
+class AbortPlugin:
     """
     abort plugin for debug purposes.
 
@@ -13,6 +10,7 @@ class AbortPlugin(object):
 
         abort: yes
     """
+
     def on_task_output(self, task, config):
         task.abort('abort plugin')
 
