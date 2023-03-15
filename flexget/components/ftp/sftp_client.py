@@ -1,5 +1,6 @@
 import importlib
 import logging
+import os
 import time
 from base64 import b64decode
 from dataclasses import dataclass
@@ -24,6 +25,7 @@ HOST_KEY_TYPES: dict = {
 }
 
 try:
+    import paramiko
     import pysftp
 
     logging.getLogger("paramiko").setLevel(logging.ERROR)
@@ -33,6 +35,40 @@ except ImportError:
 NodeHandler = Callable[[str], None]
 
 logger = logger.bind(name='sftp_client')
+
+
+def _set_authentication_patch(self, password, private_key, private_key_pass):
+    """
+    Patch pysftp.Connection._set_authentication to support additional
+    key types
+    """
+    if password is None:
+        # Use Private Key.
+        if not private_key:
+            # Try to use default key.
+            if os.path.exists(os.path.expanduser('~/.ssh/id_rsa')):
+                private_key = '~/.ssh/id_rsa'
+            elif os.path.exists(os.path.expanduser('~/.ssh/id_dsa')):
+                private_key = '~/.ssh/id_dsa'
+            else:
+                raise pysftp.exceptions.CredentialException("No password or key specified.")
+
+        if isinstance(private_key, (paramiko.AgentKey, paramiko.RSAKey)):
+            # use the paramiko agent or rsa key
+            self._tconnect['pkey'] = private_key
+        else:
+            # isn't a paramiko AgentKey or RSAKey, try to build a
+            # key from what we assume is a path to a key
+            private_key_file = os.path.expanduser(private_key)
+            for key in [paramiko.RSAKey, paramiko.DSSKey, paramiko.Ed25519Key, paramiko.ECDSAKey]:
+                try:  # try all the keys
+                    self._tconnect['pkey'] = key.from_private_key_file(
+                        private_key_file, private_key_pass
+                    )
+                    return
+                except paramiko.SSHException:  # if it fails, try dss
+                    pass
+            raise paramiko.SSHException(f'Unknown key type: {private_key}')
 
 
 @dataclass
@@ -280,6 +316,7 @@ class SftpClient:
 
         while not sftp:
             try:
+                pysftp.Connection._set_authentication = _set_authentication_patch
                 sftp = pysftp.Connection(
                     host=self.host,
                     username=self.username,

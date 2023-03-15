@@ -1,4 +1,3 @@
-import base64
 import os
 import re
 from datetime import datetime, timedelta
@@ -70,6 +69,7 @@ class TransmissionBase:
                 path=path,
                 username=user,
                 password=password,
+                timeout=30,
             )
         except TransmissionError as e:
             if e.original and e.original.code == 401:
@@ -419,14 +419,11 @@ class PluginTransmission(TransmissionBase):
                 try:
                     if downloaded:
                         with open(entry['file'], 'rb') as f:
-                            filedump = base64.b64encode(f.read()).decode('utf-8')
-                        torrent_info = client.add_torrent(filedump, 30, **options['add'])
+                            torrent_info = client.add_torrent(f.read(), **options['add'])
                     else:
                         if options['post'].get('magnetization_timeout', 0) > 0:
                             options['add']['paused'] = False
-                        torrent_info = client.add_torrent(
-                            entry['url'], timeout=30, **options['add']
-                        )
+                        torrent_info = client.add_torrent(entry['url'], **options['add'])
                 except TransmissionError as e:
                     logger.opt(exception=True).debug('TransmissionError')
                     logger.debug('Failed options dict: {}', options['add'])
@@ -613,7 +610,7 @@ class PluginTransmission(TransmissionBase):
 
                 # Set any changed file properties
                 if list(options['change'].keys()):
-                    client.change_torrent(torrent_info.id, 30, **options['change'])
+                    client.change_torrent(torrent_info.id, **options['change'])
 
                 start_torrent = partial(client.start_torrent, [torrent_info.id])
 
