@@ -235,7 +235,7 @@ class PluginTransmissionInput(TransmissionBase):
                 'labels': 'labels',
             }.items():
                 try:
-                    value = torrent.get(field)
+                    value = getattr(torrent, field)
                 except Exception:
                     logger.opt(exception=True).debug(
                         'error when requesting transmissionrpc attribute {}', attr
