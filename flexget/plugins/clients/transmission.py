@@ -447,8 +447,11 @@ class PluginTransmission(TransmissionBase):
             else:
                 # Torrent already loaded in transmission
                 if options['add'].get('download_dir'):
-                    logger.trace(
-                        'Moving {} to "{}"', torrent_info.name, options['add']['download_dir']
+                    logger.log(
+                        "VERBOSE",
+                        'Moving {} to "{}"',
+                        torrent_info.name,
+                        options['add']['download_dir'],
                     )
                     # Move data even if current reported torrent location matches new location
                     # as transmission may fail to automatically move completed file to final
@@ -852,7 +855,8 @@ class PluginTransmissionClean(TransmissionBase):
 
         remove_ids = []
         for torrent in client.get_torrents():
-            logger.trace(
+            logger.log(
+                "VERBOSE",
                 'Torrent "{}": status: "{}" - ratio: {} - date added: {}',
                 torrent.name,
                 torrent.status,
