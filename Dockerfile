@@ -16,7 +16,7 @@ COPY . /flexget
 
 RUN pip install -U pip && \
     pip wheel -e /flexget && \
-    pip wheel 'transmission-rpc>=4.1.14,<5.0.0' && \
+    pip wheel 'transmission-rpc>=4.1.4,<5.0.0' && \
     pip wheel deluge-client && \
     pip wheel cloudscraper
 
@@ -41,7 +41,7 @@ RUN pip install -U pip && \
                 --no-index \
                 -f /wheels \
                 FlexGet \
-                'transmission-rpc>=4.1.14,<5.0.0' \
+                'transmission-rpc>=4.1.4,<5.0.0' \
                 deluge-client \
                 cloudscraper && \
     rm -rf /wheels
