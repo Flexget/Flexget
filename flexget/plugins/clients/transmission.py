@@ -6,17 +6,10 @@ from fnmatch import fnmatch
 from functools import partial
 from netrc import NetrcParseError, netrc
 from time import sleep
+from typing import TYPE_CHECKING
 from urllib.parse import urlparse
 
-import transmission_rpc
 from loguru import logger
-from transmission_rpc import Torrent
-from transmission_rpc.error import (
-    TransmissionAuthError,
-    TransmissionConnectError,
-    TransmissionError,
-    TransmissionTimeoutError,
-)
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
@@ -25,6 +18,25 @@ from flexget.event import event
 from flexget.utils.pathscrub import pathscrub
 from flexget.utils.template import RenderError
 from flexget.utils.tools import parse_timedelta
+
+try:
+    import transmission_rpc
+    from transmission_rpc import TransmissionError
+    from transmission_rpc.error import (
+        TransmissionAuthError,
+        TransmissionConnectError,
+        TransmissionTimeoutError,
+    )
+except ImportError:
+    # If transmissionrpc is not found, errors will be shown later
+    transmission_rpc = None
+    TransmissionError = None
+    TransmissionAuthError = None
+    TransmissionConnectError = None
+    TransmissionTimeoutError = None
+
+if TYPE_CHECKING:
+    from transmission_rpc import Torrent
 
 logger = logger.bind(name='transmission')
 
@@ -49,7 +61,7 @@ class TransmissionBase:
                 logger.error('netrc: {}, file: {}, line: {}', e.msg, e.filename, e.lineno)
         return config
 
-    def create_rpc_client(self, config) -> transmission_rpc.Client:
+    def create_rpc_client(self, config) -> 'transmission_rpc.Client':
         user, password = config.get('username'), config.get('password')
         urlo = urlparse(config['host'])
 
@@ -84,7 +96,7 @@ class TransmissionBase:
             raise plugin.PluginError("Error connecting to transmission")
         return cli
 
-    def torrent_info(self, torrent: Torrent, config):
+    def torrent_info(self, torrent: 'Torrent', config):
         done = torrent.total_size > 0
         vloc = None
         best = None
@@ -104,7 +116,7 @@ class TransmissionBase:
             vloc = ('%s/%s' % (torrent.download_dir, best[0])).replace('/', os.sep)
         return done, vloc
 
-    def check_seed_limits(self, torrent: Torrent, session):
+    def check_seed_limits(self, torrent: 'Torrent', session):
         seed_limit_ok = True  # will remain if no seed ratio defined
         idle_limit_ok = True  # will remain if no idle limit defined
 
@@ -129,6 +141,11 @@ class TransmissionBase:
         return seed_limit_ok, idle_limit_ok
 
     def on_task_start(self, task, config):
+        if transmission_rpc is None:
+            raise plugin.PluginError(
+                'transmission-rpc module version 4.1.14 or higher required.', logger
+            )
+
         # Mark rpc client for garbage collector so every task can start
         # a fresh new according its own config - fix to bug #2804
         config = self.prepare_config(config)
