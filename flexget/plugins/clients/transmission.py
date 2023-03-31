@@ -210,32 +210,32 @@ class PluginTransmissionInput(TransmissionBase):
             if config['host'] in ('localhost', '127.0.0.1'):
                 entry['location'] = torrent.torrent_file
                 entry['url'] = pathlib.Path(torrent.torrent_file)
-            for attr in [
-                'id',
-                'activity_date',
-                'comment',
-                'desired_available',
-                'download_dir',
-                'is_finished',
-                'is_private',
-                'is_stalled',
-                'left_until_done',
-                'ratio',
-                'status',
-                'date_active',
-                'date_added',
-                'date_done',
-                'date_started',
-                'error_string',
-                'priority',
-                'progress',
-                'seconds_downloading',
-                'seconds_seeding',
-                'torrent_file',
-                'labels',
-            ]:
+            for attr, field in {
+                'id': 'id',
+                'activityDate': 'activity_date',
+                'comment': 'comment',
+                'desiredAvailable': 'desired_available',
+                'downloadDir': 'download_dir',
+                'isFinished': 'is_finished',
+                'isPrivate': 'is_private',
+                'isStalled': 'is_stalled',
+                'leftUntilDone': 'left_until_done',
+                'ratio': 'ratio',
+                'status': 'status',
+                'date_active': 'date_active',
+                'date_added': 'date_added',
+                'date_done': 'date_done',
+                'date_started': 'date_started',
+                'errorString': 'error_string',
+                'priority': 'priority',
+                'progress': 'progress',
+                'secondsDownloading': 'seconds_downloading',
+                'secondsSeeding': 'seconds_seeding',
+                'torrentFile': 'torrent_file',
+                'labels': 'labels',
+            }.items():
                 try:
-                    value = torrent.get(attr)
+                    value = torrent.get(field)
                 except Exception:
                     logger.opt(exception=True).debug(
                         'error when requesting transmissionrpc attribute {}', attr
