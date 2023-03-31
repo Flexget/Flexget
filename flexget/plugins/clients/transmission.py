@@ -143,7 +143,7 @@ class TransmissionBase:
     def on_task_start(self, task, config):
         if transmission_rpc is None:
             raise plugin.PluginError(
-                'transmission-rpc module version 4.1.14 or higher required.', logger
+                'transmission-rpc module version 4.1.4 or higher required.', logger
             )
 
         # Mark rpc client for garbage collector so every task can start
