@@ -44,7 +44,8 @@ if TYPE_CHECKING:
 
 logger = logger.bind(name='transmission')
 
-__versions__ = packaging.specifiers.SpecifierSet('>=4.1.4,<5.0.0')
+__version__ = '>=4.1.4,<5.0.0'
+__requirement__ = packaging.specifiers.SpecifierSet(__version__)
 
 
 class TransmissionBase:
@@ -149,13 +150,13 @@ class TransmissionBase:
     def on_task_start(self, task, config):
         if transmission_rpc is None:
             raise plugin.PluginError(
-                f'transmission-rpc module version {__versions__} required.', logger
+                f'transmission-rpc module version {__version__} required.', logger
             )
 
-        v = packaging.version.parse(importlib_metadata.version('transmission-rpc'))
-        if v not in __versions__:
+        v = importlib_metadata.version('transmission-rpc')
+        if not __requirement__.contains(v):
             raise plugin.PluginError(
-                f'transmission-rpc module version mismatch, {__versions__} required, please uninstall current transmission-rpc and reinstall correct version',
+                f'transmission-rpc module version mismatch, requiring transmission-rpc{__version__}',
                 logger,
             )
 
