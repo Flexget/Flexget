@@ -28,10 +28,10 @@ from flexget.utils.tools import parse_timedelta
 
 try:
     import transmission_rpc
-    from transmission_rpc import TransmissionError
     from transmission_rpc.error import (
         TransmissionAuthError,
         TransmissionConnectError,
+        TransmissionError,
         TransmissionTimeoutError,
     )
 except ImportError:
