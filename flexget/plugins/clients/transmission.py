@@ -4,11 +4,15 @@ import re
 from datetime import datetime, timedelta
 from fnmatch import fnmatch
 from functools import partial
+from importlib.metadata import version
 from netrc import NetrcParseError, netrc
 from time import sleep
 from typing import TYPE_CHECKING
 from urllib.parse import urlparse
 
+import importlib_metadata
+import packaging.specifiers
+import packaging.version
 from loguru import logger
 
 from flexget import plugin
@@ -39,6 +43,8 @@ if TYPE_CHECKING:
     from transmission_rpc import Torrent
 
 logger = logger.bind(name='transmission')
+
+__versions__ = packaging.specifiers.SpecifierSet('>=4.1.4,<5.0.0')
 
 
 class TransmissionBase:
@@ -143,7 +149,14 @@ class TransmissionBase:
     def on_task_start(self, task, config):
         if transmission_rpc is None:
             raise plugin.PluginError(
-                'transmission-rpc module version 4.1.4 or higher required.', logger
+                f'transmission-rpc module version {__versions__} required.', logger
+            )
+
+        v = packaging.version.parse(importlib_metadata.version('transmission-rpc'))
+        if v not in __versions__:
+            raise plugin.PluginError(
+                f'transmission-rpc module version mismatch, {__versions__} required, please uninstall current transmission-rpc and reinstall correct version',
+                logger,
             )
 
         # Mark rpc client for garbage collector so every task can start
