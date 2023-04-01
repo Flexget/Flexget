@@ -4,13 +4,16 @@ import re
 from datetime import datetime, timedelta
 from fnmatch import fnmatch
 from functools import partial
-from importlib.metadata import version
 from netrc import NetrcParseError, netrc
 from time import sleep
 from typing import TYPE_CHECKING
 from urllib.parse import urlparse
 
-import importlib_metadata
+try:
+    import importlib.metadata as importlib_metadata
+except ImportError:
+    import importlib_metadata
+
 import packaging.specifiers
 import packaging.version
 from loguru import logger
@@ -45,6 +48,7 @@ if TYPE_CHECKING:
 logger = logger.bind(name='transmission')
 
 __version__ = '>=4.1.4,<5.0.0'
+__package__ = 'transmission-rpc'
 __requirement__ = packaging.specifiers.SpecifierSet(__version__)
 
 
@@ -150,13 +154,13 @@ class TransmissionBase:
     def on_task_start(self, task, config):
         if transmission_rpc is None:
             raise plugin.PluginError(
-                f'transmission-rpc module version {__version__} required.', logger
+                f'{__package__} module version {__version__} required.', logger
             )
 
-        v = importlib_metadata.version('transmission-rpc')
+        v = importlib_metadata.version(__package__)
         if not __requirement__.contains(v):
             raise plugin.PluginError(
-                f'transmission-rpc module version mismatch, requiring transmission-rpc{__version__}',
+                f'{__package__} module version mismatch, requiring {__package__}{__version__}',
                 logger,
             )
 
