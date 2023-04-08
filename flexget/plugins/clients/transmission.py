@@ -12,7 +12,7 @@ from urllib.parse import urlparse
 try:
     import importlib.metadata as importlib_metadata
 except ImportError:
-    import importlib_metadata
+    import importlib_metadata  # TODO: remove this after we drop python 3.7
 
 import packaging.specifiers
 import packaging.version
