@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 import os
+import posixpath
 import socket
 import threading
 import time
@@ -167,23 +168,24 @@ class TestSFTPFileSystem:
         canonicalized.symlink_to(target, target.is_dir())
         return canonicalized
 
-    def canonicalize(self, path: str) -> Path:
+    def canonicalize(self, path: str, resolve: bool = True) -> Path:
         """
         Canonicalizes the given SFTP path to the local file system either from the the cwd, or the user home if none is set.
 
         :param path: The path to canonicalize.
+        :param resolve: If symlinks shoul be resovled.
         :raises ValueError: If the path or taget is relative and would take return a directory outside the SFTP filesytem.
         :return: An :class:`pathlib.Path` of the canonicalized path.
         """
         canonicalized: Path
         if Path(path).is_absolute():
             path = path[1:]
-            canonicalized = (self.__root / path).resolve()
+            canonicalized = Path(posixpath.normpath((self.__root / path).as_posix()))
         else:
-            canonicalized = ((self.__cwd or self.__home) / path).resolve()
+            canonicalized = Path(posixpath.normpath(((self.__cwd or self.__home) / path)))
 
         if self.__root == canonicalized or self.__root in canonicalized.parents:
-            return canonicalized
+            return canonicalized.resolve() if resolve else canonicalized
         raise ValueError(f'Unable to canoicalize {path}')
 
     def root(self) -> Path:
@@ -334,14 +336,14 @@ class TestSFTPServer(SFTPServerInterface):
     def lstat(self, path: str) -> Union[SFTPAttributes, int]:
         logger.debug('lstat(%s)', path)
         try:
-            return SFTPAttributes.from_stat(os.lstat(self.__fs.canonicalize(path)))
+            return SFTPAttributes.from_stat(os.lstat(self.__fs.canonicalize(path, resolve=False)))
         except OSError as e:
             return TestSFTPServer.log_and_return_error_code(e)
 
     def remove(self, path: str) -> int:
         logger.debug('remove(%s)', path)
         try:
-            self.__fs.canonicalize(path).unlink()
+            self.__fs.canonicalize(path, resolve=False).unlink()
         except OSError as e:
             return TestSFTPServer.log_and_return_error_code(e)
         return SFTP_OK
