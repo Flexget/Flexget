@@ -15,8 +15,8 @@ WORKDIR /wheels
 COPY . /flexget
 
 RUN pip install -U pip && \
-    pip wheel -e /flexget && \
-    pip wheel -r requirements-docker.txt
+    pip wheel -r requirements-docker.txt && \
+    pip wheel -e /flexget
 
 WORKDIR /flexget-ui-v2
 RUN wget https://github.com/Flexget/webui/releases/latest/download/dist.zip && \
@@ -38,8 +38,8 @@ RUN pip install -U pip && \
     pip install --no-cache-dir \
                 --no-index \
                 -f /wheels \
-                FlexGet \
-                -r requirements-docker.txt && \
+                -r requirements-docker.txt  \
+                FlexGet && \
     rm -rf /wheels
 
 COPY --from=0 /flexget-ui-v2 /usr/local/lib/python3.10/site-packages/flexget/ui/v2/
