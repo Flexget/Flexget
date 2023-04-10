@@ -9,7 +9,7 @@ repos:
   rev: v3.3.1
   hooks:
   - id: pyupgrade
-    args: [ --py37-plus ]
+    args: [--py37-plus]
 - repo: https://github.com/psf/black
   rev: 23.3.0
   hooks:
@@ -26,6 +26,8 @@ repos:
       args: ["-f", "requirements.txt", "-o", "requirements.txt", "--without-hashes"]
     - id: poetry-export
       args: ["--only", "dev", "-f", "requirements.txt", "-o", "dev-requirements.txt", "--without-hashes"]
+    - id: poetry-export
+      args: ["--only", "plugin-test", "-f", "requirements.txt", "-o", "dev-requirements-extras.txt", "--without-hashes"]
 ci:
   autofix_prs: true
   autoupdate_branch: develop
