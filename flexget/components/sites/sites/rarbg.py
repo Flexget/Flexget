@@ -6,14 +6,9 @@ from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.plugin import PluginError
-from flexget.utils.requests import RequestException, Session, TimedLimiter
+from flexget.utils.requests import RequestException, TimedLimiter
 
 logger = logger.bind(name='rarbg')
-
-requests = Session()
-requests.add_domain_limiter(
-    TimedLimiter('torrentapi.org', '3 seconds')
-)  # they only allow 1 request per 2 seconds
 
 CATEGORIES = {
     'all': 0,
@@ -90,10 +85,10 @@ class SearchRarBG:
     base_url = 'https://torrentapi.org/pubapi_v2.php'
     token = None
 
-    def get_token(self, refresh=False):
+    def get_token(self, session, refresh=False):
         if refresh or not self.token:
             try:
-                response = requests.get(
+                response = session.get(
                     self.base_url,
                     params={'get_token': 'get_token', 'format': 'json', 'app_id': 'flexget'},
                 ).json()
@@ -104,17 +99,18 @@ class SearchRarBG:
                 raise PluginError('Could not retrieve token: %s' % e)
         return self.token
 
-    def get(self, params, token_error=False):
+    def get(self, session, params, token_error=False):
         """
         Simple get-wrapper that allows updating invalid tokens
 
+        :param session: The requests session to use
         :param params: the params to be passed to requests
         :param token_error: whether or not we previously have had token errors, if True we should fetch a new one
         :return: json response
         """
-        params['token'] = self.get_token(refresh=token_error)
+        params['token'] = self.get_token(session=session, refresh=token_error)
         try:
-            response = requests.get(self.base_url, params=params)
+            response = session.get(self.base_url, params=params)
             logger.debug('requesting: {}', response.url)
             response = response.json()
         except RequestException as e:
@@ -128,7 +124,7 @@ class SearchRarBG:
             )
             if token_error:
                 raise PluginError('Could not retrieve a valid token: %s' % response.get('error'))
-            return self.get(params=params, token_error=True)
+            return self.get(session=session, params=params, token_error=True)
 
         return response
 
@@ -137,6 +133,12 @@ class SearchRarBG:
         """
         Search for entries on RarBG
         """
+
+        session = task.requests
+        # Don't override user specified limiters from domain_delay
+        # Use a longer delay than strictly necessary due to issues
+        # https://github.com/Flexget/Flexget/issues/3705
+        session.add_domain_limiter(TimedLimiter('torrentapi.org', '6 seconds'), replace=False)
 
         categories = config.get('category', 'all')
         # Ensure categories a list
@@ -175,7 +177,7 @@ class SearchRarBG:
                     params['search_tvdb'] = entry.get('tvdb_id')
                     logger.debug('Using tvdb id {}', entry.get('tvdb_id'))
 
-            response = self.get(params=params)
+            response = self.get(session=session, params=params)
             if not response:
                 continue
 
