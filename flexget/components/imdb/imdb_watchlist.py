@@ -84,7 +84,7 @@ class ImdbWatchlist:
         headers = {'Accept-Language': config.get('force_language')}
         params = {'view': 'detail', 'page': 1}
         if config['list'] in ['watchlist', 'ratings', 'checkins']:
-            url = 'http://www.imdb.com/user/%s/%s' % (config['user_id'], config['list'])
+            url = 'http://www.imdb.com/user/{}/{}'.format(config['user_id'], config['list'])
             if config['list'] == 'watchlist':
                 params = {'view': 'detail'}
         else:

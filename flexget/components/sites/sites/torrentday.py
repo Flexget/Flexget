@@ -133,7 +133,7 @@ class UrlRewriteTorrentday:
             try:
                 page = requests.get(url, params=params, cookies=cookies).content
             except RequestException as e:
-                raise PluginError('Could not connect to torrentday: {}'.format(e))
+                raise PluginError(f'Could not connect to torrentday: {e}')
 
             # the following should avoid table being None due to a malformed
             # html in td search results

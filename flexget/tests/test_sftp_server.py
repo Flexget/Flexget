@@ -102,7 +102,7 @@ class TestSFTPServerController:
     def kill(self) -> None:
         try:
             self.__server_socket.shutdown(socket.SHUT_RDWR)
-        except socket.error:
+        except OSError:
             pass
         self.__server_socket.close()
         logger.setLevel(logging.INFO)
@@ -182,7 +182,7 @@ class TestSFTPFileSystem:
             path = path[1:]
             canonicalized = Path(posixpath.normpath((self.__root / path).as_posix()))
         else:
-            canonicalized = Path(posixpath.normpath(((self.__cwd or self.__home) / path)))
+            canonicalized = Path(posixpath.normpath((self.__cwd or self.__home) / path))
 
         if self.__root == canonicalized or self.__root in canonicalized.parents:
             return canonicalized.resolve() if resolve else canonicalized
@@ -274,7 +274,7 @@ class TestSFTPServer(SFTPServerInterface):
     def session_ended(self):
         logger.debug('session_ended')
 
-    def open(self, path: str, flags: int, attr: SFTPAttributes) -> Union[SFTPHandle, int]:
+    def open(self, path: str, flags: int, attr: SFTPAttributes) -> SFTPHandle | int:
         logger.debug('open(%s, %s, %s)', path, flags, attr)
 
         canonicalized_path: Path = self.__fs.canonicalize(path)
@@ -325,7 +325,7 @@ class TestSFTPServer(SFTPServerInterface):
         except OSError as e:
             return TestSFTPServer.log_and_return_error_code(e)
 
-    def stat(self, path: str) -> Union[SFTPAttributes, int]:
+    def stat(self, path: str) -> SFTPAttributes | int:
         logger.debug('stat(%s)', path)
 
         try:
@@ -333,7 +333,7 @@ class TestSFTPServer(SFTPServerInterface):
         except OSError as e:
             return TestSFTPServer.log_and_return_error_code(e)
 
-    def lstat(self, path: str) -> Union[SFTPAttributes, int]:
+    def lstat(self, path: str) -> SFTPAttributes | int:
         logger.debug('lstat(%s)', path)
         try:
             return SFTPAttributes.from_stat(os.lstat(self.__fs.canonicalize(path, resolve=False)))
@@ -434,7 +434,7 @@ class TestSFTPServer(SFTPServerInterface):
         """
         return SFTP_OP_UNSUPPORTED
 
-    def readlink(self, path: str) -> Union[str, int]:
+    def readlink(self, path: str) -> str | int:
         logger.debug('readlink(%s)', path)
         """
         Return the target of a symbolic link (or shortcut) on the server.

@@ -62,9 +62,7 @@ class Cronitor:
 
     def _send_request(self, status, config, task_name):
         url = self.base_url.format(monitor_code=config["monitor_code"], status=status)
-        message = config.get(
-            "message", "{task} task {status}".format(task=task_name, status=status)
-        )
+        message = config.get("message", f"{task_name} task {status}")
         data = {"msg": message, "host": config["host"]}
         if config.get("auth_key"):
             data["auth_key"] = config["auth_key"]
@@ -72,7 +70,7 @@ class Cronitor:
             rsp = requests.get(url, params=data)
             rsp.raise_for_status()
         except RequestException as e:
-            raise PluginWarning("Could not report to cronitor: {}".format(e))
+            raise PluginWarning(f"Could not report to cronitor: {e}")
 
     def on_task_start(self, task, config):
         config = self.prepare_config(config)

@@ -71,7 +71,7 @@ class UrlRewriteNyaa:
         entries = set()
         for search_string in entry.get('search_strings', [entry['title']]):
             name = normalize_unicode(search_string)
-            url = 'https://www.nyaa.si/?page=rss&q=%s&c=%s&f=%s' % (
+            url = 'https://www.nyaa.si/?page=rss&q={}&c={}&f={}'.format(
                 quote(name.encode('utf-8')),
                 CATEGORIES[config['category']],
                 FILTERS.index(config['filter']),

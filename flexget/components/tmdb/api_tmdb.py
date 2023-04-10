@@ -131,7 +131,7 @@ class TMDBMovie(Base):
         self.id = id
         try:
             movie = tmdb_request(
-                'movie/{}'.format(self.id),
+                f'movie/{self.id}',
                 append_to_response='alternative_titles',
                 language=language,
             )
@@ -165,7 +165,7 @@ class TMDBMovie(Base):
     def get_images(self):
         logger.debug('images for movie {} not found in DB, fetching from TMDB', self.name)
         try:
-            images = tmdb_request('movie/{}/images'.format(self.id))
+            images = tmdb_request(f'movie/{self.id}/images')
         except requests.RequestException as e:
             raise LookupError('Error updating data from tmdb: %s' % e)
 
@@ -341,7 +341,7 @@ class ApiTmdb:
                 movie_filter = movie_filter.filter(TMDBMovie.year == year)
             movie = movie_filter.first()
             if not movie:
-                search_string = title + ' ({})'.format(year) if year else title
+                search_string = title + f' ({year})' if year else title
                 found = (
                     session.query(TMDBSearchResult)
                     .filter(TMDBSearchResult.search == search_string.lower())
@@ -380,31 +380,29 @@ class ApiTmdb:
             logger.verbose('Searching from TMDb {}', id_str)
             if imdb_id and not tmdb_id:
                 try:
-                    result = tmdb_request('find/{}'.format(imdb_id), external_source='imdb_id')
+                    result = tmdb_request(f'find/{imdb_id}', external_source='imdb_id')
                 except requests.RequestException as e:
-                    raise LookupError('Error searching imdb id on tmdb: {}'.format(e))
+                    raise LookupError(f'Error searching imdb id on tmdb: {e}')
                 if result['movie_results']:
                     tmdb_id = result['movie_results'][0]['id']
             if not tmdb_id:
-                search_string = title + ' ({})'.format(year) if year else title
+                search_string = title + f' ({year})' if year else title
                 search_params = {'query': title, 'language': language}
                 if year:
                     search_params['year'] = year
                 try:
                     results = tmdb_request('search/movie', **search_params)
                 except requests.RequestException as e:
-                    raise LookupError(
-                        'Error searching for tmdb item {}: {}'.format(search_string, e)
-                    )
+                    raise LookupError(f'Error searching for tmdb item {search_string}: {e}')
                 if not results['results']:
-                    raise LookupError('No results for {} from tmdb'.format(search_string))
+                    raise LookupError(f'No results for {search_string} from tmdb')
                 tmdb_id = results['results'][0]['id']
                 session.add(TMDBSearchResult(search=search_string, movie_id=tmdb_id))
             if tmdb_id:
                 movie = TMDBMovie(id=tmdb_id, language=language)
                 movie = session.merge(movie)
             else:
-                raise LookupError('Unable to find movie on tmdb: {}'.format(id_str))
+                raise LookupError(f'Unable to find movie on tmdb: {id_str}')
 
         return movie
 

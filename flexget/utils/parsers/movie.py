@@ -34,7 +34,9 @@ class MovieParser(TitleParser):
         self.proper_count = 0
 
     def __str__(self):
-        return "<MovieParser(name=%s,year=%s,quality=%s)>" % (self.name, self.year, self.quality)
+        return "<MovieParser(name={},year={},quality={})>".format(
+            self.name, self.year, self.quality
+        )
 
     def parse(self, data=None):
         """Parse movie name. Populates name, year, quality and proper_count attributes"""

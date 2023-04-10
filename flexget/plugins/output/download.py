@@ -512,7 +512,7 @@ class PluginDownload:
                     import errno
 
                     if not os.path.exists(destfile):
-                        raise plugin.PluginError('Unable to write %s: %s' % (destfile, err))
+                        raise plugin.PluginError(f'Unable to write {destfile}: {err}')
                     if err.errno != errno.EPERM and err.errno != errno.EACCES:
                         raise
 

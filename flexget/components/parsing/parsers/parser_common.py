@@ -73,7 +73,7 @@ class MovieParseResult:
     @property
     def identifier(self) -> str:
         if self.name and self.year:
-            return ('%s %s' % (self.name, self.year)).strip().lower()
+            return (f'{self.name} {self.year}').strip().lower()
         elif self.name:
             return self.name.lower()
 

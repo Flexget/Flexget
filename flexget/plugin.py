@@ -64,7 +64,7 @@ class DependencyError(Exception):
     message = property(_get_message, _set_message)
 
     def __str__(self) -> str:
-        return '<DependencyError(issued_by=%r,missing=%r,message=%r,silent=%r)>' % (
+        return '<DependencyError(issued_by={!r},missing={!r},message={!r},silent={!r})>'.format(
             self.issued_by,
             self.missing,
             self.message,
@@ -421,7 +421,7 @@ def _import_plugin(module_name: str, plugin_path: Union[str, Path]) -> None:
         if e.has_message():
             msg = e.message
         else:
-            msg = 'Plugin `%s` requires plugin `%s` to load.' % (
+            msg = 'Plugin `{}` requires plugin `{}` to load.'.format(
                 e.issued_by or module_name,
                 e.missing or 'N/A',
             )

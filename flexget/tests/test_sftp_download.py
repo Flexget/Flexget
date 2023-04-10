@@ -1,4 +1,3 @@
-# coding=utf-8
 import filecmp
 import logging
 from pathlib import Path

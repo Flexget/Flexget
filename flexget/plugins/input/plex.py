@@ -187,7 +187,7 @@ class InputPlex:
             urlconfig['X-Plex-Token'] = accesstoken
 
         for key in urlconfig:
-            urlappend += '%s=%s&' % (key, urlconfig[key])
+            urlappend += f'{key}={urlconfig[key]}&'
         if not self.plex_section_is_int(config['section']):
             try:
                 path = "/library/sections/"
@@ -212,7 +212,7 @@ class InputPlex:
             urlappend,
         )
         try:
-            path = "/library/sections/%s/%s" % (config['section'], config['selection'])
+            path = "/library/sections/{}/{}".format(config['section'], config['selection'])
             r = requests.get(
                 "http://%s:%d%s%s" % (config['plexserver'], config['port'], path, urlappend)
             )
@@ -370,7 +370,7 @@ class InputPlex:
                         if config['fetch'] != 'file':
                             filename += ".jpg"
                         else:
-                            filename = "%s%s" % (filename, fileext)
+                            filename = f"{filename}{fileext}"
                     else:
                         if viewgroup == "episode":
                             filename = filenamemap % (

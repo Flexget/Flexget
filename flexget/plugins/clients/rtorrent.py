@@ -30,7 +30,7 @@ class _Method:
         self.__name = name
 
     def __getattr__(self, name):
-        return _Method(self.__send, "%s.%s" % (self.__name, name))
+        return _Method(self.__send, f"{self.__name}.{name}")
 
     def __call__(self, *args):
         return self.__send(self.__name, args)
@@ -54,7 +54,7 @@ class HTTPDigestTransport(xmlrpc_client.Transport):
         return self.single_request(host, handler, request_body, verbose)
 
     def single_request(self, host, handler, request_body, verbose=0):
-        url = urljoin('{0}://{1}'.format(self.__scheme, host), handler)
+        url = urljoin(f'{self.__scheme}://{host}', handler)
 
         auth = self.get_auth()
         response = self.send_request(url, auth, request_body)
@@ -218,7 +218,7 @@ class RTorrent:
             self.uri = parsed_uri.path
             sp = create_proxy
         else:
-            raise OSError('Unsupported scheme %s for uri %s' % (parsed_uri.scheme, self.uri))
+            raise OSError(f'Unsupported scheme {parsed_uri.scheme} for uri {self.uri}')
 
         # Use a special transport if http(s)
         if parsed_uri.scheme in ['http', 'https']:
@@ -261,7 +261,7 @@ class RTorrent:
         for key, val in fields.items():
             # Values must be escaped if within params
             # TODO: What are the escaping requirements? re.escape works differently on python 3.7+
-            params.append('d.%s.set=%s' % (key, re.escape(str(val))))
+            params.append(f'd.{key}.set={re.escape(str(val))}')
 
         if mkdir and 'directory' in fields:
             result = self._server.execute.throw('', 'mkdir', '-p', fields['directory'])
@@ -692,7 +692,7 @@ class RTorrentInputPlugin(RTorrentPluginBase):
         try:
             torrents = client.torrents(config['view'], fields=fields)
         except (OSError, xmlrpc_client.Error) as e:
-            task.abort('Could not get torrents (%s): %s' % (config['view'], e))
+            task.abort('Could not get torrents ({}): {}'.format(config['view'], e))
             return
 
         entries = []
@@ -700,7 +700,7 @@ class RTorrentInputPlugin(RTorrentPluginBase):
         for torrent in torrents:
             entry = Entry(
                 title=torrent['name'],
-                url='%s/%s' % (os.path.expanduser(config['uri']), torrent['hash']),
+                url='{}/{}'.format(os.path.expanduser(config['uri']), torrent['hash']),
                 path=torrent['base_path'],
                 torrent_info_hash=torrent['hash'],
             )

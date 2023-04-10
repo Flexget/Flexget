@@ -2674,8 +2674,7 @@ class EmbyApi(EmbyApiBase):
 
         mlist = list_object.get_items()
 
-        for list_obj in mlist:
-            yield list_obj
+        yield from mlist
 
     @staticmethod
     def strtotime(date) -> 'datetime':

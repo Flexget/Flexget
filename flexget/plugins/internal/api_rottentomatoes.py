@@ -152,7 +152,9 @@ class RottenTomatoesMovie(RottenTomatoesContainer, Base):
         return self.updated < datetime.now() - timedelta(days=refresh_interval)
 
     def __repr__(self) -> str:
-        return '<RottenTomatoesMovie(title=%s,id=%s,year=%s)>' % (self.title, self.id, self.year)
+        return '<RottenTomatoesMovie(title={},id={},year={})>'.format(
+            self.title, self.id, self.year
+        )
 
 
 class RottenTomatoesGenre(Base):
@@ -249,7 +251,7 @@ class RottenTomatoesSearchResult(Base):
     movie = relation(RottenTomatoesMovie, backref='search_strings')
 
     def __repr__(self) -> str:
-        return '<RottenTomatoesSearchResult(search=%s,movie_id=%s,movie=%s)>' % (
+        return '<RottenTomatoesSearchResult(search={},movie_id={},movie={})>'.format(
             self.search,
             self.movie_id,
             self.movie,
@@ -293,7 +295,7 @@ def lookup_movie(
     if title:
         search_string = title.lower()
         if year:
-            search_string = '%s %s' % (search_string, year)
+            search_string = f'{search_string} {year}'
     elif not rottentomatoes_id:
         raise PluginError('No criteria specified for rotten tomatoes lookup')
 

@@ -108,9 +108,7 @@ def display_summary(options):
                 episode_id = latest.identifier
             if not porcelain:
                 if behind[0] > 0:
-                    name_column += colorize(
-                        BEHIND_EP_COLOR, ' {} {} behind'.format(behind[0], behind[1])
-                    )
+                    name_column += colorize(BEHIND_EP_COLOR, f' {behind[0]} {behind[1]} behind')
 
             table.add_row(name_column, begin, episode_id, age_col, latest_release, identifier_type)
     console(table)
@@ -154,7 +152,9 @@ def begin(manager, options):
                     console('`%s` was identified as a season.' % ep_id)
                     ep_id += 'E01'
                 console(
-                    'Releases for `%s` will be accepted starting with `%s`.' % (series.name, ep_id)
+                    'Releases for `{}` will be accepted starting with `{}`.'.format(
+                        series.name, ep_id
+                    )
                 )
                 session.commit()
             manager.config_changed()
@@ -271,13 +271,15 @@ def display_details(options):
                 ' during this time.'
             )
         else:
-            footer += '\n `%s` uses `%s` mode to identify episode numbering.' % (
+            footer += '\n `{}` uses `{}` mode to identify episode numbering.'.format(
                 series.name,
                 series.identified_by,
             )
         begin_text = 'option'
         if series.begin:
-            footer += ' \n Begin for `%s` is set to `%s`.' % (series.name, series.begin.identifier)
+            footer += ' \n Begin for `{}` is set to `{}`.'.format(
+                series.name, series.begin.identifier
+            )
             begin_text = 'and `begin` options'
         footer += ' \n See `identified_by` %s for more information.' % begin_text
     table = TerminalTable(*header, table_type=options.table_type, title=table_title)
@@ -309,7 +311,7 @@ def add(manager, options):
             except ValueError as e:
                 console(e.args[0])
             else:
-                console('Added entity `%s` to series `%s`.' % (ent_id, series.name.title()))
+                console(f'Added entity `{ent_id}` to series `{series.name.title()}`.')
         session.commit()
     manager.config_changed()
 

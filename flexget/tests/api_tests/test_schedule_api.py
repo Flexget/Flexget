@@ -90,7 +90,7 @@ class TestScheduledAPI:
         schedule_id = data[0]['id']
 
         # Real schedule ID
-        rsp = api_client.get('/schedules/{}/'.format(schedule_id))
+        rsp = api_client.get(f'/schedules/{schedule_id}/')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
 
@@ -120,7 +120,7 @@ class TestScheduledAPI:
 
         schedule_id = data[0]['id']
         payload = {'tasks': ['test2', 'test3'], 'interval': {'minutes': 10}}
-        rsp = api_client.json_put('/schedules/{}/'.format(schedule_id), data=json.dumps(payload))
+        rsp = api_client.json_put(f'/schedules/{schedule_id}/', data=json.dumps(payload))
         assert rsp.status_code == 201, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
 
@@ -150,7 +150,7 @@ class TestScheduledAPI:
 
         schedule_id = data[0]['id']
 
-        rsp = api_client.delete('/schedules/{}/'.format(schedule_id))
+        rsp = api_client.delete(f'/schedules/{schedule_id}/')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
 
@@ -213,7 +213,7 @@ class TestPositiveBooleanSchedule:
         schedule_id = data[0]['id']
 
         # Real schedule ID
-        rsp = api_client.get('/schedules/{}/'.format(schedule_id))
+        rsp = api_client.get(f'/schedules/{schedule_id}/')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
 
@@ -240,7 +240,7 @@ class TestPositiveBooleanSchedule:
 
         schedule_id = data[0]['id']
         payload = {'tasks': ['test2', 'test3'], 'interval': {'minutes': 10}}
-        rsp = api_client.json_put('/schedules/{}/'.format(schedule_id), data=json.dumps(payload))
+        rsp = api_client.json_put(f'/schedules/{schedule_id}/', data=json.dumps(payload))
         assert rsp.status_code == 201, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
 
@@ -269,7 +269,7 @@ class TestPositiveBooleanSchedule:
 
         schedule_id = data[0]['id']
 
-        rsp = api_client.delete('/schedules/{}/'.format(schedule_id))
+        rsp = api_client.delete(f'/schedules/{schedule_id}/')
         assert rsp.status_code == 409, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
 

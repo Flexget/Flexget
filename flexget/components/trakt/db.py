@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 import time
 from datetime import datetime, timedelta
 from typing import List
@@ -64,8 +61,8 @@ def device_auth():
         interval = r['interval']
 
         console(
-            'Please visit {0} and authorize Flexget. Your user code is {1}. Your code expires in '
-            '{2} minutes.'.format(r['verification_url'], user_code, expires_in / 60.0)
+            'Please visit {} and authorize Flexget. Your user code is {}. Your code expires in '
+            '{} minutes.'.format(r['verification_url'], user_code, expires_in / 60.0)
         )
 
         logger.debug('Polling for user authorization.')
@@ -96,14 +93,14 @@ def device_auth():
                 interval += 1
         raise plugin.PluginError('User code has expired. Please try again.')
     except requests.RequestException as e:
-        raise plugin.PluginError('Device authorization with Trakt.tv failed: {0}'.format(e))
+        raise plugin.PluginError(f'Device authorization with Trakt.tv failed: {e}')
 
 
 def token_oauth(data):
     try:
         return requests.post(get_api_url('oauth/token'), data=data).json()
     except requests.RequestException as e:
-        raise plugin.PluginError('Token exchange with trakt failed: {0}'.format(e))
+        raise plugin.PluginError(f'Token exchange with trakt failed: {e}')
 
 
 def delete_account(account):
@@ -172,7 +169,7 @@ def get_access_token(account, token=None, refresh=False, re_auth=False, called_f
                 session.merge(new_acc)
                 return new_acc.access_token
             except requests.RequestException as e:
-                raise plugin.PluginError('Token exchange with trakt failed: {0}'.format(e))
+                raise plugin.PluginError(f'Token exchange with trakt failed: {e}')
 
 
 def make_list_slug(name):
@@ -686,7 +683,7 @@ class TraktShow(Base):
                 'shows', self.id, 'seasons', season, 'episodes', number, '?extended=full'
             )
             if only_cached:
-                raise LookupError('Episode %s %s not found in cache' % (season, number))
+                raise LookupError(f'Episode {season} {number} not found in cache')
             logger.debug(
                 'Episode {} {} not found in cache, looking up from trakt.', season, number
             )
@@ -733,7 +730,7 @@ class TraktShow(Base):
                 if number == season_result['number']:
                     season = db_season
             if not season:
-                raise LookupError('Season %s not found for show %s' % (number, self.title))
+                raise LookupError(f'Season {number} not found for show {self.title}')
             session.commit()
         return season
 
@@ -768,7 +765,7 @@ class TraktShow(Base):
         return self._actors
 
     def __repr__(self):
-        return '<name=%s, id=%s>' % (self.title, self.id)
+        return f'<name={self.title}, id={self.id}>'
 
 
 class TraktMovie(Base):
@@ -1049,12 +1046,10 @@ def get_trakt_id_from_title(title, media_type, year=None):
     try:
         params = {'query': parsed_title, 'type': media_type, 'year': y}
         logger.debug('Type of title: {}', type(parsed_title))
-        logger.debug(
-            'Searching with params: {}', ', '.join('{}={}'.format(k, v) for k, v in params.items())
-        )
+        logger.debug('Searching with params: {}', ', '.join(f'{k}={v}' for k, v in params.items()))
         results = requests_session.get(get_api_url('search'), params=params).json()
     except requests.RequestException as e:
-        raise LookupError('Searching trakt for %s failed with error: %s' % (title, e))
+        raise LookupError(f'Searching trakt for {title} failed with error: {e}')
     for result in results:
         if year and result[media_type]['year'] != year:
             continue
@@ -1090,7 +1085,7 @@ def get_trakt_data(media_type, title=None, year=None, trakt_ids=None):
             .json()
         )
     except requests.RequestException as e:
-        raise LookupError('Error getting trakt data for id %s: %s' % (trakt_id, e))
+        raise LookupError(f'Error getting trakt data for id {trakt_id}: {e}')
 
 
 def get_user_data(data_type, media_type, session, username):
@@ -1104,7 +1099,7 @@ def get_user_data(data_type, media_type, session, username):
     :return:
     """
 
-    endpoint = '{}/{}'.format(data_type, media_type)
+    endpoint = f'{data_type}/{media_type}'
     try:
         data = session.get(get_api_url('users', username, data_type, media_type)).json()
         if not data:

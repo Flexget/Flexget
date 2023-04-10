@@ -206,7 +206,7 @@ class FilterTvdb:
                 reasons.append('reject_directors')
 
             if reasons and not force_accept:
-                msg = 'Skipping %s because of rule(s) %s' % (
+                msg = 'Skipping {} because of rule(s) {}'.format(
                     entry.get('series_name_thetvdb', None) or entry['title'],
                     ', '.join(reasons),
                 )

@@ -247,11 +247,11 @@ def change_password(username='flexget', password='', session=None):
     if check['score'] < 3:
         warning = check['feedback']['warning']
         suggestions = ' '.join(check['feedback']['suggestions'])
-        message = 'Password \'{}\' is not strong enough. '.format(password)
+        message = f'Password \'{password}\' is not strong enough. '
         if warning:
             message += warning + ' '
         if suggestions:
-            message += 'Suggestions: {}'.format(suggestions)
+            message += f'Suggestions: {suggestions}'
         raise WeakPassword(message)
 
     user = get_user(username=username, session=session)

@@ -157,7 +157,7 @@ class TestEntryUnicodeError:
 class TestEntryStringCoercion:
     def test_coercion(self):
         e = Entry('title', 'url')
-        e['test'] = str("test")
+        e['test'] = "test"
         assert type(e['test']) == str  # pylint: disable=unidiomatic-typecheck
 
 

@@ -61,7 +61,7 @@ class FilterSeenMovies(plugin_seen.FilterSeen):
             for field in self.fields:
                 if field in entry:
                     if entry[field] in accepted_ids[field]:
-                        entry.reject('already accepted %s %s once in task' % (field, entry[field]))
+                        entry.reject(f'already accepted {field} {entry[field]} once in task')
                         break
                     else:
                         accepted_ids[field].add(entry[field])

@@ -29,7 +29,7 @@ class HorribleSubs:
             logger.error('HorribleSubs request failed: {}', e)
             return entries
         for div in soup.findAll('div', attrs={'class': 'rls-link'}):
-            ttitle = '{0} [{1}]'.format(title, re.sub(r'.*-', '', div['id']))
+            ttitle = '{} [{}]'.format(title, re.sub(r'.*-', '', div['id']))
             urls = []
             for url in div.findAll('a'):
                 # skip non torrent based links
@@ -59,7 +59,7 @@ class HorribleSubs:
             return entries
 
         for li_label in soup.findAll('li'):
-            title = '[HorribleSubs] {0}{1}'.format(
+            title = '[HorribleSubs] {}{}'.format(
                 str(li_label.find('span').next_sibling), str(li_label.find('strong').text)
             )
             logger.debug('Found title `{}`', title)
@@ -67,7 +67,7 @@ class HorribleSubs:
             episode = re.sub(r'.*#', '', url)
             # Get show ID
             try:
-                soup = get_soup(requests.get('https://horriblesubs.info/{0}'.format(url)).content)
+                soup = get_soup(requests.get(f'https://horriblesubs.info/{url}').content)
             except RequestException as e:
                 logger.error('HorribleSubs request failed: {}', e)
                 return entries
@@ -75,7 +75,7 @@ class HorribleSubs:
             entries = HorribleSubs.horrible_get_downloads(
                 requests,
                 title,
-                'https://horriblesubs.info/api.php?method=getshows&type=show&mode=filter&showid={0}&value={1}'.format(
+                'https://horriblesubs.info/api.php?method=getshows&type=show&mode=filter&showid={}&value={}'.format(
                     show_id, episode
                 ),
             )
@@ -98,7 +98,7 @@ class HorribleSubs:
             logger.debug('Searching `{}`', search_string)
             results = HorribleSubs.horrible_entries(
                 task.requests,
-                'https://horriblesubs.info/api.php?method=search&value={0}'.format(search_string),
+                f'https://horriblesubs.info/api.php?method=search&value={search_string}',
             )
             entries.extend(results)
         return entries

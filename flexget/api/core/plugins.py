@@ -64,7 +64,9 @@ plugins_parser.add_argument(
 if TYPE_CHECKING:
     from typing import TypedDict
 
-    _PhaseHandler = TypedDict('_PhaseHandler', {'phase': str, 'priority': int})
+    class _PhaseHandler(TypedDict):
+        phase: str
+        priority: int
 
     class PluginDict(TypedDict, total=False):
         name: str

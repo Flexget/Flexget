@@ -35,7 +35,7 @@ class RegexListRegexp(Base):
     list_id = Column(Integer, ForeignKey(RegexpListList.id), nullable=False)
 
     def __repr__(self):
-        return '<RegexListRegexp regexp=%s,list_name=%s>' % (self.regexp, self.list.name)
+        return f'<RegexListRegexp regexp={self.regexp},list_name={self.list.name}>'
 
     def to_entry(self):
         entry = Entry()

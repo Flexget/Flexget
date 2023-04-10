@@ -377,7 +377,7 @@ class PendingListEntryAPI(APIResource):
         approved = data['operation'] == 'approve'
         operation_text = 'approved' if approved else 'pending'
         if entry.approved is approved:
-            raise BadRequest('Entry with id {} is already {}'.format(entry_id, operation_text))
+            raise BadRequest(f'Entry with id {entry_id} is already {operation_text}')
 
         entry.approved = approved
         session.commit()

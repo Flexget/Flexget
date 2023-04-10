@@ -79,7 +79,7 @@ class TVMazeLookup(Base):
             self.series = series
 
     def __repr__(self):
-        return '<TVMazeLookup(search_name={0},series_id={1})'.format(
+        return '<TVMazeLookup(search_name={},series_id={})'.format(
             self.search_name, self.series_id
         )
 
@@ -184,7 +184,7 @@ class TVMazeSeries(Base):
         self.seasons = self.populate_seasons(series)
 
     def __repr__(self):
-        return '<TVMazeSeries(title=%s,id=%s,last_update=%s)>' % (
+        return '<TVMazeSeries(title={},id={},last_update={})>'.format(
             self.name,
             self.tvmaze_id,
             self.last_update,
@@ -519,7 +519,7 @@ class APITVMaze:
         series = APITVMaze.series_lookup(session=session, only_cached=only_cached, **lookup_params)
         if not series:
             raise LookupError(
-                'Could not find series with the following parameters: {0}'.format(lookup_params)
+                f'Could not find series with the following parameters: {lookup_params}'
             )
         session.flush()
         # See if season already exists in cache
@@ -580,7 +580,7 @@ class APITVMaze:
         series = APITVMaze.series_lookup(session=session, only_cached=only_cached, **lookup_params)
         if not series:
             raise LookupError(
-                'Could not find series with the following parameters: {0}'.format(lookup_params)
+                f'Could not find series with the following parameters: {lookup_params}'
             )
 
         # See if episode already exists in cache

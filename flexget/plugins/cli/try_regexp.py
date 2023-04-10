@@ -65,7 +65,7 @@ class PluginTryRegexp:
                 except re.error:
                     console('Invalid regular expression')
                     break
-            console('%s of %s entries matched' % (count, len(task.entries)))
+            console(f'{count} of {len(task.entries)} entries matched')
         console('Bye!')
 
 

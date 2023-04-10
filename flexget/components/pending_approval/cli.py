@@ -67,7 +67,7 @@ def manage_entries(options, selection, approved):
                 if entry.approved is approved:
                     console(
                         colorize('red', 'ERROR: ')
-                        + 'Entry with ID %s is already %s' % (entry.id, approved_text)
+                        + f'Entry with ID {entry.id} is already {approved_text}'
                     )
                     sys.exit(1)
             except NoResultFound:
@@ -80,9 +80,7 @@ def manage_entries(options, selection, approved):
             return
         for entry in entries:
             if entry.approved is not approved:
-                console(
-                    'Setting pending entry with ID %s status to %s' % (entry.id, approved_text)
-                )
+                console(f'Setting pending entry with ID {entry.id} status to {approved_text}')
                 entry.approved = approved
 
 

@@ -165,7 +165,7 @@ class MagnetDL:
                 term = re.sub('-+', '-', term).strip('-')
                 # note: weird url convention, uses first letter of search term
                 slash = term[0]
-                url = 'https://www.magnetdl.com/{}/{}/'.format(slash, term)
+                url = f'https://www.magnetdl.com/{slash}/{term}/'
                 for entry in self.parse_page(scraper, url):
                     entries.append(entry)
             except Page404Error:

@@ -53,7 +53,7 @@ def bump_version(bump_type):
             if 'b' in ver_split[2]:
                 # beta version
                 minor, beta = ver_split[-1].split('b')
-                ver_split[-1] = '%sb%s' % (minor, int(beta) + 1)
+                ver_split[-1] = f'{minor}b{int(beta) + 1}'
             else:
                 ver_split[-1] = str(int(ver_split[-1]) + 1)
         if bump_type == 'dev':

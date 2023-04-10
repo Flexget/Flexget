@@ -183,8 +183,8 @@ class SearchRarBG:
             if response.get('error_code') in [10, 20]:
                 searched_string = (
                     params.get('search_string')
-                    or 'imdb={0}'.format(params.get('search_imdb'))
-                    or 'tvdb={0}'.format(params.get('tvdb_id'))
+                    or 'imdb={}'.format(params.get('search_imdb'))
+                    or 'tvdb={}'.format(params.get('tvdb_id'))
                 )
                 logger.debug(
                     'No results found for {}. Message from rarbg: {}',

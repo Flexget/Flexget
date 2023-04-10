@@ -24,7 +24,7 @@ class ModifyExtension:
 
         for entry in task.entries:
             logger.debug('`{}` filename is `{}`', entry['title'], entry.get('filename', 'N/A'))
-            entry['filename'] = '%s.%s' % (entry.get('filename', entry['title']), ext)
+            entry['filename'] = '{}.{}'.format(entry.get('filename', entry['title']), ext)
             logger.debug('filename is now `{}`', entry['filename'])
 
 

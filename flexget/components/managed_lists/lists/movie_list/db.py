@@ -43,7 +43,7 @@ class MovieListList(Base):
     )
 
     def __repr__(self):
-        return '<MovieListList,name={}id={}>'.format(self.name, self.id)
+        return f'<MovieListList,name={self.name}id={self.id}>'
 
     def to_dict(self):
         return {'id': self.id, 'name': self.name, 'added_on': self.added}

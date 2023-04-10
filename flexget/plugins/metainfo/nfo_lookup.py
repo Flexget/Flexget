@@ -233,7 +233,7 @@ class NfoReader:
             multiple_bool = values[0]
             getter_func = values[1]
 
-            nfo_field_name = 'nfo_{0}'.format(name)
+            nfo_field_name = f'nfo_{name}'
 
             if multiple_bool:
                 v = self._extract_multiple_field(name, getter_func)

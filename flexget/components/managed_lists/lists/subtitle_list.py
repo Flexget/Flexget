@@ -139,7 +139,7 @@ class SubtitleListFile(Base):
     remove_after = Column(Unicode)
 
     def __repr__(self):
-        return '<SubtitleListFile title=%s,path=%s,list_name=%s>' % (
+        return '<SubtitleListFile title={},path={},list_name={}>'.format(
             self.title,
             self.location,
             self.list.name,

@@ -37,13 +37,11 @@ class ImdbLookup:
         'imdb_year': 'year',
         'imdb_genres': lambda movie: [genre.name for genre in movie.genres],
         'imdb_languages': lambda movie: [lang.language.name for lang in movie.languages],
-        'imdb_actors': lambda movie: dict((actor.imdb_id, actor.name) for actor in movie.actors),
-        'imdb_directors': lambda movie: dict(
-            (director.imdb_id, director.name) for director in movie.directors
-        ),
-        'imdb_writers': lambda movie: dict(
-            (writer.imdb_id, writer.name) for writer in movie.writers
-        ),
+        'imdb_actors': lambda movie: {actor.imdb_id: actor.name for actor in movie.actors},
+        'imdb_directors': lambda movie: {
+            director.imdb_id: director.name for director in movie.directors
+        },
+        'imdb_writers': lambda movie: {writer.imdb_id: writer.name for writer in movie.writers},
         'imdb_mpaa_rating': 'mpaa_rating',
         'imdb_plot_keywords': lambda movie: [
             plot_keyword.name for plot_keyword in movie.plot_keywords

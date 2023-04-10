@@ -32,7 +32,9 @@ class PluginAbortIfExists:
                 logger.debug('Field {} not found. Skipping.', field)
                 continue
             if abort_re.search(entry[field]):
-                task.abort('An entry contained %s in field %s. Abort!' % (config['regexp'], field))
+                task.abort(
+                    'An entry contained {} in field {}. Abort!'.format(config['regexp'], field)
+                )
 
 
 @event('plugin.register')

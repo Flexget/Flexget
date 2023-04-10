@@ -21,72 +21,72 @@ class TestSonarrListActions:
             list_clear:
               what:
                 - sonarr_list:
-                    base_url: %(RADARR_BASE_URL)s
-                    api_key: %(RADARR_API_KEY)s
-                    port: %(RADARR_PORT)s
+                    base_url: {RADARR_BASE_URL}
+                    api_key: {RADARR_API_KEY}
+                    port: {RADARR_PORT}
             mock:
-              - { title: 'Breaking Bad', imdb_id: 'tt0903747', tvdb_id: 81189 }
-              - { title: 'The Walking Dead', imdb_id: 'tt1520211', tvdb_id: 153021 }
-              - { title: 'Game of Thrones', imdb_id: 'tt0944947', tvdb_id: 121361 }
+              - {{ title: 'Breaking Bad', imdb_id: 'tt0903747', tvdb_id: 81189 }}
+              - {{ title: 'The Walking Dead', imdb_id: 'tt1520211', tvdb_id: 153021 }}
+              - {{ title: 'Game of Thrones', imdb_id: 'tt0944947', tvdb_id: 121361 }}
             accept_all: yes
             list_add:
               - sonarr_list:
-                  base_url: %(RADARR_BASE_URL)s
-                  api_key: %(RADARR_API_KEY)s
-                  port: %(RADARR_PORT)s
+                  base_url: {RADARR_BASE_URL}
+                  api_key: {RADARR_API_KEY}
+                  port: {RADARR_PORT}
 
           clear_and_add_to_sonarr_with_tags:
             list_clear:
               what:
                 - sonarr_list:
-                    base_url: %(RADARR_BASE_URL)s
-                    api_key: %(RADARR_API_KEY)s
-                    port: %(RADARR_PORT)s
+                    base_url: {RADARR_BASE_URL}
+                    api_key: {RADARR_API_KEY}
+                    port: {RADARR_PORT}
             mock:
-              - { title: 'Game of Thrones', imdb_id: 'tt0944947', tvdb_id: 121361 }
+              - {{ title: 'Game of Thrones', imdb_id: 'tt0944947', tvdb_id: 121361 }}
             accept_all: yes
             list_add:
               - sonarr_list:
-                  base_url: %(RADARR_BASE_URL)s
-                  api_key: %(RADARR_API_KEY)s
-                  port: %(RADARR_PORT)s
+                  base_url: {RADARR_BASE_URL}
+                  api_key: {RADARR_API_KEY}
+                  port: {RADARR_PORT}
                   tags: ["tv", "othertag"]
                       
           sonarr_list_as_input_plugin:
             sonarr_list:
-              base_url: %(RADARR_BASE_URL)s
-              api_key: %(RADARR_API_KEY)s
-              port: %(RADARR_PORT)s
+              base_url: {RADARR_BASE_URL}
+              api_key: {RADARR_API_KEY}
+              port: {RADARR_PORT}
               include_data: True
             accept_all: yes
     
           remove_from_sonarr_list:
             mock:
-              - { title: 'Breaking Bad', imdb_id: 'tt0903747', tvdb_id: 81189 }
-              - { title: 'The Simpsons', imdb_id: 'tt0096697', tvdb_id: 71663 }
+              - {{ title: 'Breaking Bad', imdb_id: 'tt0903747', tvdb_id: 81189 }}
+              - {{ title: 'The Simpsons', imdb_id: 'tt0096697', tvdb_id: 71663 }}
             accept_all: yes
             list_remove:
               - sonarr_list:
-                  base_url: %(RADARR_BASE_URL)s
-                  api_key: %(RADARR_API_KEY)s
-                  port: %(RADARR_PORT)s
+                  base_url: {RADARR_BASE_URL}
+                  api_key: {RADARR_API_KEY}
+                  port: {RADARR_PORT}
     
           match_sonarr_list:
             mock:
-              - { title: 'Game.Of.Thrones.S01E01.1080p.BluRay.x264-FlexGet', imdb_id: 'tt0944947', tvdb_id: 121361 }
-              - { title: 'The.Walking.Dead.S01E01.1080p.BluRay.x264-FlexGet', imdb_id: 'tt1520211', tvdb_id: 153021 }
-              - { title: 'Breaking.Bad.S01E01.1080p.BluRay.x264-FlexGet', imdb_id: 'tt0903747', tvdb_id: 81189 }
+              - {{ title: 'Game.Of.Thrones.S01E01.1080p.BluRay.x264-FlexGet', imdb_id: 'tt0944947', tvdb_id: 121361 }}
+              - {{ title: 'The.Walking.Dead.S01E01.1080p.BluRay.x264-FlexGet', imdb_id: 'tt1520211', tvdb_id: 153021 }}
+              - {{ title: 'Breaking.Bad.S01E01.1080p.BluRay.x264-FlexGet', imdb_id: 'tt0903747', tvdb_id: 81189 }}
             list_match:
               from:
                 - sonarr_list:
-                    base_url: %(RADARR_BASE_URL)s
-                    api_key: %(RADARR_API_KEY)s
-                    port: %(RADARR_PORT)s
-    """ % {
-        'RADARR_API_KEY': SONARR_API_KEY,
-        'RADARR_BASE_URL': SONARR_BASE_URL,
-        'RADARR_PORT': SONARRR_PORT,
-    }
+                    base_url: {RADARR_BASE_URL}
+                    api_key: {RADARR_API_KEY}
+                    port: {RADARR_PORT}
+    """.format(
+        RADARR_API_KEY=SONARR_API_KEY,
+        RADARR_BASE_URL=SONARR_BASE_URL,
+        RADARR_PORT=SONARRR_PORT,
+    )
 
     def test_sonarr_list_tags(self, execute_task, manager):
         sonarr = SonarrSet(

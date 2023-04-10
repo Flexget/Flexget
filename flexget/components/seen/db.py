@@ -97,7 +97,7 @@ class SeenEntry(Base):
         self.local = local
 
     def __str__(self):
-        return '<SeenEntry(title=%s,reason=%s,task=%s,added=%s)>' % (
+        return '<SeenEntry(title={},reason={},task={},added={})>'.format(
             self.title,
             self.reason,
             self.task,
@@ -136,7 +136,7 @@ class SeenField(Base):
         self.added = datetime.now()
 
     def __str__(self):
-        return '<SeenField(field=%s,value=%s,added=%s)>' % (self.field, self.value, self.added)
+        return f'<SeenField(field={self.field},value={self.value},added={self.added})>'
 
     def to_dict(self):
         return {

@@ -84,7 +84,7 @@ class PluginTemplate:
                 if template == 'global':
                     continue
                 raise plugin.PluginError(
-                    'Unable to find template %s for task %s' % (template, task.name), logger
+                    f'Unable to find template {template} for task {task.name}', logger
                 )
             if toplevel_templates[template] is None:
                 logger.warning('Template `{}` is empty. Nothing to merge.', template)
