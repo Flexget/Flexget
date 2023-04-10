@@ -78,7 +78,7 @@ class Letterboxd:
             return
 
         result = {
-            'title': '%s (%s)' % (tmdb.name, tmdb.year),
+            'title': f'{tmdb.name} ({tmdb.year})',
             'imdb_id': tmdb.imdb_id,
             'tmdb_id': tmdb.id,
             'movie_name': tmdb.name,
@@ -96,7 +96,7 @@ class Letterboxd:
 
         entry = Entry(result)
         entry['url'] = url
-        entry['letterboxd_list'] = '%s (%s)' % (config['list'], config['username'])
+        entry['letterboxd_list'] = '{} ({})'.format(config['list'], config['username'])
         try:
             entry['letterboxd_score'] = float(soup.find(itemprop='average').get('content'))
         except AttributeError:

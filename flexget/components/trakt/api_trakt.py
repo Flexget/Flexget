@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from dateutil.parser import parse as dateutil_parse
 from loguru import logger
 

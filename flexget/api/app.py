@@ -32,7 +32,8 @@ logger = logger.bind(name='api')
 if TYPE_CHECKING:
     from typing import TypedDict
 
-    _TypeDict = TypedDict('_TypeDict', {'type': str})
+    class _TypeDict(TypedDict):
+        type: str
 
     class MessageDict(_TypeDict):
         properties: Dict[str, _TypeDict]
@@ -210,7 +211,7 @@ Compress(api_app)
 
 api = API(
     api_app,
-    title='Flexget API v{}'.format(__version__),
+    title=f'Flexget API v{__version__}',
     version=__version__,
     description='View and manage flexget core operations and plugins. Open each endpoint view for usage information.'
     ' Navigate to http://flexget.com/API for more details.',

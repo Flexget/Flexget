@@ -279,7 +279,7 @@ def filecopy(request):
                 else:
                     f.unlink()
             except OSError as e:
-                print("couldn't remove %s: %s" % (f, e))
+                print(f"couldn't remove {f}: {e}")
 
 
 @pytest.fixture()

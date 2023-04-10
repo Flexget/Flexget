@@ -34,7 +34,7 @@ class TestETAG:
         rsp = api_client.get('/movie_list/', headers=header)
         assert rsp.status_code == 304, 'Response code is %s' % rsp.status_code
         data = rsp.get_data(as_text=True)
-        assert data is ''
+        assert data == ''
 
         header = {'If-None-Match': '*'}
         rsp = api_client.head('/movie_list/', headers=header)

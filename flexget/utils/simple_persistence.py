@@ -110,7 +110,7 @@ class SimpleKeyValue(Base):
         self.value = value
 
     def __repr__(self):
-        return "<SimpleKeyValue('%s','%s','%s')>" % (self.task, self.key, self.value)
+        return f"<SimpleKeyValue('{self.task}','{self.key}','{self.value}')>"
 
 
 Index(

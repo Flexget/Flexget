@@ -59,7 +59,7 @@ def dumps(value: Any) -> str:
     try:
         return json.dumps(serialized)
     except TypeError as exc:
-        raise TypeError('Error during dumping {}. Instance: {!r}'.format(exc, serialized)) from exc
+        raise TypeError(f'Error during dumping {exc}. Instance: {serialized!r}') from exc
 
 
 def loads(value: str) -> Any:

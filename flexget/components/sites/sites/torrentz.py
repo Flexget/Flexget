@@ -69,7 +69,9 @@ class Torrentz:
             query = normalize_unicode(search_string.strip() + config.get('extra_terms', ''))
             for domain in ['is', 'pl']:
                 # urllib.quote will crash if the unicode string has non ascii characters, so encode in utf-8 beforehand
-                url = 'http://torrentz2.%s/%s?f=%s' % (domain, feed, quote(query.encode('utf-8')))
+                url = 'http://torrentz2.{}/{}?f={}'.format(
+                    domain, feed, quote(query.encode('utf-8'))
+                )
                 logger.debug('requesting: {}', url)
                 try:
                     r = task.requests.get(url)

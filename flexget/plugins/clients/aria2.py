@@ -22,10 +22,10 @@ class RpcClient:
         else:
             self.token = ''
         if username and password:
-            userpass = '%s:%s@' % (username, password)
+            userpass = f'{username}:{password}@'
         else:
             userpass = ''
-        self.url = '%s://%s%s:%s/%s' % (scheme, userpass, server, port, rpc_path)
+        self.url = f'{scheme}://{userpass}{server}:{port}/{rpc_path}'
         logger.debug('aria2 url: {}', self.url)
 
     def add_uri(self, uris, options):
@@ -45,9 +45,7 @@ class JsonRpcClient(RpcClient):
     ADDMETALINK_METHOD = 'aria2.addMetalink'
 
     def __init__(self, server, port, scheme, rpc_path, username=None, password=None, secret=None):
-        super(JsonRpcClient, self).__init__(
-            server, port, scheme, rpc_path, username, password, secret
-        )
+        super().__init__(server, port, scheme, rpc_path, username, password, secret)
         # trigger _default_error_handle on failure
         self.get_global_stat()
 
@@ -66,7 +64,7 @@ class JsonRpcClient(RpcClient):
 
     def _default_error_handle(code, message):
         logger.critical('Fault code {} message {}', code, message)
-        raise plugin.PluginError('Fault code %s message %s' % (code, message), logger)
+        raise plugin.PluginError(f'Fault code {code} message {message}', logger)
 
     def _default_success_handle(response):
         return response.text
@@ -100,9 +98,7 @@ class XmlRpcClient(RpcClient):
         schemes = {'http': None, 'https': ssl.SSLContext()}
         if scheme not in schemes:
             raise plugin.PluginError('Unknown scheme: %s' % (scheme), logger)
-        super(XmlRpcClient, self).__init__(
-            server, port, scheme, rpc_path, username, password, secret
-        )
+        super().__init__(server, port, scheme, rpc_path, username, password, secret)
         try:
             self._aria2 = xmlrpc.client.ServerProxy(self.url, context=schemes[scheme]).aria2
         except xmlrpc.client.ProtocolError as err:
@@ -119,7 +115,7 @@ class XmlRpcClient(RpcClient):
             )
         except socket_error as e:
             raise plugin.PluginError(
-                'Socket connection issue with aria2 daemon at %s: %s' % (self.url, e), logger
+                f'Socket connection issue with aria2 daemon at {self.url}: {e}', logger
             )
         except:
             logger.opt(exception=True).debug('Unexpected error during aria2 connection')

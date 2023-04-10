@@ -51,7 +51,7 @@ def required_length(nmin: int, nmax: int):
     class RequiredLength(Action):
         def __call__(self, parser: ArgParser, args, values, option_string=None):
             if not nmin <= len(values) <= nmax:
-                raise ArgumentError(self, 'requires between %s and %s arguments' % (nmin, nmax))
+                raise ArgumentError(self, f'requires between {nmin} and {nmax} arguments')
             setattr(args, self.dest, values)
 
     return RequiredLength
@@ -166,7 +166,7 @@ class ScopedNamespace(Namespace):
 
         if self.__parent__:
             return getattr(self.__parent__, key)
-        raise AttributeError("'%s' object has no attribute '%s'" % (type(self).__name__, key))
+        raise AttributeError(f"'{type(self).__name__}' object has no attribute '{key}'")
 
     def __setattr__(self, key: str, value):
         if '.' in key:
@@ -239,7 +239,7 @@ class ParserError(Exception):
         return self.message
 
     def __repr__(self):
-        return 'ParserError(%s, %s)' % (self.message, self.parser)
+        return f'ParserError({self.message}, {self.parser})'
 
 
 class ArgumentParser(ArgParser):

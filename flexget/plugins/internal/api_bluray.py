@@ -92,16 +92,14 @@ class BlurayMovie(Base):
             response = bluray_request('quicksearch/search.php', **params)
 
             if not response or 'items' not in response:
-                raise LookupError(
-                    'No search results found for {} on blu-ray.com'.format(title_year)
-                )
+                raise LookupError(f'No search results found for {title_year} on blu-ray.com')
 
             search_results = response['items']
             countries = bluray_request('countries.json.php', **country_params) or {}
 
             search_results = sorted(search_results, key=lambda k: extract_release_date(k))
         except requests.RequestException as e:
-            raise LookupError('Error searching for {} on blu-ray.com: {}'.format(title_year, e))
+            raise LookupError(f'Error searching for {title_year} on blu-ray.com: {e}')
 
         # Simply take the first result unless year does not match
         for result in search_results:
@@ -176,7 +174,7 @@ class BlurayMovie(Base):
             self._genres = [BlurayGenre(name=genre) for genre in genres]
             break
         else:
-            raise LookupError('No search results found for {} on blu-ray.com'.format(title_year))
+            raise LookupError(f'No search results found for {title_year} on blu-ray.com')
 
 
 class BlurayGenre(Base):
@@ -214,7 +212,7 @@ class ApiBluray:
     ):
         if not title:
             raise LookupError('No criteria specified for blu-ray.com lookup')
-        title_year = title + ' ({})'.format(year) if year else title
+        title_year = title + f' ({year})' if year else title
 
         movie_filter = session.query(BlurayMovie).filter(
             func.lower(BlurayMovie.name) == title.lower()
@@ -273,7 +271,7 @@ class ApiBluray:
             session.merge(movie)
 
             if not movie:
-                raise LookupError('Unable to find movie on blu-ray: {}'.format(title_year))
+                raise LookupError(f'Unable to find movie on blu-ray: {title_year}')
 
         return movie
 

@@ -32,9 +32,9 @@ unresponsive_hosts = TimedDict(WAIT_TIME)
 if TYPE_CHECKING:
     from typing import TypedDict
 
-    StateCacheDict = TypedDict(
-        'StateCacheDict', {'tokens': Union[float, int], 'last_update': datetime}
-    )
+    class StateCacheDict(TypedDict):
+        tokens: Union[float, int]
+        last_update: datetime
 
 
 def is_unresponsive(url: str) -> bool:

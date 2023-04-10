@@ -1776,7 +1776,7 @@ class TestSeriesPagination:
                 series = Series()
                 session.add(series)
 
-                series.name = 'test series {}'.format(i)
+                series.name = f'test series {i}'
                 task = SeriesTask('test task')
                 series.in_tasks = [task]
 
@@ -1832,7 +1832,7 @@ class TestSeriesPagination:
 
             for i in range(number_of_episodes):
                 episode = Episode()
-                episode.identifier = 'S01E0{}'.format(i)
+                episode.identifier = f'S01E0{i}'
                 episode.identified_by = 'ep'
                 episode.season = 1
                 episode.number = i
@@ -1902,7 +1902,7 @@ class TestSeriesPagination:
 
             for i in range(number_of_releases):
                 release = EpisodeRelease()
-                release.title = 'test release {}'.format(i)
+                release.title = f'test release {i}'
                 release.downloaded = True
 
                 episode.releases.append(release)

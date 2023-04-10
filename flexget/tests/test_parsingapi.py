@@ -5,12 +5,12 @@ from flexget.components.parsing import plugin_parsing
 class TestParsingAPI:
     def test_all_types_handled(self):
         declared_types = set(plugin_parsing.PARSER_TYPES)
-        method_handlers = set(
+        method_handlers = {
             m[6:] for m in dir(plugin.get('parsing', 'tests')) if m.startswith('parse_')
-        )
+        }
         assert set(declared_types) == set(
             method_handlers
-        ), 'declared parser types: %s, handled types: %s' % (declared_types, method_handlers)
+        ), f'declared parser types: {declared_types}, handled types: {method_handlers}'
 
     def test_parsing_plugins_have_parse_methods(self):
         for parser_type in plugin_parsing.PARSER_TYPES:

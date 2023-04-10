@@ -1,4 +1,4 @@
-class TestFromTask(object):
+class TestFromTask:
     config = """
         tasks:
           subtask:

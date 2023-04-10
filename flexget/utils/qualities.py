@@ -70,21 +70,21 @@ class QualityComponent:
         if isinstance(other, str):
             other = _registry.get(other)
         if not isinstance(other, QualityComponent):
-            raise TypeError('Cannot compare %r and %r' % (self, other))
+            raise TypeError(f'Cannot compare {self!r} and {other!r}')
         if other.type == self.type:
             return self.value == other.value
         else:
-            raise TypeError('Cannot compare %s and %s' % (self.type, other.type))
+            raise TypeError(f'Cannot compare {self.type} and {other.type}')
 
     def __lt__(self, other) -> bool:
         if isinstance(other, str):
             other = _registry.get(other)
         if not isinstance(other, QualityComponent):
-            raise TypeError('Cannot compare %r and %r' % (self, other))
+            raise TypeError(f'Cannot compare {self!r} and {other!r}')
         if other.type == self.type:
             return self.value < other.value
         else:
-            raise TypeError('Cannot compare %s and %s' % (self.type, other.type))
+            raise TypeError(f'Cannot compare {self.type} and {other.type}')
 
     def __add__(self, other):
         if not isinstance(other, int):
@@ -305,18 +305,18 @@ class Quality(Serializer):
         if not isinstance(other, Quality):
             if other is None:
                 return False
-            raise TypeError('Cannot compare %r and %r' % (self, other))
+            raise TypeError(f'Cannot compare {self!r} and {other!r}')
         return self._comparator == other._comparator
 
     def __lt__(self, other) -> bool:
         if isinstance(other, str):
             other = Quality(other)
         if not isinstance(other, Quality):
-            raise TypeError('Cannot compare %r and %r' % (self, other))
+            raise TypeError(f'Cannot compare {self!r} and {other!r}')
         return self._comparator < other._comparator
 
     def __repr__(self) -> str:
-        return '<Quality(resolution=%s,source=%s,codec=%s,color_range=%s,audio=%s)>' % (
+        return '<Quality(resolution={},source={},codec={},color_range={},audio={})>'.format(
             self.resolution,
             self.source,
             self.codec,
@@ -370,7 +370,7 @@ class RequirementComponent:
 
     def allows(self, comp: QualityComponent, loose: bool = False) -> bool:
         if comp.type != self.type:
-            raise TypeError('Cannot compare %r against %s' % (comp, self.type))
+            raise TypeError(f'Cannot compare {comp!r} against {self.type}')
         if comp in self.none_of:
             return False
         if loose:

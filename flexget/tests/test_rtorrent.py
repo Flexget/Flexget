@@ -75,15 +75,13 @@ class TestRTorrentClient:
         assert torrent.get('down_rate') == 123456
 
         assert mocked_proxy.system.multicall.called_with(
-            (
-                [
-                    {'params': (torrent_info_hash,), 'methodName': 'd.base_path'},
-                    {'params': (torrent_info_hash,), 'methodName': 'd.name'},
-                    {'params': (torrent_info_hash,), 'methodName': 'd.hash'},
-                    {'params': (torrent_info_hash,), 'methodName': 'd.custom1'},
-                    {'params': (torrent_info_hash,), 'methodName': 'd.down.rate'},
-                ]
-            )
+            [
+                {'params': (torrent_info_hash,), 'methodName': 'd.base_path'},
+                {'params': (torrent_info_hash,), 'methodName': 'd.name'},
+                {'params': (torrent_info_hash,), 'methodName': 'd.hash'},
+                {'params': (torrent_info_hash,), 'methodName': 'd.custom1'},
+                {'params': (torrent_info_hash,), 'methodName': 'd.down.rate'},
+            ]
         )
 
     def test_torrents(self, mocked_proxy):
@@ -132,16 +130,14 @@ class TestRTorrentClient:
         assert resp == 0
 
         assert mocked_proxy.system.multicall.called_with(
-            (
-                [
-                    {
-                        'params': (torrent_info_hash, '/data/downloads'),
-                        'methodName': 'd.directory_base',
-                    },
-                    {'params': (torrent_info_hash, 'test_custom1'), 'methodName': 'd.custom1'},
-                    {'params': (torrent_info_hash, '/data/downloads'), 'methodName': 'd.custom1'},
-                ]
-            )
+            [
+                {
+                    'params': (torrent_info_hash, '/data/downloads'),
+                    'methodName': 'd.directory_base',
+                },
+                {'params': (torrent_info_hash, 'test_custom1'), 'methodName': 'd.custom1'},
+                {'params': (torrent_info_hash, '/data/downloads'), 'methodName': 'd.custom1'},
+            ]
         )
 
     def test_delete(self, mocked_proxy):

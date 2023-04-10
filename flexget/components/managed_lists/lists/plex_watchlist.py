@@ -196,8 +196,7 @@ class PlexWatchlist:
     @plugin.internet(logger)
     def on_task_input(self, task, config):
         yaml_list = PlexManagedWatchlist(**config)
-        for item in yaml_list:
-            yield item
+        yield from yaml_list
 
 
 @event('plugin.register')

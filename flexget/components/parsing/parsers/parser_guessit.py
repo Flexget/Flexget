@@ -252,11 +252,9 @@ class ParserGuessit:
             if title_start != 0:
                 try:
                     pre_title = max(
-                        (
-                            match[0].end
-                            for match in guess_result.matches.values()
-                            if match[0].end <= title_start
-                        )
+                        match[0].end
+                        for match in guess_result.matches.values()
+                        if match[0].end <= title_start
                     )
                 except ValueError:
                     pre_title = 0

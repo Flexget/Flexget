@@ -442,9 +442,7 @@ class FilterSeries(FilterSeriesBase):
                     + [normalize_series_name(series_name)[:1].lower()]
                     + [alt[:1].lower() for alt in alt_names]
                 )
-                entries = set(
-                    [entry for letter in letters for entry in entries_map.get(letter, [])]
-                )
+                entries = {entry for letter in letters for entry in entries_map.get(letter, [])}
                 if entries:
                     self.parse_series(entries, series_name, series_config, db_identified_by)
 
@@ -476,7 +474,7 @@ class FilterSeries(FilterSeriesBase):
                 .options(joinedload('alternate_names'))
                 .all()
             )
-            existing_series_map = dict([(s.name_normalized, s) for s in existing_series])
+            existing_series_map = {s.name_normalized: s for s in existing_series}
             # Expunge so we can work on de-attached while processing the series to minimize db locks
             session.expunge_all()
 
@@ -843,9 +841,7 @@ class FilterSeries(FilterSeriesBase):
                 logger.debug('propers timeframe expired')
                 return pass_filter
 
-        downloaded_qualities = dict(
-            (d.quality, d.proper_count) for d in episode.downloaded_releases
-        )
+        downloaded_qualities = {d.quality: d.proper_count for d in episode.downloaded_releases}
         logger.debug('propers - downloaded qualities: {}', downloaded_qualities)
 
         # Accept propers we actually need, and remove them from the list of entries to continue processing
@@ -1038,9 +1034,7 @@ class FilterSeries(FilterSeriesBase):
         logger.debug('downloaded_qualities: {}', downloaded_qualities)
 
         # If qualities key is configured, we only want qualities defined in it.
-        wanted_qualities = set(
-            [qualities.Requirements(name) for name in config.get('qualities', [])]
-        )
+        wanted_qualities = {qualities.Requirements(name) for name in config.get('qualities', [])}
         # Compute the requirements from our set that have not yet been fulfilled
         still_needed = [
             req
@@ -1132,7 +1126,7 @@ class SeriesDBManager(FilterSeriesBase):
                 .options(joinedload('alternate_names'))
                 .all()
             )
-            existing_series_map = dict([(s.name_normalized, s) for s in existing_series])
+            existing_series_map = {s.name_normalized: s for s in existing_series}
 
             for series_item in config:
                 series_name, series_config = list(series_item.items())[0]

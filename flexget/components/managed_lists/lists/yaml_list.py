@@ -184,8 +184,7 @@ class YamlList:
     def on_task_input(self, task, config):
         config = self.process_config(config)
         yaml_list = YamlManagedList(**config)
-        for item in yaml_list:
-            yield item
+        yield from yaml_list
 
 
 @event('plugin.register')

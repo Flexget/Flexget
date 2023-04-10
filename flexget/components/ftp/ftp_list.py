@@ -162,7 +162,7 @@ class FTPList:
                 self.host, self.username, self.password, session_factory=session_factory
             )
         except FTPOSError as e:
-            raise PluginError('Could not connect to FTP: {}'.format(e.args[0]))
+            raise PluginError(f'Could not connect to FTP: {e.args[0]}')
 
         entries = []
         for d in directories:

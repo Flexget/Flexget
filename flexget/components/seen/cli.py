@@ -109,7 +109,7 @@ def seen_search(manager: Manager, options, session=None):
         for sf in se.fields:
             if sf.field.lower() == 'title':
                 continue
-            table.add_row('{}'.format(sf.field.upper()), str(sf.value))
+            table.add_row(f'{sf.field.upper()}', str(sf.value))
         table.add_row('Task', se.task)
         if se.local:
             table.add_row('Local', 'Yes')

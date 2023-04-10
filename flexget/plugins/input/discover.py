@@ -28,7 +28,7 @@ class DiscoverEntry(Base):
         self.last_execution = None
 
     def __str__(self):
-        return '<DiscoverEntry(title=%s,task=%s,added=%s)>' % (
+        return '<DiscoverEntry(title={},task={},added={})>'.format(
             self.title,
             self.task,
             self.last_execution,

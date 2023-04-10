@@ -14,7 +14,7 @@ plugin_name = 'ntfysh'
 requests = RequestSession(max_retries=3)
 
 
-class NtfyshNotifier(object):
+class NtfyshNotifier:
     """
     Example::
 

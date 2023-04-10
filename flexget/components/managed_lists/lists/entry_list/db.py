@@ -87,7 +87,7 @@ class EntryListEntry(Base):
         self.list_id = entry_list_id
 
     def __repr__(self):
-        return '<EntryListEntry,title=%s,original_url=%s>' % (self.title, self.original_url)
+        return f'<EntryListEntry,title={self.title},original_url={self.original_url}>'
 
     def to_dict(self):
         return {

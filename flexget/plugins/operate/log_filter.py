@@ -55,7 +55,7 @@ SCHEMA = {
 }
 
 
-class LogFilter(object):
+class LogFilter:
     """
     Prevent entries with specific text from being logged.
 

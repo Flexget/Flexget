@@ -30,7 +30,7 @@ class EntryTimeFrame(Base):
     proper_count = Column(Integer, default=0)
 
     def __str__(self):
-        return '<Timeframe(id=%s,added=%s,quality=%s)>' % (self.id, self.added, self.quality)
+        return f'<Timeframe(id={self.id},added={self.added},quality={self.quality})>'
 
 
 class FilterTimeFrame:

@@ -124,7 +124,7 @@ class TransmissionBase:
             and (100 * float(best[1]) / float(torrent.total_size))
             >= (config['main_file_ratio'] * 100)
         ):
-            vloc = ('%s/%s' % (torrent.download_dir, best[0])).replace('/', os.sep)
+            vloc = (f'{torrent.download_dir}/{best[0]}').replace('/', os.sep)
         return done, vloc
 
     def check_seed_limits(self, torrent: 'Torrent', session):

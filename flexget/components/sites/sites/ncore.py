@@ -115,7 +115,7 @@ class UrlRewriteNcore:
                     id = href[href.find("id=") + 3 :]
 
                     e['title'] = a.text
-                    e['url'] = URL + '/torrents.php?action=download&id={0}&'.format(id) + PASSKEY
+                    e['url'] = URL + f'/torrents.php?action=download&id={id}&' + PASSKEY
 
                     parent = a.parent.parent.parent.parent
 

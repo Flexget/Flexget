@@ -83,7 +83,7 @@ def after_end(session, transaction):
             # Transaction was created but a connection was never opened for it
             return
         open_time = time.time() - open_transactions[transaction][0]
-        msg = 'Transaction 0x%08X closed %s (open time %s)' % (
+        msg = 'Transaction 0x{:08X} closed {} (open time {})'.format(
             id(transaction),
             caller_info,
             open_time,
