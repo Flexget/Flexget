@@ -524,7 +524,7 @@ class SeriesSeasonsAPI(APIResource):
 @api.response(BadRequest)
 @series_api.route('/<int:show_id>/seasons/<int:season_id>/')
 @api.doc(params={'show_id': 'ID of the show', 'season_id': 'Season ID'})
-class SeriesSeasonsAPI(APIResource):
+class SeriesSeasonAPI(APIResource):
     @etag
     @api.response(200, 'Season retrieved successfully for show', season_schema)
     @api.doc(description='Get a specific season via its ID and show ID')
