@@ -167,7 +167,7 @@ class OutputAria2:
             'password': {'type': 'string', 'default': ''},
             'scheme': {'type': 'string', 'default': 'http'},
             # NOTE: xml/json
-            'rpc_mode': {'type': 'string', 'default': 'xml', 'enum': [RPC_CLIENTS]},
+            'rpc_mode': {'type': 'string', 'default': 'xml', 'enum': list(RPC_CLIENTS)},
             'rpc_path': {'type': 'string', 'default': 'rpc'},
             'path': {'type': 'string'},
             'filename': {'type': 'string'},
