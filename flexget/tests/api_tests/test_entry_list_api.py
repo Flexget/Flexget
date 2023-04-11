@@ -297,7 +297,7 @@ class TestEntryListPagination:
     config = 'tasks: {}'
 
     def test_entry_list_pagination(self, api_client, link_headers):
-        base_entry = dict(title='test_title_', original_url='url_')
+        base_entry = {'title': 'test_title_', 'original_url': 'url_'}
         number_of_entries = 200
 
         with Session() as session:
@@ -352,9 +352,9 @@ class TestEntryListPagination:
         assert links['prev']['page'] == 1
 
     def test_entry_list_sorting(self, api_client):
-        base_entry_1 = dict(title='test_title_1', original_url='url_c')
-        base_entry_2 = dict(title='test_title_2', original_url='url_b')
-        base_entry_3 = dict(title='test_title_3', original_url='url_a')
+        base_entry_1 = {'title': 'test_title_1', 'original_url': 'url_c'}
+        base_entry_2 = {'title': 'test_title_2', 'original_url': 'url_b'}
+        base_entry_3 = {'title': 'test_title_3', 'original_url': 'url_a'}
 
         with Session() as session:
             entry_list = EntryListList(name='test list')

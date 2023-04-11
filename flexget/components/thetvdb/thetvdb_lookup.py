@@ -64,7 +64,7 @@ class PluginThetvdbLookup:
         'tvdb_first_air_date': 'first_aired',
         'tvdb_air_time': 'airs_time',
         'tvdb_content_rating': 'content_rating',
-        'tvdb_genres': lambda series: [g for g in series.genres],
+        'tvdb_genres': lambda series: list(series.genres),
         'tvdb_network': 'network',
         'tvdb_overview': 'overview',
         'tvdb_banner': 'banner',

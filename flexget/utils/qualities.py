@@ -430,9 +430,7 @@ class RequirementComponent:
 
     def __hash__(self) -> int:
         return hash(
-            tuple(
-                [self.min, self.max, tuple(sorted(self.acceptable)), tuple(sorted(self.none_of))]
-            )
+            (self.min, self.max, tuple(sorted(self.acceptable)), tuple(sorted(self.none_of)))
         )
 
 

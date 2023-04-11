@@ -18,13 +18,13 @@ class TestHistoryAPI:
 
         assert data == []
 
-        history_entry = dict(
-            task='test_task1',
-            title='test_title1',
-            url='test_url1',
-            filename='test_filename1',
-            details='test_details1',
-        )
+        history_entry = {
+            "task": 'test_task1',
+            "title": 'test_title1',
+            "url": 'test_url1',
+            "filename": 'test_filename1',
+            "details": 'test_details1',
+        }
 
         with Session() as session:
             item = History()
@@ -67,13 +67,13 @@ class TestHistoryPaginationAPI:
     config = "{'tasks': {}}"
 
     def test_history_pagination(self, api_client, schema_match, link_headers):
-        history_entry = dict(
-            task='test_task_',
-            title='test_title_',
-            url='test_url_',
-            filename='test_filename_',
-            details='test_details_',
-        )
+        history_entry = {
+            "task": 'test_task_',
+            "title": 'test_title_',
+            "url": 'test_url_',
+            "filename": 'test_filename_',
+            "details": 'test_details_',
+        }
         num_of_entries = 200
 
         with Session() as session:
@@ -145,29 +145,29 @@ class TestHistoryPaginationAPI:
         assert not errors
 
     def test_history_sorting(self, api_client, schema_match, link_headers):
-        history_entry1 = dict(
-            task='test_task_1',
-            title='test_title_a',
-            url='test_url_1',
-            filename='test_filename_a',
-            details='test_details_1',
-        )
+        history_entry1 = {
+            "task": 'test_task_1',
+            "title": 'test_title_a',
+            "url": 'test_url_1',
+            "filename": 'test_filename_a',
+            "details": 'test_details_1',
+        }
 
-        history_entry2 = dict(
-            task='test_task_2',
-            title='test_title_b',
-            url='test_url_2',
-            filename='test_filename_b',
-            details='test_details_2',
-        )
+        history_entry2 = {
+            "task": 'test_task_2',
+            "title": 'test_title_b',
+            "url": 'test_url_2',
+            "filename": 'test_filename_b',
+            "details": 'test_details_2',
+        }
 
-        history_entry3 = dict(
-            task='test_task_3',
-            title='test_title_c',
-            url='test_url_3',
-            filename='test_filename_c',
-            details='test_details_3',
-        )
+        history_entry3 = {
+            "task": 'test_task_3',
+            "title": 'test_title_c',
+            "url": 'test_url_3',
+            "filename": 'test_filename_c',
+            "details": 'test_details_3',
+        }
 
         entries = [history_entry1, history_entry2, history_entry3]
 

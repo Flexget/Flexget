@@ -67,7 +67,7 @@ class Medusa:
             scheme=parsed_url.scheme, url=parsed_url.netloc, port=config.get('port')
         )
 
-        body_auth = dict(username=config.get('username'), password=config.get('password'))
+        body_auth = {'username': config.get('username'), 'password': config.get('password')}
 
         api_key = task.requests.post(f'{base_url}/authenticate', json=body_auth).json()['token']
 

@@ -203,7 +203,7 @@ class TMDBMovie(Base):
             'budget': self.budget,
             'revenue': self.revenue,
             'homepage': self.homepage,
-            'genres': [g for g in self.genres],
+            'genres': list(self.genres),
             'updated': self.updated,
             'lookup_language': self.lookup_language,
         }

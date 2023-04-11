@@ -121,7 +121,7 @@ class UrlRewriteSolidTorrents:
         remove_potentially_unsafe = bool(config.get('remove_potentially_unsafe', 'True'))
         category = config.get('category', 'all')
 
-        entries = list()
+        entries = []
         for search_string in entry.get('search_strings', [entry['title']]):
             # query = normalize_unicode(search_string)
             params = {

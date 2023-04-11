@@ -193,7 +193,7 @@ class SearchFileList:
         """
         Search for entries on FileList.ro
         """
-        entries = list()
+        entries = []
 
         params = {
             'cat': CATEGORIES[config['category']],

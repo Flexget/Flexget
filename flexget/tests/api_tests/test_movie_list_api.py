@@ -360,7 +360,7 @@ class TestMovieListPagination:
     config = 'tasks: {}'
 
     def test_movie_list_pagination(self, api_client, link_headers):
-        base_movie = dict(title='title_', year=1900)
+        base_movie = {'title': 'title_', 'year': 1900}
         number_of_movies = 200
 
         with Session() as session:

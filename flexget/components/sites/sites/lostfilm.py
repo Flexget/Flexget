@@ -119,7 +119,7 @@ class LostFilm:
 
     def build_config(self, config):
         """Set defaults to config"""
-        cfg = dict()
+        cfg = {}
         if isinstance(config, bool):
             cfg['enabled'] = bool(config)
         elif isinstance(config, str):

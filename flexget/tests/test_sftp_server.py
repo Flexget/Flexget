@@ -314,7 +314,7 @@ class TestSFTPServer(SFTPServerInterface):
 
         canonicalized_path: Path = self.__fs.canonicalize(path)
         try:
-            out = list()
+            out = []
             for filename in os.listdir(canonicalized_path):
                 attr = SFTPAttributes.from_stat(
                     os.stat(os.path.join(canonicalized_path, filename))

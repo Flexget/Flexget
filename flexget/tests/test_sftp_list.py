@@ -280,8 +280,8 @@ def assert_entries(
     :param allow_unexpected_entires: bool to assert if there are any additional entries generated
                                      that matchers arn't specified for.
     """
-    expected = list(map(lambda m: m['title'], [entry_matcher, *argv]))
-    found = list(map(lambda m: m['title'], task.all_entries))
+    expected = [m['title'] for m in [entry_matcher, *argv]]
+    found = [m['title'] for m in task.all_entries]
     if not allow_unexpected_entires:
         unexpected: List[str] = [title for title in found if title not in expected]
         assert not unexpected, f'Found unexpected entries {unexpected}'
@@ -307,4 +307,4 @@ def assert_no_entries(task: Task):
     """
     assert (
         len(task.all_entries) == 0
-    ), f"Expected no entries, but found {list(map(lambda m: m['title'], task.all_entries))}"
+    ), f"Expected no entries, but found {[m['title'] for m in task.all_entries]}"

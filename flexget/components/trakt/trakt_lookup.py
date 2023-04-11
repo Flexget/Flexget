@@ -323,7 +323,7 @@ class PluginTraktLookup:
             return
 
         if isinstance(config, bool):
-            config = dict()
+            config = {}
 
         for entry in task.entries:
             if is_show(entry):

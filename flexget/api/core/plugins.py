@@ -88,7 +88,7 @@ def plugin_to_dict(plugin) -> 'PluginDict':
         'debug': plugin.debug,
         'interfaces': plugin.interfaces,
         'phase_handlers': [
-            dict(phase=handler, priority=event.priority)
+            {'phase': handler, 'priority': event.priority}
             for handler, event in plugin.phase_handlers.items()
         ],
     }
