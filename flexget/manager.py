@@ -525,9 +525,9 @@ class Manager:
 
         # Represent OrderedDict as a regular dict (but don't sort it alphabetically)
         # This lets us order a dict in a yaml file for easier human consumption
-        represent_dict_order = lambda self, data: self.represent_mapping(
-            'tag:yaml.org,2002:map', data.items()
-        )
+        def represent_dict_order(self, data):
+            return self.represent_mapping('tag:yaml.org,2002:map', data.items())
+
         yaml.add_representer(collections.OrderedDict, represent_dict_order)
 
         # Set up the dumper to increase the indent for lists

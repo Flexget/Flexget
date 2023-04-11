@@ -810,9 +810,15 @@ def get_all_entities(
     episodes = show_episodes(series, session=session)
     seasons = show_seasons(series, session=session)
     if sort_by == 'identifier':
-        key = lambda e: e.identifier
+
+        def key(e):
+            return e.identifier
+
     else:
-        key = lambda e: (e.first_seen or datetime.min, e.identifier)
+
+        def key(e):
+            return e.first_seen or datetime.min, e.identifier
+
     return sorted(episodes + seasons, key=key, reverse=reverse)
 
 
