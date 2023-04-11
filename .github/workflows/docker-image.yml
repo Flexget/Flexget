@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Setup QEMU
         uses: docker/setup-qemu-action@v2
 
@@ -60,12 +60,11 @@ jobs:
       - name: Build Base Docker Image
         id: docker_build
         uses: docker/build-push-action@v4
-        if: github.event_name == 'push' && github.ref != 'refs/heads/master'
         with:
           context: ./
           file: ./Dockerfile
           builder: ${{ steps.buildx.output.name }}
-          push: true
+          push: ${{ github.event_name == 'push' && github.ref != 'refs/heads/master' }}
           platforms: linux/amd64
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
