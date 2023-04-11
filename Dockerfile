@@ -15,15 +15,12 @@ WORKDIR /wheels
 COPY . /flexget
 
 RUN pip install -U pip && \
-    pip wheel -e /flexget && \
+    pip install -r /flexget/dev-requirements.txt
+RUN python /flexget/dev_tools.py bundle-webui
+RUN pip wheel -e /flexget && \
     pip wheel 'transmission-rpc>=3.0.0,<4.0.0' && \
     pip wheel deluge-client && \
     pip wheel cloudscraper
-
-WORKDIR /flexget-ui-v2
-RUN wget https://github.com/Flexget/webui/releases/latest/download/dist.zip && \
-    unzip dist.zip && \
-    rm dist.zip
 
 FROM docker.io/python:3.11-alpine
 ENV PYTHONUNBUFFERED 1
@@ -45,8 +42,6 @@ RUN pip install -U pip && \
                 deluge-client \
                 cloudscraper && \
     rm -rf /wheels
-
-COPY --from=0 /flexget-ui-v2 /usr/local/lib/python3.11/site-packages/flexget/ui/v2/
 
 VOLUME /config
 WORKDIR /config
