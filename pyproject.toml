@@ -152,12 +152,13 @@ exclude = '''
 
 [tool.ruff]
 line-length = 99
-select = ["C4", "E", "F", "I", "PLE", "UP"]
+select = ["C4", "E", "F", "I", "PLE", "RUF", "UP"]
 
 ignore = [
     "E501",  # We leave line length up to black
     "E711", "E712",  # Comparisons to True/False/None are valid for sqlalchemy
     "PLE1205",  # Thinks we are using stdlib logging rather than loguru
+    "RUF001",  # Some of these ambiguous unicode are in tests on purpose
 ]
 
 [tool.ruff.isort]

@@ -68,7 +68,7 @@ def do_cli(manager, options):
 
     # Hack sys.argv a bit so that we get a better usage message
     sys.argv[0] = 'flexget service'
-    win32serviceutil.HandleCommandLine(AppServerSvc, argv=['flexget service'] + argv)
+    win32serviceutil.HandleCommandLine(AppServerSvc, argv=['flexget service', *argv])
 
 
 @event('options.register')

@@ -283,7 +283,7 @@ class Quality(Serializer):
     @property
     def _comparator(self) -> List:
         modifier = sum(c.modifier for c in self.components if c.modifier)
-        return [modifier] + self.components
+        return [modifier, *self.components]
 
     def __contains__(self, other):
         if isinstance(other, str):

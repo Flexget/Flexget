@@ -125,7 +125,7 @@ def create_index(table_name: str, session: Session, *column_names: str) -> None:
     :param session: Session object which should be used
     :param column_names: The names of the columns that should belong to this index.
     """
-    index_name = '_'.join(['ix', table_name] + list(column_names))
+    index_name = '_'.join(['ix', table_name, *list(column_names)])
     table = table_schema(table_name, session)
     columns = [getattr(table.c, column) for column in column_names]
     try:

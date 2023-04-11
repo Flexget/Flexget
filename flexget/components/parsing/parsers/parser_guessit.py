@@ -416,7 +416,7 @@ class ParserGuessit:
             # if we don't have name_regexps, generate one from the name
             name_regexps = ReList(
                 name_to_re(name, default_ignore_prefixes, None)
-                for name in [guessit_options['name']] + guessit_options.get('alternate_names', [])
+                for name in [guessit_options['name'], *guessit_options.get('alternate_names', [])]
             )
             # With auto regex generation, the first regex group captures the name
             re_from_name = True

@@ -26,7 +26,7 @@ def find_caller(stack):
             continue
         if module.__name__.startswith('sqlalchemy'):
             continue
-        return (module.__name__,) + tuple(frame[2:4]) + (frame[4][0].strip(),)
+        return (module.__name__, *tuple(frame[2:4])) + (frame[4][0].strip(),)
     logger.warning('Transaction from unknown origin')
     return None, None, None, None
 
@@ -51,7 +51,7 @@ def after_begin(session, transaction, connection):
         else:
             logger.debug('Transaction 0x{:08X} opened {}', id(transaction), caller_info)
         # Store information about this transaction
-        open_transactions[transaction] = (time.time(), connection.connection) + caller_info
+        open_transactions[transaction] = (time.time(), connection.connection, *caller_info)
 
 
 def after_flush(session, flush_context):

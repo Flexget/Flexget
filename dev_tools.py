@@ -131,8 +131,8 @@ def autoformat(files):
         raise Exception('Virtualenv and activation required')
 
     # black and ruff config are in pyproject.toml
-    subprocess.call(('ruff', '--fix') + files)
-    subprocess.call(('black',) + files)
+    subprocess.call(('ruff', '--fix', *files))
+    subprocess.call(('black', *files))
 
 
 @cli.command()

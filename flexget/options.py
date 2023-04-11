@@ -136,7 +136,7 @@ class InjectAction(Action):
         if 'accept' in [v.lower() for v in values]:
             entry.accept(reason='accepted by --inject')
         existing = getattr(namespace, self.dest, None) or []
-        setattr(namespace, self.dest, existing + [entry])
+        setattr(namespace, self.dest, [*existing, entry])
 
 
 class ParseExtrasAction(Action):

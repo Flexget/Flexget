@@ -45,7 +45,7 @@ class XMPPNotifier:
 
     def notify(self, title, message, config):
         try:
-            import sleekxmpp  # noqa
+            import sleekxmpp
         except ImportError as e:
             logger.debug('Error importing SleekXMPP: {}', e)
             raise DependencyError(
