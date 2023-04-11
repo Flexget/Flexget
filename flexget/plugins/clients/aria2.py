@@ -3,7 +3,6 @@ import os
 import re
 import ssl
 import xmlrpc.client
-from socket import error as socket_error
 
 import requests
 from loguru import logger
@@ -113,7 +112,7 @@ class XmlRpcClient(RpcClient):
                 % (self.url, exc.faultString),
                 logger,
             ) from exc
-        except socket_error as exc:
+        except OSError as exc:
             raise plugin.PluginError(
                 f'Socket connection issue with aria2 daemon at {self.url}: {exc}', logger
             ) from exc
@@ -231,7 +230,7 @@ class OutputAria2:
                 continue
             try:
                 self.add_entry(aria2, entry, config, task)
-            except socket_error as se:
+            except OSError as se:
                 entry.fail('Unable to reach Aria2: %s' % se)
             except xmlrpc.client.Fault as err:
                 logger.critical('Fault code {} message {}', err.faultCode, err.faultString)

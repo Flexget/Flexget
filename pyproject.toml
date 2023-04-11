@@ -151,9 +151,10 @@ exclude = '''
   )/
 )
 '''
+
 [tool.ruff]
 line-length = 99
-select = ["E", "F", "I"]
+select = ["E", "F", "I", "UP"]
 
 ignore = [
     "E501",  # We leave line length up to black
