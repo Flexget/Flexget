@@ -117,6 +117,13 @@ subliminal = ">= 2.0rc1"
 [tool.poetry.group.plugin-tests.dependencies]
 pysftp = "^0.2.9"
 
+
+[tool.poetry.group.docker.dependencies]
+transmission-rpc = "^4.1.4"
+qbittorrent-api = "^2023.3.44"
+deluge-client = "^1.9.0"
+cloudscraper = "^1.2.69"
+
 [tool.poetry.scripts]
 flexget = 'flexget:main'
 
