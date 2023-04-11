@@ -22,8 +22,7 @@ class SearchPlugin:
         elif config == 'fail':
             raise plugin.PluginError('search plugin failure')
         elif isinstance(config, list):
-            l = [{**entry, 'title': entry['title'] + suffix} for suffix in config]
-            return [Entry(e) for e in l]
+            return [Entry({**entry, 'title': entry['title'] + suffix}) for suffix in config]
         return [Entry(entry)]
 
 

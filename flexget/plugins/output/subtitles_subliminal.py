@@ -250,7 +250,7 @@ class PluginSubliminal:
                                 entry.reject('cannot find any subtitles for now.')
 
                         downloaded_languages = {
-                            Language.fromietf(str(l.language)) for l in subtitles
+                            Language.fromietf(str(s.language)) for s in subtitles
                         }
                         if entry_languages:
                             entry['subtitles_missing'] = entry_languages - downloaded_languages
@@ -272,7 +272,7 @@ class PluginSubliminal:
                     if task.options.test:
                         logger.verbose(
                             '     FOUND LANGUAGES {} for {}',
-                            [str(l.language) for l in subtitle],
+                            [str(s.language) for s in subtitle],
                             video.name,
                         )
                         continue

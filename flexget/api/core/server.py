@@ -394,8 +394,8 @@ class ServerLogAPI(APIResource):
                         if log_parser.matches(line):
                             lines_found.append(log_parser.json_string(line))
 
-                    for l in reversed(lines_found):
-                        yield l + ',\n'
+                    for line in reversed(lines_found):
+                        yield line + ',\n'
 
             # We need to track the inode in case the log file is rotated
             current_inode = file_inode(base_log_file)

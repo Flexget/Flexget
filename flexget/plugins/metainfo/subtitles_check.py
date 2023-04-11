@@ -74,7 +74,7 @@ class MetainfoSubs:
             subtitles |= set(search_external_subtitles(entry['location']).values())
             if subtitles:
                 # convert to human-readable strings
-                subtitles = [str(l) for l in subtitles]
+                subtitles = [str(s) for s in subtitles]
                 entry['subtitles'] = subtitles
                 logger.debug('Found subtitles {} for {}', '/'.join(subtitles), entry['title'])
         except Exception as e:
