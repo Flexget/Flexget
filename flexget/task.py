@@ -243,7 +243,7 @@ class Task:
             options = options_namespace
         # If execution hasn't specifically set the `allow_manual` flag, set it to False by default
         if not hasattr(options, 'allow_manual'):
-            setattr(options, 'allow_manual', False)
+            options.allow_manual = False
         self.options = options
         self.output = output
         self.session_id = session_id

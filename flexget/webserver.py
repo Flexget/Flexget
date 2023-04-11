@@ -175,7 +175,7 @@ class WebServer(threading.Thread):
     def _start_server(self):
         # Mount the WSGI callable object (app) on the root directory
         cherrypy.tree.graft(_default_app, '/')
-        for path, (registered_app, name) in _app_register.items():
+        for path, (registered_app, _name) in _app_register.items():
             cherrypy.tree.graft(registered_app, self.base_url + path)
 
         cherrypy.log.error_log.propagate = False

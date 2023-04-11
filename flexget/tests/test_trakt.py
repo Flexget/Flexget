@@ -162,7 +162,9 @@ class TestTraktShowLookup:
         assert entry.get('trakt_show_id') == 2211, 'should have populated trakt show data'
         # We don't support lookup by date at the moment, make sure there isn't a false positive
         if entry.get('trakt_episode_id') == 173423:
-            assert False, 'We support trakt episode lookup by date now? Great! Change this test.'
+            raise AssertionError(
+                'We support trakt episode lookup by date now? Great! Change this test.'
+            )
         else:
             assert entry.get('trakt_episode_id') is None, (
                 'false positive for episode match, we don\'t ' 'support lookup by date'
@@ -175,9 +177,9 @@ class TestTraktShowLookup:
         assert entry.get('trakt_show_id') == 46003, 'should have populated trakt show data'
         # We don't support lookup by absolute number at the moment, make sure there isn't a false positive
         if entry.get('trakt_show_id') == 916040:
-            assert (
-                False
-            ), 'We support trakt episode lookup by absolute number now? Great! Change this test.'
+            raise AssertionError(
+                'We support trakt episode lookup by absolute number now? Great! Change this test.'
+            )
         else:
             assert entry.get('trakt_episode_id') is None, (
                 'false positive for episode match, we don\'t ' 'support lookup by absolute number'

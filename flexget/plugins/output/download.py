@@ -507,7 +507,7 @@ class PluginDownload:
 
                 try:
                     shutil.move(entry['file'], destfile)
-                except (OSError, OSError) as err:
+                except OSError as err:
                     # ignore permission errors, see ticket #555
                     import errno
 
