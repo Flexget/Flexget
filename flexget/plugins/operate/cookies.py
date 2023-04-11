@@ -64,7 +64,7 @@ class PluginCookies:
         logger.debug('connecting: {}', filename)
         try:
             con = sqlite.connect(filename)
-        except:
+        except Exception:
             raise plugin.PluginError('Unable to open cookies sqlite database')
 
         cur = con.cursor()

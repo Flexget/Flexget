@@ -443,7 +443,7 @@ class PluginDownload:
                 logger.debug('Creating directory {}', path)
                 try:
                     os.makedirs(path)
-                except:
+                except Exception:
                     raise plugin.PluginError('Cannot create path %s' % path, logger)
 
             # check that temp file is present

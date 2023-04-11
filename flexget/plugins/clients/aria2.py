@@ -101,27 +101,27 @@ class XmlRpcClient(RpcClient):
         super().__init__(server, port, scheme, rpc_path, username, password, secret)
         try:
             self._aria2 = xmlrpc.client.ServerProxy(self.url, context=schemes[scheme]).aria2
-        except xmlrpc.client.ProtocolError as err:
+        except xmlrpc.client.ProtocolError as exc:
             raise plugin.PluginError(
                 'Could not connect to aria2 at %s. Protocol error %s: %s'
-                % (self.url, err.errcode, err.errmsg),
+                % (self.url, exc.errcode, exc.errmsg),
                 logger,
-            )
-        except xmlrpc.client.Fault as err:
+            ) from exc
+        except xmlrpc.client.Fault as exc:
             raise plugin.PluginError(
                 'XML-RPC fault: Unable to connect to aria2 daemon at %s: %s'
-                % (self.url, err.faultString),
+                % (self.url, exc.faultString),
                 logger,
-            )
-        except socket_error as e:
+            ) from exc
+        except socket_error as exc:
             raise plugin.PluginError(
-                f'Socket connection issue with aria2 daemon at {self.url}: {e}', logger
-            )
-        except:
+                f'Socket connection issue with aria2 daemon at {self.url}: {exc}', logger
+            ) from exc
+        except Exception as exc:
             logger.opt(exception=True).debug('Unexpected error during aria2 connection')
             raise plugin.PluginError(
                 'Unidentified error during connection to aria2 daemon', logger
-            )
+            ) from exc
 
     def add_uri(self, uris, options):
         # https://aria2.github.io/manual/en/html/aria2c.html#aria2.addUri
