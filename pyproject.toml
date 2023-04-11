@@ -153,16 +153,15 @@ exclude = '''
 '''
 [tool.ruff]
 line-length = 99
+select = ["E", "F", "I"]
 
 ignore = [
     "E501",  # We leave line length up to black
     "E711", "E712",  # Comparisons to True/False/None are valid for sqlalchemy
 ]
 
-[tool.isort]
-profile = 'black'
-line_length = 99
-known_first_party = ['flexget']
+[tool.ruff.isort]
+known-first-party = ['flexget']
 
 [tool.mypy]
 plugins = ["sqlmypy"]

@@ -23,9 +23,9 @@ from flexget.plugin import (
     get_plugins,
     phase_methods,
     plugin_schemas,
+    task_phases,
 )
 from flexget.plugin import plugins as all_plugins
-from flexget.plugin import task_phases
 from flexget.terminal import capture_console
 from flexget.utils import requests
 from flexget.utils.database import with_session

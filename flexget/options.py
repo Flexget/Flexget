@@ -2,9 +2,18 @@ import copy
 import random
 import string
 import sys
-from argparse import _UNRECOGNIZED_ARGS_ATTR, PARSER, REMAINDER, SUPPRESS, Action, ArgumentError
+from argparse import (
+    _UNRECOGNIZED_ARGS_ATTR,
+    PARSER,
+    REMAINDER,
+    SUPPRESS,
+    Action,
+    ArgumentError,
+    Namespace,
+    _SubParsersAction,
+    _VersionAction,
+)
 from argparse import ArgumentParser as ArgParser
-from argparse import Namespace, _SubParsersAction, _VersionAction
 from typing import IO, Any, Callable, List, Optional, TextIO
 
 import flexget
