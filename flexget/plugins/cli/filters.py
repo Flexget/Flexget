@@ -10,7 +10,7 @@ def do_cli(manager, options):
     header = ['Name', 'Description']
     table = TerminalTable(*header, table_type=options.table_type, show_lines=True)
     for filter_name, filter in get_filters().items():
-        if options.name and not options.name in filter_name:
+        if options.name and options.name not in filter_name:
             continue
         filter_doc = inspect.getdoc(filter) or ''
         table.add_row(filter_name, filter_doc)

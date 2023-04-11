@@ -14,7 +14,7 @@ def list_file_templates(manager, options):
     table = TerminalTable(*header, table_type=options.table_type, show_lines=True)
     console('Fetching all file templates, stand by...')
     for template_name in list_templates(extensions=['template']):
-        if options.name and not options.name in template_name:
+        if options.name and options.name not in template_name:
             continue
         template = get_template(template_name)
         if 'entries' in template_name:

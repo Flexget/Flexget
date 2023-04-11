@@ -275,7 +275,7 @@ def radarr_quality_to_flexget_quality_req(radarr_quality):
 
     # QUALITIES_MAP has its keys in lower case
     radarr_quality = radarr_quality.lower()
-    if not radarr_quality in QUALITIES_MAP:
+    if radarr_quality not in QUALITIES_MAP:
         logger.warning(
             "Did not find a suitible translation for Radarr quality '{}'", radarr_quality
         )

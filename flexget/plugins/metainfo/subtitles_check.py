@@ -56,7 +56,7 @@ class MetainfoSubs:
     def get_subtitles(self, entry):
         if (
             entry.get('subtitles', eval_lazy=False)
-            or not ('location' in entry)
+            or 'location' not in entry
             or ('$RECYCLE.BIN' in entry['location'])
             or not os.path.exists(entry['location'])
         ):

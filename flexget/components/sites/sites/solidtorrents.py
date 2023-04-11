@@ -104,7 +104,7 @@ class UrlRewriteSolidTorrents:
             logger.debug('Getting info for torrent ID {}', torrent_id)
             json_result = task.requests.get(url).json()
             # if json_result['error'] == '404':
-            if not 'result' in json_result:
+            if 'result' not in json_result:
                 raise UrlRewritingError("Torrent with ID %s does not exist." % torrent_id)
             entry['url'] = json_result['result']['rating']['magnet']
 
@@ -136,7 +136,7 @@ class UrlRewriteSolidTorrents:
                 raise plugin.PluginError(
                     "Error while searching solidtorrents for %s.", search_string
                 )
-            if not 'results' in json_results:
+            if 'results' not in json_results:
                 logger.info(
                     "No result founds while searching solidtorrents for %s.", search_string
                 )

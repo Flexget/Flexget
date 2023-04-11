@@ -171,8 +171,8 @@ class TestYamlLists:
         # Checks update
         assert task.accepted[0]['new'] == 'teste1'
         assert task.accepted[1]['new'] == 'teste2'
-        assert not 'new' in task.accepted[2]
+        assert 'new' not in task.accepted[2]
 
         # Checks not update
-        assert not 'trash' in task.accepted[0]
-        assert not 'trash' in task.accepted[1]
+        assert 'trash' not in task.accepted[0]
+        assert 'trash' not in task.accepted[1]

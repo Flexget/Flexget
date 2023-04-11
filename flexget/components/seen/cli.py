@@ -63,7 +63,7 @@ def seen_add(manager: Manager, options):
 
     task = DEFAULT_TASK
     local = None
-    if options.task and not options.task in manager.tasks:
+    if options.task and options.task not in manager.tasks:
         console(f"Task `{options.task}` not in config")
         return
     else:

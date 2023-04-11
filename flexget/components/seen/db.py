@@ -216,7 +216,7 @@ def forget(value, tasks=None, test=False):
 
         for sf in query_sf.all():
             se = session.query(SeenEntry).filter(SeenEntry.id == sf.seen_entry_id).first()
-            if tasks and not se.task in tasks:
+            if tasks and se.task not in tasks:
                 continue
             field_count += len(se.fields)
             count += 1

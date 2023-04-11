@@ -308,7 +308,7 @@ class SearchAlphaRatio:
                 }
 
                 for dest, src in mappings_int.items():
-                    if not src in torrent_info:
+                    if src not in torrent_info:
                         continue
 
                     # Some values are tagged with a ',' insted of a '.', replace them
