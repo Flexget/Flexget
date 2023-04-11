@@ -2,9 +2,9 @@ from datetime import datetime
 
 from loguru import logger
 
-from flexget import entry, plugin
+from flexget import plugin
 from flexget.components.imdb.utils import ImdbParser, ImdbSearch, extract_id, make_url
-from flexget.entry import Entry
+from flexget.entry import Entry, register_lazy_lookup
 from flexget.event import event
 from flexget.utils.database import with_session
 from flexget.utils.log import log_once
@@ -60,7 +60,7 @@ class ImdbLookup:
         for entry in task.entries:
             entry.add_lazy_fields(self.lazy_loader, self.field_map)
 
-    @entry.register_lazy_lookup('imdb_lookup')
+    @register_lazy_lookup('imdb_lookup')
     def lazy_loader(self, entry):
         """Does the lookup for this entry and populates the entry fields."""
         try:

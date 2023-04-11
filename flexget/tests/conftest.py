@@ -186,7 +186,7 @@ def link_headers(manager) -> Callable[[flask.Response], Dict[str, dict]]:
 
 
 @pytest.fixture(autouse=True)
-def caplog(pytestconfig, _caplog):
+def caplog(pytestconfig, _caplog):  # noqa: F811
     """
     Override caplog so that we can send loguru messages to logging for compatibility.
     """

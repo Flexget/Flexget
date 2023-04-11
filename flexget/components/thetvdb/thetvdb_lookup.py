@@ -1,6 +1,7 @@
 from loguru import logger
 
-from flexget import entry, plugin
+from flexget import plugin
+from flexget.entry import register_lazy_lookup
 from flexget.event import event
 from flexget.utils.database import with_session
 
@@ -117,19 +118,19 @@ class PluginThetvdbLookup:
             )
         return entry
 
-    @entry.register_lazy_lookup('tvdb_series_lookup')
+    @register_lazy_lookup('tvdb_series_lookup')
     def lazy_series_lookup(self, entry, language):
         return self.series_lookup(entry, language, self.series_map)
 
-    @entry.register_lazy_lookup('tvdb_series_actor_lookup')
+    @register_lazy_lookup('tvdb_series_actor_lookup')
     def lazy_series_actor_lookup(self, entry, language):
         return self.series_lookup(entry, language, self.series_actor_map)
 
-    @entry.register_lazy_lookup('tvdb_series_poster_lookup')
+    @register_lazy_lookup('tvdb_series_poster_lookup')
     def lazy_series_poster_lookup(self, entry, language):
         return self.series_lookup(entry, language, self.series_poster_map)
 
-    @entry.register_lazy_lookup('tvdb_episode_lookup')
+    @register_lazy_lookup('tvdb_episode_lookup')
     def lazy_episode_lookup(self, entry, language):
         try:
             season_offset = entry.get('thetvdb_lookup_season_offset', 0)

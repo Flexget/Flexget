@@ -1,6 +1,7 @@
 from loguru import logger
 
-from flexget import entry, plugin
+from flexget import plugin
+from flexget.entry import register_lazy_lookup
 from flexget.event import event
 
 logger = logger.bind(name='metainfo_media_id')
@@ -21,7 +22,7 @@ class MetainfoMediaId:
         for entry in task.entries:
             entry.add_lazy_fields(self.get_media_id, ['media_id'])
 
-    @entry.register_lazy_lookup('media_id')
+    @register_lazy_lookup('media_id')
     def get_media_id(self, entry):
         # Try to generate a media id based on available parser fields
         media_id = None

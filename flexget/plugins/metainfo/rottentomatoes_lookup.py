@@ -1,6 +1,7 @@
 from loguru import logger
 
-from flexget import entry, plugin
+from flexget import plugin
+from flexget.entry import register_lazy_lookup
 from flexget.event import event
 from flexget.utils.log import log_once
 
@@ -67,7 +68,7 @@ class PluginRottenTomatoesLookup:
     def __init__(self):
         self.key = None
 
-    @entry.register_lazy_lookup('rottentomatoes_lookup')
+    @register_lazy_lookup('rottentomatoes_lookup')
     def lazy_loader(self, entry):
         """Does the lookup for this entry and populates the entry fields.
 

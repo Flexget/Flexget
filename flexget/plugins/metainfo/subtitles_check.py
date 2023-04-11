@@ -4,7 +4,8 @@ import tempfile
 
 from loguru import logger
 
-from flexget import entry, plugin
+from flexget import plugin
+from flexget.entry import register_lazy_lookup
 from flexget.event import event
 
 logger = logger.bind(name='check_subtitles')
@@ -52,7 +53,7 @@ class MetainfoSubs:
         for entry in task.entries:
             entry.add_lazy_fields(self.get_subtitles, ['subtitles'])
 
-    @entry.register_lazy_lookup('subtitles_check')
+    @register_lazy_lookup('subtitles_check')
     def get_subtitles(self, entry):
         if (
             entry.get('subtitles', eval_lazy=False)
