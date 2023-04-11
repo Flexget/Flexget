@@ -111,7 +111,7 @@ class Movie(Base):
         return self.updated < datetime.now() - timedelta(days=refresh_interval)
 
     def __repr__(self):
-        return '<Movie(name=%s,votes=%s,year=%s)>' % (self.title, self.votes, self.year)
+        return f'<Movie(name={self.title},votes={self.votes},year={self.year})>'
 
 
 class MovieLanguage(Base):
@@ -213,7 +213,7 @@ class SearchResult(Base):
         self.queried = datetime.now()
 
     def __repr__(self):
-        return '<SearchResult(title=%s,url=%s,fails=%s)>' % (self.title, self.url, self.fails)
+        return f'<SearchResult(title={self.title},url={self.url},fails={self.fails})>'
 
 
 @db_schema.upgrade('imdb_lookup')

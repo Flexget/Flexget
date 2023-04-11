@@ -51,9 +51,7 @@ class ConvertMagnet:
             time.sleep(0.1)
             timeout_value -= 0.1
             if timeout_value <= 0:
-                raise plugin.PluginError(
-                    'Timed out after {} seconds trying to magnetize'.format(timeout)
-                )
+                raise plugin.PluginError(f'Timed out after {timeout} seconds trying to magnetize')
         logger.debug('Metadata acquired')
         torrent_info = handle.get_torrent_info()
         torrent_file = libtorrent.create_torrent(torrent_info)
@@ -115,7 +113,7 @@ class ConvertMagnet:
                 entry['url'] = torrent_file
                 entry['file'] = torrent_file
                 # make sure it's first in the list because of how download plugin works
-                entry['urls'].insert(0, 'file://{}'.format(quote(torrent_file)))
+                entry['urls'].insert(0, f'file://{quote(torrent_file)}')
 
 
 @event('plugin.register')

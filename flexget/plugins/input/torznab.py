@@ -69,8 +69,8 @@ class Torznab:
         params = self.params.copy()
         params.update(kwargs)
         logger.debug('Configured parameters: {}', params)
-        url = '{}/api?'.format(self.base_url)
-        url = '{}{}'.format(url, urlencode(params))
+        url = f'{self.base_url}/api?'
+        url = f'{url}{urlencode(params)}'
         return url
 
     def _setup(self, task, config):
@@ -124,9 +124,9 @@ class Torznab:
                     self.supported_params,
                 )
             else:
-                raise PluginError('No searcher available on {}'.format(self.base_url))
+                raise PluginError(f'No searcher available on {self.base_url}')
         else:
-            raise PluginError('No searcher available on {}'.format(self.base_url))
+            raise PluginError(f'No searcher available on {self.base_url}')
 
     def _check_searcher(self, searchers, searcher):
         """Check if the given searchers is in the list, available and has supported params"""
@@ -167,7 +167,7 @@ class Torznab:
         try:
             response = task.requests.get(url, timeout=self.timeout)
         except RequestException as e:
-            raise PluginError("Failed fetching '{}': {}".format(url, e))
+            raise PluginError(f"Failed fetching '{url}': {e}")
 
         entries = []
         root = ElementTree.fromstring(response.content)

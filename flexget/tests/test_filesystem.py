@@ -87,14 +87,14 @@ class TestFilesystem:
         for file in filenames:
             file = Path(file)
             if test_type == 'positive':
-                assertion_error = 'Failed %s %s test, did not find %s' % (
+                assertion_error = 'Failed {} {} test, did not find {}'.format(
                     test_type,
                     task_name,
                     file,
                 )
                 assert task.find_entry(title=file.stem), assertion_error
             else:
-                assertion_error = 'Failed %s %s test, found %s' % (test_type, task_name, file)
+                assertion_error = f'Failed {test_type} {task_name} test, found {file}'
                 assert not task.find_entry(title=file.stem), assertion_error
 
     def test_string(self, execute_task):

@@ -193,7 +193,7 @@ class ServerRawConfigAPI(APIResource):
     )
     def get(self, session: Session = None) -> Response:
         """Get raw YAML config file"""
-        with open(self.manager.config_path, 'r', encoding='utf-8') as f:
+        with open(self.manager.config_path, encoding='utf-8') as f:
             raw_config = base64.b64encode(f.read().encode("utf-8"))
         return jsonify(raw_config=raw_config.decode('utf-8'))
 
@@ -280,7 +280,7 @@ class ServerDumpThreads(APIResource):
     @api.response(200, description='Flexget threads dump', model=dump_threads_schema)
     def get(self, session: Session = None) -> Response:
         """Dump Server threads for debugging"""
-        id2name = dict([(th.ident, th.name) for th in threading.enumerate()])
+        id2name = {th.ident: th.name for th in threading.enumerate()}
         threads = []
         for threadId, stack in sys._current_frames().items():
             dump = []
@@ -373,9 +373,7 @@ class ServerLogAPI(APIResource):
 
             # Read back in the logs until we find enough lines
             for i in range(0, 9):
-                log_file = ('%s.%s' % (base_log_file, i)).rstrip(
-                    '.0'
-                )  # 1st log file has no number
+                log_file = (f'{base_log_file}.{i}').rstrip('.0')  # 1st log file has no number
 
                 if not os.path.isfile(log_file):
                     break
@@ -475,7 +473,7 @@ class LogParser:
             )
 
             operator_parenthesis = (
-                Group((Suppress('(') + operator_or + Suppress(")"))).setResultsName('parenthesis')
+                Group(Suppress('(') + operator_or + Suppress(")")).setResultsName('parenthesis')
                 | operator_quotes
             )
 

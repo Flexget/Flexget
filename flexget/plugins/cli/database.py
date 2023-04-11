@@ -47,7 +47,7 @@ def reset_plugin(options):
         reset_schema(plugin)
         console('The database for `%s` has been reset.' % plugin)
     except ValueError as e:
-        console('Unable to reset %s: %s' % (plugin, e.message))
+        console(f'Unable to reset {plugin}: {e.message}')
 
 
 @event('options.register')

@@ -69,9 +69,9 @@ class KitsuAnime:
         try:
             response = task.requests.get(next_url, params=payload)
         except RequestException as e:
-            error_message = 'Error getting list from {url}'.format(url=e.request.url)
+            error_message = f'Error getting list from {e.request.url}'
             if hasattr(e, 'response'):
-                error_message += ' status: {status}'.format(status=e.response.status_code)
+                error_message += f' status: {e.response.status_code}'
             logger.opt(exception=True).debug(error_message)
             raise plugin.PluginError(error_message)
         json_data = response.json()
@@ -131,7 +131,7 @@ class KitsuAnime:
                         url=e.request.url
                     )
                     if hasattr(e, 'response'):
-                        error_message += ' status: {status}'.format(status=e.response.status_code)
+                        error_message += f' status: {e.response.status_code}'
                     logger.opt(exception=True).debug(error_message)
                     raise plugin.PluginError(error_message)
                 json_data = response.json()
@@ -148,9 +148,9 @@ class KitsuAnime:
                     'https://kitsu.io/api/edge/users', params=user_payload
                 )
             except RequestException as e:
-                error_message = 'Error finding User url: {url}'.format(url=e.request.url)
+                error_message = f'Error finding User url: {e.request.url}'
                 if hasattr(e, 'response'):
-                    error_message += ' status: {status}'.format(status=e.response.status_code)
+                    error_message += f' status: {e.response.status_code}'
                 logger.opt(exception=True).debug(error_message)
                 raise plugin.PluginError(error_message)
             user = user_response.json()

@@ -625,7 +625,7 @@ class Manager:
         :raises: `ValueError` if there is a problem loading the config file
         """
         fire_event('manager.before_config_load', self)
-        with open(self.config_path, 'r', encoding='utf-8') as f:
+        with open(self.config_path, encoding='utf-8') as f:
             try:
                 raw_config = f.read()
             except UnicodeDecodeError:
@@ -966,7 +966,7 @@ class Manager:
         # redirect standard file descriptors
         sys.stdout.flush()
         sys.stderr.flush()
-        si = open(os.devnull, 'r')
+        si = open(os.devnull)
         so = open(os.devnull, 'ab+')
         se = open(os.devnull, 'ab+', 0)
         os.dup2(si.fileno(), sys.stdin.fileno())

@@ -96,7 +96,7 @@ class OutputFtp:
                 to_path = entry.render(to_path)
             except RenderError as err:
                 raise plugin.PluginError(
-                    "Path value replacement `%s` failed: %s" % (to_path, err.args[0])
+                    f"Path value replacement `{to_path}` failed: {err.args[0]}"
                 )
 
             # Clean invalid characters with pathscrub plugin

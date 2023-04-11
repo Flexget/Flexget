@@ -27,7 +27,7 @@ class MyEpisodesInfo(Base):
         self.updated = datetime.now()
 
     def __repr__(self):
-        return '<MyEpisodesInfo(series_name=%s, myepisodes_id=%s)>' % (
+        return '<MyEpisodesInfo(series_name={}, myepisodes_id={})>'.format(
             self.series_name,
             self.myepisodes_id,
         )
@@ -263,7 +263,7 @@ class MyEpisodes:
         season = entry['series_season']
         episode = entry['series_episode']
 
-        super_secret_code = "A%s-%s-%s" % (str(myepisodes_id), str(season), str(episode))
+        super_secret_code = f"A{str(myepisodes_id)}-{str(season)}-{str(episode)}"
 
         payload = {super_secret_code: "true"}
 

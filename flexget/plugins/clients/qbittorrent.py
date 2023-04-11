@@ -99,12 +99,10 @@ class OutputQBitTorrent:
                 self.api_url_info = '/query/torrents'
                 return response
 
-            msg = 'Failure. URL: {}'.format(url) if not msg_on_fail else msg_on_fail
+            msg = f'Failure. URL: {url}' if not msg_on_fail else msg_on_fail
         except RequestException as e:
             msg = str(e)
-        raise plugin.PluginError(
-            'Error when trying to send request to qBittorrent: {}'.format(msg)
-        )
+        raise plugin.PluginError(f'Error when trying to send request to qBittorrent: {msg}')
 
     def connect(self, config):
         """

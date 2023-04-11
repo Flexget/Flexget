@@ -116,7 +116,7 @@ class FilterImdb:
             except plugin.PluginError as e:
                 # logs skip message once trough log_once (info) and then only when ran from cmd line (w/o --cron)
                 log_once(
-                    'Skipping %s because of an error: %s' % (entry['title'], e.value),
+                    'Skipping {} because of an error: {}'.format(entry['title'], e.value),
                     logger=logger,
                 )
                 continue
@@ -129,12 +129,12 @@ class FilterImdb:
             if 'min_score' in config:
                 if entry.get('imdb_score', 0) < config['min_score']:
                     reasons.append(
-                        'min_score (%s < %s)' % (entry.get('imdb_score'), config['min_score'])
+                        'min_score ({} < {})'.format(entry.get('imdb_score'), config['min_score'])
                     )
             if 'min_votes' in config:
                 if entry.get('imdb_votes', 0) < config['min_votes']:
                     reasons.append(
-                        'min_votes (%s < %s)' % (entry.get('imdb_votes'), config['min_votes'])
+                        'min_votes ({} < {})'.format(entry.get('imdb_votes'), config['min_votes'])
                     )
             if 'min_meta_score' in config:
                 if entry.get('imdb_meta_score', 0) < config['min_meta_score']:
@@ -145,12 +145,12 @@ class FilterImdb:
             if 'min_year' in config:
                 if entry.get('imdb_year', 0) < config['min_year']:
                     reasons.append(
-                        'min_year (%s < %s)' % (entry.get('imdb_year'), config['min_year'])
+                        'min_year ({} < {})'.format(entry.get('imdb_year'), config['min_year'])
                     )
             if 'max_year' in config:
                 if entry.get('imdb_year', 0) > config['max_year']:
                     reasons.append(
-                        'max_year (%s > %s)' % (entry.get('imdb_year'), config['max_year'])
+                        'max_year ({} > {})'.format(entry.get('imdb_year'), config['max_year'])
                     )
 
             if 'accept_genres' in config:
@@ -249,7 +249,7 @@ class FilterImdb:
                     reasons.append('accept_mpaa_ratings %s' % entry.get('imdb_mpaa_rating'))
 
             if reasons and not force_accept:
-                msg = 'Didn\'t accept `%s` because of rule(s) %s' % (
+                msg = 'Didn\'t accept `{}` because of rule(s) {}'.format(
                     entry.get('imdb_name', None) or entry['title'],
                     ', '.join(reasons),
                 )

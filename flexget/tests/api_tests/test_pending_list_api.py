@@ -190,7 +190,7 @@ class TestPendingListAPI:
         assert not errors
         assert len(data) == 3
 
-        assert all((item['approved'] for item in data))
+        assert all(item['approved'] for item in data)
 
         # get entries is correct
         rsp = api_client.get('/pending_list/1/entries/')

@@ -80,7 +80,7 @@ def table_add_column(
         # If we got a type class instead of an instance of one, instantiate it
         col_type = col_type()
     type_string = session.bind.engine.dialect.type_compiler.process(col_type)
-    statement = 'ALTER TABLE %s ADD %s %s' % (table.name, name, type_string)
+    statement = f'ALTER TABLE {table.name} ADD {name} {type_string}'
     session.execute(statement)
     session.commit()
     # Update the table with the default value if given

@@ -10,11 +10,11 @@ from flexget.utils.tools import io_encoding
 
 def print_debug_info(manager, options):
     install_location = Path(__file__).absolute().parent.parent.parent
-    console('FlexGet Version: {}'.format(flexget.__version__))
-    console('Install location: {}'.format(install_location))
-    console('Config location: {}'.format(manager.config_path))
+    console(f'FlexGet Version: {flexget.__version__}')
+    console(f'Install location: {install_location}')
+    console(f'Config location: {manager.config_path}')
     console('Python version: {}.{}.{}'.format(*sys.version_info[:3]))
-    console('Detected IO encoding: {}'.format(io_encoding))
+    console(f'Detected IO encoding: {io_encoding}')
 
 
 @event('options.register')

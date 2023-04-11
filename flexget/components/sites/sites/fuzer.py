@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import re
 from urllib.parse import quote_plus
 
@@ -62,12 +61,12 @@ class UrlRewriteFuzer:
         query = '{}&{}'.format(search_term, '&'.join(categories_list))
         try:
             page = requests.get(
-                'https://www.fuzer.me/browse.php?query={}'.format(query),
+                f'https://www.fuzer.me/browse.php?query={query}',
                 params=params,
                 cookies=self.cookies,
             )
         except RequestException as e:
-            raise PluginError('Could not connect to Fuzer: {}'.format(e))
+            raise PluginError(f'Could not connect to Fuzer: {e}')
 
         if 'login' in page.url:
             raise PluginError('Could not fetch results from Fuzer. Check config')

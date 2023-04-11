@@ -37,7 +37,7 @@ class Age:
         for entry in task.entries:
             field = config['field']
             if field not in entry:
-                entry.fail('Field {0} does not exist'.format(field))
+                entry.fail(f'Field {field} does not exist')
                 continue
 
             field_value = entry[field]
@@ -63,7 +63,7 @@ class Age:
             age_cutoff = datetime.now() - parse_timedelta(config['age'])
 
             if field_date < age_cutoff:
-                info_string = 'Date in field `{0}` is older than {1}'.format(field, config['age'])
+                info_string = 'Date in field `{}` is older than {}'.format(field, config['age'])
                 if config['action'] == 'accept':
                     entry.accept(info_string)
                 else:

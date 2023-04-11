@@ -2,7 +2,7 @@ import pytest
 from jinja2 import Template
 
 
-class TestYamlLists(object):
+class TestYamlLists:
     _config = """
         tasks:
           yaml_check_list1:

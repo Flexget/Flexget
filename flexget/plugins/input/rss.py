@@ -179,7 +179,7 @@ class InputRSS:
         if sourcename:
             filename += '-' + sourcename
         filename = pathscrub(filename, filename=True)
-        filepath = os.path.join(received, '%s.%s' % (filename, ext))
+        filepath = os.path.join(received, f'{filename}.{ext}')
         with open(filepath, 'wb') as f:
             f.write(data)
         logger.critical('I have saved the invalid content to {} for you to view', filepath)
@@ -294,16 +294,16 @@ class InputRSS:
                 )
             elif status == 404:
                 raise plugin.PluginError(
-                    'RSS Feed %s (%s) not found' % (task.name, config['url']), logger
+                    'RSS Feed {} ({}) not found'.format(task.name, config['url']), logger
                 )
             elif status == 500:
                 raise plugin.PluginError(
-                    'Internal server exception on task %s (%s)' % (task.name, config['url']),
+                    'Internal server exception on task {} ({})'.format(task.name, config['url']),
                     logger,
                 )
             elif status != 200:
                 raise plugin.PluginError(
-                    'HTTP error %s received from %s' % (status, config['url']), logger
+                    'HTTP error {} received from {}'.format(status, config['url']), logger
                 )
 
             # update etag and last modified
@@ -333,7 +333,9 @@ class InputRSS:
         try:
             rss = feedparser.parse(content)
         except LookupError as e:
-            raise plugin.PluginError('Unable to parse the RSS (from %s): %s' % (config['url'], e))
+            raise plugin.PluginError(
+                'Unable to parse the RSS (from {}): {}'.format(config['url'], e)
+            )
 
         # check for bozo
         ex = rss.get('bozo_exception', False)

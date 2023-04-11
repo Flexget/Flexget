@@ -218,7 +218,7 @@ class ImdbEntrySet(MutableSet):
                 soup = get_soup(r.content)
                 form = soup.find('form', attrs={'name': 'signIn'})
                 inputs = form.select('input')
-                data = dict((i['name'], i.get('value')) for i in inputs if i.get('name'))
+                data = {i['name']: i.get('value') for i in inputs if i.get('name')}
                 data['email'] = self.config['login']
                 data['password'] = self.config['password']
                 action = form.get('action')
@@ -320,7 +320,7 @@ class ImdbEntrySet(MutableSet):
                     )
                     entry = Entry(
                         {
-                            'title': '%s (%s)' % (name, year) if year != '????' else name,
+                            'title': f'{name} ({year})' if year != '????' else name,
                             'url': row['url'],
                             'imdb_id': row['const'],
                             'imdb_url': row['url'],
@@ -405,7 +405,7 @@ class ImdbEntrySet(MutableSet):
                     break
 
             for item_id in item_ids:
-                urls.append('https://www.imdb.com/list/%s/li%s/delete' % (self.list_id, item_id))
+                urls.append(f'https://www.imdb.com/list/{self.list_id}/li{item_id}/delete')
         if not item_ids:
             logger.warning(
                 '{} is not in list {}, cannot be removed', entry['imdb_id'], self.list_id
@@ -445,7 +445,7 @@ class ImdbEntrySet(MutableSet):
             url = 'https://www.imdb.com/watchlist/%s' % entry['imdb_id']
         else:
             method = 'post'
-            url = 'https://www.imdb.com/list/%s/%s/add' % (self.list_id, entry['imdb_id'])
+            url = 'https://www.imdb.com/list/{}/{}/add'.format(self.list_id, entry['imdb_id'])
 
         logger.debug(
             'adding title {} with ID {} to imdb {}', entry['title'], entry['imdb_id'], self.list_id

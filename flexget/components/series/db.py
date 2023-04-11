@@ -115,7 +115,7 @@ class Series(Base):
         return self._name_normalized
 
     def __str__(self):
-        return '<Series(id=%s,name=%s)>' % (self.id, self.name)
+        return f'<Series(id={self.id},name={self.name})>'
 
     def __repr__(self):
         return str(self).encode('ascii', 'replace')
@@ -206,7 +206,7 @@ class Season(Base):
         return False
 
     def __str__(self):
-        return '<Season(id=%s,identifier=%s,season=%s,completed=%s)>' % (
+        return '<Season(id={},identifier={},season={},completed={})>'.format(
             self.id,
             self.identifier,
             self.season,
@@ -339,7 +339,7 @@ class Episode(Base):
         )[0]
 
     def __str__(self):
-        return '<Episode(id=%s,identifier=%s,season=%s,number=%s)>' % (
+        return '<Episode(id={},identifier={},season={},number={})>'.format(
             self.id,
             self.identifier,
             self.season,
@@ -445,7 +445,7 @@ class EpisodeRelease(Base):
         return self.proper_count > 0
 
     def __str__(self):
-        return '<Release(id=%s,quality=%s,downloaded=%s,proper_count=%s,title=%s)>' % (
+        return '<Release(id={},quality={},downloaded={},proper_count={},title={})>'.format(
             self.id,
             self.quality,
             self.downloaded,
@@ -493,7 +493,7 @@ class SeasonRelease(Base):
         return self.proper_count > 0
 
     def __str__(self):
-        return '<Release(id=%s,quality=%s,downloaded=%s,proper_count=%s,title=%s)>' % (
+        return '<Release(id={},quality={},downloaded={},proper_count={},title={})>'.format(
             self.id,
             self.quality,
             self.downloaded,
@@ -546,7 +546,9 @@ class AlternateNames(Base):
         self.alt_name = name
 
     def __str__(self):
-        return '<SeriesAlternateName(series_id=%s, alt_name=%s)>' % (self.series_id, self.alt_name)
+        return '<SeriesAlternateName(series_id={}, alt_name={})>'.format(
+            self.series_id, self.alt_name
+        )
 
     def __repr__(self):
         return str(self).encode('ascii', 'replace')
@@ -1278,12 +1280,10 @@ def remove_series_entity(name: str, identifier: str, forget: bool = False) -> No
             logger.debug('Entity `{}` from series `{}` removed from database.', identifier, name)
             return [release.title for release in entity.downloaded_releases]
 
-        name_to_parse = '{} {}'.format(series.name, identifier)
+        name_to_parse = f'{series.name} {identifier}'
         parsed = plugin.get('parsing', 'series.db').parse_series(name_to_parse, name=series.name)
         if not parsed.valid:
-            raise ValueError(
-                'Invalid identifier for series `{}`: `{}`'.format(series.name, identifier)
-            )
+            raise ValueError(f'Invalid identifier for series `{series.name}`: `{identifier}`')
 
         removed = False
         if parsed.season_pack:
@@ -1309,9 +1309,7 @@ def remove_series_entity(name: str, identifier: str, forget: bool = False) -> No
                 removed = True
                 downloaded_releases = remove_entity(episode)
         if not removed:
-            raise ValueError(
-                'Unknown identifier `%s` for series `%s`' % (identifier, name.capitalize())
-            )
+            raise ValueError(f'Unknown identifier `{identifier}` for series `{name.capitalize()}`')
 
     if forget:
         for downloaded_release in downloaded_releases:
@@ -1545,20 +1543,16 @@ def add_series_entity(
     :param identifier: Series identifier to be added.
     :param quality: If supplied, this will override the quality from the series parser.
     """
-    name_to_parse = '{} {}'.format(series.name, identifier)
+    name_to_parse = f'{series.name} {identifier}'
     if quality:
-        name_to_parse += ' {}'.format(quality)
+        name_to_parse += f' {quality}'
     parsed = plugin.get('parsing', 'series.db').parse_series(name_to_parse, name=series.name)
     if not parsed.valid:
-        raise ValueError(
-            'Invalid identifier for series `{}`: `{}`.'.format(series.name, identifier)
-        )
+        raise ValueError(f'Invalid identifier for series `{series.name}`: `{identifier}`.')
 
     added = store_parser(session, parsed, series=series)
     if not added:
-        raise ValueError(
-            'Unable to add `%s` to series `%s`.' % (identifier, series.name.capitalize())
-        )
+        raise ValueError(f'Unable to add `{identifier}` to series `{series.name.capitalize()}`.')
     else:
         for release in added:
             release.downloaded = True

@@ -370,7 +370,7 @@ class TestFilterSeries:
         assert not entry.get('series_guessed'), 'series plugin should override series_guessed'
         assert (
             entry['series_name'] == entry['series_parser'].name == 'Test Series'
-        ), 'Series name should be \'Test Series\', was: entry: %s, parser: %s' % (
+        ), 'Series name should be \'Test Series\', was: entry: {}, parser: {}'.format(
             entry['series_name'],
             entry['series_parser'].name,
         )

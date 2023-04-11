@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # FlexGet documentation build configuration file, created by
 # sphinx-quickstart on Thu Dec 22 21:49:19 2011.
@@ -192,7 +191,7 @@ latex_elements = {
 
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
-latex_documents = [('index', 'FlexGet.tex', u'FlexGet Documentation', u'FlexGet', 'manual')]
+latex_documents = [('index', 'FlexGet.tex', 'FlexGet Documentation', 'FlexGet', 'manual')]
 
 # The name of an image file (relative to this directory) to place at the top of
 # the title page.

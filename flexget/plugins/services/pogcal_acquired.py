@@ -71,7 +71,7 @@ class PogcalAcquired:
                     entry['series_name'],
                     entry['series_id'],
                 )
-            shid = '%s-%s-%s/%s-%s' % (
+            shid = '{}-{}-{}/{}-{}'.format(
                 show_id,
                 entry['series_season'],
                 entry['series_episode'],

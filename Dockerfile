@@ -17,10 +17,8 @@ COPY . /flexget
 RUN pip install -U pip && \
     pip install -r /flexget/dev-requirements.txt
 RUN python /flexget/dev_tools.py bundle-webui
-RUN pip wheel -e /flexget && \
-    pip wheel 'transmission-rpc>=3.0.0,<4.0.0' && \
-    pip wheel deluge-client && \
-    pip wheel cloudscraper
+RUN pip wheel -r /flexget/requirements-docker.txt && \
+    pip wheel -e /flexget
 
 FROM docker.io/python:3.11-alpine
 ENV PYTHONUNBUFFERED 1
@@ -32,16 +30,15 @@ RUN apk add --no-cache --upgrade \
     rm -rf /var/cache/apk/*
 
 COPY --from=0 /wheels /wheels
+COPY --from=0 /flexget/requirements-docker.txt /requirements-docker.txt
 
 RUN pip install -U pip && \
     pip install --no-cache-dir \
                 --no-index \
                 -f /wheels \
                 FlexGet \
-                'transmission-rpc>=3.0.0,<4.0.0' \
-                deluge-client \
-                cloudscraper && \
-    rm -rf /wheels
+                -r /requirements-docker.txt && \
+    rm -rf /wheels /requirements-docker.txt
 
 VOLUME /config
 WORKDIR /config

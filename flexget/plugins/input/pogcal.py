@@ -59,7 +59,7 @@ class InputPogDesign:
 
             e = Entry()
             e['title'] = t
-            e['url'] = 'https://www.pogdesign.co.uk/{0}'.format(
+            e['url'] = 'https://www.pogdesign.co.uk/{}'.format(
                 row.find_next('a')['href'].lstrip('/')
             )
             entries.append(e)

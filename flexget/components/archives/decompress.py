@@ -33,11 +33,11 @@ def open_archive_entry(entry):
     try:
         archive = archiveutil.open_archive(archive_path)
     except archiveutil.BadArchive as error:
-        fail_entry_with_error(entry, 'Bad archive: %s (%s)' % (archive_path, error))
+        fail_entry_with_error(entry, f'Bad archive: {archive_path} ({error})')
     except archiveutil.NeedFirstVolume:
         logger.error('Not the first volume: {}', archive_path)
     except archiveutil.ArchiveError as error:
-        fail_entry_with_error(entry, 'Failed to open Archive: %s (%s)' % (archive_path, error))
+        fail_entry_with_error(entry, f'Failed to open Archive: {archive_path} ({error})')
     else:
         return archive
 

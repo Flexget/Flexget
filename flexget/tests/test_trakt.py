@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import pytest
 
 from flexget.components.trakt.api import ObjectsContainer as OC
@@ -79,7 +78,7 @@ class TestTraktShowLookup:
         """trakt: Test Lookup (ONLINE)"""
         task = execute_task('test')
         entry = task.find_entry(title='House.S01E02.HDTV.XViD-FlexGet')
-        assert entry['trakt_show_id'] == 1399, 'Trakt_ID should be 1339 is %s for %s' % (
+        assert entry['trakt_show_id'] == 1399, 'Trakt_ID should be 1339 is {} for {}'.format(
             entry['trakt_show_id'],
             entry['series_name'],
         )
@@ -96,7 +95,7 @@ class TestTraktShowLookup:
         )
         assert (
             entry['trakt_series_status'] == 'ended'
-        ), 'runtime for %s is %s, should be "ended"' % (
+        ), 'runtime for {} is {}, should be "ended"'.format(
             entry['title'],
             entry['trakt_series_status'],
         )

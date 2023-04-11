@@ -34,7 +34,7 @@ class StatusTask(Base):
     )
 
     def __repr__(self):
-        return '<StatusTask(id=%s,name=%s)>' % (self.id, self.name)
+        return f'<StatusTask(id={self.id},name={self.name})>'
 
     @hybrid_property
     def last_execution_time(self):

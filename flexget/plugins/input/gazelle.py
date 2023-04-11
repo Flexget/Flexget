@@ -194,11 +194,11 @@ class InputGazelle:
             return
 
         # Forcing a re-login or no session in DB - log in using provided creds
-        url = "{}/login.php".format(self.base_url)
+        url = f"{self.base_url}/login.php"
         data = {'username': self.username, 'password': self.password, 'keeplogged': 1}
         r = self._session.post(url, data=data, allow_redirects=False, raise_status=True)
-        if not r.is_redirect or r.next.url != "{}/index.php".format(self.base_url):
-            msg = "Failed to log into {}".format(self.base_url)
+        if not r.is_redirect or r.next.url != f"{self.base_url}/index.php":
+            msg = f"Failed to log into {self.base_url}"
             for otp_text in DETECT_2FA:
                 # TODO: Find a better signal that 2FA is enabled
                 if otp_text in r.text:
@@ -225,15 +225,15 @@ class InputGazelle:
         if 'action' not in params:
             raise ValueError("An 'action' is required when making a request")
 
-        ajaxpage = "{}/ajax.php".format(self.base_url)
+        ajaxpage = f"{self.base_url}/ajax.php"
         r = self._session.get(ajaxpage, params=params, allow_redirects=False, raise_status=True)
-        if not no_login and r.is_redirect and r.next.url == "{}/login.php".format(self.base_url):
+        if not no_login and r.is_redirect and r.next.url == f"{self.base_url}/login.php":
             logger.warning("Redirected to login page, reauthenticating and trying again")
             self.authenticate(force=True)
             return self.request(no_login=True, **params)
 
         if r.status_code != 200:
-            raise PluginError("{} returned a non-200 status code".format(self.base_url))
+            raise PluginError(f"{self.base_url} returned a non-200 status code")
 
         try:
             json_response = r.json()
@@ -243,12 +243,10 @@ class InputGazelle:
                 if not error or error == "failure":
                     error = json_response.get('response', str(json_response))
 
-                raise PluginError(
-                    "{} gave a failure response of '{}'".format(self.base_url, error)
-                )
+                raise PluginError(f"{self.base_url} gave a failure response of '{error}'")
             return json_response['response']
         except (ValueError, TypeError, KeyError):
-            raise PluginError("{} returned an invalid response".format(self.base_url))
+            raise PluginError(f"{self.base_url} returned an invalid response")
 
     def search_results(self, params):
         """Generator that yields search results"""
@@ -262,8 +260,7 @@ class InputGazelle:
             result = self.request(action='browse', page=page, **params)
             if not result['results']:
                 break
-            for x in result['results']:
-                yield x
+            yield from result['results']
 
             pages = result.get('pages', pages)
             page += 1
@@ -275,7 +272,7 @@ class InputGazelle:
         """Generator that yields Entry objects from search results"""
         for result in search_results:
             # Get basic information on the release
-            info = dict((k, result[k]) for k in ('groupId', 'groupName'))
+            info = {k: result[k] for k in ('groupId', 'groupName')}
 
             # Releases can have multiple download options
             for tor in result['torrents']:
@@ -421,14 +418,12 @@ class InputGazelleMusic(InputGazelle):
         """Generator that yields Entry objects from search results"""
         for result in search_results:
             # Get basic information on the release
-            info = dict((k, result[k]) for k in ('artist', 'groupName', 'groupYear'))
+            info = {k: result[k] for k in ('artist', 'groupName', 'groupYear')}
 
             # Releases can have multiple download options
             for tor in result['torrents']:
                 temp = info.copy()
-                temp.update(
-                    dict((k, tor[k]) for k in ('media', 'encoding', 'format', 'torrentId'))
-                )
+                temp.update({k: tor[k] for k in ('media', 'encoding', 'format', 'torrentId')})
 
                 yield Entry(
                     title="{artist} - {groupName} - {groupYear} "

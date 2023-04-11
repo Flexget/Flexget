@@ -13,7 +13,7 @@ plugin_name = 'gotify'
 requests = RequestSession(max_retries=3)
 
 
-class GotifyNotifier(object):
+class GotifyNotifier:
     """
     Example::
 

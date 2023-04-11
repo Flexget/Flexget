@@ -69,17 +69,13 @@ class Medusa:
 
         body_auth = dict(username=config.get('username'), password=config.get('password'))
 
-        api_key = task.requests.post('{}/authenticate'.format(base_url), json=body_auth).json()[
-            'token'
-        ]
+        api_key = task.requests.post(f'{base_url}/authenticate', json=body_auth).json()['token']
 
         headers = {'x-auth': 'Bearer ' + api_key}
 
         params = {'limit': 1000}
 
-        series = task.requests.get(
-            '{}/series'.format(base_url), params=params, headers=headers
-        ).json()
+        series = task.requests.get(f'{base_url}/series', params=params, headers=headers).json()
 
         entries = []
         for show in series:
@@ -96,7 +92,7 @@ class Medusa:
             if entry.isvalid():
                 entries.append(entry)
             else:
-                logger.error('Invalid entry created? {}'.format(entry))
+                logger.error(f'Invalid entry created? {entry}')
 
         return entries
 

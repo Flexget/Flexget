@@ -52,7 +52,7 @@ def clean_meta(
     for key in list(meta.keys()):
         if [key] not in METAFILE_STD_KEYS:
             if log_func:
-                log_func("Removing key %r..." % (key,))
+                log_func(f"Removing key {key!r}...")
             del meta[key]
             modified.add(key)
 
@@ -60,7 +60,7 @@ def clean_meta(
         for key in list(meta["info"].keys()):
             if ["info", key] not in METAFILE_STD_KEYS:
                 if log_func:
-                    log_func("Removing key %r..." % ("info." + key,))
+                    log_func("Removing key {!r}...".format("info." + key))
                 del meta["info"][key]
                 modified.add("info." + key)
 
@@ -223,13 +223,13 @@ class Torrent:
         self.modified = False
 
     def __repr__(self) -> str:
-        return "%s(%s, %s)" % (
+        return "{}({}, {})".format(
             self.__class__.__name__,
             ", ".join(
-                "%s=%r" % (key, self.content["info"].get(key))
+                "{}={!r}".format(key, self.content["info"].get(key))
                 for key in ("name", "length", "private")
             ),
-            ", ".join("%s=%r" % (key, self.content.get(key)) for key in ("announce", "comment")),
+            ", ".join(f"{key}={self.content.get(key)!r}" for key in ("announce", "comment")),
         )
 
     def get_filelist(self) -> List[Dict[str, Union[str, int]]]:

@@ -115,7 +115,7 @@ class EmailNotifier:
                 self.mail_server.ehlo()
                 self.mail_server.starttls()
                 self.mail_server.ehlo()
-        except (socket.error, OSError) as e:
+        except OSError as e:
             raise PluginWarning(str(e))
 
         try:

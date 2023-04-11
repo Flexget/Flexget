@@ -137,7 +137,7 @@ class FilterRegexp:
                 except re.error as e:
                     # Since validator can't validate dict keys (when an option is defined for the pattern) make sure we
                     # raise a proper error here.
-                    raise plugin.PluginError('Invalid regex `%s`: %s' % (regexp, e))
+                    raise plugin.PluginError(f'Invalid regex `{regexp}`: {e}')
                 out_config.setdefault(operation, []).append({regexp: opts})
         return out_config
 

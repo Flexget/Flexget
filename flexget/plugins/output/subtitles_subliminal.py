@@ -27,7 +27,7 @@ except ImportError:
         'tvsubtitles',
     ]
 
-AUTHENTICATION_SCHEMA = dict((provider, {'type': 'object'}) for provider in PROVIDERS)
+AUTHENTICATION_SCHEMA = {provider: {'type': 'object'} for provider in PROVIDERS}
 
 
 class PluginSubliminal:
@@ -149,10 +149,8 @@ class PluginSubliminal:
         logging.getLogger("dogpile").setLevel(logging.CRITICAL)
         logging.getLogger("enzyme").setLevel(logging.WARNING)
         try:
-            languages = set([Language.fromietf(s) for s in config.get('languages', [])])
-            alternative_languages = set(
-                [Language.fromietf(s) for s in config.get('alternatives', [])]
-            )
+            languages = {Language.fromietf(s) for s in config.get('languages', [])}
+            alternative_languages = {Language.fromietf(s) for s in config.get('alternatives', [])}
         except ValueError as e:
             raise plugin.PluginError(e)
         # keep all downloaded subtitles and save to disk when done (no need to write every time)
@@ -251,9 +249,9 @@ class PluginSubliminal:
                             else:
                                 entry.reject('cannot find any subtitles for now.')
 
-                        downloaded_languages = set(
-                            [Language.fromietf(str(l.language)) for l in subtitles]
-                        )
+                        downloaded_languages = {
+                            Language.fromietf(str(l.language)) for l in subtitles
+                        }
                         if entry_languages:
                             entry['subtitles_missing'] = entry_languages - downloaded_languages
                             if len(entry['subtitles_missing']) > 0:

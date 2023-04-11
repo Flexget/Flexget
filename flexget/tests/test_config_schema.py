@@ -17,14 +17,14 @@ class TestSchemaValidator:
             try:
                 config_schema.SchemaValidator.check_schema(schema)
             except jsonschema.SchemaError as e:
-                assert False, 'plugin `%s` has an invalid schema. %s %s %s' % (
+                assert False, 'plugin `{}` has an invalid schema. {} {} {}'.format(
                     path,
                     '/'.join(str(p) for p in e.path),
                     e.validator,
                     e.message,
                 )
             except Exception as e:
-                assert False, 'plugin `%s` has an invalid schema. %s' % (path, e)
+                assert False, f'plugin `{path}` has an invalid schema. {e}'
 
     def test_refs_in_schemas_are_resolvable(self):
         def refs_in(item):
@@ -33,12 +33,10 @@ class TestSchemaValidator:
                     if key == '$ref':
                         yield value
                     else:
-                        for ref in refs_in(value):
-                            yield ref
+                        yield from refs_in(value)
             elif isinstance(item, list):
                 for i in item:
-                    for ref in refs_in(i):
-                        yield ref
+                    yield from refs_in(i)
 
         for path, schema in iter_registered_schemas():
             resolver = config_schema.RefResolver.from_schema(schema)
@@ -47,7 +45,7 @@ class TestSchemaValidator:
                     with resolver.resolving(ref):
                         pass
                 except jsonschema.RefResolutionError:
-                    assert False, '$ref %s in schema %s is invalid' % (ref, path)
+                    assert False, f'$ref {ref} in schema {path} is invalid'
 
     def test_resolves_local_refs(self):
         schema = {'$ref': '/schema/plugin/accept_all'}
@@ -111,7 +109,7 @@ class TestSchemaValidator:
         assert len(errors) == 1
         assert tuple(errors[0].schema_path) == ('anyOf', 'type')
         # It should have all the types together
-        assert set(errors[0].validator_value) == set(['string', 'array', 'number', 'integer'])
+        assert set(errors[0].validator_value) == {'string', 'array', 'number', 'integer'}
         # If there are no type errors going down one branch it should choose it
         errors = config_schema.process_config(1.5, schema)
         assert len(errors) == 1
@@ -129,7 +127,7 @@ class TestSchemaValidator:
         assert len(errors) == 1
         assert tuple(errors[0].schema_path) == ('oneOf', 'type')
         # It should have all the types together
-        assert set(errors[0].validator_value) == set(['string', 'array', 'number', 'integer'])
+        assert set(errors[0].validator_value) == {'string', 'array', 'number', 'integer'}
         # If there are no type errors going down one branch it should choose it
         errors = config_schema.process_config(1.5, schema)
         assert len(errors) == 1
@@ -155,7 +153,7 @@ class TestSchemaFormats:
             try:
                 config_schema.format_checker.check(item, format)
                 if invalid:
-                    failures.append("'%s' should not be a valid '%s" % (item, format))
+                    failures.append(f"'{item}' should not be a valid '{format}")
             except jsonschema.FormatError as e:
                 if not invalid:
                     failures.append(e.message)
@@ -184,7 +182,7 @@ class TestSchemaFormats:
         failures = self._test_format('size', valid_sizes)
         failures.extend(self._test_format('size', invalid_sizes, invalid=True))
 
-        assert not failures, '%s failures:\n%s' % (len(failures), '\n'.join(failures))
+        assert not failures, '{} failures:\n{}'.format(len(failures), '\n'.join(failures))
 
     def test_format_interval(self):
         valid_intervals = ['3 days', '12 hours', '1 minute']
@@ -194,7 +192,7 @@ class TestSchemaFormats:
         failures = self._test_format('interval', valid_intervals)
         failures.extend(self._test_format('interval', invalid_intervals, invalid=True))
 
-        assert not failures, '%s failures:\n%s' % (len(failures), '\n'.join(failures))
+        assert not failures, '{} failures:\n{}'.format(len(failures), '\n'.join(failures))
 
     def test_format_percent(self):
         valid_percent = ['1%', '1 %', '70.05 %']
@@ -204,7 +202,7 @@ class TestSchemaFormats:
         failures = self._test_format('percent', valid_percent)
         failures.extend(self._test_format('percent', invalid_percent, invalid=True))
 
-        assert not failures, '%s failures:\n%s' % (len(failures), '\n'.join(failures))
+        assert not failures, '{} failures:\n{}'.format(len(failures), '\n'.join(failures))
 
 
 class TestFormatParsers:
@@ -213,7 +211,7 @@ class TestFormatParsers:
         for item in items:
             value = parser(item[0])
             if value != item[1]:
-                failures.append('`%s` should parse to `%s` not `%s`' % (item[0], item[1], value))
+                failures.append(f'`{item[0]}` should parse to `{item[1]}` not `{value}`')
         return failures
 
     def test_parser_size(self):
@@ -236,7 +234,7 @@ class TestFormatParsers:
 
         failures = self._test_parser(config_schema.parse_size, size_tests)
 
-        assert not failures, '%s failures:\n%s' % (len(failures), '\n'.join(failures))
+        assert not failures, '{} failures:\n{}'.format(len(failures), '\n'.join(failures))
 
     def test_parser_interval(self):
         intervals_tests = [
@@ -247,11 +245,11 @@ class TestFormatParsers:
 
         failures = self._test_parser(config_schema.parse_interval, intervals_tests)
 
-        assert not failures, '%s failures:\n%s' % (len(failures), '\n'.join(failures))
+        assert not failures, '{} failures:\n{}'.format(len(failures), '\n'.join(failures))
 
     def test_parser_percent(self):
         percent_tests = [('3%', 3.0), ('30.05%', 30.05), ('30 %', 30.0)]
 
         failures = self._test_parser(config_schema.parse_percent, percent_tests)
 
-        assert not failures, '%s failures:\n%s' % (len(failures), '\n'.join(failures))
+        assert not failures, '{} failures:\n{}'.format(len(failures), '\n'.join(failures))

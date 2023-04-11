@@ -60,7 +60,7 @@ class CrossMatch:
                     config.get('case_sensitive'),
                 )
                 if common and (not all_fields or len(common) == len(fields)):
-                    msg = 'intersects with %s on field(s) %s' % (
+                    msg = 'intersects with {} on field(s) {}'.format(
                         generated_entry['title'],
                         ', '.join(common),
                     )

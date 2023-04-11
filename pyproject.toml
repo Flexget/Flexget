@@ -61,6 +61,7 @@ colorama = ">=0.4.4"
 feedparser = ">=6.0.2"
 guessit = ">=3.4,<4.0"
 html5lib = ">=0.11"
+importlib-metadata = { version = "*", python = "<3.8" }  # TODO: remove this after we drop python3.7
 jinja2 = ">=3.0,<4.0"
 jsonschema = ">=2.0"
 loguru = ">=0.4.1"
@@ -115,6 +116,13 @@ subliminal = ">= 2.0rc1"
 
 [tool.poetry.group.plugin-tests.dependencies]
 pysftp = "^0.2.9"
+
+
+[tool.poetry.group.docker.dependencies]
+transmission-rpc = "^4.1.4"
+qbittorrent-api = "^2023.3.44"
+deluge-client = "^1.9.0"
+cloudscraper = "^1.2.69"
 
 [tool.poetry.scripts]
 flexget = 'flexget:main'

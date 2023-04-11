@@ -273,7 +273,7 @@ class IRCConnection(SimpleIRCBot):
             with open(path, 'rb') as xml_file:
                 return parse(xml_file).getroot()
         except Exception as e:
-            raise TrackerFileParseError('Unable to parse tracker config file %s: %s' % (path, e))
+            raise TrackerFileParseError(f'Unable to parse tracker config file {path}: {e}')
 
     @classmethod
     def retrieve_tracker_config(cls, tracker_config_file):

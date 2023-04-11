@@ -77,7 +77,7 @@ class XMPPNotifier:
                     self.send_message(mto=recipient, mbody=self.msg, mtype='chat')
                 self.disconnect(wait=True)
 
-        message = '%s\n%s' % (title, message)
+        message = f'{title}\n{message}'
         logger.debug('Sending XMPP notification about: {}', message)
         logging.getLogger('sleekxmpp').setLevel(logging.CRITICAL)
 
