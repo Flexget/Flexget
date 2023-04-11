@@ -89,7 +89,8 @@ class TestSFTPServerController:
             )
             transport.start_server(server=server)
 
-            transport.accept()
+            # TODO: Things break if we don't assign this to something?
+            channel = transport.accept()  # noqa: F841
 
             while transport.is_active():
                 time.sleep(1)
