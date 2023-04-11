@@ -66,7 +66,7 @@ def extract_info(info, archive, to, keep_dirs, test=False):
         info.extract(archive, destination)
     except archiveutil.FSError as error:
         logger.error('OS error while creating file: {} ({})', destination, error)
-    except archiveutil.FileAlreadyExists as error:
+    except archiveutil.FileAlreadyExists:
         logger.warning('File already exists: {}', destination)
     except archiveutil.ArchiveError as error:
         logger.error('Failed to extract file: {} from {} ({})', info.filename, archive.path, error)

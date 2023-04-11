@@ -85,7 +85,6 @@ class JsonRpcClient(RpcClient):
 
     def add_torrent(self, torrent, options):
         # https://aria2.github.io/manual/en/html/aria2c.html#aria2.addTorrent
-        params = [torrent]
         return self._post(JsonRpcClient.ADDTORRENT_METHOD, params=[torrent, options])
 
     def get_global_stat(self):
@@ -264,7 +263,7 @@ class OutputAria2:
                             entry['url'], headers=None, stream=True
                         ) as response:
                             content_disposition = response.headers.get('content-disposition', None)
-                    except Exception as e:
+                    except Exception:
                         logger.warning('Not possible to retrive file info from `{}`', entry['url'])
                         entry.fail('Not possible to retrive file info from `%s`' % entry['url'])
                         return

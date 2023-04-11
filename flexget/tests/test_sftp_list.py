@@ -86,7 +86,7 @@ class TestSftpList:
         sftp.start(username='foo', password='bar')
 
         with pytest.raises(TaskAbort) as ex:
-            task = execute_task('sftp_list_bad_login')
+            execute_task('sftp_list_bad_login')
 
         assert ex.value.reason == 'Failed to connect to 127.0.0.1'
 

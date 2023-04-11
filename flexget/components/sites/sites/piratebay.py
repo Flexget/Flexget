@@ -150,7 +150,7 @@ class UrlRewritePirateBay:
             url = f'{self.url}/q.php'
             try:
                 json_results = task.requests.get(url, params=params).json()
-            except JSONDecodeError as e:
+            except JSONDecodeError:
                 raise plugin.PluginError(
                     f'Error while searching piratebay for {search_string}, invalid json response',
                 )

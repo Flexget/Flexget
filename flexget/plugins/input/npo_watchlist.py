@@ -105,7 +105,7 @@ class NPOWatchlist:
             email = config.get('email')
             password = config.get('password')
 
-            npoid_response = requests.post(
+            requests.post(
                 npoid_login_url,
                 {
                     'button': 'login',
@@ -116,7 +116,7 @@ class NPOWatchlist:
                 },
             )
 
-            npostart_response = requests.get(npoid_base + return_url)
+            requests.get(npoid_base + return_url)
 
             if 'isAuthenticatedUser' not in requests.cookies:
                 raise plugin.PluginError('Failed to login. Check username and password.')

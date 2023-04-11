@@ -63,7 +63,7 @@ class GotifyNotifier:
         }
         # Make the request
         try:
-            response = requests.post(url, params=params, json=notification)
+            requests.post(url, params=params, json=notification)
         except RequestException as e:
             if e.response is not None:
                 if e.response.status_code in (HTTPStatus.UNAUTHORIZED, HTTPStatus.FORBIDDEN):

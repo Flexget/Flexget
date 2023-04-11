@@ -234,7 +234,7 @@ class LostFilm:
                 if perfect_match:
                     try:
                         folded_name = self._simplify_name(series_name_org)
-                    except TextProcessingError as e:
+                    except TextProcessingError:
                         logger.warning('RSS item series name "{}" could be wrong', series_name_org)
                         folded_name = None
                     if folded_name and folded_name not in prefilter_list:
@@ -440,7 +440,7 @@ class LostFilm:
                             episode_num,
                         )
                         season_num = int(info_match['season'])
-                        eposode_num = int(info_match['episode'])
+                        episode_num = int(info_match['episode'])
                     if info_match['ep_org'] is not None:
                         episode_name_org = info_match['ep_org'].strip()
                     if (

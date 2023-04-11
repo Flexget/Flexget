@@ -91,7 +91,7 @@ class PluginUtorrent:
             path = entry.get('path', config.get('path', ''))
             try:
                 path = os.path.expanduser(entry.render(path))
-            except RenderError as e:
+            except RenderError:
                 logger.error(
                     'Could not render path for `{}` downloading to default directory.',
                     entry['title'],

@@ -71,7 +71,7 @@ def upgrade(ver, session):
                     .where(table.c.id == row['id'])
                     .values(json=json.dumps(p, encode_datetime=True))
                 )
-            except Exception as e:
+            except Exception:
                 failures += 1
         if failures > 0:
             logger.error(

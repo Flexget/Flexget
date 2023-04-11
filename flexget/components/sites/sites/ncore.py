@@ -86,8 +86,6 @@ class UrlRewriteNcore:
         passkey_line = str(soup.find('link', href=re.compile(r'rss\.php\?key=')))
         PASSKEY = passkey_line[passkey_line.find("key=") : passkey_line.find('"', 20, 90)]
 
-        entries = set()
-
         for search_string in entry.get('search_strings', [entry['title']]):
             data = {
                 "mire": search_string,
