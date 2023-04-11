@@ -1056,12 +1056,12 @@ class TestQualities:
         """Series plugin: qualities"""
         task = execute_task('test_1')
 
-        assert task.find_entry('accepted', title='FooBar.S01E01.PDTV-FlexGet'), (
-            'Didn' 't accept FooBar.S01E01.PDTV-FlexGet'
-        )
-        assert task.find_entry('accepted', title='FooBar.S01E01.1080p-FlexGet'), (
-            'Didn' 't accept FooBar.S01E01.1080p-FlexGet'
-        )
+        assert task.find_entry(
+            'accepted', title='FooBar.S01E01.PDTV-FlexGet'
+        ), "Didn't accept FooBar.S01E01.PDTV-FlexGet"
+        assert task.find_entry(
+            'accepted', title='FooBar.S01E01.1080p-FlexGet'
+        ), "Didn't accept FooBar.S01E01.1080p-FlexGet"
 
         assert not task.find_entry(
             'accepted', title='FooBar.S01E01.HR-FlexGet'
@@ -1069,9 +1069,9 @@ class TestQualities:
 
         task = execute_task('test_2')
 
-        assert task.find_entry('accepted', title='FooBar.S01E01.720p-FlexGet'), (
-            'Didn' 't accept FooBar.S01E01.720p-FlexGet'
-        )
+        assert task.find_entry(
+            'accepted', title='FooBar.S01E01.720p-FlexGet'
+        ), "Didn't accept FooBar.S01E01.720p-FlexGet"
 
         # test that it rejects them afterwards
 

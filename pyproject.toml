@@ -152,7 +152,7 @@ exclude = '''
 
 [tool.ruff]
 line-length = 99
-select = ["C4", "E", "F", "I", "PLE", "RUF", "UP"]
+select = ["C4", "E", "F", "I", "ISC", "PLE", "RUF", "UP"]
 
 ignore = [
     "E501",  # We leave line length up to black

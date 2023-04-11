@@ -128,9 +128,9 @@ class TestTraktShowLookup:
             assert (
                 len(session.query(TraktShow).all()) == 1
             ), 'should only have added one show to show table'
-            assert session.query(TraktShow).first().title == 'Shameless', (
-                'should have added Shameless and' 'not Shameless (2010)'
-            )
+            assert (
+                session.query(TraktShow).first().title == 'Shameless'
+            ), 'should have added Shameless and not Shameless (2010)'
             # change the search query
             session.query(TraktShowSearchResult).update(
                 {'search': "shameless.s01e03.hdtv-flexget"}
@@ -166,9 +166,9 @@ class TestTraktShowLookup:
                 'We support trakt episode lookup by date now? Great! Change this test.'
             )
         else:
-            assert entry.get('trakt_episode_id') is None, (
-                'false positive for episode match, we don\'t ' 'support lookup by date'
-            )
+            assert (
+                entry.get('trakt_episode_id') is None
+            ), 'false positive for episode match, we don\'t support lookup by date'
 
     def test_absolute(self, execute_task):
         task = execute_task('test_absolute')
@@ -181,9 +181,9 @@ class TestTraktShowLookup:
                 'We support trakt episode lookup by absolute number now? Great! Change this test.'
             )
         else:
-            assert entry.get('trakt_episode_id') is None, (
-                'false positive for episode match, we don\'t ' 'support lookup by absolute number'
-            )
+            assert (
+                entry.get('trakt_episode_id') is None
+            ), 'false positive for episode match, we don\'t support lookup by absolute number'
 
     def test_lookup_actors(self, execute_task):
         task = execute_task('test')
