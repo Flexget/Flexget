@@ -10,6 +10,7 @@ from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
+from flexget.plugin import PluginError
 from flexget.utils.template import RenderError
 
 logger = logger.bind(name='aria2')
@@ -141,6 +142,9 @@ class XmlRpcClient(RpcClient):
         return self._aria2.addTorrent(*params)
 
 
+RPC_CLIENTS = {'xml': XmlRpcClient, 'json': JsonRpcClient}
+
+
 class OutputAria2:
     """
     Simple Aria2 output
@@ -163,7 +167,7 @@ class OutputAria2:
             'password': {'type': 'string', 'default': ''},
             'scheme': {'type': 'string', 'default': 'http'},
             # NOTE: xml/json
-            'rpc_mode': {'type': 'string', 'default': 'xml'},
+            'rpc_mode': {'type': 'string', 'default': 'xml', 'enum': [RPC_CLIENTS]},
             'rpc_path': {'type': 'string', 'default': 'rpc'},
             'path': {'type': 'string'},
             'filename': {'type': 'string'},
@@ -209,10 +213,9 @@ class OutputAria2:
         if task.options.learn:
             return
         config = self.prepare_config(config)
-        rpc_clients = {'xml': XmlRpcClient, 'json': JsonRpcClient}
-        if config['rpc_mode'] not in rpc_clients:
-            entry.fail('Unknown rpc_mode: %s' % config['rpc_mode'])
-        aria2 = rpc_clients[config['rpc_mode']](
+        if config['rpc_mode'] not in RPC_CLIENTS:
+            raise PluginError(f'Unknown rpc_mode: {config["rpc_mode"]}')
+        aria2 = RPC_CLIENTS[config['rpc_mode']](
             config['server'],
             config['port'],
             config['scheme'],
