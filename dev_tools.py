@@ -130,21 +130,9 @@ def autoformat(files):
     if not venv_path:
         raise Exception('Virtualenv and activation required')
 
-    # black and isort config are in pyproject.toml
+    # black and ruff config are in pyproject.toml
+    subprocess.call(('ruff', '--fix') + files)
     subprocess.call(('black',) + files)
-    subprocess.call(
-        (
-            'isort',
-            '--virtual-env',
-            venv_path,
-            '-rc',
-            '--skip',
-            'flexget/__init__.py',
-            '--skip',
-            'flexget/manager.py',
-        )
-        + files
-    )
 
 
 @cli.command()
