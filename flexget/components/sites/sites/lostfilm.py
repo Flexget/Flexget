@@ -4,7 +4,7 @@ from urllib.request import ProxyHandler
 import feedparser
 from loguru import logger
 
-from flexget import entry, plugin
+from flexget import plugin
 from flexget.components.sites.utils import normalize_unicode
 from flexget.entry import Entry
 from flexget.event import event

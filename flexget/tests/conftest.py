@@ -16,7 +16,7 @@ import jsonschema
 import pytest
 import requests
 import yaml
-from _pytest.logging import caplog as _caplog
+from _pytest.logging import caplog as _caplog  # noqa: F401 pytest fixtures look unused
 from loguru import logger
 from vcr import VCR
 from vcr.stubs import VCRHTTPConnection, VCRHTTPSConnection

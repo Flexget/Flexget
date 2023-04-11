@@ -1,6 +1,3 @@
-import pytest
-
-
 class TestAsciifyFilter:
     config = """
         tasks:

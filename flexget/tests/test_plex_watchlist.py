@@ -1,5 +1,3 @@
-import logging
-
 import pytest
 
 PLEX_USERNAME = 'flexget_flexget'

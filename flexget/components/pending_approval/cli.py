@@ -6,7 +6,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from flexget import options
 from flexget.event import event
 from flexget.manager import Session
-from flexget.terminal import TerminalTable, colorize, console, disable_colors, table_parser
+from flexget.terminal import TerminalTable, colorize, console, table_parser
 
 from . import db
 

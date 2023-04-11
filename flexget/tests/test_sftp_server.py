@@ -8,7 +8,6 @@ import threading
 import time
 from logging import Logger
 from pathlib import Path
-from typing import Union
 
 from paramiko import (
     RSAKey,

@@ -7,9 +7,7 @@ forget (string)
     task name then everything in that task will be forgotten. With title all learned fields from it and the
     title will be forgotten. With field value only that particular field is forgotten.
 """
-import string
 from datetime import datetime
-from glob import escape
 
 from loguru import logger
 from sqlalchemy import (

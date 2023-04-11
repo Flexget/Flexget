@@ -2,7 +2,6 @@ import random
 import re
 import time
 import unicodedata
-from urllib.parse import quote
 
 from loguru import logger
 from requests import RequestException

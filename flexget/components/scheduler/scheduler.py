@@ -1,7 +1,6 @@
 import hashlib
 import logging
 import os
-import struct
 
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.schedulers.background import BackgroundScheduler

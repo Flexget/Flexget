@@ -4,7 +4,6 @@ import copy
 import hashlib
 import locale
 import operator
-import os
 import queue
 import re
 import sys

@@ -2,7 +2,6 @@ from typing import Any, Callable, Dict, List
 
 import pytest
 
-from flexget.entry import Entry
 from flexget.task import Task, TaskAbort
 
 from .test_sftp_server import TestSFTPFileSystem, TestSFTPServerController

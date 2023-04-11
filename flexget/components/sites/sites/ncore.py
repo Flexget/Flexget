@@ -3,7 +3,6 @@ import re
 from loguru import logger
 
 from flexget import plugin
-from flexget.components.sites.urlrewriting import UrlRewritingError
 from flexget.components.sites.utils import torrent_availability
 from flexget.entry import Entry
 from flexget.event import event
