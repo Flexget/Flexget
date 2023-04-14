@@ -122,7 +122,7 @@ class Discover:
                 else:
                     plugin_name, plugin_config = item, None
                 search = plugin.get(plugin_name, self)
-                if not callable(getattr(search, 'search')):
+                if not callable(search.search):
                     logger.critical(
                         'Search plugin {} does not implement search method', plugin_name
                     )

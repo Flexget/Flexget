@@ -266,7 +266,7 @@ class SeriesParser(TitleParser):
             # if we don't have name_regexps, generate one from the name
             self.name_regexps = ReList(
                 name_to_re(name, self.ignore_prefixes, self)
-                for name in [self.name] + self.alternate_names
+                for name in [self.name, *self.alternate_names]
             )
             # With auto regex generation, the first regex group captures the name
             self.re_from_name = True

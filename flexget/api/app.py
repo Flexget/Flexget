@@ -60,7 +60,7 @@ class APIClient:
     def get_endpoint(self, url: str, data=None, method: str = None):
         if method is None:
             method = 'POST' if data is not None else 'GET'
-        auth_header = dict(Authorization='Token %s' % api_key())
+        auth_header = {'Authorization': 'Token %s' % api_key()}
         response = self.app.open(
             url, data=data, follow_redirects=True, method=method, headers=auth_header
         )

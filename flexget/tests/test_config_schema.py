@@ -17,14 +17,13 @@ class TestSchemaValidator:
             try:
                 config_schema.SchemaValidator.check_schema(schema)
             except jsonschema.SchemaError as e:
-                assert False, 'plugin `{}` has an invalid schema. {} {} {}'.format(
-                    path,
-                    '/'.join(str(p) for p in e.path),
-                    e.validator,
-                    e.message,
+                raise AssertionError(
+                    'plugin `{}` has an invalid schema. {} {} {}'.format(
+                        path, '/'.join(str(p) for p in e.path), e.validator, e.message
+                    )
                 )
             except Exception as e:
-                assert False, f'plugin `{path}` has an invalid schema. {e}'
+                raise AssertionError(f'plugin `{path}` has an invalid schema. {e}')
 
     def test_refs_in_schemas_are_resolvable(self):
         def refs_in(item):
@@ -45,7 +44,7 @@ class TestSchemaValidator:
                     with resolver.resolving(ref):
                         pass
                 except jsonschema.RefResolutionError:
-                    assert False, f'$ref {ref} in schema {path} is invalid'
+                    raise AssertionError(f'$ref {ref} in schema {path} is invalid')
 
     def test_resolves_local_refs(self):
         schema = {'$ref': '/schema/plugin/accept_all'}

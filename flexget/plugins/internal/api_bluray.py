@@ -38,7 +38,7 @@ def bluray_request(endpoint, **params) -> Any:
     if response.content:
         try:
             return response.json(strict=False)
-        except JSONDecodeError as e:
+        except JSONDecodeError:
             raise PluginError('Could decode json from response blu-ray api')
 
 
@@ -127,7 +127,7 @@ class BlurayMovie(Base):
 
             try:
                 movie_info_response = requests.get(self.url).content
-            except (requests.RequestException, ConnectionError) as e:
+            except (requests.RequestException, ConnectionError):
                 raise LookupError("Couldn't connect to blu-ray.com. %s" % self.url)
 
             movie_info = get_soup(movie_info_response)

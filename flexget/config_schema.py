@@ -327,8 +327,8 @@ def is_json(instance) -> bool:
         return False
 
     try:
-        decoded_json = json_loads(instance)
-    except JSONDecodeError as e:
+        json_loads(instance)
+    except JSONDecodeError:
         raise ValueError('`%s` is not a valid json' % instance)
 
     return True

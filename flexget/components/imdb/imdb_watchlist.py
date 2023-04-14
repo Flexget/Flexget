@@ -121,9 +121,9 @@ class ImdbWatchlist:
             )
         except (TypeError, AttributeError, ValueError) as e:
             raise plugin.PluginError(
-                'Unable to get imdb list from imdb react widget.'
-                + ' Either the list is empty or the imdb parser of the imdb_watchlist plugin is broken.'
-                + ' Original error: %s.' % str(e)
+                'Unable to get imdb list from imdb react widget. '
+                'Either the list is empty or the imdb parser of the imdb_watchlist plugin is broken. '
+                'Original error: %s.' % str(e)
             )
         total_item_count = 0
         if 'list' in json_vars and 'items' in json_vars['list']:
@@ -141,9 +141,9 @@ class ImdbWatchlist:
             json_data = self.fetch_page(task, url, params, headers).json()
         except (ValueError, TypeError) as e:
             raise plugin.PluginError(
-                'Unable to get imdb list from imdb JSON API.'
-                + ' Either the list is empty or the imdb parser of the imdb_watchlist plugin is broken.'
-                + ' Original error: %s.' % str(e)
+                'Unable to get imdb list from imdb JSON API. '
+                'Either the list is empty or the imdb parser of the imdb_watchlist plugin is broken. '
+                'Original error: %s.' % str(e)
             )
         logger.verbose('imdb list contains {} items', len(json_data))
         logger.debug(

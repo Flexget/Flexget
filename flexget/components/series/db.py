@@ -770,8 +770,10 @@ def set_alt_names(alt_names: Iterable[str], db_series: Series, session: Session)
         if db_series_alt:
             if not db_series_alt.series_id == db_series.id:
                 raise plugin.PluginError(
-                    'Error adding alternate name for `%s`: `%s` is already associated with `%s`. '
-                    'Check your settings.' % (db_series.name, alt_name, db_series_alt.series.name)
+                    'Error adding alternate name for `{}`: `{}` is already associated with `{}`. '
+                    'Check your settings.'.format(
+                        db_series.name, alt_name, db_series_alt.series.name
+                    )
                 )
             else:
                 logger.debug(
@@ -810,9 +812,15 @@ def get_all_entities(
     episodes = show_episodes(series, session=session)
     seasons = show_seasons(series, session=session)
     if sort_by == 'identifier':
-        key = lambda e: e.identifier
+
+        def key(e):
+            return e.identifier
+
     else:
-        key = lambda e: (e.first_seen or datetime.min, e.identifier)
+
+        def key(e):
+            return e.first_seen or datetime.min, e.identifier
+
     return sorted(episodes + seasons, key=key, reverse=reverse)
 
 
@@ -911,8 +919,8 @@ def _add_alt_name(alt: str, db_series: Series, series_name: str, session: Sessio
         else:
             # Alternate name already exists for another series. Not good.
             raise plugin.PluginError(
-                'Error adding alternate name for `%s`: `%s` is already associated with `%s`. '
-                'Check your settings.' % (series_name, alt, db_series_alt.series.name)
+                'Error adding alternate name for `{}`: `{}` is already associated with `{}`. '
+                'Check your settings.'.format(series_name, alt, db_series_alt.series.name)
             )
     else:
         logger.debug('adding alternate name `{}` for `{}` into db', alt, series_name)

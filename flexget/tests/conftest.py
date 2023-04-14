@@ -16,7 +16,7 @@ import jsonschema
 import pytest
 import requests
 import yaml
-from _pytest.logging import caplog as _caplog
+from _pytest.logging import caplog as _caplog  # noqa: F401 pytest fixtures look unused
 from loguru import logger
 from vcr import VCR
 from vcr.stubs import VCRHTTPConnection, VCRHTTPSConnection
@@ -163,7 +163,7 @@ def schema_match(manager) -> Callable[[dict, Any], List[dict]]:
     def match(schema: dict, response: Any) -> List[dict]:
         validator = jsonschema.Draft4Validator(schema)
         errors = list(validator.iter_errors(response))
-        return [dict(value=list(e.path), message=e.message) for e in errors]
+        return [{'value': list(e.path), 'message': e.message} for e in errors]
 
     return match
 
@@ -179,14 +179,14 @@ def link_headers(manager) -> Callable[[flask.Response], Dict[str, dict]]:
         for link in requests.utils.parse_header_links(response.headers.get('link')):
             url = link['url']
             page = int(re.search(r'(?<!per_)page=(\d)', url).group(1))
-            links[link['rel']] = dict(url=url, page=page)
+            links[link['rel']] = {'url': url, 'page': page}
         return links
 
     return headers
 
 
 @pytest.fixture(autouse=True)
-def caplog(pytestconfig, _caplog):
+def caplog(pytestconfig, _caplog):  # noqa: F811
     """
     Override caplog so that we can send loguru messages to logging for compatibility.
     """

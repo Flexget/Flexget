@@ -95,13 +95,12 @@ click = ">=8.1.3"
 codacy-coverage = ">=1.2.18"
 coverage = ">=6.0"
 gitpython = ">=3.1.18"
-isort = ">=5.5.1"
 pre-commit = ">=2.9.0"
-pylint = ">=2.6.0"
 pytest-cov = ">=3.0.0"
 pytest-runner = "^6.0.0"
 pytest-xdist = ">=2.4.0"
 pytest = ">=6.2.4"
+ruff = ">=0.0.261"
 sphinx = ">=5.0.0"
 sqlalchemy-stubs = "^0.4"
 twine = ">=3.6.0"
@@ -151,10 +150,19 @@ exclude = '''
 )
 '''
 
-[tool.isort]
-profile = 'black'
-line_length = 99
-known_first_party = ['flexget']
+[tool.ruff]
+line-length = 99
+select = ["C4", "E", "F", "I", "ISC", "PLE", "RUF", "UP"]
+
+ignore = [
+    "E501",  # We leave line length up to black
+    "E711", "E712",  # Comparisons to True/False/None are valid for sqlalchemy
+    "PLE1205",  # Thinks we are using stdlib logging rather than loguru
+    "RUF001",  # Some of these ambiguous unicode are in tests on purpose
+]
+
+[tool.ruff.isort]
+known-first-party = ['flexget']
 
 [tool.mypy]
 plugins = ["sqlmypy"]

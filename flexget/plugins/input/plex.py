@@ -143,7 +143,7 @@ class InputPlex:
         except requests.RequestException as e:
             raise plugin.PluginError(
                 "Could not get servers from my.plexapp.com using "
-                "authentication-token: %s. (%s)" % (globalaccesstoken, e)
+                "authentication-token: {}. ({})".format(globalaccesstoken, e)
             )
         dom = parseString(r.text)
         for node in dom.getElementsByTagName('Server'):

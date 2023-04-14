@@ -149,7 +149,7 @@ class OutputQBitTorrent:
                 params=params,
                 verify=verify_cert,
             )
-        except RequestException as e:
+        except RequestException:
             logger.error('Error getting torrent info, request to hash {} failed', hash_torrent)
             return False
 

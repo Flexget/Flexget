@@ -169,7 +169,7 @@ class PendingEntriesAPI(APIResource):
             deleted = deleted.filter(db.PendingEntry.approved == approved)
         deleted = deleted.delete()
 
-        return success_response(f'deleted %s pending entries')
+        return success_response(f'deleted {deleted} pending entries')
 
 
 @pending_api.route('/<int:entry_id>/')

@@ -1,4 +1,3 @@
-import datetime
 from copy import copy
 
 from jinja2 import UndefinedError

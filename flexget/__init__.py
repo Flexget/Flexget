@@ -7,8 +7,8 @@ from typing import Sequence
 from ._version import __version__  # noqa
 
 # isort: split
-from flexget import log  # noqa
-from flexget.manager import Manager  # noqa
+from flexget import log
+from flexget.manager import Manager
 
 
 def main(args: Sequence[str] = None):

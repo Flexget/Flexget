@@ -61,4 +61,4 @@ class DBCleanup(APIResource):
     @api.response(200, model=plugins_schema)
     def get(self, session: Session = None) -> Response:
         """List resettable DB plugins"""
-        return jsonify(sorted(list(plugin_schemas)))
+        return jsonify(sorted(plugin_schemas))

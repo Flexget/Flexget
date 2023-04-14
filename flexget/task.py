@@ -23,9 +23,9 @@ from flexget.plugin import (
     get_plugins,
     phase_methods,
     plugin_schemas,
+    task_phases,
 )
 from flexget.plugin import plugins as all_plugins
-from flexget.plugin import task_phases
 from flexget.terminal import capture_console
 from flexget.utils import requests
 from flexget.utils.database import with_session
@@ -243,7 +243,7 @@ class Task:
             options = options_namespace
         # If execution hasn't specifically set the `allow_manual` flag, set it to False by default
         if not hasattr(options, 'allow_manual'):
-            setattr(options, 'allow_manual', False)
+            options.allow_manual = False
         self.options = options
         self.output = output
         self.session_id = session_id

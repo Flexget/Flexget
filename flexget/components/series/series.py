@@ -577,18 +577,18 @@ class FilterSeries(FilterSeriesBase):
             # set flag from database
             identified_by = db_identified_by or 'auto'
 
-        params = dict(
-            identified_by=identified_by,
-            alternate_names=get_config_as_array(config, 'alternate_name'),
-            name_regexps=get_config_as_array(config, 'name_regexp'),
-            strict_name=config.get('exact', False),
-            allow_groups=get_config_as_array(config, 'from_group'),
-            date_yearfirst=config.get('date_yearfirst'),
-            date_dayfirst=config.get('date_dayfirst'),
-            special_ids=get_config_as_array(config, 'special_ids'),
-            prefer_specials=config.get('prefer_specials'),
-            assume_special=config.get('assume_special'),
-        )
+        params = {
+            'identified_by': identified_by,
+            'alternate_names': get_config_as_array(config, 'alternate_name'),
+            'name_regexps': get_config_as_array(config, 'name_regexp'),
+            'strict_name': config.get('exact', False),
+            'allow_groups': get_config_as_array(config, 'from_group'),
+            'date_yearfirst': config.get('date_yearfirst'),
+            'date_dayfirst': config.get('date_dayfirst'),
+            'special_ids': get_config_as_array(config, 'special_ids'),
+            'prefer_specials': config.get('prefer_specials'),
+            'assume_special': config.get('assume_special'),
+        }
         for id_type in plugin_parser_common.SERIES_ID_TYPES:
             params[id_type + '_regexps'] = get_config_as_array(config, id_type + '_regexp')
 

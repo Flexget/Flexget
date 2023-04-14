@@ -12,11 +12,11 @@ import requests
 def _get_version():
     with open('flexget/_version.py') as f:
         g = globals()
-        l = {}
-        exec(f.read(), g, l)  # pylint: disable=W0122
-    if not l['__version__']:
+        loc = {}
+        exec(f.read(), g, loc)
+    if not loc['__version__']:
         raise click.ClickException('Could not find __version__ from flexget/_version.py')
-    return l['__version__']
+    return loc['__version__']
 
 
 @click.group()
@@ -130,21 +130,9 @@ def autoformat(files):
     if not venv_path:
         raise Exception('Virtualenv and activation required')
 
-    # black and isort config are in pyproject.toml
-    subprocess.call(('black',) + files)
-    subprocess.call(
-        (
-            'isort',
-            '--virtual-env',
-            venv_path,
-            '-rc',
-            '--skip',
-            'flexget/__init__.py',
-            '--skip',
-            'flexget/manager.py',
-        )
-        + files
-    )
+    # black and ruff config are in pyproject.toml
+    subprocess.call(('ruff', '--fix', *files))
+    subprocess.call(('black', *files))
 
 
 @cli.command()

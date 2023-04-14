@@ -28,7 +28,7 @@ class YamlManagedList(MutableSet):
         self.entries = []
         try:
             content = open(self.filename, encoding=self.encoding)
-        except FileNotFoundError as exc:
+        except FileNotFoundError:
             entries = []
             pass
         else:

@@ -4,7 +4,7 @@ from urllib.request import ProxyHandler
 import feedparser
 from loguru import logger
 
-from flexget import entry, plugin
+from flexget import plugin
 from flexget.components.sites.utils import normalize_unicode
 from flexget.entry import Entry
 from flexget.event import event
@@ -119,7 +119,7 @@ class LostFilm:
 
     def build_config(self, config):
         """Set defaults to config"""
-        cfg = dict()
+        cfg = {}
         if isinstance(config, bool):
             cfg['enabled'] = bool(config)
         elif isinstance(config, str):
@@ -234,7 +234,7 @@ class LostFilm:
                 if perfect_match:
                     try:
                         folded_name = self._simplify_name(series_name_org)
-                    except TextProcessingError as e:
+                    except TextProcessingError:
                         logger.warning('RSS item series name "{}" could be wrong', series_name_org)
                         folded_name = None
                     if folded_name and folded_name not in prefilter_list:
@@ -440,7 +440,7 @@ class LostFilm:
                             episode_num,
                         )
                         season_num = int(info_match['season'])
-                        eposode_num = int(info_match['episode'])
+                        episode_num = int(info_match['episode'])
                     if info_match['ep_org'] is not None:
                         episode_name_org = info_match['ep_org'].strip()
                     if (
@@ -616,7 +616,7 @@ class LostFilm:
                         raise PluginError(f'Cannot read series "alternate_name" for "{s_name:s}"')
             else:
                 raise PluginError(
-                    'Series configuration list item has ' 'unsupported type: %s' % type(s_item)
+                    'Series configuration list item has unsupported type: %s' % type(s_item)
                 )
 
 

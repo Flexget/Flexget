@@ -1,5 +1,4 @@
 import datetime
-import math
 
 from loguru import logger
 from requests import RequestException

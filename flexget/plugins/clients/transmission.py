@@ -95,15 +95,15 @@ class TransmissionBase:
                 password=password,
                 timeout=30,
             )
-        except TransmissionAuthError as e:
+        except TransmissionAuthError:
             raise plugin.PluginError(
                 "Username/password for transmission is incorrect. Cannot connect."
             )
-        except TransmissionTimeoutError as e:
+        except TransmissionTimeoutError:
             raise plugin.PluginError("Cannot connect to transmission: Connection timed out.")
         except TransmissionConnectError as e:
             raise plugin.PluginError("Error connecting to transmission: %s" % e.args[0].reason)
-        except TransmissionError as e:
+        except TransmissionError:
             raise plugin.PluginError("Error connecting to transmission")
         return cli
 

@@ -128,9 +128,9 @@ class TestTraktShowLookup:
             assert (
                 len(session.query(TraktShow).all()) == 1
             ), 'should only have added one show to show table'
-            assert session.query(TraktShow).first().title == 'Shameless', (
-                'should have added Shameless and' 'not Shameless (2010)'
-            )
+            assert (
+                session.query(TraktShow).first().title == 'Shameless'
+            ), 'should have added Shameless and not Shameless (2010)'
             # change the search query
             session.query(TraktShowSearchResult).update(
                 {'search': "shameless.s01e03.hdtv-flexget"}
@@ -162,11 +162,13 @@ class TestTraktShowLookup:
         assert entry.get('trakt_show_id') == 2211, 'should have populated trakt show data'
         # We don't support lookup by date at the moment, make sure there isn't a false positive
         if entry.get('trakt_episode_id') == 173423:
-            assert False, 'We support trakt episode lookup by date now? Great! Change this test.'
-        else:
-            assert entry.get('trakt_episode_id') is None, (
-                'false positive for episode match, we don\'t ' 'support lookup by date'
+            raise AssertionError(
+                'We support trakt episode lookup by date now? Great! Change this test.'
             )
+        else:
+            assert (
+                entry.get('trakt_episode_id') is None
+            ), 'false positive for episode match, we don\'t support lookup by date'
 
     def test_absolute(self, execute_task):
         task = execute_task('test_absolute')
@@ -175,13 +177,13 @@ class TestTraktShowLookup:
         assert entry.get('trakt_show_id') == 46003, 'should have populated trakt show data'
         # We don't support lookup by absolute number at the moment, make sure there isn't a false positive
         if entry.get('trakt_show_id') == 916040:
-            assert (
-                False
-            ), 'We support trakt episode lookup by absolute number now? Great! Change this test.'
-        else:
-            assert entry.get('trakt_episode_id') is None, (
-                'false positive for episode match, we don\'t ' 'support lookup by absolute number'
+            raise AssertionError(
+                'We support trakt episode lookup by absolute number now? Great! Change this test.'
             )
+        else:
+            assert (
+                entry.get('trakt_episode_id') is None
+            ), 'false positive for episode match, we don\'t support lookup by absolute number'
 
     def test_lookup_actors(self, execute_task):
         task = execute_task('test')

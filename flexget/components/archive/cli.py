@@ -257,7 +257,7 @@ def register_parser_arguments():
     inject_parser.add_argument(
         '--immortal',
         action='store_true',
-        help='Injected entries will not be able to be ' 'rejected by any plugins',
+        help='Injected entries will not be able to be rejected by any plugins',
     )
     exec_group = inject_parser.add_argument_group('execute arguments')
     exec_group.add_argument(

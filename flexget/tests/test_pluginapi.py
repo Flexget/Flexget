@@ -14,11 +14,11 @@ class TestPluginApi:
 
     config = 'tasks: {}'
 
-    def test_unknown_plugin(self):
+    def test_unknown_plugin1(self):
         with pytest.raises(plugin.DependencyError):
             plugin.get_plugin_by_name('nonexisting_plugin')
 
-    def test_unknown_plugin(self):
+    def test_unknown_plugin2(self):
         with pytest.raises(plugin.DependencyError):
             plugin.get('nonexisting_plugin', 'test')
 

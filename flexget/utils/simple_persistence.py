@@ -71,7 +71,7 @@ def upgrade(ver, session):
                     .where(table.c.id == row['id'])
                     .values(json=json.dumps(p, encode_datetime=True))
                 )
-            except Exception as e:
+            except Exception:
                 failures += 1
         if failures > 0:
             logger.error(
@@ -86,7 +86,7 @@ def upgrade(ver, session):
 def db_cleanup(manager, session):
     """Clean up values in the db from tasks which no longer exist."""
     # SKVs not associated with any task use None as task tame
-    existing_tasks = list(manager.tasks) + [None]
+    existing_tasks = [*list(manager.tasks), None]
     session.query(SimpleKeyValue).filter(~SimpleKeyValue.task.in_(existing_tasks)).delete(
         synchronize_session=False
     )

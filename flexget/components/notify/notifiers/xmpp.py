@@ -5,7 +5,7 @@ from loguru import logger
 from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.event import event
-from flexget.plugin import DependencyError, PluginWarning
+from flexget.plugin import DependencyError
 
 plugin_name = 'xmpp'
 
@@ -45,7 +45,7 @@ class XMPPNotifier:
 
     def notify(self, title, message, config):
         try:
-            import sleekxmpp  # noqa
+            import sleekxmpp
         except ImportError as e:
             logger.debug('Error importing SleekXMPP: {}', e)
             raise DependencyError(

@@ -19,7 +19,7 @@ from flexget.utils.tools import get_config_hash
 try:
     from irc_bot import utils as irc_bot
     from irc_bot.simple_irc_bot import SimpleIRCBot, partial
-except ImportError as e:
+except ImportError:
     irc_bot = None
     SimpleIRCBot = object
 
@@ -787,15 +787,15 @@ class IRCConnection(SimpleIRCBot):
                 logger.debug('Using pattern {} to parse message vars', rx.pattern)
                 # find the next candidate line
                 line = ''
-                for l in list(lines):
+                for candidate in list(lines):
                     # skip ignored lines
                     for ignore_rx, expected in self.ignore_lines:
-                        if ignore_rx.match(l) and expected:
+                        if ignore_rx.match(candidate) and expected:
                             logger.debug('Ignoring message: matched ignore line')
-                            lines.remove(l)
+                            lines.remove(candidate)
                             break
                     else:
-                        line = l
+                        line = candidate
                         break
 
                 raw_message += '\n' + line

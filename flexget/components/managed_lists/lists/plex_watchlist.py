@@ -20,7 +20,7 @@ if typing.TYPE_CHECKING:
 
 def import_plexaccount() -> "Type[MyPlexAccount]":
     try:
-        from plexapi.myplex import MyPlexAccount  # noqa
+        from plexapi.myplex import MyPlexAccount
 
         return MyPlexAccount
     except ImportError:

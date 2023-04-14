@@ -2,9 +2,18 @@ import copy
 import random
 import string
 import sys
-from argparse import _UNRECOGNIZED_ARGS_ATTR, PARSER, REMAINDER, SUPPRESS, Action, ArgumentError
+from argparse import (
+    _UNRECOGNIZED_ARGS_ATTR,
+    PARSER,
+    REMAINDER,
+    SUPPRESS,
+    Action,
+    ArgumentError,
+    Namespace,
+    _SubParsersAction,
+    _VersionAction,
+)
 from argparse import ArgumentParser as ArgParser
-from argparse import Namespace, _SubParsersAction, _VersionAction
 from typing import IO, Any, Callable, List, Optional, TextIO
 
 import flexget
@@ -127,7 +136,7 @@ class InjectAction(Action):
         if 'accept' in [v.lower() for v in values]:
             entry.accept(reason='accepted by --inject')
         existing = getattr(namespace, self.dest, None) or []
-        setattr(namespace, self.dest, existing + [entry])
+        setattr(namespace, self.dest, [*existing, entry])
 
 
 class ParseExtrasAction(Action):
@@ -589,5 +598,5 @@ class CoreArgumentParser(ArgumentParser):
                 exec_options.__dict__.update(result.execute.__dict__)
             result.execute = exec_options
         # Set the 'allow_manual' flag to True for any usage of the CLI
-        setattr(result, 'allow_manual', True)
+        result.allow_manual = True
         return result

@@ -44,7 +44,7 @@ class TheTVDBSet(MutableSet):
         self._items = None
 
     def __iter__(self):
-        return iter([item for item in self.items])
+        return iter(list(self.items))
 
     def __len__(self):
         return len(self.items)

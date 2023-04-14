@@ -1,20 +1,20 @@
-import argparse  # noqa
-import atexit  # noqa
-import codecs  # noqa
+import argparse
+import atexit
+import codecs
 import collections
-import copy  # noqa
-import errno  # noqa
-import fnmatch  # noqa
-import hashlib  # noqa
-import os  # noqa
-import shutil  # noqa
-import signal  # noqa
-import sys  # noqa
-import threading  # noqa
-import traceback  # noqa
-from contextlib import contextmanager  # noqa
-from datetime import datetime, timedelta  # noqa
-from typing import (  # noqa
+import copy
+import errno
+import fnmatch
+import hashlib
+import os
+import shutil
+import signal
+import sys
+import threading
+import traceback
+from contextlib import contextmanager
+from datetime import datetime, timedelta
+from typing import (
     TYPE_CHECKING,
     Dict,
     Iterator,
@@ -26,18 +26,18 @@ from typing import (  # noqa
     Union,
 )
 
-import sqlalchemy  # noqa
-import yaml  # noqa
-from loguru import logger  # noqa
+import sqlalchemy
+import yaml
+from loguru import logger
 from sqlalchemy.engine import Engine
-from sqlalchemy.exc import OperationalError  # noqa
-from sqlalchemy.ext.declarative import declarative_base  # noqa
-from sqlalchemy.orm import sessionmaker  # noqa
+from sqlalchemy.exc import OperationalError
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 
 # These need to be declared before we start importing from other flexget modules, since they might import them
 from flexget.config_schema import ConfigError
-from flexget.utils.sqlalchemy_utils import ContextSession  # noqa
-from flexget.utils.tools import get_current_flexget_version, io_encoding, pid_exists  # noqa
+from flexget.utils.sqlalchemy_utils import ContextSession
+from flexget.utils.tools import get_current_flexget_version, io_encoding, pid_exists
 
 Base = declarative_base()
 Session: Type[ContextSession] = sessionmaker(class_=ContextSession)
@@ -477,7 +477,7 @@ class Manager:
                     tray_icon.stop()
 
             if options.tray_icon:
-                from flexget.tray_icon import tray_icon  # noqa
+                from flexget.tray_icon import tray_icon
 
                 self._add_tray_icon_items(tray_icon)
 
@@ -525,9 +525,9 @@ class Manager:
 
         # Represent OrderedDict as a regular dict (but don't sort it alphabetically)
         # This lets us order a dict in a yaml file for easier human consumption
-        represent_dict_order = lambda self, data: self.represent_mapping(
-            'tag:yaml.org,2002:map', data.items()
-        )
+        def represent_dict_order(self, data):
+            return self.represent_mapping('tag:yaml.org,2002:map', data.items())
+
         yaml.add_representer(collections.OrderedDict, represent_dict_order)
 
         # Set up the dumper to increase the indent for lists

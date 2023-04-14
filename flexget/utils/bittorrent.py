@@ -4,7 +4,7 @@
 import binascii
 import re
 from contextlib import suppress
-from typing import Any, Callable, Dict, Generator, Iterator, List, Match, Union
+from typing import Any, Callable, Dict, Generator, Iterator, List, Union
 
 from loguru import logger
 
@@ -313,7 +313,7 @@ class Torrent:
         for tl in self.content.get('announce-list', []):
             for t in tl:
                 trackers.append(t)
-        if not self.content.get('announce') in trackers:
+        if self.content.get('announce') not in trackers:
             trackers.append(self.content.get('announce'))
         return trackers
 

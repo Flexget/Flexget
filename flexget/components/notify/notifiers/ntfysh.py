@@ -65,7 +65,7 @@ class NtfyshNotifier:
             req['params']['tags'] = config['tags']
 
         try:
-            response = requests.post(**req)
+            requests.post(**req)
         except RequestException as e:
             if e.response is not None:
                 if e.response.status_code in (HTTPStatus.UNAUTHORIZED, HTTPStatus.FORBIDDEN):

@@ -89,20 +89,20 @@ class QualityComponent:
     def __add__(self, other):
         if not isinstance(other, int):
             raise TypeError()
-        l = globals().get('_' + self.type + 's')
-        index = l.index(self) + other
-        if index >= len(l):
+        component_list = globals().get('_' + self.type + 's')
+        index = component_list.index(self) + other
+        if index >= len(component_list):
             index = -1
-        return l[index]
+        return component_list[index]
 
     def __sub__(self, other):
         if not isinstance(other, int):
             raise TypeError()
-        l = globals().get('_' + self.type + 's')
-        index = l.index(self) - other
+        component_list = globals().get('_' + self.type + 's')
+        index = component_list.index(self) - other
         if index < 0:
             index = 0
-        return l[index]
+        return component_list[index]
 
     def __repr__(self) -> str:
         return f'<{self.type.title()}(name={self.name},value={self.value})>'
@@ -283,7 +283,7 @@ class Quality(Serializer):
     @property
     def _comparator(self) -> List:
         modifier = sum(c.modifier for c in self.components if c.modifier)
-        return [modifier] + self.components
+        return [modifier, *self.components]
 
     def __contains__(self, other):
         if isinstance(other, str):
@@ -430,9 +430,7 @@ class RequirementComponent:
 
     def __hash__(self) -> int:
         return hash(
-            tuple(
-                [self.min, self.max, tuple(sorted(self.acceptable)), tuple(sorted(self.none_of))]
-            )
+            (self.min, self.max, tuple(sorted(self.acceptable)), tuple(sorted(self.none_of)))
         )
 
 

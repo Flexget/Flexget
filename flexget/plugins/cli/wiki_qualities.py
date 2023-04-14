@@ -23,7 +23,7 @@ def do_cli(manager, options):
 @event('options.register')
 def register_parser_arguments():
     # Register subcommand
-    parser = options.register_command(
+    options.register_command(
         'wiki-qualities',
         do_cli,
         # If we don't specify the help argument, this won't show up in --help, which is good because it's not for users

@@ -2,7 +2,7 @@
 import re
 
 from loguru import logger
-from requests.exceptions import HTTPError, RequestException
+from requests.exceptions import HTTPError
 
 from flexget import plugin
 from flexget.config_schema import one_or_more

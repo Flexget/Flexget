@@ -291,7 +291,7 @@ class TelegramNotifier:
                 break
 
     def _send_msgs(self, msg, chat_ids, session):
-        kwargs = dict()
+        kwargs = {}
         if self._parse_mode == 'markdown':
             kwargs['parse_mode'] = telegram.ParseMode.MARKDOWN
         elif self._parse_mode == 'html':
@@ -394,7 +394,7 @@ class TelegramNotifier:
         :rtype: list[ChatIdEntry]
 
         """
-        chat_ids = list()
+        chat_ids = []
         cached_usernames = {
             x.username: x
             for x in session.query(ChatIdEntry).filter(ChatIdEntry.username != None).all()
@@ -491,9 +491,9 @@ class TelegramNotifier:
                 break
             last_upd = ups[-1].update_id
 
-        usernames = dict()
-        fullnames = dict()
-        groups = dict()
+        usernames = {}
+        fullnames = {}
+        groups = {}
         for update in updates:
             if update.message:
                 chat = update.message.chat

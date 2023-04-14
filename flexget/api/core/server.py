@@ -38,15 +38,16 @@ from yaml.error import MarkedYAMLError, YAMLError
 
 from flexget._version import __version__
 from flexget.api import APIResource, api
-from flexget.api.app import APIError, BadRequest
-from flexget.api.app import __version__ as __api_version__
 from flexget.api.app import (
+    APIError,
+    BadRequest,
     base_message,
     base_message_schema,
     empty_response,
     etag,
     success_response,
 )
+from flexget.api.app import __version__ as __api_version__
 from flexget.config_schema import ConfigError
 from flexget.utils.tools import get_latest_flexget_version_number
 
@@ -394,8 +395,8 @@ class ServerLogAPI(APIResource):
                         if log_parser.matches(line):
                             lines_found.append(log_parser.json_string(line))
 
-                    for l in reversed(lines_found):
-                        yield l + ',\n'
+                    for line in reversed(lines_found):
+                        yield line + ',\n'
 
             # We need to track the inode in case the log file is rotated
             current_inode = file_inode(base_log_file)

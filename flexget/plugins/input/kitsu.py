@@ -100,7 +100,7 @@ class KitsuAnime:
                 types = config.get('type')
                 if types is not None:
                     subType = anime['attributes']['subtype']
-                    if subType is None or not subType.lower() in types:
+                    if subType is None or subType.lower() not in types:
                         continue
 
                 entry = Entry()

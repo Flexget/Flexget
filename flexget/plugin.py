@@ -15,9 +15,8 @@ from requests import RequestException
 from flexget import components as components_pkg
 from flexget import config_schema
 from flexget import plugins as plugins_pkg
-from flexget.event import Event
+from flexget.event import Event, event, fire_event, remove_event_handlers
 from flexget.event import add_event_handler as add_phase_handler
-from flexget.event import event, fire_event, remove_event_handlers
 
 logger = loguru.logger.bind(name='plugin')
 
@@ -463,7 +462,7 @@ def _load_plugins_from_dirs(dirs: List[str]) -> None:
                 _f for _f in plugin_path.relative_to(plugins_dir).parent.parts if _f
             ]
             module_name = '.'.join(
-                [plugins_pkg.__name__] + plugin_subpackages + [plugin_path.stem]
+                [plugins_pkg.__name__, *plugin_subpackages] + [plugin_path.stem]
             )
             _import_plugin(module_name, plugin_path)
     _check_phase_queue()
@@ -485,7 +484,7 @@ def _load_components_from_dirs(dirs: List[str]) -> None:
                 _f for _f in component_path.relative_to(component_dir).parent.parts if _f
             ]
             package_name = '.'.join(
-                [components_pkg.__name__] + plugin_subpackages + [component_path.stem]
+                [components_pkg.__name__, *plugin_subpackages] + [component_path.stem]
             )
             _import_plugin(package_name, component_path)
     _check_phase_queue()

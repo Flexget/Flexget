@@ -256,7 +256,7 @@ class PluginSortByWeight:
 
     def _add_debug_info(self, key, entry, weight, *args):
         if 'weights' not in entry:
-            entry['weights'] = dict()
+            entry['weights'] = {}
         short_args = []
         for arg in args:
             if isinstance(arg, timedelta):

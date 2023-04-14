@@ -113,7 +113,7 @@ class ImdbEntrySet(MutableSet):
         elif isinstance(cookies, str):
             try:
                 new_cookie = json_loads(cookies)
-            except JSONDecodeError as e:
+            except JSONDecodeError:
                 new_cookie = self.parse_cookies_file(cookies)
 
         if not new_cookie:
@@ -135,7 +135,7 @@ class ImdbEntrySet(MutableSet):
         with file.open(encoding='utf-8') as data:
             try:
                 contents = json_load(data)
-            except JSONDecodeError as e:
+            except JSONDecodeError:
                 raise PluginError('Invalid cookies file format, file not in json')
 
         return contents

@@ -20,7 +20,7 @@ class MagnetBtih:
         for entry in task.all_entries:
             if entry.get('torrent_info_hash'):
                 continue
-            for url in [entry['url']] + entry.get('urls', []):
+            for url in [entry['url'], *entry.get('urls', [])]:
                 if url.startswith('magnet:'):
                     # find base16 encoded
                     info_hash_search = re.search('btih:([0-9a-f]{40})', url, re.IGNORECASE)

@@ -5,7 +5,7 @@ from loguru import logger
 from flexget import plugin
 from flexget.event import event
 from flexget.utils.pathscrub import pathscrub
-from flexget.utils.template import RenderError, render_from_entry
+from flexget.utils.template import RenderError
 
 logger = logger.bind(name='symlink')
 

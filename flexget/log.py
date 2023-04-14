@@ -13,10 +13,7 @@ from typing import Callable, Deque, Iterator, List, Optional, Union
 import loguru
 from loguru import logger
 
-import flexget
 from flexget import __version__
-from flexget.event import event
-from flexget.utils.tools import io_encoding
 
 # A level more detailed than INFO
 VERBOSE = 15

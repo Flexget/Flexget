@@ -67,7 +67,7 @@ class EstimatesSeriesTVMaze:
             series = {}
             try:
                 series = lookup(**kwargs)
-            except LookupError as e:
+            except LookupError:
                 entity_data['data_exists'] = False
 
             if not series:

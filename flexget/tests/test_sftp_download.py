@@ -1,5 +1,4 @@
 import filecmp
-import logging
 from pathlib import Path
 
 import pytest

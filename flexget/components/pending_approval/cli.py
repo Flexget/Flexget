@@ -22,7 +22,7 @@ def valid_entry(value):
 
 def do_cli(manager, options):
     if hasattr(options, 'table_type') and options.table_type == 'porcelain':
-        disable_all_colors()
+        disable_colors()
 
     if options.action == 'list':
         list_entries(options)

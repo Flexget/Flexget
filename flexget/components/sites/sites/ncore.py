@@ -3,7 +3,6 @@ import re
 from loguru import logger
 
 from flexget import plugin
-from flexget.components.sites.urlrewriting import UrlRewritingError
 from flexget.components.sites.utils import torrent_availability
 from flexget.entry import Entry
 from flexget.event import event
@@ -86,8 +85,6 @@ class UrlRewriteNcore:
         soup = get_soup(page.content)
         passkey_line = str(soup.find('link', href=re.compile(r'rss\.php\?key=')))
         PASSKEY = passkey_line[passkey_line.find("key=") : passkey_line.find('"', 20, 90)]
-
-        entries = set()
 
         for search_string in entry.get('search_strings', [entry['title']]):
             data = {
