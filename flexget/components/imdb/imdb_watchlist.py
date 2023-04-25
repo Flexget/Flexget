@@ -188,8 +188,9 @@ class ImdbWatchlist:
         except (ValueError, TypeError) as e:
             # TODO Something is wrong if we get a ValueError, I think
             raise plugin.PluginError(
-                'Received invalid movie count: %s ; %s'
-                % (soup.find('div', class_='lister-total-num-results').string, e)
+                'Received invalid movie count: {} ; {}'.format(
+                    soup.find('div', class_='lister-total-num-results').string, e
+                )
             )
 
         if not total_item_count:

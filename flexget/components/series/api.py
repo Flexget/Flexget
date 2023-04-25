@@ -876,8 +876,7 @@ class SeriesSeasonsReleasesAPI(APIResource):
                 release.downloaded = False
 
         return success_response(
-            'successfully reset download status for all releases for season %s from show %s'
-            % (season_id, show_id)
+            f'successfully reset download status for all releases for season {season_id} from show {show_id}'
         )
 
 
@@ -1134,8 +1133,7 @@ class SeriesEpisodeReleasesAPI(APIResource):
                 release.downloaded = False
 
         return success_response(
-            'successfully reset download status for all releases for episode %s from show %s'
-            % (ep_id, show_id)
+            f'successfully reset download status for all releases for episode {ep_id} from show {show_id}'
         )
 
 

@@ -669,9 +669,8 @@ class SeriesParser(TitleParser):
         if self.valid:
             valid = 'OK'
         return (
-            '<SeriesParser(data=%s,name=%s,id=%s,season=%s,season_pack=%s,episode=%s,quality=%s,proper=%s,'
-            'status=%s)>'
-            % (
+            '<SeriesParser(data={},name={},id={},season={},season_pack={},episode={},quality={},proper={},'
+            'status={})>'.format(
                 self.data,
                 self.name,
                 str(self.id),

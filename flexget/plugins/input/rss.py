@@ -270,8 +270,9 @@ class InputRSS:
                 content = response.content
             except RequestException as e:
                 raise plugin.PluginError(
-                    'Unable to download the RSS for task %s (%s): %s'
-                    % (task.name, config['url'], e)
+                    'Unable to download the RSS for task {} ({}): {}'.format(
+                        task.name, config['url'], e
+                    )
                 )
             if config.get('ascii'):
                 # convert content to ascii (cleanup), can also help with parsing problems on malformed feeds
@@ -288,8 +289,9 @@ class InputRSS:
                 return []
             elif status == 401:
                 raise plugin.PluginError(
-                    'Authentication needed for task %s (%s): %s'
-                    % (task.name, config['url'], response.headers['www-authenticate']),
+                    'Authentication needed for task {} ({}): {}'.format(
+                        task.name, config['url'], response.headers['www-authenticate']
+                    ),
                     logger,
                 )
             elif status == 404:
@@ -367,8 +369,9 @@ class InputRSS:
                     if task.options.debug:
                         logger.error('bozo error parsing rss: {}', ex)
                     raise plugin.PluginError(
-                        'Received invalid RSS content from task %s (%s)'
-                        % (task.name, config['url'])
+                        'Received invalid RSS content from task {} ({})'.format(
+                            task.name, config['url']
+                        )
                     )
                 elif isinstance(ex, http.client.BadStatusLine) or isinstance(ex, OSError):
                     raise ex  # let the @internet decorator handle
@@ -376,8 +379,7 @@ class InputRSS:
                     # all other bozo errors
                     self.process_invalid_content(task, content, config['url'])
                     raise plugin.PluginError(
-                        'Unhandled bozo_exception. Type: %s (task: %s)'
-                        % (ex.__class__.__name__, task.name),
+                        f'Unhandled bozo_exception. Type: {ex.__class__.__name__} (task: {task.name})',
                         logger,
                     )
 

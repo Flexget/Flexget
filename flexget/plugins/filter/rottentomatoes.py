@@ -107,20 +107,23 @@ class FilterRottenTomatoes:
             if 'min_critics_score' in config:
                 if entry.get('rt_critics_score', 0) < config['min_critics_score']:
                     reasons.append(
-                        'min_critics_score (%s < %s)'
-                        % (entry.get('rt_critics_score'), config['min_critics_score'])
+                        'min_critics_score ({} < {})'.format(
+                            entry.get('rt_critics_score'), config['min_critics_score']
+                        )
                     )
             if 'min_audience_score' in config:
                 if entry.get('rt_audience_score', 0) < config['min_audience_score']:
                     reasons.append(
-                        'min_audience_score (%s < %s)'
-                        % (entry.get('rt_audience_score'), config['min_audience_score'])
+                        'min_audience_score ({} < {})'.format(
+                            entry.get('rt_audience_score'), config['min_audience_score']
+                        )
                     )
             if 'min_average_score' in config:
                 if entry.get('rt_average_score', 0) < config['min_average_score']:
                     reasons.append(
-                        'min_average_score (%s < %s)'
-                        % (entry.get('rt_average_score'), config['min_average_score'])
+                        'min_average_score ({} < {})'.format(
+                            entry.get('rt_average_score'), config['min_average_score']
+                        )
                     )
             if 'min_critics_rating' in config:
                 if not entry.get('rt_critics_rating'):
@@ -130,8 +133,9 @@ class FilterRottenTomatoes:
                     < self.critics_ratings[config['min_critics_rating']]
                 ):
                     reasons.append(
-                        'min_critics_rating (%s < %s)'
-                        % (entry.get('rt_critics_rating').lower(), config['min_critics_rating'])
+                        'min_critics_rating ({} < {})'.format(
+                            entry.get('rt_critics_rating').lower(), config['min_critics_rating']
+                        )
                     )
             if 'min_audience_rating' in config:
                 if not entry.get('rt_audience_rating'):
@@ -141,8 +145,9 @@ class FilterRottenTomatoes:
                     < self.audience_ratings[config['min_audience_rating']]
                 ):
                     reasons.append(
-                        'min_audience_rating (%s < %s)'
-                        % (entry.get('rt_audience_rating').lower(), config['min_audience_rating'])
+                        'min_audience_rating ({} < {})'.format(
+                            entry.get('rt_audience_rating').lower(), config['min_audience_rating']
+                        )
                     )
             if 'min_year' in config:
                 if entry.get('rt_year', 0) < config['min_year']:

@@ -102,8 +102,7 @@ class PluginCookies:
                 item = [notabs(field) for field in item]
                 try:
                     s.write(
-                        '%s\t%s\t%s\t%s\t%s\t%s\t%s\n'
-                        % (
+                        '{}\t{}\t{}\t{}\t{}\t{}\t{}\n'.format(
                             item[0],
                             ftstr[item[0].startswith('.')],
                             item[1],

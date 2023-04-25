@@ -688,8 +688,7 @@ class FilterSeries(FilterSeriesBase):
                 if entity < entity.series.begin:
                     for entry in entries:
                         entry.reject(
-                            'Entity `%s` is before begin value of `%s`'
-                            % (entity.identifier, entity.series.begin.identifier)
+                            f'Entity `{entity.identifier}` is before begin value of `{entity.series.begin.identifier}`'
                         )
                     continue
 

@@ -74,8 +74,7 @@ def add_event_handler(name: str, func: Callable, priority: int = 128) -> Event:
     for event in events:
         if event.func == func:
             raise ValueError(
-                '%s has already been registered as event listener under name %s'
-                % (func.__name__, name)
+                f'{func.__name__} has already been registered as event listener under name {name}'
             )
     logger.trace('registered function {} to event {}', func.__name__, name)
     event = Event(name, func, priority)

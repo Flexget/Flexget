@@ -291,8 +291,7 @@ class ImdbEntrySet(MutableSet):
             logger.debug('fetching items from IMDB')
             try:
                 r = self.session.get(
-                    'https://www.imdb.com/list/export?list_id=%s&author_id=%s'
-                    % (self.list_id, self.user_id),
+                    f'https://www.imdb.com/list/export?list_id={self.list_id}&author_id={self.user_id}',
                     cookies=self.cookies,
                 )
                 lines = list(r.iter_lines(decode_unicode=True))

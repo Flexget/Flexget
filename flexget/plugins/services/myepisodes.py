@@ -278,8 +278,9 @@ class MyEpisodes:
 
         except requests.RequestException:
             raise plugin.PluginError(
-                'Failed to mark %s of `%s` as acquired.'
-                % (entry['series_id'], entry['series_name'])
+                'Failed to mark {} of `{}` as acquired.'.format(
+                    entry['series_id'], entry['series_name']
+                )
             )
 
         logger.info('Marked {} of `{}` as acquired.', entry['series_id'], entry['series_name'])

@@ -663,14 +663,12 @@ class Manager:
                             print('')
                     if e.context_mark is not None:
                         print(
-                            ' Check configuration near line %s, column %s'
-                            % (e.context_mark.line, e.context_mark.column)
+                            f' Check configuration near line {e.context_mark.line}, column {e.context_mark.column}'
                         )
                         lines += 1
                     if e.problem_mark is not None:
                         print(
-                            ' Check configuration near line %s, column %s'
-                            % (e.problem_mark.line, e.problem_mark.column)
+                            f' Check configuration near line {e.problem_mark.line}, column {e.problem_mark.column}'
                         )
                         lines += 1
                     if lines:
@@ -811,14 +809,12 @@ class Manager:
         except OperationalError as e:
             if os.path.exists(self.db_filename):
                 print(
-                    '%s - make sure you have write permissions to file %s'
-                    % (e.message, self.db_filename),
+                    f'{e.message} - make sure you have write permissions to file {self.db_filename}',
                     file=sys.stderr,
                 )
             else:
                 print(
-                    '%s - make sure you have write permissions to directory %s'
-                    % (e.message, self.config_base),
+                    f'{e.message} - make sure you have write permissions to directory {self.config_base}',
                     file=sys.stderr,
                 )
             raise

@@ -129,8 +129,7 @@ class PluginFailed:
             if item:
                 if item.count > max_count:
                     entry.reject(
-                        'Has already failed %s times in the past. (failure reason: %s)'
-                        % (item.count, item.reason)
+                        f'Has already failed {item.count} times in the past. (failure reason: {item.reason})'
                     )
                 elif item.retry_time and item.retry_time > datetime.now():
                     entry.reject(

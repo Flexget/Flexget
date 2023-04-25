@@ -170,8 +170,7 @@ def remove(manager, options, forget=False):
                 console(e.args[0])
             else:
                 console(
-                    'Removed entities(s) matching `%s` from series `%s`.'
-                    % (identifier, name.capitalize())
+                    f'Removed entities(s) matching `{identifier}` from series `{name.capitalize()}`.'
                 )
     else:
         # remove whole series

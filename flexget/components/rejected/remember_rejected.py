@@ -79,8 +79,7 @@ class FilterRememberRejected:
                     ).first()
                     if reject_entry:
                         entry.reject(
-                            'Rejected on behalf of %s plugin: %s'
-                            % (reject_entry.rejected_by, reject_entry.reason)
+                            f'Rejected on behalf of {reject_entry.rejected_by} plugin: {reject_entry.reason}'
                         )
 
     def on_entry_reject(self, entry, remember=None, remember_time=None, **kwargs):
