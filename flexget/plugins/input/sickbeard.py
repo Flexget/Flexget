@@ -96,8 +96,9 @@ class Sickbeard:
             json = task.requests.get(url).json()
         except RequestException as e:
             raise plugin.PluginError(
-                'Unable to connect to Sickbeard at %s://%s:%s%s. Error: %s'
-                % (parsedurl.scheme, parsedurl.netloc, config.get('port'), parsedurl.path, e)
+                'Unable to connect to Sickbeard at {}://{}:{}{}. Error: {}'.format(
+                    parsedurl.scheme, parsedurl.netloc, config.get('port'), parsedurl.path, e
+                )
             )
         entries = []
         for _, show in list(json['data'].items()):

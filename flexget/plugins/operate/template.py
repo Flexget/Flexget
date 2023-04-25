@@ -111,8 +111,7 @@ class PluginTemplate:
                 task.merge_config(template_config)
             except MergeException as exc:
                 raise plugin.PluginError(
-                    'Failed to merge template %s to task %s. Error: %s'
-                    % (template, task.name, exc.value)
+                    f'Failed to merge template {template} to task {task.name}. Error: {exc.value}'
                 )
 
         logger.trace('templates: {}', config)

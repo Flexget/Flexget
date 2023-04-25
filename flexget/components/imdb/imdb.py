@@ -139,8 +139,9 @@ class FilterImdb:
             if 'min_meta_score' in config:
                 if entry.get('imdb_meta_score', 0) < config['min_meta_score']:
                     reasons.append(
-                        'min_meta_score (%s < %s)'
-                        % (entry.get('imdb_meta_score'), config['min_meta_score'])
+                        'min_meta_score ({} < {})'.format(
+                            entry.get('imdb_meta_score'), config['min_meta_score']
+                        )
                     )
             if 'min_year' in config:
                 if entry.get('imdb_year', 0) < config['min_year']:

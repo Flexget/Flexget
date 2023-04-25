@@ -1027,8 +1027,7 @@ def get_trakt_id_from_id(trakt_ids, media_type):
             ).json()
         except requests.RequestException as e:
             raise LookupError(
-                'Searching trakt for %s=%s failed with error: %s'
-                % (stripped_id_type, identifier, e)
+                f'Searching trakt for {stripped_id_type}={identifier} failed with error: {e}'
             )
         for result in results:
             if result['type'] != media_type:
@@ -1073,8 +1072,7 @@ def get_trakt_data(media_type, title=None, year=None, trakt_ids=None):
 
     if not trakt_id:
         raise LookupError(
-            'No results on Trakt.tv, title=%s, ids=%s.'
-            % (title, trakt_ids.to_dict if trakt_ids else None)
+            f'No results on Trakt.tv, title={title}, ids={trakt_ids.to_dict if trakt_ids else None}.'
         )
 
     # Get actual data from trakt
@@ -1129,8 +1127,7 @@ def get_user_data(data_type, media_type, session, username):
 
     except requests.RequestException as e:
         raise plugin.PluginError(
-            'Error fetching data from trakt.tv endpoint %s for user %s: %s'
-            % (endpoint, username, e)
+            f'Error fetching data from trakt.tv endpoint {endpoint} for user {username}: {e}'
         )
 
 

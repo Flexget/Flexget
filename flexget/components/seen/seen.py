@@ -95,8 +95,9 @@ class FilterSeen:
                         .one()
                     )
                     entry.reject(
-                        'Entry with %s `%s` is already marked seen in the task %s at %s'
-                        % (found.field, found.value, se.task, se.added.strftime('%Y-%m-%d %H:%M')),
+                        'Entry with {} `{}` is already marked seen in the task {} at {}'.format(
+                            found.field, found.value, se.task, se.added.strftime('%Y-%m-%d %H:%M')
+                        ),
                         remember=remember_rejected,
                     )
 

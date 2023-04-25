@@ -102,14 +102,12 @@ class XmlRpcClient(RpcClient):
             self._aria2 = xmlrpc.client.ServerProxy(self.url, context=schemes[scheme]).aria2
         except xmlrpc.client.ProtocolError as exc:
             raise plugin.PluginError(
-                'Could not connect to aria2 at %s. Protocol error %s: %s'
-                % (self.url, exc.errcode, exc.errmsg),
+                f'Could not connect to aria2 at {self.url}. Protocol error {exc.errcode}: {exc.errmsg}',
                 logger,
             ) from exc
         except xmlrpc.client.Fault as exc:
             raise plugin.PluginError(
-                'XML-RPC fault: Unable to connect to aria2 daemon at %s: %s'
-                % (self.url, exc.faultString),
+                f'XML-RPC fault: Unable to connect to aria2 daemon at {self.url}: {exc.faultString}',
                 logger,
             ) from exc
         except OSError as exc:

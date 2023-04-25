@@ -189,8 +189,7 @@ class IRCConnection(SimpleIRCBot):
 
                 if self.config.get(value_name) is None:
                     raise MissingConfigOption(
-                        'missing configuration option on irc config %s: %s'
-                        % (self.connection_name, value_name)
+                        f'missing configuration option on irc config {self.connection_name}: {value_name}'
                     )
 
             # Get the tracker name, for use in the connection name

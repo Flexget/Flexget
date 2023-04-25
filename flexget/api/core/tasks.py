@@ -517,7 +517,7 @@ class TaskExecutionAPI(APIResource):
                 except Empty:
                     pass
 
-                if queue.empty() and all([task['event'].is_set() for task in tasks_queued]):
+                if queue.empty() and all(task['event'].is_set() for task in tasks_queued):
                     for task in tasks_queued:
                         del _streams[task['id']]
                     break
