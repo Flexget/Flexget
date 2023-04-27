@@ -25,5 +25,6 @@ RUN ls -ahl /wheels && \
     pip install --no-cache-dir \
                 --no-index \
                 -f /wheels \
+                --no-deps \
                 FlexGet && \
     rm -rf /wheels
