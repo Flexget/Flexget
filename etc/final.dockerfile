@@ -20,7 +20,6 @@ RUN python /flexget/dev_tools.py bundle-webui
 RUN pip wheel -e /flexget
 
 FROM flexget:base
-ENV PYTHONUNBUFFERED 1
 
 COPY --from=0 /wheels /wheels
 COPY --from=0 /flexget/requirements-docker.txt /requirements-docker.txt
