@@ -19,7 +19,7 @@ RUN pip install -U pip && \
 RUN python /flexget/dev_tools.py bundle-webui
 RUN pip wheel -e /flexget
 
-FROM localhost:5000/flexget/flexget:base
+FROM flexget:base
 
 COPY --from=0 /wheels /wheels
 COPY --from=0 /flexget/requirements-docker.txt /requirements-docker.txt

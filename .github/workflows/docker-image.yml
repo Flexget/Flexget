@@ -25,7 +25,7 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
         with:
-          driver-opts: network=host
+          driver-opts: docker
 
       - name: Build Base Docker Image
         uses: docker/build-push-action@v4
@@ -33,7 +33,7 @@ jobs:
           context: ./
           file: ./etc/base.dockerfile
           push: true
-          tags: localhost:5000/flexget/flexget:base
+          tags: flexget:base
           platforms: linux/amd64
           cache-from: type=gha, scope=${{ github.workflow }}
           cache-to: type=gha, scope=${{ github.workflow }}
