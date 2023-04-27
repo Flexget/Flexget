@@ -54,6 +54,7 @@ jobs:
           cache-to: type=gha, scope=${{ github.workflow }}
 
   build:
+    runs-on: ubuntu-latest
     permissions:
       contents: read # to fetch code (actions/checkout)
       packages: write # to push to ghcr.io
@@ -116,7 +117,7 @@ jobs:
         with:
           images: |
             flexget/flexget
-            ghcr.io/flexget/flexget
+            ${{ env.IMAGE }}
           tags: |
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
