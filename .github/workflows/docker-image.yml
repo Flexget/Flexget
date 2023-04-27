@@ -32,10 +32,9 @@ jobs:
         with:
           context: ./
           file: ./etc/base.dockerfile
-          push: true
+          push: false
           tags: flexget:base
           platforms: linux/amd64
-          cache-from: type=gha, scope=${{ github.workflow }}
 
       - name: Build Final Docker Image
         uses: docker/build-push-action@v4
