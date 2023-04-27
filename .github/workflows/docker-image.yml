@@ -39,6 +39,10 @@ jobs:
           output: type=docker
           load: true
 
+      - name: Inspect
+        run: |
+          docker image inspect flexget:base
+
       - name: Build Final Docker Image
         uses: docker/build-push-action@v4
         with:
