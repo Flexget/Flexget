@@ -22,8 +22,7 @@ jobs:
       - name: Setup QEMU
         uses: docker/setup-qemu-action@v2
 
-      - name: Setup Docker Buildx
-        id: buildx
+      - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
         with:
           driver-opts: network=host
