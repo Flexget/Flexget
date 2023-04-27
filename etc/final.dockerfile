@@ -1,3 +1,5 @@
+ARG BASE_DOCKER_IMAGE
+
 FROM docker.io/python:3.11-alpine as builder
 ENV PYTHONUNBUFFERED 1
 
@@ -17,7 +19,6 @@ RUN pip install -U pip && \
 RUN python /flexget/dev_tools.py bundle-webui
 RUN pip wheel --no-deps -e /flexget
 
-ARG BASE_DOCKER_IMAGE
 FROM $BASE_DOCKER_IMAGE
 
 COPY --from=builder /wheels /wheels
