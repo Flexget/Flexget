@@ -1,3 +1,4 @@
+# must keep this line before the first `FROM` to make dynamic FROM work.
 ARG BASE_DOCKER_IMAGE
 
 FROM docker.io/python:3.11-alpine as builder
