@@ -54,7 +54,6 @@ jobs:
           cache-to: type=gha, scope=${{ github.workflow }}
 
   build:
-    if: false
     permissions:
       contents: read # to fetch code (actions/checkout)
       packages: write # to push to ghcr.io
