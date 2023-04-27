@@ -1,4 +1,4 @@
-FROM docker.io/python:3.11-alpine
+FROM docker.io/python:3.11-alpine as builder
 ENV PYTHONUNBUFFERED 1
 
 RUN apk add --no-cache --upgrade \
@@ -21,9 +21,9 @@ RUN pip wheel -e /flexget
 
 FROM flexget:base
 
-COPY --from=0 /wheels /wheels
+COPY --from=builder /wheels /wheels
 
-RUN pip install -U pip && \
+RUN ls -ahl /wheels
     pip install --no-cache-dir \
                 --no-index \
                 FlexGet && \
