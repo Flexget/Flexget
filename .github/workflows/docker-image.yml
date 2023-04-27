@@ -61,13 +61,6 @@ jobs:
     env:
       IMAGE: "ghcr.io/${{ github.repository_owner }}/flexget"
 
-    runs-on: ubuntu-latest
-    services:
-      registry:
-        image: registry:2
-        ports:
-          - 5000:5000
-
     steps:
       - uses: actions/checkout@v3
 
@@ -77,8 +70,6 @@ jobs:
       - name: Setup Docker Buildx
         id: buildx
         uses: docker/setup-buildx-action@v2
-        with:
-          driver-opts: network=host
 
       - name: Log in to Docker Hub
         if: github.event_name != 'pull_request'
