@@ -133,7 +133,7 @@ jobs:
           file: ./etc/final.dockerfile
           builder: ${{ steps.buildx.output.name }}
           ARGS: BASE_DOCKER_IMAGE=${{ env.IMAGE }}:${{ env.TAG_HASH }}
-          push: ${{ github.event_name == 'push' && github.ref != 'refs/heads/master' }}
+          push: true
           platforms: linux/amd64
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
