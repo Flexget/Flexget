@@ -7,6 +7,7 @@ RUN apk add --no-cache --upgrade \
         build-base \
         libffi-dev \
         openssl-dev \
+        git \
         cargo \
         rust \
         unzip && \
