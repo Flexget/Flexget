@@ -3,12 +3,10 @@ ENV PYTHONUNBUFFERED 1
 
 RUN apk add --no-cache --upgrade \
         ca-certificates \
-        nodejs \
         build-base \
         libffi-dev \
         openssl-dev \
-        unzip && \
-    rm -rf /var/cache/apk/*
+        unzip
 
 WORKDIR /wheels
 
