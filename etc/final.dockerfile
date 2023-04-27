@@ -17,7 +17,8 @@ RUN pip install -U pip && \
 RUN python /flexget/dev_tools.py bundle-webui
 RUN pip wheel --no-deps -e /flexget
 
-FROM localhost:5000/name/app:latest
+ARG BASE_DOCKER_IMAGE
+FROM $BASE_DOCKER_IMAGE
 
 COPY --from=builder /wheels /wheels
 

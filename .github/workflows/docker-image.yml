@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - develop
-      - small-docker
     tags:
       - v*.*.*
   pull_request:
@@ -49,6 +48,7 @@ jobs:
           context: ./
           file: ./etc/final.dockerfile
           push: false
+          ARGS: BASE_DOCKER_IMAGE=localhost:5000/name/app:latest
           platforms: linux/amd64
           cache-from: type=gha, scope=${{ github.workflow }}
           cache-to: type=gha, scope=${{ github.workflow }}
@@ -58,6 +58,9 @@ jobs:
     permissions:
       contents: read # to fetch code (actions/checkout)
       packages: write # to push to ghcr.io
+
+    env:
+      IMAGE: "ghcr.io/${{ github.repository_owner }}/flexget"
 
     runs-on: ubuntu-latest
     services:
@@ -93,13 +96,32 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ github.token }}
 
+      - run: |
+          export "TAG_HASH=base-${HASH_POETRY_LOCK:0:10}-${HASH_BASE_DOCKER:0:10}"
+          echo "TAG_HASH=${TAG_HASH}" >> $GITHUB_ENV
+
+          if ! docker pull "${IMAGE}:base-${TAG_HASH}"; then
+            echo "BUILD_BASE=true" >> $GITHUB_ENV
+            echo "build base docker image"
+            docker build -t "${IMAGE}:${TAG_HASH}" -f etc/base.dockerfile .
+            docker push "${IMAGE}:${TAG_HASH}"
+          fi
+
+          docker tag "${IMAGE}:${TAG_HASH}" base-image
+
+        env:
+          HASH_POETRY_LOCK: "${{ hashFiles('requirements-docker.txt') }}"
+          HASH_BASE_DOCKER: "${{ hashFiles('etc/base.dockerfile') }}"
+        name: build base docker image
+
       - name: Build Base Docker Image
         uses: docker/build-push-action@v4
+        if: ${{ env.BUILD_BASE }}
         with:
           context: ./
           file: ./etc/base.dockerfile
           push: true
-          tags: localhost:5000/name/app:latest
+          tags: ${{ env.IMAGE }}:${{ env.TAG_HASH }}
           platforms: linux/amd64
           cache-from: type=gha, scope=${{ github.workflow }}
           cache-to: type=gha, scope=${{ github.workflow }}
@@ -124,6 +146,7 @@ jobs:
           context: ./
           file: ./etc/final.dockerfile
           builder: ${{ steps.buildx.output.name }}
+          ARGS: BASE_DOCKER_IMAGE=${{ env.IMAGE }}:${{ env.TAG_HASH }}
           push: ${{ github.event_name == 'push' && github.ref != 'refs/heads/master' }}
           platforms: linux/amd64
           tags: ${{ steps.meta.outputs.tags }}
