@@ -55,6 +55,7 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'push' && github.ref != 'refs/heads/master' }}
     permissions:
       contents: read # to fetch code (actions/checkout)
       packages: write # to push to ghcr.io
