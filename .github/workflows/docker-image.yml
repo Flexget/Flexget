@@ -38,6 +38,7 @@ jobs:
           cache-to: type=gha, scope=${{ github.workflow }}
           outputs: |
             type=docker dest=.
+          load: true
 
       - name: Build Final Docker Image
         uses: docker/build-push-action@v4
