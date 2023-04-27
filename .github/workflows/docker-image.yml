@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - develop
+      - small-docker
     tags:
       - v*.*.*
   pull_request:
@@ -33,26 +34,6 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v2
-        if: github.event_name == 'push'
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ github.token }}
-
-      - name: Docker metadata
-        id: meta
-        uses: docker/metadata-action@v4
-        with:
-          images: |
-            flexget/flexget
-            ghcr.io/flexget/flexget
-          tags: |
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=semver,pattern={{major}}
-            type=ref,event=branch
       - name: Build Base Docker Image
         id: docker_build
         uses: docker/build-push-action@v4
