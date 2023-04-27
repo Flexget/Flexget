@@ -23,7 +23,7 @@ FROM localhost:5000/name/app:latest
 
 COPY --from=builder /wheels /wheels
 
-RUN ls -ahl /wheels
+RUN ls -ahl /wheels && \
     pip install --no-cache-dir \
                 --no-index \
                 FlexGet && \
