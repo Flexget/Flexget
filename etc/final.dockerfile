@@ -22,7 +22,6 @@ RUN pip wheel -e /flexget
 FROM flexget:base
 
 COPY --from=0 /wheels /wheels
-COPY --from=0 /flexget/requirements-docker.txt /requirements-docker.txt
 
 RUN pip install -U pip && \
     pip install --no-cache-dir \
