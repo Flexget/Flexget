@@ -34,7 +34,7 @@ jobs:
         with:
           context: ./
           file: ./etc/base.dockerfile
-          push: push
+          push: true
           tags: localhost:5000/name/app:latest
           platforms: linux/amd64
           cache-from: type=gha, scope=${{ github.workflow }}
