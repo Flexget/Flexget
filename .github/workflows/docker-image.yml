@@ -35,7 +35,6 @@ jobs:
           push: true
           tags: localhost:5000/name/app:latest
           platforms: linux/amd64
-          load: true
           cache-from: type=gha, scope=${{ github.workflow }}
           cache-to: type=gha, scope=${{ github.workflow }}
 
