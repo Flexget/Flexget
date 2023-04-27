@@ -19,7 +19,7 @@ RUN pip install -U pip && \
 RUN python /flexget/dev_tools.py bundle-webui
 RUN pip wheel -e /flexget
 
-FROM flexget:base
+FROM localhost:5000/name/app:latest
 
 COPY --from=builder /wheels /wheels
 

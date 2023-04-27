@@ -11,7 +11,7 @@ on:
     branches:
       - "*"
 
-permissions: {}
+permissions: { }
 
 jobs:
   test:
@@ -25,16 +25,20 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
         with:
-          driver: docker
+          #          driver: docker
+          driver-opts: |
+            network=host
 
       - name: Build Base Docker Image
         uses: docker/build-push-action@v4
         with:
           context: ./
           file: ./etc/base.dockerfile
-          push: false
-          tags: flexget:base
+          push: push
+          tags: localhost:5000/name/app:latest
           platforms: linux/amd64
+          cache-from: type=gha, scope=${{ github.workflow }}
+          cache-to: type=gha, scope=${{ github.workflow }}
 
       - name: Build Final Docker Image
         uses: docker/build-push-action@v4
@@ -43,6 +47,8 @@ jobs:
           file: ./etc/final.dockerfile
           push: false
           platforms: linux/amd64
+          cache-from: type=gha, scope=${{ github.workflow }}
+          cache-to: type=gha, scope=${{ github.workflow }}
 
   build:
     if: false
