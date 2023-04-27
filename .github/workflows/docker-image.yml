@@ -34,7 +34,7 @@ jobs:
           context: ./
           file: ./etc/base.dockerfile
           push: true
-          tags: localhost:5000/flexget:base
+          tags: localhost:5000/flexget/flexget:base
           platforms: linux/amd64
           cache-from: type=gha, scope=${{ github.workflow }}
           cache-to: type=gha, scope=${{ github.workflow }}
