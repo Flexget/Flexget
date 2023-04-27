@@ -30,7 +30,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: ./
-          file: ./base.dockerfile
+          file: ./etc/base.dockerfile
           push: false
           tags: flexget:base
           platforms: linux/amd64
@@ -41,14 +41,14 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: ./
-          file: ./final.dockerfile
+          file: ./etc/final.dockerfile
           push: false
           platforms: linux/amd64
           cache-from: type=gha, scope=${{ github.workflow }}
           cache-to: type=gha, scope=${{ github.workflow }}
 
   build:
-    if: ${{ github.event_name == 'push' && github.ref != 'refs/heads/master' }}
+    if: false
     permissions:
       contents: read # to fetch code (actions/checkout)
       packages: write # to push to ghcr.io
