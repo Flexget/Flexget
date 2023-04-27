@@ -25,7 +25,7 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
         with:
-          driver-opts: docker
+          driver: docker
 
       - name: Build Base Docker Image
         uses: docker/build-push-action@v4
