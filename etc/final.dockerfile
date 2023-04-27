@@ -12,7 +12,7 @@ RUN apk add --no-cache --upgrade \
 
 WORKDIR /wheels
 
-COPY . /flexget
+COPY .. /flexget
 
 RUN pip install -U pip && \
     pip install -r /flexget/dev-requirements.txt
