@@ -26,5 +26,6 @@ COPY --from=builder /wheels /wheels
 RUN ls -ahl /wheels && \
     pip install --no-cache-dir \
                 --no-index \
-                --pre FlexGet && \
+                -f /wheels \
+                FlexGet && \
     rm -rf /wheels
