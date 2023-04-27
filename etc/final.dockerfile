@@ -17,7 +17,7 @@ COPY .. /flexget
 RUN pip install -U pip && \
     pip install -r /flexget/dev-requirements.txt
 RUN python /flexget/dev_tools.py bundle-webui
-RUN pip wheel -e /flexget
+RUN pip wheel --no-deps -e /flexget
 
 FROM localhost:5000/name/app:latest
 
