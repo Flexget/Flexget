@@ -189,6 +189,9 @@ def filter_get_year(name: str) -> str:
 
 def filter_parse_size(val: str, match_re: Optional[str] = None) -> int:
     """Parse human-readable file size to bytes"""
+    if not isinstance(val, str):
+        return val
+    
     match_re = match_re or r'^(?P<digit>\d+(?:\.\d+)?)\s*(?P<unit>[a-zA-Z]+B)$'
     matched_size = re.match(match_re, val)
 
