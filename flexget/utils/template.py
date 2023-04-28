@@ -187,6 +187,32 @@ def filter_get_year(name: str) -> str:
     return split_title_year(name).year
 
 
+def filter_parse_size(val: str, match_re: Optional[str] = None) -> int:
+    """Parse human-readable file size to bytes"""
+    match_re = match_re or r'^(?P<digit>\d+(?:\.\d+)?)\s*(?P<unit>[a-zA-Z]+B)$'
+    matched_size = re.match(match_re, val)
+
+    if matched_size:
+        unit = matched_size['unit']
+        size_map = {
+            'B': 1,
+            'KB': 1024,
+            'KiB': 1024,
+            'MB': 1024**2,
+            'MiB': 1024**2,
+            'GB': 1024**3,
+            'GiB': 1024**3,
+            'TB': 1024**4,
+            'TiB': 1024**4,
+            'PB': 1024**5,
+            'PiB': 1024**5,
+        }
+        if unit in size_map:
+            size = float(matched_size['digit'])
+            return int(size * size_map[unit])
+    return 0
+
+
 def is_fs_file(pathname: Union[str, os.PathLike]) -> bool:
     """Test whether item is existing file in filesystem"""
     return os.path.isfile(pathname)
