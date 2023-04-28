@@ -37,6 +37,7 @@ class TestJinjaFilters:
         'to_date',
         'strip_year',
         'get_year',
+        'parse_size',
         'asciify',
         'strip_symbols',
     ]
