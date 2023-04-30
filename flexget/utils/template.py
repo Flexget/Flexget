@@ -187,29 +187,34 @@ def filter_get_year(name: str) -> str:
     return split_title_year(name).year
 
 
-def filter_parse_size(val: str, match_re: Optional[str] = None) -> int:
+def filter_parse_size(val: str, match_re: Optional[str] = None, si: bool = False) -> int:
     """Parse human-readable file size to bytes"""
     if not isinstance(val, str):
         return val
 
-    match_re = match_re or r'^(?P<digit>\d+(?:\.\d+)?)\s*(?P<unit>[a-zA-Z]+B)$'
-    matched_size = re.match(match_re, val)
+    carry = 1000 if si else 1024
+    size_map = {
+        'B': 1,
+        'KB': carry,
+        'MB': carry**2,
+        'GB': carry**3,
+        'TB': carry**4,
+        'PB': carry**5,
+        'EB': carry**6,
+        'KiB': 1024,
+        'MiB': 1024**2,
+        'GiB': 1024**3,
+        'TiB': 1024**4,
+        'PiB': 1024**5,
+        'EiB': 1024**6,
+    }
+
+    match_re = match_re or r'(?P<digit>\d+(?:\.\d+)?)\s*(?P<unit>[A-Z]?i?B)'
+    matched_size = re.search(match_re, val)
 
     if matched_size:
         unit = matched_size['unit']
-        size_map = {
-            'B': 1,
-            'KB': 1024,
-            'KiB': 1024,
-            'MB': 1024**2,
-            'MiB': 1024**2,
-            'GB': 1024**3,
-            'GiB': 1024**3,
-            'TB': 1024**4,
-            'TiB': 1024**4,
-            'PB': 1024**5,
-            'PiB': 1024**5,
-        }
+
         if unit in size_map:
             size = float(matched_size['digit'])
             return int(size * size_map[unit])
