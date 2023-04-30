@@ -19,6 +19,18 @@ class TestJinjaFilters:
             set:
               name: "{{title|strip_year}}"
               year: "{{title|get_year}}"
+          parse_size:
+            mock:
+              - {"title": "The Matrix [13.84GB]", "actual": 13.84 }
+              - {"title": "The Matrix [13.84 GB]", "actual": 13.84 }
+              - {"title": "The Matrix [13.84 GiB]", "actual": 13.84 }
+              - {"title": "The Matrix [13 GB]", "actual": 13 }
+            
+            accept_all: yes
+
+            set:
+              size: "{{title|parse_size}}"
+              size_si: "{{title|parse_size(si=True)}}"
     """
 
     custom_filters = [
@@ -63,6 +75,24 @@ class TestJinjaFilters:
 
         assert task.accepted[5]['name'] == 2000
         assert task.accepted[5]['year'] == 2020
+
+    def test_parse_size(self, execute_task):
+        task = execute_task('parse_size')
+
+        assert len(task.accepted) == 4
+
+        assert task.accepted[0]['size'] == int(task.accepted[0]['actual'] * 1024**3)
+        assert task.accepted[0]['size_si'] == int(task.accepted[0]['actual'] * 1000**3)
+
+        assert task.accepted[1]['size'] == int(task.accepted[1]['actual'] * 1024**3)
+        assert task.accepted[1]['size_si'] == int(task.accepted[1]['actual'] * 1000**3)
+
+        assert task.accepted[2]['size'] == int(task.accepted[2]['actual'] * 1024**3)
+        # GiB is always 1024 based
+        assert task.accepted[2]['size_si'] == int(task.accepted[2]['actual'] * 1024**3)
+
+        assert task.accepted[3]['size'] == int(task.accepted[3]['actual'] * 1024**3)
+        assert task.accepted[3]['size_si'] == int(task.accepted[3]['actual'] * 1000**3)
 
     @pytest.mark.parametrize('test_filter', custom_filters)
     def test_undefined_preserved(self, test_filter):
