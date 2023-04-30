@@ -192,15 +192,15 @@ def filter_parse_size(val: str, match_re: Optional[str] = None, si: bool = False
     if not isinstance(val, str):
         return val
 
-    carry = 1000 if si else 1024
+    base = 1000 if si else 1024
     size_map = {
         'B': 1,
-        'KB': carry,
-        'MB': carry**2,
-        'GB': carry**3,
-        'TB': carry**4,
-        'PB': carry**5,
-        'EB': carry**6,
+        'KB': base,
+        'MB': base**2,
+        'GB': base**3,
+        'TB': base**4,
+        'PB': base**5,
+        'EB': base**6,
         'KiB': 1024,
         'MiB': 1024**2,
         'GiB': 1024**3,
@@ -209,7 +209,7 @@ def filter_parse_size(val: str, match_re: Optional[str] = None, si: bool = False
         'EiB': 1024**6,
     }
 
-    match_re = match_re or r'(?P<digit>\d+(?:\.\d+)?)\s*(?P<unit>[A-Z]?i?B)'
+    match_re = match_re or r'(?P<digit>\d+(?:\.\d+)?)\s*(?P<unit>[KMGTPE]?i?B)'
     matched_size = re.search(match_re, val)
 
     if matched_size:
