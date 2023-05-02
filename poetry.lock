@@ -932,14 +932,14 @@ testing = ["covdefaults (>=2.2.2)", "coverage (>=6.5)", "pytest (>=7.2)", "pytes
 
 [[package]]
 name = "flask"
-version = "2.2.2"
+version = "2.2.4"
 description = "A simple framework for building complex web applications."
 category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "Flask-2.2.2-py3-none-any.whl", hash = "sha256:b9c46cc36662a7949f34b52d8ec7bb59c0d74ba08ba6cb9ce9adc1d8676d9526"},
-    {file = "Flask-2.2.2.tar.gz", hash = "sha256:642c450d19c4ad482f96729bd2a8f6d32554aa1e231f4f6b4e7e5264b16cca2b"},
+    {file = "Flask-2.2.4-py3-none-any.whl", hash = "sha256:13f6329ddbfff11340939cd11919daf150a01358ded4b7e81c03c055dfecb559"},
+    {file = "Flask-2.2.4.tar.gz", hash = "sha256:77504c4c097f56ac5f29b00f9009213010cf9d2923a288c0e0564a5db2bb53d6"},
 ]
 
 [package.dependencies]
