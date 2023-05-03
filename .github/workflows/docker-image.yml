@@ -65,7 +65,7 @@ jobs:
           file: ./Dockerfile
           builder: ${{ steps.buildx.output.name }}
           push: ${{ github.event_name == 'push' && github.ref != 'refs/heads/master' }}
-          platforms: linux/amd64
+          platforms: linux/amd64,linux/arm64,linux/386,linux/arm/v7,linux/arm/v6
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha, scope=${{ github.workflow }}
