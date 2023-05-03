@@ -187,7 +187,9 @@ def filter_get_year(name: str) -> str:
     return split_title_year(name).year
 
 
-def filter_parse_size(val: str, match_re: Optional[str] = None, si: bool = False) -> int:
+def filter_parse_size(
+    val: str, match_re: Optional[str] = None, si: bool = False, case: bool = True
+) -> int:
     """Parse human-readable file size to bytes"""
     if not isinstance(val, str):
         return val
@@ -208,16 +210,17 @@ def filter_parse_size(val: str, match_re: Optional[str] = None, si: bool = False
         'PiB': 1024**5,
         'EiB': 1024**6,
     }
+    size_map = {k.casefold(): v for k, v in size_map.items()}
 
     match_re = match_re or r'(?P<digit>\d+(?:\.\d+)?)\s*(?P<unit>[KMGTPE]?i?B)'
-    matched_size = re.search(match_re, val)
+    matched_size = re.search(match_re, val, flags=0 if case else re.IGNORECASE)
 
     if matched_size:
-        unit = matched_size['unit']
-
-        if unit in size_map:
+        unit = matched_size['unit'].casefold()
+        unit_base = size_map.get(unit)
+        if unit_base is not None:
             size = float(matched_size['digit'])
-            return int(size * size_map[unit])
+            return int(size * unit_base)
     return 0
 
 
