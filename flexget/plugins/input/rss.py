@@ -3,11 +3,10 @@ import http.client
 import os
 import posixpath
 import xml.sax
-from datetime import datetime
 from urllib.parse import urlparse, urlsplit
 
-import dateutil.parser
 import feedparser
+import pendulum
 from loguru import logger
 from requests import RequestException
 
@@ -20,7 +19,11 @@ from flexget.utils.pathscrub import pathscrub
 from flexget.utils.tools import decode_html
 
 logger = logger.bind(name='rss')
-feedparser.registerDateHandler(lambda date_string: dateutil.parser.parse(date_string).timetuple())
+feedparser.registerDateHandler(
+    lambda date_string: pendulum.parse(date_string, tz="UTC", strict=False)
+    .in_tz("UTC")
+    .timetuple()
+)
 
 
 def fp_field_name(name):
@@ -494,7 +497,7 @@ class InputRSS:
                             )
                 # Also grab pubdate if available
                 if hasattr(entry, 'published_parsed') and entry.published_parsed:
-                    ea['rss_pubdate'] = datetime(*entry.published_parsed[:6])
+                    ea['rss_pubdate'] = pendulum.parse(entry.published, tz="UTC", strict=False)
                 # store basic auth info
                 if 'username' in config and 'password' in config:
                     ea['download_auth'] = (config['username'], config['password'])

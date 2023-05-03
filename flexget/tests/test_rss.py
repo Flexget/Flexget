@@ -1,3 +1,4 @@
+import pendulum
 import pytest
 import yaml
 
@@ -49,6 +50,8 @@ class TestInputRSS:
               <<: *rss
               other_fields:
                 - content
+          test_pubdate:
+            rss: *rss
     """
 
     def test_rss(self, execute_task):
@@ -175,6 +178,10 @@ class TestInputRSS:
         assert task.find_entry(
             title='Multiple content items', content='<p>test content1</p><p>test content2</p>'
         ), 'RSS entry missing: multiple content tags'
+
+    def test_pubdate(self, execute_task):
+        task = execute_task("test_pubdate")
+        assert task.entries[0]["rss_pubdate"] == pendulum.datetime(2008, 12, 28, 16, 0, 0)
 
 
 class TestEscapeInputRSS:
