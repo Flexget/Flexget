@@ -283,7 +283,7 @@ class PluginTransmissionInput(TransmissionBase):
             entry['transmission_error_state'] = st_error_to_desc[torrent.error]
             # Built in done_date doesn't work when user adds an already completed file to transmission
             if torrent.progress == 100:
-                entry['transmission_date_done'] = max(torrent.added_date, torrent.done_date)
+                entry['transmission_date_done'] = torrent.done_date or torrent.added_date
 
             entries.append(entry)
         return entries
