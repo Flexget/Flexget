@@ -1,9 +1,11 @@
 import functools
 import types
 import warnings
+from datetime import datetime
 from enum import Enum
 from typing import Callable, Iterable, Mapping, Optional, Sequence, Union
 
+import pendulum
 from loguru import logger
 
 from flexget import plugin
@@ -232,6 +234,12 @@ class Entry(LazyDict, Serializer):
             isinstance(value, str) and type(value) != str
         ):  # pylint: disable=unidiomatic-typecheck
             value = str(value)
+        elif isinstance(value, datetime):
+            value = pendulum.instance(value, tz=None)
+            if not value.tz:
+                logger.warning(
+                    f"{key} was set to a naive datetime. Plugin should be updated to provide a timezone aware datetime"
+                )
 
         # url and original_url handling
         if key == 'url':
