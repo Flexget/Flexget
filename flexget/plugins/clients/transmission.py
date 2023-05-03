@@ -9,6 +9,8 @@ from time import sleep
 from typing import TYPE_CHECKING
 from urllib.parse import urlparse
 
+import pendulum
+
 try:
     import importlib.metadata as importlib_metadata
 except ImportError:
@@ -139,14 +141,13 @@ class TransmissionBase:
 
         if torrent.get('seedIdleMode') == 1:  # use torrent's own idle limit
             idle_limit_ok = (
-                torrent.activity_date + timedelta(minutes=torrent.seed_idle_limit)
-                < datetime.now().astimezone()
+                torrent.activity_date + timedelta(minutes=torrent.seed_idle_limit) < pendulum.now()
             )
         elif torrent.get('seedIdleMode') == 0:  # use global rules
             if session.idle_seeding_limit_enabled:
                 idle_limit_ok = (
                     torrent.activity_date + timedelta(minutes=session.idle_seeding_limit)
-                    < datetime.now().astimezone()
+                    < pendulum.now()
                 )
 
         return seed_limit_ok, idle_limit_ok
@@ -259,10 +260,6 @@ class PluginTransmissionInput(TransmissionBase):
                         'error when requesting transmissionrpc attribute {}', attr
                     )
                 else:
-                    # transmission-rpc adds timezone info to datetimes,
-                    # which makes them hard to deal with. Strip it.
-                    if isinstance(value, datetime):
-                        value = value.replace(tzinfo=None)
                     entry['transmission_' + attr] = value
             # Availability in percent
             entry['transmission_availability'] = (

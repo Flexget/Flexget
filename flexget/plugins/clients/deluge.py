@@ -5,6 +5,7 @@ import sys
 import time
 from pathlib import Path
 
+import pendulum
 from loguru import logger
 
 from flexget import plugin
@@ -88,7 +89,7 @@ class DelugePlugin:
 class InputDeluge(DelugePlugin):
     """Create entries for torrents in the deluge session."""
 
-    # Fields we provide outside of the deluge_ prefixed namespace
+    # Fields we provide special cases for
     settings_map = {
         'name': 'title',
         'hash': 'torrent_info_hash',
@@ -96,6 +97,12 @@ class InputDeluge(DelugePlugin):
         'num_seeds': 'torrent_seeds',
         'total_size': ('content_size', lambda size: size / 1024 / 1024),
         'files': ('content_files', lambda file_dicts: [f['path'] for f in file_dicts]),
+        # Convert to datetimes for easier use in 'if' plugin and templates
+        'time_added': ('deluge_date_added', lambda timestamp: pendulum.from_timestamp(timestamp)),
+        'completed_time': (
+            'deluge_date_completed',
+            lambda timestamp: pendulum.from_timestamp(timestamp) if timestamp else None,
+        ),
     }
 
     schema = {
