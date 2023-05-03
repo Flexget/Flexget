@@ -87,6 +87,7 @@ packaging = ">=21.3"
 pyparsing = ">=2.4.7"
 werkzeug = ">=2.2.3"
 zxcvbn-python = "^4.4.24"
+pendulum = "^2.1.2"
 
 [tool.poetry.group.dev.dependencies]
 black = ">=18.9b0"

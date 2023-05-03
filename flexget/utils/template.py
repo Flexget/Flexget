@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING, Any, AnyStr, List, Mapping, Optional, Type, Un
 from unicodedata import normalize
 
 import jinja2.filters
+import pendulum
 from dateutil import parser as dateutil_parse
 from jinja2 import (
     ChoiceLoader,
@@ -22,6 +23,7 @@ from jinja2 import (
 )
 from jinja2.nativetypes import NativeTemplate
 from loguru import logger
+from pendulum import DateTime
 
 from flexget.event import event
 from flexget.utils.lazy_dict import LazyDict
@@ -42,13 +44,56 @@ environment: Optional['FlexGetEnvironment'] = None
 def extra_vars() -> dict:
     return {
         'timedelta': timedelta,
-        'utcnow': datetime.utcnow(),
-        'now': datetime.now(),
+        'utcnow': CoercingDateTime.utcnow(),
+        'now': CoercingDateTime.now(),
     }
 
 
 class RenderError(Exception):
     """Error raised when there is a problem with jinja rendering."""
+
+
+class CoercingDateTime(DateTime):
+    """Timezone aware datetime that instead of crashing when compared to naive datetimes, does a naive comparison."""
+
+    def __le__(self, other):
+        if not other.tzinfo:
+            return self.naive() <= other
+        return super().__le__(other)
+
+    def __lt__(self, other):
+        if not other.tzinfo:
+            return self.naive() < other
+        return super().__lt__(other)
+
+    def __gt__(self, other):
+        if not other.tzinfo:
+            return self.naive() > other
+        return super().__gt__(other)
+
+    def __ge__(self, other):
+        if not other.tzinfo:
+            return self.naive() >= other
+        return super().__ge__(other)
+
+    def __eq__(self, other):
+        if not other.tzinfo:
+            return self.naive() == other
+        return super().__eq__(other)
+
+    @classmethod
+    def instance(cls, dt, tz=None) -> "CoercingDateTime":
+        dt = pendulum.instance(dt, tz=tz)
+        dt.__class__ = cls
+        return dt
+
+    @classmethod
+    def now(cls, tz=None) -> "CoercingDateTime":
+        return cls.instance(super().now(tz=tz))
+
+    @classmethod
+    def utcnow(cls) -> "CoercingDateTime":
+        return cls.instance(super().utcnow())
 
 
 def filter_pathbase(val: Optional[str]) -> str:
