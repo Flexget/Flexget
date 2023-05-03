@@ -7,6 +7,7 @@ RUN apk add --no-cache --upgrade \
         build-base \
         libffi-dev \
         openssl-dev \
+        git \
         rust \
         cargo \
         unzip && \
@@ -16,6 +17,7 @@ RUN pip install -U pip
 
 WORKDIR /dep-wheels
 COPY requirements-docker.txt /flexget/
+ENV CARGO_NET_GIT_FETCH_WITH_CLI true
 RUN pip wheel -r /flexget/requirements-docker.txt
 
 WORKDIR /wheels
