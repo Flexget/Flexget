@@ -12,15 +12,13 @@ RUN apk add --no-cache --upgrade \
 
 RUN pip install -U pip
 
-WORKDIR /dep-wheels
 COPY requirements-docker.txt /flexget/
-RUN pip wheel -r /flexget/requirements-docker.txt
+RUN pip wheel --wheel-dir /dep-wheels -r /flexget/requirements-docker.txt
 
-WORKDIR /wheels
 COPY dev_tools.py /flexget/
-RUN pip install -f /dep-wheels click && python /flexget/dev_tools.py bundle-webui --version=v2
+RUN pip install -f /dep-wheels click requests && python /flexget/dev_tools.py bundle-webui --version=v2
 COPY . /flexget
-RUN pip wheel -e /flexget
+RUN pip wheel --no-deps --wheel-dir /wheels -e /flexget
 
 FROM docker.io/python:3.11-alpine
 ENV PYTHONUNBUFFERED 1
@@ -42,7 +40,7 @@ RUN pip install -U pip && \
                 -f /wheels \
                 FlexGet \
                 -r /requirements-docker.txt && \
-    rm -rf /wheels /requirements-docker.txt
+    rm -rf /wheels /dep-wheels /requirements-docker.txt
 
 VOLUME /config
 WORKDIR /config
