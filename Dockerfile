@@ -7,9 +7,6 @@ RUN apk add --no-cache --upgrade \
         build-base \
         libffi-dev \
         openssl-dev \
-        git \
-        rust \
-        cargo \
         unzip && \
     rm -rf /var/cache/apk/*
 
@@ -17,13 +14,10 @@ RUN pip install -U pip
 
 WORKDIR /dep-wheels
 COPY requirements-docker.txt /flexget/
-ENV CARGO_NET_GIT_FETCH_WITH_CLI true
 RUN pip wheel -r /flexget/requirements-docker.txt
 
 WORKDIR /wheels
-COPY requirements-release.txt /flexget/
 COPY dev_tools.py /flexget/
-RUN pip install -r /flexget/requirements-release.txt
 RUN python /flexget/dev_tools.py bundle-webui --version=v2
 COPY . /flexget
 RUN pip wheel -e /flexget
