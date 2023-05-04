@@ -18,7 +18,7 @@ RUN pip wheel -r /flexget/requirements-docker.txt
 
 WORKDIR /wheels
 COPY dev_tools.py /flexget/
-RUN python /flexget/dev_tools.py bundle-webui --version=v2
+RUN pip install -f /dep-wheels click && python /flexget/dev_tools.py bundle-webui --version=v2
 COPY . /flexget
 RUN pip wheel -e /flexget
 
