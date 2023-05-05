@@ -1,12 +1,12 @@
 import csv
 import re
 from collections.abc import MutableSet
-from datetime import datetime
 from json import JSONDecodeError
 from json import load as json_load
 from json import loads as json_loads
 from pathlib import Path
 
+import pendulum
 from loguru import logger
 from requests.exceptions import RequestException
 from requests.utils import cookiejar_from_dict
@@ -307,16 +307,8 @@ class ImdbEntrySet(MutableSet):
                     item_type = row['title type'].lower()
                     name = row['title']
                     year = int(row['year']) if row['year'] != '????' else None
-                    created = (
-                        datetime.strptime(row['created'], '%Y-%m-%d')
-                        if row.get('created')
-                        else None
-                    )
-                    modified = (
-                        datetime.strptime(row['modified'], '%Y-%m-%d')
-                        if row.get('modified')
-                        else None
-                    )
+                    created = pendulum.parse(row['created']) if row.get('created') else None
+                    modified = pendulum.parse(row['modified']) if row.get('modified') else None
                     entry = Entry(
                         {
                             'title': f'{name} ({year})' if year != '????' else name,
