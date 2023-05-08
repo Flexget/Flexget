@@ -7,22 +7,18 @@ RUN apk add --no-cache --upgrade \
         build-base \
         libffi-dev \
         openssl-dev \
-        git \
-        cargo \
-        rust \
         unzip && \
     rm -rf /var/cache/apk/*
 
-WORKDIR /wheels
+RUN pip install -U pip
 
+COPY requirements-docker.txt /flexget/
+RUN pip wheel --wheel-dir /dep-wheels -r /flexget/requirements-docker.txt
+
+COPY dev_tools.py /flexget/
+RUN pip install -f /dep-wheels click requests && python /flexget/dev_tools.py bundle-webui --version=v2
 COPY . /flexget
-
-ENV CARGO_NET_GIT_FETCH_WITH_CLI true
-RUN pip install -U pip && \
-    pip install -r /flexget/dev-requirements.txt
-RUN python /flexget/dev_tools.py bundle-webui --version=v2
-RUN pip wheel -r /flexget/requirements-docker.txt && \
-    pip wheel -e /flexget
+RUN pip wheel --no-deps --wheel-dir /wheels -e /flexget
 
 FROM docker.io/python:3.11-alpine
 ENV PYTHONUNBUFFERED 1
@@ -33,16 +29,18 @@ RUN apk add --no-cache --upgrade \
         tzdata && \
     rm -rf /var/cache/apk/*
 
-COPY --from=0 /wheels /wheels
+COPY --from=0 /dep-wheels /dep-wheels
 COPY --from=0 /flexget/requirements-docker.txt /requirements-docker.txt
+COPY --from=0 /wheels /wheels
 
 RUN pip install -U pip && \
     pip install --no-cache-dir \
                 --no-index \
+                -f /dep-wheels \
                 -f /wheels \
                 FlexGet \
                 -r /requirements-docker.txt && \
-    rm -rf /wheels /requirements-docker.txt
+    rm -rf /wheels /dep-wheels /requirements-docker.txt
 
 VOLUME /config
 WORKDIR /config
