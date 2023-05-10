@@ -4,7 +4,7 @@ Miscellaneous SQLAlchemy helpers.
 from typing import Any, List, Optional, Union
 
 from loguru import logger
-from sqlalchemy import ColumnDefault, Index, Sequence
+from sqlalchemy import ColumnDefault, Index, Sequence, text
 from sqlalchemy.exc import NoSuchTableError, OperationalError
 from sqlalchemy.orm import Session
 from sqlalchemy.schema import MetaData, Table
@@ -34,7 +34,7 @@ def table_schema(name: str, session: Session) -> Table:
     :returns: Table schema using SQLAlchemy reflect as it currently exists in the db
     :rtype: Table
     """
-    return Table(name, MetaData(bind=session.bind), autoload=True)
+    return Table(name, MetaData(), autoload_with=session.bind)
 
 
 def table_columns(table: Union[str, Table], session: Session) -> List[str]:
@@ -81,7 +81,7 @@ def table_add_column(
         col_type = col_type()
     type_string = session.bind.engine.dialect.type_compiler.process(col_type)
     statement = f'ALTER TABLE {table.name} ADD {name} {type_string}'
-    session.execute(statement)
+    session.execute(text(statement))
     session.commit()
     # Update the table with the default value if given
     if default is not None:

@@ -203,7 +203,7 @@ def reset_schema(plugin: str, session=None) -> None:
     # Remove the plugin's tables
     for table in tables:
         try:
-            table.drop()
+            table.drop(bind=session.bind)
         except OperationalError as e:
             if 'no such table' in str(e):
                 continue
