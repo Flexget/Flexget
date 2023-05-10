@@ -95,7 +95,7 @@ class LoginAPI(APIResource):
     @api.validate(login_api_schema, description='Username and Password')
     @api.response(Unauthorized)
     @api.response(200, 'Login successful', model=base_message_schema)
-    @api.doc(parser=login_parser)
+    @api.doc(expect=[login_parser])
     def post(self, session: Session = None) -> Response:
         """Login with username and password"""
         data = request.json

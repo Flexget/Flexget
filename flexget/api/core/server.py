@@ -351,7 +351,7 @@ def file_inode(filename: str) -> int:
 
 @server_api.route('/log/')
 class ServerLogAPI(APIResource):
-    @api.doc(parser=server_log_parser)
+    @api.doc(expect=[server_log_parser])
     @api.response(200, description='Streams as line delimited JSON')
     def get(self, session: Session = None) -> Response:
         """Stream Flexget log Streams as line delimited JSON"""
