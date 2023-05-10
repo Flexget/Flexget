@@ -43,7 +43,7 @@ history_parser.add_argument('task', help='Filter by task name')
 
 
 @history_api.route('/')
-@api.doc(parser=history_parser)
+@api.doc(expect=[history_parser])
 class HistoryAPI(APIResource):
     @etag
     @api.response(NotFoundError)

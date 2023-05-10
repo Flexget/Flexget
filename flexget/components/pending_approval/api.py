@@ -66,7 +66,7 @@ class PendingEntriesAPI(APIResource):
     @etag
     @api.response(NotFoundError)
     @api.response(200, model=pending_entry_list_schema)
-    @api.doc(parser=pending_parser)
+    @api.doc(expect=[pending_parser])
     def get(self, session=None):
         """List all pending entries"""
         args = pending_parser.parse_args()
@@ -133,7 +133,7 @@ class PendingEntriesAPI(APIResource):
     @api.validate(operation_schema, description=description)
     @api.response(201, model=pending_entry_list_schema)
     @api.response(204, 'No entries modified')
-    @api.doc(parser=just_task_parser)
+    @api.doc(expect=[just_task_parser])
     def put(self, session=None):
         """Approve/Reject the status of pending entries"""
         args = filter_parser.parse_args()
@@ -153,7 +153,7 @@ class PendingEntriesAPI(APIResource):
         return rsp
 
     @api.response(200, model=base_message_schema)
-    @api.doc(parser=filter_parser)
+    @api.doc(expect=[filter_parser])
     def delete(self, session=None):
         """Delete pending entries"""
         args = filter_parser.parse_args()

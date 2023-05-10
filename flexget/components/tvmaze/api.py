@@ -158,7 +158,7 @@ episode_parser.add_argument(
 
 @tvmaze_api.route('/episode/<int:tvmaze_id>/')
 @api.doc(params={'tvmaze_id': 'TVMaze ID of show'})
-@api.doc(parser=episode_parser)
+@api.doc(expect=[episode_parser])
 class TVDBEpisodeSearchAPI(APIResource):
     @etag(cache_age=3600)
     @api.response(200, 'Successfully found episode', tvmaze_episode_schema)
