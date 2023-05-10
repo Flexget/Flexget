@@ -4,7 +4,7 @@ import os.path
 import re
 from contextlib import suppress
 from copy import copy
-from datetime import date, datetime, time, timedelta
+from datetime import date, datetime, time
 from typing import TYPE_CHECKING, Any, AnyStr, List, Mapping, Optional, Type, Union, cast
 from unicodedata import normalize
 
@@ -43,7 +43,7 @@ environment: Optional['FlexGetEnvironment'] = None
 
 def extra_vars() -> dict:
     return {
-        'timedelta': timedelta,
+        'timedelta': pendulum.duration,
         'utcnow': CoercingDateTime.utcnow(),
         'now': CoercingDateTime.now(),
     }
