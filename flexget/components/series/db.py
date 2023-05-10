@@ -986,7 +986,7 @@ def get_series_summary(
         order_by = func.max(EpisodeRelease.first_seen)
     query = query.order_by(desc(order_by)) if descending else query.order_by(order_by)
 
-    return query.slice(start, stop).from_self()
+    return query.slice(start, stop)
 
 
 def auto_identified_by(series: Series) -> str:
