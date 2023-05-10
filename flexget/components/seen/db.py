@@ -22,7 +22,7 @@ from sqlalchemy import (
     select,
     update,
 )
-from sqlalchemy.orm import relation
+from sqlalchemy.orm import relationship
 
 from flexget import db_schema, plugin
 from flexget.event import event
@@ -83,7 +83,7 @@ class SeenEntry(Base):
     added = Column(DateTime)
     local = Column(Boolean)
 
-    fields = relation('SeenField', backref='seen_entry', cascade='all, delete, delete-orphan')
+    fields = relationship('SeenField', backref='seen_entry', cascade='all, delete, delete-orphan')
 
     def __init__(self, title, task, reason=None, local=None):
         if local is None:

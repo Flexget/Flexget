@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Callable, Iterable, List, Optional
 from loguru import logger
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Unicode, select
 from sqlalchemy.orm import Session as DBSession
-from sqlalchemy.orm import relation
+from sqlalchemy.orm import relationship
 
 from flexget import db_schema
 from flexget.entry import Entry
@@ -77,7 +77,9 @@ class InputCache(Base):
     hash = Column(String)
     added = Column(DateTime, default=datetime.now)
 
-    entries = relation('InputCacheEntry', backref='cache', cascade='all, delete, delete-orphan')
+    entries = relationship(
+        'InputCacheEntry', backref='cache', cascade='all, delete, delete-orphan'
+    )
 
 
 class InputCacheEntry(Base):

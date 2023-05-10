@@ -16,7 +16,7 @@ from sqlalchemy import (
     or_,
 )
 from sqlalchemy.ext.associationproxy import association_proxy
-from sqlalchemy.orm import relation
+from sqlalchemy.orm import relationship
 from sqlalchemy.schema import ForeignKey
 
 from flexget import db_schema, plugin
@@ -117,9 +117,11 @@ class TMDBMovie(Base):
     revenue = Column(Integer)
     homepage = Column(Unicode)
     lookup_language = Column(String)
-    _posters = relation('TMDBPoster', backref='movie', cascade='all, delete, delete-orphan')
-    _backdrops = relation('TMDBBackdrop', backref='movie', cascade='all, delete, delete-orphan')
-    _genres = relation('TMDBGenre', secondary=genres_table, backref='movies')
+    _posters = relationship('TMDBPoster', backref='movie', cascade='all, delete, delete-orphan')
+    _backdrops = relationship(
+        'TMDBBackdrop', backref='movie', cascade='all, delete, delete-orphan'
+    )
+    _genres = relationship('TMDBGenre', secondary=genres_table, backref='movies')
     genres = association_proxy('_genres', 'name')
     updated = Column(DateTime, default=datetime.now, nullable=False)
 
@@ -264,7 +266,7 @@ class TMDBSearchResult(Base):
 
     search = Column(Unicode, primary_key=True)
     movie_id = Column(Integer, ForeignKey('tmdb_movies.id'), nullable=True)
-    movie = relation(TMDBMovie)
+    movie = relationship(TMDBMovie)
 
     def __init__(self, search, movie_id=None, movie=None):
         self.search = search.lower()

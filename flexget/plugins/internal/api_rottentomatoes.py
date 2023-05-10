@@ -7,7 +7,7 @@ from urllib.parse import quote_plus
 
 from loguru import logger
 from sqlalchemy import Column, DateTime, Integer, String, Table, func, sql
-from sqlalchemy.orm import Session, relation
+from sqlalchemy.orm import Session, relationship
 from sqlalchemy.schema import ForeignKey, Index
 
 from flexget import db_schema, plugin
@@ -110,27 +110,31 @@ class RottenTomatoesMovie(RottenTomatoesContainer, Base):
     id = Column(Integer, primary_key=True, autoincrement=False, nullable=False)
     title = Column(String)
     year = Column(Integer)
-    genres = relation('RottenTomatoesGenre', secondary=genres_table, backref='movies')
+    genres = relationship('RottenTomatoesGenre', secondary=genres_table, backref='movies')
     mpaa_rating = Column(String)
     runtime = Column(Integer)
     critics_consensus = Column(String)
-    release_dates = relation('ReleaseDate', backref='movie', cascade='all, delete, delete-orphan')
+    release_dates = relationship(
+        'ReleaseDate', backref='movie', cascade='all, delete, delete-orphan'
+    )
     critics_rating = Column(String)
     critics_score = Column(Integer)
     audience_rating = Column(String)
     audience_score = Column(Integer)
     synopsis = Column(String)
-    posters = relation(
+    posters = relationship(
         'RottenTomatoesPoster', backref='movie', cascade='all, delete, delete-orphan'
     )
-    cast = relation('RottenTomatoesActor', secondary=actors_table, backref='movies')
-    directors = relation('RottenTomatoesDirector', secondary=directors_table, backref='movies')
+    cast = relationship('RottenTomatoesActor', secondary=actors_table, backref='movies')
+    directors = relationship('RottenTomatoesDirector', secondary=directors_table, backref='movies')
     studio = Column(String)
     # NOTE: alternate_ids is not anymore used, it used to store imdb_id
-    alternate_ids = relation(
+    alternate_ids = relationship(
         'RottenTomatoesAlternateId', backref='movie', cascade='all, delete, delete-orphan'
     )
-    links = relation('RottenTomatoesLink', backref='movie', cascade='all, delete, delete-orphan')
+    links = relationship(
+        'RottenTomatoesLink', backref='movie', cascade='all, delete, delete-orphan'
+    )
 
     # updated time, so we can grab new rating counts after 48 hours
     # set a default, so existing data gets updated with a rating
@@ -248,7 +252,7 @@ class RottenTomatoesSearchResult(Base):
     id = Column(Integer, primary_key=True)
     search = Column(String, nullable=False)
     movie_id = Column(Integer, ForeignKey('rottentomatoes_movies.id'), nullable=False)
-    movie = relation(RottenTomatoesMovie, backref='search_strings')
+    movie = relationship(RottenTomatoesMovie, backref='search_strings')
 
     def __repr__(self) -> str:
         return '<RottenTomatoesSearchResult(search={},movie_id={},movie={})>'.format(

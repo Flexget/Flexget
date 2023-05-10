@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from loguru import logger
 from sqlalchemy import Boolean, Column, DateTime, Float, Integer, Table, Text, Unicode
 from sqlalchemy.ext.associationproxy import association_proxy
-from sqlalchemy.orm import relation
+from sqlalchemy.orm import relationship
 from sqlalchemy.schema import ForeignKey
 
 from flexget import db_schema
@@ -169,10 +169,10 @@ class TVDBSeries(Base):
     _posters = Column('posters', Unicode)
     posters_list = json_synonym('_posters')
 
-    _genres = relation('TVDBGenre', secondary=genres_table)
+    _genres = relationship('TVDBGenre', secondary=genres_table)
     genres = association_proxy('_genres', 'name')
 
-    episodes = relation('TVDBEpisode', backref='series', cascade='all, delete, delete-orphan')
+    episodes = relationship('TVDBEpisode', backref='series', cascade='all, delete, delete-orphan')
 
     def __init__(self, tvdb_id, language):
         """
@@ -392,7 +392,7 @@ class TVDBSearchResult(Base):
     id = Column(Integer, primary_key=True)
     search = Column(Unicode, nullable=False, unique=True)
     series_id = Column(Integer, ForeignKey('tvdb_series.id'), nullable=True)
-    series = relation(TVDBSeries, backref='search_strings')
+    series = relationship(TVDBSeries, backref='search_strings')
 
     def __init__(self, search, series_id=None, series=None):
         self.search = search.lower()

@@ -7,7 +7,7 @@ from dateutil.parser import parse as dateutil_parse
 from loguru import logger
 from sqlalchemy import Column, Date, DateTime, Float, Integer, Table, Unicode, func
 from sqlalchemy.ext.associationproxy import association_proxy
-from sqlalchemy.orm import Session, relation
+from sqlalchemy.orm import Session, relationship
 from sqlalchemy.schema import ForeignKey
 
 from flexget import db_schema, plugin
@@ -70,7 +70,7 @@ class BlurayMovie(Base):
     rating = Column(Float)
     bluray_rating = Column(Integer)
     certification = Column(Unicode)
-    _genres = relation('BlurayGenre', secondary=genres_table, backref='movies')
+    _genres = relationship('BlurayGenre', secondary=genres_table, backref='movies')
     genres = association_proxy('_genres', 'name')
     updated = Column(DateTime, default=datetime.now, nullable=False)
 
@@ -188,7 +188,7 @@ class BluraySearchResult(Base):
 
     search = Column(Unicode, primary_key=True)
     movie_id = Column(Integer, ForeignKey('bluray_movies.id'), nullable=True)
-    movie = relation(BlurayMovie)
+    movie = relationship(BlurayMovie)
 
     def __init__(
         self, search: str, movie_id: Optional[int] = None, movie: Optional[BlurayMovie] = None

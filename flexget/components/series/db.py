@@ -22,7 +22,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
-from sqlalchemy.orm import backref, relation
+from sqlalchemy.orm import backref, relationship
 
 from flexget import db_schema, plugin
 from flexget.components.series.utils import normalize_series_name
@@ -71,7 +71,7 @@ class Series(Base):
     begin_episode_id = Column(
         Integer, ForeignKey('series_episodes.id', name='begin_episode_id', use_alter=True)
     )
-    begin = relation(
+    begin = relationship(
         'Episode',
         uselist=False,
         primaryjoin="Series.begin_episode_id == Episode.id",
@@ -79,22 +79,22 @@ class Series(Base):
         post_update=True,
         backref='begins_series',
     )
-    episodes = relation(
+    episodes = relationship(
         'Episode',
         backref='series',
         cascade='all, delete, delete-orphan',
         primaryjoin='Series.id == Episode.series_id',
     )
-    in_tasks = relation(
+    in_tasks = relationship(
         'SeriesTask',
         backref=backref('series', uselist=False),
         cascade='all, delete, delete-orphan',
     )
-    alternate_names = relation(
+    alternate_names = relationship(
         'AlternateNames', backref='series', cascade='all, delete, delete-orphan'
     )
 
-    seasons = relation('Season', backref='series', cascade='all, delete, delete-orphan')
+    seasons = relationship('Season', backref='series', cascade='all, delete, delete-orphan')
 
     # Make a special property that does indexed case insensitive lookups on name, but stores/returns specified case
     @hybrid_property
@@ -144,7 +144,9 @@ class Season(Base):
     season = Column(Integer)
     series_id = Column(Integer, ForeignKey('series.id'), nullable=False)
 
-    releases = relation('SeasonRelease', backref='season', cascade='all, delete, delete-orphan')
+    releases = relationship(
+        'SeasonRelease', backref='season', cascade='all, delete, delete-orphan'
+    )
 
     is_season = True
 
@@ -269,7 +271,9 @@ class Episode(Base):
 
     identified_by = Column(String)
     series_id = Column(Integer, ForeignKey('series.id'), nullable=False)
-    releases = relation('EpisodeRelease', backref='episode', cascade='all, delete, delete-orphan')
+    releases = relationship(
+        'EpisodeRelease', backref='episode', cascade='all, delete, delete-orphan'
+    )
 
     is_season = False
 

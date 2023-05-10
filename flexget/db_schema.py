@@ -5,7 +5,8 @@ import sqlalchemy.event
 from loguru import logger
 from sqlalchemy import Column, DateTime, Integer, String, Table
 from sqlalchemy.exc import OperationalError
-from sqlalchemy.ext.declarative import DeclarativeMeta, as_declarative
+from sqlalchemy.ext.declarative import DeclarativeMeta
+from sqlalchemy.orm import as_declarative
 
 import flexget
 from flexget.event import event

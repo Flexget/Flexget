@@ -4,7 +4,7 @@ from datetime import timedelta
 from loguru import logger
 from sqlalchemy import Boolean, Column, DateTime, Index, Integer, String, func, select
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import relation
+from sqlalchemy.orm import relationship
 from sqlalchemy.schema import ForeignKey
 
 from flexget import db_schema
@@ -29,7 +29,7 @@ class StatusTask(Base):
     __tablename__ = 'status_task'
     id = Column(Integer, primary_key=True)
     name = Column('task', String)
-    executions = relation(
+    executions = relationship(
         'TaskExecution', backref='task', cascade='all, delete, delete-orphan', lazy='dynamic'
     )
 
