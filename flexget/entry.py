@@ -242,7 +242,9 @@ class Entry(LazyDict, Serializer):
                     f"{key} was set to a naive datetime. Plugin should be updated to provide a timezone aware datetime"
                 )
         elif isinstance(value, date):
-            value = pendulum.date(value.year, value.month, value.day)
+            # Dates become naive datetimes at midnight. This allows the user to compare with 'now', but it matters
+            # what timezone 'now' is in when determining the result.
+            value = pendulum.datetime(value.year, value.month, value.day, tz=None)
 
         # url and original_url handling
         if key == 'url':
