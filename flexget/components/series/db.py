@@ -286,7 +286,7 @@ class Episode(Base):
     @first_seen.expression
     def first_seen(cls):
         return (
-            select([func.min(EpisodeRelease.first_seen)])
+            select(func.min(EpisodeRelease.first_seen))
             .where(EpisodeRelease.episode_id == cls.id)
             .correlate(Episode.__table__)
             .label('first_seen')
@@ -1049,7 +1049,10 @@ def get_latest_season_pack_release(
     """
     session = Session.object_session(series)
     releases = (
-        session.query(Season).join(Season.releases, Season.series).filter(Series.id == series.id)
+        session.query(Season)
+        .join(Season.releases)
+        .join(Season.series)
+        .filter(Series.id == series.id)
     )
 
     if downloaded:
@@ -1088,7 +1091,8 @@ def get_latest_episode_release(
     session = Session.object_session(series)
     releases = (
         session.query(Episode)
-        .join(Episode.releases, Episode.series)
+        .join(Episode.releases)
+        .join(Episode.series)
         .filter(Series.id == series.id)
     )
 
