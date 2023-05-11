@@ -1,4 +1,5 @@
 from loguru import logger
+from sqlalchemy import text
 
 from flexget.event import event
 
@@ -9,4 +10,4 @@ logger = logger.bind(name='db_analyze')
 @event('manager.db_cleanup', 0)
 def on_cleanup(manager, session):
     logger.info('Running ANALYZE on database to improve performance.')
-    session.execute('ANALYZE')
+    session.execute(text('ANALYZE'))

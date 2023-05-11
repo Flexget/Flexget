@@ -1,5 +1,7 @@
 from argparse import ArgumentParser
 
+from sqlalchemy import text
+
 from flexget import options
 from flexget.db_schema import plugin_schemas, reset_schema
 from flexget.event import event
@@ -28,7 +30,7 @@ def vacuum():
     console('Running VACUUM on sqlite database, this could take a while.')
     session = Session()
     try:
-        session.execute('VACUUM')
+        session.execute(text('VACUUM'))
         session.commit()
     finally:
         session.close()
