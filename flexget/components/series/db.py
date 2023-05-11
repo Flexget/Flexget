@@ -818,7 +818,7 @@ def show_seasons(
     seasons = (
         seasons.order_by(Season.season.desc()) if descending else seasons.order_by(Season.season)
     )
-    return seasons.slice(start, stop).from_self().all()
+    return seasons.slice(start, stop).all()
 
 
 def get_all_entities(
@@ -855,12 +855,12 @@ def get_episode_releases(
         releases = releases.filter(EpisodeRelease.downloaded == downloaded)
     if count:
         return releases.count()
-    releases = releases.slice(start, stop).from_self()
+    releases = releases
     if descending:
         releases = releases.order_by(getattr(EpisodeRelease, sort_by).desc())
     else:
         releases = releases.order_by(getattr(EpisodeRelease, sort_by))
-    return releases.all()
+    return releases.slice(start, stop).all()
 
 
 def get_season_releases(
@@ -879,12 +879,12 @@ def get_season_releases(
         releases = releases.filter(SeasonRelease.downloaded == downloaded)
     if count:
         return releases.count()
-    releases = releases.slice(start, stop).from_self()
+    releases = releases
     if descending:
         releases = releases.order_by(getattr(SeasonRelease, sort_by).desc())
     else:
         releases = releases.order_by(getattr(SeasonRelease, sort_by))
-    return releases.all()
+    return releases.slice(start, stop).all()
 
 
 def episode_in_show(series_id: int, episode_id: int) -> bool:
@@ -1440,7 +1440,7 @@ def show_episodes(
             if descending
             else episodes.order_by(Episode.identifier)
         )
-    return episodes.slice(start, stop).from_self().all()
+    return episodes.slice(start, stop).all()
 
 
 def store_parser(

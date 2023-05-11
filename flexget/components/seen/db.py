@@ -293,7 +293,7 @@ def search(
         query = query.order_by(getattr(SeenEntry, order_by).desc())
     else:
         query = query.order_by(getattr(SeenEntry, order_by))
-    return query.group_by(SeenEntry).slice(start, stop).from_self()
+    return query.group_by(SeenEntry).slice(start, stop)
 
 
 @with_session
