@@ -18,6 +18,7 @@ from sqlalchemy import (
     desc,
     func,
     select,
+    text,
     update,
 )
 from sqlalchemy.exc import OperationalError
@@ -172,7 +173,7 @@ class Season(Base):
     @first_seen.expression
     def first_seen(cls):
         return (
-            select([func.min(SeasonRelease.first_seen)])
+            select(func.min(SeasonRelease.first_seen))
             .where(SeasonRelease.season_id == cls.id)
             .correlate(Season.__table__)
             .label('first_seen')
@@ -589,7 +590,7 @@ def upgrade(ver: Optional[int], session: Session) -> int:
             logger.info('Upgrading episode_releases table to have proper_count column')
             table_add_column('episode_releases', 'proper_count', Integer, session)
             release_table = table_schema('episode_releases', session)
-            for row in session.execute(select([release_table.c.id, release_table.c.title])):
+            for row in session.execute(select(release_table.c.id, release_table.c.title)):
                 # Recalculate the proper_count from title for old episodes
                 proper_count = (
                     plugin.get('parsing', 'series.db').parse_series(row['title']).proper_count
@@ -609,7 +610,7 @@ def upgrade(ver: Optional[int], session: Session) -> int:
         # Seed the first_seen value for all the past releases with the first_seen of their episode.
         episode_table = table_schema('series_episodes', session)
         release_table = table_schema('episode_releases', session)
-        for row in session.execute(select([episode_table.c.id, episode_table.c.first_seen])):
+        for row in session.execute(select(episode_table.c.id, episode_table.c.first_seen)):
             session.execute(
                 update(
                     release_table,
@@ -629,7 +630,7 @@ def upgrade(ver: Optional[int], session: Session) -> int:
     if ver == 3:
         # Remove index on Series.name
         try:
-            session.execute("DROP INDEX ix_series_name")
+            session.execute(text("DROP INDEX ix_series_name"))
             # This way doesn't work on sqlalchemy 1.4 for some reason
             # Index('ix_series_name').drop(bind=session.bind)
         except OperationalError:
@@ -641,7 +642,9 @@ def upgrade(ver: Optional[int], session: Session) -> int:
         create_index('series', session, 'name_lower')
         # Fill in lower case name column
         session.execute(
-            update(series_table, values={'name_lower': func.lower(series_table.c.name)})
+            update(series_table).values(
+                {series_table.c.name_lower: func.lower(series_table.c.name)}
+            )
         )
         ver = 4
     if ver == 4:
@@ -650,7 +653,9 @@ def upgrade(ver: Optional[int], session: Session) -> int:
         series_table = table_schema('series', session)
         # Clear out identified_by id series so that they can be auto detected again
         session.execute(
-            update(series_table, series_table.c.identified_by != 'ep', {'identified_by': None})
+            update(series_table)
+            .where(series_table.c.identified_by != 'ep')
+            .values({series_table.c.identified_by: None})
         )
         # Warn users about a possible config change needed.
         logger.warning(
@@ -665,24 +670,28 @@ def upgrade(ver: Optional[int], session: Session) -> int:
         # This action retroactively marks 'ep' mode for all episodes where the series is already in 'ep' mode.
         series_table = table_schema('series', session)
         ep_table = table_schema('series_episodes', session)
-        ep_mode_series = select([series_table.c.id], series_table.c.identified_by == 'ep')
+        ep_mode_series = select(series_table.c.id).where(series_table.c.identified_by == 'ep')
         where_clause = and_(
             ep_table.c.series_id.in_(ep_mode_series),
             ep_table.c.season != None,
             ep_table.c.number != None,
             ep_table.c.identified_by == None,
         )
-        session.execute(update(ep_table, where_clause, {'identified_by': 'ep'}))
+        session.execute(
+            update(ep_table).where(where_clause).values({ep_table.c.identified_by: 'ep'})
+        )
         ver = 6
     if ver == 6:
         # Translate old qualities into new quality requirements
         release_table = table_schema('episode_releases', session)
-        for row in session.execute(select([release_table.c.id, release_table.c.quality])):
+        for row in session.execute(select(release_table.c.id, release_table.c.quality)):
             # Webdl quality no longer has dash
             new_qual = row['quality'].replace('web-dl', 'webdl')
             if row['quality'] != new_qual:
                 session.execute(
-                    update(release_table, release_table.c.id == row['id'], {'quality': new_qual})
+                    update(release_table)
+                    .where(release_table.c.id == row['id'])
+                    .values({release_table.c.quality: new_qual})
                 )
         ver = 7
     # Normalization rules changed for 7 and 8, but only run this once
@@ -690,7 +699,7 @@ def upgrade(ver: Optional[int], session: Session) -> int:
         # Merge series that qualify as duplicates with new normalization scheme
         series_table = table_schema('series', session)
         ep_table = table_schema('series_episodes', session)
-        all_series = session.execute(select([series_table.c.name, series_table.c.id]))
+        all_series = session.execute(select(series_table.c.name, series_table.c.id))
         unique_series = {}
         for row in all_series:
             unique_series.setdefault(normalize_series_name(row['name']), []).append(row['id'])
@@ -711,7 +720,7 @@ def upgrade(ver: Optional[int], session: Session) -> int:
         series_table = table_schema('series', session)
         logger.verbose('Repairing series_tasks table data')
         session.execute(
-            delete(series_tasks, ~series_tasks.c.series_id.in_(select([series_table.c.id])))
+            delete(series_tasks).where(~series_tasks.c.series_id.in_(select(series_table.c.id)))
         )
         ver = 11
     if ver == 11:
@@ -724,7 +733,9 @@ def upgrade(ver: Optional[int], session: Session) -> int:
         # Force identified_by value None to 'auto'
         series_table = table_schema('series', session)
         session.execute(
-            update(series_table, series_table.c.identified_by == None, {'identified_by': 'auto'})
+            update(series_table)
+            .where(series_table.c.identified_by == None)
+            .values({series_table.c.identified_by: 'auto'})
         )
         ver = 13
     if ver == 13:

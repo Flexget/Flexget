@@ -38,7 +38,7 @@ def upgrade(ver: int, session: DBSession) -> int:
         table_add_column(table, 'json', Unicode, session)
         # Make sure we get the new schema with the added column
         table = table_schema('input_cache_entry', session)
-        for row in session.execute(select([table.c.id, table.c.entry])):
+        for row in session.execute(select(table.c.id, table.c.entry)):
             try:
                 p = pickle.loads(row['entry'])
                 session.execute(
@@ -51,7 +51,7 @@ def upgrade(ver: int, session: DBSession) -> int:
         ver = 1
     if ver == 1:
         table = table_schema('input_cache_entry', session)
-        for row in session.execute(select([table.c.id, table.c.json])):
+        for row in session.execute(select(table.c.id, table.c.json)):
             if not row['json']:
                 # Seems there could be invalid data somehow. See #2590
                 continue

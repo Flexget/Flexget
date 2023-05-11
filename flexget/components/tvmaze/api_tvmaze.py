@@ -398,7 +398,9 @@ def add_to_lookup(session=None, title=None, series=None):
             'title {} already exist for series {}, no need to save lookup', title, series.name
         )
         return
-    session.add(TVMazeLookup(search_name=title, series=series))
+    result = TVMazeLookup(search_name=title)
+    session.add(result)
+    result.series = series
 
 
 def prepare_lookup_for_tvmaze(**lookup_params):
