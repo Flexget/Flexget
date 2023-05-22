@@ -155,6 +155,7 @@ class EmbyAuth(EmbyApiBase):
 
     _userid = ''
     _token = ''
+    _host_name = ''
     _connect_token = ''
     _connect_token_link = ''
     _connect_username = ''
@@ -242,7 +243,10 @@ class EmbyAuth(EmbyApiBase):
                             raise PluginError(
                                 f'Could not login to Emby Connect account `{self._connect_username}`, no server list'
                             )
-                        if server['Name'].lower() == self.host.lower():
+                        if (
+                            server['Name'].lower() == self.host.lower()
+                            or server['Name'].lower() == self.host_name.lower()
+                        ):
                             connect_server = server
                             break
                     else:
@@ -351,11 +355,12 @@ class EmbyAuth(EmbyApiBase):
             return False
 
         if login_type == LOGIN_CONNECT:
+            self._host_name = self.host
             connect_username = self._connect_username if self._connect_username else self._username
             if (
                 'token' not in token_data
                 or 'userid' not in token_data
-                or token_data.get('connect_username') != connect_username
+                or token_data.get('connect_username').lower() != connect_username.lower()
                 or login_type != token_data.get('login_type')
             ):
                 self.logout()
@@ -373,12 +378,12 @@ class EmbyAuth(EmbyApiBase):
 
         self._userid = token_data.get('userid')
         self._token = token_data.get('token')
-        self._login_type = token_data.get('type')
+        self._login_type = token_data.get('login_type')
         self._connect_username = token_data.get('connect_username', '')
         self.host = token_data.get('host', '')
         self._logged = True
         endpoint = EMBY_ENDPOINT_USERINFO.format(userid=token_data['userid'])
-        response = EmbyApi.resquest_emby(endpoint, self, 'GET')
+        response = EmbyApi.resquest_emby(endpoint, self, 'GET', plugin_error=False)
         if not response:
             self.logout()
             return False
@@ -421,6 +426,10 @@ class EmbyAuth(EmbyApiBase):
     @property
     def username(self) -> str:
         return self._username
+
+    @property
+    def host_name(self) -> str:
+        return self._host_name
 
     @property
     def logged(self) -> bool:
@@ -2711,7 +2720,14 @@ class EmbyApi(EmbyApiBase):
         return EmbyApiMedia.TYPE
 
     @staticmethod
-    def resquest_emby(endpoint: str, auth: 'EmbyAuth', method: str, emby_connect=False, **kwargs):
+    def resquest_emby(
+        endpoint: str,
+        auth: 'EmbyAuth',
+        method: str,
+        emby_connect=False,
+        plugin_error=True,
+        **kwargs,
+    ):
         verify_certificates = True if emby_connect else False
 
         if not auth:
@@ -2719,7 +2735,10 @@ class EmbyApi(EmbyApiBase):
             return
 
         if not auth.host:
-            raise PluginError('No Emby server information')
+            if plugin_error:
+                raise PluginError('No Emby server information')
+            else:
+                return False
 
         if auth:
             endpoint = endpoint.format(userid=auth.uid)
@@ -2765,10 +2784,15 @@ class EmbyApi(EmbyApiBase):
             if e.response.status_code == 401:
                 logger.error('Autentication Error: {}', str(e))
                 return False
-            else:
+            elif plugin_error:
                 raise PluginError('Could not connect to Emby Server: %s' % str(e)) from e
+            else:
+                return False
         except RequestException as e:
-            raise PluginError('Could not connect to Emby Server: %s' % str(e)) from e
+            if plugin_error:
+                raise PluginError('Could not connect to Emby Server: %s' % str(e)) from e
+            else:
+                return False
 
         if response.status_code == 200 or response.status_code == 204:
             try:
