@@ -18,7 +18,7 @@ class ParseWarning(Warning):
         return self.__unicode__().encode('utf-8')
 
     def __repr__(self):
-        return f'ParseWarning({self}, **{repr(self.kwargs)})'
+        return f'ParseWarning({self}, **{self.kwargs!r})'
 
 
 default_ignore_prefixes = [

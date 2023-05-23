@@ -263,7 +263,7 @@ class MyEpisodes:
         season = entry['series_season']
         episode = entry['series_episode']
 
-        super_secret_code = f"A{str(myepisodes_id)}-{str(season)}-{str(episode)}"
+        super_secret_code = f"A{myepisodes_id!s}-{season!s}-{episode!s}"
 
         payload = {super_secret_code: "true"}
 

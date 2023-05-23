@@ -589,7 +589,7 @@ class LostFilm:
                 logger.warning('Unsupported series configuration type')
                 return None
         except Exception as e:
-            logger.warning(f'Error parsing series config: {repr(e):s}')
+            logger.warning(f'Error parsing series config: {e!r:s}')
             names_list = None
 
         return names_list
