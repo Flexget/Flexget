@@ -1,11 +1,7 @@
-from __future__ import absolute_import, division, unicode_literals
-
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import pytest
 
 
-class TestMetainfo(object):
+class TestMetainfo:
     config = """
         tasks:
           test_content_size:
@@ -23,7 +19,7 @@ class TestMetainfo(object):
         assert task.find_entry(content_size=1024), 'Content size 1024 MB absent'
 
 
-class TestMetainfoImdb(object):
+class TestMetainfoImdb:
     config = """
         tasks:
           test:
@@ -52,7 +48,7 @@ class TestMetainfoImdb(object):
         ), 'Failed to ignore multiple imdb urls in test 4'
 
 
-class TestMetainfoQuality(object):
+class TestMetainfoQuality:
     config = """
         tasks:
           test:
@@ -84,7 +80,7 @@ class TestMetainfoQuality(object):
         )
 
 
-class TestMetainfoSeries(object):
+class TestMetainfoSeries:
     _config = """
         templates:
           global:
@@ -92,6 +88,13 @@ class TestMetainfoSeries(object):
               series: __parser__
             metainfo_series: yes
         tasks:
+          test_jinja_tvdb:
+            thetvdb_lookup: yes
+            mock:
+              - {title: 'Westworld (2016) S01E01', series_name: 'Westworld'}
+            set:
+              title: "{{tvdb_series_name}}"
+            accept_all: yes
           test:
             mock:
               - {title: 'FlexGet.S01E02.TheName.HDTV.xvid'}
@@ -128,21 +131,21 @@ class TestMetainfoSeries(object):
             series_season=1,
             series_episode=2,
             quality='hdtv xvid',
-            id='flexget s01e02',
+            media_id='flexget s01e02',
         ), 'Failed to parse series info'
         assert task.find_entry(
             series_name='Some Series',
             series_season=3,
             series_episode=14,
             quality='720p',
-            id='some series s03e14',
+            media_id='some series s03e14',
         ), 'Failed to parse series info'
         assert task.find_entry(
             series_name='Something',
             series_season=2,
             series_episode=1,
             quality='hdtv',
-            id='something s02e01',
+            media_id='something s02e01',
         ), 'Failed to parse series info'
         # Test unwanted prefixes get stripped from series name
         assert task.find_entry(
@@ -150,14 +153,14 @@ class TestMetainfoSeries(object):
             series_season=3,
             series_episode=15,
             quality='720p',
-            id='some series s03e15',
+            media_id='some series s03e15',
         ), 'Failed to parse series info'
         assert task.find_entry(
             series_name='Some Series',
             series_season=3,
             series_episode=16,
             quality='720p',
-            id='some series s03e16',
+            media_id='some series s03e16',
         ), 'Failed to parse series info'
         # Test episode title and parentheses are stripped from series name
         assert task.find_entry(
@@ -165,14 +168,14 @@ class TestMetainfoSeries(object):
             series_season=2,
             series_episode=9,
             quality='hdtv',
-            id='show-a us s02e09',
+            media_id='show-a us s02e09',
         ), 'Failed to parse series info'
         assert task.find_entry(
             series_name='Jack\'s Show',
             series_season=3,
             series_episode=1,
             quality='1080p',
-            id='jack\'s show s03e01',
+            media_id='jack\'s show s03e01',
         ), 'Failed to parse series info'
         # Test season pack
         assert task.find_entry(
@@ -193,8 +196,13 @@ class TestMetainfoSeries(object):
             assert 'series_guessed' not in entry, error
             assert 'series_parser' not in entry, error
 
+    @pytest.mark.online
+    def test_jinja_tvdb(self, execute_task):
+        task = execute_task('test_jinja_tvdb')
+        assert task.entries[0]['title'] == 'Westworld'
 
-class TestMetainfoMovie(object):
+
+class TestMetainfoMovie:
     config = """
         templates:
           global:
