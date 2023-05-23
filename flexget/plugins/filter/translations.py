@@ -1,15 +1,14 @@
 import re
+from typing import List, Union
 from unicodedata import normalize
-from typing import Union, List
-from babelfish.language import LANGUAGES
 
+import babelfish
 from guessit.api import GuessItApi, GuessitException
 from loguru import logger
-import babelfish
 
 from flexget import plugin
-from flexget.event import event
 from flexget.config_schema import one_or_more
+from flexget.event import event
 
 PLUGIN_NAME = 'translations'
 logger = logger.bind(name=PLUGIN_NAME)
@@ -338,7 +337,7 @@ class Translations:
         _config['dubbed'] = {}
         for key in _dubbed:
             key = key.lower()
-            if not key in [UNKNOWN, DEFAULT, NATIVE, OTHER] and not self._is_language(key):
+            if key not in [UNKNOWN, DEFAULT, NATIVE, OTHER] and not self._is_language(key):
                 raise plugin.PluginError(f'`{key}` in dubbed is not a valid language for dubbed')
 
             lang = self._get_language(key)
@@ -360,7 +359,7 @@ class Translations:
         _config['subbed'] = {}
         for key in _subbed:
             key = key.lower()
-            if not key in [UNKNOWN, DEFAULT, NONE, OTHER] and not self._is_language(key):
+            if key not in [UNKNOWN, DEFAULT, NONE, OTHER] and not self._is_language(key):
                 raise plugin.PluginError(f'`{key}` in subbed is not a valid language for subbed')
 
             lang = self._get_language(key)
@@ -451,7 +450,7 @@ class Translations:
 
             source = my_config['source']
 
-            if not my_config['source'] in entry:
+            if my_config['source'] not in entry:
                 raise plugin.PluginError(f'No field {source} in entry')
 
             title = entry.get(my_config['source'])

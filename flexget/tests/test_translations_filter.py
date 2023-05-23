@@ -1,7 +1,3 @@
-from flexget import plugin
-from flexget.entry import Entry
-
-
 class TestTranslationsFilter:
     config = """
         tasks:
@@ -265,7 +261,6 @@ class TestTranslationsFilter:
         assert task.undecided[0]['title'] == 'Attack on Titan S01E01 720p WEBRip'
 
     def test_subbed(self, execute_task):
-
         task = execute_task('subbed3')
         assert len(task.accepted) == 4
         assert len(task.rejected) == 1
