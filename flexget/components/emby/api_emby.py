@@ -346,6 +346,10 @@ class EmbyAuth(EmbyApiBase):
         self._logged = False
         self._connect_username = ''
 
+        if self.host_name:
+            self.host = self.host_name
+            self._host_name = ""
+
         if 'token_data' in persist:
             persist['token_data']['token'] = None
 
@@ -383,7 +387,12 @@ class EmbyAuth(EmbyApiBase):
         self.host = token_data.get('host', '')
         self._logged = True
         endpoint = EMBY_ENDPOINT_USERINFO.format(userid=token_data['userid'])
-        response = EmbyApi.resquest_emby(endpoint, self, 'GET', plugin_error=False)
+
+        try:
+            response = EmbyApi.resquest_emby(endpoint, self, 'GET')
+        except PluginError:
+            response = None
+
         if not response:
             self.logout()
             return False
@@ -2725,7 +2734,6 @@ class EmbyApi(EmbyApiBase):
         auth: 'EmbyAuth',
         method: str,
         emby_connect=False,
-        plugin_error=True,
         **kwargs,
     ):
         verify_certificates = True if emby_connect else False
@@ -2735,10 +2743,7 @@ class EmbyApi(EmbyApiBase):
             return
 
         if not auth.host:
-            if plugin_error:
-                raise PluginError('No Emby server information')
-            else:
-                return False
+            raise PluginError('No Emby server information')
 
         if auth:
             endpoint = endpoint.format(userid=auth.uid)
@@ -2784,15 +2789,11 @@ class EmbyApi(EmbyApiBase):
             if e.response.status_code == 401:
                 logger.error('Autentication Error: {}', str(e))
                 return False
-            elif plugin_error:
-                raise PluginError('Could not connect to Emby Server: %s' % str(e)) from e
             else:
-                return False
+                raise PluginError('Could not connect to Emby Server: %s' % str(e)) from e
+
         except RequestException as e:
-            if plugin_error:
-                raise PluginError('Could not connect to Emby Server: %s' % str(e)) from e
-            else:
-                return False
+            raise PluginError('Could not connect to Emby Server: %s' % str(e)) from e
 
         if response.status_code == 200 or response.status_code == 204:
             try:
