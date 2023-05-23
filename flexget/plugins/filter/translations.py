@@ -1,15 +1,15 @@
 import re
-from typing import List, Union
 from unicodedata import normalize
-
-import babelfish
+from typing import Union, List
 from babelfish.language import LANGUAGES
+
 from guessit.api import GuessItApi, GuessitException
 from loguru import logger
+import babelfish
 
 from flexget import plugin
-from flexget.config_schema import one_or_more
 from flexget.event import event
+from flexget.config_schema import one_or_more
 
 PLUGIN_NAME = 'translations'
 logger = logger.bind(name=PLUGIN_NAME)
@@ -79,6 +79,7 @@ class Translations:
                 'properties': {
                     'source': {'type': 'string', 'default': 'title'},
                     'languages': one_or_more({'type': 'string'}),
+                    'language_fields': one_or_more({'type': 'string'}),
                     'languages_synonyms': {
                         "type": 'object',
                         'additionalProperties': {
@@ -198,6 +199,7 @@ class Translations:
             if mycode:
                 lang = mycode.name
         except babelfish.LanguageReverseError:
+            logger.debug('`{}` is not a language', lang)
             pass
 
         try:
@@ -306,11 +308,18 @@ class Translations:
             _config['languages_synonyms'][language.alpha3] = _languages_synonyms[lang[0]]
             MyCodeConverter.SYMBOLS[language.alpha3] = _languages_synonyms[lang[0]]
 
-        # The actual language of the content, or fields to get it
+        # fields to get the language
+        _config['language_fields'] = config.get('language_fields', [])
+        if not isinstance(_config['language_fields'], list):
+            _config['language_fields'] = [_config['language_fields']]
+        elif not _config['language_fields']:
+            _config['language_fields'] = []
+
+        # The actual language of the content
         _config['languages'] = config.get('languages', [])
         if not isinstance(_config['languages'], list):
             _config['languages'] = [_config['languages']]
-        elif not _config['languages']:
+        elif not _config['languages'] and not _config['language_fields']:
             _config['languages'] = [UNKNOWN]
 
         # Actions to dubbed
@@ -358,17 +367,11 @@ class Translations:
             _config['subbed'][lang[0]] = _subbed[key]
 
         ## Dubbed default
-        # if not NATIVE in _config['dubbed']:
-        #     _config['dubbed'][NATIVE] = ACTION_DO_NOTHING
-
         for field in [UNKNOWN, DEFAULT, NATIVE, OTHER]:
             if field not in _config['dubbed']:
                 _config['dubbed'][field] = _config['dubbed'].get(DEFAULT, ACTION_DO_NOTHING)
 
         ## Subbed default
-        # if not NATIVE in _config['dubbed']:
-        #     _config['subbed'][NATIVE] = ACTION_DO_NOTHING
-
         for field in [UNKNOWN, DEFAULT, NONE, OTHER]:
             if field not in _config['subbed']:
                 _config['subbed'][field] = _config['subbed'].get(DEFAULT, ACTION_DO_NOTHING)
@@ -493,21 +496,22 @@ class Translations:
                 logger.debug('`{}` is assumed not subbed', title)
 
             stream_languages = {}
-            for source in my_config['languages']:
-                if self._is_language(source):
-                    logger.debug('Using `{}` as native language for {}', source, real_title)
-                    language = self._get_language(source)
+            for lang in my_config['languages']:
+                if self._is_language(lang):
+                    logger.debug('Using `{}` as native language for {}', lang, real_title)
+                    language = self._get_language(lang)
                     if language[0] not in stream_languages:
                         stream_languages[language[0]] = 0
 
                     stream_languages[language[0]] += 1
                     continue
 
-                if source == UNKNOWN:
+                if lang == UNKNOWN:
                     if UNKNOWN not in stream_languages:
                         stream_languages[UNKNOWN] = 1
                     continue
 
+            for source in my_config['language_fields']:
                 if source not in entry:
                     logger.warning('Entry does not contain a field called `{}`', source)
                     continue

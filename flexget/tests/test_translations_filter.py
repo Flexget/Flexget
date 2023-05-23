@@ -35,7 +35,7 @@ class TestTranslationsFilter:
                     languages_synonyms:
                         portuguese:
                             - tuga
-                    languages:
+                    language_fields:
                         - "trakt_series_language"
                     dubbed:
                         portuguese: "accept"
@@ -55,7 +55,7 @@ class TestTranslationsFilter:
                     - { title: "Movie En 720p", movie_name: "Movie",  trakt_language: "english", url:"http://mock.url/file2.torrent" }
 
                 translations:
-                    languages:
+                    language_fields:
                         - "trakt_language"
                     dubbed: reject
 
