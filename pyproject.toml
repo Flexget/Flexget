@@ -55,7 +55,7 @@ authors = []
 
 [tool.poetry.dependencies]
 python = "^3.7"
-apscheduler = ">=3.2.0"
+apscheduler = ">=3.10.0"
 beautifulsoup4 = ">=4.5"
 colorama = ">=0.4.4"
 feedparser = ">=6.0.2"
