@@ -224,7 +224,7 @@ class SeriesAPI(APIResource):
     @etag
     @api.response(200, 'Series list retrieved successfully', series_list_schema)
     @api.response(NotFoundError)
-    @api.doc(parser=series_list_parser, description="Get a  list of Flexget's shows in DB")
+    @api.doc(expect=[series_list_parser], description="Get a  list of Flexget's shows in DB")
     def get(self, session=None):
         """List existing shows"""
         args = series_list_parser.parse_args()
@@ -345,7 +345,7 @@ class SeriesAPI(APIResource):
 class SeriesGetShowsAPI(APIResource):
     @etag
     @api.response(200, 'Show list retrieved successfully', series_list_schema)
-    @api.doc(params={'name': 'Name of the show(s) to search'}, parser=base_series_parser)
+    @api.doc(params={'name': 'Name of the show(s) to search'}, expect=[base_series_parser])
     def get(self, name, session):
         """List of shows matching lookup name"""
         name = normalize_series_name(name)
@@ -378,7 +378,7 @@ delete_parser.add_argument(
 class SeriesShowAPI(APIResource):
     @etag
     @api.response(200, 'Show information retrieved successfully', show_details_schema)
-    @api.doc(description='Get a specific show using its ID', parser=base_series_parser)
+    @api.doc(description='Get a specific show using its ID', expect=[base_series_parser])
     def get(self, show_id, session):
         """Get show details by ID"""
         try:
@@ -393,7 +393,7 @@ class SeriesShowAPI(APIResource):
         return jsonify(series_details(show, begin, latest))
 
     @api.response(200, 'Removed series from DB', model=base_message_schema)
-    @api.doc(description='Delete a specific show using its ID', parser=delete_parser)
+    @api.doc(description='Delete a specific show using its ID', expect=[delete_parser])
     def delete(self, show_id, session):
         """Remove series from DB"""
         try:
@@ -448,7 +448,7 @@ entity_parser = api.pagination_parser(add_sort=True)
 class SeriesSeasonsAPI(APIResource):
     @etag
     @api.response(200, 'Seasons retrieved successfully for show', season_list_schema)
-    @api.doc(description='Get all show seasons via its ID', parser=entity_parser)
+    @api.doc(description='Get all show seasons via its ID', expect=[entity_parser])
     def get(self, show_id, session):
         """Get seasons by show ID"""
         args = entity_parser.parse_args()
@@ -505,7 +505,7 @@ class SeriesSeasonsAPI(APIResource):
     @api.response(200, 'Successfully forgotten all seasons from show', model=base_message_schema)
     @api.doc(
         description='Delete all show seasons via its ID. Deleting a season will mark it as wanted again',
-        parser=delete_parser,
+        expect=[delete_parser],
     )
     def delete(self, show_id, session):
         """Deletes all seasons of a show"""
@@ -551,7 +551,7 @@ class SeriesSeasonAPI(APIResource):
     @api.doc(
         description='Delete a specific season via its ID and show ID. Deleting a season will mark it as '
         'wanted again',
-        parser=delete_parser,
+        expect=[delete_parser],
     )
     def delete(self, show_id, season_id, session):
         """Forgets season by show ID and season ID"""
@@ -581,7 +581,7 @@ class SeriesSeasonAPI(APIResource):
 class SeriesEpisodesAPI(APIResource):
     @etag
     @api.response(200, 'Episodes retrieved successfully for show', episode_list_schema)
-    @api.doc(description='Get all show episodes via its ID', parser=entity_parser)
+    @api.doc(description='Get all show episodes via its ID', expect=[entity_parser])
     def get(self, show_id, session):
         """Get episodes by show ID"""
         args = entity_parser.parse_args()
@@ -638,7 +638,7 @@ class SeriesEpisodesAPI(APIResource):
     @api.response(200, 'Successfully forgotten all episodes from show', model=base_message_schema)
     @api.doc(
         description='Delete all show episodes via its ID. Deleting an episode will mark it as wanted again',
-        parser=delete_parser,
+        expect=[delete_parser],
     )
     def delete(self, show_id, session):
         """Deletes all episodes of a show"""
@@ -684,7 +684,7 @@ class SeriesEpisodeAPI(APIResource):
     @api.doc(
         description='Delete a specific episode via its ID and show ID. Deleting an episode will mark it as '
         'wanted again',
-        parser=delete_parser,
+        expect=[delete_parser],
     )
     def delete(self, show_id, ep_id, session):
         """Forgets episode by show ID and episode ID"""
@@ -737,7 +737,7 @@ class SeriesSeasonsReleasesAPI(APIResource):
     @api.response(200, 'Releases retrieved successfully for season', season_release_list_schema)
     @api.doc(
         description='Get all matching releases for a specific season of a specific show.',
-        parser=release_list_parser,
+        expect=[release_list_parser],
     )
     def get(self, show_id, season_id, session):
         """Get all season releases by show ID and season ID"""
@@ -813,7 +813,7 @@ class SeriesSeasonsReleasesAPI(APIResource):
     @api.response(200, 'Successfully deleted all releases for season', model=base_message_schema)
     @api.doc(
         description='Delete all releases for a specific season of a specific show.',
-        parser=release_delete_parser,
+        expect=[release_delete_parser],
     )
     def delete(self, show_id, season_id, session):
         """Deletes all season releases by show ID and season ID"""
@@ -921,7 +921,7 @@ class SeriesSeasonReleaseAPI(APIResource):
     @api.response(200, 'Release successfully deleted', model=base_message_schema)
     @api.doc(
         description='Delete a specific releases for a specific season of a specific show.',
-        parser=delete_parser,
+        expect=[delete_parser],
     )
     def delete(self, show_id, season_id, rel_id, session):
         """Delete episode release by show ID, season ID and release ID"""
@@ -996,7 +996,7 @@ class SeriesEpisodeReleasesAPI(APIResource):
     @api.response(200, 'Releases retrieved successfully for episode', episode_release_list_schema)
     @api.doc(
         description='Get all matching releases for a specific episode of a specific show.',
-        parser=release_list_parser,
+        expect=[release_list_parser],
     )
     def get(self, show_id, ep_id, session):
         """Get all episodes releases by show ID and episode ID"""
@@ -1072,7 +1072,7 @@ class SeriesEpisodeReleasesAPI(APIResource):
     @api.response(200, 'Successfully deleted all releases for episode', model=base_message_schema)
     @api.doc(
         description='Delete all releases for a specific episode of a specific show.',
-        parser=release_delete_parser,
+        expect=[release_delete_parser],
     )
     def delete(self, show_id, ep_id, session):
         """Deletes all episodes releases by show ID and episode ID"""
@@ -1178,7 +1178,7 @@ class SeriesEpisodeReleaseAPI(APIResource):
     @api.response(200, 'Release successfully deleted', model=base_message_schema)
     @api.doc(
         description='Delete a specific releases for a specific episode of a specific show.',
-        parser=delete_parser,
+        expect=[delete_parser],
     )
     def delete(self, show_id, ep_id, rel_id, session):
         """Delete episode release by show ID, episode ID and release ID"""

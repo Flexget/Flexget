@@ -42,7 +42,7 @@ return_schema = api.schema_model('irc.connections', ObjectsContainer.return_resp
 
 
 @irc_api.route('/connections/')
-@api.doc(parser=irc_parser)
+@api.doc(expect=[irc_parser])
 class IRCStatus(APIResource):
     @api.response(200, model=return_schema)
     @api.response(NotFoundError)
@@ -76,7 +76,7 @@ class IRCEnums(APIResource):
 
 
 @irc_api.route('/restart/')
-@api.doc(parser=irc_parser)
+@api.doc(expect=[irc_parser])
 class IRCRestart(APIResource):
     @api.response(200, model=base_message_schema)
     @api.response(NotFoundError)
@@ -104,7 +104,7 @@ irc_stop_parser.add_argument(
 
 
 @irc_api.route('/stop/')
-@api.doc(parser=irc_stop_parser)
+@api.doc(expect=[irc_stop_parser])
 class IRCStop(APIResource):
     @api.response(200, model=base_message_schema)
     @api.response(NotFoundError)

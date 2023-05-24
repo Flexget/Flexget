@@ -38,7 +38,7 @@ def upgrade(ver, session):
             # Remove any values that are not loadable.
             table = table_schema('simple_persistence', session)
             for row in session.execute(
-                select([table.c.id, table.c.plugin, table.c.key, table.c.value])
+                select(table.c.id, table.c.plugin, table.c.key, table.c.value)
             ):
                 try:
                     pickle.loads(row['value'])
@@ -63,7 +63,7 @@ def upgrade(ver, session):
         # Make sure we get the new schema with the added column
         table = table_schema('simple_persistence', session)
         failures = 0
-        for row in session.execute(select([table.c.id, table.c.value])):
+        for row in session.execute(select(table.c.id, table.c.value)):
             try:
                 p = pickle.loads(row['value'])
                 session.execute(

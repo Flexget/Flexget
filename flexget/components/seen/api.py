@@ -67,7 +67,7 @@ class SeenSearchAPI(APIResource):
     @etag
     @api.response(NotFoundError)
     @api.response(200, 'Successfully retrieved seen objects', seen_search_schema)
-    @api.doc(parser=seen_search_parser, description='Get seen entries')
+    @api.doc(expect=[seen_search_parser], description='Get seen entries')
     def get(self, session):
         """Search for seen entries"""
         args = seen_search_parser.parse_args()
@@ -136,7 +136,7 @@ class SeenSearchAPI(APIResource):
         return rsp
 
     @api.response(200, 'Successfully delete all entries', model=base_message_schema)
-    @api.doc(parser=seen_base_parser, description='Delete seen entries')
+    @api.doc(expect=[seen_base_parser], description='Delete seen entries')
     def delete(self, session):
         """Delete seen entries"""
         args = seen_base_parser.parse_args()

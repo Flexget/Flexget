@@ -93,6 +93,7 @@ class TestStatusAPI:
             ex1.accepted = 1
             ex1.failed = 1
             ex1.end = datetime.now()
+            session.add(ex1)
 
         rsp = api_client.get('/status/1/executions/')
         assert rsp.status_code == 200
@@ -171,6 +172,7 @@ class TestTaskStatusPagination:
                     ex1.task = st
                     ex1.start = base_start_time + timedelta(hours=hours)
                     hours -= 1
+                    session.add(ex1)
 
         # Default sorting - Last execution time desc
         rsp = api_client.get('/status/')
@@ -215,6 +217,7 @@ class TestTaskStatusPagination:
                 ex.accepted = i
                 ex.start = base_start_time + timedelta(hours=i)
                 ex.end = datetime.now()
+                session.add(ex)
 
         rsp = api_client.get('/status/1/executions/')
         assert rsp.status_code == 200
@@ -298,6 +301,7 @@ class TestTaskStatusPagination:
 
                 for k, v in e.items():
                     setattr(db_e, k, v)
+                session.add(db_e)
 
         # Default sort - by start
         rsp = api_client.get('/status/1/executions/')

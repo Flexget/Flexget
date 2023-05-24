@@ -11,7 +11,7 @@ from loguru import logger
 from requests.exceptions import RequestException
 from requests.utils import cookiejar_from_dict
 from sqlalchemy import Column, String, Unicode
-from sqlalchemy.orm import relation
+from sqlalchemy.orm import relationship
 from sqlalchemy.schema import ForeignKey
 
 from flexget import db_schema, plugin
@@ -42,7 +42,7 @@ class IMDBListUser(Base):
     _cookies = Column('cookies', Unicode)
     cookies = json_synonym('_cookies')
 
-    lists = relation('IMDBListList', backref='imdb_user', cascade='all, delete, delete-orphan')
+    lists = relationship('IMDBListList', backref='imdb_user', cascade='all, delete, delete-orphan')
 
     def __init__(self, user_name, user_id, cookies):
         self.user_name = user_name

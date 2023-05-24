@@ -66,7 +66,7 @@ class Rejected(APIResource):
     @etag
     @api.response(NotFoundError)
     @api.response(200, model=rejected_entries_list_schema)
-    @api.doc(parser=rejected_parser)
+    @api.doc(expect=[rejected_parser])
     def get(self, session=None):
         """List all rejected entries"""
         args = rejected_parser.parse_args()

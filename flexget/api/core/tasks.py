@@ -199,7 +199,7 @@ tasks_parser.add_argument(
 class TasksAPI(APIResource):
     @etag
     @api.response(200, model=tasks_list_schema)
-    @api.doc(parser=tasks_parser)
+    @api.doc(expect=[tasks_parser])
     def get(self, session: Session = None) -> Response:
         """List all tasks"""
 

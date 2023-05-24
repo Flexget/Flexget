@@ -5,7 +5,8 @@ import sqlalchemy.event
 from loguru import logger
 from sqlalchemy import Column, DateTime, Integer, String, Table
 from sqlalchemy.exc import OperationalError
-from sqlalchemy.ext.declarative import DeclarativeMeta, as_declarative
+from sqlalchemy.ext.declarative import DeclarativeMeta
+from sqlalchemy.orm import as_declarative
 
 import flexget
 from flexget.event import event
@@ -202,7 +203,7 @@ def reset_schema(plugin: str, session=None) -> None:
     # Remove the plugin's tables
     for table in tables:
         try:
-            table.drop()
+            table.drop(bind=session.bind)
         except OperationalError as e:
             if 'no such table' in str(e):
                 continue
