@@ -1,4 +1,3 @@
-import json
 from collections.abc import MutableSet
 from urllib.parse import quote, urlparse
 
