@@ -88,7 +88,7 @@ entry_list_parser.add_argument('name', help='Filter results by list name')
 @entry_list_api.route('/')
 class EntryListListsAPI(APIResource):
     @etag
-    @api.doc(parser=entry_list_parser)
+    @api.doc(expect=[entry_list_parser])
     @api.response(200, 'Successfully retrieved entry lists', entry_list_return_lists_schema)
     def get(self, session=None):
         """Get entry lists"""
@@ -164,7 +164,7 @@ entries_parser = api.pagination_parser(sort_choices=sort_choices, default='title
 class EntryListEntriesAPI(APIResource):
     @etag
     @api.response(200, model=entry_lists_entries_return_schema)
-    @api.doc(params={'list_id': 'ID of the list'}, parser=entries_parser)
+    @api.doc(params={'list_id': 'ID of the list'}, expect=[entries_parser])
     def get(self, list_id, session=None):
         """Get entries by list ID"""
         try:

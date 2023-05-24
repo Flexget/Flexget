@@ -73,7 +73,7 @@ def dump(entries, debug=False, eval_lazy=False, trace=False, title_only=False):
                         try:
                             renderable = highlighter(str(value))
                         except Exception:
-                            renderable = f'[[i]not printable[/i]] ({repr(value)})'
+                            renderable = f'[[i]not printable[/i]] ({value!r})'
             entry_table.add_row(f'{field}', ': ', renderable)
         console(entry_table)
         if trace:

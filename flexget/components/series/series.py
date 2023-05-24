@@ -471,7 +471,7 @@ class FilterSeries(FilterSeriesBase):
             existing_series = (
                 session.query(db.Series)
                 .filter(db.Series.name.in_(series_names))
-                .options(joinedload('alternate_names'))
+                .options(joinedload(db.Series.alternate_names))
                 .all()
             )
             existing_series_map = {s.name_normalized: s for s in existing_series}
@@ -1122,7 +1122,7 @@ class SeriesDBManager(FilterSeriesBase):
             existing_series = (
                 session.query(db.Series)
                 .filter(db.Series.name.in_(names))
-                .options(joinedload('alternate_names'))
+                .options(joinedload(db.Series.alternate_names))
                 .all()
             )
             existing_series_map = {s.name_normalized: s for s in existing_series}

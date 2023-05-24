@@ -5,7 +5,7 @@ from typing import List
 from dateutil.parser import parse as dateutil_parse
 from loguru import logger
 from sqlalchemy import Column, Date, DateTime, Integer, String, Table, Time, Unicode, and_, or_
-from sqlalchemy.orm import relation
+from sqlalchemy.orm import relationship
 from sqlalchemy.schema import ForeignKey
 
 from flexget import db_schema, plugin
@@ -571,17 +571,17 @@ class TraktShow(Base):
     homepage = Column(Unicode)
     trailer = Column(Unicode)
     aired_episodes = Column(Integer)
-    _translations = relation(TraktShowTranslation)
+    _translations = relationship(TraktShowTranslation)
     _translation_languages = Column('translation_languages', Unicode)
     translation_languages = json_synonym('_translation_languages')
-    episodes = relation(
+    episodes = relationship(
         TraktEpisode, backref='show', cascade='all, delete, delete-orphan', lazy='dynamic'
     )
-    seasons = relation(
+    seasons = relationship(
         TraktSeason, backref='show', cascade='all, delete, delete-orphan', lazy='dynamic'
     )
-    genres = relation(TraktGenre, secondary=show_genres_table)
-    _actors = relation(TraktActor, secondary=show_actors_table)
+    genres = relationship(TraktGenre, secondary=show_genres_table)
+    _actors = relationship(TraktActor, secondary=show_actors_table)
     updated_at = Column(DateTime)
     cached_at = Column(DateTime)
 
@@ -788,11 +788,11 @@ class TraktMovie(Base):
     language = Column(Unicode)
     updated_at = Column(DateTime)
     cached_at = Column(DateTime)
-    _translations = relation(TraktMovieTranslation, backref='movie')
+    _translations = relationship(TraktMovieTranslation, backref='movie')
     _translation_languages = Column('translation_languages', Unicode)
     translation_languages = json_synonym('_translation_languages')
-    genres = relation(TraktGenre, secondary=movie_genres_table)
-    _actors = relation(TraktActor, secondary=movie_actors_table)
+    genres = relationship(TraktGenre, secondary=movie_genres_table)
+    _actors = relationship(TraktActor, secondary=movie_actors_table)
 
     def __init__(self, trakt_movie, session):
         super().__init__()
@@ -885,7 +885,7 @@ class TraktShowSearchResult(Base):
     id = Column(Integer, primary_key=True)
     search = Column(Unicode, unique=True, nullable=False)
     series_id = Column(Integer, ForeignKey('trakt_shows.id'), nullable=True)
-    series = relation(TraktShow, backref='search_strings')
+    series = relationship(TraktShow, backref='search_strings')
 
     def __init__(self, search, series_id=None, series=None):
         self.search = search.lower()
@@ -901,7 +901,7 @@ class TraktMovieSearchResult(Base):
     id = Column(Integer, primary_key=True)
     search = Column(Unicode, unique=True, nullable=False)
     movie_id = Column(Integer, ForeignKey('trakt_movies.id'), nullable=True)
-    movie = relation(TraktMovie, backref='search_strings')
+    movie = relationship(TraktMovie, backref='search_strings')
 
     def __init__(self, search, movie_id=None, movie=None):
         self.search = search.lower()

@@ -137,7 +137,7 @@ class OutputQBitTorrent:
 
         hash_torrent = hash_torrent.lower()
 
-        logger.debug(f'Checking if torrent with hash {repr(hash)} already in session.')
+        logger.debug(f'Checking if torrent with hash {hash!r} already in session.')
 
         url = f'{self.url}{self.api_url_info}'
         params = {'hashes': hash_torrent}

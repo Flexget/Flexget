@@ -31,8 +31,7 @@ import yaml
 from loguru import logger
 from sqlalchemy.engine import Engine
 from sqlalchemy.exc import OperationalError
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import declarative_base, sessionmaker
 
 # These need to be declared before we start importing from other flexget modules, since they might import them
 from flexget.config_schema import ConfigError

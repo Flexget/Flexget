@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 
 from loguru import logger
 from sqlalchemy import Column, DateTime, ForeignKey, Index, Integer, String, Unicode
-from sqlalchemy.orm import relation
+from sqlalchemy.orm import relationship
 
 from flexget import db_schema
 from flexget.event import event
@@ -42,7 +42,7 @@ class RememberTask(Base):
     id = Column(Integer, primary_key=True)
     name = Column(Unicode)
 
-    entries = relation('RememberEntry', backref='task', cascade='all, delete, delete-orphan')
+    entries = relationship('RememberEntry', backref='task', cascade='all, delete, delete-orphan')
 
 
 class RememberEntry(Base):

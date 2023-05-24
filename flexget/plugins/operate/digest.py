@@ -28,7 +28,7 @@ def upgrade(ver, session):
         table_add_column(table, 'json', Unicode, session)
         # Make sure we get the new schema with the added column
         table = table_schema('digest_entries', session)
-        for row in session.execute(select([table.c.id, table.c.entry])):
+        for row in session.execute(select(table.c.id, table.c.entry)):
             try:
                 p = pickle.loads(row['entry'])
                 session.execute(
@@ -42,7 +42,7 @@ def upgrade(ver, session):
         ver = 1
     if ver == 1:
         table = table_schema('digest_entries', session)
-        for row in session.execute(select([table.c.id, table.c.json])):
+        for row in session.execute(select(table.c.id, table.c.json)):
             if not row['json']:
                 # Seems there could be invalid data somehow. See #2590
                 continue

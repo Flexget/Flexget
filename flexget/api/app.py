@@ -203,7 +203,7 @@ class API(RestxAPI):
 api_app = Flask(__name__, template_folder=os.path.join(__path__[0], 'templates'))
 api_app.config['REMEMBER_COOKIE_NAME'] = 'flexget.token'
 api_app.config['DEBUG'] = True
-api_app.config['ERROR_404_HELP'] = False
+api_app.config['RESTX_ERROR_404_HELP'] = False
 api_app.url_map.strict_slashes = False
 
 CORS(api_app, expose_headers='Link, Total-Count, Count, ETag')

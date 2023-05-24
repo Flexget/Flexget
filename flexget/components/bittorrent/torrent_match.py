@@ -15,7 +15,7 @@ class TorrentMatchFile:
         self.size = size
 
     def __repr__(self):
-        return f"{self.__class__.__name__}(path={str(self.path)}, size={self.size})"
+        return f"{self.__class__.__name__}(path={self.path!s}, size={self.size})"
 
 
 class TorrentMatch:
