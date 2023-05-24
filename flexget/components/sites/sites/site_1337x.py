@@ -87,14 +87,13 @@ class Site1337x:
         sort_order = ''
         if isinstance(config.get('order_by'), str):
             if config['order_by'] != 'leechers':
-                order_by = '/{0}/desc'.format(config['order_by'])
+                order_by = '/{}/desc'.format(config['order_by'])
                 sort_order = 'sort-'
 
         entries = set()
 
         for search_string in entry.get('search_strings', [entry['title']]):
-
-            query = '{0}search/{1}{2}/1/'.format(
+            query = '{}search/{}{}/1/'.format(
                 sort_order, quote(search_string.encode('utf8')), order_by
             )
             logger.debug(

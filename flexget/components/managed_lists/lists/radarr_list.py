@@ -55,7 +55,7 @@ def request_get_json(url, headers):
                 "Invalid response received from Radarr: %s" % response.content
             )
     except RequestException as e:
-        raise RadarrRequestError("Unable to connect to Radarr at %s. Error: %s" % (url, e))
+        raise RadarrRequestError(f"Unable to connect to Radarr at {url}. Error: {e}")
 
 
 def request_delete_json(url, headers):
@@ -69,7 +69,7 @@ def request_delete_json(url, headers):
                 "Invalid response received from Radarr: %s" % response.content
             )
     except RequestException as e:
-        raise RadarrRequestError("Unable to connect to Radarr at %s. Error: %s" % (url, e))
+        raise RadarrRequestError(f"Unable to connect to Radarr at {url}. Error: {e}")
 
 
 def request_post_json(url, headers, data):
@@ -96,7 +96,7 @@ def request_post_json(url, headers, data):
             )
 
     except RequestException as e:
-        raise RadarrRequestError("Unable to connect to Radarr at %s. Error: %s" % (url, e))
+        raise RadarrRequestError(f"Unable to connect to Radarr at {url}. Error: {e}")
 
 
 def request_put_json(url, headers):
@@ -110,7 +110,7 @@ def request_put_json(url, headers):
                 "Invalid response received from Radarr: %s" % response.content
             )
     except RequestException as e:
-        raise RadarrRequestError("Unable to connect to Radarr at %s. Error: %s" % (url, e))
+        raise RadarrRequestError(f"Unable to connect to Radarr at {url}. Error: {e}")
 
 
 class RadarrAPIService:
@@ -123,7 +123,7 @@ class RadarrAPIService:
         if parsed_base_url.port:
             port = int(parsed_base_url.port)
 
-        self.api_url = "%s://%s:%s%s/api/v3/" % (
+        self.api_url = "{}://{}:{}{}/api/v3/".format(
             parsed_base_url.scheme,
             parsed_base_url.netloc,
             port,
@@ -275,7 +275,7 @@ def radarr_quality_to_flexget_quality_req(radarr_quality):
 
     # QUALITIES_MAP has its keys in lower case
     radarr_quality = radarr_quality.lower()
-    if not radarr_quality in QUALITIES_MAP:
+    if radarr_quality not in QUALITIES_MAP:
         logger.warning(
             "Did not find a suitible translation for Radarr quality '{}'", radarr_quality
         )

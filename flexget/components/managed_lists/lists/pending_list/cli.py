@@ -58,7 +58,7 @@ def pending_list_list(options):
         try:
             pending_list = db.get_list_by_exact_name(options.list_name, session=session)
         except NoResultFound:
-            console('Could not find pending list with name `{}`'.format(options.list_name))
+            console(f'Could not find pending list with name `{options.list_name}`')
             return
         header = ['#', 'Title', '# of fields', 'Approved']
         table = TerminalTable(*header, table_type=options.table_type)
@@ -75,7 +75,7 @@ def pending_list_show(options):
         try:
             pending_list = db.get_list_by_exact_name(options.list_name, session=session)
         except NoResultFound:
-            console('Could not find pending list with name {}'.format(options.list_name))
+            console(f'Could not find pending list with name {options.list_name}')
             return
 
         try:
@@ -108,9 +108,7 @@ def pending_list_add(options):
         try:
             pending_list = db.get_list_by_exact_name(options.list_name, session=session)
         except NoResultFound:
-            console(
-                'Could not find a pending list with name `{}`, creating'.format(options.list_name)
-            )
+            console(f'Could not find a pending list with name `{options.list_name}`, creating')
             pending_list = db.PendingListList(name=options.list_name)
             session.add(pending_list)
         session.merge(pending_list)
@@ -126,7 +124,7 @@ def pending_list_add(options):
             )
             operation = 'updated'
         else:
-            console("Adding entry with title `{}` to list `{}`".format(title, pending_list.name))
+            console(f"Adding entry with title `{title}` to list `{pending_list.name}`")
             db_entry = db.PendingListEntry(entry=entry, pending_list_id=pending_list.id)
             if options.approved:
                 console('marking entry as approved')
@@ -134,7 +132,7 @@ def pending_list_add(options):
             session.add(db_entry)
             operation = 'added'
         if options.attributes:
-            console('Adding attributes to entry `{}`'.format(title))
+            console(f'Adding attributes to entry `{title}`')
             for identifier in options.attributes:
                 for k, v in identifier.items():
                     entry[k] = v
@@ -151,7 +149,7 @@ def pending_list_approve(options, approve=None):
         try:
             entry_list = db.get_list_by_exact_name(options.list_name)
         except NoResultFound:
-            console('Could not find pending list with name `{}`'.format(options.list_name))
+            console(f'Could not find pending list with name `{options.list_name}`')
             return
         try:
             db_entry = db.get_entry_by_id(entry_list.id, int(options.entry), session=session)
@@ -175,10 +173,10 @@ def pending_list_approve(options, approve=None):
         if (db_entry.approved is True and approve is True) or (
             db_entry.approved is False and approve is False
         ):
-            console('entry {} is already {}'.format(db_entry.title, approve_text))
+            console(f'entry {db_entry.title} is already {approve_text}')
             return
         db_entry.approved = approve
-        console('Successfully marked pending entry {} as {}'.format(db_entry.title, approve_text))
+        console(f'Successfully marked pending entry {db_entry.title} as {approve_text}')
 
 
 def pending_list_del(options):
@@ -186,7 +184,7 @@ def pending_list_del(options):
         try:
             entry_list = db.get_list_by_exact_name(options.list_name)
         except NoResultFound:
-            console('Could not find pending list with name `{}`'.format(options.list_name))
+            console(f'Could not find pending list with name `{options.list_name}`')
             return
         try:
             db_entry = db.get_entry_by_id(entry_list.id, int(options.entry), session=session)
@@ -206,7 +204,7 @@ def pending_list_del(options):
                     )
                 )
                 return
-        console('Removing entry `{}` from list {}'.format(db_entry.title, options.list_name))
+        console(f'Removing entry `{db_entry.title}` from list {options.list_name}')
         session.delete(db_entry)
 
 
@@ -215,9 +213,9 @@ def pending_list_purge(options):
         try:
             entry_list = db.get_list_by_exact_name(options.list_name)
         except NoResultFound:
-            console('Could not find entry list with name `{}`'.format(options.list_name))
+            console(f'Could not find entry list with name `{options.list_name}`')
             return
-        console('Deleting list {}'.format(options.list_name))
+        console(f'Deleting list {options.list_name}')
         session.delete(entry_list)
 
 

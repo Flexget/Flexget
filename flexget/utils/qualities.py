@@ -70,39 +70,39 @@ class QualityComponent:
         if isinstance(other, str):
             other = _registry.get(other)
         if not isinstance(other, QualityComponent):
-            raise TypeError('Cannot compare %r and %r' % (self, other))
+            raise TypeError(f'Cannot compare {self!r} and {other!r}')
         if other.type == self.type:
             return self.value == other.value
         else:
-            raise TypeError('Cannot compare %s and %s' % (self.type, other.type))
+            raise TypeError(f'Cannot compare {self.type} and {other.type}')
 
     def __lt__(self, other) -> bool:
         if isinstance(other, str):
             other = _registry.get(other)
         if not isinstance(other, QualityComponent):
-            raise TypeError('Cannot compare %r and %r' % (self, other))
+            raise TypeError(f'Cannot compare {self!r} and {other!r}')
         if other.type == self.type:
             return self.value < other.value
         else:
-            raise TypeError('Cannot compare %s and %s' % (self.type, other.type))
+            raise TypeError(f'Cannot compare {self.type} and {other.type}')
 
     def __add__(self, other):
         if not isinstance(other, int):
             raise TypeError()
-        l = globals().get('_' + self.type + 's')
-        index = l.index(self) + other
-        if index >= len(l):
+        component_list = globals().get('_' + self.type + 's')
+        index = component_list.index(self) + other
+        if index >= len(component_list):
             index = -1
-        return l[index]
+        return component_list[index]
 
     def __sub__(self, other):
         if not isinstance(other, int):
             raise TypeError()
-        l = globals().get('_' + self.type + 's')
-        index = l.index(self) - other
+        component_list = globals().get('_' + self.type + 's')
+        index = component_list.index(self) - other
         if index < 0:
             index = 0
-        return l[index]
+        return component_list[index]
 
     def __repr__(self) -> str:
         return f'<{self.type.title()}(name={self.name},value={self.value})>'
@@ -283,7 +283,7 @@ class Quality(Serializer):
     @property
     def _comparator(self) -> List:
         modifier = sum(c.modifier for c in self.components if c.modifier)
-        return [modifier] + self.components
+        return [modifier, *self.components]
 
     def __contains__(self, other):
         if isinstance(other, str):
@@ -305,18 +305,18 @@ class Quality(Serializer):
         if not isinstance(other, Quality):
             if other is None:
                 return False
-            raise TypeError('Cannot compare %r and %r' % (self, other))
+            raise TypeError(f'Cannot compare {self!r} and {other!r}')
         return self._comparator == other._comparator
 
     def __lt__(self, other) -> bool:
         if isinstance(other, str):
             other = Quality(other)
         if not isinstance(other, Quality):
-            raise TypeError('Cannot compare %r and %r' % (self, other))
+            raise TypeError(f'Cannot compare {self!r} and {other!r}')
         return self._comparator < other._comparator
 
     def __repr__(self) -> str:
-        return '<Quality(resolution=%s,source=%s,codec=%s,color_range=%s,audio=%s)>' % (
+        return '<Quality(resolution={},source={},codec={},color_range={},audio={})>'.format(
             self.resolution,
             self.source,
             self.codec,
@@ -370,7 +370,7 @@ class RequirementComponent:
 
     def allows(self, comp: QualityComponent, loose: bool = False) -> bool:
         if comp.type != self.type:
-            raise TypeError('Cannot compare %r against %s' % (comp, self.type))
+            raise TypeError(f'Cannot compare {comp!r} against {self.type}')
         if comp in self.none_of:
             return False
         if loose:
@@ -430,9 +430,7 @@ class RequirementComponent:
 
     def __hash__(self) -> int:
         return hash(
-            tuple(
-                [self.min, self.max, tuple(sorted(self.acceptable)), tuple(sorted(self.none_of))]
-            )
+            (self.min, self.max, tuple(sorted(self.acceptable)), tuple(sorted(self.none_of)))
         )
 
 

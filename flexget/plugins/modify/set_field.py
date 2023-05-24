@@ -1,6 +1,7 @@
 from loguru import logger
 
-from flexget import entry, plugin
+from flexget import plugin
+from flexget.entry import register_lazy_lookup
 from flexget.event import event
 from flexget.utils.template import RenderError
 
@@ -51,7 +52,7 @@ class ModifySet:
                     },
                 )
 
-    @entry.register_lazy_lookup('set_field')
+    @register_lazy_lookup('set_field')
     def lazy_set(self, entry, config, field, orig_field_value, errors=True):
         level = 'ERROR' if errors else 'DEBUG'
         if orig_field_value is not UNSET:

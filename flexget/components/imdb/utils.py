@@ -43,7 +43,7 @@ def is_valid_imdb_title_id(value):
     Return True if `value` is a valid IMDB ID for titles (movies, series, etc).
     """
     if not isinstance(value, str):
-        raise TypeError("is_valid_imdb_title_id expects a string but got {0}".format(type(value)))
+        raise TypeError(f"is_valid_imdb_title_id expects a string but got {type(value)}")
     # IMDB IDs for titles have 'tt' followed by 7 or 8 digits
     return re.match(r'tt\d{7,8}', value) is not None
 
@@ -53,7 +53,7 @@ def is_valid_imdb_person_id(value):
     Return True if `value` is a valid IMDB ID for a person.
     """
     if not isinstance(value, str):
-        raise TypeError("is_valid_imdb_person_id expects a string but got {0}".format(type(value)))
+        raise TypeError(f"is_valid_imdb_person_id expects a string but got {type(value)}")
     # An IMDB ID for a person is formed by 'nm' followed by 7 digits
     return re.match(r'nm\d{7,8}', value) is not None
 
@@ -241,7 +241,7 @@ class ImdbParser:
         self.plot_keywords = []
 
     def __str__(self):
-        return '<ImdbParser(name=%s,imdb_id=%s)>' % (self.name, self.imdb_id)
+        return f'<ImdbParser(name={self.name},imdb_id={self.imdb_id})>'
 
     def parse(self, imdb_id, soup=None):
         self.imdb_id = extract_id(imdb_id)

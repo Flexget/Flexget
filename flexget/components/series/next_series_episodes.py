@@ -53,23 +53,17 @@ class NextSeriesEpisodes:
         if paren_match.group(2):
             alts.append(paren_match.group(1))
         if series.identified_by == 'ep':
-            search_strings = [
-                '%s %s' % (series.name, id) for id in self.ep_identifiers(season, episode)
-            ]
+            search_strings = [f'{series.name} {id}' for id in self.ep_identifiers(season, episode)]
             series_id = 'S%02dE%02d' % (season, episode)
             for alt in alts:
                 search_strings.extend(
-                    ['%s %s' % (alt, id) for id in self.ep_identifiers(season, episode)]
+                    [f'{alt} {id}' for id in self.ep_identifiers(season, episode)]
                 )
         else:
-            search_strings = [
-                '%s %s' % (series.name, id) for id in self.sequence_identifiers(episode)
-            ]
+            search_strings = [f'{series.name} {id}' for id in self.sequence_identifiers(episode)]
             series_id = episode
             for alt in alts:
-                search_strings.extend(
-                    ['%s %s' % (alt, id) for id in self.sequence_identifiers(episode)]
-                )
+                search_strings.extend([f'{alt} {id}' for id in self.sequence_identifiers(episode)])
         entry = Entry(
             title=search_strings[0],
             url='',

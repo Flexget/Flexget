@@ -11,9 +11,8 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.manager import Session
 from flexget.utils.database import json_synonym
-from flexget.utils.requests import RequestException
+from flexget.utils.requests import RequestException, TimedLimiter
 from flexget.utils.requests import Session as RequestSession
-from flexget.utils.requests import TimedLimiter
 from flexget.utils.soup import get_soup
 from flexget.utils.tools import parse_filesize
 
@@ -308,7 +307,7 @@ class SearchAlphaRatio:
                 }
 
                 for dest, src in mappings_int.items():
-                    if not src in torrent_info:
+                    if src not in torrent_info:
                         continue
 
                     # Some values are tagged with a ',' insted of a '.', replace them

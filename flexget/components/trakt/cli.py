@@ -119,7 +119,7 @@ def register_parser_arguments():
 
     refresh_parser = subparsers.add_parser(
         'refresh',
-        help='Manually refresh your access token associated with your' ' --account <name>',
+        help='Manually refresh your access token associated with your --account <name>',
     )
     refresh_parser.add_argument('account', metavar='<account>', help=acc_text)
 

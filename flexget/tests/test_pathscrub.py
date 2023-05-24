@@ -20,7 +20,7 @@ class TestPathscrub:
         }
         for test in win_fn:
             result = pathscrub(test, os='windows', filename=True)
-            assert result == win_fn[test], '%s != %s' % (result, win_fn[test])
+            assert result == win_fn[test], f'{result} != {win_fn[test]}'
 
     def test_windows_paths(self):
         win_path = {
@@ -32,7 +32,7 @@ class TestPathscrub:
         }
         for test in win_path:
             result = pathscrub(test, os='windows', filename=False)
-            assert result == win_path[test], '%s != %s' % (result, win_path[test])
+            assert result == win_path[test], f'{result} != {win_path[test]}'
 
     def test_degenerate(self):
         # If path is reduced to nothing, make sure it complains
@@ -45,7 +45,7 @@ class TestPathscrub:
         for platform in ['windows', 'linux', 'mac']:
             for test in space_paths:
                 result = pathscrub(test, filename=False)
-                assert result == space_paths[test], '%s != %s (%s)' % (
+                assert result == space_paths[test], '{} != {} ({})'.format(
                     result,
                     space_paths[test],
                     platform,
@@ -54,4 +54,4 @@ class TestPathscrub:
         # Windows only should also use backslashes as dir separators
         test = ['c:\\ aoeu \\aoeu /aoeu ', 'c:\\aoeu\\aoeu/aoeu']
         result = pathscrub(test[0], os='windows', filename=False)
-        assert result == test[1], '%s != %s' % (result, test[1])
+        assert result == test[1], f'{result} != {test[1]}'

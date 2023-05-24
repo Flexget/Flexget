@@ -37,7 +37,7 @@ def action_list(options):
     with Session() as session:
         regexp_list = db.get_list_by_exact_name(options.list_name)
         if not regexp_list:
-            console('Could not find regexp list with name {}'.format(options.list_name))
+            console(f'Could not find regexp list with name {options.list_name}')
             return
         table = TerminalTable('Regexp', table_type=options.table_type)
         regexps = db.get_regexps_by_list_id(
@@ -52,12 +52,12 @@ def action_add(options):
     with Session() as session:
         regexp_list = db.get_list_by_exact_name(options.list_name)
         if not regexp_list:
-            console('Could not find regexp list with name {}, creating'.format(options.list_name))
+            console(f'Could not find regexp list with name {options.list_name}, creating')
             regexp_list = db.create_list(options.list_name, session=session)
 
         regexp = db.get_regexp(list_id=regexp_list.id, regexp=options.regexp, session=session)
         if not regexp:
-            console("Adding regexp {} to list {}".format(options.regexp, regexp_list.name))
+            console(f"Adding regexp {options.regexp} to list {regexp_list.name}")
             db.add_to_list_by_name(regexp_list.name, options.regexp, session=session)
             console(
                 'Successfully added regexp {} to regexp list {} '.format(
@@ -65,18 +65,18 @@ def action_add(options):
                 )
             )
         else:
-            console("Regexp {} already exists in list {}".format(options.regexp, regexp_list.name))
+            console(f"Regexp {options.regexp} already exists in list {regexp_list.name}")
 
 
 def action_del(options):
     with Session() as session:
         regexp_list = db.get_list_by_exact_name(options.list_name)
         if not regexp_list:
-            console('Could not find regexp list with name {}'.format(options.list_name))
+            console(f'Could not find regexp list with name {options.list_name}')
             return
         regexp = db.get_regexp(list_id=regexp_list.id, regexp=options.regexp, session=session)
         if regexp:
-            console('Removing regexp {} from list {}'.format(options.regexp, options.list_name))
+            console(f'Removing regexp {options.regexp} from list {options.list_name}')
             session.delete(regexp)
         else:
             console(
@@ -91,7 +91,7 @@ def action_purge(options):
     with Session() as session:
         regexp_list = db.get_list_by_exact_name(options.list_name)
         if not regexp_list:
-            console('Could not find regexp list with name {}'.format(options.list_name))
+            console(f'Could not find regexp list with name {options.list_name}')
             return
         console('Deleting list %s' % options.list_name)
         session.delete(regexp_list)

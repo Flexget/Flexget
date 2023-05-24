@@ -27,7 +27,7 @@ class NewTorrents:
             return False
         return (
             entry['url'].startswith('http://www.newtorrents.info')
-            and not entry['url'] in self.resolved
+            and entry['url'] not in self.resolved
         )
 
     # UrlRewriter plugin API

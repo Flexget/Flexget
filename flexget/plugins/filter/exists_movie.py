@@ -146,7 +146,7 @@ class FilterExistsMovie:
                 else:
                     movie_id = movie.name
                     if movie.name is not None and movie.year is not None:
-                        movie_id = "%s %s" % (movie.name, movie.year)
+                        movie_id = f"{movie.name} {movie.year}"
                     path_ids[movie_id] = movie.quality
                     logger.trace('adding: {}', movie_id)
 
@@ -179,7 +179,7 @@ class FilterExistsMovie:
                     entry[key_year] = movie.year
 
                 if entry.get(key_year, eval_lazy=False):
-                    key = "%s %s" % (entry[key_name], entry[key_year])
+                    key = f"{entry[key_name]} {entry[key_year]}"
                 else:
                     key = entry[key_name]
 

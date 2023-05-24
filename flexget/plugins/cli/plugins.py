@@ -31,7 +31,7 @@ def plugins_summary(manager, options):
         roles = []
         for phase in handlers:
             priority = handlers[phase].priority
-            roles.append('{0}({1})'.format(phase, priority))
+            roles.append(f'{phase}({priority})')
 
         name = colorize('green', plugin.name) if 'builtin' in flags else plugin.name
         table.add_row(name, ', '.join(plugin.interfaces), ', '.join(roles), ', '.join(flags))

@@ -1,20 +1,20 @@
-import argparse  # noqa
-import atexit  # noqa
-import codecs  # noqa
+import argparse
+import atexit
+import codecs
 import collections
-import copy  # noqa
-import errno  # noqa
-import fnmatch  # noqa
-import hashlib  # noqa
-import os  # noqa
-import shutil  # noqa
-import signal  # noqa
-import sys  # noqa
-import threading  # noqa
-import traceback  # noqa
-from contextlib import contextmanager  # noqa
-from datetime import datetime, timedelta  # noqa
-from typing import (  # noqa
+import copy
+import errno
+import fnmatch
+import hashlib
+import os
+import shutil
+import signal
+import sys
+import threading
+import traceback
+from contextlib import contextmanager
+from datetime import datetime, timedelta
+from typing import (
     TYPE_CHECKING,
     Dict,
     Iterator,
@@ -26,18 +26,18 @@ from typing import (  # noqa
     Union,
 )
 
-import sqlalchemy  # noqa
-import yaml  # noqa
-from loguru import logger  # noqa
+import sqlalchemy
+import yaml
+from loguru import logger
 from sqlalchemy.engine import Engine
-from sqlalchemy.exc import OperationalError  # noqa
-from sqlalchemy.ext.declarative import declarative_base  # noqa
-from sqlalchemy.orm import sessionmaker  # noqa
+from sqlalchemy.exc import OperationalError
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 
 # These need to be declared before we start importing from other flexget modules, since they might import them
 from flexget.config_schema import ConfigError
-from flexget.utils.sqlalchemy_utils import ContextSession  # noqa
-from flexget.utils.tools import get_current_flexget_version, io_encoding, pid_exists  # noqa
+from flexget.utils.sqlalchemy_utils import ContextSession
+from flexget.utils.tools import get_current_flexget_version, io_encoding, pid_exists
 
 Base = declarative_base()
 Session: Type[ContextSession] = sessionmaker(class_=ContextSession)
@@ -46,13 +46,7 @@ import flexget.log  # noqa
 from flexget import config_schema, db_schema, plugin  # noqa
 from flexget.event import fire_event  # noqa
 from flexget.ipc import IPCClient, IPCServer  # noqa
-from flexget.options import (  # noqa
-    CoreArgumentParser,
-    ParserError,
-    get_parser,
-    manager_parser,
-    unicode_argv,
-)
+from flexget.options import CoreArgumentParser, ParserError, get_parser, manager_parser  # noqa
 from flexget.task import Task  # noqa
 from flexget.task_queue import TaskQueue  # noqa
 from flexget.terminal import console, get_console_output  # noqa
@@ -124,7 +118,7 @@ class Manager:
     unit_test = False
     options: argparse.Namespace
 
-    def __init__(self, args: Optional[List[str]]) -> None:
+    def __init__(self, args: List[str]) -> None:
         """
         :param args: CLI args
         """
@@ -134,9 +128,6 @@ class Manager:
         elif manager:
             logger.info('last manager was not torn down correctly')
 
-        if args is None:
-            # Decode all arguments to unicode before parsing
-            args = unicode_argv()[1:]
         self.args = args
         self.autoreload_config = False
         self.config_file_hash: Optional[str] = None
@@ -158,12 +149,12 @@ class Manager:
 
         self.config: Dict = {}
 
-        self.options = self._init_options(self.args)
-        try:
-            self._init_config(create=False)
-        except Exception:
-            flexget.log.start(level=self.options.loglevel, to_file=False)
-            raise
+        self.options = self.parse_initial_options(args)
+        self._init_config(create=False)
+        # When we are in test mode, we use a different lock file and db
+        if self.options.test:
+            self.lockfile = os.path.join(self.config_base, f'.test-{self.config_name}-lock')
+        self._init_logging()
 
         manager = self
 
@@ -187,8 +178,8 @@ class Manager:
         tray_icon.add_menu_separator(index=4)
 
     @staticmethod
-    def _init_options(args: List[str]) -> argparse.Namespace:
-        """Initialize argument parsing"""
+    def parse_initial_options(args: List[str]) -> argparse.Namespace:
+        """Parse what we can from cli args before plugins are loaded."""
         try:
             options = CoreArgumentParser().parse_known_args(args, do_help=False)[0]
         except ParserError as exc:
@@ -202,16 +193,13 @@ class Manager:
                 sys.exit(1)
         return options
 
-    def _init_logging(self, to_file: bool = True) -> None:
-        """Initialize logging facilities"""
+    def _init_logging(self) -> None:
+        """Initialize logging variables"""
         log_file = os.path.expanduser(self.options.logfile)
         # If an absolute path is not specified, use the config directory.
         if not os.path.isabs(log_file):
             log_file = os.path.join(self.config_base, log_file)
         self.log_filename = log_file
-        flexget.log.start(
-            log_file, self.options.loglevel, to_file=to_file, to_console=not self.options.cron
-        )
 
     def initialize(self) -> None:
         """
@@ -342,14 +330,10 @@ class Manager:
         and results will be streamed back.
         If not, this will attempt to obtain a lock, initialize the manager, and run the command here.
         """
-        # When we are in test mode, we use a different lock file and db
-        if self.options.test:
-            self.lockfile = os.path.join(self.config_base, f'.test-{self.config_name}-lock')
         # If another process is started, send the execution to the running process
         ipc_info = self.check_ipc_info()
         # If we are connecting to a running daemon, we don't want to log to the log file,
         # the daemon is already handling that.
-        self._init_logging(to_file=not ipc_info)
         if ipc_info:
             console(
                 'There is a FlexGet process already running for this config, sending execution there.'
@@ -493,7 +477,7 @@ class Manager:
                     tray_icon.stop()
 
             if options.tray_icon:
-                from flexget.tray_icon import tray_icon  # noqa
+                from flexget.tray_icon import tray_icon
 
                 self._add_tray_icon_items(tray_icon)
 
@@ -541,9 +525,9 @@ class Manager:
 
         # Represent OrderedDict as a regular dict (but don't sort it alphabetically)
         # This lets us order a dict in a yaml file for easier human consumption
-        represent_dict_order = lambda self, data: self.represent_mapping(
-            'tag:yaml.org,2002:map', data.items()
-        )
+        def represent_dict_order(self, data):
+            return self.represent_mapping('tag:yaml.org,2002:map', data.items())
+
         yaml.add_representer(collections.OrderedDict, represent_dict_order)
 
         # Set up the dumper to increase the indent for lists
@@ -641,7 +625,7 @@ class Manager:
         :raises: `ValueError` if there is a problem loading the config file
         """
         fire_event('manager.before_config_load', self)
-        with open(self.config_path, 'r', encoding='utf-8') as f:
+        with open(self.config_path, encoding='utf-8') as f:
             try:
                 raw_config = f.read()
             except UnicodeDecodeError:
@@ -679,14 +663,12 @@ class Manager:
                             print('')
                     if e.context_mark is not None:
                         print(
-                            ' Check configuration near line %s, column %s'
-                            % (e.context_mark.line, e.context_mark.column)
+                            f' Check configuration near line {e.context_mark.line}, column {e.context_mark.column}'
                         )
                         lines += 1
                     if e.problem_mark is not None:
                         print(
-                            ' Check configuration near line %s, column %s'
-                            % (e.problem_mark.line, e.problem_mark.column)
+                            f' Check configuration near line {e.problem_mark.line}, column {e.problem_mark.column}'
                         )
                         lines += 1
                     if lines:
@@ -827,14 +809,12 @@ class Manager:
         except OperationalError as e:
             if os.path.exists(self.db_filename):
                 print(
-                    '%s - make sure you have write permissions to file %s'
-                    % (e.message, self.db_filename),
+                    f'{e.message} - make sure you have write permissions to file {self.db_filename}',
                     file=sys.stderr,
                 )
             else:
                 print(
-                    '%s - make sure you have write permissions to directory %s'
-                    % (e.message, self.config_base),
+                    f'{e.message} - make sure you have write permissions to directory {self.config_base}',
                     file=sys.stderr,
                 )
             raise
@@ -982,7 +962,7 @@ class Manager:
         # redirect standard file descriptors
         sys.stdout.flush()
         sys.stderr.flush()
-        si = open(os.devnull, 'r')
+        si = open(os.devnull)
         so = open(os.devnull, 'ab+')
         se = open(os.devnull, 'ab+', 0)
         os.dup2(si.fileno(), sys.stdin.fileno())

@@ -30,13 +30,13 @@ class FilterContentSize:
             if size < config.get('min', 0):
                 log_once('Entry `%s` too small, rejecting' % entry['title'], logger)
                 entry.reject(
-                    'minimum size %s MB, got %s MB' % (config['min'], size), remember=remember
+                    'minimum size {} MB, got {} MB'.format(config['min'], size), remember=remember
                 )
                 return True
             if size > config.get('max', maxsize):
                 log_once('Entry `%s` too big, rejecting' % entry['title'], logger)
                 entry.reject(
-                    'maximum size %s MB, got %s MB' % (config['max'], size), remember=remember
+                    'maximum size {} MB, got {} MB'.format(config['max'], size), remember=remember
                 )
                 return True
 

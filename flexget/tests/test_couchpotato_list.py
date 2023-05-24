@@ -9,10 +9,10 @@ qualities_profiles_file = os.path.join(
     os.path.dirname(__file__), 'couchpotato_quality_profile_test_response.json'
 )
 
-with open(movie_list_file, "r", encoding='utf-8') as data:
+with open(movie_list_file, encoding='utf-8') as data:
     movie_list_response = json.load(data)
 
-with open(qualities_profiles_file, "r") as data:
+with open(qualities_profiles_file) as data:
     qualities_response = json.load(data)
 
 
@@ -89,7 +89,7 @@ class TestCouchpotatoWithQuality:
     def quality_assertion(self, entry):
         assert (
             entry['title'] in self.expected_qualities
-        ), 'Could not find entry {} in qualities list.'.format(entry)
+        ), f'Could not find entry {entry} in qualities list.'
         expected_quality = self.expected_qualities[entry['title']]
 
         # Must do this as the order is not guaranteed

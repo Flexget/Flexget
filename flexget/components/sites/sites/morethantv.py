@@ -11,9 +11,8 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.manager import Session
 from flexget.utils.database import json_synonym
-from flexget.utils.requests import RequestException
+from flexget.utils.requests import RequestException, TimedLimiter
 from flexget.utils.requests import Session as RequestSession
-from flexget.utils.requests import TimedLimiter
 from flexget.utils.soup import get_soup
 from flexget.utils.tools import parse_filesize
 
@@ -28,7 +27,14 @@ requests.add_domain_limiter(
     TimedLimiter(SITE_DOMAIN, '5 seconds')
 )  # TODO find out if they want a delay
 
-CATEGORIES = {'Movies': 'filter_cat[1]', 'TV': 'filter_cat[2]', 'Other': 'filter_cat[3]'}
+CATEGORIES = {
+    'HD Episode': 'filter_cat[3]',
+    'HD Movies': 'filter_cat[1]',
+    'HD Season': 'filter_cat[5]',
+    'SD Epiosde': 'filter_cat[4]',
+    'SD Movies': 'filter_cat[2]',
+    'SD Season': 'filter_cat[6]',
+}
 
 TAGS = [
     'action',

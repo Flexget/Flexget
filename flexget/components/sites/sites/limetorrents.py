@@ -73,11 +73,11 @@ class Limetorrents:
         order_by = ''
         if isinstance(config.get('order_by'), str):
             if config['order_by'] != 'date':
-                order_by = '{0}/1'.format(config['order_by'])
+                order_by = '{}/1'.format(config['order_by'])
 
         category = 'all'
         if isinstance(config.get('category'), str):
-            category = '{0}'.format(config['category'])
+            category = '{}'.format(config['category'])
 
         entries = set()
 
@@ -85,7 +85,7 @@ class Limetorrents:
             # No special characters - use dashes instead of %20
             cleaned_search_string = clean_symbols(search_string).replace(' ', '-')
 
-            query = 'search/{0}/{1}/{2}'.format(
+            query = 'search/{}/{}/{}'.format(
                 category, cleaned_search_string.encode('utf8'), order_by
             )
             logger.debug(
@@ -104,7 +104,6 @@ class Limetorrents:
             soup = get_soup(page.content)
             if soup.find('a', attrs={'class': 'csprite_dl14'}) is not None:
                 for link in soup.findAll('a', attrs={'class': 'csprite_dl14'}):
-
                     row = link.find_parent('tr')
                     info_url = str(link.get('href'))
 

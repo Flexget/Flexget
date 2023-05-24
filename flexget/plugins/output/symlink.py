@@ -5,13 +5,12 @@ from loguru import logger
 from flexget import plugin
 from flexget.event import event
 from flexget.utils.pathscrub import pathscrub
-from flexget.utils.template import RenderError, render_from_entry
+from flexget.utils.template import RenderError
 
 logger = logger.bind(name='symlink')
 
 
 class Symlink:
-
     schema = {
         'oneOf': [
             {
@@ -67,13 +66,13 @@ class Symlink:
                 linkto_path = entry.render(linkto_path)
             except RenderError as err:
                 raise plugin.PluginError(
-                    'Path value replacement `%s` failed: %s' % (linkto_path, err.args[0])
+                    f'Path value replacement `{linkto_path}` failed: {err.args[0]}'
                 )
             try:
                 linkto_name = entry.render(linkto_name)
             except RenderError as err:
                 raise plugin.PluginError(
-                    'Filename value replacement `%s` failed: %s' % (linkto_name, err.args[0])
+                    f'Filename value replacement `{linkto_name}` failed: {err.args[0]}'
                 )
 
             # Clean invalid characters with pathscrub plugin
@@ -108,7 +107,7 @@ class Symlink:
                             os.makedirs(dirname)
                         os.link(linkfrom, linkto)
             except OSError as e:
-                entry.fail('Failed to create %slink, %s' % (config['link_type'], e))
+                entry.fail('Failed to create {}link, {}'.format(config['link_type'], e))
 
     def hard_link_dir(self, path, destination, existing):
         if not os.path.exists(destination):

@@ -84,7 +84,7 @@ class PluginTemplate:
                 if template == 'global':
                     continue
                 raise plugin.PluginError(
-                    'Unable to find template %s for task %s' % (template, task.name), logger
+                    f'Unable to find template {template} for task {task.name}', logger
                 )
             if toplevel_templates[template] is None:
                 logger.warning('Template `{}` is empty. Nothing to merge.', template)
@@ -111,8 +111,7 @@ class PluginTemplate:
                 task.merge_config(template_config)
             except MergeException as exc:
                 raise plugin.PluginError(
-                    'Failed to merge template %s to task %s. Error: %s'
-                    % (template, task.name, exc.value)
+                    f'Failed to merge template {template} to task {task.name}. Error: {exc.value}'
                 )
 
         logger.trace('templates: {}', config)

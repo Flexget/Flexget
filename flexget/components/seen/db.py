@@ -7,9 +7,7 @@ forget (string)
     task name then everything in that task will be forgotten. With title all learned fields from it and the
     title will be forgotten. With field value only that particular field is forgotten.
 """
-import string
 from datetime import datetime
-from glob import escape
 
 from loguru import logger
 from sqlalchemy import (
@@ -97,7 +95,7 @@ class SeenEntry(Base):
         self.local = local
 
     def __str__(self):
-        return '<SeenEntry(title=%s,reason=%s,task=%s,added=%s)>' % (
+        return '<SeenEntry(title={},reason={},task={},added={})>'.format(
             self.title,
             self.reason,
             self.task,
@@ -136,7 +134,7 @@ class SeenField(Base):
         self.added = datetime.now()
 
     def __str__(self):
-        return '<SeenField(field=%s,value=%s,added=%s)>' % (self.field, self.value, self.added)
+        return f'<SeenField(field={self.field},value={self.value},added={self.added})>'
 
     def to_dict(self):
         return {
@@ -216,7 +214,7 @@ def forget(value, tasks=None, test=False):
 
         for sf in query_sf.all():
             se = session.query(SeenEntry).filter(SeenEntry.id == sf.seen_entry_id).first()
-            if tasks and not se.task in tasks:
+            if tasks and se.task not in tasks:
                 continue
             field_count += len(se.fields)
             count += 1

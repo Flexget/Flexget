@@ -29,7 +29,7 @@ class ProperMovie(Base):
         self.added = datetime.now()
 
     def __repr__(self):
-        return '<ProperMovie(title=%s,task=%s,imdb_id=%s,quality=%s,proper_count=%s,added=%s)>' % (
+        return '<ProperMovie(title={},task={},imdb_id={},quality={},proper_count={},added={})>'.format(
             self.title,
             self.task,
             self.imdb_id,

@@ -84,7 +84,7 @@ class ImdbWatchlist:
         headers = {'Accept-Language': config.get('force_language')}
         params = {'view': 'detail', 'page': 1}
         if config['list'] in ['watchlist', 'ratings', 'checkins']:
-            url = 'http://www.imdb.com/user/%s/%s' % (config['user_id'], config['list'])
+            url = 'http://www.imdb.com/user/{}/{}'.format(config['user_id'], config['list'])
             if config['list'] == 'watchlist':
                 params = {'view': 'detail'}
         else:
@@ -121,9 +121,9 @@ class ImdbWatchlist:
             )
         except (TypeError, AttributeError, ValueError) as e:
             raise plugin.PluginError(
-                'Unable to get imdb list from imdb react widget.'
-                + ' Either the list is empty or the imdb parser of the imdb_watchlist plugin is broken.'
-                + ' Original error: %s.' % str(e)
+                'Unable to get imdb list from imdb react widget. '
+                'Either the list is empty or the imdb parser of the imdb_watchlist plugin is broken. '
+                'Original error: %s.' % str(e)
             )
         total_item_count = 0
         if 'list' in json_vars and 'items' in json_vars['list']:
@@ -141,9 +141,9 @@ class ImdbWatchlist:
             json_data = self.fetch_page(task, url, params, headers).json()
         except (ValueError, TypeError) as e:
             raise plugin.PluginError(
-                'Unable to get imdb list from imdb JSON API.'
-                + ' Either the list is empty or the imdb parser of the imdb_watchlist plugin is broken.'
-                + ' Original error: %s.' % str(e)
+                'Unable to get imdb list from imdb JSON API. '
+                'Either the list is empty or the imdb parser of the imdb_watchlist plugin is broken. '
+                'Original error: %s.' % str(e)
             )
         logger.verbose('imdb list contains {} items', len(json_data))
         logger.debug(
@@ -188,8 +188,9 @@ class ImdbWatchlist:
         except (ValueError, TypeError) as e:
             # TODO Something is wrong if we get a ValueError, I think
             raise plugin.PluginError(
-                'Received invalid movie count: %s ; %s'
-                % (soup.find('div', class_='lister-total-num-results').string, e)
+                'Received invalid movie count: {} ; {}'.format(
+                    soup.find('div', class_='lister-total-num-results').string, e
+                )
             )
 
         if not total_item_count:

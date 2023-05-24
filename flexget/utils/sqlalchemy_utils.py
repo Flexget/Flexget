@@ -80,7 +80,7 @@ def table_add_column(
         # If we got a type class instead of an instance of one, instantiate it
         col_type = col_type()
     type_string = session.bind.engine.dialect.type_compiler.process(col_type)
-    statement = 'ALTER TABLE %s ADD %s %s' % (table.name, name, type_string)
+    statement = f'ALTER TABLE {table.name} ADD {name} {type_string}'
     session.execute(statement)
     session.commit()
     # Update the table with the default value if given
@@ -125,7 +125,7 @@ def create_index(table_name: str, session: Session, *column_names: str) -> None:
     :param session: Session object which should be used
     :param column_names: The names of the columns that should belong to this index.
     """
-    index_name = '_'.join(['ix', table_name] + list(column_names))
+    index_name = '_'.join(['ix', table_name, *list(column_names)])
     table = table_schema(table_name, session)
     columns = [getattr(table.c, column) for column in column_names]
     try:

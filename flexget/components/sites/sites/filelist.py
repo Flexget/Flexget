@@ -9,9 +9,8 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.manager import Session
 from flexget.utils.database import json_synonym
-from flexget.utils.requests import RequestException
+from flexget.utils.requests import RequestException, TimedLimiter
 from flexget.utils.requests import Session as RequestSession
-from flexget.utils.requests import TimedLimiter
 from flexget.utils.soup import get_soup
 from flexget.utils.tools import parse_filesize
 
@@ -194,7 +193,7 @@ class SearchFileList:
         """
         Search for entries on FileList.ro
         """
-        entries = list()
+        entries = []
 
         params = {
             'cat': CATEGORIES[config['category']],

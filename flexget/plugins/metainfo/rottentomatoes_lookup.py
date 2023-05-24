@@ -1,6 +1,7 @@
 from loguru import logger
 
-from flexget import entry, plugin
+from flexget import plugin
+from flexget.entry import register_lazy_lookup
 from flexget.event import event
 from flexget.utils.log import log_once
 
@@ -35,22 +36,22 @@ class PluginRottenTomatoesLookup:
         'rt_mpaa_rating': 'mpaa_rating',
         'rt_runtime': 'runtime',
         'rt_critics_consensus': 'critics_consensus',
-        'rt_releases': lambda movie: dict(
-            (release.name, release.date) for release in movie.release_dates
-        ),
+        'rt_releases': lambda movie: {
+            release.name: release.date for release in movie.release_dates
+        },
         'rt_critics_rating': 'critics_rating',
         'rt_critics_score': 'critics_score',
         'rt_audience_rating': 'audience_rating',
         'rt_audience_score': 'audience_score',
         'rt_average_score': lambda movie: (movie.critics_score + movie.audience_score) / 2,
         'rt_synopsis': 'synopsis',
-        'rt_posters': lambda movie: dict((poster.name, poster.url) for poster in movie.posters),
+        'rt_posters': lambda movie: {poster.name: poster.url for poster in movie.posters},
         'rt_actors': lambda movie: [actor.name for actor in movie.cast],
         'rt_directors': lambda movie: [director.name for director in movie.directors],
         'rt_studio': 'studio',
-        'rt_alternate_ids': lambda movie: dict(
-            (alt_id.name, alt_id.id) for alt_id in movie.alternate_ids
-        ),
+        'rt_alternate_ids': lambda movie: {
+            alt_id.name: alt_id.id for alt_id in movie.alternate_ids
+        },
         'rt_url': get_rt_url,
         # Generic fields filled by all movie lookup plugins:
         'movie_name': 'title',
@@ -67,7 +68,7 @@ class PluginRottenTomatoesLookup:
     def __init__(self):
         self.key = None
 
-    @entry.register_lazy_lookup('rottentomatoes_lookup')
+    @register_lazy_lookup('rottentomatoes_lookup')
     def lazy_loader(self, entry):
         """Does the lookup for this entry and populates the entry fields.
 

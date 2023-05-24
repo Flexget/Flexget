@@ -84,7 +84,7 @@ class TestSplitYearTitle:
         assert split_title_year(title) == (expected_title, expected_year)
 
 
-class TestDictMerge(object):
+class TestDictMerge:
     def test_merge_dict_to_dict_list(self):
         d1 = {'setting': {'parameter': ['item_1']}}
         d2 = {'setting': {'parameter': ['item_2']}}

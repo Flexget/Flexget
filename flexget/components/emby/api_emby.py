@@ -81,7 +81,7 @@ class EmbyApiBase(ABC):
                     source[key].insert(0, f'{EmbyApiBase.EMBY_PREF}{source[key][0]}')
 
                 for value_source in source[key]:
-                    if not value_source in destination[key]:
+                    if value_source not in destination[key]:
                         destination[key].append(value_source)
 
         return destination
@@ -98,7 +98,6 @@ class EmbyApiBase(ABC):
 
         func_get = dict.get if isinstance(source_item, dict) else getattr
         for field, val in my_field_map.items():
-
             values = val
             if not isinstance(values, list):
                 values = [val]
@@ -197,7 +196,6 @@ class EmbyAuth(EmbyApiBase):
         userdata = None
 
         if not self._apikey:
-
             if self.is_connect_server():
                 # Make Emby connect login
                 self._login_type = LOGIN_CONNECT
@@ -219,9 +217,9 @@ class EmbyAuth(EmbyApiBase):
 
                     if (
                         not connect_data
-                        or not 'AccessToken' in connect_data
-                        or not 'User' in connect_data
-                        or not 'Id' in connect_data['User']
+                        or 'AccessToken' not in connect_data
+                        or 'User' not in connect_data
+                        or 'Id' not in connect_data['User']
                     ):
                         raise PluginError(
                             f'Could not login to Emby Connect account `{self._connect_username}`'
@@ -240,7 +238,7 @@ class EmbyAuth(EmbyApiBase):
                         )
 
                     for server in connect_servers:
-                        if not 'Name' in server:
+                        if 'Name' not in server:
                             raise PluginError(
                                 f'Could not login to Emby Connect account `{self._connect_username}`, no server list'
                             )
@@ -252,7 +250,7 @@ class EmbyAuth(EmbyApiBase):
                             f'No server with name `{self.host}`` on `{self._connect_username}` account'
                         )
 
-                    if not 'AccessKey' in connect_server or not 'Url' in connect_server:
+                    if 'AccessKey' not in connect_server or 'Url' not in connect_server:
                         raise PluginError(
                             f'Could not login to Emby Connect account `{self._connect_username}`, no server list'
                         )
@@ -266,8 +264,8 @@ class EmbyAuth(EmbyApiBase):
                     )
 
                     if (
-                        not 'LocalUserId' in connect_exchange
-                        or not 'AccessToken' in connect_exchange
+                        'LocalUserId' not in connect_exchange
+                        or 'AccessToken' not in connect_exchange
                     ):
                         raise PluginError(
                             f'Could not login with Emby Connect to server `{self.host}`'
@@ -703,7 +701,6 @@ class EmbyApiList(EmbyApiBase, MutableSet):
 
     @staticmethod
     def get_api_list(**kwargs) -> EmbyApiListBase:
-
         if EmbyApiRootList.is_type(**kwargs):
             logger.debug('List is a root list')
             return EmbyApiRootList(**kwargs)
@@ -1559,7 +1556,7 @@ class EmbyApiMedia(EmbyApiBase):
             return None
 
         for parent in parents:
-            if not 'Type' in parent or parent['Type'].lower() != cls.TYPE:
+            if 'Type' not in parent or parent['Type'].lower() != cls.TYPE:
                 continue
             season = cls.cast(**parent)
             if isinstance(season, cls):
@@ -2677,8 +2674,7 @@ class EmbyApi(EmbyApiBase):
 
         mlist = list_object.get_items()
 
-        for list_obj in mlist:
-            yield list_obj
+        yield from mlist
 
     @staticmethod
     def strtotime(date) -> 'datetime':

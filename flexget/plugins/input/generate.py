@@ -20,7 +20,7 @@ class Generate:
             import random
             import string
 
-            entry['url'] = 'http://localhost/generate/%s/%s' % (
+            entry['url'] = 'http://localhost/generate/{}/{}'.format(
                 i,
                 ''.join(
                     [random.choice(string.ascii_letters + string.digits) for x in range(1, 30)]

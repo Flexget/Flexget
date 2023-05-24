@@ -38,8 +38,7 @@ class PluginTryRegexp:
             'Press ^D or type \'exit\' to continue. Type \'continue\' to continue non-interactive execution.'
         )
         console(
-            'Task \'%s\' has %s entries, enter regexp to see what matches it.'
-            % (task.name, len(task.entries))
+            f'Task \'{task.name}\' has {len(task.entries)} entries, enter regexp to see what matches it.'
         )
         while True:
             try:
@@ -65,7 +64,7 @@ class PluginTryRegexp:
                 except re.error:
                     console('Invalid regular expression')
                     break
-            console('%s of %s entries matched' % (count, len(task.entries)))
+            console(f'{count} of {len(task.entries)} entries matched')
         console('Bye!')
 
 

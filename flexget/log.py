@@ -1,8 +1,6 @@
-import codecs
 import collections
 import contextlib
 import functools
-import io
 import logging
 import logging.handlers
 import os
@@ -12,12 +10,10 @@ import uuid
 import warnings
 from typing import Callable, Deque, Iterator, List, Optional, Union
 
-import colorama
 import loguru
 from loguru import logger
 
 from flexget import __version__
-from flexget.utils.tools import io_encoding
 
 # A level more detailed than INFO
 VERBOSE = 15
@@ -165,9 +161,10 @@ def start(
     filename: str = None, level: str = 'INFO', to_console: bool = True, to_file: bool = True
 ) -> None:
     """After initialization, start file logging."""
-    global _logging_started
+    global _logging_started, _startup_buffer, _startup_buffer_id
 
     assert _logging_configured
+
     if _logging_started:
         return
 
@@ -194,26 +191,17 @@ def start(
             logger.debug("No sys.stdout, can't log to console.")
         else:
             # Make sure we don't send any characters that the current terminal doesn't support printing
-            if sys.version_info >= (3, 7):
-                sys.stdout.reconfigure(errors='replace')
-                out = sys.stdout
-            else:
-                out = io.TextIOWrapper(sys.stdout.buffer, encoding=io_encoding, errors='replace')
-                # Loguru only autodetects whether we need to wrap the stream only when it's sys.__stdout__
-                # since we've already wrapped it we need to add the colorama support ourselves
-                if os.name == "nt":
-                    out = colorama.AnsiToWin32(
-                        out, convert=True, strip=False, autoreset=False
-                    ).stream
-            logger.add(out, level=level, format=LOG_FORMAT, filter=_log_filterer)
+            sys.stdout.reconfigure(errors='replace')
+            logger.add(sys.stdout, level=level, format=LOG_FORMAT, filter=_log_filterer)
+
+    if _startup_buffer_id is not None:
+        logger.remove(_startup_buffer_id)
+        _startup_buffer_id = None
 
     # flush what we have stored from the plugin initialization
-    global _startup_buffer, _startup_buffer_id
-    if _startup_buffer_id:
-        logger.remove(_startup_buffer_id)
+    if _startup_buffer:
         for record in _startup_buffer:
             level, message = record['level'].name, record['message']
             logger.patch(lambda r: r.update(record)).log(level, message)
         _startup_buffer = []
-        _startup_buffer_id = None
     _logging_started = True

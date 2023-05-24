@@ -218,8 +218,7 @@ class FromIMDB:
         """
         for el in _list:
             if isinstance(el, Iterable) and not isinstance(el, str):
-                for sub in self.flatten_list(el):
-                    yield sub
+                yield from self.flatten_list(el)
             else:
                 yield el
 

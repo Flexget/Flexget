@@ -327,8 +327,8 @@ def is_json(instance) -> bool:
         return False
 
     try:
-        decoded_json = json_loads(instance)
-    except JSONDecodeError as e:
+        json_loads(instance)
+    except JSONDecodeError:
         raise ValueError('`%s` is not a valid json' % instance)
 
     return True
@@ -430,20 +430,17 @@ def validate_properties_w_defaults(validator, properties, instance, schema):
     for key, subschema in properties.items():
         if 'default' in subschema:
             instance.setdefault(key, subschema['default'])
-    for error in BaseValidator.VALIDATORS["properties"](validator, properties, instance, schema):
-        yield error
+    yield from BaseValidator.VALIDATORS["properties"](validator, properties, instance, schema)
 
 
 def validate_anyOf(validator, anyOf, instance, schema):
     errors = BaseValidator.VALIDATORS["anyOf"](validator, anyOf, instance, schema)
-    for e in select_child_errors(validator, errors):
-        yield e
+    yield from select_child_errors(validator, errors)
 
 
 def validate_oneOf(validator, oneOf, instance, schema):
     errors = BaseValidator.VALIDATORS["oneOf"](validator, oneOf, instance, schema)
-    for e in select_child_errors(validator, errors):
-        yield e
+    yield from select_child_errors(validator, errors)
 
 
 def validate_deprecated(validator, message, instance, schema):

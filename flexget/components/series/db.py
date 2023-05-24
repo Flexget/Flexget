@@ -115,7 +115,7 @@ class Series(Base):
         return self._name_normalized
 
     def __str__(self):
-        return '<Series(id=%s,name=%s)>' % (self.id, self.name)
+        return f'<Series(id={self.id},name={self.name})>'
 
     def __repr__(self):
         return str(self).encode('ascii', 'replace')
@@ -206,7 +206,7 @@ class Season(Base):
         return False
 
     def __str__(self):
-        return '<Season(id=%s,identifier=%s,season=%s,completed=%s)>' % (
+        return '<Season(id={},identifier={},season={},completed={})>'.format(
             self.id,
             self.identifier,
             self.season,
@@ -339,7 +339,7 @@ class Episode(Base):
         )[0]
 
     def __str__(self):
-        return '<Episode(id=%s,identifier=%s,season=%s,number=%s)>' % (
+        return '<Episode(id={},identifier={},season={},number={})>'.format(
             self.id,
             self.identifier,
             self.season,
@@ -445,7 +445,7 @@ class EpisodeRelease(Base):
         return self.proper_count > 0
 
     def __str__(self):
-        return '<Release(id=%s,quality=%s,downloaded=%s,proper_count=%s,title=%s)>' % (
+        return '<Release(id={},quality={},downloaded={},proper_count={},title={})>'.format(
             self.id,
             self.quality,
             self.downloaded,
@@ -493,7 +493,7 @@ class SeasonRelease(Base):
         return self.proper_count > 0
 
     def __str__(self):
-        return '<Release(id=%s,quality=%s,downloaded=%s,proper_count=%s,title=%s)>' % (
+        return '<Release(id={},quality={},downloaded={},proper_count={},title={})>'.format(
             self.id,
             self.quality,
             self.downloaded,
@@ -546,7 +546,9 @@ class AlternateNames(Base):
         self.alt_name = name
 
     def __str__(self):
-        return '<SeriesAlternateName(series_id=%s, alt_name=%s)>' % (self.series_id, self.alt_name)
+        return '<SeriesAlternateName(series_id={}, alt_name={})>'.format(
+            self.series_id, self.alt_name
+        )
 
     def __repr__(self):
         return str(self).encode('ascii', 'replace')
@@ -768,8 +770,10 @@ def set_alt_names(alt_names: Iterable[str], db_series: Series, session: Session)
         if db_series_alt:
             if not db_series_alt.series_id == db_series.id:
                 raise plugin.PluginError(
-                    'Error adding alternate name for `%s`: `%s` is already associated with `%s`. '
-                    'Check your settings.' % (db_series.name, alt_name, db_series_alt.series.name)
+                    'Error adding alternate name for `{}`: `{}` is already associated with `{}`. '
+                    'Check your settings.'.format(
+                        db_series.name, alt_name, db_series_alt.series.name
+                    )
                 )
             else:
                 logger.debug(
@@ -808,9 +812,15 @@ def get_all_entities(
     episodes = show_episodes(series, session=session)
     seasons = show_seasons(series, session=session)
     if sort_by == 'identifier':
-        key = lambda e: e.identifier
+
+        def key(e):
+            return e.identifier
+
     else:
-        key = lambda e: (e.first_seen or datetime.min, e.identifier)
+
+        def key(e):
+            return e.first_seen or datetime.min, e.identifier
+
     return sorted(episodes + seasons, key=key, reverse=reverse)
 
 
@@ -909,8 +919,8 @@ def _add_alt_name(alt: str, db_series: Series, series_name: str, session: Sessio
         else:
             # Alternate name already exists for another series. Not good.
             raise plugin.PluginError(
-                'Error adding alternate name for `%s`: `%s` is already associated with `%s`. '
-                'Check your settings.' % (series_name, alt, db_series_alt.series.name)
+                'Error adding alternate name for `{}`: `{}` is already associated with `{}`. '
+                'Check your settings.'.format(series_name, alt, db_series_alt.series.name)
             )
     else:
         logger.debug('adding alternate name `{}` for `{}` into db', alt, series_name)
@@ -1200,8 +1210,7 @@ def set_series_begin(series: Series, ep_id: Union[str, int]) -> Tuple[str, str]:
     if series.identified_by not in ['auto', '', None]:
         if identified_by != series.identified_by:
             raise ValueError(
-                '`begin` value `%s` does not match identifier type for identified_by `%s`'
-                % (ep_id, series.identified_by)
+                f'`begin` value `{ep_id}` does not match identifier type for identified_by `{series.identified_by}`'
             )
     series.identified_by = identified_by
     episode = (
@@ -1278,12 +1287,10 @@ def remove_series_entity(name: str, identifier: str, forget: bool = False) -> No
             logger.debug('Entity `{}` from series `{}` removed from database.', identifier, name)
             return [release.title for release in entity.downloaded_releases]
 
-        name_to_parse = '{} {}'.format(series.name, identifier)
+        name_to_parse = f'{series.name} {identifier}'
         parsed = plugin.get('parsing', 'series.db').parse_series(name_to_parse, name=series.name)
         if not parsed.valid:
-            raise ValueError(
-                'Invalid identifier for series `{}`: `{}`'.format(series.name, identifier)
-            )
+            raise ValueError(f'Invalid identifier for series `{series.name}`: `{identifier}`')
 
         removed = False
         if parsed.season_pack:
@@ -1309,9 +1316,7 @@ def remove_series_entity(name: str, identifier: str, forget: bool = False) -> No
                 removed = True
                 downloaded_releases = remove_entity(episode)
         if not removed:
-            raise ValueError(
-                'Unknown identifier `%s` for series `%s`' % (identifier, name.capitalize())
-            )
+            raise ValueError(f'Unknown identifier `{identifier}` for series `{name.capitalize()}`')
 
     if forget:
         for downloaded_release in downloaded_releases:
@@ -1545,20 +1550,16 @@ def add_series_entity(
     :param identifier: Series identifier to be added.
     :param quality: If supplied, this will override the quality from the series parser.
     """
-    name_to_parse = '{} {}'.format(series.name, identifier)
+    name_to_parse = f'{series.name} {identifier}'
     if quality:
-        name_to_parse += ' {}'.format(quality)
+        name_to_parse += f' {quality}'
     parsed = plugin.get('parsing', 'series.db').parse_series(name_to_parse, name=series.name)
     if not parsed.valid:
-        raise ValueError(
-            'Invalid identifier for series `{}`: `{}`.'.format(series.name, identifier)
-        )
+        raise ValueError(f'Invalid identifier for series `{series.name}`: `{identifier}`.')
 
     added = store_parser(session, parsed, series=series)
     if not added:
-        raise ValueError(
-            'Unable to add `%s` to series `%s`.' % (identifier, series.name.capitalize())
-        )
+        raise ValueError(f'Unable to add `{identifier}` to series `{series.name.capitalize()}`.')
     else:
         for release in added:
             release.downloaded = True

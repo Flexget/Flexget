@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import pytest
 
 from flexget.components.parsing.parsers.parser_guessit import ParserGuessit
@@ -22,7 +21,7 @@ class TestSeriesParser:
         def parse_invalid(name, data, **kwargs):
             """Makes sure either ParseWarning is raised, or return is invalid."""
             r = parse(data, name, **kwargs)
-            assert not r.valid, '{data} should not be valid'.format(data=data)
+            assert not r.valid, f'{data} should not be valid'
             return r
 
         return parse_invalid
@@ -32,7 +31,7 @@ class TestSeriesParser:
         def parse_valid(name, data, **kwargs):
             """Makes sure return is valid."""
             r = parse(data, name, **kwargs)
-            assert r.valid, '{data} should be valid'.format(data=data)
+            assert r.valid, f'{data} should be valid'
             return r
 
         return parse_valid
@@ -478,15 +477,15 @@ class TestSeriesParser:
                 if int(mock_ep1) >= int(mock_ep2) or int(mock_ep2) > 999:
                     continue
 
-                s = parse('FooBar - %s %s-FlexGet' % (mock_ep1, quality2.name), name='FooBar')
-                assert s.episode == int(mock_ep1), "confused episode %s with quality %s" % (
+                s = parse(f'FooBar - {mock_ep1} {quality2.name}-FlexGet', name='FooBar')
+                assert s.episode == int(mock_ep1), "confused episode {} with quality {}".format(
                     mock_ep1,
                     quality2.name,
                 )
 
                 # Also test with reversed relative order of episode and quality
-                s = parse('[%s] FooBar - %s [FlexGet]' % (quality2.name, mock_ep1), name='FooBar')
-                assert s.episode == int(mock_ep1), "confused episode %s with quality %s" % (
+                s = parse(f'[{quality2.name}] FooBar - {mock_ep1} [FlexGet]', name='FooBar')
+                assert s.episode == int(mock_ep1), "confused episode {} with quality {}".format(
                     mock_ep1,
                     quality2.name,
                 )
@@ -680,16 +679,16 @@ class TestSeriesParser:
         # assert_raises(ParseWarning, s.parse, 'The Show e')
 
     def test_apostrophe(self, parse):
-        s = parse(name=u"FlexGet's show", data=u"FlexGet's show s01e01")
+        s = parse(name="FlexGet's show", data="FlexGet's show s01e01")
         assert s.valid
-        s = parse(name=u"FlexGet's show", data=u"FlexGets show s01e01")
+        s = parse(name="FlexGet's show", data="FlexGets show s01e01")
         assert s.valid
-        s = parse(name=u"FlexGet's show", data=u"FlexGet s show s01e01")
+        s = parse(name="FlexGet's show", data="FlexGet s show s01e01")
         assert s.valid
-        s = parse(name=u"FlexGet's show", data=u"FlexGet show s01e01")
+        s = parse(name="FlexGet's show", data="FlexGet show s01e01")
         assert not s.valid
         # bad data with leftover escaping
-        s = parse(name=u"FlexGet's show", data=u"FlexGet\\'s show s01e01")
+        s = parse(name="FlexGet's show", data="FlexGet\\'s show s01e01")
         assert s.valid
 
     def test_alternate_names(self, parse):

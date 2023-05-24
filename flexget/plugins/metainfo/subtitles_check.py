@@ -4,7 +4,8 @@ import tempfile
 
 from loguru import logger
 
-from flexget import entry, plugin
+from flexget import plugin
+from flexget.entry import register_lazy_lookup
 from flexget.event import event
 
 logger = logger.bind(name='check_subtitles')
@@ -52,11 +53,11 @@ class MetainfoSubs:
         for entry in task.entries:
             entry.add_lazy_fields(self.get_subtitles, ['subtitles'])
 
-    @entry.register_lazy_lookup('subtitles_check')
+    @register_lazy_lookup('subtitles_check')
     def get_subtitles(self, entry):
         if (
             entry.get('subtitles', eval_lazy=False)
-            or not ('location' in entry)
+            or 'location' not in entry
             or ('$RECYCLE.BIN' in entry['location'])
             or not os.path.exists(entry['location'])
         ):
@@ -73,7 +74,7 @@ class MetainfoSubs:
             subtitles |= set(search_external_subtitles(entry['location']).values())
             if subtitles:
                 # convert to human-readable strings
-                subtitles = [str(l) for l in subtitles]
+                subtitles = [str(s) for s in subtitles]
                 entry['subtitles'] = subtitles
                 logger.debug('Found subtitles {} for {}', '/'.join(subtitles), entry['title'])
         except Exception as e:
