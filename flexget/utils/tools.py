@@ -146,7 +146,7 @@ def merge_dict_from_to(d1: dict, d2: dict) -> None:
                 elif isinstance(v, (str, bool, int, float, type(None))):
                     pass
                 else:
-                    raise Exception(f'Unknown type: {type(v)} value: {repr(v)} in dictionary')
+                    raise Exception(f'Unknown type: {type(v)} value: {v!r} in dictionary')
             elif isinstance(v, (str, bool, int, float, list, type(None))) and isinstance(
                 d2[k], (str, bool, int, float, list, type(None))
             ):
