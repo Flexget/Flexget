@@ -56,7 +56,7 @@ class InputCSV:
         try:
             r = task.requests.get(config['url'])
         except RequestException as e:
-            raise plugin.PluginError('Error fetching `%s`: %s' % (config['url'], e))
+            raise plugin.PluginError('Error fetching `{}`: {}'.format(config['url'], e))
 
         page = r.text.splitlines()
         for row in csv.reader(page):

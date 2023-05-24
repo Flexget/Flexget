@@ -179,7 +179,7 @@ class InputRSS:
         if sourcename:
             filename += '-' + sourcename
         filename = pathscrub(filename, filename=True)
-        filepath = os.path.join(received, '%s.%s' % (filename, ext))
+        filepath = os.path.join(received, f'{filename}.{ext}')
         with open(filepath, 'wb') as f:
             f.write(data)
         logger.critical('I have saved the invalid content to {} for you to view', filepath)
@@ -190,7 +190,6 @@ class InputRSS:
         in_cdata_block = False
 
         for idx, char in enumerate(bytes(content)):
-
             char = bytes([char])
             if not in_cdata_block and char == b'&':
                 if not content[idx : idx + 7].startswith(valid_escapes):
@@ -271,8 +270,9 @@ class InputRSS:
                 content = response.content
             except RequestException as e:
                 raise plugin.PluginError(
-                    'Unable to download the RSS for task %s (%s): %s'
-                    % (task.name, config['url'], e)
+                    'Unable to download the RSS for task {} ({}): {}'.format(
+                        task.name, config['url'], e
+                    )
                 )
             if config.get('ascii'):
                 # convert content to ascii (cleanup), can also help with parsing problems on malformed feeds
@@ -289,22 +289,23 @@ class InputRSS:
                 return []
             elif status == 401:
                 raise plugin.PluginError(
-                    'Authentication needed for task %s (%s): %s'
-                    % (task.name, config['url'], response.headers['www-authenticate']),
+                    'Authentication needed for task {} ({}): {}'.format(
+                        task.name, config['url'], response.headers['www-authenticate']
+                    ),
                     logger,
                 )
             elif status == 404:
                 raise plugin.PluginError(
-                    'RSS Feed %s (%s) not found' % (task.name, config['url']), logger
+                    'RSS Feed {} ({}) not found'.format(task.name, config['url']), logger
                 )
             elif status == 500:
                 raise plugin.PluginError(
-                    'Internal server exception on task %s (%s)' % (task.name, config['url']),
+                    'Internal server exception on task {} ({})'.format(task.name, config['url']),
                     logger,
                 )
             elif status != 200:
                 raise plugin.PluginError(
-                    'HTTP error %s received from %s' % (status, config['url']), logger
+                    'HTTP error {} received from {}'.format(status, config['url']), logger
                 )
 
             # update etag and last modified
@@ -334,7 +335,9 @@ class InputRSS:
         try:
             rss = feedparser.parse(content)
         except LookupError as e:
-            raise plugin.PluginError('Unable to parse the RSS (from %s): %s' % (config['url'], e))
+            raise plugin.PluginError(
+                'Unable to parse the RSS (from {}): {}'.format(config['url'], e)
+            )
 
         # check for bozo
         ex = rss.get('bozo_exception', False)
@@ -366,8 +369,9 @@ class InputRSS:
                     if task.options.debug:
                         logger.error('bozo error parsing rss: {}', ex)
                     raise plugin.PluginError(
-                        'Received invalid RSS content from task %s (%s)'
-                        % (task.name, config['url'])
+                        'Received invalid RSS content from task {} ({})'.format(
+                            task.name, config['url']
+                        )
                     )
                 elif isinstance(ex, http.client.BadStatusLine) or isinstance(ex, OSError):
                     raise ex  # let the @internet decorator handle
@@ -375,8 +379,7 @@ class InputRSS:
                     # all other bozo errors
                     self.process_invalid_content(task, content, config['url'])
                     raise plugin.PluginError(
-                        'Unhandled bozo_exception. Type: %s (task: %s)'
-                        % (ex.__class__.__name__, task.name),
+                        f'Unhandled bozo_exception. Type: {ex.__class__.__name__} (task: {task.name})',
                         logger,
                     )
 
@@ -413,7 +416,6 @@ class InputRSS:
         # default value is auto but for example guid is used in some feeds
         ignored = 0
         for entry in rss.entries:
-
             # Check if title field is overridden in config
             title_field = config.get('title', 'title')
             # ignore entries without title

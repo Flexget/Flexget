@@ -1,6 +1,3 @@
-# coding=utf-8
-
-
 import json
 import re
 from datetime import datetime, timedelta
@@ -81,7 +78,7 @@ class RutrackerAuth(AuthBase):
 
     def try_authenticate(self, payload):
         for _ in range(5):
-            self.requests.post('{}/forum/login.php'.format(self.base_url), data=payload)
+            self.requests.post(f'{self.base_url}/forum/login.php', data=payload)
             if self.requests.cookies and len(self.requests.cookies) > 0:
                 return self.requests.cookies
             else:
@@ -113,9 +110,9 @@ class RutrackerAuth(AuthBase):
     def __call__(self, r):
         url = r.url
         t_id = re.findall(r'\d+', url)[0]
-        data = 't={}'.format(t_id)
+        data = f't={t_id}'
         headers = {
-            'referer': '{}/forum/viewtopic.php?t={}'.format(self.base_url, t_id),
+            'referer': f'{self.base_url}/forum/viewtopic.php?t={t_id}',
             'Content-Type': 'application/x-www-form-urlencoded',
             't': t_id,
             'Origin': self.base_url,
@@ -123,7 +120,7 @@ class RutrackerAuth(AuthBase):
         }
         r.prepare_body(data=data, files=None)
         r.prepare_method('POST')
-        r.prepare_url(url='{}/forum/dl.php?t={}'.format(self.base_url, t_id), params=None)
+        r.prepare_url(url=f'{self.base_url}/forum/dl.php?t={t_id}', params=None)
         r.prepare_headers(headers)
         r.prepare_cookies(self.cookies_)
         return r

@@ -93,7 +93,7 @@ class IRCRestart(APIResource):
         try:
             irc_manager.restart_connections(connection)
         except KeyError:
-            raise NotFoundError('Connection {} is not a valid IRC connection'.format(connection))
+            raise NotFoundError(f'Connection {connection} is not a valid IRC connection')
         return success_response('Successfully restarted connection(s)')
 
 
@@ -122,5 +122,5 @@ class IRCStop(APIResource):
         try:
             irc_manager.stop_connections(wait=wait, name=name)
         except KeyError:
-            raise NotFoundError('Connection {} is not a valid IRC connection'.format(name))
+            raise NotFoundError(f'Connection {name} is not a valid IRC connection')
         return success_response('Successfully stopped connection(s)')

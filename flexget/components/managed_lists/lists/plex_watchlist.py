@@ -20,7 +20,7 @@ if typing.TYPE_CHECKING:
 
 def import_plexaccount() -> "Type[MyPlexAccount]":
     try:
-        from plexapi.myplex import MyPlexAccount  # noqa
+        from plexapi.myplex import MyPlexAccount
 
         return MyPlexAccount
     except ImportError:
@@ -196,8 +196,7 @@ class PlexWatchlist:
     @plugin.internet(logger)
     def on_task_input(self, task, config):
         yaml_list = PlexManagedWatchlist(**config)
-        for item in yaml_list:
-            yield item
+        yield from yaml_list
 
 
 @event('plugin.register')

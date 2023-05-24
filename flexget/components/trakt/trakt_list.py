@@ -19,7 +19,7 @@ IMMUTABLE_LISTS = ['trending', 'popular']
 def generate_show_title(item):
     show_info = item['show']
     if show_info['year'] and not item['strip_dates']:
-        return '%s (%s)' % (show_info['title'], show_info['year'])
+        return '{} ({})'.format(show_info['title'], show_info['year'])
     else:
         return show_info['title']
 
@@ -52,7 +52,7 @@ def generate_episode_title(item):
 
 field_maps = {
     'movie': {
-        'title': lambda i: '%s (%s)' % (i['movie']['title'], i['movie']['year'])
+        'title': lambda i: '{} ({})'.format(i['movie']['title'], i['movie']['year'])
         if i['movie']['year'] and not i['strip_dates']
         else '%s' % i['movie']['title'],
         'movie_name': 'movie.title',
@@ -253,13 +253,13 @@ class TraktSet(MutableSet):
                         continue
                     entry = Entry()
                     if list_type == 'episode':
-                        entry['url'] = 'https://trakt.tv/shows/%s/seasons/%s/episodes/%s' % (
+                        entry['url'] = 'https://trakt.tv/shows/{}/seasons/{}/episodes/{}'.format(
                             item['show']['ids']['slug'],
                             item['episode']['season'],
                             item['episode']['number'],
                         )
                     else:
-                        entry['url'] = 'https://trakt.tv/%ss/%s' % (
+                        entry['url'] = 'https://trakt.tv/{}s/{}'.format(
                             list_type,
                             item[list_type]['ids'].get('slug'),
                         )

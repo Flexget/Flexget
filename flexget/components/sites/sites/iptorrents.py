@@ -152,7 +152,7 @@ class UrlRewriteIPTorrents:
             task.requests.add_domain_limiter(rate_limiter)
 
         for search_string in entry.get('search_strings', [entry['title']]):
-            search_params = {key: value for (key, value) in category_params.items()}
+            search_params = dict(category_params.items())
 
             query = normalize_unicode(search_string)
             search_params.update({'q': query, 'qf': ''})

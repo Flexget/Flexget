@@ -71,7 +71,7 @@ class PendingListEntry(Base):
         self.approved = False
 
     def __repr__(self):
-        return '<PendingListEntry,title=%s,original_url=%s,approved=%s>' % (
+        return '<PendingListEntry,title={},original_url={},approved={}>'.format(
             self.title,
             self.original_url,
             self.approved,

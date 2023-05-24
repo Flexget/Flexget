@@ -69,17 +69,13 @@ class MDChangeSet:
 
     def to_md_lines(self) -> Generator[str, None, None]:
         """An iterator over the markdown lines representing this changeset."""
-        for l in self.pre_header:
-            yield l
+        yield from self.pre_header
         yield self.version_header
-        for l in self.post_header:
-            yield l
+        yield from self.post_header
         for section, items in self.sections.items():
             yield section
-            for item in items:
-                yield item
-        for l in self.footer:
-            yield l
+            yield from items
+        yield from self.footer
 
 
 def isplit(

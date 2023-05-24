@@ -1,13 +1,21 @@
-import base64
 import os
+import pathlib
 import re
 from datetime import datetime, timedelta
 from fnmatch import fnmatch
 from functools import partial
 from netrc import NetrcParseError, netrc
 from time import sleep
+from typing import TYPE_CHECKING
 from urllib.parse import urlparse
 
+try:
+    import importlib.metadata as importlib_metadata
+except ImportError:
+    import importlib_metadata  # TODO: remove this after we drop python 3.7
+
+import packaging.specifiers
+import packaging.version
 from loguru import logger
 
 from flexget import plugin
@@ -19,14 +27,29 @@ from flexget.utils.template import RenderError
 from flexget.utils.tools import parse_timedelta
 
 try:
-    import requests.exceptions
-    import transmission_rpc as transmissionrpc
-    from transmission_rpc import TransmissionError
+    import transmission_rpc
+    from transmission_rpc.error import (
+        TransmissionAuthError,
+        TransmissionConnectError,
+        TransmissionError,
+        TransmissionTimeoutError,
+    )
 except ImportError:
     # If transmissionrpc is not found, errors will be shown later
-    pass
+    transmission_rpc = None
+    TransmissionError = None
+    TransmissionAuthError = None
+    TransmissionConnectError = None
+    TransmissionTimeoutError = None
+
+if TYPE_CHECKING:
+    from transmission_rpc import Torrent
 
 logger = logger.bind(name='transmission')
+
+__version__ = '>=4.1.4,<5.0.0'
+__package__ = 'transmission-rpc'
+__requirement__ = packaging.specifiers.SpecifierSet(__version__)
 
 
 class TransmissionBase:
@@ -49,7 +72,7 @@ class TransmissionBase:
                 logger.error('netrc: {}, file: {}, line: {}', e.msg, e.filename, e.lineno)
         return config
 
-    def create_rpc_client(self, config) -> 'transmissionrpc.Client':
+    def create_rpc_client(self, config) -> 'transmission_rpc.Client':
         user, password = config.get('username'), config.get('password')
         urlo = urlparse(config['host'])
 
@@ -63,81 +86,82 @@ class TransmissionBase:
         logger.debug('Connecting to {}://{}:{}{}', protocol, urlo.hostname, port, path)
 
         try:
-            cli = transmissionrpc.Client(
+            cli = transmission_rpc.Client(
                 protocol=protocol,
                 host=urlo.hostname,
                 port=port,
                 path=path,
                 username=user,
                 password=password,
+                timeout=30,
             )
-        except TransmissionError as e:
-            if e.original and e.original.code == 401:
-                raise plugin.PluginError(
-                    "Username/password for transmission is incorrect. Cannot connect."
-                )
-            else:
-                raise plugin.PluginError("Error connecting to transmission: %s" % e.message)
-        except requests.exceptions.ConnectTimeout as e:
+        except TransmissionAuthError:
+            raise plugin.PluginError(
+                "Username/password for transmission is incorrect. Cannot connect."
+            )
+        except TransmissionTimeoutError:
             raise plugin.PluginError("Cannot connect to transmission: Connection timed out.")
-        except requests.exceptions.ConnectionError as e:
+        except TransmissionConnectError as e:
             raise plugin.PluginError("Error connecting to transmission: %s" % e.args[0].reason)
-        except ValueError as e:
+        except TransmissionError:
             raise plugin.PluginError("Error connecting to transmission")
         return cli
 
-    def torrent_info(self, torrent, config):
-        done = torrent.totalSize > 0
+    def torrent_info(self, torrent: 'Torrent', config):
+        done = torrent.total_size > 0
         vloc = None
         best = None
-        for t in torrent.files().items():
-            tf = t[1]
-            if tf['selected']:
-                if tf['size'] <= 0 or tf['completed'] < tf['size']:
+        for _, tf in enumerate(torrent.get_files()):
+            if tf.selected:
+                if tf.size <= 0 or tf.completed < tf.size:
                     done = False
                     break
-                if not best or tf['size'] > best[1]:
-                    best = (tf['name'], tf['size'])
+                if not best or tf.size > best[1]:
+                    best = (tf.name, tf.size)
         if (
             done
             and best
-            and (100 * float(best[1]) / float(torrent.totalSize))
+            and (100 * float(best[1]) / float(torrent.total_size))
             >= (config['main_file_ratio'] * 100)
         ):
-            vloc = ('%s/%s' % (torrent.downloadDir, best[0])).replace('/', os.sep)
+            vloc = (f'{torrent.download_dir}/{best[0]}').replace('/', os.sep)
         return done, vloc
 
-    def check_seed_limits(self, torrent, session):
+    def check_seed_limits(self, torrent: 'Torrent', session):
         seed_limit_ok = True  # will remain if no seed ratio defined
         idle_limit_ok = True  # will remain if no idle limit defined
 
-        if torrent.seedRatioMode == 1:  # use torrent's own seed ratio limit
-            seed_limit_ok = torrent.uploadRatio >= torrent.seedRatioLimit
-        elif torrent.seedRatioMode == 0:  # use global rules
+        if torrent.get('seedRatioMode') == 1:  # use torrent's own seed ratio limit
+            seed_limit_ok = torrent.upload_ratio >= torrent.seed_ratio_limit
+        elif torrent.get('seedRatioMode') == 0:  # use global rules
             if session.seedRatioLimited:
-                seed_limit_ok = torrent.uploadRatio >= session.seedRatioLimit
+                seed_limit_ok = torrent.upload_ratio >= session.seedRatioLimit
 
-        if torrent.seedIdleMode == 1:  # use torrent's own idle limit
+        if torrent.get('seedIdleMode') == 1:  # use torrent's own idle limit
             idle_limit_ok = (
-                torrent.date_active + timedelta(minutes=torrent.seedIdleLimit)
+                torrent.activity_date + timedelta(minutes=torrent.seed_idle_limit)
                 < datetime.now().astimezone()
             )
-        elif torrent.seedIdleMode == 0:  # use global rules
+        elif torrent.get('seedIdleMode') == 0:  # use global rules
             if session.idle_seeding_limit_enabled:
                 idle_limit_ok = (
-                    torrent.date_active + timedelta(minutes=session.idle_seeding_limit)
+                    torrent.activity_date + timedelta(minutes=session.idle_seeding_limit)
                     < datetime.now().astimezone()
                 )
 
         return seed_limit_ok, idle_limit_ok
 
     def on_task_start(self, task, config):
-        try:
-            import transmission_rpc as transmissionrpc
-            from transmission_rpc import TransmissionError  # noqa
-        except:
+        if transmission_rpc is None:
             raise plugin.PluginError(
-                'transmission-rpc module version 3.0 or higher required.', logger
+                f'{__package__} module version {__version__} required.', logger
+            )
+
+        v = importlib_metadata.version(__package__)
+        if not __requirement__.contains(v):
+            raise plugin.PluginError(
+                f'{__package__} module version mismatch, requiring {__package__}{__version__}',
+                logger,
             )
 
         # Mark rpc client for garbage collector so every task can start
@@ -198,52 +222,56 @@ class PluginTransmissionInput(TransmissionBase):
                 title=torrent.name,
                 url='',
                 torrent_info_hash=torrent.hashString,
-                content_size=torrent.totalSize / (1024 * 1024),
+                content_size=torrent.total_size / (1024 * 1024),
             )
             # Location of torrent is only valid if transmission is on same machine as flexget
             if config['host'] in ('localhost', '127.0.0.1'):
-                entry['location'] = torrent.torrentFile
-                entry['url'] = 'file://' + torrent.torrentFile
-            for attr in [
-                'id',
-                'activityDate',
-                'comment',
-                'desiredAvailable',
-                'downloadDir',
-                'isFinished',
-                'isPrivate',
-                'isStalled',
-                'leftUntilDone',
-                'ratio',
-                'status',
-                'date_active',
-                'date_added',
-                'date_done',
-                'date_started',
-                'errorString',
-                'priority',
-                'progress',
-                'secondsDownloading',
-                'secondsSeeding',
-                'torrentFile',
-            ]:
+                entry['location'] = torrent.torrent_file
+                entry['url'] = pathlib.Path(torrent.torrent_file).as_uri()
+            for attr, field in {
+                'id': 'id',
+                'activityDate': 'activity_date',
+                'comment': 'comment',
+                'desiredAvailable': 'desired_available',
+                'downloadDir': 'download_dir',
+                'isFinished': 'is_finished',
+                'isPrivate': 'is_private',
+                'isStalled': 'is_stalled',
+                'leftUntilDone': 'left_until_done',
+                'ratio': 'ratio',
+                'status': 'status',
+                'date_active': 'date_active',
+                'date_added': 'date_added',
+                'date_done': 'date_done',
+                'date_started': 'date_started',
+                'errorString': 'error_string',
+                'priority': 'priority',
+                'progress': 'progress',
+                'secondsDownloading': 'seconds_downloading',
+                'secondsSeeding': 'seconds_seeding',
+                'torrentFile': 'torrent_file',
+                'labels': 'labels',
+            }.items():
                 try:
-                    value = getattr(torrent, attr)
+                    value = getattr(torrent, field)
                 except Exception:
                     logger.opt(exception=True).debug(
                         'error when requesting transmissionrpc attribute {}', attr
                     )
                 else:
-                    # transmission-rpc adds timezone info to datetimes, which makes them hard to deal with. Strip it.
+                    # transmission-rpc adds timezone info to datetimes,
+                    # which makes them hard to deal with. Strip it.
                     if isinstance(value, datetime):
                         value = value.replace(tzinfo=None)
                     entry['transmission_' + attr] = value
             # Availability in percent
             entry['transmission_availability'] = (
-                (torrent.desiredAvailable / torrent.leftUntilDone) if torrent.leftUntilDone else 0
+                (torrent.desired_available / torrent.left_until_done)
+                if torrent.left_until_done
+                else 0
             )
 
-            entry['transmission_trackers'] = [t['announce'] for t in torrent.trackers]
+            entry['transmission_trackers'] = [t.announce for t in torrent.trackers]
             entry['transmission_seed_ratio_ok'] = seed_ratio_ok
             entry['transmission_idle_limit_ok'] = idle_limit_ok
             st_error_to_desc = {
@@ -255,9 +283,11 @@ class PluginTransmissionInput(TransmissionBase):
             entry['transmission_error_state'] = st_error_to_desc[torrent.error]
             # Built in done_date doesn't work when user adds an already completed file to transmission
             if torrent.progress == 100:
-                entry['transmission_date_done'] = datetime.fromtimestamp(
-                    max(torrent.addedDate, torrent.doneDate)
-                )
+                date_done = torrent.done_date or torrent.added_date
+                if date_done:
+                    date_done = date_done.replace(tzinfo=None)
+                entry['transmission_date_done'] = date_done
+
             entries.append(entry)
         return entries
 
@@ -317,6 +347,7 @@ class PluginTransmission(TransmissionBase):
                     'skip_files': one_or_more({'type': 'string'}),
                     'rename_like_files': {'type': 'boolean'},
                     'queue_position': {'type': 'integer'},
+                    'labels': {'type': 'array', 'items': {'type': 'string'}},
                 },
                 'additionalProperties': False,
             },
@@ -417,14 +448,11 @@ class PluginTransmission(TransmissionBase):
                 try:
                     if downloaded:
                         with open(entry['file'], 'rb') as f:
-                            filedump = base64.b64encode(f.read()).decode('utf-8')
-                        torrent_info = client.add_torrent(filedump, 30, **options['add'])
+                            torrent_info = client.add_torrent(f, 30, **options['add'])
                     else:
                         if options['post'].get('magnetization_timeout', 0) > 0:
                             options['add']['paused'] = False
-                        torrent_info = client.add_torrent(
-                            entry['url'], timeout=30, **options['add']
-                        )
+                        torrent_info = client.add_torrent(entry['url'], **options['add'])
                 except TransmissionError as e:
                     logger.opt(exception=True).debug('TransmissionError')
                     logger.debug('Failed options dict: {}', options['add'])
@@ -440,8 +468,11 @@ class PluginTransmission(TransmissionBase):
             else:
                 # Torrent already loaded in transmission
                 if options['add'].get('download_dir'):
-                    logger.verbose(
-                        'Moving {} to "{}"', torrent_info.name, options['add']['download_dir']
+                    logger.log(
+                        "VERBOSE",
+                        'Moving {} to "{}"',
+                        torrent_info.name,
+                        options['add']['download_dir'],
                     )
                     # Move data even if current reported torrent location matches new location
                     # as transmission may fail to automatically move completed file to final
@@ -449,10 +480,12 @@ class PluginTransmission(TransmissionBase):
                     # In such case this will kick transmission to really move data.
                     # If data is already located at new location then transmission just ignore
                     # this command.
-                    client.move_torrent_data(torrent_info.id, options['add']['download_dir'], 120)
+                    client.move_torrent_data(
+                        torrent_info.hashString, options['add']['download_dir'], 120
+                    )
 
             try:
-                total_size = torrent_info.totalSize
+                total_size = torrent_info.total_size
                 main_id = None
                 find_main_file = (
                     options['post'].get('main_file_only') or 'content_filename' in options['post']
@@ -460,7 +493,7 @@ class PluginTransmission(TransmissionBase):
                 skip_files = options['post'].get('skip_files')
                 # We need to index the files if any of the following are defined
                 if find_main_file or skip_files:
-                    file_list = client.get_files(torrent_info.id)[torrent_info.id]
+                    file_list = torrent_info.get_files()
 
                     if options['post'].get('magnetization_timeout', 0) > 0 and not file_list:
                         logger.debug(
@@ -470,11 +503,11 @@ class PluginTransmission(TransmissionBase):
                         )
                         for _ in range(options['post']['magnetization_timeout']):
                             sleep(1)
-                            file_list = client.get_files(torrent_info.id)[torrent_info.id]
+                            file_list = torrent_info.get_files()
                             if file_list:
                                 total_size = client.get_torrent(
                                     torrent_info.id, ['id', 'totalSize']
-                                ).totalSize
+                                ).total_size
                                 break
                         else:
                             logger.warning(
@@ -611,7 +644,7 @@ class PluginTransmission(TransmissionBase):
 
                 # Set any changed file properties
                 if list(options['change'].keys()):
-                    client.change_torrent(torrent_info.id, 30, **options['change'])
+                    client.change_torrent(torrent_info.id, **options['change'])
 
                 start_torrent = partial(client.start_torrent, [torrent_info.id])
 
@@ -652,7 +685,6 @@ class PluginTransmission(TransmissionBase):
                 continue
 
     def _make_torrent_options_dict(self, config, entry):
-
         opt_dic = {}
 
         for opt_key in (
@@ -673,6 +705,7 @@ class PluginTransmission(TransmissionBase):
             'skip_files',
             'rename_like_files',
             'queue_position',
+            'labels',
         ):
             # Values do not merge config with task
             # Task takes priority then config is used
@@ -723,6 +756,9 @@ class PluginTransmission(TransmissionBase):
 
         if 'queue_position' in opt_dic:
             change['queuePosition'] = opt_dic['queue_position']
+
+        if 'labels' in opt_dic:
+            change['labels'] = opt_dic['labels']
 
         post = options['post']
         # set to modify paused status after
@@ -840,12 +876,13 @@ class PluginTransmissionClean(TransmissionBase):
 
         remove_ids = []
         for torrent in client.get_torrents():
-            logger.verbose(
+            logger.log(
+                "VERBOSE",
                 'Torrent "{}": status: "{}" - ratio: {} - date added: {}',
                 torrent.name,
                 torrent.status,
                 torrent.ratio,
-                torrent.date_added,
+                torrent.added_date,
             )
             downloaded, dummy = self.torrent_info(torrent, config)
             if not downloaded:
@@ -859,12 +896,10 @@ class PluginTransmissionClean(TransmissionBase):
                     continue
             if 'finished_for' in config:
                 # done date might be invalid if this torrent was added to transmission when already completed
-                started_seeding = datetime.fromtimestamp(max(torrent.addedDate, torrent.doneDate))
+                started_seeding = max(torrent.added_date, torrent.done_date)
                 if started_seeding + parse_timedelta(config['finished_for']) > datetime.now():
                     continue
-            tracker_hosts = (
-                urlparse(tracker['announce']).hostname for tracker in torrent.trackers
-            )
+            tracker_hosts = [urlparse(tracker.announce).hostname for tracker in torrent.trackers]
             if 'tracker' in config:
                 if not any(tracker_re.search(tracker) for tracker in tracker_hosts):
                     continue
@@ -873,7 +908,8 @@ class PluginTransmissionClean(TransmissionBase):
                     continue
             if config.get('directories'):
                 if not any(
-                    re.search(d, torrent.downloadDir, re.IGNORECASE) for d in config['directories']
+                    re.search(d, torrent.download_dir, re.IGNORECASE)
+                    for d in config['directories']
                 ):
                     continue
             if task.options.test:

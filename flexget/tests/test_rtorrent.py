@@ -42,7 +42,7 @@ class TestRTorrentClient:
         assert '' == called_args[0]
         assert xmlrpc_client.Binary(torrent_raw) in called_args
 
-        fields = [p for p in called_args[2:]]
+        fields = list(called_args[2:])
         assert len(fields) == 3
         # TODO: check the note in clients/rtorrent.py about this escaping.
         # The client should be fixed to work consistenly on all python versions
@@ -75,15 +75,13 @@ class TestRTorrentClient:
         assert torrent.get('down_rate') == 123456
 
         assert mocked_proxy.system.multicall.called_with(
-            (
-                [
-                    {'params': (torrent_info_hash,), 'methodName': 'd.base_path'},
-                    {'params': (torrent_info_hash,), 'methodName': 'd.name'},
-                    {'params': (torrent_info_hash,), 'methodName': 'd.hash'},
-                    {'params': (torrent_info_hash,), 'methodName': 'd.custom1'},
-                    {'params': (torrent_info_hash,), 'methodName': 'd.down.rate'},
-                ]
-            )
+            [
+                {'params': (torrent_info_hash,), 'methodName': 'd.base_path'},
+                {'params': (torrent_info_hash,), 'methodName': 'd.name'},
+                {'params': (torrent_info_hash,), 'methodName': 'd.hash'},
+                {'params': (torrent_info_hash,), 'methodName': 'd.custom1'},
+                {'params': (torrent_info_hash,), 'methodName': 'd.down.rate'},
+            ]
         )
 
     def test_torrents(self, mocked_proxy):
@@ -110,7 +108,7 @@ class TestRTorrentClient:
             elif torrent.get('hash') == hash2:
                 assert torrent.get('custom1') == 'test_custom2'
             else:
-                assert False, 'Invalid hash returned'
+                raise AssertionError('Invalid hash returned')
 
         assert mocked_proxy.system.multicall.called_with(
             (['main', 'd.directory_base=', 'd.name=', 'd.hash=', 'd.custom1='],)
@@ -132,16 +130,14 @@ class TestRTorrentClient:
         assert resp == 0
 
         assert mocked_proxy.system.multicall.called_with(
-            (
-                [
-                    {
-                        'params': (torrent_info_hash, '/data/downloads'),
-                        'methodName': 'd.directory_base',
-                    },
-                    {'params': (torrent_info_hash, 'test_custom1'), 'methodName': 'd.custom1'},
-                    {'params': (torrent_info_hash, '/data/downloads'), 'methodName': 'd.custom1'},
-                ]
-            )
+            [
+                {
+                    'params': (torrent_info_hash, '/data/downloads'),
+                    'methodName': 'd.directory_base',
+                },
+                {'params': (torrent_info_hash, 'test_custom1'), 'methodName': 'd.custom1'},
+                {'params': (torrent_info_hash, '/data/downloads'), 'methodName': 'd.custom1'},
+            ]
         )
 
     def test_delete(self, mocked_proxy):

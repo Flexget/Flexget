@@ -17,10 +17,10 @@ from .parser_common import MovieParseResult, SeriesParseResult
 # rebulk (that underlies guessit) will use the 'regex' module rather than 're' if installed.
 # For consistency, prevent that unless env variable is explicitly already enabling it.
 os.environ.setdefault('REGEX_DISABLED', 'true')  # isort:skip
-from guessit.api import GuessItApi, GuessitException  # isort:skip
-from guessit.rules import rebulk_builder  # isort:skip
-from rebulk import Rebulk  # isort:skip
-from rebulk.pattern import RePattern  # isort:skip
+from guessit.api import GuessItApi, GuessitException  # isort:skip # noqa: E402
+from guessit.rules import rebulk_builder  # isort:skip # noqa: E402
+from rebulk import Rebulk  # isort:skip # noqa: E402
+from rebulk.pattern import RePattern  # isort:skip # noqa: E402
 
 
 logger = logger.bind(name='parser_guessit')
@@ -252,11 +252,9 @@ class ParserGuessit:
             if title_start != 0:
                 try:
                     pre_title = max(
-                        (
-                            match[0].end
-                            for match in guess_result.matches.values()
-                            if match[0].end <= title_start
-                        )
+                        match[0].end
+                        for match in guess_result.matches.values()
+                        if match[0].end <= title_start
                     )
                 except ValueError:
                     pre_title = 0
@@ -418,7 +416,7 @@ class ParserGuessit:
             # if we don't have name_regexps, generate one from the name
             name_regexps = ReList(
                 name_to_re(name, default_ignore_prefixes, None)
-                for name in [guessit_options['name']] + guessit_options.get('alternate_names', [])
+                for name in [guessit_options['name'], *guessit_options.get('alternate_names', [])]
             )
             # With auto regex generation, the first regex group captures the name
             re_from_name = True

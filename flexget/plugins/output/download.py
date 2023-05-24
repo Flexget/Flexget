@@ -260,20 +260,6 @@ class PluginDownload:
                 entry['download_headers'],
             )
 
-        try:
-            response = task.requests.get(url, auth=auth, raise_status=False, headers=headers)
-        except UnicodeError:
-            logger.error('Unicode error while encoding url {}', url)
-            return
-        if response.status_code != 200:
-            logger.debug('Got {} response from server. Saving error page.', response.status_code)
-            # Save the error page
-            if response.content:
-                self.save_error_page(entry, task, response.content)
-            # Raise the error
-            response.raise_for_status()
-            return
-
         # expand ~ in temp path
         # TODO jinja?
         try:
@@ -298,31 +284,45 @@ class PluginDownload:
         tmp_dir = tempfile.mkdtemp(dir=tmp_path)
         fname = hashlib.md5(url.encode('utf-8', 'replace')).hexdigest()
         datafile = os.path.join(tmp_dir, fname)
-        outfile = open(datafile, 'wb')
-        try:
-            for chunk in response.iter_content(chunk_size=150 * 1024, decode_unicode=False):
-                outfile.write(chunk)
-        except Exception as e:
-            # don't leave futile files behind
-            # outfile has to be closed before we can delete it on Windows
-            outfile.close()
-            logger.debug('Download interrupted, removing datafile')
-            os.remove(datafile)
-            if isinstance(e, socket.timeout):
-                logger.error('Timeout while downloading file')
-            else:
-                raise
-        else:
-            outfile.close()
-            # Do a sanity check on downloaded file
-            if os.path.getsize(datafile) == 0:
-                entry.fail('File %s is 0 bytes in size' % datafile)
-                os.remove(datafile)
+
+        with task.requests.get(
+            url, auth=auth, raise_status=False, headers=headers, stream=True
+        ) as response:
+            if response.status_code != 200:
+                logger.debug(
+                    'Got {} response from server. Saving error page.', response.status_code
+                )
+                # Save the error page
+                if response.content:
+                    self.save_error_page(entry, task, response.content)
+                # Raise the error
+                response.raise_for_status()
                 return
-            # store temp filename into entry so other plugins may read and modify content
-            # temp file is moved into final destination at self.output
-            entry['file'] = datafile
-            logger.debug('{} field file set to: {}', entry['title'], entry['file'])
+
+            try:
+                with open(datafile, 'wb') as outfile:
+                    for chunk in response.iter_content(
+                        chunk_size=150 * 1024, decode_unicode=False
+                    ):
+                        outfile.write(chunk)
+            except Exception as e:
+                # don't leave futile files behind
+                logger.debug('Download interrupted, removing datafile')
+                os.remove(datafile)
+                if isinstance(e, socket.timeout):
+                    logger.error('Timeout while downloading file')
+                else:
+                    raise
+            else:
+                # Do a sanity check on downloaded file
+                if os.path.getsize(datafile) == 0:
+                    entry.fail('File %s is 0 bytes in size' % datafile)
+                    os.remove(datafile)
+                    return
+                # store temp filename into entry so other plugins may read and modify content
+                # temp file is moved into final destination at self.output
+                entry['file'] = datafile
+                logger.debug('{} field file set to: {}', entry['title'], entry['file'])
 
         if 'content-type' in response.headers:
             entry['mime-type'] = str(parse_header(response.headers['content-type'])[0])
@@ -443,7 +443,7 @@ class PluginDownload:
                 logger.debug('Creating directory {}', path)
                 try:
                     os.makedirs(path)
-                except:
+                except Exception:
                     raise plugin.PluginError('Cannot create path %s' % path, logger)
 
             # check that temp file is present
@@ -507,12 +507,12 @@ class PluginDownload:
 
                 try:
                     shutil.move(entry['file'], destfile)
-                except (OSError, OSError) as err:
+                except OSError as err:
                     # ignore permission errors, see ticket #555
                     import errno
 
                     if not os.path.exists(destfile):
-                        raise plugin.PluginError('Unable to write %s: %s' % (destfile, err))
+                        raise plugin.PluginError(f'Unable to write {destfile}: {err}')
                     if err.errno != errno.EPERM and err.errno != errno.EACCES:
                         raise
 

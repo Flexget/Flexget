@@ -63,7 +63,7 @@ def seen_add(manager: Manager, options):
 
     task = DEFAULT_TASK
     local = None
-    if options.task and not options.task in manager.tasks:
+    if options.task and options.task not in manager.tasks:
         console(f"Task `{options.task}` not in config")
         return
     else:
@@ -109,7 +109,7 @@ def seen_search(manager: Manager, options, session=None):
         for sf in se.fields:
             if sf.field.lower() == 'title':
                 continue
-            table.add_row('{}'.format(sf.field.upper()), str(sf.value))
+            table.add_row(f'{sf.field.upper()}', str(sf.value))
         table.add_row('Task', se.task)
         if se.local:
             table.add_row('Local', 'Yes')

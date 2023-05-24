@@ -80,9 +80,9 @@ class PluginUtorrent:
             raise plugin.PluginError('%s' % e, logger)
         token = get_soup(response.text).find('div', id='token').text
         result = session.get(url, auth=auth, params={'action': 'list-dirs', 'token': token}).json()
-        download_dirs = dict(
-            (os.path.normcase(dir['path']), i) for i, dir in enumerate(result['download-dirs'])
-        )
+        download_dirs = {
+            os.path.normcase(dir['path']): i for i, dir in enumerate(result['download-dirs'])
+        }
 
         for entry in task.accepted:
             # bunch of urls now going to check
@@ -91,7 +91,7 @@ class PluginUtorrent:
             path = entry.get('path', config.get('path', ''))
             try:
                 path = os.path.expanduser(entry.render(path))
-            except RenderError as e:
+            except RenderError:
                 logger.error(
                     'Could not render path for `{}` downloading to default directory.',
                     entry['title'],

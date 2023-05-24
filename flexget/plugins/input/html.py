@@ -183,7 +183,6 @@ class InputHtml:
         return parse.unquote_plus(name)
 
     def create_entries(self, page_url, soup, config):
-
         queue = []
         duplicates = {}
         duplicate_limit = 4
@@ -286,7 +285,7 @@ class InputHtml:
                 # title link should be unique, add CRC32 to end if it's not
                 hash = zlib.crc32(url.encode("utf-8"))
                 crc32 = '%08X' % (hash & 0xFFFFFFFF)
-                title = '%s [%s]' % (title, crc32)
+                title = f'{title} [{crc32}]'
                 # truly duplicate, title + url crc already exists in queue
                 if title_exists(title):
                     continue

@@ -6,6 +6,7 @@ RADARR_API_KEY = '65e246ce581a426781e1a8645f0a1f2c'
 RADARR_BASE_URL = 'http://127.0.0.1'
 RADARR_PORT = 7878
 
+
 # Load up a radarr container and put VCR in record mode to record.
 # NOTE: You'll need to reset radarr during runs otherwise the tags generated will have a different id. You'll also need to setup a root folder
 # docker run -d --name=radarr-tmp -p 7878:7878 linuxserver/radarr:nightly
@@ -20,75 +21,75 @@ class TestRadarrListActions:
             list_clear:
               what:
                 - radarr_list:
-                    base_url: %(RADARR_BASE_URL)s
-                    api_key: %(RADARR_API_KEY)s
-                    port: %(RADARR_PORT)s
+                    base_url: {RADARR_BASE_URL}
+                    api_key: {RADARR_API_KEY}
+                    port: {RADARR_PORT}
             mock:
-              - { title: 'Despicable Me 2 (2013)', imdb_id: 'tt1690953', tmdb_id: 93456 }
-              - { title: 'Sinister 2 (2015)', imdb_id: 'tt2752772', tmdb_id: 283445 }
-              - { title: 'Crimson Peak (2015)', imdb_id: 'tt2554274', tmdb_id: 201085 }
-              - { title: 'Deadpool (2016)', imdb_id: 'tt1431045', tmdb_id: 293660 }
+              - {{ title: 'Despicable Me 2 (2013)', imdb_id: 'tt1690953', tmdb_id: 93456 }}
+              - {{ title: 'Sinister 2 (2015)', imdb_id: 'tt2752772', tmdb_id: 283445 }}
+              - {{ title: 'Crimson Peak (2015)', imdb_id: 'tt2554274', tmdb_id: 201085 }}
+              - {{ title: 'Deadpool (2016)', imdb_id: 'tt1431045', tmdb_id: 293660 }}
             accept_all: yes
             list_add:
               - radarr_list:
-                  base_url: %(RADARR_BASE_URL)s
-                  api_key: %(RADARR_API_KEY)s
-                  port: %(RADARR_PORT)s
+                  base_url: {RADARR_BASE_URL}
+                  api_key: {RADARR_API_KEY}
+                  port: {RADARR_PORT}
 
           clear_and_add_to_radarr_with_tags:
             list_clear:
               what:
                 - radarr_list:
-                    base_url: %(RADARR_BASE_URL)s
-                    api_key: %(RADARR_API_KEY)s
-                    port: %(RADARR_PORT)s
+                    base_url: {RADARR_BASE_URL}
+                    api_key: {RADARR_API_KEY}
+                    port: {RADARR_PORT}
             mock:
-              - { title: 'Deadpool (2016)', imdb_id: 'tt1431045', tmdb_id: 293660 }
+              - {{ title: 'Deadpool (2016)', imdb_id: 'tt1431045', tmdb_id: 293660 }}
             accept_all: yes
             list_add:
               - radarr_list:
-                  base_url: %(RADARR_BASE_URL)s
-                  api_key: %(RADARR_API_KEY)s
-                  port: %(RADARR_PORT)s
+                  base_url: {RADARR_BASE_URL}
+                  api_key: {RADARR_API_KEY}
+                  port: {RADARR_PORT}
                   tags: ["movies", "othertag"]
                       
           radarr_list_as_input_plugin:
             radarr_list:
-              base_url: %(RADARR_BASE_URL)s
-              api_key: %(RADARR_API_KEY)s
-              port: %(RADARR_PORT)s
+              base_url: {RADARR_BASE_URL}
+              api_key: {RADARR_API_KEY}
+              port: {RADARR_PORT}
               include_data: True
             accept_all: yes
     
           remove_from_radarr_list:
             mock:
-              - { title: "Ocean\'s Twelve (2004)", imdb_id: 'tt0349903', tmdb_id: 163 }
-              - { title: 'Sinister 2 (2015)', imdb_id: 'tt2752772', tmdb_id: 283445 }
+              - {{ title: "Ocean\'s Twelve (2004)", imdb_id: 'tt0349903', tmdb_id: 163 }}
+              - {{ title: 'Sinister 2 (2015)', imdb_id: 'tt2752772', tmdb_id: 283445 }}
             accept_all: yes
             list_remove:
               - radarr_list:
-                  base_url: %(RADARR_BASE_URL)s
-                  api_key: %(RADARR_API_KEY)s
-                  port: %(RADARR_PORT)s
+                  base_url: {RADARR_BASE_URL}
+                  api_key: {RADARR_API_KEY}
+                  port: {RADARR_PORT}
     
           match_radarr_list:
             mock:
-              - { title: 'Despicable.Me.2.2013.1080p.BluRay.x264-FlexGet', imdb_id: 'tt1690953', tmdb_id: 93456 }
-              - { title: 'Sinister.2.2015.720p.BluRay.x264-FlexGet', imdb_id: 'tt2752772', tmdb_id: 283445 }
-              - { title: 'Crimson.Peak.2015.720p.BluRay.x264-FlexGet', imdb_id: 'tt2554274', tmdb_id: 201085 }
-              - { title: 'Deadpool.2016.1080p.BluRay.x264-FlexGet', imdb_id: 'tt1431045', tmdb_id: 293660 }
-              - { title: 'Kung.Fu.Panda.3.2016.720p.BluRay.x264-FlexGet', imdb_id: 'tt2267968', tmdb_id: 140300 }
+              - {{ title: 'Despicable.Me.2.2013.1080p.BluRay.x264-FlexGet', imdb_id: 'tt1690953', tmdb_id: 93456 }}
+              - {{ title: 'Sinister.2.2015.720p.BluRay.x264-FlexGet', imdb_id: 'tt2752772', tmdb_id: 283445 }}
+              - {{ title: 'Crimson.Peak.2015.720p.BluRay.x264-FlexGet', imdb_id: 'tt2554274', tmdb_id: 201085 }}
+              - {{ title: 'Deadpool.2016.1080p.BluRay.x264-FlexGet', imdb_id: 'tt1431045', tmdb_id: 293660 }}
+              - {{ title: 'Kung.Fu.Panda.3.2016.720p.BluRay.x264-FlexGet', imdb_id: 'tt2267968', tmdb_id: 140300 }}
             list_match:
               from:
                 - radarr_list:
-                    base_url: %(RADARR_BASE_URL)s
-                    api_key: %(RADARR_API_KEY)s
-                    port: %(RADARR_PORT)s
-    """ % {
-        'RADARR_API_KEY': RADARR_API_KEY,
-        'RADARR_BASE_URL': RADARR_BASE_URL,
-        'RADARR_PORT': RADARR_PORT,
-    }
+                    base_url: {RADARR_BASE_URL}
+                    api_key: {RADARR_API_KEY}
+                    port: {RADARR_PORT}
+    """.format(
+        RADARR_API_KEY=RADARR_API_KEY,
+        RADARR_BASE_URL=RADARR_BASE_URL,
+        RADARR_PORT=RADARR_PORT,
+    )
 
     def test_radarr_list_tags(self, execute_task, manager):
         radarr = RadarrAPIService(RADARR_API_KEY, RADARR_BASE_URL, RADARR_PORT)

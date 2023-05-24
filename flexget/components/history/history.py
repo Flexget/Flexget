@@ -27,7 +27,7 @@ class PluginHistory:
             reason = ''
             if 'reason' in entry:
                 reason = ' (reason: %s)' % entry['reason']
-            item.details = 'Accepted by %s%s' % (entry.get('accepted_by', '<unknown>'), reason)
+            item.details = 'Accepted by {}{}'.format(entry.get('accepted_by', '<unknown>'), reason)
             task.session.add(item)
 
 

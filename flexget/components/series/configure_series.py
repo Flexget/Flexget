@@ -44,7 +44,6 @@ class ConfigureSeries(plugin_series.FilterSeriesBase):
         }
 
     def on_task_prepare(self, task, config):
-
         series = {}
         for input_name, input_config in config.get('from', {}).items():
             input_plugin = plugin.get_plugin_by_name(input_name)

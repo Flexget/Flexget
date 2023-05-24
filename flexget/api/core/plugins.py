@@ -64,7 +64,9 @@ plugins_parser.add_argument(
 if TYPE_CHECKING:
     from typing import TypedDict
 
-    _PhaseHandler = TypedDict('_PhaseHandler', {'phase': str, 'priority': int})
+    class _PhaseHandler(TypedDict):
+        phase: str
+        priority: int
 
     class PluginDict(TypedDict, total=False):
         name: str
@@ -86,7 +88,7 @@ def plugin_to_dict(plugin) -> 'PluginDict':
         'debug': plugin.debug,
         'interfaces': plugin.interfaces,
         'phase_handlers': [
-            dict(phase=handler, priority=event.priority)
+            {'phase': handler, 'priority': event.priority}
             for handler, event in plugin.phase_handlers.items()
         ],
     }

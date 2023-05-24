@@ -1,13 +1,10 @@
-# -*- coding: utf-8 -*-
-
-
 import re
 from urllib.request import ProxyHandler
 
 import feedparser
 from loguru import logger
 
-from flexget import entry, plugin
+from flexget import plugin
 from flexget.components.sites.utils import normalize_unicode
 from flexget.entry import Entry
 from flexget.event import event
@@ -122,7 +119,7 @@ class LostFilm:
 
     def build_config(self, config):
         """Set defaults to config"""
-        cfg = dict()
+        cfg = {}
         if isinstance(config, bool):
             cfg['enabled'] = bool(config)
         elif isinstance(config, str):
@@ -237,7 +234,7 @@ class LostFilm:
                 if perfect_match:
                     try:
                         folded_name = self._simplify_name(series_name_org)
-                    except TextProcessingError as e:
+                    except TextProcessingError:
                         logger.warning('RSS item series name "{}" could be wrong', series_name_org)
                         folded_name = None
                     if folded_name and folded_name not in prefilter_list:
@@ -443,7 +440,7 @@ class LostFilm:
                             episode_num,
                         )
                         season_num = int(info_match['season'])
-                        eposode_num = int(info_match['episode'])
+                        episode_num = int(info_match['episode'])
                     if info_match['ep_org'] is not None:
                         episode_name_org = info_match['ep_org'].strip()
                     if (
@@ -487,7 +484,7 @@ class LostFilm:
                 logger.error('No download links were found on the download page')
                 continue
 
-            episode_id = 'S{:02d}E{:02d}'.format(season_num, episode_num)
+            episode_id = f'S{season_num:02d}E{episode_num:02d}'
             for d_item in d_items:
                 find_item = d_item.find('div', class_='inner-box--link sub').a['href']
                 if not find_item:
@@ -592,7 +589,7 @@ class LostFilm:
                 logger.warning('Unsupported series configuration type')
                 return None
         except Exception as e:
-            logger.warning('Error parsing series config: {:s}'.format(repr(e)))
+            logger.warning(f'Error parsing series config: {repr(e):s}')
             names_list = None
 
         return names_list
@@ -616,12 +613,10 @@ class LostFilm:
                         for a_name in s_cfg['alternate_name']:
                             names_list.add(LostFilm._simplify_name(a_name))
                     else:
-                        raise PluginError(
-                            'Cannot read series "alternate_name" for "{:s}"'.format(s_name)
-                        )
+                        raise PluginError(f'Cannot read series "alternate_name" for "{s_name:s}"')
             else:
                 raise PluginError(
-                    'Series configuration list item has ' 'unsupported type: %s' % type(s_item)
+                    'Series configuration list item has unsupported type: %s' % type(s_item)
                 )
 
 

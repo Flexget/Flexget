@@ -256,16 +256,16 @@ class PluginSortByWeight:
 
     def _add_debug_info(self, key, entry, weight, *args):
         if 'weights' not in entry:
-            entry['weights'] = dict()
+            entry['weights'] = {}
         short_args = []
         for arg in args:
             if isinstance(arg, timedelta):
                 short_args.append(arg.days)
             elif isinstance(arg, datetime):
                 date = arg.date()
-                short_args.append('%s-%s-%s' % (date.year, date.month, date.day))
+                short_args.append(f'{date.year}-{date.month}-{date.day}')
             elif isinstance(arg, Quality):
-                quality_string = '[ %s ]-%s-%s, [ %s ]' % (
+                quality_string = '[ {} ]-{}-{}, [ {} ]'.format(
                     arg.resolution,
                     arg.source,
                     arg.codec,
@@ -275,7 +275,7 @@ class PluginSortByWeight:
                     short_args.append(quality_string)
             else:
                 short_args.append(arg)
-        entry['weights'][key] = '%s = %s' % (weight, short_args)
+        entry['weights'][key] = f'{weight} = {short_args}'
 
 
 @event('plugin.register')

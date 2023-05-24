@@ -23,9 +23,9 @@ from flexget.plugin import (
     get_plugins,
     phase_methods,
     plugin_schemas,
+    task_phases,
 )
 from flexget.plugin import plugins as all_plugins
-from flexget.plugin import task_phases
 from flexget.terminal import capture_console
 from flexget.utils import requests
 from flexget.utils.database import with_session
@@ -243,7 +243,7 @@ class Task:
             options = options_namespace
         # If execution hasn't specifically set the `allow_manual` flag, set it to False by default
         if not hasattr(options, 'allow_manual'):
-            setattr(options, 'allow_manual', False)
+            options.allow_manual = False
         self.options = options
         self.output = output
         self.session_id = session_id
@@ -385,7 +385,7 @@ class Task:
         return (self.priority, self._count) == (other.priority, other._count)
 
     def __str__(self):
-        return '<Task(name=%s,aborted=%s)>' % (self.name, self.aborted)
+        return f'<Task(name={self.name},aborted={self.aborted})>'
 
     def disable_phase(self, phase):
         """Disable ``phase`` from execution.
@@ -560,7 +560,7 @@ class Task:
             else:
                 warn.logger.warning(warn)
         except EntryUnicodeError as eue:
-            msg = 'Plugin %s tried to create non-unicode compatible entry (key: %s, value: %r)' % (
+            msg = 'Plugin {} tried to create non-unicode compatible entry (key: {}, value: {!r})'.format(
                 keyword,
                 eue.key,
                 eue.value,
@@ -571,7 +571,7 @@ class Task:
             err.logger.critical(err.value)
             self.abort(err.value)
         except DependencyError as e:
-            msg = 'Plugin `%s` cannot be used because dependency `%s` is missing.' % (
+            msg = 'Plugin `{}` cannot be used because dependency `{}` is missing.'.format(
                 keyword,
                 e.missing,
             )
@@ -579,11 +579,11 @@ class Task:
             self.abort(msg)
         except Warning as e:
             # If warnings have been elevated to errors
-            msg = 'Warning during plugin %s: %s' % (keyword, e)
+            msg = f'Warning during plugin {keyword}: {e}'
             logger.exception(msg)
             self.abort(msg)
         except Exception as e:
-            msg = 'BUG: Unhandled error in plugin %s: %s' % (keyword, e)
+            msg = f'BUG: Unhandled error in plugin {keyword}: {e}'
             logger.opt(exception=True).critical(msg)
             traceback = self.manager.crash_report()
             self.abort(msg, traceback=traceback)
@@ -596,13 +596,11 @@ class Task:
         :param str plugin: Plugin name
         :param str reason: Why the rerun is done
         """
-        msg = (
-            'Plugin {0} has requested task to be ran again after execution has completed.'.format(
-                self.current_plugin if plugin is None else plugin
-            )
+        msg = 'Plugin {} has requested task to be ran again after execution has completed.'.format(
+            self.current_plugin if plugin is None else plugin
         )
         if reason:
-            msg += ' Reason: {0}'.format(reason)
+            msg += f' Reason: {reason}'
         # Only print the first request for a rerun to the info log
         if self._rerun:
             logger.debug(msg)
@@ -621,7 +619,7 @@ class Task:
         try:
             merge_dict_from_to(new_config, self.config)
         except MergeException as e:
-            raise PluginError('Failed to merge configs for task %s: %s' % (self.name, e))
+            raise PluginError(f'Failed to merge configs for task {self.name}: {e}')
 
     def check_config_hash(self):
         """
@@ -745,6 +743,7 @@ class Task:
             fire_event('task.execute.completed', self)
         finally:
             self.finished_event.set()
+            self.requests.close()
 
     @staticmethod
     def validate_config(config):

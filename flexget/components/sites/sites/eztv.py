@@ -23,12 +23,12 @@ class UrlRewriteEztv:
     def url_rewrite(self, task, entry):
         url = entry['url']
         page = None
-        for (scheme, netloc) in EZTV_MIRRORS:
+        for scheme, netloc in EZTV_MIRRORS:
             try:
                 _, _, path, params, query, fragment = urlparse(url)
                 url = urlunparse((scheme, netloc, path, params, query, fragment))
                 page = task.requests.get(url).content
-            except RequestException as e:
+            except RequestException:
                 logger.debug('Eztv mirror `{}` seems to be down', url)
                 continue
             break

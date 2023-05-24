@@ -148,7 +148,7 @@ class MQTTNotifier:
             'encrypted_communication'
         ):
             client.tls_set(
-                ca_certs=certs.get('broker_ca_cert'),
+                ca_certs=config.get('certificates', {}).get('broker_ca_cert'),
                 certfile=None,
                 keyfile=None,
                 cert_reqs=ssl.CERT_NONE,

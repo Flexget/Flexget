@@ -7,7 +7,6 @@ from flexget.components.managed_lists.lists.movie_list.db import (
     MovieListList,
     MovieListMovie,
 )
-from flexget.components.managed_lists.lists.movie_list.movie_list import MovieListBase
 from flexget.manager import Session
 from flexget.utils import json
 
@@ -361,7 +360,7 @@ class TestMovieListPagination:
     config = 'tasks: {}'
 
     def test_movie_list_pagination(self, api_client, link_headers):
-        base_movie = dict(title='title_', year=1900)
+        base_movie = {'title': 'title_', 'year': 1900}
         number_of_movies = 200
 
         with Session() as session:

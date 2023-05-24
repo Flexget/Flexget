@@ -169,7 +169,7 @@ class PendingEntriesAPI(APIResource):
             deleted = deleted.filter(db.PendingEntry.approved == approved)
         deleted = deleted.delete()
 
-        return success_response('deleted %s pending entries'.format(deleted))
+        return success_response(f'deleted {deleted} pending entries')
 
 
 @pending_api.route('/<int:entry_id>/')
@@ -200,7 +200,7 @@ class PendingEntryAPI(APIResource):
         approved = data['operation'] == 'approve'
         operation_text = 'approved' if approved else 'pending'
         if entry.approved is approved:
-            raise BadRequest('Entry with id {} is already {}'.format(entry_id, operation_text))
+            raise BadRequest(f'Entry with id {entry_id} is already {operation_text}')
 
         entry.approved = approved
         session.commit()

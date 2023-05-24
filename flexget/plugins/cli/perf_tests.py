@@ -49,7 +49,6 @@ def imdb_query(session):
     log_query_count('test')
     start_time = time.time()
     for url in track(imdb_urls, description='Benchmarking...'):
-
         # movie = session.query(Movie).filter(Movie.url == url).first()
         # movie = session.query(Movie).options(subqueryload(Movie.genres)).filter(Movie.url == url).one()
 

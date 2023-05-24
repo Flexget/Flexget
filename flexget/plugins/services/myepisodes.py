@@ -27,7 +27,7 @@ class MyEpisodesInfo(Base):
         self.updated = datetime.now()
 
     def __repr__(self):
-        return '<MyEpisodesInfo(series_name=%s, myepisodes_id=%s)>' % (
+        return '<MyEpisodesInfo(series_name={}, myepisodes_id={})>'.format(
             self.series_name,
             self.myepisodes_id,
         )
@@ -129,7 +129,6 @@ class MyEpisodes:
             or 'series_episode' not in entry
             or 'series_name' not in entry
         ):
-
             raise plugin.PluginWarning(
                 'Can\'t mark entry `%s` in myepisodes without series_season, series_episode and series_name '
                 'fields' % entry['title'],
@@ -264,7 +263,7 @@ class MyEpisodes:
         season = entry['series_season']
         episode = entry['series_episode']
 
-        super_secret_code = "A%s-%s-%s" % (str(myepisodes_id), str(season), str(episode))
+        super_secret_code = f"A{str(myepisodes_id)}-{str(season)}-{str(episode)}"
 
         payload = {super_secret_code: "true"}
 
@@ -279,8 +278,9 @@ class MyEpisodes:
 
         except requests.RequestException:
             raise plugin.PluginError(
-                'Failed to mark %s of `%s` as acquired.'
-                % (entry['series_id'], entry['series_name'])
+                'Failed to mark {} of `{}` as acquired.'.format(
+                    entry['series_id'], entry['series_name']
+                )
             )
 
         logger.info('Marked {} of `{}` as acquired.', entry['series_id'], entry['series_name'])

@@ -18,9 +18,7 @@ class Proxy:
             {'type': 'string', 'format': 'url'},
             {
                 'type': 'object',
-                'properties': dict(
-                    (prot, {'type': 'string', 'format': 'url'}) for prot in PROTOCOLS
-                ),
+                'properties': {prot: {'type': 'string', 'format': 'url'} for prot in PROTOCOLS},
                 'additionalProperties': False,
             },
         ]
@@ -41,7 +39,7 @@ class Proxy:
             proxies = config
         else:
             # Map all protocols to the configured proxy
-            proxies = dict((prot, config) for prot in PROTOCOLS)
+            proxies = {prot: config for prot in PROTOCOLS}
         logger.verbose('Setting proxy to {}', proxies)
         task.requests.proxies = proxies
 

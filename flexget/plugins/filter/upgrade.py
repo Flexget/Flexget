@@ -30,7 +30,7 @@ class EntryUpgrade(Base):
     updated = Column(DateTime, index=True, default=datetime.now)
 
     def __str__(self):
-        return '<Upgrade(id=%s,added=%s,quality=%s)>' % (self.id, self.added, self.quality)
+        return f'<Upgrade(id={self.id},added={self.added},quality={self.quality})>'
 
 
 class FilterUpgrade:
@@ -63,7 +63,6 @@ class FilterUpgrade:
         return config
 
     def filter_entries(self, entries, existing, target, action_on_lower):
-
         target_requirement = qualities.Requirements(target) if target else None
         filtered = []
 

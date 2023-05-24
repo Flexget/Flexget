@@ -34,7 +34,7 @@ class StatusTask(Base):
     )
 
     def __repr__(self):
-        return '<StatusTask(id=%s,name=%s)>' % (self.id, self.name)
+        return f'<StatusTask(id={self.id},name={self.name})>'
 
     @hybrid_property
     def last_execution_time(self):
@@ -76,19 +76,16 @@ class TaskExecution(Base):
     abort_reason = Column(String, nullable=True)
 
     def __repr__(self):
-        return (
-            '<TaskExecution(task_id=%s,start=%s,end=%s,succeeded=%s,p=%s,a=%s,r=%s,f=%s,reason=%s)>'
-            % (
-                self.task_id,
-                self.start,
-                self.end,
-                self.succeeded,
-                self.produced,
-                self.accepted,
-                self.rejected,
-                self.failed,
-                self.abort_reason,
-            )
+        return '<TaskExecution(task_id={},start={},end={},succeeded={},p={},a={},r={},f={},reason={})>'.format(
+            self.task_id,
+            self.start,
+            self.end,
+            self.succeeded,
+            self.produced,
+            self.accepted,
+            self.rejected,
+            self.failed,
+            self.abort_reason,
         )
 
     def to_dict(self):

@@ -18,10 +18,10 @@ class TestCachedAPI:
 
         assert response.status_code == 200
 
-        rsp = api_client.get('/cached/?url={}'.format(image_url))
+        rsp = api_client.get(f'/cached/?url={image_url}')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
         assert rsp.data == response.content
 
-        rsp = api_client.get('/cached/?url={}?force=true'.format(image_url))
+        rsp = api_client.get(f'/cached/?url={image_url}?force=true')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code

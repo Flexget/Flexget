@@ -70,7 +70,7 @@ class TestExec:
     def test_auto_escape(self, execute_task):
         task = execute_task('test_auto_escape')
         for entry in task.accepted:
-            with open(os.path.join(self.__tmp__, entry['title']), 'r') as infile:
+            with open(os.path.join(self.__tmp__, entry['title'])) as infile:
                 line = infile.readline().rstrip('\n')
                 assert line == 'single \' double\"', '%s != single \' double\"' % line
                 line = infile.readline().rstrip('\n')

@@ -28,7 +28,7 @@ class DiscoverEntry(Base):
         self.last_execution = None
 
     def __str__(self):
-        return '<DiscoverEntry(title=%s,task=%s,added=%s)>' % (
+        return '<DiscoverEntry(title={},task={},added={})>'.format(
             self.title,
             self.task,
             self.last_execution,
@@ -122,7 +122,7 @@ class Discover:
                 else:
                     plugin_name, plugin_config = item, None
                 search = plugin.get(plugin_name, self)
-                if not callable(getattr(search, 'search')):
+                if not callable(search.search):
                     logger.critical(
                         'Search plugin {} does not implement search method', plugin_name
                     )

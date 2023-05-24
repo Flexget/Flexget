@@ -279,7 +279,7 @@ class TVDBSeries(Base):
 
     def to_dict(self):
         return {
-            'aliases': [a for a in self.aliases],
+            'aliases': list(self.aliases),
             'tvdb_id': self.id,
             'last_updated': datetime.fromtimestamp(self.last_updated).strftime(
                 '%Y-%m-%d %H:%M:%S'
@@ -299,7 +299,7 @@ class TVDBSeries(Base):
             'zap2it_id': self.zap2it_id,
             'banner': self.banner,
             'posters': self.posters,
-            'genres': [g for g in self.genres],
+            'genres': list(self.genres),
             'first_aired': self.first_aired,
         }
 
@@ -448,7 +448,7 @@ class TVDBSeriesSearchResult(Base):
 
     def to_dict(self):
         return {
-            'aliases': [a for a in self.aliases],
+            'aliases': list(self.aliases),
             'banner': self.banner,
             'first_aired': self.first_aired,
             'tvdb_id': self.id,
@@ -522,7 +522,7 @@ def _update_search_strings(series, session, search=None):
     search_strings = series.search_strings
     aliases = [a.lower() for a in series.aliases] if series.aliases else []
     searches = [search.lower()] if search else []
-    add = [series.name.lower()] + aliases + searches
+    add = [series.name.lower(), *aliases, *searches]
     for name in set(add):
         if name not in search_strings:
             search_result = (

@@ -1,4 +1,4 @@
-FROM docker.io/python:3.10-alpine
+FROM docker.io/python:3.11-alpine
 ENV PYTHONUNBUFFERED 1
 
 RUN apk add --no-cache --upgrade \
@@ -10,22 +10,17 @@ RUN apk add --no-cache --upgrade \
         unzip && \
     rm -rf /var/cache/apk/*
 
-WORKDIR /wheels
+RUN pip install -U pip
 
+COPY requirements-docker.txt /flexget/
+RUN pip wheel --wheel-dir /dep-wheels -r /flexget/requirements-docker.txt
+
+COPY dev_tools.py /flexget/
+RUN pip install -f /dep-wheels click requests && python /flexget/dev_tools.py bundle-webui --version=v2
 COPY . /flexget
+RUN pip wheel --no-deps --wheel-dir /wheels -e /flexget
 
-RUN pip install -U pip && \
-    pip wheel -e /flexget && \
-    pip wheel 'transmission-rpc>=3.0.0,<4.0.0' && \
-    pip wheel deluge-client && \
-    pip wheel cloudscraper
-
-WORKDIR /flexget-ui-v2
-RUN wget https://github.com/Flexget/webui/releases/latest/download/dist.zip && \
-    unzip dist.zip && \
-    rm dist.zip
-
-FROM docker.io/python:3.10-alpine
+FROM docker.io/python:3.11-alpine
 ENV PYTHONUNBUFFERED 1
 
 RUN apk add --no-cache --upgrade \
@@ -34,19 +29,18 @@ RUN apk add --no-cache --upgrade \
         tzdata && \
     rm -rf /var/cache/apk/*
 
+COPY --from=0 /dep-wheels /dep-wheels
+COPY --from=0 /flexget/requirements-docker.txt /requirements-docker.txt
 COPY --from=0 /wheels /wheels
 
 RUN pip install -U pip && \
     pip install --no-cache-dir \
                 --no-index \
+                -f /dep-wheels \
                 -f /wheels \
                 FlexGet \
-                'transmission-rpc>=3.0.0,<4.0.0' \
-                deluge-client \
-                cloudscraper && \
-    rm -rf /wheels
-
-COPY --from=0 /flexget-ui-v2 /usr/local/lib/python3.10/site-packages/flexget/ui/v2/
+                -r /requirements-docker.txt && \
+    rm -rf /wheels /dep-wheels /requirements-docker.txt
 
 VOLUME /config
 WORKDIR /config

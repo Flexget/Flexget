@@ -175,7 +175,7 @@ class WebServer(threading.Thread):
     def _start_server(self):
         # Mount the WSGI callable object (app) on the root directory
         cherrypy.tree.graft(_default_app, '/')
-        for path, (registered_app, name) in _app_register.items():
+        for path, (registered_app, _name) in _app_register.items():
             cherrypy.tree.graft(registered_app, self.base_url + path)
 
         cherrypy.log.error_log.propagate = False
@@ -247,11 +247,11 @@ def change_password(username='flexget', password='', session=None):
     if check['score'] < 3:
         warning = check['feedback']['warning']
         suggestions = ' '.join(check['feedback']['suggestions'])
-        message = 'Password \'{}\' is not strong enough. '.format(password)
+        message = f'Password \'{password}\' is not strong enough. '
         if warning:
             message += warning + ' '
         if suggestions:
-            message += 'Suggestions: {}'.format(suggestions)
+            message += f'Suggestions: {suggestions}'
         raise WeakPassword(message)
 
     user = get_user(username=username, session=session)

@@ -8,7 +8,7 @@ try:
     from guppy import hpy
 except ImportError:
     # this will leave the plugin unloaded
-    raise plugin.DependencyError(issued_by='memusage', missing='ext lib `guppy`', silent=True)
+    raise plugin.DependencyError(issued_by='memusage', missing='guppy3', silent=True)
 
 logger = logger.bind(name='mem_usage')
 
@@ -46,12 +46,16 @@ def on_manager_shutdown(manager):
     if not manager.options.mem_usage:
         return
 
-    import resource
+    try:
+        import resource
 
-    console(
-        'Resource Module memory usage: %s (kb)'
-        % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
-    )
+        console(
+            'Resource Module memory usage: %s (kb)'
+            % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+        )
+    except ImportError:
+        console('Resource Module memory usage:')
+
     global heapy
     console('Heapy module calculating memory usage:')
     console(heapy.heap())

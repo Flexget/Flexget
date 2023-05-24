@@ -33,11 +33,11 @@ def open_archive_entry(entry):
     try:
         archive = archiveutil.open_archive(archive_path)
     except archiveutil.BadArchive as error:
-        fail_entry_with_error(entry, 'Bad archive: %s (%s)' % (archive_path, error))
+        fail_entry_with_error(entry, f'Bad archive: {archive_path} ({error})')
     except archiveutil.NeedFirstVolume:
         logger.error('Not the first volume: {}', archive_path)
     except archiveutil.ArchiveError as error:
-        fail_entry_with_error(entry, 'Failed to open Archive: %s (%s)' % (archive_path, error))
+        fail_entry_with_error(entry, f'Failed to open Archive: {archive_path} ({error})')
     else:
         return archive
 
@@ -66,7 +66,7 @@ def extract_info(info, archive, to, keep_dirs, test=False):
         info.extract(archive, destination)
     except archiveutil.FSError as error:
         logger.error('OS error while creating file: {} ({})', destination, error)
-    except archiveutil.FileAlreadyExists as error:
+    except archiveutil.FileAlreadyExists:
         logger.warning('File already exists: {}', destination)
     except archiveutil.ArchiveError as error:
         logger.error('Failed to extract file: {} from {} ({})', info.filename, archive.path, error)

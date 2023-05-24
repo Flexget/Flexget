@@ -9,12 +9,6 @@ from flexget import plugin
 from flexget.db_schema import versioned_base, with_session
 from flexget.entry import Entry
 
-try:
-    # NOTE: Importing other plugins is discouraged!
-    from flexget.components.parsing.parsers import parser_common as plugin_parser_common
-except ImportError:
-    raise plugin.DependencyError(issued_by=__name__, missing='parser_common')
-
 logger = logger.bind(name='movie_list')
 Base = versioned_base('movie_list', 0)
 
@@ -43,7 +37,7 @@ class MovieListList(Base):
     )
 
     def __repr__(self):
-        return '<MovieListList,name={}id={}>'.format(self.name, self.id)
+        return f'<MovieListList,name={self.name}id={self.id}>'
 
     def to_dict(self):
         return {'id': self.id, 'name': self.name, 'added_on': self.added}

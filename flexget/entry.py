@@ -2,7 +2,7 @@ import functools
 import types
 import warnings
 from enum import Enum
-from typing import Callable, Dict, Iterable, Mapping, Optional, Sequence, Union
+from typing import Callable, Iterable, Mapping, Optional, Sequence, Union
 
 from loguru import logger
 
@@ -54,7 +54,7 @@ class EntryUnicodeError(Exception):
         self.value = value
 
     def __str__(self):
-        return 'Entry strings must be unicode: %s (%r)' % (self.key, self.value)
+        return f'Entry strings must be unicode: {self.key} ({self.value!r})'
 
 
 class Entry(LazyDict, Serializer):
@@ -236,7 +236,9 @@ class Entry(LazyDict, Serializer):
         # url and original_url handling
         if key == 'url':
             if not isinstance(value, (str, LazyLookup)):
-                raise plugin.PluginError('Tried to set %r url to %r' % (self.get('title'), value))
+                raise plugin.PluginError(
+                    'Tried to set {!r} url to {!r}'.format(self.get('title'), value)
+                )
             self.setdefault('original_url', value)
 
         # title handling
@@ -395,7 +397,7 @@ class Entry(LazyDict, Serializer):
         return hash(self.get('original_title', '') + self.get('original_url', ''))
 
     def __repr__(self):
-        return '<Entry(title=%s,state=%s)>' % (self['title'], self._state)
+        return '<Entry(title={},state={})>'.format(self['title'], self._state)
 
 
 lazy_func_registry = {}

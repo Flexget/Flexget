@@ -8,14 +8,14 @@ from flexget.task import Task
 logger = logger.bind(name='from_task')
 
 
-class FromTask(object):
+class FromTask:
     """An input plugin which returns accepted entries from another task."""
 
     schema = {'type': 'string'}
 
     def on_task_input(self, task, config):
         target_task_name = config
-        subtask_name = '{}>{}'.format(task.name, target_task_name)
+        subtask_name = f'{task.name}>{target_task_name}'
         subtask_config = task.manager.config['tasks'].get(target_task_name, {})
         # TODO: This seen disabling is sorta hacky, is there a better way?
         subtask_config.setdefault('seen', False)

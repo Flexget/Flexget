@@ -18,15 +18,21 @@ class TestRetryFailedAPI:
         errors = schema_match(OC.retry_entries_list_object, data)
         assert not errors
 
-        failed_entry_dict_1 = dict(
-            title='Failed title1', url='http://123.com', reason='Test reason1'
-        )
-        failed_entry_dict_2 = dict(
-            title='Failed title2', url='http://124.com', reason='Test reason2'
-        )
-        failed_entry_dict_3 = dict(
-            title='Failed title3', url='http://125.com', reason='Test reason3'
-        )
+        failed_entry_dict_1 = {
+            "title": 'Failed title1',
+            "url": 'http://123.com',
+            "reason": 'Test reason1',
+        }
+        failed_entry_dict_2 = {
+            "title": 'Failed title2',
+            "url": 'http://124.com',
+            "reason": 'Test reason2',
+        }
+        failed_entry_dict_3 = {
+            "title": 'Failed title3',
+            "url": 'http://125.com',
+            "reason": 'Test reason3',
+        }
         failed_entries = sorted(
             [failed_entry_dict_1, failed_entry_dict_2, failed_entry_dict_3],
             key=lambda x: x['title'],
@@ -50,7 +56,7 @@ class TestRetryFailedAPI:
         data = sorted(data, key=lambda x: x['title'])
         for idx, entry in enumerate(failed_entries):
             for key, value in entry.items():
-                assert data[idx].get(key) == failed_entries[idx].get(key)
+                assert data[idx].get(key) == value
 
         rsp = api_client.delete('/failed/')
         assert rsp.status_code == 200
@@ -72,9 +78,11 @@ class TestRetryFailedAPI:
         errors = schema_match(base_message, data)
         assert not errors
 
-        failed_entry_dict_1 = dict(
-            title='Failed title1', url='http://123.com', reason='Test reason1'
-        )
+        failed_entry_dict_1 = {
+            "title": 'Failed title1',
+            "url": 'http://123.com',
+            "reason": 'Test reason1',
+        }
 
         with Session() as session:
             failed_entry = FailedEntry(**failed_entry_dict_1)
@@ -88,7 +96,7 @@ class TestRetryFailedAPI:
         errors = schema_match(OC.retry_failed_entry_object, data)
         assert not errors
         for key, value in failed_entry_dict_1.items():
-            assert data.get(key) == failed_entry_dict_1.get(key)
+            assert data.get(key) == value
 
         rsp = api_client.delete('/failed/1/')
         assert rsp.status_code == 200
@@ -116,9 +124,11 @@ class TestFailedPaginationAPI:
     config = 'tasks: {}'
 
     def add_failed_entries(self):
-        base_failed_entry = dict(
-            title='Failed title_', url='http://123.com/', reason='Test reason_'
-        )
+        base_failed_entry = {
+            "title": 'Failed title_',
+            "url": 'http://123.com/',
+            "reason": 'Test reason_',
+        }
         num_of_entries = 200
 
         with Session() as session:
@@ -172,15 +182,21 @@ class TestFailedPaginationAPI:
         assert links['prev']['page'] == 1
 
     def test_failed_sorting(self, api_client):
-        failed_entry_dict_1 = dict(
-            title='Failed title_1', url='http://jhb.com', reason='Test reason_3'
-        )
-        failed_entry_dict_2 = dict(
-            title='Failed title_2', url='http://def.com', reason='Test reason_1'
-        )
-        failed_entry_dict_3 = dict(
-            title='Failed title_3', url='http://abc.com', reason='Test reason_2'
-        )
+        failed_entry_dict_1 = {
+            "title": 'Failed title_1',
+            "url": 'http://jhb.com',
+            "reason": 'Test reason_3',
+        }
+        failed_entry_dict_2 = {
+            "title": 'Failed title_2',
+            "url": 'http://def.com',
+            "reason": 'Test reason_1',
+        }
+        failed_entry_dict_3 = {
+            "title": 'Failed title_3',
+            "url": 'http://abc.com',
+            "reason": 'Test reason_2',
+        }
 
         with Session() as session:
             failed_entry1 = FailedEntry(**failed_entry_dict_1)

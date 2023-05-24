@@ -73,7 +73,7 @@ class SearchPTN:
     def create_entries(self, soup, imdb_id=None):
         entries = []
         links = soup.findAll('a', attrs={'href': re.compile(r'download\.php\?torrent=\d+')})
-        rows = [l.find_parent('tr') for l in links]
+        rows = [link.find_parent('tr') for link in links]
         for row in rows:
             entry = Entry()
             entry['title'] = row.find('a', attrs={'href': re.compile(r'detail\.php\?id')}).text

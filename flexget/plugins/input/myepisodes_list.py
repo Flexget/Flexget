@@ -67,7 +67,7 @@ class MyEpisodesList:
         try:
             soup = get_soup(page)
         except Exception as e:
-            raise plugin.PluginError("Unable to parse myepisodes.com page: %s" % (e,))
+            raise plugin.PluginError(f"Unable to parse myepisodes.com page: {e}")
 
         entries = []
 
@@ -83,7 +83,7 @@ class MyEpisodesList:
                 # Remove year from end of name if present
                 name = re.sub(r'\s+\(\d{4}\)$', '', name)
             showid = option.get('value')
-            url = '%sviews.php?type=epsbyshow&showid=%s' % (URL, showid)
+            url = f'{URL}views.php?type=epsbyshow&showid={showid}'
 
             entry = Entry()
             entry['title'] = name

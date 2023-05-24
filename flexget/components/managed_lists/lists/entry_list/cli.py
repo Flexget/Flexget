@@ -63,7 +63,7 @@ def entry_list_list(options):
         try:
             entry_list = db.get_list_by_exact_name(options.list_name, session=session)
         except NoResultFound:
-            console('Could not find entry list with name {}'.format(options.list_name))
+            console(f'Could not find entry list with name {options.list_name}')
             return
         header = ['#', 'Title', '# of fields']
         table = TerminalTable(*header, table_type=options.table_type)
@@ -79,7 +79,7 @@ def entry_list_show(options):
         try:
             entry_list = db.get_list_by_exact_name(options.list_name, session=session)
         except NoResultFound:
-            console('Could not find entry list with name {}'.format(options.list_name))
+            console(f'Could not find entry list with name {options.list_name}')
             return
 
         try:
@@ -111,7 +111,7 @@ def entry_list_add(options):
         try:
             entry_list = db.get_list_by_exact_name(options.list_name, session=session)
         except NoResultFound:
-            console('Could not find entry list with name `{}`, creating'.format(options.list_name))
+            console(f'Could not find entry list with name `{options.list_name}`, creating')
             entry_list = db.EntryListList(name=options.list_name)
             session.add(entry_list)
         session.merge(entry_list)
@@ -129,14 +129,14 @@ def entry_list_add(options):
                 title, entry_list.name
             )
         else:
-            console("Adding entry with title `{}` to list `{}`".format(title, entry_list.name))
+            console(f"Adding entry with title `{title}` to list `{entry_list.name}`")
             db_entry = db.EntryListEntry(entry=entry, entry_list_id=entry_list.id)
             session.add(db_entry)
             output = 'Successfully added entry `{}` to entry list `{}` '.format(
                 title, entry_list.name
             )
         if options.attributes:
-            console('Adding attributes to entry `{}`'.format(title))
+            console(f'Adding attributes to entry `{title}`')
             for identifier in options.attributes:
                 for k, v in identifier.items():
                     entry[k] = v
@@ -149,7 +149,7 @@ def entry_list_del(options):
         try:
             entry_list = db.get_list_by_exact_name(options.list_name)
         except NoResultFound:
-            console('Could not find entry list with name `{}`'.format(options.list_name))
+            console(f'Could not find entry list with name `{options.list_name}`')
             return
         try:
             db_entry = db.get_entry_by_id(entry_list.id, int(options.entry), session=session)
@@ -169,7 +169,7 @@ def entry_list_del(options):
                     )
                 )
                 return
-        console('Removing entry `%s` from list %s' % (db_entry.title, options.list_name))
+        console(f'Removing entry `{db_entry.title}` from list {options.list_name}')
         session.delete(db_entry)
 
 
@@ -178,7 +178,7 @@ def entry_list_purge(options):
         try:
             entry_list = db.get_list_by_exact_name(options.list_name)
         except NoResultFound:
-            console('Could not find entry list with name `{}`'.format(options.list_name))
+            console(f'Could not find entry list with name `{options.list_name}`')
             return
         console('Deleting list %s' % options.list_name)
         session.delete(entry_list)

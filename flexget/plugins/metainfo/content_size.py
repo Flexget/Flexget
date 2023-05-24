@@ -72,7 +72,7 @@ class MetainfoContentSize:
                         logger.trace('setting content size to {}', amount)
                         entry['content_size'] = amount
                         continue
-                except OSError as e:
+                except OSError:
                     # is_file can throw OSError for invalid paths (at least on windows)
                     continue
 

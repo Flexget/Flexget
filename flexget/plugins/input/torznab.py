@@ -9,6 +9,7 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.plugin import PluginError
 from flexget.utils.requests import RequestException
+from flexget.utils.tools import parse_timedelta
 
 logger = logger.bind(name='torznab')
 
@@ -33,6 +34,7 @@ class Torznab:
                     'default': 'search',
                 },
                 'website': {'type': 'string', 'format': 'url'},
+                'timeout': {"type": "string", "format": "interval"},
             },
             'required': ['website', 'apikey'],
             'additionalProperties': False,
@@ -67,13 +69,15 @@ class Torznab:
         params = self.params.copy()
         params.update(kwargs)
         logger.debug('Configured parameters: {}', params)
-        url = '{}/api?'.format(self.base_url)
-        url = '{}{}'.format(url, urlencode(params))
+        url = f'{self.base_url}/api?'
+        url = f'{url}{urlencode(params)}'
         return url
 
     def _setup(self, task, config):
         """Set up parameters"""
         self.base_url = config['website'].rstrip('/')
+        config.setdefault('timeout', '30 seconds')
+        self.timeout = parse_timedelta(config['timeout']).total_seconds()
         self.supported_params = []
         if config['searcher'] == 'tv':
             config['searcher'] = 'tvsearch'
@@ -87,7 +91,7 @@ class Torznab:
     def _setup_caps(self, task, searcher, categories):
         """Gets the capabilities of the torznab indexer and matches it with the provided configuration"""
 
-        response = task.requests.get(self._build_url(t='caps'))
+        response = task.requests.get(self._build_url(t='caps'), timeout=self.timeout)
         logger.debug('Raw caps response {}', response.content)
         root = ElementTree.fromstring(response.content)
         self._setup_searcher(root, searcher, categories)
@@ -120,9 +124,9 @@ class Torznab:
                     self.supported_params,
                 )
             else:
-                raise PluginError('No searcher available on {}'.format(self.base_url))
+                raise PluginError(f'No searcher available on {self.base_url}')
         else:
-            raise PluginError('No searcher available on {}'.format(self.base_url))
+            raise PluginError(f'No searcher available on {self.base_url}')
 
     def _check_searcher(self, searchers, searcher):
         """Check if the given searchers is in the list, available and has supported params"""
@@ -161,9 +165,9 @@ class Torznab:
         logger.info('Fetching URL: {}', url)
 
         try:
-            response = task.requests.get(url)
+            response = task.requests.get(url, timeout=self.timeout)
         except RequestException as e:
-            raise PluginError("Failed fetching '{}': {}".format(url, e))
+            raise PluginError(f"Failed fetching '{url}': {e}")
 
         entries = []
         root = ElementTree.fromstring(response.content)
