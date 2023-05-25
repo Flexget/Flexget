@@ -134,8 +134,8 @@ class TransmissionBase:
         if torrent.get('seedRatioMode') == 1:  # use torrent's own seed ratio limit
             seed_limit_ok = torrent.upload_ratio >= torrent.seed_ratio_limit
         elif torrent.get('seedRatioMode') == 0:  # use global rules
-            if session.seedRatioLimited:
-                seed_limit_ok = torrent.upload_ratio >= session.seedRatioLimit
+            if session.seed_ratio_limited:
+                seed_limit_ok = torrent.upload_ratio >= session.seed_ratio_limit
 
         if torrent.get('seedIdleMode') == 1:  # use torrent's own idle limit
             idle_limit_ok = (
@@ -240,10 +240,10 @@ class PluginTransmissionInput(TransmissionBase):
                 'leftUntilDone': 'left_until_done',
                 'ratio': 'ratio',
                 'status': 'status',
-                'date_active': 'date_active',
-                'date_added': 'date_added',
-                'date_done': 'date_done',
-                'date_started': 'date_started',
+                'date_active': 'activity_date',
+                'date_added': 'added_date',
+                'date_done': 'done_date',
+                'date_started': 'start_date',
                 'errorString': 'error_string',
                 'priority': 'priority',
                 'progress': 'progress',
