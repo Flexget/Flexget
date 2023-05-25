@@ -71,5 +71,7 @@ jobs:
           provenance: false
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha, scope=${{ github.workflow }}
-          cache-to: type=gha, mode=max, scope=${{ github.workflow }}
+          cache-from: |
+            type=gha, scope=${{ github.ref }}
+            type=gha, scope=${{ github.base_ref }}
+          cache-to: type=gha, mode=max, scope=${{ github.ref }}
