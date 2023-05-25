@@ -15,7 +15,7 @@ interactions:
         X-Api-Key:
           - 65e246ce581a426781e1a8645f0a1f2c
       method: POST
-      uri: http://127.0.0.1:7878/api/tag
+      uri: http://127.0.0.1:7878/api/v3/tag
     response:
       body:
         string: !!binary |
@@ -59,7 +59,7 @@ interactions:
         X-Api-Key:
           - 65e246ce581a426781e1a8645f0a1f2c
       method: GET
-      uri: http://127.0.0.1:7878/api/profile
+      uri: http://127.0.0.1:7878/api/v3/qualityProfile
     response:
       body:
         string: !!binary |
@@ -125,7 +125,7 @@ interactions:
         X-Api-Key:
           - 65e246ce581a426781e1a8645f0a1f2c
       method: GET
-      uri: http://127.0.0.1:7878/api/movie
+      uri: http://127.0.0.1:7878/api/v3/movie
     response:
       body:
         string: !!binary |
@@ -168,7 +168,7 @@ interactions:
         X-Api-Key:
           - 65e246ce581a426781e1a8645f0a1f2c
       method: GET
-      uri: http://127.0.0.1:7878/api/movie/lookup/imdb?imdbId=tt1431045
+      uri: http://127.0.0.1:7878/api/v3/movie/lookup/imdb?imdbId=tt1431045
     response:
       body:
         string: !!binary |
@@ -227,7 +227,7 @@ interactions:
         X-Api-Key:
           - 65e246ce581a426781e1a8645f0a1f2c
       method: GET
-      uri: http://127.0.0.1:7878/api/rootfolder
+      uri: http://127.0.0.1:7878/api/v3/rootfolder
     response:
       body:
         string: !!binary |
@@ -272,7 +272,7 @@ interactions:
         X-Api-Key:
           - 65e246ce581a426781e1a8645f0a1f2c
       method: GET
-      uri: http://127.0.0.1:7878/api/tag
+      uri: http://127.0.0.1:7878/api/v3/tag
     response:
       body:
         string: !!binary |
@@ -322,7 +322,7 @@ interactions:
         X-Api-Key:
           - 65e246ce581a426781e1a8645f0a1f2c
       method: POST
-      uri: http://127.0.0.1:7878/api/movie
+      uri: http://127.0.0.1:7878/api/v3/movie
     response:
       body:
         string: !!binary |
@@ -380,7 +380,7 @@ interactions:
         X-Api-Key:
           - 65e246ce581a426781e1a8645f0a1f2c
       method: GET
-      uri: http://127.0.0.1:7878/api/tag
+      uri: http://127.0.0.1:7878/api/v3/tag
     response:
       body:
         string: !!binary |
@@ -424,7 +424,7 @@ interactions:
         X-Api-Key:
           - 65e246ce581a426781e1a8645f0a1f2c
       method: GET
-      uri: http://127.0.0.1:7878/api/movie
+      uri: http://127.0.0.1:7878/api/v3/movie
     response:
       body:
         string: !!binary |

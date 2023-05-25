@@ -17,7 +17,7 @@ interactions:
         X-Api-Key:
           - 7f0a2ce32a3e43c8a7389e9539c487b4
       method: POST
-      uri: http://127.0.0.1:8989/api/tag
+      uri: http://127.0.0.1:8989/api/v3/tag
     response:
       body:
         string: !!binary |
@@ -64,7 +64,7 @@ interactions:
         X-Api-Key:
           - 7f0a2ce32a3e43c8a7389e9539c487b4
       method: GET
-      uri: http://127.0.0.1:8989/api/series
+      uri: http://127.0.0.1:8989/api/v3/series
     response:
       body:
         string: !!binary |
@@ -111,7 +111,7 @@ interactions:
         X-Api-Key:
           - 7f0a2ce32a3e43c8a7389e9539c487b4
       method: GET
-      uri: http://127.0.0.1:8989/api/series
+      uri: http://127.0.0.1:8989/api/v3/series
     response:
       body:
         string: !!binary |
@@ -158,7 +158,7 @@ interactions:
         X-Api-Key:
           - 7f0a2ce32a3e43c8a7389e9539c487b4
       method: GET
-      uri: http://127.0.0.1:8989/api/series/lookup?term=tvdb:121361
+      uri: http://127.0.0.1:8989/api/v3/series/lookup?term=tvdb:121361
     response:
       body:
         string: !!binary |
@@ -219,7 +219,7 @@ interactions:
         X-Api-Key:
           - 7f0a2ce32a3e43c8a7389e9539c487b4
       method: GET
-      uri: http://127.0.0.1:8989/api/Rootfolder
+      uri: http://127.0.0.1:8989/api/v3/Rootfolder
     response:
       body:
         string: !!binary |
@@ -268,7 +268,7 @@ interactions:
         X-Api-Key:
           - 7f0a2ce32a3e43c8a7389e9539c487b4
       method: GET
-      uri: http://127.0.0.1:8989/api/tag
+      uri: http://127.0.0.1:8989/api/v3/tag
     response:
       body:
         string: !!binary |
@@ -342,7 +342,7 @@ interactions:
         X-Api-Key:
           - 7f0a2ce32a3e43c8a7389e9539c487b4
       method: POST
-      uri: http://127.0.0.1:8989/api/series
+      uri: http://127.0.0.1:8989/api/v3/series
     response:
       body:
         string: !!binary |
@@ -405,7 +405,7 @@ interactions:
         X-Api-Key:
           - 7f0a2ce32a3e43c8a7389e9539c487b4
       method: GET
-      uri: http://127.0.0.1:8989/api/tag
+      uri: http://127.0.0.1:8989/api/v3/tag
     response:
       body:
         string: !!binary |
@@ -453,7 +453,7 @@ interactions:
         X-Api-Key:
           - 7f0a2ce32a3e43c8a7389e9539c487b4
       method: GET
-      uri: http://127.0.0.1:8989/api/series
+      uri: http://127.0.0.1:8989/api/v3/series
     response:
       body:
         string: !!binary |

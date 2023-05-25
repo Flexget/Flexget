@@ -13,7 +13,7 @@ interactions:
         X-Api-Key:
           - 7f0a2ce32a3e43c8a7389e9539c487b4
       method: GET
-      uri: http://127.0.0.1:8989/api/series
+      uri: http://127.0.0.1:8989/api/v3/series
     response:
       body:
         string: !!binary |
@@ -78,7 +78,7 @@ interactions:
         X-Api-Key:
           - 7f0a2ce32a3e43c8a7389e9539c487b4
       method: DELETE
-      uri: http://127.0.0.1:8989/api/series/23
+      uri: http://127.0.0.1:8989/api/v3/series/23
     response:
       body:
         string: !!binary |
@@ -127,7 +127,7 @@ interactions:
         X-Api-Key:
           - 7f0a2ce32a3e43c8a7389e9539c487b4
       method: DELETE
-      uri: http://127.0.0.1:8989/api/series/23
+      uri: http://127.0.0.1:8989/api/v3/series/23
     response:
       body:
         string: "{\n  \"message\": \"Series with ID 23 does not exist\",\n  \"description\"\
@@ -190,7 +190,7 @@ interactions:
         X-Api-Key:
           - 7f0a2ce32a3e43c8a7389e9539c487b4
       method: GET
-      uri: http://127.0.0.1:8989/api/series
+      uri: http://127.0.0.1:8989/api/v3/series
     response:
       body:
         string: !!binary |
@@ -237,7 +237,7 @@ interactions:
         X-Api-Key:
           - 7f0a2ce32a3e43c8a7389e9539c487b4
       method: GET
-      uri: http://127.0.0.1:8989/api/series/lookup?term=tvdb:81189
+      uri: http://127.0.0.1:8989/api/v3/series/lookup?term=tvdb:81189
     response:
       body:
         string: !!binary |
@@ -297,7 +297,7 @@ interactions:
         X-Api-Key:
           - 7f0a2ce32a3e43c8a7389e9539c487b4
       method: GET
-      uri: http://127.0.0.1:8989/api/Rootfolder
+      uri: http://127.0.0.1:8989/api/v3/Rootfolder
     response:
       body:
         string: !!binary |
@@ -346,7 +346,7 @@ interactions:
         X-Api-Key:
           - 7f0a2ce32a3e43c8a7389e9539c487b4
       method: GET
-      uri: http://127.0.0.1:8989/api/tag
+      uri: http://127.0.0.1:8989/api/v3/tag
     response:
       body:
         string: !!binary |
@@ -418,7 +418,7 @@ interactions:
         X-Api-Key:
           - 7f0a2ce32a3e43c8a7389e9539c487b4
       method: POST
-      uri: http://127.0.0.1:8989/api/series
+      uri: http://127.0.0.1:8989/api/v3/series
     response:
       body:
         string: !!binary |
@@ -480,7 +480,7 @@ interactions:
         X-Api-Key:
           - 7f0a2ce32a3e43c8a7389e9539c487b4
       method: GET
-      uri: http://127.0.0.1:8989/api/series
+      uri: http://127.0.0.1:8989/api/v3/series
     response:
       body:
         string: !!binary |
@@ -542,7 +542,7 @@ interactions:
         X-Api-Key:
           - 7f0a2ce32a3e43c8a7389e9539c487b4
       method: GET
-      uri: http://127.0.0.1:8989/api/series/lookup?term=tvdb:153021
+      uri: http://127.0.0.1:8989/api/v3/series/lookup?term=tvdb:153021
     response:
       body:
         string: !!binary |
@@ -602,7 +602,7 @@ interactions:
         X-Api-Key:
           - 7f0a2ce32a3e43c8a7389e9539c487b4
       method: GET
-      uri: http://127.0.0.1:8989/api/Rootfolder
+      uri: http://127.0.0.1:8989/api/v3/Rootfolder
     response:
       body:
         string: !!binary |
@@ -677,7 +677,7 @@ interactions:
         X-Api-Key:
           - 7f0a2ce32a3e43c8a7389e9539c487b4
       method: POST
-      uri: http://127.0.0.1:8989/api/series
+      uri: http://127.0.0.1:8989/api/v3/series
     response:
       body:
         string: !!binary |
@@ -739,7 +739,7 @@ interactions:
         X-Api-Key:
           - 7f0a2ce32a3e43c8a7389e9539c487b4
       method: GET
-      uri: http://127.0.0.1:8989/api/series
+      uri: http://127.0.0.1:8989/api/v3/series
     response:
       body:
         string: !!binary |
@@ -812,7 +812,7 @@ interactions:
         X-Api-Key:
           - 7f0a2ce32a3e43c8a7389e9539c487b4
       method: GET
-      uri: http://127.0.0.1:8989/api/series/lookup?term=tvdb:121361
+      uri: http://127.0.0.1:8989/api/v3/series/lookup?term=tvdb:121361
     response:
       body:
         string: !!binary |
@@ -873,7 +873,7 @@ interactions:
         X-Api-Key:
           - 7f0a2ce32a3e43c8a7389e9539c487b4
       method: GET
-      uri: http://127.0.0.1:8989/api/Rootfolder
+      uri: http://127.0.0.1:8989/api/v3/Rootfolder
     response:
       body:
         string: !!binary |
@@ -948,7 +948,7 @@ interactions:
         X-Api-Key:
           - 7f0a2ce32a3e43c8a7389e9539c487b4
       method: POST
-      uri: http://127.0.0.1:8989/api/series
+      uri: http://127.0.0.1:8989/api/v3/series
     response:
       body:
         string: !!binary |
@@ -1011,7 +1011,7 @@ interactions:
         X-Api-Key:
           - 7f0a2ce32a3e43c8a7389e9539c487b4
       method: GET
-      uri: http://127.0.0.1:8989/api/series
+      uri: http://127.0.0.1:8989/api/v3/series
     response:
       body:
         string: !!binary |
@@ -1094,7 +1094,7 @@ interactions:
         X-Api-Key:
           - 7f0a2ce32a3e43c8a7389e9539c487b4
       method: GET
-      uri: http://127.0.0.1:8989/api/profile
+      uri: http://127.0.0.1:8989/api/v3/qualityProfile
     response:
       body:
         string: !!binary |
@@ -1156,7 +1156,7 @@ interactions:
         X-Api-Key:
           - 7f0a2ce32a3e43c8a7389e9539c487b4
       method: GET
-      uri: http://127.0.0.1:8989/api/series
+      uri: http://127.0.0.1:8989/api/v3/series
     response:
       body:
         string: !!binary |
@@ -1241,7 +1241,7 @@ interactions:
         X-Api-Key:
           - 7f0a2ce32a3e43c8a7389e9539c487b4
       method: DELETE
-      uri: http://127.0.0.1:8989/api/series/24
+      uri: http://127.0.0.1:8989/api/v3/series/24
     response:
       body:
         string: !!binary |
@@ -1288,7 +1288,7 @@ interactions:
         X-Api-Key:
           - 7f0a2ce32a3e43c8a7389e9539c487b4
       method: GET
-      uri: http://127.0.0.1:8989/api/series
+      uri: http://127.0.0.1:8989/api/v3/series
     response:
       body:
         string: !!binary |
@@ -1363,7 +1363,7 @@ interactions:
         X-Api-Key:
           - 7f0a2ce32a3e43c8a7389e9539c487b4
       method: GET
-      uri: http://127.0.0.1:8989/api/profile
+      uri: http://127.0.0.1:8989/api/v3/qualityProfile
     response:
       body:
         string: !!binary |
@@ -1425,7 +1425,7 @@ interactions:
         X-Api-Key:
           - 7f0a2ce32a3e43c8a7389e9539c487b4
       method: GET
-      uri: http://127.0.0.1:8989/api/series
+      uri: http://127.0.0.1:8989/api/v3/series
     response:
       body:
         string: !!binary |
@@ -1500,7 +1500,7 @@ interactions:
         X-Api-Key:
           - 7f0a2ce32a3e43c8a7389e9539c487b4
       method: GET
-      uri: http://127.0.0.1:8989/api/series
+      uri: http://127.0.0.1:8989/api/v3/series
     response:
       body:
         string: !!binary |
@@ -1577,7 +1577,7 @@ interactions:
         X-Api-Key:
           - 7f0a2ce32a3e43c8a7389e9539c487b4
       method: DELETE
-      uri: http://127.0.0.1:8989/api/series/26
+      uri: http://127.0.0.1:8989/api/v3/series/26
     response:
       body:
         string: !!binary |
@@ -1626,7 +1626,7 @@ interactions:
         X-Api-Key:
           - 7f0a2ce32a3e43c8a7389e9539c487b4
       method: DELETE
-      uri: http://127.0.0.1:8989/api/series/25
+      uri: http://127.0.0.1:8989/api/v3/series/25
     response:
       body:
         string: !!binary |
@@ -1673,7 +1673,7 @@ interactions:
         X-Api-Key:
           - 7f0a2ce32a3e43c8a7389e9539c487b4
       method: GET
-      uri: http://127.0.0.1:8989/api/series
+      uri: http://127.0.0.1:8989/api/v3/series
     response:
       body:
         string: !!binary |
@@ -1720,7 +1720,7 @@ interactions:
         X-Api-Key:
           - 7f0a2ce32a3e43c8a7389e9539c487b4
       method: GET
-      uri: http://127.0.0.1:8989/api/profile
+      uri: http://127.0.0.1:8989/api/v3/qualityProfile
     response:
       body:
         string: !!binary |
