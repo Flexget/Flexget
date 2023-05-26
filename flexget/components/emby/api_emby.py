@@ -1831,10 +1831,11 @@ class EmbyApiSerie(EmbyApiMedia):
                 filter(lambda s: s.get('Name') == args.get('SearchTerm'), series['Items'])
             )
 
-            if args.get('Years'):
-                serie_filter = list(
-                    filter(lambda s: s.get('Year') == args.get('Years'), serie_filter)
-                )
+            if len(serie_filter) > 1:
+                if args.get('Years'):
+                    serie_filter = list(
+                        filter(lambda s: s.get('Year') == args.get('Years'), serie_filter)
+                    )
 
             if len(serie_filter) == 1:
                 serie = serie_filter[0]
@@ -2697,6 +2698,9 @@ class EmbyApi(EmbyApiBase):
     @staticmethod
     def strtotime(date) -> 'datetime':
         # YYYY-MM-DDTHH:MM:SS.0000000+00:00
+        # YYYY-MM-DDTHH:MM:SS.0000000Z
+        # YYYY-MM-DDTHH:MM:SS+00:00
+        # YYYY-MM-DDTHH:MM:SSZ
 
         if not date:
             return None
@@ -2704,12 +2708,23 @@ class EmbyApi(EmbyApiBase):
             return date
         elif not isinstance(date, str):
             return None
+        
+        # Remove the 'Z' character if present
+        date = date.replace('Z', '')
 
-        # Normalize date
-        date_py = re.sub(r'^(.*)\.([0-9]{6})[0-9]*\+([0-9]{2})\:([0-9]{2})$', r'\1.\2+\3\4', date)
+        # Check if the offset is present
+        if '+' in date:
+            date = date.split('+')[0]
+
+        # Check if ms is present
+        if '.' in date:
+            date = date.split('.')[0]
+
+        # Define the format
+        format_str = '%Y-%m-%dT%H:%M:%S'
 
         try:
-            date = datetime.strptime(date_py, '%Y-%m-%dT%H:%M:%S.%f%z')
+            date = datetime.strptime(date, format_str)
         except ValueError:
             date = None
 
@@ -2729,13 +2744,55 @@ class EmbyApi(EmbyApiBase):
         return EmbyApiMedia.TYPE
 
     @staticmethod
-    def resquest_emby(
-        endpoint: str,
-        auth: 'EmbyAuth',
-        method: str,
-        emby_connect=False,
-        **kwargs,
-    ):
+    def request_split_provider(*args, **kwargs):
+        if 'AnyProviderIdEquals' not in kwargs:
+            return False
+
+        data = kwargs.copy()
+
+        providers = data['AnyProviderIdEquals'].split(';')
+        if not isinstance(providers, list) or len(providers) < 2:
+            return False
+        
+        del data['AnyProviderIdEquals']
+
+        returns = {}
+
+        for provider in providers:
+            data['AnyProviderIdEquals'] = provider
+            items = EmbyApi.resquest_emby(*args,**data)
+            if not items or 'Items' not in items or not items['Items']:
+                continue;
+            for item in items['Items']:
+                if 'Id' not in item:
+                    continue
+                
+                id = item['Id']
+                if id not in returns:
+                    returns[id] = {'count':0,'item':item}
+
+                returns[id]['count']+=1
+
+        if len(returns) == 0:
+            return False
+
+        sorted_returns = sorted(returns.values(), key=lambda x: x['count'], reverse=True)
+
+        max_count = sorted_returns[0]['count']
+        max_count_items = [d['item'] for d in sorted_returns if d['count'] == max_count]
+
+        if len(max_count_items) > 1:
+            return False
+
+        return {
+            'Items':max_count_items,
+            'TotalRecordCount':len(max_count_items)
+        }
+
+
+
+    @staticmethod
+    def resquest_emby(endpoint: str, auth: 'EmbyAuth', method: str, emby_connect=False, **kwargs):
         verify_certificates = True if emby_connect else False
 
         if not auth:
@@ -2791,14 +2848,32 @@ class EmbyApi(EmbyApiBase):
                 return False
             else:
                 raise PluginError('Could not connect to Emby Server: %s' % str(e)) from e
-
         except RequestException as e:
             raise PluginError('Could not connect to Emby Server: %s' % str(e)) from e
 
         if response.status_code == 200 or response.status_code == 204:
             try:
-                return response.json()
+                return_data = response.json()             
+
+                # If we need to pull a Provider, and we don't get returns, and we have more that one provider, try with split requests
+                if 'AnyProviderIdEquals' in kwargs and 'Items' in return_data and isinstance(return_data['Items'],list) and len(return_data['Items']) == 0:
+                    return_providers = EmbyApi.request_split_provider(endpoint,auth,method,emby_connect,**kwargs)
+                    if return_providers:
+                        return_data = return_providers
             except ValueError:
                 return {'code': response.status_code}
+
+            #Fill Year if not available
+            if "Items" in  return_data:
+                items = return_data["Items"]
+                for item in items:
+                    if "Year" not in item and "PremiereDate" in item:
+                        premiere_date = EmbyApi.strtotime(item["PremiereDate"])
+                        if not isinstance(premiere_date,datetime):
+                            continue
+                        year = premiere_date.year
+                        item["Year"] = year  
+
+            return return_data
 
         return False
