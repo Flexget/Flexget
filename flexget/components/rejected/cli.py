@@ -1,15 +1,9 @@
-from flexget import options, plugin
+from flexget import options
 from flexget.event import event
 from flexget.manager import Session
 from flexget.terminal import TerminalTable, console, table_parser
 
 from . import db
-
-try:
-    # NOTE: Importing other plugins is discouraged!
-    from flexget.components.rejected import remember_rejected as plugin_remember_rejected
-except ImportError:
-    raise plugin.DependencyError(issued_by=__name__, missing='remember_rejected')
 
 
 def do_cli(manager, options):

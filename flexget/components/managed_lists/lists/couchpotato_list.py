@@ -17,7 +17,7 @@ class CouchPotatoBase:
     def movie_list_request(base_url, port, api_key):
         parsedurl = urlparse(base_url)
         logger.debug('Received movie list request')
-        return '%s://%s:%s%s/api/%s/movie.list?status=active' % (
+        return '{}://{}:{}{}/api/{}/movie.list?status=active'.format(
             parsedurl.scheme,
             parsedurl.netloc,
             port,
@@ -29,7 +29,7 @@ class CouchPotatoBase:
     def profile_list_request(base_url, port, api_key):
         parsedurl = urlparse(base_url)
         logger.debug('Received profile list request')
-        return '%s://%s:%s%s/api/%s/profile.list' % (
+        return '{}://{}:{}{}/api/{}/profile.list'.format(
             parsedurl.scheme,
             parsedurl.netloc,
             port,
@@ -41,7 +41,7 @@ class CouchPotatoBase:
     def movie_add_request(base_url, port, api_key):
         parsedurl = urlparse(base_url)
         logger.debug('Received movie add request')
-        return '%s://%s:%s%s/api/%s/movie.add' % (
+        return '{}://{}:{}{}/api/{}/movie.add'.format(
             parsedurl.scheme,
             parsedurl.netloc,
             port,
@@ -53,7 +53,7 @@ class CouchPotatoBase:
     def movie_delete_request(base_url, port, api_key):
         parsedurl = urlparse(base_url)
         logger.debug('Received movie delete request')
-        return '%s://%s:%s%s/api/%s/movie.delete?delete_from=wanted' % (
+        return '{}://{}:{}{}/api/{}/movie.delete?delete_from=wanted'.format(
             parsedurl.scheme,
             parsedurl.netloc,
             port,
@@ -79,9 +79,7 @@ class CouchPotatoBase:
         try:
             return requests.get(url).json()
         except RequestException as e:
-            raise plugin.PluginError(
-                'Unable to connect to Couchpotato at %s. Error: %s' % (url, e)
-            )
+            raise plugin.PluginError(f'Unable to connect to Couchpotato at {url}. Error: {e}')
 
     @staticmethod
     def quality_requirement_builder(quality_profile):
@@ -107,22 +105,14 @@ class CouchPotatoBase:
         # TODO list is converted to set because if a quality has 3d type in CP, it gets duplicated during the conversion
         # TODO when (and if) 3d is supported in flexget this will be needed to removed
         res_string = '|'.join(
-            set(
-                [
-                    resolutions[quality]
-                    for quality in quality_profile['qualities']
-                    if quality in resolutions
-                ]
-            )
+            {
+                resolutions[quality]
+                for quality in quality_profile['qualities']
+                if quality in resolutions
+            }
         )
         source_string = '|'.join(
-            set(
-                [
-                    sources[quality]
-                    for quality in quality_profile['qualities']
-                    if quality in sources
-                ]
-            )
+            {sources[quality] for quality in quality_profile['qualities'] if quality in sources}
         )
 
         quality_requirement = (res_string + ' ' + source_string).rstrip()
@@ -192,7 +182,7 @@ class CouchPotatoBase:
         )
         title = entry.get('movie_name')
         imdb_id = entry.get('imdb_id')
-        add_movie_url += '?title=%s&identifier=%s' % (title, imdb_id)
+        add_movie_url += f'?title={title}&identifier={imdb_id}'
         add_movie_json = CouchPotatoBase.get_json(add_movie_url)
         return add_movie_json['movie']
 

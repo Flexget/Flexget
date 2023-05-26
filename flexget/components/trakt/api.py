@@ -165,7 +165,7 @@ class TraktSeriesSearchApi(APIResource):
     @etag(cache_age=3600)
     @api.response(200, 'Successfully found show', series_return_schema)
     @api.response(NotFoundError)
-    @api.doc(parser=lookup_parser)
+    @api.doc(expect=[lookup_parser])
     def get(self, session=None):
         """Trakt series lookup"""
         args = lookup_parser.parse_args()
@@ -187,7 +187,7 @@ class TraktSeriesSearchApi(APIResource):
 @trakt_api.route('/series/<string:title>')
 @api.doc(params={'title': 'Series name'})
 class TraktSeriesWithTitleSearchApi(APIResource):
-    @api.doc(parser=lookup_parser)
+    @api.doc(expect=[lookup_parser])
     @api.response(301)
     def get(self, title, session=None):
         kwargs = lookup_parser.parse_args()
@@ -200,7 +200,7 @@ class TraktMovieSearchApi(APIResource):
     @etag(cache_age=3600)
     @api.response(200, 'Successfully found show', movie_return_schema)
     @api.response(NotFoundError)
-    @api.doc(parser=lookup_parser)
+    @api.doc(expect=[lookup_parser])
     def get(self, session=None):
         """Trakt movie lookup"""
         args = lookup_parser.parse_args()
@@ -222,7 +222,7 @@ class TraktMovieSearchApi(APIResource):
 @trakt_api.route('/movies/<string:title>')
 @api.doc(params={'title': 'Movie name'})
 class TraktMovieWithTitleSearchApi(APIResource):
-    @api.doc(parser=lookup_parser)
+    @api.doc(expect=[lookup_parser])
     @api.response(301)
     def get(self, title, session=None):
         kwargs = lookup_parser.parse_args()

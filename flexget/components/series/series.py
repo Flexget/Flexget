@@ -1,4 +1,3 @@
-import argparse
 import itertools
 import sys
 import time
@@ -441,9 +440,7 @@ class FilterSeries(FilterSeriesBase):
                     + [normalize_series_name(series_name)[:1].lower()]
                     + [alt[:1].lower() for alt in alt_names]
                 )
-                entries = set(
-                    [entry for letter in letters for entry in entries_map.get(letter, [])]
-                )
+                entries = {entry for letter in letters for entry in entries_map.get(letter, [])}
                 if entries:
                     self.parse_series(entries, series_name, series_config, db_identified_by)
 
@@ -472,10 +469,10 @@ class FilterSeries(FilterSeriesBase):
             existing_series = (
                 session.query(db.Series)
                 .filter(db.Series.name.in_(series_names))
-                .options(joinedload('alternate_names'))
+                .options(joinedload(db.Series.alternate_names))
                 .all()
             )
-            existing_series_map = dict([(s.name_normalized, s) for s in existing_series])
+            existing_series_map = {s.name_normalized: s for s in existing_series}
             # Expunge so we can work on de-attached while processing the series to minimize db locks
             session.expunge_all()
 
@@ -610,18 +607,18 @@ class FilterSeries(FilterSeriesBase):
             # set flag from database
             identified_by = db_identified_by or 'auto'
 
-        params = dict(
-            identified_by=identified_by,
-            alternate_names=get_config_as_array(config, 'alternate_name'),
-            name_regexps=get_config_as_array(config, 'name_regexp'),
-            strict_name=config.get('exact', False),
-            allow_groups=get_config_as_array(config, 'from_group'),
-            date_yearfirst=config.get('date_yearfirst'),
-            date_dayfirst=config.get('date_dayfirst'),
-            special_ids=get_config_as_array(config, 'special_ids'),
-            prefer_specials=config.get('prefer_specials'),
-            assume_special=config.get('assume_special'),
-        )
+        params = {
+            'identified_by': identified_by,
+            'alternate_names': get_config_as_array(config, 'alternate_name'),
+            'name_regexps': get_config_as_array(config, 'name_regexp'),
+            'strict_name': config.get('exact', False),
+            'allow_groups': get_config_as_array(config, 'from_group'),
+            'date_yearfirst': config.get('date_yearfirst'),
+            'date_dayfirst': config.get('date_dayfirst'),
+            'special_ids': get_config_as_array(config, 'special_ids'),
+            'prefer_specials': config.get('prefer_specials'),
+            'assume_special': config.get('assume_special'),
+        }
         for id_type in plugin_parser_common.SERIES_ID_TYPES:
             params[id_type + '_regexps'] = get_config_as_array(config, id_type + '_regexp')
 
@@ -721,8 +718,7 @@ class FilterSeries(FilterSeriesBase):
                 if entity < entity.series.begin:
                     for entry in entries:
                         entry.reject(
-                            'Entity `%s` is before begin value of `%s`'
-                            % (entity.identifier, entity.series.begin.identifier)
+                            f'Entity `{entity.identifier}` is before begin value of `{entity.series.begin.identifier}`'
                         )
                     continue
 
@@ -867,9 +863,7 @@ class FilterSeries(FilterSeriesBase):
                 logger.debug('propers timeframe expired')
                 return pass_filter
 
-        downloaded_qualities = dict(
-            (d.quality, d.proper_count) for d in episode.downloaded_releases
-        )
+        downloaded_qualities = {d.quality: d.proper_count for d in episode.downloaded_releases}
         logger.debug('propers - downloaded qualities: {}', downloaded_qualities)
 
         # Accept propers we actually need, and remove them from the list of entries to continue processing
@@ -1070,9 +1064,7 @@ class FilterSeries(FilterSeriesBase):
         logger.debug('downloaded_qualities: {}', downloaded_qualities)
 
         # If qualities key is configured, we only want qualities defined in it.
-        wanted_qualities = set(
-            [qualities.Requirements(name) for name in config.get('qualities', [])]
-        )
+        wanted_qualities = {qualities.Requirements(name) for name in config.get('qualities', [])}
         # Compute the requirements from our set that have not yet been fulfilled
         still_needed = [
             req
@@ -1161,10 +1153,10 @@ class SeriesDBManager(FilterSeriesBase):
             existing_series = (
                 session.query(db.Series)
                 .filter(db.Series.name.in_(names))
-                .options(joinedload('alternate_names'))
+                .options(joinedload(db.Series.alternate_names))
                 .all()
             )
-            existing_series_map = dict([(s.name_normalized, s) for s in existing_series])
+            existing_series_map = {s.name_normalized: s for s in existing_series}
 
             for series_item in config:
                 series_name, series_config = list(series_item.items())[0]

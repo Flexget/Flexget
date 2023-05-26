@@ -18,11 +18,12 @@ from sqlalchemy import (
     desc,
     func,
     select,
+    text,
     update,
 )
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
-from sqlalchemy.orm import backref, relation
+from sqlalchemy.orm import backref, relationship
 
 from flexget import db_schema, plugin
 from flexget.components.series.utils import normalize_series_name
@@ -71,7 +72,7 @@ class Series(Base):
     begin_episode_id = Column(
         Integer, ForeignKey('series_episodes.id', name='begin_episode_id', use_alter=True)
     )
-    begin = relation(
+    begin = relationship(
         'Episode',
         uselist=False,
         primaryjoin="Series.begin_episode_id == Episode.id",
@@ -79,22 +80,22 @@ class Series(Base):
         post_update=True,
         backref='begins_series',
     )
-    episodes = relation(
+    episodes = relationship(
         'Episode',
         backref='series',
         cascade='all, delete, delete-orphan',
         primaryjoin='Series.id == Episode.series_id',
     )
-    in_tasks = relation(
+    in_tasks = relationship(
         'SeriesTask',
         backref=backref('series', uselist=False),
         cascade='all, delete, delete-orphan',
     )
-    alternate_names = relation(
+    alternate_names = relationship(
         'AlternateNames', backref='series', cascade='all, delete, delete-orphan'
     )
 
-    seasons = relation('Season', backref='series', cascade='all, delete, delete-orphan')
+    seasons = relationship('Season', backref='series', cascade='all, delete, delete-orphan')
 
     # Make a special property that does indexed case insensitive lookups on name, but stores/returns specified case
     @hybrid_property
@@ -115,11 +116,7 @@ class Series(Base):
         return self._name_normalized
 
     def __str__(self):
-        return '<Series(id=%s,name=%s,identified_by=%s)>' % (
-            self.id,
-            self.name,
-            self.identified_by,
-        )
+        return f'<Series(id={self.id},name={self.name},identified_by={self.identified_by})>'
 
     def __repr__(self):
         return str(self).encode('ascii', 'replace')
@@ -148,7 +145,9 @@ class Season(Base):
     season = Column(Integer)
     series_id = Column(Integer, ForeignKey('series.id'), nullable=False)
 
-    releases = relation('SeasonRelease', backref='season', cascade='all, delete, delete-orphan')
+    releases = relationship(
+        'SeasonRelease', backref='season', cascade='all, delete, delete-orphan'
+    )
 
     is_season = True
 
@@ -174,7 +173,7 @@ class Season(Base):
     @first_seen.expression
     def first_seen(cls):
         return (
-            select([func.min(SeasonRelease.first_seen)])
+            select(func.min(SeasonRelease.first_seen))
             .where(SeasonRelease.season_id == cls.id)
             .correlate(Season.__table__)
             .label('first_seen')
@@ -210,7 +209,7 @@ class Season(Base):
         return False
 
     def __str__(self):
-        return '<Season(id=%s,identifier=%s,season=%s,completed=%s)>' % (
+        return '<Season(id={},identifier={},season={},completed={})>'.format(
             self.id,
             self.identifier,
             self.season,
@@ -273,7 +272,9 @@ class Episode(Base):
 
     identified_by = Column(String)
     series_id = Column(Integer, ForeignKey('series.id'), nullable=False)
-    releases = relation('EpisodeRelease', backref='episode', cascade='all, delete, delete-orphan')
+    releases = relationship(
+        'EpisodeRelease', backref='episode', cascade='all, delete, delete-orphan'
+    )
 
     is_season = False
 
@@ -286,7 +287,7 @@ class Episode(Base):
     @first_seen.expression
     def first_seen(cls):
         return (
-            select([func.min(EpisodeRelease.first_seen)])
+            select(func.min(EpisodeRelease.first_seen))
             .where(EpisodeRelease.episode_id == cls.id)
             .correlate(Episode.__table__)
             .label('first_seen')
@@ -343,7 +344,7 @@ class Episode(Base):
         )[0]
 
     def __str__(self):
-        return '<Episode(id=%s,identifier=%s,season=%s,number=%s,identified_by=%s)>' % (
+        return '<Episode(id={},identifier={},season={},number={},identified_by={})>'.format(
             self.id,
             self.identifier,
             self.season,
@@ -450,7 +451,7 @@ class EpisodeRelease(Base):
         return self.proper_count > 0
 
     def __str__(self):
-        return '<Release(id=%s,quality=%s,downloaded=%s,proper_count=%s,title=%s)>' % (
+        return '<Release(id={},quality={},downloaded={},proper_count={},title={})>'.format(
             self.id,
             self.quality,
             self.downloaded,
@@ -498,7 +499,7 @@ class SeasonRelease(Base):
         return self.proper_count > 0
 
     def __str__(self):
-        return '<Release(id=%s,quality=%s,downloaded=%s,proper_count=%s,title=%s)>' % (
+        return '<Release(id={},quality={},downloaded={},proper_count={},title={})>'.format(
             self.id,
             self.quality,
             self.downloaded,
@@ -551,7 +552,9 @@ class AlternateNames(Base):
         self.alt_name = name
 
     def __str__(self):
-        return '<SeriesAlternateName(series_id=%s, alt_name=%s)>' % (self.series_id, self.alt_name)
+        return '<SeriesAlternateName(series_id={}, alt_name={})>'.format(
+            self.series_id, self.alt_name
+        )
 
     def __repr__(self):
         return str(self).encode('ascii', 'replace')
@@ -588,7 +591,7 @@ def upgrade(ver: Optional[int], session: Session) -> int:
             logger.info('Upgrading episode_releases table to have proper_count column')
             table_add_column('episode_releases', 'proper_count', Integer, session)
             release_table = table_schema('episode_releases', session)
-            for row in session.execute(select([release_table.c.id, release_table.c.title])):
+            for row in session.execute(select(release_table.c.id, release_table.c.title)):
                 # Recalculate the proper_count from title for old episodes
                 proper_count = (
                     plugin.get('parsing', 'series.db').parse_series(row['title']).proper_count
@@ -608,7 +611,7 @@ def upgrade(ver: Optional[int], session: Session) -> int:
         # Seed the first_seen value for all the past releases with the first_seen of their episode.
         episode_table = table_schema('series_episodes', session)
         release_table = table_schema('episode_releases', session)
-        for row in session.execute(select([episode_table.c.id, episode_table.c.first_seen])):
+        for row in session.execute(select(episode_table.c.id, episode_table.c.first_seen)):
             session.execute(
                 update(
                     release_table,
@@ -628,7 +631,7 @@ def upgrade(ver: Optional[int], session: Session) -> int:
     if ver == 3:
         # Remove index on Series.name
         try:
-            session.execute("DROP INDEX ix_series_name")
+            session.execute(text("DROP INDEX ix_series_name"))
             # This way doesn't work on sqlalchemy 1.4 for some reason
             # Index('ix_series_name').drop(bind=session.bind)
         except OperationalError:
@@ -640,7 +643,9 @@ def upgrade(ver: Optional[int], session: Session) -> int:
         create_index('series', session, 'name_lower')
         # Fill in lower case name column
         session.execute(
-            update(series_table, values={'name_lower': func.lower(series_table.c.name)})
+            update(series_table).values(
+                {series_table.c.name_lower: func.lower(series_table.c.name)}
+            )
         )
         ver = 4
     if ver == 4:
@@ -649,7 +654,9 @@ def upgrade(ver: Optional[int], session: Session) -> int:
         series_table = table_schema('series', session)
         # Clear out identified_by id series so that they can be auto detected again
         session.execute(
-            update(series_table, series_table.c.identified_by != 'ep', {'identified_by': None})
+            update(series_table)
+            .where(series_table.c.identified_by != 'ep')
+            .values({series_table.c.identified_by: None})
         )
         # Warn users about a possible config change needed.
         logger.warning(
@@ -664,24 +671,28 @@ def upgrade(ver: Optional[int], session: Session) -> int:
         # This action retroactively marks 'ep' mode for all episodes where the series is already in 'ep' mode.
         series_table = table_schema('series', session)
         ep_table = table_schema('series_episodes', session)
-        ep_mode_series = select([series_table.c.id], series_table.c.identified_by == 'ep')
+        ep_mode_series = select(series_table.c.id).where(series_table.c.identified_by == 'ep')
         where_clause = and_(
             ep_table.c.series_id.in_(ep_mode_series),
             ep_table.c.season != None,
             ep_table.c.number != None,
             ep_table.c.identified_by == None,
         )
-        session.execute(update(ep_table, where_clause, {'identified_by': 'ep'}))
+        session.execute(
+            update(ep_table).where(where_clause).values({ep_table.c.identified_by: 'ep'})
+        )
         ver = 6
     if ver == 6:
         # Translate old qualities into new quality requirements
         release_table = table_schema('episode_releases', session)
-        for row in session.execute(select([release_table.c.id, release_table.c.quality])):
+        for row in session.execute(select(release_table.c.id, release_table.c.quality)):
             # Webdl quality no longer has dash
             new_qual = row['quality'].replace('web-dl', 'webdl')
             if row['quality'] != new_qual:
                 session.execute(
-                    update(release_table, release_table.c.id == row['id'], {'quality': new_qual})
+                    update(release_table)
+                    .where(release_table.c.id == row['id'])
+                    .values({release_table.c.quality: new_qual})
                 )
         ver = 7
     # Normalization rules changed for 7 and 8, but only run this once
@@ -689,7 +700,7 @@ def upgrade(ver: Optional[int], session: Session) -> int:
         # Merge series that qualify as duplicates with new normalization scheme
         series_table = table_schema('series', session)
         ep_table = table_schema('series_episodes', session)
-        all_series = session.execute(select([series_table.c.name, series_table.c.id]))
+        all_series = session.execute(select(series_table.c.name, series_table.c.id))
         unique_series = {}
         for row in all_series:
             unique_series.setdefault(normalize_series_name(row['name']), []).append(row['id'])
@@ -710,7 +721,7 @@ def upgrade(ver: Optional[int], session: Session) -> int:
         series_table = table_schema('series', session)
         logger.verbose('Repairing series_tasks table data')
         session.execute(
-            delete(series_tasks, ~series_tasks.c.series_id.in_(select([series_table.c.id])))
+            delete(series_tasks).where(~series_tasks.c.series_id.in_(select(series_table.c.id)))
         )
         ver = 11
     if ver == 11:
@@ -723,7 +734,9 @@ def upgrade(ver: Optional[int], session: Session) -> int:
         # Force identified_by value None to 'auto'
         series_table = table_schema('series', session)
         session.execute(
-            update(series_table, series_table.c.identified_by == None, {'identified_by': 'auto'})
+            update(series_table)
+            .where(series_table.c.identified_by == None)
+            .values({series_table.c.identified_by: 'auto'})
         )
         ver = 13
     if ver == 13:
@@ -773,8 +786,10 @@ def set_alt_names(alt_names: Iterable[str], db_series: Series, session: Session)
         if db_series_alt:
             if not db_series_alt.series_id == db_series.id:
                 raise plugin.PluginError(
-                    'Error adding alternate name for `%s`: `%s` is already associated with `%s`. '
-                    'Check your settings.' % (db_series.name, alt_name, db_series_alt.series.name)
+                    'Error adding alternate name for `{}`: `{}` is already associated with `{}`. '
+                    'Check your settings.'.format(
+                        db_series.name, alt_name, db_series_alt.series.name
+                    )
                 )
             else:
                 logger.debug(
@@ -804,7 +819,7 @@ def show_seasons(
     seasons = (
         seasons.order_by(Season.season.desc()) if descending else seasons.order_by(Season.season)
     )
-    return seasons.slice(start, stop).from_self().all()
+    return seasons.slice(start, stop).all()
 
 
 def get_all_entities(
@@ -813,9 +828,15 @@ def get_all_entities(
     episodes = show_episodes(series, session=session)
     seasons = show_seasons(series, session=session)
     if sort_by == 'identifier':
-        key = lambda e: e.identifier
+
+        def key(e):
+            return e.identifier
+
     else:
-        key = lambda e: (e.first_seen or datetime.min, e.identifier)
+
+        def key(e):
+            return e.first_seen or datetime.min, e.identifier
+
     return sorted(episodes + seasons, key=key, reverse=reverse)
 
 
@@ -835,12 +856,12 @@ def get_episode_releases(
         releases = releases.filter(EpisodeRelease.downloaded == downloaded)
     if count:
         return releases.count()
-    releases = releases.slice(start, stop).from_self()
+    releases = releases
     if descending:
         releases = releases.order_by(getattr(EpisodeRelease, sort_by).desc())
     else:
         releases = releases.order_by(getattr(EpisodeRelease, sort_by))
-    return releases.all()
+    return releases.slice(start, stop).all()
 
 
 def get_season_releases(
@@ -859,12 +880,12 @@ def get_season_releases(
         releases = releases.filter(SeasonRelease.downloaded == downloaded)
     if count:
         return releases.count()
-    releases = releases.slice(start, stop).from_self()
+    releases = releases
     if descending:
         releases = releases.order_by(getattr(SeasonRelease, sort_by).desc())
     else:
         releases = releases.order_by(getattr(SeasonRelease, sort_by))
-    return releases.all()
+    return releases.slice(start, stop).all()
 
 
 def episode_in_show(series_id: int, episode_id: int) -> bool:
@@ -914,8 +935,8 @@ def _add_alt_name(alt: str, db_series: Series, series_name: str, session: Sessio
         else:
             # Alternate name already exists for another series. Not good.
             raise plugin.PluginError(
-                'Error adding alternate name for `%s`: `%s` is already associated with `%s`. '
-                'Check your settings.' % (series_name, alt, db_series_alt.series.name)
+                'Error adding alternate name for `{}`: `{}` is already associated with `{}`. '
+                'Check your settings.'.format(series_name, alt, db_series_alt.series.name)
             )
     else:
         logger.debug('adding alternate name `{}` for `{}` into db', alt, series_name)
@@ -977,7 +998,7 @@ def get_series_summary(
         order_by = func.max(EpisodeRelease.first_seen)
     query = query.order_by(desc(order_by)) if descending else query.order_by(order_by)
 
-    return query.slice(start, stop).from_self()
+    return query.slice(start, stop)
 
 
 def auto_identified_by(series: Series) -> str:
@@ -1040,7 +1061,10 @@ def get_latest_season_pack_release(
     """
     session = Session.object_session(series)
     releases = (
-        session.query(Season).join(Season.releases, Season.series).filter(Series.id == series.id)
+        session.query(Season)
+        .join(Season.releases)
+        .join(Season.series)
+        .filter(Series.id == series.id)
     )
 
     if downloaded:
@@ -1079,7 +1103,8 @@ def get_latest_episode_release(
     session = Session.object_session(series)
     releases = (
         session.query(Episode)
-        .join(Episode.releases, Episode.series)
+        .join(Episode.releases)
+        .join(Episode.series)
         .filter(Series.id == series.id)
     )
 
@@ -1205,8 +1230,7 @@ def set_series_begin(series: Series, ep_id: Union[str, int]) -> Tuple[str, str]:
     if series.identified_by not in ['auto', '', None]:
         if identified_by != series.identified_by:
             raise ValueError(
-                '`begin` value `%s` does not match identifier type for identified_by `%s`'
-                % (ep_id, series.identified_by)
+                f'`begin` value `{ep_id}` does not match identifier type for identified_by `{series.identified_by}`'
             )
     series.identified_by = identified_by
     episode = (
@@ -1283,12 +1307,10 @@ def remove_series_entity(name: str, identifier: str, forget: bool = False) -> No
             logger.debug('Entity `{}` from series `{}` removed from database.', identifier, name)
             return [release.title for release in entity.downloaded_releases]
 
-        name_to_parse = '{} {}'.format(series.name, identifier)
+        name_to_parse = f'{series.name} {identifier}'
         parsed = plugin.get('parsing', 'series.db').parse_series(name_to_parse, name=series.name)
         if not parsed.valid:
-            raise ValueError(
-                'Invalid identifier for series `{}`: `{}`'.format(series.name, identifier)
-            )
+            raise ValueError(f'Invalid identifier for series `{series.name}`: `{identifier}`')
 
         removed = False
         if parsed.season_pack:
@@ -1314,9 +1336,7 @@ def remove_series_entity(name: str, identifier: str, forget: bool = False) -> No
                 removed = True
                 downloaded_releases = remove_entity(episode)
         if not removed:
-            raise ValueError(
-                'Unknown identifier `%s` for series `%s`' % (identifier, name.capitalize())
-            )
+            raise ValueError(f'Unknown identifier `{identifier}` for series `{name.capitalize()}`')
 
     if forget:
         for downloaded_release in downloaded_releases:
@@ -1421,7 +1441,7 @@ def show_episodes(
             if descending
             else episodes.order_by(Episode.identifier)
         )
-    return episodes.slice(start, stop).from_self().all()
+    return episodes.slice(start, stop).all()
 
 
 def store_parser(
@@ -1550,20 +1570,16 @@ def add_series_entity(
     :param identifier: Series identifier to be added.
     :param quality: If supplied, this will override the quality from the series parser.
     """
-    name_to_parse = '{} {}'.format(series.name, identifier)
+    name_to_parse = f'{series.name} {identifier}'
     if quality:
-        name_to_parse += ' {}'.format(quality)
+        name_to_parse += f' {quality}'
     parsed = plugin.get('parsing', 'series.db').parse_series(name_to_parse, name=series.name)
     if not parsed.valid:
-        raise ValueError(
-            'Invalid identifier for series `{}`: `{}`.'.format(series.name, identifier)
-        )
+        raise ValueError(f'Invalid identifier for series `{series.name}`: `{identifier}`.')
 
     added = store_parser(session, parsed, series=series)
     if not added:
-        raise ValueError(
-            'Unable to add `%s` to series `%s`.' % (identifier, series.name.capitalize())
-        )
+        raise ValueError(f'Unable to add `{identifier}` to series `{series.name.capitalize()}`.')
     else:
         for release in added:
             release.downloaded = True

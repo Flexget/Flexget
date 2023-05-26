@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 
 from loguru import logger
 from sqlalchemy import Boolean, Column, DateTime, Float, Integer, String, Table, Unicode
-from sqlalchemy.orm import relation
+from sqlalchemy.orm import relationship
 from sqlalchemy.schema import ForeignKey, Index
 
 from flexget import db_schema
@@ -71,12 +71,12 @@ class Movie(Base):
     url = Column(String, index=True)
 
     # many-to-many relations
-    genres = relation('Genre', secondary=genres_table, backref='movies')
-    actors = relation('Actor', secondary=actors_table, backref='movies')
-    directors = relation('Director', secondary=directors_table, backref='movies')
-    writers = relation('Writer', secondary=writers_table, backref='movies')
-    plot_keywords = relation('PlotKeyword', secondary=plot_keywords_table, backref='movies')
-    languages = relation('MovieLanguage', order_by='MovieLanguage.prominence')
+    genres = relationship('Genre', secondary=genres_table, backref='movies')
+    actors = relationship('Actor', secondary=actors_table, backref='movies')
+    directors = relationship('Director', secondary=directors_table, backref='movies')
+    writers = relationship('Writer', secondary=writers_table, backref='movies')
+    plot_keywords = relationship('PlotKeyword', secondary=plot_keywords_table, backref='movies')
+    languages = relationship('MovieLanguage', order_by='MovieLanguage.prominence')
 
     score = Column(Float)
     votes = Column(Integer)
@@ -111,7 +111,7 @@ class Movie(Base):
         return self.updated < datetime.now() - timedelta(days=refresh_interval)
 
     def __repr__(self):
-        return '<Movie(name=%s,votes=%s,year=%s)>' % (self.title, self.votes, self.year)
+        return f'<Movie(name={self.title},votes={self.votes},year={self.year})>'
 
 
 class MovieLanguage(Base):
@@ -121,7 +121,7 @@ class MovieLanguage(Base):
     language_id = Column(Integer, ForeignKey('imdb_languages.id'), primary_key=True)
     prominence = Column(Integer)
 
-    language = relation('Language')
+    language = relationship('Language')
 
     def __init__(self, language, prominence=None):
         self.language = language
@@ -213,7 +213,7 @@ class SearchResult(Base):
         self.queried = datetime.now()
 
     def __repr__(self):
-        return '<SearchResult(title=%s,url=%s,fails=%s)>' % (self.title, self.url, self.fails)
+        return f'<SearchResult(title={self.title},url={self.url},fails={self.fails})>'
 
 
 @db_schema.upgrade('imdb_lookup')

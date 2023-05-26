@@ -21,7 +21,7 @@ def do_cli(manager, options):
             headers = ['Time', 'Title']
         else:
             headers = ['Field', 'Value']
-        title = 'Showing {} entries from History'.format(query.count())
+        title = f'Showing {query.count()} entries from History'
         table = TerminalTable(*headers, table_type=options.table_type, title=title)
         for item in reversed(query.all()):
             if not options.short:

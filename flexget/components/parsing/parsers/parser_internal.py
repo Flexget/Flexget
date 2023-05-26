@@ -21,7 +21,6 @@ except AttributeError:
 
 
 class ParserInternal:
-
     # movie_parser API
 
     @plugin.priority(1)

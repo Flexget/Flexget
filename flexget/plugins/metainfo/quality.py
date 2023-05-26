@@ -1,6 +1,7 @@
 from loguru import logger
 
-from flexget import entry, plugin
+from flexget import plugin
+from flexget.entry import register_lazy_lookup
 from flexget.event import event
 from flexget.utils import qualities
 
@@ -32,7 +33,7 @@ class MetainfoQuality:
             else:
                 entry.add_lazy_fields(self.get_quality, ['quality'])
 
-    @entry.register_lazy_lookup('quality')
+    @register_lazy_lookup('quality')
     def get_quality(self, entry):
         if entry.get('quality', eval_lazy=False):
             logger.debug(

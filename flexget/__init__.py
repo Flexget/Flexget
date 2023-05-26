@@ -7,19 +7,23 @@ from typing import Sequence
 from ._version import __version__  # noqa
 
 # isort: split
-from flexget import log  # noqa
-from flexget.manager import Manager  # noqa
+from flexget import log
+from flexget.manager import Manager
 
 
-def main(args: Sequence = None):
+def main(args: Sequence[str] = None):
     """Main entry point for Command Line Interface"""
 
+    if args is None:
+        args = sys.argv[1:]
     try:
         log.initialize()
 
         try:
             manager = Manager(args)
         except (OSError, ValueError) as e:
+            options = Manager.parse_initial_options(args)
+            log.start(level=options.loglevel, to_file=False)
             if _is_debug():
                 import traceback
 
@@ -27,6 +31,13 @@ def main(args: Sequence = None):
             else:
                 print('Could not instantiate manager: %s' % e, file=sys.stderr)
             sys.exit(1)
+        else:
+            log.start(
+                manager.log_filename,
+                manager.options.loglevel,
+                to_file=manager.check_ipc_info() is None,
+                to_console=not manager.options.cron,
+            )
 
         try:
             if manager.options.profile:

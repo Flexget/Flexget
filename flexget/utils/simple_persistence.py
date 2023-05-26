@@ -38,7 +38,7 @@ def upgrade(ver, session):
             # Remove any values that are not loadable.
             table = table_schema('simple_persistence', session)
             for row in session.execute(
-                select([table.c.id, table.c.plugin, table.c.key, table.c.value])
+                select(table.c.id, table.c.plugin, table.c.key, table.c.value)
             ):
                 try:
                     pickle.loads(row['value'])
@@ -63,7 +63,7 @@ def upgrade(ver, session):
         # Make sure we get the new schema with the added column
         table = table_schema('simple_persistence', session)
         failures = 0
-        for row in session.execute(select([table.c.id, table.c.value])):
+        for row in session.execute(select(table.c.id, table.c.value)):
             try:
                 p = pickle.loads(row['value'])
                 session.execute(
@@ -71,7 +71,7 @@ def upgrade(ver, session):
                     .where(table.c.id == row['id'])
                     .values(json=json.dumps(p, encode_datetime=True))
                 )
-            except Exception as e:
+            except Exception:
                 failures += 1
         if failures > 0:
             logger.error(
@@ -86,7 +86,7 @@ def upgrade(ver, session):
 def db_cleanup(manager, session):
     """Clean up values in the db from tasks which no longer exist."""
     # SKVs not associated with any task use None as task tame
-    existing_tasks = list(manager.tasks) + [None]
+    existing_tasks = [*list(manager.tasks), None]
     session.query(SimpleKeyValue).filter(~SimpleKeyValue.task.in_(existing_tasks)).delete(
         synchronize_session=False
     )
@@ -110,7 +110,7 @@ class SimpleKeyValue(Base):
         self.value = value
 
     def __repr__(self):
-        return "<SimpleKeyValue('%s','%s','%s')>" % (self.task, self.key, self.value)
+        return f"<SimpleKeyValue('{self.task}','{self.key}','{self.value}')>"
 
 
 Index(

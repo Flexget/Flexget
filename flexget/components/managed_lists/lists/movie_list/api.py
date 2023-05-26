@@ -126,7 +126,7 @@ movie_list_parser.add_argument('name', help='Filter results by list name')
 class MovieListAPI(APIResource):
     @etag
     @api.response(200, model=return_lists_schema)
-    @api.doc(parser=movie_list_parser)
+    @api.doc(expect=[movie_list_parser])
     def get(self, session=None):
         """Gets movies lists"""
         args = movie_list_parser.parse_args()
@@ -196,7 +196,7 @@ class MovieListMoviesAPI(APIResource):
     @etag
     @api.response(NotFoundError)
     @api.response(200, model=return_movies_schema)
-    @api.doc(params={'list_id': 'ID of the list'}, parser=movies_parser)
+    @api.doc(params={'list_id': 'ID of the list'}, expect=[movies_parser])
     def get(self, list_id, session=None):
         """Get movies by list ID"""
         args = movies_parser.parse_args()

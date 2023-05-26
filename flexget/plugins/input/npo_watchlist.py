@@ -79,9 +79,7 @@ class NPOWatchlist:
             logger.debug('Fetching NPO profile page: {}', url)
             page_response = requests.get(url)
             if page_response.url != url:
-                raise plugin.PluginError(
-                    'Unexpected page: {} (expected {})'.format(page_response.url, url)
-                )
+                raise plugin.PluginError(f'Unexpected page: {page_response.url} (expected {url})')
             return page_response
         except RequestException as e:
             raise plugin.PluginError('Request error: %s' % str(e))
@@ -98,7 +96,7 @@ class NPOWatchlist:
         try:
             login_response = requests.get(npostart_login_url)
             if not login_response.url.startswith(npoid_login_url):
-                raise plugin.PluginError('Unexpected login page: {}'.format(login_response.url))
+                raise plugin.PluginError(f'Unexpected login page: {login_response.url}')
 
             login_page = get_soup(login_response.content)
             token = login_page.find('input', attrs={'name': '__RequestVerificationToken'})['value']
@@ -107,7 +105,7 @@ class NPOWatchlist:
             email = config.get('email')
             password = config.get('password')
 
-            npoid_response = requests.post(
+            requests.post(
                 npoid_login_url,
                 {
                     'button': 'login',
@@ -118,7 +116,7 @@ class NPOWatchlist:
                 },
             )
 
-            npostart_response = requests.get(npoid_base + return_url)
+            requests.get(npoid_base + return_url)
 
             if 'isAuthenticatedUser' not in requests.cookies:
                 raise plugin.PluginError('Failed to login. Check username and password.')
@@ -166,7 +164,7 @@ class NPOWatchlist:
             'X-Requested-With': 'XMLHttpRequest',
         }
         if page > 1:
-            headers['Referer'] = episode_tiles_url.format(mediaId) + '?page={0}'.format(
+            headers['Referer'] = episode_tiles_url.format(mediaId) + '?page={}'.format(
                 page - 1
             )  # referer from prev page
 
@@ -246,9 +244,9 @@ class NPOWatchlist:
 
                     episode_name = list_item.find('h2')
                     if episode_name:
-                        title = '{} ({})'.format(next(episode_name.stripped_strings), episode_id)
+                        title = f'{next(episode_name.stripped_strings)} ({episode_id})'
                     else:
-                        title = '{}'.format(episode_id)
+                        title = f'{episode_id}'
 
                     timer = '0'
                     timerdiv = list_item.find('div', class_='npo-asset-tile-timer')

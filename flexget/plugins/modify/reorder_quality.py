@@ -46,8 +46,7 @@ class ReorderQuality:
 
             if quality_component.type != other_quality_component.type:
                 raise plugin.PluginError(
-                    '%s=%s and %s=%s do not have the same quality type'
-                    % (
+                    '{}={} and {}={} do not have the same quality type'.format(
                         quality,
                         quality_component.type,
                         other_quality,

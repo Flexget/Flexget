@@ -54,7 +54,7 @@ class RetryFailed(APIResource):
     @etag
     @api.response(NotFoundError)
     @api.response(200, model=retry_entries_list_schema)
-    @api.doc(parser=failed_parser)
+    @api.doc(expect=[failed_parser])
     def get(self, session=None):
         """List all failed entries"""
         args = failed_parser.parse_args()

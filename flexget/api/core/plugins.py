@@ -64,7 +64,9 @@ plugins_parser.add_argument(
 if TYPE_CHECKING:
     from typing import TypedDict
 
-    _PhaseHandler = TypedDict('_PhaseHandler', {'phase': str, 'priority': int})
+    class _PhaseHandler(TypedDict):
+        phase: str
+        priority: int
 
     class PluginDict(TypedDict, total=False):
         name: str
@@ -86,7 +88,7 @@ def plugin_to_dict(plugin) -> 'PluginDict':
         'debug': plugin.debug,
         'interfaces': plugin.interfaces,
         'phase_handlers': [
-            dict(phase=handler, priority=event.priority)
+            {'phase': handler, 'priority': event.priority}
             for handler, event in plugin.phase_handlers.items()
         ],
     }
@@ -98,7 +100,7 @@ class PluginsAPI(APIResource):
     @api.response(200, model=plugin_list_reply_schema)
     @api.response(BadRequest)
     @api.response(NotFoundError)
-    @api.doc(parser=plugins_parser)
+    @api.doc(expect=[plugins_parser])
     def get(self, session: Session = None) -> Response:
         """Get list of registered plugins"""
         args = plugins_parser.parse_args()
@@ -152,7 +154,7 @@ class PluginAPI(APIResource):
     @etag(cache_age=3600)
     @api.response(BadRequest)
     @api.response(200, model=plugin_schema)
-    @api.doc(parser=plugin_parser, params={'plugin_name': 'Name of the plugin to return'})
+    @api.doc(expect=[plugin_parser], params={'plugin_name': 'Name of the plugin to return'})
     def get(self, plugin_name: str, session=None):
         """Return plugin data by name"""
         args = plugin_parser.parse_args()

@@ -2,9 +2,18 @@ import copy
 import random
 import string
 import sys
-from argparse import _UNRECOGNIZED_ARGS_ATTR, PARSER, REMAINDER, SUPPRESS, Action, ArgumentError
+from argparse import (
+    _UNRECOGNIZED_ARGS_ATTR,
+    PARSER,
+    REMAINDER,
+    SUPPRESS,
+    Action,
+    ArgumentError,
+    Namespace,
+    _SubParsersAction,
+    _VersionAction,
+)
 from argparse import ArgumentParser as ArgParser
-from argparse import Namespace, _SubParsersAction, _VersionAction
 from typing import IO, Any, Callable, List, Optional, TextIO
 
 import flexget
@@ -15,16 +24,6 @@ from flexget.utils.tools import get_current_flexget_version, get_latest_flexget_
 _UNSET = object()
 
 core_parser: Optional['CoreArgumentParser'] = None
-
-
-def unicode_argv() -> List[str]:
-    """Like sys.argv, but decodes all arguments."""
-    args = []
-    for arg in sys.argv:
-        if isinstance(arg, bytes):
-            arg = arg.decode(sys.getfilesystemencoding())
-        args.append(arg)
-    return args
 
 
 def get_parser(command: str = None) -> 'ArgumentParser':
@@ -61,7 +60,7 @@ def required_length(nmin: int, nmax: int):
     class RequiredLength(Action):
         def __call__(self, parser: ArgParser, args, values, option_string=None):
             if not nmin <= len(values) <= nmax:
-                raise ArgumentError(self, 'requires between %s and %s arguments' % (nmin, nmax))
+                raise ArgumentError(self, f'requires between {nmin} and {nmax} arguments')
             setattr(args, self.dest, values)
 
     return RequiredLength
@@ -137,7 +136,7 @@ class InjectAction(Action):
         if 'accept' in [v.lower() for v in values]:
             entry.accept(reason='accepted by --inject')
         existing = getattr(namespace, self.dest, None) or []
-        setattr(namespace, self.dest, existing + [entry])
+        setattr(namespace, self.dest, [*existing, entry])
 
 
 class ParseExtrasAction(Action):
@@ -176,7 +175,7 @@ class ScopedNamespace(Namespace):
 
         if self.__parent__:
             return getattr(self.__parent__, key)
-        raise AttributeError("'%s' object has no attribute '%s'" % (type(self).__name__, key))
+        raise AttributeError(f"'{type(self).__name__}' object has no attribute '{key}'")
 
     def __setattr__(self, key: str, value):
         if '.' in key:
@@ -249,7 +248,7 @@ class ParserError(Exception):
         return self.message
 
     def __repr__(self):
-        return 'ParserError(%s, %s)' % (self.message, self.parser)
+        return f'ParserError({self.message}, {self.parser})'
 
 
 class ArgumentParser(ArgParser):
@@ -283,7 +282,7 @@ class ArgumentParser(ArgParser):
             this attribute name in the root parser's namespace
         """
         # Do this early, so even option processing stuff is caught
-        if '--bugreport' in unicode_argv():
+        if '--bugreport' in sys.argv:
             self._debug_tb_callback()
 
         self.subparsers = None
@@ -369,8 +368,7 @@ class ArgumentParser(ArgParser):
         do_help: bool = None,
     ):
         if args is None:
-            # Decode all arguments to unicode before parsing
-            args = unicode_argv()[1:]
+            args = sys.argv[1:]
         if namespace is None:
             namespace = ScopedNamespace()
         old_do_help = ArgumentParser.do_help
@@ -600,5 +598,5 @@ class CoreArgumentParser(ArgumentParser):
                 exec_options.__dict__.update(result.execute.__dict__)
             result.execute = exec_options
         # Set the 'allow_manual' flag to True for any usage of the CLI
-        setattr(result, 'allow_manual', True)
+        result.allow_manual = True
         return result

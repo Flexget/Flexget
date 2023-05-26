@@ -30,7 +30,7 @@ class MetainfoImdbUrl:
                 continue
             urls = re.findall(r'\bimdb.com/title/tt\d+\b', entry['description'])
             # Find unique imdb ids
-            imdb_ids = [_f for _f in set(extract_id(url) for url in urls) if _f]
+            imdb_ids = [_f for _f in {extract_id(url) for url in urls} if _f]
             if not imdb_ids:
                 continue
 

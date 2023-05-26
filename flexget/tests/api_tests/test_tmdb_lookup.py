@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import pytest
 
 from flexget.api.app import base_message

@@ -122,7 +122,7 @@ list_parser.add_argument('name', help='Filter results by list name')
 @pending_list_api.route('/')
 class PendingListListsAPI(APIResource):
     @etag
-    @api.doc(parser=list_parser)
+    @api.doc(expect=[list_parser])
     @api.response(200, 'Successfully retrieved pending lists', pending_list_return_lists_schema)
     def get(self, session=None):
         """Get pending lists"""
@@ -198,7 +198,7 @@ entries_parser.add_argument('filter', help='Filter by title name')
 
 
 @pending_list_api.route('/<int:list_id>/entries/')
-@api.doc(params={'list_id': 'ID of the list'}, parser=entries_parser)
+@api.doc(params={'list_id': 'ID of the list'}, expect=[entries_parser])
 @api.response(NotFoundError)
 class PendingListEntriesAPI(APIResource):
     @etag
@@ -377,7 +377,7 @@ class PendingListEntryAPI(APIResource):
         approved = data['operation'] == 'approve'
         operation_text = 'approved' if approved else 'pending'
         if entry.approved is approved:
-            raise BadRequest('Entry with id {} is already {}'.format(entry_id, operation_text))
+            raise BadRequest(f'Entry with id {entry_id} is already {operation_text}')
 
         entry.approved = approved
         session.commit()

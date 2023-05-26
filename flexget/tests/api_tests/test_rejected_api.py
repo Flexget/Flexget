@@ -31,12 +31,12 @@ def add_rejected_entry(entry):
 class TestRejectedAPI:
     config = "{'tasks': {}}"
 
-    entry = dict(
-        test_title='test_title',
-        test_url='test_url',
-        rejected_by='rejected API test',
-        reason='test_reason',
-    )
+    entry = {
+        'test_title': 'test_title',
+        'test_url': 'test_url',
+        'rejected_by': 'rejected API test',
+        'reason': 'test_reason',
+    }
 
     def test_rejected_get_all_empty(self, api_client, schema_match):
         rsp = api_client.get('/rejected/')
@@ -160,9 +160,12 @@ class TestRejectedPagination:
     config = 'tasks: {}'
 
     def test_rejected_pagination(self, api_client, link_headers):
-        base_reject_entry = dict(
-            title='test_title_', url='test_url_', rejected_by='rejected_by_', reason='reason_'
-        )
+        base_reject_entry = {
+            'title': 'test_title_',
+            'url': 'test_url_',
+            'rejected_by': 'rejected_by_',
+            'reason': 'reason_',
+        }
         number_of_entries = 200
 
         with Session() as session:
@@ -222,27 +225,27 @@ class TestRejectedPagination:
         expires_2 = datetime.now() + parse_timedelta('2 hours')
         expires_3 = datetime.now() + parse_timedelta('3 hours')
 
-        reject_entry_1 = dict(
-            title='test_title_1',
-            url='test_url_c',
-            rejected_by='rejected_by_2',
-            reason='reason_3',
-            expires=expires_1,
-        )
-        reject_entry_2 = dict(
-            title='test_title_2',
-            url='test_url_a',
-            rejected_by='rejected_by_3',
-            reason='reason_2',
-            expires=expires_2,
-        )
-        reject_entry_3 = dict(
-            title='test_title_3',
-            url='test_url_b',
-            rejected_by='rejected_by_1',
-            reason='reason_1',
-            expires=expires_3,
-        )
+        reject_entry_1 = {
+            'title': 'test_title_1',
+            'url': 'test_url_c',
+            'rejected_by': 'rejected_by_2',
+            'reason': 'reason_3',
+            'expires': expires_1,
+        }
+        reject_entry_2 = {
+            'title': 'test_title_2',
+            'url': 'test_url_a',
+            'rejected_by': 'rejected_by_3',
+            'reason': 'reason_2',
+            'expires': expires_2,
+        }
+        reject_entry_3 = {
+            'title': 'test_title_3',
+            'url': 'test_url_b',
+            'rejected_by': 'rejected_by_1',
+            'reason': 'reason_1',
+            'expires': expires_3,
+        }
 
         with Session() as session:
             task = RememberTask(name='rejected API test')

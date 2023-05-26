@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 import time
 from datetime import datetime, timedelta
 from typing import List
@@ -8,7 +5,7 @@ from typing import List
 from dateutil.parser import parse as dateutil_parse
 from loguru import logger
 from sqlalchemy import Column, Date, DateTime, Integer, String, Table, Time, Unicode, and_, or_
-from sqlalchemy.orm import relation
+from sqlalchemy.orm import relationship
 from sqlalchemy.schema import ForeignKey
 
 from flexget import db_schema, plugin
@@ -64,8 +61,8 @@ def device_auth():
         interval = r['interval']
 
         console(
-            'Please visit {0} and authorize Flexget. Your user code is {1}. Your code expires in '
-            '{2} minutes.'.format(r['verification_url'], user_code, expires_in / 60.0)
+            'Please visit {} and authorize Flexget. Your user code is {}. Your code expires in '
+            '{} minutes.'.format(r['verification_url'], user_code, expires_in / 60.0)
         )
 
         logger.debug('Polling for user authorization.')
@@ -96,14 +93,14 @@ def device_auth():
                 interval += 1
         raise plugin.PluginError('User code has expired. Please try again.')
     except requests.RequestException as e:
-        raise plugin.PluginError('Device authorization with Trakt.tv failed: {0}'.format(e))
+        raise plugin.PluginError(f'Device authorization with Trakt.tv failed: {e}')
 
 
 def token_oauth(data):
     try:
         return requests.post(get_api_url('oauth/token'), data=data).json()
     except requests.RequestException as e:
-        raise plugin.PluginError('Token exchange with trakt failed: {0}'.format(e))
+        raise plugin.PluginError(f'Token exchange with trakt failed: {e}')
 
 
 def delete_account(account):
@@ -172,7 +169,7 @@ def get_access_token(account, token=None, refresh=False, re_auth=False, called_f
                 session.merge(new_acc)
                 return new_acc.access_token
             except requests.RequestException as e:
-                raise plugin.PluginError('Token exchange with trakt failed: {0}'.format(e))
+                raise plugin.PluginError(f'Token exchange with trakt failed: {e}')
 
 
 def make_list_slug(name):
@@ -574,17 +571,17 @@ class TraktShow(Base):
     homepage = Column(Unicode)
     trailer = Column(Unicode)
     aired_episodes = Column(Integer)
-    _translations = relation(TraktShowTranslation)
+    _translations = relationship(TraktShowTranslation)
     _translation_languages = Column('translation_languages', Unicode)
     translation_languages = json_synonym('_translation_languages')
-    episodes = relation(
+    episodes = relationship(
         TraktEpisode, backref='show', cascade='all, delete, delete-orphan', lazy='dynamic'
     )
-    seasons = relation(
+    seasons = relationship(
         TraktSeason, backref='show', cascade='all, delete, delete-orphan', lazy='dynamic'
     )
-    genres = relation(TraktGenre, secondary=show_genres_table)
-    _actors = relation(TraktActor, secondary=show_actors_table)
+    genres = relationship(TraktGenre, secondary=show_genres_table)
+    _actors = relationship(TraktActor, secondary=show_actors_table)
     updated_at = Column(DateTime)
     cached_at = Column(DateTime)
 
@@ -686,7 +683,7 @@ class TraktShow(Base):
                 'shows', self.id, 'seasons', season, 'episodes', number, '?extended=full'
             )
             if only_cached:
-                raise LookupError('Episode %s %s not found in cache' % (season, number))
+                raise LookupError(f'Episode {season} {number} not found in cache')
             logger.debug(
                 'Episode {} {} not found in cache, looking up from trakt.', season, number
             )
@@ -733,7 +730,7 @@ class TraktShow(Base):
                 if number == season_result['number']:
                     season = db_season
             if not season:
-                raise LookupError('Season %s not found for show %s' % (number, self.title))
+                raise LookupError(f'Season {number} not found for show {self.title}')
             session.commit()
         return season
 
@@ -768,7 +765,7 @@ class TraktShow(Base):
         return self._actors
 
     def __repr__(self):
-        return '<name=%s, id=%s>' % (self.title, self.id)
+        return f'<name={self.title}, id={self.id}>'
 
 
 class TraktMovie(Base):
@@ -791,11 +788,11 @@ class TraktMovie(Base):
     language = Column(Unicode)
     updated_at = Column(DateTime)
     cached_at = Column(DateTime)
-    _translations = relation(TraktMovieTranslation, backref='movie')
+    _translations = relationship(TraktMovieTranslation, backref='movie')
     _translation_languages = Column('translation_languages', Unicode)
     translation_languages = json_synonym('_translation_languages')
-    genres = relation(TraktGenre, secondary=movie_genres_table)
-    _actors = relation(TraktActor, secondary=movie_actors_table)
+    genres = relationship(TraktGenre, secondary=movie_genres_table)
+    _actors = relationship(TraktActor, secondary=movie_actors_table)
 
     def __init__(self, trakt_movie, session):
         super().__init__()
@@ -888,7 +885,7 @@ class TraktShowSearchResult(Base):
     id = Column(Integer, primary_key=True)
     search = Column(Unicode, unique=True, nullable=False)
     series_id = Column(Integer, ForeignKey('trakt_shows.id'), nullable=True)
-    series = relation(TraktShow, backref='search_strings')
+    series = relationship(TraktShow, backref='search_strings')
 
     def __init__(self, search, series_id=None, series=None):
         self.search = search.lower()
@@ -904,7 +901,7 @@ class TraktMovieSearchResult(Base):
     id = Column(Integer, primary_key=True)
     search = Column(Unicode, unique=True, nullable=False)
     movie_id = Column(Integer, ForeignKey('trakt_movies.id'), nullable=True)
-    movie = relation(TraktMovie, backref='search_strings')
+    movie = relationship(TraktMovie, backref='search_strings')
 
     def __init__(self, search, movie_id=None, movie=None):
         self.search = search.lower()
@@ -1030,8 +1027,7 @@ def get_trakt_id_from_id(trakt_ids, media_type):
             ).json()
         except requests.RequestException as e:
             raise LookupError(
-                'Searching trakt for %s=%s failed with error: %s'
-                % (stripped_id_type, identifier, e)
+                f'Searching trakt for {stripped_id_type}={identifier} failed with error: {e}'
             )
         for result in results:
             if result['type'] != media_type:
@@ -1049,12 +1045,10 @@ def get_trakt_id_from_title(title, media_type, year=None):
     try:
         params = {'query': parsed_title, 'type': media_type, 'year': y}
         logger.debug('Type of title: {}', type(parsed_title))
-        logger.debug(
-            'Searching with params: {}', ', '.join('{}={}'.format(k, v) for k, v in params.items())
-        )
+        logger.debug('Searching with params: {}', ', '.join(f'{k}={v}' for k, v in params.items()))
         results = requests_session.get(get_api_url('search'), params=params).json()
     except requests.RequestException as e:
-        raise LookupError('Searching trakt for %s failed with error: %s' % (title, e))
+        raise LookupError(f'Searching trakt for {title} failed with error: {e}')
     for result in results:
         if year and result[media_type]['year'] != year:
             continue
@@ -1078,8 +1072,7 @@ def get_trakt_data(media_type, title=None, year=None, trakt_ids=None):
 
     if not trakt_id:
         raise LookupError(
-            'No results on Trakt.tv, title=%s, ids=%s.'
-            % (title, trakt_ids.to_dict if trakt_ids else None)
+            f'No results on Trakt.tv, title={title}, ids={trakt_ids.to_dict if trakt_ids else None}.'
         )
 
     # Get actual data from trakt
@@ -1090,7 +1083,7 @@ def get_trakt_data(media_type, title=None, year=None, trakt_ids=None):
             .json()
         )
     except requests.RequestException as e:
-        raise LookupError('Error getting trakt data for id %s: %s' % (trakt_id, e))
+        raise LookupError(f'Error getting trakt data for id {trakt_id}: {e}')
 
 
 def get_user_data(data_type, media_type, session, username):
@@ -1104,7 +1097,7 @@ def get_user_data(data_type, media_type, session, username):
     :return:
     """
 
-    endpoint = '{}/{}'.format(data_type, media_type)
+    endpoint = f'{data_type}/{media_type}'
     try:
         data = session.get(get_api_url('users', username, data_type, media_type)).json()
         if not data:
@@ -1134,8 +1127,7 @@ def get_user_data(data_type, media_type, session, username):
 
     except requests.RequestException as e:
         raise plugin.PluginError(
-            'Error fetching data from trakt.tv endpoint %s for user %s: %s'
-            % (endpoint, username, e)
+            f'Error fetching data from trakt.tv endpoint {endpoint} for user {username}: {e}'
         )
 
 

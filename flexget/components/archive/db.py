@@ -55,7 +55,7 @@ class ArchiveEntry(Base):
         self.added = datetime.now()
 
     def __str__(self):
-        return '<ArchiveEntry(title=%s,url=%s,task=%s,added=%s)>' % (
+        return '<ArchiveEntry(title={},url={},task={},added={})>'.format(
             self.title,
             self.url,
             self.task,
@@ -73,7 +73,7 @@ class ArchiveTag(Base):
         self.name = name
 
     def __str__(self):
-        return '<ArchiveTag(id=%s,name=%s)>' % (self.id, self.name)
+        return f'<ArchiveTag(id={self.id},name={self.name})>'
 
 
 class ArchiveSource(Base):
@@ -86,7 +86,7 @@ class ArchiveSource(Base):
         self.name = name
 
     def __str__(self):
-        return '<ArchiveSource(id=%s,name=%s)>' % (self.id, self.name)
+        return f'<ArchiveSource(id={self.id},name={self.name})>'
 
 
 @db_schema.upgrade('archive')

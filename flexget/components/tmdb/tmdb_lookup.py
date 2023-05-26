@@ -1,6 +1,7 @@
 from loguru import logger
 
-from flexget import entry, plugin
+from flexget import plugin
+from flexget.entry import register_lazy_lookup
 from flexget.event import event
 from flexget.manager import Session
 from flexget.utils.log import log_once
@@ -55,7 +56,7 @@ class PluginTmdbLookup:
         ]
     }
 
-    @entry.register_lazy_lookup('tmdb_lookup')
+    @register_lazy_lookup('tmdb_lookup')
     def lazy_loader(self, entry, language):
         """Does the lookup for this entry and populates the entry fields."""
         lookup = plugin.get('api_tmdb', self).lookup

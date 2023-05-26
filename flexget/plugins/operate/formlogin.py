@@ -62,7 +62,7 @@ class FormLogin:
 
         num_forms = len(br.get_current_page().find_all('form'))
         if not num_forms:
-            raise plugin.PluginError('Unable to find any forms on {}'.format(url), logger)
+            raise plugin.PluginError(f'Unable to find any forms on {url}', logger)
         try:
             for form_num in range(num_forms):
                 br.select_form(nr=form_num)

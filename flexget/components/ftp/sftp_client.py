@@ -1,10 +1,12 @@
 import importlib
 import logging
+import os
 import time
 from base64 import b64decode
 from dataclasses import dataclass
 from functools import partial
 from pathlib import Path, PurePath, PurePosixPath
+from stat import S_ISLNK
 from typing import Callable, List, Optional
 from urllib.parse import quote, urljoin
 
@@ -23,6 +25,7 @@ HOST_KEY_TYPES: dict = {
 }
 
 try:
+    import paramiko
     import pysftp
 
     logging.getLogger("paramiko").setLevel(logging.ERROR)
@@ -32,6 +35,40 @@ except ImportError:
 NodeHandler = Callable[[str], None]
 
 logger = logger.bind(name='sftp_client')
+
+
+def _set_authentication_patch(self, password, private_key, private_key_pass):
+    """
+    Patch pysftp.Connection._set_authentication to support additional
+    key types
+    """
+    if password is None:
+        # Use Private Key.
+        if not private_key:
+            # Try to use default key.
+            if os.path.exists(os.path.expanduser('~/.ssh/id_rsa')):
+                private_key = '~/.ssh/id_rsa'
+            elif os.path.exists(os.path.expanduser('~/.ssh/id_dsa')):
+                private_key = '~/.ssh/id_dsa'
+            else:
+                raise pysftp.exceptions.CredentialException("No password or key specified.")
+
+        if isinstance(private_key, (paramiko.AgentKey, paramiko.RSAKey)):
+            # use the paramiko agent or rsa key
+            self._tconnect['pkey'] = private_key
+        else:
+            # isn't a paramiko AgentKey or RSAKey, try to build a
+            # key from what we assume is a path to a key
+            private_key_file = os.path.expanduser(private_key)
+            for key in [paramiko.RSAKey, paramiko.DSSKey, paramiko.Ed25519Key, paramiko.ECDSAKey]:
+                try:  # try all the keys
+                    self._tconnect['pkey'] = key.from_private_key_file(
+                        private_key_file, private_key_pass
+                    )
+                    return
+                except paramiko.SSHException:  # if it fails, try dss
+                    pass
+            raise paramiko.SSHException(f'Unknown key type: {private_key}')
 
 
 @dataclass
@@ -56,7 +93,6 @@ class SftpClient:
         host_key: Optional[HostKey] = None,
         connection_tries: int = 3,
     ):
-
         if not pysftp:
             raise plugin.DependencyError(
                 issued_by='sftp_client',
@@ -108,8 +144,15 @@ class SftpClient:
 
         for directory in directories:
             try:
+                # Always normalize the root path so it's not necessary to normalised
+                # nodes as there are discovered, which means that symlinks will appear
+                # in the entry paths raw rather than been resolved to their target.
                 self._sftp.walktree(
-                    directory, file_handler, dir_handler, unknown_handler, recursive
+                    self._sftp.normalize(directory),
+                    file_handler,
+                    dir_handler,
+                    unknown_handler,
+                    recursive,
                 )
             except OSError as e:
                 logger.warning('Failed to open {} ({})', directory, str(e))
@@ -123,7 +166,8 @@ class SftpClient:
         :param source: path of the resource to download
         :param to: path of the directory to download to
         :param recursive: indicates whether to download the contents of "source" recursively
-        :param delete_origin: indicates whether to delete the source resource upon download
+        :param delete_origin: indicates whether to delete the source resource upon download, is the source
+                              is a symlink, only the symlink will be removed rather than it's target.
         """
 
         dir_handler: NodeHandler = self._handler_builder.get_null_handler()
@@ -134,30 +178,37 @@ class SftpClient:
         if not self.path_exists(source):
             raise SftpError(f'Remote path does not exist: {source}')
 
+        is_symlink: bool = self.is_link(source)
         if self.is_file(source):
             source_file: str = parsed_path.name
             source_dir: str = parsed_path.parent.as_posix()
             try:
                 self._sftp.cwd(source_dir)
-                self._download_file(to, delete_origin, source_file)
+                self._download_file(to, delete_origin and not is_symlink, source_file)
             except Exception as e:
-                raise SftpError(f'Failed to download file {source} ({str(e)})')
+                raise SftpError(f'Failed to download file {source} ({e!s})')
 
-            if delete_origin:
-                self.remove_dir(source_dir)
+            if delete_origin and is_symlink:
+                self.remove_file(source)
+
         elif self.is_dir(source):
             base_path: str = parsed_path.joinpath('..').as_posix()
             dir_name: str = parsed_path.name
-            handle_file: NodeHandler = partial(self._download_file, to, delete_origin)
+            handle_file: NodeHandler = partial(
+                self._download_file, to, delete_origin and not is_symlink
+            )
 
             try:
                 self._sftp.cwd(base_path)
                 self._sftp.walktree(dir_name, handle_file, dir_handler, unknown_handler, recursive)
             except Exception as e:
-                raise SftpError(f'Failed to download directory {source} ({str(e)})')
+                raise SftpError(f'Failed to download directory {source} ({e!s})')
 
             if delete_origin:
-                self.remove_dir(source)
+                if self.is_link(source):
+                    self.remove_file(source)
+                else:
+                    self.remove_dir(source)
         else:
             logger.warning('Skipping unknown file: {}', source)
 
@@ -212,6 +263,14 @@ class SftpClient:
         """
         return self._sftp.isdir(path)
 
+    def is_link(self, path: str) -> bool:
+        """
+        Check if the node at a given path is a directory
+        :param path: path to check
+        :return: boolean indicating if the path is a directory
+        """
+        return S_ISLNK(self._sftp.sftp_client.lstat(path).st_mode)
+
     def path_exists(self, path: str) -> bool:
         """
         Check of a path exists
@@ -232,7 +291,7 @@ class SftpClient:
             try:
                 self._sftp.makedirs(path)
             except Exception as e:
-                raise SftpError(f'Failed to create remote directory {path} ({str(e)})')
+                raise SftpError(f'Failed to create remote directory {path} ({e!s})')
 
     def close(self) -> None:
         """
@@ -248,7 +307,6 @@ class SftpClient:
         self._sftp.timeout = socket_timeout_sec
 
     def _connect(self, connection_tries: int) -> 'pysftp.Connection':
-
         tries: int = connection_tries
         retry_interval: int = RETRY_INTERVAL_SEC
 
@@ -258,6 +316,7 @@ class SftpClient:
 
         while not sftp:
             try:
+                pysftp.Connection._set_authentication = _set_authentication_patch
                 sftp = pysftp.Connection(
                     host=self.host,
                     username=self.username,
@@ -308,7 +367,7 @@ class SftpClient:
             try:
                 self.make_dirs(to)
             except Exception as e:
-                raise SftpError(f'Failed to create remote directory {to} ({str(e)})')
+                raise SftpError(f'Failed to create remote directory {to} ({e!s})')
 
         if not self.is_dir(to):
             raise SftpError(f'Not a directory: {to}')
@@ -319,10 +378,9 @@ class SftpClient:
         except OSError:
             raise SftpError(f'Remote directory does not exist: {to}')
         except Exception as e:
-            raise SftpError(f'Failed to upload {source} ({str(e)})')
+            raise SftpError(f'Failed to upload {source} ({e!s})')
 
     def _download_file(self, destination: str, delete_origin: bool, source: str) -> None:
-
         destination_path: str = self._get_download_path(source, destination)
         destination_dir: str = Path(destination_path).parent.as_posix()
 
@@ -575,8 +633,7 @@ class Handlers:
         private_key_pass: Optional[str],
         host_key: Optional[HostKey],
     ) -> Entry:
-
-        url = urljoin(prefix, quote(sftp.normalize(path)))
+        url = urljoin(prefix, quote(path))
         title = PurePosixPath(path).name
 
         entry = Entry(title, url)

@@ -19,7 +19,7 @@ from flexget.utils.tools import get_config_hash
 try:
     from irc_bot import utils as irc_bot
     from irc_bot.simple_irc_bot import SimpleIRCBot, partial
-except ImportError as e:
+except ImportError:
     irc_bot = None
     SimpleIRCBot = object
 
@@ -171,10 +171,8 @@ class IRCConnection(SimpleIRCBot):
 
         channel_list = []
         if self.tracker_config is not None:
-
             # Validate config with the settings in the torrent file
             for param in self.tracker_config.find('settings'):
-
                 # Handle textbox entries
                 if param.tag == 'textbox':
                     value_name = param.get('name')
@@ -191,8 +189,7 @@ class IRCConnection(SimpleIRCBot):
 
                 if self.config.get(value_name) is None:
                     raise MissingConfigOption(
-                        'missing configuration option on irc config %s: %s'
-                        % (self.connection_name, value_name)
+                        f'missing configuration option on irc config {self.connection_name}: {value_name}'
                     )
 
             # Get the tracker name, for use in the connection name
@@ -275,7 +272,7 @@ class IRCConnection(SimpleIRCBot):
             with open(path, 'rb') as xml_file:
                 return parse(xml_file).getroot()
         except Exception as e:
-            raise TrackerFileParseError('Unable to parse tracker config file %s: %s' % (path, e))
+            raise TrackerFileParseError(f'Unable to parse tracker config file {path}: {e}')
 
     @classmethod
     def retrieve_tracker_config(cls, tracker_config_file):
@@ -284,7 +281,9 @@ class IRCConnection(SimpleIRCBot):
         :param tracker_config_file: URL or path to .tracker file
         :return: parsed XML
         """
-        base_url = 'https://raw.githubusercontent.com/autodl-community/autodl-trackers/master/'
+        base_url = (
+            'https://raw.githubusercontent.com/autodl-community/autodl-trackers/master/trackers/'
+        )
         tracker_config_file = os.path.expanduser(tracker_config_file)
 
         # First we attempt to find the file locally as-is
@@ -345,7 +344,10 @@ class IRCConnection(SimpleIRCBot):
                 )
                 for t in trackers:
                     name = t.get('path', '')
-                    if not name.endswith('.tracker') or name.lower() != tracker_name.lower():
+                    if (
+                        not name.endswith('.tracker')
+                        or name.lower() != 'trackers/' + tracker_name.lower()
+                    ):
                         continue
                     tracker = requests.get(base_url + name)
                     tracker_name = name
@@ -784,15 +786,15 @@ class IRCConnection(SimpleIRCBot):
                 logger.debug('Using pattern {} to parse message vars', rx.pattern)
                 # find the next candidate line
                 line = ''
-                for l in list(lines):
+                for candidate in list(lines):
                     # skip ignored lines
                     for ignore_rx, expected in self.ignore_lines:
-                        if ignore_rx.match(l) and expected:
+                        if ignore_rx.match(candidate) and expected:
                             logger.debug('Ignoring message: matched ignore line')
-                            lines.remove(l)
+                            lines.remove(candidate)
                             break
                     else:
-                        line = l
+                        line = candidate
                         break
 
                 raw_message += '\n' + line

@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from loguru import logger
 from sqlalchemy import Boolean, Column, DateTime, Float, Integer, Table, Text, Unicode
 from sqlalchemy.ext.associationproxy import association_proxy
-from sqlalchemy.orm import relation
+from sqlalchemy.orm import relationship
 from sqlalchemy.schema import ForeignKey
 
 from flexget import db_schema
@@ -169,10 +169,10 @@ class TVDBSeries(Base):
     _posters = Column('posters', Unicode)
     posters_list = json_synonym('_posters')
 
-    _genres = relation('TVDBGenre', secondary=genres_table)
+    _genres = relationship('TVDBGenre', secondary=genres_table)
     genres = association_proxy('_genres', 'name')
 
-    episodes = relation('TVDBEpisode', backref='series', cascade='all, delete, delete-orphan')
+    episodes = relationship('TVDBEpisode', backref='series', cascade='all, delete, delete-orphan')
 
     def __init__(self, tvdb_id, language):
         """
@@ -279,7 +279,7 @@ class TVDBSeries(Base):
 
     def to_dict(self):
         return {
-            'aliases': [a for a in self.aliases],
+            'aliases': list(self.aliases),
             'tvdb_id': self.id,
             'last_updated': datetime.fromtimestamp(self.last_updated).strftime(
                 '%Y-%m-%d %H:%M:%S'
@@ -299,7 +299,7 @@ class TVDBSeries(Base):
             'zap2it_id': self.zap2it_id,
             'banner': self.banner,
             'posters': self.posters,
-            'genres': [g for g in self.genres],
+            'genres': list(self.genres),
             'first_aired': self.first_aired,
         }
 
@@ -392,7 +392,7 @@ class TVDBSearchResult(Base):
     id = Column(Integer, primary_key=True)
     search = Column(Unicode, nullable=False, unique=True)
     series_id = Column(Integer, ForeignKey('tvdb_series.id'), nullable=True)
-    series = relation(TVDBSeries, backref='search_strings')
+    series = relationship(TVDBSeries, backref='search_strings')
 
     def __init__(self, search, series_id=None, series=None):
         self.search = search.lower()
@@ -448,7 +448,7 @@ class TVDBSeriesSearchResult(Base):
 
     def to_dict(self):
         return {
-            'aliases': [a for a in self.aliases],
+            'aliases': list(self.aliases),
             'banner': self.banner,
             'first_aired': self.first_aired,
             'tvdb_id': self.id,
@@ -522,7 +522,7 @@ def _update_search_strings(series, session, search=None):
     search_strings = series.search_strings
     aliases = [a.lower() for a in series.aliases] if series.aliases else []
     searches = [search.lower()] if search else []
-    add = [series.name.lower()] + aliases + searches
+    add = [series.name.lower(), *aliases, *searches]
     for name in set(add):
         if name not in search_strings:
             search_result = (

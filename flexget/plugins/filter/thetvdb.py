@@ -125,7 +125,6 @@ class FilterTvdb:
 
     @plugin.priority(126)
     def on_task_filter(self, task, config):
-
         lookup = plugin.get('thetvdb_lookup', self).lookup
 
         for entry in task.entries:
@@ -142,20 +141,21 @@ class FilterTvdb:
             if 'min_series_rating' in config:
                 if entry['tvdb_rating'] < config['min_series_rating']:
                     reasons.append(
-                        'series_rating (%s < %s)'
-                        % (entry['tvdb_rating'], config['min_series_rating'])
+                        'series_rating ({} < {})'.format(
+                            entry['tvdb_rating'], config['min_series_rating']
+                        )
                     )
             if 'min_episode_rating' in config:
                 if entry['tvdb_ep_rating'] < config['min_episode_rating']:
                     reasons.append(
-                        'tvdb_ep_rating (%s < %s)'
-                        % (entry['tvdb_ep_rating'], config['min_episode_rating'])
+                        'tvdb_ep_rating ({} < {})'.format(
+                            entry['tvdb_ep_rating'], config['min_episode_rating']
+                        )
                     )
             if 'min_episode_air_year' in config:
                 if entry['tvdb_ep_air_date'].strftime("%Y") < config['min_episode_air_year']:
                     reasons.append(
-                        'tvdb_ep_air_date (%s < %s)'
-                        % (
+                        'tvdb_ep_air_date ({} < {})'.format(
                             entry['tvdb_ep_air_date'].strftime("%Y"),
                             config['min_episode_air_year'],
                         )
@@ -163,8 +163,7 @@ class FilterTvdb:
             if 'max_episode_air_year' in config:
                 if entry['tvdb_ep_air_date'].strftime("%Y") > config['max_episode_air_year']:
                     reasons.append(
-                        'tvdb_ep_air_date (%s < %s)'
-                        % (
+                        'tvdb_ep_air_date ({} < {})'.format(
                             entry['tvdb_ep_air_date'].strftime("%Y"),
                             config['max_episode_air_year'],
                         )
@@ -207,7 +206,7 @@ class FilterTvdb:
                 reasons.append('reject_directors')
 
             if reasons and not force_accept:
-                msg = 'Skipping %s because of rule(s) %s' % (
+                msg = 'Skipping {} because of rule(s) {}'.format(
                     entry.get('series_name_thetvdb', None) or entry['title'],
                     ', '.join(reasons),
                 )

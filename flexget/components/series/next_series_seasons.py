@@ -51,10 +51,10 @@ class NextSeriesSeasons:
         paren_match = re.match(r'(.+?)( \(.+\))?$', series.name)
         if paren_match.group(2):
             alts.append(paren_match.group(1))
-        search_strings = ['%s %s' % (series.name, id) for id in self.season_identifiers(season)]
+        search_strings = [f'{series.name} {id}' for id in self.season_identifiers(season)]
         series_id = 'S%02d' % season
         for alt in alts:
-            search_strings.extend(['%s %s' % (alt, id) for id in self.season_identifiers(season)])
+            search_strings.extend([f'{alt} {id}' for id in self.season_identifiers(season)])
         entry = Entry(
             title=search_strings[0],
             url='',

@@ -11,14 +11,17 @@ class TestSeenAPI:
     config = "{'tasks': {}}"
 
     def add_seen_entries(self):
-        seen_entry_1 = dict(title='test_title', reason='test_reason', task='test_task')
-        field_1 = dict(field='test_field_1', value='test_value_1')
-        field_2 = dict(field='test_field_2', value='test_value_2')
-        seen_entry_2 = dict(
-            title='test_title_2', reason='test_reason_2', task='test_task_2', local=True
-        )
-        field_3 = dict(field='test_field_3', value='test_value_3')
-        field_4 = dict(field='test_field_4', value='test_value_4')
+        seen_entry_1 = {"title": 'test_title', "reason": 'test_reason', "task": 'test_task'}
+        field_1 = {"field": 'test_field_1', "value": 'test_value_1'}
+        field_2 = {"field": 'test_field_2', "value": 'test_value_2'}
+        seen_entry_2 = {
+            "title": 'test_title_2',
+            "reason": 'test_reason_2',
+            "task": 'test_task_2',
+            "local": True,
+        }
+        field_3 = {"field": 'test_field_3', "value": 'test_value_3'}
+        field_4 = {"field": 'test_field_4', "value": 'test_value_4'}
 
         entries = sorted([seen_entry_1, seen_entry_2], key=lambda entry: entry['title'])
 
@@ -185,8 +188,8 @@ class TestSeenPagination:
     config = 'tasks: {}'
 
     def test_seen_pagination(self, api_client, link_headers):
-        base_seen_entry = dict(title='test_title_', task='test_task_', reason='test_reason_')
-        base_seen_field = dict(field='test_field_', value='test_value_')
+        base_seen_entry = {"title": 'test_title_', "task": 'test_task_', "reason": 'test_reason_'}
+        base_seen_field = {"field": 'test_field_', "value": 'test_value_'}
         number_of_entries = 200
 
         with Session() as session:
@@ -245,21 +248,30 @@ class TestSeenPagination:
         assert links['prev']['page'] == 1
 
     def test_seen_sorting(self, api_client):
-        seen_entry_1 = dict(
-            title='test_title_1', reason='test_reason_c', task='test_task_2', local=True
-        )
-        field_1 = dict(field='test_field_1', value='test_value_1')
-        field_2 = dict(field='test_field_2', value='test_value_2')
-        seen_entry_2 = dict(
-            title='test_title_2', reason='test_reason_b', task='test_task_3', local=True
-        )
-        field_3 = dict(field='test_field_3', value='test_value_3')
-        field_4 = dict(field='test_field_4', value='test_value_4')
-        seen_entry_3 = dict(
-            title='test_title_3', reason='test_reason_a', task='test_task_1', local=False
-        )
-        field_5 = dict(field='test_field_3', value='test_value_3')
-        field_6 = dict(field='test_field_4', value='test_value_4')
+        seen_entry_1 = {
+            "title": 'test_title_1',
+            "reason": 'test_reason_c',
+            "task": 'test_task_2',
+            "local": True,
+        }
+        field_1 = {"field": 'test_field_1', "value": 'test_value_1'}
+        field_2 = {"field": 'test_field_2', "value": 'test_value_2'}
+        seen_entry_2 = {
+            "title": 'test_title_2',
+            "reason": 'test_reason_b',
+            "task": 'test_task_3',
+            "local": True,
+        }
+        field_3 = {"field": 'test_field_3', "value": 'test_value_3'}
+        field_4 = {"field": 'test_field_4', "value": 'test_value_4'}
+        seen_entry_3 = {
+            "title": 'test_title_3',
+            "reason": 'test_reason_a',
+            "task": 'test_task_1',
+            "local": False,
+        }
+        field_5 = {"field": 'test_field_3', "value": 'test_value_3'}
+        field_6 = {"field": 'test_field_4', "value": 'test_value_4'}
 
         with Session() as session:
             seen_db_1 = SeenEntry(**seen_entry_1)

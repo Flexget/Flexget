@@ -32,9 +32,9 @@ unresponsive_hosts = TimedDict(WAIT_TIME)
 if TYPE_CHECKING:
     from typing import TypedDict
 
-    StateCacheDict = TypedDict(
-        'StateCacheDict', {'tokens': Union[float, int], 'last_update': datetime}
-    )
+    class StateCacheDict(TypedDict):
+        tokens: Union[float, int]
+        last_update: datetime
 
 
 def is_unresponsive(url: str) -> bool:
@@ -222,12 +222,16 @@ class Session(requests.Session):
         )
         self.domain_limiters[domain] = TimedLimiter(domain, delay)
 
-    def add_domain_limiter(self, limiter: DomainLimiter) -> None:
+    def add_domain_limiter(self, limiter: DomainLimiter, replace: bool = True) -> None:
         """
         Add a limiter to throttle requests to a specific domain.
 
         :param DomainLimiter limiter: The `DomainLimiter` to add to the session.
+        :param replace: If `True`, an existing domain limiter for this domain will be replaced.
+            If `False`, no changes will be made.
         """
+        if limiter.domain in self.domain_limiters and not replace:
+            return
         self.domain_limiters[limiter.domain] = limiter
 
     def request(self, method: str, url: str, *args, **kwargs) -> requests.Response:

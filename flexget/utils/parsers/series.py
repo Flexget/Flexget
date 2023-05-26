@@ -76,10 +76,12 @@ class SeriesParser(TitleParser):
         [
             TitleParser.re_not_in_word(regexp)
             for regexp in [
-                r'(\d{2,4})%s(\d{1,2})%s(\d{1,2})' % (separators, separators),
-                r'(\d{1,2})%s(\d{1,2})%s(\d{2,4})' % (separators, separators),
+                fr'(\d{{2,4}}){separators}(\d{{1,2}}){separators}(\d{{1,2}})',
+                fr'(\d{{1,2}}){separators}(\d{{1,2}}){separators}(\d{{2,4}})',
                 r'(\d{4})x(\d{1,2})%s(\d{1,2})' % separators,
-                r'(\d{1,2})(?:st|nd|rd|th)?%s([a-z]{3,10})%s(\d{4})' % (separators, separators),
+                r'(\d{{1,2}})(?:st|nd|rd|th)?{}([a-z]{{3,10}}){}(\d{{4}})'.format(
+                    separators, separators
+                ),
             ]
         ]
     )
@@ -249,9 +251,7 @@ class SeriesParser(TitleParser):
 
         # check if data appears to be unwanted (abort)
         if self.parse_unwanted(self.remove_dirt(self.data)):
-            raise ParseWarning(
-                self, '`{data}` appears to be an episode pack'.format(data=self.data)
-            )
+            raise ParseWarning(self, f'`{self.data}` appears to be an episode pack')
 
         name = self.remove_dirt(self.name)
 
@@ -266,7 +266,7 @@ class SeriesParser(TitleParser):
             # if we don't have name_regexps, generate one from the name
             self.name_regexps = ReList(
                 name_to_re(name, self.ignore_prefixes, self)
-                for name in [self.name] + self.alternate_names
+                for name in [self.name, *self.alternate_names]
             )
             # With auto regex generation, the first regex group captures the name
             self.re_from_name = True
@@ -496,7 +496,7 @@ class SeriesParser(TitleParser):
         if self.valid:
             return
 
-        msg = 'Title `%s` looks like series `%s` but cannot find ' % (self.data, self.name)
+        msg = f'Title `{self.data}` looks like series `{self.name}` but cannot find '
         if self.identified_by == 'auto':
             msg += 'any series numbering.'
         else:
@@ -672,9 +672,8 @@ class SeriesParser(TitleParser):
         if self.valid:
             valid = 'OK'
         return (
-            '<SeriesParser(data=%s,name=%s,id=%s,id_type=%s,identified_by=%s,season=%s,season_pack=%s,'
-            'episode=%s,quality=%s,proper=%s,status=%s)>'
-            % (
+            '<SeriesParser(data={},name={},id={},id_type={},identified_by={},season={},season_pack={},episode={},quality={},proper={},'
+            'status={})>'.format(
                 self.data,
                 self.name,
                 str(self.id),

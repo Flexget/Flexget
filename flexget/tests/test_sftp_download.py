@@ -1,6 +1,4 @@
-# coding=utf-8
 import filecmp
-import logging
 from pathlib import Path
 
 import pytest
@@ -14,63 +12,57 @@ class TestSftpDownload:
     _config = """
         templates:
           anchors:
-            _sftp_list: &base_sftp_download
-                to: {{ download_path }}
-                socket_timeout_sec: 2
-                connection_tries: 1
+            _sftp_download: &base_sftp_download
+              to: {{ download_path }}
+              socket_timeout_sec: 2
+              connection_tries: 1
+            _mock_file:
+              - &mock_file
+                {'title': 'file.mkv', 'url': 'sftp://test_user:test_pass@127.0.0.1:40022/home/test_user/file.mkv', 'host_key': {
+                          'key_type': 'ssh-rsa',
+                          'public_key': 'AAAAB3NzaC1yc2EAAAADAQABAAABAQC7Hn9BizDY6wI1oNYUBoVHAVioXzOJkZDPB+QsUHDBOqVIcdL/glfMtgIO1E5khoBYql8DSSI+EyrxaC+mfeJ7Ax5qZnimOFvZsJvwvO5h7LI4W1KkoJrYUfMLFfHkDy5EbPIuXeAQGdF/JzOXoIqMcCmKQDS56WRDnga91CGQeXAuzINiviZ63R55b8ynN2JFqKW5V6WZiYZBSmTia68s2ZefkFMiv7E6gmD4WYj6hitz8FGPUoyFAGIR+NVqZ5i9l/8CDuNcZ8E8G7AmNFQhChAeQdEOPO0f2vdH6aRb8Cn0EAy6zpBllxQO8EuLjiEfH01n4/VlGeQEiXlyCLqj'
+                        }}
+            _mock_dir:
+              - &mock_dir
+                {'title': 'dir', 'url': 'sftp://test_user:test_pass@127.0.0.1:40022/home/test_user/dir', 'host_key': {
+                          'key_type': 'ssh-rsa',
+                          'public_key': 'AAAAB3NzaC1yc2EAAAADAQABAAABAQC7Hn9BizDY6wI1oNYUBoVHAVioXzOJkZDPB+QsUHDBOqVIcdL/glfMtgIO1E5khoBYql8DSSI+EyrxaC+mfeJ7Ax5qZnimOFvZsJvwvO5h7LI4W1KkoJrYUfMLFfHkDy5EbPIuXeAQGdF/JzOXoIqMcCmKQDS56WRDnga91CGQeXAuzINiviZ63R55b8ynN2JFqKW5V6WZiYZBSmTia68s2ZefkFMiv7E6gmD4WYj6hitz8FGPUoyFAGIR+NVqZ5i9l/8CDuNcZ8E8G7AmNFQhChAeQdEOPO0f2vdH6aRb8Cn0EAy6zpBllxQO8EuLjiEfH01n4/VlGeQEiXlyCLqj'
+                        }}
 
         tasks:
           sftp_download_file:
-            mock: 
-              - {'title': 'file.mkv', 'url': 'sftp://test_user:test_pass@127.0.0.1:40022/home/test_user/file.mkv', 'host_key': {
-                  'key_type': 'ssh-rsa',
-                  'public_key': 'AAAAB3NzaC1yc2EAAAADAQABAAABAQC7Hn9BizDY6wI1oNYUBoVHAVioXzOJkZDPB+QsUHDBOqVIcdL/glfMtgIO1E5khoBYql8DSSI+EyrxaC+mfeJ7Ax5qZnimOFvZsJvwvO5h7LI4W1KkoJrYUfMLFfHkDy5EbPIuXeAQGdF/JzOXoIqMcCmKQDS56WRDnga91CGQeXAuzINiviZ63R55b8ynN2JFqKW5V6WZiYZBSmTia68s2ZefkFMiv7E6gmD4WYj6hitz8FGPUoyFAGIR+NVqZ5i9l/8CDuNcZ8E8G7AmNFQhChAeQdEOPO0f2vdH6aRb8Cn0EAy6zpBllxQO8EuLjiEfH01n4/VlGeQEiXlyCLqj'
-                }}
+            mock:
+              - *mock_file
             accept_all: True
             sftp_download:
               <<: *base_sftp_download
-              delete_origin: False
 
           sftp_download_dir:
-            mock: 
-              - {'title': 'dir', 'url': 'sftp://test_user:test_pass@127.0.0.1:40022/home/test_user/dir', 'host_key': {
-                  'key_type': 'ssh-rsa',
-                  'public_key': 'AAAAB3NzaC1yc2EAAAADAQABAAABAQC7Hn9BizDY6wI1oNYUBoVHAVioXzOJkZDPB+QsUHDBOqVIcdL/glfMtgIO1E5khoBYql8DSSI+EyrxaC+mfeJ7Ax5qZnimOFvZsJvwvO5h7LI4W1KkoJrYUfMLFfHkDy5EbPIuXeAQGdF/JzOXoIqMcCmKQDS56WRDnga91CGQeXAuzINiviZ63R55b8ynN2JFqKW5V6WZiYZBSmTia68s2ZefkFMiv7E6gmD4WYj6hitz8FGPUoyFAGIR+NVqZ5i9l/8CDuNcZ8E8G7AmNFQhChAeQdEOPO0f2vdH6aRb8Cn0EAy6zpBllxQO8EuLjiEfH01n4/VlGeQEiXlyCLqj'
-                }}
+            mock:
+              - *mock_dir
             accept_all: True
             sftp_download:
               to: {{ download_path }}
-              delete_origin: False
 
-          sftp_download_dir_recusive:
-            mock: 
-              - {'title': 'dir', 'url': 'sftp://test_user:test_pass@127.0.0.1:40022/home/test_user/dir', 'host_key': {
-                  'key_type': 'ssh-rsa',
-                  'public_key': 'AAAAB3NzaC1yc2EAAAADAQABAAABAQC7Hn9BizDY6wI1oNYUBoVHAVioXzOJkZDPB+QsUHDBOqVIcdL/glfMtgIO1E5khoBYql8DSSI+EyrxaC+mfeJ7Ax5qZnimOFvZsJvwvO5h7LI4W1KkoJrYUfMLFfHkDy5EbPIuXeAQGdF/JzOXoIqMcCmKQDS56WRDnga91CGQeXAuzINiviZ63R55b8ynN2JFqKW5V6WZiYZBSmTia68s2ZefkFMiv7E6gmD4WYj6hitz8FGPUoyFAGIR+NVqZ5i9l/8CDuNcZ8E8G7AmNFQhChAeQdEOPO0f2vdH6aRb8Cn0EAy6zpBllxQO8EuLjiEfH01n4/VlGeQEiXlyCLqj'
-                }}
+          sftp_download_dir_recusive_true:
+            mock:
+              - *mock_dir
             accept_all: True
             sftp_download:
               to: {{ download_path }}
-              delete_origin: False
               recursive: True
 
-          sftp_download_file_delete_origin:
-            mock: 
-              - {'title': 'file.mkv', 'url': 'sftp://test_user:test_pass@127.0.0.1:40022/home/test_user/file.mkv', 'host_key': {
-                  'key_type': 'ssh-rsa',
-                  'public_key': 'AAAAB3NzaC1yc2EAAAADAQABAAABAQC7Hn9BizDY6wI1oNYUBoVHAVioXzOJkZDPB+QsUHDBOqVIcdL/glfMtgIO1E5khoBYql8DSSI+EyrxaC+mfeJ7Ax5qZnimOFvZsJvwvO5h7LI4W1KkoJrYUfMLFfHkDy5EbPIuXeAQGdF/JzOXoIqMcCmKQDS56WRDnga91CGQeXAuzINiviZ63R55b8ynN2JFqKW5V6WZiYZBSmTia68s2ZefkFMiv7E6gmD4WYj6hitz8FGPUoyFAGIR+NVqZ5i9l/8CDuNcZ8E8G7AmNFQhChAeQdEOPO0f2vdH6aRb8Cn0EAy6zpBllxQO8EuLjiEfH01n4/VlGeQEiXlyCLqj'
-                }}
+          sftp_download_file_delete_origin_true:
+            mock:
+              - *mock_file
             accept_all: True
             sftp_download:
               <<: *base_sftp_download
               delete_origin: True
 
-          sftp_download_dir_delete_origin:
-            mock: 
-              - {'title': 'dir', 'url': 'sftp://test_user:test_pass@127.0.0.1:40022/home/test_user/dir', 'host_key': {
-                  'key_type': 'ssh-rsa',
-                  'public_key': 'AAAAB3NzaC1yc2EAAAADAQABAAABAQC7Hn9BizDY6wI1oNYUBoVHAVioXzOJkZDPB+QsUHDBOqVIcdL/glfMtgIO1E5khoBYql8DSSI+EyrxaC+mfeJ7Ax5qZnimOFvZsJvwvO5h7LI4W1KkoJrYUfMLFfHkDy5EbPIuXeAQGdF/JzOXoIqMcCmKQDS56WRDnga91CGQeXAuzINiviZ63R55b8ynN2JFqKW5V6WZiYZBSmTia68s2ZefkFMiv7E6gmD4WYj6hitz8FGPUoyFAGIR+NVqZ5i9l/8CDuNcZ8E8G7AmNFQhChAeQdEOPO0f2vdH6aRb8Cn0EAy6zpBllxQO8EuLjiEfH01n4/VlGeQEiXlyCLqj'
-                }}
+          sftp_download_dir_delete_origin_true_recursive_true:
+            mock:
+              - *mock_dir
             accept_all: True
             sftp_download:
               <<: *base_sftp_download
@@ -117,7 +109,7 @@ class TestSftpDownload:
         sftp_fs.create_file('dir/file.mkv', 100)
         sftp_fs.create_file('dir/nested/file.mkv', 100)
 
-        execute_task('sftp_download_dir_recusive')
+        execute_task('sftp_download_dir_recusive_true')
         assert filecmp.dircmp(remote_dir, download_path / 'dir')
 
     def test_sftp_download_file_and_delete(
@@ -125,8 +117,18 @@ class TestSftpDownload:
     ):
         remote_file: Path = sftp_fs.create_file('file.mkv', 100)
 
-        execute_task('sftp_download_file_delete_origin')
+        execute_task('sftp_download_file_delete_origin_true')
         assert not remote_file.exists()
+
+    def test_sftp_download_file_and_delete_when_symlink_deletes_symlink_only(
+        self, execute_task, download_path: Path, sftp_fs: TestSFTPFileSystem
+    ):
+        remote_file: Path = sftp_fs.create_file('/target.mkv', 100)
+        remote_link: Path = sftp_fs.create_symlink('file.mkv', remote_file)
+
+        execute_task('sftp_download_file_delete_origin_true')
+        assert remote_file.exists(), '/target.mkv should not have been deleted.'
+        assert not remote_link.exists(), 'file.mkv should have been deleted.'
 
     @pytest.mark.skip(
         reason='No attempt is made by the sftp_download plugin to remove the directories)'
@@ -138,5 +140,5 @@ class TestSftpDownload:
         sftp_fs.create_file('dir/file.mkv', 100)
         sftp_fs.create_file('dir/nested/file.mkv', 100)
 
-        execute_task('sftp_download_dir_delete_origin')
+        execute_task('sftp_download_dir_delete_origin_true_recursive_true')
         assert not remote_dir.exists()

@@ -15,7 +15,7 @@ class TorrentMatchFile:
         self.size = size
 
     def __repr__(self):
-        return "%s(path=%s, size=%s)" % (self.__class__.__name__, str(self.path), self.size)
+        return f"{self.__class__.__name__}(path={self.path!s}, size={self.size})"
 
 
 class TorrentMatch:
@@ -192,7 +192,7 @@ class TorrentMatch:
 
         for entry in set(task.accepted).difference(matched_entries):
             entry.reject(
-                'No local files matched {}% of the torrent size'.format(100 - max_size_difference)
+                f'No local files matched {100 - max_size_difference}% of the torrent size'
             )
 
 

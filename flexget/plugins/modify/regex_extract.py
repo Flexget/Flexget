@@ -56,7 +56,6 @@ class RegexExtract:
             raise plugin.PluginError('Error compiling regex: %s' % str(e))
 
     def on_task_modify(self, task, config):
-
         prefix = config.get('prefix')
         modified = 0
 

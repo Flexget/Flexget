@@ -32,7 +32,8 @@ logger = logger.bind(name='api')
 if TYPE_CHECKING:
     from typing import TypedDict
 
-    _TypeDict = TypedDict('_TypeDict', {'type': str})
+    class _TypeDict(TypedDict):
+        type: str
 
     class MessageDict(_TypeDict):
         properties: Dict[str, _TypeDict]
@@ -59,7 +60,7 @@ class APIClient:
     def get_endpoint(self, url: str, data=None, method: str = None):
         if method is None:
             method = 'POST' if data is not None else 'GET'
-        auth_header = dict(Authorization='Token %s' % api_key())
+        auth_header = {'Authorization': 'Token %s' % api_key()}
         response = self.app.open(
             url, data=data, follow_redirects=True, method=method, headers=auth_header
         )
@@ -202,7 +203,7 @@ class API(RestxAPI):
 api_app = Flask(__name__, template_folder=os.path.join(__path__[0], 'templates'))
 api_app.config['REMEMBER_COOKIE_NAME'] = 'flexget.token'
 api_app.config['DEBUG'] = True
-api_app.config['ERROR_404_HELP'] = False
+api_app.config['RESTX_ERROR_404_HELP'] = False
 api_app.url_map.strict_slashes = False
 
 CORS(api_app, expose_headers='Link, Total-Count, Count, ETag')
@@ -210,7 +211,7 @@ Compress(api_app)
 
 api = API(
     api_app,
-    title='Flexget API v{}'.format(__version__),
+    title=f'Flexget API v{__version__}',
     version=__version__,
     description='View and manage flexget core operations and plugins. Open each endpoint view for usage information.'
     ' Navigate to http://flexget.com/API for more details.',

@@ -107,7 +107,7 @@ class AppleTrailers:
 
                         trailers[movie_url] = {'json_url': json_url, 'json': movie_data}
                     else:
-                        self.broken('FilmId not found for {0}'.format(entry['movie_name']))
+                        self.broken('FilmId not found for {}'.format(entry['movie_name']))
 
                 except RequestException as e:
                     logger.error('Failed to get trailer {}: {}', entry['title'], e.args[0])

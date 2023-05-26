@@ -35,9 +35,7 @@ class PyloadApi:
             return self.requests.get(self.url.rstrip("/") + "/" + method.strip("/"))
         except RequestException as e:
             if e.response and e.response.status_code == 500:
-                raise plugin.PluginError(
-                    'Internal API Error: <%s> <%s>' % (method, self.url), logger
-                )
+                raise plugin.PluginError(f'Internal API Error: <{method}> <{self.url}>', logger)
             raise
 
     def post(self, method, data):
@@ -46,7 +44,7 @@ class PyloadApi:
         except RequestException as e:
             if e.response and e.response.status_code == 500:
                 raise plugin.PluginError(
-                    'Internal API Error: <%s> <%s> <%s>' % (method, self.url, data), logger
+                    f'Internal API Error: <{method}> <{self.url}> <{data}>', logger
                 )
             raise
 
@@ -155,11 +153,17 @@ class PluginPyLoad:
 
         for entry in task.accepted:
             # bunch of urls now going to check
-            content = entry.get('description', '') + ' ' + quote(entry['url'])
-            content = json.dumps(content)
+            contents = []
+            description = entry.get('description')
+            if description is not None:
+                contents.append(description)
+            contents.append(quote(entry['url']))
+            content = " ".join(contents)
+
+            content = repr(content)
 
             if is_pyload_ng:
-                url = entry['url'] if config.get('parse_url', self.DEFAULT_PARSE_URL) else ''
+                url = repr(entry['url'] if config.get('parse_url', self.DEFAULT_PARSE_URL) else '')
             else:
                 url = (
                     json.dumps(entry['url'])
@@ -222,8 +226,8 @@ class PluginPyLoad:
 
                 if is_pyload_ng:
                     data = {
-                        'name': name.encode('ascii', 'ignore').decode(),
-                        'links': urls,
+                        'name': repr(name.encode('ascii', 'ignore').decode()),
+                        'links': repr(urls),
                         'dest': dest,
                     }
                 else:

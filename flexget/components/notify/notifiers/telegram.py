@@ -49,15 +49,15 @@ class ChatIdEntry(ChatIdsBase):
     group = Column(String, index=True, nullable=True)
 
     def __str__(self):
-        x = ['id={0}'.format(self.id)]
+        x = [f'id={self.id}']
         if self.username:
-            x.append('username={0}'.format(self.username))
+            x.append(f'username={self.username}')
         if self.firstname:
-            x.append('firstname={0}'.format(self.firstname))
+            x.append(f'firstname={self.firstname}')
         if self.surname:
-            x.append('surname={0}'.format(self.surname))
+            x.append(f'surname={self.surname}')
         if self.group:
-            x.append('group={0}'.format(self.group))
+            x.append(f'group={self.group}')
         return ' '.join(x)
 
 
@@ -274,12 +274,10 @@ class TelegramNotifier:
     def _enforce_telegram_plugin_ver():
         if telegram is None:
             raise plugin.PluginWarning('missing python-telegram-bot pkg')
-        elif not hasattr(telegram, str('__version__')):
+        elif not hasattr(telegram, '__version__'):
             raise plugin.PluginWarning('invalid or old python-telegram-bot pkg')
         elif version.parse(telegram.__version__) < version.parse(_MIN_TELEGRAM_VER):
-            raise plugin.PluginWarning(
-                'old python-telegram-bot ({0})'.format(telegram.__version__)
-            )
+            raise plugin.PluginWarning(f'old python-telegram-bot ({telegram.__version__})')
 
     def _replace_chat_id(self, old_id, new_id, session):
         upd_usernames, upd_fullnames, upd_groups = self._get_bot_updates()
@@ -293,7 +291,7 @@ class TelegramNotifier:
                 break
 
     def _send_msgs(self, msg, chat_ids, session):
-        kwargs = dict()
+        kwargs = {}
         if self._parse_mode == 'markdown':
             kwargs['parse_mode'] = telegram.ParseMode.MARKDOWN
         elif self._parse_mode == 'html':
@@ -369,9 +367,7 @@ class TelegramNotifier:
         logger.debug('loading cached chat ids')
         chat_ids = self._get_cached_chat_ids(session, usernames, fullnames, groups)
         logger.debug(
-            'found {0} cached chat_ids: {1}'.format(
-                len(chat_ids), ['{0}'.format(x) for x in chat_ids]
-            )
+            'found {} cached chat_ids: {}'.format(len(chat_ids), [f'{x}' for x in chat_ids])
         )
 
         if not (usernames or fullnames or groups):
@@ -381,9 +377,7 @@ class TelegramNotifier:
         logger.debug('loading new chat ids')
         new_chat_ids = list(self._get_new_chat_ids(usernames, fullnames, groups))
         logger.debug(
-            'found {0} new chat_ids: {1}'.format(
-                len(new_chat_ids), ['{0}'.format(x) for x in new_chat_ids]
-            )
+            'found {} new chat_ids: {}'.format(len(new_chat_ids), [f'{x}' for x in new_chat_ids])
         )
 
         chat_ids.extend(new_chat_ids)
@@ -400,19 +394,18 @@ class TelegramNotifier:
         :rtype: list[ChatIdEntry]
 
         """
-        chat_ids = list()
-        cached_usernames = dict(
-            (x.username, x)
+        chat_ids = []
+        cached_usernames = {
+            x.username: x
             for x in session.query(ChatIdEntry).filter(ChatIdEntry.username != None).all()
-        )
-        cached_fullnames = dict(
-            ((x.firstname, x.surname), x)
+        }
+        cached_fullnames = {
+            (x.firstname, x.surname): x
             for x in session.query(ChatIdEntry).filter(ChatIdEntry.firstname != None).all()
-        )
-        cached_groups = dict(
-            (x.group, x)
-            for x in session.query(ChatIdEntry).filter(ChatIdEntry.group != None).all()
-        )
+        }
+        cached_groups = {
+            x.group: x for x in session.query(ChatIdEntry).filter(ChatIdEntry.group != None).all()
+        }
 
         len_ = len(usernames)
         for i, username in enumerate(reversed(usernames)):
@@ -498,9 +491,9 @@ class TelegramNotifier:
                 break
             last_upd = ups[-1].update_id
 
-        usernames = dict()
-        fullnames = dict()
-        groups = dict()
+        usernames = {}
+        fullnames = {}
+        groups = {}
         for update in updates:
             if update.message:
                 chat = update.message.chat
@@ -531,7 +524,7 @@ class TelegramNotifier:
         logger.info('saving updated chat_ids to db')
 
         # avoid duplicate chat_ids. (this is possible if configuration specified both username & fullname
-        chat_ids_d = dict((x.id, x) for x in chat_ids)
+        chat_ids_d = {x.id: x for x in chat_ids}
 
         session.add_all(iter(chat_ids_d.values()))
         session.commit()

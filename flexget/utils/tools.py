@@ -4,7 +4,6 @@ import copy
 import hashlib
 import locale
 import operator
-import os
 import queue
 import re
 import sys
@@ -147,7 +146,7 @@ def merge_dict_from_to(d1: dict, d2: dict) -> None:
                 elif isinstance(v, (str, bool, int, float, type(None))):
                     pass
                 else:
-                    raise Exception(f'Unknown type: {type(v)} value: {repr(v)} in dictionary')
+                    raise Exception(f'Unknown type: {type(v)} value: {v!r} in dictionary')
             elif isinstance(v, (str, bool, int, float, list, type(None))) and isinstance(
                 d2[k], (str, bool, int, float, list, type(None))
             ):
@@ -155,8 +154,7 @@ def merge_dict_from_to(d1: dict, d2: dict) -> None:
                 pass
             else:
                 raise MergeException(
-                    'Merging key %s failed, conflicting datatypes %r vs. %r.'
-                    % (k, type(v).__name__, type(d2[k]).__name__)
+                    f'Merging key {k} failed, conflicting datatypes {type(v).__name__!r} vs. {type(d2[k]).__name__!r}.'
                 )
         else:
             d2[k] = copy.deepcopy(v)
@@ -297,7 +295,7 @@ class TimedDict(MutableMapping):
         return len(list(self.__iter__()))
 
     def __repr__(self):
-        return '%s(%r)' % (
+        return '{}({!r})'.format(
             self.__class__.__name__,
             dict(list(zip(self._store, (v[1] for v in list(self._store.values()))))),
         )

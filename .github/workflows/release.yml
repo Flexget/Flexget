@@ -28,7 +28,7 @@ jobs:
         cache-dependency-path: 'dev-requirements.txt'
     - name: Install dev dependencies
       run: |
-        pip install -r dev-requirements.txt
+        pip install -r requirements-release.txt
     - name: Set Deployment Status Pending
       uses: deliverybot/deployment-status@v1
       with:

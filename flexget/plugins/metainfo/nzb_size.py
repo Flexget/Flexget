@@ -34,7 +34,6 @@ class NzbSize:
                 or entry.get('filename')
                 and entry['filename'].endswith('.nzb')
             ):
-
                 if 'file' not in entry:
                     logger.warning(
                         '`{}` does not have a `file` that could be used to get size information',

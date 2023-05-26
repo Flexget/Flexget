@@ -219,9 +219,9 @@ class TestTorrentScrub:
             title = os.path.splitext(filename)[0]
 
             modified = task.find_entry(title=title)
-            assert modified, "%r cannot be found in %r" % (title, task)
+            assert modified, f"{title!r} cannot be found in {task!r}"
             modified = modified.get('torrent')
-            assert modified, "No 'torrent' key in %r" % (title,)
+            assert modified, f"No 'torrent' key in {title!r}"
 
             osize = os.path.getsize(filename)
             msize = tmpdir.join(filename).size()
@@ -260,9 +260,9 @@ class TestTorrentScrub:
         task = execute_task('test_fields')
         title = 'fields.LICENSE'
         torrent = task.find_entry(title=title)
-        assert torrent, "%r cannot be found in %r" % (title, task)
+        assert torrent, f"{title!r} cannot be found in {task!r}"
         torrent = torrent.get('torrent')
-        assert torrent, "No 'torrent' key in %r" % (title,)
+        assert torrent, f"No 'torrent' key in {title!r}"
 
         assert 'name' in torrent.content['info'], "'info.name' was lost"
         assert 'comment' not in torrent.content, "'comment' not scrubbed"

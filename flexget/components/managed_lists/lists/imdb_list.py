@@ -11,7 +11,7 @@ from loguru import logger
 from requests.exceptions import RequestException
 from requests.utils import cookiejar_from_dict
 from sqlalchemy import Column, String, Unicode
-from sqlalchemy.orm import relation
+from sqlalchemy.orm import relationship
 from sqlalchemy.schema import ForeignKey
 
 from flexget import db_schema, plugin
@@ -42,7 +42,7 @@ class IMDBListUser(Base):
     _cookies = Column('cookies', Unicode)
     cookies = json_synonym('_cookies')
 
-    lists = relation('IMDBListList', backref='imdb_user', cascade='all, delete, delete-orphan')
+    lists = relationship('IMDBListList', backref='imdb_user', cascade='all, delete, delete-orphan')
 
     def __init__(self, user_name, user_id, cookies):
         self.user_name = user_name
@@ -113,7 +113,7 @@ class ImdbEntrySet(MutableSet):
         elif isinstance(cookies, str):
             try:
                 new_cookie = json_loads(cookies)
-            except JSONDecodeError as e:
+            except JSONDecodeError:
                 new_cookie = self.parse_cookies_file(cookies)
 
         if not new_cookie:
@@ -135,7 +135,7 @@ class ImdbEntrySet(MutableSet):
         with file.open(encoding='utf-8') as data:
             try:
                 contents = json_load(data)
-            except JSONDecodeError as e:
+            except JSONDecodeError:
                 raise PluginError('Invalid cookies file format, file not in json')
 
         return contents
@@ -218,7 +218,7 @@ class ImdbEntrySet(MutableSet):
                 soup = get_soup(r.content)
                 form = soup.find('form', attrs={'name': 'signIn'})
                 inputs = form.select('input')
-                data = dict((i['name'], i.get('value')) for i in inputs if i.get('name'))
+                data = {i['name']: i.get('value') for i in inputs if i.get('name')}
                 data['email'] = self.config['login']
                 data['password'] = self.config['password']
                 action = form.get('action')
@@ -291,8 +291,7 @@ class ImdbEntrySet(MutableSet):
             logger.debug('fetching items from IMDB')
             try:
                 r = self.session.get(
-                    'https://www.imdb.com/list/export?list_id=%s&author_id=%s'
-                    % (self.list_id, self.user_id),
+                    f'https://www.imdb.com/list/export?list_id={self.list_id}&author_id={self.user_id}',
                     cookies=self.cookies,
                 )
                 lines = list(r.iter_lines(decode_unicode=True))
@@ -320,7 +319,7 @@ class ImdbEntrySet(MutableSet):
                     )
                     entry = Entry(
                         {
-                            'title': '%s (%s)' % (name, year) if year != '????' else name,
+                            'title': f'{name} ({year})' if year != '????' else name,
                             'url': row['url'],
                             'imdb_id': row['const'],
                             'imdb_url': row['url'],
@@ -405,7 +404,7 @@ class ImdbEntrySet(MutableSet):
                     break
 
             for item_id in item_ids:
-                urls.append('https://www.imdb.com/list/%s/li%s/delete' % (self.list_id, item_id))
+                urls.append(f'https://www.imdb.com/list/{self.list_id}/li{item_id}/delete')
         if not item_ids:
             logger.warning(
                 '{} is not in list {}, cannot be removed', entry['imdb_id'], self.list_id
@@ -445,7 +444,7 @@ class ImdbEntrySet(MutableSet):
             url = 'https://www.imdb.com/watchlist/%s' % entry['imdb_id']
         else:
             method = 'post'
-            url = 'https://www.imdb.com/list/%s/%s/add' % (self.list_id, entry['imdb_id'])
+            url = 'https://www.imdb.com/list/{}/{}/add'.format(self.list_id, entry['imdb_id'])
 
         logger.debug(
             'adding title {} with ID {} to imdb {}', entry['title'], entry['imdb_id'], self.list_id

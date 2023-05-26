@@ -18,7 +18,9 @@ class TestParser:
 
     def test_parsing(self, parse):
         movie = parse('The.Matrix.1999.1080p.HDDVD.x264-FlexGet')
-        assert movie.name == 'The Matrix', 'failed to parse %s (got %s)' % (movie.data, movie.name)
+        assert movie.name == 'The Matrix', 'failed to parse {} (got {})'.format(
+            movie.data, movie.name
+        )
         assert movie.year == 1999, 'failed to parse year from %s' % movie.data
 
         movie = parse('WALL-E 720p BluRay x264-FlexGet')
@@ -55,11 +57,11 @@ class TestParser:
         assert movie.name == 'TRON Legacy', 'failed to parse %s' % movie.data
 
         movie = parse('[SomeThing]Up.2009.720p.x264-FlexGet')
-        assert movie.name == 'Up', 'failed to parse %s (got %s)' % (movie.data, movie.name)
+        assert movie.name == 'Up', f'failed to parse {movie.data} (got {movie.name})'
         assert movie.year == 2009, 'failed to parse year from %s' % movie.data
 
         movie = parse('[720p] A.Movie.Title.2013.otherstuff.x264')
-        assert movie.name == 'A Movie Title', 'failed to parse %s (got %s)' % (
+        assert movie.name == 'A Movie Title', 'failed to parse {} (got {})'.format(
             movie.data,
             movie.name,
         )

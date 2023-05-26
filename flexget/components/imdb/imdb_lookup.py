@@ -2,9 +2,9 @@ from datetime import datetime
 
 from loguru import logger
 
-from flexget import entry, plugin
+from flexget import plugin
 from flexget.components.imdb.utils import ImdbParser, ImdbSearch, extract_id, make_url
-from flexget.entry import Entry
+from flexget.entry import Entry, register_lazy_lookup
 from flexget.event import event
 from flexget.utils.database import with_session
 from flexget.utils.log import log_once
@@ -37,13 +37,11 @@ class ImdbLookup:
         'imdb_year': 'year',
         'imdb_genres': lambda movie: [genre.name for genre in movie.genres],
         'imdb_languages': lambda movie: [lang.language.name for lang in movie.languages],
-        'imdb_actors': lambda movie: dict((actor.imdb_id, actor.name) for actor in movie.actors),
-        'imdb_directors': lambda movie: dict(
-            (director.imdb_id, director.name) for director in movie.directors
-        ),
-        'imdb_writers': lambda movie: dict(
-            (writer.imdb_id, writer.name) for writer in movie.writers
-        ),
+        'imdb_actors': lambda movie: {actor.imdb_id: actor.name for actor in movie.actors},
+        'imdb_directors': lambda movie: {
+            director.imdb_id: director.name for director in movie.directors
+        },
+        'imdb_writers': lambda movie: {writer.imdb_id: writer.name for writer in movie.writers},
         'imdb_mpaa_rating': 'mpaa_rating',
         'imdb_plot_keywords': lambda movie: [
             plot_keyword.name for plot_keyword in movie.plot_keywords
@@ -62,7 +60,7 @@ class ImdbLookup:
         for entry in task.entries:
             entry.add_lazy_fields(self.lazy_loader, self.field_map)
 
-    @entry.register_lazy_lookup('imdb_lookup')
+    @register_lazy_lookup('imdb_lookup')
     def lazy_loader(self, entry):
         """Does the lookup for this entry and populates the entry fields."""
         try:
@@ -277,6 +275,7 @@ class ImdbLookup:
         movie.mpaa_rating = parser.mpaa_rating
         movie.plot_outline = parser.plot_outline
         movie.url = imdb_url
+        session.add(movie)
         for name in parser.genres:
             genre = session.query(db.Genre).filter(db.Genre.name == name).first()
             if not genre:
@@ -311,7 +310,6 @@ class ImdbLookup:
             movie.plot_keywords.append(plot_keyword)  # pylint:disable=E1101
         # so that we can track how long since we've updated the info later
         movie.updated = datetime.now()
-        session.add(movie)
         return movie
 
     @property

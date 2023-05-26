@@ -74,7 +74,6 @@ class InputTail:
             entry[k] = v % entry
 
     def on_task_input(self, task, config):
-
         # Let details plugin know that it is ok if this task doesn't produce any entries
         task.no_entries_ok = True
 
@@ -92,7 +91,7 @@ class InputTail:
             else:
                 last_pos = 0
 
-            with open(filename, 'r', encoding=encoding, errors='replace') as file:
+            with open(filename, encoding=encoding, errors='replace') as file:
                 if task.options.tail_reset == filename or task.options.tail_reset == task.name:
                     if last_pos == 0:
                         logger.info('Task {} tail position is already zero', task.name)

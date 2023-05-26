@@ -37,7 +37,7 @@ def imdb_query(session):
 
     logger.info('Getting imdb_urls ...')
     # query so that we avoid loading whole object (maybe cached?)
-    for _, url in session.execute(select([Movie.id, Movie.url])):
+    for _, url in session.execute(select(Movie.id, Movie.url)):
         imdb_urls.append(url)
     logger.info('Got {} urls from database', len(imdb_urls))
     if not imdb_urls:
@@ -49,7 +49,6 @@ def imdb_query(session):
     log_query_count('test')
     start_time = time.time()
     for url in track(imdb_urls, description='Benchmarking...'):
-
         # movie = session.query(Movie).filter(Movie.url == url).first()
         # movie = session.query(Movie).options(subqueryload(Movie.genres)).filter(Movie.url == url).one()
 

@@ -104,14 +104,13 @@ class NotifyToast:
     def windows_notify(self, title, message, config):
         config = self.prepare_config(config)
         try:
-            from win32api import GetModuleHandle, PostQuitMessage
+            from win32api import GetModuleHandle
             from win32con import (
                 CW_USEDEFAULT,
                 IDI_APPLICATION,
                 IMAGE_ICON,
                 LR_DEFAULTSIZE,
                 LR_LOADFROMFILE,
-                WM_DESTROY,
                 WM_USER,
                 WS_OVERLAPPED,
                 WS_SYSMENU,
@@ -122,11 +121,8 @@ class NotifyToast:
                 NIF_MESSAGE,
                 NIF_TIP,
                 NIM_ADD,
-                NIM_DELETE,
-                NIM_MODIFY,
                 WNDCLASS,
                 CreateWindow,
-                DestroyWindow,
                 LoadIcon,
                 LoadImage,
                 RegisterClass,

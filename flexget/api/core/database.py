@@ -1,4 +1,5 @@
 from flask import Response, jsonify, request
+from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from flexget.api import APIResource, api
@@ -39,7 +40,7 @@ class DBOperation(APIResource):
             self.manager.db_cleanup(force=True)
             msg = 'DB Cleanup finished'
         elif operation == 'vacuum':
-            session.execute('VACUUM')
+            session.execute(text('VACUUM'))
             session.commit()
             msg = 'DB VACUUM finished'
         elif operation == 'plugin_reset':
@@ -61,4 +62,4 @@ class DBCleanup(APIResource):
     @api.response(200, model=plugins_schema)
     def get(self, session: Session = None) -> Response:
         """List resettable DB plugins"""
-        return jsonify(sorted(list(plugin_schemas)))
+        return jsonify(sorted(plugin_schemas))

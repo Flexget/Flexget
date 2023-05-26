@@ -13,12 +13,26 @@ class TestJinjaFilters:
               - {"title":"2000", "url":"mock://local3" }
               - {"title":"2000 (2020)", "url":"mock://local4" }
               - {"title":"2000 2020", "url":"mock://local5" }
-                
+
             accept_all: yes
-                
+
             set:
               name: "{{title|strip_year}}"
               year: "{{title|get_year}}"
+          parse_size:
+            mock:
+              - {"title": "The Matrix [13.84GB]", "actual": 13.84 }
+              - {"title": "The Matrix [13.84 GB]", "actual": 13.84 }
+              - {"title": "The Matrix [13.84 GiB]", "actual": 13.84 }
+              - {"title": "The Matrix [13 GB]", "actual": 13 }
+              - {"title": "The Matrix [WebRip 6mbps][13.84GB]", "actual": 13.84 }
+
+            accept_all: yes
+
+            set:
+              size: "{{title|parse_size}}"
+              size_si: "{{title|parse_size(si=True)}}"
+              size_case: "{{title|parse_size(case=False)}}"
     """
 
     custom_filters = [
@@ -37,6 +51,7 @@ class TestJinjaFilters:
         'to_date',
         'strip_year',
         'get_year',
+        'parse_size',
         'asciify',
         'strip_symbols',
     ]
@@ -62,6 +77,28 @@ class TestJinjaFilters:
 
         assert task.accepted[5]['name'] == 2000
         assert task.accepted[5]['year'] == 2020
+
+    def test_parse_size(self, execute_task):
+        task = execute_task('parse_size')
+
+        assert len(task.accepted) == 5
+
+        assert task.accepted[0]['size'] == int(task.accepted[0]['actual'] * 1024**3)
+        assert task.accepted[0]['size_si'] == int(task.accepted[0]['actual'] * 1000**3)
+
+        assert task.accepted[1]['size'] == int(task.accepted[1]['actual'] * 1024**3)
+        assert task.accepted[1]['size_si'] == int(task.accepted[1]['actual'] * 1000**3)
+
+        assert task.accepted[2]['size'] == int(task.accepted[2]['actual'] * 1024**3)
+        # GiB is always 1024 based
+        assert task.accepted[2]['size_si'] == int(task.accepted[2]['actual'] * 1024**3)
+
+        assert task.accepted[3]['size'] == int(task.accepted[3]['actual'] * 1024**3)
+        assert task.accepted[3]['size_si'] == int(task.accepted[3]['actual'] * 1000**3)
+
+        assert task.accepted[4]['size'] == int(task.accepted[4]['actual'] * 1024**3)
+        assert task.accepted[4]['size_si'] == int(task.accepted[4]['actual'] * 1000**3)
+        assert task.accepted[4]['size_case'] == 6 * 1024**2  # a case that parsed wrong size
 
     @pytest.mark.parametrize('test_filter', custom_filters)
     def test_undefined_preserved(self, test_filter):

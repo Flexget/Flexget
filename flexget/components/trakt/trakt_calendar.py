@@ -1,5 +1,4 @@
 import datetime
-import math
 
 from loguru import logger
 from requests import RequestException
@@ -118,7 +117,7 @@ class TraktCalendar:
                 )
                 logger.debug('Found {} calendar entries', len(results))
             except RequestException as e:
-                raise plugin.PluginError('Error while fetching calendar: {0}'.format(e))
+                raise plugin.PluginError(f'Error while fetching calendar: {e}')
 
             for result in results:
                 e = Entry()
@@ -128,16 +127,16 @@ class TraktCalendar:
 
                 title = e['trakt_series_name']
                 if not config['strip_dates']:
-                    title = '{0} ({1})'.format(title, e['trakt_series_year'])
+                    title = '{} ({})'.format(title, e['trakt_series_year'])
 
                 url = e['trakt_series_url']
 
                 if config['type'] == 'episodes':
-                    title = '{0} S{1:02d}E{2:02d}'.format(
+                    title = '{} S{:02d}E{:02d}'.format(
                         title, e['trakt_season'], e['trakt_episode']
                     )
 
-                    url = '{0}/seasons/{1}/episodes/{2}'.format(
+                    url = '{}/seasons/{}/episodes/{}'.format(
                         url, e['trakt_season'], e['trakt_episode']
                     )
 

@@ -1,4 +1,3 @@
-import json
 from collections.abc import MutableSet
 from urllib.parse import quote, urlparse
 
@@ -55,7 +54,7 @@ def request_get_json(url, headers):
                 "Invalid response received from Radarr: %s" % response.content
             )
     except RequestException as e:
-        raise RadarrRequestError("Unable to connect to Radarr at %s. Error: %s" % (url, e))
+        raise RadarrRequestError(f"Unable to connect to Radarr at {url}. Error: {e}")
 
 
 def request_delete_json(url, headers):
@@ -69,13 +68,13 @@ def request_delete_json(url, headers):
                 "Invalid response received from Radarr: %s" % response.content
             )
     except RequestException as e:
-        raise RadarrRequestError("Unable to connect to Radarr at %s. Error: %s" % (url, e))
+        raise RadarrRequestError(f"Unable to connect to Radarr at {url}. Error: {e}")
 
 
 def request_post_json(url, headers, data):
     """Makes a POST request and returns the JSON response"""
     try:
-        response = requests.post(url, headers=headers, data=data, timeout=10)
+        response = requests.post(url, headers=headers, json=data, timeout=10)
         if response.status_code == 201:
             return response.json()
         else:
@@ -96,7 +95,7 @@ def request_post_json(url, headers, data):
             )
 
     except RequestException as e:
-        raise RadarrRequestError("Unable to connect to Radarr at %s. Error: %s" % (url, e))
+        raise RadarrRequestError(f"Unable to connect to Radarr at {url}. Error: {e}")
 
 
 def request_put_json(url, headers):
@@ -110,7 +109,7 @@ def request_put_json(url, headers):
                 "Invalid response received from Radarr: %s" % response.content
             )
     except RequestException as e:
-        raise RadarrRequestError("Unable to connect to Radarr at %s. Error: %s" % (url, e))
+        raise RadarrRequestError(f"Unable to connect to Radarr at {url}. Error: {e}")
 
 
 class RadarrAPIService:
@@ -123,7 +122,7 @@ class RadarrAPIService:
         if parsed_base_url.port:
             port = int(parsed_base_url.port)
 
-        self.api_url = "%s://%s:%s%s/api/" % (
+        self.api_url = "{}://{}:{}{}/api/v3/".format(
             parsed_base_url.scheme,
             parsed_base_url.netloc,
             port,
@@ -132,7 +131,7 @@ class RadarrAPIService:
 
     def get_profiles(self):
         """Gets all profiles"""
-        request_url = self.api_url + "profile"
+        request_url = self.api_url + "qualityProfile"
         headers = self._default_headers()
         return request_get_json(request_url, headers)
 
@@ -147,7 +146,7 @@ class RadarrAPIService:
         request_url = self.api_url + "tag"
         headers = self._default_headers()
         data = {"label": label}
-        return request_post_json(request_url, headers, json.dumps(data))
+        return request_post_json(request_url, headers, data)
 
     def get_movies(self):
         """Gets all movies"""
@@ -220,7 +219,7 @@ class RadarrAPIService:
             data["addOptions"] = add_options
 
         try:
-            json_response = request_post_json(request_url, headers, json.dumps(data))
+            json_response = request_post_json(request_url, headers, data)
         except RadarrRequestError as ex:
             spec_ex = spec_exception_from_response_ex(ex)
             if spec_ex:
@@ -275,7 +274,7 @@ def radarr_quality_to_flexget_quality_req(radarr_quality):
 
     # QUALITIES_MAP has its keys in lower case
     radarr_quality = radarr_quality.lower()
-    if not radarr_quality in QUALITIES_MAP:
+    if radarr_quality not in QUALITIES_MAP:
         logger.warning(
             "Did not find a suitible translation for Radarr quality '{}'", radarr_quality
         )
@@ -528,7 +527,7 @@ class RadarrSet(MutableSet):
 
             # Check if we should add quality requirement
             if self.config.get("include_data"):
-                movie_profile_id = movie["profileId"]
+                movie_profile_id = movie["qualityProfileId"]
                 for profile in profiles:
                     profile_id = profile["id"]
                     if profile_id == movie_profile_id:

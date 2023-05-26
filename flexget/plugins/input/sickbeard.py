@@ -85,7 +85,7 @@ class Sickbeard:
 
     def on_task_input(self, task, config):
         parsedurl = urlparse(config.get('base_url'))
-        url = '%s://%s:%s%s/api/%s/?cmd=shows' % (
+        url = '{}://{}:{}{}/api/{}/?cmd=shows'.format(
             parsedurl.scheme,
             parsedurl.netloc,
             config.get('port'),
@@ -96,19 +96,20 @@ class Sickbeard:
             json = task.requests.get(url).json()
         except RequestException as e:
             raise plugin.PluginError(
-                'Unable to connect to Sickbeard at %s://%s:%s%s. Error: %s'
-                % (parsedurl.scheme, parsedurl.netloc, config.get('port'), parsedurl.path, e)
+                'Unable to connect to Sickbeard at {}://{}:{}{}. Error: {}'.format(
+                    parsedurl.scheme, parsedurl.netloc, config.get('port'), parsedurl.path, e
+                )
             )
         entries = []
         for _, show in list(json['data'].items()):
-            logger.debug('processing show: {}'.format(show))
+            logger.debug(f'processing show: {show}')
             fg_qualities = ''  # Initializes the quality parameter
             if show['paused'] and config.get('only_monitored'):
                 continue
             if show['status'] == 'Ended' and not config.get('include_ended'):
                 continue
             if config.get('include_data'):
-                show_url = '%s:%s/api/%s/?cmd=show&tvdbid=%s' % (
+                show_url = '{}:{}/api/{}/?cmd=show&tvdbid={}'.format(
                     config['base_url'],
                     config['port'],
                     config['api_key'],

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from urllib.parse import parse_qs, urlencode, urlparse
 
 from loguru import logger

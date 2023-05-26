@@ -2,7 +2,7 @@
 import re
 
 from loguru import logger
-from requests.exceptions import HTTPError, RequestException
+from requests.exceptions import HTTPError
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
@@ -157,7 +157,7 @@ class TelegramInput:
             entry['title'] = text
 
             # We need a url, so we add a dummy
-            entry['url'] = f"http://localhost?update_id={str(update_id)}"
+            entry['url'] = f"http://localhost?update_id={update_id!s}"
 
             # Store the message if we need to use it in other plugins
             entry['telegram_message'] = message['message']

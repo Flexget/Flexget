@@ -14,11 +14,11 @@ class TestPluginApi:
 
     config = 'tasks: {}'
 
-    def test_unknown_plugin(self):
+    def test_unknown_plugin1(self):
         with pytest.raises(plugin.DependencyError):
             plugin.get_plugin_by_name('nonexisting_plugin')
 
-    def test_unknown_plugin(self):
+    def test_unknown_plugin2(self):
         with pytest.raises(plugin.DependencyError):
             plugin.get('nonexisting_plugin', 'test')
 
@@ -30,9 +30,9 @@ class TestPluginApi:
     def test_load(self):
         plugin.load_plugins()
         plugin_path = os.path.dirname(plugins.__file__)
-        plugin_modules = set(
+        plugin_modules = {
             os.path.basename(i) for k in ("/*.py", "/*/*.py") for i in glob.glob(plugin_path + k)
-        )
+        }
         assert len(plugin_modules) >= 10, "Less than 10 plugin modules looks fishy"
         # Hmm, this test isn't good, because we have plugin modules that don't register a class (like cli ones)
         # and one module can load multiple plugins TODO: Maybe consider some replacement

@@ -42,7 +42,6 @@ class Subtitles:
         return config
 
     def on_task_download(self, task, config):
-
         # filter all entries that have IMDB ID set
         try:
             entries = [e for e in task.accepted if e['imdb_id'] is not None]

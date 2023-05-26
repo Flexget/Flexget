@@ -12,11 +12,11 @@ import requests
 def _get_version():
     with open('flexget/_version.py') as f:
         g = globals()
-        l = {}
-        exec(f.read(), g, l)  # pylint: disable=W0122
-    if not l['__version__']:
+        loc = {}
+        exec(f.read(), g, loc)
+    if not loc['__version__']:
         raise click.ClickException('Could not find __version__ from flexget/_version.py')
-    return l['__version__']
+    return loc['__version__']
 
 
 @click.group()
@@ -53,7 +53,7 @@ def bump_version(bump_type):
             if 'b' in ver_split[2]:
                 # beta version
                 minor, beta = ver_split[-1].split('b')
-                ver_split[-1] = '%sb%s' % (minor, int(beta) + 1)
+                ver_split[-1] = f'{minor}b{int(beta) + 1}'
             else:
                 ver_split[-1] = str(int(ver_split[-1]) + 1)
         if bump_type == 'dev':
@@ -67,7 +67,8 @@ def bump_version(bump_type):
 
 
 @cli.command()
-def bundle_webui():
+@click.option("--version", 'ui_version', default='', type=click.Choice(['v2', 'v1', '']))
+def bundle_webui(ui_version: str = ""):
     """Bundle webui for release packaging"""
     ui_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'flexget', 'ui')
 
@@ -77,46 +78,51 @@ def bundle_webui():
         z = zipfile.ZipFile(io.BytesIO(r.content))
         z.extractall(dest_path)
 
-    # WebUI V1
-    click.echo('Bundle WebUI v1...')
-    try:
-        # Remove existing
-        app_path = os.path.join(ui_path, 'v1', 'app')
-        if os.path.exists(app_path):
-            shutil.rmtree(app_path)
-        # Just stashed the old webui zip on a random github release for easy hosting.
-        # It doesn't get updated anymore, we should probably stop bundling it with releases soon.
-        download_extract(
-            'https://github.com/Flexget/Flexget/releases/download/v3.0.6/webui_v1.zip',
-            os.path.join(ui_path, 'v1'),
-        )
-    except OSError as e:
-        click.echo('Unable to download and extract WebUI v1 due to %e' % str(e))
-        raise click.Abort()
-
-    # WebUI V2
-    try:
-        click.echo('Bundle WebUI v2...')
-        # Remove existing
-        app_path = os.path.join(ui_path, 'v2', 'dist')
-        if os.path.exists(app_path):
-            shutil.rmtree(app_path)
-
-        release = requests.get('https://api.github.com/repos/Flexget/webui/releases/latest').json()
-
-        v2_package = None
-        for asset in release['assets']:
-            if asset['name'] == 'dist.zip':
-                v2_package = asset['browser_download_url']
-                break
-
-        if not v2_package:
-            click.echo('Unable to find dist.zip in assets')
+    if ui_version in ['', 'v1']:
+        # WebUI V1
+        click.echo('Bundle WebUI v1...')
+        try:
+            # Remove existing
+            app_path = os.path.join(ui_path, 'v1', 'app')
+            if os.path.exists(app_path):
+                shutil.rmtree(app_path)
+            # Just stashed the old webui zip on a random github release for easy hosting.
+            # It doesn't get updated anymore,
+            # we should probably stop bundling it with releases soon.
+            download_extract(
+                'https://github.com/Flexget/Flexget/releases/download/v3.0.6/webui_v1.zip',
+                os.path.join(ui_path, 'v1'),
+            )
+        except OSError as e:
+            click.echo('Unable to download and extract WebUI v1 due to %e' % str(e))
             raise click.Abort()
-        download_extract(v2_package, os.path.join(ui_path, 'v2'))
-    except (OSError, ValueError) as e:
-        click.echo('Unable to download and extract WebUI v2 due to %s' % str(e))
-        raise click.Abort()
+
+    if ui_version in ['', 'v2']:
+        # WebUI V2
+        try:
+            click.echo('Bundle WebUI v2...')
+            # Remove existing
+            app_path = os.path.join(ui_path, 'v2', 'dist')
+            if os.path.exists(app_path):
+                shutil.rmtree(app_path)
+
+            release = requests.get(
+                'https://api.github.com/repos/Flexget/webui/releases/latest'
+            ).json()
+
+            v2_package = None
+            for asset in release['assets']:
+                if asset['name'] == 'dist.zip':
+                    v2_package = asset['browser_download_url']
+                    break
+
+            if not v2_package:
+                click.echo('Unable to find dist.zip in assets')
+                raise click.Abort()
+            download_extract(v2_package, os.path.join(ui_path, 'v2'))
+        except (OSError, ValueError) as e:
+            click.echo('Unable to download and extract WebUI v2 due to %s' % str(e))
+            raise click.Abort()
 
 
 @cli.command()
@@ -130,21 +136,9 @@ def autoformat(files):
     if not venv_path:
         raise Exception('Virtualenv and activation required')
 
-    # black and isort config are in pyproject.toml
-    subprocess.call(('black',) + files)
-    subprocess.call(
-        (
-            'isort',
-            '--virtual-env',
-            venv_path,
-            '-rc',
-            '--skip',
-            'flexget/__init__.py',
-            '--skip',
-            'flexget/manager.py',
-        )
-        + files
-    )
+    # black and ruff config are in pyproject.toml
+    subprocess.call(('ruff', '--fix', *files))
+    subprocess.call(('black', *files))
 
 
 @cli.command()

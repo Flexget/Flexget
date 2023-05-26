@@ -88,7 +88,7 @@ class PluginWordPress:
 
         except RequestException as err:
             logger.error('{}', err)
-            raise PluginError('WordPress Authentication at %s failed' % (url,))
+            raise PluginError(f'WordPress Authentication at {url} failed')
 
 
 @event('plugin.register')

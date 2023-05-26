@@ -18,6 +18,6 @@ class TestMove:
     @pytest.mark.filecopy('movie.mkv', '__tmp__/movie.mkv')
     def test_move(self, execute_task, tmpdir):
         assert (tmpdir / 'movie.mkv').exists()
-        task = execute_task('test_move')
+        execute_task('test_move')
         assert not (tmpdir / 'movie.mkv').exists()
         assert (tmpdir / 'newdir/movie.mkv').exists()

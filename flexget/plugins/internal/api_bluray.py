@@ -7,7 +7,7 @@ from dateutil.parser import parse as dateutil_parse
 from loguru import logger
 from sqlalchemy import Column, Date, DateTime, Float, Integer, Table, Unicode, func
 from sqlalchemy.ext.associationproxy import association_proxy
-from sqlalchemy.orm import Session, relation
+from sqlalchemy.orm import Session, relationship
 from sqlalchemy.schema import ForeignKey
 
 from flexget import db_schema, plugin
@@ -38,7 +38,7 @@ def bluray_request(endpoint, **params) -> Any:
     if response.content:
         try:
             return response.json(strict=False)
-        except JSONDecodeError as e:
+        except JSONDecodeError:
             raise PluginError('Could decode json from response blu-ray api')
 
 
@@ -70,7 +70,7 @@ class BlurayMovie(Base):
     rating = Column(Float)
     bluray_rating = Column(Integer)
     certification = Column(Unicode)
-    _genres = relation('BlurayGenre', secondary=genres_table, backref='movies')
+    _genres = relationship('BlurayGenre', secondary=genres_table, backref='movies')
     genres = association_proxy('_genres', 'name')
     updated = Column(DateTime, default=datetime.now, nullable=False)
 
@@ -92,16 +92,14 @@ class BlurayMovie(Base):
             response = bluray_request('quicksearch/search.php', **params)
 
             if not response or 'items' not in response:
-                raise LookupError(
-                    'No search results found for {} on blu-ray.com'.format(title_year)
-                )
+                raise LookupError(f'No search results found for {title_year} on blu-ray.com')
 
             search_results = response['items']
             countries = bluray_request('countries.json.php', **country_params) or {}
 
             search_results = sorted(search_results, key=lambda k: extract_release_date(k))
         except requests.RequestException as e:
-            raise LookupError('Error searching for {} on blu-ray.com: {}'.format(title_year, e))
+            raise LookupError(f'Error searching for {title_year} on blu-ray.com: {e}')
 
         # Simply take the first result unless year does not match
         for result in search_results:
@@ -129,7 +127,7 @@ class BlurayMovie(Base):
 
             try:
                 movie_info_response = requests.get(self.url).content
-            except (requests.RequestException, ConnectionError) as e:
+            except (requests.RequestException, ConnectionError):
                 raise LookupError("Couldn't connect to blu-ray.com. %s" % self.url)
 
             movie_info = get_soup(movie_info_response)
@@ -176,7 +174,7 @@ class BlurayMovie(Base):
             self._genres = [BlurayGenre(name=genre) for genre in genres]
             break
         else:
-            raise LookupError('No search results found for {} on blu-ray.com'.format(title_year))
+            raise LookupError(f'No search results found for {title_year} on blu-ray.com')
 
 
 class BlurayGenre(Base):
@@ -190,7 +188,7 @@ class BluraySearchResult(Base):
 
     search = Column(Unicode, primary_key=True)
     movie_id = Column(Integer, ForeignKey('bluray_movies.id'), nullable=True)
-    movie = relation(BlurayMovie)
+    movie = relationship(BlurayMovie)
 
     def __init__(
         self, search: str, movie_id: Optional[int] = None, movie: Optional[BlurayMovie] = None
@@ -214,7 +212,7 @@ class ApiBluray:
     ):
         if not title:
             raise LookupError('No criteria specified for blu-ray.com lookup')
-        title_year = title + ' ({})'.format(year) if year else title
+        title_year = title + f' ({year})' if year else title
 
         movie_filter = session.query(BlurayMovie).filter(
             func.lower(BlurayMovie.name) == title.lower()
@@ -273,7 +271,7 @@ class ApiBluray:
             session.merge(movie)
 
             if not movie:
-                raise LookupError('Unable to find movie on blu-ray: {}'.format(title_year))
+                raise LookupError(f'Unable to find movie on blu-ray: {title_year}')
 
         return movie
 

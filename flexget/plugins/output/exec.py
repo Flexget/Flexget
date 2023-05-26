@@ -177,8 +177,9 @@ class PluginExec:
                             )
                             if config.get('fail_entries'):
                                 entry.fail(
-                                    'cmd `%s` could not be encoded to %s.'
-                                    % (cmd, config['encoding'])
+                                    'cmd `{}` could not be encoded to {}.'.format(
+                                        cmd, config['encoding']
+                                    )
                                 )
                             continue
                         # Run the command, fail entries with non-zero return code if configured to

@@ -3,6 +3,7 @@ import os
 import re
 import sys
 import time
+from pathlib import Path
 
 from loguru import logger
 
@@ -165,14 +166,12 @@ class InputDeluge(DelugePlugin):
         for hash, torrent_dict in torrents.items():
             # Make sure it has a url so no plugins crash
             entry = Entry(deluge_id=hash, url='')
-            config_path = os.path.expanduser(config.get('config_path', ''))
-            if config_path:
-                torrent_path = os.path.join(config_path, 'state', hash + '.torrent')
-                if os.path.isfile(torrent_path):
-                    entry['location'] = torrent_path
-                    if not torrent_path.startswith('/'):
-                        torrent_path = '/' + torrent_path
-                    entry['url'] = 'file://' + torrent_path
+            if config.get('config_path'):
+                config_path = Path(config['config_path']).expanduser()
+                torrent_path = config_path / 'state' / f'{hash}.torrent'
+                if torrent_path.is_file():
+                    entry['location'] = str(torrent_path)
+                    entry['url'] = torrent_path.as_uri()
                 else:
                     logger.warning('Did not find torrent file at {}', torrent_path)
             # Pieces is just a really long list, cluttering up the entry and --dump output

@@ -199,7 +199,7 @@ tasks_parser.add_argument(
 class TasksAPI(APIResource):
     @etag
     @api.response(200, model=tasks_list_schema)
-    @api.doc(parser=tasks_parser)
+    @api.doc(expect=[tasks_parser])
     def get(self, session: Session = None) -> Response:
         """List all tasks"""
 
@@ -392,9 +392,11 @@ class ExecuteLog(Queue):
 if TYPE_CHECKING:
     from typing import TypedDict
 
-    StreamTaskDict = TypedDict(
-        'StreamTaskDict', {'queue': ExecuteLog, 'last_update': datetime, 'args': Dict[str, Any]}
-    )
+    class StreamTaskDict(TypedDict):
+        queue: ExecuteLog
+        last_update: datetime
+        args: Dict[str, Any]
+
     _streams: Dict[str, StreamTaskDict]
 _streams = {}
 
@@ -515,7 +517,7 @@ class TaskExecutionAPI(APIResource):
                 except Empty:
                     pass
 
-                if queue.empty() and all([task['event'].is_set() for task in tasks_queued]):
+                if queue.empty() and all(task['event'].is_set() for task in tasks_queued):
                     for task in tasks_queued:
                         del _streams[task['id']]
                     break

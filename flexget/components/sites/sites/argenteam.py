@@ -38,7 +38,6 @@ class SearchArgenteam:
         entries = set()
 
         for search_string in entry.get('search_strings', [entry['title']]):
-
             try:
                 params = {'q': normalize_scene(search_string)}
                 resp = task.requests.get(self.base_url + 'search', params=params)

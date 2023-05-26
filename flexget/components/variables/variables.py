@@ -96,7 +96,7 @@ def _process(element, environment):
             if new_key:
                 element[new_key] = element.pop(k)
                 k = new_key
-            val = _process(element[k], environment)
+            val = _process(v, environment)
             if val:
                 element[k] = val
     elif isinstance(element, list):

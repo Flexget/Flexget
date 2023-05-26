@@ -2,12 +2,12 @@ from __future__ import annotations
 
 import logging
 import os
+import posixpath
 import socket
 import threading
 import time
 from logging import Logger
 from pathlib import Path
-from typing import Union
 
 from paramiko import (
     RSAKey,
@@ -89,7 +89,8 @@ class TestSFTPServerController:
             )
             transport.start_server(server=server)
 
-            channel = transport.accept()
+            # TODO: Things break if we don't assign this to something?
+            channel = transport.accept()  # noqa: F841
 
             while transport.is_active():
                 time.sleep(1)
@@ -101,7 +102,7 @@ class TestSFTPServerController:
     def kill(self) -> None:
         try:
             self.__server_socket.shutdown(socket.SHUT_RDWR)
-        except socket.error:
+        except OSError:
             pass
         self.__server_socket.close()
         logger.setLevel(logging.INFO)
@@ -167,23 +168,24 @@ class TestSFTPFileSystem:
         canonicalized.symlink_to(target, target.is_dir())
         return canonicalized
 
-    def canonicalize(self, path: str) -> Path:
+    def canonicalize(self, path: str, resolve: bool = True) -> Path:
         """
         Canonicalizes the given SFTP path to the local file system either from the the cwd, or the user home if none is set.
 
         :param path: The path to canonicalize.
+        :param resolve: If symlinks shoul be resovled.
         :raises ValueError: If the path or taget is relative and would take return a directory outside the SFTP filesytem.
         :return: An :class:`pathlib.Path` of the canonicalized path.
         """
         canonicalized: Path
         if Path(path).is_absolute():
             path = path[1:]
-            canonicalized = (self.__root / path).resolve()
+            canonicalized = Path(posixpath.normpath((self.__root / path).as_posix()))
         else:
-            canonicalized = ((self.__cwd or self.__home) / path).resolve()
+            canonicalized = Path(posixpath.normpath((self.__cwd or self.__home) / path))
 
         if self.__root == canonicalized or self.__root in canonicalized.parents:
-            return canonicalized
+            return canonicalized.resolve() if resolve else canonicalized
         raise ValueError(f'Unable to canoicalize {path}')
 
     def root(self) -> Path:
@@ -272,7 +274,7 @@ class TestSFTPServer(SFTPServerInterface):
     def session_ended(self):
         logger.debug('session_ended')
 
-    def open(self, path: str, flags: int, attr: SFTPAttributes) -> Union[SFTPHandle, int]:
+    def open(self, path: str, flags: int, attr: SFTPAttributes) -> SFTPHandle | int:
         logger.debug('open(%s, %s, %s)', path, flags, attr)
 
         canonicalized_path: Path = self.__fs.canonicalize(path)
@@ -312,7 +314,7 @@ class TestSFTPServer(SFTPServerInterface):
 
         canonicalized_path: Path = self.__fs.canonicalize(path)
         try:
-            out = list()
+            out = []
             for filename in os.listdir(canonicalized_path):
                 attr = SFTPAttributes.from_stat(
                     os.stat(os.path.join(canonicalized_path, filename))
@@ -323,7 +325,7 @@ class TestSFTPServer(SFTPServerInterface):
         except OSError as e:
             return TestSFTPServer.log_and_return_error_code(e)
 
-    def stat(self, path: str) -> Union[SFTPAttributes, int]:
+    def stat(self, path: str) -> SFTPAttributes | int:
         logger.debug('stat(%s)', path)
 
         try:
@@ -331,17 +333,17 @@ class TestSFTPServer(SFTPServerInterface):
         except OSError as e:
             return TestSFTPServer.log_and_return_error_code(e)
 
-    def lstat(self, path: str) -> Union[SFTPAttributes, int]:
+    def lstat(self, path: str) -> SFTPAttributes | int:
         logger.debug('lstat(%s)', path)
         try:
-            return SFTPAttributes.from_stat(os.lstat(self.__fs.canonicalize(path)))
+            return SFTPAttributes.from_stat(os.lstat(self.__fs.canonicalize(path, resolve=False)))
         except OSError as e:
             return TestSFTPServer.log_and_return_error_code(e)
 
     def remove(self, path: str) -> int:
         logger.debug('remove(%s)', path)
         try:
-            self.__fs.canonicalize(path).unlink()
+            self.__fs.canonicalize(path, resolve=False).unlink()
         except OSError as e:
             return TestSFTPServer.log_and_return_error_code(e)
         return SFTP_OK
@@ -432,7 +434,7 @@ class TestSFTPServer(SFTPServerInterface):
         """
         return SFTP_OP_UNSUPPORTED
 
-    def readlink(self, path: str) -> Union[str, int]:
+    def readlink(self, path: str) -> str | int:
         logger.debug('readlink(%s)', path)
         """
         Return the target of a symbolic link (or shortcut) on the server.

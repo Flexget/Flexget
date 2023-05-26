@@ -24,7 +24,7 @@ def upgrade(ver, session):
         ver = 0
     if ver == 0:
         table = table_schema('wait_list_entries', session)
-        for row in session.execute(select([table.c.id, table.c.json])):
+        for row in session.execute(select(table.c.id, table.c.json)):
             if not row['json']:
                 # Seems there could be invalid data somehow. See #2590
                 continue
@@ -71,7 +71,7 @@ class PendingListEntry(Base):
         self.approved = False
 
     def __repr__(self):
-        return '<PendingListEntry,title=%s,original_url=%s,approved=%s>' % (
+        return '<PendingListEntry,title={},original_url={},approved={}>'.format(
             self.title,
             self.original_url,
             self.approved,

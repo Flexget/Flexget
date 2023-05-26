@@ -24,7 +24,7 @@ class History(Base):
         self.time = datetime.now()
 
     def __str__(self):
-        return '<History(filename=%s,task=%s)>' % (self.filename, self.task)
+        return f'<History(filename={self.filename},task={self.task})>'
 
     def to_dict(self):
         return {

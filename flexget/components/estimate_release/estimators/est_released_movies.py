@@ -11,7 +11,6 @@ logger = logger.bind(name='est_movies')
 class EstimatesReleasedMovies:
     @plugin.priority(0)
     def estimate(self, entry):
-
         entity_data = {'data_exists': True, 'entity_date': None}
         if 'tmdb_released' in entry:
             logger.verbose('Querying release estimation for {}', entry['title'])

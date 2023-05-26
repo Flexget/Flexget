@@ -4,7 +4,7 @@ from datetime import timedelta
 from loguru import logger
 from sqlalchemy import Boolean, Column, DateTime, Index, Integer, String, func, select
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import relation
+from sqlalchemy.orm import relationship
 from sqlalchemy.schema import ForeignKey
 
 from flexget import db_schema
@@ -29,12 +29,12 @@ class StatusTask(Base):
     __tablename__ = 'status_task'
     id = Column(Integer, primary_key=True)
     name = Column('task', String)
-    executions = relation(
+    executions = relationship(
         'TaskExecution', backref='task', cascade='all, delete, delete-orphan', lazy='dynamic'
     )
 
     def __repr__(self):
-        return '<StatusTask(id=%s,name=%s)>' % (self.id, self.name)
+        return f'<StatusTask(id={self.id},name={self.name})>'
 
     @hybrid_property
     def last_execution_time(self):
@@ -45,7 +45,7 @@ class StatusTask(Base):
     @last_execution_time.expression
     def last_execution_time(cls):
         return (
-            select([func.max(TaskExecution.start)])
+            select(func.max(TaskExecution.start))
             .where(TaskExecution.task_id == cls.id)
             .correlate(StatusTask.__table__)
             .label('last_execution_time')
@@ -76,19 +76,16 @@ class TaskExecution(Base):
     abort_reason = Column(String, nullable=True)
 
     def __repr__(self):
-        return (
-            '<TaskExecution(task_id=%s,start=%s,end=%s,succeeded=%s,p=%s,a=%s,r=%s,f=%s,reason=%s)>'
-            % (
-                self.task_id,
-                self.start,
-                self.end,
-                self.succeeded,
-                self.produced,
-                self.accepted,
-                self.rejected,
-                self.failed,
-                self.abort_reason,
-            )
+        return '<TaskExecution(task_id={},start={},end={},succeeded={},p={},a={},r={},f={},reason={})>'.format(
+            self.task_id,
+            self.start,
+            self.end,
+            self.succeeded,
+            self.produced,
+            self.accepted,
+            self.rejected,
+            self.failed,
+            self.abort_reason,
         )
 
     def to_dict(self):

@@ -93,6 +93,7 @@ class TestStatusAPI:
             ex1.accepted = 1
             ex1.failed = 1
             ex1.end = datetime.now()
+            session.add(ex1)
 
         rsp = api_client.get('/status/1/executions/')
         assert rsp.status_code == 200
@@ -166,11 +167,12 @@ class TestTaskStatusPagination:
                 st.name = base_name + str(i)
                 session.add(st)
 
-                for ix in range(2):
+                for _ix in range(2):
                     ex1 = TaskExecution()
                     ex1.task = st
                     ex1.start = base_start_time + timedelta(hours=hours)
                     hours -= 1
+                    session.add(ex1)
 
         # Default sorting - Last execution time desc
         rsp = api_client.get('/status/')
@@ -215,6 +217,7 @@ class TestTaskStatusPagination:
                 ex.accepted = i
                 ex.start = base_start_time + timedelta(hours=i)
                 ex.end = datetime.now()
+                session.add(ex)
 
         rsp = api_client.get('/status/1/executions/')
         assert rsp.status_code == 200
@@ -256,36 +259,36 @@ class TestTaskStatusPagination:
         assert links['prev']['page'] == 1
 
     def test_executions_sorting(self, api_client):
-        ex1 = dict(
-            start=datetime.now() - timedelta(days=7),
-            end=datetime.now() - timedelta(days=6),
-            produced=10,
-            accepted=5,
-            rejected=2,
-            failed=0,
-        )
+        ex1 = {
+            "start": datetime.now() - timedelta(days=7),
+            "end": datetime.now() - timedelta(days=6),
+            "produced": 10,
+            "accepted": 5,
+            "rejected": 2,
+            "failed": 0,
+        }
 
-        ex2 = dict(
-            start=datetime.now() - timedelta(days=2),
-            end=datetime.now() - timedelta(days=1),
-            produced=1,
-            accepted=50,
-            rejected=7,
-            failed=8,
-            succeeded=True,
-            abort_reason='test reason 1',
-        )
+        ex2 = {
+            "start": datetime.now() - timedelta(days=2),
+            "end": datetime.now() - timedelta(days=1),
+            "produced": 1,
+            "accepted": 50,
+            "rejected": 7,
+            "failed": 8,
+            "succeeded": True,
+            "abort_reason": 'test reason 1',
+        }
 
-        ex3 = dict(
-            start=datetime.now() - timedelta(days=365),
-            end=datetime.now() - timedelta(days=300),
-            produced=2,
-            accepted=1,
-            rejected=3,
-            failed=5,
-            succeeded=False,
-            abort_reason='test reason 2',
-        )
+        ex3 = {
+            "start": datetime.now() - timedelta(days=365),
+            "end": datetime.now() - timedelta(days=300),
+            "produced": 2,
+            "accepted": 1,
+            "rejected": 3,
+            "failed": 5,
+            "succeeded": False,
+            "abort_reason": 'test reason 2',
+        }
 
         with Session() as session:
             st1 = StatusTask()
@@ -298,6 +301,7 @@ class TestTaskStatusPagination:
 
                 for k, v in e.items():
                     setattr(db_e, k, v)
+                session.add(db_e)
 
         # Default sort - by start
         rsp = api_client.get('/status/1/executions/')

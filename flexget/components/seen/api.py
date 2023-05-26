@@ -67,7 +67,7 @@ class SeenSearchAPI(APIResource):
     @etag
     @api.response(NotFoundError)
     @api.response(200, 'Successfully retrieved seen objects', seen_search_schema)
-    @api.doc(parser=seen_search_parser, description='Get seen entries')
+    @api.doc(expect=[seen_search_parser], description='Get seen entries')
     def get(self, session):
         """Search for seen entries"""
         args = seen_search_parser.parse_args()
@@ -91,7 +91,7 @@ class SeenSearchAPI(APIResource):
         # Unquotes and prepares value for DB lookup
         if value:
             value = unquote(value)
-            value = '%{0}%'.format(value)
+            value = f'%{value}%'
 
         start = per_page * (page - 1)
         stop = start + per_page
@@ -136,7 +136,7 @@ class SeenSearchAPI(APIResource):
         return rsp
 
     @api.response(200, 'Successfully delete all entries', model=base_message_schema)
-    @api.doc(parser=seen_base_parser, description='Delete seen entries')
+    @api.doc(expect=[seen_base_parser], description='Delete seen entries')
     def delete(self, session):
         """Delete seen entries"""
         args = seen_base_parser.parse_args()
@@ -166,7 +166,7 @@ class SeenSearchIDAPI(APIResource):
         try:
             seen_entry = db.get_entry_by_id(seen_entry_id, session=session)
         except NoResultFound:
-            raise NotFoundError('Could not find entry ID {0}'.format(seen_entry_id))
+            raise NotFoundError(f'Could not find entry ID {seen_entry_id}')
         return jsonify(seen_entry.to_dict())
 
     @api.response(200, 'Successfully deleted entry', model=base_message_schema)
@@ -175,6 +175,6 @@ class SeenSearchIDAPI(APIResource):
         try:
             entry = db.get_entry_by_id(seen_entry_id, session=session)
         except NoResultFound:
-            raise NotFoundError('Could not delete entry ID {0}'.format(seen_entry_id))
+            raise NotFoundError(f'Could not delete entry ID {seen_entry_id}')
         db.forget_by_id(entry.id, session=session)
-        return success_response('successfully deleted seen entry {}'.format(seen_entry_id))
+        return success_response(f'successfully deleted seen entry {seen_entry_id}')

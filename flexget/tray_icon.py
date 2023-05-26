@@ -63,7 +63,7 @@ class TrayIcon:
         Add a menu item byt passing its text and function, or pass a created MenuItem. Force position by sending index
         """
         if not any(v for v in (menu_item, text)):
-            raise ValueError(f"Either 'text' or 'menu_item' are required")
+            raise ValueError("Either 'text' or 'menu_item' are required")
 
         menu_item = menu_item or MenuItem(text=text, action=action, **kwargs)
         if index is not None:

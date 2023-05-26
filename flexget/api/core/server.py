@@ -38,15 +38,16 @@ from yaml.error import MarkedYAMLError, YAMLError
 
 from flexget._version import __version__
 from flexget.api import APIResource, api
-from flexget.api.app import APIError, BadRequest
-from flexget.api.app import __version__ as __api_version__
 from flexget.api.app import (
+    APIError,
+    BadRequest,
     base_message,
     base_message_schema,
     empty_response,
     etag,
     success_response,
 )
+from flexget.api.app import __version__ as __api_version__
 from flexget.config_schema import ConfigError
 from flexget.utils.tools import get_latest_flexget_version_number
 
@@ -193,7 +194,7 @@ class ServerRawConfigAPI(APIResource):
     )
     def get(self, session: Session = None) -> Response:
         """Get raw YAML config file"""
-        with open(self.manager.config_path, 'r', encoding='utf-8') as f:
+        with open(self.manager.config_path, encoding='utf-8') as f:
             raw_config = base64.b64encode(f.read().encode("utf-8"))
         return jsonify(raw_config=raw_config.decode('utf-8'))
 
@@ -280,7 +281,7 @@ class ServerDumpThreads(APIResource):
     @api.response(200, description='Flexget threads dump', model=dump_threads_schema)
     def get(self, session: Session = None) -> Response:
         """Dump Server threads for debugging"""
-        id2name = dict([(th.ident, th.name) for th in threading.enumerate()])
+        id2name = {th.ident: th.name for th in threading.enumerate()}
         threads = []
         for threadId, stack in sys._current_frames().items():
             dump = []
@@ -350,7 +351,7 @@ def file_inode(filename: str) -> int:
 
 @server_api.route('/log/')
 class ServerLogAPI(APIResource):
-    @api.doc(parser=server_log_parser)
+    @api.doc(expect=[server_log_parser])
     @api.response(200, description='Streams as line delimited JSON')
     def get(self, session: Session = None) -> Response:
         """Stream Flexget log Streams as line delimited JSON"""
@@ -373,9 +374,7 @@ class ServerLogAPI(APIResource):
 
             # Read back in the logs until we find enough lines
             for i in range(0, 9):
-                log_file = ('%s.%s' % (base_log_file, i)).rstrip(
-                    '.0'
-                )  # 1st log file has no number
+                log_file = (f'{base_log_file}.{i}').rstrip('.0')  # 1st log file has no number
 
                 if not os.path.isfile(log_file):
                     break
@@ -396,8 +395,8 @@ class ServerLogAPI(APIResource):
                         if log_parser.matches(line):
                             lines_found.append(log_parser.json_string(line))
 
-                    for l in reversed(lines_found):
-                        yield l + ',\n'
+                    for line in reversed(lines_found):
+                        yield line + ',\n'
 
             # We need to track the inode in case the log file is rotated
             current_inode = file_inode(base_log_file)
@@ -475,7 +474,7 @@ class LogParser:
             )
 
             operator_parenthesis = (
-                Group((Suppress('(') + operator_or + Suppress(")"))).setResultsName('parenthesis')
+                Group(Suppress('(') + operator_or + Suppress(")")).setResultsName('parenthesis')
                 | operator_quotes
             )
 

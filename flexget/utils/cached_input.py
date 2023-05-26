@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Callable, Iterable, List, Optional
 from loguru import logger
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Unicode, select
 from sqlalchemy.orm import Session as DBSession
-from sqlalchemy.orm import relation
+from sqlalchemy.orm import relationship
 
 from flexget import db_schema
 from flexget.entry import Entry
@@ -38,7 +38,7 @@ def upgrade(ver: int, session: DBSession) -> int:
         table_add_column(table, 'json', Unicode, session)
         # Make sure we get the new schema with the added column
         table = table_schema('input_cache_entry', session)
-        for row in session.execute(select([table.c.id, table.c.entry])):
+        for row in session.execute(select(table.c.id, table.c.entry)):
             try:
                 p = pickle.loads(row['entry'])
                 session.execute(
@@ -51,7 +51,7 @@ def upgrade(ver: int, session: DBSession) -> int:
         ver = 1
     if ver == 1:
         table = table_schema('input_cache_entry', session)
-        for row in session.execute(select([table.c.id, table.c.json])):
+        for row in session.execute(select(table.c.id, table.c.json)):
             if not row['json']:
                 # Seems there could be invalid data somehow. See #2590
                 continue
@@ -77,7 +77,9 @@ class InputCache(Base):
     hash = Column(String)
     added = Column(DateTime, default=datetime.now)
 
-    entries = relation('InputCacheEntry', backref='cache', cascade='all, delete, delete-orphan')
+    entries = relationship(
+        'InputCacheEntry', backref='cache', cascade='all, delete, delete-orphan'
+    )
 
 
 class InputCacheEntry(Base):

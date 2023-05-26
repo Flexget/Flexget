@@ -4,7 +4,7 @@ Miscellaneous SQLAlchemy helpers.
 from typing import Any, List, Optional, Union
 
 from loguru import logger
-from sqlalchemy import ColumnDefault, Index, Sequence
+from sqlalchemy import ColumnDefault, Index, Sequence, text
 from sqlalchemy.exc import NoSuchTableError, OperationalError
 from sqlalchemy.orm import Session
 from sqlalchemy.schema import MetaData, Table
@@ -34,7 +34,7 @@ def table_schema(name: str, session: Session) -> Table:
     :returns: Table schema using SQLAlchemy reflect as it currently exists in the db
     :rtype: Table
     """
-    return Table(name, MetaData(bind=session.bind), autoload=True)
+    return Table(name, MetaData(), autoload_with=session.bind)
 
 
 def table_columns(table: Union[str, Table], session: Session) -> List[str]:
@@ -80,8 +80,8 @@ def table_add_column(
         # If we got a type class instead of an instance of one, instantiate it
         col_type = col_type()
     type_string = session.bind.engine.dialect.type_compiler.process(col_type)
-    statement = 'ALTER TABLE %s ADD %s %s' % (table.name, name, type_string)
-    session.execute(statement)
+    statement = f'ALTER TABLE {table.name} ADD {name} {type_string}'
+    session.execute(text(statement))
     session.commit()
     # Update the table with the default value if given
     if default is not None:
@@ -125,7 +125,7 @@ def create_index(table_name: str, session: Session, *column_names: str) -> None:
     :param session: Session object which should be used
     :param column_names: The names of the columns that should belong to this index.
     """
-    index_name = '_'.join(['ix', table_name] + list(column_names))
+    index_name = '_'.join(['ix', table_name, *list(column_names)])
     table = table_schema(table_name, session)
     columns = [getattr(table.c, column) for column in column_names]
     try:
@@ -135,10 +135,13 @@ def create_index(table_name: str, session: Session, *column_names: str) -> None:
 
 
 class ContextSession(Session):
-    """:class:`sqlalchemy.orm.Session` which can be used as context manager"""
+    """:class:`sqlalchemy.orm.Session` which automatically commits when used as context manager without errors"""
+
+    # TODO: This auto-committing might be a bad idea and need to be removed
+    # might be hard to figure out where exactly code needs to be updated to compensate though.
 
     def __enter__(self) -> 'ContextSession':
-        return self
+        return super().__enter__()
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         try:
@@ -147,4 +150,4 @@ class ContextSession(Session):
             else:
                 self.rollback()
         finally:
-            self.close()
+            super().__exit__(exc_type, exc_val, exc_tb)
