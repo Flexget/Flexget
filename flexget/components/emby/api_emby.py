@@ -2708,7 +2708,7 @@ class EmbyApi(EmbyApiBase):
             return date
         elif not isinstance(date, str):
             return None
-        
+
         # Remove the 'Z' character if present
         date = date.replace('Z', '')
 
@@ -2753,25 +2753,25 @@ class EmbyApi(EmbyApiBase):
         providers = data['AnyProviderIdEquals'].split(';')
         if not isinstance(providers, list) or len(providers) < 2:
             return False
-        
+
         del data['AnyProviderIdEquals']
 
         returns = {}
 
         for provider in providers:
             data['AnyProviderIdEquals'] = provider
-            items = EmbyApi.resquest_emby(*args,**data)
+            items = EmbyApi.resquest_emby(*args, **data)
             if not items or 'Items' not in items or not items['Items']:
-                continue;
+                continue
             for item in items['Items']:
                 if 'Id' not in item:
                     continue
-                
+
                 id = item['Id']
                 if id not in returns:
-                    returns[id] = {'count':0,'item':item}
+                    returns[id] = {'count': 0, 'item': item}
 
-                returns[id]['count']+=1
+                returns[id]['count'] += 1
 
         if len(returns) == 0:
             return False
@@ -2784,12 +2784,7 @@ class EmbyApi(EmbyApiBase):
         if len(max_count_items) > 1:
             return False
 
-        return {
-            'Items':max_count_items,
-            'TotalRecordCount':len(max_count_items)
-        }
-
-
+        return {'Items': max_count_items, 'TotalRecordCount': len(max_count_items)}
 
     @staticmethod
     def resquest_emby(endpoint: str, auth: 'EmbyAuth', method: str, emby_connect=False, **kwargs):
@@ -2853,26 +2848,33 @@ class EmbyApi(EmbyApiBase):
 
         if response.status_code == 200 or response.status_code == 204:
             try:
-                return_data = response.json()             
+                return_data = response.json()
 
                 # If we need to pull a Provider, and we don't get returns, and we have more that one provider, try with split requests
-                if 'AnyProviderIdEquals' in kwargs and 'Items' in return_data and isinstance(return_data['Items'],list) and len(return_data['Items']) == 0:
-                    return_providers = EmbyApi.request_split_provider(endpoint,auth,method,emby_connect,**kwargs)
+                if (
+                    'AnyProviderIdEquals' in kwargs
+                    and 'Items' in return_data
+                    and isinstance(return_data['Items'], list)
+                    and len(return_data['Items']) == 0
+                ):
+                    return_providers = EmbyApi.request_split_provider(
+                        endpoint, auth, method, emby_connect, **kwargs
+                    )
                     if return_providers:
                         return_data = return_providers
             except ValueError:
                 return {'code': response.status_code}
 
-            #Fill Year if not available
-            if "Items" in  return_data:
+            # Fill Year if not available
+            if "Items" in return_data:
                 items = return_data["Items"]
                 for item in items:
                     if "Year" not in item and "PremiereDate" in item:
                         premiere_date = EmbyApi.strtotime(item["PremiereDate"])
-                        if not isinstance(premiere_date,datetime):
+                        if not isinstance(premiere_date, datetime):
                             continue
                         year = premiere_date.year
-                        item["Year"] = year  
+                        item["Year"] = year
 
             return return_data
 
