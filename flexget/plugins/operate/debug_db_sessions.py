@@ -26,7 +26,7 @@ def find_caller(stack):
             continue
         if module.__name__.startswith('sqlalchemy'):
             continue
-        return (module.__name__, *tuple(frame[2:4])) + (frame[4][0].strip(),)
+        return (module.__name__, *tuple(frame[2:4]), frame[4][0].strip())
     logger.warning('Transaction from unknown origin')
     return None, None, None, None
 
