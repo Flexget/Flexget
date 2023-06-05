@@ -28,7 +28,6 @@ class TestNextSeriesEpisodes:
               backfill: yes
             series:
             - Test Series 1:
-                tracking: backfill
                 identified_by: ep
             max_reruns: 0
           test_next_series_episodes_no_backfill:
@@ -41,7 +40,6 @@ class TestNextSeriesEpisodes:
               backfill: yes
             series:
             - Test Series 2:
-                tracking: backfill
                 identified_by: ep
             max_reruns: 0
           test_next_series_episodes_from_start:
@@ -64,7 +62,6 @@ class TestNextSeriesEpisodes:
             series:
             - Test Series 5:
                 begin: S03E02
-                tracking: backfill
             max_reruns: 0
           test_next_series_episodes_begin_backfill_and_rerun:
             accept_all: yes  # make sure mock output stores all created entries
@@ -73,7 +70,6 @@ class TestNextSeriesEpisodes:
             series:
             - Test Series 6:
                 begin: S03E02
-                tracking: backfill
             mock_output: yes
             max_reruns: 1
           test_next_series_episodes_backfill_advancement:
@@ -82,7 +78,6 @@ class TestNextSeriesEpisodes:
             series:
             - Test Series 7:
                 identified_by: ep
-                tracking: backfill
             regexp:
               reject:
               - .
@@ -257,16 +252,8 @@ class TestNextSeriesEpisodesSeasonPack:
               next_series_episodes:
                 backfill: yes
                 from_start: yes
-            _series_ep_tracking: &series_ep_tracking
-              identified_by: ep
-              tracking: backfill
-            _series_ep_tracking_begin_s02e01: &series_ep_tracking_begin_s02e01
-              identified_by: ep
-              tracking: backfill
-              begin: s02e01
             _series_ep_tracking_begin_s04e01: &series_ep_tracking_begin_s04e01
               identified_by: ep
-              tracking: backfill
               begin: s04e01
         tasks:
           inject_series:
@@ -312,13 +299,7 @@ class TestNextSeriesEpisodesSeasonPack:
             <<: *nse_backfill
             series:
             - Test Series 2:
-                <<: *series_ep_tracking
-            max_reruns: 0
-          test_next_series_episodes_season_pack_backfill_and_begin:
-            <<: *nse_backfill
-            series:
-            - Test Series 3:
-                <<: *series_ep_tracking_begin_s02e01
+                identified_by: ep
             max_reruns: 0
           test_next_series_episodes_season_pack_from_start:
             <<: *nse_from_start
@@ -330,13 +311,7 @@ class TestNextSeriesEpisodesSeasonPack:
             <<: *nse_backfill_from_start
             series:
             - Test Series 5:
-                <<: *series_ep_tracking
-            max_reruns: 0
-          test_next_series_episodes_season_pack_from_start_backfill_and_begin:
-            <<: *nse_backfill_from_start
-            series:
-            - Test Series 6:
-                <<: *series_ep_tracking_begin_s02e01
+                identified_by: ep
             max_reruns: 0
           test_next_series_episodes_season_pack_and_ep:
             next_series_episodes: yes
@@ -348,13 +323,14 @@ class TestNextSeriesEpisodesSeasonPack:
             <<: *nse_backfill
             series:
             - Test Series 8:
-                <<: *series_ep_tracking
+                identified_by: ep
             max_reruns: 0
           test_next_series_episodes_season_pack_and_ep_backfill_and_begin:
             <<: *nse_backfill
             series:
             - Test Series 9:
-                <<: *series_ep_tracking_begin_s02e01
+                identified_by: ep
+                begin: s02e01
             max_reruns: 0
           test_next_series_episodes_season_pack_and_ep_from_start:
             <<: *nse_from_start
@@ -366,13 +342,14 @@ class TestNextSeriesEpisodesSeasonPack:
             <<: *nse_backfill_from_start
             series:
             - Test Series 11:
-                <<: *series_ep_tracking
+                identified_by: ep
             max_reruns: 0
           test_next_series_episodes_season_pack_and_ep_from_start_backfill_and_begin:
             <<: *nse_backfill_from_start
             series:
             - Test Series 12:
-                <<: *series_ep_tracking_begin_s02e01
+                  identified_by: ep
+                  begin: s02e01
             max_reruns: 0
           test_next_series_episodes_season_pack_gap:
             next_series_episodes: yes
@@ -384,13 +361,14 @@ class TestNextSeriesEpisodesSeasonPack:
             <<: *nse_backfill
             series:
             - Test Series 14:
-                <<: *series_ep_tracking
+                identified_by: ep
             max_reruns: 0
           test_next_series_episodes_season_pack_gap_backfill_and_begin:
             <<: *nse_backfill
             series:
             - Test Series 15:
-                <<: *series_ep_tracking_begin_s04e01
+                identified_by: ep
+                begin: s04e01
             max_reruns: 0
           test_next_series_episodes_season_pack_gap_from_start:
             <<: *nse_from_start
@@ -402,13 +380,14 @@ class TestNextSeriesEpisodesSeasonPack:
             <<: *nse_backfill_from_start
             series:
             - Test Series 17:
-                <<: *series_ep_tracking
+                identified_by: ep
             max_reruns: 0
           test_next_series_episodes_season_pack_gap_from_start_backfill_and_begin:
             <<: *nse_backfill_from_start
             series:
             - Test Series 18:
-                <<: *series_ep_tracking_begin_s04e01
+                identified_by: ep
+                begin: s04e01
             max_reruns: 0
           test_next_series_episodes_season_pack_and_ep_gap:
             next_series_episodes: yes
@@ -420,13 +399,14 @@ class TestNextSeriesEpisodesSeasonPack:
             <<: *nse_backfill
             series:
             - Test Series 20:
-                <<: *series_ep_tracking
+                identified_by: ep
             max_reruns: 0
           test_next_series_episodes_season_pack_and_ep_gap_backfill_and_begin:
             <<: *nse_backfill
             series:
             - Test Series 21:
-                <<: *series_ep_tracking_begin_s04e01
+                identified_by: ep
+                begin: s04e01
             max_reruns: 0
           test_next_series_episodes_season_pack_and_ep_gap_from_start:
             <<: *nse_from_start
@@ -438,13 +418,14 @@ class TestNextSeriesEpisodesSeasonPack:
             <<: *nse_backfill_from_start
             series:
             - Test Series 23:
-                <<: *series_ep_tracking
+                identified_by: ep
             max_reruns: 0
           test_next_series_episodes_season_pack_and_ep_gap_from_start_backfill_and_begin:
             <<: *nse_backfill_from_start
             series:
             - Test Series 24:
-                <<: *series_ep_tracking_begin_s04e01
+                identified_by: ep
+                begin: s04e01
             max_reruns: 0
 
           test_next_series_episodes_season_pack_begin_completed:
@@ -489,11 +470,6 @@ class TestNextSeriesEpisodesSeasonPack:
                 ['Test Series 2 S01E01', 'Test Series 2 S03E01'],
             ),
             (
-                'test_next_series_episodes_season_pack_backfill_and_begin',
-                ['Test Series 3 S02'],
-                ['Test Series 3 S03E01'],
-            ),
-            (
                 'test_next_series_episodes_season_pack_from_start',
                 ['Test Series 4 S02'],
                 ['Test Series 4 S03E01'],
@@ -502,11 +478,6 @@ class TestNextSeriesEpisodesSeasonPack:
                 'test_next_series_episodes_season_pack_from_start_backfill',
                 ['Test Series 5 S02'],
                 ['Test Series 5 S03E01', 'Test Series 5 S01E01'],
-            ),
-            (
-                'test_next_series_episodes_season_pack_from_start_backfill_and_begin',
-                ['Test Series 6 S02'],
-                ['Test Series 6 S03E01'],
             ),
             (
                 'test_next_series_episodes_season_pack_and_ep',
