@@ -121,6 +121,7 @@ qbittorrent-api = "^2023.3.44"
 deluge-client = "^1.9.0"
 cloudscraper = "^1.2.69"
 python-telegram-bot = "^12.8"
+mutagen = "^1.46.0"
 
 [tool.poetry.scripts]
 flexget = 'flexget:main'
