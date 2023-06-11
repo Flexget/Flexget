@@ -493,6 +493,7 @@ class PluginTransmission(TransmissionBase):
                 skip_files = options['post'].get('skip_files')
                 # We need to index the files if any of the following are defined
                 if find_main_file or skip_files:
+                    torrent_info = client.get_torrent(torrent_info.id)
                     file_list = torrent_info.get_files()
 
                     if options['post'].get('magnetization_timeout', 0) > 0 and not file_list:
@@ -503,6 +504,7 @@ class PluginTransmission(TransmissionBase):
                         )
                         for _ in range(options['post']['magnetization_timeout']):
                             sleep(1)
+                            torrent_info = client.get_torrent(torrent_info.id)
                             file_list = torrent_info.get_files()
                             if file_list:
                                 total_size = client.get_torrent(
