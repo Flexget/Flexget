@@ -36,10 +36,8 @@ class Newznab:
                 'type': 'string',
                 'enum': ['movie', 'tvsearch', 'tv', 'music', 'book', 'all'],
             },
-            'oneOf': [
-                {'url': {'type': 'string', 'format': 'url'}},
-                {'website': {'type': 'string', 'format': 'url'}},
-            ],
+            'url': {'type': 'string', 'format': 'url'},
+            'website': {'type': 'string', 'format': 'url'},
             'apikey': {'type': 'string'},
         },
         'required': ['category'],
