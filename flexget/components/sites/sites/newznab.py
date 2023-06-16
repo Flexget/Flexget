@@ -15,7 +15,8 @@ class Newznab:
     """
     Newznab search plugin
     Provide a url or your website + apikey and a category.
-    When a URL is provided it will override website, apikey, and category.
+    When a URL is provided it will override website and apikey; category will not be used in the URL
+    but is still needed to properly fill out search parameters.
 
     Config example:
 
@@ -35,8 +36,10 @@ class Newznab:
                 'type': 'string',
                 'enum': ['movie', 'tvsearch', 'tv', 'music', 'book', 'all'],
             },
-            'url': {'type': 'string', 'format': 'url'},
-            'website': {'type': 'string', 'format': 'url'},
+            'oneOf': [
+                {'url': {'type': 'string', 'format': 'url'}},
+                {'website': {'type': 'string', 'format': 'url'}}
+            ],
             'apikey': {'type': 'string'},
         },
         'required': ['category'],
@@ -52,7 +55,7 @@ class Newznab:
         if 'url' in config:
             return config['url'], params
 
-        category = config.get('category')
+        category = config.get('category', 'all')
         if category == 'tv':
             category = 'tvsearch'
         if category == 'all':
@@ -64,7 +67,7 @@ class Newznab:
 
         url = f"{config.get('website')}/api"
 
-        return url, params
+        return url, params, category
 
     def fill_entries_for_url(self, url, params, task):
         entries = []
@@ -95,12 +98,12 @@ class Newznab:
         return entries
 
     def search(self, task, entry, config=None):
-        url, params = self.get_url_and_params(config)
-        if config['category'] == 'movie':
+        url, params, category = self.get_url_and_params(config)
+        if category == 'movie':
             return self.do_search_movie(entry, task, url, params)
-        elif config['category'] in ('tv', 'tvsearch'):
+        elif category in ('tv', 'tvsearch'):
             return self.do_search_tvsearch(entry, task, url, params)
-        elif config['category'] == 'all':
+        elif category == 'all':
             return self.do_search_all(entry, task, url, params)
         else:
             entries = []
