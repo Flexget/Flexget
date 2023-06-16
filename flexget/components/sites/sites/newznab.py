@@ -38,7 +38,7 @@ class Newznab:
             },
             'oneOf': [
                 {'url': {'type': 'string', 'format': 'url'}},
-                {'website': {'type': 'string', 'format': 'url'}}
+                {'website': {'type': 'string', 'format': 'url'}},
             ],
             'apikey': {'type': 'string'},
         },
