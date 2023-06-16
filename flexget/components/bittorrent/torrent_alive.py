@@ -69,8 +69,8 @@ def get_scrape_url(tracker_url, info_hash):
 
 
 def get_udp_seeds(url, info_hash):
-    parsed_url = urlparse(url)
     try:
+        parsed_url = urlparse(url)
         port = parsed_url.port
     except ValueError:
         logger.error('UDP Port Error, url was {}', url)
