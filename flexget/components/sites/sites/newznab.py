@@ -54,7 +54,7 @@ class Newznab:
         if 'url' in config:
             return config['url'], params
 
-        category = config.get('category', 'all')
+        category = config['category']
         if category == 'tv':
             category = 'tvsearch'
         if category == 'all':
@@ -64,9 +64,9 @@ class Newznab:
         params['extended'] = 1
         params['apikey'] = config.get('apikey')
 
-        url = f"{config.get('website')}/api"
+        url = f"{config['website']}/api"
 
-        return url, params, category
+        return url, params
 
     def fill_entries_for_url(self, url, params, task):
         entries = []
@@ -97,12 +97,12 @@ class Newznab:
         return entries
 
     def search(self, task, entry, config=None):
-        url, params, category = self.get_url_and_params(config)
-        if category == 'movie':
+        url, params = self.get_url_and_params(config)
+        if config['category'] == 'movie':
             return self.do_search_movie(entry, task, url, params)
-        elif category in ('tv', 'tvsearch'):
+        elif config['category'] in ('tv', 'tvsearch'):
             return self.do_search_tvsearch(entry, task, url, params)
-        elif category == 'all':
+        elif config['category'] == 'all':
             return self.do_search_all(entry, task, url, params)
         else:
             entries = []
