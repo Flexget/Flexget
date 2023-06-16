@@ -14,9 +14,10 @@ logger = logger.bind(name='newznab')
 class Newznab:
     """
     Newznab search plugin
-    Provide a url or your website + apikey and a category
+    Provide a url or your website + apikey and a category.
+    When a URL is provided it will override website, apikey, and category.
 
-    Config example::
+    Config example:
 
         newznab:
           url: "http://website/api?apikey=xxxxxxxxxxxxxxxxxxxxxxxxxx&t=movie&extended=1"
@@ -24,7 +25,7 @@ class Newznab:
           apikey: xxxxxxxxxxxxxxxxxxxxxxxxxx
           category: movie
 
-    Category is any of: movie, tvsearch, music, book, all
+    Category is any of: movie, tvsearch, tv, music, book, all
     """
 
     schema = {
@@ -42,24 +43,28 @@ class Newznab:
         'additionalProperties': False,
     }
 
-    def build_config(self, config):
+    @staticmethod
+    def get_url_and_params(config):
         logger.debug(type(config))
-        config['params'] = {}
-        if config['category'] == 'tv':
-            config['category'] = 'tvsearch'
-        if config['category'] == 'all':
-            config['category'] = 'search'
+        params = {}
 
-        if 'url' not in config:
-            if 'apikey' in config and 'website' in config:
-                config['params'] = {
-                    't': config['category'],
-                    'apikey': config['apikey'],
-                    'extended': 1,
-                }
-                config['url'] = f"{config['website']}/api"
+        # url overrides all other settings
+        if 'url' in config:
+            return config['url'], params
 
-        return config
+        category = config.get('category')
+        if category == 'tv':
+            category = 'tvsearch'
+        if category == 'all':
+            category = 'search'
+
+        params['t'] = category
+        params['extended'] = 1
+        params['apikey'] = config.get('apikey')
+
+        url = f"{config.get('website')}/api"
+
+        return url, params
 
     def fill_entries_for_url(self, url, params, task):
         entries = []
@@ -90,13 +95,13 @@ class Newznab:
         return entries
 
     def search(self, task, entry, config=None):
-        config = self.build_config(config)
+        url, params = self.get_url_and_params(config)
         if config['category'] == 'movie':
-            return self.do_search_movie(entry, task, config)
-        elif config['category'] == 'tvsearch':
-            return self.do_search_tvsearch(entry, task, config)
-        elif config['category'] == 'search':
-            return self.do_search_all(entry, task, config)
+            return self.do_search_movie(entry, task, url, params)
+        elif config['category'] in ('tv', 'tvsearch'):
+            return self.do_search_tvsearch(entry, task, url, params)
+        elif config['category'] == 'all':
+            return self.do_search_all(entry, task, url, params)
         else:
             entries = []
             logger.warning(
@@ -104,7 +109,7 @@ class Newznab:
             )
             return entries
 
-    def do_search_tvsearch(self, arg_entry, task, config=None):
+    def do_search_tvsearch(self, arg_entry, task, url, params):
         logger.info('Searching for {}', arg_entry['title'])
         # normally this should be used with next_series_episodes who has provided season and episodenumber
         if (
@@ -114,24 +119,24 @@ class Newznab:
         ):
             return []
         if arg_entry.get('tvdb_id'):
-            config['params']['tvdbid'] = arg_entry.get('tvdb_id')
+            params['tvdbid'] = arg_entry.get('tvdb_id')
         elif arg_entry.get('trakt_id'):
-            config['params']['traktid'] = arg_entry.get('trakt_id')
+            params['traktid'] = arg_entry.get('trakt_id')
         elif arg_entry.get('tvmaze_series_id'):
-            config['params']['tvmazeid'] = arg_entry.get('tvmaze_series_id')
+            params['tvmazeid'] = arg_entry.get('tvmaze_series_id')
         elif arg_entry.get('tmdb_id'):
-            config['params']['tmdbid'] = arg_entry.get('tmdb_id')
+            params['tmdbid'] = arg_entry.get('tmdb_id')
         elif arg_entry.get('imdb_id'):
-            config['params']['imdbid'] = arg_entry.get('imdb_id')
+            params['imdbid'] = arg_entry.get('imdb_id')
         elif arg_entry.get('tvrage_id'):
-            config['params']['rid'] = arg_entry.get('tvrage_id')
+            params['rid'] = arg_entry.get('tvrage_id')
         else:
-            config['params']['q'] = arg_entry['series_name']
-        config['params']['season'] = arg_entry['series_season']
-        config['params']['ep'] = arg_entry['series_episode']
-        return self.fill_entries_for_url(config['url'], config['params'], task)
+            params['q'] = arg_entry['series_name']
+        params['ep'] = arg_entry['series_episode']
+        params['season'] = arg_entry['series_season']
+        return self.fill_entries_for_url(url, params, task)
 
-    def do_search_movie(self, arg_entry, task, config=None):
+    def do_search_movie(self, arg_entry, task, url, params):
         logger.info('Searching for {} (imdb_id:{})', arg_entry['title'], arg_entry.get('imdb_id'))
         # normally this should be used with emit_movie_queue who has imdbid (i guess)
         if not arg_entry.get('imdb_id'):
@@ -139,13 +144,13 @@ class Newznab:
             return []
 
         imdb_id = arg_entry['imdb_id'].replace('tt', '')
-        config['params']['imdbid'] = imdb_id
-        return self.fill_entries_for_url(config['url'], config['params'], task)
+        params['imdbid'] = imdb_id
+        return self.fill_entries_for_url(url, params, task)
 
-    def do_search_all(self, arg_entry, task, config=None):
+    def do_search_all(self, arg_entry, task, url, params):
         logger.info('Searching for {}', arg_entry['title'])
-        config['params']['q'] = arg_entry['title']
-        return self.fill_entries_for_url(config['url'], config['params'], task)
+        params['q'] = arg_entry['title']
+        return self.fill_entries_for_url(url, params, task)
 
 
 @event('plugin.register')
