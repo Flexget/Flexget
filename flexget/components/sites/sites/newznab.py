@@ -41,7 +41,7 @@ class Newznab:
             'apikey': {'type': 'string'},
         },
         'required': ['category'],
-        'oneOf': [{'required': 'url'}, {'required': 'website'}],
+        'oneOf': [{'required': ['url']}, {'required': ['website']}],
         'additionalProperties': False,
     }
 
