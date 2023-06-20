@@ -152,7 +152,7 @@ class TestSFTPFileSystem:
 
     def create_symlink(self, path: str, target: Path) -> Path:
         """
-        Creata a symlink on the :class:`StubSFTPServer` instance, if the
+        Create a symlink on the :class:`StubSFTPServer` instance, if the
         path or target is relative, it will be done so in relation to the
         users home directory.
 
