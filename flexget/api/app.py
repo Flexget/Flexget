@@ -4,7 +4,7 @@ import re
 from collections import deque
 from contextlib import suppress
 from functools import partial, wraps
-from typing import TYPE_CHECKING, Callable, Dict, List, Mapping, Tuple, Union
+from typing import TYPE_CHECKING, Callable, Dict, List, Mapping, Optional, Tuple, Union
 
 from flask import Flask, Request, Response, jsonify, make_response, request
 from flask_compress import Compress
@@ -57,7 +57,7 @@ class APIClient:
     def __getattr__(self, item: str) -> 'APIEndpoint':
         return APIEndpoint('/api/' + item, self.get_endpoint)
 
-    def get_endpoint(self, url: str, data=None, method: str = None):
+    def get_endpoint(self, url: str, data=None, method: Optional[str] = None):
         if method is None:
             method = 'POST' if data is not None else 'GET'
         auth_header = {'Authorization': 'Token %s' % api_key()}
@@ -81,7 +81,7 @@ class APIEndpoint:
 
     __getitem__ = __getattr__
 
-    def __call__(self, data=None, method: str = None):
+    def __call__(self, data=None, method: Optional[str] = None):
         return self.caller(self.endpoint, data=data, method=method)
 
 
@@ -117,7 +117,7 @@ class API(RestxAPI):
     def validate(
         self,
         model: Model,
-        schema_override: Dict[str, List[Dict[str, str]]] = None,
+        schema_override: Optional[Dict[str, List[Dict[str, str]]]] = None,
         description=None,
     ):
         """
@@ -168,9 +168,9 @@ class API(RestxAPI):
     def pagination_parser(
         self,
         parser: RequestParser = None,
-        sort_choices: List[str] = None,
-        default: str = None,
-        add_sort: bool = None,
+        sort_choices: Optional[List[str]] = None,
+        default: Optional[str] = None,
+        add_sort: Optional[bool] = None,
     ) -> RequestParser:
         """
         Return a standardized pagination parser, to be used for any endpoint that has pagination.
@@ -237,7 +237,7 @@ class APIError(Exception):
     status = 'Error'
     response_model = base_message_schema
 
-    def __init__(self, message: str = None, payload=None) -> None:
+    def __init__(self, message: Optional[str] = None, payload=None) -> None:
         self.message = message
         self.payload = payload
 
@@ -373,7 +373,7 @@ def api_key(session: Session = None) -> str:
     return session.query(User).first().token  # type: ignore
 
 
-def etag(method: Callable = None, cache_age: int = 0):
+def etag(method: Optional[Callable] = None, cache_age: int = 0):
     """
     A decorator that add an ETag header to the response and checks for the "If-Match" and "If-Not-Match" headers to
      return an appropriate response.

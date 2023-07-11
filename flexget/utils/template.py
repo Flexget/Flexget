@@ -71,7 +71,7 @@ def filter_pathdir(val: Optional[str]) -> str:
     return os.path.dirname(val or '')
 
 
-def filter_pathscrub(val: str, os_mode: str = None) -> str:
+def filter_pathscrub(val: str, os_mode: Optional[str] = None) -> str:
     """Replace problematic characters in a path."""
     if not isinstance(val, str):
         return val
@@ -115,7 +115,7 @@ def filter_date_suffix(date_str: str):
     return date_str + suffix
 
 
-def filter_format_number(val, places: int = None, grouping: bool = True) -> str:
+def filter_format_number(val, places: Optional[int] = None, grouping: bool = True) -> str:
     """Formats a number according to the user's locale."""
     if not isinstance(val, (int, float)):
         return val
@@ -281,7 +281,7 @@ def make_environment(manager: 'Manager') -> None:
             environment.tests[name.split('_', 1)[1]] = test
 
 
-def list_templates(extensions: List[str] = None) -> List[str]:
+def list_templates(extensions: Optional[List[str]] = None) -> List[str]:
     """Returns all templates names that are configured under environment loader dirs"""
     if environment is None or not hasattr(environment, 'loader'):
         return []

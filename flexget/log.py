@@ -158,7 +158,10 @@ def initialize(unit_test: bool = False) -> None:
 
 
 def start(
-    filename: str = None, level: str = 'INFO', to_console: bool = True, to_file: bool = True
+    filename: Optional[str] = None,
+    level: str = 'INFO',
+    to_console: bool = True,
+    to_file: bool = True,
 ) -> None:
     """After initialization, start file logging."""
     global _logging_started, _startup_buffer, _startup_buffer_id

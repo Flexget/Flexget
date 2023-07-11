@@ -53,10 +53,10 @@ class TrayIcon:
     @check_if_tray_is_active
     def add_menu_item(
         self,
-        text: str = None,
-        action: Callable = None,
+        text: Optional[str] = None,
+        action: Optional[Callable] = None,
         menu_item: 'MenuItem' = None,
-        index: int = None,
+        index: Optional[int] = None,
         **kwargs,
     ):
         """
@@ -72,7 +72,7 @@ class TrayIcon:
             self.menu_items.append(menu_item)
 
     @check_if_tray_is_active
-    def add_menu_separator(self, index: int = None):
+    def add_menu_separator(self, index: Optional[int] = None):
         self.add_menu_item(menu_item=Menu.SEPARATOR, index=index)
 
     def add_core_menu_items(self):

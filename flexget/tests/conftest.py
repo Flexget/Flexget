@@ -85,7 +85,9 @@ def execute_task(manager: Manager) -> Callable[..., Task]:
     """
 
     def execute(
-        task_name: str, abort: bool = False, options: Union[dict, argparse.Namespace] = None
+        task_name: str,
+        abort: bool = False,
+        options: Optional[Union[dict, argparse.Namespace]] = None,
     ) -> Task:
         """
         Use to execute one test task from config.

@@ -254,9 +254,9 @@ class Manager:
 
     def execute(
         self,
-        options: Union[dict, argparse.Namespace] = None,
+        options: Optional[Union[dict, argparse.Namespace]] = None,
         priority: int = 1,
-        suppress_warnings: Sequence[str] = None,
+        suppress_warnings: Optional[Sequence[str]] = None,
     ) -> List[Tuple[str, str, threading.Event]]:
         """
         Run all (can be limited with options) tasks from the config.
@@ -366,7 +366,7 @@ class Manager:
             self.handle_cli()
             self._shutdown()
 
-    def handle_cli(self, options: argparse.Namespace = None) -> None:
+    def handle_cli(self, options: Optional[argparse.Namespace] = None) -> None:
         """
         Dispatch a cli command to the appropriate function.
 
@@ -617,7 +617,9 @@ class Manager:
                 sha1_hash.update(data)
         return sha1_hash.hexdigest()
 
-    def load_config(self, output_to_console: bool = True, config_file_hash: str = None) -> None:
+    def load_config(
+        self, output_to_console: bool = True, config_file_hash: Optional[str] = None
+    ) -> None:
         """
         Loads the config file from disk, validates and activates it.
 
@@ -742,7 +744,7 @@ class Manager:
         config_changed()
         fire_event('manager.config_updated', self)
 
-    def validate_config(self, config: dict = None) -> dict:
+    def validate_config(self, config: Optional[dict] = None) -> dict:
         """
         Check all root level keywords are valid. Config may be modified by before_config_validate hooks. Modified
         config will be returned.
@@ -898,7 +900,7 @@ class Manager:
                 self.release_lock()
                 self._has_lock = False
 
-    def write_lock(self, ipc_info: dict = None) -> None:
+    def write_lock(self, ipc_info: Optional[dict] = None) -> None:
         assert self._has_lock
         with open(self.lockfile, 'w', encoding='utf-8') as f:
             f.write(f'PID: {os.getpid()}\n')

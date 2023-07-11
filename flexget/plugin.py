@@ -198,7 +198,7 @@ _plugin_options = []
 _new_phase_queue: Dict[str, List[Optional[str]]] = {}
 
 
-def register_task_phase(name: str, before: str = None, after: str = None):
+def register_task_phase(name: str, before: Optional[str] = None, after: Optional[str] = None):
     """Adds a new task phase to the available phases."""
     if before and after:
         raise RegisterException('You can only give either before or after for a phase.')
