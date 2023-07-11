@@ -90,8 +90,8 @@ class Entry(LazyDict, Serializer):
     def trace(
         self,
         message: Optional[str],
-        operation: str = None,
-        plugin: str = None,
+        operation: Optional[str] = None,
+        plugin: Optional[str] = None,
     ) -> None:
         """
         Adds trace message to the entry which should contain useful information about why
@@ -167,7 +167,7 @@ class Entry(LazyDict, Serializer):
         """
         self.add_hook('complete', func, **kwargs)
 
-    def accept(self, reason: str = None, **kwargs) -> None:
+    def accept(self, reason: Optional[str] = None, **kwargs) -> None:
         if self.rejected:
             logger.debug('tried to accept rejected {!r}', self)
         elif not self.accepted:
@@ -176,7 +176,7 @@ class Entry(LazyDict, Serializer):
             # Run entry on_accept hooks
             self.run_hooks('accept', reason=reason, **kwargs)
 
-    def reject(self, reason: str = None, **kwargs) -> None:
+    def reject(self, reason: Optional[str] = None, **kwargs) -> None:
         # ignore rejections on immortal entries
         if self.get('immortal'):
             reason_str = '(%s)' % reason if reason else ''
@@ -352,8 +352,8 @@ class Entry(LazyDict, Serializer):
         self,
         lazy_func: Union[Callable[['Entry'], None], str],
         fields: Iterable[str],
-        args: Sequence = None,
-        kwargs: Mapping = None,
+        args: Optional[Sequence] = None,
+        kwargs: Optional[Mapping] = None,
     ):
         """
         Add lazy fields to an entry.

@@ -149,7 +149,7 @@ class TerminalTable(rich.table.Table):
         'heavy-head': {'box': rich.box.HEAVY_HEAD},
     }
 
-    def __init__(self, *args, table_type: str = None, **kwargs) -> None:
+    def __init__(self, *args, table_type: Optional[str] = None, **kwargs) -> None:
         self.table_type = table_type
         if table_type:
             kwargs = {**kwargs, **self.TABLE_TYPES[table_type]}

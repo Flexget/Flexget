@@ -119,7 +119,7 @@ class cached:
 
     cache = TimedDict(cache_time='5 minutes')
 
-    def __init__(self, name: str, persist: str = None) -> None:
+    def __init__(self, name: str, persist: Optional[str] = None) -> None:
         # Cast name to unicode to prevent sqlalchemy warnings when filtering
         self.name = str(name)
         # Parse persist time
@@ -222,7 +222,7 @@ class IterableCache:
     If `finished_hook` is supplied, it will be called the first time the iterable is run to the end.
     """
 
-    def __init__(self, iterable: Iterable, finished_hook: Callable[[List], None] = None):
+    def __init__(self, iterable: Iterable, finished_hook: Optional[Callable[[List], None]] = None):
         self.iterable = iter(iterable)
         self.cache: List = []
         self.finished_hook = finished_hook

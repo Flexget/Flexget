@@ -805,8 +805,8 @@ def set_alt_names(alt_names: Iterable[str], db_series: Series, session: Session)
 
 def show_seasons(
     series: Series,
-    start: int = None,
-    stop: int = None,
+    start: Optional[int] = None,
+    stop: Optional[int] = None,
     count: bool = False,
     descending: bool = False,
     session: Session = None,
@@ -841,12 +841,12 @@ def get_all_entities(
 
 def get_episode_releases(
     episode: Episode,
-    downloaded: bool = None,
-    start: int = None,
-    stop: int = None,
+    downloaded: Optional[bool] = None,
+    start: Optional[int] = None,
+    stop: Optional[int] = None,
     count: bool = False,
     descending: bool = False,
-    sort_by: str = None,
+    sort_by: Optional[str] = None,
     session: Session = None,
 ) -> List[EpisodeRelease]:
     """Return all releases for a given episode"""
@@ -865,12 +865,12 @@ def get_episode_releases(
 
 def get_season_releases(
     season: Season,
-    downloaded: bool = None,
-    start: int = None,
-    stop: int = None,
+    downloaded: Optional[bool] = None,
+    start: Optional[int] = None,
+    stop: Optional[int] = None,
     count: bool = False,
     descending: bool = False,
-    sort_by: str = None,
+    sort_by: Optional[str] = None,
     session: Session = None,
 ) -> Union[int, List[SeasonRelease]]:
     """Return all releases for a given season"""
@@ -946,15 +946,15 @@ def _add_alt_name(alt: str, db_series: Series, series_name: str, session: Sessio
 
 @with_session
 def get_series_summary(
-    configured: str = None,
-    premieres: bool = None,
-    start: int = None,
-    stop: int = None,
+    configured: Optional[str] = None,
+    premieres: Optional[bool] = None,
+    start: Optional[int] = None,
+    stop: Optional[int] = None,
     count: bool = False,
     sort_by: str = 'show_name',
-    descending: bool = None,
+    descending: Optional[bool] = None,
     session: Session = None,
-    name: str = None,
+    name: Optional[str] = None,
 ) -> Union[int, Iterable[Series]]:
     """
     Return a query with results for all series.
@@ -1048,7 +1048,7 @@ def auto_identified_by(series: Series) -> str:
 
 
 def get_latest_season_pack_release(
-    series: Series, downloaded: bool = True, season: int = None
+    series: Series, downloaded: bool = True, season: Optional[int] = None
 ) -> Optional[Season]:
     """
     Return the latest season pack release for a series
@@ -1091,7 +1091,7 @@ def get_latest_season_pack_release(
 
 
 def get_latest_episode_release(
-    series: Series, downloaded: bool = True, season: int = None
+    series: Series, downloaded: bool = True, season: Optional[int] = None
 ) -> Optional[Episode]:
     """
     :param series series: SQLAlchemy session
@@ -1146,7 +1146,7 @@ def get_latest_episode_release(
 
 
 def get_latest_release(
-    series: Series, downloaded: bool = True, season: int = None
+    series: Series, downloaded: bool = True, season: Optional[int] = None
 ) -> Union[EpisodeRelease, SeasonRelease, None]:
     """
     Return the latest downloaded entity of a series, either season pack or episode
@@ -1411,8 +1411,8 @@ def season_release_by_id(release_id: int, session: Session = None) -> SeasonRele
 
 def show_episodes(
     series: Series,
-    start: int = None,
-    stop: int = None,
+    start: Optional[int] = None,
+    stop: Optional[int] = None,
     count: bool = False,
     descending: bool = False,
     session: Session = None,
