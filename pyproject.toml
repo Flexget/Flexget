@@ -158,6 +158,7 @@ ignore = [
     "E711", "E712",  # Comparisons to True/False/None are valid for sqlalchemy
     "PLE1205",  # Thinks we are using stdlib logging rather than loguru
     "RUF001",  # Some of these ambiguous unicode are in tests on purpose
+    "RUF012", # Maybe can re-enable after https://github.com/astral-sh/ruff/issues/5243
 ]
 
 [tool.ruff.isort]
