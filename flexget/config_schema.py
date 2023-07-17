@@ -183,13 +183,13 @@ def parse_percent(percent_input: str) -> float:
         raise ValueError("should be in format '0-x%'")
 
 
-def parse_size(size_input: str) -> int:
+def parse_size(size_input: str, si: bool = False) -> int:
     """Takes a size string from the config and turns it into int(bytes)."""
     try:
         # Bytes
         return int(size_input)
     except ValueError:
-        return parse_filesize(size_input, si=False)
+        return parse_filesize(size_input, si=si)
 
 
 # Public API end here, the rest should not be used outside this module
