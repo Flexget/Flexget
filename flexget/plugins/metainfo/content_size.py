@@ -44,7 +44,7 @@ class MetainfoContentSize:
                     entry['content_size'] = parse_filesize(description, si=False, match_re=SIZE_RE)
                     continue
                 except ValueError:
-                    print()
+                    pass
             # If this entry has a local file, (it was added by filesystem plugin) grab the size.
             if entry.get('location'):
                 # If it is a .torrent or .nzb, don't bother getting the size as it will not be the content's size
@@ -56,7 +56,6 @@ class MetainfoContentSize:
                 try:
                     if location.is_file():
                         amount = os.path.getsize(entry['location'])
-                        amount = int(amount)
                         logger.trace('setting content size to {}', amount)
                         entry['content_size'] = amount
                         continue
