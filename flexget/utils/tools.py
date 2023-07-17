@@ -355,7 +355,7 @@ def parse_filesize(
 
     :param string text_size: string containing the data size to parse i.e. "5 GB"
     :param bool si: If True, possibly ambiguous units like KB, MB, GB will be assumed to be base 10 units,
-    rather than the default base 2. i.e. if si then 50 GB = 47684 else 50GB = 51200
+      rather than base 2. i.e. if si then 1 KB = 1000 B else 1 KB = 1024 B
     :param match_re: A custom regex can be defined to match the size. The first capture group should match
       the number, and the second should match the unit.
 
