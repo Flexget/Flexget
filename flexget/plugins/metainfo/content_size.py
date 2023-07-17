@@ -6,7 +6,7 @@ from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
-from flexget.utils.tools import parse_filesize
+from flexget.utils.tools import format_filesize, parse_filesize
 
 logger = logger.bind(name='metanfo_csize')
 
@@ -56,7 +56,7 @@ class MetainfoContentSize:
                 try:
                     if location.is_file():
                         amount = os.path.getsize(entry['location'])
-                        logger.trace('setting content size to {}', amount)
+                        logger.trace('setting content size to {}', format_filesize(amount))
                         entry['content_size'] = amount
                         continue
                 except OSError:

@@ -8,7 +8,7 @@ import queue
 import re
 import sys
 import weakref
-from collections import OrderedDict, defaultdict
+from collections import defaultdict
 from collections.abc import MutableMapping
 from datetime import datetime, timedelta
 from html.entities import name2codepoint
@@ -50,24 +50,6 @@ def str_to_int(string: str) -> Optional[int]:
         return int(string.replace(',', ''))
     except ValueError:
         return None
-
-
-def convert_bytes(bytes_num: Union[int, float]) -> str:
-    """Returns given bytes as prettified string."""
-
-    bytes_num = float(bytes_num)
-    units_prefixes = OrderedDict(
-        {
-            'T': 1099511627776,  # 1024 ** 4
-            'G': 1073741824,  # 1024 ** 3
-            'M': 1048576,  # 1024 ** 2
-            'K': 1024,
-        }
-    )
-    for unit, threshold in units_prefixes.items():
-        if bytes_num > threshold:
-            return f'{bytes_num / threshold:.2f}{unit}'
-    return f'{bytes_num:.2f}b'
 
 
 class MergeException(Exception):
@@ -399,6 +381,29 @@ def parse_filesize(
     amount = float(amount_str.replace(',', '').replace(' ', ''))
     base = 1000 if si else 1024
     return int(amount * (base**order))
+
+
+def format_filesize(num_bytes: Union[int, float], si: bool = False) -> str:
+    """Returns given bytes as prettified string."""
+
+    base = 1000 if si else 1024
+    amount = float(num_bytes)
+    prefix = ''
+    unit_prefixes = [
+        # For some reason the convention is to use lowercase k for si kilobytes
+        'k' if si else 'K',
+        'M',
+        'G',
+        'T',
+        'P',
+    ]
+    for unit in unit_prefixes:
+        if amount >= base:
+            amount /= base
+            prefix = f'{unit}{"" if si else "i"}'
+        else:
+            break
+    return f'{round(amount, 2)} {prefix}B'
 
 
 def get_config_hash(config: Any) -> str:

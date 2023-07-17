@@ -6,7 +6,7 @@ from loguru import logger
 from flexget import plugin
 from flexget.event import event
 from flexget.utils.log import log_once
-from flexget.utils.tools import parse_filesize
+from flexget.utils.tools import format_filesize, parse_filesize
 
 logger = logger.bind(name='content_size')
 
@@ -43,16 +43,22 @@ class FilterContentSize:
         if 'content_size' in entry:
             min_size, max_size = self.process_config(config)
             size = entry['content_size']
-            logger.debug('{} size {} MB', entry['title'], size)
+            logger.debug('{} size {}', entry['title'], format_filesize(size))
             # Avoid confusion by printing a reject message to info log, as
             # download plugin has already printed a downloading message.
             if size < min_size:
                 log_once('Entry `%s` too small, rejecting' % entry['title'], logger)
-                entry.reject(f'minimum size {min_size} B, got {size} B', remember=remember)
+                entry.reject(
+                    f'minimum size {format_filesize(min_size)}, got {format_filesize(size)}',
+                    remember=remember,
+                )
                 return True
             if size > max_size:
                 log_once('Entry `%s` too big, rejecting' % entry['title'], logger)
-                entry.reject(f'maximum size {min_size} B, got {size} B', remember=remember)
+                entry.reject(
+                    f'maximum size {format_filesize(max_size)}, got {format_filesize(size)}',
+                    remember=remember,
+                )
                 return True
 
     @plugin.priority(130)

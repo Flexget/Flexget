@@ -4,6 +4,7 @@ from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
+from flexget.utils.tools import format_filesize
 
 logger = logger.bind(name='nzb_size')
 
@@ -56,7 +57,7 @@ class NzbSize:
                     for segment in nzbfile.segments:
                         size += segment.bytes
 
-                logger.debug('{} content size: {} B', entry['title'], size)
+                logger.debug('{} content size: {}', entry['title'], format_filesize(size))
                 entry['content_size'] = size
             else:
                 logger.trace('{} does not seem to be nzb', entry['title'])
