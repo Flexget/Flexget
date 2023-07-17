@@ -56,9 +56,8 @@ class NzbSize:
                     for segment in nzbfile.segments:
                         size += segment.bytes
 
-                size_mb = size / 1024 / 1024
-                logger.debug('{} content size: {} MB', entry['title'], size_mb)
-                entry['content_size'] = size_mb
+                logger.debug('{} content size: {} B', entry['title'], size)
+                entry['content_size'] = size
             else:
                 logger.trace('{} does not seem to be nzb', entry['title'])
 

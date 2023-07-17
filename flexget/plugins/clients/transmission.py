@@ -222,7 +222,7 @@ class PluginTransmissionInput(TransmissionBase):
                 title=torrent.name,
                 url='',
                 torrent_info_hash=torrent.hashString,
-                content_size=torrent.total_size / (1024 * 1024),
+                content_size=torrent.total_size,
             )
             # Location of torrent is only valid if transmission is on same machine as flexget
             if config['host'] in ('localhost', '127.0.0.1'):

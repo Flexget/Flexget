@@ -118,7 +118,9 @@ class UrlRewriteNcore:
 
                     e['torrent_seeds'] = parent.find('div', class_='box_s2').string
                     e['torrent_leeches'] = parent.find('div', class_='box_l2').string
-                    e['content_size'] = parent.find('div', class_='box_meret2').string
+                    e['content_size'] = (
+                        float(parent.find('div', class_='box_meret2').string) * 1024**2
+                    )
                     e['torrent_availability'] = torrent_availability(
                         e['torrent_seeds'], e['torrent_leeches']
                     )

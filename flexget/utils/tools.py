@@ -66,7 +66,7 @@ def convert_bytes(bytes_num: Union[int, float]) -> str:
     )
     for unit, threshold in units_prefixes.items():
         if bytes_num > threshold:
-            return f'{bytes_num/threshold:.2f}{unit}'
+            return f'{bytes_num / threshold:.2f}{unit}'
     return f'{bytes_num:.2f}b'
 
 
@@ -365,21 +365,24 @@ def get_current_flexget_version() -> str:
     return flexget.__version__
 
 
-def parse_filesize(text_size: str, si: bool = True) -> float:
+def parse_filesize(
+    text_size: str, si: bool = True, match_re: Optional[Union[str, Pattern[str]]] = None
+) -> int:
     """
-    Parses a data size and returns its value in mebibytes
+    Parses a data size and returns its value in bytes
 
     :param string text_size: string containing the data size to parse i.e. "5 GB"
     :param bool si: If True, possibly ambiguous units like KB, MB, GB will be assumed to be base 10 units,
     rather than the default base 2. i.e. if si then 50 GB = 47684 else 50GB = 51200
+    :param match_re: A custom regex can be defined to match the size. The first capture group should match
+      the number, and the second should match the unit.
 
-    :returns: an float with the data size in mebibytes
+    :returns: an int with the data size in bytes
     """
     prefix_order = {'': 0, 'k': 1, 'm': 2, 'g': 3, 't': 4, 'p': 5}
 
-    parsed_size = re.match(
-        r'(\d+(?:[.,\s]\d+)*)(?:\s*)((?:[ptgmk]i?)?b)', text_size.strip().lower(), flags=re.UNICODE
-    )
+    match_re = match_re or r'\b(\d+(?:[.,\s]\d+)*)\s*((?:[ptgmk]i?)?b)\b'
+    parsed_size = re.search(match_re, text_size.lower())
     if not parsed_size:
         raise ValueError('%s does not look like a file size' % text_size)
     amount_str = parsed_size.group(1)
@@ -395,7 +398,7 @@ def parse_filesize(text_size: str, si: bool = True) -> float:
     order = prefix_order[unit]
     amount = float(amount_str.replace(',', '').replace(' ', ''))
     base = 1000 if si else 1024
-    return (amount * (base**order)) / 1024**2
+    return int(amount * (base**order))
 
 
 def get_config_hash(config: Any) -> str:

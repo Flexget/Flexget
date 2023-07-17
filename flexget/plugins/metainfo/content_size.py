@@ -1,4 +1,3 @@
-import math
 import os.path
 import re
 from pathlib import Path
@@ -7,10 +6,11 @@ from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
+from flexget.utils.tools import parse_filesize
 
 logger = logger.bind(name='metanfo_csize')
 
-SIZE_RE = re.compile(r'Size[^\d]{0,7}(\d*\.?\d+).{0,5}(MB|GB)', re.IGNORECASE)
+SIZE_RE = re.compile(r'Size[^\d]{0,7}(\d*\.?\d+).{0,5}(MB|GB)', re.IGNORECASE | re.UNICODE)
 
 
 class MetainfoContentSize:
@@ -38,27 +38,15 @@ class MetainfoContentSize:
                 )
                 continue
             # Try to parse size from description
-            match = False
             description = entry.get('description', '')
             if isinstance(description, str):
-                match = SIZE_RE.search(description)
-            if match:
                 try:
-                    amount = float(match.group(1).replace(',', '.'))
-                except Exception:
-                    logger.error(
-                        'BUG: Unable to convert {} into float ({})', match.group(1), entry['title']
-                    )
+                    entry['content_size'] = parse_filesize(description, si=False, match_re=SIZE_RE)
                     continue
-                unit = match.group(2).lower()
-                count += 1
-                if unit == 'gb':
-                    amount = math.ceil(amount * 1024)
-                logger.trace('setting content size to {}', amount)
-                entry['content_size'] = int(amount)
-                continue
+                except ValueError:
+                    print()
             # If this entry has a local file, (it was added by filesystem plugin) grab the size.
-            elif entry.get('location'):
+            if entry.get('location'):
                 # If it is a .torrent or .nzb, don't bother getting the size as it will not be the content's size
                 location = entry['location']
                 if isinstance(location, str):
@@ -68,7 +56,7 @@ class MetainfoContentSize:
                 try:
                     if location.is_file():
                         amount = os.path.getsize(entry['location'])
-                        amount = int(amount / (1024 * 1024))
+                        amount = int(amount)
                         logger.trace('setting content size to {}', amount)
                         entry['content_size'] = amount
                         continue
