@@ -176,9 +176,7 @@ def movie_list_del(options):
             )
         except NoResultFound:
             console(
-                'Could not find movie with ID {} in list `{}`'.format(
-                    int(options.movie), options.list_name
-                )
+                f'Could not find movie with ID {int(options.movie)} in list `{options.list_name}`'
             )
             return
         except ValueError:
@@ -187,11 +185,7 @@ def movie_list_del(options):
                 list_id=movie_list.id, title=title, year=year, session=session
             )
         if not movie_exist:
-            console(
-                'Could not find movie with title {} in list {}'.format(
-                    options.movie, options.list_name
-                )
-            )
+            console(f'Could not find movie with title {options.movie} in list {options.list_name}')
             return
         else:
             console(f'Removing movie {movie_exist.title} from list {options.list_name}')

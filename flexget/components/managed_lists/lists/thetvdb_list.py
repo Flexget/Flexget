@@ -83,9 +83,7 @@ class TheTVDBSet(MutableSet):
                         series_name, _ = split_title_year(series_name)
                     entry = Entry()
                     entry['title'] = entry['series_name'] = series_name
-                    entry['url'] = 'http://thetvdb.com/index.php?tab=series&id={}'.format(
-                        str(series.id)
-                    )
+                    entry['url'] = f'http://thetvdb.com/index.php?tab=series&id={series.id!s}'
                     entry['tvdb_id'] = str(series.id)
                     self._items.append(entry)
         return self._items

@@ -264,7 +264,7 @@ class MovieListMoviesAPI(APIResource):
         movie_identifiers = data.get('movie_identifiers', [])
         # Validates ID type based on allowed ID
         for id_name in movie_identifiers:
-            if list(id_name)[0] not in MovieListBase().supported_ids:
+            if next(iter(id_name)) not in MovieListBase().supported_ids:
                 raise BadRequest('movie identifier %s is not allowed' % id_name)
         title, year = data['movie_name'], data.get('movie_year')
         movie = db.get_movie_by_title_and_year(
@@ -325,7 +325,7 @@ class MovieListMovieAPI(APIResource):
 
         # Validates ID type based on allowed ID
         for id_name in data:
-            if list(id_name)[0] not in MovieListBase().supported_ids:
+            if next(iter(id_name)) not in MovieListBase().supported_ids:
                 raise BadRequest('movie identifier %s is not allowed' % id_name)
         movie.ids[:] = db.get_db_movie_identifiers(
             identifier_list=data, movie_id=movie_id, session=session
