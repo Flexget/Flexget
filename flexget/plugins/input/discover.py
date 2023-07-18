@@ -28,11 +28,7 @@ class DiscoverEntry(Base):
         self.last_execution = None
 
     def __str__(self):
-        return '<DiscoverEntry(title={},task={},added={})>'.format(
-            self.title,
-            self.task,
-            self.last_execution,
-        )
+        return f'<DiscoverEntry(title={self.title},task={self.task},added={self.last_execution})>'
 
 
 Index('ix_discover_entry_title_task', DiscoverEntry.title, DiscoverEntry.task)

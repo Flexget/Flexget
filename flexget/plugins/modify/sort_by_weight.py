@@ -265,12 +265,7 @@ class PluginSortByWeight:
                 date = arg.date()
                 short_args.append(f'{date.year}-{date.month}-{date.day}')
             elif isinstance(arg, Quality):
-                quality_string = '[ {} ]-{}-{}, [ {} ]'.format(
-                    arg.resolution,
-                    arg.source,
-                    arg.codec,
-                    arg.audio,
-                )
+                quality_string = f'[ {arg.resolution} ]-{arg.source}-{arg.codec}, [ {arg.audio} ]'
                 if quality_string not in short_args:
                     short_args.append(quality_string)
             else:

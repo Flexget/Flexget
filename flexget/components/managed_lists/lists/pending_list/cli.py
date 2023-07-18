@@ -139,11 +139,7 @@ def pending_list_add(options):
                 for k, v in identifier.items():
                     entry[k] = v
             db_entry.entry = entry
-        console(
-            'Successfully {} entry `{}` to pending list `{}` '.format(
-                operation, title, pending_list.name
-            )
-        )
+        console(f'Successfully {operation} entry `{title}` to pending list `{pending_list.name}` ')
 
 
 def pending_list_approve(options, approve=None):

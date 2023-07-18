@@ -551,9 +551,7 @@ class AlternateNames(Base):
         self.alt_name = name
 
     def __str__(self):
-        return '<SeriesAlternateName(series_id={}, alt_name={})>'.format(
-            self.series_id, self.alt_name
-        )
+        return f'<SeriesAlternateName(series_id={self.series_id}, alt_name={self.alt_name})>'
 
     def __repr__(self):
         return str(self).encode('ascii', 'replace')

@@ -151,11 +151,7 @@ def begin(manager, options):
                 if entity_type == 'season':
                     console('`%s` was identified as a season.' % ep_id)
                     ep_id += 'E01'
-                console(
-                    'Releases for `{}` will be accepted starting with `{}`.'.format(
-                        series.name, ep_id
-                    )
-                )
+                console(f'Releases for `{series.name}` will be accepted starting with `{ep_id}`.')
                 session.commit()
             manager.config_changed()
 
@@ -276,9 +272,7 @@ def display_details(options):
             )
         begin_text = 'option'
         if series.begin:
-            footer += ' \n Begin for `{}` is set to `{}`.'.format(
-                series.name, series.begin.identifier
-            )
+            footer += f' \n Begin for `{series.name}` is set to `{series.begin.identifier}`.'
             begin_text = 'and `begin` options'
         footer += ' \n See `identified_by` %s for more information.' % begin_text
     table = TerminalTable(*header, table_type=options.table_type, title=table_title)

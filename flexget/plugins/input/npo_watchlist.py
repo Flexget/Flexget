@@ -164,8 +164,8 @@ class NPOWatchlist:
             'X-Requested-With': 'XMLHttpRequest',
         }
         if page > 1:
-            headers['Referer'] = episode_tiles_url.format(mediaId) + '?page={}'.format(
-                page - 1
+            headers['Referer'] = (
+                episode_tiles_url.format(mediaId) + f'?page={page - 1}'
             )  # referer from prev page
 
         logger.debug(

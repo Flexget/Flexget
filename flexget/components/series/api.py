@@ -846,9 +846,7 @@ class SeriesSeasonsReleasesAPI(APIResource):
                 fire_event('forget', release.title)
             db.delete_season_release_by_id(release.id)
         return success_response(
-            'successfully deleted all releases for season {} from show {}'.format(
-                season_id, show_id
-            )
+            f'successfully deleted all releases for season {season_id} from show {show_id}'
         )
 
     @api.response(

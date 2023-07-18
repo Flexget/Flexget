@@ -6,10 +6,7 @@ import pytest
 def assert_mock_calls(expected_calls, mock_object):
     assert (
         expected_calls == mock_object.mock_calls
-    ), "expecting calls {!r}, got {!r} instead".format(
-        expected_calls,
-        mock_object.mock_calls,
-    )
+    ), f"expecting calls {expected_calls!r}, got {mock_object.mock_calls!r} instead"
 
 
 def assert_series_count_in_db(expected_count):
@@ -20,9 +17,7 @@ def assert_series_count_in_db(expected_count):
     actual_series_count = session.query(Series).count()
     assert (
         expected_count == actual_series_count
-    ), "expecting {} series stored in db, got {} instead".format(
-        expected_count, actual_series_count
-    )
+    ), f"expecting {expected_count} series stored in db, got {actual_series_count} instead"
 
 
 class TestConfigureSeriesBetaSeriesList:

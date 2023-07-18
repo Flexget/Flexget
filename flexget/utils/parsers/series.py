@@ -79,9 +79,7 @@ class SeriesParser(TitleParser):
                 fr'(\d{{2,4}}){separators}(\d{{1,2}}){separators}(\d{{1,2}})',
                 fr'(\d{{1,2}}){separators}(\d{{1,2}}){separators}(\d{{2,4}})',
                 r'(\d{4})x(\d{1,2})%s(\d{1,2})' % separators,
-                r'(\d{{1,2}})(?:st|nd|rd|th)?{}([a-z]{{3,10}}){}(\d{{4}})'.format(
-                    separators, separators
-                ),
+                fr'(\d{{1,2}})(?:st|nd|rd|th)?{separators}([a-z]{{3,10}}){separators}(\d{{4}})',
             ]
         ]
     )

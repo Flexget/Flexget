@@ -45,11 +45,7 @@ class TestPathscrub:
         for platform in ['windows', 'linux', 'mac']:
             for test in space_paths:
                 result = pathscrub(test, filename=False)
-                assert result == space_paths[test], '{} != {} ({})'.format(
-                    result,
-                    space_paths[test],
-                    platform,
-                )
+                assert result == space_paths[test], f'{result} != {space_paths[test]} ({platform})'
 
         # Windows only should also use backslashes as dir separators
         test = ['c:\\ aoeu \\aoeu /aoeu ', 'c:\\aoeu\\aoeu/aoeu']
