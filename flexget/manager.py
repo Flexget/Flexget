@@ -143,7 +143,7 @@ class Manager:
         self.is_daemon = False
         self.ipc_server: IPCServer
         self.task_queue: TaskQueue
-        self.persist: 'SimplePersistence'
+        self.persist: SimplePersistence
         self.initialized = False
 
         self.config: Dict = {}

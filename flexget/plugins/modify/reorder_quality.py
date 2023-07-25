@@ -36,7 +36,7 @@ class ReorderQuality:
     def on_task_start(self, task, config):
         self.quality_priorities = {}
         for quality, _config in config.items():
-            action, other_quality = list(_config.items())[0]
+            action, other_quality = next(iter(_config.items()))
 
             if quality not in qualities._registry:
                 raise plugin.PluginError('%s is not a valid quality' % quality)
