@@ -250,7 +250,7 @@ class FilterSeriesBase:
                 # convert into dict-form if necessary
                 series_settings = {}
                 if isinstance(series, dict):
-                    series, series_settings = list(series.items())[0]
+                    series, series_settings = next(iter(series.items()))
                 # Make sure this isn't a series with no name
                 if not series:
                     logger.warning('Series config contains a series with no name!')
@@ -299,7 +299,7 @@ class FilterSeriesBase:
         unique_series = {}
         for series_list in series_lists:
             for series in series_list:
-                series, series_settings = list(series.items())[0]
+                series, series_settings = next(iter(series.items()))
                 if series not in unique_series:
                     unique_series[series] = series_settings
                 else:
@@ -370,7 +370,7 @@ class FilterSeries(FilterSeriesBase):
         # generate list of all series in one dict
         all_series = {}
         for series_item in config:
-            series_name, series_config = list(series_item.items())[0]
+            series_name, series_config = next(iter(series_item.items()))
             all_series[series_name] = series_config
 
         # scan for problematic names, enable exact mode for them
@@ -414,13 +414,13 @@ class FilterSeries(FilterSeriesBase):
             # str() added to make sure number shows (e.g. 24) are turned into strings
 
             # First add all series config names (normalized)
-            series_names = [str(normalize_series_name(list(s.keys())[0])) for s in config]
+            series_names = [str(normalize_series_name(next(iter(s.keys())))) for s in config]
             # Add series names from the config without normalization to capture configs
             #  that use slightly different series names. See https://github.com/Flexget/Flexget/issues/2057
             series_names.extend(
-                str(list(s.keys())[0])
+                str(next(iter(s.keys())))
                 for s in config
-                if str(list(s.keys())[0]) not in series_names
+                if str(next(iter(s.keys()))) not in series_names
             )
 
             existing_db_series = []
@@ -433,7 +433,7 @@ class FilterSeries(FilterSeriesBase):
             existing_db_series = {s.name_normalized: s for s in existing_db_series}
 
             for series_item in config:
-                series_name, series_config = list(series_item.items())[0]
+                series_name, series_config = next(iter(series_item.items()))
                 alt_names = get_config_as_array(series_config, 'alternate_name')
                 db_series = existing_db_series.get(normalize_series_name(series_name))
                 db_identified_by = db_series.identified_by if db_series else None
@@ -467,7 +467,7 @@ class FilterSeries(FilterSeriesBase):
         # Prefetch series
         with Session() as session:
             # str() added to make sure number shows (e.g. 24) are turned into strings
-            series_names = [str(list(s.keys())[0]) for s in config]
+            series_names = [str(next(iter(s.keys()))) for s in config]
             existing_series = (
                 session.query(db.Series)
                 .filter(db.Series.name.in_(series_names))
@@ -481,7 +481,7 @@ class FilterSeries(FilterSeriesBase):
         start_time = preferred_clock()
         for series_item in config:
             with Session() as session:
-                series_name, series_config = list(series_item.items())[0]
+                series_name, series_config = next(iter(series_item.items()))
 
                 if series_config.get('parse_only'):
                     logger.debug(
@@ -1118,7 +1118,7 @@ class SeriesDBManager(FilterSeriesBase):
             config = self.prepare_config(task.config['series'])
 
             # Prefetch series
-            names = [str(list(series.keys())[0]) for series in config]
+            names = [str(next(iter(series.keys()))) for series in config]
             existing_series = (
                 session.query(db.Series)
                 .filter(db.Series.name.in_(names))
@@ -1128,7 +1128,7 @@ class SeriesDBManager(FilterSeriesBase):
             existing_series_map = {s.name_normalized: s for s in existing_series}
 
             for series_item in config:
-                series_name, series_config = list(series_item.items())[0]
+                series_name, series_config = next(iter(series_item.items()))
                 # Make sure number shows (e.g. 24) are turned into strings
                 series_name = str(series_name)
                 db_series = existing_series_map.get(normalize_series_name(series_name))

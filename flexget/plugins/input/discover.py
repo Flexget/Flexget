@@ -114,7 +114,7 @@ class Discover:
             entry_results = []
             for item in config['from']:
                 if isinstance(item, dict):
-                    plugin_name, plugin_config = list(item.items())[0]
+                    plugin_name, plugin_config = next(iter(item.items()))
                 else:
                     plugin_name, plugin_config = item, None
                 search = plugin.get(plugin_name, self)

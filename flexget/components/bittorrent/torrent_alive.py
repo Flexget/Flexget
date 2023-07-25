@@ -154,8 +154,8 @@ def get_http_seeds(url, info_hash):
     if not data:
         logger.debug('No data received from tracker scrape.')
         return 0
-    logger.debug('get_http_seeds is returning: {}', list(data.values())[0]['complete'])
-    return list(data.values())[0]['complete']
+    logger.debug('get_http_seeds is returning: {}', next(iter(data.values()))['complete'])
+    return next(iter(data.values()))['complete']
 
 
 def get_tracker_seeds(url, info_hash):

@@ -416,7 +416,7 @@ def select_child_errors(validator, errors):
         elif len(no_type_errors) == 1:
             # If one of the possible schemas did not have a 'type' error, assume that is the intended one and issue
             # all errors from that subschema
-            for e in list(no_type_errors.values())[0]:
+            for e in next(iter(no_type_errors.values())):
                 e.schema_path.extendleft(reversed(error.schema_path))
                 e.path.extendleft(reversed(error.path))
                 yield e
