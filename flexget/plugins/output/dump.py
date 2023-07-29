@@ -8,6 +8,7 @@ from rich.pretty import Pretty, is_expandable
 from flexget import options, plugin
 from flexget.event import event
 from flexget.terminal import TerminalTable, console
+from flexget.utils.tools import format_filesize
 
 logger = logger.bind(name='dump')
 
@@ -65,6 +66,8 @@ def dump(entries, debug=False, eval_lazy=False, trace=False, title_only=False):
                     if field.rsplit('_', maxsplit=1)[-1] == 'url':
                         url = quote(value, safe=":/")
                         renderable = f'[link={url}][repr.url]{escape(value)}[/repr.url][/link]'
+                    elif field == 'content_size':
+                        renderable = highlighter(str(value)) + f' ({format_filesize(value)})'
                     elif isinstance(value, str):
                         renderable = escape(value.replace('\r', '').replace('\n', ''))
                     elif is_expandable(value):
