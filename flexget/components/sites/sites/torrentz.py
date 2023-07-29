@@ -109,7 +109,7 @@ class Torrentz:
                 entry = Entry()
                 entry['title'] = item.title
                 entry['url'] = item.link
-                entry['content_size'] = int(m.group(1))
+                entry['content_size'] = int(m.group(1)) * 1024**2
                 entry['torrent_seeds'] = int(m.group(2).replace(',', ''))
                 entry['torrent_leeches'] = int(m.group(3).replace(',', ''))
                 entry['torrent_info_hash'] = m.group(4).upper()

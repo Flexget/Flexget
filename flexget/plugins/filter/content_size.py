@@ -1,10 +1,12 @@
 from sys import maxsize
+from typing import Tuple
 
 from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 from flexget.utils.log import log_once
+from flexget.utils.tools import format_filesize, parse_filesize
 
 logger = logger.bind(name='content_size')
 
@@ -13,30 +15,49 @@ class FilterContentSize:
     schema = {
         'type': 'object',
         'properties': {
-            'min': {'type': 'number'},
-            'max': {'type': 'number'},
+            'min': {'type': ['number', 'string'], 'format': 'size'},
+            'max': {'type': ['number', 'string'], 'format': 'size'},
             'strict': {'type': 'boolean', 'default': True},
         },
         'additionalProperties': False,
     }
 
+    @staticmethod
+    def process_config(config: dict) -> Tuple[int, int]:
+        min_size = config.get('min', 0)
+        if isinstance(min_size, (int, float)):
+            min_size = min_size * 1024**2
+        else:
+            min_size = parse_filesize(min_size)
+        max_size = maxsize
+        if config.get('max'):
+            max_size = config['max']
+            if isinstance(max_size, (int, float)):
+                max_size = max_size * 1024**2
+            else:
+                max_size = parse_filesize(max_size)
+        return min_size, max_size
+
     def process_entry(self, task, entry, config, remember=True):
         """Rejects this entry if it does not pass content_size requirements. Returns true if the entry was rejected."""
         if 'content_size' in entry:
+            min_size, max_size = self.process_config(config)
             size = entry['content_size']
-            logger.debug('{} size {} MB', entry['title'], size)
+            logger.debug('{} size {}', entry['title'], format_filesize(size))
             # Avoid confusion by printing a reject message to info log, as
             # download plugin has already printed a downloading message.
-            if size < config.get('min', 0):
+            if size < min_size:
                 log_once('Entry `%s` too small, rejecting' % entry['title'], logger)
                 entry.reject(
-                    'minimum size {} MB, got {} MB'.format(config['min'], size), remember=remember
+                    f'minimum size {format_filesize(min_size)}, got {format_filesize(size)}',
+                    remember=remember,
                 )
                 return True
-            if size > config.get('max', maxsize):
+            if size > max_size:
                 log_once('Entry `%s` too big, rejecting' % entry['title'], logger)
                 entry.reject(
-                    'maximum size {} MB, got {} MB'.format(config['max'], size), remember=remember
+                    f'maximum size {format_filesize(max_size)}, got {format_filesize(size)}',
+                    remember=remember,
                 )
                 return True
 

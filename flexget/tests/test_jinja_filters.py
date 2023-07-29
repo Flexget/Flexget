@@ -32,7 +32,6 @@ class TestJinjaFilters:
             set:
               size: "{{title|parse_size}}"
               size_si: "{{title|parse_size(si=True)}}"
-              size_case: "{{title|parse_size(case=False)}}"
     """
 
     custom_filters = [
@@ -98,7 +97,6 @@ class TestJinjaFilters:
 
         assert task.accepted[4]['size'] == int(task.accepted[4]['actual'] * 1024**3)
         assert task.accepted[4]['size_si'] == int(task.accepted[4]['actual'] * 1000**3)
-        assert task.accepted[4]['size_case'] == 6 * 1024**2  # a case that parsed wrong size
 
     @pytest.mark.parametrize('test_filter', custom_filters)
     def test_undefined_preserved(self, test_filter):

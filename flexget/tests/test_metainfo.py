@@ -14,9 +14,9 @@ class TestMetainfo:
     def test_content_size(self, execute_task):
         """Metainfo: parse content size"""
         task = execute_task('test_content_size')
-        assert task.find_entry(content_size=10), 'Content size 10 MB absent'
-        assert task.find_entry(content_size=200), 'Content size 200 MB absent'
-        assert task.find_entry(content_size=1024), 'Content size 1024 MB absent'
+        assert task.find_entry(content_size=int(10.2 * 1024**2)), 'Content size 10.2 MB absent'
+        assert task.find_entry(content_size=200 * 1024**2), 'Content size 200 MB absent'
+        assert task.find_entry(content_size=1024 * 1024**2), 'Content size 1024 MB absent'
 
 
 class TestMetainfoImdb:
