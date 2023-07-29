@@ -109,7 +109,7 @@ class SftpClient:
         self.host_key: Optional[HostKey] = host_key
 
         self.prefix: str = self._get_prefix()
-        self._sftp: 'pysftp.Connection' = self._connect(connection_tries)
+        self._sftp: pysftp.Connection = self._connect(connection_tries)
         self._handler_builder: HandlerBuilder = HandlerBuilder(
             self._sftp, self.prefix, self.private_key, self.private_key_pass, self.host_key
         )
@@ -312,7 +312,7 @@ class SftpClient:
 
         logger.debug('Connecting to {}', self.host)
 
-        sftp: Optional['pysftp.Connection'] = None
+        sftp: Optional[pysftp.Connection] = None
 
         while not sftp:
             try:

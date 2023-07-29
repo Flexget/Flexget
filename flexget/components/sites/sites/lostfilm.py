@@ -603,7 +603,7 @@ class LostFilm:
                 # The name is something like '365' or '36.6'
                 names_list.add(LostFilm._simplify_name(str(s_item)))
             elif isinstance(s_item, dict):
-                s_name, s_cfg = list(s_item.items())[0]
+                s_name, s_cfg = next(iter(s_item.items()))
                 names_list.add(LostFilm._simplify_name(s_name))
                 if s_cfg.get('alternate_name'):
                     if isinstance(s_cfg['alternate_name'], str):

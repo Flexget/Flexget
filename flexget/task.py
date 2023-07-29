@@ -571,10 +571,7 @@ class Task:
             err.logger.critical(err.value)
             self.abort(err.value)
         except DependencyError as e:
-            msg = 'Plugin `{}` cannot be used because dependency `{}` is missing.'.format(
-                keyword,
-                e.missing,
-            )
+            msg = f'Plugin `{keyword}` cannot be used because dependency `{e.missing}` is missing.'
             logger.critical(e.message)
             self.abort(msg)
         except Warning as e:

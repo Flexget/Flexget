@@ -60,9 +60,7 @@ def action_add(options):
             console(f"Adding regexp {options.regexp} to list {regexp_list.name}")
             db.add_to_list_by_name(regexp_list.name, options.regexp, session=session)
             console(
-                'Successfully added regexp {} to regexp list {} '.format(
-                    options.regexp, regexp_list.name
-                )
+                f'Successfully added regexp {options.regexp} to regexp list {regexp_list.name} '
             )
         else:
             console(f"Regexp {options.regexp} already exists in list {regexp_list.name}")
@@ -79,11 +77,7 @@ def action_del(options):
             console(f'Removing regexp {options.regexp} from list {options.list_name}')
             session.delete(regexp)
         else:
-            console(
-                'Could not find regexp {} in list {}'.format(
-                    options.movie_title, options.list_name
-                )
-            )
+            console(f'Could not find regexp {options.movie_title} in list {options.list_name}')
             return
 
 

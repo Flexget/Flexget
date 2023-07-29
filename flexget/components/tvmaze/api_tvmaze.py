@@ -79,9 +79,7 @@ class TVMazeLookup(Base):
             self.series = series
 
     def __repr__(self):
-        return '<TVMazeLookup(search_name={},series_id={})'.format(
-            self.search_name, self.series_id
-        )
+        return f'<TVMazeLookup(search_name={self.search_name},series_id={self.series_id})'
 
 
 class TVMazeSeries(Base):

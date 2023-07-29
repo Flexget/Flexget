@@ -41,9 +41,9 @@ class TrayIcon:
         logging.getLogger('PIL.Image').setLevel(logging.INFO)
 
         self.path_to_image: Path = path_to_image
-        self.icon: Optional['Icon'] = None
-        self._menu: Optional['Menu'] = None
-        self.menu_items: List['MenuItem'] = []
+        self.icon: Optional[Icon] = None
+        self._menu: Optional[Menu] = None
+        self.menu_items: List[MenuItem] = []
 
         self.active: bool = _import_success
         self.running: bool = False
