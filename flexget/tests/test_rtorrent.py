@@ -315,10 +315,7 @@ class TestRTorrentOutputPlugin:
 
         mocked_client.update.assert_called_with(
             info_hash=torrent_info_hash,
-            fields={
-                'priority': 1,
-                'custom1': 'test_custom1'
-            },
+            fields={'priority': 1, 'custom1': 'test_custom1'},
             custom_fields={},
         )
 
@@ -333,9 +330,7 @@ class TestRTorrentOutputPlugin:
 
         mocked_client.update.assert_called_with(
             info_hash=torrent_info_hash,
-            fields={
-                'custom1': 'test_custom1'
-            },
+            fields={'custom1': 'test_custom1'},
             custom_fields={},
         )
 
