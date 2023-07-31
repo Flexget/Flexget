@@ -335,8 +335,8 @@ class TestRTorrentOutputPlugin:
         )
 
         mocked_client.move.assert_called_with(
-            info_hash=torrent_info_hash,
-            dst_path='/new/path',
+            torrent_info_hash,
+            '/new/path',
         )
 
     def test_delete(self, mocked_client, execute_task):
@@ -347,7 +347,7 @@ class TestRTorrentOutputPlugin:
 
         execute_task('test_delete')
 
-        mocked_client.delete.assert_called_with(info_hash=torrent_info_hash)
+        mocked_client.delete.assert_called_with(torrent_info_hash)
 
 
 @mock.patch('flexget.plugins.clients.rtorrent.RTorrent')
