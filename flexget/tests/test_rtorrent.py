@@ -299,6 +299,7 @@ class TestRTorrentOutputPlugin:
                 'custom1': 'test_custom1',
                 'custom2': 'test_custom2',
             },
+            custom_fields={},
             start=False,
             mkdir=False,
         )
@@ -313,7 +314,12 @@ class TestRTorrentOutputPlugin:
         execute_task('test_update')
 
         mocked_client.update.assert_called_with(
-            torrent_info_hash, {'priority': 1, 'custom1': 'test_custom1'}
+            info_hash=torrent_info_hash,
+            fields={
+                'priority': 1,
+                'custom1': 'test_custom1'
+            },
+            custom_fields={},
         )
 
     def test_update_path(self, mocked_client, execute_task):
@@ -325,9 +331,18 @@ class TestRTorrentOutputPlugin:
 
         execute_task('test_update_path')
 
-        mocked_client.update.assert_called_with(torrent_info_hash, {'custom1': 'test_custom1'})
+        mocked_client.update.assert_called_with(
+            info_hash=torrent_info_hash,
+            fields={
+                'custom1': 'test_custom1'
+            },
+            custom_fields={},
+        )
 
-        mocked_client.move.assert_called_with(torrent_info_hash, '/new/path')
+        mocked_client.move.assert_called_with(
+            info_hash=torrent_info_hash,
+            dst_path='/new/path',
+        )
 
     def test_delete(self, mocked_client, execute_task):
         mocked_client = mocked_client()
@@ -337,7 +352,7 @@ class TestRTorrentOutputPlugin:
 
         execute_task('test_delete')
 
-        mocked_client.delete.assert_called_with(torrent_info_hash)
+        mocked_client.delete.assert_called_with(info_hash=torrent_info_hash)
 
 
 @mock.patch('flexget.plugins.clients.rtorrent.RTorrent')
