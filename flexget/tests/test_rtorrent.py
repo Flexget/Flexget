@@ -384,7 +384,9 @@ class TestRTorrentInputPlugin:
         task = execute_task('test_input')
 
         mocked_client.torrents.assert_called_with(
-            'complete', fields=['custom1', 'custom3', 'down_rate']
+            'complete',
+            fields=['custom1', 'custom3', 'down_rate'],
+            custom_fields=None,
         )
 
         assert len(task.all_entries) == 2
