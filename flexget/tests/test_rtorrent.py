@@ -278,7 +278,7 @@ class TestRTorrentOutputPlugin:
         mocked_client.load.assert_called_with(
             torrent_raw,
             fields={'priority': 3, 'directory': '/data/downloads', 'custom1': 'test_custom1'},
-            custom_fields={}
+            custom_fields={},
             start=True,
             mkdir=True,
         )
