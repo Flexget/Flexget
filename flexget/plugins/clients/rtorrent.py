@@ -305,7 +305,7 @@ class RTorrent:
             fields = list(self.default_fields)
 
         if not custom_fields:
-            custom_fields = list()
+            custom_fields = []
 
         fields = self._clean_fields(fields)
 
@@ -329,7 +329,7 @@ class RTorrent:
         fields = self._clean_fields(fields)
 
         if not custom_fields:
-            custom_fields = list()
+            custom_fields = []
 
         params = ['d.%s=' % field for field in fields]
 
@@ -343,7 +343,10 @@ class RTorrent:
         resp = self._server.d.multicall2('', params)
 
         # Response is formatted as a list of lists, with just the values
-        return [dict(list(zip(self._clean_fields(fields, reverse=True) + custom_fields, val))) for val in resp]
+        return [
+            dict(list(zip(self._clean_fields(fields, reverse=True) + custom_fields, val)))
+            for val in resp
+        ]
 
     def update(self, info_hash, fields, custom_fields=None):
         if not fields:
@@ -708,7 +711,9 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
             custom_fields = {}
 
         try:
-            resp = client.load(torrent_raw, fields=options, custom_fields=custom_fields, start=start, mkdir=mkdir)
+            resp = client.load(
+                torrent_raw, fields=options, custom_fields=custom_fields, start=start, mkdir=mkdir
+            )
             if resp != 0:
                 entry.fail('Failed to add to rTorrent invalid return value %s' % resp)
         except xmlrpc_client.Error as e:
