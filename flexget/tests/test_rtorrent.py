@@ -197,8 +197,12 @@ class TestRTorrentClient:
 
 @mock.patch('flexget.plugins.clients.rtorrent.RTorrent')
 class TestRTorrentOutputPlugin:
+    variable_value = 'variable field jinja replacesment test value'
+    entry_field_value = 'entry field jinja replacement test value'
     config = (
         """
+        variables:
+            rtorrent_variable_test: '""" + variable_value + """'
         tasks:
           test_add_torrent:
             accept_all: yes
@@ -206,6 +210,8 @@ class TestRTorrentOutputPlugin:
               - {title: 'test', url: '"""
         + torrent_url
         + """'}
+            set:
+              rtorrent_test_add_val: '""" + entry_field_value + """'
             rtorrent:
               action: add
               start: yes
@@ -214,6 +220,10 @@ class TestRTorrentOutputPlugin:
               priority: high
               path: /data/downloads
               custom1: test_custom1
+              custom_fields:
+                named_custom_field_1: named custom field value 1
+                named_custom_field_2: Test variable substitution - '{? rtorrent_variable_test ?}'
+                named_custom_field_3: Test entry field substitution - '{{rtorrent_test_add_val}}'
           test_add_torrent_set:
             accept_all: yes
             set:
@@ -278,7 +288,11 @@ class TestRTorrentOutputPlugin:
         mocked_client.load.assert_called_with(
             torrent_raw,
             fields={'priority': 3, 'directory': '/data/downloads', 'custom1': 'test_custom1'},
-            custom_fields={},
+            custom_fields={
+                'named_custom_field_1': 'named custom field value 1',
+                'named_custom_field_2': "Test variable substitution - '" + self.variable_value + "'",
+                'named_custom_field_3': "Test entry field substitution - '" + self.entry_field_value + "'",
+            },
             start=True,
             mkdir=True,
         )
