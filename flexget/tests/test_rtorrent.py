@@ -202,7 +202,9 @@ class TestRTorrentOutputPlugin:
     config = (
         """
         variables:
-            rtorrent_variable_test: '""" + variable_value + """'
+            rtorrent_variable_test: '"""
+        + variable_value
+        + """'
         tasks:
           test_add_torrent:
             accept_all: yes
@@ -211,7 +213,9 @@ class TestRTorrentOutputPlugin:
         + torrent_url
         + """'}
             set:
-              rtorrent_test_add_val: '""" + entry_field_value + """'
+              rtorrent_test_add_val: '"""
+        + entry_field_value
+        + """'
             rtorrent:
               action: add
               start: yes
@@ -292,8 +296,12 @@ class TestRTorrentOutputPlugin:
             fields={'priority': 3, 'directory': '/data/downloads', 'custom1': 'test_custom1'},
             custom_fields={
                 'named_custom_field_1': 'named custom field value 1',
-                'named_custom_field_2': "Test variable substitution - '" + self.variable_value + "'",
-                'named_custom_field_3': "Test entry field substitution - '" + self.entry_field_value + "'",
+                'named_custom_field_2': "Test variable substitution - '"
+                + self.variable_value
+                + "'",
+                'named_custom_field_3': "Test entry field substitution - '"
+                + self.entry_field_value
+                + "'",
             },
             start=True,
             mkdir=True,
