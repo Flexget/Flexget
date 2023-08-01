@@ -270,7 +270,7 @@ class RTorrent:
         # Set custom fields
         for key, val in custom_fields.items():
             # Values must be escaped if within params
-            params.append(f'd.custom.set={re.escape(str(key))},{re.escape(str(val))}')
+            params.append('d.custom.set="{}","{}"'.format(key.replace('"', '\\"'), val.replace('"', '\\"')))
 
         if mkdir and 'directory' in fields:
             result = self._server.execute.throw('', 'mkdir', '-p', fields['directory'])
@@ -316,7 +316,7 @@ class RTorrent:
             getattr(multi_call, method_name)(info_hash)
 
         for custom_field in custom_fields:
-            method_name = 'd.custom%s' % re.escape(str(custom_field))
+            method_name = 'd.custom={}'.format(custom_field.replace('"', '\\"'))
             getattr(multi_call, method_name)(info_hash)
 
         resp = multi_call()
@@ -336,7 +336,7 @@ class RTorrent:
         # Set custom fields
         for custom_field in custom_fields:
             # Values must be escaped if within params
-            params.append(f'd.custom={re.escape(str(custom_field))}')
+            params.append('d.custom={}'.format(custom_field.replace('"', '\\"')))
 
         params.insert(0, view)
 
