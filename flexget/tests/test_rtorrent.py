@@ -259,6 +259,9 @@ class TestRTorrentOutputPlugin:
               action: update
               uri: http://localhost/SCGI
               custom1: test_custom1
+              custom_fields:
+                named_custom_field_1: named custom field value 1 update
+                named_custom_field_update_1: some value
           test_update_path:
             accept_all: yes
             mock:
@@ -270,6 +273,9 @@ class TestRTorrentOutputPlugin:
               custom1: test_custom1
               uri: http://localhost/SCGI
               path: /new/path
+              custom_fields:
+                named_custom_field_1: named custom field value 1 update again
+                named_custom_field_update_2: some value again
           test_delete:
             accept_all: yes
             mock:
@@ -340,7 +346,10 @@ class TestRTorrentOutputPlugin:
         mocked_client.update.assert_called_with(
             info_hash=torrent_info_hash,
             fields={'priority': 1, 'custom1': 'test_custom1'},
-            custom_fields={},
+            custom_fields={
+                'named_custom_field_1': 'named custom field value 1 update',
+                'named_custom_field_update_1': 'some value',
+            },
         )
 
     def test_update_path(self, mocked_client, execute_task):
@@ -355,7 +364,10 @@ class TestRTorrentOutputPlugin:
         mocked_client.update.assert_called_with(
             info_hash=torrent_info_hash,
             fields={'custom1': 'test_custom1'},
-            custom_fields={},
+            custom_fields={
+                'named_custom_field_1': 'named custom field value 1 update again'
+                'named_custom_field_update_2': 'some value again'
+            },
         )
 
         mocked_client.move.assert_called_with(
@@ -387,7 +399,10 @@ class TestRTorrentInputPlugin:
                 - custom1
                 - custom3
                 - down_rate
-
+              custom_fields:
+                - foo
+                - bar
+                - foobar
     """
 
     def test_input(self, mocked_client, execute_task):
@@ -410,7 +425,7 @@ class TestRTorrentInputPlugin:
         mocked_client.torrents.assert_called_with(
             'complete',
             fields=['custom1', 'custom3', 'down_rate'],
-            custom_fields=None,
+            custom_fields=['foo', 'bar', 'foobar'],
         )
 
         assert len(task.all_entries) == 2
