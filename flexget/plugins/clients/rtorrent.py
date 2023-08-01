@@ -270,7 +270,9 @@ class RTorrent:
         # Set custom fields
         for key, val in custom_fields.items():
             # Values must be escaped if within params
-            params.append('d.custom.set="{}","{}"'.format(key.replace('"', '\\"'), val.replace('"', '\\"')))
+            params.append(
+                'd.custom.set="{}","{}"'.format(key.replace('"', '\\"'), val.replace('"', '\\"'))
+            )
 
         if mkdir and 'directory' in fields:
             result = self._server.execute.throw('', 'mkdir', '-p', fields['directory'])
