@@ -329,7 +329,9 @@ class TestRTorrentOutputPlugin:
                 'custom1': 'test_custom1',
                 'custom2': 'test_custom2',
             },
-            custom_fields={'named_custom_field_1': 'named custom field value 1',},
+            custom_fields={
+                'named_custom_field_1': 'named custom field value 1',
+            },
             start=False,
             mkdir=False,
         )
