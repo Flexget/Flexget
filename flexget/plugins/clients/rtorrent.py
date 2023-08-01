@@ -426,24 +426,15 @@ class RTorrentPluginBase:
                     options[opt_key] = entry.render(entry_value)
 
         # Add custom fields on to options
-        entry_custom_fields = entry.get('custom_fields')
-        config_custom_fields = config.get('custom_fields')
+        entry_custom_fields = entry.get('custom_fields', {})
+        config_custom_fields = config.get('custom_fields', {})
 
-        if entry_custom_fields is None:
-            entry_custom_fields = {}
-
-        if config_custom_fields is None:
-            config_custom_fields = {}
-
-        merged_custom_fields = {}
         if entry_first:
-            merged_custom_fields.update(entry_custom_fields)
-            merged_custom_fields.update(config_custom_fields)
+            merged_custom_fields = {**config_custom_fields, **entry_custom_fields}
         else:
-            merged_custom_fields.update(config_custom_fields)
-            merged_custom_fields.update(entry_custom_fields)
+            merged_custom_fields = {**entry_custom_fields, **config_custom_fields}
 
-        if len(merged_custom_fields) > 0:
+        if merged_custom_fields:
             options['custom_fields'] = {}
             for key, value in merged_custom_fields.items():
                 options['custom_fields'][key] = entry.render(value)
@@ -705,10 +696,7 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
             pass
 
         # Setup options and custom fields
-        if 'custom_fields' in options:
-            custom_fields = options.pop('custom_fields')
-        else:
-            custom_fields = {}
+        custom_fields = options.pop('custom_fields', {})
 
         try:
             resp = client.load(
