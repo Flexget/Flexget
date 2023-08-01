@@ -231,6 +231,8 @@ class TestRTorrentOutputPlugin:
               custom1: test_custom1
               priority: low
               custom2: test_custom2
+              custom_fields:
+                named_custom_field_1: named custom field value 1
             mock:
               - {title: 'test', url: '"""
         + torrent_url
@@ -313,7 +315,7 @@ class TestRTorrentOutputPlugin:
                 'custom1': 'test_custom1',
                 'custom2': 'test_custom2',
             },
-            custom_fields={},
+            custom_fields={'named_custom_field_1': 'named custom field value 1',},
             start=False,
             mkdir=False,
         )
