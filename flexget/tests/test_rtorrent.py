@@ -365,8 +365,8 @@ class TestRTorrentOutputPlugin:
             info_hash=torrent_info_hash,
             fields={'custom1': 'test_custom1'},
             custom_fields={
-                'named_custom_field_1': 'named custom field value 1 update again'
-                'named_custom_field_update_2': 'some value again'
+                'named_custom_field_1': 'named custom field value 1 update again',
+                'named_custom_field_update_2': 'some value again',
             },
         )
 
