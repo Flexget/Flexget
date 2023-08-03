@@ -169,7 +169,7 @@ class TestRTorrentClient:
 
         assert resp == 0
 
-        print('JMLTEST: {}'.format(mocked_proxy.mock_calls))
+        print(f'JMLTEST: {mocked_proxy.mock_calls}')
 
         mocked_proxy.execute.throw.assert_has_calls(
             [
