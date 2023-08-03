@@ -169,8 +169,6 @@ class TestRTorrentClient:
 
         assert resp == 0
 
-        print(f'JMLTEST: {mocked_proxy.mock_calls}')
-
         mocked_proxy.execute.throw.assert_has_calls(
             [
                 mock.call('', 'rm', '-drf', '/data/downloads/ubuntu-9.04-desktop-amd64.iso'),
