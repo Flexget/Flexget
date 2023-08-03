@@ -483,7 +483,7 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
             'mkdir': {'type': 'boolean', 'default': True},
             'action': {
                 'type': 'string',
-                'emun': ['update', 'delete', 'add', 'purge'],
+                'enum': ['update', 'delete', 'add', 'purge'],
                 'default': 'add',
             },
             # properties to set on rtorrent download object
