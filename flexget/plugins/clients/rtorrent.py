@@ -372,6 +372,19 @@ class RTorrent:
     def delete(self, info_hash):
         return self._server.d.erase(info_hash)
 
+    def purge_torrent(self, info_hash):
+        torrent = self.torrent(info_hash, fields=['base_path'])
+        base_path = torrent['base_path']
+
+        self.stop(info_hash)
+
+        try:
+            self._server.execute.throw('', 'rm', '-drfa', base_path)
+        except xmlrpc_client.Error:
+            raise xmlrpc_client.Error(f'Unable to delete data at "{base_path}"')
+
+        return self.delete(info_hash)
+
     def stop(self, info_hash):
         self._server.d.stop(info_hash)
         return self._server.d.close(info_hash)
@@ -468,7 +481,7 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
             'digest_auth': {'type': 'boolean', 'default': False},
             'start': {'type': 'boolean', 'default': True},
             'mkdir': {'type': 'boolean', 'default': True},
-            'action': {'type': 'string', 'emun': ['update', 'delete', 'add'], 'default': 'add'},
+            'action': {'type': 'string', 'emun': ['update', 'delete', 'add', 'purge'], 'default': 'add'},
             # properties to set on rtorrent download object
             'message': {'type': 'string'},
             'priority': {'type': 'string'},
@@ -552,6 +565,16 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
                         continue
                     self.delete_entry(client, entry)
 
+                if config['action'] == 'purge':
+                    if task.options.test:
+                        logger.info(
+                            'Would purge {} ({}) from rTorrent',
+                            entry['title'],
+                            entry['torrent_info_hash'],
+                        )
+                        continue
+                    self.purge_entry(client, entry)
+
                 if config['action'] == 'update':
                     if task.options.test:
                         logger.info(
@@ -573,6 +596,16 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
             )
         except xmlrpc_client.Error as e:
             entry.fail('Failed to delete: %s' % str(e))
+            return
+
+    def purge_entry(self, client, entry):
+        try:
+            client.purge_torrent(entry['torrent_info_hash'])
+            logger.verbose(
+                'Purged {} ({}) in rtorrent ', entry['title'], entry['torrent_info_hash']
+            )
+        except xmlrpc_client.Error as e:
+            entry.fail('Failed to purge: %s' % str(e))
             return
 
     def update_entry(self, client, entry, config):
