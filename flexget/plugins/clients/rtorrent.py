@@ -481,7 +481,11 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
             'digest_auth': {'type': 'boolean', 'default': False},
             'start': {'type': 'boolean', 'default': True},
             'mkdir': {'type': 'boolean', 'default': True},
-            'action': {'type': 'string', 'emun': ['update', 'delete', 'add', 'purge'], 'default': 'add'},
+            'action': {
+                'type': 'string',
+                'emun': ['update', 'delete', 'add', 'purge'],
+                'default': 'add',
+            },
             # properties to set on rtorrent download object
             'message': {'type': 'string'},
             'priority': {'type': 'string'},
