@@ -251,9 +251,13 @@ class RTorrent:
 
         return fields
 
-    def load(self, raw_torrent, fields=None, start=False, mkdir=True):
+    def load(self, raw_torrent, fields=None, custom_fields=None, start=False, mkdir=True):
         if fields is None:
             fields = {}
+
+        if custom_fields is None:
+            custom_fields = {}
+
         # First param is empty 'target'
         params = ['', xmlrpc_client.Binary(raw_torrent)]
 
@@ -262,6 +266,13 @@ class RTorrent:
             # Values must be escaped if within params
             # TODO: What are the escaping requirements? re.escape works differently on python 3.7+
             params.append(f'd.{key}.set={re.escape(str(val))}')
+
+        # Set custom fields
+        for key, val in custom_fields.items():
+            # Values must be escaped if within params
+            params.append(
+                'd.custom.set="{}","{}"'.format(key.replace('"', '\\"'), val.replace('"', '\\"'))
+            )
 
         if mkdir and 'directory' in fields:
             result = self._server.execute.throw('', 'mkdir', '-p', fields['directory'])
@@ -290,10 +301,13 @@ class RTorrent:
     def get_directory(self):
         return self._server.get_directory()
 
-    def torrent(self, info_hash, fields=None):
+    def torrent(self, info_hash, fields=None, custom_fields=None):
         """Get the details of a torrent"""
         if not fields:
             fields = list(self.default_fields)
+
+        if not custom_fields:
+            custom_fields = []
 
         fields = self._clean_fields(fields)
 
@@ -303,29 +317,55 @@ class RTorrent:
             method_name = 'd.%s' % field
             getattr(multi_call, method_name)(info_hash)
 
+        for custom_field in custom_fields:
+            method_name = 'd.custom={}'.format(custom_field.replace('"', '\\"'))
+            getattr(multi_call, method_name)(info_hash)
+
         resp = multi_call()
         # TODO: Maybe we should return a named tuple or a Torrent class?
         return dict(list(zip(self._clean_fields(fields, reverse=True), list(resp))))
 
-    def torrents(self, view='main', fields=None):
+    def torrents(self, view='main', fields=None, custom_fields=None):
         if not fields:
             fields = list(self.default_fields)
         fields = self._clean_fields(fields)
 
+        if not custom_fields:
+            custom_fields = []
+
         params = ['d.%s=' % field for field in fields]
+
+        # Set custom fields
+        for custom_field in custom_fields:
+            # Values must be escaped if within params
+            params.append('d.custom={}'.format(custom_field.replace('"', '\\"')))
+
         params.insert(0, view)
 
         resp = self._server.d.multicall2('', params)
 
         # Response is formatted as a list of lists, with just the values
-        return [dict(list(zip(self._clean_fields(fields, reverse=True), val))) for val in resp]
+        return [
+            dict(list(zip(self._clean_fields(fields, reverse=True) + custom_fields, val)))
+            for val in resp
+        ]
 
-    def update(self, info_hash, fields):
+    def update(self, info_hash, fields, custom_fields=None):
+        if not fields:
+            fields = {}
+
+        if not custom_fields:
+            custom_fields = {}
+
         multi_call = xmlrpc_client.MultiCall(self._server)
 
         for key, val in fields.items():
             method_name = 'd.%s.set' % key
             getattr(multi_call, method_name)(info_hash, val)
+
+        for key, val in custom_fields.items():
+            method_name = 'd.custom.set'
+            getattr(multi_call, method_name)(info_hash, key, val)
 
         return multi_call()[0]
 
@@ -387,6 +427,20 @@ class RTorrentPluginBase:
                 elif entry_value:
                     options[opt_key] = entry.render(entry_value)
 
+        # Add custom fields on to options
+        entry_custom_fields = entry.get('custom_fields', {})
+        config_custom_fields = config.get('custom_fields', {})
+
+        if entry_first:
+            merged_custom_fields = {**config_custom_fields, **entry_custom_fields}
+        else:
+            merged_custom_fields = {**entry_custom_fields, **config_custom_fields}
+
+        if merged_custom_fields:
+            options['custom_fields'] = {}
+            for key, value in merged_custom_fields.items():
+                options['custom_fields'][key] = entry.render(value)
+
         # Convert priority from string to int
         priority = options.get('priority')
         if priority and priority in self.priority_map:
@@ -425,6 +479,7 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
             'custom4': {'type': 'string'},
             'custom5': {'type': 'string'},
             'fast_resume': {'type': 'boolean', 'default': False},
+            'custom_fields': {'type': 'object', 'additionalProperties': {'type': 'string'}},
         },
         'required': ['uri'],
         'additionalProperties': False,
@@ -556,8 +611,13 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
         if 'directory' in options:
             del options['directory']
 
+        if 'custom_fields' in options:
+            custom_fields = options.pop('custom_fields')
+        else:
+            custom_fields = {}
+
         try:
-            client.update(info_hash, options)
+            client.update(info_hash=info_hash, fields=options, custom_fields=custom_fields)
             logger.verbose('Updated {} ({}) in rtorrent ', entry['title'], info_hash)
         except xmlrpc_client.Error as e:
             entry.fail('Failed to update: %s' % str(e))
@@ -637,8 +697,13 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
             # No existing found
             pass
 
+        # Setup options and custom fields
+        custom_fields = options.pop('custom_fields', {})
+
         try:
-            resp = client.load(torrent_raw, fields=options, start=start, mkdir=mkdir)
+            resp = client.load(
+                torrent_raw, fields=options, custom_fields=custom_fields, start=start, mkdir=mkdir
+            )
             if resp != 0:
                 entry.fail('Failed to add to rTorrent invalid return value %s' % resp)
         except xmlrpc_client.Error as e:
@@ -673,6 +738,7 @@ class RTorrentInputPlugin(RTorrentPluginBase):
             'digest_auth': {'type': 'boolean', 'default': False},
             'view': {'type': 'string', 'default': 'main'},
             'fields': one_or_more({'type': 'string', 'enum': list(RTorrent.default_fields)}),
+            'custom_fields': {'type': 'array', 'items': {'type': 'string'}},
         },
         'required': ['uri'],
         'additionalProperties': False,
@@ -688,9 +754,10 @@ class RTorrentInputPlugin(RTorrentPluginBase):
         )
 
         fields = config.get('fields')
+        custom_fields = config.get('custom_fields')
 
         try:
-            torrents = client.torrents(config['view'], fields=fields)
+            torrents = client.torrents(config['view'], fields=fields, custom_fields=custom_fields)
         except (OSError, xmlrpc_client.Error) as e:
             task.abort('Could not get torrents ({}): {}'.format(config['view'], e))
             return
