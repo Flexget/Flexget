@@ -379,7 +379,7 @@ class RTorrent:
         self.stop(info_hash)
 
         try:
-            self._server.execute.throw('', 'rm', '-drfa', base_path)
+            self._server.execute.throw('', 'rm', '-drf', base_path)
         except xmlrpc_client.Error:
             raise xmlrpc_client.Error(f'Unable to delete data at "{base_path}"')
 
