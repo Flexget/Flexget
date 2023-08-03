@@ -1,4 +1,3 @@
-from sys import maxsize
 from typing import Tuple
 
 from loguru import logger
@@ -24,19 +23,14 @@ class FilterContentSize:
 
     @staticmethod
     def process_config(config: dict) -> Tuple[int, int]:
-        min_size = config.get('min', 0)
-        if isinstance(min_size, (int, float)):
-            min_size = min_size * 1024**2
-        else:
-            min_size = parse_filesize(min_size)
-        max_size = maxsize
-        if config.get('max'):
-            max_size = config['max']
-            if isinstance(max_size, (int, float)):
-                max_size = max_size * 1024**2
-            else:
-                max_size = parse_filesize(max_size)
-        return min_size, max_size
+        def _parse_config_size(size):
+            if isinstance(size, (int, float)):
+                return size * 1024**2
+            if isinstance(size, str):
+                return parse_filesize(size)
+            return None
+
+        return _parse_config_size(config.get('min')), _parse_config_size(config.get('max'))
 
     def process_entry(self, task, entry, config, remember=True):
         """Rejects this entry if it does not pass content_size requirements. Returns true if the entry was rejected."""
@@ -46,14 +40,14 @@ class FilterContentSize:
             logger.debug('{} size {}', entry['title'], format_filesize(size))
             # Avoid confusion by printing a reject message to info log, as
             # download plugin has already printed a downloading message.
-            if size < min_size:
+            if min_size is not None and size < min_size:
                 log_once('Entry `%s` too small, rejecting' % entry['title'], logger)
                 entry.reject(
                     f'minimum size {format_filesize(min_size)}, got {format_filesize(size)}',
                     remember=remember,
                 )
                 return True
-            if size > max_size:
+            if max_size is not None and size > max_size:
                 log_once('Entry `%s` too big, rejecting' % entry['title'], logger)
                 entry.reject(
                     f'maximum size {format_filesize(max_size)}, got {format_filesize(size)}',
