@@ -150,6 +150,31 @@ class TestRTorrentClient:
         assert resp == 0
         assert mocked_proxy.d.erase.called_with((torrent_info_hash,))
 
+    def test_purge_torrent(self, mocked_proxy):
+        mocked_proxy = mocked_proxy()
+
+        mocked_proxy.system.multicall.return_value = [
+            ['ubuntu-9.04-desktop-amd64.iso'],
+            [torrent_info_hash],
+            ['/data/downloads/ubuntu-9.04-desktop-amd64.iso'],
+        ]
+
+        mocked_proxy.d.stop.return_value = 0
+        mocked_proxy.d.close.return_value = 0
+        mocked_proxy.d.erase.return_value = 0
+        mocked_proxy.execute.throw.return_value = 0
+
+        client = RTorrent('http://localhost/RPC2')
+        resp = client.purge_torrent(torrent_info_hash)
+
+        assert resp == 0
+
+        mocked_proxy.execute.throw.assert_has_calls(
+            [
+                mock.call('', 'rm', '-drf', '/data/downloads/ubuntu-9.04-desktop-amd64.iso'),
+            ]
+        )
+
     def test_move(self, mocked_proxy):
         mocked_proxy = mocked_proxy()
         mocked_proxy.system.multicall.return_value = [
@@ -286,6 +311,15 @@ class TestRTorrentOutputPlugin:
               action: delete
               uri: http://localhost/SCGI
               custom1: test_custom1
+          test_purge:
+            accept_all: yes
+            mock:
+              - {title: 'test', url: '"""
+        + torrent_url
+        + """', 'torrent_info_hash': '09977FE761B8D293AD8A929CCAF2E9322D525A6C'}
+            rtorrent:
+              action: purge
+              uri: http://localhost/SCGI
     """
     )
 
@@ -386,6 +420,16 @@ class TestRTorrentOutputPlugin:
         execute_task('test_delete')
 
         mocked_client.delete.assert_called_with(torrent_info_hash)
+
+    def test_purge(self, mocked_client, execute_task):
+        mocked_client = mocked_client()
+        mocked_client.load.return_value = 0
+        mocked_client.version = [0, 9, 4]
+        mocked_client.purge_torrent.return_value = 0
+
+        execute_task('test_purge')
+
+        mocked_client.purge_torrent.assert_called_with(torrent_info_hash)
 
 
 @mock.patch('flexget.plugins.clients.rtorrent.RTorrent')
