@@ -26,7 +26,7 @@ from loguru import logger
 from flexget.event import event
 from flexget.utils.lazy_dict import LazyDict
 from flexget.utils.pathscrub import pathscrub
-from flexget.utils.tools import parse_filesize, split_title_year
+from flexget.utils.tools import format_filesize, parse_filesize, split_title_year
 
 if TYPE_CHECKING:
     from flexget.entry import Entry
@@ -196,6 +196,14 @@ def filter_parse_size(val: str, si: bool = False, match_re: Optional[str] = None
         return parse_filesize(val, si=si, match_re=match_re)
     except ValueError:
         return 0
+
+
+def filter_format_size(val: Union[str, int, float], si=False):
+    try:
+        size = int(val)
+    except ValueError:
+        return val
+    return format_filesize(size, si=si)
 
 
 def is_fs_file(pathname: Union[str, os.PathLike]) -> bool:
