@@ -51,6 +51,7 @@ class TestJinjaFilters:
         'strip_year',
         'get_year',
         'parse_size',
+        'format_size',
         'asciify',
         'strip_symbols',
     ]

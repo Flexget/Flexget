@@ -198,11 +198,9 @@ def filter_parse_size(val: str, si: bool = False, match_re: Optional[str] = None
         return 0
 
 
-def filter_format_size(val: Union[str, int, float], si=False):
-    try:
-        size = int(val)
-    except ValueError:
-        return val
+def filter_format_size(size: Union[int, float], si=False):
+    if not isinstance(size, (int, float)):
+        return size
     return format_filesize(size, si=si)
 
 
