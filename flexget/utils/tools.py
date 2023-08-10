@@ -383,12 +383,24 @@ def parse_filesize(
     return int(amount * (base**order))
 
 
-def format_filesize(num_bytes: Union[int, float], si: bool = False) -> str:
-    """Returns given bytes as prettified string."""
+def format_filesize(
+    num_bytes: Union[int, float], si: bool = False, unit: Optional[str] = None
+) -> str:
+    """
+    Returns given bytes as prettified string.
 
+    :param bool si: If true, decimal based units will be used rather than binary.
+    :param str unit: If a specific unit is specified it will be used. Otherwise,
+        an appropriate unit will be picked automatically based on size.
+    """
+
+    if unit:
+        all_units = [f'{p}b' for p in 'kmgtp'] + [f'{p}ib' for p in 'kmgtp'] + ['b']
+        if unit.lower() not in all_units:
+            raise ValueError(f'{unit} is not a recognized filesize unit')
+        si = 'i' not in unit.lower()
     base = 1000 if si else 1024
     amount = float(num_bytes)
-    prefix = ''
     unit_prefixes = [
         # For some reason the convention is to use lowercase k for si kilobytes
         'k' if si else 'K',
@@ -397,13 +409,20 @@ def format_filesize(num_bytes: Union[int, float], si: bool = False) -> str:
         'T',
         'P',
     ]
-    for unit in unit_prefixes:
-        if amount >= base:
-            amount /= base
-            prefix = f'{unit}{"" if si else "i"}'
-        else:
+
+    out_unit = 'B'
+    round_digits = 2
+    for p in unit_prefixes:
+        if not unit and amount < base:
             break
-    return f'{round(amount, 2)} {prefix}B'
+        if unit and out_unit.lower() == unit.lower():
+            break
+        amount /= base
+        out_unit = f'{p}{"" if si else "i"}B'
+        # If user specified a unit that's too big, allow a few more fractional digits
+        if amount < 1:
+            round_digits += 1
+    return f'{round(amount, round_digits)} {out_unit}'
 
 
 def get_config_hash(config: Any) -> str:

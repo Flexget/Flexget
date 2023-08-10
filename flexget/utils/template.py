@@ -198,10 +198,10 @@ def filter_parse_size(val: str, si: bool = False, match_re: Optional[str] = None
         return 0
 
 
-def filter_format_size(size: Union[int, float], si=False):
+def filter_format_size(size: Union[int, float], si=False, unit=None):
     if not isinstance(size, (int, float)):
         return size
-    return format_filesize(size, si=si)
+    return format_filesize(size, si=si, unit=unit)
 
 
 def is_fs_file(pathname: Union[str, os.PathLike]) -> bool:
