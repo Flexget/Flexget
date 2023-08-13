@@ -1,3 +1,5 @@
+from rich.markup import escape
+
 from flexget import options, plugin
 from flexget.event import event
 from flexget.manager import Manager
@@ -105,7 +107,7 @@ def seen_search(manager: Manager, options, session=None):
     seen_entries = db.search(value=search_term, status=None, tasks=tasks, session=session)
     table = TerminalTable('Field', 'Value', table_type=options.table_type)
     for se in seen_entries.all():
-        table.add_row('Title', se.title)
+        table.add_row('Title', escape(se.title))
         for sf in se.fields:
             if sf.field.lower() == 'title':
                 continue
