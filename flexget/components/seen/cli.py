@@ -32,14 +32,17 @@ def seen_forget(manager: Manager, options):
             forget_name = imdb_id
 
     tasks = None
-    if options.tasks:
+    if options.task:
         tasks = []
-        for task in options.tasks:
+        for task in options.task:
             try:
                 tasks.extend(m for m in manager.matching_tasks(task) if m not in tasks)
             except ValueError as e:
                 console(e)
                 continue
+        if not tasks:
+            console('None of the specified tasks exist.')
+            return
 
     # If tasks are specified it should use pattern matching as search
     if tasks:
@@ -63,21 +66,30 @@ def seen_add(manager: Manager, options):
         else:
             console("Could not parse IMDB ID")
 
-    task = DEFAULT_TASK
-    local = None
-    if options.task and options.task not in manager.tasks:
-        console(f"Task `{options.task}` not in config")
-        return
-    else:
-        task = options.task
+    if options.task:
+        tasks = []
         local = True
+        for task in options.task:
+            if task not in manager.tasks:
+                console(f"Task `{task}` not in config")
+                continue
+            tasks.append(task)
+        if not tasks:
+            console('No specified tasks in config.')
+            return
+    else:
+        tasks = [DEFAULT_TASK]
+        local = None
 
-    db.add(seen_name, task, {'cli_add': seen_name}, local=local)
+    for task in tasks:
+        db.add(seen_name, task, {'cli_add': seen_name}, local=local)
 
-    if task == DEFAULT_TASK:
+    if tasks == [DEFAULT_TASK]:
         console(f'Added `{seen_name}` as seen. This will affect all tasks.')
     else:
-        console(f'Added `{seen_name}` as seen. This will affect `{task}` task.')
+        console(
+            f'Added `{seen_name}` as seen. This will affect {", ".join(f"`{t}`" for t in tasks)} task(s).'
+        )
 
 
 @with_session
@@ -95,9 +107,9 @@ def seen_search(manager: Manager, options, session=None):
         search_term = search_term.replace("*", "%").replace("?", "_")
 
     tasks = None
-    if options.tasks:
+    if options.task:
         tasks = []
-        for task in options.tasks:
+        for task in options.task:
             try:
                 tasks.extend(m for m in manager.matching_tasks(task) if m not in tasks)
             except ValueError as e:
@@ -132,8 +144,8 @@ def register_parser_arguments():
         'forget', help='Forget entry or entire task from seen plugin database'
     )
     forget_parser.add_argument(
-        '--tasks',
-        nargs='+',
+        '--task',
+        action='append',
         metavar='TASK',
         help='forget only in specified task(s), optionally using glob patterns ("tv-*"). '
         'matching is case-insensitive',
@@ -147,6 +159,7 @@ def register_parser_arguments():
     add_parser = subparsers.add_parser('add', help='Add a title or url to the seen database')
     add_parser.add_argument(
         '--task',
+        action='append',
         metavar='TASK',
         help='add in specified task'
         'matching is case-insensitive. Will make entry local to that task',
@@ -156,8 +169,8 @@ def register_parser_arguments():
         'search', help='Search text from the seen database', parents=[table_parser]
     )
     search_parser.add_argument(
-        '--tasks',
-        nargs='+',
+        '--task',
+        action='append',
         metavar='TASK',
         help='search only in specified task(s), optionally using glob patterns ("tv-*"). '
         'matching is case-insensitive',
