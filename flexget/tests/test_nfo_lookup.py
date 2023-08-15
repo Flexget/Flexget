@@ -4,37 +4,37 @@ import pytest
 @pytest.mark.online
 class TestNfoLookupWithMovies:
     base = "nfo_lookup_test_dir/"
-    config = """
+    config = f"""
         tasks:
           test_1:  # Only ID
             filesystem:
-              path: {0}/test_1
+              path: {base}/test_1
               mask: '*.mkv'
             nfo_lookup: yes
             imdb_lookup: yes
           test_2:  # ID and Title
             filesystem:
-              path: {0}/test_2
+              path: {base}/test_2
               mask: '*.mkv'
             nfo_lookup: yes
           test_3:  # ID, Title and Original Title
             filesystem:
-              path: {0}/test_3
+              path: {base}/test_3
               mask: '*.mkv'
             nfo_lookup: yes
           test_4:  # ID, Title and Plot
             filesystem:
-              path: {0}/test_4
+              path: {base}/test_4
               mask: '*.mkv'
             nfo_lookup: yes
           test_5:  # ID and genres
             filesystem:
-              path: {0}/test_5
+              path: {base}/test_5
               mask: '*.mkv'
             nfo_lookup: yes
           test_6:  # No nfo file is provided
             filesystem:
-              path: {0}/test_6
+              path: {base}/test_6
               mask: '*.mkv'
             nfo_lookup: yes
             imdb_lookup: yes
@@ -49,32 +49,30 @@ class TestNfoLookupWithMovies:
             nfo_lookup: yes
           test_9:  # Disabled configuration
             filesystem:
-              path: {0}/test_9
+              path: {base}/test_9
               mask: '*.mkv'
             nfo_lookup: no
           test_10:  # Test with ID, title and actors
             filesystem:
-              path: {0}/test_10
+              path: {base}/test_10
               mask: '*.mkv'
             nfo_lookup: yes
           test_11:  # Test with all fields
             filesystem:
-              path: {0}/test_11
+              path: {base}/test_11
               mask: '*.mkv'
             nfo_lookup: yes
           test_12:  # Test with an invalid file
             filesystem:
-              path: {0}/test_12
+              path: {base}/test_12
               mask: '*.mkv'
             nfo_lookup: yes
           test_13:  # Test with an nfo file containing invalid IMDB ID
             filesystem:
-              path: {0}/test_13
+              path: {base}/test_13
               mask: '*.mkv'
             nfo_lookup: yes
-    """.format(
-        base
-    )
+    """
 
     def test_nfo_with_only_id(self, execute_task):
         task = execute_task('test_1')

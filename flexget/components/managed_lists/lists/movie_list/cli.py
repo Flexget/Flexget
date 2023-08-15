@@ -48,8 +48,8 @@ def lookup_movie(title, session, identifiers=None):
 def movie_list_keyword_type(identifier):
     if identifier.count('=') != 1:
         raise ArgumentTypeError(
-            'Received identifier in wrong format: {}, '
-            ' should be in keyword format like `imdb_id=tt1234567`'.format(identifier)
+            f'Received identifier in wrong format: {identifier}, '
+            ' should be in keyword format like `imdb_id=tt1234567`'
         )
     name, value = identifier.split('=', 2)
     if name not in MovieListBase().supported_ids:
