@@ -17,9 +17,7 @@ class TestParsingAPI:
             for p in plugin.get_plugins(interface='%s_parser' % parser_type):
                 assert hasattr(
                     p.instance, 'parse_%s' % parser_type
-                ), '{type} parsing plugin {name} has no parse_{type} method'.format(
-                    type=parser_type, name=p.name
-                )
+                ), f'{parser_type} parsing plugin {p.name} has no parse_{parser_type} method'
 
 
 class TestTaskParsing:
