@@ -228,9 +228,7 @@ class Entry(LazyDict, Serializer):
             raise EntryUnicodeError(key, value)
         # Coerce any enriched strings (such as those returned by BeautifulSoup) to plain strings to avoid serialization
         # troubles.
-        elif (
-            isinstance(value, str) and type(value) != str
-        ):  # pylint: disable=unidiomatic-typecheck
+        elif isinstance(value, str) and type(value) is not str:  # noqa: E721
             value = str(value)
 
         # url and original_url handling
