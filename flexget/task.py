@@ -56,7 +56,7 @@ class TaskConfigHash(Base):
 
 
 @with_session
-def config_changed(task: str = None, session: ContextSession = None) -> None:
+def config_changed(task: Optional[str] = None, session: ContextSession = None) -> None:
     """
     Forces config_modified flag to come out true on next run of `task`. Used when the db changes, and all
     entries need to be reprocessed.
@@ -134,7 +134,7 @@ class EntryIterator:
 class EntryContainer(list):
     """Container for a list of entries, also contains accepted, rejected failed iterators over them."""
 
-    def __init__(self, iterable: list = None):
+    def __init__(self, iterable: Optional[list] = None):
         list.__init__(self, iterable or [])
 
         self._entries = EntryIterator(self, [EntryState.UNDECIDED, EntryState.ACCEPTED])
@@ -409,7 +409,7 @@ class Task:
             raise ValueError(f'`{plugin}` is not a valid plugin.')
         self.disabled_plugins.append(plugin)
 
-    def abort(self, reason='Unknown', silent=False, traceback: str = None):
+    def abort(self, reason='Unknown', silent=False, traceback: Optional[str] = None):
         """Abort this task execution, no more plugins will be executed except the abort handling ones."""
         self.aborted = True
         self.abort_reason = reason
@@ -571,10 +571,7 @@ class Task:
             err.logger.critical(err.value)
             self.abort(err.value)
         except DependencyError as e:
-            msg = 'Plugin `{}` cannot be used because dependency `{}` is missing.'.format(
-                keyword,
-                e.missing,
-            )
+            msg = f'Plugin `{keyword}` cannot be used because dependency `{e.missing}` is missing.'
             logger.critical(e.message)
             self.abort(msg)
         except Warning as e:

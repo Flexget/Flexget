@@ -109,7 +109,7 @@ class FilterRegexp:
                 if not isinstance(regexp_item, dict):
                     regexp = regexp_item
                     regexp_item = {regexp: {}}
-                regexp, opts = list(regexp_item.items())[0]
+                regexp, opts = next(iter(regexp_item.items()))
                 # Parse custom settings for this regexp
                 if not isinstance(opts, dict):
                     opts = {'path': opts}
@@ -209,7 +209,7 @@ class FilterRegexp:
         for entry in entries:
             logger.trace('testing {} regexps to {}', len(regexps), entry['title'])
             for regexp_opts in regexps:
-                regexp, opts = list(regexp_opts.items())[0]
+                regexp, opts = next(iter(regexp_opts.items()))
 
                 # check if entry matches given regexp configuration
                 field = self.matches(entry, regexp, opts.get('from'), opts.get('not'))

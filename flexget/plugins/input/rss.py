@@ -145,7 +145,7 @@ class InputRSS:
                 if isinstance(item, str):
                     key, val = item, item
                 else:
-                    key, val = list(item.items())[0]
+                    key, val = next(iter(item.items()))
                 other_fields.append({fp_field_name(key): val.lower()})
             config['other_fields'] = other_fields
         # set default value for group_links as deactivated

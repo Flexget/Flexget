@@ -14,7 +14,7 @@ from loguru import logger
 from flexget.event import fire_event
 from flexget.utils import qualities, template
 from flexget.utils.template import get_template
-from flexget.utils.tools import parse_episode_identifier, parse_timedelta
+from flexget.utils.tools import parse_episode_identifier, parse_filesize, parse_timedelta
 
 logger = logger.bind(name='config_schema')
 
@@ -183,18 +183,13 @@ def parse_percent(percent_input: str) -> float:
         raise ValueError("should be in format '0-x%'")
 
 
-def parse_size(size_input: str) -> int:
+def parse_size(size_input: str, si: bool = False) -> int:
     """Takes a size string from the config and turns it into int(bytes)."""
-    prefixes = [None, 'K', 'M', 'G', 'T', 'P']
     try:
         # Bytes
         return int(size_input)
     except ValueError:
-        size_input = size_input.upper().rstrip('IB')
-        value, unit = float(size_input[:-1]), size_input[-1:]
-        if unit not in prefixes:
-            raise ValueError("should be in format '0-x (KiB, MiB, GiB, TiB, PiB)'")
-        return int(1024 ** prefixes.index(unit) * value)
+        return parse_filesize(size_input, si=si)
 
 
 # Public API end here, the rest should not be used outside this module
@@ -416,7 +411,7 @@ def select_child_errors(validator, errors):
         elif len(no_type_errors) == 1:
             # If one of the possible schemas did not have a 'type' error, assume that is the intended one and issue
             # all errors from that subschema
-            for e in list(no_type_errors.values())[0]:
+            for e in next(iter(no_type_errors.values())):
                 e.schema_path.extendleft(reversed(error.schema_path))
                 e.path.extendleft(reversed(error.path))
                 yield e

@@ -141,13 +141,17 @@ class PluginPyLoad:
         parse_urls_command = 'parseURLs'
         add_package_command = 'addPackage'
         set_package_data_command = 'setPackageData'
+        package_id_parameter = 'pid'
+        folder_key = 'folder'
 
         # pyload-ng is returning dict instead of session string on login
         if isinstance(session, dict):
             is_pyload_ng = True
             parse_urls_command = 'parse_urls'
             add_package_command = 'add_package'
-            set_package_data_command = 'set_package_date'
+            set_package_data_command = 'set_package_data'
+            package_id_parameter = 'package_id'
+            folder_key = '_folder'
 
         hoster = config.get('hoster', self.DEFAULT_HOSTER)
 
@@ -252,8 +256,8 @@ class PluginPyLoad:
                         folder = self.DEFAULT_FOLDER
                         logger.error('Error rendering jinja event: {}', e)
                     # set folder with api
-                    data = json.dumps({'folder': folder})
-                    post_data = {'pid': pid, 'data': data}
+                    data = json.dumps({folder_key: folder})
+                    post_data = {package_id_parameter: pid, 'data': data}
                     if not is_pyload_ng:
                         post_data['session'] = session
                     api.post(set_package_data_command, data=post_data)
@@ -262,7 +266,7 @@ class PluginPyLoad:
                 package_password = config.get('package_password')
                 if package_password:
                     data = json.dumps({'password': package_password})
-                    post_data = {'pid': pid, 'data': data}
+                    post_data = {package_id_parameter: pid, 'data': data}
                     if not is_pyload_ng:
                         post_data['session'] = session
                     api.post(set_package_data_command, data=post_data)

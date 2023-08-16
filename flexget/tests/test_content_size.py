@@ -99,7 +99,7 @@ class TestFileSize:
         task = execute_task('test_min')
         entry = task.find_entry('rejected', title='test')
         assert entry, 'should have rejected, minimum size'
-        assert entry['content_size'] == 0, 'content_size was not detected'
+        assert entry['content_size'] == 28047, 'content_size was not detected'
 
     @pytest.mark.filecopy('test.torrent', '__tmp__/test.file')
     def test_max(self, execute_task):
@@ -107,7 +107,7 @@ class TestFileSize:
         task = execute_task('test_max')
         entry = task.find_entry('accepted', title='test')
         assert entry, 'should have been accepted, it is below maximum size'
-        assert entry['content_size'] == 0, 'content_size was not detected'
+        assert entry['content_size'] == 28047, 'content_size was not detected'
 
     def test_torrent(self, execute_task):
         task = execute_task('test_torrent')

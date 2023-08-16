@@ -125,16 +125,12 @@ def entry_list_add(options):
                     title, entry_list.name
                 )
             )
-            output = 'Successfully updated entry `{}` to entry list `{}` '.format(
-                title, entry_list.name
-            )
+            output = f'Successfully updated entry `{title}` to entry list `{entry_list.name}` '
         else:
             console(f"Adding entry with title `{title}` to list `{entry_list.name}`")
             db_entry = db.EntryListEntry(entry=entry, entry_list_id=entry_list.id)
             session.add(db_entry)
-            output = 'Successfully added entry `{}` to entry list `{}` '.format(
-                title, entry_list.name
-            )
+            output = f'Successfully added entry `{title}` to entry list `{entry_list.name}` '
         if options.attributes:
             console(f'Adding attributes to entry `{title}`')
             for identifier in options.attributes:

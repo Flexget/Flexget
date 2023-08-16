@@ -41,9 +41,9 @@ class TrayIcon:
         logging.getLogger('PIL.Image').setLevel(logging.INFO)
 
         self.path_to_image: Path = path_to_image
-        self.icon: Optional['Icon'] = None
-        self._menu: Optional['Menu'] = None
-        self.menu_items: List['MenuItem'] = []
+        self.icon: Optional[Icon] = None
+        self._menu: Optional[Menu] = None
+        self.menu_items: List[MenuItem] = []
 
         self.active: bool = _import_success
         self.running: bool = False
@@ -53,14 +53,14 @@ class TrayIcon:
     @check_if_tray_is_active
     def add_menu_item(
         self,
-        text: str = None,
-        action: Callable = None,
+        text: Optional[str] = None,
+        action: Optional[Callable] = None,
         menu_item: 'MenuItem' = None,
-        index: int = None,
+        index: Optional[int] = None,
         **kwargs,
     ):
         """
-        Add a menu item byt passing its text and function, or pass a created MenuItem. Force position by sending index
+        Add a menu item by passing its text and function, or pass a created MenuItem. Force position by sending index
         """
         if not any(v for v in (menu_item, text)):
             raise ValueError("Either 'text' or 'menu_item' are required")
@@ -72,7 +72,7 @@ class TrayIcon:
             self.menu_items.append(menu_item)
 
     @check_if_tray_is_active
-    def add_menu_separator(self, index: int = None):
+    def add_menu_separator(self, index: Optional[int] = None):
         self.add_menu_item(menu_item=Menu.SEPARATOR, index=index)
 
     def add_core_menu_items(self):

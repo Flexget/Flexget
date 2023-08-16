@@ -322,9 +322,7 @@ class ApiTmdb:
             year = title_parser.year
         if not (title or tmdb_id or imdb_id):
             raise LookupError('No criteria specified for TMDb lookup')
-        id_str = '<title={}, year={}, tmdb_id={}, imdb_id={}>'.format(
-            title, year, tmdb_id, imdb_id
-        )
+        id_str = f'<title={title}, year={year}, tmdb_id={tmdb_id}, imdb_id={imdb_id}>'
 
         logger.debug('Looking up TMDb information for {}', id_str)
         movie = None

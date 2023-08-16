@@ -198,7 +198,7 @@ _plugin_options = []
 _new_phase_queue: Dict[str, List[Optional[str]]] = {}
 
 
-def register_task_phase(name: str, before: str = None, after: str = None):
+def register_task_phase(name: str, before: Optional[str] = None, after: Optional[str] = None):
     """Adds a new task phase to the available phases."""
     if before and after:
         raise RegisterException('You can only give either before or after for a phase.')
@@ -461,9 +461,7 @@ def _load_plugins_from_dirs(dirs: List[str]) -> None:
             plugin_subpackages = [
                 _f for _f in plugin_path.relative_to(plugins_dir).parent.parts if _f
             ]
-            module_name = '.'.join(
-                [plugins_pkg.__name__, *plugin_subpackages] + [plugin_path.stem]
-            )
+            module_name = '.'.join([plugins_pkg.__name__, *plugin_subpackages, plugin_path.stem])
             _import_plugin(module_name, plugin_path)
     _check_phase_queue()
 
@@ -484,7 +482,7 @@ def _load_components_from_dirs(dirs: List[str]) -> None:
                 _f for _f in component_path.relative_to(component_dir).parent.parts if _f
             ]
             package_name = '.'.join(
-                [components_pkg.__name__, *plugin_subpackages] + [component_path.stem]
+                [components_pkg.__name__, *plugin_subpackages, component_path.stem]
             )
             _import_plugin(package_name, component_path)
     _check_phase_queue()

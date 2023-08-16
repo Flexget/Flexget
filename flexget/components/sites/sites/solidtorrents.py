@@ -161,9 +161,7 @@ class UrlRewriteSolidTorrents:
         entry['torrent_availability'] = torrent_availability(
             entry['torrent_seeds'], entry['torrent_leeches']
         )
-        entry['content_size'] = int(
-            round(int(json_result['size']) / (1024 * 1024))
-        )  # content_size is in MiB
+        entry['content_size'] = int(json_result['size'])  # content_size is in bytes
         entry['torrent_info_hash'] = json_result['infohash']
         entry['url'] = json_result['magnet']
         return entry

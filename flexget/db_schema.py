@@ -259,7 +259,7 @@ def versioned_base(plugin: str, version: int) -> VersionedBaseMeta:
 
 
 @sqlalchemy.event.listens_for(Base.metadata, "after_create")
-def after_table_create(target, connection, tables: List[Table] = None, **kw) -> None:
+def after_table_create(target, connection, tables: Optional[List[Table]] = None, **kw) -> None:
     """Sets the schema version to most recent for a plugin when it's tables are freshly created."""
     if tables:
         # TODO: Detect if any database upgrading is needed and acquire the lock only in one place

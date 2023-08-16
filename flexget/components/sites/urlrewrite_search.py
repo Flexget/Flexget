@@ -53,7 +53,7 @@ class PluginSearch:
                 search_config = None
                 if isinstance(name, dict):
                     # the name is the first/only key in the dict.
-                    name, search_config = list(name.items())[0]
+                    name, search_config = next(iter(name.items()))
                 logger.verbose('Searching `{}` from {}', entry['title'], name)
                 try:
                     try:

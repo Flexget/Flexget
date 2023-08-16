@@ -156,9 +156,7 @@ class RottenTomatoesMovie(RottenTomatoesContainer, Base):
         return self.updated < datetime.now() - timedelta(days=refresh_interval)
 
     def __repr__(self) -> str:
-        return '<RottenTomatoesMovie(title={},id={},year={})>'.format(
-            self.title, self.id, self.year
-        )
+        return f'<RottenTomatoesMovie(title={self.title},id={self.id},year={self.year})>'
 
 
 class RottenTomatoesGenre(Base):

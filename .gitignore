@@ -17,6 +17,7 @@ local
 *.iml
 flexget.log
 flexget.log.*
+crash_report.*.log
 received/
 share/
 dist/

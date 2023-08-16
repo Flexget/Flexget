@@ -8,7 +8,7 @@ import queue
 import re
 import sys
 import weakref
-from collections import OrderedDict, defaultdict
+from collections import defaultdict
 from collections.abc import MutableMapping
 from datetime import datetime, timedelta
 from html.entities import name2codepoint
@@ -50,24 +50,6 @@ def str_to_int(string: str) -> Optional[int]:
         return int(string.replace(',', ''))
     except ValueError:
         return None
-
-
-def convert_bytes(bytes_num: Union[int, float]) -> str:
-    """Returns given bytes as prettified string."""
-
-    bytes_num = float(bytes_num)
-    units_prefixes = OrderedDict(
-        {
-            'T': 1099511627776,  # 1024 ** 4
-            'G': 1073741824,  # 1024 ** 3
-            'M': 1048576,  # 1024 ** 2
-            'K': 1024,
-        }
-    )
-    for unit, threshold in units_prefixes.items():
-        if bytes_num > threshold:
-            return f'{bytes_num/threshold:.2f}{unit}'
-    return f'{bytes_num:.2f}b'
 
 
 class MergeException(Exception):
@@ -365,21 +347,24 @@ def get_current_flexget_version() -> str:
     return flexget.__version__
 
 
-def parse_filesize(text_size: str, si: bool = True) -> float:
+def parse_filesize(
+    text_size: str, si: bool = True, match_re: Optional[Union[str, Pattern[str]]] = None
+) -> int:
     """
-    Parses a data size and returns its value in mebibytes
+    Parses a data size and returns its value in bytes
 
     :param string text_size: string containing the data size to parse i.e. "5 GB"
     :param bool si: If True, possibly ambiguous units like KB, MB, GB will be assumed to be base 10 units,
-    rather than the default base 2. i.e. if si then 50 GB = 47684 else 50GB = 51200
+      rather than base 2. i.e. if si then 1 KB = 1000 B else 1 KB = 1024 B
+    :param match_re: A custom regex can be defined to match the size. The first capture group should match
+      the number, and the second should match the unit.
 
-    :returns: an float with the data size in mebibytes
+    :returns: an int with the data size in bytes
     """
     prefix_order = {'': 0, 'k': 1, 'm': 2, 'g': 3, 't': 4, 'p': 5}
 
-    parsed_size = re.match(
-        r'(\d+(?:[.,\s]\d+)*)(?:\s*)((?:[ptgmk]i?)?b)', text_size.strip().lower(), flags=re.UNICODE
-    )
+    match_re = match_re or r'\b(\d+(?:[.,\s]\d+)*)\s*((?:[ptgmk]i?)?b)\b'
+    parsed_size = re.search(match_re, text_size.lower())
     if not parsed_size:
         raise ValueError('%s does not look like a file size' % text_size)
     amount_str = parsed_size.group(1)
@@ -395,7 +380,49 @@ def parse_filesize(text_size: str, si: bool = True) -> float:
     order = prefix_order[unit]
     amount = float(amount_str.replace(',', '').replace(' ', ''))
     base = 1000 if si else 1024
-    return (amount * (base**order)) / 1024**2
+    return int(amount * (base**order))
+
+
+def format_filesize(
+    num_bytes: Union[int, float], si: bool = False, unit: Optional[str] = None
+) -> str:
+    """
+    Returns given bytes as prettified string.
+
+    :param bool si: If true, decimal based units will be used rather than binary.
+    :param str unit: If a specific unit is specified it will be used. Otherwise,
+        an appropriate unit will be picked automatically based on size.
+    """
+
+    if unit:
+        all_units = [f'{p}b' for p in 'kmgtp'] + [f'{p}ib' for p in 'kmgtp'] + ['b']
+        if unit.lower() not in all_units:
+            raise ValueError(f'{unit} is not a recognized filesize unit')
+        si = 'i' not in unit.lower()
+    base = 1000 if si else 1024
+    amount = float(num_bytes)
+    unit_prefixes = [
+        # For some reason the convention is to use lowercase k for si kilobytes
+        'k' if si else 'K',
+        'M',
+        'G',
+        'T',
+        'P',
+    ]
+
+    out_unit = 'B'
+    round_digits = 2
+    for p in unit_prefixes:
+        if not unit and amount < base:
+            break
+        if unit and out_unit.lower() == unit.lower():
+            break
+        amount /= base
+        out_unit = f'{p}{"" if si else "i"}B'
+        # If user specified a unit that's too big, allow a few more fractional digits
+        if amount < 1:
+            round_digits += 1
+    return f'{round(amount, round_digits)} {out_unit}'
 
 
 def get_config_hash(config: Any) -> str:

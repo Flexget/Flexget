@@ -155,10 +155,14 @@ class TestEntryUnicodeError:
 
 
 class TestEntryStringCoercion:
+    class MyStr(str):
+        pass
+
     def test_coercion(self):
         e = Entry('title', 'url')
-        e['test'] = "test"
-        assert type(e['test']) == str  # pylint: disable=unidiomatic-typecheck
+        e['test'] = self.MyStr('test')
+        assert type(e['test']) is str  # noqa: E721
+        assert e['test'] == 'test'
 
 
 class TestFilterRequireField:
