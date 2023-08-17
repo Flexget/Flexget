@@ -16,7 +16,7 @@ class TestSftpDownload:
               to: {{ download_path }}
               socket_timeout_sec: 2
               connection_tries: 1
-            _mock_file: 
+            _mock_file:
               - &mock_file
                 {'title': 'file.mkv', 'url': 'sftp://test_user:test_pass@127.0.0.1:40022/home/test_user/file.mkv', 'host_key': {
                           'key_type': 'ssh-rsa',

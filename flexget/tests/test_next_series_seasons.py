@@ -23,26 +23,22 @@ class TestNextSeriesSeasonSeasonsPack:
                 from_start: yes
             _series_ep_pack: &series_ep_pack
               identified_by: ep
-              tracking: backfill
               season_packs:
                 threshold: 1000
                 reject_eps: yes
             _series_ep_tracking_pack: &series_ep_tracking_pack
               identified_by: ep
-              tracking: backfill
               season_packs:
                 threshold: 1000
                 reject_eps: yes
             _series_ep_tracking_begin_s02e01: &series_ep_tracking_pack_begin_s02e01
               identified_by: ep
-              tracking: backfill
               begin: s02e01
               season_packs:
                 threshold: 1000
                 reject_eps: yes
             _series_ep_tracking_begin_s04e01: &series_ep_tracking_pack_begin_s04e01
               identified_by: ep
-              tracking: backfill
               begin: s04e01
               season_packs:
                 threshold: 1000
@@ -254,7 +250,7 @@ class TestNextSeriesSeasonSeasonsPack:
     def inject_series(self, execute_task, release_name):
         execute_task(
             'inject_series',
-            options={'inject': [Entry(title=release_name, url='')], 'disable_tracking': True},
+            options={'inject': [Entry(title=release_name, url='')]},
         )
 
     @pytest.mark.parametrize(

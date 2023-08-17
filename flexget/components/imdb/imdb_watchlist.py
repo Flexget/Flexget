@@ -233,6 +233,12 @@ class ImdbWatchlist:
                 entry['url'] = link
                 entry['imdb_id'] = extract_id(link)
                 entry['imdb_name'] = entry['title']
+
+                rating_spans = item.findAll('span', class_="ipl-rating-star__rating")
+                logger.debug("rating_spans: {}", len(rating_spans))
+                # There should be 24 ratings spans and the user score should be in the second
+                if len(rating_spans) == 24:
+                    entry['imdb_user_score'] = int(rating_spans[1].text)
                 entries.append(entry)
 
         return entries

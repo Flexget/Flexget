@@ -38,12 +38,6 @@
                 display: 'Caching'
             },
             {
-                name: 'disable_tracking',
-                value: false,
-                help: 'disable episode advancement for this run',
-                display: 'Tracking'
-            },
-            {
                 name: 'discover_now',
                 value: false,
                 help: 'immediately try to discover everything',

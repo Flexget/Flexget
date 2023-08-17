@@ -13,9 +13,9 @@ class TestJinjaFilters:
               - {"title":"2000", "url":"mock://local3" }
               - {"title":"2000 (2020)", "url":"mock://local4" }
               - {"title":"2000 2020", "url":"mock://local5" }
-                
+
             accept_all: yes
-                
+
             set:
               name: "{{title|strip_year}}"
               year: "{{title|get_year}}"
@@ -26,7 +26,7 @@ class TestJinjaFilters:
               - {"title": "The Matrix [13.84 GiB]", "actual": 13.84 }
               - {"title": "The Matrix [13 GB]", "actual": 13 }
               - {"title": "The Matrix [WebRip 6mbps][13.84GB]", "actual": 13.84 }
-            
+
             accept_all: yes
 
             set:

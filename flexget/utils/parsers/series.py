@@ -401,12 +401,15 @@ class SeriesParser(TitleParser):
                 # ressu: Added matching for 0101, 0102... It will fail on
                 #        season 11 though
                 logger.trace('ep identifier expected. Attempting SEE format parsing.')
+                # remove obvious date format from this desperate try
+                desperate = re.sub(r'\d{4}\s\d{1,2}\s\d{1,2}', '', data_stripped)
                 match = re.search(
                     self.re_not_in_word(r'(\d?\d)(\d\d)'),
-                    data_stripped,
+                    desperate,
                     re.IGNORECASE | re.UNICODE,
                 )
                 if match:
+                    logger.trace('-> had luck with SEE')
                     # strict_name
                     if self.strict_name:
                         if match.start() > 1:
@@ -667,11 +670,13 @@ class SeriesParser(TitleParser):
         if self.valid:
             valid = 'OK'
         return (
-            '<SeriesParser(data={},name={},id={},season={},season_pack={},episode={},quality={},proper={},'
+            '<SeriesParser(data={},name={},id={},id_type={},identified_by={},season={},season_pack={},episode={},quality={},proper={},'
             'status={})>'.format(
                 self.data,
                 self.name,
                 str(self.id),
+                self.id_type,
+                self.identified_by,
                 self.season,
                 self.season_pack,
                 self.episode,
