@@ -43,7 +43,12 @@ class DiscordNotifier:
                         'title': {'type': 'string'},
                         'description': {'type': 'string'},
                         'url': {'type': 'string', 'format': 'uri'},
-                        'color': {'type': 'integer'},
+                        'color': {
+                            'oneOf': [
+                                {'type': 'integer'},
+                                {'type': 'string'},
+                            ]
+                        },
                         'footer': {
                             'type': 'object',
                             'properties': {
@@ -143,6 +148,13 @@ class DiscordNotifier:
                     logger.warning("'timestamp' is invalid, dropping it")
                 else:
                     embed['timestamp'] = datetime.strftime(ts, r'%Y-%m-%dT%H:%M:%S%z')
+
+            if isinstance(embed.get('color'), str):
+                try:
+                    int(embed['color'], 16)
+                except TypeError:
+                    logger.warning(f"Invalid 'color' for embed ({embed['color']}), ignoring")
+                    embed.pop('color', None)
 
         web_hook = {
             'content': message,
