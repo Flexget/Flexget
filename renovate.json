@@ -4,6 +4,7 @@
     "config:base"
   ],
   "rangeStrategy": "widen",
+  "rebaseWhen": "behind-base-branch",
   "lockFileMaintenance": {
     "enabled": true
   },
