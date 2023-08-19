@@ -1,4 +1,5 @@
-from datetime import datetime
+from datetime import datetime, timedelta
+from time import sleep as wait
 
 from dateutil.parser import ParserError, isoparse
 from loguru import logger
@@ -6,13 +7,13 @@ from loguru import logger
 from flexget import plugin
 from flexget.event import event
 from flexget.plugin import PluginWarning
-from flexget.utils.requests import RequestException, Session, TimedLimiter
+from flexget.utils.requests import RequestException, Session, TokenBucketLimiter
 
 plugin_name = 'discord'
 
 logger = logger.bind(name=plugin_name)
 session = Session()
-session.add_domain_limiter(TimedLimiter('discord.com', '3 seconds'))
+session.add_domain_limiter(TokenBucketLimiter('discord.com', 6, '3 seconds'))
 
 
 class DiscordNotifier:
@@ -43,7 +44,12 @@ class DiscordNotifier:
                         'title': {'type': 'string'},
                         'description': {'type': 'string'},
                         'url': {'type': 'string', 'format': 'uri'},
-                        'color': {'type': 'integer'},
+                        'color': {
+                            'oneOf': [
+                                {'type': 'integer'},
+                                {'type': 'string'},
+                            ]
+                        },
                         'footer': {
                             'type': 'object',
                             'properties': {
@@ -144,6 +150,13 @@ class DiscordNotifier:
                 else:
                     embed['timestamp'] = datetime.strftime(ts, r'%Y-%m-%dT%H:%M:%S%z')
 
+            if isinstance(embed.get('color'), str):
+                try:
+                    int(embed['color'], 16)
+                except TypeError:
+                    logger.warning(f"Invalid 'color' for embed ({embed['color']}), ignoring")
+                    embed.pop('color', None)
+
         web_hook = {
             'content': message,
             'username': config.get('username'),
@@ -151,10 +164,31 @@ class DiscordNotifier:
             'embeds': config.get('embeds'),
         }
 
-        try:
-            session.post(config['web_hook_url'], json=web_hook)
-        except RequestException as e:
-            raise PluginWarning(e.args[0])
+        # Send the request and handle the rate-limit response.
+        for i in range(3):
+            try:
+                req = session.post(config['web_hook_url'], json=web_hook)
+                tokens = int(req.headers.get('x-ratelimit-remaining', 1))
+                tokens_reset = timedelta(
+                    seconds=int(req.headers.get('x-ratelimit-reset-after', 3))
+                )
+                logger.trace(f'Remaining rate tokens: {tokens}. Resets afer {tokens_reset} secs.')
+                session.add_domain_limiter(
+                    TokenBucketLimiter('discord.com', tokens=tokens, rate=tokens_reset)
+                )
+            except RequestException as e:
+                if e.response.status_code == 429:
+                    timeout = int(
+                        e.response.headers.get(
+                            'retry-after', e.response.json().get('retry_after', 3)
+                        )
+                    )
+                    logger.info(f'Rate-limited, waiting for {timedelta(seconds=timeout)}')
+                    wait(timeout)
+                    continue
+                raise PluginWarning(e.args[0])
+            else:
+                break
 
 
 @event('plugin.register')
