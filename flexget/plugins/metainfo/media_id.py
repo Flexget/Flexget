@@ -7,7 +7,7 @@ from flexget.event import event
 logger = logger.bind(name='metainfo_media_id')
 
 
-class MetainfoMediaId:
+class MetainfoMediaId(plugin.PluginBase):
     """
     Populate media_id field based on media type etc.
     """

@@ -30,7 +30,7 @@ except ImportError:
 AUTHENTICATION_SCHEMA = {provider: {'type': 'object'} for provider in PROVIDERS}
 
 
-class PluginSubliminal:
+class PluginSubliminal(plugin.PluginBase):
     r"""
     Search and download subtitles using Subliminal by Antoine Bertin
     (https://pypi.python.org/pypi/subliminal).

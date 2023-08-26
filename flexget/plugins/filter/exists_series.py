@@ -17,7 +17,7 @@ except ImportError:
 logger = logger.bind(name='exists_series')
 
 
-class FilterExistsSeries:
+class FilterExistsSeries(plugin.PluginBase):
     """
     Intelligent series aware exists rejecting.
 

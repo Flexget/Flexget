@@ -17,7 +17,7 @@ requests = RequestSession(max_retries=3)
 requests.add_domain_limiter(TimedLimiter('pushsafer.com', '5 seconds'))
 
 
-class PushsaferNotifier:
+class PushsaferNotifier(plugin.PluginBase):
     """
     Example::
 

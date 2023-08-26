@@ -10,7 +10,7 @@ from flexget.utils.tools import ReList
 logger = logger.bind(name='regex_extract')
 
 
-class RegexExtract:
+class RegexExtract(plugin.PluginBase):
     r"""
     Updates an entry with the values of regex matched named groups
 

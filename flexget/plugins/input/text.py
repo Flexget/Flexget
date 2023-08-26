@@ -12,7 +12,7 @@ from flexget.utils.cached_input import cached
 logger = logger.bind(name='text')
 
 
-class Text:
+class Text(plugin.PluginBase):
     """
     Parse any text for entries using regular expression.
 

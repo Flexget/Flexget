@@ -497,7 +497,7 @@ class TraktSet(MutableSet):
         return True
 
 
-class TraktList:
+class TraktList(plugin.PluginBase):
     schema = TraktSet.schema
 
     def get_list(self, config):

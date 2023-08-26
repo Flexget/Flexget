@@ -8,7 +8,7 @@ from flexget.utils import qualities
 logger = logger.bind(name='metainfo_quality')
 
 
-class MetainfoQuality:
+class MetainfoQuality(plugin.PluginBase):
     """
     Utility:
 

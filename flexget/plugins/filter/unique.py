@@ -7,7 +7,7 @@ from flexget.event import event
 logger = logger.bind(name='unique')
 
 
-class Unique:
+class Unique(plugin.PluginBase):
     """
     Take action on entries with duplicate fields, except for the first item
 

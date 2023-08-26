@@ -6,7 +6,7 @@ from flexget.event import event
 logger = logger.bind(name="archetorrent")
 
 
-class UrlRewriteArchetorrent:
+class UrlRewriteArchetorrent(plugin.PluginBase):
     """Archetorrent urlrewriter."""
 
     # urlrewriter API

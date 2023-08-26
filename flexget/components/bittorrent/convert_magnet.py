@@ -12,7 +12,7 @@ from flexget.utils.tools import parse_timedelta
 logger = logger.bind(name='convert_magnet')
 
 
-class ConvertMagnet:
+class ConvertMagnet(plugin.PluginBase):
     """Convert magnet only entries to a torrent file"""
 
     schema = {

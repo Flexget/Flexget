@@ -61,7 +61,7 @@ class ChatIdEntry(ChatIdsBase):
         return ' '.join(x)
 
 
-class TelegramNotifier:
+class TelegramNotifier(plugin.PluginBase):
     """Send a message to one or more Telegram users or groups upon accepting a download.
 
 

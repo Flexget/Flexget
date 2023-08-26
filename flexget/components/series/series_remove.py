@@ -8,7 +8,7 @@ from . import db
 logger = logger.bind(name='series_remove')
 
 
-class OutputSeriesRemove:
+class OutputSeriesRemove(plugin.PluginBase):
     schema = {
         'oneOf': [
             {'type': 'boolean'},

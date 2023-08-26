@@ -97,7 +97,7 @@ class RegexpList(MutableSet):
         return match.to_entry() if match else None
 
 
-class PluginRegexpList:
+class PluginRegexpList(plugin.PluginBase):
     """Subtitle list"""
 
     schema = RegexpList.schema

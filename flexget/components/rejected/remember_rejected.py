@@ -13,7 +13,7 @@ from . import db
 logger = logger.bind(name='remember_rej')
 
 
-class FilterRememberRejected:
+class FilterRememberRejected(plugin.PluginBase):
     """Internal.
     Rejects entries which have been rejected in the past.
 

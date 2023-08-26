@@ -8,7 +8,7 @@ from . import db
 logger = logger.bind(name='history')
 
 
-class PluginHistory:
+class PluginHistory(plugin.PluginBase):
     """Records all accepted entries for later lookup"""
 
     schema = {'type': 'boolean'}

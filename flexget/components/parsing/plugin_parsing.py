@@ -35,7 +35,7 @@ def init_parsers(manager):
         )
 
 
-class PluginParsing:
+class PluginParsing(plugin.PluginBase):
     """Provides parsing framework"""
 
     @property

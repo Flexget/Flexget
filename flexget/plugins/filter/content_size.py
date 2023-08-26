@@ -10,7 +10,7 @@ from flexget.utils.tools import format_filesize, parse_filesize
 logger = logger.bind(name='content_size')
 
 
-class FilterContentSize:
+class FilterContentSize(plugin.PluginBase):
     schema = {
         'type': 'object',
         'properties': {

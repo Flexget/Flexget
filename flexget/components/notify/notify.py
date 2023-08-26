@@ -27,7 +27,7 @@ VIA_SCHEMA = {
 }
 
 
-class Notify:
+class Notify(plugin.PluginBase):
     schema = {
         'type': 'object',
         'properties': {

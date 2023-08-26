@@ -8,7 +8,7 @@ from flexget.utils.soup import get_soup
 logger = logger.bind(name='bakabt')
 
 
-class UrlRewriteBakaBT:
+class UrlRewriteBakaBT(plugin.PluginBase):
     """BakaBT urlrewriter."""
 
     # urlrewriter API

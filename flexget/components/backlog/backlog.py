@@ -13,7 +13,7 @@ from flexget.utils.tools import parse_timedelta
 logger = logger.bind(name='backlog')
 
 
-class InputBacklog:
+class InputBacklog(plugin.PluginBase):
     """
     Keeps task history for given amount of time.
 

@@ -166,7 +166,7 @@ class MovieList(MutableSet):
         return match.to_entry() if match else None
 
 
-class PluginMovieList:
+class PluginMovieList(plugin.PluginBase):
     """Remove all accepted elements from your trakt.tv watchlist/library/seen or custom list."""
 
     schema = {

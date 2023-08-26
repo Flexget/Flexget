@@ -8,7 +8,7 @@ from flexget.event import event
 logger = logger.bind(name='sleep')
 
 
-class PluginSleep:
+class PluginSleep(plugin.PluginBase):
     """
     Causes a pause in execution to occur at the beginning of the specified phase of a task.
     The point at which the pause occurs can be adjusted using the `plugin_priority` plugin.

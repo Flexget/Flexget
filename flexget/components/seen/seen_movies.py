@@ -10,7 +10,7 @@ from . import seen as plugin_seen
 logger = logger.bind(name='seen_movies')
 
 
-class FilterSeenMovies(plugin_seen.FilterSeen):
+class FilterSeenMovies(plugin_seen.FilterSeen, plugin.PluginBase):
     """
     Prevents movies being downloaded twice.
     Works only on entries which have imdb url available.

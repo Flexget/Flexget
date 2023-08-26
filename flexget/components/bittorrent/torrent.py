@@ -9,7 +9,7 @@ from flexget.utils.bittorrent import Torrent, is_torrent_file
 logger = logger.bind(name='modif_torrent')
 
 
-class TorrentFilename:
+class TorrentFilename(plugin.PluginBase):
     """
     Makes sure that entries containing torrent-file have .torrent
     extension. This is enabled always by default (builtins).

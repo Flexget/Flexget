@@ -45,7 +45,7 @@ SORT = {
 }
 
 
-class UrlRewriteNcore:
+class UrlRewriteNcore(plugin.PluginBase):
     """nCore urlrewriter."""
 
     schema = {

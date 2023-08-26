@@ -7,7 +7,7 @@ from flexget.event import event
 logger = logger.bind(name='archives')
 
 
-class FilterArchives:
+class FilterArchives(plugin.PluginBase):
     """
     Accepts entries that are valid Zip or RAR archives
 

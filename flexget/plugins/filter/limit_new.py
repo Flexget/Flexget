@@ -6,7 +6,7 @@ from flexget.event import event
 logger = logger.bind(name='limit_new')
 
 
-class FilterLimitNew:
+class FilterLimitNew(plugin.PluginBase):
     """
     Limit number of new items.
 

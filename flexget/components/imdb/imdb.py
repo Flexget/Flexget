@@ -7,7 +7,7 @@ from flexget.utils.log import log_once
 logger = logger.bind(name='imdb')
 
 
-class FilterImdb:
+class FilterImdb(plugin.PluginBase):
     """
     This plugin allows filtering based on IMDB score, votes and genres etc.
 

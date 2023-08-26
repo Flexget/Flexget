@@ -9,7 +9,7 @@ from flexget.event import event
 logger = logger.bind(name='argenteam')
 
 
-class SearchArgenteam:
+class SearchArgenteam(plugin.PluginBase):
     """Argenteam
     Search plugin which gives results from www.argenteam.net, latin american (Argentina) web.
 

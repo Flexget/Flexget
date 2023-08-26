@@ -21,7 +21,7 @@ from flexget.utils.tools import decode_html
 logger = logger.bind(name='download')
 
 
-class PluginDownload:
+class PluginDownload(plugin.PluginBase):
     """
     Downloads content from entry url and writes it into a file.
 

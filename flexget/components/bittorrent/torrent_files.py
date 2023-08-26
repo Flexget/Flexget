@@ -8,7 +8,7 @@ from flexget.event import event
 logger = logger.bind(name='torrent_files')
 
 
-class TorrentFiles:
+class TorrentFiles(plugin.PluginBase):
     """Provides content files information when dealing with torrents."""
 
     @plugin.priority(200)

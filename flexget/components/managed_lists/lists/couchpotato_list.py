@@ -272,7 +272,7 @@ class CouchPotatoSet(MutableSet):
         return self._find_entry(entry)
 
 
-class CouchPotatoList:
+class CouchPotatoList(plugin.PluginBase):
     schema = CouchPotatoSet.schema
 
     @staticmethod

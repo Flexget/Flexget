@@ -28,7 +28,7 @@ def fp_field_name(name):
     return name.replace(':', '_').lower()
 
 
-class InputRSS:
+class InputRSS(plugin.PluginBase):
     """
     Parses RSS feed.
 

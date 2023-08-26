@@ -13,7 +13,7 @@ from flexget.utils.tools import parse_filesize
 logger = logger.bind(name='awesomehd')
 
 
-class SearchAwesomeHD:
+class SearchAwesomeHD(plugin.PluginBase):
     """
     AwesomeHD search plugin.
     """

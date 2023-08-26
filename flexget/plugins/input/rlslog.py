@@ -21,7 +21,7 @@ except ImportError:
 logger = logger.bind(name='rlslog')
 
 
-class RlsLog:
+class RlsLog(plugin.PluginBase):
     """
     Adds support for rlslog.net as a feed.
     """

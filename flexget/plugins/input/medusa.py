@@ -9,7 +9,7 @@ from flexget.event import event
 logger = logger.bind(name='medusa')
 
 
-class Medusa:
+class Medusa(plugin.PluginBase):
     schema = {
         'type': 'object',
         'properties': {

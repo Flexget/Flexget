@@ -14,7 +14,7 @@ logger = logger.bind(name='from_telegram')
 _TELEGRAM_API_URL = "https://api.telegram.org/"
 
 
-class TelegramInput:
+class TelegramInput(plugin.PluginBase):
     """
     Parse any messages from Telegram and fills fields with regex
 

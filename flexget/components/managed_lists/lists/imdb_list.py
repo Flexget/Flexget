@@ -485,7 +485,7 @@ class ImdbEntrySet(MutableSet):
         return None
 
 
-class ImdbList:
+class ImdbList(plugin.PluginBase):
     schema = ImdbEntrySet.schema
 
     @staticmethod

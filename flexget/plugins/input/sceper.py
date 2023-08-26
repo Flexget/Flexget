@@ -17,7 +17,7 @@ except ImportError:
 logger = logger.bind(name='sceper')
 
 
-class InputSceper:
+class InputSceper(plugin.PluginBase):
     """
     Uses sceper.ws category url as input.
 

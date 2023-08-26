@@ -9,7 +9,7 @@ from flexget.utils.requests import Session
 logger = logger.bind(name='cfscraper')
 
 
-class CFScraper:
+class CFScraper(plugin.PluginBase):
     """
     Plugin that enables scraping of cloudflare protected sites.
 

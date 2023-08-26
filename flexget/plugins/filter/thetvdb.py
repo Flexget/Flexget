@@ -7,7 +7,7 @@ from flexget.utils.log import log_once
 logger = logger.bind(name='thetvdb')
 
 
-class FilterTvdb:
+class FilterTvdb(plugin.PluginBase):
     """
     This plugin allows filtering based on thetvdb series rating,
     episode rating, status, genres, runtime, content-rating,

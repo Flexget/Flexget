@@ -17,7 +17,7 @@ requests.add_domain_limiter(TimedLimiter('appspot.com', '5 seconds'))
 JOIN_URL = 'https://joinjoaomgcd.appspot.com/_ah/api/messaging/v1/sendPush'
 
 
-class JoinNotifier:
+class JoinNotifier(plugin.PluginBase):
     """
     Example::
 

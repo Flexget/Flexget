@@ -1,6 +1,7 @@
 import os
 import re
 import time
+import typing
 from functools import total_ordering
 from http.client import BadStatusLine
 from importlib import import_module
@@ -18,11 +19,18 @@ from flexget import plugins as plugins_pkg
 from flexget.event import Event, event, fire_event, remove_event_handlers
 from flexget.event import add_event_handler as add_phase_handler
 
+if typing.TYPE_CHECKING:
+    pass
+
 logger = loguru.logger.bind(name='plugin')
 
 PRIORITY_DEFAULT = 128
 PRIORITY_LAST = -255
 PRIORITY_FIRST = 255
+
+
+class PluginBase:
+    pass
 
 
 class DependencyError(Exception):

@@ -16,7 +16,7 @@ MIRRORS = [
 ]
 
 
-class TorrentCache:
+class TorrentCache(plugin.PluginBase):
     """Adds urls to torrent cache sites to the urls list."""
 
     def infohash_urls(self, info_hash):

@@ -16,7 +16,7 @@ AIRING_STATUS = {'airing': 1, 'finished': 2, 'planned': 3, 'all': 6}
 ANIME_TYPE = ['all', 'tv', 'ova', 'movie', 'special', 'ona', 'music', 'unknown']
 
 
-class MyAnimeList:
+class MyAnimeList(plugin.PluginBase):
     """ " Creates entries for series and movies from MyAnimeList list
 
     Syntax:

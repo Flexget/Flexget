@@ -398,7 +398,7 @@ class MockManager(Manager):
 # Perhaps this bit should go somewhere else... The way reruns work can be complicated, and was causing issues in
 # some cases. This plugin should run on all tests in the suite, to make sure certain phases aren't getting
 # called twice. https://github.com/Flexget/Flexget/issues/3254
-class DoublePhaseChecker:
+class DoublePhaseChecker(plugin.PluginBase):
     @staticmethod
     def on_phase(task, phase):
         if getattr(task, f'did_{phase}', None):

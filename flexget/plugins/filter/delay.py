@@ -81,7 +81,7 @@ def upgrade(ver, session):
     return ver
 
 
-class FilterDelay:
+class FilterDelay(plugin.PluginBase):
     """
     Add delay to a task. This is useful for de-prioritizing expensive / bad-quality tasks.
 

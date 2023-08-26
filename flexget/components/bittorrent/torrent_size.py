@@ -7,7 +7,7 @@ from flexget.utils.tools import format_filesize
 logger = logger.bind(name='torrent_size')
 
 
-class TorrentSize:
+class TorrentSize(plugin.PluginBase):
     """
     Provides file size information when dealing with torrents
     """

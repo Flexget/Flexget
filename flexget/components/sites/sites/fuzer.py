@@ -41,7 +41,7 @@ CATEGORIES = {
 }
 
 
-class UrlRewriteFuzer:
+class UrlRewriteFuzer(plugin.PluginBase):
     schema = {
         'type': 'object',
         'properties': {

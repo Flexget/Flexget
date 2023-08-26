@@ -13,7 +13,7 @@ plugin_name = 'bark'
 logger = logger.bind(name=plugin_name)
 
 
-class BarkNotifier:
+class BarkNotifier(plugin.PluginBase):
     """
     Example::
 

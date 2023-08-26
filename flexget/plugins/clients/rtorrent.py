@@ -470,7 +470,7 @@ class RTorrentPluginBase:
         return options
 
 
-class RTorrentOutputPlugin(RTorrentPluginBase):
+class RTorrentOutputPlugin(RTorrentPluginBase, plugin.PluginBase):
     schema = {
         'type': 'object',
         'properties': {

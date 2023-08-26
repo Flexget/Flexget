@@ -13,7 +13,7 @@ def on_entry_action(entry, act=None, task=None, reason=None, **kwargs):
         entry['reason'] = reason
 
 
-class EntryOperations:
+class EntryOperations(plugin.PluginBase):
     """
     Records accept, reject and fail metainfo into entries.
 

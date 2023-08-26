@@ -14,7 +14,7 @@ except ImportError:
 logger = logger.bind(name='metainfo_series')
 
 
-class MetainfoSeries:
+class MetainfoSeries(plugin.PluginBase):
     """
     Check if entry appears to be a series, and populate series info if so.
     """

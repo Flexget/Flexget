@@ -17,7 +17,7 @@ plugin_name = 'email'
 logger = logger.bind(name=plugin_name)
 
 
-class EmailNotifier:
+class EmailNotifier(plugin.PluginBase):
     """
     Send an e-mail with the list of all succeeded (downloaded) entries.
 

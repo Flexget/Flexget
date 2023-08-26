@@ -12,7 +12,7 @@ from . import db
 logger = logger.bind(name='archive')
 
 
-class Archive:
+class Archive(plugin.PluginBase):
     """
     Archives all new items into database where they can be later searched and injected.
     Stores the entries in the state as they are at the exit phase, this way task cleanup for title
@@ -88,7 +88,7 @@ class Archive:
             self.on_task_learn(task, config)
 
 
-class UrlrewriteArchive:
+class UrlrewriteArchive(plugin.PluginBase):
     """
     Provides capability to rewrite urls from archive or make searches with discover.
     """

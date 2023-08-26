@@ -6,7 +6,7 @@ from flexget.event import event
 logger = logger.bind(name='nzbget')
 
 
-class OutputNzbget:
+class OutputNzbget(plugin.PluginBase):
     """
     Example::
 

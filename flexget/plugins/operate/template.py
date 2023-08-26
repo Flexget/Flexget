@@ -9,7 +9,7 @@ plugin_name = 'template'
 logger = logger.bind(name=plugin_name)
 
 
-class PluginTemplate:
+class PluginTemplate(plugin.PluginBase):
     """
     Appyly templates with preconfigured plugins to a task config.
 

@@ -174,7 +174,7 @@ class PlexManagedWatchlist(MutableSet):
                 return item
 
 
-class PlexWatchlist:
+class PlexWatchlist(plugin.PluginBase):
     schema = {
         'properties': {
             'username': {'type': 'string'},

@@ -6,7 +6,7 @@ from flexget.event import event
 logger = logger.bind(name='headers')
 
 
-class PluginHeaders:
+class PluginHeaders(plugin.PluginBase):
     """Allow setting up any headers in all requests (which use urllib2)
 
     Example:

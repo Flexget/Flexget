@@ -13,7 +13,7 @@ from flexget.utils.template import RenderError
 logger = logger.bind(name='ftp')
 
 
-class OutputFtp:
+class OutputFtp(plugin.PluginBase):
     """
     Ftp Download plugin
 

@@ -32,7 +32,7 @@ class GazelleSession(Base):
     expires = Column(DateTime)
 
 
-class InputGazelle:
+class InputGazelle(plugin.PluginBase):
     """A generic plugin that searches a Gazelle-based website
 
     Limited functionality but should work for almost all of them.
@@ -311,7 +311,7 @@ class InputGazelle:
         return self.get_entries(self.search_results(params))
 
 
-class InputGazelleMusic(InputGazelle):
+class InputGazelleMusic(InputGazelle, plugin.PluginBase):
     """A plugin that searches a Gazelle-based music website
 
     Based on https://github.com/WhatCD/Gazelle since it's the starting point of

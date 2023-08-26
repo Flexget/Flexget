@@ -435,7 +435,7 @@ def prepare_lookup_for_tvmaze(**lookup_params):
     return prepared_params
 
 
-class APITVMaze:
+class APITVMaze(plugin.PluginBase):
     @staticmethod
     @with_session
     def series_lookup(session=None, only_cached=False, **lookup_params):

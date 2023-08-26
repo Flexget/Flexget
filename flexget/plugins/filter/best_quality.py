@@ -10,7 +10,7 @@ logger = logger.bind(name='best_quality')
 entry_actions = {'accept': Entry.accept, 'reject': Entry.reject}
 
 
-class FilterBestQuality:
+class FilterBestQuality(plugin.PluginBase):
     schema = {
         'type': 'object',
         'properties': {

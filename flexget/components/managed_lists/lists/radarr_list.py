@@ -607,7 +607,7 @@ class RadarrSet(MutableSet):
                 logger.error('Radarr search term lookup failed: {}', ex)
 
 
-class RadarrList:
+class RadarrList(plugin.PluginBase):
     """List plugin for Radarr that also works as an input plugin"""
 
     schema = {

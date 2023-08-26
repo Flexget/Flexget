@@ -327,7 +327,7 @@ class FilterSeriesBase:
         return task.config['series']
 
 
-class FilterSeries(FilterSeriesBase):
+class FilterSeries(FilterSeriesBase, plugin.PluginBase):
     """
     Intelligent filter for tv-series.
 

@@ -21,7 +21,7 @@ except ImportError:
 logger = logger.bind(name='allyoulike')
 
 
-class UrlRewriteAllyoulike:
+class UrlRewriteAllyoulike(plugin.PluginBase):
     r"""
     allyoulike.com urlrewriter
     Version 0.1

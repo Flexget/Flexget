@@ -11,7 +11,7 @@ plugin_name = 'ifttt'
 logger = logger.bind(name=plugin_name)
 
 
-class IFTTTNotifier:
+class IFTTTNotifier(plugin.PluginBase):
     """
     Push the notification to an IFTTT webhook.
 

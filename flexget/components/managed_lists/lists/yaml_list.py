@@ -152,7 +152,7 @@ class YamlManagedList(MutableSet):
         return False
 
 
-class YamlList:
+class YamlList(plugin.PluginBase):
     schema = {
         'oneOf': [
             {'type': 'string'},

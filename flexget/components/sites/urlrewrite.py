@@ -9,7 +9,7 @@ from flexget.event import event
 logger = logger.bind(name='urlrewrite')
 
 
-class UrlRewrite:
+class UrlRewrite(plugin.PluginBase):
     r"""
     Generic configurable urlrewriter.
 

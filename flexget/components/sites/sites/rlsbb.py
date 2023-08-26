@@ -12,7 +12,7 @@ from flexget.utils.soup import get_soup
 logger = logger.bind(name='rlsbb')
 
 
-class UrlRewriteRlsbb:
+class UrlRewriteRlsbb(plugin.PluginBase):
     r"""
     rlsbb.ru urlrewriter
     Version 0.1

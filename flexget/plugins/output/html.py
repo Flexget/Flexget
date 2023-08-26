@@ -11,7 +11,7 @@ PLUGIN_NAME = 'make_html'
 logger = logger.bind(name=PLUGIN_NAME)
 
 
-class OutputHtml:
+class OutputHtml(plugin.PluginBase):
     schema = {
         'type': 'object',
         'properties': {'template': {'type': 'string'}, 'file': {'type': 'string'}},

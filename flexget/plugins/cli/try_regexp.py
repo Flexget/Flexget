@@ -9,7 +9,7 @@ from flexget.terminal import console
 logger = logger.bind(name='try_regexp')
 
 
-class PluginTryRegexp:
+class PluginTryRegexp(plugin.PluginBase):
     """
     This plugin allows user to test regexps for a task.
     """

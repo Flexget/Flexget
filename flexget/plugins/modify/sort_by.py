@@ -12,7 +12,7 @@ logger = logger.bind(name='sort_by')
 RE_ARTICLES = r'^(the|a|an)\s'
 
 
-class PluginSortBy:
+class PluginSortBy(plugin.PluginBase):
     """
     Sort task entries based on a field
 

@@ -15,7 +15,7 @@ from flexget.utils.tools import parse_filesize
 logger = logger.bind(name='1337x')
 
 
-class Site1337x:
+class Site1337x(plugin.PluginBase):
     """
     1337x search plugin.
     """

@@ -8,7 +8,7 @@ from flexget.event import event
 logger = logger.bind(name='emby_list')
 
 
-class PluginEmbyList:
+class PluginEmbyList(plugin.PluginBase):
     """
     Returns Emby Lists
 

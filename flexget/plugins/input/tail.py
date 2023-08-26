@@ -22,7 +22,7 @@ class TailPosition(Base):
     position = Column(Integer)
 
 
-class InputTail:
+class InputTail(plugin.PluginBase):
     """
     Parse any text for entries using regular expression.
 

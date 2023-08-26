@@ -9,7 +9,7 @@ from flexget.event import event
 logger = logger.bind(name='content_filter')
 
 
-class FilterContentFilter:
+class FilterContentFilter(plugin.PluginBase):
     """
     Rejects entries based on the filenames in the content. Torrent files only right now.
 

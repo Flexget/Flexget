@@ -89,7 +89,7 @@ selector_map = {
 }
 
 
-class PluginPathBySpace:
+class PluginPathBySpace(plugin.PluginBase):
     """Allows setting a field to a folder based on it's space
 
     Path will be selected at random if multiple paths match the within

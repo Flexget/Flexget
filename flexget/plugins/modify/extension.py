@@ -6,7 +6,7 @@ from flexget.event import event
 logger = logger.bind(name='extension')
 
 
-class ModifyExtension:
+class ModifyExtension(plugin.PluginBase):
     """
     Allows specifying file extension explicitly when all other built-in detection mechanisms fail.
 

@@ -15,7 +15,7 @@ plugin_name = "cronitor"
 logger = logger.bind(name=plugin_name)
 
 
-class Cronitor:
+class Cronitor(plugin.PluginBase):
     """
     Example::
       cronitor: ABC123

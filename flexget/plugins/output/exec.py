@@ -26,7 +26,7 @@ class EscapingEntry(Entry):
         return value
 
 
-class PluginExec:
+class PluginExec(plugin.PluginBase):
     """
     Execute commands
 

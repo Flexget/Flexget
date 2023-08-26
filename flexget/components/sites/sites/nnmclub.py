@@ -8,7 +8,7 @@ from flexget.utils import requests
 logger = logger.bind(name='nnm-club')
 
 
-class UrlRewriteNnmClub:
+class UrlRewriteNnmClub(plugin.PluginBase):
     """Nnm-club.me urlrewriter."""
 
     def url_rewritable(self, task, entry):

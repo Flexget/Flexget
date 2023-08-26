@@ -18,7 +18,7 @@ def merge_found_qualities(existing_qualities: Dict[str, set], new_qualities: Dic
         existing_qualities.setdefault(movie_id, set()).update(quals)
 
 
-class FilterExistsMovie:
+class FilterExistsMovie(plugin.PluginBase):
     """
     Reject existing movies.
 

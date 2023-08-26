@@ -7,7 +7,7 @@ from flexget.event import event
 logger = logger.bind(name='verify_ssl')
 
 
-class VerifySSLCertificates:
+class VerifySSLCertificates(plugin.PluginBase):
     """
     Plugin that can off SSL certificate verification.
 

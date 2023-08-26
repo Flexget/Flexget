@@ -16,7 +16,7 @@ from flexget.utils.soup import get_soup
 logger = logger.bind(name='html')
 
 
-class InputHtml:
+class InputHtml(plugin.PluginBase):
     """
     Parses urls from html page. Usefull on sites which have direct download
     links of any type (mp3, jpg, torrent, ...).

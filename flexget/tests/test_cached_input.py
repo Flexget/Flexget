@@ -7,7 +7,7 @@ from flexget.entry import Entry
 from flexget.utils.cached_input import cached
 
 
-class InputPersist:
+class InputPersist(plugin.PluginBase):
     """Fake input plugin to test db cache. Only emits an entry the first time it is run."""
 
     hasrun = False

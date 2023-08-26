@@ -15,7 +15,7 @@ logger = logger.bind(name='trakt_calendar')
 max_number_of_days = 31
 
 
-class TraktCalendar:
+class TraktCalendar(plugin.PluginBase):
     schema = {
         'type': 'object',
         'properties': {

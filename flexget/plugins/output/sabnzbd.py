@@ -9,7 +9,7 @@ from flexget.event import event
 logger = logger.bind(name='sabnzbd')
 
 
-class OutputSabnzbd:
+class OutputSabnzbd(plugin.PluginBase):
     """
     Example::
 

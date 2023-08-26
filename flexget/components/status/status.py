@@ -11,7 +11,7 @@ from . import db
 logger = logger.bind(name='status')
 
 
-class Status:
+class Status(plugin.PluginBase):
     """Track health status of tasks"""
 
     schema = {'type': 'boolean'}

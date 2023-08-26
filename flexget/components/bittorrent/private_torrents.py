@@ -6,7 +6,7 @@ from flexget.event import event
 logger = logger.bind(name='priv_torrents')
 
 
-class FilterPrivateTorrents:
+class FilterPrivateTorrents(plugin.PluginBase):
     """How to handle private torrents.
 
     private_torrents: yes|no

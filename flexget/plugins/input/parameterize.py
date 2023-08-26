@@ -7,7 +7,7 @@ from flexget.utils.template import RenderError, render_from_entry
 log = logging.getLogger('parameterize')
 
 
-class Parameterize:
+class Parameterize(plugin.PluginBase):
     schema = {
         'type': 'object',
         'properties': {

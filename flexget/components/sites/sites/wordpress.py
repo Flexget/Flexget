@@ -46,7 +46,7 @@ def get_valid_cookies(cookies):
     return cookiejar_from_dict(valid_cookies)
 
 
-class PluginWordPress:
+class PluginWordPress(plugin.PluginBase):
     """
     Supports accessing feeds and media that require wordpress account credentials
     Usage:

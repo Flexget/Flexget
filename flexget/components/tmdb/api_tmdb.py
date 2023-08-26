@@ -276,7 +276,7 @@ class TMDBSearchResult(Base):
             self.movie = movie
 
 
-class ApiTmdb:
+class ApiTmdb(plugin.PluginBase):
     """Does lookups to TMDb and provides movie information. Caches lookups."""
 
     @staticmethod

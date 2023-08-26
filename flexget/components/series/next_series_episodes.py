@@ -13,7 +13,7 @@ from . import db
 logger = logger.bind(name='next_series_episodes')
 
 
-class NextSeriesEpisodes:
+class NextSeriesEpisodes(plugin.PluginBase):
     """
     Emit next episode number from all series configured in this task.
 

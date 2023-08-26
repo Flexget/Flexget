@@ -8,7 +8,7 @@ from . import db
 logger = logger.bind(name='set_series_begin')
 
 
-class SetSeriesBegin:
+class SetSeriesBegin(plugin.PluginBase):
     """
     Set the first episode for series. Uses series_name and series_id.
 

@@ -13,7 +13,7 @@ logger = logger.bind(name='metanfo_csize')
 SIZE_RE = re.compile(r'Size[^\d]{0,7}(\d*\.?\d+).{0,5}(MB|GB)', re.IGNORECASE | re.UNICODE)
 
 
-class MetainfoContentSize:
+class MetainfoContentSize(plugin.PluginBase):
     """
     Utility:
 

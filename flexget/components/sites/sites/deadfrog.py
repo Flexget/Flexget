@@ -10,7 +10,7 @@ from flexget.utils.soup import get_soup
 logger = logger.bind(name='deadfrog')
 
 
-class UrlRewriteDeadFrog:
+class UrlRewriteDeadFrog(plugin.PluginBase):
     """DeadFrog urlrewriter."""
 
     # urlrewriter API

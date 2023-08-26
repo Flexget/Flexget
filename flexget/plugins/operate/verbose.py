@@ -9,7 +9,7 @@ from flexget.utils.log import log_once
 logger = logger.bind(name='verbose')
 
 
-class Verbose:
+class Verbose(plugin.PluginBase):
     """
     Verbose entry accept, reject and failure
     """

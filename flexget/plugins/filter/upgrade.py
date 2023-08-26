@@ -33,7 +33,7 @@ class EntryUpgrade(Base):
         return f'<Upgrade(id={self.id},added={self.added},quality={self.quality})>'
 
 
-class FilterUpgrade:
+class FilterUpgrade(plugin.PluginBase):
     schema = {
         'type': 'object',
         'properties': {

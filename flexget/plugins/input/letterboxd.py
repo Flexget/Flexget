@@ -36,7 +36,7 @@ SORT_BY = {
 }
 
 
-class Letterboxd:
+class Letterboxd(plugin.PluginBase):
     schema = {
         'type': 'object',
         'properties': {

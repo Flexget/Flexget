@@ -14,7 +14,7 @@ logger = logger.bind(name='betaseries_list')
 API_URL_PREFIX = 'https://api.betaseries.com/'
 
 
-class BetaSeriesList:
+class BetaSeriesList(plugin.PluginBase):
     """
     Emits an entry for each serie followed by one or more BetaSeries account.
     See https://www.betaseries.com/

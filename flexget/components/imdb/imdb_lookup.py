@@ -14,7 +14,7 @@ from . import db
 logger = logger.bind(name='imdb_lookup')
 
 
-class ImdbLookup:
+class ImdbLookup(plugin.PluginBase):
     """
     Retrieves imdb information for entries.
     Also provides imdb lookup functionality to all other imdb related plugins.

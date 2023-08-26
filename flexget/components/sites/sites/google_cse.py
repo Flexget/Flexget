@@ -16,7 +16,7 @@ requests.headers.update({'User-Agent': 'Mozilla/4.0 (compatible; MSIE 5.5; Windo
 requests.add_domain_limiter(TimedLimiter('imdb.com', '2 seconds'))
 
 
-class UrlRewriteGoogleCse:
+class UrlRewriteGoogleCse(plugin.PluginBase):
     """Google custom query urlrewriter."""
 
     # urlrewriter API
@@ -51,7 +51,7 @@ class UrlRewriteGoogleCse:
             raise UrlRewritingError(e)
 
 
-class UrlRewriteGoogle:
+class UrlRewriteGoogle(plugin.PluginBase):
     # urlrewriter API
 
     def url_rewritable(self, task, entry):

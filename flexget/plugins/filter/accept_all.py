@@ -6,7 +6,7 @@ from flexget.event import event
 logger = logger.bind(name='accept_all')
 
 
-class FilterAcceptAll:
+class FilterAcceptAll(plugin.PluginBase):
     """
     Just accepts all entries.
 

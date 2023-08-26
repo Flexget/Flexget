@@ -13,7 +13,7 @@ except ImportError:
 logger = logger.bind(name='torrent_scrub')
 
 
-class TorrentScrub:
+class TorrentScrub(plugin.PluginBase):
     """Scrubs torrents from unwanted keys.
 
     Example:

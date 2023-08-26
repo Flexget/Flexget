@@ -22,7 +22,7 @@ class PogcalShow(Base):
     name = Column(Unicode)
 
 
-class PogcalAcquired:
+class PogcalAcquired(plugin.PluginBase):
     schema = {
         'type': 'object',
         'properties': {'username': {'type': 'string'}, 'password': {'type': 'string'}},

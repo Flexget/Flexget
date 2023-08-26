@@ -12,7 +12,7 @@ from flexget.utils import json
 logger = logger.bind(name='json')
 
 
-class Json:
+class Json(plugin.PluginBase):
     """
     Return entries from a json file.
 

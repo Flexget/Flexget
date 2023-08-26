@@ -8,7 +8,7 @@ from flexget.event import event
 logger = logger.bind(name='modify_torrents')
 
 
-class AddTrackers:
+class AddTrackers(plugin.PluginBase):
     """
     Adds tracker URL to torrent files.
 
@@ -34,7 +34,7 @@ class AddTrackers:
                 entry['url'] += ''.join(['&tr=' + url for url in config])
 
 
-class RemoveTrackers:
+class RemoveTrackers(plugin.PluginBase):
     """
     Removes trackers from torrent files using regexp matching.
 
@@ -68,7 +68,7 @@ class RemoveTrackers:
                     entry['url'] = re.sub(tr_search, '', entry['url'], re.IGNORECASE | re.UNICODE)
 
 
-class ModifyTrackers:
+class ModifyTrackers(plugin.PluginBase):
     """
     Modify tracker URL to torrent files.
 

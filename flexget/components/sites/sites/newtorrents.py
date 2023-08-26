@@ -14,7 +14,7 @@ from flexget.utils.soup import get_soup
 logger = logger.bind(name='newtorrents')
 
 
-class NewTorrents:
+class NewTorrents(plugin.PluginBase):
     """NewTorrents urlrewriter and search plugin."""
 
     def __init__(self):

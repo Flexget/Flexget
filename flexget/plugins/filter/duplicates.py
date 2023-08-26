@@ -6,7 +6,7 @@ from flexget.event import event
 logger = logger.bind(name='duplicates')
 
 
-class Duplicates:
+class Duplicates(plugin.PluginBase):
     """
     Take action on entries with duplicate field values
 

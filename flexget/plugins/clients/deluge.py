@@ -85,7 +85,7 @@ class DelugePlugin:
                     return username, password
 
 
-class InputDeluge(DelugePlugin):
+class InputDeluge(DelugePlugin, plugin.PluginBase):
     """Create entries for torrents in the deluge session."""
 
     # Fields we provide outside of the deluge_ prefixed namespace

@@ -4,7 +4,7 @@ from flexget.event import event
 from . import series as plugin_series
 
 
-class FilterAllSeries(plugin_series.FilterSeriesBase):
+class FilterAllSeries(plugin_series.FilterSeriesBase, plugin.PluginBase):
     """
     Grabs all entries that appear to be series episodes in a task.
 

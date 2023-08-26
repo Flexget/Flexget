@@ -49,7 +49,7 @@ class PyloadApi:
             raise
 
 
-class PluginPyLoad:
+class PluginPyLoad(plugin.PluginBase):
     """
     Parse task content or url for hoster links and adds them to pyLoad.
 

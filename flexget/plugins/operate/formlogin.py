@@ -16,7 +16,7 @@ except ImportError:
 logger = logger.bind(name='formlogin')
 
 
-class FormLogin:
+class FormLogin(plugin.PluginBase):
     """
     Login on form
     """

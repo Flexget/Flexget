@@ -10,7 +10,7 @@ from flexget.event import event
 logger = logger.bind(name='rutracker')
 
 
-class SiteRutracker:
+class SiteRutracker(plugin.PluginBase):
     schema = {'type': 'boolean'}
 
     base_url = 'https://api.t-ru.org'

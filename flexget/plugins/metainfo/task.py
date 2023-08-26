@@ -6,7 +6,7 @@ from flexget.event import event
 logger = logger.bind(name='metainfo_task')
 
 
-class MetainfoTask:
+class MetainfoTask(plugin.PluginBase):
     """
     Set 'task' field for entries.
     """

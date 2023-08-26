@@ -21,7 +21,7 @@ DEFAULT_TEMPLATE_VALUE = json.dumps(
 )
 
 
-class SNSNotification:
+class SNSNotification(plugin.PluginBase):
     """
     Emits SNS notifications of entries
 

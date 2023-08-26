@@ -16,7 +16,7 @@ session = Session()
 session.add_domain_limiter(TokenBucketLimiter('discord.com', 6, '3 seconds'))
 
 
-class DiscordNotifier:
+class DiscordNotifier(plugin.PluginBase):
     """
     Example::
 

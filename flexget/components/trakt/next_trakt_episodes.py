@@ -12,7 +12,7 @@ from . import db
 logger = logger.bind(name='next_trakt_episodes')
 
 
-class NextTraktEpisodes:
+class NextTraktEpisodes(plugin.PluginBase):
     """
     Creates an entry for the latest or the next item in your watched or collected
     episodes in your trakt account.

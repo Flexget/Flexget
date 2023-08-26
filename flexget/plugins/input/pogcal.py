@@ -9,7 +9,7 @@ from flexget.utils.soup import get_soup
 logger = logger.bind(name='pogcal')
 
 
-class InputPogDesign:
+class InputPogDesign(plugin.PluginBase):
     schema = {
         'type': 'object',
         'properties': {'username': {'type': 'string'}, 'password': {'type': 'string'}},

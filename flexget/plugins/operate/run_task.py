@@ -9,7 +9,7 @@ from flexget.event import event
 logger = logger.bind(name='run_task')
 
 
-class RunTask:
+class RunTask(plugin.PluginBase):
     schema = {
         'type': 'object',
         'properties': {

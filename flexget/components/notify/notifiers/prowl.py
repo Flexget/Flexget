@@ -19,7 +19,7 @@ requests = RequestSession(max_retries=3)
 requests.add_domain_limiter(TimedLimiter('prowlapp.com', '5 seconds'))
 
 
-class ProwlNotifier:
+class ProwlNotifier(plugin.PluginBase):
     """
     Send prowl notifications
 

@@ -12,7 +12,7 @@ from flexget.utils.soup import get_soup
 logger = logger.bind(name='horriblesubs')
 
 
-class HorribleSubs:
+class HorribleSubs(plugin.PluginBase):
     """
     Give latest horriblesubs releases
     """

@@ -33,7 +33,7 @@ class MyEpisodesInfo(Base):
         )
 
 
-class MyEpisodes:
+class MyEpisodes(plugin.PluginBase):
     """
     Marks a series episode as acquired in your myepisodes.com account.
 

@@ -12,7 +12,7 @@ except ImportError:
 logger = logger.bind(name='metainfo_movie')
 
 
-class MetainfoMovie:
+class MetainfoMovie(plugin.PluginBase):
     """
     Check if entry appears to be a movie, and populate movie info if so.
     """

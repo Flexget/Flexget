@@ -46,7 +46,7 @@ Index(
 )
 
 
-class FilterProperMovies:
+class FilterProperMovies(plugin.PluginBase):
     """
     Automatically download proper movies.
 

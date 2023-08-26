@@ -83,7 +83,7 @@ TRACKERS = [
 ]
 
 
-class FromPirateBay:
+class FromPirateBay(plugin.PluginBase):
     """
     Return torrent listing from piratebay api.
 

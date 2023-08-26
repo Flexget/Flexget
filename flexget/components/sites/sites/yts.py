@@ -13,7 +13,7 @@ from flexget.utils.tools import parse_filesize
 logger = logger.bind(name='yts')
 
 
-class UrlRewriteYTS:
+class UrlRewriteYTS(plugin.PluginBase):
     """YTS search"""
 
     schema = {'type': 'boolean'}

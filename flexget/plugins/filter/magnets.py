@@ -2,7 +2,7 @@ from flexget import plugin
 from flexget.event import event
 
 
-class Magnets:
+class Magnets(plugin.PluginBase):
     """Removes magnet urls form the urls list. Rejects entries that have nothing but magnet urls."""
 
     schema = {'type': 'boolean'}

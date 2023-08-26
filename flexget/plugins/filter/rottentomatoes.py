@@ -7,7 +7,7 @@ from flexget.utils.log import log_once
 logger = logger.bind(name='rt')
 
 
-class FilterRottenTomatoes:
+class FilterRottenTomatoes(plugin.PluginBase):
     """
     This plugin allows filtering based on Rotten Tomatoes score, votes and genres etc.
 

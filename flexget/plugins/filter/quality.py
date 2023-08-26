@@ -8,7 +8,7 @@ from flexget.utils import qualities
 logger = logger.bind(name='quality')
 
 
-class FilterQuality:
+class FilterQuality(plugin.PluginBase):
     """
     Rejects all entries that don't have one of the specified qualities
 

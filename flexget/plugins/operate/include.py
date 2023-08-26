@@ -12,7 +12,7 @@ plugin_name = 'include'
 logger = logger.bind(name=plugin_name)
 
 
-class PluginInclude:
+class PluginInclude(plugin.PluginBase):
     """
     Include configuration from another yaml file.
 

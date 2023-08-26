@@ -3,7 +3,7 @@ from flexget.event import event
 from flexget.utils import pathscrub
 
 
-class PathScrub:
+class PathScrub(plugin.PluginBase):
     """
     Plugin that will clear illegal characters from paths. Other plugins should use this if available when
     creating paths. User can specify what os if filenames must be compatible with an os other than current.

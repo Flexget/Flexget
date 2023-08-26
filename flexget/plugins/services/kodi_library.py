@@ -11,7 +11,7 @@ logger = logger.bind(name='kodi_library')
 JSON_URI = '/jsonrpc'
 
 
-class KodiLibrary:
+class KodiLibrary(plugin.PluginBase):
     schema = {
         'type': 'object',
         'properties': {

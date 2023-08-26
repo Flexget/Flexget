@@ -16,7 +16,7 @@ except ImportError:
 logger = logger.bind(name='nfo_lookup')
 
 
-class NfoLookup:
+class NfoLookup(plugin.PluginBase):
     """
     Retrieves information from a local '.nfo' info file.
 

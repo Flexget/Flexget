@@ -177,7 +177,7 @@ class TransmissionBase:
                     logger.error('It looks like there was a problem connecting to transmission.')
 
 
-class PluginTransmissionInput(TransmissionBase):
+class PluginTransmissionInput(TransmissionBase, plugin.PluginBase):
     schema = {
         'anyOf': [
             {'type': 'boolean'},

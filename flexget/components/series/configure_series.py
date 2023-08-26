@@ -10,7 +10,7 @@ from . import series as plugin_series
 logger = logger.bind(name='configure_series')
 
 
-class ConfigureSeries(plugin_series.FilterSeriesBase):
+class ConfigureSeries(plugin_series.FilterSeriesBase, plugin.PluginBase):
     """Generates series configuration from any input (supporting API version 2, soon all)
 
     Configuration::

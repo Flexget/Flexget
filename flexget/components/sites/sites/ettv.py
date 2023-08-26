@@ -16,7 +16,7 @@ DOMAINS = [
 ]
 
 
-class UrlRewriteETTV:
+class UrlRewriteETTV(plugin.PluginBase):
     """ETTV urlrewriter."""
 
     # urlrewriter API

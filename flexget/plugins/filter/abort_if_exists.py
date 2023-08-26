@@ -8,7 +8,7 @@ from flexget.event import event
 logger = logger.bind(name='abort_if_exists')
 
 
-class PluginAbortIfExists:
+class PluginAbortIfExists(plugin.PluginBase):
     """Aborts a task if an entry field matches the regexp"""
 
     schema = {

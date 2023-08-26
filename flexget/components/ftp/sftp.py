@@ -28,7 +28,7 @@ SftpConfig = namedtuple(
 )
 
 
-class SftpList:
+class SftpList(plugin.PluginBase):
     """
     Generate entries from SFTP. This plugin requires the pysftp Python module and its dependencies.
 
@@ -144,7 +144,7 @@ class SftpList:
         return entries
 
 
-class SftpDownload:
+class SftpDownload(plugin.PluginBase):
     """
     Download files from a SFTP server. This plugin requires the pysftp Python module and its
     dependencies.
@@ -269,7 +269,7 @@ class SftpDownload:
         return config
 
 
-class SftpUpload:
+class SftpUpload(plugin.PluginBase):
     """
     Upload files to a SFTP server. This plugin requires the pysftp Python module and its
     dependencies.

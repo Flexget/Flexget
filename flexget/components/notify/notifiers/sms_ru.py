@@ -19,7 +19,7 @@ requests = RequestSession(max_retries=3)
 requests.add_domain_limiter(TimedLimiter('sms.ru', '5 seconds'))
 
 
-class SMSRuNotifier:
+class SMSRuNotifier(plugin.PluginBase):
     """
     Sends SMS notification through sms.ru http api sms/send.
     Phone number is a login assigned to sms.ru account.

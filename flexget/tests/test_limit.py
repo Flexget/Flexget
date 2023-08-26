@@ -2,7 +2,7 @@ from flexget import plugin
 from flexget.entry import Entry
 
 
-class OneEntryInput:
+class OneEntryInput(plugin.PluginBase):
     """Fake input plugin, fails if second entry is grabbed."""
 
     def on_task_input(self, task, config):

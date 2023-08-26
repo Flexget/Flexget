@@ -18,7 +18,7 @@ logger = logger.bind(name='subtitles')
 # http://trac.opensubtitles.org/projects/opensubtitles/wiki/XMLRPC
 
 
-class Subtitles:
+class Subtitles(plugin.PluginBase):
     """
     Fetch subtitles from opensubtitles.org
     """

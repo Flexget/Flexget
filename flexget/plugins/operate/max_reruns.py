@@ -7,7 +7,7 @@ from flexget.task import Task
 logger = logger.bind(name='max_reruns')
 
 
-class MaxReRuns:
+class MaxReRuns(plugin.PluginBase):
     """Overrides the maximum amount of re-runs allowed by a task."""
 
     schema = {'type': 'integer'}

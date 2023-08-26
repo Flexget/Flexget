@@ -10,7 +10,7 @@ logger = logger.bind(name='priority')
 # Currently the manager reads this value directly out of the config when the 'execute' command is run, and this plugin
 # does nothing but make the config key valid.
 # In daemon mode, schedules should be made which run tasks in the proper order instead of using this.
-class TaskPriority:
+class TaskPriority(plugin.PluginBase):
     """Set task priorities"""
 
     schema = {'type': 'integer'}

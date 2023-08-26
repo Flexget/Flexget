@@ -68,7 +68,7 @@ class AlphaRatioCookie(Base):
     expires = Column(DateTime)
 
 
-class SearchAlphaRatio:
+class SearchAlphaRatio(plugin.PluginBase):
     """
     AlphaRatio search plugin.
     """

@@ -7,7 +7,7 @@ from flexget.plugin import PluginError
 logger = logger.bind(name='list_remove')
 
 
-class ListRemove:
+class ListRemove(plugin.PluginBase):
     schema = {
         'type': 'array',
         'items': {

@@ -7,7 +7,7 @@ from flexget.event import event
 logger = logger.bind(name='require_field')
 
 
-class FilterRequireField:
+class FilterRequireField(plugin.PluginBase):
     """
     Rejects entries without defined field.
 

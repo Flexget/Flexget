@@ -12,7 +12,7 @@ logger = logger.bind(name='gen_series')
 PER_RUN = 50
 
 
-class GenSeries:
+class GenSeries(plugin.PluginBase):
     """
     Purely for debugging purposes. Not great quality :)
 

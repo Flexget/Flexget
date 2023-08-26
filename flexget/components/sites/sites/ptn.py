@@ -53,7 +53,7 @@ default_search_params = {
 }
 
 
-class SearchPTN:
+class SearchPTN(plugin.PluginBase):
     schema = {
         'type': 'object',
         'properties': {

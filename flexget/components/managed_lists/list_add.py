@@ -7,7 +7,7 @@ from flexget.plugin import PluginError
 logger = logger.bind(name='list_add')
 
 
-class ListAdd:
+class ListAdd(plugin.PluginBase):
     schema = {
         'type': 'array',
         'items': {

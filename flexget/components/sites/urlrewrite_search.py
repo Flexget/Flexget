@@ -8,7 +8,7 @@ from flexget.event import event
 logger = logger.bind(name='urlrewrite_search')
 
 
-class PluginSearch:
+class PluginSearch(plugin.PluginBase):
     """
     Search entry from sites. Accepts list of known search plugins, list is in priority order.
     Once hit has been found no more searches are performed. Should be used only when

@@ -10,7 +10,7 @@ from . import db
 logger = logger.bind(name=__name__)
 
 
-class EntryList:
+class EntryList(plugin.PluginBase):
     schema = {'type': 'string'}
 
     @staticmethod

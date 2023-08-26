@@ -13,7 +13,7 @@ from flexget.utils.template import RenderError
 logger = logger.bind(name='qbittorrent')
 
 
-class OutputQBitTorrent:
+class OutputQBitTorrent(plugin.PluginBase):
     """
     Example:
 
@@ -322,7 +322,7 @@ class OutputQBitTorrent:
             self.add_entries(task, config)
 
 
-class FromQBitTorrent:
+class FromQBitTorrent(plugin.PluginBase):
     schema = {
         'type': 'object',
         'properties': {

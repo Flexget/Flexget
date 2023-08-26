@@ -10,7 +10,7 @@ from flexget.utils.template import RenderError
 logger = logger.bind(name='symlink')
 
 
-class Symlink:
+class Symlink(plugin.PluginBase):
     schema = {
         'oneOf': [
             {

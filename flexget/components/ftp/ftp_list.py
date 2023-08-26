@@ -20,7 +20,7 @@ except ImportError:
 logger = logger.bind(name='ftp_list')
 
 
-class FTPList:
+class FTPList(plugin.PluginBase):
     def __init__(self):
         self.username = None
         self.password = None

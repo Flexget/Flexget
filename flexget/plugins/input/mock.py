@@ -8,7 +8,7 @@ from flexget.event import event
 logger = logger.bind(name='mock')
 
 
-class Mock:
+class Mock(plugin.PluginBase):
     """
     Allows adding mock input entries.
 

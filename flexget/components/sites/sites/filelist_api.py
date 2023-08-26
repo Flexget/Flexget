@@ -13,7 +13,7 @@ logger = logger.bind(name='filelist')
 requests = RequestSession()
 
 
-class SearchFileList:
+class SearchFileList(plugin.PluginBase):
     """
     FileList search plugin w/ API w00t.
     """

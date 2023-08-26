@@ -21,7 +21,7 @@ REPUTATIONS = {  # Maps reputation name to feed address
 }
 
 
-class Torrentz:
+class Torrentz(plugin.PluginBase):
     """Torrentz search and urlrewriter"""
 
     schema = {

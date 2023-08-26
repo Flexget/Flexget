@@ -10,7 +10,7 @@ from flexget.utils.soup import get_soup
 logger = logger.bind(name='koreus')
 
 
-class UrlRewriteKoreus:
+class UrlRewriteKoreus(plugin.PluginBase):
     """Koreus urlrewriter."""
 
     # urlrewriter API

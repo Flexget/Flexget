@@ -14,7 +14,7 @@ from flexget.utils.tools import parse_timedelta
 logger = logger.bind(name='torznab')
 
 
-class Torznab:
+class Torznab(plugin.PluginBase):
     """Torznab search plugin
 
     Handles searching for tv shows and movies, with fallback to simple query strings if these are not available.

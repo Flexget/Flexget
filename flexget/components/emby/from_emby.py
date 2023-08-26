@@ -9,7 +9,7 @@ from flexget.event import event
 logger = logger.bind(name='from_emby')
 
 
-class EmbyInput:
+class EmbyInput(plugin.PluginBase):
     """
     Returns Emby Inputs
 

@@ -15,7 +15,7 @@ FAIL_LIMIT = 100
 logger = logger.bind(name='failed')
 
 
-class PluginFailed:
+class PluginFailed(plugin.PluginBase):
     """
     Records entry failures and stores them for trying again after a certain interval.
     Rejects them after they have failed too many times.

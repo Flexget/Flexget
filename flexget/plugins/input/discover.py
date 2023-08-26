@@ -44,7 +44,7 @@ def db_cleanup(manager, session):
         session.delete(discover_entry)
 
 
-class Discover:
+class Discover(plugin.PluginBase):
     """
     Discover content based on other inputs material.
 

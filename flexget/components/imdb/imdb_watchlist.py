@@ -29,7 +29,7 @@ TITLE_TYPE_MAP = {
 }
 
 
-class ImdbWatchlist:
+class ImdbWatchlist(plugin.PluginBase):
     """ "Creates an entry for each movie in your imdb list."""
 
     schema = {

@@ -2,7 +2,7 @@ from flexget import plugin
 from flexget.event import event
 
 
-class AbortPlugin:
+class AbortPlugin(plugin.PluginBase):
     """
     abort plugin for debug purposes.
 

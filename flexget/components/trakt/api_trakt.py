@@ -118,7 +118,7 @@ class TraktUserCache(TimedDict):
 user_cache = TraktUserCache(cache_time=USER_CACHE_DURATION)
 
 
-class ApiTrakt:
+class ApiTrakt(plugin.PluginBase):
     def __init__(self, username=None, account=None):
         self.account = account
         self.username = db.get_username(username, account)

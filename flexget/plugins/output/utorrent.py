@@ -11,7 +11,7 @@ from flexget.utils.template import RenderError
 logger = logger.bind(name='utorrent')
 
 
-class PluginUtorrent:
+class PluginUtorrent(plugin.PluginBase):
     """
     Parse task content or url for hoster links and adds them to utorrent.
 

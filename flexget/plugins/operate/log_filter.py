@@ -55,7 +55,7 @@ SCHEMA = {
 }
 
 
-class LogFilter:
+class LogFilter(plugin.PluginBase):
     """
     Prevent entries with specific text from being logged.
 

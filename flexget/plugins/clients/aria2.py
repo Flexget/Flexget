@@ -142,7 +142,7 @@ class XmlRpcClient(RpcClient):
 RPC_CLIENTS = {'xml': XmlRpcClient, 'json': JsonRpcClient}
 
 
-class OutputAria2:
+class OutputAria2(plugin.PluginBase):
     """
     Simple Aria2 output
 

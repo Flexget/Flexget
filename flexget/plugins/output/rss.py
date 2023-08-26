@@ -46,7 +46,7 @@ class RSSEntry(Base):
     enc_type = Column(String)
 
 
-class OutputRSS:
+class OutputRSS(plugin.PluginBase):
     """
     Write RSS containing succeeded (downloaded) entries.
 

@@ -16,7 +16,7 @@ CHUNK_SIZE = 200
 MAX_TWEETS = 1000
 
 
-class TwitterFeed:
+class TwitterFeed(plugin.PluginBase):
     """Parses a twitter feed
 
     Example::

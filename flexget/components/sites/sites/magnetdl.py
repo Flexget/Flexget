@@ -21,7 +21,7 @@ class Page404Error(Exception):
     pass
 
 
-class MagnetDL:
+class MagnetDL(plugin.PluginBase):
     """Creates entries from magnetdl categories"""
 
     url = 'https://www.magnetdl.com'

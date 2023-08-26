@@ -11,7 +11,7 @@ from flexget.terminal import console
 logger = logger.bind(name='dump_config')
 
 
-class OutputDumpConfig:
+class OutputDumpConfig(plugin.PluginBase):
     """
     Dumps task config in STDOUT in yaml at exit or abort event.
     """

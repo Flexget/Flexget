@@ -286,7 +286,7 @@ class SonarrSet(MutableSet):
         return self._find_entry(entry)
 
 
-class SonarrList:
+class SonarrList(plugin.PluginBase):
     schema = SonarrSet.schema
 
     @staticmethod

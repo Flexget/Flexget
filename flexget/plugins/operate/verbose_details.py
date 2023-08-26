@@ -6,7 +6,7 @@ from flexget.event import event
 logger = logger.bind(name='details')
 
 
-class PluginDetails:
+class PluginDetails(plugin.PluginBase):
     def on_task_start(self, task, config):
         # Make a flag for tasks to declare if it is ok not to produce entries
         task.no_entries_ok = False
@@ -37,7 +37,7 @@ class PluginDetails:
         )
 
 
-class NoEntriesOk:
+class NoEntriesOk(plugin.PluginBase):
     """Allows manually silencing the warning message for tasks that regularly produce no entries."""
 
     schema = {'type': 'boolean'}

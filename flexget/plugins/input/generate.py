@@ -7,7 +7,7 @@ from flexget.event import event
 logger = logger.bind(name='generate')
 
 
-class Generate:
+class Generate(plugin.PluginBase):
     """Generates n number of random entries. Used for debugging purposes."""
 
     schema = {'type': 'integer'}

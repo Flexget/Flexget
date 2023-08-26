@@ -4,7 +4,7 @@ from flexget.event import event
 from . import seen as plugin_seen
 
 
-class FilterSeenInfoHash(plugin_seen.FilterSeen):
+class FilterSeenInfoHash(plugin_seen.FilterSeen, plugin.PluginBase):
     """Prevents the same torrent from being downloaded twice by remembering the infohash of all downloaded torrents."""
 
     schema = {'oneOf': [{'type': 'boolean'}, {'type': 'string', 'enum': ['global', 'local']}]}

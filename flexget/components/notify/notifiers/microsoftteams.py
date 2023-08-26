@@ -13,7 +13,7 @@ plugin_name = 'ms_teams'
 logger = logger.bind(name=plugin_name)
 
 
-class MsTeamsNotifier:
+class MsTeamsNotifier(plugin.PluginBase):
     """
     Example::
 

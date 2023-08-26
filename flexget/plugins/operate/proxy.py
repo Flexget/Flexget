@@ -10,7 +10,7 @@ logger = logger.bind(name='proxy')
 PROTOCOLS = ['http', 'https']
 
 
-class Proxy:
+class Proxy(plugin.PluginBase):
     """Adds a proxy to the requests session."""
 
     schema = {

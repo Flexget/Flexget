@@ -23,7 +23,7 @@ TRAILER_SOURCE = {
 }
 
 
-class AniList:
+class AniList(plugin.PluginBase):
     """ " Creates entries for series and movies from your AniList list
 
     Syntax:

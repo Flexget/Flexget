@@ -11,7 +11,7 @@ from flexget.utils.cached_input import cached
 logger = logger.bind(name='from_imdb')
 
 
-class FromIMDB:
+class FromIMDB(plugin.PluginBase):
     """
     This plugin enables generating entries based on an entity, an entity being a person, character or company.
     It's based on IMDBpy which is required (pip install imdbpy). The basic config required just an IMDB ID of the

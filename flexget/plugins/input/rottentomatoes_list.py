@@ -14,7 +14,7 @@ except ImportError:
 logger = logger.bind(name='rottentomatoes_list')
 
 
-class RottenTomatoesList:
+class RottenTomatoesList(plugin.PluginBase):
     """
     Emits an entry for each movie in a Rotten Tomatoes list.
 

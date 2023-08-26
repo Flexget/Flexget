@@ -10,7 +10,7 @@ from flexget.event import event
 logger = logger.bind(name='exists')
 
 
-class FilterExists:
+class FilterExists(plugin.PluginBase):
     """
     Reject entries that already exist in given path.
 

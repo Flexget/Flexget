@@ -46,7 +46,7 @@ CATEGORIES = {
 FILTERS = ['all', 'filter remakes', 'trusted only']
 
 
-class UrlRewriteNyaa:
+class UrlRewriteNyaa(plugin.PluginBase):
     """Nyaa urlrewriter and search plugin."""
 
     schema = {

@@ -11,7 +11,7 @@ from flexget.event import event
 logger = logger.bind(name='regexp')
 
 
-class FilterRegexp:
+class FilterRegexp(plugin.PluginBase):
     """
     All possible forms.
 

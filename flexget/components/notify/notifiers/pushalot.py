@@ -17,7 +17,7 @@ requests = RequestSession(max_retries=3)
 requests.add_domain_limiter(TimedLimiter('pushalot.com', '5 seconds'))
 
 
-class PushalotNotifier:
+class PushalotNotifier(plugin.PluginBase):
     """
     Example::
 

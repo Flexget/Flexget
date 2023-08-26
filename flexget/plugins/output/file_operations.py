@@ -165,7 +165,7 @@ class BaseFileOps:
         raise NotImplementedError()
 
 
-class DeleteFiles(BaseFileOps):
+class DeleteFiles(BaseFileOps, plugin.PluginBase):
     """Delete all accepted files."""
 
     schema = {

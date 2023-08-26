@@ -10,7 +10,7 @@ from flexget.utils.soup import get_soup
 logger = logger.bind(name='FTDB')
 
 
-class UrlRewriteFTDB:
+class UrlRewriteFTDB(plugin.PluginBase):
     """FTDB RSS url_rewrite"""
 
     def url_rewritable(self, task, entry):

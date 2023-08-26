@@ -8,7 +8,7 @@ from flexget.event import event
 logger = logger.bind(name='cinemageddon')
 
 
-class UrlRewriteCinemageddon:
+class UrlRewriteCinemageddon(plugin.PluginBase):
     """Cinemageddon urlrewriter."""
 
     def url_rewritable(self, task, entry):

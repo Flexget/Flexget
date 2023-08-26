@@ -13,7 +13,7 @@ logger = logger.bind(name='anidb_list')
 USER_ID_RE = r'^\d{1,6}$'
 
 
-class AnidbList:
+class AnidbList(plugin.PluginBase):
     """ "Creates an entry for each movie or series in your AniDB wishlist."""
 
     anidb_url = 'http://anidb.net/perl-bin/'

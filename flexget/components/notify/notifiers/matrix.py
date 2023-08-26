@@ -22,7 +22,7 @@ def urljoin(*args):
     return "/".join(str(x).rstrip('/') for x in args)
 
 
-class MatrixNotifier:
+class MatrixNotifier(plugin.PluginBase):
     """
     Sends messages via Matrix. The MatrixHttpApi library is required to be installed.
     Install it with: `pip install matrix_client`

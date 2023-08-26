@@ -5,7 +5,7 @@ from . import db
 from . import series as plugin_series
 
 
-class FilterSeriesPremiere(plugin_series.FilterSeriesBase):
+class FilterSeriesPremiere(plugin_series.FilterSeriesBase, plugin.PluginBase):
     """
     Accept an entry that appears to be the first episode of any series.
 

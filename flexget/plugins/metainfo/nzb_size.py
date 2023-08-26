@@ -12,7 +12,7 @@ logger = logger.bind(name='nzb_size')
 mimetypes.add_type('application/x-nzb', '.nzb')
 
 
-class NzbSize:
+class NzbSize(plugin.PluginBase):
     """
     Provides entry size information when dealing with nzb files
     """

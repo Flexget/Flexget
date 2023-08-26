@@ -9,7 +9,7 @@ from . import db
 logger = logger.bind(name='pending_approval')
 
 
-class PendingApproval:
+class PendingApproval(plugin.PluginBase):
     schema = {
         'type': 'boolean',
         'deprecated': 'pending_approval is deprecated, switch to using pending_list',

@@ -8,7 +8,7 @@ from flexget.task import Task
 logger = logger.bind(name='from_task')
 
 
-class FromTask:
+class FromTask(plugin.PluginBase):
     """An input plugin which returns accepted entries from another task."""
 
     schema = {'type': 'string'}

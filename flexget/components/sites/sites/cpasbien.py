@@ -16,7 +16,7 @@ logger = logger.bind(name='search_cpasbien')
 session = requests.Session()
 
 
-class SearchCPASBIEN:
+class SearchCPASBIEN(plugin.PluginBase):
     schema = {
         'type': 'object',
         'properties': {

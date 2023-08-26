@@ -98,7 +98,7 @@ def dump(entries, debug=False, eval_lazy=False, trace=False, title_only=False):
             console('')
 
 
-class OutputDump:
+class OutputDump(plugin.PluginBase):
     """
     Outputs all entries to console
     """

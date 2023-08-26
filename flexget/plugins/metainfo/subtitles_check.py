@@ -11,7 +11,7 @@ from flexget.event import event
 logger = logger.bind(name='check_subtitles')
 
 
-class MetainfoSubs:
+class MetainfoSubs(plugin.PluginBase):
     """
     Set 'subtitles' field for entries, if they are local video files with subs.
     The field is a list of language codes (3-letter ISO-639-3) for each subtitles

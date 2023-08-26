@@ -9,7 +9,7 @@ logger = logger.bind(name='change')
 found_deprecated = False
 
 
-class ChangeWarn:
+class ChangeWarn(plugin.PluginBase):
     """
     Gives warning if user has deprecated / changed configuration in the root level.
 

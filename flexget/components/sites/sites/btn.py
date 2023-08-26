@@ -16,7 +16,7 @@ logger = logger.bind(name='search_btn')
 ORIGINS = ['None', 'Scene', 'P2P', 'User', 'Mixed', 'Internal']
 
 
-class SearchBTN:
+class SearchBTN(plugin.PluginBase):
     schema = {
         'oneOf': [
             {'type': 'string'},

@@ -9,7 +9,7 @@ from flexget.event import event
 logger = logger.bind(name='assume_quality')
 
 
-class AssumeQuality:
+class AssumeQuality(plugin.PluginBase):
     """
     Applies quality components to entries that match specified quality requirements.
     When a quality is applied, any components which are unknown in the entry are filled from the applied quality.

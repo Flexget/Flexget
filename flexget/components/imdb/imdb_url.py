@@ -9,7 +9,7 @@ from flexget.event import event
 logger = logger.bind(name='metainfo_imdb_url')
 
 
-class MetainfoImdbUrl:
+class MetainfoImdbUrl(plugin.PluginBase):
     """
     Scan entry information for imdb url.
     """

@@ -200,7 +200,7 @@ class BluraySearchResult(Base):
             self.movie = movie
 
 
-class ApiBluray:
+class ApiBluray(plugin.PluginBase):
     """Does lookups to Blu-ray.com and provides movie information. Caches lookups."""
 
     @staticmethod

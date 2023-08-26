@@ -8,7 +8,7 @@ from flexget.event import event
 logger = logger.bind(name='manipulate')
 
 
-class Manipulate:
+class Manipulate(plugin.PluginBase):
     r"""
     Usage:
 

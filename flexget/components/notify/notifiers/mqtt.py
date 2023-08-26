@@ -11,7 +11,7 @@ plugin_name = 'mqtt'
 logger = logger.bind(name=plugin_name)
 
 
-class MQTTNotifier:
+class MQTTNotifier(plugin.PluginBase):
     """
     Example::
       notify:

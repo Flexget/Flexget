@@ -21,7 +21,7 @@ def translate_type(type):
     return {'shows': 'serial', 'movies': 'film'}[type]
 
 
-class FilmwebWatchlist:
+class FilmwebWatchlist(plugin.PluginBase):
     """ "Creates an entry for each movie in your Filmweb list."""
 
     schema = {

@@ -39,13 +39,13 @@ class TestPluginApi:
         # assert len(plugin.plugins) >= len(plugin_modules) - 1, "Less plugins than plugin modules"
 
     def test_register_by_class(self, execute_task):
-        class TestPlugin:
+        class TestPlugin(plugin.PluginBase):
             pass
 
-        class Oneword:
+        class Oneword(plugin.PluginBase):
             pass
 
-        class TestHTML:
+        class TestHTML(plugin.PluginBase):
             pass
 
         assert 'test_plugin' not in plugin.plugins

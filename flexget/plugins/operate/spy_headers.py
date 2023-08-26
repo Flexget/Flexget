@@ -6,7 +6,7 @@ from flexget.event import event
 logger = logger.bind(name='spy_headers')
 
 
-class PluginSpyHeaders:
+class PluginSpyHeaders(plugin.PluginBase):
     """
     Logs all headers sent in http requests. Useful for resolving issues.
 

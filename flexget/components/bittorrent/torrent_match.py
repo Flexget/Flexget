@@ -18,7 +18,7 @@ class TorrentMatchFile:
         return f"{self.__class__.__name__}(path={self.path!s}, size={self.size})"
 
 
-class TorrentMatch:
+class TorrentMatch(plugin.PluginBase):
     """Plugin that attempts to match .torrents to local files"""
 
     schema = {

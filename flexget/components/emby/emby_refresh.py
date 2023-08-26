@@ -9,7 +9,7 @@ from flexget.event import event
 logger = logger.bind(name='emby_reload')
 
 
-class EmbyRefreshLibrary:
+class EmbyRefreshLibrary(plugin.PluginBase):
     """
     Refresh Emby Library
 

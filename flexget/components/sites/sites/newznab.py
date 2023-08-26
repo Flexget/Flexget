@@ -11,7 +11,7 @@ __author__ = 'deksan'
 logger = logger.bind(name='newznab')
 
 
-class Newznab:
+class Newznab(plugin.PluginBase):
     """
     Newznab search plugin
     Provide a url or your website + apikey and a category.

@@ -33,7 +33,7 @@ class EntryTimeFrame(Base):
         return f'<Timeframe(id={self.id},added={self.added},quality={self.quality})>'
 
 
-class FilterTimeFrame:
+class FilterTimeFrame(plugin.PluginBase):
     schema = {
         'type': 'object',
         'properties': {

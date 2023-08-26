@@ -100,7 +100,7 @@ class PassThePopcornCookie(Base):
     expires = Column(DateTime)
 
 
-class SearchPassThePopcorn:
+class SearchPassThePopcorn(plugin.PluginBase):
     """
     PassThePopcorn search plugin.
     """

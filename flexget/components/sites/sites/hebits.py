@@ -40,7 +40,7 @@ class HeBitsSort(Enum):
     random = 7
 
 
-class SearchHeBits:
+class SearchHeBits(plugin.PluginBase):
     """
     HeBits search plugin.
     """

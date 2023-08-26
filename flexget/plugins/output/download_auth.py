@@ -11,7 +11,7 @@ PLUGIN_NAME = 'download_auth'
 logger = logger.bind(name=PLUGIN_NAME)
 
 
-class DownloadAuth:
+class DownloadAuth(plugin.PluginBase):
     host_schema = {
         'additionalProperties': {
             'type': 'object',

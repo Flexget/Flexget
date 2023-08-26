@@ -140,7 +140,7 @@ class TheTVDBSet(MutableSet):
         return True
 
 
-class TheTVDBList:
+class TheTVDBList(plugin.PluginBase):
     schema = TheTVDBSet.schema
 
     def get_list(self, config):

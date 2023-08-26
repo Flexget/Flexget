@@ -126,7 +126,7 @@ class RutrackerAuth(AuthBase):
         return r
 
 
-class RutrackerUrlrewrite:
+class RutrackerUrlrewrite(plugin.PluginBase):
     """Usage:
 
     rutracker_auth:

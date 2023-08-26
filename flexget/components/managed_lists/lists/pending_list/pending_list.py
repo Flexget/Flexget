@@ -115,7 +115,7 @@ class PendingListSet(MutableSet):
             return Entry(match.entry) if match else None
 
 
-class PendingList:
+class PendingList(plugin.PluginBase):
     schema = {
         'oneOf': [
             {'type': 'string'},

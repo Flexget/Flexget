@@ -15,7 +15,7 @@ logger = logger.bind(name=plugin_name)
 NOTIFYMYANDROID_URL = 'https://www.notifymyandroid.com/publicapi/notify'
 
 
-class NotifyMyAndroidNotifier:
+class NotifyMyAndroidNotifier(plugin.PluginBase):
     """
     Example::
 

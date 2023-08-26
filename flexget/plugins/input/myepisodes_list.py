@@ -15,7 +15,7 @@ logger = logger.bind(name='myepisodes_list')
 URL = 'http://www.myepisodes.com/'
 
 
-class MyEpisodesList:
+class MyEpisodesList(plugin.PluginBase):
     """Creates an entry for each item in your myepisodes.com show list.
 
     Syntax:

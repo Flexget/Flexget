@@ -12,7 +12,7 @@ from flexget.utils.cached_input import cached
 logger = logger.bind(name='regexp_parse')
 
 
-class RegexpParse:
+class RegexpParse(plugin.PluginBase):
     r"""This plugin is designed to take input from a web resource or a file.
     It then parses the text via regexps supplied in the config file.
 

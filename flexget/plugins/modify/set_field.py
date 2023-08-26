@@ -11,7 +11,7 @@ logger = logger.bind(name='set')
 UNSET = '__unset__'
 
 
-class ModifySet:
+class ModifySet(plugin.PluginBase):
     """Allows adding information to a task entry for use later.
 
     Example:

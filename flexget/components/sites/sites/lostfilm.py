@@ -81,7 +81,7 @@ class TextProcessingError(Exception):
         return repr(self.value)
 
 
-class LostFilm:
+class LostFilm(plugin.PluginBase):
     """
     Grab new torrents from lostfilm RSS feed
 
