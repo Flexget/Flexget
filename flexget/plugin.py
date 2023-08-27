@@ -9,8 +9,14 @@ from typing import Callable, Dict, Iterable, List, Optional, Union
 from urllib.error import HTTPError, URLError
 
 import loguru
-import pkg_resources
 from requests import RequestException
+
+try:
+    # This is in our requirements for python versions older than 3.10 to get the new style selectable entry points
+    from importlib_metadata import entry_points
+except ImportError:
+    # Python 3.10 and higher has the new functionality
+    from importlib.metadata import entry_points
 
 from flexget import components as components_pkg
 from flexget import config_schema
@@ -490,7 +496,7 @@ def _load_components_from_dirs(dirs: List[str]) -> None:
 
 def _load_plugins_from_packages() -> None:
     """Load plugins installed via PIP"""
-    for entrypoint in pkg_resources.iter_entry_points('FlexGet.plugins'):
+    for entrypoint in entry_points(group='FlexGet.plugins'):
         try:
             plugin_module = entrypoint.load()
         except DependencyError as e:
@@ -517,7 +523,7 @@ def _load_plugins_from_packages() -> None:
             raise
         else:
             logger.trace(
-                'Loaded packaged module {} from {}', entrypoint.module_name, plugin_module.__file__
+                'Loaded packaged module {} from {}', entrypoint.module, plugin_module.__file__
             )
     _check_phase_queue()
 
