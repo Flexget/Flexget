@@ -6,7 +6,7 @@ description = """\
     different sources like RSS-feeds, html-pages, various sites and more.\
 """
 readme = "README.rst"
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 authors = [
     { name = "Marko Koivusalo", email = "marko.koivusalo@gmail.com" },
     { name = "Chase Sterling", email = "chase.sterling@gmail.com" },
@@ -54,7 +54,7 @@ description = ""
 authors = []
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.8"
 apscheduler = ">=3.10.0"
 beautifulsoup4 = ">=4.5"
 colorama = ">=0.4.4"
@@ -87,7 +87,7 @@ packaging = ">=21.3"
 pyparsing = ">=2.4.7"
 werkzeug = ">=2.2.3"
 zxcvbn = "^4.4.24"
-pendulum = "^2.1.2"
+pendulum = { "git" = "https://github.com/sdispater/pendulum.git" }  # TODO: Wait for a release before we merge
 
 [tool.poetry.group.dev.dependencies]
 black = ">=18.9b0"
