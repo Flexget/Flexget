@@ -10,7 +10,7 @@ from unicodedata import normalize
 
 import jinja2.filters
 import pendulum
-from dateutil import parser as dateutil_parse
+import wrapt
 from jinja2 import (
     ChoiceLoader,
     Environment,
@@ -44,8 +44,9 @@ environment: Optional['FlexGetEnvironment'] = None
 def extra_vars() -> dict:
     return {
         'timedelta': pendulum.duration,
-        'utcnow': CoercingDateTime.utcnow(),
-        'now': CoercingDateTime.now(),
+        'duration': pendulum.duration,
+        'utcnow': DateTime.utcnow(),
+        'now': DateTime.now(),
     }
 
 
@@ -54,46 +55,26 @@ class RenderError(Exception):
 
 
 class CoercingDateTime(DateTime):
-    """Timezone aware datetime that instead of crashing when compared to naive datetimes, does a naive comparison."""
+    """
+    Datetime that avoids crashing when comparing tz aware and naive datetimes.
+    When this happens, it will assume the naive datetime is in the same timezone as the dt aware one.
 
-    def __le__(self, other):
-        if not other.tzinfo:
-            return self.naive() <= other
-        return super().__le__(other)
+    This allows us to introduce tz aware datetimes into entry fields without breaking old configs, or old plugins.
+    """
 
-    def __lt__(self, other):
-        if not other.tzinfo:
-            return self.naive() < other
-        return super().__lt__(other)
 
-    def __gt__(self, other):
-        if not other.tzinfo:
-            return self.naive() > other
-        return super().__gt__(other)
+@wrapt.decorator
+def same_tz(wrapped, instance, args, kwargs):
+    other = args[0]
+    if instance.tzinfo and not other.tzinfo:
+        other = CoercingDateTime.instance(other, tz=instance.tzinfo)
+    elif not instance.tzinfo and other.tzinfo:
+        other = CoercingDateTime.instance(other).naive()
+    return wrapped(other, **kwargs)
 
-    def __ge__(self, other):
-        if not other.tzinfo:
-            return self.naive() >= other
-        return super().__ge__(other)
 
-    def __eq__(self, other):
-        if not other.tzinfo:
-            return self.naive() == other
-        return super().__eq__(other)
-
-    @classmethod
-    def instance(cls, dt, tz=None) -> "CoercingDateTime":
-        dt = pendulum.instance(dt, tz=tz)
-        dt.__class__ = cls
-        return dt
-
-    @classmethod
-    def now(cls, tz=None) -> "CoercingDateTime":
-        return cls.instance(super().now(tz=tz))
-
-    @classmethod
-    def utcnow(cls) -> "CoercingDateTime":
-        return cls.instance(super().utcnow())
+for fun in ("__lt__", "__le__", "__gt__", "__ge__", "__eq__", "__sub__"):
+    setattr(CoercingDateTime, fun, same_tz(getattr(CoercingDateTime, fun)))
 
 
 def filter_pathbase(val: Optional[str]) -> str:
@@ -147,7 +128,7 @@ def filter_formatdate(val, format_str):
 
 def filter_parsedate(val):
     """Attempts to parse a date according to the rules in ISO 8601 and RFC 2822"""
-    return dateutil_parse.parse(val)
+    return pendulum.parse(val, strict=False, tz=None)
 
 
 def filter_date_suffix(date_str: str):
