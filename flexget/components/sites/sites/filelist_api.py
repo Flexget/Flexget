@@ -144,7 +144,7 @@ class SearchFileList:
                 entry['url'] = result['download_link']
                 entry['imdb'] = result['imdb']
                 # size is returned in bytes but expected in MiB
-                entry['content_size'] = result['size'] / 2**20
+                entry['content_size'] = result['size']
                 entry['torrent_snatches'] = result['times_completed']
                 entry['torrent_seeds'] = result['seeders']
                 entry['torrent_leeches'] = result['leechers']

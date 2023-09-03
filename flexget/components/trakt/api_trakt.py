@@ -190,7 +190,9 @@ class ApiTrakt:
                     .first()
                 ):
                     logger.debug('Adding search result to db')
-                    session.merge(db.TraktShowSearchResult(search=title, series=series))
+                    result = session.merge(db.TraktShowSearchResult(search=title))
+                    result.series = series
+
             elif series and found:
                 logger.debug('Updating search result in db')
                 found.series = series
@@ -247,7 +249,8 @@ class ApiTrakt:
                     .first()
                 ):
                     logger.debug('Adding search result to db')
-                    session.merge(db.TraktMovieSearchResult(search=title, movie=movie))
+                    result = session.merge(db.TraktMovieSearchResult(search=title))
+                    result.movie = movie
             elif movie and found:
                 logger.debug('Updating search result in db')
                 found.movie = movie

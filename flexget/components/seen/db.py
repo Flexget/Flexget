@@ -22,7 +22,7 @@ from sqlalchemy import (
     select,
     update,
 )
-from sqlalchemy.orm import relation
+from sqlalchemy.orm import relationship
 
 from flexget import db_schema, plugin
 from flexget.event import event
@@ -35,7 +35,6 @@ try:
     from flexget.components.imdb.utils import extract_id
 except ImportError:
     raise plugin.DependencyError(issued_by=__name__, missing='imdb')
-
 
 logger = logger.bind(name='seen.db')
 Base = db_schema.versioned_base('seen', 4)
@@ -83,7 +82,7 @@ class SeenEntry(Base):
     added = Column(DateTime)
     local = Column(Boolean)
 
-    fields = relation('SeenField', backref='seen_entry', cascade='all, delete, delete-orphan')
+    fields = relationship('SeenField', backref='seen_entry', cascade='all, delete, delete-orphan')
 
     def __init__(self, title, task, reason=None, local=None):
         if local is None:
@@ -170,7 +169,7 @@ def forget(value, tasks=None, test=False):
     """
     See module docstring
 
-    :param string value: Can be task name, entry title or field value
+    :param string value: Can be entry title or field value
     :return: count, field_count where count is number of entries removed and field_count number of fields
     """
     with Session() as session:
@@ -186,18 +185,15 @@ def forget(value, tasks=None, test=False):
             tasks = None
 
         if tasks:
-            query_se = (
-                session.query(SeenEntry)
-                .filter(SeenEntry.title.like(value, escape=ESCAPE_QUERY))
-                .filter(SeenEntry.task.in_(tasks))
-            )
+            query_se = session.query(SeenEntry).filter(SeenEntry.task.in_(tasks))
+            # If we just got a wildcard no need for further filtering
+            if value != '%':
+                query_se = query_se.filter(SeenEntry.title.like(value, escape=ESCAPE_QUERY))
             query_sf = session.query(SeenField).filter(
                 SeenField.value.like(value, escape=ESCAPE_QUERY)
             )
         else:
-            query_se = session.query(SeenEntry).filter(
-                or_(SeenEntry.title == value, SeenEntry.task == value)
-            )
+            query_se = session.query(SeenEntry).filter(SeenEntry.title == value)
             query_sf = session.query(SeenField).filter(SeenField.value == value)
 
         for se in query_se.all():
@@ -213,7 +209,7 @@ def forget(value, tasks=None, test=False):
                 session.delete(se)
 
         for sf in query_sf.all():
-            se = session.query(SeenEntry).filter(SeenEntry.id == sf.seen_entry_id).first()
+            se = sf.seen_entry
             if tasks and se.task not in tasks:
                 continue
             field_count += len(se.fields)
@@ -293,7 +289,7 @@ def search(
         query = query.order_by(getattr(SeenEntry, order_by).desc())
     else:
         query = query.order_by(getattr(SeenEntry, order_by))
-    return query.group_by(SeenEntry).slice(start, stop).from_self()
+    return query.group_by(SeenEntry).slice(start, stop)
 
 
 @with_session

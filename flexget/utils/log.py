@@ -26,7 +26,7 @@ def upgrade(ver: Optional[int], session: Session):
     if ver is None:
         logger.info('Adding index to md5sum column of log_once table.')
         table = table_schema('log_once', session)
-        Index('log_once_md5sum', table.c.md5sum, unique=True).create()
+        Index('log_once_md5sum', table.c.md5sum, unique=True).create(bind=session.bind)
         ver = 0
     return ver
 

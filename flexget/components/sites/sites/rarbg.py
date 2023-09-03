@@ -207,7 +207,7 @@ class SearchRarBG:
                     e['url'] = result.get('download')
                     e['torrent_seeds'] = int(result.get('seeders'))
                     e['torrent_leeches'] = int(result.get('leechers'))
-                    e['content_size'] = int(result.get('size')) / 1024 / 1024
+                    e['content_size'] = int(result.get('size'))
                     episode_info = result.get('episode_info')
                     if episode_info:
                         e['imdb_id'] = episode_info.get('imdb')

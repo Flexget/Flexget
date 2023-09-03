@@ -62,7 +62,7 @@ class FilterIf:
         def handle_phase(task, config):
             entry_actions = {'accept': Entry.accept, 'reject': Entry.reject, 'fail': Entry.fail}
             for item in config:
-                requirement, action = list(item.items())[0]
+                requirement, action = next(iter(item.items()))
                 passed_entries = (e for e in task.entries if self.check_condition(requirement, e))
                 if isinstance(action, str):
                     if not phase == 'filter':

@@ -28,6 +28,8 @@ jobs:
       - name: Setup Docker Buildx
         id: buildx
         uses: docker/setup-buildx-action@v2
+        with:
+          install: true
 
       - name: Log in to Docker Hub
         if: github.event_name != 'pull_request'
@@ -65,8 +67,11 @@ jobs:
           file: ./Dockerfile
           builder: ${{ steps.buildx.output.name }}
           push: ${{ github.event_name == 'push' && github.ref != 'refs/heads/master' }}
-          platforms: linux/amd64
+          platforms: linux/amd64,linux/arm64
+          provenance: false
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha, scope=${{ github.workflow }}
-          cache-to: type=gha, scope=${{ github.workflow }}
+          cache-from: |
+            type=gha, scope=${{ github.ref_name }}
+            type=gha, scope=${{ github.base_ref }}
+          cache-to: type=gha, mode=max, scope=${{ github.ref_name }}

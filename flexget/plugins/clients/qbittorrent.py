@@ -137,7 +137,7 @@ class OutputQBitTorrent:
 
         hash_torrent = hash_torrent.lower()
 
-        logger.debug(f'Checking if torrent with hash {repr(hash)} already in session.')
+        logger.debug(f'Checking if torrent with hash {hash!r} already in session.')
 
         url = f'{self.url}{self.api_url_info}'
         params = {'hashes': hash_torrent}
@@ -369,7 +369,7 @@ class FromQBitTorrent:
                 title=torrent['name'],
                 url=torrent['magnet_uri'],
                 content_files=[f['name'] for f in torrent.files],
-                content_size=torrent['size'] // 1024 // 1024,
+                content_size=torrent['size'],
                 torrent_info_hash=torrent['infohash_v1'],
                 torrent_info_hash_v2=torrent['infohash_v2'],
                 torrent_seeds=torrent['num_seeds'],

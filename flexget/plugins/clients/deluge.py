@@ -95,7 +95,7 @@ class InputDeluge(DelugePlugin):
         'hash': 'torrent_info_hash',
         'num_peers': 'torrent_peers',
         'num_seeds': 'torrent_seeds',
-        'total_size': ('content_size', lambda size: size / 1024 / 1024),
+        'total_size': 'content_size',
         'files': ('content_files', lambda file_dicts: [f['path'] for f in file_dicts]),
         # Convert to datetimes for easier use in 'if' plugin and templates
         'time_added': ('deluge_date_added', lambda timestamp: pendulum.from_timestamp(timestamp)),

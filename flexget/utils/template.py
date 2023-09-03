@@ -28,7 +28,7 @@ from pendulum import DateTime
 from flexget.event import event
 from flexget.utils.lazy_dict import LazyDict
 from flexget.utils.pathscrub import pathscrub
-from flexget.utils.tools import split_title_year
+from flexget.utils.tools import format_filesize, parse_filesize, split_title_year
 
 if TYPE_CHECKING:
     from flexget.entry import Entry
@@ -116,7 +116,7 @@ def filter_pathdir(val: Optional[str]) -> str:
     return os.path.dirname(val or '')
 
 
-def filter_pathscrub(val: str, os_mode: str = None) -> str:
+def filter_pathscrub(val: str, os_mode: Optional[str] = None) -> str:
     """Replace problematic characters in a path."""
     if not isinstance(val, str):
         return val
@@ -160,7 +160,7 @@ def filter_date_suffix(date_str: str):
     return date_str + suffix
 
 
-def filter_format_number(val, places: int = None, grouping: bool = True) -> str:
+def filter_format_number(val, places: Optional[int] = None, grouping: bool = True) -> str:
     """Formats a number according to the user's locale."""
     if not isinstance(val, (int, float)):
         return val
@@ -232,6 +232,23 @@ def filter_get_year(name: str) -> str:
     return split_title_year(name).year
 
 
+def filter_parse_size(val: str, si: bool = False, match_re: Optional[str] = None) -> int:
+    """Parse human-readable file size to bytes"""
+    if not isinstance(val, str):
+        return val
+
+    try:
+        return parse_filesize(val, si=si, match_re=match_re)
+    except ValueError:
+        return 0
+
+
+def filter_format_size(size: Union[int, float], si=False, unit=None):
+    if not isinstance(size, (int, float)):
+        return size
+    return format_filesize(size, si=si, unit=unit)
+
+
 def is_fs_file(pathname: Union[str, os.PathLike]) -> bool:
     """Test whether item is existing file in filesystem"""
     return os.path.isfile(pathname)
@@ -289,7 +306,7 @@ def make_environment(manager: 'Manager') -> None:
             environment.tests[name.split('_', 1)[1]] = test
 
 
-def list_templates(extensions: List[str] = None) -> List[str]:
+def list_templates(extensions: Optional[List[str]] = None) -> List[str]:
     """Returns all templates names that are configured under environment loader dirs"""
     if environment is None or not hasattr(environment, 'loader'):
         return []

@@ -18,7 +18,7 @@ class TaskQueue:
     """
 
     def __init__(self) -> None:
-        self.run_queue: 'queue.PriorityQueue[Task]' = queue.PriorityQueue()
+        self.run_queue: queue.PriorityQueue[Task] = queue.PriorityQueue()
         self._shutdown_now = False
         self._shutdown_when_finished = False
 

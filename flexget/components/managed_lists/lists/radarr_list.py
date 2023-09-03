@@ -1,4 +1,3 @@
-import json
 from collections.abc import MutableSet
 from urllib.parse import quote, urlparse
 
@@ -75,7 +74,7 @@ def request_delete_json(url, headers):
 def request_post_json(url, headers, data):
     """Makes a POST request and returns the JSON response"""
     try:
-        response = requests.post(url, headers=headers, data=data, timeout=10)
+        response = requests.post(url, headers=headers, json=data, timeout=10)
         if response.status_code == 201:
             return response.json()
         else:
@@ -123,7 +122,7 @@ class RadarrAPIService:
         if parsed_base_url.port:
             port = int(parsed_base_url.port)
 
-        self.api_url = "{}://{}:{}{}/api/".format(
+        self.api_url = "{}://{}:{}{}/api/v3/".format(
             parsed_base_url.scheme,
             parsed_base_url.netloc,
             port,
@@ -132,7 +131,7 @@ class RadarrAPIService:
 
     def get_profiles(self):
         """Gets all profiles"""
-        request_url = self.api_url + "profile"
+        request_url = self.api_url + "qualityProfile"
         headers = self._default_headers()
         return request_get_json(request_url, headers)
 
@@ -147,7 +146,7 @@ class RadarrAPIService:
         request_url = self.api_url + "tag"
         headers = self._default_headers()
         data = {"label": label}
-        return request_post_json(request_url, headers, json.dumps(data))
+        return request_post_json(request_url, headers, data)
 
     def get_movies(self):
         """Gets all movies"""
@@ -220,7 +219,7 @@ class RadarrAPIService:
             data["addOptions"] = add_options
 
         try:
-            json_response = request_post_json(request_url, headers, json.dumps(data))
+            json_response = request_post_json(request_url, headers, data)
         except RadarrRequestError as ex:
             spec_ex = spec_exception_from_response_ex(ex)
             if spec_ex:
@@ -528,7 +527,7 @@ class RadarrSet(MutableSet):
 
             # Check if we should add quality requirement
             if self.config.get("include_data"):
-                movie_profile_id = movie["profileId"]
+                movie_profile_id = movie["qualityProfileId"]
                 for profile in profiles:
                     profile_id = profile["id"]
                     if profile_id == movie_profile_id:

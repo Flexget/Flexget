@@ -26,7 +26,7 @@ _UNSET = object()
 core_parser: Optional['CoreArgumentParser'] = None
 
 
-def get_parser(command: str = None) -> 'ArgumentParser':
+def get_parser(command: Optional[str] = None) -> 'ArgumentParser':
     global core_parser
     if not core_parser:
         core_parser = CoreArgumentParser()
@@ -211,7 +211,7 @@ class NestedSubparserAction(_SubParsersAction):
         super().__init__(*args, **kwargs)
         self.required = required
 
-    def add_parser(self, name: str, parent_defaults: dict = None, **kwargs):
+    def add_parser(self, name: str, parent_defaults: Optional[dict] = None, **kwargs):
         if parent_defaults:
             self.parent_defaults[name] = parent_defaults
         return super().add_parser(name, **kwargs)
@@ -343,10 +343,10 @@ class ArgumentParser(ArgParser):
 
     def parse_args(
         self,
-        args: List[str] = None,
-        namespace: Namespace = None,
+        args: Optional[List[str]] = None,
+        namespace: Optional[Namespace] = None,
         raise_errors: bool = False,
-        file: TextIO = None,
+        file: Optional[TextIO] = None,
     ):  # pylint: disable=W0221
         """
         :param raise_errors: If this is true, errors will be raised as `ParserError`s instead of calling sys.exit
@@ -363,9 +363,9 @@ class ArgumentParser(ArgParser):
 
     def parse_known_args(
         self,
-        args: List[str] = None,
-        namespace: Namespace = None,
-        do_help: bool = None,
+        args: Optional[List[str]] = None,
+        namespace: Optional[Namespace] = None,
+        do_help: Optional[bool] = None,
     ):
         if args is None:
             args = sys.argv[1:]

@@ -60,7 +60,8 @@ class PluginParsing:
 
     def on_task_exit(self, task, config):
         # Restore default parsers for next task run
-        selected_parsers.pop()
+        if selected_parsers:
+            selected_parsers.pop()
 
     on_task_abort = on_task_exit
 

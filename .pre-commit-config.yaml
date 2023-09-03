@@ -1,17 +1,17 @@
 default_language_version:
   python: python3
 repos:
-- repo: https://github.com/charliermarsh/ruff-pre-commit
-  rev: 'v0.0.263'
+- repo: https://github.com/astral-sh/ruff-pre-commit
+  rev: 'v0.0.285'
   hooks:
     - id: ruff
       args: [ --fix, --exit-non-zero-on-fix ]
 - repo: https://github.com/psf/black
-  rev: 23.3.0
+  rev: 23.7.0
   hooks:
   - id: black
 - repo: https://github.com/python-poetry/poetry
-  rev: '1.4.0'
+  rev: '1.5.1'
   hooks:
     - id: poetry-check
     - id: poetry-lock
@@ -20,6 +20,8 @@ repos:
       args: ["--check"]
     - id: poetry-export
       args: ["-f", "requirements.txt", "-o", "requirements.txt", "--without-hashes"]
+    - id: poetry-export
+      args: ["--only", "release", "-f", "requirements.txt", "-o", "requirements-release.txt", "--without-hashes"]
     - id: poetry-export
       args: ["--only", "dev", "-f", "requirements.txt", "-o", "dev-requirements.txt", "--without-hashes"]
     - id: poetry-export

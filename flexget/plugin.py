@@ -9,8 +9,14 @@ from typing import Callable, Dict, Iterable, List, Optional, Union
 from urllib.error import HTTPError, URLError
 
 import loguru
-import pkg_resources
 from requests import RequestException
+
+try:
+    # This is in our requirements for python versions older than 3.10 to get the new style selectable entry points
+    from importlib_metadata import entry_points
+except ImportError:
+    # Python 3.10 and higher has the new functionality
+    from importlib.metadata import entry_points
 
 from flexget import components as components_pkg
 from flexget import config_schema
@@ -198,7 +204,7 @@ _plugin_options = []
 _new_phase_queue: Dict[str, List[Optional[str]]] = {}
 
 
-def register_task_phase(name: str, before: str = None, after: str = None):
+def register_task_phase(name: str, before: Optional[str] = None, after: Optional[str] = None):
     """Adds a new task phase to the available phases."""
     if before and after:
         raise RegisterException('You can only give either before or after for a phase.')
@@ -461,9 +467,7 @@ def _load_plugins_from_dirs(dirs: List[str]) -> None:
             plugin_subpackages = [
                 _f for _f in plugin_path.relative_to(plugins_dir).parent.parts if _f
             ]
-            module_name = '.'.join(
-                [plugins_pkg.__name__, *plugin_subpackages] + [plugin_path.stem]
-            )
+            module_name = '.'.join([plugins_pkg.__name__, *plugin_subpackages, plugin_path.stem])
             _import_plugin(module_name, plugin_path)
     _check_phase_queue()
 
@@ -484,7 +488,7 @@ def _load_components_from_dirs(dirs: List[str]) -> None:
                 _f for _f in component_path.relative_to(component_dir).parent.parts if _f
             ]
             package_name = '.'.join(
-                [components_pkg.__name__, *plugin_subpackages] + [component_path.stem]
+                [components_pkg.__name__, *plugin_subpackages, component_path.stem]
             )
             _import_plugin(package_name, component_path)
     _check_phase_queue()
@@ -492,7 +496,7 @@ def _load_components_from_dirs(dirs: List[str]) -> None:
 
 def _load_plugins_from_packages() -> None:
     """Load plugins installed via PIP"""
-    for entrypoint in pkg_resources.iter_entry_points('FlexGet.plugins'):
+    for entrypoint in entry_points(group='FlexGet.plugins'):
         try:
             plugin_module = entrypoint.load()
         except DependencyError as e:
@@ -519,7 +523,7 @@ def _load_plugins_from_packages() -> None:
             raise
         else:
             logger.trace(
-                'Loaded packaged module {} from {}', entrypoint.module_name, plugin_module.__file__
+                'Loaded packaged module {} from {}', entrypoint.module, plugin_module.__file__
             )
     _check_phase_queue()
 

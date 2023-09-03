@@ -411,203 +411,6 @@ class TestFilterSeries:
         assert task.accepted[0] == entries[0], 'first entry should have been accepted'
 
 
-class TestEpisodeAdvancement:
-    config = """
-        templates:
-          global:
-            parsing:
-              series: {{parser}}
-        tasks:
-          test_backwards_1:
-            mock:
-              - {title: 'backwards s02e12'}
-              - {title: 'backwards s02e10'}
-            series:
-              - backwards
-
-          test_backwards_2:
-            mock:
-              - {title: 'backwards s02e01'}
-            series:
-              - backwards
-
-          test_backwards_3:
-            mock:
-              - {title: 'backwards s01e01'}
-            series:
-              - backwards
-
-          test_backwards_okay_1:
-            mock:
-              - {title: 'backwards s01e02'}
-            series:
-              - backwards:
-                  tracking: backfill
-
-          test_backwards_okay_2:
-            mock:
-              - {title: 'backwards s01e03'}
-            series:
-              - backwards:
-                  tracking: no
-
-          test_forwards_1:
-            mock:
-              - {title: 'forwards s01e01'}
-            series:
-              - forwards
-
-          test_forwards_2:
-            mock:
-              - {title: 'forwards s02e01'}
-            series:
-              - forwards
-
-          test_forwards_3:
-            mock:
-              - {title: 'forwards s03e01'}
-            series:
-              - forwards
-
-          test_forwards_4:
-            mock:
-              - {title: 'forwards s04e02'}
-            series:
-              - forwards
-
-          test_forwards_5:
-            mock:
-              - {title: 'forwards s05e01'}
-            series:
-              - forwards
-
-          test_forwards_okay_1:
-            mock:
-              - {title: 'forwards s05e01'}
-            series:
-              - forwards:
-                  tracking: no
-
-          test_unordered:
-            mock:
-              - {title: 'zzz s01e05'}
-              - {title: 'zzz s01e06'}
-              - {title: 'zzz s01e07'}
-              - {title: 'zzz s01e08'}
-              - {title: 'zzz s01e09'}
-              - {title: 'zzz s01e10'}
-              - {title: 'zzz s01e15'}
-              - {title: 'zzz s01e14'}
-              - {title: 'zzz s01e13'}
-              - {title: 'zzz s01e12'}
-              - {title: 'zzz s01e11'}
-              - {title: 'zzz s01e01'}
-            series:
-              - zzz
-
-          test_seq1:
-            mock:
-              - title: seq 05
-            series:
-              - seq
-          test_seq2:
-            mock:
-              - title: seq 06
-            series:
-              - seq
-          test_seq3:
-            mock:
-              - title: seq 10
-            series:
-              - seq
-          test_seq4:
-            mock:
-              - title: seq 01
-            series:
-              - seq
-
-    """
-
-    def test_backwards(self, execute_task):
-        """Series plugin: episode advancement (backwards)"""
-        task = execute_task('test_backwards_1')
-        assert task.find_entry(
-            'accepted', title='backwards s02e12'
-        ), 'backwards s02e12 should have been accepted'
-        assert task.find_entry(
-            'accepted', title='backwards s02e10'
-        ), 'backwards s02e10 should have been accepted within grace margin'
-        task = execute_task('test_backwards_2')
-        assert task.find_entry(
-            'accepted', title='backwards s02e01'
-        ), 'backwards s02e01 should have been accepted, in current season'
-        task = execute_task('test_backwards_3')
-        assert task.find_entry(
-            'rejected', title='backwards s01e01'
-        ), 'backwards s01e01 should have been rejected, in previous season'
-        task = execute_task('test_backwards_okay_1')
-        assert task.find_entry(
-            'accepted', title='backwards s01e02'
-        ), 'backwards s01e01 should have been accepted, backfill enabled'
-        task = execute_task('test_backwards_okay_2')
-        assert task.find_entry(
-            'accepted', title='backwards s01e03'
-        ), 'backwards s01e01 should have been accepted, tracking off'
-
-    def test_forwards(self, execute_task):
-        """Series plugin: episode advancement (future)"""
-        task = execute_task('test_forwards_1')
-        assert task.find_entry(
-            'accepted', title='forwards s01e01'
-        ), 'forwards s01e01 should have been accepted'
-        task = execute_task('test_forwards_2')
-        assert task.find_entry(
-            'accepted', title='forwards s02e01'
-        ), 'forwards s02e01 should have been accepted'
-        task = execute_task('test_forwards_3')
-        assert task.find_entry(
-            'accepted', title='forwards s03e01'
-        ), 'forwards s03e01 should have been accepted'
-        task = execute_task('test_forwards_4')
-        assert task.find_entry(
-            'rejected', title='forwards s04e02'
-        ), 'forwards s04e02 should have been rejected'
-        task = execute_task('test_forwards_5')
-        assert task.find_entry(
-            'rejected', title='forwards s05e01'
-        ), 'forwards s05e01 should have been rejected'
-        task = execute_task('test_forwards_okay_1')
-        assert task.find_entry(
-            'accepted', title='forwards s05e01'
-        ), 'forwards s05e01 should have been accepted with tracking turned off'
-
-    def test_unordered(self, execute_task):
-        """Series plugin: unordered episode advancement"""
-        task = execute_task('test_unordered')
-        assert len(task.accepted) == 12, 'not everyone was accepted'
-
-    def test_sequence(self, execute_task):
-        # First should be accepted
-        task = execute_task('test_seq1')
-        entry = task.find_entry('accepted', title='seq 05')
-        assert entry['series_id'] == 5
-
-        # Next in sequence should be accepted
-        task = execute_task('test_seq2')
-        entry = task.find_entry('accepted', title='seq 06')
-        assert entry['series_id'] == 6
-
-        # Should be too far in the future
-        task = execute_task('test_seq3')
-        entry = task.find_entry(title='seq 10')
-        assert entry not in task.accepted, 'Should have been too far in future'
-
-        # Should be too far in the past
-        task = execute_task('test_seq4')
-        entry = task.find_entry(title='seq 01')
-        assert entry not in task.accepted, 'Should have been too far in the past'
-
-
 class TestFilterSeriesPriority:
     config = """
         templates:
@@ -1656,13 +1459,6 @@ class TestBegin:
             - title: WTest.S03E01
             series:
             - WTest
-          test_advancement3:
-            mock:
-            - title: WTest.S03E01
-            series:
-            - WTest:
-                begin: S03E01
-
     """
 
     def test_season_id(self, execute_task):
@@ -1709,17 +1505,6 @@ class TestBegin:
         assert (
             len(task.accepted) == 2
         ), 'Entries should have been accepted, they are not before the begin episode'
-
-    def test_advancement(self, execute_task):
-        # Put S01E01 into the database as latest download
-        task = execute_task('test_advancement1')
-        assert task.accepted
-        # Just verify regular ep advancement would block S03E01
-        task = execute_task('test_advancement2')
-        assert not task.accepted, 'Episode advancement should have blocked'
-        # Make sure ep advancement doesn't block it when we've set begin to that ep
-        task = execute_task('test_advancement3')
-        assert task.accepted, 'Episode should have been accepted'
 
 
 class TestSeriesPremiere:
@@ -2255,7 +2040,6 @@ class TestSeriesSeasonPack:
               season_packs: yes
           - bar:
               season_packs: yes
-              tracking: backfill
           - baz:
               season_packs: 3
           - boo:
@@ -2412,20 +2196,6 @@ class TestSeriesSeasonPack:
         assert len(task.accepted) == 1
 
         task = execute_task('foo_s01ep1')
-        assert not task.accepted
-
-    def test_tracking_rules_old_season(self, execute_task):
-        task = execute_task('foo_s02')
-        assert len(task.accepted) == 1
-
-        task = execute_task('foo_s01')
-        assert not task.accepted
-
-    def test_tracking_rules_new_season(self, execute_task):
-        task = execute_task('foo_s01')
-        assert len(task.accepted) == 1
-
-        task = execute_task('foo_s03')
         assert not task.accepted
 
     def test_several_seasons(self, execute_task):

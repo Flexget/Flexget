@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 
 from loguru import logger
 from sqlalchemy import Boolean, Column, DateTime, Float, Integer, String, Table, Unicode
-from sqlalchemy.orm import relation
+from sqlalchemy.orm import relationship
 from sqlalchemy.schema import ForeignKey, Index
 
 from flexget import db_schema
@@ -71,12 +71,12 @@ class Movie(Base):
     url = Column(String, index=True)
 
     # many-to-many relations
-    genres = relation('Genre', secondary=genres_table, backref='movies')
-    actors = relation('Actor', secondary=actors_table, backref='movies')
-    directors = relation('Director', secondary=directors_table, backref='movies')
-    writers = relation('Writer', secondary=writers_table, backref='movies')
-    plot_keywords = relation('PlotKeyword', secondary=plot_keywords_table, backref='movies')
-    languages = relation('MovieLanguage', order_by='MovieLanguage.prominence')
+    genres = relationship('Genre', secondary=genres_table, backref='movies')
+    actors = relationship('Actor', secondary=actors_table, backref='movies')
+    directors = relationship('Director', secondary=directors_table, backref='movies')
+    writers = relationship('Writer', secondary=writers_table, backref='movies')
+    plot_keywords = relationship('PlotKeyword', secondary=plot_keywords_table, backref='movies')
+    languages = relationship('MovieLanguage', order_by='MovieLanguage.prominence')
 
     score = Column(Float)
     votes = Column(Integer)
@@ -121,7 +121,7 @@ class MovieLanguage(Base):
     language_id = Column(Integer, ForeignKey('imdb_languages.id'), primary_key=True)
     prominence = Column(Integer)
 
-    language = relation('Language')
+    language = relationship('Language')
 
     def __init__(self, language, prominence=None):
         self.language = language

@@ -4,7 +4,7 @@
 import binascii
 import re
 from contextlib import suppress
-from typing import Any, Callable, Dict, Generator, Iterator, List, Union
+from typing import Any, Callable, Dict, Generator, Iterator, List, Optional, Union
 
 from loguru import logger
 
@@ -38,7 +38,9 @@ METAFILE_STD_KEYS = [
 
 
 def clean_meta(
-    meta: Dict[str, Any], including_info: bool = False, log_func: Callable[..., None] = None
+    meta: Dict[str, Any],
+    including_info: bool = False,
+    log_func: Optional[Callable[..., None]] = None,
 ):
     """Clean meta dict. Optionally log changes using the given logger.
 

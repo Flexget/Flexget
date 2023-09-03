@@ -139,7 +139,7 @@ series_parser.add_argument(
 
 
 @tvdb_api.route('/series/<string:title>/')
-@api.doc(params={'title': 'TV Show name or TVDB ID'}, parser=series_parser)
+@api.doc(params={'title': 'TV Show name or TVDB ID'}, expect=[series_parser])
 class TVDBSeriesLookupAPI(APIResource):
     @etag(cache_age=3600)
     @api.response(200, 'Successfully found show', tvdb_series_schema)
@@ -182,7 +182,7 @@ episode_parser.add_argument(
 
 
 @tvdb_api.route('/episode/<int:tvdb_id>/')
-@api.doc(params={'tvdb_id': 'TVDB ID of show'}, parser=episode_parser)
+@api.doc(params={'tvdb_id': 'TVDB ID of show'}, expect=[episode_parser])
 class TVDBEpisodeSearchAPI(APIResource):
     @etag(cache_age=3600)
     @api.response(200, 'Successfully found episode', tvdb_episode_schema)
@@ -232,7 +232,7 @@ search_parser.add_argument(
 
 
 @tvdb_api.route('/search/')
-@api.doc(parser=search_parser)
+@api.doc(expect=[search_parser])
 class TVDBSeriesSearchAPI(APIResource):
     @etag(cache_age=3600)
     @api.response(200, 'Successfully got results', search_results_schema)

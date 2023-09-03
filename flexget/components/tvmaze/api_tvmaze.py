@@ -15,7 +15,7 @@ from sqlalchemy import (
     and_,
     or_,
 )
-from sqlalchemy.orm import relation
+from sqlalchemy.orm import relationship
 from sqlalchemy.orm.exc import MultipleResultsFound
 
 from flexget import db_schema, plugin
@@ -69,7 +69,7 @@ class TVMazeLookup(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     search_name = Column(Unicode, index=True, unique=True)
     series_id = Column(Integer, ForeignKey('tvmaze_series.tvmaze_id'))
-    series = relation('TVMazeSeries', backref='search_strings')
+    series = relationship('TVMazeSeries', backref='search_strings')
 
     def __init__(self, search_name, series_id=None, series=None):
         self.search_name = search_name.lower()
@@ -79,9 +79,7 @@ class TVMazeLookup(Base):
             self.series = series
 
     def __repr__(self):
-        return '<TVMazeLookup(search_name={},series_id={})'.format(
-            self.search_name, self.series_id
-        )
+        return f'<TVMazeLookup(search_name={self.search_name},series_id={self.series_id})'
 
 
 class TVMazeSeries(Base):
@@ -90,7 +88,7 @@ class TVMazeSeries(Base):
     tvmaze_id = Column(Integer, primary_key=True)
     status = Column(Unicode)
     rating = Column(Float)
-    genres = relation(TVMazeGenre, secondary=genres_table)
+    genres = relationship(TVMazeGenre, secondary=genres_table)
     weight = Column(Integer)
     updated = Column(DateTime)  # last time show was updated at tvmaze
     name = Column(Unicode)
@@ -109,13 +107,13 @@ class TVMazeSeries(Base):
     runtime = Column(Integer)
     show_type = Column(String)
     network = Column(Unicode)
-    episodes = relation(
+    episodes = relationship(
         'TVMazeEpisodes',
         order_by='TVMazeEpisodes.season_number',
         cascade='all, delete, delete-orphan',
         backref='series',
     )
-    seasons = relation(
+    seasons = relationship(
         'TVMazeSeason',
         order_by='TVMazeSeason.number',
         cascade='all, delete, delete-orphan',
@@ -398,7 +396,9 @@ def add_to_lookup(session=None, title=None, series=None):
             'title {} already exist for series {}, no need to save lookup', title, series.name
         )
         return
-    session.add(TVMazeLookup(search_name=title, series=series))
+    result = TVMazeLookup(search_name=title)
+    session.add(result)
+    result.series = series
 
 
 def prepare_lookup_for_tvmaze(**lookup_params):

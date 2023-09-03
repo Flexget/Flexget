@@ -69,8 +69,8 @@ def get_scrape_url(tracker_url, info_hash):
 
 
 def get_udp_seeds(url, info_hash):
-    parsed_url = urlparse(url)
     try:
+        parsed_url = urlparse(url)
         port = parsed_url.port
     except ValueError:
         logger.error('UDP Port Error, url was {}', url)
@@ -154,8 +154,8 @@ def get_http_seeds(url, info_hash):
     if not data:
         logger.debug('No data received from tracker scrape.')
         return 0
-    logger.debug('get_http_seeds is returning: {}', list(data.values())[0]['complete'])
-    return list(data.values())[0]['complete']
+    logger.debug('get_http_seeds is returning: {}', next(iter(data.values()))['complete'])
+    return next(iter(data.values()))['complete']
 
 
 def get_tracker_seeds(url, info_hash):

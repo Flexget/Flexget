@@ -136,8 +136,8 @@ class TransmissionBase:
         if torrent.get('seedRatioMode') == 1:  # use torrent's own seed ratio limit
             seed_limit_ok = torrent.upload_ratio >= torrent.seed_ratio_limit
         elif torrent.get('seedRatioMode') == 0:  # use global rules
-            if session.seedRatioLimited:
-                seed_limit_ok = torrent.upload_ratio >= session.seedRatioLimit
+            if session.seed_ratio_limited:
+                seed_limit_ok = torrent.upload_ratio >= session.seed_ratio_limit
 
         if torrent.get('seedIdleMode') == 1:  # use torrent's own idle limit
             idle_limit_ok = (
@@ -223,7 +223,7 @@ class PluginTransmissionInput(TransmissionBase):
                 title=torrent.name,
                 url='',
                 torrent_info_hash=torrent.hashString,
-                content_size=torrent.total_size / (1024 * 1024),
+                content_size=torrent.total_size,
             )
             # Location of torrent is only valid if transmission is on same machine as flexget
             if config['host'] in ('localhost', '127.0.0.1'):
@@ -241,10 +241,10 @@ class PluginTransmissionInput(TransmissionBase):
                 'leftUntilDone': 'left_until_done',
                 'ratio': 'ratio',
                 'status': 'status',
-                'date_active': 'date_active',
-                'date_added': 'date_added',
-                'date_done': 'date_done',
-                'date_started': 'date_started',
+                'date_active': 'activity_date',
+                'date_added': 'added_date',
+                'date_done': 'done_date',
+                'date_started': 'start_date',
                 'errorString': 'error_string',
                 'priority': 'priority',
                 'progress': 'progress',
@@ -280,7 +280,10 @@ class PluginTransmissionInput(TransmissionBase):
             entry['transmission_error_state'] = st_error_to_desc[torrent.error]
             # Built in done_date doesn't work when user adds an already completed file to transmission
             if torrent.progress == 100:
-                entry['transmission_date_done'] = torrent.done_date or torrent.added_date
+                date_done = torrent.done_date or torrent.added_date
+                if date_done:
+                    date_done = date_done.replace(tzinfo=None)
+                entry['transmission_date_done'] = date_done
 
             entries.append(entry)
         return entries
@@ -487,6 +490,7 @@ class PluginTransmission(TransmissionBase):
                 skip_files = options['post'].get('skip_files')
                 # We need to index the files if any of the following are defined
                 if find_main_file or skip_files:
+                    torrent_info = client.get_torrent(torrent_info.id)
                     file_list = torrent_info.get_files()
 
                     if options['post'].get('magnetization_timeout', 0) > 0 and not file_list:
@@ -497,6 +501,7 @@ class PluginTransmission(TransmissionBase):
                         )
                         for _ in range(options['post']['magnetization_timeout']):
                             sleep(1)
+                            torrent_info = client.get_torrent(torrent_info.id)
                             file_list = torrent_info.get_files()
                             if file_list:
                                 total_size = client.get_torrent(

@@ -1,7 +1,7 @@
 #!/usr/bin/python
 import os
 import sys
-from typing import Sequence
+from typing import Optional, Sequence
 
 # __version__ import need to be first in order to avoid circular import within logger
 from ._version import __version__  # noqa
@@ -11,7 +11,7 @@ from flexget import log
 from flexget.manager import Manager
 
 
-def main(args: Sequence[str] = None):
+def main(args: Optional[Sequence[str]] = None):
     """Main entry point for Command Line Interface"""
 
     if args is None:

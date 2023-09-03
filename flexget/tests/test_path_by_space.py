@@ -25,37 +25,37 @@ class TestPathSelect:
               - {title: 'Existence.2012'}
             path_by_space:
               to_field: path
-              within: 0G
+              within: 0GB
               select: most_free
               paths:
-                - /data/1.5G,100G
-                - /data/50G,100G
-                - /data/1G,100G
+                - /data/1.5GB,100GB
+                - /data/50GB,100GB
+                - /data/1GB,100GB
           test_most_free_within:
             mock:
               - {title: 'Existence.2012'}
             path_by_space:
               to_field: path
-              within: 1G
+              within: 1GB
               select: most_free
               paths:
-                - /data/49.5G,100G
-                - /data/60G,100G
-                - /data/50G,100G
-                - /data/50.5G,100G
-                - /data/80G,100G
+                - /data/49.5GB,100GB
+                - /data/60GB,100GB
+                - /data/50GB,100GB
+                - /data/50.5GB,100GB
+                - /data/80GB,100GB
           test_most_used:
             mock:
               - {title: 'Existence.2012'}
             path_by_space:
               to_field: path
-              within: 1G
+              within: 1GB
               select: most_used
               paths:
-                - /data/90G,100G
-                - /data/80G,100G
-                - /data/90.5G,100G
-                - /data/88G,100G
+                - /data/90GB,100GB
+                - /data/80GB,100GB
+                - /data/90.5GB,100GB
+                - /data/88GB,100GB
           test_most_free_percent:
             mock:
               - {title: 'Existence.2012'}
@@ -64,10 +64,10 @@ class TestPathSelect:
               within: 2%
               select: most_free_percent
               paths:
-                - /data/50G,100G
-                - /data/40G,50G
-                - /data/65G,80G
-                - /data/50.5G,100G
+                - /data/50GB,100GB
+                - /data/40GB,50GB
+                - /data/65GB,80GB
+                - /data/50.5GB,100GB
           test_most_free_percent_within:
             mock:
               - {title: 'Existence.2012'}
@@ -76,11 +76,11 @@ class TestPathSelect:
               within: 2%
               select: most_free_percent
               paths:
-                - /data/50G,100G
-                - /data/50.5G,100G
-                - /data/52G,100G
-                - /data/57G,100G
-                - /data/80G,100G
+                - /data/50GB,100GB
+                - /data/50.5GB,100GB
+                - /data/52GB,100GB
+                - /data/57GB,100GB
+                - /data/80GB,100GB
           test_most_used_percent:
             mock:
               - {title: 'Existence.2012'}
@@ -89,10 +89,10 @@ class TestPathSelect:
               within: 2%
               select: most_used_percent
               paths:
-                - /data/99G,100G
-                - /data/49G,50G
-                - /data/40.5G,50G
-                - /data/90.5G,100G
+                - /data/99GB,100GB
+                - /data/49GB,50GB
+                - /data/40.5GB,50GB
+                - /data/90.5GB,100GB
     """
 
     @pytest.fixture()
@@ -103,46 +103,46 @@ class TestPathSelect:
 
     def test_most_free(self, disk_static_fun, no_path_validation, execute_task):
         task = execute_task('test_most_free')
-        assert task.entries[0].get('path') == "/data/1G,100G"
+        assert task.entries[0].get('path') == "/data/1GB,100GB"
 
     def test_most_free_within(self, disk_static_func, no_path_validation, execute_task):
         for _ in range(0, 3):
             task = execute_task('test_most_free_within')
             assert task.entries[0].get('path') in [
-                "/data/49.5G,100G",
-                "/data/50.5G,100G",
-                "/data/50G,100G",
+                "/data/49.5GB,100GB",
+                "/data/50.5GB,100GB",
+                "/data/50GB,100GB",
             ], "path %s not in list" % task.entries[0].get('path')
 
     def test_most_free_percent(self, disk_static_func, no_path_validation, execute_task):
         for _ in range(0, 2):
             task = execute_task('test_most_free_percent')
             assert task.entries[0].get('path') in [
-                '/data/50.5G,100G',
-                '/data/50G,100G',
+                '/data/50.5GB,100GB',
+                '/data/50GB,100GB',
             ], "path %s not in list" % task.entries[0].get('path')
 
     def test_most_free_percent_within(self, disk_static_func, no_path_validation, execute_task):
         for _ in range(0, 2):
             task = execute_task('test_most_free_percent_within')
             assert task.entries[0].get('path') in [
-                '/data/50G,100G',
-                '/data/50.5G,100G',
-                '/data/52G,100G',
+                '/data/50GB,100GB',
+                '/data/50.5GB,100GB',
+                '/data/52GB,100GB',
             ], "path %s not in list" % task.entries[0].get('path')
 
     def test_most_used_percent(self, disk_static_func, no_path_validation, execute_task):
         for _ in range(0, 2):
             task = execute_task('test_most_used_percent')
             assert task.entries[0].get('path') in [
-                '/data/99G,100G',
-                '/data/49G,50G',
+                '/data/99GB,100GB',
+                '/data/49GB,50GB',
             ], "path %s not in list" % task.entries[0].get('path')
 
     def test_most_used(self, disk_static_func, no_path_validation, execute_task):
         for _ in range(0, 2):
             task = execute_task('test_most_used')
             assert task.entries[0].get('path') in [
-                '/data/90G,100G',
-                '/data/90.5G,100G',
+                '/data/90GB,100GB',
+                '/data/90.5GB,100GB',
             ], "path %s not in list" % task.entries[0].get('path')

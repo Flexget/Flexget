@@ -182,7 +182,7 @@ class Torznab:
             else:
                 entry['url'] = enclosure.attrib['url']
                 try:
-                    entry['content_size'] = int(enclosure.attrib['length']) // (2**20)
+                    entry['content_size'] = int(enclosure.attrib['length'])
                 except ValueError:
                     entry['content_size'] = 0
                 entry['type'] = enclosure.attrib['type']
@@ -241,7 +241,7 @@ class Torznab:
                 entry['torrent_seeds'] = misc['peers'] - entry['torrent_leeches']
 
         if 'content_size' not in entry.keys() and 'size' in misc.keys():
-            entry['content_size'] = misc['size'] // (2**20)
+            entry['content_size'] = misc['size']
 
         if 'torrent_seeds' in entry.keys() and 'torrent_leeches' in entry.keys():
             entry['torrent_availability'] = torrent_availability(

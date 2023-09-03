@@ -54,8 +54,8 @@ def normalize_name(name: str) -> str:
 class MovieParseResult:
     def __init__(
         self,
-        data: str = None,
-        name: str = None,
+        data: Optional[str] = None,
+        name: Optional[str] = None,
         year: Optional[int] = None,
         quality: Quality = None,
         proper_count: int = 0,
@@ -113,11 +113,11 @@ class MovieParseResult:
 class SeriesParseResult:
     def __init__(
         self,
-        data: str = None,
-        name: str = None,
-        identified_by: str = None,
-        id_type: str = None,
-        id: Union[Tuple[int, int], str, int, datetime.date] = None,
+        data: Optional[str] = None,
+        name: Optional[str] = None,
+        identified_by: Optional[str] = None,
+        id_type: Optional[str] = None,
+        id: Optional[Union[Tuple[int, int], str, int, datetime.date]] = None,
         episodes: int = 1,
         season_pack: bool = False,
         strict_name: bool = False,

@@ -53,9 +53,7 @@ class KitsuAnime:
     @cached('kitsu', persist='2 hours')
     def on_task_input(self, task, config):
         user_id = self._resolve_user_id(task, config)
-        next_url = 'https://kitsu.io/api/edge/users/{user_id}/library-entries'.format(
-            user_id=user_id
-        )
+        next_url = f'https://kitsu.io/api/edge/users/{user_id}/library-entries'
 
         payload = {
             'filter[status]': ','.join(config['lists']),
@@ -127,9 +125,7 @@ class KitsuAnime:
                 try:
                     response = task.requests.get(next_url)
                 except RequestException as e:
-                    error_message = 'Error getting list from next page url: {url}'.format(
-                        url=e.request.url
-                    )
+                    error_message = f'Error getting list from next page url: {e.request.url}'
                     if hasattr(e, 'response'):
                         error_message += f' status: {e.response.status_code}'
                     logger.opt(exception=True).debug(error_message)

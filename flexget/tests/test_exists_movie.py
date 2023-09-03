@@ -49,6 +49,8 @@ class TestExistsMovie:
           test_diff_qualities_allowed:
             mock:
               - {title: 'Quality.of.Life.480p'}
+              - {title: 'Quality.of.Life.1080p'}
+              - {title: 'Quality.of.Life.720p'}
             accept_all: yes
             exists_movie:
               path:  __tmp__
@@ -63,6 +65,7 @@ class TestExistsMovie:
           test_diff_qualities_downgrade:
             mock:
               - {title: 'Quality.of.Life.480p'}
+              - {title: 'Quality.of.Life.576p'}
             accept_all: yes
             exists_movie:
               path:  __tmp__
@@ -91,7 +94,7 @@ class TestExistsMovie:
     """
 
     test_files = ['Downloaded.2013.mkv', 'Invalid.jpg']
-    test_dirs = ['Existence.2012', 'Quality.of.Life.720p', 'Subs']
+    test_dirs = ['Existence.2012', 'Quality.of.Life.720p', 'Quality.of.Life.xvid.540p', 'Subs']
 
     @pytest.fixture(params=['internal', 'guessit'], ids=['internal', 'guessit'])
     def config(self, request, tmpdir):
@@ -157,6 +160,12 @@ class TestExistsMovie:
         assert task.find_entry(
             'accepted', title='Quality.of.Life.480p'
         ), 'Quality.of.Life.480p should have been accepted'
+        assert task.find_entry(
+            'accepted', title='Quality.of.Life.1080p'
+        ), 'Quality.of.Life.1080p should have been accepted'
+        assert task.find_entry(
+            'rejected', title='Quality.of.Life.720p'
+        ), 'Quality.of.Life.720p should have been rejected'
 
     def test_diff_qualities_not_allowed(self, execute_task):
         """exists_movie plugin: existsting but w. diff quality"""
@@ -171,6 +180,9 @@ class TestExistsMovie:
         assert task.find_entry(
             'rejected', title='Quality.of.Life.480p'
         ), 'Quality.of.Life.480p should have been rejected'
+        assert task.find_entry(
+            'rejected', title='Quality.of.Life.576p'
+        ), 'Quality.of.Life.576p should have been rejected'
 
     def test_diff_qualities_upgrade(self, execute_task):
         """Test better qualities than exist are accepted."""

@@ -1,12 +1,13 @@
 from argparse import ArgumentParser, ArgumentTypeError
 from functools import partial
 
+from rich.highlighter import ReprHighlighter
 from sqlalchemy.orm.exc import NoResultFound
 
 from flexget import options
 from flexget.event import event
 from flexget.manager import Session
-from flexget.terminal import TerminalTable, colorize, console, disable_colors, table_parser
+from flexget.terminal import TerminalTable, console, disable_colors, table_parser
 
 from . import db
 
@@ -54,6 +55,7 @@ def pending_list_lists(options):
 
 def pending_list_list(options):
     """List pending list entries"""
+    highlighter = ReprHighlighter()
     with Session() as session:
         try:
             pending_list = db.get_list_by_exact_name(options.list_name, session=session)
@@ -65,7 +67,7 @@ def pending_list_list(options):
         for entry in db.get_entries_by_list_id(
             pending_list.id, order_by='added', descending=True, session=session
         ):
-            approved = colorize('green', entry.approved) if entry.approved else entry.approved
+            approved = highlighter(str(entry.approved))
             table.add_row(str(entry.id), entry.title, str(len(entry.entry)), approved)
     console(table)
 
@@ -137,11 +139,7 @@ def pending_list_add(options):
                 for k, v in identifier.items():
                     entry[k] = v
             db_entry.entry = entry
-        console(
-            'Successfully {} entry `{}` to pending list `{}` '.format(
-                operation, title, pending_list.name
-            )
-        )
+        console(f'Successfully {operation} entry `{title}` to pending list `{pending_list.name}` ')
 
 
 def pending_list_approve(options, approve=None):

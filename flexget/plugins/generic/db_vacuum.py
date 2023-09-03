@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 
 from loguru import logger
+from sqlalchemy import text
 from sqlalchemy.exc import OperationalError
 
 from flexget.event import event
@@ -21,7 +22,7 @@ def on_cleanup(manager):
         logger.info('Running VACUUM on database to improve performance and decrease db size.')
         with Session() as session:
             try:
-                session.execute('VACUUM')
+                session.execute(text('VACUUM'))
             except OperationalError as e:
                 # Does not work on python 3.6, github issue #1596
                 logger.error('Could not execute VACUUM command: {}', e)

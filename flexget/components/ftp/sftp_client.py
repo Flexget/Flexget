@@ -109,7 +109,7 @@ class SftpClient:
         self.host_key: Optional[HostKey] = host_key
 
         self.prefix: str = self._get_prefix()
-        self._sftp: 'pysftp.Connection' = self._connect(connection_tries)
+        self._sftp: pysftp.Connection = self._connect(connection_tries)
         self._handler_builder: HandlerBuilder = HandlerBuilder(
             self._sftp, self.prefix, self.private_key, self.private_key_pass, self.host_key
         )
@@ -186,7 +186,7 @@ class SftpClient:
                 self._sftp.cwd(source_dir)
                 self._download_file(to, delete_origin and not is_symlink, source_file)
             except Exception as e:
-                raise SftpError(f'Failed to download file {source} ({str(e)})')
+                raise SftpError(f'Failed to download file {source} ({e!s})')
 
             if delete_origin and is_symlink:
                 self.remove_file(source)
@@ -202,7 +202,7 @@ class SftpClient:
                 self._sftp.cwd(base_path)
                 self._sftp.walktree(dir_name, handle_file, dir_handler, unknown_handler, recursive)
             except Exception as e:
-                raise SftpError(f'Failed to download directory {source} ({str(e)})')
+                raise SftpError(f'Failed to download directory {source} ({e!s})')
 
             if delete_origin:
                 if self.is_link(source):
@@ -291,7 +291,7 @@ class SftpClient:
             try:
                 self._sftp.makedirs(path)
             except Exception as e:
-                raise SftpError(f'Failed to create remote directory {path} ({str(e)})')
+                raise SftpError(f'Failed to create remote directory {path} ({e!s})')
 
     def close(self) -> None:
         """
@@ -312,7 +312,7 @@ class SftpClient:
 
         logger.debug('Connecting to {}', self.host)
 
-        sftp: Optional['pysftp.Connection'] = None
+        sftp: Optional[pysftp.Connection] = None
 
         while not sftp:
             try:
@@ -367,7 +367,7 @@ class SftpClient:
             try:
                 self.make_dirs(to)
             except Exception as e:
-                raise SftpError(f'Failed to create remote directory {to} ({str(e)})')
+                raise SftpError(f'Failed to create remote directory {to} ({e!s})')
 
         if not self.is_dir(to):
             raise SftpError(f'Not a directory: {to}')
@@ -378,7 +378,7 @@ class SftpClient:
         except OSError:
             raise SftpError(f'Remote directory does not exist: {to}')
         except Exception as e:
-            raise SftpError(f'Failed to upload {source} ({str(e)})')
+            raise SftpError(f'Failed to upload {source} ({e!s})')
 
     def _download_file(self, destination: str, delete_origin: bool, source: str) -> None:
         destination_path: str = self._get_download_path(source, destination)

@@ -1,4 +1,3 @@
-import argparse
 import itertools
 import sys
 import time
@@ -176,7 +175,6 @@ class FilterSeriesBase:
                 'special_ids': one_or_more({'type': 'string'}),
                 'prefer_specials': {'type': 'boolean'},
                 'assume_special': {'type': 'boolean'},
-                'tracking': {'type': ['boolean', 'string'], 'enum': [True, False, 'backfill']},
                 # Season pack
                 'season_packs': {
                     'oneOf': [
@@ -250,7 +248,7 @@ class FilterSeriesBase:
                 # convert into dict-form if necessary
                 series_settings = {}
                 if isinstance(series, dict):
-                    series, series_settings = list(series.items())[0]
+                    series, series_settings = next(iter(series.items()))
                 # Make sure this isn't a series with no name
                 if not series:
                     logger.warning('Series config contains a series with no name!')
@@ -299,7 +297,7 @@ class FilterSeriesBase:
         unique_series = {}
         for series_list in series_lists:
             for series in series_list:
-                series, series_settings = list(series.items())[0]
+                series, series_settings = next(iter(series.items()))
                 if series not in unique_series:
                     unique_series[series] = series_settings
                 else:
@@ -333,7 +331,7 @@ class FilterSeries(FilterSeriesBase):
     """
     Intelligent filter for tv-series.
 
-    http://flexget.com/wiki/Plugins/series
+    https://flexget.com/Plugins/series
     """
 
     @property
@@ -370,7 +368,7 @@ class FilterSeries(FilterSeriesBase):
         # generate list of all series in one dict
         all_series = {}
         for series_item in config:
-            series_name, series_config = list(series_item.items())[0]
+            series_name, series_config = next(iter(series_item.items()))
             all_series[series_name] = series_config
 
         # scan for problematic names, enable exact mode for them
@@ -414,13 +412,13 @@ class FilterSeries(FilterSeriesBase):
             # str() added to make sure number shows (e.g. 24) are turned into strings
 
             # First add all series config names (normalized)
-            series_names = [str(normalize_series_name(list(s.keys())[0])) for s in config]
+            series_names = [str(normalize_series_name(next(iter(s.keys())))) for s in config]
             # Add series names from the config without normalization to capture configs
             #  that use slightly different series names. See https://github.com/Flexget/Flexget/issues/2057
             series_names.extend(
-                str(list(s.keys())[0])
+                str(next(iter(s.keys())))
                 for s in config
-                if str(list(s.keys())[0]) not in series_names
+                if str(next(iter(s.keys()))) not in series_names
             )
 
             existing_db_series = []
@@ -433,7 +431,7 @@ class FilterSeries(FilterSeriesBase):
             existing_db_series = {s.name_normalized: s for s in existing_db_series}
 
             for series_item in config:
-                series_name, series_config = list(series_item.items())[0]
+                series_name, series_config = next(iter(series_item.items()))
                 alt_names = get_config_as_array(series_config, 'alternate_name')
                 db_series = existing_db_series.get(normalize_series_name(series_name))
                 db_identified_by = db_series.identified_by if db_series else None
@@ -467,11 +465,11 @@ class FilterSeries(FilterSeriesBase):
         # Prefetch series
         with Session() as session:
             # str() added to make sure number shows (e.g. 24) are turned into strings
-            series_names = [str(list(s.keys())[0]) for s in config]
+            series_names = [str(next(iter(s.keys()))) for s in config]
             existing_series = (
                 session.query(db.Series)
                 .filter(db.Series.name.in_(series_names))
-                .options(joinedload('alternate_names'))
+                .options(joinedload(db.Series.alternate_names))
                 .all()
             )
             existing_series_map = {s.name_normalized: s for s in existing_series}
@@ -481,7 +479,7 @@ class FilterSeries(FilterSeriesBase):
         start_time = preferred_clock()
         for series_item in config:
             with Session() as session:
-                series_name, series_config = list(series_item.items())[0]
+                series_name, series_config = next(iter(series_item.items()))
 
                 if series_config.get('parse_only'):
                     logger.debug(
@@ -538,13 +536,19 @@ class FilterSeries(FilterSeriesBase):
                 # configuration always overrides everything
                 if series_config.get('identified_by', 'auto') != 'auto':
                     db_series.identified_by = series_config['identified_by']
+
                 # if series doesn't have identified_by flag already set, calculate one now that new eps are added to db
+                auto_begin = False
                 if not db_series.identified_by or db_series.identified_by == 'auto':
                     db_series.identified_by = db.auto_identified_by(db_series)
                     logger.debug(
                         'identified_by set to `{}` based on series history',
                         db_series.identified_by,
                     )
+                    # Update begin only if locked into ep or seq mode
+                    if db_series.identified_by in ['ep', 'seq']:
+                        auto_begin = True
+
                 # Remove begin episode if identified_by has now been set to a different type than begin ep
                 if (
                     db_series.begin
@@ -556,6 +560,32 @@ class FilterSeries(FilterSeriesBase):
                         f'it does not match the identified_by type for series ({db_series.identified_by})'
                     )
                     del db_series.begin
+                    auto_begin = True
+
+                # Set begin to latest release, or fall back to beginning
+                if auto_begin:
+                    latest: db.Episode = db.get_latest_release(entity.series)
+                    ep_id = None
+                    if latest:
+                        if db_series.identified_by == 'ep':
+                            ep_id = f"S{latest.season}E01"
+                        else:
+                            ep_id = latest.identifier
+                        logger.verbose(
+                            f"Defaulting series `{series_name}` begin to start of current season `{ep_id}`"
+                        )
+                    else:
+                        if db_series.identified_by == 'ep':
+                            ep_id = 'S01E01'
+                        elif db_series.identified_by == 'sequence':
+                            ep_id = '01'
+                        if ep_id is not None:
+                            logger.verbose(
+                                f"Defaulting series `{series_name}` begin to best guess `{ep_id}`"
+                            )
+
+                    if ep_id is not None:
+                        db.set_series_begin(entity.series, ep_id)
 
                 self.process_series(task, series_entries, series_config)
 
@@ -761,20 +791,13 @@ class FilterSeries(FilterSeriesBase):
 
             # episode tracking. used only with season and sequence based series
             if entity.identified_by in ['ep', 'sequence']:
-                if task.options.disable_tracking or not config.get('tracking', True):
-                    logger.debug('episode tracking disabled')
-                else:
-                    logger.debug('-' * 20 + ' tracking -->')
-                    # Grace is number of distinct eps in the task for this series + 2
-                    backfill = config.get('tracking') == 'backfill'
-                    if self.process_entity_tracking(
-                        entity,
-                        entries,
-                        grace=len(series_entries) + 2,
-                        backfill=backfill,
-                        threshold=ep_threshold,
-                    ):
-                        continue
+                logger.debug('-' * 20 + ' tracking -->')
+                if self.process_entity_tracking(
+                    entity,
+                    entries,
+                    threshold=ep_threshold,
+                ):
+                    continue
 
             # quality
             if 'target' in config or 'qualities' in config:
@@ -807,7 +830,7 @@ class FilterSeries(FilterSeriesBase):
         """
 
         pass_filter = []
-        # First find best available proper for each quality without modifying incoming entry order
+        # First find the best available proper for each quality without modifying incoming entry order
         sorted_entries = sorted(
             entries, key=lambda e: (e['quality'], e['proper_count']), reverse=True
         )
@@ -895,76 +918,84 @@ class FilterSeries(FilterSeriesBase):
             logger.debug('no quality meets requirements')
         return result
 
-    def process_entity_tracking(self, entity, entries, grace, threshold, backfill=False):
+    def process_entity_tracking(self, entity, entries, threshold):
         """
         Rejects all entity that are too old or new, return True when this happens.
 
         :param entity: Entity model
         :param list entries: List of entries for given episode.
-        :param int grace: Number of episodes before or after latest download that are allowed.
-        :param bool backfill: If this is True, previous episodes will be allowed,
-            but forward advancement will still be restricted.
+        :param int threshold: Number of episodes allowed in season
         """
 
-        latest = db.get_latest_release(entity.series)
-        if entity.series.begin and (not latest or entity.series.begin > latest):
-            latest = entity.series.begin
+        latest: db.Episode = db.get_latest_release(entity.series)
+        begin: db.Episode = entity.series.begin
+        if begin and (not latest or begin > latest):
+            latest = begin
+
+        if not latest:
+            return False
+
+        # Make dummy begin if we don't have one
+        if begin is None:
+            begin = db.Episode()
+            begin.identified_by = latest.identified_by
+            begin.number = 1
+            if begin.identified_by == 'ep':
+                begin.season = 1
+                begin.identifier = "S01E01"
+                logger.verbose("Series begin is unknown, defaulting to ep S01E01")
+            elif begin.identified_by == 'sequence':
+                begin.season = 0
+                begin.identifier = "1"
+                logger.verbose("Series begin is unknown, defaulting to sequence 1")
+            else:
+                logger.debug("Unable to set default begin (identified_by is date, auto)")
+
         logger.debug('latest download: {}', latest)
         logger.debug('current: {}', entity)
+        logger.debug('begin: {}', begin)
 
-        if latest:
-            # reject any entity if a season pack for this season was already downloaded
-            if entity.season in entity.series.completed_seasons:
-                logger.debug('season `{}` already completed for this series', entity.season)
-                for entry in entries:
-                    entry.reject('season `%s` is already completed' % entity.season)
-                return True
+        # reject any entity if a season pack for this season was already downloaded
+        if entity.season in entity.series.completed_seasons:
+            logger.debug('season `{}` already completed for this series', entity.season)
+            for entry in entries:
+                entry.reject('Season `%s` is already completed' % entity.season)
+            return True
 
-            # Test if episode threshold has been met
-            if entity.is_season and entity.series.episodes_for_season(entity.season) > threshold:
-                logger.debug('threshold of {} has been met, skipping season pack', threshold)
+        # Test if episode threshold has been met
+        if entity.is_season and entity.series.episodes_for_season(entity.season) > threshold:
+            logger.debug('threshold of {} has been met, skipping season pack', threshold)
+            for entry in entries:
+                entry.reject(
+                    'The configured number of episodes for this season has already been downloaded'
+                )
+            return True
+
+        if latest.identified_by == entity.identified_by and latest.identified_by not in [
+            "date",
+            "auto",
+        ]:
+            if entity < begin:
+                logger.debug(
+                    f'episode {entity.identifier} before begin {begin.identifier}! rejecting all occurrences'
+                )
                 for entry in entries:
                     entry.reject(
-                        'The configured number of episodes for this season has already been downloaded'
+                        'Episode `{entity.identifier}` is from before series begin value `%s`. '
+                        % begin.identifier
                     )
                 return True
 
-            if latest.identified_by == entity.identified_by:
-                # Allow any previous episodes this season, or previous episodes within grace if sequence
-                if not backfill:
-                    if entity.season < latest.season or (
-                        entity.identified_by == 'sequence'
-                        and entity.number < (latest.number - grace)
-                    ):
-                        logger.debug('too old! rejecting all occurrences')
-                        for entry in entries:
-                            entry.reject(
-                                'Too much in the past from latest downloaded entity %s'
-                                % latest.identifier
-                            )
-                        return True
-
-                # Allow future episodes within grace, or first episode of next season, or season pack of next season
-                if (
-                    entity.season > latest.season + 1
-                    or not entity.is_season
-                    and (
-                        (entity.season > latest.season and entity.number > 1)
-                        or not latest.is_season
-                        and (
-                            entity.season == latest.season
-                            and entity.number > (latest.number + grace)
-                        )
-                    )
-                ):
-                    logger.debug('too new! rejecting all occurrences')
-                    for entry in entries:
-                        entry.reject(
-                            'Too much in the future from latest downloaded entity `%s`. '
-                            'See `--disable-tracking` if this should be downloaded.'
-                            % latest.identifier
-                        )
-                    return True
+        # TODO: should not be in tracking ?
+        if (
+            entity.identified_by != entity.series.identified_by
+            and entity.series.identified_by != "auto"
+        ):
+            for entry in entries:
+                entry.reject(
+                    'Episode `{entity.identifier}` doesn\'t match series format `%s`. '
+                    % entity.series.identified_by
+                )
 
     def process_timeframe(self, task, config, episode, entries):
         """
@@ -1118,17 +1149,17 @@ class SeriesDBManager(FilterSeriesBase):
             config = self.prepare_config(task.config['series'])
 
             # Prefetch series
-            names = [str(list(series.keys())[0]) for series in config]
+            names = [str(next(iter(series.keys()))) for series in config]
             existing_series = (
                 session.query(db.Series)
                 .filter(db.Series.name.in_(names))
-                .options(joinedload('alternate_names'))
+                .options(joinedload(db.Series.alternate_names))
                 .all()
             )
             existing_series_map = {s.name_normalized: s for s in existing_series}
 
             for series_item in config:
-                series_name, series_config = list(series_item.items())[0]
+                series_name, series_config = next(iter(series_item.items()))
                 # Make sure number shows (e.g. 24) are turned into strings
                 series_name = str(series_name)
                 db_series = existing_series_map.get(normalize_series_name(series_name))
@@ -1197,17 +1228,4 @@ def register_parser_arguments():
         default='',
         metavar='NAME',
         help='stop timeframe for a given series',
-    )
-    exec_parser.add_argument(
-        '--disable-tracking',
-        action='store_true',
-        default=False,
-        help='disable episode advancement for this run',
-    )
-    # Backwards compatibility
-    exec_parser.add_argument(
-        '--disable-advancement',
-        action='store_true',
-        dest='disable_tracking',
-        help=argparse.SUPPRESS,
     )

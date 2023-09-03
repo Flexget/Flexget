@@ -275,6 +275,7 @@ class ImdbLookup:
         movie.mpaa_rating = parser.mpaa_rating
         movie.plot_outline = parser.plot_outline
         movie.url = imdb_url
+        session.add(movie)
         for name in parser.genres:
             genre = session.query(db.Genre).filter(db.Genre.name == name).first()
             if not genre:
@@ -309,7 +310,6 @@ class ImdbLookup:
             movie.plot_keywords.append(plot_keyword)  # pylint:disable=E1101
         # so that we can track how long since we've updated the info later
         movie.updated = datetime.now()
-        session.add(movie)
         return movie
 
     @property

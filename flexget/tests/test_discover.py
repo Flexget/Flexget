@@ -173,7 +173,6 @@ class TestEmitSeriesInDiscover:
               - test_search: yes
             series:
             - My Show 2:
-                tracking: backfill
                 identified_by: ep
             max_reruns: 0
           test_next_series_episodes:

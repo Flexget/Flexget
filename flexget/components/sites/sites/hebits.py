@@ -130,7 +130,7 @@ class SearchHeBits:
                 torrent_id = result['torrents'][0]['torrentId']
                 seeders = result['torrents'][0]['seeders']
                 leechers = result['torrents'][0]['leechers']
-                size = result['torrents'][0]['size'] / 2**20
+                size = result['torrents'][0]['size']
                 title = result['torrents'][0]['release']
 
                 entry = Entry(

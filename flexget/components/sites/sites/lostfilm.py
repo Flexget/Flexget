@@ -589,7 +589,7 @@ class LostFilm:
                 logger.warning('Unsupported series configuration type')
                 return None
         except Exception as e:
-            logger.warning(f'Error parsing series config: {repr(e):s}')
+            logger.warning(f'Error parsing series config: {e!r:s}')
             names_list = None
 
         return names_list
@@ -603,7 +603,7 @@ class LostFilm:
                 # The name is something like '365' or '36.6'
                 names_list.add(LostFilm._simplify_name(str(s_item)))
             elif isinstance(s_item, dict):
-                s_name, s_cfg = list(s_item.items())[0]
+                s_name, s_cfg = next(iter(s_item.items()))
                 names_list.add(LostFilm._simplify_name(s_name))
                 if s_cfg.get('alternate_name'):
                     if isinstance(s_cfg['alternate_name'], str):

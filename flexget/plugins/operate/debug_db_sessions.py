@@ -26,7 +26,7 @@ def find_caller(stack):
             continue
         if module.__name__.startswith('sqlalchemy'):
             continue
-        return (module.__name__, *tuple(frame[2:4])) + (frame[4][0].strip(),)
+        return (module.__name__, *tuple(frame[2:4]), frame[4][0].strip())
     logger.warning('Transaction from unknown origin')
     return None, None, None, None
 
@@ -83,11 +83,7 @@ def after_end(session, transaction):
             # Transaction was created but a connection was never opened for it
             return
         open_time = time.time() - open_transactions[transaction][0]
-        msg = 'Transaction 0x{:08X} closed {} (open time {})'.format(
-            id(transaction),
-            caller_info,
-            open_time,
-        )
+        msg = f'Transaction 0x{id(transaction):08X} closed {caller_info} (open time {open_time})'
         if open_time > 2:
             logger.warning(msg)
         else:
