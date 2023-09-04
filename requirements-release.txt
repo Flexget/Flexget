@@ -1,5 +1,5 @@
 bleach==6.0.0 ; python_version >= "3.7" and python_version < "4.0"
-build==0.10.0 ; python_version >= "3.7" and python_version < "4.0"
+build==1.0.0 ; python_version >= "3.7" and python_version < "4.0"
 certifi==2023.7.22 ; python_version >= "3.7" and python_version < "4.0"
 cffi==1.15.1 ; python_version >= "3.7" and python_version < "4.0" and sys_platform == "linux"
 charset-normalizer==3.2.0 ; python_version >= "3.7" and python_version < "4.0"
