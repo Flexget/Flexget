@@ -1,3 +1,4 @@
+import importlib.metadata as importlib_metadata
 import os
 import pathlib
 import re
@@ -9,15 +10,9 @@ from time import sleep
 from typing import TYPE_CHECKING
 from urllib.parse import urlparse
 
-import pendulum
-
-try:
-    import importlib.metadata as importlib_metadata
-except ImportError:
-    import importlib_metadata  # TODO: remove this after we drop python 3.7
-
 import packaging.specifiers
 import packaging.version
+import pendulum
 from loguru import logger
 
 from flexget import plugin
