@@ -1,6 +1,6 @@
 import os
 from collections.abc import MutableSet
-from datetime import date, datetime, time
+from datetime import datetime
 
 from babelfish import Language
 from loguru import logger
@@ -419,7 +419,7 @@ class PluginSubtitleList:
 
     @classmethod
     def _expired(cls, file, config):
-        added_interval = datetime.combine(date.today(), time()) - file['added']
+        added_interval = file['added'].diff()
         if file['remove_after'] and added_interval > parse_timedelta(file['remove_after']):
             return True
         elif config.get('remove_after') and added_interval > parse_timedelta(
