@@ -87,7 +87,7 @@ packaging = ">=21.3"
 pyparsing = ">=2.4.7"
 werkzeug = ">=2.2.3"
 zxcvbn = "^4.4.24"
-pendulum = { "git" = "https://github.com/sdispater/pendulum.git" }  # TODO: Wait for a release before we merge
+pendulum = ">=3.0.0b1"
 
 [tool.poetry.group.dev.dependencies]
 black = ">=18.9b0"
