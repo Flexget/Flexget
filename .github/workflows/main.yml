@@ -22,7 +22,7 @@ jobs:
     env:
       POETRY_VERSION: "1.2.2"
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4
     # Can we cache the apt-get stuff somehow?
     - name: Install unrar  # used by some flexget tests
       if: matrix.operating-system == 'ubuntu-latest'
