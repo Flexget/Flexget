@@ -12,7 +12,7 @@ SONARRR_PORT = 8989
 # docker run -d --name=sonarr-tmp -p 8989:8989 linuxserver/sonarr:preview
 @pytest.mark.online
 class TestSonarrListActions:
-    config = """
+    config = f"""
         templates:
           global:
             disable: [seen]
@@ -21,9 +21,9 @@ class TestSonarrListActions:
             list_clear:
               what:
                 - sonarr_list:
-                    base_url: {RADARR_BASE_URL}
-                    api_key: {RADARR_API_KEY}
-                    port: {RADARR_PORT}
+                    base_url: {SONARR_BASE_URL}
+                    api_key: {SONARR_API_KEY}
+                    port: {SONARRR_PORT}
             mock:
               - {{ title: 'Breaking Bad', imdb_id: 'tt0903747', tvdb_id: 81189 }}
               - {{ title: 'The Walking Dead', imdb_id: 'tt1520211', tvdb_id: 153021 }}
@@ -31,32 +31,32 @@ class TestSonarrListActions:
             accept_all: yes
             list_add:
               - sonarr_list:
-                  base_url: {RADARR_BASE_URL}
-                  api_key: {RADARR_API_KEY}
-                  port: {RADARR_PORT}
+                  base_url: {SONARR_BASE_URL}
+                  api_key: {SONARR_API_KEY}
+                  port: {SONARRR_PORT}
 
           clear_and_add_to_sonarr_with_tags:
             list_clear:
               what:
                 - sonarr_list:
-                    base_url: {RADARR_BASE_URL}
-                    api_key: {RADARR_API_KEY}
-                    port: {RADARR_PORT}
+                    base_url: {SONARR_BASE_URL}
+                    api_key: {SONARR_API_KEY}
+                    port: {SONARRR_PORT}
             mock:
               - {{ title: 'Game of Thrones', imdb_id: 'tt0944947', tvdb_id: 121361 }}
             accept_all: yes
             list_add:
               - sonarr_list:
-                  base_url: {RADARR_BASE_URL}
-                  api_key: {RADARR_API_KEY}
-                  port: {RADARR_PORT}
+                  base_url: {SONARR_BASE_URL}
+                  api_key: {SONARR_API_KEY}
+                  port: {SONARRR_PORT}
                   tags: ["tv", "othertag"]
                       
           sonarr_list_as_input_plugin:
             sonarr_list:
-              base_url: {RADARR_BASE_URL}
-              api_key: {RADARR_API_KEY}
-              port: {RADARR_PORT}
+              base_url: {SONARR_BASE_URL}
+              api_key: {SONARR_API_KEY}
+              port: {SONARRR_PORT}
               include_data: True
             accept_all: yes
     
@@ -67,9 +67,9 @@ class TestSonarrListActions:
             accept_all: yes
             list_remove:
               - sonarr_list:
-                  base_url: {RADARR_BASE_URL}
-                  api_key: {RADARR_API_KEY}
-                  port: {RADARR_PORT}
+                  base_url: {SONARR_BASE_URL}
+                  api_key: {SONARR_API_KEY}
+                  port: {SONARRR_PORT}
     
           match_sonarr_list:
             mock:
@@ -79,14 +79,10 @@ class TestSonarrListActions:
             list_match:
               from:
                 - sonarr_list:
-                    base_url: {RADARR_BASE_URL}
-                    api_key: {RADARR_API_KEY}
-                    port: {RADARR_PORT}
-    """.format(
-        RADARR_API_KEY=SONARR_API_KEY,
-        RADARR_BASE_URL=SONARR_BASE_URL,
-        RADARR_PORT=SONARRR_PORT,
-    )
+                    base_url: {SONARR_BASE_URL}
+                    api_key: {SONARR_API_KEY}
+                    port: {SONARRR_PORT}
+    """
 
     def test_sonarr_list_tags(self, execute_task, manager):
         sonarr = SonarrSet(
