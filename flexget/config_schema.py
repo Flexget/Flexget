@@ -4,6 +4,7 @@ import re
 from collections import defaultdict
 from json import JSONDecodeError
 from json import loads as json_loads
+from referencing.exceptions import Unresolvable
 from typing import Any, Callable, Dict, List, Match, Optional, Pattern, Union
 from urllib.parse import parse_qsl, urlparse
 
@@ -118,7 +119,7 @@ def resolve_ref(uri: str) -> JsonSchema:
             schema = schema(**dict(parse_qsl(parsed.query)))
         schema = {'$schema': BASE_SCHEMA_URI, **schema}
         return schema
-    raise jsonschema.RefResolutionError("%s could not be resolved" % uri)
+    raise Unresolvable("%s could not be resolved" % uri)
 
 
 def process_config(

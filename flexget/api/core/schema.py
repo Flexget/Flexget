@@ -1,5 +1,5 @@
 from flask import Response, jsonify, request
-from jsonschema import RefResolutionError
+from referencing.exceptions import Unresolvable
 from sqlalchemy.orm import Session
 
 from flexget.api import APIResource, api
@@ -59,7 +59,7 @@ class SchemaAPI(APIResource):
         """Get schema definition"""
         try:
             schema = resolve_ref(request.full_path)
-        except RefResolutionError:
+        except Unresolvable:
             raise NotFoundError('invalid schema path')
         schema['id'] = request.url
         return jsonify(rewrite_refs(schema, request.url_root))

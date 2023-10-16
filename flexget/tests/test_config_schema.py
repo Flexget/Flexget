@@ -2,6 +2,8 @@ from datetime import timedelta
 
 import jsonschema
 
+from referencing.exceptions import Unresolvable
+
 from flexget import config_schema
 
 
@@ -43,7 +45,7 @@ class TestSchemaValidator:
                 try:
                     with resolver.resolving(ref):
                         pass
-                except jsonschema.RefResolutionError:
+                except Unresolvable:
                     raise AssertionError(f'$ref {ref} in schema {path} is invalid')
 
     def test_resolves_local_refs(self):

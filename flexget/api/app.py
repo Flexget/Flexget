@@ -12,9 +12,9 @@ from flask_cors import CORS
 from flask_restx import Api as RestxAPI
 from flask_restx import Model, Resource
 from flask_restx.reqparse import RequestParser
-from jsonschema import RefResolutionError
 from jsonschema.exceptions import ValidationError as SchemaValidationError
 from loguru import logger
+from referencing.exceptions import Unresolvable
 from sqlalchemy.orm import Session
 from werkzeug.http import generate_etag
 
@@ -137,7 +137,7 @@ class API(RestxAPI):
 
                     if errors:
                         raise ValidationError(errors)
-                except RefResolutionError as e:
+                except Unresolvable as e:
                     raise APIError(str(e))
                 return func(*args, **kwargs)
 
