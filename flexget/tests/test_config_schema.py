@@ -1,7 +1,6 @@
 from datetime import timedelta
 
 import jsonschema
-
 from referencing.exceptions import Unresolvable
 
 from flexget import config_schema

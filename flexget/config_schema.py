@@ -4,13 +4,13 @@ import re
 from collections import defaultdict
 from json import JSONDecodeError
 from json import loads as json_loads
-from referencing.exceptions import Unresolvable
 from typing import Any, Callable, Dict, List, Match, Optional, Pattern, Union
 from urllib.parse import parse_qsl, urlparse
 
 import jsonschema
 from jsonschema import ValidationError
 from loguru import logger
+from referencing.exceptions import Unresolvable
 
 from flexget.event import fire_event
 from flexget.utils import qualities, template
