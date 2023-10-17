@@ -12,7 +12,7 @@ RADARR_PORT = 7878
 # docker run -d --name=radarr-tmp -p 7878:7878 linuxserver/radarr:nightly
 @pytest.mark.online
 class TestRadarrListActions:
-    config = """
+    config = f"""
         templates:
           global:
             disable: [seen]
@@ -85,11 +85,7 @@ class TestRadarrListActions:
                     base_url: {RADARR_BASE_URL}
                     api_key: {RADARR_API_KEY}
                     port: {RADARR_PORT}
-    """.format(
-        RADARR_API_KEY=RADARR_API_KEY,
-        RADARR_BASE_URL=RADARR_BASE_URL,
-        RADARR_PORT=RADARR_PORT,
-    )
+    """
 
     def test_radarr_list_tags(self, execute_task, manager):
         radarr = RadarrAPIService(RADARR_API_KEY, RADARR_BASE_URL, RADARR_PORT)

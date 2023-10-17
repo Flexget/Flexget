@@ -6,7 +6,7 @@ PLEX_PASSWORD = 'flexget_flexget'
 
 @pytest.mark.online
 class TestPlex:
-    config = """
+    config = f"""
       templates:
         global:
           disable: [seen]
@@ -51,10 +51,7 @@ class TestPlex:
           list_remove:
             - plex_watchlist:
                 <<: *plex_def
-    """.format(
-        PLEX_USERNAME=PLEX_USERNAME,
-        PLEX_PASSWORD=PLEX_PASSWORD,
-    )
+    """
 
     def test_list_add(self, execute_task):
         task = execute_task('test_list_add')
