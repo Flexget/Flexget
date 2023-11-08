@@ -8,6 +8,7 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.requests import TokenBucketLimiter
 from flexget.utils.soup import get_soup
+from flexget.utils.tools import parse_filesize
 
 logger = logger.bind(name='nCore')
 
@@ -111,15 +112,15 @@ class UrlRewriteNcore:
                     href = a.get('href')
                     id = href[href.find("id=") + 3 :]
 
-                    e['title'] = a.text
+                    e['title'] = a.get('title')
                     e['url'] = URL + f'/torrents.php?action=download&id={id}&' + PASSKEY
 
                     parent = a.parent.parent.parent.parent
 
-                    e['torrent_seeds'] = parent.find('div', class_='box_s2').string
-                    e['torrent_leeches'] = parent.find('div', class_='box_l2').string
-                    e['content_size'] = (
-                        float(parent.find('div', class_='box_meret2').string) * 1024**2
+                    e['torrent_seeds'] = int(parent.find('div', class_='box_s2').string)
+                    e['torrent_leeches'] = int(parent.find('div', class_='box_l2').string)
+                    e['content_size'] = parse_filesize(
+                        parent.find('div', class_='box_meret2').string
                     )
                     e['torrent_availability'] = torrent_availability(
                         e['torrent_seeds'], e['torrent_leeches']
