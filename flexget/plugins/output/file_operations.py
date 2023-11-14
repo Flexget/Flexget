@@ -219,6 +219,20 @@ class TransformingOps(BaseFileOps):
     move = None
     destination_field = None
 
+    def copy_permissive(self, src, dst, follow_symlinks=True):
+        # this function is like shutil.copy but in case copy mode fails we ignore the error
+        if os.path.isdir(dst):
+            dst = os.path.join(dst, os.path.basename(src))
+        shutil.copyfile(src, dst, follow_symlinks=follow_symlinks)
+
+        try:
+            shutil.copymode(src, dst, follow_symlinks=follow_symlinks)
+        except OSError as err:
+            if err.errno == 1:
+                self.logger.warning(str(err))
+            else:
+                raise
+
     def handle_entry(self, task, config, entry, siblings):
         src = entry['location']
         src_isdir = os.path.isdir(src)
@@ -308,9 +322,9 @@ class TransformingOps(BaseFileOps):
             if self.move:
                 shutil.move(src, dst)
             elif src_isdir:
-                shutil.copytree(src, dst)
+                shutil.copytree(src, dst, copy_function=self.copy_permissive)
             else:
-                shutil.copy(src, dst)
+                self.copy_permissive(src, dst)
             self.logger.info('`{}` has been {} to `{}`', src, funct_done, dst)
             # further errors will not have any effect (the entry has been successfully moved or copied out)
             for s, ext in siblings.items():
