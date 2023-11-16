@@ -106,7 +106,7 @@ class SearchPassThePopcorn:
             'order_desc': {'type': 'boolean', 'default': True},
             'freeleech': {'type': 'boolean'},
             'release_type': {'type': 'string', 'enum': list(RELEASE_TYPES.keys())},
-            'grouping': {'type': 'boolean', 'default': True},
+            'grouping': {'type': 'boolean', 'default': False},
         },
         'required': ['apiuser', 'apikey', 'passkey'],
         'additionalProperties': False,
@@ -121,9 +121,7 @@ class SearchPassThePopcorn:
         Search for entries on PassThePopcorn
         """
         params = {}
-
-        request_headers = {"ApiUser": config['apiuser'], "ApiKey": config['apikey']}
-
+        
         if 'tags' in config:
             tags = config['tags'] if isinstance(config['tags'], list) else [config['tags']]
             params['taglist'] = ',+'.join(tags)
@@ -153,6 +151,8 @@ class SearchPassThePopcorn:
 
         search_strings = entry.get('search_strings', [entry['title']])
 
+        request_headers = {"ApiUser": config['apiuser'], "ApiKey": config['apikey']}
+
         # searching with imdb id is much more precise
         if entry.get('imdb_id'):
             search_strings = [entry['imdb_id']]
@@ -161,13 +161,14 @@ class SearchPassThePopcorn:
             params['searchstr'] = search_string
             logger.debug('Using search params: {}', params)
             try:
-                result = requests.get(self.base_url + 'torrents.php', headers=request_headers, params=params).json()
+                siteresponse = requests.get(self.base_url + 'torrents.php', headers=request_headers, params=params)
+                result = siteresponse.json()
+                logger.debug('PTP Search Request: {}',str(siteresponse.url))
             except RequestException as e:
-                logger.error('PassThePopcorn request failed: {}', e)
-                continue
+                raise plugin.PluginError('Error searching PassThePopcorn. %s' % str(e))
 
             total_results = result['TotalResults']
-            logger.debug('Total results: {}', total_results)
+            logger.debug('Total Search results: {}', total_results)
 
             authkey = result['AuthKey']
             passkey = result['PassKey']
@@ -195,8 +196,18 @@ class SearchPassThePopcorn:
 
                 for torrent in movie['Torrents']:
                     e = Entry()
+                    
+                    # Add the PTP qualities to the title so the quality plugin has a better chance
+                    release_res = torrent['Resolution']
+                    release_res = release_res.replace("PAL", "576p") #Common PAL DVD vertial resolution
+                    release_res = release_res.replace("NTSC", "480p") #Common PAL DVD vertial resolution
+                    # many older realses have a resolution defined as 624x480 for example this will split the value at take the hight
+                    tsplit = release_res.split("x", 1)                    
+                    if len(tsplit)>1:
+                        release_res = tsplit[1] + 'p' 
 
-                    e['title'] = torrent['ReleaseName']
+                    releasname = torrent['ReleaseName'].replace("4K", "") # Remove 4K from release name as that is often the source not the torrent resolution it confuses the quality plugin
+                    e['title'] = releasname + ' [' + release_res + ' ' + torrent['Source'] + ' ' + torrent['Codec'] + ' ' + torrent['Container'] + ']'
 
                     e['imdb_id'] = entry.get('imdb_id')
 
@@ -228,7 +239,7 @@ class SearchPassThePopcorn:
                             e['torrent_id'], authkey, passkey
                         )
                     )
-
+                    logger.debug('Add Entry: {} S:{}', e['title'],e['torrent_seeds'])
                     entries.add(e)
 
         return entries
