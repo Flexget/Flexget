@@ -200,7 +200,7 @@ class SearchPassThePopcorn:
                     # Add the PTP qualities to the title so the quality plugin has a better chance
                     release_res = torrent['Resolution']
                     release_res = release_res.replace("PAL", "576p") #Common PAL DVD vertial resolution
-                    release_res = release_res.replace("NTSC", "480p") #Common PAL DVD vertial resolution
+                    release_res = release_res.replace("NTSC", "480p") #Common NTSC DVD vertial resolution
                     # many older releases have a resolution defined as 624x480 for example this will split the value at take the hight
                     tsplit = release_res.split("x", 1)                    
                     if len(tsplit)>1:
