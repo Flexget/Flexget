@@ -206,8 +206,8 @@ class SearchPassThePopcorn:
                     if len(tsplit)>1:
                         release_res = tsplit[1] + 'p' 
 
-                    releasname = torrent['ReleaseName'].replace("4K", "") # Remove 4K from release name as that is often the source not the torrent resolution it confuses the quality plugin
-                    e['title'] = releasname + ' [' + release_res + ' ' + torrent['Source'] + ' ' + torrent['Codec'] + ' ' + torrent['Container'] + ']'
+                    release_name = torrent['ReleaseName'].replace("4K", "") # Remove 4K from release name as that is often the source not the torrent resolution it confuses the quality plugin
+                    e['title'] = release_name + ' [' + release_res + ' ' + torrent['Source'] + ' ' + torrent['Codec'] + ' ' + torrent['Container'] + ']'
 
                     e['imdb_id'] = entry.get('imdb_id')
 
