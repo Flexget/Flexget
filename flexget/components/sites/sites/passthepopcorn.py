@@ -75,16 +75,6 @@ ORDERING = {
 
 RELEASE_TYPES = {'non-scene': 0, 'scene': 1, 'golden popcorn': 2}
 
-
-@db_schema.upgrade('passthepopcorn')
-def upgrade(ver, session):
-    if ver is None:
-        ver = 0
-    if ver == 0:
-        raise db_schema.UpgradeImpossible
-    return ver
-
-
 class SearchPassThePopcorn:
     """
     PassThePopcorn search plugin.
