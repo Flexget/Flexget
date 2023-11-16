@@ -1,16 +1,10 @@
-import datetime
-
 from dateutil.parser import parse as dateutil_parse
 from loguru import logger
-from requests.exceptions import TooManyRedirects
-from sqlalchemy import Column, DateTime, Unicode
 
 from flexget import db_schema, plugin
 from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.manager import Session
-from flexget.utils.database import json_synonym
 from flexget.utils.requests import RequestException, TimedLimiter
 from flexget.utils.requests import Session as RequestSession
 from flexget.utils.tools import parse_filesize
@@ -90,6 +84,7 @@ def upgrade(ver, session):
         raise db_schema.UpgradeImpossible
     return ver
 
+
 class SearchPassThePopcorn:
     """
     PassThePopcorn search plugin.
@@ -121,7 +116,7 @@ class SearchPassThePopcorn:
         Search for entries on PassThePopcorn
         """
         params = {}
-        
+
         if 'tags' in config:
             tags = config['tags'] if isinstance(config['tags'], list) else [config['tags']]
             params['taglist'] = ',+'.join(tags)
@@ -132,7 +127,7 @@ class SearchPassThePopcorn:
 
         if config.get('freeleech'):
             params['freetorrent'] = int(config['freeleech'])
-        
+
         ordering = 'desc' if config['order_desc'] else 'asc'
 
         grouping = int(config['grouping'])
@@ -165,9 +160,11 @@ class SearchPassThePopcorn:
             params['searchstr'] = search_string
             logger.debug('Using search params: {}', params)
             try:
-                siteresponse = requests.get(self.base_url + 'torrents.php', headers=request_headers, params=params)
+                siteresponse = requests.get(
+                    self.base_url + 'torrents.php', headers=request_headers, params=params
+                )
                 result = siteresponse.json()
-                logger.debug('PTP Search Request: {}',str(siteresponse.url))
+                logger.debug('PTP Search Request: {}', str(siteresponse.url))
             except RequestException as e:
                 raise plugin.PluginError('Error searching PassThePopcorn. %s' % str(e))
 
@@ -200,18 +197,35 @@ class SearchPassThePopcorn:
 
                 for torrent in movie['Torrents']:
                     e = Entry()
-                    
+
                     # Add the PTP qualities to the title so the quality plugin has a better chance
                     release_res = torrent['Resolution']
-                    release_res = release_res.replace("PAL", "576p") #Common PAL DVD vertial resolution
-                    release_res = release_res.replace("NTSC", "480p") #Common NTSC DVD vertial resolution
+                    release_res = release_res.replace(
+                        "PAL", "576p"
+                    )  # Common PAL DVD vertial resolution
+                    release_res = release_res.replace(
+                        "NTSC", "480p"
+                    )  # Common NTSC DVD vertial resolution
                     # many older releases have a resolution defined as 624x480 for example this will split the value at take the hight
-                    tsplit = release_res.split("x", 1)                    
-                    if len(tsplit)>1:
-                        release_res = tsplit[1] + 'p' 
+                    tsplit = release_res.split("x", 1)
+                    if len(tsplit) > 1:
+                        release_res = tsplit[1] + 'p'
 
-                    release_name = torrent['ReleaseName'].replace("4K", "") # Remove 4K from release name as that is often the source not the torrent resolution it confuses the quality plugin
-                    e['title'] = release_name + ' [' + release_res + ' ' + torrent['Source'] + ' ' + torrent['Codec'] + ' ' + torrent['Container'] + ']'
+                    release_name = torrent['ReleaseName'].replace(
+                        "4K", ""
+                    )  # Remove 4K from release name as that is often the source not the torrent resolution it confuses the quality plugin
+                    e['title'] = (
+                        release_name
+                        + ' ['
+                        + release_res
+                        + ' '
+                        + torrent['Source']
+                        + ' '
+                        + torrent['Codec']
+                        + ' '
+                        + torrent['Container']
+                        + ']'
+                    )
 
                     e['imdb_id'] = entry.get('imdb_id')
 
@@ -243,7 +257,7 @@ class SearchPassThePopcorn:
                             e['torrent_id'], authkey, passkey
                         )
                     )
-                    logger.debug('Add Entry: {} Seeds:{}', e['title'],e['torrent_seeds'])
+                    logger.debug('Add Entry: {} Seeds:{}', e['title'], e['torrent_seeds'])
                     entries.add(e)
 
         return entries
