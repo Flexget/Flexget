@@ -75,6 +75,7 @@ ORDERING = {
 
 RELEASE_TYPES = {'non-scene': 0, 'scene': 1, 'golden popcorn': 2}
 
+
 class SearchPassThePopcorn:
     """
     PassThePopcorn search plugin.
