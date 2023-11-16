@@ -205,13 +205,7 @@ class SearchPassThePopcorn:
                     release_name = torrent['ReleaseName'].replace(
                         "4K", ""
                     )  # Remove 4K from release name as that is often the source not the torrent resolution it confuses the quality plugin
-                    e['title'] = "{} [{} {} {} {}]".format(
-                        release_name,
-                        release_res,
-                        torrent['Source'],
-                        torrent['Codec'],
-                        torrent['Container'],
-                    )
+                    e['title'] = f"{release_name} [{release_res} {torrent['Source']} {torrent['Codec']} {torrent['Container']}]"
 
                     e['imdb_id'] = entry.get('imdb_id')
 
