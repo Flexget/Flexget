@@ -132,7 +132,7 @@ class SearchPassThePopcorn:
 
         if config.get('freeleech'):
             params['freetorrent'] = int(config['freeleech'])
-
+        
         ordering = 'desc' if config['order_desc'] else 'asc'
 
         grouping = int(config['grouping'])
@@ -156,6 +156,10 @@ class SearchPassThePopcorn:
         # searching with imdb id is much more precise
         if entry.get('imdb_id'):
             search_strings = [entry['imdb_id']]
+        else:
+            # use the movie year if available to improve search results.
+            if 'movie_year' in entry:
+                params['year'] = int(entry['movie_year'])
 
         for search_string in search_strings:
             params['searchstr'] = search_string
@@ -239,7 +243,7 @@ class SearchPassThePopcorn:
                             e['torrent_id'], authkey, passkey
                         )
                     )
-                    logger.debug('Add Entry: {} S:{}', e['title'],e['torrent_seeds'])
+                    logger.debug('Add Entry: {} Seeds:{}', e['title'],e['torrent_seeds'])
                     entries.add(e)
 
         return entries
