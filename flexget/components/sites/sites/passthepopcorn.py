@@ -90,16 +90,6 @@ def upgrade(ver, session):
         raise db_schema.UpgradeImpossible
     return ver
 
-
-class PassThePopcornCookie(Base):
-    __tablename__ = 'passthepopcorn_cookie'
-
-    username = Column(Unicode, primary_key=True)
-    _cookie = Column('cookie', Unicode)
-    cookie = json_synonym('_cookie')
-    expires = Column(DateTime)
-
-
 class SearchPassThePopcorn:
     """
     PassThePopcorn search plugin.
@@ -108,8 +98,8 @@ class SearchPassThePopcorn:
     schema = {
         'type': 'object',
         'properties': {
-            'username': {'type': 'string'},
-            'password': {'type': 'string'},
+            'apiuser': {'type': 'string'},
+            'apikey': {'type': 'string'},
             'passkey': {'type': 'string'},
             'tags': one_or_more({'type': 'string', 'enum': TAGS}, unique_items=True),
             'order_by': {'type': 'string', 'enum': list(ORDERING.keys()), 'default': 'Time added'},
@@ -118,113 +108,12 @@ class SearchPassThePopcorn:
             'release_type': {'type': 'string', 'enum': list(RELEASE_TYPES.keys())},
             'grouping': {'type': 'boolean', 'default': True},
         },
-        'required': ['username', 'password', 'passkey'],
+        'required': ['apiuser', 'apikey', 'passkey'],
         'additionalProperties': False,
     }
 
     base_url = 'https://passthepopcorn.me/'
     errors = False
-
-    def get(self, url, params, username, password, passkey, force=False):
-        """
-        Wrapper to allow refreshing the cookie if it is invalid for some reason
-
-        :param unicode url: the url to be requested
-        :param dict params: request params
-        :param str username:
-        :param str password:
-        :param str passkey: the user's private passkey
-        :param bool force: flag used to refresh the cookie forcefully ie. forgo DB lookup
-        :return:
-        """
-        cookies = self.get_login_cookie(username, password, passkey, force=force)
-        invalid_cookie = False
-        response = None
-
-        try:
-            response = requests.get(url, params=params, cookies=cookies)
-            if self.base_url + 'login.php' in response.url:
-                invalid_cookie = True
-        except TooManyRedirects:
-            # TODO Apparently it endlessly redirects if the cookie is invalid? I assume it's a gazelle bug.
-            logger.debug('PassThePopcorn request failed: Too many redirects. Invalid cookie?')
-            invalid_cookie = True
-        except RequestException as e:
-            if e.response is not None and e.response.status_code == 429:
-                logger.error('Saved cookie is invalid and will be deleted. Error: {}', str(e))
-                # cookie is invalid and must be deleted
-                with Session() as session:
-                    session.query(PassThePopcornCookie).filter(
-                        PassThePopcornCookie.username == username
-                    ).delete()
-                invalid_cookie = True
-            else:
-                logger.error('PassThePopcorn request failed: {}', str(e))
-
-        if invalid_cookie:
-            if self.errors:
-                raise plugin.PluginError(
-                    'PassThePopcorn login cookie is invalid. Login page received?'
-                )
-            self.errors = True
-            # try again
-            response = self.get(url, params, username, password, passkey, force=True)
-        else:
-            self.errors = False
-
-        return response
-
-    def get_login_cookie(self, username, password, passkey, force=False):
-        """
-        Retrieves login cookie
-
-        :param str username:
-        :param str password:
-        :param str passkey: the user's private passkey
-        :param bool force: if True, then retrieve a fresh cookie instead of looking in the DB
-        :return:
-        """
-        if not force:
-            with Session() as session:
-                saved_cookie = (
-                    session.query(PassThePopcornCookie)
-                    .filter(PassThePopcornCookie.username == username)
-                    .first()
-                )
-                if (
-                    saved_cookie
-                    and saved_cookie.expires
-                    and saved_cookie.expires >= datetime.datetime.now()
-                ):
-                    logger.debug('Found valid login cookie')
-                    return saved_cookie.cookie
-
-        url = self.base_url + 'ajax.php'
-        params = {
-            'username': username,
-            'password': password,
-            'login': 'Login',
-            'keeplogged': '1',
-            'passkey': passkey,
-            'action': 'login',
-        }
-        try:
-            logger.debug('Attempting to retrieve PassThePopcorn cookie')
-            requests.post(url, data=params, timeout=30)
-        except RequestException as e:
-            raise plugin.PluginError('PassThePopcorn login failed: %s' % e)
-
-        with Session() as session:
-            expires = datetime.datetime.now() + datetime.timedelta(days=30)
-            logger.debug(
-                'Saving or updating PassThePopcorn cookie in db. Expires 30 days from now: {}',
-                expires,
-            )
-            cookie = PassThePopcornCookie(
-                username=username, cookie=dict(requests.cookies), expires=expires
-            )
-            session.merge(cookie)
-            return cookie.cookie
 
     @plugin.internet(logger)
     def search(self, task, entry, config):
@@ -232,6 +121,8 @@ class SearchPassThePopcorn:
         Search for entries on PassThePopcorn
         """
         params = {}
+
+        request_headers = {"ApiUser": config['apiuser'], "ApiKey": config['apikey']}
 
         if 'tags' in config:
             tags = config['tags'] if isinstance(config['tags'], list) else [config['tags']]
@@ -270,13 +161,7 @@ class SearchPassThePopcorn:
             params['searchstr'] = search_string
             logger.debug('Using search params: {}', params)
             try:
-                result = self.get(
-                    self.base_url + 'torrents.php',
-                    params,
-                    config['username'],
-                    config['password'],
-                    config['passkey'],
-                ).json()
+                result = requests.get(self.base_url + 'torrents.php', headers=request_headers, params=params).json()
             except RequestException as e:
                 logger.error('PassThePopcorn request failed: {}', e)
                 continue
