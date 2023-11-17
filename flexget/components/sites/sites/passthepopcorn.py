@@ -75,6 +75,7 @@ ORDERING = {
 
 RELEASE_TYPES = {'non-scene': 0, 'scene': 1, 'golden popcorn': 2}
 
+
 @db_schema.upgrade('passthepopcorn')
 def upgrade(ver, session):
     if ver is None:
@@ -87,6 +88,7 @@ def upgrade(ver, session):
         logger.info('DB Schema is now v1')
         ver = 1
     return ver
+
 
 class SearchPassThePopcorn:
     """
