@@ -79,7 +79,7 @@ RELEASE_TYPES = {'non-scene': 0, 'scene': 1, 'golden popcorn': 2}
 @db_schema.upgrade('passthepopcorn')
 def upgrade(ver, session):
     if ver is None:
-        raise db_schema.UpgradeImpossible
+        logger.info('No Schema Found to Upgrade')
     else:
         if table_exists('passthepopcorn_cookie', session):
             logger.info('Removing old Cookie Tracking Table')
