@@ -7,11 +7,8 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.requests import RequestException, TimedLimiter
 from flexget.utils.requests import Session as RequestSession
+from flexget.utils.sqlalchemy_utils import drop_tables, table_exists
 from flexget.utils.tools import parse_filesize
-from flexget.utils.sqlalchemy_utils import (
-    drop_tables,
-    table_exists
-)
 
 logger = logger.bind(name='passthepopcorn')
 Base = db_schema.versioned_base('passthepopcorn', 1)
