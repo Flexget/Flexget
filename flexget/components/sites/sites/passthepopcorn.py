@@ -140,15 +140,19 @@ class SearchPassThePopcorn:
         else:
             # use the movie year if available to improve search results.
             if 'movie_year' in entry:
-                #the movie list plugin seems to have garbage in the year entry sometimes like a 1 for the year
-                #validate we have a useful year to filter on
+                # the movie list plugin seems to have garbage in the year entry sometimes like a 1 for the year
+                # validate we have a useful year to filter on
                 try:
                     if int(entry['movie_year']) > 1900:
                         params['year'] = int(entry['movie_year'])
                     else:
-                        logger.error(f"Searching for '{entry['title']}' ignoring invalid movie_year: '{entry['movie_year']}'")
+                        logger.error(
+                            f"Searching for '{entry['title']}' ignoring invalid movie_year: '{entry['movie_year']}'"
+                        )
                 except ValueError:
-                    logger.error(f"Searching for '{entry['title']}'  ignoring non numeric movie_year: '{entry['movie_year']}'")
+                    logger.error(
+                        f"Searching for '{entry['title']}'  ignoring non numeric movie_year: '{entry['movie_year']}'"
+                    )
 
         task.requests.add_domain_limiter(TimedLimiter('passthepopcorn.me', '5 seconds'))
 
