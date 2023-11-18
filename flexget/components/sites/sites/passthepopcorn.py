@@ -6,7 +6,6 @@ from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.requests import RequestException, TimedLimiter
-from flexget.utils.requests import Session as RequestSession
 from flexget.utils.tools import parse_filesize
 
 logger = logger.bind(name='passthepopcorn')
