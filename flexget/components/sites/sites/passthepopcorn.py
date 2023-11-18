@@ -11,7 +11,7 @@ from flexget.utils.sqlalchemy_utils import drop_tables, table_exists
 from flexget.utils.tools import parse_filesize
 
 logger = logger.bind(name='passthepopcorn')
-Base = db_schema.versioned_base('passthepopcorn', 1)
+Base = db_schema.versioned_base('passthepopcorn', 2)
 
 requests = RequestSession()
 requests.add_domain_limiter(TimedLimiter('passthepopcorn.me', '5 seconds'))
@@ -79,13 +79,11 @@ RELEASE_TYPES = {'non-scene': 0, 'scene': 1, 'golden popcorn': 2}
 
 @db_schema.upgrade('passthepopcorn')
 def upgrade(ver, session):
-    if ver is None:
-        raise db_schema.UpgradeImpossible
-    else:
+    if ver is None or ver < 2:
         if table_exists('passthepopcorn_cookie', session):
             logger.info('Removing old Cookie Tracking Table')
-            # Drop the deprecated data
             drop_tables(['passthepopcorn_cookie'], session)
+        ver = 2
     return ver
 
 
