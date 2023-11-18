@@ -11,9 +11,6 @@ from flexget.utils.tools import parse_filesize
 
 logger = logger.bind(name='passthepopcorn')
 
-requests = RequestSession()
-requests.add_domain_limiter(TimedLimiter('passthepopcorn.me', '5 seconds'))
-
 TAGS = [
     'action',
     'adventure',
@@ -145,6 +142,8 @@ class SearchPassThePopcorn:
             # use the movie year if available to improve search results.
             if 'movie_year' in entry:
                 params['year'] = int(entry['movie_year'])
+                
+        task.requests.add_domain_limiter(TimedLimiter('passthepopcorn.me', '5 seconds'))
 
         for search_string in search_strings:
             params['searchstr'] = search_string
