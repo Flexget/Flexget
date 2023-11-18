@@ -11,7 +11,6 @@ from flexget.utils.sqlalchemy_utils import drop_tables, table_exists
 from flexget.utils.tools import parse_filesize
 
 logger = logger.bind(name='passthepopcorn')
-Base = db_schema.versioned_base('passthepopcorn', 2)
 
 requests = RequestSession()
 requests.add_domain_limiter(TimedLimiter('passthepopcorn.me', '5 seconds'))
