@@ -6,7 +6,6 @@ from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.requests import RequestException, TimedLimiter
-from flexget.utils.requests import Session as RequestSession
 from flexget.utils.tools import parse_filesize
 
 logger = logger.bind(name='passthepopcorn')
@@ -142,7 +141,7 @@ class SearchPassThePopcorn:
             # use the movie year if available to improve search results.
             if 'movie_year' in entry:
                 params['year'] = int(entry['movie_year'])
-                
+
         task.requests.add_domain_limiter(TimedLimiter('passthepopcorn.me', '5 seconds'))
 
         for search_string in search_strings:
