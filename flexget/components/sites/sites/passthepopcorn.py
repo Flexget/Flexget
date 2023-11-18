@@ -83,7 +83,6 @@ def upgrade(ver, session):
         if table_exists('passthepopcorn_cookie', session):
             logger.info('Removing old Cookie Tracking Table')
             drop_tables(['passthepopcorn_cookie'], session)
-        ver = 2
     return ver
 
 
