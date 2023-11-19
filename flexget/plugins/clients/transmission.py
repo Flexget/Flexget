@@ -1,3 +1,4 @@
+import importlib.metadata
 import os
 import pathlib
 import re
@@ -8,11 +9,6 @@ from netrc import NetrcParseError, netrc
 from time import sleep
 from typing import TYPE_CHECKING
 from urllib.parse import urlparse
-
-try:
-    import importlib.metadata as importlib_metadata
-except ImportError:
-    import importlib_metadata  # TODO: remove this after we drop python 3.7
 
 import packaging.specifiers
 import packaging.version
@@ -157,7 +153,7 @@ class TransmissionBase:
                 f'{__package__} module version {__version__} required.', logger
             )
 
-        v = importlib_metadata.version(__package__)
+        v = importlib.metadata.version(__package__)
         if not __requirement__.contains(v):
             raise plugin.PluginError(
                 f'{__package__} module version mismatch, requiring {__package__}{__version__}',

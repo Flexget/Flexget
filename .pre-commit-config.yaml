@@ -14,10 +14,10 @@ repos:
   rev: '1.7.0'
   hooks:
     - id: poetry-check
-    - id: poetry-lock
-      name: poetry-lock-check
+    - id: poetry-check
+      name: poetry-check-lock
       files: ^pyproject\.toml|poetry\.lock$
-      args: ["--check"]
+      args: ["--lock"]
     - id: poetry-export
       args: ["-f", "requirements.txt", "-o", "requirements.txt", "--without-hashes"]
     - id: poetry-export
