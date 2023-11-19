@@ -21,7 +21,7 @@ class DomainDelay:
     def on_task_start(self, task, config):
         for domain, delay in config.items():
             logger.debug('Adding minimum interval of {} between requests to {}', delay, domain)
-            task.requests.add_domain_limiter(TimedLimiter(domain, delay))
+            task.requests.add_domain_limiter(TimedLimiter(domain, delay), replace=True)
 
 
 @event('plugin.register')

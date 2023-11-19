@@ -146,10 +146,8 @@ class UrlRewriteIPTorrents:
 
         entries = set()
 
-        if not task.requests.domain_limiters.get(DOMAIN, None):
-            logger.debug('limiting requests with a delay of {}', DELAY)
-            rate_limiter = requests.TokenBucketLimiter(DOMAIN, 1, DELAY, True)
-            task.requests.add_domain_limiter(rate_limiter)
+        rate_limiter = requests.TokenBucketLimiter(DOMAIN, 1, DELAY, True)
+        task.requests.add_domain_limiter(rate_limiter, replace=False)
 
         for search_string in entry.get('search_strings', [entry['title']]):
             search_params = dict(category_params.items())

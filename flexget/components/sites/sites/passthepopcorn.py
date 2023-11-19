@@ -154,7 +154,9 @@ class SearchPassThePopcorn:
                         f"Searching for '{entry['title']}'  ignoring non numeric movie_year: '{entry['movie_year']}'"
                     )
 
-        task.requests.add_domain_limiter(TimedLimiter('passthepopcorn.me', '5 seconds'))
+        task.requests.add_domain_limiter(
+            TimedLimiter('passthepopcorn.me', '5 seconds'), replace=False
+        )
 
         for search_string in search_strings:
             params['searchstr'] = search_string
