@@ -13,7 +13,7 @@ from flexget.utils.database import with_session
 from flexget.utils.sqlalchemy_utils import create_index, drop_index, index_exists
 
 logger = logger.bind(name='status.db')
-Base = db_schema.versioned_base('status', 2)
+Base = db_schema.versioned_base('status', 3)
 
 
 @db_schema.upgrade('status')
