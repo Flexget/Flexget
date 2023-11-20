@@ -2,7 +2,7 @@ import datetime
 from datetime import timedelta
 
 from loguru import logger
-from sqlalchemy import Boolean, Column, DateTime, Index, Integer, String, func, select
+from sqlalchemy import Boolean, Column, DateTime, Integer, String, func, select
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship
 from sqlalchemy.schema import ForeignKey
