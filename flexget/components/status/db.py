@@ -67,7 +67,7 @@ class StatusTask(Base):
 class TaskExecution(Base):
     __tablename__ = 'status_execution'
     id = Column(Integer, primary_key=True)
-    task_id = Column(Integer, ForeignKey('status_task.id'))
+    task_id = Column(Integer, ForeignKey('status_task.id'), index=True)
 
     start = Column(DateTime)
     end = Column(DateTime)
@@ -105,9 +105,6 @@ class TaskExecution(Base):
             'failed': self.failed,
             'abort_reason': self.abort_reason,
         }
-
-
-Index('ix_status_execution_task_id', TaskExecution.task_id)
 
 
 @event('manager.db_cleanup')
