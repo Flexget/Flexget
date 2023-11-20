@@ -107,10 +107,7 @@ class TaskExecution(Base):
         }
 
 
-Index(
-    'ix_status_execution_task_id',
-    TaskExecution.task_id
-)
+Index('ix_status_execution_task_id', TaskExecution.task_id)
 
 
 @event('manager.db_cleanup')
