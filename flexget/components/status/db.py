@@ -108,11 +108,8 @@ class TaskExecution(Base):
 
 
 Index(
-    'ix_status_execution_task_id_start_end_succeeded',
-    TaskExecution.task_id,
-    TaskExecution.start,
-    TaskExecution.end,
-    TaskExecution.succeeded,
+    'ix_status_execution_task_id',
+    TaskExecution.task_id
 )
 
 
