@@ -28,6 +28,20 @@ def table_exists(name: str, session: Session) -> bool:
         return False
     return True
 
+def index_exists(table_name: str, index_name: str, session: Session) -> bool:
+    """
+    Use SQLAlchemy reflect to check index existences.
+
+    :param string table_name: Table name to check
+    :param string index_name: Index name to check
+    :param Session session: Session to use
+    :return: True if table exists, False otherwise
+    :rtype: bool
+    """
+    try:
+        return bool(table_index(table_name, index_name, session))
+    except NoSuchTableError:
+        return False
 
 def table_schema(name: str, session: Session) -> Table:
     """
@@ -51,6 +65,28 @@ def table_columns(table: Union[str, Table], session: Session) -> List[str]:
         res.append(column.name)
     return res
 
+def table_index(table_name: str, index_name: str, session: Session) -> Index:
+    """Finds an index by table name and index name
+
+    :param string table_name: Name of table
+    :param string index_name: Name of the index
+    :param Session session: SQLAlchemy Session
+    :returns: The requested index
+    """
+
+    table = table_schema(table_name, session)
+    return get_index_by_name(table, index_name)
+
+def drop_index(table_name: str, index_name: str, session: Session) -> None:
+    """Drops an index by table name and index name
+
+    :param string table_name: Name of table
+    :param string index_name: Name of the index
+    :param Session session: SQLAlchemy Session
+    """
+
+    index = table_index(table_name, index_name, session)
+    index.drop(bind=session.bind)
 
 def table_add_column(
     table: Union[Table, str],
