@@ -764,7 +764,7 @@ class PluginTransmission(TransmissionBase):
                 obj_labels = [label for labels in obj_labels for label in labels.split(",")]
                 labels.update(obj_labels)
             labels = [entry.render(label) for label in labels]
-            labels = [re.sub(r"(\s),|,(\s)", r"\1\2", label).replace(","," ") for label in labels]
+            labels = [re.sub(r"(\s),|,(\s)", r"\1\2", label).replace(",", " ") for label in labels]
             labels = [label.strip() for label in labels]
             labels = [label for label in labels if label]
             if labels:
