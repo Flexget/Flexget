@@ -343,7 +343,7 @@ class PluginTransmission(TransmissionBase):
                     'skip_files': one_or_more({'type': 'string'}),
                     'rename_like_files': {'type': 'boolean'},
                     'queue_position': {'type': 'integer'},
-                    'labels': {'type': 'array', 'items': {'type': 'string'}},
+                    'labels': one_or_more({'type': 'string'}),
                 },
                 'additionalProperties': False,
             },
@@ -756,7 +756,19 @@ class PluginTransmission(TransmissionBase):
             change['queuePosition'] = opt_dic['queue_position']
 
         if 'labels' in opt_dic:
-            change['labels'] = opt_dic['labels']
+            labels = set()
+            for obj in [config, entry]:
+                obj_labels = obj.get('labels', [])
+                if not isinstance(obj_labels, list):
+                    obj_labels = [obj_labels]
+                obj_labels = [label for labels in obj_labels for label in labels.split(",")]
+                labels.update(obj_labels)
+            labels = [entry.render(label) for label in labels]
+            labels = [re.sub(r"(\s),|,(\s)", r"\1\2", label).replace(","," ") for label in labels]
+            labels = [label.strip() for label in labels]
+            labels = [label for label in labels if label]
+            if labels:
+                change['labels'] = labels
 
         post = options['post']
         # set to modify paused status after
