@@ -1,6 +1,5 @@
 """Create a Ombi managed list.
 """
-from __future__ import absolute_import, division, unicode_literals
 
 from collections.abc import MutableSet
 from typing import Any, Callable, Dict, List, Optional
@@ -217,7 +216,6 @@ class OmbiSet(MutableSet):
         return len(self.items)
 
     def add(self, entry: Entry):
-
         log.info(f"Adding {entry['title']} to ombi_list.")
 
         log.debug(f"Getting OMBI entry for {entry['title']}.")
@@ -233,7 +231,6 @@ class OmbiSet(MutableSet):
         log.info(f"{entry['title']} was added to ombi_list.")
 
     def __ior__(self, entries: List[Entry]):
-
         for entry in entries:
             self.add(entry)
 
@@ -260,12 +257,10 @@ class OmbiSet(MutableSet):
         log.info(f"{entry['title']} was removed from ombi_list.")
 
     def __isub__(self, entries: List[Entry]):
-
         for entry in entries:
             self.discard(entry)
 
     def _find_entry(self, entry: Entry):
-
         if "imdb_id" not in entry:
             log.warning(
                 f"{entry['title']} is missing the imdb_id, consider using tmdb_lookup plugin."
@@ -292,7 +287,6 @@ class OmbiSet(MutableSet):
 
     @property
     def items(self) -> List[Entry]:
-
         if self._items:
             return self._items
 
@@ -356,7 +350,6 @@ class OmbiSet(MutableSet):
     # -- Public interface ends here -- #
 
     def _get_ombi_entry(self, entry: Entry) -> Optional[OmbiEntry]:
-
         if "imdb_id" not in entry:
             log.warning(
                 f"{entry['title']} is missing the imdb_id, consider using tmdb_lookup plugin."
@@ -446,7 +439,6 @@ class OmbiSet(MutableSet):
             raise plugin.PluginError(f"Unable to connect to Ombi at {url}. Error: {error}")
 
     def generate_movie_entry(self, parent_request):
-
         log.debug('Found: %s', parent_request.get('title'))
 
         # If we dont have an imdb id, maybe we should get it from the title?
@@ -470,7 +462,6 @@ class OmbiSet(MutableSet):
         )
 
     def generate_tv_entry(self, parent_request, child_request=None, season=None, episode=None):
-
         if self.config.get('type') == 'shows':
             log.debug('Found: %s', parent_request.get('title'))
             if not parent_request.get('imdbId'):
@@ -533,7 +524,7 @@ class OmbiSet(MutableSet):
             raise plugin.PluginError('Error: Unknown list type %s.' % (self.config.get('type')))
 
 
-class OmbiList(object):
+class OmbiList:
     schema = OmbiSet.schema
 
     def get_list(self, config):
