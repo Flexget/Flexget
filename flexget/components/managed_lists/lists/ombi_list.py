@@ -5,6 +5,7 @@ from collections.abc import MutableSet
 from typing import Any, Callable, Dict, List, Optional
 
 from loguru import logger
+from requests import HTTPError
 
 from flexget import plugin
 from flexget.entry import Entry
@@ -15,36 +16,93 @@ from flexget.utils.requests import RequestException
 log = logger.bind(name='ombi_list')
 
 
+class OmbiRequest:
+    def __init__(self, config: Dict[str, str]) -> None:
+        self.base_url = config['url']
+        # We dont really need the whole config, just the auth part
+        # but I'm saving it for now, in case we need to configure
+        # token refresh or something
+        self.config = config
+        self.auth_header = self._create_auth_header()
+
+    def _create_auth_header(self):
+        if "api_key" in self.config:
+            log.debug('Authenticating via api_key')
+            api_key = self.config['api_key']
+            header = {'ApiKey': api_key}
+            return header
+
+        if self.config.get('username') and self.config.get('password'):
+            log.debug('Authenticating via username: %s', self.config.get('username'))
+            access_token = self._get_access_token()
+            return {"Authorization": "Bearer %s" % access_token}
+
+        raise plugin.PluginError('Error: an api_key or username and password must be configured')
+
+    def _get_access_token(self):
+        endpoint = "/api/v1/Token"
+        data = {'username': self.config.get('username'), 'password': self.config.get('password')}
+        headers = self.create_json_headers()
+        try:
+            access_token = self._request('post', endpoint, data=data, headers=headers).get(
+                'access_token'
+            )
+            return access_token
+        except (HTTPError, RequestException, ValueError) as e:
+            raise plugin.PluginError('Ombi username and password login failed') from e
+
+    def _request(self, method, endpoint, **params):
+        if not endpoint.startswith('/'):
+            endpoint = '/' + endpoint
+
+        url = self.base_url + endpoint
+
+        headers: Dict[str, str] = params.pop('headers', {})
+        data = params.pop('data', None)
+
+        # add auth header
+        headers.update(self.auth_header.copy())
+
+        response = requests.request(
+            method, url, params=params, headers=headers, raise_status=False, json=data
+        )
+
+        response.raise_for_status()
+
+        return response.json()
+
+    def get(self, endpoint, **params):
+        result = self._request('get', endpoint, **params)
+        return result
+
+    def post(self, endpoint, **params):
+        result = self._request('post', endpoint, **params)
+        return result
+
+    def put(self, endpoint, **params):
+        result = self._request('put', endpoint, **params)
+        return result
+
+    def delete(self, endpoint, **params):
+        return self._request('delete', endpoint, **params)
+
+    @classmethod
+    def create_json_headers(cls):
+        return {'Content-Type': 'application/json', 'Accept': 'application/json'}
+
+
 class OmbiEntry:
     """Represents a Generic entry returned from the Ombi API."""
 
     def __init__(
         self,
-        base_url: str,
-        auth: Callable[[], Dict[str, str]],
+        request: OmbiRequest,
         entry_type: str,
         data: Dict[str, Any],
     ) -> None:
-        self.base_url = base_url
-        self.auth = auth
+        self._request = request
         self.entry_type = entry_type
         self.data = data
-
-    def _post_data(self, api_endpoint: str, json: Dict[str, Any]) -> Optional[Dict[str, Any]]:
-        """Post API data to Ombi."""
-
-        req_url = f"{self.base_url}/{api_endpoint}"
-
-        headers = {'Content-Type': 'application/json', 'Accept': 'application/json'}
-        headers.update(self.auth())
-        response = requests.post(req_url, json=json, headers=headers)
-
-        if not response.ok:
-            log.error(f"{req_url} return {response.reason}")
-            # Do I throw an exception here? Is that allowed from a plugin?
-            return None
-
-        return response.json()
 
     def mark_requested(self):
         """Mark an entry in Ombi as being requested."""
@@ -56,15 +114,18 @@ class OmbiEntry:
         log.verbose(f"Requesting {self.data['title']} in Ombi.")
 
         api_endpoint = (
-            "api/v1/Request/movie" if self.entry_type == 'movie' else "api/v2/Requests/tv"
+            "/api/v1/Request/movie" if self.entry_type == 'movie' else "api/v2/Requests/tv"
         )
 
         data = {"theMovieDbId": self.data["theMovieDbId"]}
 
-        response = self._post_data(api_endpoint, data)
+        headers = self._request.create_json_headers()
+
+        # Maybe we need to try/catch this and throw a plugin exception?
+        response = self._request.post(api_endpoint, data=data, headers=headers)
 
         if not response:
-            # Unable to mark this item as requested, but what now?
+            log.error(f"Failed to request {self.data['title']} in OMBI.")
             return
 
         if response.get('isError'):
@@ -93,10 +154,12 @@ class OmbiEntry:
 
         data = {"id": self.data["requestId"]}
 
-        response = self._post_data(api_endpoint, data)
+        headers = self._request.create_json_headers()
+        # Maybe we need to try/catch this and throw a plugin exception?
+        response = self._request.post(api_endpoint, data=data, headers=headers)
 
         if not response:
-            # Unable to mark this item as requested, but what now?
+            log.error(f"Failed to mark {self.data['title']} as available in OMBI.")
             return
 
         if response.get('isError'):
@@ -112,34 +175,49 @@ class OmbiMovie(OmbiEntry):
 
     entry_type = 'movie'
 
-    def __init__(
-        self, base_url: str, auth: Callable[[], Dict[str, str]], data: Dict[str, Any]
-    ) -> None:
-        super().__init__(base_url, auth, self.entry_type, data)
+    def __init__(self, request: OmbiRequest, data: Dict[str, Any]) -> None:
+        super().__init__(request, self.entry_type, data)
 
     @classmethod
-    def from_imdb_id(cls, base_url: str, imdb_id: str, auth: Callable[[], Dict[str, str]]):
+    def from_imdb_id(cls, request: OmbiRequest, imdb_id: str):
         """Create a Ombi Entry from an IMDB ID."""
 
-        headers = {'Content-Type': 'application/json', 'Accept': 'application/json'}
-        headers.update(auth())
+        headers = request.create_json_headers()
 
-        url = f"{base_url}/api/v2/Search/{cls.entry_type}/imdb/{imdb_id}"
+        endpoint = f"api/v2/Search/{cls.entry_type}/imdb/{imdb_id}"
 
-        response = requests.get(url, headers=headers)
+        data = request.get(endpoint, headers=headers)
 
-        if not response.ok:
-            log.error(f"{url} return {response.reason}")
-            # Do I throw an exception here? Is that allowed from a plugin?
-            return None
-
-        data = response.json()
-
-        # Their is a bug in OMBI where if you get a movie by its TMDB ID
+        # Their is a bug in OMBI where if you get a movie by its IMDB_ID
         # then the theMovieDbId field will be blank for some reason...
-        # data['theMovieDbId'] = tmdb_id
 
-        return OmbiMovie(base_url, auth, data)
+        return OmbiMovie(request, data)
+
+    @classmethod
+    def from_tmdb_id(cls, request: OmbiRequest, tmdb_id: str):
+        """Create a Ombi Entry from an TMDB ID."""
+
+        headers = request
+
+        endpoint = f"/api/v2/Search/{cls.entry_type}/{tmdb_id}"
+
+        data = request.get(endpoint, headers=headers)
+
+        return OmbiMovie(request, data)
+
+    @classmethod
+    def from_id(cls, request: OmbiRequest, entry: Entry):
+        """Create a Ombi Entry from an OMBI ID."""
+
+        if entry.get('imdb_id'):
+            return cls.from_imdb_id(request, entry['imdb_id'])
+
+        if entry.get('tmdb_id'):
+            return cls.from_tmdb_id(request, entry['tmdb_id'])
+
+        raise plugin.PluginError(
+            f"Error: Unable to find required ID to lookup OMBI {cls.entry_type}."
+        )
 
 
 # In the future this might need split out into 3 classes (Show, Season, Episode)
@@ -350,16 +428,12 @@ class OmbiSet(MutableSet):
     # -- Public interface ends here -- #
 
     def _get_ombi_entry(self, entry: Entry) -> Optional[OmbiEntry]:
-        if "imdb_id" not in entry:
-            log.warning(
-                f"{entry['title']} is missing the imdb_id, consider using tmdb_lookup plugin."
-            )
-            return None
-
         entry_type: str = self.config['type']
 
+        request = OmbiRequest(self.config)
+
         if entry_type == 'movies':
-            return OmbiMovie.from_imdb_id(self.config.get('url'), entry['imdb_id'], self.ombi_auth)
+            return OmbiMovie.from_id(request, entry)
 
         return OmbiTv.from_tvdb_id(self.config.get('url'), entry['tmdb_id'], self.ombi_auth)
 
@@ -420,23 +494,26 @@ class OmbiSet(MutableSet):
         raise plugin.PluginError('Error: an api_key or username and password must be configured')
 
     def get_request_list(self):
-        auth_header = self.ombi_auth()
-
-        base_url = self.config.get('url')
+        request = OmbiRequest(self.config)
 
         if self.config.get('type') in ['movies']:
-            url = f"{base_url}/api/v1/Request/movie"
+            endpoint = "/api/v1/Request/movie"
         elif self.config.get('type') in ['shows', 'seasons', 'episodes']:
-            url = f"{base_url}/api/v1/Request/tv"
+            endpoint = "/api/v1/Request/tv"
         else:
-            raise plugin.PluginError('Error: Unknown list type %s.' % (self.config.get('type')))
+            raise plugin.PluginError(
+                'Error: Unknown OmbiList type %s.' % (self.config.get('type'))
+            )
 
-        log.debug('Connecting to Ombi to retrieve request type : %s', self.config.get('type'))
+        log.debug('Connecting to Ombi to retrieve list of %s requests.', self.config.get('type'))
 
         try:
-            return requests.get(url, headers=auth_header).json()
-        except (RequestException, ValueError) as error:
-            raise plugin.PluginError(f"Unable to connect to Ombi at {url}. Error: {error}")
+            headers = request.create_json_headers()
+            return request.get(endpoint, headers=headers)
+        except (HTTPError, RequestException, ValueError) as error:
+            raise plugin.PluginError(
+                'Error retrieving list of %s requests', self.config.get('type')
+            ) from error
 
     def generate_movie_entry(self, parent_request):
         log.debug('Found: %s', parent_request.get('title'))
