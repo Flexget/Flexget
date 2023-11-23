@@ -308,7 +308,11 @@ class OmbiSet(MutableSet):
             'username': {'type': 'string'},
             'password': {'type': 'string'},
             'type': {'type': 'string', 'enum': ['shows', 'seasons', 'episodes', 'movies']},
-            'status': {'type': 'string', 'enum': ['approved', 'available', 'requested', 'denied']},
+            'status': {
+                'type': 'string',
+                'enum': ['approved', 'available', 'requested', 'denied'],
+                'default': 'requested',
+            },
             'include_year': {'type': 'boolean', 'default': False},
             'include_ep_title': {'type': 'boolean', 'default': False},
         },
@@ -343,6 +347,7 @@ class OmbiSet(MutableSet):
             return
 
         ombi_entry.mark_requested()
+        self.invalidate_cache()
 
     def __ior__(self, entries: List[Entry]):
         for entry in entries:
@@ -370,6 +375,8 @@ class OmbiSet(MutableSet):
 
         log.info(f"{entry['title']} was removed from ombi_list.")
 
+        self.invalidate_cache()
+
     def __isub__(self, entries: List[Entry]):
         for entry in entries:
             self.discard(entry)
@@ -390,69 +397,67 @@ class OmbiSet(MutableSet):
     def __contains__(self, entry):
         return self._find_entry(entry) is not None
 
-    def clear(self):
-        if self.items:
-            for item in self.items:
-                self.discard(item)
-            self._cached_items = None
+    def invalidate_cache(self):
+        self._items = None
 
     def get(self, entry):
         return self._find_entry(entry)
 
     @property
     def items(self) -> List[Entry]:
+        # If we have already cached the items, return them
         if self._items:
             return self._items
 
-        json = self.get_request_list()
+        # Get all the requested items from Ombi
+        requested_items = self.get_requested_items()
 
+        # _items can be set to None to invalidate the cache
         self._items = []
 
-        for parent_request in json:
-            if self.config.get('type') == 'movies':
-                # check that the request is approved unless user has selected to include everything
-                if (
-                    self.config.get('only_approved')
-                    and not parent_request.get('approved')
-                    or parent_request.get('approved')
-                ):
-                    # Always include items that are not available and only include available items if user has selected to do so
-                    if (
-                        self.config.get('include_available')
-                        and parent_request.get('available')
-                        or not parent_request.get('available')
-                    ):
-                        entry = self.generate_movie_entry(parent_request)
-                        self._items.append(entry)
-            elif self.config.get('type') == 'shows':
-                # Shows do not have approvals or available flags so include them all
-                entry = self.generate_tv_entry(parent_request)
-                self._items.append(entry)
-            else:
-                for child_request in parent_request["childRequests"]:
-                    for season in child_request["seasonRequests"]:
-                        # Seasons do not have approvals or available flags so include them all
-                        if self.config.get('type') == 'seasons':
-                            entry = self.generate_tv_entry(parent_request, child_request, season)
-                            if entry:
+        type = self.config['type']
+
+        if type == 'shows':
+            shows = [self.generate_tv_entry(show) for show in requested_items]
+            # Shows dont have approvals or available flags so include them all
+            self._items.extend(shows)
+            return self._items
+
+        if type == 'movies':
+            if self.config['status'] == 'requested':
+                movies = [self.generate_movie_entry(movie) for movie in requested_items]
+                self._items.extend(movies)
+                return self._items
+
+            filtered_items = [
+                movie for movie in requested_items if movie.get(self.config['status'])
+            ]
+            movies = [self.generate_movie_entry(movie) for movie in filtered_items]
+            self._items.extend(movies)
+            return self._items
+
+        # At this point only seasons and episodes are left
+
+        # This code should be refactored to be more readable
+        # but I'm not familiar enough with how flexget and Ombi
+        # handle seasons and episodes to do it right now
+        for parent_request in requested_items:
+            for child_request in parent_request["childRequests"]:
+                for season in child_request["seasonRequests"]:
+                    # Seasons do not have approvals or available flags so include them all
+                    if self.config['type'] == 'seasons':
+                        entry = self.generate_tv_entry(parent_request, child_request, season)
+                        if entry:
+                            self._items.append(entry)
+                    else:
+                        for episode in season['episodes']:
+                            if self.config['status'] == 'requested' or episode.get(
+                                self.config['status']
+                            ):
+                                entry = self.generate_tv_entry(
+                                    parent_request, child_request, season, episode
+                                )
                                 self._items.append(entry)
-                        else:
-                            for episode in season['episodes']:
-                                # check that the request is approved unless user has selected to include everything
-                                if (
-                                    self.config.get('only_approved')
-                                    and not episode.get('approved')
-                                    or episode.get('approved')
-                                ):
-                                    # Always include items that are not available and only include available items if user has selected to do so
-                                    if (
-                                        self.config.get('include_available')
-                                        and episode.get('available')
-                                    ) or not episode.get('available'):
-                                        entry = self.generate_tv_entry(
-                                            parent_request, child_request, season, episode
-                                        )
-                                        self._items.append(entry)
         return self._items
 
     @property
@@ -529,19 +534,22 @@ class OmbiSet(MutableSet):
 
         raise plugin.PluginError('Error: an api_key or username and password must be configured')
 
-    def get_request_list(self):
+    def get_requested_items(self) -> Dict[str, Any]:
+        """Get a list of all the items that have been requested in Ombi.
+
+        Raises:
+            plugin.PluginError: If an error occurs while retrieving the list of items.
+
+        Returns:
+            Dict[str, Any]: A dictionary containing all the items that have been requested in Ombi.
+        """
         request = OmbiRequest(self.config)
 
-        if self.config.get('type') in ['movies']:
-            endpoint = "/api/v1/Request/movie"
-        elif self.config.get('type') in ['shows', 'seasons', 'episodes']:
-            endpoint = "/api/v1/Request/tv"
-        else:
-            raise plugin.PluginError(
-                'Error: Unknown OmbiList type %s.' % (self.config.get('type'))
-            )
+        endpoint = (
+            "/api/v2/Requests/movie" if self.config['type'] == 'movies' else "/api/v2/Requests/tv"
+        )
 
-        log.debug('Connecting to Ombi to retrieve list of %s requests.', self.config.get('type'))
+        log.debug(f"Connecting to Ombi to retrieve list of {self.config['type']} requests.")
 
         try:
             headers = request.create_json_headers()
