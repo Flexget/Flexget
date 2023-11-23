@@ -16,6 +16,12 @@ from flexget.utils.requests import RequestException
 log = logger.bind(name='ombi_list')
 
 
+class ApiError(Exception):
+    """Exception raised when an API call fails."""
+
+    pass
+
+
 class OmbiRequest:
     def __init__(self, config: Dict[str, str]) -> None:
         self.base_url = config['url']
@@ -67,9 +73,23 @@ class OmbiRequest:
             method, url, params=params, headers=headers, raise_status=False, json=data
         )
 
-        response.raise_for_status()
+        result = response.json()
 
-        return response.json()
+        try:
+            response.raise_for_status()
+        except HTTPError as e:
+            log.debug(e)
+            if result.get('errors'):
+                log.debug(result.get('title'))
+                log.debug(result.get('errors'))
+
+            raise e
+
+        if result.get('isError'):
+            log.debug(result)
+            raise ApiError(result.get('errorMessage'))
+
+        return result
 
     def get(self, endpoint, **params):
         result = self._request('get', endpoint, **params)
@@ -111,7 +131,7 @@ class OmbiEntry:
             log.verbose(f"{self.data['title']} already requested in Ombi.")
             return
 
-        log.verbose(f"Requesting {self.data['title']} in Ombi.")
+        log.info(f"Requesting {self.data['title']} in Ombi.")
 
         api_endpoint = (
             "/api/v1/Request/movie" if self.entry_type == 'movie' else "api/v2/Requests/tv"
@@ -122,20 +142,15 @@ class OmbiEntry:
         headers = self._request.create_json_headers()
 
         try:
-            response = self._request.post(api_endpoint, data=data, headers=headers)
-
-            if response.get('isError'):
-                log.error(
-                    f"Failed to request {self.data['title']} because: {response['errorMessage']}"
-                )
+            response: Dict[str, Any] = self._request.post(api_endpoint, data=data, headers=headers)
 
             self.data['requestId'] = response['requestId']
 
-            log.verbose(f"{self.data['title']} was requested in Ombi.")
+            log.info(f"{self.data['title']} was requested in Ombi.")
             return
-        except HTTPError as e:
+        except (HTTPError, ApiError) as e:
             log.error(f"Failed to mark {self.data['title']} as requested in Ombi.")
-            log.debug(e)
+            log.verbose(e)
             return
 
     def mark_available(self):
@@ -145,7 +160,7 @@ class OmbiEntry:
             log.verbose(f"{self.data['title']} already available in Ombi.")
             return
 
-        log.verbose(f"Marking {self.data['title']} as available in Ombi.")
+        log.info(f"Marking {self.data['title']} as available in Ombi.")
 
         api_endpoint = (
             "api/v1/Request/movie/available"
@@ -158,16 +173,11 @@ class OmbiEntry:
         headers = self._request.create_json_headers()
 
         try:
-            response = self._request.post(api_endpoint, data=data, headers=headers)
+            self._request.post(api_endpoint, data=data, headers=headers)
 
-            if response.get('isError'):
-                log.error(
-                    f"Failed to mark {self.data['title']} as available because: {response['errorMessage']}"
-                )
-
-            log.verbose(f"{self.data['title']} has been marked available.")
+            log.info(f"{self.data['title']} has been marked available.")
             return
-        except HTTPError as e:
+        except (HTTPError, ApiError) as e:
             log.error(f"Failed to mark {self.data['title']} as available in Ombi.")
             log.debug(e)
             return
@@ -196,8 +206,8 @@ class OmbiMovie(OmbiEntry):
             # then the theMovieDbId field will be blank for some reason...
 
             return OmbiMovie(request, data)
-        except HTTPError as e:
-            log.error(f"Failed to get OMBI movie by IMDB ID: {imdb_id}")
+        except (HTTPError, ApiError) as e:
+            log.error(f"Failed to get Ombi movie by imdb_id: {imdb_id}")
             log.debug(e)
             return None
 
@@ -205,16 +215,20 @@ class OmbiMovie(OmbiEntry):
     def from_tmdb_id(cls, request: OmbiRequest, tmdb_id: str):
         """Create a Ombi Entry from an TMDB ID."""
 
-        headers = request
+        headers = request.create_json_headers()
 
         endpoint = f"/api/v2/Search/{cls.entry_type}/{tmdb_id}"
 
         try:
             data = request.get(endpoint, headers=headers)
 
+            # There is a bug in Ombi where if you get a movie by its imdb_id
+            # then the theMovieDbId field will be blank for some reason...
+            data['theMovieDbId'] = tmdb_id
+
             return OmbiMovie(request, data)
-        except HTTPError as e:
-            log.error(f"Failed to get OMBI movie by TMDB ID: {tmdb_id}")
+        except (HTTPError, ApiError) as e:
+            log.error(f"Failed to get Ombi movie by tmdb_id: {tmdb_id}")
             log.debug(e)
             return None
 
@@ -222,14 +236,14 @@ class OmbiMovie(OmbiEntry):
     def from_id(cls, request: OmbiRequest, entry: Entry):
         """Create a Ombi Entry from an OMBI ID."""
 
-        if entry.get('imdb_id'):
-            return cls.from_imdb_id(request, entry['imdb_id'])
-
         if entry.get('tmdb_id'):
             return cls.from_tmdb_id(request, entry['tmdb_id'])
 
+        if entry.get('imdb_id'):
+            return cls.from_imdb_id(request, entry['imdb_id'])
+
         raise plugin.PluginError(
-            f"Error: Unable to find required ID to lookup OMBI {cls.entry_type}."
+            f"Error: Unable to find required ID to lookup Ombi {cls.entry_type}."
         )
 
 
@@ -318,8 +332,6 @@ class OmbiSet(MutableSet):
             return
 
         ombi_entry.mark_requested()
-
-        log.info(f"{entry['title']} was added to ombi_list.")
 
     def __ior__(self, entries: List[Entry]):
         for entry in entries:
@@ -523,7 +535,7 @@ class OmbiSet(MutableSet):
         try:
             headers = request.create_json_headers()
             return request.get(endpoint, headers=headers)
-        except (HTTPError, RequestException, ValueError) as error:
+        except (HTTPError, ApiError) as error:
             raise plugin.PluginError(
                 'Error retrieving list of %s requests', self.config.get('type')
             ) from error
