@@ -121,21 +121,22 @@ class OmbiEntry:
 
         headers = self._request.create_json_headers()
 
-        # Maybe we need to try/catch this and throw a plugin exception?
-        response = self._request.post(api_endpoint, data=data, headers=headers)
+        try:
+            response = self._request.post(api_endpoint, data=data, headers=headers)
 
-        if not response:
-            log.error(f"Failed to request {self.data['title']} in OMBI.")
+            if response.get('isError'):
+                log.error(
+                    f"Failed to request {self.data['title']} because: {response['errorMessage']}"
+                )
+
+            self.data['requestId'] = response['requestId']
+
+            log.verbose(f"{self.data['title']} was requested in Ombi.")
             return
-
-        if response.get('isError'):
-            log.error(
-                f"Failed to request {self.data['title']} because: {response['errorMessage']}"
-            )
-
-        self.data['requestId'] = response['requestId']
-
-        log.verbose(f"{self.data['title']} has been requested.")
+        except HTTPError as e:
+            log.error(f"Failed to mark {self.data['title']} as requested in Ombi.")
+            log.debug(e)
+            return
 
     def mark_available(self):
         """Mark an entry in Ombi as avaliable."""
@@ -155,19 +156,21 @@ class OmbiEntry:
         data = {"id": self.data["requestId"]}
 
         headers = self._request.create_json_headers()
-        # Maybe we need to try/catch this and throw a plugin exception?
-        response = self._request.post(api_endpoint, data=data, headers=headers)
 
-        if not response:
-            log.error(f"Failed to mark {self.data['title']} as available in OMBI.")
+        try:
+            response = self._request.post(api_endpoint, data=data, headers=headers)
+
+            if response.get('isError'):
+                log.error(
+                    f"Failed to mark {self.data['title']} as available because: {response['errorMessage']}"
+                )
+
+            log.verbose(f"{self.data['title']} has been marked available.")
             return
-
-        if response.get('isError'):
-            log.error(
-                f"Failed to mark {self.data['title']} as available because: {response['errorMessage']}"
-            )
-
-        log.verbose(f"{self.data['title']} has been marked available.")
+        except HTTPError as e:
+            log.error(f"Failed to mark {self.data['title']} as available in Ombi.")
+            log.debug(e)
+            return
 
 
 class OmbiMovie(OmbiEntry):
@@ -186,12 +189,17 @@ class OmbiMovie(OmbiEntry):
 
         endpoint = f"api/v2/Search/{cls.entry_type}/imdb/{imdb_id}"
 
-        data = request.get(endpoint, headers=headers)
+        try:
+            data = request.get(endpoint, headers=headers)
 
-        # Their is a bug in OMBI where if you get a movie by its IMDB_ID
-        # then the theMovieDbId field will be blank for some reason...
+            # There is a bug in Ombi where if you get a movie by its imdb_id
+            # then the theMovieDbId field will be blank for some reason...
 
-        return OmbiMovie(request, data)
+            return OmbiMovie(request, data)
+        except HTTPError as e:
+            log.error(f"Failed to get OMBI movie by IMDB ID: {imdb_id}")
+            log.debug(e)
+            return None
 
     @classmethod
     def from_tmdb_id(cls, request: OmbiRequest, tmdb_id: str):
@@ -201,9 +209,14 @@ class OmbiMovie(OmbiEntry):
 
         endpoint = f"/api/v2/Search/{cls.entry_type}/{tmdb_id}"
 
-        data = request.get(endpoint, headers=headers)
+        try:
+            data = request.get(endpoint, headers=headers)
 
-        return OmbiMovie(request, data)
+            return OmbiMovie(request, data)
+        except HTTPError as e:
+            log.error(f"Failed to get OMBI movie by TMDB ID: {tmdb_id}")
+            log.debug(e)
+            return None
 
     @classmethod
     def from_id(cls, request: OmbiRequest, entry: Entry):
