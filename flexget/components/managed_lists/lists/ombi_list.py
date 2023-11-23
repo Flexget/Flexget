@@ -2,7 +2,7 @@
 """
 
 from collections.abc import MutableSet
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Literal, Optional, TypedDict
 
 from loguru import logger
 from requests import HTTPError
@@ -22,13 +22,26 @@ class ApiError(Exception):
     pass
 
 
+class Config(TypedDict, total=False):
+    """The config schema for the Ombi managed list."""
+
+    url: str
+    api_key: Optional[str]
+    username: Optional[str]
+    password: Optional[str]
+    type: Literal['shows', 'seasons', 'episodes', 'movies']
+    status: Literal['approved', 'available', 'requested', 'denied']
+    include_year: bool
+    include_ep_title: bool
+
+
 class OmbiRequest:
-    def __init__(self, config: Dict[str, str]) -> None:
+    def __init__(self, config: Config) -> None:
         self.base_url = config['url']
         # We dont really need the whole config, just the auth part
         # but I'm saving it for now, in case we need to configure
         # token refresh or something
-        self.config = config
+        self.config: Config = config
         self.auth_header = self._create_auth_header()
 
     def _create_auth_header(self):
@@ -295,8 +308,7 @@ class OmbiSet(MutableSet):
             'username': {'type': 'string'},
             'password': {'type': 'string'},
             'type': {'type': 'string', 'enum': ['shows', 'seasons', 'episodes', 'movies']},
-            'only_approved': {'type': 'boolean', 'default': True},
-            'include_available': {'type': 'boolean', 'default': False},
+            'status': {'type': 'string', 'enum': ['approved', 'available', 'requested', 'denied']},
             'include_year': {'type': 'boolean', 'default': False},
             'include_ep_title': {'type': 'boolean', 'default': False},
         },
@@ -310,9 +322,8 @@ class OmbiSet(MutableSet):
         return False
 
     def __init__(self, config: Dict[str, Any]):
-        self.config = config
-        self._items = None
-        self._cached_items = None
+        self.config: Config = config
+        self._items: Optional[List[Entry]] = None
 
     def __iter__(self):
         return iter(self.items)
