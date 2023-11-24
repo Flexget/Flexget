@@ -156,7 +156,7 @@ class OmbiEntry:
         if self.data.get('denied'):
             return True, 'denied'
 
-        return True
+        return False, 'unrequested'
 
     def mark_available(self):
         """Mark an entry in Ombi as avaliable."""
