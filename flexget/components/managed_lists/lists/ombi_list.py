@@ -186,6 +186,60 @@ class OmbiEntry:
             log.debug(e)
             return
 
+    def mark_deleted(self):
+        """Mark an entry in Ombi as deleted."""
+
+        if not self.data['requested']:
+            log.verbose(f"{self.data['title']} is not requested in Ombi, unable to delete it.")
+            return
+
+        log.info(f"Marking {self.data['title']} as deleted in Ombi.")
+
+        api_endpoint = f"api/v1/Request/{self.entry_type}/{self.data['requestId']}"
+
+        headers = self._request.create_json_headers()
+
+        try:
+            self._request.delete(api_endpoint, headers=headers)
+
+            log.info(f"{self.data['title']} has been marked deleted.")
+            return
+        except (HTTPError, ApiError) as e:
+            log.error(f"Failed to mark {self.data['title']} as deleted in Ombi.")
+            log.debug(e)
+            return
+
+    def mark_unavailable(self):
+        """Mark an entry in Ombi as unavaliable."""
+
+        if not self.data['available']:
+            log.verbose(f"{self.data['title']} already unavailable in Ombi.")
+            return
+
+        if not self.data['requested']:
+            log.verbose(
+                f"{self.data['title']} is not requested in Ombi, unable to mark unavailable."
+            )
+            return
+
+        log.info(f"Marking {self.data['title']} as unavailable in Ombi.")
+
+        api_endpoint = f"api/v1/Request/{self.entry_type}/unavailable"
+
+        data = {"id": self.data["requestId"]}
+
+        headers = self._request.create_json_headers()
+
+        try:
+            self._request.post(api_endpoint, data=data, headers=headers)
+
+            log.info(f"{self.data['title']} has been marked unavailable.")
+            return
+        except (HTTPError, ApiError) as e:
+            log.error(f"Failed to mark {self.data['title']} as unavailable in Ombi.")
+            log.debug(e)
+            return
+
     def mark_denied(self):
         """Mark an entry in Ombi as denied."""
 
@@ -203,7 +257,7 @@ class OmbiEntry:
         headers = self._request.create_json_headers()
 
         try:
-            self._request.post(api_endpoint, data=data, headers=headers)
+            self._request.put(api_endpoint, data=data, headers=headers)
 
             log.info(f"{self.data['title']} has been marked denied.")
             return
@@ -437,6 +491,11 @@ class OmbiSet(MutableSet):
                 'enum': ['approved', 'available', 'requested', 'denied'],
                 'default': 'requested',
             },
+            'on_remove': {
+                'type': 'string',
+                'enum': ['unavailable', 'denied', 'deleted'],
+                'default': 'deleted',
+            },
             'include_year': {'type': 'boolean', 'default': False},
             'include_ep_title': {'type': 'boolean', 'default': False},
         },
@@ -502,6 +561,9 @@ class OmbiSet(MutableSet):
             entry (Entry): An item from a task.
         """
 
+        # I'm wondering if we should be checking if the entry is already
+        # in the list of _items first.
+
         log.info(f"Removing {entry['title']} from ombi_list.")
 
         log.debug(f"Getting OMBI entry for {entry['title']}.")
@@ -512,12 +574,19 @@ class OmbiSet(MutableSet):
             log.error(f"Failed to find OMBI entry for {entry['title']}.")
             return
 
-        ombi_entry.mark_requested()
-        ombi_entry.mark_available()
+        unmark_status = getattr(ombi_entry, f"mark_{self.config['on_remove']}", None)
 
-        log.info(f"{entry['title']} was removed from ombi_list.")
+        if not unmark_status:
+            log.error(
+                f"Failed to find correct method to mark {entry['title']} as {self.config['on_remove']}."
+            )
+            return
+
+        unmark_status()
 
         self.invalidate_cache()
+
+        return
 
     def __isub__(self, entries: list[Entry]):
         for entry in entries:
