@@ -2,7 +2,7 @@
 """
 
 from collections.abc import MutableSet
-from typing import Any, Callable, Dict, List, Literal, Optional, TypedDict
+from typing import Any, Callable, Dict, List, Literal, Optional, Tuple, TypedDict, Union
 
 from loguru import logger
 from requests import HTTPError
@@ -137,18 +137,130 @@ class OmbiEntry:
         self.entry_type = entry_type
         self.data = data
 
+    def already_requested(self) -> Tuple[bool, str]:
+        """Check if an entry in Ombi has already been requested.
+
+        Returns:
+            Tuple[bool, str]: A tuple containing a boolean indicating if the entry has already been requested and a string indicating the status of the entry.
+        """
+
+        if self.data['requested']:
+            return True, 'requested'
+
+        if self.data['available']:
+            return True, 'available'
+
+        if self.data.get('approved'):
+            return True, 'approved'
+
+        if self.data.get('denied'):
+            return True, 'denied'
+
+        return True
+
+    def mark_available(self):
+        """Mark an entry in Ombi as avaliable."""
+
+        if self.data['available']:
+            log.verbose(f"{self.data['title']} already available in Ombi.")
+            return
+
+        log.info(f"Marking {self.data['title']} as available in Ombi.")
+
+        api_endpoint = f"api/v1/Request/{self.entry_type}/available"
+
+        data = {"id": self.data["requestId"]}
+
+        headers = self._request.create_json_headers()
+
+        try:
+            self._request.post(api_endpoint, data=data, headers=headers)
+
+            log.info(f"{self.data['title']} has been marked available.")
+            return
+        except (HTTPError, ApiError) as e:
+            log.error(f"Failed to mark {self.data['title']} as available in Ombi.")
+            log.debug(e)
+            return
+
+    def mark_denied(self):
+        """Mark an entry in Ombi as denied."""
+
+        if self.data.get('denied'):
+            log.verbose(f"{self.data['title']} already denied in Ombi.")
+            return
+
+        log.info(f"Marking {self.data['title']} as denied in Ombi.")
+
+        api_endpoint = f"api/v1/Request/{self.entry_type}/deny"
+
+        # In the future, we might want to allow the user to specify a reason.
+        data = {"id": self.data["requestId"], "reason": "Denied by Flexget automation."}
+
+        headers = self._request.create_json_headers()
+
+        try:
+            self._request.post(api_endpoint, data=data, headers=headers)
+
+            log.info(f"{self.data['title']} has been marked denied.")
+            return
+        except (HTTPError, ApiError) as e:
+            log.error(f"Failed to mark {self.data['title']} as denied in Ombi.")
+            log.debug(e)
+            return
+
+    def mark_approved(self):
+        """Mark an entry in Ombi as approved."""
+
+        if self.data.get('approved'):
+            log.verbose(f"{self.data['title']} already approved in Ombi.")
+            return
+
+        log.info(f"Marking {self.data['title']} as approved in Ombi.")
+
+        api_endpoint = f"api/v1/Request/{self.entry_type}/approve"
+
+        # In the future, we might want to allow the user to specify a reason.
+        data = {"id": self.data["requestId"]}
+
+        headers = self._request.create_json_headers()
+
+        try:
+            self._request.post(api_endpoint, data=data, headers=headers)
+
+            log.info(f"{self.data['title']} has been marked approved.")
+            return
+        except (HTTPError, ApiError) as e:
+            log.error(f"Failed to mark {self.data['title']} as approved in Ombi.")
+            log.debug(e)
+            return
+
+
+class OmbiMovie(OmbiEntry):
+    """Manage a Movie entry in Ombi."""
+
+    entry_type = 'movie'
+
+    def __init__(self, request: OmbiRequest, data: Dict[str, Any]) -> None:
+        super().__init__(request, self.entry_type, data)
+
     def mark_requested(self):
         """Mark an entry in Ombi as being requested."""
 
-        if self.data['requested']:
-            log.verbose(f"{self.data['title']} already requested in Ombi.")
+        # A status such as approved, denied and avaiable are a sub status of requested.
+        # Which means you can not mark an entry as approved, denied or available without first marking it as requested.
+        # You also can not mark an entry as requested if it is already approved, denied or available.
+        already_requested, status = self.already_requested()
+
+        if already_requested:
+            log.verbose(
+                f"Not marking {self.data['title']} as requested in Ombi because it is already {status}."
+            )
             return
 
         log.info(f"Requesting {self.data['title']} in Ombi.")
 
-        api_endpoint = (
-            "/api/v1/Request/movie" if self.entry_type == 'movie' else "api/v2/Requests/tv"
-        )
+        api_endpoint = f"api/v1/Request/{self.entry_type}"
 
         data = {"theMovieDbId": self.data["theMovieDbId"]}
 
@@ -165,44 +277,6 @@ class OmbiEntry:
             log.error(f"Failed to mark {self.data['title']} as requested in Ombi.")
             log.verbose(e)
             return
-
-    def mark_available(self):
-        """Mark an entry in Ombi as avaliable."""
-
-        if self.data['available']:
-            log.verbose(f"{self.data['title']} already available in Ombi.")
-            return
-
-        log.info(f"Marking {self.data['title']} as available in Ombi.")
-
-        api_endpoint = (
-            "api/v1/Request/movie/available"
-            if self.entry_type == 'movie'
-            else "api/v1/Request/tv/available"
-        )
-
-        data = {"id": self.data["requestId"]}
-
-        headers = self._request.create_json_headers()
-
-        try:
-            self._request.post(api_endpoint, data=data, headers=headers)
-
-            log.info(f"{self.data['title']} has been marked available.")
-            return
-        except (HTTPError, ApiError) as e:
-            log.error(f"Failed to mark {self.data['title']} as available in Ombi.")
-            log.debug(e)
-            return
-
-
-class OmbiMovie(OmbiEntry):
-    """Manage a Movie entry in Ombi."""
-
-    entry_type = 'movie'
-
-    def __init__(self, request: OmbiRequest, data: Dict[str, Any]) -> None:
-        super().__init__(request, self.entry_type, data)
 
     @classmethod
     def from_imdb_id(cls, request: OmbiRequest, imdb_id: str):
@@ -261,6 +335,7 @@ class OmbiMovie(OmbiEntry):
 
 
 # In the future this might need split out into 3 classes (Show, Season, Episode)
+# for right now, each OmbiTv entry is supposed to represent a single Show, Season, or Episode
 class OmbiTv(OmbiEntry):
     """Manage a TV entry in Ombi."""
 
@@ -270,6 +345,59 @@ class OmbiTv(OmbiEntry):
         self, base_url: str, auth: Callable[[], Dict[str, str]], data: Dict[str, Any]
     ) -> None:
         super().__init__(base_url, auth, self.entry_type, data)
+
+    def mark_requested(self):
+        """Mark an entry in Ombi as being requested."""
+
+        if self.data['requested']:
+            log.verbose(f"{self.data['title']} already requested in Ombi.")
+            return
+
+        log.info(f"Requesting {self.data['title']} in Ombi.")
+
+        api_endpoint = "api/v2/Requests/tv"
+
+        data = {"theMovieDbId": self.data["theMovieDbId"]}
+
+        headers = self._request.create_json_headers()
+
+        # I'm not sure what this will even request... If the current entry is a show will it request the whole show?
+        # If its a season will it request the whole season? If its an episode will it request only the episode?
+        # Here is an example payload from the Ombi API docs. Note even TV shows use tmdb_id instead of tvdb_id
+        # {
+        #     "theMovieDbId": 0,
+        #     "languageCode": "string",
+        #     "source": 0,
+        #     "requestAll": true,
+        #     "latestSeason": true,
+        #     "languageProfile": 0,
+        #     "firstSeason": true,
+        #     "seasons": [
+        #         {
+        #         "seasonNumber": 0,
+        #         "episodes": [
+        #             {
+        #             "episodeNumber": 0
+        #             }
+        #         ]
+        #         }
+        #     ],
+        #     "requestOnBehalf": "string",
+        #     "rootFolderOverride": 0,
+        #     "qualityPathOverride": 0
+        # }
+
+        try:
+            response: Dict[str, Any] = self._request.post(api_endpoint, data=data, headers=headers)
+
+            self.data['requestId'] = response['requestId']
+
+            log.info(f"{self.data['title']} was requested in Ombi.")
+            return
+        except (HTTPError, ApiError) as e:
+            log.error(f"Failed to mark {self.data['title']} as requested in Ombi.")
+            log.verbose(e)
+            return
 
     @classmethod
     def from_tvdb_id(cls, base_url: str, tmdb_id: str, auth: Callable[[], Dict[str, str]]):
@@ -336,7 +464,7 @@ class OmbiSet(MutableSet):
         return len(self.items)
 
     def add(self, entry: Entry):
-        log.info(f"Adding {entry['title']} to ombi_list.")
+        log.info(f"Adding {entry['title']} to Ombi as {self.config['status']}.")
 
         log.debug(f"Getting OMBI entry for {entry['title']}.")
 
@@ -346,7 +474,25 @@ class OmbiSet(MutableSet):
             log.error(f"Failed to find OMBI entry for {entry['title']}.")
             return
 
+        # To set a status like approved or denied, we need to mark the entry as requested first
         ombi_entry.mark_requested()
+
+        if self.config['status'] == 'requested':
+            self.invalidate_cache()
+            return
+
+        # Get the correct method, such as mark_approved or mark_denied
+        mark_status = getattr(ombi_entry, f"mark_{self.config['status']}", None)
+
+        if not mark_status:
+            log.error(
+                f"Failed to find correct method to mark {entry['title']} as {self.config['status']}."
+            )
+            return
+
+        # Mark the entry with the correct status
+        mark_status()
+
         self.invalidate_cache()
 
     def __ior__(self, entries: List[Entry]):
@@ -468,7 +614,7 @@ class OmbiSet(MutableSet):
 
     # -- Public interface ends here -- #
 
-    def _get_ombi_entry(self, entry: Entry) -> Optional[OmbiEntry]:
+    def _get_ombi_entry(self, entry: Entry) -> Union[OmbiMovie, OmbiTv, None]:
         entry_type: str = self.config['type']
 
         request = OmbiRequest(self.config)
