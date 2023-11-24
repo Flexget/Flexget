@@ -1,11 +1,13 @@
 """Create a Ombi managed list.
 """
+from __future__ import annotations
 
 from collections.abc import MutableSet
-from typing import Any, Callable, Dict, List, Literal, Optional, Tuple, TypedDict, Union
+from typing import Any, Callable, Literal
 
 from loguru import logger
 from requests import HTTPError
+from typing_extensions import NotRequired, TypedDict  # for Python <3.11 with (Not)Required
 
 from flexget import plugin
 from flexget.entry import Entry
@@ -22,15 +24,16 @@ class ApiError(Exception):
     pass
 
 
-class Config(TypedDict, total=False):
+class Config(TypedDict):
     """The config schema for the Ombi managed list."""
 
     url: str
-    api_key: Optional[str]
-    username: Optional[str]
-    password: Optional[str]
+    api_key: NotRequired[str]
+    username: NotRequired[str]
+    password: NotRequired[str]
     type: Literal['shows', 'seasons', 'episodes', 'movies']
     status: Literal['approved', 'available', 'requested', 'denied']
+    on_remove: NotRequired[Literal['unavailable', 'denied', 'deleted']]
     include_year: bool
     include_ep_title: bool
 
@@ -76,7 +79,7 @@ class OmbiRequest:
 
         url = self.base_url + endpoint
 
-        headers: Dict[str, str] = params.pop('headers', {})
+        headers: dict[str, str] = params.pop('headers', {})
         data = params.pop('data', None)
 
         # add auth header
@@ -131,13 +134,13 @@ class OmbiEntry:
         self,
         request: OmbiRequest,
         entry_type: str,
-        data: Dict[str, Any],
+        data: dict[str, Any],
     ) -> None:
         self._request = request
         self.entry_type = entry_type
         self.data = data
 
-    def already_requested(self) -> Tuple[bool, str]:
+    def already_requested(self) -> tuple[bool, str]:
         """Check if an entry in Ombi has already been requested.
 
         Returns:
@@ -241,7 +244,7 @@ class OmbiMovie(OmbiEntry):
 
     entry_type = 'movie'
 
-    def __init__(self, request: OmbiRequest, data: Dict[str, Any]) -> None:
+    def __init__(self, request: OmbiRequest, data: dict[str, Any]) -> None:
         super().__init__(request, self.entry_type, data)
 
     def mark_requested(self):
@@ -268,7 +271,7 @@ class OmbiMovie(OmbiEntry):
         headers = self._request.create_json_headers()
 
         try:
-            response: Dict[str, Any] = self._request.post(api_endpoint, data=data, headers=headers)
+            response: dict[str, Any] = self._request.post(api_endpoint, data=data, headers=headers)
 
             self.data['requestId'] = response['requestId']
 
@@ -339,7 +342,7 @@ class OmbiTv(OmbiEntry):
     entry_type = 'tv'
 
     def __init__(
-        self, base_url: str, auth: Callable[[], Dict[str, str]], data: Dict[str, Any]
+        self, base_url: str, auth: Callable[[], dict[str, str]], data: dict[str, Any]
     ) -> None:
         super().__init__(base_url, auth, self.entry_type, data)
 
@@ -385,7 +388,7 @@ class OmbiTv(OmbiEntry):
         # }
 
         try:
-            response: Dict[str, Any] = self._request.post(api_endpoint, data=data, headers=headers)
+            response: dict[str, Any] = self._request.post(api_endpoint, data=data, headers=headers)
 
             self.data['requestId'] = response['requestId']
 
@@ -397,7 +400,7 @@ class OmbiTv(OmbiEntry):
             return
 
     @classmethod
-    def from_tvdb_id(cls, base_url: str, tmdb_id: str, auth: Callable[[], Dict[str, str]]):
+    def from_tvdb_id(cls, base_url: str, tmdb_id: str, auth: Callable[[], dict[str, str]]):
         """Create a Ombi Entry from an TVDB ID."""
 
         headers = {'Content-Type': 'application/json', 'Accept': 'application/json'}
@@ -446,9 +449,9 @@ class OmbiSet(MutableSet):
     def immutable(self):
         return False
 
-    def __init__(self, config: Dict[str, Any]):
+    def __init__(self, config: dict[str, Any]):
         self.config: Config = config
-        self._items: Optional[List[Entry]] = None
+        self._items: list[Entry] | None = None
 
     def __iter__(self):
         return iter(self.items)
@@ -488,7 +491,7 @@ class OmbiSet(MutableSet):
 
         self.invalidate_cache()
 
-    def __ior__(self, entries: List[Entry]):
+    def __ior__(self, entries: list[Entry]):
         for entry in entries:
             self.add(entry)
 
@@ -516,7 +519,7 @@ class OmbiSet(MutableSet):
 
         self.invalidate_cache()
 
-    def __isub__(self, entries: List[Entry]):
+    def __isub__(self, entries: list[Entry]):
         for entry in entries:
             self.discard(entry)
 
@@ -543,7 +546,7 @@ class OmbiSet(MutableSet):
         return self._find_entry(entry)
 
     @property
-    def items(self) -> List[Entry]:
+    def items(self) -> list[Entry]:
         # If we have already cached the items, return them
         if self._items:
             return self._items
@@ -607,7 +610,7 @@ class OmbiSet(MutableSet):
 
     # -- Public interface ends here -- #
 
-    def _get_ombi_entry(self, entry: Entry) -> Union[OmbiMovie, OmbiTv, None]:
+    def _get_ombi_entry(self, entry: Entry) -> OmbiMovie | OmbiTv | None:
         entry_type: str = self.config['type']
 
         request = OmbiRequest(self.config)
@@ -650,7 +653,7 @@ class OmbiSet(MutableSet):
         except (RequestException, ValueError) as e:
             raise plugin.PluginError('Ombi username and password login failed: %s' % e)
 
-    def ombi_auth(self) -> Dict[str, str]:
+    def ombi_auth(self) -> dict[str, str]:
         """Returns a dictionary that contains authrization headers for the OMBI API.
 
         Raises:
@@ -673,7 +676,7 @@ class OmbiSet(MutableSet):
 
         raise plugin.PluginError('Error: an api_key or username and password must be configured')
 
-    def get_requested_items(self) -> Dict[str, Any]:
+    def get_requested_items(self) -> dict[str, Any]:
         """Get a list of all the items that have been requested in Ombi.
 
         Raises:
