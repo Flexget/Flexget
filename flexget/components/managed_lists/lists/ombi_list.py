@@ -262,7 +262,8 @@ class OmbiMovie(OmbiEntry):
 
         api_endpoint = f"api/v1/Request/{self.entry_type}"
 
-        data = {"theMovieDbId": self.data["theMovieDbId"]}
+        # In Ombi an Items ID is also its theMovieDbId
+        data = {"theMovieDbId": self.data["id"]}
 
         headers = self._request.create_json_headers()
 
@@ -309,10 +310,6 @@ class OmbiMovie(OmbiEntry):
         try:
             data = request.get(endpoint, headers=headers)
 
-            # There is a bug in Ombi where if you get a movie by its imdb_id
-            # then the theMovieDbId field will be blank for some reason...
-            data['theMovieDbId'] = tmdb_id
-
             return OmbiMovie(request, data)
         except (HTTPError, ApiError) as e:
             log.error(f"Failed to get Ombi movie by tmdb_id: {tmdb_id}")
@@ -357,7 +354,7 @@ class OmbiTv(OmbiEntry):
 
         api_endpoint = "api/v2/Requests/tv"
 
-        data = {"theMovieDbId": self.data["theMovieDbId"]}
+        data = {"theMovieDbId": self.data["id"]}
 
         headers = self._request.create_json_headers()
 
@@ -416,10 +413,6 @@ class OmbiTv(OmbiEntry):
             return None
 
         data = response.json()
-
-        # Their is a bug in OMBI where if you get a movie by its TMDB ID
-        # then the theMovieDbId field will be blank for some reason...
-        data['theMovieDbId'] = tmdb_id
 
         return OmbiTv(base_url, auth, data)
 
@@ -717,7 +710,7 @@ class OmbiSet(MutableSet):
             title=self.generate_title(parent_request),
             url=simdburl,
             imdb_id=parent_request.get('imdbId'),
-            tmdb_id=parent_request.get('theMovieDbId'),
+            tmdb_id=parent_request.get('id'),
             movie_name=parent_request.get('title'),
             movie_year=int(parent_request.get('releaseDate')[0:4]),
             ombi_request_id=parent_request.get('id'),
