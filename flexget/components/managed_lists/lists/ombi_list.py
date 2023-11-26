@@ -104,9 +104,10 @@ class OmbiRequest:
 
             raise e
 
-        if result.get('isError'):
-            log.debug(result)
-            raise ApiError(result.get('errorMessage'))
+        if isinstance(result, dict):
+            if result.get('isError'):
+                log.debug(result)
+                raise ApiError(result.get('errorMessage'))
 
         return result
 
