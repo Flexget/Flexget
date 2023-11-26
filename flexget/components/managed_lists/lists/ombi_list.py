@@ -144,6 +144,19 @@ class OmbiEntry:
         self.entry_type = entry_type
         self.data = data
 
+    @property
+    def requestId(self) -> str:
+        if "requestId" in self.data:
+            return self.data['requestId']
+
+        new_data = self._request.get(f"/api/v2/Search/{self.entry_type}/{self.data['id']}")
+        self.data = new_data
+        return self.data['requestId']
+
+    @requestId.setter
+    def requestId(self, value: str):
+        self.data['requestId'] = value
+
     def already_requested(self) -> tuple[bool, str]:
         """Check if an entry in Ombi has already been requested.
 
@@ -176,7 +189,7 @@ class OmbiEntry:
 
         api_endpoint = f"api/v1/Request/{self.entry_type}/available"
 
-        data = {"id": self.data["requestId"]}
+        data = {"id": self.requestId}
 
         headers = self._request.create_json_headers()
 
@@ -199,7 +212,7 @@ class OmbiEntry:
 
         log.info(f"Marking {self.data['title']} as deleted in Ombi.")
 
-        api_endpoint = f"api/v1/Request/{self.entry_type}/{self.data['requestId']}"
+        api_endpoint = f"api/v1/Request/{self.entry_type}/{self.requestId}"
 
         headers = self._request.create_json_headers()
 
@@ -230,7 +243,7 @@ class OmbiEntry:
 
         api_endpoint = f"api/v1/Request/{self.entry_type}/unavailable"
 
-        data = {"id": self.data["requestId"]}
+        data = {"id": self.requestId}
 
         headers = self._request.create_json_headers()
 
@@ -256,7 +269,7 @@ class OmbiEntry:
         api_endpoint = f"api/v1/Request/{self.entry_type}/deny"
 
         # In the future, we might want to allow the user to specify a reason.
-        data = {"id": self.data["requestId"], "reason": "Denied by Flexget automation."}
+        data = {"id": self.requestId, "reason": "Denied by Flexget automation."}
 
         headers = self._request.create_json_headers()
 
@@ -282,7 +295,7 @@ class OmbiEntry:
         api_endpoint = f"api/v1/Request/{self.entry_type}/approve"
 
         # In the future, we might want to allow the user to specify a reason.
-        data = {"id": self.data["requestId"]}
+        data = {"id": self.requestId}
 
         headers = self._request.create_json_headers()
 
@@ -331,7 +344,7 @@ class OmbiMovie(OmbiEntry):
         try:
             response: dict[str, Any] = self._request.post(api_endpoint, data=data, headers=headers)
 
-            self.data['requestId'] = response['requestId']
+            self.requestId = response['requestId']
 
             log.info(f"{self.data['title']} was requested in Ombi.")
             return
@@ -448,7 +461,7 @@ class OmbiTv(OmbiEntry):
         try:
             response: dict[str, Any] = self._request.post(api_endpoint, data=data, headers=headers)
 
-            self.data['requestId'] = response['requestId']
+            self.requestId = response['requestId']
 
             log.info(f"{self.data['title']} was requested in Ombi.")
             return
@@ -746,7 +759,7 @@ class OmbiSet(MutableSet):
 
         raise plugin.PluginError('Error: an api_key or username and password must be configured')
 
-    def get_requested_items(self) -> dict[str, Any]:
+    def get_requested_items(self) -> list[OmbiEntry]:
         """Get a list of all the items that have been requested in Ombi.
 
         Raises:
