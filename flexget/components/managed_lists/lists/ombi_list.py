@@ -35,7 +35,7 @@ class Config(TypedDict):
     username: NotRequired[str]
     password: NotRequired[str]
     type: Literal['shows', 'seasons', 'episodes', 'movies']
-    status: Literal['approved', 'available', 'requested', 'denied']
+    status: Literal['approved', 'available', 'requested', 'denied', 'all']
     on_remove: NotRequired[Literal['unavailable', 'denied', 'deleted']]
     include_year: bool
     include_ep_title: bool
@@ -505,8 +505,8 @@ class OmbiSet(MutableSet):
             'type': {'type': 'string', 'enum': ['shows', 'seasons', 'episodes', 'movies']},
             'status': {
                 'type': 'string',
-                'enum': ['approved', 'available', 'requested', 'denied'],
-                'default': 'requested',
+                'enum': ['approved', 'available', 'requested', 'denied', 'all'],
+                'default': 'approved',
             },
             'on_remove': {
                 'type': 'string',
@@ -649,16 +649,48 @@ class OmbiSet(MutableSet):
             return self._items
 
         if type == 'movies':
-            if self.config['status'] == 'requested':
+            # The Ombi API allows a mix of statuses to be returned,
+            # so we have to be careful when we filter them.
+            # For example a requested movie can be both approved and denied
+            # at the same time.
+
+            if self.config['status'] == 'approved':
+                filtered_items = [
+                    movie
+                    for movie in requested_items
+                    if movie.get('approved') and not movie.get('denied')
+                ]
+                movies = [self.generate_movie_entry(movie) for movie in filtered_items]
+                self._items.extend(movies)
+                return self._items
+
+            if self.config['status'] == 'all':
                 movies = [self.generate_movie_entry(movie) for movie in requested_items]
                 self._items.extend(movies)
                 return self._items
 
-            filtered_items = [
-                movie for movie in requested_items if movie.get(self.config['status'])
-            ]
-            movies = [self.generate_movie_entry(movie) for movie in filtered_items]
-            self._items.extend(movies)
+            if self.config['status'] == 'requested':
+                filtered_items = [
+                    movie
+                    for movie in requested_items
+                    if not movie.get('approved') and not movie.get('denied')
+                ]
+                movies = [self.generate_movie_entry(movie) for movie in filtered_items]
+                self._items.extend(movies)
+                return self._items
+
+            if self.config['status'] == 'available':
+                filtered_items = [movie for movie in requested_items if movie.get('available')]
+                movies = [self.generate_movie_entry(movie) for movie in filtered_items]
+                self._items.extend(movies)
+                return self._items
+
+            if self.config['status'] == 'denied':
+                filtered_items = [movie for movie in requested_items if movie.get('denied')]
+                movies = [self.generate_movie_entry(movie) for movie in filtered_items]
+                self._items.extend(movies)
+                return self._items
+
             return self._items
 
         # At this point only seasons and episodes are left
@@ -796,13 +828,13 @@ class OmbiSet(MutableSet):
             title=self.generate_title(parent_request),
             url=simdburl,
             imdb_id=parent_request.get('imdbId'),
-            tmdb_id=parent_request.get('id'),
-            ombi_id=parent_request.get('id'),
+            tmdb_id=parent_request.get('theMovieDbId'),
+            ombi_id=parent_request.get('theMovieDbId'),
             movie_name=parent_request.get('title'),
             movie_year=int(parent_request.get('releaseDate')[0:4]),
             ombi_request_id=parent_request.get('id'),
             ombi_released=parent_request.get('released'),
-            ombi_status=parent_request.get('status'),
+            ombi_status=parent_request.get('requestStatus'),
             ombi_approved=parent_request.get('approved'),
             ombi_available=parent_request.get('available'),
             ombi_denied=parent_request.get('denied'),
@@ -821,7 +853,8 @@ class OmbiSet(MutableSet):
                 series_name=self.generate_title(parent_request),
                 tvdb_id=parent_request.get('tvDbId'),
                 imdb_id=parent_request.get('imdbId'),
-                ombi_id=parent_request.get('id'),
+                tmdb_id=parent_request.get('externalProviderId'),
+                ombi_id=parent_request.get('externalProviderId'),
                 ombi_status=parent_request.get('status'),
                 ombi_request_id=parent_request.get('id'),
             )
@@ -839,7 +872,8 @@ class OmbiSet(MutableSet):
                 series_id=self.generate_series_id(season),
                 tvdb_id=parent_request.get('tvDbId'),
                 imdb_id=parent_request.get('imdbId'),
-                ombi_id=parent_request.get('id'),
+                tmdb_id=parent_request.get('externalProviderId'),
+                ombi_id=parent_request.get('externalProviderId'),
                 ombi_childrequest_id=child_request.get('id'),
                 ombi_season_id=season.get('id'),
                 ombi_status=parent_request.get('status'),
@@ -861,7 +895,8 @@ class OmbiSet(MutableSet):
                 series_id=self.generate_series_id(season, episode),
                 tvdb_id=parent_request.get('tvDbId'),
                 imdb_id=parent_request.get('imdbId'),
-                ombi_id=parent_request.get('id'),
+                tmdb_id=parent_request.get('externalProviderId'),
+                ombi_id=parent_request.get('externalProviderId'),
                 ombi_request_id=parent_request.get('id'),
                 ombi_childrequest_id=child_request.get('id'),
                 ombi_season_id=season.get('id'),
