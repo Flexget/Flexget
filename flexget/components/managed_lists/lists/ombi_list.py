@@ -18,6 +18,9 @@ from flexget.utils.requests import RequestException
 log = logger.bind(name='ombi_list')
 
 
+SUPPORTED_IDS = ['imdb_id', 'tmdb_id', 'tvdb_id', 'ombi_id']
+
+
 class ApiError(Exception):
     """Exception raised when an API call fails."""
 
@@ -477,7 +480,7 @@ class OmbiTv(OmbiEntry):
 class OmbiSet(MutableSet):
     """The schema for the Ombi managed list."""
 
-    supported_ids = ['imdb_id', 'tmdb_id', 'ombi_id']
+    supported_ids = SUPPORTED_IDS
     schema = {
         'type': 'object',
         'properties': {
@@ -593,15 +596,12 @@ class OmbiSet(MutableSet):
             self.discard(entry)
 
     def _find_entry(self, entry: Entry):
-        if "imdb_id" not in entry:
-            log.warning(
-                f"{entry['title']} is missing the imdb_id, consider using tmdb_lookup plugin."
-            )
-            return None
-
         for item in self.items:
-            if item['imdb_id'] == entry['imdb_id']:
-                return item
+            # Search with all the supported ids
+            for id in SUPPORTED_IDS:
+                # Had to make the default values here not match
+                if entry.get(id, False) == item.get(id, True):
+                    return item
 
         return None
 
@@ -783,6 +783,7 @@ class OmbiSet(MutableSet):
             url=simdburl,
             imdb_id=parent_request.get('imdbId'),
             tmdb_id=parent_request.get('id'),
+            ombi_id=parent_request.get('id'),
             movie_name=parent_request.get('title'),
             movie_year=int(parent_request.get('releaseDate')[0:4]),
             ombi_request_id=parent_request.get('id'),
@@ -806,6 +807,7 @@ class OmbiSet(MutableSet):
                 series_name=self.generate_title(parent_request),
                 tvdb_id=parent_request.get('tvDbId'),
                 imdb_id=parent_request.get('imdbId'),
+                ombi_id=parent_request.get('id'),
                 ombi_status=parent_request.get('status'),
                 ombi_request_id=parent_request.get('id'),
             )
@@ -823,6 +825,7 @@ class OmbiSet(MutableSet):
                 series_id=self.generate_series_id(season),
                 tvdb_id=parent_request.get('tvDbId'),
                 imdb_id=parent_request.get('imdbId'),
+                ombi_id=parent_request.get('id'),
                 ombi_childrequest_id=child_request.get('id'),
                 ombi_season_id=season.get('id'),
                 ombi_status=parent_request.get('status'),
@@ -844,6 +847,7 @@ class OmbiSet(MutableSet):
                 series_id=self.generate_series_id(season, episode),
                 tvdb_id=parent_request.get('tvDbId'),
                 imdb_id=parent_request.get('imdbId'),
+                ombi_id=parent_request.get('id'),
                 ombi_request_id=parent_request.get('id'),
                 ombi_childrequest_id=child_request.get('id'),
                 ombi_season_id=season.get('id'),
