@@ -757,7 +757,7 @@ class OmbiSet(MutableSet):
         request = OmbiRequest(self.config)
 
         endpoint = (
-            "/api/v2/Requests/movie" if self.config['type'] == 'movies' else "/api/v2/Requests/tv"
+            "/api/v1/Request/movie" if self.config['type'] == 'movies' else "/api/v1/Request/tv"
         )
 
         log.debug(f"Connecting to Ombi to retrieve list of {self.config['type']} requests.")
