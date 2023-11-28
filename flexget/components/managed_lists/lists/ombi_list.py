@@ -642,15 +642,9 @@ class OmbiSet(MutableSet):
         # _items can be set to None to invalidate the cache
         self._items = []
 
-        type = self.config['type']
+        list_type = self.config['type']
 
-        if type == 'shows':
-            shows = [self.generate_tv_entry(show) for show in requested_items]
-            # Shows dont have approvals or available flags so include them all
-            self._items.extend(shows)
-            return self._items
-
-        if type == 'movies':
+        if list_type == 'movies':
             # The Ombi API allows a mix of statuses to be returned,
             # so we have to be careful when we filter them.
             # For example a requested movie can be both approved and denied
@@ -662,29 +656,51 @@ class OmbiSet(MutableSet):
 
             return self._items
 
-        # At this point only seasons and episodes are left
+        if list_type == 'shows':
+            shows = [self.generate_tv_entry(show) for show in requested_items]
+            # Shows dont have approvals or available flags so include them all
+            self._items = shows
+            return self._items
 
-        # This code should be refactored to be more readable
-        # but I'm not familiar enough with how flexget and Ombi
-        # handle seasons and episodes to do it right now
-        for parent_request in requested_items:
-            for child_request in parent_request["childRequests"]:
-                for season in child_request["seasonRequests"]:
-                    # Seasons do not have approvals or available flags so include them all
-                    if self.config['type'] == 'seasons':
-                        entry = self.generate_tv_entry(parent_request, child_request, season)
-                        if entry:
-                            self._items.append(entry)
-                    else:
-                        for episode in season['episodes']:
-                            if self.config['status'] == 'requested' or episode.get(
-                                self.config['status']
-                            ):
-                                entry = self.generate_tv_entry(
-                                    parent_request, child_request, season, episode
-                                )
-                                self._items.append(entry)
-        return self._items
+        if list_type == 'seasons':
+            seasons = [
+                self.generate_tv_entry(show, request, season)
+                for show in requested_items
+                for request in show['childRequests']
+                for season in request['seasonRequests']
+            ]
+            # Seasons dont have approvals or available flags so include them all
+            self._items = seasons
+            return self._items
+
+        if list_type == 'episodes':
+            # Generate a list of tuples (show, request, season, episode)
+            episode_data = [
+                (show, request, season, episode)
+                for show in requested_items
+                for request in show['childRequests']
+                for season in request['seasonRequests']
+                for episode in season['episodes']
+            ]
+
+            # Generate a list of episodes
+            episodes = [episode for _, _, _, episode in episode_data]
+
+            # Filter the list of episodes
+            filtered_episodes = filter_ombi_items(episodes, self.config)
+
+            # Generate a list of Entry objects
+            entries = [
+                self.generate_tv_entry(*data)
+                for data in episode_data
+                if data[3] in filtered_episodes
+            ]
+
+            self._items = entries
+            return self._items
+
+        # We should never get here, but just in case...
+        raise plugin.PluginError('Error: Unknown list type %s.' % (self.config.get('type')))
 
     @property
     def online(self):
