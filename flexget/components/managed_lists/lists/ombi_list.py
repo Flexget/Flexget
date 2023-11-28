@@ -855,9 +855,13 @@ class OmbiSet(MutableSet):
                 season.get('seasonNumber'),
                 episode.get('episodeNumber'),
             )
+            if not parent_request.get('imdbId'):
+                simdburl = ''
+            else:
+                simdburl = 'http://www.imdb.com/title/' + parent_request.get('imdbId') + '/'
             return Entry(
                 title=self.generate_title(parent_request, season, episode),
-                url=episode.get('url'),
+                url=simdburl,
                 series_name=self.generate_title(parent_request),
                 series_season=season.get('seasonNumber'),
                 series_episode=episode.get('episodeNumber'),
