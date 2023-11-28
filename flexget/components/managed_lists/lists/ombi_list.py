@@ -35,7 +35,8 @@ class Config(TypedDict):
     username: NotRequired[str]
     password: NotRequired[str]
     type: Literal['shows', 'seasons', 'episodes', 'movies']
-    status: Literal['approved', 'available', 'requested', 'denied', 'all']
+    status: Literal['approved', 'requested', 'denied', 'all']
+    hide_available: bool
     on_remove: NotRequired[Literal['unavailable', 'denied', 'deleted']]
     include_year: bool
     include_ep_title: bool
@@ -505,9 +506,10 @@ class OmbiSet(MutableSet):
             'type': {'type': 'string', 'enum': ['shows', 'seasons', 'episodes', 'movies']},
             'status': {
                 'type': 'string',
-                'enum': ['approved', 'available', 'requested', 'denied', 'all'],
+                'enum': ['approved', 'requested', 'denied', 'all'],
                 'default': 'approved',
             },
+            'hide_available': {'type': 'boolean', 'default': True},
             'on_remove': {
                 'type': 'string',
                 'enum': ['unavailable', 'denied', 'deleted'],
@@ -654,42 +656,9 @@ class OmbiSet(MutableSet):
             # For example a requested movie can be both approved and denied
             # at the same time.
 
-            if self.config['status'] == 'approved':
-                filtered_items = [
-                    movie
-                    for movie in requested_items
-                    if movie.get('approved') and not movie.get('denied')
-                ]
-                movies = [self.generate_movie_entry(movie) for movie in filtered_items]
-                self._items.extend(movies)
-                return self._items
+            filtered_items = filter_ombi_items(requested_items, self.config)
 
-            if self.config['status'] == 'all':
-                movies = [self.generate_movie_entry(movie) for movie in requested_items]
-                self._items.extend(movies)
-                return self._items
-
-            if self.config['status'] == 'requested':
-                filtered_items = [
-                    movie
-                    for movie in requested_items
-                    if not movie.get('approved') and not movie.get('denied')
-                ]
-                movies = [self.generate_movie_entry(movie) for movie in filtered_items]
-                self._items.extend(movies)
-                return self._items
-
-            if self.config['status'] == 'available':
-                filtered_items = [movie for movie in requested_items if movie.get('available')]
-                movies = [self.generate_movie_entry(movie) for movie in filtered_items]
-                self._items.extend(movies)
-                return self._items
-
-            if self.config['status'] == 'denied':
-                filtered_items = [movie for movie in requested_items if movie.get('denied')]
-                movies = [self.generate_movie_entry(movie) for movie in filtered_items]
-                self._items.extend(movies)
-                return self._items
+            self._items = [self.generate_movie_entry(item) for item in filtered_items]
 
             return self._items
 
@@ -922,3 +891,45 @@ class OmbiList:
 @event('plugin.register')
 def register_plugin():
     plugin.register(OmbiList, 'ombi_list', api_ver=2, interfaces=['task', 'list'])
+
+
+def filter_ombi_items(items: list[dict[str, Any]], config: Config) -> list[dict[str, Any]]:
+    """Filter Ombi items based on the config.
+
+    Arguments:
+        items {list[dict[str, Any]]} -- The Items returned from the Ombi API.
+        config {Config} -- The config for the Ombi managed list.
+
+    Raises:
+        plugin.PluginError: If an unknown status is specified in the config.
+
+    Returns:
+        list[dict[str, Any]] -- The filtered list of items.
+    """
+
+    filtered_items = items
+
+    if config['hide_available']:
+        filtered_items = [item for item in filtered_items if not item.get('available')]
+
+    if config['status'] == 'all':
+        return filtered_items
+
+    if config['status'] == 'approved':
+        filtered_items = [
+            item for item in filtered_items if item.get('approved') and not item.get('denied')
+        ]
+        return filtered_items
+
+    if config['status'] == 'denied':
+        filtered_items = [item for item in filtered_items if item.get('denied')]
+        return filtered_items
+
+    if config['status'] == 'requested':
+        filtered_items = [
+            item for item in filtered_items if not item.get('approved') and not item.get('denied')
+        ]
+        return filtered_items
+
+    # We shouldn't get here, but just in case...
+    raise plugin.PluginError('Error: Unknown status %s.' % (config.get('status')))
