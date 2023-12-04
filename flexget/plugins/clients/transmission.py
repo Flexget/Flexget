@@ -762,9 +762,14 @@ class PluginTransmission(TransmissionBase):
                 if not isinstance(obj_labels, list):
                     obj_labels = [obj_labels]
                 labels.update(obj_labels)
-            labels = [entry.render(label) for label in labels]
+            rendered_labels = []
+            for label in labels:
+                try:
+                    rendered_labels.append(entry.render(label))
+                except RenderError as e:
+                    logger.warning('Unable to render label {!r} for {}: {}', label, entry['title'], e)
             # Transmission doesn't allow commas in labels
-            labels = [re.sub(r"(\s),|,(\s)", r"\1\2", label).replace(",", " ") for label in labels]
+            labels = [re.sub(r"(\s),|,(\s)", r"\1\2", label).replace(",", " ") for label in rendered_labels]
             labels = [label.strip() for label in labels]
             labels = [label for label in labels if label]
             if labels:
