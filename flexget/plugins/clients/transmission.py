@@ -767,7 +767,9 @@ class PluginTransmission(TransmissionBase):
                 try:
                     rendered_labels.append(entry.render(label))
                 except RenderError as e:
-                    logger.warning('Unable to render label {!r} for {}: {}', label, entry['title'], e)
+                    logger.warning(
+                        'Unable to render label {!r} for {}: {}', label, entry['title'], e
+                    )
             # Transmission doesn't allow commas in labels
             labels = [re.sub(", ?", " ", label) for label in rendered_labels]
             labels = [label.strip() for label in labels]
