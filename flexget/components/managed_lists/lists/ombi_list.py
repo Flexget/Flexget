@@ -17,7 +17,8 @@ from flexget.utils.requests import RequestException
 
 log = logger.bind(name='ombi_list')
 
-SUPPORTED_IDS = ['ombi_id', 'tmdb_id', 'imdb_id']
+# This should probably be a list of enum but the Type hinting is worse than Literal
+SUPPORTED_IDS: list[Literal['ombi_id', 'tmdb_id', 'imdb_id']] = ['ombi_id', 'tmdb_id', 'imdb_id']
 
 
 class ApiError(Exception):
@@ -94,7 +95,12 @@ class OmbiRequest:
             method, url, params=params, headers=headers, raise_status=False, json=data
         )
 
-        result = response.json()
+        result = {}
+
+        # I did this instead of a try/catch of the JSONDecodeError,
+        # I only had issues with doing a "delete" request
+        if 'application/json' in response.headers.get('Content-Type', ''):
+            result = response.json()
 
         try:
             response.raise_for_status()
@@ -559,6 +565,15 @@ class OmbiSet(MutableSet):
         # To set a status like approved or denied, we need to mark the entry as requested first
         ombi_entry.mark_requested()
 
+        # need to refactor the other mark_${status} methods to
+        # call mark_requested() first as its required to be requested first
+
+        # but there is edge cases
+        # Not marking Top Gun as requested in Ombi because it is already available.
+        # mark_requested  Marking Top Gun as approved in Ombi.
+        # mark_requested  {'result': False, 'message': None, 'isError': True, 'errorMessage': 'Request does not exist', 'errorCode': None, 'requestId': 0}
+        # mark_requested  Failed to mark Top Gun as approved in Ombi.
+
         if self.config['status'] == 'requested':
             self.invalidate_cache()
             return
@@ -621,18 +636,13 @@ class OmbiSet(MutableSet):
 
     def _find_entry(self, entry: Entry):
         log.verbose(f"Searching for {entry['title']} in Ombi.")
-        log.verbose(f"Ombi has {len(self.items)} items.")
 
-        # The way its currently implemented, it will only work for Movies and TV Shows.
-        # A lot more work will have to be done to support Seasons and Episodes.
-        for item in self.items:
-            # Search with all the supported ids
-            for id in SUPPORTED_IDS:
-                # Had to make the default values here not match
-                if entry.get(id, False) == item.get(id, True):
-                    return item
+        find_method = getattr(self, f"_find_{self.config['type']}", None)
 
-        return None
+        if not find_method:
+            raise plugin.PluginError('Error: Unknown list type %s.' % (self.config.get('type')))
+
+        return find_method(entry)
 
     def __contains__(self, entry):
         return self._find_entry(entry) is not None
@@ -722,6 +732,60 @@ class OmbiSet(MutableSet):
         return True
 
     # -- Public interface ends here -- #
+
+    def _find_movies(self, entry: Entry):
+        log.debug("Doing a movie search in Ombi.")
+
+        for item in self.items:
+            # Search with all the supported ids
+            for id in SUPPORTED_IDS:
+                if entry.get(id, False) == item.get(id, True):
+                    return item
+
+        return None
+
+    def _find_shows(self, entry: Entry):
+        log.debug("Doing a show search in Ombi.")
+
+        for item in self.items:
+            # Search with all the supported ids
+            for id in SUPPORTED_IDS:
+                # Since we are searching at the show level,
+                # we only need to match the main id
+                if entry.get(id, False) == item.get(id, True):
+                    return item
+
+        return None
+
+    def _find_seasons(self, entry: Entry):
+        log.debug("Doing a season search in Ombi.")
+
+        for item in self.items:
+            # Search with all the supported ids
+            for id in SUPPORTED_IDS:
+                # First find the correct show
+                if entry.get(id, False) == item.get(id, True):
+                    # Then find the correct season
+                    if entry.get('tmdb_season', False) == item.get('tmdb_season', True):
+                        return item
+
+        return None
+
+    def _find_episodes(self, entry: Entry):
+        log.debug("Doing a episode search in Ombi.")
+
+        for item in self.items:
+            # Search with all the supported ids
+            for id in SUPPORTED_IDS:
+                # First find the correct show
+                if entry.get(id, False) == item.get(id, True):
+                    # Then find the correct season
+                    if entry.get('tmdb_season', False) == item.get('tmdb_season', True):
+                        # Then find the correct episode
+                        if entry.get('tmdb_episode', False) == item.get('tmdb_episode', True):
+                            return item
+
+        return None
 
     def _get_ombi_entry(self, entry: Entry) -> OmbiMovie | OmbiTv | None:
         entry_type: str = self.config['type']
@@ -871,9 +935,11 @@ class OmbiSet(MutableSet):
                 tvdb_id=parent_request.get('tvDbId'),
                 imdb_id=parent_request.get('imdbId'),
                 tmdb_id=parent_request.get('externalProviderId'),
+                tmdb_season=season.get('seasonNumber'),
                 ombi_id=parent_request.get('externalProviderId'),
                 ombi_childrequest_id=child_request.get('id'),
                 ombi_season_id=season.get('id'),
+                ombi_season=season.get('seasonNumber'),
                 ombi_status=parent_request.get('status'),
                 ombi_request_id=parent_request.get('id'),
             )
@@ -898,11 +964,15 @@ class OmbiSet(MutableSet):
                 tvdb_id=parent_request.get('tvDbId'),
                 imdb_id=parent_request.get('imdbId'),
                 tmdb_id=parent_request.get('externalProviderId'),
+                tmdb_season=season.get('seasonNumber'),
+                tmdb_episode=episode.get('episodeNumber'),
                 ombi_id=parent_request.get('externalProviderId'),
                 ombi_request_id=parent_request.get('id'),
                 ombi_childrequest_id=child_request.get('id'),
                 ombi_season_id=season.get('id'),
+                ombi_season=season.get('seasonNumber'),
                 ombi_episode_id=episode.get('id'),
+                ombi_episode=episode.get('episodeNumber'),
                 ombi_approved=episode.get('approved'),
                 ombi_available=episode.get('available'),
                 ombi_requested=episode.get('requested'),
