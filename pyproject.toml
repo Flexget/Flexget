@@ -133,7 +133,7 @@ testpaths = ["flexget/tests"]
 [tool.black]
 line-length = 99
 skip-string-normalization = true
-target-version = ['py38', 'py39', 'py310', 'py311']
+target-version = ['py38', 'py39', 'py310', 'py311', 'py312']
 # Only include files in /flexget/, or directly in project root
 include = '^/(flexget/.*)?[^/]*\.pyi?$'
 exclude = '''
