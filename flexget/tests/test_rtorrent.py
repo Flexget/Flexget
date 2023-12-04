@@ -89,7 +89,7 @@ class TestRTorrentClient:
         hash1 = '09977FE761AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
         hash2 = '09977FE761BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB'
 
-        mocked_proxy.d.multicall.return_value = (
+        mocked_proxy.d.multicall2.return_value = (
             ['/data/downloads', 'private.torrent', hash1, 'test_custom1'],
             ['/data/downloads', 'private.torrent', hash2, 'test_custom2'],
         )
@@ -98,6 +98,7 @@ class TestRTorrentClient:
         torrents = client.torrents(fields=['custom1'])  # Required fields should be added
 
         assert isinstance(torrents, list)
+        assert len(torrents) == 2
 
         for torrent in torrents:
             assert torrent.get('base_path') == '/data/downloads'
@@ -110,8 +111,8 @@ class TestRTorrentClient:
             else:
                 raise AssertionError('Invalid hash returned')
 
-        mocked_proxy.system.multicall.assert_called_with(
-            (['main', 'd.directory_base=', 'd.name=', 'd.hash=', 'd.custom1='],)
+        mocked_proxy.d.multicall2.assert_called_with(
+            '', ['main', 'd.base_path=', 'd.name=', 'd.hash=', 'd.custom1=']
         )
 
     def test_update(self, mocked_proxy):
@@ -131,12 +132,12 @@ class TestRTorrentClient:
 
         mocked_proxy.system.multicall.assert_called_with(
             [
+                {'params': (torrent_info_hash, 'test_custom1'), 'methodName': 'd.custom1.set'},
                 {
                     'params': (torrent_info_hash, '/data/downloads'),
-                    'methodName': 'd.directory_base',
+                    'methodName': 'd.directory_base.set',
                 },
-                {'params': (torrent_info_hash, 'test_custom1'), 'methodName': 'd.custom1'},
-                {'params': (torrent_info_hash, '/data/downloads'), 'methodName': 'd.custom1'},
+                {'params': (torrent_info_hash, 3), 'methodName': 'd.priority.set'},
             ]
         )
 
@@ -148,7 +149,7 @@ class TestRTorrentClient:
         resp = client.delete(torrent_info_hash)
 
         assert resp == 0
-        mocked_proxy.d.erase.assert_called_with((torrent_info_hash,))
+        mocked_proxy.d.erase.assert_called_with(torrent_info_hash)
 
     def test_purge_torrent(self, mocked_proxy):
         mocked_proxy = mocked_proxy()
@@ -205,7 +206,7 @@ class TestRTorrentClient:
         resp = client.start(torrent_info_hash)
 
         assert resp == 0
-        mocked_proxy.d.start.assert_called_with((torrent_info_hash,))
+        mocked_proxy.d.start.assert_called_with(torrent_info_hash)
 
     def test_stop(self, mocked_proxy):
         mocked_proxy = mocked_proxy()
@@ -216,8 +217,8 @@ class TestRTorrentClient:
         resp = client.stop(torrent_info_hash)
 
         assert resp == 0
-        mocked_proxy.d.stop.assert_called_with((torrent_info_hash,))
-        mocked_proxy.d.close.assert_called_with((torrent_info_hash,))
+        mocked_proxy.d.stop.assert_called_with(torrent_info_hash)
+        mocked_proxy.d.close.assert_called_with(torrent_info_hash)
 
 
 @mock.patch('flexget.plugins.clients.rtorrent.RTorrent')
