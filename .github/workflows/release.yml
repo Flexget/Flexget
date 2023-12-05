@@ -1,6 +1,5 @@
 name: Build and release to PyPI
-on:
-  deployment: {}
+on: ['deployment']
 permissions: {}
 jobs:
   release:
@@ -30,10 +29,9 @@ jobs:
       run: |
         pip install -r requirements-release.txt
     - name: Set Deployment Status Pending
-      uses: deliverybot/deployment-status@v1
+      uses: justacodename/deployment-status@v2
       with:
         state: pending
-        token: ${{ github.token }}
     - name: Run release script
       env:
         TWINE_USERNAME: "__token__"
@@ -56,13 +54,11 @@ jobs:
         token: ${{ secrets.GITHUB_TOKEN }}
         body: ${{ env.CHANGELOG_BODY }}
     - name: Set Deployment Status Success
-      uses: deliverybot/deployment-status@v1
+      uses: justacodename/deployment-status@v2
       with:
         state: success
-        token: ${{ github.token }}
     - name: Set Deployment Status Failure
       if: failure() || cancelled()
-      uses: deliverybot/deployment-status@v1
+      uses: justacodename/deployment-status@v2
       with:
         state: failure
-        token: ${{ github.token }}
