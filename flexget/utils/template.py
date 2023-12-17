@@ -10,7 +10,6 @@ from unicodedata import normalize
 
 import jinja2.filters
 import pendulum
-import wrapt
 from jinja2 import (
     ChoiceLoader,
     Environment,
@@ -62,19 +61,42 @@ class CoercingDateTime(DateTime):
     This allows us to introduce tz aware datetimes into entry fields without breaking old configs, or old plugins.
     """
 
+    @staticmethod
+    def _same_tz(first, second):
+        if first.tzinfo and not second.tzinfo:
+            second = CoercingDateTime.instance(second, tz=first.tzinfo)
+        elif not first.tzinfo and second.tzinfo:
+            first = CoercingDateTime.instance(first, tz=second.tzinfo)
+        return first, second
 
-@wrapt.decorator
-def same_tz(wrapped, instance, args, kwargs):
-    other = args[0]
-    if instance.tzinfo and not other.tzinfo:
-        other = CoercingDateTime.instance(other, tz=instance.tzinfo)
-    elif not instance.tzinfo and other.tzinfo:
-        other = CoercingDateTime.instance(other).naive()
-    return wrapped(other, **kwargs)
+    def __lt__(self, other):
+        self, other = self._same_tz(self, other)
+        return DateTime.__lt__(self, other)
 
+    def __le__(self, other):
+        self, other = self._same_tz(self, other)
+        return DateTime.__le__(self, other)
 
-for fun in ("__lt__", "__le__", "__gt__", "__ge__", "__eq__", "__sub__"):
-    setattr(CoercingDateTime, fun, same_tz(getattr(CoercingDateTime, fun)))
+    def __gt__(self, other):
+        self, other = self._same_tz(self, other)
+        return DateTime.__gt__(self, other)
+
+    def __ge__(self, other):
+        self, other = self._same_tz(self, other)
+        return DateTime.__ge__(self, other)
+
+    def __eq__(self, other):
+        self, other = self._same_tz(self, other)
+        return DateTime.__eq__(self, other)
+
+    def __ne__(self, other):
+        self, other = self._same_tz(self, other)
+        return DateTime.__ne__(self, other)
+
+    def __sub__(self, other):
+        if isinstance(other, datetime):
+            self, other = self._same_tz(self, other)
+        return DateTime.__sub__(self, other)
 
 
 def filter_pathbase(val: Optional[str]) -> str:
