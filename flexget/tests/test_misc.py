@@ -5,6 +5,7 @@ import stat
 import sys
 import time
 
+import pendulum
 import pytest
 
 from flexget.entry import Entry, EntryUnicodeError
@@ -336,3 +337,37 @@ class TestSetPlugin:
         entry = task.find_entry('entries', title='Entry 1')
         new_now = entry['now']
         assert now != new_now
+
+
+class TestCoercingDateTime:
+    def test_lt(self):
+        now = CoercingDateTime.now()
+        later = now.add(hours=1)
+        assert now < later
+        assert now < later.naive()
+        assert now.naive() < later
+        assert now.naive() < later.naive()
+
+    def test_eq(self):
+        now = CoercingDateTime.now()
+        assert now == now.naive()
+        assert now.naive() == now
+
+    def test_ne(self):
+        now = CoercingDateTime.now()
+        assert not (now != now.naive())
+        assert not (now.naive() != now)
+
+    def test_sub(self):
+        now = CoercingDateTime.now()
+        later = now.add(hours=1)
+
+        assert later - now == pendulum.Duration(hours=1)
+        assert later - now.naive() == pendulum.Duration(hours=1)
+        assert later.naive() - now == pendulum.Duration(hours=1)
+        assert later.naive() - now.naive() == pendulum.Duration(hours=1)
+
+        # Make sure subtracting timedeltas still works
+        diff = now - pendulum.Duration(hours=1)
+        assert diff == now.subtract(hours=1)
+        assert isinstance(diff, CoercingDateTime)
