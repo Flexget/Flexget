@@ -58,8 +58,7 @@ class SearchAwesomeHD:
         config = self.prepare_config(config)
 
         # set a domain limit, but allow the user to overwrite it
-        if 'awesome-hd.me' not in task.requests.domain_limiters:
-            task.requests.add_domain_limiter(TimedLimiter('awesome-hd.me', '5 seconds'))
+        task.requests.add_domain_limiter(TimedLimiter('awesome-hd.me', '5 seconds'), replace=False)
 
         entries = set()
 

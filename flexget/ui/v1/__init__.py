@@ -76,7 +76,7 @@ def register_web_ui(mgr):
         if not os.path.exists(app_base):
             logger.warning(
                 'Unable to start web ui in debug mode. To enable debug mode please run the debug build, '
-                'see http://flexget.com/wiki/Web-UI for instructions'
+                'see https://flexget.com/Web-UI for instructions'
             )
             logger.warning('Attempting to serve web ui from complied directory')
             app_base = None
@@ -87,7 +87,7 @@ def register_web_ui(mgr):
             logger.critical(
                 'Failed to start web ui,'
                 ' this can happen if you are running from GitHub version and forgot to run the web ui build, '
-                'see http://flexget.com/wiki/Web-UI for instructions'
+                'see https://flexget.com/Web-UI for instructions'
             )
             app_base = None
 

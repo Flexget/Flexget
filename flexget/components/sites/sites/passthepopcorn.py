@@ -1,25 +1,14 @@
-import datetime
-
 from dateutil.parser import parse as dateutil_parse
 from loguru import logger
-from requests.exceptions import TooManyRedirects
-from sqlalchemy import Column, DateTime, Unicode
 
-from flexget import db_schema, plugin
+from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.manager import Session
-from flexget.utils.database import json_synonym
 from flexget.utils.requests import RequestException, TimedLimiter
-from flexget.utils.requests import Session as RequestSession
 from flexget.utils.tools import parse_filesize
 
 logger = logger.bind(name='passthepopcorn')
-Base = db_schema.versioned_base('passthepopcorn', 1)
-
-requests = RequestSession()
-requests.add_domain_limiter(TimedLimiter('passthepopcorn.me', '5 seconds'))
 
 TAGS = [
     'action',
@@ -82,24 +71,6 @@ ORDERING = {
 RELEASE_TYPES = {'non-scene': 0, 'scene': 1, 'golden popcorn': 2}
 
 
-@db_schema.upgrade('passthepopcorn')
-def upgrade(ver, session):
-    if ver is None:
-        ver = 0
-    if ver == 0:
-        raise db_schema.UpgradeImpossible
-    return ver
-
-
-class PassThePopcornCookie(Base):
-    __tablename__ = 'passthepopcorn_cookie'
-
-    username = Column(Unicode, primary_key=True)
-    _cookie = Column('cookie', Unicode)
-    cookie = json_synonym('_cookie')
-    expires = Column(DateTime)
-
-
 class SearchPassThePopcorn:
     """
     PassThePopcorn search plugin.
@@ -108,123 +79,22 @@ class SearchPassThePopcorn:
     schema = {
         'type': 'object',
         'properties': {
-            'username': {'type': 'string'},
-            'password': {'type': 'string'},
+            'apiuser': {'type': 'string'},
+            'apikey': {'type': 'string'},
             'passkey': {'type': 'string'},
             'tags': one_or_more({'type': 'string', 'enum': TAGS}, unique_items=True),
             'order_by': {'type': 'string', 'enum': list(ORDERING.keys()), 'default': 'Time added'},
             'order_desc': {'type': 'boolean', 'default': True},
             'freeleech': {'type': 'boolean'},
             'release_type': {'type': 'string', 'enum': list(RELEASE_TYPES.keys())},
-            'grouping': {'type': 'boolean', 'default': True},
+            'grouping': {'type': 'boolean', 'default': False},
         },
-        'required': ['username', 'password', 'passkey'],
+        'required': ['apiuser', 'apikey', 'passkey'],
         'additionalProperties': False,
     }
 
     base_url = 'https://passthepopcorn.me/'
     errors = False
-
-    def get(self, url, params, username, password, passkey, force=False):
-        """
-        Wrapper to allow refreshing the cookie if it is invalid for some reason
-
-        :param unicode url: the url to be requested
-        :param dict params: request params
-        :param str username:
-        :param str password:
-        :param str passkey: the user's private passkey
-        :param bool force: flag used to refresh the cookie forcefully ie. forgo DB lookup
-        :return:
-        """
-        cookies = self.get_login_cookie(username, password, passkey, force=force)
-        invalid_cookie = False
-        response = None
-
-        try:
-            response = requests.get(url, params=params, cookies=cookies)
-            if self.base_url + 'login.php' in response.url:
-                invalid_cookie = True
-        except TooManyRedirects:
-            # TODO Apparently it endlessly redirects if the cookie is invalid? I assume it's a gazelle bug.
-            logger.debug('PassThePopcorn request failed: Too many redirects. Invalid cookie?')
-            invalid_cookie = True
-        except RequestException as e:
-            if e.response is not None and e.response.status_code == 429:
-                logger.error('Saved cookie is invalid and will be deleted. Error: {}', str(e))
-                # cookie is invalid and must be deleted
-                with Session() as session:
-                    session.query(PassThePopcornCookie).filter(
-                        PassThePopcornCookie.username == username
-                    ).delete()
-                invalid_cookie = True
-            else:
-                logger.error('PassThePopcorn request failed: {}', str(e))
-
-        if invalid_cookie:
-            if self.errors:
-                raise plugin.PluginError(
-                    'PassThePopcorn login cookie is invalid. Login page received?'
-                )
-            self.errors = True
-            # try again
-            response = self.get(url, params, username, password, passkey, force=True)
-        else:
-            self.errors = False
-
-        return response
-
-    def get_login_cookie(self, username, password, passkey, force=False):
-        """
-        Retrieves login cookie
-
-        :param str username:
-        :param str password:
-        :param str passkey: the user's private passkey
-        :param bool force: if True, then retrieve a fresh cookie instead of looking in the DB
-        :return:
-        """
-        if not force:
-            with Session() as session:
-                saved_cookie = (
-                    session.query(PassThePopcornCookie)
-                    .filter(PassThePopcornCookie.username == username)
-                    .first()
-                )
-                if (
-                    saved_cookie
-                    and saved_cookie.expires
-                    and saved_cookie.expires >= datetime.datetime.now()
-                ):
-                    logger.debug('Found valid login cookie')
-                    return saved_cookie.cookie
-
-        url = self.base_url + 'ajax.php'
-        params = {
-            'username': username,
-            'password': password,
-            'login': 'Login',
-            'keeplogged': '1',
-            'passkey': passkey,
-            'action': 'login',
-        }
-        try:
-            logger.debug('Attempting to retrieve PassThePopcorn cookie')
-            requests.post(url, data=params, timeout=30)
-        except RequestException as e:
-            raise plugin.PluginError('PassThePopcorn login failed: %s' % e)
-
-        with Session() as session:
-            expires = datetime.datetime.now() + datetime.timedelta(days=30)
-            logger.debug(
-                'Saving or updating PassThePopcorn cookie in db. Expires 30 days from now: {}',
-                expires,
-            )
-            cookie = PassThePopcornCookie(
-                username=username, cookie=dict(requests.cookies), expires=expires
-            )
-            session.merge(cookie)
-            return cookie.cookie
 
     @plugin.internet(logger)
     def search(self, task, entry, config):
@@ -262,27 +132,46 @@ class SearchPassThePopcorn:
 
         search_strings = entry.get('search_strings', [entry['title']])
 
+        request_headers = {"ApiUser": config['apiuser'], "ApiKey": config['apikey']}
+
         # searching with imdb id is much more precise
         if entry.get('imdb_id'):
             search_strings = [entry['imdb_id']]
+        else:
+            # use the movie year if available to improve search results.
+            if 'movie_year' in entry:
+                # the movie list plugin seems to have garbage in the year entry sometimes like a 1 for the year
+                # validate we have a useful year to filter on
+                try:
+                    if int(entry['movie_year']) > 1900:
+                        params['year'] = int(entry['movie_year'])
+                    else:
+                        logger.error(
+                            f"Searching for '{entry['title']}' ignoring invalid movie_year: '{entry['movie_year']}'"
+                        )
+                except ValueError:
+                    logger.error(
+                        f"Searching for '{entry['title']}'  ignoring non numeric movie_year: '{entry['movie_year']}'"
+                    )
+
+        task.requests.add_domain_limiter(
+            TimedLimiter('passthepopcorn.me', '5 seconds'), replace=False
+        )
 
         for search_string in search_strings:
             params['searchstr'] = search_string
             logger.debug('Using search params: {}', params)
             try:
-                result = self.get(
-                    self.base_url + 'torrents.php',
-                    params,
-                    config['username'],
-                    config['password'],
-                    config['passkey'],
-                ).json()
+                siteresponse = task.requests.get(
+                    self.base_url + 'torrents.php', headers=request_headers, params=params
+                )
+                result = siteresponse.json()
+                logger.debug('PTP Search Request: {}', str(siteresponse.url))
             except RequestException as e:
-                logger.error('PassThePopcorn request failed: {}', e)
-                continue
+                raise plugin.PluginError('Error searching PassThePopcorn. %s' % str(e))
 
             total_results = result['TotalResults']
-            logger.debug('Total results: {}', total_results)
+            logger.debug('Total Search results: {}', total_results)
 
             authkey = result['AuthKey']
             passkey = result['PassKey']
@@ -311,7 +200,25 @@ class SearchPassThePopcorn:
                 for torrent in movie['Torrents']:
                     e = Entry()
 
-                    e['title'] = torrent['ReleaseName']
+                    # Add the PTP qualities to the title so the quality plugin has a better chance
+                    release_res = torrent['Resolution']
+                    release_res = release_res.replace(
+                        "PAL", "576p"
+                    )  # Common PAL DVD vertial resolution
+                    release_res = release_res.replace(
+                        "NTSC", "480p"
+                    )  # Common NTSC DVD vertial resolution
+                    # many older releases have a resolution defined as 624x480 for example this will split the value at take the hight
+                    tsplit = release_res.split("x", 1)
+                    if len(tsplit) > 1:
+                        release_res = tsplit[1] + 'p'
+
+                    release_name = torrent['ReleaseName'].replace(
+                        "4K", ""
+                    )  # Remove 4K from release name as that is often the source not the torrent resolution it confuses the quality plugin
+                    e[
+                        'title'
+                    ] = f"{release_name} [{release_res} {torrent['Source']} {torrent['Codec']} {torrent['Container']}]"
 
                     e['imdb_id'] = entry.get('imdb_id')
 
@@ -343,7 +250,7 @@ class SearchPassThePopcorn:
                             e['torrent_id'], authkey, passkey
                         )
                     )
-
+                    logger.debug('Add Entry: {} Seeds:{}', e['title'], e['torrent_seeds'])
                     entries.add(e)
 
         return entries

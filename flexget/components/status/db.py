@@ -2,7 +2,7 @@ import datetime
 from datetime import timedelta
 
 from loguru import logger
-from sqlalchemy import Boolean, Column, DateTime, Index, Integer, String, func, select
+from sqlalchemy import Boolean, Column, DateTime, Integer, String, func, select
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship
 from sqlalchemy.schema import ForeignKey
@@ -10,18 +10,22 @@ from sqlalchemy.schema import ForeignKey
 from flexget import db_schema
 from flexget.event import event
 from flexget.utils.database import with_session
-from flexget.utils.sqlalchemy_utils import create_index
+from flexget.utils.sqlalchemy_utils import create_index, drop_index, index_exists
 
 logger = logger.bind(name='status.db')
-Base = db_schema.versioned_base('status', 2)
+Base = db_schema.versioned_base('status', 3)
 
 
 @db_schema.upgrade('status')
 def upgrade(ver, session):
-    if ver < 2:
+    if ver < 3:
+        table_name = 'status_execution'
+        old_index_name = 'ix_status_execution_task_id_start_end_succeeded'
+        if index_exists(table_name, old_index_name, session):
+            drop_index(table_name, old_index_name, session)
         # Creates the executions table index
-        create_index('status_execution', session, 'task_id', 'start', 'end', 'succeeded')
-        ver = 2
+        create_index(table_name, session, 'task_id')
+        ver = 3
     return ver
 
 
@@ -63,7 +67,7 @@ class StatusTask(Base):
 class TaskExecution(Base):
     __tablename__ = 'status_execution'
     id = Column(Integer, primary_key=True)
-    task_id = Column(Integer, ForeignKey('status_task.id'))
+    task_id = Column(Integer, ForeignKey('status_task.id'), index=True)
 
     start = Column(DateTime)
     end = Column(DateTime)
@@ -101,15 +105,6 @@ class TaskExecution(Base):
             'failed': self.failed,
             'abort_reason': self.abort_reason,
         }
-
-
-Index(
-    'ix_status_execution_task_id_start_end_succeeded',
-    TaskExecution.task_id,
-    TaskExecution.start,
-    TaskExecution.end,
-    TaskExecution.succeeded,
-)
 
 
 @event('manager.db_cleanup')

@@ -16,13 +16,13 @@ jobs:
     runs-on: ${{ matrix.operating-system }}
     strategy:
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11"]
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
         operating-system: [ubuntu-latest] # TODO: Fix a couple tests and enable windows. windows-latest
       fail-fast: false
     env:
       POETRY_VERSION: "1.2.2"
     steps:
-    - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4
+    - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
     # Can we cache the apt-get stuff somehow?
     - name: Install unrar  # used by some flexget tests
       if: matrix.operating-system == 'ubuntu-latest'
@@ -34,7 +34,7 @@ jobs:
     # manually for now, until there is more info.
     - name: Set up Python ${{ matrix.python-version }}
       id: setup-python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
     - name: cache poetry install

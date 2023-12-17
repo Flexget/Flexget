@@ -46,7 +46,7 @@ class SearchBTN:
         return config
 
     def search(self, task, entry, config):
-        task.requests.add_domain_limiter(self.request_limiter)
+        task.requests.add_domain_limiter(self.request_limiter, replace=False)
         config = self.prepare_config(config)
         api_key = config['api_key']
 
