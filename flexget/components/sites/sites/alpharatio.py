@@ -16,8 +16,10 @@ from flexget.utils.requests import Session as RequestSession
 from flexget.utils.soup import get_soup
 from flexget.utils.tools import parse_filesize
 
+
 def remove_special_characters(text):
     return re.sub(r'[^a-zA-Z0-9 ]', '', text)
+
 
 logger = logger.bind(name='alpharatio')
 Base = db_schema.versioned_base('alpharatio', 0)
@@ -211,8 +213,6 @@ class SearchAlphaRatio:
         raise plugin.PluginError(
             'AlphaRatio layout has changed, unable to parse correctly. Please open a Github issue'
         )
-
-
 
     @plugin.internet(logger)
     def search(self, task, entry, config):
