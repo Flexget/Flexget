@@ -152,9 +152,12 @@ _sources = [
 _codecs = [
     QualityComponent('codec', 10, 'divx'),
     QualityComponent('codec', 20, 'xvid'),
+    QualityComponent('codec', 25, 'nvenc'),
     QualityComponent('codec', 30, 'h264', '[hx].?264'),
     QualityComponent('codec', 35, 'vp9'),
-    QualityComponent('codec', 40, 'h265', '[hx].?265|hevc'),
+    QualityComponent('codec', 40, 'h265', '[hx].?265'),
+    QualityComponent('codec', 40, 'h265', 'hevc'),
+    QualityComponent('codec', 50, 'av1', 'av-?1'),
 ]
 
 _color_ranges = [
