@@ -58,7 +58,7 @@ class SeriesParser(TitleParser):
     season_pack_regexps = ReList(
         [
             # S01 or Season 1 but not Season 1 Episode|Part 2
-            r'(?:season\s?|s)(\d{1,})(?:\s|$)(?!(?:(?:.*?\s)?(?:episode|e|ep|part|pt)\s?(?:\d{1,3}|%s)|(?:\d{1,3})\s?of\s?(?:\d{1,3})))'
+            r'(?:season\s?|s)(\d{1,}\b)(?!(?:(?:.*?\s)?(?:episode|e|ep|part|pt)\s?(?:\d{1,3}|%s)|(?:\d{1,3})\s?of\s?(?:\d{1,3})))'
             % roman_numeral_re,
             r'(\d{1,3})\s?x\s?all',  # 1xAll
         ]
