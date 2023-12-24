@@ -7,7 +7,7 @@ colorama==0.4.6 ; python_version >= "3.8" and python_version < "4.0" and (os_nam
 cryptography==41.0.7 ; python_version >= "3.8" and python_version < "4.0" and sys_platform == "linux"
 docutils==0.20.1 ; python_version >= "3.8" and python_version < "4.0"
 idna==3.6 ; python_version >= "3.8" and python_version < "4.0"
-importlib-metadata==7.0.0 ; python_version >= "3.8" and python_version < "4.0"
+importlib-metadata==7.0.1 ; python_version >= "3.8" and python_version < "4.0"
 importlib-resources==6.1.1 ; python_version >= "3.8" and python_version < "3.9"
 jaraco-classes==3.3.0 ; python_version >= "3.8" and python_version < "4.0"
 jeepney==0.8.0 ; python_version >= "3.8" and python_version < "4.0" and sys_platform == "linux"
