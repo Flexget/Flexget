@@ -16,6 +16,11 @@ from flexget.utils.requests import Session as RequestSession
 from flexget.utils.soup import get_soup
 from flexget.utils.tools import parse_filesize
 
+
+def remove_special_characters(text):
+    return re.sub(r'[^a-zA-Z0-9 ]', '', text)
+
+
 logger = logger.bind(name='alpharatio')
 Base = db_schema.versioned_base('alpharatio', 0)
 
@@ -243,7 +248,7 @@ class SearchAlphaRatio:
         )
 
         for search_string in entry.get('search_strings', [entry['title']]):
-            params['searchstr'] = search_string
+            params['searchstr'] = remove_special_characters(search_string)
             logger.debug('Using search params: {}', params)
             try:
                 page = self.get(
