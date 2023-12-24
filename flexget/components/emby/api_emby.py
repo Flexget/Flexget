@@ -6,6 +6,7 @@ from collections.abc import MutableSet
 from datetime import datetime
 from urllib.parse import urlencode
 
+import pendulum
 from loguru import logger
 from requests.exceptions import HTTPError, RequestException
 
@@ -2701,15 +2702,12 @@ class EmbyApi(EmbyApiBase):
         if not date:
             return None
         elif isinstance(date, datetime):
-            return date
+            return pendulum.instance(date)
         elif not isinstance(date, str):
             return None
 
-        # Normalize date
-        date_py = re.sub(r'^(.*)\.([0-9]{6})[0-9]*\+([0-9]{2})\:([0-9]{2})$', r'\1.\2+\3\4', date)
-
         try:
-            date = datetime.strptime(date_py, '%Y-%m-%dT%H:%M:%S.%f%z')
+            date = pendulum.parse(date)
         except ValueError:
             date = None
 

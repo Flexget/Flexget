@@ -1,6 +1,7 @@
 import functools
 import types
 import warnings
+from datetime import date, datetime
 from enum import Enum
 from typing import Callable, Iterable, Mapping, Optional, Sequence, Union
 
@@ -9,7 +10,7 @@ from loguru import logger
 from flexget import plugin
 from flexget.utils.lazy_dict import LazyDict, LazyLookup
 from flexget.utils.serialization import Serializer, deserialize, serialize
-from flexget.utils.template import FlexGetTemplate, render_from_entry
+from flexget.utils.template import CoercingDateTime, FlexGetTemplate, render_from_entry
 
 logger = logger.bind(name='entry')
 
@@ -230,6 +231,16 @@ class Entry(LazyDict, Serializer):
         # troubles.
         elif isinstance(value, str) and type(value) is not str:  # noqa: E721
             value = str(value)
+        # Turn datetimes and dates into their pendulum versions
+        elif isinstance(value, datetime):
+            value = CoercingDateTime.instance(value)
+            if not value.tzinfo:
+                logger.warning(
+                    f"{key} was set to a naive datetime. Plugin should be updated to provide a timezone aware datetime"
+                )
+        elif isinstance(value, date):
+            # Dates become datetimes at midnight. This allows the user to compare with 'now' and other datetimes
+            value = CoercingDateTime.create(value.year, value.month, value.day, tz='local')
 
         # url and original_url handling
         if key == 'url':

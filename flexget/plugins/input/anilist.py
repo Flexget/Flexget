@@ -1,5 +1,4 @@
-from datetime import datetime
-
+import pendulum
 from loguru import logger
 
 from flexget import plugin
@@ -165,19 +164,21 @@ class AniList:
                         entry['al_banner'] = anime.get('bannerImage')
                         entry['al_cover'] = anime.get('coverImage', {}).get('large')
                         entry['al_date_end'] = (
-                            datetime(
+                            pendulum.datetime(
                                 year=anime.get('endDate').get('year'),
                                 month=(anime.get('endDate').get('month') or 1),
                                 day=(anime.get('endDate').get('day') or 1),
+                                tz='Asia/Tokyo',
                             )
                             if anime.get('endDate').get('year')
                             else None
                         )
                         entry['al_date_start'] = (
-                            datetime(
+                            pendulum.datetime(
                                 year=anime.get('startDate').get('year'),
                                 month=(anime.get('startDate').get('month') or 1),
                                 day=(anime.get('startDate').get('day') or 1),
+                                tz='Asia/Tokyo',
                             )
                             if anime.get('startDate').get('year')
                             else None

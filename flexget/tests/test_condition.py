@@ -1,3 +1,8 @@
+from pendulum import DateTime
+
+from flexget.entry import Entry
+
+
 class TestCondition:
     config = """
         templates:
@@ -94,3 +99,38 @@ class TestQualityCondition:
             count = len(task.rejected)
             expected = int(taskname[-1])
             assert count == expected, "Expected %s rejects, got %d" % (expected, count)
+
+
+class TestDateCondition:
+    config = """
+        templates:
+          global:
+            disable: [seen]
+        tasks:
+          test_now:
+            if:
+            - dt_field < now: accept
+          test_compare:
+            if:
+            - dt_field1 < dt_field2: accept
+    """
+
+    def test_naive(self, execute_task):
+        entry = Entry(title='1960', url='', dt_field=DateTime.create(1960, 1, 1, tz=None))
+        task = execute_task('test_now', options={'inject': [entry]})
+        assert len(task.accepted) == 1
+        entry = Entry(title='future', url='', dt_field=DateTime.now().add(days=1).naive())
+        task = execute_task('test_now', options={'inject': [entry]})
+        assert len(task.accepted) == 0
+
+    def test_tz(self, execute_task):
+        # This would end up being false if a naive comparison was done, but with timezones dt1 < dt2
+        dt1 = DateTime.create(2023, 1, 1, 2, tz="America/New_York")
+        dt2 = DateTime.create(2023, 1, 1, 1, tz="America/Los_Angeles")
+        entry = Entry(title='entry', url='', dt_field1=dt1, dt_field2=dt2)
+        task = execute_task('test_compare', options={'inject': [entry]})
+        assert len(task.accepted) == 1
+        # Sanity check that when we reverse the comparison it's not true
+        entry = Entry(title='entry', url='', dt_field1=dt2, dt_field2=dt1)
+        task = execute_task('test_compare', options={'inject': [entry]})
+        assert len(task.accepted) == 0

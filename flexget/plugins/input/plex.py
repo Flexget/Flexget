@@ -1,11 +1,11 @@
 """Plugin for plex media server (www.plexapp.com)."""
 import os
 import re
-from datetime import datetime
 from os.path import basename
 from socket import gethostbyname
 from xml.dom.minidom import parseString
 
+import pendulum
 from loguru import logger
 
 from flexget import plugin
@@ -324,7 +324,7 @@ class InputPlex:
                 filenamemap = "%s_%s_%s_%s.%s"
 
             e['plex_year'] = node.getAttribute('year')
-            e['plex_added'] = datetime.fromtimestamp(int(node.getAttribute('addedAt')))
+            e['plex_added'] = pendulum.from_timestamp(int(node.getAttribute('addedAt')))
             e['plex_duration'] = node.getAttribute('duration')
             e['plex_summary'] = node.getAttribute('summary')
             e['plex_userrating'] = node.getAttribute('userrating')

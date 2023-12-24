@@ -4,12 +4,12 @@ import os.path
 import re
 from contextlib import suppress
 from copy import copy
-from datetime import date, datetime, time, timedelta
+from datetime import date, datetime, time
 from typing import TYPE_CHECKING, Any, AnyStr, List, Mapping, Optional, Type, Union, cast
 from unicodedata import normalize
 
 import jinja2.filters
-from dateutil import parser as dateutil_parse
+import pendulum
 from jinja2 import (
     ChoiceLoader,
     Environment,
@@ -22,6 +22,7 @@ from jinja2 import (
 )
 from jinja2.nativetypes import NativeTemplate
 from loguru import logger
+from pendulum import DateTime
 
 from flexget.event import event
 from flexget.utils.lazy_dict import LazyDict
@@ -41,14 +42,61 @@ environment: Optional['FlexGetEnvironment'] = None
 
 def extra_vars() -> dict:
     return {
-        'timedelta': timedelta,
-        'utcnow': datetime.utcnow(),
-        'now': datetime.now(),
+        'timedelta': pendulum.duration,
+        'duration': pendulum.duration,
+        'utcnow': DateTime.utcnow(),
+        'now': DateTime.now(),
     }
 
 
 class RenderError(Exception):
     """Error raised when there is a problem with jinja rendering."""
+
+
+class CoercingDateTime(DateTime):
+    """
+    Datetime that avoids crashing when comparing tz aware and naive datetimes.
+    When this happens, it will assume the naive datetime is in the same timezone as the dt aware one.
+
+    This allows us to introduce tz aware datetimes into entry fields without breaking old configs, or old plugins.
+    """
+
+    @staticmethod
+    def _same_tz(first, second):
+        if first.tzinfo and not second.tzinfo:
+            second = CoercingDateTime.instance(second, tz=first.tzinfo)
+        elif not first.tzinfo and second.tzinfo:
+            first = CoercingDateTime.instance(first, tz=second.tzinfo)
+        return first, second
+
+    def __lt__(self, other):
+        self, other = self._same_tz(self, other)
+        return DateTime.__lt__(self, other)
+
+    def __le__(self, other):
+        self, other = self._same_tz(self, other)
+        return DateTime.__le__(self, other)
+
+    def __gt__(self, other):
+        self, other = self._same_tz(self, other)
+        return DateTime.__gt__(self, other)
+
+    def __ge__(self, other):
+        self, other = self._same_tz(self, other)
+        return DateTime.__ge__(self, other)
+
+    def __eq__(self, other):
+        self, other = self._same_tz(self, other)
+        return DateTime.__eq__(self, other)
+
+    def __ne__(self, other):
+        self, other = self._same_tz(self, other)
+        return DateTime.__ne__(self, other)
+
+    def __sub__(self, other):
+        if isinstance(other, datetime):
+            self, other = self._same_tz(self, other)
+        return DateTime.__sub__(self, other)
 
 
 def filter_pathbase(val: Optional[str]) -> str:
@@ -102,7 +150,7 @@ def filter_formatdate(val, format_str):
 
 def filter_parsedate(val):
     """Attempts to parse a date according to the rules in ISO 8601 and RFC 2822"""
-    return dateutil_parse.parse(val)
+    return pendulum.parse(val, strict=False, tz=None)
 
 
 def filter_date_suffix(date_str: str):

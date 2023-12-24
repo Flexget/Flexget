@@ -1,12 +1,12 @@
 import os
 import re
 import socket
-from datetime import datetime
 from io import BytesIO
 from time import sleep
 from urllib.parse import urljoin, urlparse, urlsplit
 from xmlrpc import client as xmlrpc_client
 
+import pendulum
 from loguru import logger
 from requests.auth import HTTPBasicAuth, HTTPDigestAuth
 
@@ -813,7 +813,7 @@ class RTorrentInputPlugin(RTorrentPluginBase):
                 entry[attr] = value
 
             if 'timestamp_finished' in entry:
-                entry['timestamp_finished'] = datetime.fromtimestamp(entry['timestamp_finished'])
+                entry['timestamp_finished'] = pendulum.from_timestamp(entry['timestamp_finished'])
 
             entries.append(entry)
 

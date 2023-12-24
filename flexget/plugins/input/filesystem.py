@@ -1,8 +1,8 @@
 import re
 import sys
-from datetime import datetime
 from pathlib import Path
 
+import pendulum
 from loguru import logger
 
 from flexget import plugin
@@ -122,13 +122,13 @@ class Filesystem:
             entry['title'] = filepath.name
         file_stat = filepath.stat()
         try:
-            entry['timestamp'] = datetime.fromtimestamp(file_stat.st_mtime)
+            entry['timestamp'] = pendulum.from_timestamp(file_stat.st_mtime, tz='local')
         except Exception as e:
             logger.warning('Error setting timestamp for {}: {}', filepath, e)
             entry['timestamp'] = None
-        entry['accessed'] = datetime.fromtimestamp(file_stat.st_atime)
-        entry['modified'] = datetime.fromtimestamp(file_stat.st_mtime)
-        entry['created'] = datetime.fromtimestamp(file_stat.st_ctime)
+        entry['accessed'] = pendulum.from_timestamp(file_stat.st_atime, tz='local')
+        entry['modified'] = pendulum.from_timestamp(file_stat.st_mtime, tz='local')
+        entry['created'] = pendulum.from_timestamp(file_stat.st_ctime, tz='local')
         if entry.isvalid():
             if test_mode:
                 logger.info("Test mode. Entry includes:")

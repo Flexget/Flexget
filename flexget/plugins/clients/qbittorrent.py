@@ -1,6 +1,6 @@
 import os
-from datetime import datetime
 
+import pendulum
 from loguru import logger
 from requests import Session
 from requests.exceptions import RequestException
@@ -378,8 +378,8 @@ class FromQBitTorrent:
                 qbittorrent_category=torrent['category'],
                 qbittorrent_state=torrent['state'],
                 qbittorrent_eta=torrent['eta'],
-                qbittorrent_added_on=datetime.fromtimestamp(torrent['added_on']),
-                qbittorrent_completion_on=datetime.fromtimestamp(torrent['completion_on']),
+                qbittorrent_added_on=pendulum.from_timestamp(torrent['added_on']),
+                qbittorrent_completion_on=pendulum.from_timestamp(torrent['completion_on']),
                 qbittorrent_completed_path=torrent['content_path'],
                 qbittorrent_download_path=torrent['download_path'],
                 qbittorrent_save_path=torrent['save_path'],
