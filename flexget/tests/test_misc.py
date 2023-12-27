@@ -176,11 +176,7 @@ class TestEntryCoercion:
     def test_date_coercion(self):
         e = Entry('title', 'url')
         e['date'] = datetime.date(2023, 9, 3)
-        assert isinstance(e['date'], CoercingDateTime)
-        # Times should be midnight in the local timezone
-        assert e['date'].hour == 0
-        assert e['date'].minute == 0
-        assert e['date'].tzinfo == CoercingDateTime.now().tzinfo
+        assert isinstance(e['date'], pendulum.Date)
 
 
 class TestFilterRequireField:
