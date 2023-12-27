@@ -5,6 +5,7 @@ from datetime import date, datetime
 from enum import Enum
 from typing import Callable, Iterable, Mapping, Optional, Sequence, Union
 
+import pendulum
 from loguru import logger
 
 from flexget import plugin
@@ -239,8 +240,7 @@ class Entry(LazyDict, Serializer):
                     f"{key} was set to a naive datetime. Plugin should be updated to provide a timezone aware datetime"
                 )
         elif isinstance(value, date):
-            # Dates become datetimes at midnight. This allows the user to compare with 'now' and other datetimes
-            value = CoercingDateTime.create(value.year, value.month, value.day, tz='local')
+            value = pendulum.instance(value)
 
         # url and original_url handling
         if key == 'url':

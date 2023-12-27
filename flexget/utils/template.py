@@ -44,8 +44,8 @@ def extra_vars() -> dict:
     return {
         'timedelta': pendulum.duration,
         'duration': pendulum.duration,
-        'utcnow': DateTime.utcnow(),
-        'now': DateTime.now(),
+        'utcnow': CoercingDateTime.utcnow(),
+        'now': CoercingDateTime.now(),
     }
 
 
@@ -58,11 +58,17 @@ class CoercingDateTime(DateTime):
     Datetime that avoids crashing when comparing tz aware and naive datetimes.
     When this happens, it will assume the naive datetime is in the same timezone as the dt aware one.
 
+    It also allows comparisons with plain dates, where the date is assumed to be at midnight in the same timezone.
+
     This allows us to introduce tz aware datetimes into entry fields without breaking old configs, or old plugins.
     """
 
     @staticmethod
     def _same_tz(first, second):
+        if isinstance(second, date) and not isinstance(second, datetime):
+            second = CoercingDateTime.create(
+                second.year, second.month, second.day, tz=first.tzinfo
+            )
         if first.tzinfo and not second.tzinfo:
             second = CoercingDateTime.instance(second, tz=first.tzinfo)
         elif not first.tzinfo and second.tzinfo:
