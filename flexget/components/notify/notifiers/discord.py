@@ -7,7 +7,7 @@ from loguru import logger
 from flexget import plugin
 from flexget.event import event
 from flexget.plugin import PluginWarning
-from flexget.utils.requests import RequestException, Session, TokenBucketLimiter
+from flexget.utils.requests import ReadTimeout, RequestException, Session, TokenBucketLimiter
 
 plugin_name = 'discord'
 
@@ -176,6 +176,9 @@ class DiscordNotifier:
                 session.add_domain_limiter(
                     TokenBucketLimiter('discord.com', tokens=tokens, rate=tokens_reset)
                 )
+            except ReadTimeout:
+                logger.info(f'Request timed out')
+                continue
             except RequestException as e:
                 if e.response.status_code == 429:
                     timeout = int(
