@@ -23,6 +23,7 @@ from jinja2 import (
 from jinja2.nativetypes import NativeTemplate
 from loguru import logger
 from pendulum import DateTime
+from pendulum import Interval as _Interval
 
 from flexget.event import event
 from flexget.utils.lazy_dict import LazyDict
@@ -53,12 +54,20 @@ class RenderError(Exception):
     """Error raised when there is a problem with jinja rendering."""
 
 
+class Interval(_Interval):
+    """Same as normal Interval, but gives a better string representation for our templates."""
+
+    def __str__(self):
+        return self.in_words()
+
+
 class CoercingDateTime(DateTime):
     """
-    Datetime that avoids crashing when comparing tz aware and naive datetimes.
-    When this happens, it will assume the naive datetime is in the same timezone as the dt aware one.
-
-    It also allows comparisons with plain dates, where the date is assumed to be at midnight in the same timezone.
+    Datetime with some features that make it better when used in our templates:
+    - Avoids crashing when comparing tz aware and naive datetimes.
+      When this happens, it will assume the naive datetime is in the same timezone as the dt aware one.
+    - Allows comparisons with plain dates, where the date is assumed to be at midnight in the same timezone.
+    - Returns `Interval`s with a nicer string representation for our templates
 
     This allows us to introduce tz aware datetimes into entry fields without breaking old configs, or old plugins.
     """
@@ -103,6 +112,15 @@ class CoercingDateTime(DateTime):
         if isinstance(other, datetime):
             self, other = self._same_tz(self, other)
         return DateTime.__sub__(self, other)
+
+    def diff(self, dt: Optional[datetime] = None, abs: bool = True) -> Interval:
+        """
+        Returns the difference between two DateTime objects represented as an Interval.
+        """
+        if dt is None:
+            dt = self.now(self.tz)
+
+        return Interval(self, dt, absolute=abs)
 
 
 def filter_pathbase(val: Optional[str]) -> str:
