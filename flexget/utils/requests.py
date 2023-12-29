@@ -11,7 +11,7 @@ from urllib.request import urlopen
 
 import requests
 from loguru import logger
-from requests import RequestException, ReadTimeout
+from requests import RequestException
 
 from flexget import __version__ as version
 from flexget.utils.tools import TimedDict, parse_timedelta

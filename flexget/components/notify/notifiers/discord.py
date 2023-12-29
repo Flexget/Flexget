@@ -3,11 +3,12 @@ from time import sleep as wait
 
 from dateutil.parser import ParserError, isoparse
 from loguru import logger
+from requests.exceptions import ReadTimeout
 
 from flexget import plugin
 from flexget.event import event
 from flexget.plugin import PluginWarning
-from flexget.utils.requests import ReadTimeout, RequestException, Session, TokenBucketLimiter
+from flexget.utils.requests import RequestException, Session, TokenBucketLimiter
 
 plugin_name = 'discord'
 
@@ -177,7 +178,7 @@ class DiscordNotifier:
                     TokenBucketLimiter('discord.com', tokens=tokens, rate=tokens_reset)
                 )
             except ReadTimeout:
-                logger.info(f'Request timed out')
+                logger.info('Request timed out')
                 continue
             except RequestException as e:
                 if e.response.status_code == 429:
