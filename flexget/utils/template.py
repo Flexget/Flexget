@@ -174,7 +174,7 @@ def filter_formatdate(val, format_str):
 
 def filter_parsedate(val):
     """Attempts to parse a date according to the rules in ISO 8601 and RFC 2822"""
-    return pendulum.parse(val, strict=False, tz=None)
+    return CoercingDateTime.instance(pendulum.parse(val, strict=False, tz=None))
 
 
 def filter_date_suffix(date_str: str):
