@@ -37,14 +37,11 @@ class TestSchemaValidator:
                 for i in item:
                     yield from refs_in(i)
 
+        registry = config_schema.Registry()
         for path, schema in iter_registered_schemas():
-            resolver = config_schema.RefResolver.from_schema(schema)
+            resolver = registry.resolver(base_uri=path)
             for ref in refs_in(schema):
-                try:
-                    with resolver.resolving(ref):
-                        pass
-                except jsonschema.RefResolutionError:
-                    raise AssertionError(f'$ref {ref} in schema {path} is invalid')
+                assert resolver.lookup(ref)
 
     def test_resolves_local_refs(self):
         schema = {'$ref': '/schema/plugin/accept_all'}
