@@ -1,4 +1,5 @@
 import datetime
+import functools
 import os
 import re
 from collections import defaultdict
@@ -10,6 +11,8 @@ from urllib.parse import parse_qsl, urlparse
 import jsonschema
 from jsonschema import ValidationError
 from loguru import logger
+from referencing import Registry as _Registry
+from referencing import Resource
 from referencing.exceptions import Unresolvable
 
 from flexget.event import fire_event
@@ -122,6 +125,10 @@ def resolve_ref(uri: str) -> JsonSchema:
     raise Unresolvable("%s could not be resolved" % uri)
 
 
+def retrieve_resource(uri: str) -> Resource:
+    return Resource.from_contents(resolve_ref(uri))
+
+
 def process_config(
     config: Any, schema: Optional[JsonSchema] = None, set_defaults: bool = True
 ) -> List[ConfigValidationError]:
@@ -134,16 +141,17 @@ def process_config(
     """
     if schema is None:
         schema = get_schema()
-    resolver = RefResolver.from_schema(schema)
+
+    registry = Registry()
     if set_defaults:
         # Use the jsonschema 'validates' decorator to make sure our custom behavior continues across $refs
         # which declare a $schema. https://github.com/python-jsonschema/jsonschema/issues/994
         jsonschema.validators.validates(f'{BASE_SCHEMA_NAME} w defaults')(SchemaValidatorWDefaults)
         validator = SchemaValidatorWDefaults(
-            schema, resolver=resolver, format_checker=format_checker
+            schema, registry=registry, format_checker=format_checker
         )
     else:
-        validator = SchemaValidator(schema, resolver=resolver, format_checker=format_checker)
+        validator = SchemaValidator(schema, registry=registry, format_checker=format_checker)
     try:
         errors: List[ValidationError] = list(validator.iter_errors(config))
     finally:
@@ -196,10 +204,7 @@ def parse_size(size_input: str, si: bool = False) -> int:
 # Public API end here, the rest should not be used outside this module
 
 
-class RefResolver(jsonschema.RefResolver):
-    def __init__(self, *args, **kwargs):
-        kwargs.setdefault('handlers', {'': resolve_ref})
-        super().__init__(*args, **kwargs)
+Registry = functools.partial(_Registry, retrieve=retrieve_resource)
 
 
 format_checker = jsonschema.FormatChecker(('email',))
