@@ -77,7 +77,7 @@ class NextSonarrEpisodes:
     # Function that gets a page number and page size and returns the responding result json
     def get_page(self, task, config, page_number):
         parsedurl = urlparse(config.get('base_url'))
-        url = '{}://{}:{}{}/api/wanted/missing?page={}&pageSize={}&sortKey=series.title&sortdir=asc'.format(
+        url = '{}://{}:{}{}/api/v3/wanted/missing?page={}&pageSize={}&sortKey=series.title&sortdir=asc'.format(
             parsedurl.scheme,
             parsedurl.netloc,
             config.get('port'),
