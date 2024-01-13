@@ -154,6 +154,7 @@ _codecs = [
     QualityComponent('codec', 20, 'xvid'),
     QualityComponent('codec', 25, 'nvenc'),
     QualityComponent('codec', 30, 'h264', '[hx].?264'),
+    QualityComponent('codec', 30, 'h264', 'avc'),
     QualityComponent('codec', 35, 'vp9'),
     QualityComponent('codec', 40, 'h265', '[hx].?265'),
     QualityComponent('codec', 40, 'h265', 'hevc'),
