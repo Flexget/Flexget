@@ -116,7 +116,7 @@ pysftp = "^0.2.9"
 subliminal = ">= 2.0rc1"
 
 [tool.poetry.group.docker.dependencies]
-transmission-rpc = "^4.1.4"
+transmission-rpc = "^4.1.4 || ^7.0.0"
 qbittorrent-api = "^2023.3.44 || ^2024.0.0"
 deluge-client = "^1.9.0"
 cloudscraper = "^1.2.69"
