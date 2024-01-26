@@ -44,7 +44,7 @@ if TYPE_CHECKING:
 
 logger = logger.bind(name='transmission')
 
-__version__ = '>=7.0.0,=<7.0.3'
+__version__ = '>=7.0.3,<8.0.0'
 __package__ = 'transmission-rpc'
 __requirement__ = packaging.specifiers.SpecifierSet(__version__)
 
