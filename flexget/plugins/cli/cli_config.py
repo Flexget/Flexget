@@ -16,6 +16,7 @@ Commandline example::
   --cli-config url=http://some.url/ path=~/downloads
 
 """
+
 import argparse
 import functools
 

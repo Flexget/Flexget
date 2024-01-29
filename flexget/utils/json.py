@@ -4,6 +4,7 @@ Plugins can just import the methods from this module.
 
 Also allows date and datetime objects to be encoded/decoded.
 """
+
 import datetime
 from collections.abc import Iterable, Mapping
 from contextlib import suppress

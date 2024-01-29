@@ -1,4 +1,5 @@
 """Plugin for telegram input"""
+
 import re
 
 from loguru import logger

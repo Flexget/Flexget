@@ -6,6 +6,7 @@ Avoid using this module on your own or in plugins, this was originally made for 
 You can safely use task.simple_persistence and manager.persist, if we implement something better we
 can replace underlying mechanism in single point (and provide transparent switch).
 """
+
 import pickle
 from collections import defaultdict
 from collections.abc import MutableMapping

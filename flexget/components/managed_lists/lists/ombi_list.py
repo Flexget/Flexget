@@ -1,5 +1,6 @@
 """Create a Ombi managed list.
 """
+
 from __future__ import annotations
 
 from collections.abc import MutableSet

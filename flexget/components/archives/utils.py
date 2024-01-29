@@ -5,7 +5,6 @@ Provides wrapper archive and exception classes to simplify
 archive extraction
 """
 
-
 import os
 import shutil
 import zipfile

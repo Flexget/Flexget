@@ -1,4 +1,5 @@
 """Logging utilities"""
+
 import hashlib
 from datetime import datetime, timedelta
 from typing import TYPE_CHECKING, Optional

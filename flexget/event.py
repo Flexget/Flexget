@@ -1,6 +1,7 @@
 """
 Provides small event framework
 """
+
 from typing import Any, Callable, Dict, List
 
 from loguru import logger

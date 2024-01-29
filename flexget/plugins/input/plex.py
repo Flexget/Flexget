@@ -1,4 +1,5 @@
 """Plugin for plex media server (www.plexapp.com)."""
+
 import os
 import re
 from os.path import basename

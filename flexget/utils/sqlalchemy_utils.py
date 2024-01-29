@@ -1,6 +1,7 @@
 """
 Miscellaneous SQLAlchemy helpers.
 """
+
 from typing import Any, List, Optional, Union
 
 from loguru import logger
