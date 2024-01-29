@@ -52,9 +52,11 @@ def generate_episode_title(item):
 
 field_maps = {
     'movie': {
-        'title': lambda i: '{} ({})'.format(i['movie']['title'], i['movie']['year'])
-        if i['movie']['year'] and not i['strip_dates']
-        else '%s' % i['movie']['title'],
+        'title': lambda i: (
+            '{} ({})'.format(i['movie']['title'], i['movie']['year'])
+            if i['movie']['year'] and not i['strip_dates']
+            else '%s' % i['movie']['title']
+        ),
         'movie_name': 'movie.title',
         'movie_year': 'movie.year',
         'trakt_movie_name': 'movie.title',

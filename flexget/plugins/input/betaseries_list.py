@@ -1,4 +1,5 @@
 """Input plugin for www.betaseries.com"""
+
 from hashlib import md5
 
 from loguru import logger

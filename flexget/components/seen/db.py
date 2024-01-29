@@ -7,6 +7,7 @@ forget (string)
     task name then everything in that task will be forgotten. With title all learned fields from it and the
     title will be forgotten. With field value only that particular field is forgotten.
 """
+
 from datetime import datetime
 
 from loguru import logger

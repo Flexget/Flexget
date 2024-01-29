@@ -128,16 +128,16 @@ class SearchAwesomeHD:
             if 'WEB' in source.upper():
                 encoder = re.sub('REMUX', '', encoder, flags=re.IGNORECASE).strip()
 
-            e[
-                'title'
-            ] = '{movie_name} {year} {resolution} {source} {audio} {encoder}-{release_group}'.format(
-                movie_name=result.find('name').get_text(),
-                year=result.find('year').get_text(),
-                resolution=result.find('resolution').get_text(),
-                source=source,
-                audio=audio,
-                encoder=encoder,
-                release_group=e['release_group'],
+            e['title'] = (
+                '{movie_name} {year} {resolution} {source} {audio} {encoder}-{release_group}'.format(
+                    movie_name=result.find('name').get_text(),
+                    year=result.find('year').get_text(),
+                    resolution=result.find('resolution').get_text(),
+                    source=source,
+                    audio=audio,
+                    encoder=encoder,
+                    release_group=e['release_group'],
+                )
             )
 
             entries.add(e)

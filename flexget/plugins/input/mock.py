@@ -1,4 +1,5 @@
 """Plugin for mocking task data."""
+
 from loguru import logger
 
 from flexget import plugin

@@ -5,6 +5,7 @@
   We have normalizers in way too many places as is ...
 
 """
+
 import re
 from unicodedata import normalize
 

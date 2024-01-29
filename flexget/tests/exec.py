@@ -4,6 +4,7 @@ It requires 2 arguments, the output directory and filename.
 A file will be created in the output directory with the given filename.
 If there are more arguments to the script, they will be written 1 per line to the file.
 """
+
 import os
 import sys
 

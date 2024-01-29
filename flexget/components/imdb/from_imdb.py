@@ -272,11 +272,13 @@ class FromIMDB:
             person.get(job_type, [])
             if job_type in self.jobs_without_content_type
             else [
-                person.get(job_type + ' ' + 'documentary', [])
-                and person.get(job_type + ' ' + 'short', [])
-                and self.items_by_content_type(person, job_type, content_type)
-                if content_type == 'movie'
-                else self.items_by_content_type(person, job_type, content_type)
+                (
+                    person.get(job_type + ' ' + 'documentary', [])
+                    and person.get(job_type + ' ' + 'short', [])
+                    and self.items_by_content_type(person, job_type, content_type)
+                    if content_type == 'movie'
+                    else self.items_by_content_type(person, job_type, content_type)
+                )
                 for content_type in content_types
             ]
         )

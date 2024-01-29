@@ -1,4 +1,5 @@
 """Plugin for json files."""
+
 from pathlib import Path
 
 import dateutil.parser as parser

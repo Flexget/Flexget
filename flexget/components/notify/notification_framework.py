@@ -20,7 +20,6 @@ describes the config format for the plugin.
 
 """
 
-
 from jinja2 import Template
 from loguru import logger
 

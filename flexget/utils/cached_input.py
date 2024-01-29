@@ -24,8 +24,7 @@ logger = logger.bind(name='input_cache')
 if TYPE_CHECKING:
 
     class Base:
-        def __init__(self, *args, **kwargs) -> None:
-            ...
+        def __init__(self, *args, **kwargs) -> None: ...
 
 else:
     Base = db_schema.versioned_base('input_cache', 2)

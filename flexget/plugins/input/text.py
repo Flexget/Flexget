@@ -1,4 +1,5 @@
 """Plugin for text file or URL feeds via regex."""
+
 import re
 from pathlib import Path
 
