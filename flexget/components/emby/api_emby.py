@@ -2602,13 +2602,13 @@ class EmbyApi(EmbyApiBase):
     def set_provideres_search_arg(args: dict, **kwargs):
         providers = []
 
-        if 'imdb_id' in kwargs and kwargs['imdb_id']:
+        if kwargs.get('imdb_id'):
             providers.append(f'imdb.{kwargs.get("imdb_id")}')
-        if 'tmdb_id' in kwargs and kwargs['tmdb_id']:
+        if kwargs.get('tmdb_id'):
             providers.append(f'tmdb.{kwargs.get("tmdb_id")}')
-        if 'tvdb_id' in kwargs and kwargs['tvdb_id']:
+        if kwargs.get('tvdb_id'):
             providers.append(f'tvdb.{kwargs.get("tvdb_id")}')
-        if 'tvrage_id' in kwargs and kwargs['tvrage_id']:
+        if kwargs.get('tvrage_id'):
             providers.append(f'tvrage.{kwargs.get("tvrage_id")}')
 
         providers = list(dict.fromkeys(providers))

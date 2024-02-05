@@ -191,7 +191,7 @@ class RegexpParse:
         # put every key in keys into the rey_to_regexps list
         for key, value in config['keys'].items():
             key_to_regexps[key] = self.compile_regexp_dict_list(value['regexps'])
-            if 'required' in value and value['required']:
+            if value.get('required'):
                 self.required.append(key)
 
         entries = []
