@@ -44,6 +44,7 @@ class ConvertMagnet:
             params['url'] = magnet_uri
         else:
             params.url = magnet_uri
+        params.save_path = destination_folder
         handle = session.add_torrent(params)
         logger.debug('Acquiring torrent metadata for magnet {}', magnet_uri)
         timeout_value = timeout
