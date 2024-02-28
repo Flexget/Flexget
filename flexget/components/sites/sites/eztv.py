@@ -1,8 +1,8 @@
 import re
-
-from loguru import logger
 from math import ceil
 from urllib.parse import urlparse, urlunparse, quote
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.components.sites.urlrewriting import UrlRewritingError
@@ -108,16 +108,15 @@ class Eztv:
         task.requests.add_domain_limiter(TimedLimiter('eztvx.to', '2 seconds'))
         if not entry.get('imdb_id'):
             raise plugin.PluginWarning(f'Entry `{entry["title"]}` has no `imdb_id` set')
-        for result in self.get_results(task, entry, entry['imdb_id'].lstrip('tt')):
-            yield result
+        yield from self.get_results(task, entry, entry['imdb_id'].lstrip('tt'))
 
     @cached('eztv', persist='2 hours')
     def on_task_input(self, task, config=None):
         if not config:
             return
         task.requests.add_domain_limiter(TimedLimiter('eztvx.to', '2 seconds'))
-        for entry in self.get_results(task):
-            yield entry
+        yield from self.get_results(task)
+
 
 
 @event('plugin.register')
