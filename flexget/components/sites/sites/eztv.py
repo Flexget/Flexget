@@ -103,6 +103,8 @@ class Eztv:
                 results = self.api_call(task, entry, query)
 
     def search(self, task, entry, config=None):
+        if not config:
+            return
         task.requests.add_domain_limiter(TimedLimiter('eztvx.to', '2 seconds'))
         if not entry.get('imdb_id'):
             raise plugin.PluginWarning(f'Entry `{entry["title"]}` has no `imdb_id` set')
@@ -111,6 +113,8 @@ class Eztv:
 
     @cached('eztv', persist='2 hours')
     def on_task_input(self, task, config=None):
+        if not config:
+            return
         task.requests.add_domain_limiter(TimedLimiter('eztvx.to', '2 seconds'))
         for entry in self.get_results(task):
             yield entry
