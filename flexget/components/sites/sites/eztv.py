@@ -1,6 +1,6 @@
 import re
 from math import ceil
-from urllib.parse import urlparse, urlunparse, quote
+from urllib.parse import urlparse, urlunparse
 
 from loguru import logger
 
@@ -116,7 +116,6 @@ class Eztv:
             return
         task.requests.add_domain_limiter(TimedLimiter('eztvx.to', '2 seconds'))
         yield from self.get_results(task)
-
 
 
 @event('plugin.register')
