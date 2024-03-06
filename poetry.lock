@@ -2927,13 +2927,13 @@ files = [
 
 [[package]]
 name = "rpyc"
-version = "5.3.1"
+version = "6.0.0"
 description = "Remote Python Call (RPyC) is a transparent and symmetric distributed computing library"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "rpyc-5.3.1-py3-none-any.whl", hash = "sha256:6e8153792ac221a80f420d2e0b241a10c6e43b105d325998b18a4e7af329f9ec"},
-    {file = "rpyc-5.3.1.tar.gz", hash = "sha256:f2233174879faf18ae266437d5a65511ce46c817cec4edc1344f036758cfbf52"},
+    {file = "rpyc-6.0.0-py3-none-any.whl", hash = "sha256:e86b5831378f794c623db46e8ade6fff766c56cf9dbe96886e614025b4647339"},
+    {file = "rpyc-6.0.0.tar.gz", hash = "sha256:a7e12b31f40978cbd6b74e0b713da389d4b2565cef612adcb0f4b41aeb188230"},
 ]
 
 [package.dependencies]
