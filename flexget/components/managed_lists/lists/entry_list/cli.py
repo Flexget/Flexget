@@ -86,18 +86,14 @@ def entry_list_show(options):
             entry = db.get_entry_by_id(entry_list.id, int(options.entry), session=session)
         except NoResultFound:
             console(
-                'Could not find matching entry with ID {} in list `{}`'.format(
-                    int(options.entry), options.list_name
-                )
+                f'Could not find matching entry with ID {int(options.entry)} in list `{options.list_name}`'
             )
             return
         except ValueError:
             entry = db.get_entry_by_title(entry_list.id, options.entry, session=session)
             if not entry:
                 console(
-                    'Could not find matching entry with title `{}` in list `{}`'.format(
-                        options.entry, options.list_name
-                    )
+                    f'Could not find matching entry with title `{options.entry}` in list `{options.list_name}`'
                 )
                 return
         table = TerminalTable('Field name', 'Value', table_type=options.table_type)
@@ -121,9 +117,7 @@ def entry_list_add(options):
         db_entry = db.get_entry_by_title(list_id=entry_list.id, title=title, session=session)
         if db_entry:
             console(
-                "Entry with the title `{}` already exist with list `{}`. Will replace identifiers if given".format(
-                    title, entry_list.name
-                )
+                f"Entry with the title `{title}` already exist with list `{entry_list.name}`. Will replace identifiers if given"
             )
             output = f'Successfully updated entry `{title}` to entry list `{entry_list.name}` '
         else:
@@ -151,18 +145,14 @@ def entry_list_del(options):
             db_entry = db.get_entry_by_id(entry_list.id, int(options.entry), session=session)
         except NoResultFound:
             console(
-                'Could not find matching entry with ID {} in list `{}`'.format(
-                    int(options.entry), options.list_name
-                )
+                f'Could not find matching entry with ID {int(options.entry)} in list `{options.list_name}`'
             )
             return
         except ValueError:
             db_entry = db.get_entry_by_title(entry_list.id, options.entry, session=session)
             if not db_entry:
                 console(
-                    'Could not find matching entry with title `{}` in list `{}`'.format(
-                        options.entry, options.list_name
-                    )
+                    f'Could not find matching entry with title `{options.entry}` in list `{options.list_name}`'
                 )
                 return
         console(f'Removing entry `{db_entry.title}` from list {options.list_name}')

@@ -101,9 +101,7 @@ class UrlRewriteFuzer:
 
             e = Entry()
             e['title'] = name
-            final_url = 'https://www.fuzer.me/rss/torrent.php/{}/{}/{}/{}'.format(
-                attachment_id, self.user_id, self.rss_key, torrent_name
-            )
+            final_url = f'https://www.fuzer.me/rss/torrent.php/{attachment_id}/{self.user_id}/{self.rss_key}/{torrent_name}'
 
             logger.debug('RSS-ified download link: {}', final_url)
             e['url'] = final_url

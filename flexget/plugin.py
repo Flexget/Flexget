@@ -69,12 +69,7 @@ class DependencyError(Exception):
     message = property(_get_message, _set_message)
 
     def __str__(self) -> str:
-        return '<DependencyError(issued_by={!r},missing={!r},message={!r},silent={!r})>'.format(
-            self.issued_by,
-            self.missing,
-            self.message,
-            self.silent,
-        )
+        return f'<DependencyError(issued_by={self.issued_by!r},missing={self.missing!r},message={self.message!r},silent={self.silent!r})>'
 
 
 class RegisterException(Exception):

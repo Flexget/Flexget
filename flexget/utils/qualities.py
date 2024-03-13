@@ -320,13 +320,7 @@ class Quality(Serializer):
         return self._comparator < other._comparator
 
     def __repr__(self) -> str:
-        return '<Quality(resolution={},source={},codec={},color_range={},audio={})>'.format(
-            self.resolution,
-            self.source,
-            self.codec,
-            self.color_range,
-            self.audio,
-        )
+        return f'<Quality(resolution={self.resolution},source={self.source},codec={self.codec},color_range={self.color_range},audio={self.audio})>'
 
     def __str__(self) -> str:
         return self.name

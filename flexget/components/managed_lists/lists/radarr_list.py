@@ -122,12 +122,7 @@ class RadarrAPIService:
         if parsed_base_url.port:
             port = int(parsed_base_url.port)
 
-        self.api_url = "{}://{}:{}{}/api/v3/".format(
-            parsed_base_url.scheme,
-            parsed_base_url.netloc,
-            port,
-            parsed_base_url.path,
-        )
+        self.api_url = f"{parsed_base_url.scheme}://{parsed_base_url.netloc}:{port}{parsed_base_url.path}/api/v3/"
 
     def get_profiles(self):
         """Gets all profiles"""

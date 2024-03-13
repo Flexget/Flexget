@@ -110,11 +110,9 @@ class TestQualityParser:
         if not guessit and parser.__name__ == 'ParserGuessit':
             return
         quality = parser().parse_movie(test_quality[0]).quality
-        assert str(quality) == test_quality[1], '`{}` quality should be `{}` not `{}`'.format(
-            test_quality[0],
-            test_quality[1],
-            quality,
-        )
+        assert (
+            str(quality) == test_quality[1]
+        ), f'`{test_quality[0]}` quality should be `{test_quality[1]}` not `{quality}`'
 
 
 class TestQualityInternalParser:
@@ -132,11 +130,9 @@ class TestQualityInternalParser:
     )
     def test_quality_failures(self, test_quality):
         quality = ParserInternal().parse_movie(test_quality[0]).quality
-        assert str(quality) == test_quality[1], '`{}` quality should be `{}` not `{}`'.format(
-            test_quality[0],
-            test_quality[1],
-            quality,
-        )
+        assert (
+            str(quality) == test_quality[1]
+        ), f'`{test_quality[0]}` quality should be `{test_quality[1]}` not `{quality}`'
 
 
 class TestFilterQuality:

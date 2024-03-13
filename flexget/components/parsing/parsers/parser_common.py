@@ -98,16 +98,7 @@ class MovieParseResult:
 
     def __str__(self) -> str:
         valid = 'OK' if self.valid else 'INVALID'
-        return '<MovieParseResult(data={},name={},year={},id={},quality={},proper={},release_group={},status={})>'.format(
-            self.data,
-            self.name,
-            self.year,
-            self.identifier,
-            self.quality,
-            self.proper_count,
-            self.release_group,
-            valid,
-        )
+        return f'<MovieParseResult(data={self.data},name={self.name},year={self.year},id={self.identifier},quality={self.quality},proper={self.proper_count},release_group={self.release_group},status={valid})>'
 
 
 class SeriesParseResult:
@@ -206,17 +197,6 @@ class SeriesParseResult:
     def __str__(self) -> str:
         valid = 'OK' if self.valid else 'INVALID'
         return (
-            '<SeriesParseResult(data={},name={},id={},season={},season_pack={},episode={},quality={},proper={},'
-            'special={},status={})>'.format(
-                self.data,
-                self.name,
-                str(self.id),
-                self.season,
-                self.season_pack,
-                self.episode,
-                self.quality,
-                self.proper_count,
-                self.special,
-                valid,
-            )
+            f'<SeriesParseResult(data={self.data},name={self.name},id={self.id!s},season={self.season},season_pack={self.season_pack},episode={self.episode},quality={self.quality},proper={self.proper_count},'
+            f'special={self.special},status={valid})>'
         )

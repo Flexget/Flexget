@@ -670,18 +670,6 @@ class SeriesParser(TitleParser):
         if self.valid:
             valid = 'OK'
         return (
-            '<SeriesParser(data={},name={},id={},id_type={},identified_by={},season={},season_pack={},episode={},quality={},proper={},'
-            'status={})>'.format(
-                self.data,
-                self.name,
-                str(self.id),
-                self.id_type,
-                self.identified_by,
-                self.season,
-                self.season_pack,
-                self.episode,
-                self.quality,
-                self.proper_count,
-                valid,
-            )
+            f'<SeriesParser(data={self.data},name={self.name},id={self.id!s},id_type={self.id_type},identified_by={self.identified_by},season={self.season},season_pack={self.season_pack},episode={self.episode},quality={self.quality},proper={self.proper_count},'
+            f'status={valid})>'
         )

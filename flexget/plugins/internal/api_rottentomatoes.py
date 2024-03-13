@@ -253,11 +253,7 @@ class RottenTomatoesSearchResult(Base):
     movie = relationship(RottenTomatoesMovie, backref='search_strings')
 
     def __repr__(self) -> str:
-        return '<RottenTomatoesSearchResult(search={},movie_id={},movie={})>'.format(
-            self.search,
-            self.movie_id,
-            self.movie,
-        )
+        return f'<RottenTomatoesSearchResult(search={self.search},movie_id={self.movie_id},movie={self.movie})>'
 
 
 @internet(logger)

@@ -80,17 +80,7 @@ class TaskExecution(Base):
     abort_reason = Column(String, nullable=True)
 
     def __repr__(self):
-        return '<TaskExecution(task_id={},start={},end={},succeeded={},p={},a={},r={},f={},reason={})>'.format(
-            self.task_id,
-            self.start,
-            self.end,
-            self.succeeded,
-            self.produced,
-            self.accepted,
-            self.rejected,
-            self.failed,
-            self.abort_reason,
-        )
+        return f'<TaskExecution(task_id={self.task_id},start={self.start},end={self.end},succeeded={self.succeeded},p={self.produced},a={self.accepted},r={self.rejected},f={self.failed},reason={self.abort_reason})>'
 
     def to_dict(self):
         return {

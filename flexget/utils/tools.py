@@ -278,10 +278,7 @@ class TimedDict(MutableMapping):
         return len(list(self.__iter__()))
 
     def __repr__(self):
-        return '{}({!r})'.format(
-            self.__class__.__name__,
-            dict(list(zip(self._store, (v[1] for v in list(self._store.values()))))),
-        )
+        return f'{self.__class__.__name__}({dict(list(zip(self._store, (v[1] for v in list(self._store.values())))))!r})'
 
     @classmethod
     def clear_all(cls):

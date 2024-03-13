@@ -54,9 +54,7 @@ class PendingEntry(Base):
         self.entry = entry
 
     def __repr__(self):
-        return '<PendingEntry(task_name={},title={},url={},approved={})>'.format(
-            self.task_name, self.title, self.url, self.approved
-        )
+        return f'<PendingEntry(task_name={self.task_name},title={self.title},url={self.url},approved={self.approved})>'
 
     def to_dict(self):
         return {

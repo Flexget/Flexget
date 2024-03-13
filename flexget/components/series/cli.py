@@ -266,10 +266,7 @@ def display_details(options):
                 ' during this time.'
             )
         else:
-            footer += '\n `{}` uses `{}` mode to identify episode numbering.'.format(
-                series.name,
-                series.identified_by,
-            )
+            footer += f'\n `{series.name}` uses `{series.identified_by}` mode to identify episode numbering.'
         begin_text = 'option'
         if series.begin:
             footer += f' \n Begin for `{series.name}` is set to `{series.begin.identifier}`.'

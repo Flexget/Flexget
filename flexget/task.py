@@ -560,11 +560,7 @@ class Task:
             else:
                 warn.logger.warning(warn)
         except EntryUnicodeError as eue:
-            msg = 'Plugin {} tried to create non-unicode compatible entry (key: {}, value: {!r})'.format(
-                keyword,
-                eue.key,
-                eue.value,
-            )
+            msg = f'Plugin {keyword} tried to create non-unicode compatible entry (key: {eue.key}, value: {eue.value!r})'
             logger.critical(msg)
             self.abort(msg)
         except PluginError as err:
@@ -593,9 +589,7 @@ class Task:
         :param str plugin: Plugin name
         :param str reason: Why the rerun is done
         """
-        msg = 'Plugin {} has requested task to be ran again after execution has completed.'.format(
-            self.current_plugin if plugin is None else plugin
-        )
+        msg = f'Plugin {self.current_plugin if plugin is None else plugin} has requested task to be ran again after execution has completed.'
         if reason:
             msg += f' Reason: {reason}'
         # Only print the first request for a rerun to the info log

@@ -71,11 +71,7 @@ class PendingListEntry(Base):
         self.approved = False
 
     def __repr__(self):
-        return '<PendingListEntry,title={},original_url={},approved={}>'.format(
-            self.title,
-            self.original_url,
-            self.approved,
-        )
+        return f'<PendingListEntry,title={self.title},original_url={self.original_url},approved={self.approved}>'
 
     def to_dict(self):
         return {

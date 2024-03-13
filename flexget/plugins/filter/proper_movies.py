@@ -29,14 +29,7 @@ class ProperMovie(Base):
         self.added = datetime.now()
 
     def __repr__(self):
-        return '<ProperMovie(title={},task={},imdb_id={},quality={},proper_count={},added={})>'.format(
-            self.title,
-            self.task,
-            self.imdb_id,
-            self.quality,
-            self.proper_count,
-            self.added,
-        )
+        return f'<ProperMovie(title={self.title},task={self.task},imdb_id={self.imdb_id},quality={self.quality},proper_count={self.proper_count},added={self.added})>'
 
 
 # create index

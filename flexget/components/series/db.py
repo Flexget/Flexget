@@ -209,12 +209,7 @@ class Season(Base):
         return False
 
     def __str__(self):
-        return '<Season(id={},identifier={},season={},completed={})>'.format(
-            self.id,
-            self.identifier,
-            self.season,
-            self.completed,
-        )
+        return f'<Season(id={self.id},identifier={self.identifier},season={self.season},completed={self.completed})>'
 
     def __repr__(self):
         return str(self).encode('ascii', 'replace')
@@ -344,13 +339,7 @@ class Episode(Base):
         )[0]
 
     def __str__(self):
-        return '<Episode(id={},identifier={},season={},number={},identified_by={})>'.format(
-            self.id,
-            self.identifier,
-            self.season,
-            self.number,
-            self.identified_by,
-        )
+        return f'<Episode(id={self.id},identifier={self.identifier},season={self.season},number={self.number},identified_by={self.identified_by})>'
 
     def __repr__(self):
         return str(self).encode('ascii', 'replace')
@@ -451,13 +440,7 @@ class EpisodeRelease(Base):
         return self.proper_count > 0
 
     def __str__(self):
-        return '<Release(id={},quality={},downloaded={},proper_count={},title={})>'.format(
-            self.id,
-            self.quality,
-            self.downloaded,
-            self.proper_count,
-            self.title,
-        )
+        return f'<Release(id={self.id},quality={self.quality},downloaded={self.downloaded},proper_count={self.proper_count},title={self.title})>'
 
     def __repr__(self):
         return str(self).encode('ascii', 'replace')
@@ -499,13 +482,7 @@ class SeasonRelease(Base):
         return self.proper_count > 0
 
     def __str__(self):
-        return '<Release(id={},quality={},downloaded={},proper_count={},title={})>'.format(
-            self.id,
-            self.quality,
-            self.downloaded,
-            self.proper_count,
-            self.title,
-        )
+        return f'<Release(id={self.id},quality={self.quality},downloaded={self.downloaded},proper_count={self.proper_count},title={self.title})>'
 
     def __repr__(self):
         return str(self).encode('ascii', 'replace')
@@ -784,10 +761,8 @@ def set_alt_names(alt_names: Iterable[str], db_series: Series, session: Session)
         if db_series_alt:
             if not db_series_alt.series_id == db_series.id:
                 raise plugin.PluginError(
-                    'Error adding alternate name for `{}`: `{}` is already associated with `{}`. '
-                    'Check your settings.'.format(
-                        db_series.name, alt_name, db_series_alt.series.name
-                    )
+                    f'Error adding alternate name for `{db_series.name}`: `{alt_name}` is already associated with `{db_series_alt.series.name}`. '
+                    'Check your settings.'
                 )
             else:
                 logger.debug(
@@ -933,8 +908,8 @@ def _add_alt_name(alt: str, db_series: Series, series_name: str, session: Sessio
         else:
             # Alternate name already exists for another series. Not good.
             raise plugin.PluginError(
-                'Error adding alternate name for `{}`: `{}` is already associated with `{}`. '
-                'Check your settings.'.format(series_name, alt, db_series_alt.series.name)
+                f'Error adding alternate name for `{series_name}`: `{alt}` is already associated with `{db_series_alt.series.name}`. '
+                'Check your settings.'
             )
     else:
         logger.debug('adding alternate name `{}` for `{}` into db', alt, series_name)
