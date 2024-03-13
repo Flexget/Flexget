@@ -478,17 +478,15 @@ class TestSeriesParser:
                     continue
 
                 s = parse(f'FooBar - {mock_ep1} {quality2.name}-FlexGet', name='FooBar')
-                assert s.episode == int(mock_ep1), "confused episode {} with quality {}".format(
-                    mock_ep1,
-                    quality2.name,
-                )
+                assert s.episode == int(
+                    mock_ep1
+                ), f"confused episode {mock_ep1} with quality {quality2.name}"
 
                 # Also test with reversed relative order of episode and quality
                 s = parse(f'[{quality2.name}] FooBar - {mock_ep1} [FlexGet]', name='FooBar')
-                assert s.episode == int(mock_ep1), "confused episode {} with quality {}".format(
-                    mock_ep1,
-                    quality2.name,
-                )
+                assert s.episode == int(
+                    mock_ep1
+                ), f"confused episode {mock_ep1} with quality {quality2.name}"
 
     def test_name_with_number(self, parse):
         """SeriesParser: test number in a name"""

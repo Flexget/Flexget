@@ -95,12 +95,7 @@ class SeenEntry(Base):
         self.local = local
 
     def __str__(self):
-        return '<SeenEntry(title={},reason={},task={},added={})>'.format(
-            self.title,
-            self.reason,
-            self.task,
-            self.added,
-        )
+        return f'<SeenEntry(title={self.title},reason={self.reason},task={self.task},added={self.added})>'
 
     def to_dict(self):
         fields = []

@@ -27,9 +27,8 @@ class MyEpisodesInfo(Base):
         self.updated = datetime.now()
 
     def __repr__(self):
-        return '<MyEpisodesInfo(series_name={}, myepisodes_id={})>'.format(
-            self.series_name,
-            self.myepisodes_id,
+        return (
+            f'<MyEpisodesInfo(series_name={self.series_name}, myepisodes_id={self.myepisodes_id})>'
         )
 
 

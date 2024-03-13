@@ -46,12 +46,7 @@ class ReorderQuality:
 
             if quality_component.type != other_quality_component.type:
                 raise plugin.PluginError(
-                    '{}={} and {}={} do not have the same quality type'.format(
-                        quality,
-                        quality_component.type,
-                        other_quality,
-                        other_quality_component.type,
-                    )
+                    f'{quality}={quality_component.type} and {other_quality}={other_quality_component.type} do not have the same quality type'
                 )
 
             self.quality_priorities[quality] = quality_component.value

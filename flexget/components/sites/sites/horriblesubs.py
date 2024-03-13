@@ -75,9 +75,7 @@ class HorribleSubs:
             entries = HorribleSubs.horrible_get_downloads(
                 requests,
                 title,
-                'https://horriblesubs.info/api.php?method=getshows&type=show&mode=filter&showid={}&value={}'.format(
-                    show_id, episode
-                ),
+                f'https://horriblesubs.info/api.php?method=getshows&type=show&mode=filter&showid={show_id}&value={episode}',
             )
         return entries
 

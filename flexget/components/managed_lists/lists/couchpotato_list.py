@@ -17,49 +17,25 @@ class CouchPotatoBase:
     def movie_list_request(base_url, port, api_key):
         parsedurl = urlparse(base_url)
         logger.debug('Received movie list request')
-        return '{}://{}:{}{}/api/{}/movie.list?status=active'.format(
-            parsedurl.scheme,
-            parsedurl.netloc,
-            port,
-            parsedurl.path,
-            api_key,
-        )
+        return f'{parsedurl.scheme}://{parsedurl.netloc}:{port}{parsedurl.path}/api/{api_key}/movie.list?status=active'
 
     @staticmethod
     def profile_list_request(base_url, port, api_key):
         parsedurl = urlparse(base_url)
         logger.debug('Received profile list request')
-        return '{}://{}:{}{}/api/{}/profile.list'.format(
-            parsedurl.scheme,
-            parsedurl.netloc,
-            port,
-            parsedurl.path,
-            api_key,
-        )
+        return f'{parsedurl.scheme}://{parsedurl.netloc}:{port}{parsedurl.path}/api/{api_key}/profile.list'
 
     @staticmethod
     def movie_add_request(base_url, port, api_key):
         parsedurl = urlparse(base_url)
         logger.debug('Received movie add request')
-        return '{}://{}:{}{}/api/{}/movie.add'.format(
-            parsedurl.scheme,
-            parsedurl.netloc,
-            port,
-            parsedurl.path,
-            api_key,
-        )
+        return f'{parsedurl.scheme}://{parsedurl.netloc}:{port}{parsedurl.path}/api/{api_key}/movie.add'
 
     @staticmethod
     def movie_delete_request(base_url, port, api_key):
         parsedurl = urlparse(base_url)
         logger.debug('Received movie delete request')
-        return '{}://{}:{}{}/api/{}/movie.delete?delete_from=wanted'.format(
-            parsedurl.scheme,
-            parsedurl.netloc,
-            port,
-            parsedurl.path,
-            api_key,
-        )
+        return f'{parsedurl.scheme}://{parsedurl.netloc}:{port}{parsedurl.path}/api/{api_key}/movie.delete?delete_from=wanted'
 
     @staticmethod
     def build_url(base_url, request_type, port, api_key):

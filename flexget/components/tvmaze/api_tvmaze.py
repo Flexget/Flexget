@@ -182,10 +182,8 @@ class TVMazeSeries(Base):
         self.seasons = self.populate_seasons(series)
 
     def __repr__(self):
-        return '<TVMazeSeries(title={},id={},last_update={})>'.format(
-            self.name,
-            self.tvmaze_id,
-            self.last_update,
+        return (
+            f'<TVMazeSeries(title={self.name},id={self.tvmaze_id},last_update={self.last_update})>'
         )
 
     def __str__(self):

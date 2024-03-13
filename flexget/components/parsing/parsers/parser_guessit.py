@@ -174,9 +174,7 @@ class ParserGuessit:
             else:
                 raise ParseWarning(
                     self,
-                    'Guessit quality returned type {}: {}. Expected str or list.'.format(
-                        type(component), component
-                    ),
+                    f'Guessit quality returned type {type(component)}: {component}. Expected str or list.',
                 )
 
         return qualities.Quality(' '.join(flattened_qualities))

@@ -84,18 +84,14 @@ def pending_list_show(options):
             entry = db.get_entry_by_id(pending_list.id, int(options.entry), session=session)
         except NoResultFound:
             console(
-                'Could not find matching pending entry with ID {} in list `{}`'.format(
-                    int(options.entry), options.list_name
-                )
+                f'Could not find matching pending entry with ID {int(options.entry)} in list `{options.list_name}`'
             )
             return
         except ValueError:
             entry = db.get_entry_by_title(pending_list.id, options.entry, session=session)
             if not entry:
                 console(
-                    'Could not find matching pending entry with title `{}` in list `{}`'.format(
-                        options.entry, options.list_name
-                    )
+                    f'Could not find matching pending entry with title `{options.entry}` in list `{options.list_name}`'
                 )
                 return
         header = ['Field name', 'Value']
@@ -120,9 +116,7 @@ def pending_list_add(options):
         db_entry = db.get_entry_by_title(list_id=pending_list.id, title=title, session=session)
         if db_entry:
             console(
-                "Entry with the title `{}` already exist with list `{}`. Will replace identifiers if given".format(
-                    title, pending_list.name
-                )
+                f"Entry with the title `{title}` already exist with list `{pending_list.name}`. Will replace identifiers if given"
             )
             operation = 'updated'
         else:
@@ -153,18 +147,14 @@ def pending_list_approve(options, approve=None):
             db_entry = db.get_entry_by_id(entry_list.id, int(options.entry), session=session)
         except NoResultFound:
             console(
-                'Could not find matching entry with ID {} in list `{}`'.format(
-                    int(options.entry), options.list_name
-                )
+                f'Could not find matching entry with ID {int(options.entry)} in list `{options.list_name}`'
             )
             return
         except ValueError:
             db_entry = db.get_entry_by_title(entry_list.id, options.entry, session=session)
             if not db_entry:
                 console(
-                    'Could not find matching entry with title `{}` in list `{}`'.format(
-                        options.entry, options.list_name
-                    )
+                    f'Could not find matching entry with title `{options.entry}` in list `{options.list_name}`'
                 )
                 return
         approve_text = 'approved' if approve else 'rejected'
@@ -188,18 +178,14 @@ def pending_list_del(options):
             db_entry = db.get_entry_by_id(entry_list.id, int(options.entry), session=session)
         except NoResultFound:
             console(
-                'Could not find matching entry with ID {} in list `{}`'.format(
-                    int(options.entry), options.list_name
-                )
+                f'Could not find matching entry with ID {int(options.entry)} in list `{options.list_name}`'
             )
             return
         except ValueError:
             db_entry = db.get_entry_by_title(entry_list.id, options.entry, session=session)
             if not db_entry:
                 console(
-                    'Could not find matching entry with title `{}` in list `{}`'.format(
-                        options.entry, options.list_name
-                    )
+                    f'Could not find matching entry with title `{options.entry}` in list `{options.list_name}`'
                 )
                 return
         console(f'Removing entry `{db_entry.title}` from list {options.list_name}')
