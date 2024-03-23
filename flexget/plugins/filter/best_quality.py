@@ -53,14 +53,14 @@ class FilterBestQuality:
             # Sort entities in order of quality and best proper
             entries.sort(key=lambda e: (e['quality'], e.get('proper_count', 0)), reverse=True)
 
-            # First entry will be the best quality
-            best = entries.pop(0)
+            # Store the best quality for comparison
+            best_quality = entries[0]['quality']
 
-            if action_on_best:
-                action_on_best(best, 'has the best quality for identifier %s' % identifier)
+            for entry in entries:
+                if action_on_best and entry['quality'] == best_quality:
+                    action_on_best(entry, 'has the best quality for identifier %s' % identifier)
 
-            if action_on_lower:
-                for entry in entries:
+                if action_on_lower and entry['quality'] < best_quality:
                     action_on_lower(entry, 'lower quality for identifier %s' % identifier)
 
 
