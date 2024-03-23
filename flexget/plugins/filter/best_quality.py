@@ -25,6 +25,10 @@ class FilterBestQuality:
                 'enum': ['accept', 'reject', 'do_nothing'],
                 'default': 'reject',
             },
+            'single_best': {
+                'type': 'boolean',
+                'default': True,
+            }
         },
         'additionalProperties': False,
     }
@@ -53,15 +57,24 @@ class FilterBestQuality:
             # Sort entities in order of quality and best proper
             entries.sort(key=lambda e: (e['quality'], e.get('proper_count', 0)), reverse=True)
 
-            # First entry will be the best quality
-            best = entries.pop(0)
+            if config['single_best']:
+                # First entry will be the best quality
+                best = entries.pop(0)
 
-            if action_on_best:
-                action_on_best(best, 'has the best quality for identifier %s' % identifier)
+                if action_on_best:
+                    action_on_best(best, 'has the best quality for identifier %s' % identifier)
 
-            if action_on_lower:
+                if action_on_lower:
+                    for entry in entries:
+                        action_on_lower(entry, 'lower quality for identifier %s' % identifier)
+            else:
+                # Store the best quality for comparison
+                best_quality = entries[0]['quality']
                 for entry in entries:
-                    action_on_lower(entry, 'lower quality for identifier %s' % identifier)
+                    if action_on_best and entry['quality'] == best_quality:
+                        action_on_best(entry, 'has the best quality for identifier %s' % identifier)
+                    if action_on_lower and entry['quality'] < best_quality:
+                        action_on_lower(entry, 'lower quality for identifier %s' % identifier)
 
 
 @event('plugin.register')
