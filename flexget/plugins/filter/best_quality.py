@@ -28,7 +28,7 @@ class FilterBestQuality:
             'single_best': {
                 'type': 'boolean',
                 'default': True,
-            }
+            },
         },
         'additionalProperties': False,
     }
@@ -72,7 +72,9 @@ class FilterBestQuality:
                 best_quality = entries[0]['quality']
                 for entry in entries:
                     if action_on_best and entry['quality'] == best_quality:
-                        action_on_best(entry, 'has the best quality for identifier %s' % identifier)
+                        action_on_best(
+                            entry, 'has the best quality for identifier %s' % identifier
+                        )
                     if action_on_lower and entry['quality'] < best_quality:
                         action_on_lower(entry, 'lower quality for identifier %s' % identifier)
 
