@@ -131,6 +131,8 @@ flexget = 'flexget:main'
 [tool.pytest.ini_options]
 testpaths = ["flexget/tests"]
 
+# We switched to using ruff for formatting, but leaving this in for now
+# for anybody that's using black manually.
 [tool.black]
 line-length = 99
 skip-string-normalization = true
@@ -151,8 +153,10 @@ exclude = '''
 
 [tool.ruff]
 line-length = 99
-select = ["C4", "E", "F", "I", "ISC", "PLE", "RUF", "UP"]
+extend-exclude = ["flexget/ui"]
 
+[tool.ruff.lint]
+select = ["C4", "E", "F", "I", "ISC", "PLE", "RUF", "UP"]
 ignore = [
     "E501",  # We leave line length up to black
     "E711", "E712",  # Comparisons to True/False/None are valid for sqlalchemy
@@ -160,6 +164,9 @@ ignore = [
     "RUF001",  # Some of these ambiguous unicode are in tests on purpose
     "RUF012", # Maybe can re-enable after https://github.com/astral-sh/ruff/issues/5243
 ]
+
+[tool.ruff.format]
+quote-style = "preserve"
 
 [tool.ruff.isort]
 known-first-party = ['flexget']
