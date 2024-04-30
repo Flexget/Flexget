@@ -89,7 +89,6 @@ zxcvbn = "^4.4.24"
 pendulum = ">=3.0.0"
 
 [tool.poetry.group.dev.dependencies]
-black = ">=18.9b0"
 codacy-coverage = ">=1.2.18"
 coverage = ">=6.0"
 gitpython = ">=3.1.18"
@@ -98,7 +97,7 @@ pytest-cov = ">=3.0.0"
 pytest-runner = "^6.0.0"
 pytest-xdist = ">=2.4.0"
 pytest = ">=6.2.4"
-ruff = ">=0.0.261"
+ruff = ">=0.4.2"
 sphinx = ">=5.0.0"
 sqlalchemy-stubs = "^0.4"
 vcrpy = ">=4.1.1"
@@ -165,11 +164,11 @@ ignore = [
     "RUF012", # Maybe can re-enable after https://github.com/astral-sh/ruff/issues/5243
 ]
 
+[tool.ruff.lint.isort]
+known-first-party = ['flexget']
+
 [tool.ruff.format]
 quote-style = "preserve"
-
-[tool.ruff.isort]
-known-first-party = ['flexget']
 
 [tool.mypy]
 plugins = ["sqlmypy"]

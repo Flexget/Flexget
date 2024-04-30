@@ -35,7 +35,7 @@ def version():
 def bump_version(bump_type):
     """Bumps version to the next release, or development version."""
     cur_ver = _get_version()
-    click.echo('current version: %s' % cur_ver)
+    click.echo(f'current version: {cur_ver}')
     ver_split = cur_ver.split('.')
     if 'dev' in ver_split[-1]:
         if bump_type == 'dev':
@@ -61,9 +61,9 @@ def bump_version(bump_type):
     new_version = '.'.join(ver_split)
     for line in fileinput.FileInput('flexget/_version.py', inplace=1):
         if line.startswith('__version__ ='):
-            line = "__version__ = '%s'\n" % new_version
+            line = f"__version__ = '{new_version}'\n"
         print(line, end='')
-    click.echo('new version: %s' % new_version)
+    click.echo(f'new version: {new_version}')
 
 
 @cli.command()
@@ -94,7 +94,7 @@ def bundle_webui(ui_version: str = ""):
                 os.path.join(ui_path, 'v1'),
             )
         except OSError as e:
-            click.echo('Unable to download and extract WebUI v1 due to %e' % str(e))
+            click.echo(f'Unable to download and extract WebUI v1 due to {e!s:e}')
             raise click.Abort()
 
     if ui_version in ['', 'v2']:
@@ -121,14 +121,14 @@ def bundle_webui(ui_version: str = ""):
                 raise click.Abort()
             download_extract(v2_package, os.path.join(ui_path, 'v2'))
         except (OSError, ValueError) as e:
-            click.echo('Unable to download and extract WebUI v2 due to %s' % str(e))
+            click.echo(f'Unable to download and extract WebUI v2 due to {e!s}')
             raise click.Abort()
 
 
 @cli.command()
 @click.argument('files', nargs=-1)
 def autoformat(files):
-    """Reformat code with black and isort"""
+    """Reformat code with Ruff"""
     if not files:
         project_root = os.path.dirname(os.path.realpath(__file__))
         files = (project_root,)
@@ -136,9 +136,9 @@ def autoformat(files):
     if not venv_path:
         raise Exception('Virtualenv and activation required')
 
-    # black and ruff config are in pyproject.toml
-    subprocess.call(('ruff', '--fix', *files))
-    subprocess.call(('black', *files))
+    # ruff config is in pyproject.toml
+    subprocess.call(('ruff', 'check', '--fix', *files))
+    subprocess.call(('ruff', 'format', *files))
 
 
 @cli.command()
