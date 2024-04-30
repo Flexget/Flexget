@@ -9,7 +9,7 @@ from . import db
 def do_cli(manager, options):
     if options.action == 'clear':
         num = db.clear_entries(options.task, all=True)
-        console('%s entries cleared from backlog.' % num)
+        console(f'{num} entries cleared from backlog.')
     else:
         header = ['Title', 'Task', 'Expires']
         table_data = []

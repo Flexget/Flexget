@@ -156,8 +156,9 @@ class PluginExec:
                         # fail the entry if configured to do so
                         if config.get('fail_entries'):
                             entry.fail(
-                                'Entry `%s` does not have required fields for string replacement.'
-                                % entry['title']
+                                'Entry `{}` does not have required fields for string replacement.'.format(
+                                    entry['title']
+                                )
                             )
                         continue
 

@@ -26,7 +26,7 @@ class PluginHistory:
             item.url = entry['url']
             reason = ''
             if 'reason' in entry:
-                reason = ' (reason: %s)' % entry['reason']
+                reason = ' (reason: {})'.format(entry['reason'])
             item.details = 'Accepted by {}{}'.format(entry.get('accepted_by', '<unknown>'), reason)
             task.session.add(item)
 

@@ -276,7 +276,7 @@ class TransformingOps(BaseFileOps):
                 self.logger.info('Creating destination directory `{}`', dst_path)
                 os.makedirs(dst_path)
         if not os.path.isdir(dst_path) and not task.options.test:
-            raise plugin.PluginWarning('destination `%s` is not a directory.' % dst_path)
+            raise plugin.PluginWarning(f'destination `{dst_path}` is not a directory.')
 
         # unpack_safety
         if config.get('unpack_safety', entry.get('unpack_safety', True)):

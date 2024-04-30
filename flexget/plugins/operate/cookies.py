@@ -72,7 +72,7 @@ class PluginCookies:
             cur.execute('select host, path, isSecure, expiry, name, value from moz_cookies')
         except sqlite.Error:
             raise plugin.PluginError(
-                '%s does not appear to be a valid Firefox 3 cookies file' % filename, logger
+                f'{filename} does not appear to be a valid Firefox 3 cookies file', logger
             )
 
         ftstr = ['FALSE', 'TRUE']
@@ -171,7 +171,7 @@ class PluginCookies:
                 cj = http.cookiejar.LWPCookieJar()
                 self.cookiejars[cookie_file] = cj
             else:
-                raise plugin.PluginError('Unknown cookie type %s' % cookie_type, logger)
+                raise plugin.PluginError(f'Unknown cookie type {cookie_type}', logger)
 
             try:
                 cj.load(filename=cookie_file, ignore_expires=True)
@@ -180,7 +180,7 @@ class PluginCookies:
                 import sys
 
                 raise plugin.PluginError(
-                    'Cookies could not be loaded: %s' % sys.exc_info()[1], logger
+                    f'Cookies could not be loaded: {sys.exc_info()[1]}', logger
                 )
 
         # Add cookiejar to our requests session

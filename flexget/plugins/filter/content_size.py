@@ -41,14 +41,14 @@ class FilterContentSize:
             # Avoid confusion by printing a reject message to info log, as
             # download plugin has already printed a downloading message.
             if min_size is not None and size < min_size:
-                log_once('Entry `%s` too small, rejecting' % entry['title'], logger)
+                log_once('Entry `{}` too small, rejecting'.format(entry['title']), logger)
                 entry.reject(
                     f'minimum size {format_filesize(min_size)}, got {format_filesize(size)}',
                     remember=remember,
                 )
                 return True
             if max_size is not None and size > max_size:
-                log_once('Entry `%s` too big, rejecting' % entry['title'], logger)
+                log_once('Entry `{}` too big, rejecting'.format(entry['title']), logger)
                 entry.reject(
                     f'maximum size {format_filesize(max_size)}, got {format_filesize(size)}',
                     remember=remember,

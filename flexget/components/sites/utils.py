@@ -1,4 +1,4 @@
-""" Common tools used by plugins implementing search plugin api
+"""Common tools used by plugins implementing search plugin api
 
 .. NOTE:: Try to avoid using or extending this file!
 

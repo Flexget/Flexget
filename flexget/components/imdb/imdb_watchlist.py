@@ -43,8 +43,9 @@ class ImdbWatchlist:
             'list': {
                 'type': 'string',
                 'oneOf': [{'enum': USER_LISTS}, {'pattern': CUSTOM_LIST_RE}],
-                'error_oneOf': 'list must be either %s, or a custom list name (lsXXXXXXXXX)'
-                % ', '.join(USER_LISTS),
+                'error_oneOf': 'list must be either {}, or a custom list name (lsXXXXXXXXX)'.format(
+                    ', '.join(USER_LISTS)
+                ),
             },
             'force_language': {'type': 'string', 'default': 'en-us'},
             'type': {
@@ -88,7 +89,7 @@ class ImdbWatchlist:
             if config['list'] == 'watchlist':
                 params = {'view': 'detail'}
         else:
-            url = 'http://www.imdb.com/list/%s' % config['list']
+            url = 'http://www.imdb.com/list/{}'.format(config['list'])
         if 'all' not in config['type']:
             title_types = [TITLE_TYPE_MAP[title_type] for title_type in config['type']]
             params['title_type'] = ','.join(title_types)
@@ -123,7 +124,7 @@ class ImdbWatchlist:
             raise plugin.PluginError(
                 'Unable to get imdb list from imdb react widget. '
                 'Either the list is empty or the imdb parser of the imdb_watchlist plugin is broken. '
-                'Original error: %s.' % str(e)
+                f'Original error: {e!s}.'
             )
         total_item_count = 0
         if 'list' in json_vars and 'items' in json_vars['list']:
@@ -143,7 +144,7 @@ class ImdbWatchlist:
             raise plugin.PluginError(
                 'Unable to get imdb list from imdb JSON API. '
                 'Either the list is empty or the imdb parser of the imdb_watchlist plugin is broken. '
-                'Original error: %s.' % str(e)
+                f'Original error: {e!s}.'
             )
         logger.verbose('imdb list contains {} items', len(json_data))
         logger.debug(
@@ -166,7 +167,7 @@ class ImdbWatchlist:
             entry['title'] = title
             if 'year' in json_data[imdb_id]['title']['primary']:
                 year = json_data[imdb_id]['title']['primary']['year'][0]
-                entry['title'] += ' (%s)' % year
+                entry['title'] += f' ({year})'
                 entry['imdb_year'] = year
             entry['url'] = json_data[imdb_id]['title']['primary']['href']
             entry['imdb_id'] = imdb_id
@@ -226,7 +227,7 @@ class ImdbWatchlist:
                 entry['title'] = a.text
                 try:
                     year = int(item.find('span', class_='lister-item-year').text)
-                    entry['title'] += ' (%s)' % year
+                    entry['title'] += f' ({year})'
                     entry['imdb_year'] = year
                 except (ValueError, TypeError):
                     pass

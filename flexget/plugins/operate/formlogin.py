@@ -76,7 +76,7 @@ class FormLogin:
                 received = os.path.join(task.manager.config_base, 'received')
                 if not os.path.isdir(received):
                     os.mkdir(received)
-                filename = os.path.join(received, '%s.formlogin.html' % task.name)
+                filename = os.path.join(received, f'{task.name}.formlogin.html')
                 with open(filename, 'wb') as f:
                     f.write(response.content)
                 logger.critical(
@@ -84,7 +84,7 @@ class FormLogin:
                 )
                 raise plugin.PluginError('Unable to find login fields', logger)
         except socket.timeout:
-            raise plugin.PluginError('Timed out on url %s' % url)
+            raise plugin.PluginError(f'Timed out on url {url}')
 
         try:
             br.submit_selected()

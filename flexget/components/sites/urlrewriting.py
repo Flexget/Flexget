@@ -53,8 +53,8 @@ class PluginUrlRewriting:
             tries += 1
             if tries > 20:
                 raise UrlRewritingError(
-                    'URL rewriting was left in infinite loop while rewriting url for %s, '
-                    'some rewriter is returning always True' % entry
+                    f'URL rewriting was left in infinite loop while rewriting url for {entry}, '
+                    'some rewriter is returning always True'
                 )
             for urlrewriter in plugin.get_plugins(interface='urlrewriter'):
                 name = urlrewriter.name

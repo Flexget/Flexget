@@ -45,21 +45,19 @@ class SeriesParser(TitleParser):
         [
             TitleParser.re_not_in_word(regexp)
             for regexp in [
-                r'(?:series|season|s)\s?(\d{1,4})(?:\s(?:.*\s)?)?(?:episode|ep|e|part|pt)\s?(\d{1,3}|%s)(?:\s?e?(\d{1,2}))?'
-                % roman_numeral_re,
+                rf'(?:series|season|s)\s?(\d{{1,4}})(?:\s(?:.*\s)?)?(?:episode|ep|e|part|pt)\s?(\d{{1,3}}|{roman_numeral_re})(?:\s?e?(\d{{1,2}}))?',
                 r'(?:series|season)\s?(\d{1,4})\s(\d{1,3})\s?of\s?(?:\d{1,3})',
                 r'(\d{1,2})\s?x\s?(\d+)(?:\s(\d{1,2}))?',
                 r'(\d{1,3})\s?of\s?(?:\d{1,3})',
-                r'(?:episode|e|ep|part|pt)\s?(\d{1,3}|%s)' % roman_numeral_re,
-                r'part\s(%s)' % '|'.join(map(str, english_numbers)),
+                rf'(?:episode|e|ep|part|pt)\s?(\d{{1,3}}|{roman_numeral_re})',
+                r'part\s({})'.format('|'.join(map(str, english_numbers))),
             ]
         ]
     )
     season_pack_regexps = ReList(
         [
             # S01 or Season 1 but not Season 1 Episode|Part 2
-            r'(?:season\s?|s)(\d{1,}\b)(?!(?:(?:.*?\s)?(?:episode|e|ep|part|pt)\s?(?:\d{1,3}|%s)|(?:\d{1,3})\s?of\s?(?:\d{1,3})))'
-            % roman_numeral_re,
+            rf'(?:season\s?|s)(\d{{1,}}\b)(?!(?:(?:.*?\s)?(?:episode|e|ep|part|pt)\s?(?:\d{{1,3}}|{roman_numeral_re})|(?:\d{{1,3}})\s?of\s?(?:\d{{1,3}})))',
             r'(\d{1,3})\s?x\s?all',  # 1xAll
         ]
     )
@@ -76,10 +74,10 @@ class SeriesParser(TitleParser):
         [
             TitleParser.re_not_in_word(regexp)
             for regexp in [
-                fr'(\d{{2,4}}){separators}(\d{{1,2}}){separators}(\d{{1,2}})',
-                fr'(\d{{1,2}}){separators}(\d{{1,2}}){separators}(\d{{2,4}})',
-                r'(\d{4})x(\d{1,2})%s(\d{1,2})' % separators,
-                fr'(\d{{1,2}})(?:st|nd|rd|th)?{separators}([a-z]{{3,10}}){separators}(\d{{4}})',
+                rf'(\d{{2,4}}){separators}(\d{{1,2}}){separators}(\d{{1,2}})',
+                rf'(\d{{1,2}}){separators}(\d{{1,2}}){separators}(\d{{2,4}})',
+                rf'(\d{{4}})x(\d{{1,2}}){separators}(\d{{1,2}})',
+                rf'(\d{{1,2}})(?:st|nd|rd|th)?{separators}([a-z]{{3,10}}){separators}(\d{{4}})',
             ]
         ]
     )
@@ -88,7 +86,7 @@ class SeriesParser(TitleParser):
             TitleParser.re_not_in_word(regexp)
             for regexp in [
                 r'(\d{1,3})(?:v(?P<version>\d))?',
-                r'(?:pt|part)\s?(\d+|%s)' % roman_numeral_re,
+                rf'(?:pt|part)\s?(\d+|{roman_numeral_re})',
             ]
         ]
     )
@@ -498,7 +496,7 @@ class SeriesParser(TitleParser):
         if self.identified_by == 'auto':
             msg += 'any series numbering.'
         else:
-            msg += 'a(n) `%s` style identifier.' % self.identified_by
+            msg += f'a(n) `{self.identified_by}` style identifier.'
         raise ParseWarning(self, msg)
 
     def parse_unwanted(self, data):
@@ -653,7 +651,7 @@ class SeriesParser(TitleParser):
         # Return False if this is not a roman numeral we can translate
         for char in roman:
             if char not in 'XVI':
-                raise ValueError('`%s` is not a valid roman numeral' % roman)
+                raise ValueError(f'`{roman}` is not a valid roman numeral')
 
         # Add up the parts of the numeral
         i = result = 0

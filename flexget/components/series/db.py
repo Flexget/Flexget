@@ -191,8 +191,8 @@ class Season(Base):
         age_hours = diff.seconds // 60 // 60
         age = ''
         if age_days:
-            age += '%sd ' % age_days
-        age += '%sh' % age_hours
+            age += f'{age_days}d '
+        age += f'{age_hours}h'
         return age
 
     @property
@@ -300,8 +300,8 @@ class Episode(Base):
         age_hours = diff.seconds // 60 // 60
         age = ''
         if age_days:
-            age += '%sd ' % age_days
-        age += '%sh' % age_hours
+            age += f'{age_days}d '
+        age += f'{age_hours}h'
         return age
 
     @property
@@ -1252,7 +1252,7 @@ def remove_series(name: str, forget: bool = False) -> None:
             session.commit()
             logger.debug('Removed series `{}` from database.', name)
         else:
-            raise ValueError('Unknown series `%s`' % name)
+            raise ValueError(f'Unknown series `{name}`')
     for downloaded_release in downloaded_releases:
         fire_event('forget', downloaded_release)
 
@@ -1269,7 +1269,7 @@ def remove_series_entity(name: str, identifier: str, forget: bool = False) -> No
     with Session() as session:
         series = session.query(Series).filter(Series.name == name).first()
         if not series:
-            raise ValueError('Unknown series `%s`' % name)
+            raise ValueError(f'Unknown series `{name}`')
 
         def remove_entity(entity):
             if not series.begin:
@@ -1324,7 +1324,7 @@ def delete_episode_release_by_id(release_id: int) -> None:
             session.commit()
             logger.debug('Deleted release ID `{}`', release_id)
         else:
-            raise ValueError('Unknown identifier `%s` for release' % release_id)
+            raise ValueError(f'Unknown identifier `{release_id}` for release')
 
 
 def delete_season_release_by_id(release_id: int) -> None:
@@ -1335,7 +1335,7 @@ def delete_season_release_by_id(release_id: int) -> None:
             session.commit()
             logger.debug('Deleted release ID `{}`', release_id)
         else:
-            raise ValueError('Unknown identifier `%s` for release' % release_id)
+            raise ValueError(f'Unknown identifier `{release_id}` for release')
 
 
 def shows_by_name(normalized_name: str, session: Session = None) -> List[Series]:

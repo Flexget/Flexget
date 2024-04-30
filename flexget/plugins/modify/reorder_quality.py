@@ -39,7 +39,7 @@ class ReorderQuality:
             action, other_quality = next(iter(_config.items()))
 
             if quality not in qualities._registry:
-                raise plugin.PluginError('%s is not a valid quality' % quality)
+                raise plugin.PluginError(f'{quality} is not a valid quality')
 
             quality_component = qualities._registry[quality]
             other_quality_component = qualities._registry[other_quality]

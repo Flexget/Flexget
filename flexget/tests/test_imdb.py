@@ -234,17 +234,17 @@ class TestImdb:
         assert task.find_entry(imdb_name='The Matrix'), 'The Matrix not found'
         matrix = float(task.find_entry(imdb_name='The Matrix')['imdb_score'])
         # Currently The Matrix has an 8.7, check a range in case it changes
-        assert 8.6 < matrix < 8.8, (
-            'The Matrix should have score 8.7 not %s. (Did the rating change?)' % matrix
-        )
+        assert (
+            8.6 < matrix < 8.8
+        ), f'The Matrix should have score 8.7 not {matrix}. (Did the rating change?)'
         assert (
             int(task.find_entry(imdb_name='The Matrix')['imdb_votes']) > 450000
         ), 'The Matrix should have more than 450000 votes'
         bfe = float(task.find_entry(title='Battlefield Earth')['imdb_score'])
         # Currently Battlefield Earth has an 2.4, check a range in case it changes
-        assert 2.3 <= bfe <= 2.5, (
-            'Battlefield Earth should have score 2.3 not %s. (Did the rating change?)' % bfe
-        )
+        assert (
+            2.3 <= bfe <= 2.5
+        ), f'Battlefield Earth should have score 2.3 not {bfe}. (Did the rating change?)'
         assert task.find_entry(
             'accepted', imdb_name='The Matrix'
         ), 'The Matrix should\'ve been accepted'
@@ -284,9 +284,9 @@ class TestImdb:
         bullets = task.find_entry(imdb_original_name='L\'immortel')['imdb_languages']
         assert bullets[0] == 'french', 'Could not find languages for 22 Bullets'
         for movie in ['The Matrix', 'Crank', 'The Damned United']:
-            assert task.find_entry('accepted', imdb_name=movie), (
-                '%s should\'ve been accepted' % movie
-            )
+            assert task.find_entry(
+                'accepted', imdb_name=movie
+            ), f'{movie} should\'ve been accepted'
         assert not task.find_entry(
             'rejected', title='22 Bullets'
         ), '22 Bullets should have been rejected'
@@ -298,14 +298,17 @@ class TestImdb:
         assert host_langs == [
             'korean',
             'english',
-        ], 'Languages were not returned in order of prominence, got %s' % (', '.join(host_langs))
+        ], 'Languages were not returned in order of prominence, got {}'.format(
+            ', '.join(host_langs)
+        )
 
     def test_mpaa(self, execute_task):
         task = execute_task('mpaa')
         aladdin = task.find_entry(imdb_name='Aladdin')
-        assert aladdin['imdb_mpaa_rating'] == 'G', (
-            'Didn\'t get right rating for Aladdin. Should be G got %s'
-            % aladdin['imdb_mpaa_rating']
+        assert (
+            aladdin['imdb_mpaa_rating'] == 'G'
+        ), 'Didn\'t get right rating for Aladdin. Should be G got {}'.format(
+            aladdin['imdb_mpaa_rating']
         )
         assert aladdin.accepted, 'Non R rated movie should have been accepted'
         saw = task.find_entry(imdb_name='Saw')

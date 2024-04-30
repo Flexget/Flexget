@@ -19,7 +19,7 @@ class TestTVDBSeriesLookupAPI:
         }
 
         rsp = api_client.get('/tvdb/series/The X-Files/')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
 
@@ -39,7 +39,7 @@ class TestTVDBSeriesLookupAPI:
         }
 
         rsp = api_client.get('/tvdb/series/77398/')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
 
@@ -51,7 +51,7 @@ class TestTVDBSeriesLookupAPI:
 
     def test_tvdb_series_lookup_error(self, api_client, schema_match):
         rsp = api_client.get('/tvdb/series/sdfgsfgbsfxfdgx/')
-        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 404, f'Response code is {rsp.status_code}'
         data = json.loads(rsp.get_data(as_text=True))
         errors = schema_match(base_message, data)
         assert not errors
@@ -71,7 +71,7 @@ class TestTVDBSeriesActorsLookupAPI:
         }
 
         rsp = api_client.get('/tvdb/series/The X-Files/?include_actors=true')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
 
@@ -88,7 +88,7 @@ class TestTVDBEpisodeLookupAPI:
 
     def test_tvdb_episode_lookup_season_and_ep_number(self, api_client, schema_match):
         rsp = api_client.get('/tvdb/episode/77398/')
-        assert rsp.status_code == 400, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 400, f'Response code is {rsp.status_code}'
 
         values = {
             'episode_number': 6,
@@ -99,7 +99,7 @@ class TestTVDBEpisodeLookupAPI:
         }
 
         rsp = api_client.get('/tvdb/episode/77398/?season_number=10&ep_number=6')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
         errors = schema_match(OC.episode_object, data)
@@ -123,7 +123,7 @@ class TestTVDBEpisodeABSLookupAPI:
         }
 
         rsp = api_client.get('/tvdb/episode/279121/?absolute_number=46')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
         errors = schema_match(OC.episode_object, data)
@@ -147,7 +147,7 @@ class TestTVDBEpisodeAirDateLookupAPI:
         }
 
         rsp = api_client.get('/tvdb/episode/279121/?air_date=2016-05-24')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
         errors = schema_match(OC.episode_object, data)
@@ -163,7 +163,7 @@ class TestTVDSearchNameLookupAPI:
 
     def test_tvdb_search_results_by_name(self, api_client, schema_match):
         rsp = api_client.get('/tvdb/search/?search_name=supernatural')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
 
@@ -182,7 +182,7 @@ class TestTVDSearchIMDBLookupAPI:
 
     def test_tvdb_search_results_by_imdb_id(self, api_client, schema_match):
         rsp = api_client.get('/tvdb/search/?imdb_id=tt0944947')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
         errors = schema_match(OC.search_results_object, data)
@@ -200,7 +200,7 @@ class TestTVDSearchZAP2ITLookupAPI:
 
     def test_tvdb_search_results_by_zap2it_id(self, api_client, schema_match):
         rsp = api_client.get('/tvdb/search/?zap2it_id=EP01922936')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
         errors = schema_match(OC.search_results_object, data)
@@ -218,7 +218,7 @@ class TestTVDSearchAPIErrors:
 
     def test_tvdb_search_bad_request(self, api_client, schema_match):
         rsp = api_client.get('/tvdb/search/')
-        assert rsp.status_code == 400, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 400, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
         errors = schema_match(base_message, data)
@@ -226,7 +226,7 @@ class TestTVDSearchAPIErrors:
 
     def test_tvdb_search_lookup_error(self, api_client, schema_match):
         rsp = api_client.get('/tvdb/search/?search_name=sdfgsdfgsdfgsdfg')
-        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 404, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
         errors = schema_match(base_message, data)
@@ -247,7 +247,7 @@ class TestTVDBLanguages:
         }
 
         rsp = api_client.get('/tvdb/series/Tegenlicht/?language=nl')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
 
@@ -267,7 +267,7 @@ class TestTVDBLanguages:
         }
 
         rsp = api_client.get('/tvdb/episode/252712/?season_number=10&ep_number=1&language=nl')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
         errors = schema_match(OC.episode_object, data)
@@ -278,7 +278,7 @@ class TestTVDBLanguages:
 
     def test_tvdb_search_with_language(self, api_client, schema_match):
         rsp = api_client.get('/tvdb/search/?language=nl&search_name=Tegenlicht')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
         errors = schema_match(OC.search_results_object, data)

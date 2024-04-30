@@ -47,11 +47,13 @@ class GenSeries:
                             episode + 1,
                             quality,
                         )
-                        entry['url'] = 'http://localhost/mock/%s' % ''.join(
-                            [
-                                random.choice(string.ascii_letters + string.digits)
-                                for x in range(1, 30)
-                            ]
+                        entry['url'] = 'http://localhost/mock/{}'.format(
+                            ''.join(
+                                [
+                                    random.choice(string.ascii_letters + string.digits)
+                                    for x in range(1, 30)
+                                ]
+                            )
                         )
                         self.entries.append(entry)
         logger.info('Generated {} entries', len(self.entries))

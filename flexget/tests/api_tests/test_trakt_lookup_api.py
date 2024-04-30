@@ -12,10 +12,10 @@ class TestTraktSeriesLookupAPI:
     def test_trakt_series_lookup_no_params(self, api_client, schema_match):
         # Bad API call
         rsp = api_client.get('/trakt/series/')
-        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 404, f'Response code is {rsp.status_code}'
 
         rsp = api_client.get('/trakt/series/?title=the x-files')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
 
@@ -49,7 +49,7 @@ class TestTraktSeriesLookupAPI:
         }
 
         rsp = api_client.get('/trakt/series/?title=the flash&year=1990')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
         errors = schema_match(oc.series_return_object, data)
@@ -62,7 +62,7 @@ class TestTraktSeriesLookupAPI:
         values = {'id': 75481, 'title': 'The Flash', 'tvdb_id': 272094, 'year': 1967}
 
         rsp = api_client.get('/trakt/series/?title=the flash&trakt_slug=the-flash-1967')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
 
@@ -84,7 +84,7 @@ class TestTraktSeriesLookupAPI:
         }
 
         rsp = api_client.get('/trakt/series/?title=the flash&tmdb_id=60735')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
         errors = schema_match(oc.series_return_object, data)
@@ -105,7 +105,7 @@ class TestTraktSeriesLookupAPI:
         }
 
         rsp = api_client.get('/trakt/series/?title=the flash&imdb_id=tt3107288')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
         for field, value in values.items():
@@ -123,7 +123,7 @@ class TestTraktSeriesLookupAPI:
         }
 
         rsp = api_client.get('/trakt/series/?title=the flash&tvdb_id=279121')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
         errors = schema_match(oc.series_return_object, data)
@@ -144,7 +144,7 @@ class TestTraktSeriesLookupAPI:
         }
 
         rsp = api_client.get('/trakt/series/?title=the flash&tvrage_id=36939')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
         errors = schema_match(oc.series_return_object, data)
@@ -157,7 +157,7 @@ class TestTraktSeriesLookupAPI:
         values = {'id': 75481, 'title': 'The Flash', 'year': 1967}
 
         rsp = api_client.get('/trakt/series/?title=the flash&trakt_id=75481')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
         errors = schema_match(oc.series_return_object, data)
@@ -168,7 +168,7 @@ class TestTraktSeriesLookupAPI:
 
     def test_trakt_series_lookup_with_actors_param(self, api_client, schema_match):
         rsp = api_client.get('/trakt/series/?title=the x-files&include_actors=true')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
         errors = schema_match(oc.series_return_object, data)
@@ -179,7 +179,7 @@ class TestTraktSeriesLookupAPI:
 
     def test_trakt_series_lookup_with_translations_param(self, api_client, schema_match):
         rsp = api_client.get('/trakt/series/?title=game of thrones&include_translations=true')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
         errors = schema_match(oc.series_return_object, data)
@@ -189,7 +189,7 @@ class TestTraktSeriesLookupAPI:
 
     def test_trakt_series_lookup_error(self, api_client, schema_match):
         rsp = api_client.get('/trakt/series/?title=sdfgsdfgsdfgsdfgsdfg')
-        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 404, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
         errors = schema_match(base_message, data)
@@ -203,10 +203,10 @@ class TestTraktMovieLookupAPI:
     def test_trakt_movies_lookup_no_params(self, api_client, schema_match):
         # Bad API call
         rsp = api_client.get('/trakt/movies/')
-        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 404, f'Response code is {rsp.status_code}'
 
         rsp = api_client.get('/trakt/movies/?title=the matrix')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
         errors = schema_match(oc.movie_return_object, data)
@@ -224,7 +224,7 @@ class TestTraktMovieLookupAPI:
 
     def test_trakt_movies_lookup_year_param(self, api_client, schema_match):
         rsp = api_client.get('/trakt/movies/?title=the matrix&year=2003')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
         errors = schema_match(oc.movie_return_object, data)
@@ -242,7 +242,7 @@ class TestTraktMovieLookupAPI:
 
     def test_trakt_movies_lookup_slug_param(self, api_client, schema_match):
         rsp = api_client.get('/trakt/movies/?title=the matrix&trakt_slug=the-matrix-reloaded-2003')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
         errors = schema_match(oc.movie_return_object, data)
@@ -260,7 +260,7 @@ class TestTraktMovieLookupAPI:
 
     def test_trakt_movies_lookup_actors_params(self, api_client, schema_match):
         rsp = api_client.get('/trakt/movies/?title=the matrix&include_actors=true')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
         errors = schema_match(oc.movie_return_object, data)
@@ -281,7 +281,7 @@ class TestTraktMovieLookupAPI:
 
     def test_trakt_movies_lookup_translations_params(self, api_client, schema_match):
         rsp = api_client.get('/trakt/movies/?title=the matrix&include_translations=true')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
         errors = schema_match(oc.movie_return_object, data)
@@ -302,7 +302,7 @@ class TestTraktMovieLookupAPI:
 
     def test_trakt_movies_lookup_error(self, api_client, schema_match):
         rsp = api_client.get('/trakt/movies/?title=sdfgsdfgsdfgsdfgsdfg')
-        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 404, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
         errors = schema_match(base_message, data)

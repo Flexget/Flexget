@@ -241,7 +241,7 @@ class ParserGuessit:
             if not name:
                 valid = False
             elif country:
-                name += ' (%s)' % country
+                name += f' ({country})'
         elif guess_result.matches['title']:
             # Make sure the name match is up to FlexGet standards
             # Check there is no unmatched cruft before the matched name

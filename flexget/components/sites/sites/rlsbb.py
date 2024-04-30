@@ -171,7 +171,7 @@ class UrlRewriteRlsbb:
             entry['urls'] = urls
             entry['url'] = urls[0]
         else:
-            raise UrlRewritingError('No useable links found at %s' % entry['url'])
+            raise UrlRewritingError('No useable links found at {}'.format(entry['url']))
 
 
 @event('plugin.register')

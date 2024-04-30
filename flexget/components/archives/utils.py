@@ -211,7 +211,7 @@ class ArchiveInfo:
         self.filename = os.path.basename(self.path)
 
         if self._is_dir():
-            raise ValueError('Appears to be a directory: %s' % self.path)
+            raise ValueError(f'Appears to be a directory: {self.path}')
 
     def _is_dir(self):
         """Indicates if info object looks to be a directory"""
@@ -226,7 +226,7 @@ class ArchiveInfo:
         dest_dir = os.path.dirname(destination)
 
         if os.path.exists(destination):
-            raise FileAlreadyExists('File already exists: %s' % destination)
+            raise FileAlreadyExists(f'File already exists: {destination}')
 
         logger.debug('Creating path: {}', dest_dir)
         makepath(dest_dir)

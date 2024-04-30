@@ -506,9 +506,12 @@ class TaskExecutionAPI(APIResource):
         def stream_response():
             # First return the tasks to execute
             yield '{"stream": ['
-            yield json.dumps(
-                {'tasks': [{'id': task['id'], 'name': task['name']} for task in tasks_queued]}
-            ) + ',\n'
+            yield (
+                json.dumps(
+                    {'tasks': [{'id': task['id'], 'name': task['name']} for task in tasks_queued]}
+                )
+                + ',\n'
+            )
 
             while True:
                 try:

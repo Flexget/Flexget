@@ -62,21 +62,19 @@ class FilterBestQuality:
                 best = entries.pop(0)
 
                 if action_on_best:
-                    action_on_best(best, 'has the best quality for identifier %s' % identifier)
+                    action_on_best(best, f'has the best quality for identifier {identifier}')
 
                 if action_on_lower:
                     for entry in entries:
-                        action_on_lower(entry, 'lower quality for identifier %s' % identifier)
+                        action_on_lower(entry, f'lower quality for identifier {identifier}')
             else:
                 # Store the best quality for comparison
                 best_quality = entries[0]['quality']
                 for entry in entries:
                     if action_on_best and entry['quality'] == best_quality:
-                        action_on_best(
-                            entry, 'has the best quality for identifier %s' % identifier
-                        )
+                        action_on_best(entry, f'has the best quality for identifier {identifier}')
                     if action_on_lower and entry['quality'] < best_quality:
-                        action_on_lower(entry, 'lower quality for identifier %s' % identifier)
+                        action_on_lower(entry, f'lower quality for identifier {identifier}')
 
 
 @event('plugin.register')

@@ -128,7 +128,7 @@ def irc_prefix(var):
     :return: Prefixed variable
     """
     if isinstance(var, str):
-        return 'irc_%s' % var.lower()
+        return f'irc_{var.lower()}'
 
 
 def strip_whitespace(value):
@@ -244,7 +244,7 @@ class IRCConnection(SimpleIRCBot):
             'servers': self.server_list,
             'port': config['port'],
             'channels': channel_list,
-            'nickname': config.get('nickname', 'Flexget-%s' % str(uuid4())),
+            'nickname': config.get('nickname', f'Flexget-{uuid4()!s}'),
             'password': config.get('password'),
             'invite_nickname': config.get('invite_nickname'),
             'invite_message': config.get('invite_message'),
@@ -356,8 +356,7 @@ class IRCConnection(SimpleIRCBot):
                 raise TrackerFileError(e)
         if not tracker:
             raise TrackerFileError(
-                'Unable to find %s on disk or Github. Did you spell it correctly?'
-                % tracker_config_file
+                f'Unable to find {tracker_config_file} on disk or Github. Did you spell it correctly?'
             )
 
         # If we got this far, let's save our work :)
@@ -984,7 +983,7 @@ class IRCConnectionManager:
         status = []
         if name:
             if name not in irc_connections:
-                raise ValueError('%s is not a valid irc connection' % name)
+                raise ValueError(f'{name} is not a valid irc connection')
             else:
                 status.append(self.status_dict(name))
         else:

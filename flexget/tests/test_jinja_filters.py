@@ -108,7 +108,7 @@ class TestJinjaFilters:
         """
         from flexget.utils.template import environment
 
-        template = environment.from_string('{{non_existent_field|%s}}' % test_filter)
+        template = environment.from_string(f'{{{{non_existent_field|{test_filter}}}}}')
         with pytest.raises(jinja2.UndefinedError):
             template.render({})
 

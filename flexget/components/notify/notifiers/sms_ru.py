@@ -49,7 +49,7 @@ class SMSRuNotifier:
         try:
             token_response = requests.get(SMS_TOKEN_URL)
         except RequestException as e:
-            raise PluginWarning('Could not get auth token: %s' % repr(e))
+            raise PluginWarning(f'Could not get auth token: {e!r}')
 
         sha512 = hashlib.sha512(config['password'] + token_response.text).hexdigest()
 

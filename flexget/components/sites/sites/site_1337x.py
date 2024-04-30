@@ -63,7 +63,7 @@ class Site1337x:
             logger.debug('requesting: {}', page.url)
         except RequestException as e:
             logger.error('1337x request failed: {}', e)
-            raise UrlRewritingError('1337x request failed: %s' % e)
+            raise UrlRewritingError(f'1337x request failed: {e}')
 
         soup = get_soup(page.content)
 

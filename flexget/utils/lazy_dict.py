@@ -52,7 +52,7 @@ class LazyLookup:
         return self.store[key]
 
     def __repr__(self):
-        return '<LazyLookup(%r)>' % self.callee_list
+        return f'<LazyLookup({self.callee_list!r})>'
 
 
 class LazyDict(MutableMapping):
@@ -82,9 +82,7 @@ class LazyDict(MutableMapping):
 
     copy = __copy__
 
-    def get(
-        self, key, default: Any = None, eval_lazy: bool = True
-    ) -> Any:  # pylint: disable=W0221
+    def get(self, key, default: Any = None, eval_lazy: bool = True) -> Any:  # pylint: disable=W0221
         """
         Adds the `eval_lazy` keyword argument to the normal :func:`dict.get` method.
 

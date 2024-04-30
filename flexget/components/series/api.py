@@ -279,7 +279,7 @@ class SeriesAPI(APIResource):
         total_pages = int(ceil(total_items / float(per_page)))
 
         if total_pages < page and total_pages != 0:
-            raise NotFoundError('page %s does not exist' % page)
+            raise NotFoundError(f'page {page} does not exist')
 
         # Actual results in page
         actual_size = min(per_page, len(series_list))
@@ -288,7 +288,7 @@ class SeriesAPI(APIResource):
         if lookup:
             api_client = APIClient()
             for endpoint in lookup:
-                base_url = '/%s/series/' % endpoint
+                base_url = f'/{endpoint}/series/'
                 for show in series_list:
                     pos = series_list.index(show)
                     series_list[pos].setdefault('lookup', {})
@@ -317,7 +317,7 @@ class SeriesAPI(APIResource):
         normalized_name = normalize_series_name(series_name)
         matches = db.shows_by_exact_name(normalized_name, session=session)
         if matches:
-            raise Conflict('Show `%s` already exist in DB' % series_name)
+            raise Conflict(f'Show `{series_name}` already exist in DB')
         show = db.Series()
         show.name = series_name
         session.add(show)
@@ -384,7 +384,7 @@ class SeriesShowAPI(APIResource):
         try:
             show = db.show_by_id(show_id, session=session)
         except NoResultFound:
-            raise NotFoundError('Show with ID %s not found' % show_id)
+            raise NotFoundError(f'Show with ID {show_id} not found')
 
         args = series_list_parser.parse_args()
         begin = args.get('begin')
@@ -399,13 +399,13 @@ class SeriesShowAPI(APIResource):
         try:
             show = db.show_by_id(show_id, session=session)
         except NoResultFound:
-            raise NotFoundError('Show with ID %s not found' % show_id)
+            raise NotFoundError(f'Show with ID {show_id} not found')
 
         name = show.name
         args = delete_parser.parse_args()
         db.remove_series(name, forget=args.get('forget'))
 
-        return success_response('successfully removed series %s from DB' % show_id)
+        return success_response(f'successfully removed series {show_id} from DB')
 
     @api.response(
         200, 'Episodes for series will be accepted starting with ep_id', show_details_schema
@@ -421,7 +421,7 @@ class SeriesShowAPI(APIResource):
         try:
             show = db.show_by_id(show_id, session=session)
         except NoResultFound:
-            raise NotFoundError('Show with ID %s not found' % show_id)
+            raise NotFoundError(f'Show with ID {show_id} not found')
         data = request.json
         ep_id = data.get('begin_episode')
         alt_names = data.get('alternate_names')
@@ -472,7 +472,7 @@ class SeriesSeasonsAPI(APIResource):
         try:
             show = db.show_by_id(show_id, session=session)
         except NoResultFound:
-            raise NotFoundError('show with ID %s not found' % show_id)
+            raise NotFoundError(f'show with ID {show_id} not found')
 
         total_items = db.show_seasons(show, count=True, session=session)
 
@@ -484,7 +484,7 @@ class SeriesSeasonsAPI(APIResource):
         total_pages = int(ceil(total_items / float(per_page)))
 
         if total_pages < page and total_pages != 0:
-            raise NotFoundError('page %s does not exist' % page)
+            raise NotFoundError(f'page {page} does not exist')
 
         # Actual results in page
         actual_size = min(per_page, len(seasons))
@@ -512,12 +512,12 @@ class SeriesSeasonsAPI(APIResource):
         try:
             show = db.show_by_id(show_id, session=session)
         except NoResultFound:
-            raise NotFoundError('show with ID %s not found' % show_id)
+            raise NotFoundError(f'show with ID {show_id} not found')
         args = delete_parser.parse_args()
         forget = args.get('forget')
         for season in show.seasons:
             db.remove_series_entity(show.name, season.identifier, forget)
-        return success_response('successfully removed all series %s seasons from DB' % show_id)
+        return success_response(f'successfully removed all series {show_id} seasons from DB')
 
 
 @api.response(NotFoundError)
@@ -533,11 +533,11 @@ class SeriesSeasonAPI(APIResource):
         try:
             db.show_by_id(show_id, session=session)
         except NoResultFound:
-            raise NotFoundError('show with ID %s not found' % show_id)
+            raise NotFoundError(f'show with ID {show_id} not found')
         try:
             season = db.season_by_id(season_id, session)
         except NoResultFound:
-            raise NotFoundError('season with ID %s not found' % season_id)
+            raise NotFoundError(f'season with ID {season_id} not found')
         if not db.season_in_show(show_id, season_id):
             raise BadRequest(f'season with id {season_id} does not belong to show {show_id}')
 
@@ -558,11 +558,11 @@ class SeriesSeasonAPI(APIResource):
         try:
             show = db.show_by_id(show_id, session=session)
         except NoResultFound:
-            raise NotFoundError('show with ID %s not found' % show_id)
+            raise NotFoundError(f'show with ID {show_id} not found')
         try:
             season = db.season_by_id(season_id, session)
         except NoResultFound:
-            raise NotFoundError('season with ID %s not found' % season_id)
+            raise NotFoundError(f'season with ID {season_id} not found')
         if not db.season_in_show(show_id, season_id):
             raise BadRequest(f'season with id {season_id} does not belong to show {show_id}')
 
@@ -605,7 +605,7 @@ class SeriesEpisodesAPI(APIResource):
         try:
             show = db.show_by_id(show_id, session=session)
         except NoResultFound:
-            raise NotFoundError('show with ID %s not found' % show_id)
+            raise NotFoundError(f'show with ID {show_id} not found')
 
         total_items = db.show_episodes(show, count=True, session=session)
 
@@ -617,7 +617,7 @@ class SeriesEpisodesAPI(APIResource):
         total_pages = int(ceil(total_items / float(per_page)))
 
         if total_pages < page and total_pages != 0:
-            raise NotFoundError('page %s does not exist' % page)
+            raise NotFoundError(f'page {page} does not exist')
 
         # Actual results in page
         actual_size = min(per_page, len(episodes))
@@ -645,12 +645,12 @@ class SeriesEpisodesAPI(APIResource):
         try:
             show = db.show_by_id(show_id, session=session)
         except NoResultFound:
-            raise NotFoundError('show with ID %s not found' % show_id)
+            raise NotFoundError(f'show with ID {show_id} not found')
         args = delete_parser.parse_args()
         forget = args.get('forget')
         for episode in show.episodes:
             db.remove_series_entity(show.name, episode.identifier, forget)
-        return success_response('successfully removed all series %s episodes from DB' % show_id)
+        return success_response(f'successfully removed all series {show_id} episodes from DB')
 
 
 @api.response(NotFoundError)
@@ -666,11 +666,11 @@ class SeriesEpisodeAPI(APIResource):
         try:
             db.show_by_id(show_id, session=session)
         except NoResultFound:
-            raise NotFoundError('show with ID %s not found' % show_id)
+            raise NotFoundError(f'show with ID {show_id} not found')
         try:
             episode = db.episode_by_id(ep_id, session)
         except NoResultFound:
-            raise NotFoundError('episode with ID %s not found' % ep_id)
+            raise NotFoundError(f'episode with ID {ep_id} not found')
         if not db.episode_in_show(show_id, ep_id):
             raise BadRequest(f'episode with id {ep_id} does not belong to show {show_id}')
 
@@ -691,11 +691,11 @@ class SeriesEpisodeAPI(APIResource):
         try:
             show = db.show_by_id(show_id, session=session)
         except NoResultFound:
-            raise NotFoundError('show with ID %s not found' % show_id)
+            raise NotFoundError(f'show with ID {show_id} not found')
         try:
             episode = db.episode_by_id(ep_id, session)
         except NoResultFound:
-            raise NotFoundError('episode with ID %s not found' % ep_id)
+            raise NotFoundError(f'episode with ID {ep_id} not found')
         if not db.episode_in_show(show_id, ep_id):
             raise BadRequest(f'episode with id {ep_id} does not belong to show {show_id}')
 
@@ -744,11 +744,11 @@ class SeriesSeasonsReleasesAPI(APIResource):
         try:
             db.show_by_id(show_id, session=session)
         except NoResultFound:
-            raise NotFoundError('show with ID %s not found' % show_id)
+            raise NotFoundError(f'show with ID {show_id} not found')
         try:
             season = db.season_by_id(season_id, session)
         except NoResultFound:
-            raise NotFoundError('season with ID %s not found' % season_id)
+            raise NotFoundError(f'season with ID {season_id} not found')
         if not db.season_in_show(show_id, season_id):
             raise BadRequest(f'seasons with id {season_id} does not belong to show {show_id}')
 
@@ -791,7 +791,7 @@ class SeriesSeasonsReleasesAPI(APIResource):
         total_pages = int(ceil(total_items / float(per_page)))
 
         if total_pages < page and total_pages != 0:
-            raise NotFoundError('page %s does not exist' % page)
+            raise NotFoundError(f'page {page} does not exist')
 
         # Actual results in page
         actual_size = min(per_page, len(release_items))
@@ -820,11 +820,11 @@ class SeriesSeasonsReleasesAPI(APIResource):
         try:
             db.show_by_id(show_id, session=session)
         except NoResultFound:
-            raise NotFoundError('show with ID %s not found' % show_id)
+            raise NotFoundError(f'show with ID {show_id} not found')
         try:
             season = db.season_by_id(season_id, session)
         except NoResultFound:
-            raise NotFoundError('seasons with ID %s not found' % season_id)
+            raise NotFoundError(f'seasons with ID {season_id} not found')
         if not db.season_in_show(show_id, season_id):
             raise BadRequest(f'season with id {season_id} does not belong to show {show_id}')
 
@@ -861,11 +861,11 @@ class SeriesSeasonsReleasesAPI(APIResource):
         try:
             db.show_by_id(show_id, session=session)
         except NoResultFound:
-            raise NotFoundError('show with ID %s not found' % show_id)
+            raise NotFoundError(f'show with ID {show_id} not found')
         try:
             season = db.season_by_id(season_id, session)
         except NoResultFound:
-            raise NotFoundError('season with ID %s not found' % season_id)
+            raise NotFoundError(f'season with ID {season_id} not found')
         if not db.season_in_show(show_id, season_id):
             raise BadRequest(f'season with id {season_id} does not belong to show {show_id}')
 
@@ -898,15 +898,15 @@ class SeriesSeasonReleaseAPI(APIResource):
         try:
             db.show_by_id(show_id, session=session)
         except NoResultFound:
-            raise NotFoundError('show with ID %s not found' % show_id)
+            raise NotFoundError(f'show with ID {show_id} not found')
         try:
             db.season_by_id(season_id, session)
         except NoResultFound:
-            raise NotFoundError('season with ID %s not found' % season_id)
+            raise NotFoundError(f'season with ID {season_id} not found')
         try:
             release = db.season_release_by_id(rel_id, session)
         except NoResultFound:
-            raise NotFoundError('release with ID %s not found' % rel_id)
+            raise NotFoundError(f'release with ID {rel_id} not found')
         if not db.season_in_show(show_id, season_id):
             raise BadRequest(f'season with id {season_id} does not belong to show {show_id}')
         if not db.release_in_season(season_id, rel_id):
@@ -926,15 +926,15 @@ class SeriesSeasonReleaseAPI(APIResource):
         try:
             db.show_by_id(show_id, session=session)
         except NoResultFound:
-            raise NotFoundError('show with ID %s not found' % show_id)
+            raise NotFoundError(f'show with ID {show_id} not found')
         try:
             db.season_by_id(season_id, session)
         except NoResultFound:
-            raise NotFoundError('season with ID %s not found' % season_id)
+            raise NotFoundError(f'season with ID {season_id} not found')
         try:
             release = db.season_release_by_id(rel_id, session)
         except NoResultFound:
-            raise NotFoundError('release with ID %s not found' % rel_id)
+            raise NotFoundError(f'release with ID {rel_id} not found')
         if not db.season_in_show(show_id, season_id):
             raise BadRequest(f'season with id {season_id} does not belong to show {show_id}')
         if not db.release_in_season(season_id, rel_id):
@@ -957,22 +957,22 @@ class SeriesSeasonReleaseAPI(APIResource):
         try:
             db.show_by_id(show_id, session=session)
         except NoResultFound:
-            raise NotFoundError('show with ID %s not found' % show_id)
+            raise NotFoundError(f'show with ID {show_id} not found')
         try:
             db.season_by_id(season_id, session)
         except NoResultFound:
-            raise NotFoundError('season with ID %s not found' % season_id)
+            raise NotFoundError(f'season with ID {season_id} not found')
         try:
             release = db.season_release_by_id(rel_id, session)
         except NoResultFound:
-            raise NotFoundError('release with ID %s not found' % rel_id)
+            raise NotFoundError(f'release with ID {rel_id} not found')
         if not db.season_in_show(show_id, season_id):
             raise BadRequest(f'season with id {season_id} does not belong to show {show_id}')
         if not db.release_in_season(season_id, rel_id):
             raise BadRequest(f'release id {rel_id} does not belong to episode {season_id}')
 
         if not release.downloaded:
-            raise BadRequest('release with id %s is not set as downloaded' % rel_id)
+            raise BadRequest(f'release with id {rel_id} is not set as downloaded')
         release.downloaded = False
 
         rsp = jsonify(release.to_dict())
@@ -1001,11 +1001,11 @@ class SeriesEpisodeReleasesAPI(APIResource):
         try:
             db.show_by_id(show_id, session=session)
         except NoResultFound:
-            raise NotFoundError('show with ID %s not found' % show_id)
+            raise NotFoundError(f'show with ID {show_id} not found')
         try:
             episode = db.episode_by_id(ep_id, session)
         except NoResultFound:
-            raise NotFoundError('episode with ID %s not found' % ep_id)
+            raise NotFoundError(f'episode with ID {ep_id} not found')
         if not db.episode_in_show(show_id, ep_id):
             raise BadRequest(f'episode with id {ep_id} does not belong to show {show_id}')
 
@@ -1048,7 +1048,7 @@ class SeriesEpisodeReleasesAPI(APIResource):
         total_pages = int(ceil(total_items / float(per_page)))
 
         if total_pages < page and total_pages != 0:
-            raise NotFoundError('page %s does not exist' % page)
+            raise NotFoundError(f'page {page} does not exist')
 
         # Actual results in page
         actual_size = min(per_page, len(release_items))
@@ -1077,11 +1077,11 @@ class SeriesEpisodeReleasesAPI(APIResource):
         try:
             db.show_by_id(show_id, session=session)
         except NoResultFound:
-            raise NotFoundError('show with ID %s not found' % show_id)
+            raise NotFoundError(f'show with ID {show_id} not found')
         try:
             episode = db.episode_by_id(ep_id, session)
         except NoResultFound:
-            raise NotFoundError('episode with ID %s not found' % ep_id)
+            raise NotFoundError(f'episode with ID {ep_id} not found')
         if not db.episode_in_show(show_id, ep_id):
             raise BadRequest(f'episode with id {ep_id} does not belong to show {show_id}')
 
@@ -1118,11 +1118,11 @@ class SeriesEpisodeReleasesAPI(APIResource):
         try:
             db.show_by_id(show_id, session=session)
         except NoResultFound:
-            raise NotFoundError('show with ID %s not found' % show_id)
+            raise NotFoundError(f'show with ID {show_id} not found')
         try:
             episode = db.episode_by_id(ep_id, session)
         except NoResultFound:
-            raise NotFoundError('episode with ID %s not found' % ep_id)
+            raise NotFoundError(f'episode with ID {ep_id} not found')
         if not db.episode_in_show(show_id, ep_id):
             raise BadRequest(f'episode with id {ep_id} does not belong to show {show_id}')
 
@@ -1155,15 +1155,15 @@ class SeriesEpisodeReleaseAPI(APIResource):
         try:
             db.show_by_id(show_id, session=session)
         except NoResultFound:
-            raise NotFoundError('show with ID %s not found' % show_id)
+            raise NotFoundError(f'show with ID {show_id} not found')
         try:
             db.episode_by_id(ep_id, session)
         except NoResultFound:
-            raise NotFoundError('episode with ID %s not found' % ep_id)
+            raise NotFoundError(f'episode with ID {ep_id} not found')
         try:
             release = db.episode_release_by_id(rel_id, session)
         except NoResultFound:
-            raise NotFoundError('release with ID %s not found' % rel_id)
+            raise NotFoundError(f'release with ID {rel_id} not found')
         if not db.episode_in_show(show_id, ep_id):
             raise BadRequest(f'episode with id {ep_id} does not belong to show {show_id}')
         if not db.release_in_episode(ep_id, rel_id):
@@ -1183,15 +1183,15 @@ class SeriesEpisodeReleaseAPI(APIResource):
         try:
             db.show_by_id(show_id, session=session)
         except NoResultFound:
-            raise NotFoundError('show with ID %s not found' % show_id)
+            raise NotFoundError(f'show with ID {show_id} not found')
         try:
             db.episode_by_id(ep_id, session)
         except NoResultFound:
-            raise NotFoundError('episode with ID %s not found' % ep_id)
+            raise NotFoundError(f'episode with ID {ep_id} not found')
         try:
             release = db.episode_release_by_id(rel_id, session)
         except NoResultFound:
-            raise NotFoundError('release with ID %s not found' % rel_id)
+            raise NotFoundError(f'release with ID {rel_id} not found')
         if not db.episode_in_show(show_id, ep_id):
             raise BadRequest(f'episode with id {ep_id} does not belong to show {show_id}')
         if not db.release_in_episode(ep_id, rel_id):
@@ -1216,22 +1216,22 @@ class SeriesEpisodeReleaseAPI(APIResource):
         try:
             db.show_by_id(show_id, session=session)
         except NoResultFound:
-            raise NotFoundError('show with ID %s not found' % show_id)
+            raise NotFoundError(f'show with ID {show_id} not found')
         try:
             db.episode_by_id(ep_id, session)
         except NoResultFound:
-            raise NotFoundError('episode with ID %s not found' % ep_id)
+            raise NotFoundError(f'episode with ID {ep_id} not found')
         try:
             release = db.episode_release_by_id(rel_id, session)
         except NoResultFound:
-            raise NotFoundError('release with ID %s not found' % rel_id)
+            raise NotFoundError(f'release with ID {rel_id} not found')
         if not db.episode_in_show(show_id, ep_id):
             raise BadRequest(f'episode with id {ep_id} does not belong to show {show_id}')
         if not db.release_in_episode(ep_id, rel_id):
             raise BadRequest(f'release id {rel_id} does not belong to episode {ep_id}')
 
         if not release.downloaded:
-            raise BadRequest('release with id %s is not set as downloaded' % rel_id)
+            raise BadRequest(f'release with id {rel_id} is not set as downloaded')
         release.downloaded = False
 
         rsp = jsonify(release.to_dict())

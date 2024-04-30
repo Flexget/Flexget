@@ -141,7 +141,7 @@ class PluginPathBySpace:
             for entry in task.all_entries:
                 entry[config['to_field']] = path
         else:
-            task.abort('Unable to select a path based on %s' % config['select'])
+            task.abort('Unable to select a path based on {}'.format(config['select']))
             return
 
 

@@ -197,7 +197,7 @@ def reset_schema(plugin: str, session=None) -> None:
     :param plugin: The plugin whose schema should be reset
     """
     if plugin not in plugin_schemas:
-        raise ValueError('The plugin %s has no stored schema to reset.' % plugin)
+        raise ValueError(f'The plugin {plugin} has no stored schema to reset.')
     table_names = plugin_schemas[plugin].get('tables', [])
     tables = [table_schema(name, session) for name in table_names]
     # Remove the plugin's tables
@@ -218,7 +218,7 @@ def reset_schema(plugin: str, session=None) -> None:
 def register_plugin_table(tablename: str, plugin: str, version: int):
     plugin_schemas.setdefault(plugin, {'version': version, 'tables': []})
     if plugin_schemas[plugin]['version'] != version:
-        raise Exception('Two different schema versions received for plugin %s' % plugin)
+        raise Exception(f'Two different schema versions received for plugin {plugin}')
     plugin_schemas[plugin]['tables'].append(tablename)
 
 

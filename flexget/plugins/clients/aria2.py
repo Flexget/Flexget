@@ -96,7 +96,7 @@ class XmlRpcClient(RpcClient):
     def __init__(self, server, port, scheme, rpc_path, username=None, password=None, secret=None):
         schemes = {'http': None, 'https': ssl.SSLContext()}
         if scheme not in schemes:
-            raise plugin.PluginError('Unknown scheme: %s' % (scheme), logger)
+            raise plugin.PluginError(f'Unknown scheme: {scheme}', logger)
         super().__init__(server, port, scheme, rpc_path, username, password, secret)
         try:
             self._aria2 = xmlrpc.client.ServerProxy(self.url, context=schemes[scheme]).aria2
@@ -229,7 +229,7 @@ class OutputAria2:
             try:
                 self.add_entry(aria2, entry, config, task)
             except OSError as se:
-                entry.fail('Unable to reach Aria2: %s' % se)
+                entry.fail(f'Unable to reach Aria2: {se}')
             except xmlrpc.client.Fault as err:
                 logger.critical('Fault code {} message {}', err.faultCode, err.faultString)
                 entry.fail('Aria2 communication Fault')
@@ -246,7 +246,7 @@ class OutputAria2:
             path = entry.get('path', config.get('path', None))
             options['dir'] = os.path.expanduser(entry.render(path).rstrip('/'))
         except RenderError as e:
-            entry.fail('failed to render \'path\': %s' % e)
+            entry.fail(f'failed to render \'path\': {e}')
             return
 
         filename = entry.get('content_filename', config.get('filename', None))
@@ -265,7 +265,9 @@ class OutputAria2:
                             content_disposition = response.headers.get('content-disposition', None)
                     except Exception:
                         logger.warning('Not possible to retrive file info from `{}`', entry['url'])
-                        entry.fail('Not possible to retrive file info from `%s`' % entry['url'])
+                        entry.fail(
+                            'Not possible to retrive file info from `{}`'.format(entry['url'])
+                        )
                         return
 
                     if content_disposition:
@@ -299,7 +301,7 @@ class OutputAria2:
             try:
                 options['out'] = os.path.expanduser(entry.render(filename))
             except RenderError as e:
-                entry.fail('failed to render \'filename\': %s' % e)
+                entry.fail(f'failed to render \'filename\': {e}')
                 return
 
         # handle torrent files

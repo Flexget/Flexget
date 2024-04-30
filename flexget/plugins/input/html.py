@@ -267,14 +267,14 @@ class InputHtml:
                     continue
                 logger.debug('title from link: {}', title)
             else:
-                raise plugin.PluginError('Unknown title_from value %s' % title_from)
+                raise plugin.PluginError(f'Unknown title_from value {title_from}')
 
             if not title:
                 logger.warning('title could not be determined for link {}', log_link)
                 continue
 
             # strip unicode white spaces
-            title = title.replace('\u200B', '').strip()
+            title = title.replace('\u200b', '').strip()
 
             # in case the title contains xxxxxxx.torrent - foooo.torrent clean it a bit (get up to first .torrent)
             # TODO: hack

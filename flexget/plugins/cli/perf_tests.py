@@ -12,7 +12,7 @@ TESTS = ['imdb_query']
 
 def cli_perf_test(manager, options):
     if options.test_name not in TESTS:
-        console('Unknown performance test %s' % options.test_name)
+        console(f'Unknown performance test {options.test_name}')
         return
     session = Session()
     try:

@@ -38,7 +38,7 @@ class NewTorrents:
         ):
             results = self.entries_from_search(entry['title'], url=url)
             if not results:
-                raise UrlRewritingError("No matches for %s" % entry['title'])
+                raise UrlRewritingError("No matches for {}".format(entry['title']))
             url = results[0]['url']
         else:
             url = self.url_from_page(url)
@@ -79,8 +79,8 @@ class NewTorrents:
         """Parses torrent download url from search results"""
         name = normalize_unicode(name)
         if not url:
-            url = 'http://www.newtorrents.info/search/%s' % quote(
-                name.encode('utf-8'), safe=b':/~?=&%'
+            url = 'http://www.newtorrents.info/search/{}'.format(
+                quote(name.encode('utf-8'), safe=b':/~?=&%')
             )
 
         logger.debug('search url: {}', url)
@@ -94,7 +94,7 @@ class NewTorrents:
         # saving torrents in dict
         torrents = []
         for link in soup.find_all('a', attrs={'href': re.compile('down.php')}):
-            torrent_url = 'http://www.newtorrents.info%s' % link.get('href')
+            torrent_url = 'http://www.newtorrents.info{}'.format(link.get('href'))
             release_name = link.parent.next.get('title')
             # quick dirty hack
             seed = link.find_next('td', attrs={'class': re.compile('s')}).renderContents()

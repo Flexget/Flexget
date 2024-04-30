@@ -119,7 +119,7 @@ class SearchPTN:
         search_params = default_search_params.copy()
         if 'movie_name' in entry:
             if 'movie_year' in entry:
-                search_params['advancedsearchparameters'] = '[year=%s]' % entry['movie_year']
+                search_params['advancedsearchparameters'] = '[year={}]'.format(entry['movie_year'])
             searches = [entry['movie_name']]
         else:
             searches = entry.get('search_strings', [entry['title']])

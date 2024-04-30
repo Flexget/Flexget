@@ -27,9 +27,9 @@ class TestInfoHash:
         """Torrent: infohash parsing"""
         task = execute_task('test')
         info_hash = task.entries[0].get('torrent_info_hash')
-        assert info_hash == '14FFE5DD23188FD5CB53A1D47F1289DB70ABF31E', (
-            'InfoHash does not match (got %s)' % info_hash
-        )
+        assert (
+            info_hash == '14FFE5DD23188FD5CB53A1D47F1289DB70ABF31E'
+        ), f'InfoHash does not match (got {info_hash})'
 
     def test_magnet_infohash(self, execute_task):
         """Tests metainfo/magnet_btih plugin"""
@@ -228,8 +228,8 @@ class TestTorrentScrub:
 
             # Dump small torrents on demand
             if 0 and not clean:
-                print("original=%r" % original.content)
-                print("modified=%r" % modified.content)
+                print(f"original={original.content!r}")
+                print(f"modified={modified.content!r}")
 
             # Make sure essentials survived
             assert 'announce' in modified.content
@@ -305,9 +305,9 @@ class TestTorrentAlive:
     def test_torrent_alive_fail(self, mocked_request, execute_task):
         task = execute_task('test_torrent_alive_fail')
         assert not task.accepted, 'Torrent should not have met seed requirement.'
-        assert task._rerun_count == 1, (
-            'Task should have been rerun 1 time. Was rerun %s times.' % task._rerun_count
-        )
+        assert (
+            task._rerun_count == 1
+        ), f'Task should have been rerun 1 time. Was rerun {task._rerun_count} times.'
 
         # Run it again to make sure remember_rejected prevents a rerun from occurring
         task = execute_task('test_torrent_alive_fail')

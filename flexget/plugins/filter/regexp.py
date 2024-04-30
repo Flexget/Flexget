@@ -189,7 +189,7 @@ class FilterRegexp:
                     # Make sure the not_regexps do not match for this field
                     for not_regexp in not_regexps or []:
                         if self.matches(entry, not_regexp, find_from=[field]):
-                            entry.trace('Configured not_regexp %s matched, ignored' % not_regexp)
+                            entry.trace(f'Configured not_regexp {not_regexp} matched, ignored')
                             break
                     else:  # None of the not_regexps matched
                         return field
@@ -217,8 +217,8 @@ class FilterRegexp:
                 # Run if we are in match mode and have a hit, or are in non-match mode and don't have a hit
                 if match_mode == bool(field):
                     # Creates the string with the reason for the hit
-                    matchtext = 'regexp \'%s\' ' % regexp.pattern + (
-                        'matched field \'%s\'' % field if match_mode else 'didn\'t match'
+                    matchtext = f'regexp \'{regexp.pattern}\' ' + (
+                        f'matched field \'{field}\'' if match_mode else 'didn\'t match'
                     )
                     logger.debug('{} for {}', matchtext, entry['title'])
                     # apply settings to entry and run the method on it
@@ -236,7 +236,7 @@ class FilterRegexp:
                     break
             else:
                 # We didn't run method for any of the regexps, add this entry to rest
-                entry.trace('None of configured %s regexps matched' % operation)
+                entry.trace(f'None of configured {operation} regexps matched')
         return matched
 
 

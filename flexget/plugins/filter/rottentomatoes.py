@@ -170,7 +170,7 @@ class FilterRottenTomatoes:
                 rejected = config['reject_actors']
                 for actor_name in entry.get('rt_actors', []):
                     if actor_name in rejected:
-                        reasons.append('reject_actors %s' % actor_name)
+                        reasons.append(f'reject_actors {actor_name}')
                         break
 
             # Accept if actors contains an accepted actor, but don't reject otherwise
@@ -186,7 +186,7 @@ class FilterRottenTomatoes:
                 rejected = config['reject_directors']
                 for director_name in entry.get('rt_directors', []):
                     if director_name in rejected:
-                        reasons.append('reject_directors %s' % director_name)
+                        reasons.append(f'reject_directors {director_name}')
                         break
 
             # Accept if the director is in the accept list, but do not reject if the director is unknown
@@ -201,12 +201,12 @@ class FilterRottenTomatoes:
             if 'reject_mpaa_ratings' in config:
                 rejected = config['reject_mpaa_ratings']
                 if entry.get('rt_mpaa_rating') in rejected:
-                    reasons.append('reject_mpaa_ratings %s' % entry['rt_mpaa_rating'])
+                    reasons.append('reject_mpaa_ratings {}'.format(entry['rt_mpaa_rating']))
 
             if 'accept_mpaa_ratings' in config:
                 accepted = config['accept_mpaa_ratings']
                 if entry.get('rt_mpaa_rating') not in accepted:
-                    reasons.append('accept_mpaa_ratings %s' % entry.get('rt_mpaa_rating'))
+                    reasons.append('accept_mpaa_ratings {}'.format(entry.get('rt_mpaa_rating')))
 
             if reasons and not force_accept:
                 msg = 'Didn\'t accept `{}` because of rule(s) {}'.format(

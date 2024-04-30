@@ -28,7 +28,7 @@ def do_cli_task(manager, options):
         try:
             task = session.query(db.StatusTask).filter(db.StatusTask.name == options.task).one()
         except NoResultFound:
-            console('Task name `%s` does not exists or does not have any records' % options.task)
+            console(f'Task name `{options.task}` does not exists or does not have any records')
             return
         else:
             query = task.executions.order_by(desc(db.TaskExecution.start))[: options.limit]
@@ -38,7 +38,7 @@ def do_cli_task(manager, options):
 
                 if ex.end is not None and ex.start is not None:
                     delta = ex.end - ex.start
-                    duration = '%1.fs' % delta.total_seconds()
+                    duration = f'{delta.total_seconds():1.0f}s'
                 else:
                     duration = '?'
 
@@ -105,7 +105,7 @@ def do_cli_summary(manager, options):
                 str(ok.accepted) if ok is not None else '-',
                 str(ok.rejected) if ok is not None else '-',
                 str(ok.failed) if ok is not None else '-',
-                '%1.fs' % duration.total_seconds() if duration is not None else '-',
+                f'{duration.total_seconds():1.0f}s' if duration is not None else '-',
             )
 
     console(table)

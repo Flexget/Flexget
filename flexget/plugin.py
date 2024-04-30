@@ -279,7 +279,7 @@ class PluginInfo(dict):
 
         # Check for unsupported api versions
         if api_ver < 2:
-            raise PluginError('Api versions <2 are no longer supported. Plugin %s' % name)
+            raise PluginError(f'Api versions <2 are no longer supported. Plugin {name}')
 
         # Set basic info attributes
         self.api_ver = api_ver
@@ -356,7 +356,7 @@ class PluginInfo(dict):
         self[attr] = value
 
     def __str__(self):
-        return '<PluginInfo(name=%s)>' % self.name
+        return f'<PluginInfo(name={self.name})>'
 
     def _is_valid_operand(self, other):
         return hasattr(other, 'name')
@@ -583,7 +583,7 @@ def get_plugins(
 
     def matches(plugin):
         if phase is not None and phase not in phase_methods:
-            raise ValueError('Unknown phase %s' % phase)
+            raise ValueError(f'Unknown phase {phase}')
         if phase and phase not in plugin.phase_handlers:
             return False
         if interface and interface not in plugin.interfaces:

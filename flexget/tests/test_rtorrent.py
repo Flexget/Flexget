@@ -6,7 +6,7 @@ from xmlrpc import client as xmlrpc_client
 from flexget.plugins.clients.rtorrent import RTorrent
 
 torrent_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'private.torrent')
-torrent_url = 'file:///%s' % torrent_file
+torrent_url = f'file:///{torrent_file}'
 torrent_info_hash = '09977FE761B8D293AD8A929CCAF2E9322D525A6C'
 
 with open(torrent_file, 'rb') as tor_file:
@@ -478,7 +478,7 @@ class TestRTorrentInputPlugin:
         assert len(task.all_entries) == 2
 
         for entry in task.entries:
-            assert entry['url'] == 'http://localhost/RPC2/%s' % torrent_info_hash
+            assert entry['url'] == f'http://localhost/RPC2/{torrent_info_hash}'
             assert entry['name'] == 'private.torrent'
             assert entry['torrent_info_hash'] == torrent_info_hash
             assert entry['path'] == '/data/downloads/private'

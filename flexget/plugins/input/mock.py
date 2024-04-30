@@ -37,7 +37,7 @@ class Mock:
             entry = Entry(line)
             # no url specified, add random one based on title (ie. test)
             if 'url' not in entry:
-                entry['url'] = 'mock://localhost/mock/%s' % hash(entry['title'])
+                entry['url'] = 'mock://localhost/mock/{}'.format(hash(entry['title']))
             entries.append(entry)
         return entries
 

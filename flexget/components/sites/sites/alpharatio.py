@@ -180,7 +180,7 @@ class SearchAlphaRatio:
                 timeout=30,
             )
         except RequestException as e:
-            raise plugin.PluginError('AlphaRatio login failed: %s' % e)
+            raise plugin.PluginError(f'AlphaRatio login failed: {e}')
 
         if 'Your username or password was incorrect.' in response.text:
             raise plugin.PluginError(

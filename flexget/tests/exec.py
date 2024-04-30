@@ -17,7 +17,7 @@ if __name__ == "__main__":
     filename = sys.argv[2]
     # Make sure the output folder exists
     if not os.path.exists(out_dir):
-        print("output dir %s does not exist" % sys.argv[1])
+        print(f"output dir {sys.argv[1]} does not exist")
         sys.exit(1)
 
     with open(os.path.join(out_dir, filename), 'w') as outfile:

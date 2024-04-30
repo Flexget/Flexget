@@ -47,7 +47,7 @@ class TMDBConfig(Base):
         try:
             configuration = tmdb_request('configuration')
         except requests.RequestException as e:
-            raise LookupError('Error updating data from tmdb: %s' % e)
+            raise LookupError(f'Error updating data from tmdb: {e}')
         self.configuration = configuration
 
     @property
@@ -138,7 +138,7 @@ class TMDBMovie(Base):
                 language=language,
             )
         except requests.RequestException as e:
-            raise LookupError('Error updating data from tmdb: %s' % e)
+            raise LookupError(f'Error updating data from tmdb: {e}')
         self.imdb_id = movie['imdb_id']
         self.name = movie['title']
         self.original_name = movie['original_title']
@@ -169,7 +169,7 @@ class TMDBMovie(Base):
         try:
             images = tmdb_request(f'movie/{self.id}/images')
         except requests.RequestException as e:
-            raise LookupError('Error updating data from tmdb: %s' % e)
+            raise LookupError(f'Error updating data from tmdb: {e}')
 
         self._posters = [TMDBPoster(movie_id=self.id, **p) for p in images['posters']]
         self._backdrops = [TMDBBackdrop(movie_id=self.id, **b) for b in images['backdrops']]
@@ -375,7 +375,7 @@ class ApiTmdb:
                 logger.debug('Movie {} information restored from cache.', movie.name)
         else:
             if only_cached:
-                raise LookupError('Movie %s not found from cache' % id_str)
+                raise LookupError(f'Movie {id_str} not found from cache')
             # There was no movie found in the cache, do a lookup from tmdb
             logger.verbose('Searching from TMDb {}', id_str)
             if imdb_id and not tmdb_id:

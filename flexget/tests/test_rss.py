@@ -130,7 +130,7 @@ class TestInputRSS:
         assert entry, 'Entry not created for item with multiple enclosures'
         urls = ['http://localhost/enclosure%d' % num for num in range(1, 3)]
         urls_not_present = [url for url in urls if url not in entry.get('urls')]
-        assert not urls_not_present, '%s should be present in urls list' % urls_not_present
+        assert not urls_not_present, f'{urls_not_present} should be present in urls list'
         # Test no entries were made for the enclosures
         for url in urls:
             assert not task.find_entry(
@@ -254,4 +254,4 @@ class TestRssOnline:
         tasks = yaml.safe_load(self.config)['tasks']
         for task in tasks:
             task = execute_task(task)
-            assert task.entries, 'No results for task `%s`' % task
+            assert task.entries, f'No results for task `{task}`'

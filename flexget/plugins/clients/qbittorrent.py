@@ -294,7 +294,7 @@ class OutputQBitTorrent:
                     tmp_path = os.path.join(task.manager.config_base, 'temp')
                     logger.debug('entry: {}', entry)
                     logger.debug('temp: {}', ', '.join(os.listdir(tmp_path)))
-                    entry.fail("Downloaded temp file '%s' doesn't exist!?" % entry['file'])
+                    entry.fail("Downloaded temp file '{}' doesn't exist!?".format(entry['file']))
                     continue
                 self.add_torrent_file(entry, form_data, config['verify_cert'])
             else:
@@ -356,13 +356,13 @@ class FromQBitTorrent:
 
         for torrent in client.torrents_info():
             if 'category' in config:
-                logger.debug("filtered `%s` by wrong category" % torrent['name'])
+                logger.debug("filtered `{}` by wrong category".format(torrent['name']))
                 if torrent['category'] != config['category']:
                     continue
 
             if 'completed' in config:
                 if not torrent.state_enum.is_complete:
-                    logger.debug("filtered `%s` by not completed" % torrent['name'])
+                    logger.debug("filtered `{}` by not completed".format(torrent['name']))
                     continue
 
             yield Entry(

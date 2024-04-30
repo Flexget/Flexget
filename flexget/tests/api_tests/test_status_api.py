@@ -114,7 +114,7 @@ class TestTaskStatusPagination:
         for i in range(number_of_entries):
             with Session() as session:
                 st = StatusTask()
-                st.name = 'status task %s' % i
+                st.name = f'status task {i}'
                 session.add(st)
 
         rsp = api_client.get('/status/')

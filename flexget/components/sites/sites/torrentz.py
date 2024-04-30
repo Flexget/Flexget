@@ -81,14 +81,14 @@ class Torrentz:
                     logger.warning('torrentz.{} connection failed. Error: {}', domain, err)
                     continue
                 except requests.RequestException as err:
-                    raise plugin.PluginError('Error getting torrentz search results: %s' % err)
+                    raise plugin.PluginError(f'Error getting torrentz search results: {err}')
 
             else:
                 raise plugin.PluginError('Error getting torrentz search results')
 
             if not r.content.strip():
                 raise plugin.PluginError(
-                    'No data from %s. Maybe torrentz is blocking the FlexGet User-Agent' % url
+                    f'No data from {url}. Maybe torrentz is blocking the FlexGet User-Agent'
                 )
 
             rss = feedparser.parse(r.content)

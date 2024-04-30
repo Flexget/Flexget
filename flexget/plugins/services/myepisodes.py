@@ -129,8 +129,8 @@ class MyEpisodes:
             or 'series_name' not in entry
         ):
             raise plugin.PluginWarning(
-                'Can\'t mark entry `%s` in myepisodes without series_season, series_episode and series_name '
-                'fields' % entry['title'],
+                'Can\'t mark entry `{}` in myepisodes without series_season, series_episode and series_name '
+                'fields'.format(entry['title']),
                 logger,
             )
 
@@ -156,7 +156,7 @@ class MyEpisodes:
             return myepisodes_id
 
         raise plugin.PluginWarning(
-            'Unable to determine the myepisodes id for: `%s`' % entry['title'], logger
+            'Unable to determine the myepisodes id for: `{}`'.format(entry['title']), logger
         )
 
     def _retrieve_id_from_database(self, entry):
@@ -193,7 +193,7 @@ class MyEpisodes:
                 self._save_id(search_value, myepisodes_id)
 
         except requests.RequestException as e:
-            raise plugin.PluginError('Error searching for myepisodes id: %s' % e)
+            raise plugin.PluginError(f'Error searching for myepisodes id: {e}')
 
         return myepisodes_id
 
@@ -316,7 +316,7 @@ class MyEpisodes:
                     logger,
                 )
         except requests.RequestException as e:
-            raise plugin.PluginError('Error logging in to myepisodes: %s' % e)
+            raise plugin.PluginError(f'Error logging in to myepisodes: {e}')
 
         return session
 

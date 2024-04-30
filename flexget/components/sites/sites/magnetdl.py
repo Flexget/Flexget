@@ -104,7 +104,7 @@ class MagnetDL:
             raise plugin.DependencyError(
                 issued_by='cfscraper',
                 missing='cloudscraper',
-                message='CLOudscraper module required. ImportError: %s' % e,
+                message=f'CLOudscraper module required. ImportError: {e}',
             )
 
         scraper = cloudscraper.create_scraper()
@@ -147,7 +147,7 @@ class MagnetDL:
             raise plugin.DependencyError(
                 issued_by='cfscraper',
                 missing='cloudscraper',
-                message='CLOudscraper module required. ImportError: %s' % e,
+                message=f'CLOudscraper module required. ImportError: {e}',
             )
         scraper = cloudscraper.create_scraper()
         entries = []

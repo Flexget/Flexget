@@ -48,7 +48,7 @@ class PluginBlurayLookup:
                 movie = lookup(title=title, year=year, session=session)
                 entry.update_using_map(self.field_map, movie)
         except LookupError:
-            log_once('Bluray lookup failed for %s' % entry['title'], logger, 'WARNING')
+            log_once('Bluray lookup failed for {}'.format(entry['title']), logger, 'WARNING')
 
     def lookup(self, entry):
         """

@@ -87,7 +87,7 @@ def action_purge(options):
         if not regexp_list:
             console(f'Could not find regexp list with name {options.list_name}')
             return
-        console('Deleting list %s' % options.list_name)
+        console(f'Deleting list {options.list_name}')
         session.delete(regexp_list)
 
 

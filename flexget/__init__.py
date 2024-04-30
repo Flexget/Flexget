@@ -29,7 +29,7 @@ def main(args: Optional[Sequence[str]] = None):
 
                 traceback.print_exc()
             else:
-                print('Could not instantiate manager: %s' % e, file=sys.stderr)
+                print(f'Could not instantiate manager: {e}', file=sys.stderr)
             sys.exit(1)
         else:
             log.start(
@@ -59,7 +59,7 @@ def main(args: Optional[Sequence[str]] = None):
 
                 traceback.print_exc()
             else:
-                print('Could not start manager: %s' % e, file=sys.stderr)
+                print(f'Could not start manager: {e}', file=sys.stderr)
 
             sys.exit(1)
     except KeyboardInterrupt:

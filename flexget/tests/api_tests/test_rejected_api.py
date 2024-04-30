@@ -40,7 +40,7 @@ class TestRejectedAPI:
 
     def test_rejected_get_all_empty(self, api_client, schema_match):
         rsp = api_client.get('/rejected/')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
 
@@ -51,7 +51,7 @@ class TestRejectedAPI:
         add_rejected_entry(self.entry)
 
         rsp = api_client.get('/rejected/')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
 
@@ -76,7 +76,7 @@ class TestRejectedAPI:
         add_rejected_entry(self.entry)
 
         rsp = api_client.get('/rejected/')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
 
@@ -84,7 +84,7 @@ class TestRejectedAPI:
         assert not errors
 
         rsp = api_client.delete('/rejected/')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
 
@@ -98,7 +98,7 @@ class TestRejectedAPI:
         add_rejected_entry(self.entry)
 
         rsp = api_client.get('/rejected/1/')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
 
@@ -117,7 +117,7 @@ class TestRejectedAPI:
             assert data.get(field) == value
 
         rsp = api_client.get('/rejected/10/')
-        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 404, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
 
@@ -128,28 +128,28 @@ class TestRejectedAPI:
         add_rejected_entry(self.entry)
 
         rsp = api_client.get('/rejected/1/')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
         errors = schema_match(OC.rejected_entry_object, data)
         assert not errors
 
         rsp = api_client.delete('/rejected/1/')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
         errors = schema_match(base_message, data)
         assert not errors
 
         rsp = api_client.delete('/rejected/1/')
-        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 404, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
         errors = schema_match(base_message, data)
         assert not errors
 
         rsp = api_client.get('/rejected/1/')
-        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 404, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
         errors = schema_match(base_message, data)
@@ -182,7 +182,7 @@ class TestRejectedPagination:
 
         # Default values
         rsp = api_client.get('/rejected/')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
         data = json.loads(rsp.get_data(as_text=True))
 
         assert len(data) == 50
@@ -258,46 +258,46 @@ class TestRejectedPagination:
 
         # Sort by title
         rsp = api_client.get('/rejected/?sort_by=title')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
         data = json.loads(rsp.get_data(as_text=True))
 
         assert data[0]['title'] == 'test_title_3'
 
         rsp = api_client.get('/rejected/?sort_by=title&order=asc')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
         data = json.loads(rsp.get_data(as_text=True))
 
         assert data[0]['title'] == 'test_title_1'
 
         # Sort by url
         rsp = api_client.get('/rejected/?sort_by=url')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
         data = json.loads(rsp.get_data(as_text=True))
 
         assert data[0]['url'] == 'test_url_c'
 
         rsp = api_client.get('/rejected/?sort_by=url&order=asc')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
         data = json.loads(rsp.get_data(as_text=True))
 
         assert data[0]['url'] == 'test_url_a'
 
         # Sort by expires
         rsp = api_client.get('/rejected/?sort_by=expires')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
         data = json.loads(rsp.get_data(as_text=True))
 
         assert data[0]['title'] == 'test_title_3'
 
         rsp = api_client.get('/rejected/?sort_by=expires&order=asc')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
         data = json.loads(rsp.get_data(as_text=True))
 
         assert data[0]['title'] == 'test_title_1'
 
         # Combine sorting and pagination
         rsp = api_client.get('/rejected/?sort_by=title&per_page=2&page=2')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
         data = json.loads(rsp.get_data(as_text=True))
 
         assert data[0]['title'] == 'test_title_1'

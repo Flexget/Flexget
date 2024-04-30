@@ -113,7 +113,7 @@ class SlackNotifier:
             'attachments': config.get('attachments'),
         }
         if config.get('icon_emoji'):
-            notification['icon_emoji'] = ':%s:' % config['icon_emoji'].strip(':')
+            notification['icon_emoji'] = ':{}:'.format(config['icon_emoji'].strip(':'))
         if config.get('icon_url'):
             notification['icon_url'] = config['icon_url']
 

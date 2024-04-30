@@ -25,7 +25,7 @@ class BacklogEntry(Base):
     entry = entry_synonym('_json')
 
     def __repr__(self):
-        return '<BacklogEntry(title=%s)>' % (self.title)
+        return f'<BacklogEntry(title={self.title})>'
 
 
 Index('ix_backlog_feed_expire', BacklogEntry.task, BacklogEntry.expire)

@@ -47,7 +47,7 @@ def reset_plugin(options):
     plugin = options.plugin_name[0]
     try:
         reset_schema(plugin)
-        console('The database for `%s` has been reset.' % plugin)
+        console(f'The database for `{plugin}` has been reset.')
     except ValueError as e:
         console(f'Unable to reset {plugin}: {e.message}')
 

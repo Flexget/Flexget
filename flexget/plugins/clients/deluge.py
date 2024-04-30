@@ -429,7 +429,9 @@ class OutputDeluge(DelugePlugin):
                     magnet = entry['url']
                 else:
                     if not os.path.exists(entry['file']):
-                        entry.fail('Downloaded temp file \'%s\' doesn\'t exist!' % entry['file'])
+                        entry.fail(
+                            'Downloaded temp file \'{}\' doesn\'t exist!'.format(entry['file'])
+                        )
                         del entry['file']
                         return
                     with open(entry['file'], 'rb') as f:

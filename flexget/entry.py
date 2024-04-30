@@ -104,7 +104,7 @@ class Entry(LazyDict, Serializer):
         :param plugin: Uses task.current_plugin by default, pass value to override
         """
         if operation not in (None, 'accept', 'reject', 'fail'):
-            raise ValueError('Unknown operation %s' % operation)
+            raise ValueError(f'Unknown operation {operation}')
         item = (plugin, operation, message)
         if item not in self.traces:
             self.traces.append(item)
@@ -131,7 +131,7 @@ class Entry(LazyDict, Serializer):
         try:
             self._hooks[action].append(functools.partial(func, **kwargs))
         except KeyError:
-            raise ValueError('`%s` is not a valid entry action' % action)
+            raise ValueError(f'`{action}` is not a valid entry action')
 
     def on_accept(self, func: Callable, **kwargs) -> None:
         """
@@ -181,7 +181,7 @@ class Entry(LazyDict, Serializer):
     def reject(self, reason: Optional[str] = None, **kwargs) -> None:
         # ignore rejections on immortal entries
         if self.get('immortal'):
-            reason_str = '(%s)' % reason if reason else ''
+            reason_str = f'({reason})' if reason else ''
             logger.info('Tried to reject immortal {} {}', self['title'], reason_str)
             self.trace(f'Tried to reject immortal {reason_str}')
             return
@@ -253,7 +253,7 @@ class Entry(LazyDict, Serializer):
         # title handling
         if key == 'title':
             if not isinstance(value, (str, LazyLookup)):
-                raise plugin.PluginError('Tried to set title to %r' % value)
+                raise plugin.PluginError(f'Tried to set title to {value!r}')
             self.setdefault('original_title', value)
 
         try:
@@ -321,8 +321,7 @@ class Entry(LazyDict, Serializer):
         """
         if not isinstance(template, (str, FlexGetTemplate)):
             raise ValueError(
-                'Trying to render non string template or unrecognized template format, got %s'
-                % repr(template)
+                f'Trying to render non string template or unrecognized template format, got {template!r}'
             )
         logger.trace('rendering: {}', template)
         return render_from_entry(template, self, native=native)

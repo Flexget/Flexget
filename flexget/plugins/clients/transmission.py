@@ -99,7 +99,7 @@ class TransmissionBase:
         except TransmissionTimeoutError:
             raise plugin.PluginError("Cannot connect to transmission: Connection timed out.")
         except TransmissionConnectError as e:
-            raise plugin.PluginError("Error connecting to transmission: %s" % e.args[0].reason)
+            raise plugin.PluginError(f"Error connecting to transmission: {e.args[0].reason}")
         except TransmissionError:
             raise plugin.PluginError("Error connecting to transmission")
         return cli
@@ -434,7 +434,7 @@ class PluginTransmission(TransmissionBase):
                     tmp_path = os.path.join(task.manager.config_base, 'temp')
                     logger.debug('entry: {}', entry)
                     logger.debug('temp: {}', ', '.join(os.listdir(tmp_path)))
-                    entry.fail("Downloaded temp file '%s' doesn't exist!?" % entry['file'])
+                    entry.fail("Downloaded temp file '{}' doesn't exist!?".format(entry['file']))
                     continue
 
                 try:

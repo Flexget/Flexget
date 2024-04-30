@@ -127,17 +127,17 @@ def begin(manager, options):
         series = db.shows_by_exact_name(normalized_name, session)
         if options.forget:
             if not series:
-                console('Series `%s` was not found in the database.' % series_name)
+                console(f'Series `{series_name}` was not found in the database.')
             else:
                 series = series[0]
                 series.begin = None
-                console('The begin episode for `%s` has been forgotten.' % series.name)
+                console(f'The begin episode for `{series.name}` has been forgotten.')
                 session.commit()
                 manager.config_changed()
         elif options.episode_id:
             ep_id = options.episode_id
             if not series:
-                console('Series not yet in database. Adding `%s`.' % series_name)
+                console(f'Series not yet in database. Adding `{series_name}`.')
                 series = db.Series()
                 series.name = series_name
                 session.add(series)
@@ -149,7 +149,7 @@ def begin(manager, options):
                 console(e)
             else:
                 if entity_type == 'season':
-                    console('`%s` was identified as a season.' % ep_id)
+                    console(f'`{ep_id}` was identified as a season.')
                     ep_id += 'E01'
                 console(f'Releases for `{series.name}` will be accepted starting with `{ep_id}`.')
                 session.commit()
@@ -175,7 +175,7 @@ def remove(manager, options, forget=False):
         except ValueError as e:
             console(e.args[0])
         else:
-            console('Removed series `%s` from database.' % name.capitalize())
+            console(f'Removed series `{name.capitalize()}` from database.')
 
     manager.config_changed()
 
@@ -211,14 +211,15 @@ def display_details(options):
         # Sort by length of name, so that partial matches always show shortest matching title
         matches = db.shows_by_name(name, session=session)
         if not matches:
-            console(colorize(ERROR_COLOR, 'ERROR: Unknown series `%s`' % name))
+            console(colorize(ERROR_COLOR, f'ERROR: Unknown series `{name}`'))
             return
         # Pick the best matching series
         series = matches[0]
         table_title = series.name
         if len(matches) > 1:
             warning = (
-                colorize('red', ' WARNING: ') + 'Multiple series match to `{}`.\n '
+                colorize('red', ' WARNING: ')
+                + 'Multiple series match to `{}`.\n '
                 'Be more specific to see the results of other matches:\n\n'
                 ' {}'.format(name, ', '.join(s.name for s in matches[1:]))
             )
@@ -257,7 +258,7 @@ def display_details(options):
             entity_data.append('\n'.join(release_qualities))
             entity_data.append('\n'.join(release_propers))
             table_data.append(entity_data)
-        footer = ' %s \n' % (colorize(DOWNLOADED_RELEASE_COLOR, '* Downloaded'))
+        footer = ' {} \n'.format(colorize(DOWNLOADED_RELEASE_COLOR, '* Downloaded'))
         if not series.identified_by:
             footer += (
                 '\n Series plugin is still learning which episode numbering mode is \n'
@@ -271,7 +272,7 @@ def display_details(options):
         if series.begin:
             footer += f' \n Begin for `{series.name}` is set to `{series.begin.identifier}`.'
             begin_text = 'and `begin` options'
-        footer += ' \n See `identified_by` %s for more information.' % begin_text
+        footer += f' \n See `identified_by` {begin_text} for more information.'
     table = TerminalTable(*header, table_type=options.table_type, title=table_title)
     for row in table_data:
         table.add_row(*row)
@@ -289,7 +290,7 @@ def add(manager, options):
     with Session() as session:
         series = db.shows_by_exact_name(normalized_name, session)
         if not series:
-            console('Series not yet in database, adding `%s`' % series_name)
+            console(f'Series not yet in database, adding `{series_name}`')
             series = db.Series()
             series.name = series_name
             session.add(series)

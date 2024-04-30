@@ -38,7 +38,7 @@ def action_status(options, irc_manager):
     try:
         status = irc_manager.status(connection)
     except ValueError as e:
-        console('ERROR: %s' % e.args[0])
+        console(f'ERROR: {e.args[0]}')
         return
 
     header = ['Name', 'Alive', 'Channels', 'Server']
@@ -67,7 +67,7 @@ def action_status(options, irc_manager):
 def action_restart(options, irc_manager):
     connection = options.irc_connection
     try:
-        console('Restarting irc connection %s. It may take a short while.' % connection)
+        console(f'Restarting irc connection {connection}. It may take a short while.')
         irc_manager.restart_connections(connection)
         console(
             'Successfully restarted {0}. Use `flexget irc status {0}` to check its status.'.format(
@@ -75,13 +75,13 @@ def action_restart(options, irc_manager):
             )
         )
     except KeyError:
-        console('ERROR: %s is not a valid irc connection' % connection)
+        console(f'ERROR: {connection} is not a valid irc connection')
 
 
 def action_stop(options, irc_manager):
     connection = options.irc_connection
     try:
-        console('Stopping irc connection %s. It may take a short while.' % connection)
+        console(f'Stopping irc connection {connection}. It may take a short while.')
         irc_manager.stop_connections(wait=False, name=connection)
         console(
             'Successfully stopped {0}. Use `flexget irc status {0}` to check its status.'.format(
@@ -89,7 +89,7 @@ def action_stop(options, irc_manager):
             )
         )
     except KeyError:
-        console('ERROR: %s is not a valid irc connection' % connection)
+        console(f'ERROR: {connection} is not a valid irc connection')
 
 
 @event('options.register')

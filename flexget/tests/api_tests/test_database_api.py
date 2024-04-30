@@ -26,7 +26,7 @@ class TestDatabaseAPI:
             payload['plugin_name'] = plugin_name
 
         rsp = api_client.json_post('/database/', data=json.dumps(payload))
-        assert rsp.status_code == status, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == status, f'Response code is {rsp.status_code}'
         data = json.loads(rsp.get_data(as_text=True))
 
         errors = schema_match(schema, data)

@@ -33,7 +33,7 @@ def replace_in_item(replaces, item):
     if isinstance(item, str):
         # Do replacement in text objects
         for key, val in replaces.items():
-            item = item.replace('$%s' % key, val)
+            item = item.replace(f'${key}', val)
         return item
     elif isinstance(item, list):
         # Make a new list with replacements done on each item

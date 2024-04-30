@@ -168,7 +168,7 @@ class CouchPotatoBase:
         delete_movie_url = CouchPotatoBase.build_url(
             config.get('base_url'), 'delete', config.get('port'), config.get('api_key')
         )
-        delete_movie_url += '&id=%s' % movie_id
+        delete_movie_url += f'&id={movie_id}'
         CouchPotatoBase.get_json(delete_movie_url)
 
 

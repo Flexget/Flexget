@@ -37,7 +37,7 @@ class TestSeenAPI:
 
     def test_seen_get_all(self, api_client, schema_match):
         rsp = api_client.get('/seen/')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
         data = json.loads(rsp.get_data(as_text=True))
 
         errors = schema_match(OC.seen_search_object, data)
@@ -46,7 +46,7 @@ class TestSeenAPI:
         entries = self.add_seen_entries()
 
         rsp = api_client.get('/seen/')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
         data = json.loads(rsp.get_data(as_text=True))
 
         errors = schema_match(OC.seen_search_object, data)
@@ -59,7 +59,7 @@ class TestSeenAPI:
         assert len(data) == 2
 
         rsp = api_client.get('/seen/?local=true')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
         data = json.loads(rsp.get_data(as_text=True))
 
         errors = schema_match(OC.seen_search_object, data)
@@ -68,7 +68,7 @@ class TestSeenAPI:
         assert len(data) == 1
 
         rsp = api_client.get('/seen/?value=test_value_2')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
         data = json.loads(rsp.get_data(as_text=True))
 
         errors = schema_match(OC.seen_search_object, data)
@@ -77,7 +77,7 @@ class TestSeenAPI:
         assert len(data) == 1
 
         rsp = api_client.get('/seen/?value=bla')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
         data = json.loads(rsp.get_data(as_text=True))
 
         errors = schema_match(OC.seen_search_object, data)
@@ -89,7 +89,7 @@ class TestSeenAPI:
         entries = self.add_seen_entries()
 
         rsp = api_client.get('/seen/')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
         data = json.loads(rsp.get_data(as_text=True))
 
         errors = schema_match(OC.seen_search_object, data)
@@ -100,7 +100,7 @@ class TestSeenAPI:
                 assert value[k] == v
 
         rsp = api_client.delete('/seen/')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
         data = json.loads(rsp.get_data(as_text=True))
 
         errors = schema_match(base_message, data)
@@ -111,7 +111,7 @@ class TestSeenAPI:
         self.add_seen_entries()
 
         rsp = api_client.delete('/seen/?local=true')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
         data = json.loads(rsp.get_data(as_text=True))
 
         errors = schema_match(base_message, data)
@@ -120,7 +120,7 @@ class TestSeenAPI:
         assert data['message'] == 'successfully deleted 1 entries'
 
         rsp = api_client.delete('/seen/?value=test_value_2')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
         data = json.loads(rsp.get_data(as_text=True))
 
         errors = schema_match(base_message, data)
@@ -129,7 +129,7 @@ class TestSeenAPI:
         assert data['message'] == 'successfully deleted 1 entries'
 
         rsp = api_client.get('/seen/')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
         data = json.loads(rsp.get_data(as_text=True))
 
         errors = schema_match(OC.seen_search_object, data)
@@ -141,7 +141,7 @@ class TestSeenAPI:
         entries = self.add_seen_entries()
 
         rsp = api_client.get('/seen/1/')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
         data = json.loads(rsp.get_data(as_text=True))
 
         errors = schema_match(OC.seen_object, data)
@@ -151,7 +151,7 @@ class TestSeenAPI:
             assert data[key] == value
 
         rsp = api_client.get('/seen/10/')
-        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 404, f'Response code is {rsp.status_code}'
         data = json.loads(rsp.get_data(as_text=True))
 
         errors = schema_match(base_message, data)
@@ -161,14 +161,14 @@ class TestSeenAPI:
         self.add_seen_entries()
 
         rsp = api_client.delete('/seen/1/')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
         data = json.loads(rsp.get_data(as_text=True))
 
         errors = schema_match(base_message, data)
         assert not errors
 
         rsp = api_client.get('/seen/')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
         data = json.loads(rsp.get_data(as_text=True))
 
         errors = schema_match(OC.seen_search_object, data)
@@ -177,7 +177,7 @@ class TestSeenAPI:
         assert len(data) == 1
 
         rsp = api_client.delete('/seen/10/')
-        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 404, f'Response code is {rsp.status_code}'
         data = json.loads(rsp.get_data(as_text=True))
 
         errors = schema_match(base_message, data)
@@ -209,7 +209,7 @@ class TestSeenPagination:
 
         # Default values
         rsp = api_client.get('/seen/')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
         data = json.loads(rsp.get_data(as_text=True))
 
         assert len(data) == 50
@@ -288,59 +288,59 @@ class TestSeenPagination:
 
         # Sort by title
         rsp = api_client.get('/seen/?sort_by=title')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
         data = json.loads(rsp.get_data(as_text=True))
 
         assert data[0]['title'] == 'test_title_3'
 
         rsp = api_client.get('/seen/?sort_by=title&order=asc')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
         data = json.loads(rsp.get_data(as_text=True))
 
         assert data[0]['title'] == 'test_title_1'
 
         # Sort by task
         rsp = api_client.get('/seen/?sort_by=task')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
         data = json.loads(rsp.get_data(as_text=True))
 
         assert data[0]['task'] == 'test_task_3'
 
         rsp = api_client.get('/seen/?sort_by=task&order=asc')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
         data = json.loads(rsp.get_data(as_text=True))
 
         assert data[0]['task'] == 'test_task_1'
 
         # Sort by reason
         rsp = api_client.get('/seen/?sort_by=reason')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
         data = json.loads(rsp.get_data(as_text=True))
 
         assert data[0]['reason'] == 'test_reason_c'
 
         rsp = api_client.get('/seen/?sort_by=reason&order=asc')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
         data = json.loads(rsp.get_data(as_text=True))
 
         assert data[0]['reason'] == 'test_reason_a'
 
         # Sort by local
         rsp = api_client.get('/seen/?sort_by=local')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
         data = json.loads(rsp.get_data(as_text=True))
 
         assert data[0]['local'] == True
 
         rsp = api_client.get('/seen/?sort_by=local&order=asc')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
         data = json.loads(rsp.get_data(as_text=True))
 
         assert data[0]['local'] == False
 
         # Combine sorting and pagination
         rsp = api_client.get('/seen/?sort_by=reason&per_page=2&page=2')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
         data = json.loads(rsp.get_data(as_text=True))
 
         assert data[0]['reason'] == 'test_reason_a'

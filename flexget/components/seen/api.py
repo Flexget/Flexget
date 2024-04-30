@@ -123,7 +123,7 @@ class SeenSearchAPI(APIResource):
 
         # Invalid page request
         if page > total_pages and total_pages != 0:
-            raise NotFoundError('page %s does not exist' % page)
+            raise NotFoundError(f'page {page} does not exist')
 
         # Get pagination headers
         pagination = pagination_headers(total_pages, total_items, actual_size, request)

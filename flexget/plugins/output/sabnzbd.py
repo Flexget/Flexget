@@ -50,7 +50,7 @@ class OutputSabnzbd:
         if 'key' in config:
             params['apikey'] = config['key']
         if 'category' in config:
-            params['cat'] = '%s' % config['category']
+            params['cat'] = '{}'.format(config['category'])
         if 'script' in config:
             params['script'] = config['script']
         if 'pp' in config:

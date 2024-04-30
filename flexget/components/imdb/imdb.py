@@ -188,7 +188,7 @@ class FilterImdb:
                 rejected = config['reject_actors']
                 for actor_id, actor_name in entry.get('imdb_actors', {}).items():
                     if actor_id in rejected or actor_name in rejected:
-                        reasons.append('reject_actors %s' % actor_name or actor_id)
+                        reasons.append(f'reject_actors {actor_name}' or actor_id)
                         break
 
             # Accept if actors contains an accepted actor, but don't reject otherwise
@@ -206,7 +206,7 @@ class FilterImdb:
                 rejected = config['reject_directors']
                 for director_id, director_name in entry.get('imdb_directors', {}).items():
                     if director_id in rejected or director_name in rejected:
-                        reasons.append('reject_directors %s' % director_name or director_id)
+                        reasons.append(f'reject_directors {director_name}' or director_id)
                         break
 
             # Accept if the director is in the accept list, but do not reject if the director is unknown
@@ -225,7 +225,7 @@ class FilterImdb:
                 rejected = config['reject_writers']
                 for writer_id, writer_name in entry.get('imdb_writers', {}).items():
                     if writer_id in rejected or writer_name in rejected:
-                        reasons.append('reject_writers %s' % writer_name or writer_id)
+                        reasons.append(f'reject_writers {writer_name}' or writer_id)
                         break
 
             # Accept if the writer is in the accept list, but do not reject if the writer is unknown
@@ -242,12 +242,12 @@ class FilterImdb:
             if 'reject_mpaa_ratings' in config:
                 rejected = config['reject_mpaa_ratings']
                 if entry.get('imdb_mpaa_rating') in rejected:
-                    reasons.append('reject_mpaa_ratings %s' % entry['imdb_mpaa_rating'])
+                    reasons.append('reject_mpaa_ratings {}'.format(entry['imdb_mpaa_rating']))
 
             if 'accept_mpaa_ratings' in config:
                 accepted = config['accept_mpaa_ratings']
                 if entry.get('imdb_mpaa_rating') not in accepted:
-                    reasons.append('accept_mpaa_ratings %s' % entry.get('imdb_mpaa_rating'))
+                    reasons.append('accept_mpaa_ratings {}'.format(entry.get('imdb_mpaa_rating')))
 
             if reasons and not force_accept:
                 msg = 'Didn\'t accept `{}` because of rule(s) {}'.format(

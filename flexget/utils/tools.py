@@ -364,17 +364,17 @@ def parse_filesize(
     match_re = match_re or r'\b(\d+(?:[.,\s]\d+)*)\s*((?:[ptgmk]i?)?b)\b'
     parsed_size = re.search(match_re, text_size.lower())
     if not parsed_size:
-        raise ValueError('%s does not look like a file size' % text_size)
+        raise ValueError(f'{text_size} does not look like a file size')
     amount_str = parsed_size.group(1)
     unit = parsed_size.group(2)
     if not unit.endswith('b'):
-        raise ValueError('%s does not look like a file size' % text_size)
+        raise ValueError(f'{text_size} does not look like a file size')
     unit = unit.rstrip('b')
     if unit.endswith('i'):
         si = False
         unit = unit.rstrip('i')
     if unit not in prefix_order:
-        raise ValueError('%s does not look like a file size' % text_size)
+        raise ValueError(f'{text_size} does not look like a file size')
     order = prefix_order[unit]
     amount = float(amount_str.replace(',', '').replace(' ', ''))
     base = 1000 if si else 1024

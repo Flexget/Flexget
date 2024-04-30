@@ -28,7 +28,7 @@ class MetainfoSubs:
         except ImportError as e:
             logger.debug('Error importing Subliminal: {}', e)
             raise plugin.DependencyError(
-                'subliminal', 'subliminal', 'Subliminal module required. ImportError: %s' % e
+                'subliminal', 'subliminal', f'Subliminal module required. ImportError: {e}'
             )
         from dogpile.cache.exception import RegionAlreadyConfigured
         from subliminal.cli import MutexLock

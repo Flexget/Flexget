@@ -33,7 +33,7 @@ class ListRemove:
                 try:
                     thelist = plugin.get(plugin_name, self).get_list(plugin_config)
                 except AttributeError:
-                    raise PluginError('Plugin %s does not support list interface' % plugin_name)
+                    raise PluginError(f'Plugin {plugin_name} does not support list interface')
                 if task.manager.options.test and thelist.online:
                     logger.info(
                         '`{}` is marked as online, would remove accepted items outside of --test mode.',

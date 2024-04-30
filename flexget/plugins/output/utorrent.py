@@ -77,7 +77,7 @@ class PluginUtorrent:
                 raise plugin.PluginError(
                     'Invalid credentials, check your utorrent webui username and password.', logger
                 )
-            raise plugin.PluginError('%s' % e, logger)
+            raise plugin.PluginError(f'{e}', logger)
         token = get_soup(response.text).find('div', id='token').text
         result = session.get(url, auth=auth, params={'action': 'list-dirs', 'token': token}).json()
         download_dirs = {
@@ -132,7 +132,7 @@ class PluginUtorrent:
                 tmp_path = os.path.join(task.manager.config_base, 'temp')
                 logger.debug('entry: {}', entry)
                 logger.debug('temp: {}', ', '.join(os.listdir(tmp_path)))
-                entry.fail("Downloaded temp file '%s' doesn't exist!?" % entry['file'])
+                entry.fail("Downloaded temp file '{}' doesn't exist!?".format(entry['file']))
                 continue
 
             # Add torrent
@@ -157,7 +157,7 @@ class PluginUtorrent:
                 logger.info('Added `{}` to utorrent', entry['url'])
                 logger.info('in folder {} {} ', folder, path)
             else:
-                entry.fail('Fail to add `%s` to utorrent' % entry['url'])
+                entry.fail('Fail to add `{}` to utorrent'.format(entry['url']))
 
     def on_task_learn(self, task, config):
         """Make sure all temp files are cleaned up when entries are learned"""

@@ -53,7 +53,7 @@ class PluginPeriscope:
         except ImportError as e:
             logger.debug('Error importing Periscope: {}', e)
             raise plugin.DependencyError(
-                'periscope', 'periscope', 'Periscope module required. ImportError: %s' % e
+                'periscope', 'periscope', f'Periscope module required. ImportError: {e}'
             )
 
     def subbed(self, filename):
@@ -87,7 +87,7 @@ class PluginPeriscope:
             if 'location' not in entry:
                 logger.warning('Cannot act on entries that do not represent a local file.')
             elif not os.path.exists(entry['location']):
-                entry.fail('file not found: %s' % entry['location'])
+                entry.fail('file not found: {}'.format(entry['location']))
             elif '$RECYCLE.BIN' in entry['location']:
                 continue  # ignore deleted files in Windows shares
             elif not config['overwrite'] and self.subbed(entry['location']):

@@ -167,7 +167,7 @@ class ApiTrakt:
         if only_cached:
             if series:
                 return series
-            raise LookupError('Series %s not found from cache' % lookup_params)
+            raise LookupError(f'Series {lookup_params} not found from cache')
         if series and not series.expired:
             return series
         try:
@@ -219,7 +219,7 @@ class ApiTrakt:
         if only_cached:
             if movie:
                 return movie
-            raise LookupError('Movie %s not found from cache' % lookup_params)
+            raise LookupError(f'Movie {lookup_params} not found from cache')
         if movie and not movie.expired:
             return movie
         # Parse the movie for better results

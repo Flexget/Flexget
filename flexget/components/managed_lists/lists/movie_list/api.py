@@ -148,7 +148,7 @@ class MovieListAPI(APIResource):
         except NoResultFound:
             movie_list = None
         if movie_list:
-            raise Conflict('list with name \'%s\' already exists' % name)
+            raise Conflict(f'list with name \'{name}\' already exists')
         movie_list = db.MovieListList(name=name)
         session.add(movie_list)
         session.commit()
@@ -234,7 +234,7 @@ class MovieListMoviesAPI(APIResource):
         total_pages = int(ceil(total_items / float(per_page)))
 
         if page > total_pages:
-            raise NotFoundError('page %s does not exist' % page)
+            raise NotFoundError(f'page {page} does not exist')
 
         # Actual results in page
         actual_size = min(len(movies), per_page)
@@ -265,7 +265,7 @@ class MovieListMoviesAPI(APIResource):
         # Validates ID type based on allowed ID
         for id_name in movie_identifiers:
             if next(iter(id_name)) not in MovieListBase().supported_ids:
-                raise BadRequest('movie identifier %s is not allowed' % id_name)
+                raise BadRequest(f'movie identifier {id_name} is not allowed')
         title, year = data['movie_name'], data.get('movie_year')
         movie = db.get_movie_by_title_and_year(
             list_id=list_id, title=title, year=year, session=session
@@ -326,7 +326,7 @@ class MovieListMovieAPI(APIResource):
         # Validates ID type based on allowed ID
         for id_name in data:
             if next(iter(id_name)) not in MovieListBase().supported_ids:
-                raise BadRequest('movie identifier %s is not allowed' % id_name)
+                raise BadRequest(f'movie identifier {id_name} is not allowed')
         movie.ids[:] = db.get_db_movie_identifiers(
             identifier_list=data, movie_id=movie_id, session=session
         )

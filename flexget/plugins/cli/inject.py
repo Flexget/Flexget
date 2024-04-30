@@ -37,8 +37,8 @@ def do_cli(manager, options):
     if options.url:
         entry['url'] = options.url
     else:
-        entry['url'] = 'http://localhost/inject/%s' % ''.join(
-            random.sample(string.ascii_letters + string.digits, 30)
+        entry['url'] = 'http://localhost/inject/{}'.format(
+            ''.join(random.sample(string.ascii_letters + string.digits, 30))
         )
     if options.force:
         entry['immortal'] = True

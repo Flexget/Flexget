@@ -1,1 +1,1 @@
-""" Core API endpoints, not plugin related"""
+"""Core API endpoints, not plugin related"""

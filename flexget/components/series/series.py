@@ -303,7 +303,7 @@ class FilterSeriesBase:
                 else:
                     if kwargs.get('log_once'):
                         log_once(
-                            'Series `%s` is already configured in series plugin' % series, logger
+                            f'Series `{series}` is already configured in series plugin', logger
                         )
                     else:
                         logger.warning(
@@ -709,7 +709,7 @@ class FilterSeries(FilterSeriesBase):
             if entity.season in accepted_seasons:
                 for entry in entries:
                     entry.reject(
-                        'already accepted season pack for season `%s` in this task' % entity.season
+                        f'already accepted season pack for season `{entity.season}` in this task'
                     )
                 continue
 
@@ -959,7 +959,7 @@ class FilterSeries(FilterSeriesBase):
         if entity.season in entity.series.completed_seasons:
             logger.debug('season `{}` already completed for this series', entity.season)
             for entry in entries:
-                entry.reject('Season `%s` is already completed' % entity.season)
+                entry.reject(f'Season `{entity.season}` is already completed')
             return True
 
         # Test if episode threshold has been met
@@ -981,8 +981,7 @@ class FilterSeries(FilterSeriesBase):
                 )
                 for entry in entries:
                     entry.reject(
-                        'Episode `{entity.identifier}` is from before series begin value `%s`. '
-                        % begin.identifier
+                        f'Episode `{{entity.identifier}}` is from before series begin value `{begin.identifier}`. '
                     )
                 return True
 
@@ -993,8 +992,7 @@ class FilterSeries(FilterSeriesBase):
         ):
             for entry in entries:
                 entry.reject(
-                    'Episode `{entity.identifier}` doesn\'t match series format `%s`. '
-                    % entity.series.identified_by
+                    f'Episode `{{entity.identifier}}` doesn\'t match series format `{entity.series.identified_by}`. '
                 )
 
     def process_timeframe(self, task, config, episode, entries):

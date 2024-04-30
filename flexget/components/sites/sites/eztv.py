@@ -46,7 +46,7 @@ class Eztv:
             break
 
         if not page:
-            raise UrlRewritingError('No mirrors found for url %s' % entry['url'])
+            raise UrlRewritingError('No mirrors found for url {}'.format(entry['url']))
 
         logger.debug('Eztv mirror `{}` chosen', url)
         try:
@@ -58,7 +58,7 @@ class Eztv:
         logger.debug('{} torrent mirrors found', len(mirrors))
 
         if not mirrors:
-            raise UrlRewritingError('Unable to locate download link from url %s' % url)
+            raise UrlRewritingError(f'Unable to locate download link from url {url}')
 
         entry['urls'] = [m.get('href') for m in mirrors]
         entry['url'] = mirrors[0].get('href')

@@ -88,7 +88,7 @@ class Symlink:
             if os.path.exists(linkto) and (
                 config['link_type'] == 'soft' or os.path.isfile(linkfrom)
             ):
-                msg = 'Symlink destination %s already exists' % linkto
+                msg = f'Symlink destination {linkto} already exists'
                 if existing == 'ignore':
                     logger.verbose(msg)
                 else:

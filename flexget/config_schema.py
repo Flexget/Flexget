@@ -67,7 +67,7 @@ def register_config_key(key: str, schema: JsonSchema, required: bool = False):
     root_schema['properties'][key] = schema
     if required:
         root_schema.setdefault('required', []).append(key)
-    register_schema('/schema/config/%s' % key, schema)
+    register_schema(f'/schema/config/{key}', schema)
 
 
 def get_schema() -> JsonSchema:
@@ -122,7 +122,7 @@ def resolve_ref(uri: str) -> JsonSchema:
             schema = schema(**dict(parse_qsl(parsed.query)))
         schema = {'$schema': BASE_SCHEMA_URI, **schema}
         return schema
-    raise Unresolvable("%s could not be resolved" % uri)
+    raise Unresolvable(f"{uri} could not be resolved")
 
 
 def retrieve_resource(uri: str) -> Resource:
@@ -172,7 +172,7 @@ def parse_time(time_string: str) -> datetime.time:
             return datetime.datetime.strptime(time_string, f).time()
         except ValueError:
             continue
-    raise ValueError('invalid time `%s`' % time_string)
+    raise ValueError(f'invalid time `{time_string}`')
 
 
 def parse_interval(interval_string: str) -> datetime.timedelta:
@@ -259,7 +259,7 @@ def is_regex(instance) -> Union[bool, Pattern]:
     try:
         return re.compile(instance)
     except re.error as e:
-        raise ValueError('Error parsing regex: %s' % e)
+        raise ValueError(f'Error parsing regex: {e}')
 
 
 @format_checker.checks('file', raises=ValueError)
@@ -268,7 +268,7 @@ def is_file(instance) -> bool:
         return True
     if os.path.isfile(os.path.expanduser(instance)):
         return True
-    raise ValueError('`%s` does not exist' % instance)
+    raise ValueError(f'`{instance}` does not exist')
 
 
 @format_checker.checks('path', raises=ValueError)
@@ -282,7 +282,7 @@ def is_path(instance) -> bool:
         instance = os.path.dirname(instance[0 : result.start()])
     if os.path.isdir(os.path.expanduser(instance)):
         return True
-    raise ValueError('`%s` does not exist' % instance)
+    raise ValueError(f'`{instance}` does not exist')
 
 
 # TODO: jsonschema has a format checker for uri if rfc3987 is installed, perhaps we should use that
@@ -330,7 +330,7 @@ def is_json(instance) -> bool:
     try:
         json_loads(instance)
     except JSONDecodeError:
-        raise ValueError('`%s` is not a valid json' % instance)
+        raise ValueError(f'`{instance}` is not a valid json')
 
     return True
 
@@ -360,8 +360,8 @@ def set_error_message(error: jsonschema.ValidationError) -> None:
         if error.cause:
             error.message = str(error.cause)
     elif error.validator == 'enum':
-        error.message = 'Must be one of the following: %s' % ', '.join(
-            map(str, error.validator_value)
+        error.message = 'Must be one of the following: {}'.format(
+            ', '.join(map(str, error.validator_value))
         )
     elif error.validator == 'additionalProperties':
         if error.validator_value is False:
@@ -369,17 +369,17 @@ def set_error_message(error: jsonschema.ValidationError) -> None:
                 jsonschema._utils.find_additional_properties(error.instance, error.schema)
             )
             if len(extras) == 1:
-                error.message = 'The key `%s` is not valid here.' % extras.pop()
+                error.message = f'The key `{extras.pop()}` is not valid here.'
             else:
-                error.message = 'The keys %s are not valid here.' % ', '.join(
-                    '`%s`' % e for e in extras
+                error.message = 'The keys {} are not valid here.'.format(
+                    ', '.join(f'`{e}`' for e in extras)
                 )
     else:
         # Remove u'' string representation from jsonschema error messages
         error.message = re.sub('u\'(.*?)\'', '`\\1`', error.message)
 
     # Then update with any custom error message supplied from the schema
-    custom_error = error.schema.get('error_%s' % error.validator, error.schema.get('error'))
+    custom_error = error.schema.get(f'error_{error.validator}', error.schema.get('error'))
     if custom_error:
         error.message = template.render(custom_error, error.__dict__)
 

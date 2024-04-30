@@ -50,8 +50,7 @@ def on_manager_shutdown(manager):
         import resource
 
         console(
-            'Resource Module memory usage: %s (kb)'
-            % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+            f'Resource Module memory usage: {resource.getrusage(resource.RUSAGE_SELF).ru_maxrss} (kb)'
         )
     except ImportError:
         console('Resource Module memory usage:')

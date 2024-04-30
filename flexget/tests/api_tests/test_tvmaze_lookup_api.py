@@ -24,7 +24,7 @@ class TestTVMAzeSeriesLookupAPI:
         }
 
         rsp = api_client.get('/tvmaze/series/The X-Files/')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
 
@@ -35,7 +35,7 @@ class TestTVMAzeSeriesLookupAPI:
             assert data.get(field) == value
 
         rsp = api_client.get('/tvmaze/series/sdfgv35wvg23vg2/')
-        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 404, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
 
@@ -44,7 +44,7 @@ class TestTVMAzeSeriesLookupAPI:
 
     def test_tvmaze_series_lookup_by_id(self, api_client, schema_match):
         rsp = api_client.get('/tvmaze/series/13/')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
 
@@ -68,7 +68,7 @@ class TestTVMAzeSeriesLookupAPI:
 
     def test_tvmaze_episode_by_ep_and_season(self, api_client, schema_match):
         rsp = api_client.get('/tvmaze/episode/13/?season_num=1&ep_num=1')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
 
@@ -90,7 +90,7 @@ class TestTVMAzeSeriesLookupAPI:
 
     def test_tvmaze_episode_by_air_date(self, api_client, schema_match):
         rsp = api_client.get('/tvmaze/episode/3928/?air_date=2016-09-12')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
 
@@ -112,7 +112,7 @@ class TestTVMAzeSeriesLookupAPI:
             assert data.get(field) == value
 
         rsp = api_client.get('/tvmaze/episode/3928/')
-        assert rsp.status_code == 400, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 400, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
 
@@ -120,7 +120,7 @@ class TestTVMAzeSeriesLookupAPI:
         assert not errors
 
         rsp = api_client.get('/tvmaze/episode/3928/?season_num=1')
-        assert rsp.status_code == 400, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 400, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
 
@@ -129,7 +129,7 @@ class TestTVMAzeSeriesLookupAPI:
 
     def test_tvmaze_episode_lookup_error(self, api_client, schema_match):
         rsp = api_client.get('/tvmaze/episode/13/?season_num=100&ep_num=100')
-        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 404, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
 

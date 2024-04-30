@@ -287,7 +287,7 @@ def lookup_movie(
         title = title_parser.name
         year = title_parser.year
         if title == '' and not (rottentomatoes_id or title):
-            raise PluginError('Failed to parse name from %s' % smart_match)
+            raise PluginError(f'Failed to parse name from {smart_match}')
 
     search_string = ""
     if title:
@@ -346,7 +346,7 @@ def lookup_movie(
             logger.debug('Movie {} information restored from cache.', id_str())
     else:
         if only_cached:
-            raise PluginError('Movie %s not found from cache' % id_str())
+            raise PluginError(f'Movie {id_str()} not found from cache')
         # There was no movie found in the cache, do a lookup from Rotten Tomatoes
         logger.debug('Movie {} not found in cache, looking up from rotten tomatoes.', id_str())
         try:
@@ -454,7 +454,7 @@ def lookup_movie(
             raise PluginError('Error looking up movie from RottenTomatoes')
 
     if not movie:
-        raise PluginError('No results found from rotten tomatoes for %s' % id_str())
+        raise PluginError(f'No results found from rotten tomatoes for {id_str()}')
     else:
         # Access attributes to force the relationships to eager load before we detach from session
         for attr in [
@@ -555,7 +555,7 @@ def _set_movie_details(
                 movie.links.append(RottenTomatoesLink(name, url))
         movie.updated = datetime.now()
     else:
-        raise PluginError('No movie_data for rottentomatoes_id %s' % movie.id)
+        raise PluginError(f'No movie_data for rottentomatoes_id {movie.id}')
 
     return movie
 

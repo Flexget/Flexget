@@ -94,7 +94,7 @@ class TorrentScrub:
                         del field[key]
                         modified.add(fieldname)
             else:
-                raise ValueError("INTERNAL ERROR: Unknown mode %r" % mode)
+                raise ValueError(f"INTERNAL ERROR: Unknown mode {mode!r}")
 
             # Commit any changes back into entry
             if modified:

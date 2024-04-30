@@ -140,10 +140,10 @@ class TestDiscover:
         task = execute_task('test_next_series_episodes_with_bad_search')
         for epnum in range(1, 5):
             title = 'My Show S01E0%d' % epnum
-            assert any(e['title'] == title for e in task.mock_output), '%s not accepted' % title
-        assert len(task.mock_output) == 4, '4 episodes should have been accepted, not %s' % len(
-            task.mock_output
-        )
+            assert any(e['title'] == title for e in task.mock_output), f'{title} not accepted'
+        assert (
+            len(task.mock_output) == 4
+        ), f'4 episodes should have been accepted, not {len(task.mock_output)}'
 
     def test_next_series_episodes_multiple_results(self, execute_task):
         # Makes sure the next episode is being searched for on reruns, even when there are multiple search

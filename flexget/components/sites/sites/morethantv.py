@@ -214,7 +214,7 @@ class SearchMoreThanTV:
                 timeout=30,
             )
         except RequestException as e:
-            raise plugin.PluginError('MoreThanTV login failed: %s' % e)
+            raise plugin.PluginError(f'MoreThanTV login failed: {e}')
 
         if 'Your username or password was incorrect.' in response.text:
             raise plugin.PluginError(

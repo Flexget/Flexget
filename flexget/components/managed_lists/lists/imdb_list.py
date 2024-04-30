@@ -273,7 +273,9 @@ class ImdbEntrySet(MutableSet):
                             self.list_id = li['data_list_id']
                             break
                     else:
-                        raise plugin.PluginError('Could not find list %s' % self.config['list'])
+                        raise plugin.PluginError(
+                            'Could not find list {}'.format(self.config['list'])
+                        )
 
             user = IMDBListUser(self.config['login'], self.user_id, self.cookies)
             list = IMDBListList(self.list_id, self.config['list'], self.user_id)
@@ -352,7 +354,7 @@ class ImdbEntrySet(MutableSet):
     @property
     def immutable(self):
         if self.config['list'] in IMMUTABLE_LISTS:
-            return '%s list is not modifiable' % self.config['list']
+            return '{} list is not modifiable'.format(self.config['list'])
 
     def _from_iterable(cls, it):
         # TODO: is this the right answer? the returned object won't have our custom __contains__ logic
@@ -366,7 +368,9 @@ class ImdbEntrySet(MutableSet):
 
     def discard(self, entry):
         if self.config['list'] in IMMUTABLE_LISTS:
-            raise plugin.PluginError('%s lists are not modifiable' % ' and '.join(IMMUTABLE_LISTS))
+            raise plugin.PluginError(
+                '{} lists are not modifiable'.format(' and '.join(IMMUTABLE_LISTS))
+            )
         if 'imdb_id' not in entry:
             logger.warning(
                 'Cannot remove {} from imdb_list because it does not have an imdb_id',
@@ -383,7 +387,7 @@ class ImdbEntrySet(MutableSet):
                 'https://www.imdb.com/list/_ajax/watchlist_has', data=data, cookies=self.cookies
             ).json()
             item_ids = status.get('has', {}).get(entry['imdb_id'])
-            urls = ['https://www.imdb.com/watchlist/%s' % entry['imdb_id']]
+            urls = ['https://www.imdb.com/watchlist/{}'.format(entry['imdb_id'])]
         else:
             method = 'post'
             data = {'tconst': entry['imdb_id']}
@@ -423,7 +427,9 @@ class ImdbEntrySet(MutableSet):
     def _add(self, entry):
         """Submit a new movie to imdb. (does not update cache)"""
         if self.config['list'] in IMMUTABLE_LISTS:
-            raise plugin.PluginError('%s lists are not modifiable' % ' and '.join(IMMUTABLE_LISTS))
+            raise plugin.PluginError(
+                '{} lists are not modifiable'.format(' and '.join(IMMUTABLE_LISTS))
+            )
         if 'imdb_id' not in entry:
             logger.warning(
                 'Cannot add {} to imdb_list because it does not have an imdb_id', entry['title']
@@ -433,7 +439,7 @@ class ImdbEntrySet(MutableSet):
         self.authenticate()
         if self.config['list'] == 'watchlist':
             method = 'put'
-            url = 'https://www.imdb.com/watchlist/%s' % entry['imdb_id']
+            url = 'https://www.imdb.com/watchlist/{}'.format(entry['imdb_id'])
         else:
             method = 'post'
             url = 'https://www.imdb.com/list/{}/{}/add'.format(self.list_id, entry['imdb_id'])

@@ -192,7 +192,7 @@ class EmailNotifier:
                     self.connect_to_smtp_server(config)
                     connection_error = e
                 else:
-                    raise PluginWarning('Could not connect to SMTP server: %s' % str(e))
+                    raise PluginWarning(f'Could not connect to SMTP server: {e!s}')
 
 
 @event('plugin.register')

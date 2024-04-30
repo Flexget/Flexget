@@ -112,7 +112,7 @@ class TestUpgradeTarget:
 
         for title in ['Movie.2160p WEB-DL X264 AC3', 'Movie.720p.WEB-DL.X264.AC3']:
             entry = task.find_entry('undecided', title=title)
-            assert entry, '%s should have been undecided' % title
+            assert entry, f'{title} should have been undecided'
 
     def test_target_quality_1080p(self, execute_task):
         execute_task('existing_download_480p')

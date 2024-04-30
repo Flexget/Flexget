@@ -168,7 +168,7 @@ class SearchPassThePopcorn:
                 result = siteresponse.json()
                 logger.debug('PTP Search Request: {}', str(siteresponse.url))
             except RequestException as e:
-                raise plugin.PluginError('Error searching PassThePopcorn. %s' % str(e))
+                raise plugin.PluginError(f'Error searching PassThePopcorn. {e!s}')
 
             total_results = result['TotalResults']
             logger.debug('Total Search results: {}', total_results)
@@ -213,7 +213,9 @@ class SearchPassThePopcorn:
                     if len(tsplit) > 1:
                         release_res = tsplit[1] + 'p'
 
-                    release_name = torrent['ReleaseName'].replace(
+                    release_name = torrent[
+                        'ReleaseName'
+                    ].replace(
                         "4K", ""
                     )  # Remove 4K from release name as that is often the source not the torrent resolution it confuses the quality plugin
                     e['title'] = (

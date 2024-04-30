@@ -14,20 +14,20 @@ class TestVariablesAPI:
             session.add(s)
 
         rsp = api_client.get('/variables/')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
         assert json.loads(rsp.get_data(as_text=True)) == self.variables_dict
 
     def test_variables_put(self, api_client):
         rsp = api_client.get('/variables/')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
         assert json.loads(rsp.get_data(as_text=True)) == {}
 
         rsp = api_client.json_put('/variables/', data=json.dumps(self.variables_dict))
-        assert rsp.status_code == 201, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 201, f'Response code is {rsp.status_code}'
         assert json.loads(rsp.get_data(as_text=True)) == self.variables_dict
 
         rsp = api_client.get('/variables/')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
         assert json.loads(rsp.get_data(as_text=True)) == self.variables_dict
 
     def test_variables_patch(self, api_client):
@@ -36,5 +36,5 @@ class TestVariablesAPI:
         new_data = {'a': [1, 2, 3], 'foo': 'bar'}
 
         rsp = api_client.json_patch('/variables/', data=json.dumps(new_data))
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
         assert json.loads(rsp.get_data(as_text=True)) == {'a': [1, 2, 3], 'foo': 'bar', 'c': 'd'}

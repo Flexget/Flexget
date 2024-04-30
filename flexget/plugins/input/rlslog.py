@@ -66,7 +66,9 @@ class RlsLog:
                 releases.append(release)
             else:
                 log_once(
-                    '%s skipped due to missing or unsupported download link' % (release['title']),
+                    '{} skipped due to missing or unsupported download link'.format(
+                        release['title']
+                    ),
                     logger,
                 )
 

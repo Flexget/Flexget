@@ -14,9 +14,9 @@ class TestParsingAPI:
 
     def test_parsing_plugins_have_parse_methods(self):
         for parser_type in plugin_parsing.PARSER_TYPES:
-            for p in plugin.get_plugins(interface='%s_parser' % parser_type):
+            for p in plugin.get_plugins(interface=f'{parser_type}_parser'):
                 assert hasattr(
-                    p.instance, 'parse_%s' % parser_type
+                    p.instance, f'parse_{parser_type}'
                 ), f'{parser_type} parsing plugin {p.name} has no parse_{parser_type} method'
 
 
