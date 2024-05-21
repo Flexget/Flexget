@@ -125,6 +125,10 @@ class NfoLookup:
         if os.path.isfile(nfo_full_filename):
             return nfo_full_filename
 
+        movie_nfo_filename = os.path.join(os.path.dirname(location), 'movie' + self.nfo_file_extension)
+        if os.path.isfile(movie_nfo_filename):
+            return movie_nfo_filename
+
 
 class BadXmlFile(Exception):
     """
