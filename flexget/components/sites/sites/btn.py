@@ -66,7 +66,7 @@ class SearchBTN:
             else:
                 search['series'] = entry['series_name']
             if entry.get('season_pack_lookup', False) and 'series_season' in entry:
-                search['name'] = 'Season %s' % entry['series_season']
+                search['name'] = 'Season {}'.format(entry['series_season'])
             elif 'series_id' in entry:
                 # BTN wants an ep style identifier even for sequence shows
                 if entry.get('series_id_type') == 'sequence':
@@ -97,7 +97,7 @@ class SearchBTN:
             try:
                 content = r.json()
             except ValueError as e:
-                raise plugin.PluginError('Error searching btn. Maybe it\'s down?. %s' % str(e))
+                raise plugin.PluginError(f'Error searching btn. Maybe it\'s down?. {e!s}')
             if not content or not content['result']:
                 logger.debug('No results from btn')
                 if content and content.get('error'):

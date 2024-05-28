@@ -82,13 +82,13 @@ class AssumeQuality:
                 target = qualities.Requirements(target)
             except ValueError:
                 raise plugin.PluginError(
-                    '%s is not a valid quality. Forgetting assumption.' % target
+                    f'{target} is not a valid quality. Forgetting assumption.'
                 )
             try:
                 quality = qualities.get(quality)
             except ValueError:
                 raise plugin.PluginError(
-                    '%s is not a valid quality. Forgetting assumption.' % quality
+                    f'{quality} is not a valid quality. Forgetting assumption.'
                 )
             self.assumptions.append(assume(target, quality))
         self.assumptions.sort(

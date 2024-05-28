@@ -89,7 +89,7 @@ class SearchCPASBIEN:
                 str_url = (base_url, 'recherche', query_url_fragment)
                 url = '/'.join(str_url)
             else:
-                category_url_fragment = '%s' % config['category']
+                category_url_fragment = '{}'.format(config['category'])
                 str_url = (base_url, 'recherche', category_url_fragment, query_url_fragment)
                 url = '/'.join(str_url)
             logger.debug('search url: {}', url + '.html')

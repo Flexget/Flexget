@@ -115,7 +115,7 @@ def create_token(api_key, login, password):
             'X-BetaSeries-Key': api_key,
         },
     )
-    assert r.status_code == 200, "Bad HTTP status code: %s" % r.status_code
+    assert r.status_code == 200, f"Bad HTTP status code: {r.status_code}"
     j = r.json()
     error_list = j['errors']
     for err in error_list:
@@ -143,7 +143,7 @@ def query_member_id(api_key, user_token, login_name):
             'X-BetaSeries-Token': user_token,
         },
     )
-    assert r.status_code == 200, "Bad HTTP status code: %s" % r.status_code
+    assert r.status_code == 200, f"Bad HTTP status code: {r.status_code}"
     j = r.json()
     error_list = j['errors']
     for err in error_list:
@@ -185,7 +185,7 @@ def query_series(api_key, user_token, member_name=None):
             'X-BetaSeries-Token': user_token,
         },
     )
-    assert r.status_code == 200, "Bad HTTP status code: %s" % r.status_code
+    assert r.status_code == 200, f"Bad HTTP status code: {r.status_code}"
     j = r.json()
     error_list = j['errors']
     for err in error_list:

@@ -70,9 +70,7 @@ class UrlRewrite:
 
                 if regexp.match(entry['url']):
                     entry.fail('urlrewriting')
-                    raise UrlRewritingError(
-                        'Regexp %s result should NOT continue to match!' % name
-                    )
+                    raise UrlRewritingError(f'Regexp {name} result should NOT continue to match!')
                 return
 
 

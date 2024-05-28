@@ -75,7 +75,7 @@ class PluginTmdbLookup:
                 )
                 entry.update_using_map(self.field_map, movie)
         except LookupError:
-            log_once('TMDB lookup failed for %s' % entry['title'], logger, 'WARNING')
+            log_once('TMDB lookup failed for {}'.format(entry['title']), logger, 'WARNING')
 
     def lookup(self, entry, language):
         """

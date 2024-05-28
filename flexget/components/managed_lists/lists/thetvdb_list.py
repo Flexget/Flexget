@@ -66,7 +66,7 @@ class TheTVDBSet(MutableSet):
                 ).get('user/favorites')
                 series_ids = [int(f_id) for f_id in req['favorites'] if f_id != '']
             except RequestException as e:
-                raise PluginError('Error retrieving favorites from thetvdb: %s' % str(e))
+                raise PluginError(f'Error retrieving favorites from thetvdb: {e!s}')
             self._items = []
             for series_id in series_ids:
                 # Lookup the series name from the id

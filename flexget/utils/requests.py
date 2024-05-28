@@ -126,7 +126,7 @@ class TokenBucketLimiter(DomainLimiter):
         self.last_update = datetime.now()
         if self.tokens < 1:
             if not self.wait:
-                raise RequestException('Requests to %s have exceeded their limit.' % self.domain)
+                raise RequestException(f'Requests to {self.domain} have exceeded their limit.')
             wait = self.rate.total_seconds() * (1 - self.tokens)
             # Don't spam console if wait is low
             if wait < 4:
@@ -196,7 +196,7 @@ class Session(requests.Session):
         self.adapters['http://'].max_retries = max_retries
         # Stores min intervals between requests for certain sites
         self.domain_limiters: Dict[str, DomainLimiter] = {}
-        self.headers.update({'User-Agent': 'FlexGet/%s (www.flexget.com)' % version})
+        self.headers.update({'User-Agent': f'FlexGet/{version} (www.flexget.com)'})
 
     def add_cookiejar(self, cookiejar):
         """

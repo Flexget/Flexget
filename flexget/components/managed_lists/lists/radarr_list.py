@@ -50,9 +50,7 @@ def request_get_json(url, headers):
         if response.status_code == 200:
             return response.json()
         else:
-            raise RadarrRequestError(
-                "Invalid response received from Radarr: %s" % response.content
-            )
+            raise RadarrRequestError(f"Invalid response received from Radarr: {response.content}")
     except RequestException as e:
         raise RadarrRequestError(f"Unable to connect to Radarr at {url}. Error: {e}")
 
@@ -64,9 +62,7 @@ def request_delete_json(url, headers):
         if response.status_code == 200:
             return response.json()
         else:
-            raise RadarrRequestError(
-                "Invalid response received from Radarr: %s" % response.content
-            )
+            raise RadarrRequestError(f"Invalid response received from Radarr: {response.content}")
     except RequestException as e:
         raise RadarrRequestError(f"Unable to connect to Radarr at {url}. Error: {e}")
 
@@ -88,7 +84,7 @@ def request_post_json(url, headers, data):
                 logger.error('Radarr returned non-JSON error result: {}', response.content)
 
             raise RadarrRequestError(
-                "Invalid response received from Radarr: %s" % response.content,
+                f"Invalid response received from Radarr: {response.content}",
                 logger,
                 status_code=response.status_code,
                 error_message=error_message,
@@ -105,9 +101,7 @@ def request_put_json(url, headers):
         if response.status_code == 200:
             return response.json()
         else:
-            raise RadarrRequestError(
-                "Invalid response received from Radarr: %s" % response.content
-            )
+            raise RadarrRequestError(f"Invalid response received from Radarr: {response.content}")
     except RequestException as e:
         raise RadarrRequestError(f"Unable to connect to Radarr at {url}. Error: {e}")
 
@@ -408,14 +402,11 @@ class RadarrSet(MutableSet):
                     'Could not add movie {} because it already exists on Radarr', result['title']
                 )
             except RadarrRequestError as ex:
-                msg = 'The movie add command raised exception: %s' % ex
+                msg = f'The movie add command raised exception: {ex}'
                 logger.error(msg)
                 entry.fail(msg)
         else:
-            msg = (
-                'The lookup for entry %s did not return any results.Can not add the movie in Radarr.'
-                % entry
-            )
+            msg = f'The lookup for entry {entry} did not return any results.Can not add the movie in Radarr.'
             logger.verbose(msg)
             entry.fail(msg)
 

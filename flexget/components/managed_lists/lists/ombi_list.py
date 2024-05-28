@@ -1,5 +1,4 @@
-"""Create a Ombi managed list.
-"""
+"""Create a Ombi managed list."""
 
 from __future__ import annotations
 
@@ -64,7 +63,7 @@ class OmbiRequest:
         if self.config.get('username') and self.config.get('password'):
             log.debug('Authenticating via username: %s', self.config.get('username'))
             access_token = self._get_access_token()
-            return {"Authorization": "Bearer %s" % access_token}
+            return {"Authorization": f"Bearer {access_token}"}
 
         raise plugin.PluginError('Error: an api_key or username and password must be configured')
 
@@ -641,7 +640,9 @@ class OmbiSet(MutableSet):
         find_method = getattr(self, f"_find_{self.config['type']}", None)
 
         if not find_method:
-            raise plugin.PluginError('Error: Unknown list type %s.' % (self.config.get('type')))
+            raise plugin.PluginError(
+                'Error: Unknown list type {}.'.format(self.config.get('type'))
+            )
 
         return find_method(entry)
 
@@ -724,7 +725,7 @@ class OmbiSet(MutableSet):
             return self._items
 
         # We should never get here, but just in case...
-        raise plugin.PluginError('Error: Unknown list type %s.' % (self.config.get('type')))
+        raise plugin.PluginError('Error: Unknown list type {}.'.format(self.config.get('type')))
 
     @property
     def online(self):
@@ -829,7 +830,7 @@ class OmbiSet(MutableSet):
             )
             return access_token
         except (RequestException, ValueError) as e:
-            raise plugin.PluginError('Ombi username and password login failed: %s' % e)
+            raise plugin.PluginError(f'Ombi username and password login failed: {e}')
 
     def ombi_auth(self) -> dict[str, str]:
         """Returns a dictionary that contains authrization headers for the OMBI API.
@@ -850,7 +851,7 @@ class OmbiSet(MutableSet):
         if self.config.get('username') and self.config.get('password'):
             log.debug('Authenticating via username: %s', self.config.get('username'))
             access_token = self.get_access_token()
-            return {"Authorization": "Bearer %s" % access_token}
+            return {"Authorization": f"Bearer {access_token}"}
 
         raise plugin.PluginError('Error: an api_key or username and password must be configured')
 
@@ -979,7 +980,9 @@ class OmbiSet(MutableSet):
                 ombi_requested=episode.get('requested'),
             )
         else:
-            raise plugin.PluginError('Error: Unknown list type %s.' % (self.config.get('type')))
+            raise plugin.PluginError(
+                'Error: Unknown list type {}.'.format(self.config.get('type'))
+            )
 
 
 class OmbiList:
@@ -1036,4 +1039,4 @@ def filter_ombi_items(items: list[dict[str, Any]], config: Config) -> list[dict[
         return filtered_items
 
     # We shouldn't get here, but just in case...
-    raise plugin.PluginError('Error: Unknown status %s.' % (config.get('status')))
+    raise plugin.PluginError('Error: Unknown status {}.'.format(config.get('status')))

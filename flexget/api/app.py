@@ -60,7 +60,7 @@ class APIClient:
     def get_endpoint(self, url: str, data=None, method: Optional[str] = None):
         if method is None:
             method = 'POST' if data is not None else 'GET'
-        auth_header = {'Authorization': 'Token %s' % api_key()}
+        auth_header = {'Authorization': f'Token {api_key()}'}
         response = self.app.open(
             url, data=data, follow_redirects=True, method=method, headers=auth_header
         )
@@ -404,7 +404,7 @@ def etag(method: Optional[Callable] = None, cache_age: int = 0):
         )
         data = (rv.get_data().decode() + content_headers).encode()
         etag = generate_etag(data)
-        rv.headers['Cache-Control'] = 'max-age=%s' % cache_age
+        rv.headers['Cache-Control'] = f'max-age={cache_age}'
         rv.headers['ETag'] = etag
         if_match = request.headers.get('If-Match')
         if_none_match = request.headers.get('If-None-Match')
@@ -445,8 +445,8 @@ def pagination_headers(
     link_with_params = f'<{url}?per_page={per_page}&'
 
     # Removed page and per_page from query string
-    query_string = re.sub(br'per_page=\d+', b'', request.query_string)
-    query_string = re.sub(br'page=\d+', b'', query_string)
+    query_string = re.sub(rb'per_page=\d+', b'', request.query_string)
+    query_string = re.sub(rb'page=\d+', b'', query_string)
     query_string = re.sub(b'&{2,}', b'&', query_string)
 
     # Add all original query params

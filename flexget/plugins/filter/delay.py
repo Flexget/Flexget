@@ -27,7 +27,7 @@ class DelayedEntry(Base):
     entry = entry_synonym('_json')
 
     def __repr__(self):
-        return '<DelayedEntry(title=%s)>' % self.title
+        return f'<DelayedEntry(title={self.title})>'
 
 
 Index('delay_feed_title', DelayedEntry.task, DelayedEntry.title)

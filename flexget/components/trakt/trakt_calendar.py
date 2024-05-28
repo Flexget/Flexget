@@ -50,9 +50,9 @@ class TraktCalendar:
         'trakt_genres': 'genres',
         'trakt_series_network': 'network',
         'imdb_url': lambda s: s['ids']['imdb']
-        and 'http://www.imdb.com/title/%s' % s['ids']['imdb'],
+        and 'http://www.imdb.com/title/{}'.format(s['ids']['imdb']),
         'trakt_series_url': lambda s: s['ids']['slug']
-        and 'https://trakt.tv/shows/%s' % s['ids']['slug'],
+        and 'https://trakt.tv/shows/{}'.format(s['ids']['slug']),
         'trakt_series_country': 'country',
         'trakt_series_status': 'status',
         'trakt_series_overview': 'overview',

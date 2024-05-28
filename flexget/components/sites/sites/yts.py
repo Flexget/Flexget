@@ -24,7 +24,7 @@ class UrlRewriteYTS:
             normalize_unicode(s) for s in entry.get('search_strings', [entry['title']])
         ]
         for search_string in search_strings:
-            url = 'https://yts.am/api/v2/list_movies.json?query_term=%s' % (
+            url = 'https://yts.am/api/v2/list_movies.json?query_term={}'.format(
                 quote(search_string.encode('utf-8'))
             )
 
@@ -38,7 +38,7 @@ class UrlRewriteYTS:
                     logger.debug('Could not decode json from response: {}', result.text)
                     raise plugin.PluginError('Error getting result from yts.')
             except requests.RequestException as e:
-                raise plugin.PluginError('Could not retrieve query from yts (%s)' % e.args[0])
+                raise plugin.PluginError(f'Could not retrieve query from yts ({e.args[0]})')
             if not data['status'] == 'ok':
                 raise plugin.PluginError('failed to query YTS')
 

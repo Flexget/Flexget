@@ -35,7 +35,7 @@ class InputPogDesign:
                 raise plugin.PluginError('Invalid username/password for pogdesign.')
             page = session.get('https://www.pogdesign.co.uk/cat/show-select')
         except requests.RequestException as e:
-            raise plugin.PluginError('Error retrieving source: %s' % e)
+            raise plugin.PluginError(f'Error retrieving source: {e}')
         soup = get_soup(page.text)
         entries = []
         for row in soup.find_all('li', {'class': 'selectgrp checked'}):

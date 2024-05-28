@@ -49,7 +49,7 @@ class FilmwebWatchlist:
             raise plugin.DependencyError(
                 'filmweb_watchlist',
                 'pyfilmweb',
-                'pyfilmweb==0.1.1.1 module required. ImportError: %s' % e,
+                f'pyfilmweb==0.1.1.1 module required. ImportError: {e}',
                 logger,
             )
 
@@ -65,14 +65,14 @@ class FilmwebWatchlist:
         try:
             fw.login(str(config['login']), str(config['password']))
         except RequestFailed as error:
-            raise plugin.PluginError('Authentication request failed, reason %s' % str(error))
+            raise plugin.PluginError(f'Authentication request failed, reason {error!s}')
 
         user = LoggedUser(fw)
 
         try:
             watch_list = user.get_want_to_see()
         except RequestFailed as error:
-            raise plugin.PluginError('Fetching watch list failed, reason %s' % str(error))
+            raise plugin.PluginError(f'Fetching watch list failed, reason {error!s}')
 
         logger.verbose('Filmweb list contains {} items', len(watch_list))
 
@@ -88,7 +88,7 @@ class FilmwebWatchlist:
 
             entry = Entry()
             entry['title'] = item_info['name_org'] or item_info['name']
-            entry['title'] += ' (%s)' % item_info['year']
+            entry['title'] += ' ({})'.format(item_info['year'])
             entry['year'] = item_info['year']
             entry['url'] = item['film'].url
             entry['filmweb_type'] = item_info['type']

@@ -134,7 +134,7 @@ class PluginPyLoad:
         except plugin.PluginError:
             raise
         except Exception as e:
-            raise plugin.PluginError('Unknown error: %s' % str(e), logger)
+            raise plugin.PluginError(f'Unknown error: {e!s}', logger)
 
         # old pyload (stable)
         is_pyload_ng = False
@@ -208,7 +208,7 @@ class PluginPyLoad:
             # no urls found
             if not urls:
                 if config.get('handle_no_url_as_failure', self.DEFAULT_HANDLE_NO_URL_AS_FAILURE):
-                    entry.fail('No suited urls in entry %s' % entry['title'])
+                    entry.fail('No suited urls in entry {}'.format(entry['title']))
                 else:
                     logger.info('No suited urls in entry {}', entry['title'])
                 continue

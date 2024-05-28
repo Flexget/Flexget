@@ -117,7 +117,7 @@ class InputPlex:
                 headers=header,
             )
         except requests.RequestException as error:
-            raise plugin.PluginError('Could not log in to myplex! Error: %s' % error)
+            raise plugin.PluginError(f'Could not log in to myplex! Error: {error}')
         if 'Invalid email' in r.text:
             raise plugin.PluginError('Myplex: invalid username and/or password!')
         dom = parseString(r.text)
@@ -139,7 +139,7 @@ class InputPlex:
             return globalaccesstoken
         try:
             r = requests.get(
-                "https://my.plexapp.com/pms/servers?X-Plex-Token=%s" % globalaccesstoken
+                f"https://my.plexapp.com/pms/servers?X-Plex-Token={globalaccesstoken}"
             )
         except requests.RequestException as e:
             raise plugin.PluginError(
@@ -155,7 +155,9 @@ class InputPlex:
                 accesstoken = node.getAttribute('accessToken')
                 logger.debug('Got plextoken: {}', accesstoken)
         if not accesstoken:
-            raise plugin.PluginError('Could not retrieve accesstoken for %s.' % config['server'])
+            raise plugin.PluginError(
+                'Could not retrieve accesstoken for {}.'.format(config['server'])
+            )
         else:
             return accesstoken
 
@@ -196,13 +198,13 @@ class InputPlex:
                     "http://%s:%d%s%s" % (config['plexserver'], config['port'], path, urlappend)
                 )
             except requests.RequestException as e:
-                raise plugin.PluginError('Error retrieving source: %s' % e)
+                raise plugin.PluginError(f'Error retrieving source: {e}')
             dom = parseString(r.text.encode("utf-8"))
             for node in dom.getElementsByTagName('Directory'):
                 if node.getAttribute('title') == config['section']:
                     config['section'] = int(node.getAttribute('key'))
         if not self.plex_section_is_int(config['section']):
-            raise plugin.PluginError('Could not find section \'%s\'' % config['section'])
+            raise plugin.PluginError('Could not find section \'{}\''.format(config['section']))
 
         logger.debug(
             'Fetching http://{}:{}/library/sections/{}/{}{}',

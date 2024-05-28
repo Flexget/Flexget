@@ -84,15 +84,15 @@ class TestTraktShowLookup:
         )
         assert (
             entry['trakt_series_status'] == 'ended'
-        ), 'Series Status should be "ENDED" returned %s' % (entry['trakt_series_status'])
+        ), 'Series Status should be "ENDED" returned {}'.format(entry['trakt_series_status'])
 
     def test_lookup(self, execute_task):
         """trakt: Test Lookup (ONLINE)"""
         task = execute_task('test')
         entry = task.find_entry(title='House.S01E02.HDTV.XViD-FlexGet')
-        assert entry['trakt_ep_name'] == 'Paternity', (
-            '%s trakt_ep_name should be Paternity' % entry['title']
-        )
+        assert (
+            entry['trakt_ep_name'] == 'Paternity'
+        ), '{} trakt_ep_name should be Paternity'.format(entry['title'])
         assert (
             entry['trakt_series_status'] == 'ended'
         ), 'runtime for {} is {}, should be "ended"'.format(
@@ -442,7 +442,9 @@ class TestTraktMovieLookup:
     def test_lookup_sources(self, execute_task):
         task = execute_task('test_lookup_sources')
         for e in task.all_entries:
-            assert e['movie_name'] == 'The Matrix', 'looking up based on %s failed' % e['title']
+            assert e['movie_name'] == 'The Matrix', 'looking up based on {} failed'.format(
+                e['title']
+            )
 
     def test_search_results(self, execute_task):
         task = execute_task('test_search_results')
@@ -513,8 +515,8 @@ class TestTraktMovieLookup:
         trakt_actors = list(entry['trakt_actors'].values())
         trakt_actors = [trakt_actor['name'] for trakt_actor in trakt_actors]
         assert entry['movie_name'] == 'The Matrix', 'movie lookup failed'
-        assert set(trakt_actors) == set(actors), 'looking up actors for %s failed' % entry.get(
-            'title'
+        assert set(trakt_actors) == set(actors), 'looking up actors for {} failed'.format(
+            entry.get('title')
         )
         assert entry['trakt_actors']['7134']['name'] == 'Keanu Reeves', 'trakt id mapping failed'
         assert (

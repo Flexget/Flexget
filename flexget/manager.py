@@ -879,12 +879,11 @@ class Manager:
                     with open(self.lockfile, encoding='utf-8') as f:
                         pid = f.read()
                     print(
-                        'Another process (%s) is running, will exit.' % pid.split('\n')[0],
+                        'Another process ({}) is running, will exit.'.format(pid.split('\n')[0]),
                         file=sys.stderr,
                     )
                     print(
-                        "If you're sure there is no other instance running, delete %s"
-                        % self.lockfile,
+                        f"If you're sure there is no other instance running, delete {self.lockfile}",
                         file=sys.stderr,
                     )
                     sys.exit(1)

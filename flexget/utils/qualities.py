@@ -33,7 +33,7 @@ class QualityComponent:
         """
 
         if type not in ['resolution', 'source', 'codec', 'color_range', 'audio']:
-            raise ValueError('%s is not a valid quality component type.' % type)
+            raise ValueError(f'{type} is not a valid quality component type.')
         self.type = type
         self.value = value
         self.name = name
@@ -173,15 +173,15 @@ channels = r'(?:(?:[^\w+]?[1-7][\W_]?(?:0|1|ch)))'
 _audios = [
     QualityComponent('audio', 10, 'mp3'),
     # TODO: No idea what order these should go in or if we need different regexps
-    QualityComponent('audio', 20, 'aac', 'aac%s?' % channels),
-    QualityComponent('audio', 30, 'dd5.1', 'dd%s' % channels),
-    QualityComponent('audio', 40, 'ac3', 'ac3%s?' % channels),
-    QualityComponent('audio', 45, 'dd+5.1', 'dd[p+]%s' % channels),
-    QualityComponent('audio', 50, 'flac', 'flac%s?' % channels),
+    QualityComponent('audio', 20, 'aac', f'aac{channels}?'),
+    QualityComponent('audio', 30, 'dd5.1', f'dd{channels}'),
+    QualityComponent('audio', 40, 'ac3', f'ac3{channels}?'),
+    QualityComponent('audio', 45, 'dd+5.1', f'dd[p+]{channels}'),
+    QualityComponent('audio', 50, 'flac', f'flac{channels}?'),
     # The DTSs are a bit backwards, but the more specific one needs to be parsed first
-    QualityComponent('audio', 70, 'dtshd', r'dts[\W_]?hd(?:[\W_]?ma)?%s?' % channels),
+    QualityComponent('audio', 70, 'dtshd', rf'dts[\W_]?hd(?:[\W_]?ma)?{channels}?'),
     QualityComponent('audio', 60, 'dts'),
-    QualityComponent('audio', 80, 'truehd', 'truehd%s?' % channels),
+    QualityComponent('audio', 80, 'truehd', f'truehd{channels}?'),
 ]
 
 _UNKNOWNS = {
@@ -337,9 +337,9 @@ def get(quality_name: str) -> Quality:
     for part in quality_name.lower().split():
         component = _registry.get(part)
         if not component:
-            raise ValueError('`%s` is not a valid quality string' % part)
+            raise ValueError(f'`{part}` is not a valid quality string')
         if component.type in found_components:
-            raise ValueError('`%s` cannot be defined twice in a quality' % component.type)
+            raise ValueError(f'`{component.type}` cannot be defined twice in a quality')
         found_components[component.type] = component
     if not found_components:
         raise ValueError('No quality specified')
@@ -390,13 +390,13 @@ class RequirementComponent:
             min_str, max_str = text.split('-')
             min_quality, max_quality = _registry[min_str], _registry[max_str]
             if min_quality.type != max_quality.type != self.type:
-                raise ValueError('Component type mismatch: %s' % text)
+                raise ValueError(f'Component type mismatch: {text}')
             self.min, self.max = min_quality, max_quality
         elif '|' in text:
             req_quals = text.split('|')
             quals = {_registry[qual] for qual in req_quals}
             if any(qual.type != self.type for qual in quals):
-                raise ValueError('Component type mismatch: %s' % text)
+                raise ValueError(f'Component type mismatch: {text}')
             self.acceptable |= quals
         else:
             qual = _registry[text.strip('!<>=+')]
@@ -478,7 +478,7 @@ class Requirements:
                     if found.type == component.type:
                         component.add_requirement(part)
         except KeyError as e:
-            raise ValueError('%s is not a valid quality component.' % e.args[0])
+            raise ValueError(f'{e.args[0]} is not a valid quality component.')
 
     def allows(self, qual: Union[Quality, str], loose: bool = False) -> bool:
         """Determine whether this set of requirements allows a given quality.

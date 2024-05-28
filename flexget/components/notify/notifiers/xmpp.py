@@ -49,7 +49,7 @@ class XMPPNotifier:
         except ImportError as e:
             logger.debug('Error importing SleekXMPP: {}', e)
             raise DependencyError(
-                plugin_name, 'sleekxmpp', 'SleekXMPP module required. ImportError: %s' % e
+                plugin_name, 'sleekxmpp', f'SleekXMPP module required. ImportError: {e}'
             )
         try:
             import dns  # noqa
@@ -59,7 +59,7 @@ class XMPPNotifier:
             except ImportError as e:
                 logger.debug('Error importing dnspython: {}', e)
                 raise DependencyError(
-                    plugin_name, 'dnspython', 'dnspython module required. ImportError: %s' % e
+                    plugin_name, 'dnspython', f'dnspython module required. ImportError: {e}'
                 )
 
         class SendMsgBot(sleekxmpp.ClientXMPP):

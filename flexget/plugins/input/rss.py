@@ -243,11 +243,11 @@ class InputRSS:
         )
         headers = task.requests.headers
         if not all_entries:
-            etag = task.simple_persistence.get('%s_etag' % url_hash, None)
+            etag = task.simple_persistence.get(f'{url_hash}_etag', None)
             if etag:
                 logger.debug('Sending etag {} for task {}', etag, task.name)
                 headers['If-None-Match'] = etag
-            modified = task.simple_persistence.get('%s_modified' % url_hash, None)
+            modified = task.simple_persistence.get(f'{url_hash}_modified', None)
             if modified:
                 if not isinstance(modified, str):
                     logger.debug('Invalid date was stored for last modified time.')
@@ -315,11 +315,11 @@ class InputRSS:
             if not config['all_entries']:
                 etag = response.headers.get('etag')
                 if etag:
-                    task.simple_persistence['%s_etag' % url_hash] = etag
+                    task.simple_persistence[f'{url_hash}_etag'] = etag
                     logger.debug('etag {} saved for task {}', etag, task.name)
                 if response.headers.get('last-modified'):
                     modified = response.headers['last-modified']
-                    task.simple_persistence['%s_modified' % url_hash] = modified
+                    task.simple_persistence[f'{url_hash}_modified'] = modified
                     logger.debug('last modified {} saved for task {}', modified, task.name)
         else:
             # This is a file, open it
@@ -346,10 +346,7 @@ class InputRSS:
         ex = rss.get('bozo_exception', False)
         if ex or rss.get('bozo'):
             if rss.entries:
-                msg = (
-                    'Bozo error %s while parsing feed, but entries were produced, ignoring the error.'
-                    % type(ex)
-                )
+                msg = f'Bozo error {type(ex)} while parsing feed, but entries were produced, ignoring the error.'
                 if config.get('silent', False):
                     logger.debug(msg)
                 else:
@@ -399,7 +396,7 @@ class InputRSS:
                 if rss.entries[0]['published_parsed'] < rss.entries[-1]['published_parsed']:
                     # Sort them if they are not
                     rss.entries.sort(key=lambda x: x['published_parsed'], reverse=True)
-            last_entry_id = task.simple_persistence.get('%s_last_entry' % url_hash)
+            last_entry_id = task.simple_persistence.get(f'{url_hash}_last_entry')
 
         # new entries to be created
         entries = []
@@ -438,7 +435,7 @@ class InputRSS:
                 break
 
             # remove annoying zero width spaces
-            entry.title = entry.title.replace('\u200B', '')
+            entry.title = entry.title.replace('\u200b', '')
 
             # helper
             # TODO: confusing? refactor into class member ...
@@ -577,7 +574,7 @@ class InputRSS:
                 entry_id = ''
 
             if entry_id.strip():
-                task.simple_persistence['%s_last_entry' % url_hash] = entry_id
+                task.simple_persistence[f'{url_hash}_last_entry'] = entry_id
             else:
                 logger.debug(
                     'rss feed location saving skipped: no title information in first entry'

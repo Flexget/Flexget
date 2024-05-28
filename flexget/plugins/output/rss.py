@@ -205,7 +205,7 @@ class OutputRSS:
             try:
                 template = get_template(config['template'], scope='task')
             except ValueError as e:
-                raise plugin.PluginError('Invalid template specified: %s' % e)
+                raise plugin.PluginError(f'Invalid template specified: {e}')
             try:
                 rss.description = render_from_entry(template, entry)
             except RenderError as e:

@@ -55,7 +55,7 @@ field_maps = {
         'title': lambda i: (
             '{} ({})'.format(i['movie']['title'], i['movie']['year'])
             if i['movie']['year'] and not i['strip_dates']
-            else '%s' % i['movie']['title']
+            else '{}'.format(i['movie']['title'])
         ),
         'movie_name': 'movie.title',
         'movie_year': 'movie.year',
@@ -101,7 +101,7 @@ class TraktSet(MutableSet):
     @property
     def immutable(self):
         if self.config['list'] in IMMUTABLE_LISTS:
-            return '%s list is not modifiable' % self.config['list']
+            return '{} list is not modifiable'.format(self.config['list'])
 
     schema = {
         'type': 'object',
@@ -188,7 +188,9 @@ class TraktSet(MutableSet):
             self.config['list'] in ['collection', 'watched', 'trending', 'popular']
             and self.config['type'] == 'auto'
         ):
-            raise plugin.PluginError('`type` cannot be `auto` for %s list.' % self.config['list'])
+            raise plugin.PluginError(
+                '`type` cannot be `auto` for {} list.'.format(self.config['list'])
+            )
 
         limit_per_page = 1000
 
@@ -280,12 +282,11 @@ class TraktSet(MutableSet):
                                 translation = result.json()
                             except ValueError:
                                 raise plugin.PluginError(
-                                    'Error decoding movie translation from trakt: %s.'
-                                    % result.text
+                                    f'Error decoding movie translation from trakt: {result.text}.'
                                 )
                         except RequestException as e:
                             raise plugin.PluginError(
-                                'Could not retrieve movie translation from trakt: %s' % str(e)
+                                f'Could not retrieve movie translation from trakt: {e!s}'
                             )
                         if not translation or not translation[0]['title']:
                             logger.warning(
@@ -310,7 +311,7 @@ class TraktSet(MutableSet):
                         logger.debug('Invalid entry created? {}', entry)
 
         except RequestException as e:
-            raise plugin.PluginError('Could not retrieve list from trakt (%s)' % e)
+            raise plugin.PluginError(f'Could not retrieve list from trakt ({e})')
 
     @property
     def items(self):

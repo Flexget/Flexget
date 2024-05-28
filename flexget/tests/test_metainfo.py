@@ -63,20 +63,20 @@ class TestMetainfoQuality:
         entry = task.find_entry(title='FooBar.S01E02.720p.HDTV')
         assert entry, 'entry not found?'
         assert 'quality' in entry, 'failed to pick up quality'
-        assert entry['quality'].name == '720p hdtv', 'picked up wrong quality %s' % entry.get(
-            'quality', None
+        assert entry['quality'].name == '720p hdtv', 'picked up wrong quality {}'.format(
+            entry.get('quality', None)
         )
         entry = task.find_entry(title='ShowB.S04E19.Name of Ep.720p.WEB-DL.DD5.1.H.264')
         assert entry, 'entry not found?'
         assert 'quality' in entry, 'failed to pick up quality'
         assert (
             entry['quality'].name == '720p webdl h264 dd5.1'
-        ), 'picked up wrong quality %s' % entry.get('quality', None)
+        ), 'picked up wrong quality {}'.format(entry.get('quality', None))
         # quality in description should not override one found in title
         entry = task.find_entry(title='Good.Movie.hdtv')
         assert 'quality' in entry, 'failed to pick up quality'
-        assert entry['quality'].name == 'hdtv', 'picked up wrong quality %s' % entry.get(
-            'quality', None
+        assert entry['quality'].name == 'hdtv', 'picked up wrong quality {}'.format(
+            entry.get('quality', None)
         )
 
 
@@ -191,7 +191,7 @@ class TestMetainfoSeries:
         task = execute_task('false_positives')
         for entry in task.entries:
             # None of these should be detected as series
-            error = '%s should not be detected as a series' % entry['title']
+            error = '{} should not be detected as a series'.format(entry['title'])
             assert 'series_name' not in entry, error
             assert 'series_guessed' not in entry, error
             assert 'series_parser' not in entry, error

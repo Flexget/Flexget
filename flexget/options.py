@@ -76,13 +76,13 @@ class VersionAction(_VersionAction):
         latest = get_latest_flexget_version_number()
 
         # Print the version number
-        console('%s' % get_current_flexget_version())
+        console(f'{get_current_flexget_version()}')
         # Check for latest version from server
         if latest:
             if current == latest:
                 console('You are on the latest release.')
             else:
-                console('Latest release: %s' % latest)
+                console(f'Latest release: {latest}')
         else:
             console(
                 'Error getting latest version number from https://pypi.python.org/pypi/FlexGet'
@@ -127,8 +127,8 @@ class InjectAction(Action):
         if values:
             kwargs['url'] = values.pop(0)
         else:
-            kwargs['url'] = 'http://localhost/inject/%s' % ''.join(
-                random.sample(string.ascii_letters + string.digits, 30)
+            kwargs['url'] = 'http://localhost/inject/{}'.format(
+                ''.join(random.sample(string.ascii_letters + string.digits, 30))
             )
         if 'force' in [v.lower() for v in values]:
             kwargs['immortal'] = True
@@ -144,9 +144,9 @@ class ParseExtrasAction(Action):
 
     def __init__(self, option_strings, parser, help=None, metavar=None, dest=None, required=False):
         if metavar is None:
-            metavar = '<%s arguments>' % parser.prog
+            metavar = f'<{parser.prog} arguments>'
         if help is None:
-            help = 'arguments for the `%s` command are allowed here' % parser.prog
+            help = f'arguments for the `{parser.prog}` command are allowed here'
         self._parser = parser
         super().__init__(
             option_strings=option_strings,
@@ -160,7 +160,7 @@ class ParseExtrasAction(Action):
     def __call__(self, parser, namespace, values, option_string=None):
         namespace, extras = self._parser.parse_known_args(values, namespace)
         if extras:
-            parser.error('unrecognized arguments: %s' % ' '.join(extras))
+            parser.error('unrecognized arguments: {}'.format(' '.join(extras)))
 
 
 class ScopedNamespace(Namespace):
@@ -412,7 +412,7 @@ class ArgumentParser(ArgParser):
             raise TypeError('This parser does not have subparsers')
         p = self.subparsers.choices.get(name, default)
         if p is _UNSET:
-            raise ValueError('%s is not an existing subparser name' % name)
+            raise ValueError(f'{name} is not an existing subparser name')
         return p
 
     def _get_values(self, action, arg_strings):

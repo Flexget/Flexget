@@ -57,7 +57,7 @@ def get_events(name: str) -> List[Event]:
     :return: List of :class:`Event` for *name* ordered by priority
     """
     if name not in _events:
-        raise KeyError('No such event %s' % name)
+        raise KeyError(f'No such event {name}')
     _events[name].sort(reverse=True)
     return _events[name]
 

@@ -124,7 +124,7 @@ class Letterboxd:
             try:
                 page = requests.get(url).content
             except RequestException as e:
-                raise plugin.PluginError('Error retrieving list from Letterboxd: %s' % e)
+                raise plugin.PluginError(f'Error retrieving list from Letterboxd: {e}')
             soup = get_soup(page)
 
             for film in soup.find_all(attrs={config['f_slug']: True}):

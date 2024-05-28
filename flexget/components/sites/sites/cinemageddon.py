@@ -16,7 +16,7 @@ class UrlRewriteCinemageddon:
 
     def url_rewrite(self, task, entry):
         entry['url'] = entry['url'].replace('details.php?id=', 'download.php?id=')
-        entry['url'] += '&name=%s.torrent' % (quote(entry['title'], safe=''))
+        entry['url'] += '&name={}.torrent'.format(quote(entry['title'], safe=''))
 
 
 @event('plugin.register')

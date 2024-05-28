@@ -71,12 +71,12 @@ def manage_entries(options, selection, approved):
                     )
                     sys.exit(1)
             except NoResultFound:
-                console('Pending entry with ID %s does not exist' % selection)
+                console(f'Pending entry with ID {selection} does not exist')
                 sys.exit(1)
             else:
                 entries = [entry]
         if not entries:
-            console('All entries are already %s' % approved_text)
+            console(f'All entries are already {approved_text}')
             return
         for entry in entries:
             if entry.approved is not approved:

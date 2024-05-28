@@ -58,7 +58,7 @@ class NotifyToast:
             from pync import Notifier
         except ImportError as e:
             logger.debug('Error importing pync: {}', e)
-            raise DependencyError(plugin_name, 'pync', 'pync module required. ImportError: %s' % e)
+            raise DependencyError(plugin_name, 'pync', f'pync module required. ImportError: {e}')
 
         icon_path = None
         try:
@@ -79,7 +79,7 @@ class NotifyToast:
         try:
             Notifier.notify(message, **notify_kwargs)
         except Exception as e:
-            raise PluginWarning('Cannot send a notification: %s' % e)
+            raise PluginWarning(f'Cannot send a notification: {e}')
 
     def linux_notify(self, title, message, config):
         config = self.prepare_config(config)
@@ -88,7 +88,7 @@ class NotifyToast:
         except ImportError as e:
             logger.debug('Error importing Notify: {}', e)
             raise DependencyError(
-                plugin_name, 'gi.repository', 'Notify module required. ImportError: %s' % e
+                plugin_name, 'gi.repository', f'Notify module required. ImportError: {e}'
             )
 
         if not Notify.init("Flexget"):
@@ -99,7 +99,7 @@ class NotifyToast:
         n.set_timeout(timeout)
 
         if not n.show():
-            raise PluginWarning('Unable to send notification for %s' % title)
+            raise PluginWarning(f'Unable to send notification for {title}')
 
     def windows_notify(self, title, message, config):
         config = self.prepare_config(config)

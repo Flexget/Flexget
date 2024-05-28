@@ -160,7 +160,7 @@ class ServerReloadAPI(APIResource):
                 errors = []
                 for er in e.errors:
                     errors.append({'error': er.message, 'config_path': er.json_pointer})
-                raise APIError('Error loading config: %s' % e.args[0], payload={'errors': errors})
+                raise APIError(f'Error loading config: {e.args[0]}', payload={'errors': errors})
             response = 'Config successfully reloaded from disk'
         else:
             self.manager.shutdown(data.get('force'))

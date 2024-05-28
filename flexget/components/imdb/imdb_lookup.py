@@ -160,7 +160,7 @@ class ImdbLookup:
                 if result.fails and not manager.options.execute.retry:
                     # this movie cannot be found, not worth trying again ...
                     logger.debug('{} will fail lookup', entry['title'])
-                    raise plugin.PluginError('IMDB lookup failed for %s' % entry['title'])
+                    raise plugin.PluginError('IMDB lookup failed for {}'.format(entry['title']))
                 else:
                     if result.url:
                         logger.trace('Setting imdb url for {} from db', entry['title'])
@@ -182,7 +182,7 @@ class ImdbLookup:
                 logger.verbose('Found {}', entry['imdb_url'])
             else:
                 log_once(
-                    'IMDB lookup failed for %s' % entry['title'],
+                    'IMDB lookup failed for {}'.format(entry['title']),
                     logger,
                     'WARNING',
                     session=session,
@@ -192,7 +192,7 @@ class ImdbLookup:
                 result.fails = True
                 session.add(result)
                 session.commit()
-                raise plugin.PluginError('Title `%s` lookup failed' % entry['title'])
+                raise plugin.PluginError('Title `{}` lookup failed'.format(entry['title']))
 
         # check if this imdb page has been parsed & cached
         movie = session.query(db.Movie).filter(db.Movie.url == entry['imdb_url']).first()
@@ -233,7 +233,7 @@ class ImdbLookup:
             # TODO: might be a little too broad catch, what was this for anyway? ;P
             if manager.options.debug:
                 logger.exception(e)
-            raise plugin.PluginError('Invalid parameter: %s' % entry['imdb_url'], logger)
+            raise plugin.PluginError('Invalid parameter: {}'.format(entry['imdb_url']), logger)
 
         for att in [
             'title',

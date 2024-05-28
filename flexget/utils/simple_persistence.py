@@ -147,7 +147,7 @@ class SimplePersistence(MutableMapping):
 
     def __getitem__(self, key):
         if key not in self.store or self.store[key] == DELETE:
-            raise KeyError('%s is not contained in the simple_persistence table.' % key)
+            raise KeyError(f'{key} is not contained in the simple_persistence table.')
         return self.store[key]
 
     def __delitem__(self, key):

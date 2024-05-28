@@ -123,7 +123,9 @@ class Notify:
                         message = get_template(config['entries']['template'], scope='entry')
                     except ValueError:
                         raise plugin.PluginError(
-                            'Cannot locate template on disk: %s' % config['entries']['template']
+                            'Cannot locate template on disk: {}'.format(
+                                config['entries']['template']
+                            )
                         )
                 else:
                     message = config['entries']['message']
@@ -145,7 +147,7 @@ class Notify:
                     template = get_template(config['task']['template'], scope='task')
                 except ValueError:
                     raise plugin.PluginError(
-                        'Cannot locate template on disk: %s' % config['task']['template']
+                        'Cannot locate template on disk: {}'.format(config['task']['template'])
                     )
             self.send_notification(
                 config['task']['title'],

@@ -86,14 +86,14 @@ class PluginSubliminal:
         except ImportError as e:
             logger.debug('Error importing Babelfish: {}', e)
             raise plugin.DependencyError(
-                'subliminal', 'babelfish', 'Babelfish module required. ImportError: %s' % e
+                'subliminal', 'babelfish', f'Babelfish module required. ImportError: {e}'
             )
         try:
             import subliminal  # noqa
         except ImportError as e:
             logger.debug('Error importing Subliminal: {}', e)
             raise plugin.DependencyError(
-                'subliminal', 'subliminal', 'Subliminal module required. ImportError: %s' % e
+                'subliminal', 'subliminal', f'Subliminal module required. ImportError: {e}'
             )
 
     def on_task_output(self, task, config):
@@ -174,7 +174,7 @@ class PluginSubliminal:
                     logger.warning('Cannot act on entries that do not represent a local file.')
                     continue
                 if not os.path.exists(entry['location']):
-                    entry.fail('file not found: %s' % entry['location'])
+                    entry.fail('file not found: {}'.format(entry['location']))
                     continue
                 if '$RECYCLE.BIN' in entry['location']:  # ignore deleted files in Windows shares
                     continue

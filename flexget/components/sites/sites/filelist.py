@@ -167,7 +167,7 @@ class SearchFileList:
                 timeout=30,
             )
         except RequestException as e:
-            raise plugin.PluginError('FileList.ro login failed: %s' % e)
+            raise plugin.PluginError(f'FileList.ro login failed: {e}')
 
         if 'https://filelist.ro/my.php' != response.url:
             raise plugin.PluginError(

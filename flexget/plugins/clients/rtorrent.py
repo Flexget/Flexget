@@ -155,7 +155,7 @@ def create_proxy(url):
         path = parsed.path
         return xmlrpc_client.ServerProxy('http://1', transport=SCGITransport(socket_path=path))
     if parsed.scheme == 'scgi':
-        url = 'http://%s' % parsed.netloc
+        url = f'http://{parsed.netloc}'
         return xmlrpc_client.ServerProxy(url, transport=SCGITransport())
     logger.debug('Creating Normal XMLRPC Proxy with url {!r}', url)
     return xmlrpc_client.ServerProxy(url)
@@ -277,7 +277,9 @@ class RTorrent:
         if mkdir and 'directory' in fields:
             result = self._server.execute.throw('', 'mkdir', '-p', fields['directory'])
             if result != 0:
-                raise xmlrpc_client.Error('Failed creating directory %s' % fields['directory'])
+                raise xmlrpc_client.Error(
+                    'Failed creating directory {}'.format(fields['directory'])
+                )
 
         # by default rtorrent won't allow calls over 512kb in size.
         xmlrpc_size = (
@@ -314,7 +316,7 @@ class RTorrent:
         multi_call = xmlrpc_client.MultiCall(self._server)
 
         for field in fields:
-            method_name = 'd.%s' % field
+            method_name = f'd.{field}'
             getattr(multi_call, method_name)(info_hash)
 
         for custom_field in custom_fields:
@@ -333,7 +335,7 @@ class RTorrent:
         if not custom_fields:
             custom_fields = []
 
-        params = ['d.%s=' % field for field in fields]
+        params = [f'd.{field}=' for field in fields]
 
         # Set custom fields
         for custom_field in custom_fields:
@@ -360,7 +362,7 @@ class RTorrent:
         multi_call = xmlrpc_client.MultiCall(self._server)
 
         for key, val in fields.items():
-            method_name = 'd.%s.set' % key
+            method_name = f'd.{key}.set'
             getattr(multi_call, method_name)(info_hash, val)
 
         for key, val in custom_fields.items():
@@ -401,7 +403,7 @@ class RTorrent:
             logger.verbose('Creating destination directory `{}`', dst_path)
             self._server.execute.throw('', 'mkdir', '-p', dst_path)
         except xmlrpc_client.Error:
-            raise xmlrpc_client.Error("unable to create folder %s" % dst_path)
+            raise xmlrpc_client.Error(f"unable to create folder {dst_path}")
 
         self._server.execute.throw('', 'mv', '-u', torrent['base_path'], dst_path)
         self._server.d.set_directory(info_hash, dst_path)
@@ -539,7 +541,7 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
                     try:
                         options = self._build_options(config, entry)
                     except RenderError as e:
-                        entry.fail("failed to render properties %s" % str(e))
+                        entry.fail(f"failed to render properties {e!s}")
                         continue
 
                     # fast_resume is not really an rtorrent option so it's not in _build_options
@@ -556,7 +558,7 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
                 info_hash = entry.get('torrent_info_hash')
 
                 if not info_hash:
-                    entry.fail('Failed to %s as no info_hash found' % config['action'])
+                    entry.fail('Failed to {} as no info_hash found'.format(config['action']))
                     continue
 
                 if config['action'] == 'delete':
@@ -590,7 +592,7 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
                     self.update_entry(client, entry, config)
 
         except OSError as e:
-            raise plugin.PluginError("Couldn't connect to rTorrent: %s" % str(e))
+            raise plugin.PluginError(f"Couldn't connect to rTorrent: {e!s}")
 
     def delete_entry(self, client, entry):
         try:
@@ -599,7 +601,7 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
                 'Deleted {} ({}) in rtorrent ', entry['title'], entry['torrent_info_hash']
             )
         except xmlrpc_client.Error as e:
-            entry.fail('Failed to delete: %s' % str(e))
+            entry.fail(f'Failed to delete: {e!s}')
             return
 
     def purge_entry(self, client, entry):
@@ -609,7 +611,7 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
                 'Purged {} ({}) in rtorrent ', entry['title'], entry['torrent_info_hash']
             )
         except xmlrpc_client.Error as e:
-            entry.fail('Failed to purge: %s' % str(e))
+            entry.fail(f'Failed to purge: {e!s}')
             return
 
     def update_entry(self, client, entry, config):
@@ -625,7 +627,7 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
         try:
             options = self._build_options(config, entry, entry_first=False)
         except RenderError as e:
-            entry.fail("failed to render properties %s" % str(e))
+            entry.fail(f"failed to render properties {e!s}")
             return
 
         if existing and 'directory' in options:
@@ -641,7 +643,7 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
                     )
                     client.move(info_hash, options['directory'])
                 except xmlrpc_client.Error as e:
-                    entry.fail('Failed moving torrent: %s' % str(e))
+                    entry.fail(f'Failed moving torrent: {e!s}')
                     return
 
         # Remove directory from update otherwise rTorrent will append the title to the directory path
@@ -657,7 +659,7 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
             client.update(info_hash=info_hash, fields=options, custom_fields=custom_fields)
             logger.verbose('Updated {} ({}) in rtorrent ', entry['title'], info_hash)
         except xmlrpc_client.Error as e:
-            entry.fail('Failed to update: %s' % str(e))
+            entry.fail(f'Failed to update: {e!s}')
             return
 
     def add_entry(self, client, entry, options, start=True, mkdir=False, fast_resume=False):
@@ -679,7 +681,7 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
 
             # Verify valid torrent file
             if not is_torrent_file(entry['file']):
-                entry.fail("Downloaded temp file '%s' is not a torrent file" % entry['file'])
+                entry.fail("Downloaded temp file '{}' is not a torrent file".format(entry['file']))
                 return
 
             # Modify the torrent with resume data if needed
@@ -701,7 +703,7 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
                     file_path = os.path.join(base, relative_file_path)
                     # TODO should it simply add the torrent anyway?
                     if not os.path.exists(file_path) and not os.path.isfile(file_path):
-                        entry.fail('%s does not exist. Cannot add fast resume data.' % file_path)
+                        entry.fail(f'{file_path} does not exist. Cannot add fast resume data.')
                         return
                     # cannot bencode floats, so we need to coerce to int
                     mtime = int(os.path.getmtime(file_path))
@@ -716,13 +718,13 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
                 with open(entry['file'], 'rb') as f:
                     torrent_raw = f.read()
             except OSError as e:
-                entry.fail('Failed to add to rTorrent %s' % str(e))
+                entry.fail(f'Failed to add to rTorrent {e!s}')
                 return
 
             try:
                 Torrent(torrent_raw)
             except SyntaxError as e:
-                entry.fail('Strange, unable to decode torrent, raise a BUG: %s' % str(e))
+                entry.fail(f'Strange, unable to decode torrent, raise a BUG: {e!s}')
                 return
 
         # First check if it already exists
@@ -742,10 +744,10 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
                 torrent_raw, fields=options, custom_fields=custom_fields, start=start, mkdir=mkdir
             )
             if resp != 0:
-                entry.fail('Failed to add to rTorrent invalid return value %s' % resp)
+                entry.fail(f'Failed to add to rTorrent invalid return value {resp}')
         except xmlrpc_client.Error as e:
             logger.exception(e)
-            entry.fail('Failed to add to rTorrent %s' % str(e))
+            entry.fail(f'Failed to add to rTorrent {e!s}')
             return
 
         # Verify the torrent loaded

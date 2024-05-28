@@ -54,7 +54,7 @@ class TorrentFilename:
                 try:
                     torrent = Torrent(data)
                 except SyntaxError as e:
-                    entry.fail('%s - broken or invalid torrent file received' % e.args[0])
+                    entry.fail(f'{e.args[0]} - broken or invalid torrent file received')
                     self.purge(entry)
                     continue
 
@@ -102,7 +102,7 @@ class TorrentFilename:
         # title = title.encode('iso8859-1', 'ignore') # Damn \u200b -character, how I loathe thee
         # TODO: replace only zero width spaces, leave unicode alone?
 
-        fn = '%s.torrent' % title
+        fn = f'{title}.torrent'
         logger.debug('make_filename made {}', fn)
         return fn
 

@@ -82,7 +82,7 @@ class NPOWatchlist:
                 raise plugin.PluginError(f'Unexpected page: {page_response.url} (expected {url})')
             return page_response
         except RequestException as e:
-            raise plugin.PluginError('Request error: %s' % str(e))
+            raise plugin.PluginError(f'Request error: {e!s}')
 
     def _login(self, task, config):
         if 'isAuthenticatedUser' in requests.cookies:
@@ -122,7 +122,7 @@ class NPOWatchlist:
                 raise plugin.PluginError('Failed to login. Check username and password.')
             logger.debug('Succesfully logged in: {}', email)
         except RequestException as e:
-            raise plugin.PluginError('Request error: %s' % str(e))
+            raise plugin.PluginError(f'Request error: {e!s}')
 
     def _get_favourites_entries(self, task, config, profileId):
         # Details of profile using the $profileId:
@@ -140,7 +140,7 @@ class NPOWatchlist:
                 if favourite['mediaType'] == 'series':
                     entries += self._get_series_episodes(task, config, favourite['mediaId'])
         except RequestException as e:
-            raise plugin.PluginError('Request error: %s' % str(e))
+            raise plugin.PluginError(f'Request error: {e!s}')
         return entries
 
     def _get_series_episodes(self, task, config, mediaId, series_info=None, page=1):

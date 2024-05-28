@@ -114,7 +114,7 @@ class PendingEntriesAPI(APIResource):
         total_pages = int(ceil(total_items / float(per_page)))
 
         if page > total_pages:
-            raise NotFoundError('page %s does not exist' % page)
+            raise NotFoundError(f'page {page} does not exist')
 
         # Actual results in page
         actual_size = min(per_page, len(pending_entries))
@@ -183,7 +183,7 @@ class PendingEntryAPI(APIResource):
         try:
             entry = db.get_entry_by_id(session, entry_id)
         except NoResultFound:
-            raise NotFoundError('No pending entry with ID %s' % entry_id)
+            raise NotFoundError(f'No pending entry with ID {entry_id}')
         return jsonify(entry.to_dict())
 
     @api.response(201, model=pending_entry_schema)
@@ -194,7 +194,7 @@ class PendingEntryAPI(APIResource):
         try:
             entry = db.get_entry_by_id(session, entry_id)
         except NoResultFound:
-            raise NotFoundError('No pending entry with ID %s' % entry_id)
+            raise NotFoundError(f'No pending entry with ID {entry_id}')
 
         data = request.json
         approved = data['operation'] == 'approve'
@@ -214,6 +214,6 @@ class PendingEntryAPI(APIResource):
         try:
             entry = db.get_entry_by_id(session, entry_id)
         except NoResultFound:
-            raise NotFoundError('No pending entry with ID %s' % entry_id)
+            raise NotFoundError(f'No pending entry with ID {entry_id}')
         session.delete(entry)
-        return success_response('successfully deleted entry with ID %s' % entry_id)
+        return success_response(f'successfully deleted entry with ID {entry_id}')

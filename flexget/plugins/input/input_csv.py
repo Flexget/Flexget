@@ -67,7 +67,7 @@ class InputCSV:
                 try:
                     entry[name] = row[index - 1].strip()
                 except IndexError:
-                    raise plugin.PluginError('Field `%s` index is out of range' % name)
+                    raise plugin.PluginError(f'Field `{name}` index is out of range')
 
             entries.append(entry)
         return entries

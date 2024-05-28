@@ -89,7 +89,6 @@ zxcvbn = "^4.4.24"
 pendulum = ">=3.0.0"
 
 [tool.poetry.group.dev.dependencies]
-black = ">=18.9b0"
 codacy-coverage = ">=1.2.18"
 coverage = ">=6.0"
 gitpython = ">=3.1.18"
@@ -98,7 +97,7 @@ pytest-cov = ">=3.0.0"
 pytest-runner = "^6.0.0"
 pytest-xdist = ">=2.4.0"
 pytest = ">=6.2.4"
-ruff = ">=0.0.261"
+ruff = ">=0.4.2"
 sphinx = ">=5.0.0"
 sqlalchemy-stubs = "^0.4"
 vcrpy = ">=4.1.1"
@@ -131,6 +130,8 @@ flexget = 'flexget:main'
 [tool.pytest.ini_options]
 testpaths = ["flexget/tests"]
 
+# We switched to using ruff for formatting, but leaving this in for now
+# for anybody that's using black manually.
 [tool.black]
 line-length = 99
 skip-string-normalization = true
@@ -151,18 +152,24 @@ exclude = '''
 
 [tool.ruff]
 line-length = 99
-select = ["C4", "E", "F", "I", "ISC", "PLE", "RUF", "UP"]
+extend-exclude = ["flexget/ui"]
 
+[tool.ruff.lint]
+select = ["C4", "E", "F", "I", "ISC", "PLE", "RUF", "UP"]
 ignore = [
     "E501",  # We leave line length up to black
     "E711", "E712",  # Comparisons to True/False/None are valid for sqlalchemy
+    "ISC001",  # Ruff recommends disabling this when using the ruff formatter
     "PLE1205",  # Thinks we are using stdlib logging rather than loguru
     "RUF001",  # Some of these ambiguous unicode are in tests on purpose
     "RUF012", # Maybe can re-enable after https://github.com/astral-sh/ruff/issues/5243
 ]
 
-[tool.ruff.isort]
+[tool.ruff.lint.isort]
 known-first-party = ['flexget']
+
+[tool.ruff.format]
+quote-style = "preserve"
 
 [tool.mypy]
 plugins = ["sqlmypy"]

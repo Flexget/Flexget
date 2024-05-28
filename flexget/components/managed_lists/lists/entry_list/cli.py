@@ -13,8 +13,8 @@ from . import db
 def attribute_type(attribute):
     if attribute.count('=') != 1:
         raise ArgumentTypeError(
-            'Received attribute in wrong format: %s, '
-            'should be in keyword format like `imdb_id=tt1234567`' % attribute
+            f'Received attribute in wrong format: {attribute}, '
+            'should be in keyword format like `imdb_id=tt1234567`'
         )
     name, value = attribute.split('=', 2)
     return {name: value}
@@ -166,7 +166,7 @@ def entry_list_purge(options):
         except NoResultFound:
             console(f'Could not find entry list with name `{options.list_name}`')
             return
-        console('Deleting list %s' % options.list_name)
+        console(f'Deleting list {options.list_name}')
         session.delete(entry_list)
 
 

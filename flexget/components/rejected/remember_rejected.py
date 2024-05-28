@@ -92,7 +92,7 @@ class FilterRememberRejected:
         if remember_time:
             if isinstance(remember_time, str):
                 remember_time = parse_timedelta(remember_time)
-        message = 'Remembering rejection of `%s`' % entry['title']
+        message = 'Remembering rejection of `{}`'.format(entry['title'])
         if remember_time:
             message += ' for %i minutes' % (remember_time.seconds / 60)
         logger.info(message)

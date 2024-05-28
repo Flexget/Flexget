@@ -64,7 +64,7 @@ def get_scrape_url(tracker_url, info_hash):
         result = tracker_url + '/scrape'
 
     result += '&' if '?' in result else '?'
-    result += 'info_hash=%s' % quote(binascii.unhexlify(info_hash))
+    result += f'info_hash={quote(binascii.unhexlify(info_hash))}'
     return result
 
 

@@ -93,10 +93,10 @@ class UrlRewritePirateBay:
             # some api mirrors might contain path, for ex https://pirateproxy.surf/api?url=/q.php?q=ubuntu&cat=0
             # valid URLs are https://piratebay.org/description.php?id=\d+ and https://apibay.org/description.php?id=\d+
             self.url_match = re.compile(
-                fr'^{escaped_url_scheme}://(?:thepiratebay\.org(?:\:\d+)?|{escaped_url_netloc})/description\.php\?id=(\d+)$'
+                rf'^{escaped_url_scheme}://(?:thepiratebay\.org(?:\:\d+)?|{escaped_url_netloc})/description\.php\?id=(\d+)$'
             )
             self.url_search = re.compile(
-                fr'^(?:https?://thepiratebay\.org(?:\:\d+)?|{escaped_url_scheme}://{escaped_url_netloc})/search\.php\?q=.*$'
+                rf'^(?:https?://thepiratebay\.org(?:\:\d+)?|{escaped_url_scheme}://{escaped_url_netloc})/search\.php\?q=.*$'
             )
 
     # urlrewriter API

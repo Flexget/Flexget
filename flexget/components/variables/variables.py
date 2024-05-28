@@ -34,12 +34,12 @@ class Variables(Base):
 def variables_from_file(config_base, filename):
     variables_file = os.path.join(config_base, filename)
     if not os.path.exists(variables_file):
-        raise PluginError('File %s does not exist!' % variables_file)
+        raise PluginError(f'File {variables_file} does not exist!')
     try:
         with codecs.open(variables_file, 'rb', 'utf-8') as f:
             variables_dict = yaml.safe_load(f.read())
     except yaml.YAMLError as e:
-        raise PluginError('Invalid variables file: %s' % e)
+        raise PluginError(f'Invalid variables file: {e}')
     return variables_dict or {}
 
 

@@ -122,9 +122,8 @@ lazy_lookup_types = {
         'trakt_genres': lambda i: [db_genre.name for db_genre in i.genres],
         'trakt_series_network': 'network',
         'imdb_url': lambda series: series.imdb_id
-        and 'http://www.imdb.com/title/%s' % series.imdb_id,
-        'trakt_series_url': lambda series: series.slug
-        and 'https://trakt.tv/shows/%s' % series.slug,
+        and f'http://www.imdb.com/title/{series.imdb_id}',
+        'trakt_series_url': lambda series: series.slug and f'https://trakt.tv/shows/{series.slug}',
         'trakt_series_country': 'country',
         'trakt_series_status': 'status',
         'trakt_series_overview': 'overview',

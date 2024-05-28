@@ -140,9 +140,8 @@ class PluginDownload:
             # disallow html content
             html_mimes = ['html', 'text/html']
             if entry.get('mime-type') in html_mimes and fail_html:
-                error = (
-                    'Unexpected html content received from `%s` - maybe a login page?'
-                    % entry['url']
+                error = 'Unexpected html content received from `{}` - maybe a login page?'.format(
+                    entry['url']
                 )
                 self.cleanup_temp_file(entry)
 
@@ -165,7 +164,9 @@ class PluginDownload:
         received = os.path.join(task.manager.config_base, 'received', task.name)
         if not os.path.isdir(received):
             os.makedirs(received)
-        filename = os.path.join(received, pathscrub('%s.error' % entry['title'], filename=True))
+        filename = os.path.join(
+            received, pathscrub('{}.error'.format(entry['title']), filename=True)
+        )
         logger.error(
             'Error retrieving {}, the error page has been saved to {}', entry['title'], filename
         )
@@ -216,7 +217,7 @@ class PluginDownload:
                 self.download_entry(task, entry, url, tmp_path)
         except RequestException as e:
             logger.warning('RequestException {}, while downloading {}', e, url)
-            return 'Network error during request: %s' % e
+            return f'Network error during request: {e}'
         except BadStatusLine as e:
             logger.warning('Failed to reach server. Reason: {}', getattr(e, 'message', 'N/A'))
             return 'BadStatusLine'
@@ -229,7 +230,7 @@ class PluginDownload:
             return 'OSError'
         except ValueError as e:
             # Probably unknown url type
-            msg = 'ValueError %s' % e
+            msg = f'ValueError {e}'
             logger.warning(msg)
             logger.opt(exception=True).debug(msg)
             return msg
@@ -265,7 +266,7 @@ class PluginDownload:
         try:
             tmp_path = os.path.expanduser(tmp_path)
         except RenderError as e:
-            entry.fail('Could not set temp path. Error during string replacement: %s' % e)
+            entry.fail(f'Could not set temp path. Error during string replacement: {e}')
             return
 
         # Clean illegal characters from temp path name
@@ -278,7 +279,7 @@ class PluginDownload:
 
         # check for write-access
         if not os.access(tmp_path, os.W_OK):
-            raise plugin.PluginError('Not allowed to write to temp directory `%s`' % tmp_path)
+            raise plugin.PluginError(f'Not allowed to write to temp directory `{tmp_path}`')
 
         # download and write data into a temp file
         tmp_dir = tempfile.mkdtemp(dir=tmp_path)
@@ -316,7 +317,7 @@ class PluginDownload:
             else:
                 # Do a sanity check on downloaded file
                 if os.path.getsize(datafile) == 0:
-                    entry.fail('File %s is 0 bytes in size' % datafile)
+                    entry.fail(f'File {datafile} is 0 bytes in size')
                     os.remove(datafile)
                     return
                 # store temp filename into entry so other plugins may read and modify content
@@ -408,14 +409,14 @@ class PluginDownload:
         if 'file' not in entry and not task.options.test:
             logger.debug('file missing, entry: {}', entry)
             raise plugin.PluginError(
-                'Entry `%s` has no temp file associated with' % entry['title'], logger
+                'Entry `{}` has no temp file associated with'.format(entry['title']), logger
             )
 
         try:
             # use path from entry if has one, otherwise use from download definition parameter
             path = entry.get('path', config.get('path'))
             if not isinstance(path, str):
-                raise plugin.PluginError('Invalid `path` in entry `%s`' % entry['title'])
+                raise plugin.PluginError('Invalid `path` in entry `{}`'.format(entry['title']))
 
             # override path from command line parameter
             if task.options.dl_path:
@@ -425,7 +426,7 @@ class PluginDownload:
             try:
                 path = os.path.expanduser(entry.render(path))
             except RenderError as e:
-                entry.fail('Could not set path. Error during string replacement: %s' % e)
+                entry.fail(f'Could not set path. Error during string replacement: {e}')
                 return
 
             # Clean illegal characters from path name
@@ -444,13 +445,13 @@ class PluginDownload:
                 try:
                     os.makedirs(path)
                 except Exception:
-                    raise plugin.PluginError('Cannot create path %s' % path, logger)
+                    raise plugin.PluginError(f'Cannot create path {path}', logger)
 
             # check that temp file is present
             if not os.path.exists(entry['file']):
                 logger.debug('entry: {}', entry)
                 raise plugin.PluginWarning(
-                    'Downloaded temp file `%s` doesn\'t exist!?' % entry['file']
+                    'Downloaded temp file `{}` doesn\'t exist!?'.format(entry['file'])
                 )
 
             if config.get('filename'):
@@ -458,7 +459,7 @@ class PluginDownload:
                     entry['filename'] = entry.render(config['filename'])
                     logger.debug('set filename from config {}', entry['filename'])
                 except RenderError as e:
-                    entry.fail('Could not set filename. Error during string replacement: %s' % e)
+                    entry.fail(f'Could not set filename. Error during string replacement: {e}')
                     return
             # if we still don't have a filename, try making one from title (last resort)
             elif not entry.get('filename'):
@@ -499,7 +500,7 @@ class PluginDownload:
                     logger.info(
                         'File `{}` already exists and is not identical, download failed.', destfile
                     )
-                    entry.fail('File `%s` already exists and is not identical.' % destfile)
+                    entry.fail(f'File `{destfile}` already exists and is not identical.')
                     return
             else:
                 # move temp file

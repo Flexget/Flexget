@@ -88,7 +88,7 @@ class FilterContentFilter:
                 mask = matching_mask(files, config['reject'])
                 if mask:
                     logger.info('Entry {} has banned file {}, rejecting', entry['title'], mask)
-                    entry.reject('has banned file %s' % mask, remember=True)
+                    entry.reject(f'has banned file {mask}', remember=True)
                     return True
             if config.get('require_mainfile') and len(files) > 1:
                 best = None

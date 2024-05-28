@@ -335,11 +335,11 @@ class TestFilterSeries:
         ]
         for d in df:
             entry = task.find_entry(title=d)
-            assert entry, 'Date format did not match %s' % d
-            assert 'series_parser' in entry, 'series_parser missing from %s' % d
-            assert entry['series_parser'].id_type == 'date', (
-                '%s did not return three groups for dates' % d
-            )
+            assert entry, f'Date format did not match {d}'
+            assert 'series_parser' in entry, f'series_parser missing from {d}'
+            assert (
+                entry['series_parser'].id_type == 'date'
+            ), f'{d} did not return three groups for dates'
 
         # parse from filename
         assert task.find_entry(filename='Filename.Series.S01E26.XViD'), 'Filename parsing failed'
@@ -767,7 +767,7 @@ class TestDuplicates:
         # these should be accepted
         accepted = ['Foo.Bar.S02E03.HDTV.XviD-FlexGet', 'Foo.Bar.S02E05.720p.HDTV.XviD-YYY']
         for item in accepted:
-            assert task.find_entry('accepted', title=item), '%s should have been accepted' % item
+            assert task.find_entry('accepted', title=item), f'{item} should have been accepted'
 
         # these should be rejected
         rejected = [
@@ -777,7 +777,7 @@ class TestDuplicates:
             'Foo.Bar.S02E04.HDTV.1080p.XviD-2HD[ASDF]',
         ]
         for item in rejected:
-            assert task.find_entry('rejected', title=item), '%s should have been rejected' % item
+            assert task.find_entry('rejected', title=item), f'{item} should have been rejected'
 
 
 class TestQualities:
@@ -1633,7 +1633,7 @@ class TestIDTypes:
     def test_id_types(self, execute_task):
         task = execute_task('all_types')
         for entry in task.entries:
-            assert entry['series_name'], '%s not parsed by series plugin' % entry['title']
+            assert entry['series_name'], '{} not parsed by series plugin'.format(entry['title'])
             assert entry['series_id_type'] in entry['series_name']
 
 
@@ -1788,8 +1788,8 @@ class TestReruns:
 
     def test_one_accept(self, execute_task):
         task = execute_task('one_accept')
-        assert len(task.mock_output) == 1, 'should have accepted once!: %s' % ', '.join(
-            e['title'] for e in task.mock_output
+        assert len(task.mock_output) == 1, 'should have accepted once!: {}'.format(
+            ', '.join(e['title'] for e in task.mock_output)
         )
 
 

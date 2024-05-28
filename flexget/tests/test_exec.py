@@ -46,24 +46,24 @@ class TestExec:
         task = execute_task('replace_from_entry')
         assert len(task.accepted) == 2, "not all entries were accepted"
         for entry in task.accepted:
-            assert tmpdir.join(entry['title']).exists(), (
-                "exec.py did not create a file for %s" % entry['title']
-            )
+            assert tmpdir.join(
+                entry['title']
+            ).exists(), "exec.py did not create a file for {}".format(entry['title'])
 
     def test_adv_format(self, execute_task, tmpdir):
         task = execute_task('test_adv_format')
         for entry in task.accepted:
             with tmpdir.join(entry['title']).open('r') as infile:
                 line = infile.readline().rstrip('\n')
-                assert line == '/path/with spaces', '%s != /path/with spaces' % line
+                assert line == '/path/with spaces', f'{line} != /path/with spaces'
                 line = infile.readline().rstrip('\n')
-                assert line == '/the/final destinaton/', '%s != /the/final destinaton/' % line
+                assert line == '/the/final destinaton/', f'{line} != /the/final destinaton/'
                 line = infile.readline().rstrip('\n')
-                assert line == 'a with\'quote', '%s != a with\'quote' % line
+                assert line == 'a with\'quote', f'{line} != a with\'quote'
                 line = infile.readline().rstrip('\n')
-                assert line == '/a hybrid/path/with spaces', (
-                    '%s != /a hybrid/path/with spaces' % line
-                )
+                assert (
+                    line == '/a hybrid/path/with spaces'
+                ), f'{line} != /a hybrid/path/with spaces'
 
     # TODO: This doesn't work on linux.
     @pytest.mark.skip(reason='This doesn\'t work on linux')
@@ -72,10 +72,8 @@ class TestExec:
         for entry in task.accepted:
             with open(os.path.join(self.__tmp__, entry['title'])) as infile:
                 line = infile.readline().rstrip('\n')
-                assert line == 'single \' double\"', '%s != single \' double\"' % line
+                assert line == 'single \' double"', f'{line} != single \' double"'
                 line = infile.readline().rstrip('\n')
-                assert line == '/start/single \' double\"', (
-                    '%s != /start/single \' double\"' % line
-                )
+                assert line == '/start/single \' double"', f'{line} != /start/single \' double"'
                 line = infile.readline().rstrip('\n')
                 assert line == '% a $a! ` *', '%s != % a $a! ` *' % line

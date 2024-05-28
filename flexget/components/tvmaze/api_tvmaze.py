@@ -462,7 +462,7 @@ class APITVMaze:
             if series:  # If force_cache is True, return series even if it expired
                 logger.debug('forcing cache for series {}', series.name)
                 return series
-            raise LookupError('Series %s not found from cache' % lookup_params)
+            raise LookupError(f'Series {lookup_params} not found from cache')
         if series and not series.expired:
             logger.debug('returning series {} from cache', series.name)
             return series

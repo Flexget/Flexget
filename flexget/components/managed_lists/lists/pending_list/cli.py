@@ -15,8 +15,8 @@ from . import db
 def attribute_type(attribute):
     if attribute.count('=') != 1:
         raise ArgumentTypeError(
-            'Received attribute in wrong format: %s, '
-            'should be in keyword format like `imdb_id=tt1234567`' % attribute
+            f'Received attribute in wrong format: {attribute}, '
+            'should be in keyword format like `imdb_id=tt1234567`'
         )
     name, value = attribute.split('=', 2)
     return {name: value}

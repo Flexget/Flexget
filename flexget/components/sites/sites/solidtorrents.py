@@ -72,10 +72,10 @@ class UrlRewriteSolidTorrents:
             escaped_url_scheme = re.escape(parsed_url.scheme)
             escaped_url_netloc = re.escape(parsed_url.netloc)
             self.url_match = re.compile(
-                fr'^{escaped_url_scheme}://{escaped_url_netloc}/view/[^/]+/([a-zA-Z0-9]{24})$'
+                rf'^{escaped_url_scheme}://{escaped_url_netloc}/view/[^/]+/([a-zA-Z0-9]{24})$'
             )
             self.url_search = re.compile(
-                fr'^{escaped_url_scheme}://{escaped_url_netloc}/search\?q=.*$'
+                rf'^{escaped_url_scheme}://{escaped_url_netloc}/search\?q=.*$'
             )
 
     # urlrewriter API
@@ -105,7 +105,7 @@ class UrlRewriteSolidTorrents:
             json_result = task.requests.get(url).json()
             # if json_result['error'] == '404':
             if 'result' not in json_result:
-                raise UrlRewritingError("Torrent with ID %s does not exist." % torrent_id)
+                raise UrlRewritingError(f"Torrent with ID {torrent_id} does not exist.")
             entry['url'] = json_result['result']['rating']['magnet']
 
     @plugin.internet(logger)

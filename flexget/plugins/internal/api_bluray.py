@@ -128,7 +128,7 @@ class BlurayMovie(Base):
             try:
                 movie_info_response = requests.get(self.url).content
             except (requests.RequestException, ConnectionError):
-                raise LookupError("Couldn't connect to blu-ray.com. %s" % self.url)
+                raise LookupError(f"Couldn't connect to blu-ray.com. {self.url}")
 
             movie_info = get_soup(movie_info_response)
 
@@ -257,7 +257,7 @@ class ApiBluray:
                 logger.debug('Movie {} information restored from cache.', movie.name)
         else:
             if only_cached:
-                raise LookupError('Movie %s not found from cache' % title_year)
+                raise LookupError(f'Movie {title_year} not found from cache')
             # There was no movie found in the cache, do a lookup from blu-ray.com
             logger.verbose('Searching from blu-ray.com `{}`', title)
 

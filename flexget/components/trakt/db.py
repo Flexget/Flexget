@@ -107,7 +107,7 @@ def delete_account(account):
     with Session() as session:
         acc = session.query(TraktUserAuth).filter(TraktUserAuth.account == account).first()
         if not acc:
-            raise plugin.PluginError('Account %s not found.' % account)
+            raise plugin.PluginError(f'Account {account} not found.')
         session.delete(acc)
 
 
@@ -155,8 +155,7 @@ def get_access_token(account, token=None, refresh=False, re_auth=False, called_f
                 token_dict = device_auth()
             else:
                 raise plugin.PluginError(
-                    'Account %s has not been authorized. See `flexget trakt auth -h` on how to.'
-                    % account
+                    f'Account {account} has not been authorized. See `flexget trakt auth -h` on how to.'
                 )
             try:
                 new_acc = TraktUserAuth(
@@ -201,7 +200,7 @@ def get_session(account=None, token=None):
     if account:
         access_token = get_access_token(account, token) if account else None
         if access_token:
-            session.headers.update({'Authorization': 'Bearer %s' % access_token})
+            session.headers.update({'Authorization': f'Bearer {access_token}'})
     return session
 
 
@@ -690,9 +689,9 @@ class TraktShow(Base):
             try:
                 data = get_session().get(url).json()
             except requests.RequestException:
-                raise LookupError('Error Retrieving Trakt url: %s' % url)
+                raise LookupError(f'Error Retrieving Trakt url: {url}')
             if not data:
-                raise LookupError('No data in response from trakt %s' % url)
+                raise LookupError(f'No data in response from trakt {url}')
             episode = self.episodes.filter(TraktEpisode.id == data['ids']['trakt']).first()
             if episode:
                 episode.update(data, session)
@@ -708,15 +707,15 @@ class TraktShow(Base):
         if not season or self.expired:
             url = get_api_url('shows', self.id, 'seasons', '?extended=full')
             if only_cached:
-                raise LookupError('Season %s not found in cache' % number)
+                raise LookupError(f'Season {number} not found in cache')
             logger.debug('Season {} not found in cache, looking up from trakt.', number)
             try:
                 ses = get_session()
                 data = ses.get(url).json()
             except requests.RequestException:
-                raise LookupError('Error Retrieving Trakt url: %s' % url)
+                raise LookupError(f'Error Retrieving Trakt url: {url}')
             if not data:
-                raise LookupError('No data in response from trakt %s' % url)
+                raise LookupError(f'No data in response from trakt {url}')
             # We fetch all seasons for the given show because we barely get any data otherwise
             for season_result in data:
                 db_season = self.seasons.filter(

@@ -87,7 +87,7 @@ class OutputFtp:
             try:
                 ftp = self.ftp_connect(config, ftp_url, current_path)
             except ftplib.all_errors as e:
-                entry.fail("Unable to connect to server : %s" % e)
+                entry.fail(f"Unable to connect to server : {e}")
                 break
 
             to_path = config['ftp_tmp_path']
@@ -106,7 +106,7 @@ class OutputFtp:
                 logger.debug('Creating base path: {}', to_path)
                 os.makedirs(to_path)
             if not os.path.isdir(to_path):
-                raise plugin.PluginWarning("Destination `%s` is not a directory." % to_path)
+                raise plugin.PluginWarning(f"Destination `{to_path}` is not a directory.")
 
             file_name = os.path.basename(ftp_url.path)
 
@@ -192,10 +192,10 @@ class OutputFtp:
             try:
                 if local_file.tell() != 0:
                     ftp = self.check_connection(ftp, config, ftp_url, current_path)
-                    ftp.retrbinary('RETR %s' % file_name, local_file.write, local_file.tell())
+                    ftp.retrbinary(f'RETR {file_name}', local_file.write, local_file.tell())
                 else:
                     ftp = self.check_connection(ftp, config, ftp_url, current_path)
-                    ftp.retrbinary('RETR %s' % file_name, local_file.write)
+                    ftp.retrbinary(f'RETR {file_name}', local_file.write)
             except Exception as error:
                 if max_attempts != 0:
                     if size_at_last_err == local_file.tell():

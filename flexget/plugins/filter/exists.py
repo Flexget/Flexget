@@ -38,7 +38,7 @@ class FilterExists:
         for folder in config:
             folder = Path(folder).expanduser()
             if not folder.exists():
-                raise plugin.PluginWarning('Path %s does not exist' % folder, logger)
+                raise plugin.PluginWarning(f'Path {folder} does not exist', logger)
             for p in folder.rglob('*'):
                 if p.is_file():
                     key = p.name
@@ -53,7 +53,7 @@ class FilterExists:
                 name = name.lower()
             if name in filenames:
                 logger.debug('Found {} in {}', name, filenames[name])
-                entry.reject('exists in %s' % filenames[name])
+                entry.reject(f'exists in {filenames[name]}')
 
 
 @event('plugin.register')

@@ -46,7 +46,7 @@ class FailedEntry(Base):
         self.tof = datetime.now()
 
     def __str__(self):
-        return '<Failed(title=%s)>' % self.title
+        return f'<Failed(title={self.title})>'
 
     def to_dict(self):
         return {

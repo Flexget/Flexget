@@ -133,8 +133,7 @@ class PluginFailed:
                     )
                 elif item.retry_time and item.retry_time > datetime.now():
                     entry.reject(
-                        'Waiting before retrying entry which has failed in the past. (failure reason: %s)'
-                        % item.reason
+                        f'Waiting before retrying entry which has failed in the past. (failure reason: {item.reason})'
                     )
 
 

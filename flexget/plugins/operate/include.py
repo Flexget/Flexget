@@ -46,7 +46,7 @@ class PluginInclude:
                 logger.error('Included file {} has invalid config:', file)
                 for error in errors:
                     logger.error('[{}] {}', error.json_pointer, error.message)
-                task.abort('Invalid config in included file %s' % file)
+                task.abort(f'Invalid config in included file {file}')
 
             logger.debug('Merging {} into task {}', file, task.name)
             # merge
@@ -54,7 +54,7 @@ class PluginInclude:
                 task.merge_config(include)
             except MergeException:
                 raise plugin.PluginError(
-                    'Failed to merge include file to task %s, incompatible datatypes' % task.name
+                    f'Failed to merge include file to task {task.name}, incompatible datatypes'
                 )
 
 

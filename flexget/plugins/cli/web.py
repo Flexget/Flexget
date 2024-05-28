@@ -17,11 +17,11 @@ def do_cli(manager, options, session=None):
 
     if options.action == 'gentoken':
         token = generate_token(session=session)
-        console('Generated new token %s' % token)
+        console(f'Generated new token {token}')
 
     if options.action == 'showtoken':
         user = get_user()
-        console('Token: %s' % user.token)
+        console(f'Token: {user.token}')
 
 
 @event('options.register')

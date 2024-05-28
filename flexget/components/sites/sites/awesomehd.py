@@ -52,7 +52,7 @@ class SearchAwesomeHD:
         except ImportError as e:
             logger.debug('Error importing lxml: {}', e)
             raise plugin.DependencyError(
-                'awesomehd', 'lxml', 'lxml module required. ImportError: %s' % e
+                'awesomehd', 'lxml', f'lxml module required. ImportError: {e}'
             )
 
         config = self.prepare_config(config)

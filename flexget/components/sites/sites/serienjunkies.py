@@ -133,8 +133,8 @@ class UrlRewriteSerienjunkies:
                     continue
 
                 url = link['href']
-                pattern = (
-                    r'http:\/\/download\.serienjunkies\.org.*%s_.*\.html' % self.config['hoster']
+                pattern = r'http:\/\/download\.serienjunkies\.org.*{}_.*\.html'.format(
+                    self.config['hoster']
                 )
 
                 if re.match(pattern, url) or self.config['hoster'] == 'all':

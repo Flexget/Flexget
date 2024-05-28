@@ -148,7 +148,7 @@ class PendingListListsAPI(APIResource):
         except NoResultFound:
             pass
         else:
-            raise Conflict('list with name \'%s\' already exists' % name)
+            raise Conflict(f'list with name \'{name}\' already exists')
 
         pending_list = db.PendingListList()
         pending_list.name = name
@@ -250,7 +250,7 @@ class PendingListEntriesAPI(APIResource):
         total_pages = int(ceil(total_items / float(per_page)))
 
         if page > total_pages:
-            raise NotFoundError('page %s does not exist' % page)
+            raise NotFoundError(f'page {page} does not exist')
 
         # Actual results in page
         actual_size = min(len(entries), per_page)
@@ -280,7 +280,7 @@ class PendingListEntriesAPI(APIResource):
         title = data.get('title')
         entry_object = db.get_entry_by_title(list_id=list_id, title=title, session=session)
         if entry_object:
-            raise Conflict('entry with title \'%s\' already exists' % title)
+            raise Conflict(f'entry with title \'{title}\' already exists')
         entry_object = db.PendingListEntry(entry=data, pending_list_id=list_id)
         if data.get('approved'):
             entry_object.approved = data['approved']

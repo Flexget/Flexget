@@ -12,7 +12,7 @@ from loguru import logger
 logger = logger.bind(name='torrent')
 
 # Magic indicator used to quickly recognize torrent files
-TORRENT_RE = re.compile(br'^d\d{1,3}:')
+TORRENT_RE = re.compile(rb'^d\d{1,3}:')
 
 # List of all standard keys in a metafile
 # See http://packages.python.org/pyrocore/apidocs/pyrocore.util.metafile-module.html#METAFILE_STD_KEYS
@@ -101,9 +101,7 @@ def is_torrent_file(metafilepath: str) -> bool:
 
 def tokenize(
     text: bytes,
-    match=re.compile(
-        br'([idel])|(\d+):|(-?\d+)'
-    ).match,  # type: Callable[[bytes, int], Match[bytes]]
+    match=re.compile(rb'([idel])|(\d+):|(-?\d+)').match,  # type: Callable[[bytes, int], Match[bytes]]
 ) -> Generator[bytes, None, None]:
     i = 0
     while i < len(text):

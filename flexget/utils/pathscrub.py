@@ -55,6 +55,6 @@ def pathscrub(dirty_path: str, os: Optional[str] = None, filename: bool = False)
     # If we stripped everything from a filename, complain
     if filename and dirty_path and not path:
         raise ValueError(
-            'Nothing was left after stripping invalid characters from path `%s`!' % dirty_path
+            f'Nothing was left after stripping invalid characters from path `{dirty_path}`!'
         )
     return drive + path

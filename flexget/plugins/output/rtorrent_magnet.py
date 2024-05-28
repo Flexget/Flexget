@@ -33,7 +33,7 @@ class PluginRtorrentMagnet:
     schema = {'type': 'string', 'format': 'path'}
 
     def write_torrent_file(self, task, entry, path):
-        path = os.path.join(path, 'meta-%s.torrent' % entry['title'])
+        path = os.path.join(path, 'meta-{}.torrent'.format(entry['title']))
         path = os.path.expanduser(path)
 
         if task.options.test:

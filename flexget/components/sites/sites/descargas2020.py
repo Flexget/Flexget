@@ -84,7 +84,7 @@ class UrlRewriteDescargas2020:
                 torrent_id = match.group(2).rstrip('/')
 
         if not torrent_id:
-            raise UrlRewritingError('Unable to locate torrent ID from url %s' % url)
+            raise UrlRewritingError(f'Unable to locate torrent ID from url {url}')
 
         return url_format.format(torrent_id)
 

@@ -22,7 +22,7 @@ class UrlRewriteAnimeIndex:
 
     def url_rewrite(self, task, entry):
         entry['url'] = entry['url'].replace('index.php?page=torrent-details&', 'download.php?')
-        entry['url'] += '&f=%s.torrent' % (quote(entry['title'], safe=''))
+        entry['url'] += '&f={}.torrent'.format(quote(entry['title'], safe=''))
 
 
 @event('plugin.register')

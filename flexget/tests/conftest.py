@@ -434,41 +434,41 @@ class APIClient:
     def json_post(self, *args, **kwargs) -> flask.Response:
         self._append_header('Content-Type', 'application/json', kwargs)
         if kwargs.get('auth', True):
-            self._append_header('Authorization', 'Token %s' % self.api_key, kwargs)
+            self._append_header('Authorization', f'Token {self.api_key}', kwargs)
         return self.client.post(*args, **kwargs)
 
     def json_put(self, *args, **kwargs) -> flask.Response:
         self._append_header('Content-Type', 'application/json', kwargs)
         if kwargs.get('auth', True):
-            self._append_header('Authorization', 'Token %s' % self.api_key, kwargs)
+            self._append_header('Authorization', f'Token {self.api_key}', kwargs)
         return self.client.put(*args, **kwargs)
 
     def json_patch(self, *args, **kwargs) -> flask.Response:
         self._append_header('Content-Type', 'application/json', kwargs)
         if kwargs.get('auth', True):
-            self._append_header('Authorization', 'Token %s' % self.api_key, kwargs)
+            self._append_header('Authorization', f'Token {self.api_key}', kwargs)
         return self.client.patch(*args, **kwargs)
 
     def get(self, *args, **kwargs) -> flask.Response:
         if kwargs.get('auth', True):
-            self._append_header('Authorization', 'Token %s' % self.api_key, kwargs)
+            self._append_header('Authorization', f'Token {self.api_key}', kwargs)
 
         return self.client.get(*args, **kwargs)
 
     def delete(self, *args, **kwargs) -> flask.Response:
         if kwargs.get('auth', True):
-            self._append_header('Authorization', 'Token %s' % self.api_key, kwargs)
+            self._append_header('Authorization', f'Token {self.api_key}', kwargs)
 
         return self.client.delete(*args, **kwargs)
 
     def json_delete(self, *args, **kwargs) -> flask.Response:
         self._append_header('Content-Type', 'application/json', kwargs)
         if kwargs.get('auth', True):
-            self._append_header('Authorization', 'Token %s' % self.api_key, kwargs)
+            self._append_header('Authorization', f'Token {self.api_key}', kwargs)
         return self.client.delete(*args, **kwargs)
 
     def head(self, *args, **kwargs) -> flask.Response:
         if kwargs.get('auth', True):
-            self._append_header('Authorization', 'Token %s' % self.api_key, kwargs)
+            self._append_header('Authorization', f'Token {self.api_key}', kwargs)
 
         return self.client.head(*args, **kwargs)

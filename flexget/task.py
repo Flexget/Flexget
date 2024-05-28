@@ -394,7 +394,7 @@ class Task:
         :raises ValueError: *phase* could not be found.
         """
         if phase not in task_phases:
-            raise ValueError('%s is not a valid phase' % phase)
+            raise ValueError(f'{phase} is not a valid phase')
         if phase not in self.disabled_phases:
             logger.debug('Disabling {} phase', phase)
             self.disabled_phases.append(phase)
@@ -467,7 +467,7 @@ class Task:
         :param string phase: Name of the phase
         """
         if phase not in phase_methods:
-            raise Exception('%s is not a valid task phase' % phase)
+            raise Exception(f'{phase} is not a valid task phase')
         # warn if no inputs, filters or outputs in the task
         if phase in ['input', 'filter', 'output']:
             if not self.manager.unit_test:
@@ -765,8 +765,7 @@ class Task:
         """
         if not isinstance(template, (str, FlexGetTemplate)):
             raise ValueError(
-                'Trying to render non string template or unrecognized template format, got %s'
-                % repr(template)
+                f'Trying to render non string template or unrecognized template format, got {template!r}'
             )
         logger.trace('rendering: {}', template)
         return render_from_task(template, self)

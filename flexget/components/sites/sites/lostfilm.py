@@ -616,7 +616,7 @@ class LostFilm:
                         raise PluginError(f'Cannot read series "alternate_name" for "{s_name:s}"')
             else:
                 raise PluginError(
-                    'Series configuration list item has unsupported type: %s' % type(s_item)
+                    f'Series configuration list item has unsupported type: {type(s_item)}'
                 )
 
 

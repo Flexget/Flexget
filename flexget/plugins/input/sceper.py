@@ -34,7 +34,7 @@ class InputSceper:
         try:
             page = task.requests.get(url).content
         except RequestException as e:
-            raise plugin.PluginError('Error getting input page: %s' % e)
+            raise plugin.PluginError(f'Error getting input page: {e}')
         soup = get_soup(page)
 
         releases = []
@@ -84,8 +84,9 @@ class InputSceper:
                 from flexget.utils.log import log_once
 
                 log_once(
-                    '%s skipped due to missing or unsupported (unresolvable) download link'
-                    % (release['title']),
+                    '{} skipped due to missing or unsupported (unresolvable) download link'.format(
+                        release['title']
+                    ),
                     logger,
                 )
             else:

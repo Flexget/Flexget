@@ -688,7 +688,7 @@ class EmbyApiList(EmbyApiBase, MutableSet):
 
         self._list = self.get_api_list(**kwargs)
         if not self._list:
-            raise PluginError('List \'%s\' does not exist' % self.name)
+            raise PluginError(f'List \'{self.name}\' does not exist')
 
         self._items = self._list.get_items()
 
@@ -2689,7 +2689,7 @@ class EmbyApi(EmbyApiBase):
 
         list_object = EmbyApiList.get_api_list(**kwargs)
         if not list_object:
-            raise PluginError('List \'%s\' does not exist' % mlist)
+            raise PluginError(f'List \'{mlist}\' does not exist')
 
         mlist = list_object.get_items()
 
@@ -2788,10 +2788,10 @@ class EmbyApi(EmbyApiBase):
                 logger.error('Autentication Error: {}', str(e))
                 return False
             else:
-                raise PluginError('Could not connect to Emby Server: %s' % str(e)) from e
+                raise PluginError(f'Could not connect to Emby Server: {e!s}') from e
 
         except RequestException as e:
-            raise PluginError('Could not connect to Emby Server: %s' % str(e)) from e
+            raise PluginError(f'Could not connect to Emby Server: {e!s}') from e
 
         if response.status_code == 200 or response.status_code == 204:
             try:

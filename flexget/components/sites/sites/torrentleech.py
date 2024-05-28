@@ -109,7 +109,7 @@ class UrlRewriteTorrentleech:
                 allow_redirects=True,
             )
         except RequestException as e:
-            raise PluginError('Could not connect to torrentleech: %s' % str(e))
+            raise PluginError(f'Could not connect to torrentleech: {e!s}')
 
         if login.url.endswith('/user/account/login/'):
             raise PluginError('Could not login to torrentleech, faulty credentials?')

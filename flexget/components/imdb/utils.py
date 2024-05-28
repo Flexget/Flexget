@@ -69,7 +69,7 @@ def extract_id(url):
 
 def make_url(imdb_id):
     """Return IMDb URL of the given ID"""
-    return 'https://www.imdb.com/title/%s/' % imdb_id
+    return f'https://www.imdb.com/title/{imdb_id}/'
 
 
 class ImdbSearch:

@@ -17,7 +17,7 @@ def action_auth(options):
         console('Successfully authorized Flexget app on Trakt.tv. Enjoy!')
         return
     except plugin.PluginError as e:
-        console('Authorization failed: %s' % e)
+        console(f'Authorization failed: {e}')
 
 
 def action_list(options):
@@ -47,7 +47,7 @@ def action_list(options):
             .first()
         )
         if acc:
-            console('Authorization expires on %s' % acc.expires)
+            console(f'Authorization expires on {acc.expires}')
         else:
             console('Flexget has not been authorized to access your account.')
 
@@ -61,7 +61,7 @@ def action_refresh(options):
         console('Successfully refreshed your access token.')
         return
     except plugin.PluginError as e:
-        console('Authorization failed: %s' % e)
+        console(f'Authorization failed: {e}')
 
 
 def action_delete(options):
@@ -73,7 +73,7 @@ def action_delete(options):
         console('Successfully deleted your access token.')
         return
     except plugin.PluginError as e:
-        console('Deletion failed: %s' % e)
+        console(f'Deletion failed: {e}')
 
 
 def do_cli(manager, options):
@@ -105,7 +105,7 @@ def register_parser_arguments():
         'pin',
         metavar='<pin>',
         help='Get this by authorizing FlexGet to use your trakt account '
-        'at %s. WARNING: DEPRECATED.' % db.PIN_URL,
+        f'at {db.PIN_URL}. WARNING: DEPRECATED.',
         nargs='?',
     )
 

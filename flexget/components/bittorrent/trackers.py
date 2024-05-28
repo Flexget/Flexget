@@ -64,7 +64,7 @@ class RemoveTrackers:
             if entry['url'].startswith('magnet:'):
                 for regexp in config:
                     # Replace any tracker strings that match the regexp with nothing
-                    tr_search = r'&tr=([^&]*%s[^&]*)' % regexp
+                    tr_search = rf'&tr=([^&]*{regexp}[^&]*)'
                     entry['url'] = re.sub(tr_search, '', entry['url'], re.IGNORECASE | re.UNICODE)
 
 

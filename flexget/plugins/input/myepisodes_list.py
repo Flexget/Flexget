@@ -61,7 +61,7 @@ class MyEpisodesList:
                         logger,
                     )
             except RequestException as e:
-                raise plugin.PluginError("Error logging in to myepisodes: %s" % e)
+                raise plugin.PluginError(f"Error logging in to myepisodes: {e}")
 
         page = task.requests.get(URL + "myshows/manage/").content
         try:

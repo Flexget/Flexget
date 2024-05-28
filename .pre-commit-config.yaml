@@ -2,16 +2,13 @@ default_language_version:
   python: python3
 repos:
 - repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: 'v0.4.1'
+  rev: 'v0.4.2'
   hooks:
     - id: ruff
       args: [ --fix, --exit-non-zero-on-fix ]
-- repo: https://github.com/psf/black
-  rev: 24.4.0
-  hooks:
-  - id: black
+    - id: ruff-format
 - repo: https://github.com/python-poetry/poetry
-  rev: '1.8.0'
+  rev: '1.8.2'
   hooks:
     - id: poetry-check
     - id: poetry-check

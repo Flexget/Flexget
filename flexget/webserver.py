@@ -86,7 +86,7 @@ class User(Base, UserMixin):
     password = Column(Unicode)
 
     def __repr__(self):
-        return '<User %r>' % self.name
+        return f'<User {self.name!r}>'
 
     def get_id(self):
         return self.name
@@ -103,7 +103,7 @@ class WebSecret(Base):
 
 def register_app(path, application, name):
     if path in _app_register:
-        raise ValueError('path %s already registered' % path)
+        raise ValueError(f'path {path} already registered')
     _app_register[path] = (application, name)
 
 
