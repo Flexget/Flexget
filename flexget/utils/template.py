@@ -74,6 +74,8 @@ class CoercingDateTime(DateTime):
 
     @staticmethod
     def _same_tz(first, second):
+        if not first or not second:
+            return first, second
         if isinstance(second, date) and not isinstance(second, datetime):
             second = CoercingDateTime.create(
                 second.year, second.month, second.day, tz=first.tzinfo
