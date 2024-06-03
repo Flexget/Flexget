@@ -99,7 +99,7 @@ class TransmissionBase:
         except TransmissionTimeoutError:
             raise plugin.PluginError("Cannot connect to transmission: Connection timed out.")
         except TransmissionConnectError as e:
-            raise plugin.PluginError(f"Error connecting to transmission: {e.args[0].reason}")
+            raise plugin.PluginError(f"Error connecting to transmission: {e.message}")
         except TransmissionError:
             raise plugin.PluginError("Error connecting to transmission")
         return cli
@@ -276,8 +276,6 @@ class PluginTransmissionInput(TransmissionBase):
             # Built in done_date doesn't work when user adds an already completed file to transmission
             if torrent.progress == 100:
                 date_done = torrent.done_date or torrent.added_date
-                if date_done:
-                    date_done = date_done.replace(tzinfo=None)
                 entry['transmission_date_done'] = date_done
 
             entries.append(entry)
