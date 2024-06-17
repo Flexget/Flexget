@@ -119,7 +119,7 @@ transmission-rpc = "^4.1.4 || ^7.0.0"
 qbittorrent-api = "^2023.3.44 || ^2024.0.0"
 deluge-client = "^1.9.0"
 cloudscraper = "^1.2.69"
-python-telegram-bot = "^12.8 || ^21.0.0"
+python-telegram-bot = "^12.8"
 
 [tool.poetry.scripts]
 flexget = 'flexget:main'
