@@ -1,13 +1,18 @@
-import telegram
 from loguru import logger
 from packaging import version
 from sqlalchemy import Column, Integer, String
-from telegram.error import ChatMigrated, NetworkError, TelegramError
 
 from flexget import db_schema, plugin
 from flexget.event import event
 from flexget.manager import Session
 from flexget.plugin import PluginError, PluginWarning
+
+try:
+    import telegram
+    from telegram.error import ChatMigrated, NetworkError, TelegramError
+except ImportError:
+    telegram = None
+
 
 _MIN_TELEGRAM_VER = '3.4'
 
