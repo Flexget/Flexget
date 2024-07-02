@@ -164,7 +164,7 @@ class TestEntryCoercion:
     def test_string_coercion(self):
         e = Entry('title', 'url')
         e['test'] = self.MyStr('test')
-        assert type(e['test']) is str  # noqa: E721
+        assert type(e['test']) is str
         assert e['test'] == 'test'
 
     def test_datetime_coercion(self):
