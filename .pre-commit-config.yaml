@@ -8,7 +8,7 @@ repos:
       args: [ --fix, --exit-non-zero-on-fix ]
     - id: ruff-format
 - repo: https://github.com/python-poetry/poetry
-  rev: '1.8.2'
+  rev: '1.8.3'
   hooks:
     - id: poetry-check
     - id: poetry-check
