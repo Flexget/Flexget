@@ -17,10 +17,10 @@ from .parser_common import MovieParseResult, SeriesParseResult
 # rebulk (that underlies guessit) will use the 'regex' module rather than 're' if installed.
 # For consistency, prevent that unless env variable is explicitly already enabling it.
 os.environ.setdefault('REGEX_DISABLED', 'true')  # isort:skip
-from guessit.api import GuessItApi, GuessitException  # isort:skip # noqa: E402
-from guessit.rules import rebulk_builder  # isort:skip # noqa: E402
-from rebulk import Rebulk  # isort:skip # noqa: E402
-from rebulk.pattern import RePattern  # isort:skip # noqa: E402
+from guessit.api import GuessItApi, GuessitException  # isort:skip
+from guessit.rules import rebulk_builder  # isort:skip
+from rebulk import Rebulk  # isort:skip
+from rebulk.pattern import RePattern  # isort:skip
 
 
 logger = logger.bind(name='parser_guessit')
