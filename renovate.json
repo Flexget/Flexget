@@ -17,5 +17,8 @@
   "gitIgnoredAuthors": ["66853113+pre-commit-ci[bot]@users.noreply.github.com"],
   "vulnerabilityAlerts": {
     "enabledManagers": ["dockerfile", "poetry", "github-actions"]
+  },
+  "pre-commit": {
+    "enabled": true
   }
 }

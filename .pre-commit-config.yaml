@@ -28,4 +28,4 @@ repos:
 ci:
   autofix_prs: true
   autoupdate_branch: develop
-  autoupdate_schedule: weekly
+  autoupdate_schedule: quarterly
