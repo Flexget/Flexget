@@ -102,16 +102,57 @@ class AniList:
         req_variables = {'user': config['username']}
         req_chunk = 1
         req_fields = (
-            'id, status, title{ romaji, english }, synonyms, siteUrl, idMal, format, episodes, '
-            'trailer{ site, id }, coverImage{ large }, bannerImage, genres, tags{ name }, '
-            'externalLinks{ site, url }, startDate{ year, month, day }, endDate{ year, month, day}'
+            'id',
+            'idMal',
+            'title{ romaji, english, native }',
+            'type',
+            'format',
+            'status',
+            'description',
+            'startDate{ year, month, day }',
+            'endDate{ year, month, day}',
+            'season',
+            'seasonYear',
+            'seasonInt',
+            'episodes',
+            'duration',
+            'countryOfOrigin',
+            'source',
+            'hashtag',
+            'trailer{ site, id, thumbnail }',
+            'updatedAt',
+            'coverImage{ extraLarge }',
+            'bannerImage',
+            'genres',
+            'synonyms',
+            'averageScore',
+            'meanScore',
+            'popularity',
+            'trending',
+            'favourites',
+            'tags{ name }',
+            # 'relations',
+            # 'characters',
+            # 'staff',
+            'studios{ nodes{ name }}',
+            'isAdult',
+            'nextAiringEpisode{ airingAt, episode }',
+            'airingSchedule{ nodes{ airingAt, episode }}',
+            # 'trends',
+            'externalLinks{ site, url }',
+            'streamingEpisodes{ title, url, site }',
+            'rankings{ context }',
+            # 'recommendations',
+            'stats{ scoreDistribution{ score, amount }, statusDistribution{ status, amount }}',
+            'siteUrl',
+            'modNotes',
         )
         while req_chunk:
             req_query = (
                 f'query ($user: String){{ collection: MediaListCollection(userName: $user, '
                 f'type: ANIME, perChunk: 500, chunk: {req_chunk}, status_in: '
                 f'[{", ".join([s.upper() for s in selected_list_status])}]) {{ hasNextChunk, '
-                f'statuses: lists{{ status, name, list: entries{{ anime: media{{ {req_fields}'
+                f'statuses: lists{{ status, name, list: entries{{ anime: media{{ {", ".join(req_fields)}'
                 f' }}}}}}}}}}'
             )
 
@@ -154,7 +195,7 @@ class AniList:
                         ids = {}
                         try:
                             ids = task.requests.post(
-                                'https://relations.yuna.moe/api/ids',
+                                'https://relations.yuna.moe/api/v2/ids',
                                 json={'anilist': anime.get('id')},
                             ).json()
                             logger.debug(f'Additional IDs: {ids}')
@@ -168,6 +209,8 @@ class AniList:
                         entry['al_id'] = anime.get('id', ids.get('anilist'))
                         entry['anidb_id'] = ids.get('anidb')
                         entry['kitsu_id'] = ids.get('kitsu')
+                        entry['tvdb_id'] = ids.get('thetvdb')
+                        entry['tmdb_id'] = ids.get('themoviedb')
                         entry['mal_id'] = anime.get('idMal', ids.get('myanimelist'))
                         entry['al_banner'] = anime.get('bannerImage')
                         entry['al_cover'] = anime.get('coverImage', {}).get('large')
@@ -213,6 +256,8 @@ class AniList:
                             and anime.get('trailer').get('site') in TRAILER_SOURCE
                             else None
                         )
+                        entry['al_season'] = f"{anime.get('seasonYear')} {anime.get('season')}"
+                        entry['anilist'] = anime
                         entry['alternate_name'] = anime.get('synonyms', [])
                         eng_title = anime.get('title', {}).get('english')
                         if (
@@ -221,9 +266,9 @@ class AniList:
                             and eng_title not in entry['alternate_name']
                         ):
                             entry['alternate_name'].insert(0, eng_title)
-                        entry['series_name'] = entry['al_title'].get('romaji') or entry[
-                            'al_title'
-                        ].get('english')
+                        entry['series_name'] = (
+                            entry['al_title'].get('romaji') or entry['al_title'].get('english')
+                        ).strip()
                         entry['title'] = entry['series_name']
                         entry['url'] = anime.get('siteUrl')
                         if entry.isvalid():
