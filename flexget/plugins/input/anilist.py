@@ -1,3 +1,5 @@
+import time
+
 import pendulum
 from loguru import logger
 
@@ -6,7 +8,7 @@ from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.cached_input import cached
-from flexget.utils.requests import RequestException
+from flexget.utils.requests import RequestException, TokenBucketLimiter
 
 logger = logger.bind(name='anilist')
 
@@ -72,6 +74,7 @@ class AniList:
 
     @cached('anilist', persist='2 hours')
     def on_task_input(self, task, config):
+        task.requests.add_domain_limiter(TokenBucketLimiter('anilist.co', 90, '1 minute'))
         if isinstance(config, str):
             config = {'username': config}
         selected_list_status = config.get('status', ['current', 'planning'])
@@ -120,6 +123,11 @@ class AniList:
                 list_response = list_response.json()['data']
             except RequestException as e:
                 logger.error(f'Error reading list: {e}')
+                if hasattr(e.response, 'headers') and e.response.headers.get('Retry-After'):
+                    wait = e.response.headers.get('Retry-After')
+                    logger.warning(f'Rate-limited. Waiting {wait} seconds before retrying')
+                    time.sleep(float(wait))
+                    continue
                 break
             except ValueError as e:
                 logger.error(f'Invalid JSON response: {e}')
