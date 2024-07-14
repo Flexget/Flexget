@@ -168,7 +168,7 @@ class DiscordNotifier:
         }
 
         if config.get('silent'):
-            web_hook['flags'] = 4096 # Suppress notification bitfield
+            web_hook['flags'] = 4096  # Suppress notification bitfield
 
         # Send the request and handle the rate-limit response.
         for i in range(3):
