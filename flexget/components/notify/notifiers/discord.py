@@ -26,6 +26,7 @@ class DiscordNotifier:
           via:
             - discord:
                 web_hook_url: <string>
+                [silent: <boolean>] (suppress notification)
                 [username: <string>] (override the default username of the webhook)
                 [avatar_url: <string>] (override the default avatar of the webhook)
                 [embeds: <arrays>[<object>]] (override embeds)
@@ -37,6 +38,7 @@ class DiscordNotifier:
             'web_hook_url': {'type': 'string', 'format': 'uri'},
             'username': {'type': 'string', 'default': 'Flexget'},
             'avatar_url': {'type': 'string', 'format': 'uri'},
+            'silent': {'type': 'boolean', 'default': False},
             'embeds': {
                 'type': 'array',
                 'items': {
@@ -164,6 +166,9 @@ class DiscordNotifier:
             'avatar_url': config.get('avatar_url'),
             'embeds': config.get('embeds'),
         }
+
+        if config.get('silent'):
+            web_hook['flags'] = 4096  # Suppress notification bitfield
 
         # Send the request and handle the rate-limit response.
         for i in range(3):
