@@ -13,7 +13,6 @@ try:
 except ImportError:
     telegram = None
 
-
 _MIN_TELEGRAM_VER = '3.4'
 
 _PLUGIN_NAME = 'telegram'
@@ -292,10 +291,7 @@ class TelegramNotifier:
 
     def _send_msgs(self, msg, chat_ids, session):
         kwargs = {}
-        if self._parse_mode == 'markdown':
-            kwargs['parse_mode'] = telegram.ParseMode.MARKDOWN
-        elif self._parse_mode == 'html':
-            kwargs['parse_mode'] = telegram.ParseMode.HTML
+        kwargs['parse_mode'] = 'MarkdownV2' if self._parse_mode == 'markdown' else 'HTML'
         kwargs['disable_web_page_preview'] = self._disable_previews
         for chat_id in (x.id for x in chat_ids):
             try:
