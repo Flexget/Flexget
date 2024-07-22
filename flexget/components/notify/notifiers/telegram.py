@@ -17,7 +17,7 @@ _MIN_TELEGRAM_VER = '3.4'
 
 _PLUGIN_NAME = 'telegram'
 
-_PARSERS = ['markdown', 'html']
+_PARSERS = {'html': 'HMTL', 'markdown': 'MarkdownV2', 'markdown_legacy': 'Markdown'}
 
 _DISABLE_PREVIEWS_ATTR = 'disable_previews'
 _TOKEN_ATTR = 'bot_token'
@@ -125,7 +125,7 @@ class TelegramNotifier:
         'type': 'object',
         'properties': {
             _TOKEN_ATTR: {'type': 'string'},
-            _PARSE_ATTR: {'type': 'string', 'enum': _PARSERS},
+            _PARSE_ATTR: {'type': 'string', 'enum': list(_PARSERS.keys())},
             _DISABLE_PREVIEWS_ATTR: {'type': 'boolean', 'default': False},
             _RCPTS_ATTR: {
                 'type': 'array',
@@ -291,7 +291,8 @@ class TelegramNotifier:
 
     def _send_msgs(self, msg, chat_ids, session):
         kwargs = {}
-        kwargs['parse_mode'] = 'MarkdownV2' if self._parse_mode == 'markdown' else 'HTML'
+        if self._parse_mode:
+            kwargs['parse_mode'] = _PARSERS[self._parse_mode]
         kwargs['disable_web_page_preview'] = self._disable_previews
         for chat_id in (x.id for x in chat_ids):
             try:
