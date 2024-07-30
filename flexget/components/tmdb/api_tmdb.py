@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from functools import lru_cache
 
 from dateutil.parser import parse as dateutil_parse
 from loguru import logger
@@ -23,6 +24,7 @@ from flexget import db_schema, plugin
 from flexget.event import event
 from flexget.manager import Session
 from flexget.utils import requests
+from flexget.utils.cache import timed_lru_cache
 from flexget.utils.database import json_synonym, with_session, year_property
 
 logger = logger.bind(name='api_tmdb')
@@ -92,6 +94,43 @@ genres_table = Table(
     Column('genre_id', Integer, ForeignKey('tmdb_genres.id')),
 )
 Base.register_table(genres_table)
+
+
+RELEASE_DATE_TYPE_MAPPING = {
+    1: 'premiere',
+    2: 'theatrical_limited',
+    3: 'theatrical',
+    4: 'digital',
+    5: 'physical',
+    6: 'tv',
+}
+
+
+@timed_lru_cache("1 days", maxsize=10000)
+def get_release_dates(id, name, lookup_language):
+    logger.debug('release dates for movie {} not found in DB, fetching from TMDB', name)
+    try:
+        release_dates = {}
+        results = tmdb_request('movie/{}/release_dates'.format(id))['results']
+        for iso in results:
+            # loop and get the first release per type
+            for release in iso['release_dates']:
+                release_type = RELEASE_DATE_TYPE_MAPPING[release['type']]
+                release_date = dateutil_parse(release['release_date']).date()
+                release_language = release['iso_639_1'] or lookup_language
+
+                if release_language != lookup_language:
+                    continue
+
+                if release_type not in release_dates or (
+                    release_dates.get(release_type) >= release_date
+                ):
+                    release_dates[release_type] = release_date
+
+        return release_dates
+
+    except requests.RequestException as e:
+        raise LookupError('Error updating data from tmdb: %s' % e)
 
 
 class TMDBMovie(Base):
@@ -185,6 +224,14 @@ class TMDBMovie(Base):
         if not self._backdrops:
             self.get_images()
         return self._backdrops
+
+    @property
+    def release_dates(self):
+        return get_release_dates(
+            id=self.id,
+            name=self.name,
+            lookup_language=self.lookup_language or self.language,
+        )
 
     def to_dict(self):
         return {
