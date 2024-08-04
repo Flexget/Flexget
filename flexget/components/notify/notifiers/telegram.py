@@ -17,7 +17,7 @@ _MIN_TELEGRAM_VER = '3.4'
 
 _PLUGIN_NAME = 'telegram'
 
-_PARSERS = {'html': 'HMTL', 'markdown': 'MarkdownV2', 'markdown_legacy': 'Markdown'}
+_PARSERS = {'html': 'HTML', 'markdown': 'MarkdownV2', 'markdown_legacy': 'Markdown'}
 
 _DISABLE_PREVIEWS_ATTR = 'disable_previews'
 _TOKEN_ATTR = 'bot_token'
