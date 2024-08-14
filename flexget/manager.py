@@ -342,6 +342,10 @@ class Manager:
                 client = IPCClient(ipc_info['port'], ipc_info['password'])
             except ValueError as e:
                 logger.error(e)
+            except ConnectionRefusedError:
+                logger.warning("Remove lock file because connect refused")
+                self.release_lock()
+                return self.start()
             else:
                 try:
                     client.handle_cli(self.args)
