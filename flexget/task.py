@@ -12,7 +12,6 @@ from loguru import logger
 from sqlalchemy import Column, Integer, String, Unicode
 
 from flexget import config_schema, db_schema
-from flexget.db_schema import VersionedBaseMeta
 from flexget.entry import Entry, EntryState, EntryUnicodeError
 from flexget.event import event, fire_event
 from flexget.manager import Session
@@ -37,6 +36,8 @@ from flexget.utils.tools import MergeException, get_config_hash, merge_dict_from
 logger = logger.bind(name='task')
 
 if TYPE_CHECKING:
+    from flexget.db_schema import VersionedBaseMeta
+
     Base = VersionedBaseMeta
 else:
     Base = db_schema.versioned_base('feed', 0)

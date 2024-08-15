@@ -29,7 +29,6 @@ from typing import (
 import sqlalchemy
 import yaml
 from loguru import logger
-from sqlalchemy.engine import Engine
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import declarative_base, sessionmaker
 
@@ -51,6 +50,8 @@ from flexget.task_queue import TaskQueue  # noqa
 from flexget.terminal import console, get_console_output  # noqa
 
 if TYPE_CHECKING:
+    from sqlalchemy.engine import Engine
+
     from flexget.tray_icon import TrayIcon
     from flexget.utils.simple_persistence import SimplePersistence
 

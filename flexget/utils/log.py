@@ -4,7 +4,6 @@ import hashlib
 from datetime import datetime, timedelta
 from typing import TYPE_CHECKING, Optional
 
-import loguru
 from loguru import logger
 from sqlalchemy import Column, DateTime, Index, Integer, String
 from sqlalchemy.orm import Session
@@ -17,6 +16,8 @@ from flexget.utils.sqlalchemy_utils import table_schema
 logger = logger.bind(name='util.log')
 
 if TYPE_CHECKING:
+    import loguru
+
     Base = object
 else:
     Base = db_schema.versioned_base('log_once', 0)

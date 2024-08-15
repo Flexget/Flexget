@@ -8,7 +8,6 @@ from sqlalchemy.orm import Session
 
 from flexget.api import APIResource, api
 from flexget.api.app import BadRequest, NotFoundError, etag, pagination_headers
-from flexget.config_schema import JsonSchema
 from flexget.plugin import DependencyError, get_plugin_by_name, get_plugins
 
 logger = logger.bind(name='plugins')
@@ -63,6 +62,8 @@ plugins_parser.add_argument(
 
 if TYPE_CHECKING:
     from typing import TypedDict
+
+    from flexget.config_schema import JsonSchema
 
     class _PhaseHandler(TypedDict):
         phase: str
