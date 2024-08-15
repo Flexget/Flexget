@@ -97,7 +97,7 @@ pytest-cov = ">=3.0.0"
 pytest-runner = "^6.0.0"
 pytest-xdist = ">=2.4.0"
 pytest = ">=6.2.4"
-ruff = ">=0.4.2"
+ruff = ">=0.6.0"
 sphinx = ">=5.0.0"
 sqlalchemy-stubs = "^0.4"
 vcrpy = ">=4.1.1"
@@ -155,7 +155,7 @@ line-length = 99
 extend-exclude = ["flexget/ui"]
 
 [tool.ruff.lint]
-select = ["C4", "E", "F", "I", "ISC", "PLE", "RUF", "UP"]
+select = ["C4", "E", "F", "I", "ISC", "PLE", "RUF", "TCH", "UP"]
 ignore = [
     "E501",  # We leave line length up to black
     "E711", "E712",  # Comparisons to True/False/None are valid for sqlalchemy
