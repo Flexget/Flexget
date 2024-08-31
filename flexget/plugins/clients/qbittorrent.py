@@ -293,8 +293,8 @@ class OutputQBitTorrent:
                     logger.info('Upload Speed Limit: {}', form_data.get('upLimit'))
                 if maxdownspeed:
                     logger.info('Download Speed Limit: {}', form_data.get('dlLimit'))
-                logger.info('Ratio limit: {}', form_data.get('ratio_limit', -2)
-                logger.info('Seeding time limit: {} minutes', form_data.get('seeding_time_limit', -1)
+                logger.info('Ratio limit: {}', form_data.get('ratio_limit', -2))
+                logger.info('Seeding time limit: {} minutes', form_data.get('seeding_time_limit', -1))
                 continue
 
             if self.check_torrent_exists(
