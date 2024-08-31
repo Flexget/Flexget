@@ -54,7 +54,7 @@ class OutputQBitTorrent:
                     'fail_html': {'type': 'boolean'},
                     'add_paused': {'type': 'boolean'},
                     'skip_check': {'type': 'boolean'},
-                    'ratio_limit': {'type': 'float'},
+                    'ratio_limit': {'type': 'number'},
                     'seeding_time_limit': {'type': 'integer'},
                 },
                 'additionalProperties': False,
