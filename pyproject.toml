@@ -96,7 +96,7 @@ pre-commit = ">=3.2.0"
 pytest-cov = ">=3.0.0"
 pytest-runner = "^6.0.0"
 pytest-xdist = ">=2.4.0"
-pytest = ">=6.2.4"
+pytest = ">=6.2.4,<8"  # TODO: Tests break on pytest 8+, investigate why.
 ruff = ">=0.6.0"
 sphinx = ">=5.0.0"
 sqlalchemy-stubs = "^0.4"
