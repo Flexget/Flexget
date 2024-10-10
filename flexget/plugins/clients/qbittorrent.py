@@ -247,7 +247,8 @@ class OutputQBitTorrent:
 
             add_paused = entry.get('add_paused', config.get('add_paused'))
             if add_paused:
-                form_data['paused'] = 'true'
+                form_data['paused'] = 'true'  # qBittorrent v4.6.7-
+                form_data['stopped'] = 'true'  # qBittorrent v5.0.0+
 
             skip_check = entry.get('skip_check', config.get('skip_check'))
             if skip_check:
