@@ -9,6 +9,7 @@ from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.template import RenderError
+from flexget.utils.tools import parse_timedelta
 
 logger = logger.bind(name='qbittorrent')
 
@@ -55,7 +56,7 @@ class OutputQBitTorrent:
                     'add_paused': {'type': 'boolean'},
                     'skip_check': {'type': 'boolean'},
                     'ratio_limit': {'type': 'number'},
-                    'seeding_time_limit': {'type': 'integer'},
+                    'seeding_time_limit': {'type': 'string', 'format': 'interval'},
                 },
                 'additionalProperties': False,
             },
@@ -273,7 +274,7 @@ class OutputQBitTorrent:
 
             seeding_time_limit = entry.get('seeding_time_limit', config.get('seeding_time_limit'))
             if seeding_time_limit:
-                form_data['seedingTimeLimit'] = seeding_time_limit
+                form_data['seedingTimeLimit'] = parse_timedelta(seeding_time_limit) * 60
 
             is_magnet = entry['url'].startswith('magnet:')
 
