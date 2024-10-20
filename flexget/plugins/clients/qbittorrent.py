@@ -274,7 +274,7 @@ class OutputQBitTorrent:
 
             seeding_time_limit = entry.get('seeding_time_limit', config.get('seeding_time_limit'))
             if seeding_time_limit:
-                form_data['seedingTimeLimit'] = parse_timedelta(seeding_time_limit) * 60
+                form_data['seedingTimeLimit'] = int(parse_timedelta(seeding_time_limit).total_seconds() / 60)
 
             is_magnet = entry['url'].startswith('magnet:')
 
