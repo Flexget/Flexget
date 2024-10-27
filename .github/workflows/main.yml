@@ -60,4 +60,11 @@ jobs:
       run: poetry install --no-interaction
     - name: Test with pytest
       run: |
-        poetry run pytest -n auto
+        poetry run pytest -n auto --junit-xml=test-results.xml
+    - name: Publish Test Results
+      if: always()
+      uses: EnricoMi/publish-unit-test-result-action@v2
+      with:
+        files: |
+          test-results.xml
+
