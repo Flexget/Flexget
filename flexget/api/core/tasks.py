@@ -1,7 +1,7 @@
 import argparse
-import cgi
 import copy
 from datetime import datetime, timedelta
+from email.message import EmailMessage
 from json import JSONEncoder
 from queue import Empty, Queue
 from typing import TYPE_CHECKING, Any, Dict
@@ -464,10 +464,13 @@ class TaskExecutionAPI(APIResource):
                 entry = Entry()
                 entry['url'] = item['url']
                 if not item.get('title'):
+                    # Apparently email module is the only place in stdlib that parses headers
+                    msg = EmailMessage()
                     try:
-                        value, params = cgi.parse_header(
-                            requests.head(item['url']).headers['Content-Disposition']
-                        )
+                        msg['content-type'] = requests.head(item['url']).headers[
+                            'Content-Disposition'
+                        ]
+                        params = msg['content-type'].params
                         entry['title'] = params['filename']
                     except KeyError:
                         raise BadRequest(
