@@ -6,13 +6,89 @@ description = """\
     different sources like RSS-feeds, html-pages, various sites and more.\
 """
 readme = "README.rst"
-requires-python = ">=3.8"
+requires-python = ">=3.8,<4.0"
 authors = [
     { name = "Marko Koivusalo", email = "marko.koivusalo@gmail.com" },
     { name = "Chase Sterling", email = "chase.sterling@gmail.com" },
 ]
 license = { file = "LICENSE" }
-dynamic = ["version", "dependencies"]
+dynamic = ["version", "optional-dependencies"]
+dependencies = [
+    "apscheduler >=3.10.0",
+    "beautifulsoup4 >=4.5",
+    "colorama >=0.4.4",
+    "feedparser >=6.0.2",
+    "guessit >=3.4,<4.0",
+    "html5lib >=0.11",
+    "importlib-metadata >=3.6; python_version <'3.10'",  # TODO: remove this after we drop python3.9
+    "jinja2 >=3.0,<4.0",
+    "jsonschema >=2.0",
+    "loguru >=0.4.1",
+    "psutil >=5.8.0",
+    "pynzb ~=0.1.0",
+    "pyrss2gen ~=1.1",
+    "python-dateutil ~=2.8",
+    "pyyaml >=4.2b1",
+    "rebulk >=2.0.0",
+    "requests >=2.20.0",
+    "rich >=9.0.0",
+    "rpyc >=5.0,!=5.2.*,!=5.3.0",  # 5.2.1-5.3.0 cause a hang https://github.com/Flexget/Flexget/issues/3601
+    "sqlalchemy >=2.0,<2.999",
+    # TODO: urllib3 >=2 has changes that require vcr cassettes to be upgraded. Requirements of some of our deps (boto?)
+    # require urllib3 <2 on python < 3.10. In order to not be running different versions of urllib on different
+    # versions of python, this is pinned in our deps. This can be removed completely if the issue gets solved.
+    # https://github.com/kevin1024/vcrpy/issues/719
+    "urllib3 <2",
+    # WebUI/API Deps
+    "cherrypy >=18.0.0",
+    "flask-compress >=1.2.1",
+    "flask-cors >=2.1.2",
+    "flask-login >=0.6.3",
+    "flask-restx >=0.5.1",
+    "flask >=0.7",
+    "packaging >=21.3",
+    "pyparsing >=2.4.7",
+    "werkzeug >=2.2.3",
+    "zxcvbn >=4.4.24",
+    "pendulum >=3.0.0",
+]
+
+[dependency-groups]
+dev = [
+    "codacy-coverage >=1.2.18",
+    "coverage >=6.0",
+    "gitpython >=3.1.18",
+    "pre-commit >=3.2.0",
+    "pytest-cov >=3.0.0",
+    "pytest-runner ~=6.0.0",
+    "pytest-xdist >=2.4.0",
+    "pytest >=6.2.4,<8",  # TODO: Tests break on pytest 8+, investigate why.
+    "ruff >=0.6.0",
+    "sphinx >=5.0.0",
+    "vcrpy >=4.1.1",
+    # docutils 0.21 cannot be installed with poetry
+    # See https://github.com/python-poetry/poetry/issues/9293
+    "docutils !=0.21",
+]
+release = [
+    "build >=0.9.0",
+    "click >=8.1.3",
+    "twine >=3.6.0",
+]
+plugin-test = [
+    # These are optional dependencies for plugins that have tests in the test suite
+    "boto3 >=1.24.89",
+    "plexapi >=4.13.1",
+    "pysftp ~=0.2.9",
+    "subliminal >= 2.0rc1",
+]
+docker = [
+    "transmission-rpc ~=7.0",
+    "qbittorrent-api ~=2024.0",
+    "deluge-client ~=1.9",
+    "cloudscraper >=1.2.69",
+    "python-telegram-bot ~=12.8",
+]
 
 [project.urls]
 "Homepage" = "https://flexget.com"
@@ -27,111 +103,24 @@ flexget = "flexget:main"
 flexget-headless = "flexget:main"  # This is useful on Windows to avoid a cmd popup
 
 [build-system]
-requires = ["setuptools"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling", "hatch-requirements-txt"]
+build-backend = "hatchling.build"
 
-[tool.setuptools.packages.find]
-namespaces = true
-include = ["flexget*"]
-exclude = ["flexget.tests*"]
+[tool.hatch.metadata.hooks.requirements_txt.optional-dependencies]
+locked = ["requirements.txt"]
 
-[tool.setuptools.package-data]
-# Everything in our package directory should go in the dist
-"*" = ["*.*"]
+[tool.hatch.version]
+path = "flexget/_version.py"
 
-[tool.setuptools.dynamic]
-version = {attr = "flexget._version.__version__"}
-dependencies = {file = "requirements.txt"}
+[tool.hatch.build]
+skip-excluded-dirs = true
 
-
-## Dependency settings
-# Poetry is only being used for dependency managment. The other metadata in this section is not used, and just
-# here to fulfil poetry's requirements.
-[tool.poetry]
-name = "flexget"
-version = "0.0.0"
-description = ""
-authors = []
-
-[tool.poetry.dependencies]
-python = "^3.8"
-apscheduler = ">=3.10.0"
-beautifulsoup4 = ">=4.5"
-colorama = ">=0.4.4"
-feedparser = ">=6.0.2"
-guessit = ">=3.4,<4.0"
-html5lib = ">=0.11"
-importlib-metadata = { version = ">=3.6", python = "<3.10" }  # TODO: remove this after we drop python3.9
-jinja2 = ">=3.0,<4.0"
-jsonschema = ">=2.0"
-loguru = ">=0.4.1"
-psutil = ">=5.8.0"
-pynzb = "^0.1.0"
-pyrss2gen = "^1.1"
-python-dateutil = "^2.8.2"
-pyyaml = ">=4.2b1"
-rebulk = ">=2.0.0"
-requests = ">=2.20.0"
-rich = ">=9.0.0"
-rpyc = ">=5.0,!=5.2.*,!=5.3.0"  # 5.2.1-5.3.0 cause a hang https://github.com/Flexget/Flexget/issues/3601
-sqlalchemy = ">=2.0,<2.999"
-# TODO: urllib3 >=2 has changes that require vcr cassettes to be upgraded. Requirements of some of our deps (boto?)
-# require urllib3 <2 on python < 3.10. In order to not be running different versions of urllib on different
-# versions of python, this is pinned in our deps. This can be removed completely if the issue gets solved.
-# https://github.com/kevin1024/vcrpy/issues/719
-urllib3 = "<2"
-# WebUI/API Deps
-cherrypy = ">=18.0.0"
-flask-compress = ">=1.2.1"
-flask-cors = ">=2.1.2"
-flask-login = ">=0.6.3"
-flask-restx = ">=0.5.1"
-flask = ">=0.7"
-packaging = ">=21.3"
-pyparsing = ">=2.4.7"
-werkzeug = ">=2.2.3"
-zxcvbn = "^4.4.24"
-pendulum = ">=3.0.0"
-
-[tool.poetry.group.dev.dependencies]
-codacy-coverage = ">=1.2.18"
-coverage = ">=6.0"
-gitpython = ">=3.1.18"
-pre-commit = ">=3.2.0"
-pytest-cov = ">=3.0.0"
-pytest-runner = "^6.0.0"
-pytest-xdist = ">=2.4.0"
-pytest = ">=6.2.4,<8"  # TODO: Tests break on pytest 8+, investigate why.
-ruff = ">=0.6.0"
-sphinx = ">=5.0.0"
-sqlalchemy-stubs = "^0.4"
-vcrpy = ">=4.1.1"
-# docutils 0.21 cannot be installed with poetry
-# See https://github.com/python-poetry/poetry/issues/9293
-docutils = "!=0.21"
-
-[tool.poetry.group.release.dependencies]
-build = ">=0.9.0"
-click = ">=8.1.3"
-twine = ">=3.6.0"
-
-[tool.poetry.group.plugin-test.dependencies]
-# These are optional dependencies for plugins that have tests in the test suite
-boto3 = ">=1.24.89"
-plexapi = ">=4.13.1"
-pysftp = "^0.2.9"
-subliminal = ">= 2.0rc1"
-
-[tool.poetry.group.docker.dependencies]
-transmission-rpc = "^4.1.4 || ^7.0.0"
-qbittorrent-api = "^2023.3.44 || ^2024.0.0"
-deluge-client = "^1.9.0"
-cloudscraper = "^1.2.69"
-python-telegram-bot = "^12.8"
-
-[tool.poetry.scripts]
-flexget = 'flexget:main'
-
+[tool.hatch.build.targets.sdist]
+include = [
+    "flexget/*",
+    "/*requirements*.txt"
+]
+exclude = ["flexget/tests"]
 
 ## Other tool settings
 
@@ -178,6 +167,3 @@ known-first-party = ['flexget']
 
 [tool.ruff.format]
 quote-style = "preserve"
-
-[tool.mypy]
-plugins = ["sqlmypy"]

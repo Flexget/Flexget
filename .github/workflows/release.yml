@@ -23,11 +23,16 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: ${{ env.PYTHON_VERSION }}
-        cache: 'pip'
-        cache-dependency-path: 'dev-requirements.txt'
+    - name: Install uv
+      uses: astral-sh/setup-uv@v3
+      with:
+        # Install a specific version of uv.
+        version: "0.4.27"
+        enable-cache: true
+        cache-dependency-glob: 'uv.lock'
     - name: Install dev dependencies
       run: |
-        pip install -r requirements-release.txt
+        uv sync --only-group release --frozen
     - name: Set Deployment Status Pending
       uses: justacodename/deployment-status@v2
       with:
@@ -43,7 +48,7 @@ jobs:
       if: env.release_tag
       run: |
         echo 'CHANGELOG_BODY<<EOF' >> $GITHUB_ENV
-        python dev_tools.py get-changelog ${{ env.release_tag }} >> $GITHUB_ENV
+        uv run --no-project dev_tools.py get-changelog ${{ env.release_tag }} >> $GITHUB_ENV
         echo 'EOF' >> $GITHUB_ENV
     - name: Create GitHub Release
       uses: ncipollo/release-action@v1
