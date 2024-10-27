@@ -69,4 +69,5 @@ jobs:
       with:
         files: |
           test-results.xml
+        check_name: ${{ matrix.python-version }}
 
