@@ -14,10 +14,7 @@ lib/
 local
 .idea/
 *.iml
-config.yml
-db-config.sqlite
-flexget.log
-flexget.log.*
+/*.log*
 received/
 share/
 dist/
