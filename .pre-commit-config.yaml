@@ -13,6 +13,8 @@ repos:
     - id: uv-lock
     - id: uv-export
       args: ["--frozen", "--no-dev", "--no-emit-project", "--output-file=requirements.txt", "--no-hashes"]
+    - id: uv-export
+      args: ["--frozen", "--no-emit-project", "--output-file=dev-requirements.txt", "--no-hashes"]
 ci:
   autofix_prs: true
   autoupdate_branch: develop
