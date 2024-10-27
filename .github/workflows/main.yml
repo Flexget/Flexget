@@ -65,10 +65,8 @@ jobs:
       if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: utest Results (Python ${{ matrix.python-version }})
+        name: Test Results (Python ${{ matrix.python-version }})
         path: test-results.xml
-
-
 
   publish-test-results:
     name: "Publish Tests Results"
