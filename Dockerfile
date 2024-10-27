@@ -1,4 +1,4 @@
-FROM docker.io/python:3.11-alpine
+FROM docker.io/python:3.13-alpine
 ENV PYTHONUNBUFFERED 1
 
 RUN apk add --no-cache --upgrade \
@@ -20,7 +20,7 @@ RUN pip install -f /dep-wheels click requests && python /flexget/dev_tools.py bu
 COPY . /flexget
 RUN pip wheel --no-deps --wheel-dir /wheels -e /flexget
 
-FROM docker.io/python:3.11-alpine
+FROM docker.io/python:3.13-alpine
 ENV PYTHONUNBUFFERED 1
 
 RUN apk add --no-cache --upgrade \
