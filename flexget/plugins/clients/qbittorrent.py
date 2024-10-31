@@ -225,8 +225,6 @@ class OutputQBitTorrent:
         config.setdefault('maxupspeed', 0)
         config.setdefault('maxdownspeed', 0)
         config.setdefault('fail_html', True)
-        config.setdefault('ratio_limit', -2)
-        config.setdefault('seeding_time_limit', -1)
         return config
 
     def add_entries(self, task, config):
