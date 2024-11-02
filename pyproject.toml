@@ -104,7 +104,6 @@ pytest-xdist = ">=2.4.0"
 pytest = ">=6.2.4,<8"  # TODO: Tests break on pytest 8+, investigate why.
 ruff = ">=0.6.0"
 sphinx = ">=5.0.0"
-sqlalchemy-stubs = "^0.4"
 vcrpy = ">=4.1.1"
 # docutils 0.21 cannot be installed with poetry
 # See https://github.com/python-poetry/poetry/issues/9293
