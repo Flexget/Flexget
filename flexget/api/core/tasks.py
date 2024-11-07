@@ -1,7 +1,6 @@
 import argparse
 import copy
 from datetime import datetime, timedelta
-from email.message import EmailMessage
 from json import JSONEncoder
 from queue import Empty, Queue
 from typing import TYPE_CHECKING, Any, Dict
@@ -29,6 +28,7 @@ from flexget.task import task_phases
 from flexget.terminal import capture_console
 from flexget.utils import json, requests
 from flexget.utils.lazy_dict import LazyLookup
+from flexget.utils.requests import parse_header
 
 # Tasks API
 tasks_api = api.namespace('tasks', description='Manage Tasks')
@@ -464,13 +464,10 @@ class TaskExecutionAPI(APIResource):
                 entry = Entry()
                 entry['url'] = item['url']
                 if not item.get('title'):
-                    # Apparently email module is the only place in stdlib that parses headers
-                    msg = EmailMessage()
                     try:
-                        msg['content-type'] = requests.head(item['url']).headers[
-                            'Content-Disposition'
-                        ]
-                        params = msg['content-type'].params
+                        value, params = parse_header(
+                            requests.head(item['url']).headers['Content-Disposition']
+                        )
                         entry['title'] = params['filename']
                     except KeyError:
                         raise BadRequest(

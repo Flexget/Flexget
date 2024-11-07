@@ -5,7 +5,8 @@ import time
 # Allow some request objects to be imported from here instead of requests
 import warnings
 from datetime import datetime, timedelta
-from typing import TYPE_CHECKING, Dict, Optional, Union
+from email.message import EmailMessage
+from typing import TYPE_CHECKING, Dict, Mapping, Optional, Tuple, Union
 from urllib.parse import urlparse
 from urllib.request import urlopen
 
@@ -180,6 +181,16 @@ def limit_domains(url: str, limit_dict: Dict[str, DomainLimiter]) -> None:
         if domain in url:
             limiter()
             break
+
+
+def parse_header(header: str) -> Tuple[str, Mapping]:
+    """Parse a MIME header (such as Content-Type) into a main value and a dictionary of parameters.
+
+    Replaces function in the deprecated cgi stdlib module.
+    """
+    msg = EmailMessage()
+    msg['content-type'] = header
+    return msg.get_content_type(), msg['content-type'].params
 
 
 class Session(requests.Session):
