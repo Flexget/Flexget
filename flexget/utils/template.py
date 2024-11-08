@@ -74,6 +74,10 @@ class CoercingDateTime(DateTime):
 
     @staticmethod
     def _same_tz(first, second):
+        if not isinstance(first, datetime) or not isinstance(second, date):
+            raise TypeError(
+                f'Cannot compare instances of {first.__class__.__name__} and {second.__class__.__name__}'
+            )
         if not first or not second:
             return first, second
         if isinstance(second, date) and not isinstance(second, datetime):
@@ -103,10 +107,15 @@ class CoercingDateTime(DateTime):
         return DateTime.__ge__(self, other)
 
     def __eq__(self, other):
+        # stdlib and pendulum dates and datetimes all subclass 'date'
+        if not isinstance(other, date):
+            return False
         self, other = self._same_tz(self, other)
         return DateTime.__eq__(self, other)
 
     def __ne__(self, other):
+        if not isinstance(other, date):
+            return True
         self, other = self._same_tz(self, other)
         return DateTime.__ne__(self, other)
 
