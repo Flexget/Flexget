@@ -275,12 +275,9 @@ class TestTorrentScrub:
         for filename in self.test_files:
             osize = os.path.getsize(filename)
             msize = tmpdir.join(filename).size()
-            assert osize == msize, "Filesizes aren't supposed to differ (%r %d, %r %d)!" % (
-                filename,
-                osize,
-                self.__tmp__ + filename,
-                msize,
-            )
+            assert (
+                osize == msize
+            ), f"Filesizes aren't supposed to differ ({filename!r} {osize}, {self.__tmp__ + filename!r} {msize})!"
 
 
 @pytest.mark.usefixtures('tmpdir')

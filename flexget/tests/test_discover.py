@@ -139,7 +139,7 @@ class TestDiscover:
     def test_next_series_episodes_with_bad_search(self, execute_task):
         task = execute_task('test_next_series_episodes_with_bad_search')
         for epnum in range(1, 5):
-            title = 'My Show S01E0%d' % epnum
+            title = f'My Show S01E0{epnum}'
             assert any(e['title'] == title for e in task.mock_output), f'{title} not accepted'
         assert (
             len(task.mock_output) == 4

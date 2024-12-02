@@ -195,7 +195,9 @@ class InputPlex:
             try:
                 path = "/library/sections/"
                 r = requests.get(
-                    "http://%s:%d%s%s" % (config['plexserver'], config['port'], path, urlappend)
+                    "http://{}:{}{}{}".format(
+                        config['plexserver'], config['port'], path, urlappend
+                    )
                 )
             except requests.RequestException as e:
                 raise plugin.PluginError(f'Error retrieving source: {e}')
@@ -217,11 +219,11 @@ class InputPlex:
         try:
             path = "/library/sections/{}/{}".format(config['section'], config['selection'])
             r = requests.get(
-                "http://%s:%d%s%s" % (config['plexserver'], config['port'], path, urlappend)
+                "http://{}:{}{}{}".format(config['plexserver'], config['port'], path, urlappend)
             )
         except requests.RequestException as e:
             raise plugin.PluginError(
-                'There is no section with number %d. (%s)' % (config['section'], e)
+                'There is no section with number {}. ({})'.format(config['section'], e)
             )
         dom = parseString(r.text.encode("utf-8"))
         plexsectionname = dom.getElementsByTagName('MediaContainer')[0].getAttribute('title1')
@@ -275,26 +277,26 @@ class InputPlex:
                 entries.append(e)
                 # show ends here.
                 continue
-            e['plex_art'] = "http://%s:%d%s%s" % (
+            e['plex_art'] = "http://{}:{}{}{}".format(
                 config['server'],
                 config['port'],
                 node.getAttribute(arttag),
                 urlappend,
             )
-            e['plex_cover'] = "http://%s:%d%s%s" % (
+            e['plex_cover'] = "http://{}:{}{}{}".format(
                 config['server'],
                 config['port'],
                 node.getAttribute(covertag),
                 urlappend,
             )
-            e['plex_season_cover'] = "http://%s:%d%s%s" % (
+            e['plex_season_cover'] = "http://{}:{}{}{}".format(
                 config['server'],
                 config['port'],
                 node.getAttribute(seasoncovertag),
                 urlappend,
             )
             if viewgroup == "episode":
-                e['plex_thumb'] = "http://%s:%d%s%s" % (
+                e['plex_thumb'] = "http://{}:{}{}{}".format(
                     config['server'],
                     config['port'],
                     node.getAttribute('thumb'),
@@ -315,7 +317,7 @@ class InputPlex:
                     e['series_season'] = season
                     e['series_episode'] = episode
                     e['series_id_type'] = 'ep'
-                    e['series_id'] = 'S%02dE%02d' % (season, episode)
+                    e['series_id'] = f'S{season:02d}E{episode:02d}'
                 else:
                     logger.debug(
                         "Could not get episode number for '{}' (Hint, ratingKey: {})",
@@ -395,14 +397,14 @@ class InputPlex:
                                 container,
                             )
                             entry['title'] = filename
-                    entry['plex_url'] = "http://%s:%d%s%s" % (
+                    entry['plex_url'] = "http://{}:{}{}{}".format(
                         config['server'],
                         config['port'],
                         key,
                         urlappend,
                     )
                     entry['plex_path'] = key
-                    entry['url'] = "http://%s:%d%s%s" % (
+                    entry['url'] = "http://{}:{}{}{}".format(
                         config['server'],
                         config['port'],
                         key,

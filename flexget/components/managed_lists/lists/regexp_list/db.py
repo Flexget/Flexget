@@ -21,7 +21,7 @@ class RegexpListList(Base):
     )
 
     def __repr__(self):
-        return '<RegexpListList name=%s,id=%d>' % (self.name, self.id)
+        return f'<RegexpListList name={self.name},id={self.id}>'
 
     def to_dict(self):
         return {'id': self.id, 'name': self.name, 'added_on': self.added}
@@ -40,7 +40,7 @@ class RegexListRegexp(Base):
     def to_entry(self):
         entry = Entry()
         entry['title'] = entry['regexp'] = self.regexp
-        entry['url'] = 'mock://localhost/regexp_list/%d' % self.id
+        entry['url'] = f'mock://localhost/regexp_list/{self.id}'
         return entry
 
     def to_dict(self):

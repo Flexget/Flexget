@@ -91,7 +91,7 @@ def clear_entries(options):
         if options.task_name:
             query = query.filter(db.PendingEntry.task_name == options.task_name)
         deleted = query.delete()
-        console('Successfully deleted %i pending entries' % deleted)
+        console(f'Successfully deleted {deleted} pending entries')
 
 
 @event('options.register')

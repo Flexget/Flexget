@@ -668,7 +668,7 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
             return
 
         if entry['url'].startswith('magnet:'):
-            torrent_raw = 'd10:magnet-uri%d:%se' % (len(entry['url']), entry['url'])
+            torrent_raw = 'd10:magnet-uri{}:{}e'.format(len(entry['url']), entry['url'])
             torrent_raw = torrent_raw.encode('ascii')
         else:
             # Check that file is downloaded
