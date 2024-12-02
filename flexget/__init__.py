@@ -1,7 +1,8 @@
 #!/usr/bin/python
 import os
 import sys
-from typing import Optional, Sequence
+from collections.abc import Sequence
+from typing import Optional
 
 # __version__ import need to be first in order to avoid circular import within logger
 from ._version import __version__  # noqa

@@ -1,7 +1,7 @@
 import datetime
 import re
 from string import capwords
-from typing import List, Optional, Tuple, Union
+from typing import Optional, Union
 
 from loguru import logger
 
@@ -108,7 +108,7 @@ class SeriesParseResult:
         name: Optional[str] = None,
         identified_by: Optional[str] = None,
         id_type: Optional[str] = None,
-        id: Optional[Union[Tuple[int, int], str, int, datetime.date]] = None,
+        id: Optional[Union[tuple[int, int], str, int, datetime.date]] = None,
         episodes: int = 1,
         season_pack: bool = False,
         strict_name: bool = False,
@@ -123,7 +123,7 @@ class SeriesParseResult:
         self.episodes: int = episodes
         self.season_pack: bool = season_pack
         self.identified_by: str = identified_by
-        self.id: Union[Tuple[int, int], str, int, datetime.date] = id
+        self.id: Union[tuple[int, int], str, int, datetime.date] = id
         self.id_type: str = id_type
         self.quality: Quality = quality if quality is not None else Quality()
         self.proper_count: int = proper_count
@@ -155,7 +155,7 @@ class SeriesParseResult:
         return None
 
     @property
-    def identifiers(self) -> List[str]:
+    def identifiers(self) -> list[str]:
         """Return all identifiers this parser represents. (for packs)"""
         # Currently 'ep' is the only id type that supports packs
         if not self.valid:

@@ -2,10 +2,11 @@ import locale
 import os
 import os.path
 import re
+from collections.abc import Mapping
 from contextlib import suppress
 from copy import copy
 from datetime import date, datetime, time
-from typing import TYPE_CHECKING, Any, AnyStr, List, Mapping, Optional, Type, Union, cast
+from typing import TYPE_CHECKING, Any, AnyStr, Optional, Union, cast
 from unicodedata import normalize
 
 import jinja2.filters
@@ -318,7 +319,7 @@ class FlexGetNativeTemplate(FlexGetTemplate, NativeTemplate):
 class FlexGetEnvironment(Environment):
     """Environment with template_class support"""
 
-    template_class: Type[FlexGetTemplate]
+    template_class: type[FlexGetTemplate]
 
 
 @event('manager.initialize')
@@ -344,7 +345,7 @@ def make_environment(manager: 'Manager') -> None:
             environment.tests[name.split('_', 1)[1]] = test
 
 
-def list_templates(extensions: Optional[List[str]] = None) -> List[str]:
+def list_templates(extensions: Optional[list[str]] = None) -> list[str]:
     """Returns all templates names that are configured under environment loader dirs"""
     if environment is None or not hasattr(environment, 'loader'):
         return []

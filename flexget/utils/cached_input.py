@@ -1,8 +1,9 @@
 import copy
 import pickle
+from collections.abc import Iterable
 from datetime import datetime, timedelta
 from functools import partial
-from typing import TYPE_CHECKING, Callable, Iterable, List, Optional
+from typing import TYPE_CHECKING, Callable, Optional
 
 from loguru import logger
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Unicode, select
@@ -180,7 +181,7 @@ class cached:
 
         return wrapped_func
 
-    def store_to_db(self, entries: List[str]):
+    def store_to_db(self, entries: list[str]):
         # Store to database
         logger.debug(f'Storing cache {self.cache_name} to database.')
         with Session() as session:
@@ -196,7 +197,7 @@ class cached:
             db_cache.added = datetime.now()
             session.merge(db_cache)
 
-    def load_from_db(self, load_expired: bool = False) -> Optional[List[InputCacheEntry]]:
+    def load_from_db(self, load_expired: bool = False) -> Optional[list[InputCacheEntry]]:
         with Session() as session:
             db_cache = (
                 session.query(InputCache)
@@ -221,9 +222,9 @@ class IterableCache:
     If `finished_hook` is supplied, it will be called the first time the iterable is run to the end.
     """
 
-    def __init__(self, iterable: Iterable, finished_hook: Optional[Callable[[List], None]] = None):
+    def __init__(self, iterable: Iterable, finished_hook: Optional[Callable[[list], None]] = None):
         self.iterable = iter(iterable)
-        self.cache: List = []
+        self.cache: list = []
         self.finished_hook = finished_hook
 
     def __iter__(self):

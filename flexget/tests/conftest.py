@@ -8,7 +8,7 @@ import sys
 from contextlib import contextmanager
 from http import client
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Union
+from typing import Any, Callable, Optional, Union
 from unittest import mock
 
 import flask
@@ -156,13 +156,13 @@ def api_client(manager) -> 'APIClient':
 
 
 @pytest.fixture()
-def schema_match(manager) -> Callable[[dict, Any], List[dict]]:
+def schema_match(manager) -> Callable[[dict, Any], list[dict]]:
     """
     This fixture enables verifying JSON Schema. Return a list of validation error dicts. List is empty if no errors
     occurred.
     """
 
-    def match(schema: dict, response: Any) -> List[dict]:
+    def match(schema: dict, response: Any) -> list[dict]:
         validator = jsonschema.Draft4Validator(schema)
         errors = list(validator.iter_errors(response))
         return [{'value': list(e.path), 'message': e.message} for e in errors]
@@ -171,12 +171,12 @@ def schema_match(manager) -> Callable[[dict, Any], List[dict]]:
 
 
 @pytest.fixture()
-def link_headers(manager) -> Callable[[flask.Response], Dict[str, dict]]:
+def link_headers(manager) -> Callable[[flask.Response], dict[str, dict]]:
     """
     Parses link headers and return them in dict form
     """
 
-    def headers(response: flask.Response) -> Dict[str, dict]:
+    def headers(response: flask.Response) -> dict[str, dict]:
         links = {}
         for link in requests.utils.parse_header_links(response.headers.get('link')):
             url = link['url']

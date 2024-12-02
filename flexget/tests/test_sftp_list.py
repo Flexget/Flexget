@@ -1,4 +1,4 @@
-from typing import Any, Callable, Dict, List
+from typing import Any, Callable
 
 import pytest
 
@@ -266,8 +266,8 @@ class TestSftpList:
 
 def assert_entries(
     task: Task,
-    entry_matcher: Dict[str, Any],
-    *argv: Dict[str, Any],
+    entry_matcher: dict[str, Any],
+    *argv: dict[str, Any],
     allow_unexpected_entires: bool = False,
 ):
     """
@@ -283,10 +283,10 @@ def assert_entries(
     expected = [m['title'] for m in [entry_matcher, *argv]]
     found = [m['title'] for m in task.all_entries]
     if not allow_unexpected_entires:
-        unexpected: List[str] = [title for title in found if title not in expected]
+        unexpected: list[str] = [title for title in found if title not in expected]
         assert not unexpected, f'Found unexpected entries {unexpected}'
 
-    not_found: List[str] = [title for title in expected if title not in found]
+    not_found: list[str] = [title for title in expected if title not in found]
     assert not not_found, f'Entires not found {not_found} in {found}'
 
     for matcher in [entry_matcher, *argv]:

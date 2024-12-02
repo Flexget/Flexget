@@ -14,7 +14,7 @@ from argparse import (
     _VersionAction,
 )
 from argparse import ArgumentParser as ArgParser
-from typing import IO, Any, Callable, List, Optional, TextIO
+from typing import IO, Any, Callable, Optional, TextIO
 
 import flexget
 from flexget.entry import Entry
@@ -337,7 +337,7 @@ class ArgumentParser(ArgParser):
 
     def parse_args(
         self,
-        args: Optional[List[str]] = None,
+        args: Optional[list[str]] = None,
         namespace: Optional[Namespace] = None,
         raise_errors: bool = False,
         file: Optional[TextIO] = None,
@@ -357,7 +357,7 @@ class ArgumentParser(ArgParser):
 
     def parse_known_args(
         self,
-        args: Optional[List[str]] = None,
+        args: Optional[list[str]] = None,
         namespace: Optional[Namespace] = None,
         do_help: Optional[bool] = None,
     ):

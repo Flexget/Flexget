@@ -10,22 +10,16 @@ import re
 import sys
 import weakref
 from collections import defaultdict
-from collections.abc import MutableMapping
+from collections.abc import Iterable, Iterator, MutableMapping, Sequence
 from datetime import datetime, timedelta
 from html.entities import name2codepoint
 from pprint import pformat
+from re import Pattern
 from typing import (
     TYPE_CHECKING,
     Any,
-    Dict,
-    Iterable,
-    Iterator,
-    List,
     NamedTuple,
     Optional,
-    Pattern,
-    Sequence,
-    Tuple,
     Union,
 )
 
@@ -238,7 +232,7 @@ _binOps = {
 class TimedDict(MutableMapping):
     """Acts like a normal dict, but keys will only remain in the dictionary for a specified time span."""
 
-    _instances: Dict[int, 'TimedDict'] = weakref.WeakValueDictionary()
+    _instances: dict[int, 'TimedDict'] = weakref.WeakValueDictionary()
 
     def __init__(self, cache_time: Union[timedelta, str] = '5 minutes'):
         self.cache_time = parse_timedelta(cache_time)
@@ -450,7 +444,7 @@ def get_config_as_array(config: dict, key: str) -> list:
 
 def parse_episode_identifier(
     ep_id: Union[str, int], identify_season: bool = False
-) -> Tuple[str, str]:
+) -> tuple[str, str]:
     """
     Parses series episode identifier, raises ValueError if it fails
 
@@ -486,7 +480,7 @@ def parse_episode_identifier(
     return identified_by, entity_type
 
 
-def group_entries(entries: Iterable['Entry'], identifier: str) -> Dict[str, List['Entry']]:
+def group_entries(entries: Iterable['Entry'], identifier: str) -> dict[str, list['Entry']]:
     from flexget.utils.template import RenderError
 
     grouped_entries = defaultdict(list)
@@ -504,7 +498,7 @@ def group_entries(entries: Iterable['Entry'], identifier: str) -> Dict[str, List
     return grouped_entries
 
 
-def aggregate_inputs(task: 'Task', inputs: List[dict]) -> List['Entry']:
+def aggregate_inputs(task: 'Task', inputs: list[dict]) -> list['Entry']:
     from flexget import plugin
 
     entries = []

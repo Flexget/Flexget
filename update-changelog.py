@@ -1,7 +1,8 @@
 import collections
 import re
 import sys
-from typing import Generator, Iterable, List, Optional, Tuple
+from collections.abc import Generator, Iterable
+from typing import Optional
 
 from git import Repo
 
@@ -20,9 +21,9 @@ class MDChangeSet:
     def __init__(self) -> None:
         self.pre_header = ['\n']
         self.version_header = ''
-        self.post_header: List[str] = []
-        self.sections: collections.OrderedDict[str, List[str]] = collections.OrderedDict()
-        self.footer: List[str] = []
+        self.post_header: list[str] = []
+        self.sections: collections.OrderedDict[str, list[str]] = collections.OrderedDict()
+        self.footer: list[str] = []
 
     @classmethod
     def from_md_lines(cls, lines):
@@ -80,9 +81,9 @@ class MDChangeSet:
 
 def isplit(
     start_text: str, iterator: Iterable[str]
-) -> Tuple[List[str], Optional[str], Iterable[str]]:
+) -> tuple[list[str], Optional[str], Iterable[str]]:
     """Returns head, match, tail tuple, where match is the first line that starts with `start_text`"""
-    head: List[str] = []
+    head: list[str] = []
     iterator = iter(iterator)
     for item in iterator:
         if item.startswith(start_text):
@@ -106,7 +107,7 @@ if __name__ == '__main__':
     cur_ver = MDChangeSet.from_md_lines(active_lines)
     latestref = re.match(r'<!---\s*([\d\w]+)', start_comment).group(1)
     oldestref = re.match(r'<!---\s*([\d\w]+)', end_comment).group(1)
-    released_vers: List[MDChangeSet] = []
+    released_vers: list[MDChangeSet] = []
     commits = list(repo.iter_commits(f'{latestref}..HEAD', reverse=True))
     modified = False
     if commits:
