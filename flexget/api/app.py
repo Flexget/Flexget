@@ -2,9 +2,10 @@ import json
 import os
 import re
 from collections import deque
+from collections.abc import Mapping
 from contextlib import suppress
 from functools import partial, wraps
-from typing import TYPE_CHECKING, Callable, Dict, List, Mapping, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Callable, Optional, Union
 
 from flask import Flask, Request, Response, jsonify, make_response, request
 from flask_compress import Compress
@@ -36,8 +37,8 @@ if TYPE_CHECKING:
         type: str
 
     class MessageDict(_TypeDict):
-        properties: Dict[str, _TypeDict]
-        required: List[str]
+        properties: dict[str, _TypeDict]
+        required: list[str]
 
     PaginationHeaders = TypedDict(
         'PaginationHeaders', {'Link': str, 'Total-Count': int, 'Count': int}
@@ -117,7 +118,7 @@ class API(RestxAPI):
     def validate(
         self,
         model: Model,
-        schema_override: Optional[Dict[str, List[Dict[str, str]]]] = None,
+        schema_override: Optional[dict[str, list[dict[str, str]]]] = None,
         description=None,
     ):
         """
@@ -168,7 +169,7 @@ class API(RestxAPI):
     def pagination_parser(
         self,
         parser: RequestParser = None,
-        sort_choices: Optional[List[str]] = None,
+        sort_choices: Optional[list[str]] = None,
         default: Optional[str] = None,
         add_sort: Optional[bool] = None,
     ) -> RequestParser:
@@ -328,7 +329,7 @@ class ValidationError(APIError):
     )
 
     def __init__(
-        self, validation_errors: List[SchemaValidationError], message: str = 'validation error'
+        self, validation_errors: list[SchemaValidationError], message: str = 'validation error'
     ) -> None:
         payload = {
             'validation_errors': [self._verror_to_dict(error) for error in validation_errors]
@@ -336,7 +337,7 @@ class ValidationError(APIError):
         super().__init__(message, payload=payload)
 
     def _verror_to_dict(self, error: SchemaValidationError) -> Mapping[str, Union[str, list]]:
-        error_dict: Dict[str, Union[str, list]] = {}
+        error_dict: dict[str, Union[str, list]] = {}
         for attr in self.verror_attrs:
             if isinstance(getattr(error, attr), deque):
                 error_dict[attr] = list(getattr(error, attr))
@@ -363,7 +364,7 @@ def success_response(message: str, status_code: int = 200, status: str = 'succes
 @api.errorhandler(Conflict)
 @api.errorhandler(NotModified)
 @api.errorhandler(PreconditionFailed)
-def api_errors(error: APIError) -> Tuple[dict, int]:
+def api_errors(error: APIError) -> tuple[dict, int]:
     return error.to_dict(), error.status_code
 
 

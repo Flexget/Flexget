@@ -4,8 +4,9 @@
 # Test scripts and other short code fragments can be considered as being in the public domain.
 import binascii
 import re
+from collections.abc import Generator, Iterator
 from contextlib import suppress
-from typing import Any, Callable, Dict, Generator, Iterator, List, Optional, Union
+from typing import Any, Callable, Optional, Union
 
 from loguru import logger
 
@@ -39,7 +40,7 @@ METAFILE_STD_KEYS = [
 
 
 def clean_meta(
-    meta: Dict[str, Any],
+    meta: dict[str, Any],
     including_info: bool = False,
     log_func: Optional[Callable[..., None]] = None,
 ):
@@ -144,7 +145,7 @@ def decode_item(src_iter: Iterator[bytes], token: bytes) -> Union[bytes, str, in
     return data
 
 
-def bdecode(text: bytes) -> Dict[str, Any]:
+def bdecode(text: bytes) -> dict[str, Any]:
     try:
         src_iter = tokenize(text)
         data = decode_item(src_iter, next(src_iter))
@@ -233,7 +234,7 @@ class Torrent:
             ", ".join(f"{key}={self.content.get(key)!r}" for key in ("announce", "comment")),
         )
 
-    def get_filelist(self) -> List[Dict[str, Union[str, int]]]:
+    def get_filelist(self) -> list[dict[str, Union[str, int]]]:
         """Return array containing fileinfo dictionaries (name, length, path)"""
         files = []
         if 'length' in self.content['info']:
@@ -303,7 +304,7 @@ class Torrent:
         return self.content['info'].get('private', False)
 
     @property
-    def trackers(self) -> List[str]:
+    def trackers(self) -> list[str]:
         """
         :returns: List of trackers, supports single-tracker and multi-tracker implementations
         """

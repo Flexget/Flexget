@@ -3,7 +3,7 @@ import copy
 from datetime import datetime, timedelta
 from json import JSONEncoder
 from queue import Empty, Queue
-from typing import TYPE_CHECKING, Any, Dict
+from typing import TYPE_CHECKING, Any
 
 from flask import Response, jsonify, request
 from flask_restx import inputs
@@ -395,9 +395,9 @@ if TYPE_CHECKING:
     class StreamTaskDict(TypedDict):
         queue: ExecuteLog
         last_update: datetime
-        args: Dict[str, Any]
+        args: dict[str, Any]
 
-    _streams: Dict[str, StreamTaskDict]
+    _streams: dict[str, StreamTaskDict]
 _streams = {}
 
 # Another namespace for the same endpoint

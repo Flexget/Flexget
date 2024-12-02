@@ -85,7 +85,7 @@ class YamlManagedList(MutableSet):
         """
         top_fields = ['title', 'url']
 
-        def sort_key(item: typing.Tuple[str, typing.Any]) -> typing.Tuple[int, str]:
+        def sort_key(item: tuple[str, typing.Any]) -> tuple[int, str]:
             # Sort important fields first, then the rest of the fields alphabetically
             try:
                 return top_fields.index(item[0]), ''

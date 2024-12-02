@@ -1,11 +1,12 @@
 import os
 import re
 import time
+from collections.abc import Iterable
 from functools import total_ordering
 from http.client import BadStatusLine
 from importlib import import_module
 from pathlib import Path
-from typing import Callable, Dict, Iterable, List, Optional, Union
+from typing import Callable, Optional, Union
 from urllib.error import HTTPError, URLError
 
 import loguru
@@ -189,14 +190,14 @@ phase_methods = {
 phase_methods.update((_phase, 'on_task_' + _phase) for _phase in task_phases)  # DRY
 
 # Mapping of plugin name to PluginInfo instance (logical singletons)
-plugins: Dict[str, 'PluginInfo'] = {}
+plugins: dict[str, 'PluginInfo'] = {}
 
 # Loading done?
 plugins_loaded = False
 
 _loaded_plugins = {}
 _plugin_options = []
-_new_phase_queue: Dict[str, List[Optional[str]]] = {}
+_new_phase_queue: dict[str, list[Optional[str]]] = {}
 
 
 def register_task_phase(name: str, before: Optional[str] = None, after: Optional[str] = None):
@@ -245,7 +246,7 @@ class PluginInfo(dict):
         self,
         plugin_class: type,
         name: Optional[str] = None,
-        interfaces: Optional[List[str]] = None,
+        interfaces: Optional[list[str]] = None,
         builtin: bool = False,
         debug: bool = False,
         api_ver: int = 1,
@@ -288,7 +289,7 @@ class PluginInfo(dict):
         self.builtin = builtin
         self.debug = debug
         self.category = category
-        self.phase_handlers: Dict[str, Event] = {}
+        self.phase_handlers: dict[str, Event] = {}
         self.schema: config_schema.JsonSchema = {}
         self.schema_id: Optional[str] = None
 
@@ -373,7 +374,7 @@ class PluginInfo(dict):
 register = PluginInfo
 
 
-def _get_standard_plugins_path() -> List[str]:
+def _get_standard_plugins_path() -> list[str]:
     """
     :returns: List of directories where traditional plugins should be tried to load from.
     """
@@ -388,7 +389,7 @@ def _get_standard_plugins_path() -> List[str]:
     return paths
 
 
-def _get_standard_components_path() -> List[str]:
+def _get_standard_components_path() -> list[str]:
     """
     :returns: List of directories where component plugins should be tried to load from.
     """
@@ -445,7 +446,7 @@ def _import_plugin(module_name: str, plugin_path: Union[str, Path]) -> None:
         logger.trace('Loaded module {} from {}', module_name, plugin_path)
 
 
-def _load_plugins_from_dirs(dirs: List[str]) -> None:
+def _load_plugins_from_dirs(dirs: list[str]) -> None:
     """
     :param list dirs: Directories from where plugins are loaded from
     """
@@ -468,7 +469,7 @@ def _load_plugins_from_dirs(dirs: List[str]) -> None:
 
 
 # TODO: this is now identical to _load_plugins_from_dirs, REMOVE
-def _load_components_from_dirs(dirs: List[str]) -> None:
+def _load_components_from_dirs(dirs: list[str]) -> None:
     """
     :param list dirs: Directories where plugin components are loaded from
     """
@@ -524,7 +525,7 @@ def _load_plugins_from_packages() -> None:
 
 
 def load_plugins(
-    extra_plugins: Optional[List[str]] = None, extra_components: Optional[List[str]] = None
+    extra_plugins: Optional[list[str]] = None, extra_components: Optional[list[str]] = None
 ) -> None:
     """
     Load plugins from the standard plugin and component paths.
@@ -615,7 +616,7 @@ def register_schema():
     config_schema.register_schema('/schema/plugins', plugin_schemas)
 
 
-def get_phases_by_plugin(name: str) -> List[str]:
+def get_phases_by_plugin(name: str) -> list[str]:
     """Return all phases plugin :name: hooks"""
     return list(get_plugin_by_name(name).phase_handlers)
 

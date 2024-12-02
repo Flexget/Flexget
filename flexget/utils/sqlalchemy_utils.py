@@ -2,7 +2,7 @@
 Miscellaneous SQLAlchemy helpers.
 """
 
-from typing import Any, List, Optional, Union
+from typing import Any, Optional, Union
 
 from loguru import logger
 from sqlalchemy import ColumnDefault, Index, Sequence, text
@@ -54,7 +54,7 @@ def table_schema(name: str, session: Session) -> Table:
     return Table(name, MetaData(), autoload_with=session.bind)
 
 
-def table_columns(table: Union[str, Table], session: Session) -> List[str]:
+def table_columns(table: Union[str, Table], session: Session) -> list[str]:
     """
     :param string table: Name of table or table schema
     :param Session session: SQLAlchemy Session
@@ -137,7 +137,7 @@ def table_add_column(
         session.commit()
 
 
-def drop_tables(names: List[str], session: Session) -> None:
+def drop_tables(names: list[str], session: Session) -> None:
     """Takes a list of table names and drops them from the database if they exist."""
     metadata = MetaData()
     metadata.reflect(bind=session.bind)

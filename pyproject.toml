@@ -6,7 +6,7 @@ description = """\
     different sources like RSS-feeds, html-pages, various sites and more.\
 """
 readme = "README.rst"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 authors = [
     { name = "Marko Koivusalo", email = "marko.koivusalo@gmail.com" },
     { name = "Chase Sterling", email = "chase.sterling@gmail.com" },
@@ -54,7 +54,7 @@ description = ""
 authors = []
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.9"
 apscheduler = ">=3.10.0"
 beautifulsoup4 = ">=4.5"
 colorama = ">=0.4.4"
@@ -142,7 +142,7 @@ testpaths = ["flexget/tests"]
 [tool.black]
 line-length = 99
 skip-string-normalization = true
-target-version = ['py38', 'py39', 'py310', 'py311', 'py312']
+target-version = ['py39', 'py310', 'py311', 'py312', 'py313']
 # Only include files in /flexget/, or directly in project root
 include = '^/(flexget/.*)?[^/]*\.pyi?$'
 exclude = '''

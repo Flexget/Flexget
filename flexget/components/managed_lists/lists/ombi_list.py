@@ -176,7 +176,7 @@ class OmbiEntry:
         """Check if an entry in Ombi has already been requested.
 
         Returns:
-            Tuple[bool, str]: A tuple containing a boolean indicating if the entry has already been requested and a string indicating the status of the entry.
+            tuple[bool, str]: A tuple containing a boolean indicating if the entry has already been requested and a string indicating the status of the entry.
         """
 
         if self.data['requested']:
@@ -839,7 +839,7 @@ class OmbiSet(MutableSet):
             plugin.PluginError: If the api_key or username/password are not defined.
 
         Returns:
-            Dict[str, str]: Authorization headers.
+            dict[str, str]: Authorization headers.
         """
 
         if "api_key" in self.config:
@@ -862,7 +862,7 @@ class OmbiSet(MutableSet):
             plugin.PluginError: If an error occurs while retrieving the list of items.
 
         Returns:
-            Dict[str, Any]: A dictionary containing all the items that have been requested in Ombi.
+            dict[str, Any]: A dictionary containing all the items that have been requested in Ombi.
         """
         request = OmbiRequest(self.config)
 
