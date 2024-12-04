@@ -658,7 +658,7 @@ class OutputDeluge(DelugePlugin):
                 if opts.get('main_file_only'):
                     # download only the main file (and subs)
                     file_priorities = [
-                        1 if f == main_file or f == sub_file and keep_subs else 0
+                        1 if f == main_file or (f == sub_file and keep_subs) else 0
                         for f in status['files']
                     ]
                     client.call(

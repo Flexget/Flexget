@@ -76,4 +76,4 @@ class TestExec:
                 line = infile.readline().rstrip('\n')
                 assert line == '/start/single \' double"', f'{line} != /start/single \' double"'
                 line = infile.readline().rstrip('\n')
-                assert line == '% a $a! ` *', '%s != % a $a! ` *' % line
+                assert line == '% a $a! ` *', f'{line} != % a $a! ` *'

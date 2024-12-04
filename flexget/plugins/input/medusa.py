@@ -80,10 +80,8 @@ class Medusa:
         entries = []
         for show in series:
             logger.debug('processing show: {}', show)
-            if (
-                (show['config']['paused'] and config.get('only_monitored'))
-                or show['status'] == 'Ended'
-                and not config.get('include_ended')
+            if (show['config']['paused'] and config.get('only_monitored')) or (
+                show['status'] == 'Ended' and not config.get('include_ended')
             ):
                 logger.debug('discarted show: {}', show)
 

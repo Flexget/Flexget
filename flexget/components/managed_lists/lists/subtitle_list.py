@@ -120,7 +120,7 @@ class SubtitleListList(Base):
     )
 
     def __repr__(self):
-        return '<SubtitleListList name=%s,id=%d>' % (self.name, self.id)
+        return f'<SubtitleListList name={self.name},id={self.id}>'
 
     def to_dict(self):
         return {'id': self.id, 'name': self.name, 'added_on': self.added}
@@ -144,7 +144,7 @@ class SubtitleListFile(Base):
     def to_entry(self):
         entry = Entry()
         entry['title'] = self.title
-        entry['url'] = 'mock://localhost/subtitle_list/%d' % self.id
+        entry['url'] = f'mock://localhost/subtitle_list/{self.id}'
         entry['location'] = self.location
         entry['remove_after'] = self.remove_after
         entry['added'] = self.added

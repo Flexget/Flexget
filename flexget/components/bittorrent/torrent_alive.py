@@ -23,7 +23,7 @@ class TorrentAliveThread(threading.Thread):
     _counter = itertools.count()
 
     def __init__(self, tracker, info_hash):
-        threading.Thread.__init__(self, name='torrent_alive-%d' % next(self._counter))
+        threading.Thread.__init__(self, name=f'torrent_alive-{next(self._counter)}')
         self.tracker = tracker
         self.info_hash = info_hash
         self.tracker_seeds = 0
@@ -201,8 +201,9 @@ class TorrentAlive:
         for entry in task.entries:
             if 'torrent_seeds' in entry and entry['torrent_seeds'] < config['min_seeds']:
                 entry.reject(
-                    reason='Had < %d required seeds. (%s)'
-                    % (config['min_seeds'], entry['torrent_seeds'])
+                    reason='Had < {} required seeds. ({})'.format(
+                        config['min_seeds'], entry['torrent_seeds']
+                    )
                 )
 
     # Run on output phase so that we let torrent plugin output modified torrent file first

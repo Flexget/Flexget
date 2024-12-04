@@ -128,7 +128,7 @@ class TestInputRSS:
             title='Multiple enclosures', url='http://localhost/multiple_enclosures'
         )
         assert entry, 'Entry not created for item with multiple enclosures'
-        urls = ['http://localhost/enclosure%d' % num for num in range(1, 3)]
+        urls = [f'http://localhost/enclosure{num}' for num in range(1, 3)]
         urls_not_present = [url for url in urls if url not in entry.get('urls')]
         assert not urls_not_present, f'{urls_not_present} should be present in urls list'
         # Test no entries were made for the enclosures

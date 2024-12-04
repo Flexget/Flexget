@@ -287,7 +287,7 @@ class ServerDumpThreads(APIResource):
         for threadId, stack in sys._current_frames().items():
             dump = []
             for filename, lineno, name, line in traceback.extract_stack(stack):
-                dump.append('File: "%s", line %d, in %s' % (filename, lineno, name))
+                dump.append(f'File: "{filename}", line {lineno}, in {name}')
                 if line:
                     dump.append(line.strip())
             threads.append({'name': id2name.get(threadId), 'id': threadId, 'dump': dump})

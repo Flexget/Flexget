@@ -39,11 +39,11 @@ class NextSeriesEpisodes:
         self.rerun_entries = []
 
     def ep_identifiers(self, season, episode):
-        return ['S%02dE%02d' % (season, episode), '%dx%02d' % (season, episode)]
+        return [f'S{season:02d}E{episode:02d}', f'{season}x{episode:02d}']
 
     def sequence_identifiers(self, episode):
         # Use a set to remove doubles, which will happen depending on number of digits in episode
-        return {'%d' % episode, '%02d' % episode, '%03d' % episode}
+        return {f'{episode}', f'{episode:02d}', f'{episode:03d}'}
 
     def search_entry(self, series, season, episode, task, rerun=True):
         # Extract the alternate names for the series
@@ -54,7 +54,7 @@ class NextSeriesEpisodes:
             alts.append(paren_match.group(1))
         if series.identified_by == 'ep':
             search_strings = [f'{series.name} {id}' for id in self.ep_identifiers(season, episode)]
-            series_id = 'S%02dE%02d' % (season, episode)
+            series_id = f'S{season:02d}E{episode:02d}'
             for alt in alts:
                 search_strings.extend(
                     [f'{alt} {id}' for id in self.ep_identifiers(season, episode)]

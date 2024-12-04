@@ -72,7 +72,7 @@ def clean_meta(
             for key in list(entry.keys()):
                 if ["info", "files", key] not in METAFILE_STD_KEYS:
                     if log_func:
-                        log_func("Removing key %r from file #%d..." % (key, idx + 1))
+                        log_func(f"Removing key {key!r} from file #{idx + 1}...")
                     del entry[key]
                     modified.add("info.files." + key)
 

@@ -152,7 +152,7 @@ class NextTraktEpisodes:
         entry['series_season'] = season
         entry['series_episode'] = episode
         entry['series_id_type'] = 'ep'
-        entry['series_id'] = 'S%02dE%02d' % (season, episode)
+        entry['series_id'] = f'S{season:02d}E{episode:02d}'
         entry['title'] = entry['series_name'] + ' ' + entry['series_id']
         entry['url'] = 'https://trakt.tv/shows/{}/seasons/{}/episodes/{}'.format(
             fields['trakt_id'],

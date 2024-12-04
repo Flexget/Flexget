@@ -833,10 +833,8 @@ class SeriesSeasonsReleasesAPI(APIResource):
         release_items = []
         for release in season.releases:
             if (
-                downloaded
-                and release.downloaded
-                or downloaded is False
-                and not release.downloaded
+                (downloaded and release.downloaded)
+                or (downloaded is False and not release.downloaded)
                 or not downloaded
             ):
                 release_items.append(release)
@@ -944,9 +942,7 @@ class SeriesSeasonReleaseAPI(APIResource):
             fire_event('forget', release.title)
 
         db.delete_season_release_by_id(rel_id)
-        return success_response(
-            'successfully deleted release %d from season %d' % (rel_id, season_id)
-        )
+        return success_response(f'successfully deleted release {rel_id} from season {season_id}')
 
     @api.response(200, 'Successfully reset downloaded release status', model=season_release_schema)
     @api.doc(
@@ -1090,10 +1086,8 @@ class SeriesEpisodeReleasesAPI(APIResource):
         release_items = []
         for release in episode.releases:
             if (
-                downloaded
-                and release.downloaded
-                or downloaded is False
-                and not release.downloaded
+                (downloaded and release.downloaded)
+                or (downloaded is False and not release.downloaded)
                 or not downloaded
             ):
                 release_items.append(release)
@@ -1201,9 +1195,7 @@ class SeriesEpisodeReleaseAPI(APIResource):
             fire_event('forget', release.title)
 
         db.delete_episode_release_by_id(rel_id)
-        return success_response(
-            'successfully deleted release %d from episode %d' % (rel_id, ep_id)
-        )
+        return success_response(f'successfully deleted release {rel_id} from episode {ep_id}')
 
     @api.response(
         200, 'Successfully reset downloaded release status', model=episode_release_schema

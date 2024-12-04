@@ -39,7 +39,7 @@ def clear_failed(manager):
     # TODO: this should be a function in db.py
     with Session() as session:
         results = session.query(db.FailedEntry).delete()
-        console('Cleared %i items.' % results)
+        console(f'Cleared {results} items.')
         session.commit()
         if results:
             manager.config_changed()

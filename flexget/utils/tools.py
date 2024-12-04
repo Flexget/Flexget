@@ -79,7 +79,7 @@ def _htmldecode(text: str) -> str:
     else:
 
         def uchr(value):
-            value > 127 and chr(value) or chr(value)
+            (value > 127 and chr(value)) or chr(value)
 
     def entitydecode(match, uchr=uchr):
         entity = match.group(1)

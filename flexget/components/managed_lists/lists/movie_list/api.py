@@ -168,7 +168,7 @@ class MovieListListAPI(APIResource):
         try:
             movie_list = db.get_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
-            raise NotFoundError('list_id %d does not exist' % list_id)
+            raise NotFoundError(f'list_id {list_id} does not exist')
         return jsonify(movie_list.to_dict())
 
     @api.response(200, model=base_message_schema)
@@ -178,7 +178,7 @@ class MovieListListAPI(APIResource):
         try:
             movie_list = db.get_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
-            raise NotFoundError('list_id %d does not exist' % list_id)
+            raise NotFoundError(f'list_id {list_id} does not exist')
         session.delete(movie_list)
         return success_response('successfully deleted list')
 
@@ -222,7 +222,7 @@ class MovieListMoviesAPI(APIResource):
         try:
             list = db.get_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
-            raise NotFoundError('list_id %d does not exist' % list_id)
+            raise NotFoundError(f'list_id {list_id} does not exist')
 
         total_items = list.movies.count()
 
@@ -259,7 +259,7 @@ class MovieListMoviesAPI(APIResource):
         try:
             db.get_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
-            raise NotFoundError('list_id %d does not exist' % list_id)
+            raise NotFoundError(f'list_id {list_id} does not exist')
         data = request.json
         movie_identifiers = data.get('movie_identifiers', [])
         # Validates ID type based on allowed ID
@@ -271,7 +271,7 @@ class MovieListMoviesAPI(APIResource):
             list_id=list_id, title=title, year=year, session=session
         )
         if movie:
-            raise Conflict('movie with name "%s" already exist in list %d' % (title, list_id))
+            raise Conflict(f'movie with name "{title}" already exist in list {list_id}')
         movie = db.MovieListMovie()
         movie.title = title
         movie.year = year
@@ -295,7 +295,7 @@ class MovieListMovieAPI(APIResource):
         try:
             movie = db.get_movie_by_id(list_id=list_id, movie_id=movie_id, session=session)
         except NoResultFound:
-            raise NotFoundError('could not find movie with id %d in list %d' % (movie_id, list_id))
+            raise NotFoundError(f'could not find movie with id {movie_id} in list {list_id}')
         return jsonify(movie.to_dict())
 
     @api.response(200, model=base_message_schema)
@@ -304,10 +304,10 @@ class MovieListMovieAPI(APIResource):
         try:
             movie = db.get_movie_by_id(list_id=list_id, movie_id=movie_id, session=session)
         except NoResultFound:
-            raise NotFoundError('could not find movie with id %d in list %d' % (movie_id, list_id))
-        logger.debug('deleting movie {}', movie.id)
+            raise NotFoundError(f'could not find movie with id {movie_id} in list {list_id}')
+        logger.debug(f'deleting movie {movie.id}')
         session.delete(movie)
-        return success_response('successfully deleted movie %d' % movie_id)
+        return success_response(f'successfully deleted movie {movie_id}')
 
     @api.validate(model=input_movie_list_id_schema, description=movie_identifiers_doc)
     @api.response(200, model=movie_list_object_schema)
@@ -320,7 +320,7 @@ class MovieListMovieAPI(APIResource):
         try:
             movie = db.get_movie_by_id(list_id=list_id, movie_id=movie_id, session=session)
         except NoResultFound:
-            raise NotFoundError('could not find movie with id %d in list %d' % (movie_id, list_id))
+            raise NotFoundError(f'could not find movie with id {movie_id} in list {list_id}')
         data = request.json
 
         # Validates ID type based on allowed ID

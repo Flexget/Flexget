@@ -196,10 +196,8 @@ class CouchPotatoSet(MutableSet):
         for cp_entry in self.movies:
             for sup_id in self.supported_ids:
                 if (
-                    entry.get(sup_id) is not None
-                    and entry[sup_id] == cp_entry[sup_id]
-                    or entry.get('title').lower() == cp_entry.get('title').lower()
-                ):
+                    entry.get(sup_id) is not None and entry[sup_id] == cp_entry[sup_id]
+                ) or entry.get('title').lower() == cp_entry.get('title').lower():
                     return cp_entry
 
     def __init__(self, config):
