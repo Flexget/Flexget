@@ -2,6 +2,7 @@ import pytest
 
 
 @pytest.mark.online
+@pytest.mark.xdist_group(name="npo_watchlist")
 class TestNpoWatchlistInfo:
     config = """
         tasks:
@@ -67,6 +68,7 @@ class TestNpoWatchlistInfo:
 
 
 @pytest.mark.online
+@pytest.mark.xdist_group(name="npo_watchlist")
 class TestNpoWatchlistPremium:
     config = """
         tasks:
@@ -92,6 +94,7 @@ class TestNpoWatchlistPremium:
 
 
 @pytest.mark.online
+@pytest.mark.xdist_group(name="npo_watchlist")
 class TestNpoWatchlistLanguageTheTVDBLookup:
     config = """
         tasks:
