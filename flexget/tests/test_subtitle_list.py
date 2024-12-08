@@ -1,6 +1,5 @@
 import datetime
 import os
-import sys
 
 import pytest
 
@@ -11,14 +10,9 @@ from flexget.components.managed_lists.lists.subtitle_list import (
 )
 from flexget.manager import Session
 
-try:
-    import subliminal
-except ImportError:
-    subliminal = babelfish = None
 
-
-@pytest.mark.usefixtures('tmpdir')
 @pytest.mark.filecopy(['movie.mkv', 'series.mkv'], '__tmp__')
+@pytest.mark.xdist_group(name="subtitle_list")
 class TestSubtitleList:
     config = """
          templates:
@@ -261,11 +255,8 @@ class TestSubtitleList:
         task = execute_task('subtitle_emit')
         assert len(task.entries) == 0, 'File should have expired.'
 
-    # Skip if subliminal is not installed or if python version <2.7
     @pytest.mark.xfail(reason="No idea what this test is supposed to test, but it fails.")
     @pytest.mark.online
-    @pytest.mark.skipif(sys.version_info < (2, 7), reason='requires python2.7')
-    @pytest.mark.skipif(not subliminal, reason='requires subliminal')
     def test_subtitle_list_subliminal_fail(self, execute_task):
         task = execute_task('subtitle_add_with_languages')
 
@@ -274,11 +265,8 @@ class TestSubtitleList:
         task = execute_task('subtitle_fail')
         assert len(task.rejected) == 2, 'Entries should be rejected since the files are not valid.'
 
-    # Skip if subliminal is not installed or if python version <2.7
     @pytest.mark.skip
     @pytest.mark.online
-    @pytest.mark.skipif(sys.version_info < (2, 7), reason='requires python2.7')
-    @pytest.mark.skipif(not subliminal, reason='requires subliminal')
     def test_subtitle_list_subliminal_semi_fail(self, execute_task):
         task = execute_task('subtitle_add_local_file')
 
@@ -296,10 +284,7 @@ class TestSubtitleList:
             len(task.failed) == 1
         ), 'Only one language should have been downloaded which results in failure'
 
-    # Skip if subliminal is not installed or if python version <2.7
     @pytest.mark.skip(reason="Test sporadically fails")
-    # @pytest.mark.skipif(sys.version_info < (2, 7), reason='requires python2.7')
-    # @pytest.mark.skipif(not subliminal, reason='requires subliminal')
     def test_subtitle_list_subliminal_success(self, execute_task):
         task = execute_task('subtitle_add_local_file')
         assert len(task.entries) == 1, 'Task should have accepted walking dead local file'
@@ -336,9 +321,6 @@ class TestSubtitleList:
         except OSError:
             pass
 
-    # Skip if subliminal is not installed or if python version <2.7
-    @pytest.mark.skipif(sys.version_info < (2, 7), reason='requires python2.7')
-    @pytest.mark.skipif(not subliminal, reason='requires subliminal')
     def test_subtitle_list_local_subtitles(self, execute_task):
         task = execute_task('subtitle_add_local_file')
         task = execute_task('subtitle_add_another_local_file')
@@ -364,9 +346,6 @@ class TestSubtitleList:
             len(task.entries) == 3
         ), 'Should have found 3 video files and the containing dir should not be included.'
 
-    # Skip if subliminal is not installed or if python version <2.7
-    @pytest.mark.skipif(sys.version_info < (2, 7), reason='requires python2.7')
-    @pytest.mark.skipif(not subliminal, reason='requires subliminal')
     def test_subtitle_list_subliminal_dir_success(self, execute_task):
         task = execute_task('subtitle_add_local_dir')
 

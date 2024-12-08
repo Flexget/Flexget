@@ -1,7 +1,6 @@
 import pytest
 
 
-@pytest.mark.usefixtures('tmpdir')
 @pytest.mark.filecopy('test.torrent', '__tmp__/')
 @pytest.mark.filecopy('multi.torrent', '__tmp__/')
 class TestContentFilter:

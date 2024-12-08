@@ -7,6 +7,7 @@ from flexget.task import Task, TaskAbort
 from .test_sftp_server import TestSFTPFileSystem, TestSFTPServerController
 
 
+@pytest.mark.xdist_group(name="sftp")
 class TestSftpList:
     config = """
         templates:

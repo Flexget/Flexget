@@ -19,7 +19,7 @@ mdurl==0.1.2 ; python_version >= "3.9" and python_version < "4.0"
 more-itertools==10.5.0 ; python_version >= "3.9" and python_version < "4.0" and (platform_machine != "ppc64le" and platform_machine != "s390x")
 nh3==0.2.19 ; python_version >= "3.9" and python_version < "4.0"
 packaging==24.2 ; python_version >= "3.9" and python_version < "4.0"
-pkginfo==1.11.2 ; python_version >= "3.9" and python_version < "4.0"
+pkginfo==1.12.0 ; python_version >= "3.9" and python_version < "4.0"
 pycparser==2.22 ; python_version >= "3.9" and python_version < "4.0" and (platform_machine != "ppc64le" and platform_machine != "s390x") and sys_platform == "linux" and platform_python_implementation != "PyPy"
 pygments==2.18.0 ; python_version >= "3.9" and python_version < "4.0"
 pyproject-hooks==1.2.0 ; python_version >= "3.9" and python_version < "4.0"

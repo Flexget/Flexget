@@ -66,8 +66,7 @@ def manager(
     """
     Create a :class:`MockManager` for this test based on `config` argument.
     """
-    if 'tmpdir' in request.fixturenames:
-        config = config.replace('__tmp__', request.getfixturevalue('tmpdir').strpath)
+    config = config.replace('__tmp__', request.getfixturevalue('tmp_path').as_posix())
     try:
         mockmanager = MockManager(config, request.cls.__name__)
     except Exception:
@@ -257,8 +256,7 @@ def filecopy(request):
         for sources, dst in copy_list:
             if isinstance(sources, str):
                 sources = [sources]
-            if 'tmpdir' in request.fixturenames:
-                dst = dst.replace('__tmp__', request.getfixturevalue('tmpdir').strpath)
+            dst = dst.replace('__tmp__', request.getfixturevalue('tmp_path').as_posix())
             dst = Path(dst)
             for f in itertools.chain(*(Path().glob(src) for src in sources)):
                 dest_path = dst
