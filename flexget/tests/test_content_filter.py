@@ -87,6 +87,22 @@ class TestContentFilter:
             accept_all: yes
             content_filter:
               max_files: 3
+
+          test_list_populate:
+            mock:
+              - ubuntu
+            accept_all: yes
+            list_add:
+              - entry_list: accept-list
+
+          test_list_require:
+            mock:
+              - {title: 'test', file: '__tmp__/test.torrent'}
+            accept_all: yes
+            content_filter:
+              require:
+                from:
+                  - entry_list: accept-list
     """
 
     def test_reject1(self, execute_task):
@@ -149,3 +165,8 @@ class TestContentFilter:
 
         assert task.find_entry('rejected', title='manyfiles'), 'should have rejected, >3 files'
         assert task.find_entry('accepted', title='onefile'), 'should have accepted, has <=3 files'
+
+    def test_list_require(self, execute_task):
+        execute_task('test_list_populate')
+        task = execute_task('test_list_require')
+        assert task.find_entry('accepted', title='test'), 'should have accepted, contains ubuntu'

@@ -3,8 +3,8 @@ from fnmatch import fnmatch
 from loguru import logger
 
 from flexget import plugin
-from flexget.config_schema import one_or_more
 from flexget.event import event
+from flexget.plugin import PluginError
 
 logger = logger.bind(name='content_filter')
 
@@ -19,7 +19,41 @@ class FilterContentFilter:
         require:
           - '*.avi'
           - '*.mkv'
+        reject:
+          from:
+            - regexp_list: my-rejections
     """
+
+    lists_schema = {
+        'oneOf': [
+            {'type': 'string'},
+            {
+                'type': 'array',
+                'items': {'type': 'string'},
+                'minItems': 1,
+                'uniqueItems': False,
+            },
+            {
+                'type': 'object',
+                'properties': {
+                    'from': {
+                        'type': 'array',
+                        'items': {
+                            'allOf': [
+                                {'$ref': '/schema/plugins?interface=list'},
+                                {
+                                    'maxProperties': 1,
+                                    'error_maxProperties': 'Plugin options within content_filter plugin must be indented '
+                                    '2 more spaces than the first letter of the plugin name.',
+                                    'minProperties': 1,
+                                },
+                            ]
+                        },
+                    }
+                },
+            },
+        ]
+    }
 
     schema = {
         'type': 'object',
@@ -27,9 +61,9 @@ class FilterContentFilter:
             'min_files': {'type': 'integer'},
             'max_files': {'type': 'integer'},
             # These two properties allow a string or list of strings
-            'require': one_or_more({'type': 'string'}),
-            'require_all': one_or_more({'type': 'string'}),
-            'reject': one_or_more({'type': 'string'}),
+            'require': lists_schema,
+            'require_all': lists_schema,
+            'reject': lists_schema,
             'require_mainfile': {'type': 'boolean', 'default': False},
             'strict': {'type': 'boolean', 'default': False},
         },
@@ -41,6 +75,20 @@ class FilterContentFilter:
             if key in config:
                 if isinstance(config[key], str):
                     config[key] = [config[key]]
+                elif isinstance(config[key], dict) and config[key].get('from'):
+                    for item in config[key]['from']:
+                        for plugin_name, plugin_config in item.items():
+                            try:
+                                config[key] = [
+                                    f"*{entry['title']}*"
+                                    for entry in plugin.get(plugin_name, self).get_list(
+                                        plugin_config
+                                    )
+                                ]
+                            except AttributeError:
+                                raise PluginError(
+                                    f'Plugin {plugin_name} does not support list interface'
+                                )
         return config
 
     def process_entry(self, task, entry, config):
