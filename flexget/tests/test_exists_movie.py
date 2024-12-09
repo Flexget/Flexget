@@ -97,17 +97,17 @@ class TestExistsMovie:
     test_dirs = ['Existence.2012', 'Quality.of.Life.720p', 'Quality.of.Life.xvid.540p', 'Subs']
 
     @pytest.fixture(params=['internal', 'guessit'], ids=['internal', 'guessit'])
-    def config(self, request, tmpdir):
+    def config(self, request, tmp_path):
         """Override and parametrize default config fixture for all series tests."""
         for test_dir in self.test_dirs:
-            tmpdir.mkdir(test_dir)
+            tmp_path.joinpath(test_dir).mkdir()
         # create test files
         for test_file in self.test_files:
-            tmpdir.join(test_file).write('')
+            tmp_path.joinpath(test_file).write_text('')
         return (
             Template(self._config)
             .render({'parser': request.param})
-            .replace('__tmp__', tmpdir.strpath)
+            .replace('__tmp__', tmp_path.as_posix())
         )
 
     def test_existing_dirs(self, execute_task):
