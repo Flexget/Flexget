@@ -60,7 +60,7 @@ jobs:
       run: poetry install --no-interaction
     - name: Test with pytest
       run: |
-        poetry run pytest -n logical -p no:legacypath --dist loadgroup --junit-xml=test-results.xml
+        poetry run pytest --junit-xml=test-results.xml
     - name: Upload Test Results
       if: always()
       uses: actions/upload-artifact@v4
