@@ -135,6 +135,7 @@ flexget = 'flexget:main'
 ## Other tool settings
 
 [tool.pytest.ini_options]
+addopts = '-n logical -p no:legacypath --dist loadgroup'
 testpaths = ["flexget/tests"]
 
 # We switched to using ruff for formatting, but leaving this in for now
