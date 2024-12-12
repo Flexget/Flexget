@@ -98,10 +98,10 @@ class FilterContentFilter:
                     any(matching_mask(file, mask) for file in files) for mask in config['require']
                 ):
                     logger.info(
-                        'Entry {} does not have any of the required filetypes, rejecting',
+                        'Entry {} does not have any of the required files, rejecting',
                         entry['title'],
                     )
-                    entry.reject('does not have any of the required filetypes', remember=True)
+                    entry.reject('does not have any of the required files', remember=True)
                     return True
             if config.get('require_all'):
                 # Make sure each mask matches at least one of the contained files
@@ -110,10 +110,10 @@ class FilterContentFilter:
                     for mask in config['require_all']
                 ):
                     logger.info(
-                        'Entry {} does not have all of the required filetypes, rejecting',
+                        'Entry {} does not have all of the required files, rejecting',
                         entry['title'],
                     )
-                    entry.reject('does not have all of the required filetypes', remember=True)
+                    entry.reject('does not have all of the required files', remember=True)
                     return True
             if config.get('reject'):
                 mask = any(
