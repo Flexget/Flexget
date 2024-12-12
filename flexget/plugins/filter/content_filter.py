@@ -1,3 +1,4 @@
+import re
 from fnmatch import fnmatch
 
 from loguru import logger
@@ -66,6 +67,7 @@ class FilterContentFilter:
             'reject': lists_schema,
             'require_mainfile': {'type': 'boolean', 'default': False},
             'strict': {'type': 'boolean', 'default': False},
+            'regexp_mode': {'type': 'boolean', 'default': False},
         },
         'additionalProperties': False,
     }
@@ -82,18 +84,19 @@ class FilterContentFilter:
             files = entry['content_files']
             logger.debug('{} files: {}', entry['title'], files)
 
-            def matching_mask(files, masks):
+            def matching_mask(file, mask):
                 """Returns matching mask if any files match any of the masks, false otherwise"""
-                for file in files:
-                    for mask in masks:
-                        if fnmatch(file, mask):
-                            return mask
-                return False
+                if config.get('regexp_mode'):
+                    return re.search(mask, file, re.IGNORECASE)
+                else:
+                    return fnmatch(file, mask)
 
             # Avoid confusion by printing a reject message to info log, as
             # download plugin has already printed a downloading message.
             if config.get('require'):
-                if not matching_mask(files, config['require']):
+                if not any(
+                    any(matching_mask(file, mask) for file in files) for mask in config['require']
+                ):
                     logger.info(
                         'Entry {} does not have any of the required filetypes, rejecting',
                         entry['title'],
@@ -103,7 +106,8 @@ class FilterContentFilter:
             if config.get('require_all'):
                 # Make sure each mask matches at least one of the contained files
                 if not all(
-                    any(fnmatch(file, mask) for file in files) for mask in config['require_all']
+                    any(matching_mask(file, mask) for file in files)
+                    for mask in config['require_all']
                 ):
                     logger.info(
                         'Entry {} does not have all of the required filetypes, rejecting',
@@ -112,7 +116,9 @@ class FilterContentFilter:
                     entry.reject('does not have all of the required filetypes', remember=True)
                     return True
             if config.get('reject'):
-                mask = matching_mask(files, config['reject'])
+                mask = any(
+                    any(matching_mask(file, mask) for file in files) for mask in config['reject']
+                )
                 if mask:
                     logger.info('Entry {} has banned file {}, rejecting', entry['title'], mask)
                     entry.reject(f'has banned file {mask}', remember=True)
@@ -156,8 +162,7 @@ class FilterContentFilter:
                     config[key] = [config[key]]
                 elif isinstance(config[key], dict) and config[key].get('from'):
                     config[key] = [
-                        f"*{entry['title']}*"
-                        for entry in aggregate_inputs(task, config[key]['from'])
+                        entry['title'] for entry in aggregate_inputs(task, config[key]['from'])
                     ]
 
         for entry in task.accepted:

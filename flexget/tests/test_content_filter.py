@@ -90,14 +90,14 @@ class TestContentFilter:
 
           test_list_populate_a:
             mock:
-              - ubuntu
+              - ubuntu*
             accept_all: yes
             list_add:
               - entry_list: accept-list
 
           test_list_populate_r:
             mock:
-              - flexget
+              - flexget*
             accept_all: yes
             list_add:
               - entry_list: accept-list
@@ -118,7 +118,7 @@ class TestContentFilter:
             content_filter:
               require:
                 from:
-                  - mock: ['ubuntu']
+                  - mock: ['ubuntu*']
 
           test_input_require_r:
             mock:
@@ -127,7 +127,7 @@ class TestContentFilter:
             content_filter:
               require:
                 from:
-                  - mock: ['flexget']
+                  - mock: ['*flexget*']
 
           test_input_require_all:
             mock:
@@ -136,7 +136,27 @@ class TestContentFilter:
             content_filter:
               require_all:
                 from:
-                  - mock: ['flexget', 'ubuntu']
+                  - mock: ['*flexget*', 'ubuntu*']
+
+          test_regexp_require_a:
+            mock:
+              - {title: 'test', file: '__tmp__/test.torrent'}
+            accept_all: yes
+            content_filter:
+              regexp_mode: yes
+              require:
+                from:
+                  - mock: ['ubuntu']
+
+          test_regexp_require_r:
+            mock:
+              - {title: 'test', file: '__tmp__/test.torrent'}
+            accept_all: yes
+            content_filter:
+              regexp_mode: yes
+              require:
+                from:
+                  - mock: ['flexget']
     """
 
     def test_reject1(self, execute_task):
@@ -227,3 +247,13 @@ class TestContentFilter:
         assert task.find_entry(
             'rejected', title='test'
         ), 'should have rejected, one mask isn\'t satisfied'
+
+    def test_regexp_require_a(self, execute_task):
+        task = execute_task('test_regexp_require_a')
+        assert task.find_entry('accepted', title='test'), 'should have accepted, contains ubuntu'
+
+    def test_regexp_require_r(self, execute_task):
+        task = execute_task('test_regexp_require_r')
+        assert task.find_entry(
+            'rejected', title='test'
+        ), 'should have rejected, mask isn\'t satisfied'
