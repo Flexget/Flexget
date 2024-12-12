@@ -1,5 +1,5 @@
 FROM docker.io/python:3.11-alpine
-ENV PYTHONUNBUFFERED 1
+ENV PYTHONUNBUFFERED=1
 
 RUN apk add --no-cache --upgrade \
         ca-certificates \
@@ -21,7 +21,7 @@ COPY . /flexget
 RUN pip wheel --no-deps --wheel-dir /wheels -e /flexget
 
 FROM docker.io/python:3.11-alpine
-ENV PYTHONUNBUFFERED 1
+ENV PYTHONUNBUFFERED=1
 
 RUN apk add --no-cache --upgrade \
         ca-certificates \
