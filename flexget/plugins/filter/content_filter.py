@@ -4,7 +4,7 @@ from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
-from flexget.plugin import PluginError
+from flexget.utils.tools import aggregate_inputs
 
 logger = logger.bind(name='content_filter')
 
@@ -40,7 +40,7 @@ class FilterContentFilter:
                         'type': 'array',
                         'items': {
                             'allOf': [
-                                {'$ref': '/schema/plugins?interface=list'},
+                                {'$ref': '/schema/plugins?phase=input'},
                                 {
                                     'maxProperties': 1,
                                     'error_maxProperties': 'Plugin options within content_filter plugin must be indented '
@@ -69,27 +69,6 @@ class FilterContentFilter:
         },
         'additionalProperties': False,
     }
-
-    def prepare_config(self, config):
-        for key in ['require', 'require_all', 'reject']:
-            if key in config:
-                if isinstance(config[key], str):
-                    config[key] = [config[key]]
-                elif isinstance(config[key], dict) and config[key].get('from'):
-                    for item in config[key]['from']:
-                        for plugin_name, plugin_config in item.items():
-                            try:
-                                config[key] = [
-                                    f"*{entry['title']}*"
-                                    for entry in plugin.get(plugin_name, self).get_list(
-                                        plugin_config
-                                    )
-                                ]
-                            except AttributeError:
-                                raise PluginError(
-                                    f'Plugin {plugin_name} does not support list interface'
-                                )
-        return config
 
     def process_entry(self, task, entry, config):
         """
@@ -171,7 +150,16 @@ class FilterContentFilter:
             )
             # return
 
-        config = self.prepare_config(config)
+        for key in ['require', 'require_all', 'reject']:
+            if key in config:
+                if isinstance(config[key], str):
+                    config[key] = [config[key]]
+                elif isinstance(config[key], dict) and config[key].get('from'):
+                    config[key] = [
+                        f"*{entry['title']}*"
+                        for entry in aggregate_inputs(task, config[key]['from'])
+                    ]
+
         for entry in task.accepted:
             if self.process_entry(task, entry, config):
                 task.rerun(plugin='content_filter')
