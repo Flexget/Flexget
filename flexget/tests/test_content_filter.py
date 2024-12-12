@@ -88,9 +88,16 @@ class TestContentFilter:
             content_filter:
               max_files: 3
 
-          test_list_populate:
+          test_list_populate_a:
             mock:
               - ubuntu
+            accept_all: yes
+            list_add:
+              - entry_list: accept-list
+
+          test_list_populate_r:
+            mock:
+              - flexget
             accept_all: yes
             list_add:
               - entry_list: accept-list
@@ -103,6 +110,33 @@ class TestContentFilter:
               require:
                 from:
                   - entry_list: accept-list
+
+          test_input_require_a:
+            mock:
+              - {title: 'test', file: '__tmp__/test.torrent'}
+            accept_all: yes
+            content_filter:
+              require:
+                from:
+                  - mock: ['ubuntu']
+
+          test_input_require_r:
+            mock:
+              - {title: 'test', file: '__tmp__/test.torrent'}
+            accept_all: yes
+            content_filter:
+              require:
+                from:
+                  - mock: ['flexget']
+
+          test_input_require_all:
+            mock:
+              - {title: 'test', file: '__tmp__/test.torrent'}
+            accept_all: yes
+            content_filter:
+              require_all:
+                from:
+                  - mock: ['flexget', 'ubuntu']
     """
 
     def test_reject1(self, execute_task):
@@ -113,7 +147,7 @@ class TestContentFilter:
         task = execute_task('test_reject2')
         assert task.find_entry(
             'accepted', title='test'
-        ), 'should have accepted, doesn\t contain *.avi'
+        ), 'should have accepted, doesn\'t contain *.avi'
 
     def test_require1(self, execute_task):
         task = execute_task('test_require1')
@@ -123,7 +157,7 @@ class TestContentFilter:
         task = execute_task('test_require2')
         assert task.find_entry(
             'rejected', title='test'
-        ), 'should have rejected, doesn\t contain *.avi'
+        ), 'should have rejected, doesn\'t contain *.avi'
 
     def test_require_all1(self, execute_task):
         task = execute_task('test_require_all1')
@@ -166,7 +200,30 @@ class TestContentFilter:
         assert task.find_entry('rejected', title='manyfiles'), 'should have rejected, >3 files'
         assert task.find_entry('accepted', title='onefile'), 'should have accepted, has <=3 files'
 
-    def test_list_require(self, execute_task):
-        execute_task('test_list_populate')
+    def test_list_require_a(self, execute_task):
+        execute_task('test_list_populate_a')
         task = execute_task('test_list_require')
         assert task.find_entry('accepted', title='test'), 'should have accepted, contains ubuntu'
+
+    def test_list_require_r(self, execute_task):
+        execute_task('test_list_populate_r')
+        task = execute_task('test_list_require')
+        assert task.find_entry(
+            'rejected', title='test'
+        ), 'should have rejected, mask isn\'t satisfied'
+
+    def test_input_require_a(self, execute_task):
+        task = execute_task('test_input_require_a')
+        assert task.find_entry('accepted', title='test'), 'should have accepted, contains ubuntu'
+
+    def test_input_require_r(self, execute_task):
+        task = execute_task('test_input_require_r')
+        assert task.find_entry(
+            'rejected', title='test'
+        ), 'should have rejected, mask isn\'t satisfied'
+
+    def test_input_require_all(self, execute_task):
+        task = execute_task('test_input_require_all')
+        assert task.find_entry(
+            'rejected', title='test'
+        ), 'should have rejected, one mask isn\'t satisfied'
