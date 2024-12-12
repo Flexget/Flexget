@@ -116,13 +116,11 @@ class FilterContentFilter:
                     entry.reject('does not have all of the required files', remember=True)
                     return True
             if config.get('reject'):
-                mask = any(
-                    any(matching_mask(file, mask) for file in files) for mask in config['reject']
-                )
-                if mask:
-                    logger.info('Entry {} has banned file {}, rejecting', entry['title'], mask)
-                    entry.reject(f'has banned file {mask}', remember=True)
-                    return True
+                for mask in config['reject']:
+                    if any(matching_mask(file, mask) for file in files):
+                        logger.info('Entry {} has banned file {}, rejecting', entry['title'], mask)
+                        entry.reject(f'has banned file {mask}', remember=True)
+                        return True
             if config.get('require_mainfile') and len(files) > 1:
                 best = None
                 for f in entry['torrent'].get_filelist():
