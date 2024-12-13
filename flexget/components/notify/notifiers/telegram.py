@@ -1,12 +1,15 @@
+from __future__ import annotations
+
 import asyncio
 from collections import defaultdict
-from collections.abc import AsyncGenerator
+from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 from textwrap import wrap
+from typing import TYPE_CHECKING
 
 import sqlalchemy
 from loguru import logger
-from packaging import version
+from packaging.version import Version
 from sqlalchemy import Column, Integer, String
 
 from flexget import db_schema, plugin
@@ -14,11 +17,16 @@ from flexget.event import event
 from flexget.manager import Session
 from flexget.plugin import PluginError
 
+if TYPE_CHECKING:
+    from collections.abc import AsyncGenerator
+
 try:
-    import telegram
-except ImportError:
-    telegram = None
+    if Version(version("python-telegram-bot")) < Version('21.9'):
+        raise plugin.PluginWarning('obsolete python-telegram-bot pkg')
+except PackageNotFoundError:
+    pass
 else:
+    import telegram
     from telegram.error import ChatMigrated, NetworkError, TelegramError
     from telegram.ext import ApplicationBuilder
 
@@ -27,10 +35,8 @@ try:
 except ImportError:
     Image = None
 
-_TEXT_LIMIT = 4096
-_MIN_TELEGRAM_VER = '21.9'
 _PLUGIN_NAME = 'telegram'
-
+_TEXT_LIMIT = 4096
 _PARSERS = {'html': 'HTML', 'markdown': 'MarkdownV2', 'markdown_legacy': 'Markdown'}
 
 _DISABLE_PREVIEWS_ATTR = 'disable_previews'
@@ -195,7 +201,6 @@ class TelegramNotifier:
     }
 
     def notify(self, title: str, message: str, config: dict) -> None:
-        self._check_python_telegram_bot_package_version()
         self._load_config(config)
         asyncio.run(self.main(message))
 
@@ -249,15 +254,6 @@ class TelegramNotifier:
             logger.error(
                 f'Could not connect Telegram servers at this time, please try again later: {e.message}'
             )
-
-    @staticmethod
-    def _check_python_telegram_bot_package_version() -> None:
-        if telegram is None:
-            raise plugin.PluginWarning('missing python-telegram-bot pkg')
-        elif not hasattr(telegram, '__version__'):
-            raise plugin.PluginWarning('invalid or obsolete python-telegram-bot pkg')
-        elif version.parse(telegram.__version__) < version.parse(_MIN_TELEGRAM_VER):
-            raise plugin.PluginWarning('obsolete python-telegram-bot pkg')
 
     async def _replace_chat_id(
         self, old_id: int, new_id: int, session: sqlalchemy.orm.Session
