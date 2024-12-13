@@ -1,10 +1,11 @@
+import re
 from fnmatch import fnmatch
 
 from loguru import logger
 
 from flexget import plugin
-from flexget.config_schema import one_or_more
 from flexget.event import event
+from flexget.utils.tools import aggregate_inputs
 
 logger = logger.bind(name='content_filter')
 
@@ -19,7 +20,41 @@ class FilterContentFilter:
         require:
           - '*.avi'
           - '*.mkv'
+        reject:
+          from:
+            - regexp_list: my-rejections
     """
+
+    lists_schema = {
+        'oneOf': [
+            {'type': 'string'},
+            {
+                'type': 'array',
+                'items': {'type': 'string'},
+                'minItems': 1,
+                'uniqueItems': False,
+            },
+            {
+                'type': 'object',
+                'properties': {
+                    'from': {
+                        'type': 'array',
+                        'items': {
+                            'allOf': [
+                                {'$ref': '/schema/plugins?phase=input'},
+                                {
+                                    'maxProperties': 1,
+                                    'error_maxProperties': 'Plugin options within content_filter plugin must be indented '
+                                    '2 more spaces than the first letter of the plugin name.',
+                                    'minProperties': 1,
+                                },
+                            ]
+                        },
+                    }
+                },
+            },
+        ]
+    }
 
     schema = {
         'type': 'object',
@@ -27,21 +62,15 @@ class FilterContentFilter:
             'min_files': {'type': 'integer'},
             'max_files': {'type': 'integer'},
             # These two properties allow a string or list of strings
-            'require': one_or_more({'type': 'string'}),
-            'require_all': one_or_more({'type': 'string'}),
-            'reject': one_or_more({'type': 'string'}),
+            'require': lists_schema,
+            'require_all': lists_schema,
+            'reject': lists_schema,
             'require_mainfile': {'type': 'boolean', 'default': False},
             'strict': {'type': 'boolean', 'default': False},
+            'regexp_mode': {'type': 'boolean', 'default': False},
         },
         'additionalProperties': False,
     }
-
-    def prepare_config(self, config):
-        for key in ['require', 'require_all', 'reject']:
-            if key in config:
-                if isinstance(config[key], str):
-                    config[key] = [config[key]]
-        return config
 
     def process_entry(self, task, entry, config):
         """
@@ -55,41 +84,43 @@ class FilterContentFilter:
             files = entry['content_files']
             logger.debug('{} files: {}', entry['title'], files)
 
-            def matching_mask(files, masks):
+            def matching_mask(file, mask):
                 """Returns matching mask if any files match any of the masks, false otherwise"""
-                for file in files:
-                    for mask in masks:
-                        if fnmatch(file, mask):
-                            return mask
-                return False
+                if config.get('regexp_mode'):
+                    return re.search(mask, file, re.IGNORECASE)
+                else:
+                    return fnmatch(file, mask)
 
             # Avoid confusion by printing a reject message to info log, as
             # download plugin has already printed a downloading message.
             if config.get('require'):
-                if not matching_mask(files, config['require']):
+                if not any(
+                    any(matching_mask(file, mask) for file in files) for mask in config['require']
+                ):
                     logger.info(
-                        'Entry {} does not have any of the required filetypes, rejecting',
+                        'Entry {} does not have any of the required files, rejecting',
                         entry['title'],
                     )
-                    entry.reject('does not have any of the required filetypes', remember=True)
+                    entry.reject('does not have any of the required files', remember=True)
                     return True
             if config.get('require_all'):
                 # Make sure each mask matches at least one of the contained files
                 if not all(
-                    any(fnmatch(file, mask) for file in files) for mask in config['require_all']
+                    any(matching_mask(file, mask) for file in files)
+                    for mask in config['require_all']
                 ):
                     logger.info(
-                        'Entry {} does not have all of the required filetypes, rejecting',
+                        'Entry {} does not have all of the required files, rejecting',
                         entry['title'],
                     )
-                    entry.reject('does not have all of the required filetypes', remember=True)
+                    entry.reject('does not have all of the required files', remember=True)
                     return True
             if config.get('reject'):
-                mask = matching_mask(files, config['reject'])
-                if mask:
-                    logger.info('Entry {} has banned file {}, rejecting', entry['title'], mask)
-                    entry.reject(f'has banned file {mask}', remember=True)
-                    return True
+                for mask in config['reject']:
+                    if any(matching_mask(file, mask) for file in files):
+                        logger.info('Entry {} has banned file {}, rejecting', entry['title'], mask)
+                        entry.reject(f'has banned file {mask}', remember=True)
+                        return True
             if config.get('require_mainfile') and len(files) > 1:
                 best = None
                 for f in entry['torrent'].get_filelist():
@@ -123,7 +154,15 @@ class FilterContentFilter:
             )
             # return
 
-        config = self.prepare_config(config)
+        for key in ['require', 'require_all', 'reject']:
+            if key in config:
+                if isinstance(config[key], str):
+                    config[key] = [config[key]]
+                elif isinstance(config[key], dict) and config[key].get('from'):
+                    config[key] = [
+                        entry['title'] for entry in aggregate_inputs(task, config[key]['from'])
+                    ]
+
         for entry in task.accepted:
             if self.process_entry(task, entry, config):
                 task.rerun(plugin='content_filter')
