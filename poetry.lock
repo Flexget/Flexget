@@ -29,7 +29,7 @@ dev = ["black", "coverage", "isort", "pre-commit", "pyenchant", "pylint"]
 name = "anyio"
 version = "4.7.0"
 description = "High level compatibility layer for multiple asynchronous event loop implementations"
-optional = false
+optional = true
 python-versions = ">=3.9"
 files = [
     {file = "anyio-4.7.0-py3-none-any.whl", hash = "sha256:ea60c3723ab42ba6fff7e8ccb0488c898ec538ff4df1f1d5e642c3601d07e352"},
@@ -754,7 +754,7 @@ colorama = {version = "*", markers = "platform_system == \"Windows\""}
 name = "cloudscraper"
 version = "1.2.71"
 description = "A Python module to bypass Cloudflare's anti-bot page."
-optional = false
+optional = true
 python-versions = "*"
 files = [
     {file = "cloudscraper-1.2.71-py2.py3-none-any.whl", hash = "sha256:76f50ca529ed2279e220837befdec892626f9511708e200d48d5bb76ded679b0"},
@@ -936,7 +936,7 @@ files = [
 name = "deluge-client"
 version = "1.10.2"
 description = "Simple Deluge Client"
-optional = false
+optional = true
 python-versions = "*"
 files = [
     {file = "deluge-client-1.10.2.tar.gz", hash = "sha256:3881aee3c4e0ca9dd8a56b710047b837e1d087a83e421636a074771f92a9f1b5"},
@@ -1296,7 +1296,7 @@ test = ["PyYAML", "pylint", "pytest", "pytest-benchmark", "pytest-cov", "pytest-
 name = "h11"
 version = "0.14.0"
 description = "A pure-Python, bring-your-own-I/O implementation of HTTP/1.1"
-optional = false
+optional = true
 python-versions = ">=3.7"
 files = [
     {file = "h11-0.14.0-py3-none-any.whl", hash = "sha256:e3fe4ac4b851c468cc8363d500db52c2ead036020723024a109d37346efaa761"},
@@ -1328,7 +1328,7 @@ lxml = ["lxml"]
 name = "httpcore"
 version = "1.0.7"
 description = "A minimal low-level HTTP client."
-optional = false
+optional = true
 python-versions = ">=3.8"
 files = [
     {file = "httpcore-1.0.7-py3-none-any.whl", hash = "sha256:a3fff8f43dc260d5bd363d9f9cf1830fa3a458b332856f34282de498ed420edd"},
@@ -1349,7 +1349,7 @@ trio = ["trio (>=0.22.0,<1.0)"]
 name = "httpx"
 version = "0.28.1"
 description = "The next generation HTTP client."
-optional = false
+optional = true
 python-versions = ">=3.8"
 files = [
     {file = "httpx-0.28.1-py3-none-any.whl", hash = "sha256:d909fcccc110f8c7faf814ca82a9a4d816bc5a6dbfea25d6591d6985b8ba59ad"},
@@ -2566,7 +2566,7 @@ six = ">=1.5"
 name = "python-telegram-bot"
 version = "21.9"
 description = "We have made you a wrapper you can't refuse"
-optional = false
+optional = true
 python-versions = ">=3.9"
 files = [
     {file = "python_telegram_bot-21.9-py3-none-any.whl", hash = "sha256:6a5e71056fbd138c78dbdefa3c7834d77022622997c60003c9b442061ee91633"},
@@ -2705,7 +2705,7 @@ files = [
 name = "qbittorrent-api"
 version = "2024.11.70"
 description = "Python client for qBittorrent v4.1+ Web API."
-optional = false
+optional = true
 python-versions = ">=3.9"
 files = [
     {file = "qbittorrent_api-2024.11.70-py3-none-any.whl", hash = "sha256:301cd641c827f64f3f78bf371b526f997717073c9d732ab6e127c9a69a470966"},
@@ -3091,7 +3091,7 @@ files = [
 name = "sniffio"
 version = "1.3.1"
 description = "Sniff out which async library your code is running under"
-optional = false
+optional = true
 python-versions = ">=3.7"
 files = [
     {file = "sniffio-1.3.1-py3-none-any.whl", hash = "sha256:2f6da418d1f1e0fddd844478f41680e794e6051915791a034ff65e5f100525a2"},
@@ -3113,7 +3113,7 @@ files = [
 name = "socksio"
 version = "1.0.0"
 description = "Sans-I/O implementation of SOCKS4, SOCKS4A, and SOCKS5."
-optional = false
+optional = true
 python-versions = ">=3.6"
 files = [
     {file = "socksio-1.0.0-py3-none-any.whl", hash = "sha256:95dc1f15f9b34e8d7b16f06d74b8ccf48f609af32ab33c608d08761c5dcbb1f3"},
@@ -3466,7 +3466,7 @@ files = [
 name = "transmission-rpc"
 version = "7.0.11"
 description = "Python module that implements the Transmission bittorent client JSON-RPC protocol"
-optional = false
+optional = true
 python-versions = "~=3.8"
 files = [
     {file = "transmission_rpc-7.0.11-py3-none-any.whl", hash = "sha256:94fd008b54640dd9fff14d7ae26848f901e9d130a70950b8930f9b395988914f"},
@@ -3974,7 +3974,15 @@ files = [
     {file = "zxcvbn-4.4.28.tar.gz", hash = "sha256:151bd816817e645e9064c354b13544f85137ea3320ca3be1fb6873ea75ef7dc1"},
 ]
 
+[extras]
+all = ["cloudscraper", "deluge-client", "python-telegram-bot", "qbittorrent-api", "transmission-rpc"]
+cloudscraper = ["cloudscraper"]
+deluge = ["deluge-client"]
+qbittorrent = ["qbittorrent-api"]
+telegram = ["python-telegram-bot"]
+transmission = ["transmission-rpc"]
+
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "2308e7d10dd0021b754e3a3926ee91ee0b055cb12ee6e23a4e1846d725412735"
+content-hash = "abcd00ab4d913bd22bd1b25e6ab08ee7e9e14856de94499770894c9ce0f37f28"

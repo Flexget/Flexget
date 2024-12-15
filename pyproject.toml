@@ -57,7 +57,9 @@ authors = []
 python = "^3.9"
 apscheduler = ">=3.10.0"
 beautifulsoup4 = ">=4.5"
+cloudscraper = {version = "^1.2.69", optional = true}
 colorama = ">=0.4.4"
+deluge-client = {version = "^1.9.0", optional = true}
 feedparser = ">=6.0.2"
 guessit = ">=3.4,<4.0"
 html5lib = ">=0.11"
@@ -69,12 +71,15 @@ psutil = ">=5.8.0"
 pynzb = "^0.1.0"
 pyrss2gen = "^1.1"
 python-dateutil = "^2.8.2"
+python-telegram-bot = {version = ">=21.9", extras = ["socks"], optional = true}
 pyyaml = ">=4.2b1"
+qbittorrent-api = {version = "^2023.3.44 || ^2024.0.0", optional = true}
 rebulk = ">=2.0.0"
 requests = ">=2.20.0"
 rich = ">=9.0.0"
 rpyc = ">=5.0,!=5.2.*,!=5.3.0"  # 5.2.1-5.3.0 cause a hang https://github.com/Flexget/Flexget/issues/3601
 sqlalchemy = ">=2.0,<2.999"
+transmission-rpc = {version = "^4.1.4 || ^7.0.0", optional = true}
 # TODO: urllib3 >=2 has changes that require vcr cassettes to be upgraded. Requirements of some of our deps (boto?)
 # require urllib3 <2 on python < 3.10. In order to not be running different versions of urllib on different
 # versions of python, this is pinned in our deps. This can be removed completely if the issue gets solved.
@@ -92,6 +97,14 @@ pyparsing = ">=2.4.7"
 werkzeug = ">=2.2.3"
 zxcvbn = "^4.4.24"
 pendulum = ">=3.0.0"
+
+[tool.poetry.extras]
+cloudscraper = ["cloudscraper"]
+deluge = ["deluge-client"]
+telegram = ["python-telegram-bot"]
+qbittorrent= ["qbittorrent-api"]
+transmission = ["transmission-rpc"]
+all = ["deluge-client", "python-telegram-bot", "qbittorrent-api", "transmission-rpc", "cloudscraper"]
 
 [tool.poetry.group.dev.dependencies]
 codacy-coverage = ">=1.2.18"
@@ -121,16 +134,8 @@ plexapi = ">=4.13.1"
 pysftp = "^0.2.9"
 subliminal = ">= 2.0rc1"
 
-[tool.poetry.group.docker.dependencies]
-transmission-rpc = "^4.1.4 || ^7.0.0"
-qbittorrent-api = "^2023.3.44 || ^2024.0.0"
-deluge-client = "^1.9.0"
-cloudscraper = "^1.2.69"
-python-telegram-bot = {version = ">=21.9", extras = ["socks"]}
-
 [tool.poetry.scripts]
 flexget = 'flexget:main'
-
 
 ## Other tool settings
 
