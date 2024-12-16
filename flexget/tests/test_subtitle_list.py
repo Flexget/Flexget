@@ -255,7 +255,6 @@ class TestSubtitleList:
         task = execute_task('subtitle_emit')
         assert len(task.entries) == 0, 'File should have expired.'
 
-    @pytest.mark.xfail(reason="No idea what this test is supposed to test, but it fails.")
     @pytest.mark.online
     def test_subtitle_list_subliminal_fail(self, execute_task):
         task = execute_task('subtitle_add_with_languages')
@@ -284,7 +283,6 @@ class TestSubtitleList:
             len(task.failed) == 1
         ), 'Only one language should have been downloaded which results in failure'
 
-    @pytest.mark.skip(reason="Test sporadically fails")
     def test_subtitle_list_subliminal_success(self, execute_task):
         task = execute_task('subtitle_add_local_file')
         assert len(task.entries) == 1, 'Task should have accepted walking dead local file'

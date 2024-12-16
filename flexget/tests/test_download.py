@@ -1,5 +1,4 @@
 import os
-import sys
 
 import pytest
 from jinja2 import Template
@@ -106,10 +105,6 @@ class TestDownloadTemp:
               temp:
         """
 
-    @pytest.mark.skipif(
-        sys.platform.startswith('win'),
-        reason='Windows does not have a guaranteed "private" directory afaik',
-    )
     def test_wrong_permission(self, execute_task):
         """Download plugin: Temp directory has wrong permissions"""
         task = execute_task('temp_wrong_permission', abort_ok=True)

@@ -201,10 +201,8 @@ class TestExistsMovie:
             'rejected', title='Test.S01E01'
         ), 'pre-existin proper should have caused reject'
 
-    @pytest.mark.skip(reason='test is broken')
     def test_invalid(self, execute_task):
         """exists_movie plugin: no episode numbering on the disk"""
-        # shouldn't raise anything
         execute_task('test_invalid')
 
     @pytest.mark.skip(reason='test is broken')
