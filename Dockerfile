@@ -1,4 +1,5 @@
-FROM docker.io/python:3.11-alpine
+# TODO: Alpine version is pinned due to https://github.com/Flexget/Flexget/issues/4085
+FROM docker.io/python:3.11-alpine3.20
 ENV PYTHONUNBUFFERED=1
 
 RUN apk add --no-cache --upgrade \
