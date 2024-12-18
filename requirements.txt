@@ -1,6 +1,6 @@
 aniso8601==9.0.1 ; python_version >= "3.9" and python_version < "4.0"
 apscheduler==3.11.0 ; python_version >= "3.9" and python_version < "4.0"
-attrs==24.2.0 ; python_version >= "3.9" and python_version < "4.0"
+attrs==24.3.0 ; python_version >= "3.9" and python_version < "4.0"
 autocommand==2.2.2 ; python_version >= "3.9" and python_version < "4.0"
 babelfish==0.6.0 ; python_version >= "3.9" and python_version < "4.0"
 backports-tarfile==1.2.0 ; python_version >= "3.9" and python_version < "3.12"
