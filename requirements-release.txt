@@ -1,6 +1,6 @@
 backports-tarfile==1.2.0 ; python_version >= "3.9" and python_version < "3.12" and (platform_machine != "ppc64le" and platform_machine != "s390x")
 build==1.2.2.post1 ; python_version >= "3.9" and python_version < "4.0"
-certifi==2024.8.30 ; python_version >= "3.9" and python_version < "4.0"
+certifi==2024.12.14 ; python_version >= "3.9" and python_version < "4.0"
 cffi==1.17.1 ; python_version >= "3.9" and python_version < "4.0" and (platform_machine != "ppc64le" and platform_machine != "s390x") and sys_platform == "linux" and platform_python_implementation != "PyPy"
 charset-normalizer==3.4.0 ; python_version >= "3.9" and python_version < "4.0"
 click==8.1.7 ; python_version >= "3.9" and python_version < "4.0"

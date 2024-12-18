@@ -1,0 +1,72 @@
+name: Test
+
+on:
+  push:
+    branches:
+    - develop
+  pull_request:
+    branches:
+    - "*"
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    name: Run Tests
+    runs-on: ${{ matrix.operating-system }}
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+        operating-system: [windows-latest, macos-latest, ubuntu-latest]
+      fail-fast: false
+    env:
+      POETRY_VERSION: "1.8.5"
+    steps:
+    - uses: actions/checkout@v4
+    - run: |
+        pipx install poetry==${{ env.POETRY_VERSION }}
+    - name: Set up Python ${{ matrix.python-version }}
+      id: setup-python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+        cache: 'poetry'
+    - name: Install project
+      run: poetry install --all-extras --no-interaction
+    - name: Test with pytest
+      run: |
+        poetry run pytest -n logical --dist loadgroup --junit-xml=test-results.xml
+    - name: Upload Test Results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: Test Results (Python ${{ matrix.python-version }} ${{ matrix.operating-system }})
+        path: test-results.xml
+
+  publish-test-results:
+    name: "Publish Tests Results"
+    needs: tests
+    runs-on: ubuntu-latest
+    permissions:
+      checks: write
+
+      # only needed unless run with comment_mode: off
+      pull-requests: write
+
+      # only needed for private repository
+      contents: read
+
+      # only needed for private repository
+      issues: read
+    if: always()
+
+    steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        with:
+          files: "artifacts/**/*.xml"

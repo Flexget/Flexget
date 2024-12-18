@@ -14,7 +14,6 @@ def is_hard_link(file1, file2):
     return (s1[stat.ST_INO], s1[stat.ST_DEV]) == (s2[stat.ST_INO], s2[stat.ST_DEV])
 
 
-@pytest.mark.skipif(os.name == 'nt', reason='symlinks do not work on windows')
 class TestSymlink:
     _config = """
         templates:

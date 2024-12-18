@@ -223,7 +223,6 @@ class TestEscapeInputRSS:
         ), 'RSS entry: Cyrillic'
 
 
-@pytest.mark.xfail(reason="silverorange changed some stuff")
 @pytest.mark.online
 class TestRssOnline:
     config = """
