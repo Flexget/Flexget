@@ -32,6 +32,10 @@ jobs:
         python-version: ${{ matrix.python-version }}
         cache: 'poetry'
     - name: Install project
+      run: poetry install --no-interaction
+    - name: Check functionality without extras
+      run: poetry run python flexget/tests/check_functionality_without_extras.py
+    - name: Install project extras
       run: poetry install --all-extras --no-interaction
     - name: Test with pytest
       run: |
