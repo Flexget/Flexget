@@ -26,7 +26,7 @@ if git log --skip 1 origin/master..origin/develop|grep '^commit '; then
   python dev_tools.py bundle-webui
 
   # Build and upload to pypi.
-  python -m build
+  uv build
   twine upload --skip-existing dist/*
 
   # Commit and tag released version

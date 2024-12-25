@@ -115,11 +115,11 @@ class NextSonarrEpisodes:
                         series_name=record['series']['title'],
                         series_season=season,
                         series_episode=episode,
-                        series_id='S%02dE%02d' % (season, episode),
+                        series_id=f'S{season:02d}E{episode:02d}',
                         tvdb_id=record['series'].get('tvdbId'),
                         tvrage_id=record['series'].get('tvRageId'),
                         tvmaze_id=record['series'].get('tvMazeId'),
-                        title=record['series']['title'] + ' ' + 'S%02dE%02d' % (season, episode),
+                        title=record['series']['title'] + ' ' + f'S{season:02d}E{episode:02d}',
                     )
                     # Test mode logging
                     if entry and task.options.test:

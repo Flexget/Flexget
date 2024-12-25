@@ -42,7 +42,7 @@ class NextSeriesSeasons:
         self.rerun_entries = []
 
     def season_identifiers(self, season):
-        return ['S%02d' % season]
+        return [f'S{season:02d}']
 
     def search_entry(self, series, season, task, rerun=True):
         # Extract the alternate names for the series
@@ -52,7 +52,7 @@ class NextSeriesSeasons:
         if paren_match.group(2):
             alts.append(paren_match.group(1))
         search_strings = [f'{series.name} {id}' for id in self.season_identifiers(season)]
-        series_id = 'S%02d' % season
+        series_id = f'S{season:02d}'
         for alt in alts:
             search_strings.extend([f'{alt} {id}' for id in self.season_identifiers(season)])
         entry = Entry(

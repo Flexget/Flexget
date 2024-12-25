@@ -1,5 +1,4 @@
 import argparse
-import cgi
 import random
 import string
 
@@ -10,6 +9,7 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.terminal import console
 from flexget.utils import requests
+from flexget.utils.requests import parse_header
 
 
 @event('manager.subcommand.inject')
@@ -23,9 +23,7 @@ def do_cli(manager, options):
     if options.url and not options.title:
         # Attempt to get a title from the URL response's headers
         try:
-            value, params = cgi.parse_header(
-                requests.head(options.url).headers['Content-Disposition']
-            )
+            value, params = parse_header(requests.head(options.url).headers['Content-Disposition'])
             options.title = params['filename']
         except KeyError:
             console(

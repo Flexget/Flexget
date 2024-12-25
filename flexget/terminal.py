@@ -1,8 +1,9 @@
 import contextlib
 import os
 import threading
+from collections.abc import Iterator
 from textwrap import wrap
-from typing import Any, Iterator, Optional, TextIO, Union
+from typing import Any, Optional, TextIO, Union
 
 import rich
 import rich.box

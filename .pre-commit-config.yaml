@@ -1,21 +1,21 @@
-default_language_version:
-  python: python3
-repos:
-- repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: 'v0.7.1'
-  hooks:
-    - id: ruff
-      args: [ --fix, --exit-non-zero-on-fix ]
-    - id: ruff-format
-- repo: https://github.com/astral-sh/uv-pre-commit
-  rev: 0.4.27
-  hooks:
-    - id: uv-lock
-    - id: uv-export
-      args: ["--frozen", "--no-dev", "--no-emit-project", "--output-file=requirements.txt", "--no-hashes"]
-    - id: uv-export
-      args: ["--frozen", "--no-emit-project", "--output-file=dev-requirements.txt", "--no-hashes"]
 ci:
-  autofix_prs: true
-  autoupdate_branch: develop
   autoupdate_schedule: quarterly
+  skip: [ uv-lock ]
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.8.6
+    hooks:
+      - id: ruff
+        args: [ --fix ]
+      - id: ruff-format
+  - repo: https://github.com/astral-sh/uv-pre-commit
+    rev: 0.5.14
+    hooks:
+      - id: uv-lock
+      - id: uv-export
+        args: [ --frozen, --no-emit-project, --output-file=dev-requirements.txt, --no-hashes ]
+  - repo: https://github.com/renovatebot/pre-commit-hooks
+    rev: 39.86.3
+    hooks:
+      - id: renovate-config-validator
+        args: [ --strict ]

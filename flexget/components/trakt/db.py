@@ -1,6 +1,5 @@
 import time
 from datetime import datetime, timedelta
-from typing import List
 
 from dateutil.parser import parse as dateutil_parse
 from loguru import logger
@@ -391,7 +390,7 @@ movie_actors_table = Table(
 Base.register_table(movie_actors_table)
 
 
-def get_db_actors(ident, style) -> List[TraktActor]:
+def get_db_actors(ident, style) -> list[TraktActor]:
     actors = {}
     url = get_api_url(f'{style}s', ident, 'people')
     req_session = get_session()

@@ -7,9 +7,9 @@ version: 2
 
 # Set the version of Python and other tools you might need
 build:
-  os: ubuntu-20.04
+  os: ubuntu-24.04 # renovate: datasource=docker depName=ubuntu versioning=ubuntu
   tools:
-    python: "3.10"
+    python: '3.12' # renovate: datasource=python-version depName=python
 
 # Build documentation in the docs/ directory with Sphinx
 sphinx:

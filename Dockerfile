@@ -1,5 +1,5 @@
-FROM docker.io/python:3.11-alpine as builder
-ENV PYTHONUNBUFFERED 1
+FROM docker.io/python:3.11-alpine@sha256:bc84eb94541f34a0e98535b130ea556ae85f6a431fdb3095762772eeb260ffc3 AS builder
+ENV PYTHONUNBUFFERED=1
 
 RUN --mount=type=cache,target=/var/cache/apk \
     apk add --upgrade \
@@ -10,7 +10,7 @@ RUN --mount=type=cache,target=/var/cache/apk \
         openssl-dev \
         unzip
 
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+COPY --from=ghcr.io/astral-sh/uv:latest@sha256:f0786ad49e2e684c18d38697facb229f538a6f5e374c56f54125aabe7d14b3f7 /uv /uvx /bin/
 ENV UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy
 WORKDIR /flexget
 RUN --mount=type=cache,target=/root/.cache/uv \
@@ -25,8 +25,9 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen --no-dev
 
 # Final image without uv
-FROM docker.io/python:3.11-alpine
-ENV PYTHONUNBUFFERED 1
+# TODO: Alpine version is pinned due to https://github.com/Flexget/Flexget/issues/4085
+FROM docker.io/python:3.11-alpine3.20@sha256:fbcb089a803d5673f225dc923b8e29ecc7945e9335465037b6961107b9da3d61
+ENV PYTHONUNBUFFERED=1
 
 RUN --mount=type=cache,target=/var/cache/apk \
     apk add --upgrade \

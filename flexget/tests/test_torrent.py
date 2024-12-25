@@ -45,7 +45,6 @@ class TestInfoHash:
         )
 
 
-@pytest.mark.usefixtures('tmpdir')
 class TestSeenInfoHash:
     config = """
         tasks:
@@ -84,7 +83,6 @@ class TestSeenInfoHash:
         ), 'Should not have accepted both entries with the same info hash'
 
 
-@pytest.mark.usefixtures('tmpdir')
 class TestModifyTrackers:
     config = """
         templates:
@@ -124,9 +122,9 @@ class TestModifyTrackers:
         return Torrent(data)
 
     @pytest.mark.filecopy('test.torrent', '__tmp__/test.torrent')
-    def test_add_trackers(self, execute_task, tmpdir):
+    def test_add_trackers(self, execute_task, tmp_path):
         task = execute_task('test_add_trackers')
-        torrent = self.load_torrent(os.path.join(tmpdir.strpath, 'test.torrent'))
+        torrent = self.load_torrent(os.path.join(tmp_path.as_posix(), 'test.torrent'))
         assert (
             'udp://thetracker.com/announce' in torrent.trackers
         ), 'udp://thetracker.com/announce should have been added to trackers'
@@ -134,9 +132,9 @@ class TestModifyTrackers:
         assert 'tr=udp://thetracker.com/announce' in task.find_entry(title='test_magnet')['url']
 
     @pytest.mark.filecopy('test.torrent', '__tmp__/test.torrent')
-    def test_remove_trackers(self, execute_task, tmpdir):
+    def test_remove_trackers(self, execute_task, tmp_path):
         task = execute_task('test_remove_trackers')
-        torrent = self.load_torrent(os.path.join(tmpdir.strpath, 'test.torrent'))
+        torrent = self.load_torrent(os.path.join(tmp_path.as_posix(), 'test.torrent'))
         assert (
             'http://ipv6.torrent.ubuntu.com:6969/announce' not in torrent.trackers
         ), 'ipv6 tracker should have been removed'
@@ -148,9 +146,9 @@ class TestModifyTrackers:
         )
 
     @pytest.mark.filecopy('test.torrent', '__tmp__/test.torrent')
-    def test_modify_trackers(self, execute_task, tmpdir):
+    def test_modify_trackers(self, execute_task, tmp_path):
         execute_task('test_modify_trackers')
-        torrent = self.load_torrent(os.path.join(tmpdir.strpath, 'test.torrent'))
+        torrent = self.load_torrent(tmp_path.joinpath('test.torrent'))
         assert (
             'http://torrent.replaced.com:6969/announce' in torrent.trackers
         ), 'ubuntu tracker should have been added'
@@ -173,7 +171,6 @@ class TestPrivateTorrents:
         assert task.find_entry('accepted', title='test_public'), 'did not pass public torrent'
 
 
-@pytest.mark.usefixtures('tmpdir')
 class TestTorrentScrub:
     config = """
         tasks:
@@ -210,7 +207,7 @@ class TestTorrentScrub:
     test_files = [i[1] for i in test_cases]
 
     @pytest.mark.filecopy(test_files, '__tmp__')
-    def test_torrent_scrub(self, execute_task, tmpdir):
+    def test_torrent_scrub(self, execute_task, tmp_path):
         # Run task
         task = execute_task('test_all')
 
@@ -224,7 +221,7 @@ class TestTorrentScrub:
             assert modified, f"No 'torrent' key in {title!r}"
 
             osize = os.path.getsize(filename)
-            msize = tmpdir.join(filename).size()
+            msize = tmp_path.joinpath(filename).stat().st_size
 
             # Dump small torrents on demand
             if 0 and not clean:
@@ -269,21 +266,17 @@ class TestTorrentScrub:
         assert 'x_cross_seed' not in torrent.content['info'], "'info.x_cross_seed' not scrubbed"
 
     @pytest.mark.filecopy(test_files, '__tmp__')
-    def test_torrent_scrub_off(self, execute_task, tmpdir):
+    def test_torrent_scrub_off(self, execute_task, tmp_path):
         execute_task('test_off')
 
         for filename in self.test_files:
             osize = os.path.getsize(filename)
-            msize = tmpdir.join(filename).size()
-            assert osize == msize, "Filesizes aren't supposed to differ (%r %d, %r %d)!" % (
-                filename,
-                osize,
-                self.__tmp__ + filename,
-                msize,
-            )
+            msize = tmp_path.joinpath(filename).stat().st_size
+            assert (
+                osize == msize
+            ), f"Filesizes aren't supposed to differ ({filename!r} {osize}, {self.__tmp__ + filename!r} {msize})!"
 
 
-@pytest.mark.usefixtures('tmpdir')
 class TestTorrentAlive:
     config = """
         templates:
@@ -344,11 +337,11 @@ class TestRtorrentMagnet:
             accept_all: yes
     """
 
-    def test_rtorrent_magnet(self, execute_task, tmpdir):
+    def test_rtorrent_magnet(self, execute_task, tmp_path):
         execute_task('test')
-        fullpath = tmpdir.join('meta-test.torrent')
-        assert fullpath.isfile()
+        fullpath = tmp_path.joinpath('meta-test.torrent')
+        assert fullpath.is_file()
         assert (
-            fullpath.read()
+            fullpath.read_text()
             == 'd10:magnet-uri76:magnet:?xt=urn:btih:HASH&dn=title&tr=http://torrent.ubuntu.com:6969/announcee'
         )

@@ -14,7 +14,7 @@ from argparse import (
     _VersionAction,
 )
 from argparse import ArgumentParser as ArgParser
-from typing import IO, Any, Callable, List, Optional, TextIO
+from typing import IO, Any, Callable, Optional, TextIO
 
 import flexget
 from flexget.entry import Entry
@@ -278,9 +278,6 @@ class ArgumentParser(ArgParser):
         :param nested_namespace_name: When used as a subparser, options from this parser will be stored nested under
             this attribute name in the root parser's namespace
         """
-        # Do this early, so even option processing stuff is caught
-        if '--bugreport' in sys.argv:
-            self._debug_tb_callback()
 
         self.subparsers = None
         self.raise_errors = None
@@ -340,7 +337,7 @@ class ArgumentParser(ArgParser):
 
     def parse_args(
         self,
-        args: Optional[List[str]] = None,
+        args: Optional[list[str]] = None,
         namespace: Optional[Namespace] = None,
         raise_errors: bool = False,
         file: Optional[TextIO] = None,
@@ -360,7 +357,7 @@ class ArgumentParser(ArgParser):
 
     def parse_known_args(
         self,
-        args: Optional[List[str]] = None,
+        args: Optional[list[str]] = None,
         namespace: Optional[Namespace] = None,
         do_help: Optional[bool] = None,
     ):
@@ -425,11 +422,6 @@ class ArgumentParser(ArgParser):
                     arg_strings[0] = matches[0]
         return super()._get_values(action, arg_strings)
 
-    def _debug_tb_callback(self, *dummy):
-        import cgitb
-
-        cgitb.enable(format="text")
-
 
 # This will hold just the arguments directly for Manager.
 manager_parser = ArgumentParser(add_help=False)
@@ -469,14 +461,6 @@ manager_parser.add_argument(
     type=str.upper,
 )
 manager_parser.set_post_defaults(loglevel='VERBOSE')
-# This option is already handled above.
-manager_parser.add_argument(
-    '--bugreport',
-    action='store_true',
-    dest='debug_tb',
-    help='Use this option to create a detailed bug report, '
-    'note that the output might contain PRIVATE data, so edit that out',
-)
 manager_parser.add_argument(
     '--profile',
     metavar='OUTFILE',

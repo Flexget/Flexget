@@ -3,7 +3,7 @@ name: No PRs to Master
 on:
   pull_request:
     branches:
-      - 'master'
+      - master
 
 permissions:
   contents: read

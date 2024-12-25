@@ -2,7 +2,6 @@
 import datetime
 import os
 import stat
-import sys
 import time
 
 import pendulum
@@ -133,8 +132,7 @@ class TestDownload:
               fail_html: no
     """
 
-    @pytest.mark.skipif(sys.platform.startswith('win'), reason="doesn't work on windows")
-    def test_download(self, execute_task, tmpdir):
+    def test_download(self, execute_task):
         # A little convoluted, but you have to set the umask in order to have
         # the current value returned to you
         curr_umask = os.umask(0)

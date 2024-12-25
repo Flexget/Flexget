@@ -5,7 +5,6 @@ from flexget.event import fire_event
 from flexget.manager import Session
 
 
-@pytest.mark.usefixtures('tmpdir')
 class TestVariablesFromFile:
     config = """
         variables: __tmp__/variables.yml

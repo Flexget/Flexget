@@ -1,11 +1,3 @@
-import pytest
-
-try:
-    import rarfile
-except ImportError:
-    rarfile = None
-
-
 class TestArchiveFilter:
     config = """
         tasks:
@@ -19,7 +11,6 @@ class TestArchiveFilter:
                 archives: yes
     """
 
-    @pytest.mark.skipif(rarfile is None, reason='rarfile module required')
     def test_rar(self, execute_task):
         """Test RAR acceptance"""
         task = execute_task('test_archives')

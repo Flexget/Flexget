@@ -1,9 +1,10 @@
 import functools
 import types
 import warnings
+from collections.abc import Iterable, Mapping, Sequence
 from datetime import date, datetime
 from enum import Enum
-from typing import Callable, Iterable, Mapping, Optional, Sequence, Union
+from typing import Callable, Optional, Union
 
 import pendulum
 from loguru import logger

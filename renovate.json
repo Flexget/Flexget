@@ -1,24 +1,52 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:base"
+    "config:best-practices",
+    ":automergeMajor",
+    ":enablePreCommit",
+    ":rebaseStalePrs"
   ],
-  "rangeStrategy": "widen",
-  "rebaseWhen": "behind-base-branch",
-  "lockFileMaintenance": {
-    "enabled": true
+  "gitIgnoredAuthors": [
+    "66853113+pre-commit-ci[bot]@users.noreply.github.com"
+  ],
+  "rangeStrategy": "update-lockfile",
+  "customManagers": [
+    {
+      "customType": "regex",
+      "fileMatch": [
+        "^\\.github/workflows/[^/]+\\.ya?ml$"
+      ],
+      "matchStrings": [
+        "\\s*[A-Z_]+?_VERSION:\\s*[\"']?(?<currentValue>.+?)[\"']?\\s*# renovate: datasource=(?<datasource>.+?) depName=(?<depName>.+?)(?: versioning=(?<versioning>.+?))?\\s"
+      ]
+    },
+    {
+      "customType": "regex",
+      "fileMatch": [
+        "^\\.readthedocs\\.ya?ml$"
+      ],
+      "matchStrings": [
+        ":\\s*[\"']?(?:ubuntu-)?(?<currentValue>[^:]+?)[\"']?\\s*# renovate: datasource=(?<datasource>.+?) depName=(?<depName>.+?)(?: versioning=(?<versioning>.+?))?\\s"
+      ]
+    }
+  ],
+  "npm": {
+    "enabled": false
   },
   "pip_requirements": {
     "enabled": false
   },
-  "npm": {
-    "enabled": false
-  },
-  "gitIgnoredAuthors": ["66853113+pre-commit-ci[bot]@users.noreply.github.com"],
-  "vulnerabilityAlerts": {
-    "enabledManagers": ["dockerfile", "poetry", "github-actions"]
-  },
-  "pre-commit": {
-    "enabled": true
-  }
+  "packageRules": [
+    {
+      "extends": [
+        ":pinDigestsDisabled"
+      ],
+      "matchManagers": [
+        "custom.regex"
+      ],
+      "matchDatasources": [
+        "docker"
+      ]
+    }
+  ]
 }

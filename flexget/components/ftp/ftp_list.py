@@ -93,11 +93,8 @@ class FTPList:
                     if 'files' in content_types or 'symlinks' in content_types:
                         for _file in files:
                             content = ftp.path.join(base, _file)
-                            if (
-                                ftp.path.isfile(content)
-                                and 'files' in content_types
-                                or ftp.path.islink(path)
-                                and 'symlinks' in content_types
+                            if (ftp.path.isfile(content) and 'files' in content_types) or (
+                                ftp.path.islink(path) and 'symlinks' in content_types
                             ):
                                 logger.debug(
                                     'type match successful for file {}, trying to create entry',
@@ -107,11 +104,8 @@ class FTPList:
                     if 'dirs' in content_types or 'symlinks' in content_types:
                         for _dir in dirs:
                             content = ftp.path.join(base, _dir)
-                            if (
-                                ftp.path.isdir(content)
-                                and 'dirs' in content_types
-                                or ftp.path.islink(path)
-                                and 'symlinks' in content_types
+                            if (ftp.path.isdir(content) and 'dirs' in content_types) or (
+                                ftp.path.islink(path) and 'symlinks' in content_types
                             ):
                                 logger.debug(
                                     'type match successful for dir {}, trying to create entry',

@@ -1,7 +1,7 @@
-name: 'Close stale issues and PRs'
+name: Close stale issues and PRs
 on:
   schedule:
-    - cron: '30 */12 * * *'
+    - cron: 30 */12 * * *
 env:
   DAYS_BEFORE_ISSUE_STALE: 150
   DAYS_BEFORE_ISSUE_CLOSE: 30
@@ -17,14 +17,14 @@ jobs:
       pull-requests: write  # for actions/stale to close stale PRs
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/stale@v9
+      - uses: actions/stale@28ca1036281a5e5922ead5184a1bbf96e5fc984e # v9
         with:
-          stale-issue-message: 'This issue is stale because it has been open ${{ env.DAYS_BEFORE_ISSUE_STALE }} days with no activity. Remove stale label or comment or this will be closed in ${{ env.DAYS_BEFORE_ISSUE_CLOSE }} days.'
-          close-issue-message: 'This issue has been stale for ${{ env.DAYS_BEFORE_ISSUE_CLOSE }} days and is being closed.'
+          stale-issue-message: This issue is stale because it has been open ${{ env.DAYS_BEFORE_ISSUE_STALE }} days with no activity. Remove stale label or comment or this will be closed in ${{ env.DAYS_BEFORE_ISSUE_CLOSE }} days.
+          close-issue-message: This issue has been stale for ${{ env.DAYS_BEFORE_ISSUE_CLOSE }} days and is being closed.
           days-before-issue-stale: ${{ env.DAYS_BEFORE_ISSUE_STALE }}
           days-before-issue-close: ${{ env.DAYS_BEFORE_ISSUE_CLOSE }}
-          stale-pr-message: 'This PR is stale because it has been open ${{ env.DAYS_BEFORE_PR_STALE }} days with no activity. Remove stale label or comment or this will be closed in ${{ env.DAYS_BEFORE_PR_CLOSE }} days.'
-          close-pr-message: 'This PR has been stale for ${{ env.DAYS_BEFORE_PR_CLOSE }} days and is being closed. Apologies if this is still relevant, it can be hard to find the time to review and merge everything. Feel free to make sure it is up to date and open it again.'
+          stale-pr-message: This PR is stale because it has been open ${{ env.DAYS_BEFORE_PR_STALE }} days with no activity. Remove stale label or comment or this will be closed in ${{ env.DAYS_BEFORE_PR_CLOSE }} days.
+          close-pr-message: This PR has been stale for ${{ env.DAYS_BEFORE_PR_CLOSE }} days and is being closed. Apologies if this is still relevant, it can be hard to find the time to review and merge everything. Feel free to make sure it is up to date and open it again.
           days-before-pr-stale: ${{ env.DAYS_BEFORE_PR_STALE }}
           days-before-pr-close: ${{ env.DAYS_BEFORE_PR_CLOSE }}
           operations-per-run: 100

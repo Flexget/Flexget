@@ -41,7 +41,7 @@ class PluginRtorrentMagnet:
         else:
             logger.info('Writing rTorrent Magnet File: {}', path)
             with open(path, 'w') as f:
-                f.write('d10:magnet-uri%d:%se' % (len(entry['url']), entry['url']))
+                f.write('d10:magnet-uri{}:{}e'.format(len(entry['url']), entry['url']))
         entry['output'] = path
 
     # Run after download plugin to only pick up entries it did not already handle

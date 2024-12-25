@@ -1,0 +1,86 @@
+name: Test
+
+on:
+  push:
+    branches:
+      - develop
+  pull_request:
+    branches:
+      - '*'
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref || github.run_id }}
+  cancel-in-progress: true
+env:
+  UV_VERSION: 0.5.14 # renovate: datasource=pypi depName=uv
+jobs:
+  check-lockfile-status:
+    name: Check Lockfile Status
+    runs-on: ubuntu-latest
+    env:
+      PYTHON_VERSION: '3.13' # renovate: datasource=python-version depName=python
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@887a942a15af3a7626099df99e897a18d9e5ab3a # v5
+        with:
+          enable-cache: true
+          python-version: ${{ env.PYTHON_VERSION }}
+          version: ${{ env.UV_VERSION }}
+      - run: uv lock --locked
+  tests:
+    name: Run Tests
+    runs-on: ${{ matrix.operating-system }}
+    strategy:
+      matrix:
+        python-version: [ '3.9', '3.10', '3.11', '3.12', '3.13' ]
+        operating-system: [ windows-latest, macos-latest, ubuntu-latest ]
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@887a942a15af3a7626099df99e897a18d9e5ab3a # v5
+        with:
+          enable-cache: true
+          python-version: ${{ matrix.python-version }}
+          version: ${{ env.UV_VERSION }}
+      - name: Install dependencies
+        run: uv sync --group plugin-test --frozen
+      - name: Test with pytest
+        run: |
+          uv run pytest -n logical --dist loadgroup --junit-xml=test-results.xml
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@6f51ac03b9356f520e9adb1b1b7802705f340c2b # v4
+        with:
+          name: Test Results (Python ${{ matrix.python-version }} ${{ matrix.operating-system }})
+          path: test-results.xml
+
+  publish-test-results:
+    name: Publish Tests Results
+    needs: tests
+    runs-on: ubuntu-latest
+    permissions:
+      checks: write
+
+      # only needed unless run with comment_mode: off
+      pull-requests: write
+
+      # only needed for private repository
+      contents: read
+
+      # only needed for private repository
+      issues: read
+    if: always()
+
+    steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4
+        with:
+          path: artifacts
+
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@170bf24d20d201b842d7a52403b73ed297e6645b # v2
+        with:
+          files: artifacts/**/*.xml

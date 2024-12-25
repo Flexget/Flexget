@@ -1,7 +1,7 @@
 from collections import namedtuple
 from itertools import groupby
 from pathlib import Path
-from typing import List, Optional
+from typing import Optional
 from urllib.parse import unquote, urlparse
 
 from loguru import logger
@@ -108,7 +108,7 @@ class SftpList:
         return config
 
     @classmethod
-    def on_task_input(cls, task: Task, config: dict) -> List[Entry]:
+    def on_task_input(cls, task: Task, config: dict) -> list[Entry]:
         """
         Input task handler
         """
@@ -121,7 +121,7 @@ class SftpList:
         get_size: bool = config['get_size']
         socket_timeout_sec: int = config['socket_timeout_sec']
         connection_tries: int = config['connection_tries']
-        directories: List[str] = []
+        directories: list[str] = []
 
         if files_only and dirs_only:
             logger.warning(
@@ -136,7 +136,7 @@ class SftpList:
         sftp_config: SftpConfig = task_config_to_sftp_config(config)
         sftp: SftpClient = sftp_connect(sftp_config, socket_timeout_sec, connection_tries)
 
-        entries: List[Entry] = sftp.list_directories(
+        entries: list[Entry] = sftp.list_directories(
             directories, recursive, get_size, files_only, dirs_only
         )
         sftp.close()

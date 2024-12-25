@@ -6,9 +6,10 @@ import os
 import sys
 import threading
 import traceback
+from collections.abc import Generator
 from pathlib import Path
 from time import sleep
-from typing import IO, Dict, Generator
+from typing import IO
 from typing import Optional as OptionalType
 
 import cherrypy
@@ -144,7 +145,7 @@ class ServerReloadAPI(APIResource):
                 self.manager.load_config(output_to_console=False)
             except YAMLError as e:
                 if isinstance(e, MarkedYAMLError):
-                    error: Dict[str, int] = {}
+                    error: dict[str, int] = {}
                     if e.problem is not None:
                         error.update({'reason': e.problem})
                     if e.context_mark is not None:
@@ -219,7 +220,7 @@ class ServerRawConfigAPI(APIResource):
             config = yaml.safe_load(raw_config)
         except YAMLError as e:
             if isinstance(e, MarkedYAMLError):
-                error: Dict[str, int] = {}
+                error: dict[str, int] = {}
                 if e.problem is not None:
                     error.update({'reason': e.problem})
                 if e.context_mark is not None:
@@ -286,7 +287,7 @@ class ServerDumpThreads(APIResource):
         for threadId, stack in sys._current_frames().items():
             dump = []
             for filename, lineno, name, line in traceback.extract_stack(stack):
-                dump.append('File: "%s", line %d, in %s' % (filename, lineno, name))
+                dump.append(f'File: "{filename}", line {lineno}, in {name}')
                 if line:
                     dump.append(line.strip())
             threads.append({'name': id2name.get(threadId), 'id': threadId, 'dump': dump})

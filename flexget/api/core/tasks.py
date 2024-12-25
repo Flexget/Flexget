@@ -1,10 +1,9 @@
 import argparse
-import cgi
 import copy
 from datetime import datetime, timedelta
 from json import JSONEncoder
 from queue import Empty, Queue
-from typing import TYPE_CHECKING, Any, Dict
+from typing import TYPE_CHECKING, Any
 
 from flask import Response, jsonify, request
 from flask_restx import inputs
@@ -29,6 +28,7 @@ from flexget.task import task_phases
 from flexget.terminal import capture_console
 from flexget.utils import json, requests
 from flexget.utils.lazy_dict import LazyLookup
+from flexget.utils.requests import parse_header
 
 # Tasks API
 tasks_api = api.namespace('tasks', description='Manage Tasks')
@@ -395,9 +395,9 @@ if TYPE_CHECKING:
     class StreamTaskDict(TypedDict):
         queue: ExecuteLog
         last_update: datetime
-        args: Dict[str, Any]
+        args: dict[str, Any]
 
-    _streams: Dict[str, StreamTaskDict]
+    _streams: dict[str, StreamTaskDict]
 _streams = {}
 
 # Another namespace for the same endpoint
@@ -465,7 +465,7 @@ class TaskExecutionAPI(APIResource):
                 entry['url'] = item['url']
                 if not item.get('title'):
                     try:
-                        value, params = cgi.parse_header(
+                        value, params = parse_header(
                             requests.head(item['url']).headers['Content-Disposition']
                         )
                         entry['title'] = params['filename']

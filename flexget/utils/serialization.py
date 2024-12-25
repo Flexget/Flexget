@@ -1,6 +1,6 @@
 import datetime
 from abc import ABC, abstractmethod
-from typing import Any, Optional, Type
+from typing import Any, Optional
 
 import yaml
 from loguru import logger
@@ -199,14 +199,14 @@ class TupleSerializer(Serializer):
         return tuple(deserialize(data))  # type: ignore
 
 
-def _serializer_for(value) -> Optional[Type[Serializer]]:
+def _serializer_for(value) -> Optional[type[Serializer]]:
     for s in Serializer.__subclasses__():
         if s.serializer_handles(value):
             return s
     return None
 
 
-def _deserializer_for(serializer_name: str) -> Type[Serializer]:
+def _deserializer_for(serializer_name: str) -> type[Serializer]:
     for s in Serializer.__subclasses__():
         if serializer_name == s.serializer_name():
             return s

@@ -82,14 +82,15 @@ class TestYamlLists:
     """
 
     @pytest.fixture
-    def config(self, tmpdir):
+    def config(self, tmp_path):
         """
         Prepare config
         """
 
-        yaml_dir = tmpdir.mkdir('yaml_lists')
+        yaml_dir = tmp_path.joinpath('yaml_lists')
+        yaml_dir.mkdir()
 
-        return Template(self._config).render({'yaml_dir': yaml_dir.strpath})
+        return Template(self._config).render({'yaml_dir': yaml_dir.as_posix()})
 
     def test_list_create(self, execute_task):
         task = execute_task('yaml_list_create')
