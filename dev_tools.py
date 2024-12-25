@@ -40,7 +40,7 @@ def bump_version(bump_type):
     if 'dev' in ver_split[-1]:
         if bump_type == 'dev':
             # If this is already a development version, increment the dev count by 1
-            ver_split[-1] = 'dev%d' % (int(ver_split[-1].strip('dev') or 0) + 1)
+            ver_split[-1] = 'dev{}'.format(int(ver_split[-1].strip('dev') or 0) + 1)
         else:
             # Just strip off dev tag for next release version
             ver_split = ver_split[:-1]

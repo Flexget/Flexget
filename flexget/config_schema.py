@@ -5,7 +5,8 @@ import re
 from collections import defaultdict
 from json import JSONDecodeError
 from json import loads as json_loads
-from typing import Any, Callable, Dict, List, Match, Optional, Pattern, Union
+from re import Match, Pattern
+from typing import Any, Callable, Optional, Union
 from urllib.parse import parse_qsl, urlparse
 
 import jsonschema
@@ -26,8 +27,8 @@ BASE_SCHEMA_NAME = 'draft4'
 BASE_SCHEMA_URI = 'http://json-schema.org/draft-04/schema#'
 BaseValidator = jsonschema.Draft4Validator
 # Type hint for json schemas. (If we upgrade to a newer json schema version, the type might allow more than dicts.)
-JsonSchema = Dict[str, Any]
-schema_paths: Dict[str, Union[JsonSchema, Callable[..., JsonSchema]]] = {}
+JsonSchema = dict[str, Any]
+schema_paths: dict[str, Union[JsonSchema, Callable[..., JsonSchema]]] = {}
 
 
 class ConfigValidationError(ValidationError):
@@ -35,7 +36,7 @@ class ConfigValidationError(ValidationError):
 
 
 class ConfigError(ValueError):
-    errors: List[ConfigValidationError]
+    errors: list[ConfigValidationError]
 
 
 # TODO: Rethink how config key and schema registration work
@@ -131,7 +132,7 @@ def retrieve_resource(uri: str) -> Resource:
 
 def process_config(
     config: Any, schema: Optional[JsonSchema] = None, set_defaults: bool = True
-) -> List[ConfigValidationError]:
+) -> list[ConfigValidationError]:
     """
     Validates the config, and sets defaults within it if `set_defaults` is set.
     If schema is not given, uses the root config schema.
@@ -153,7 +154,7 @@ def process_config(
     else:
         validator = SchemaValidator(schema, registry=registry, format_checker=format_checker)
     try:
-        errors: List[ValidationError] = list(validator.iter_errors(config))
+        errors: list[ValidationError] = list(validator.iter_errors(config))
     finally:
         # Make sure we don't leave the default setting validator installed
         jsonschema.validators.validates(BASE_SCHEMA_NAME)(SchemaValidator)

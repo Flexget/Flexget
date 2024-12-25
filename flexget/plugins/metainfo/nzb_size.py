@@ -30,10 +30,8 @@ class NzbSize:
             raise plugin.DependencyError(issued_by='nzb_size', missing='lib pynzb')
 
         for entry in task.accepted:
-            if (
-                entry.get('mime-type') in ['text/nzb', 'application/x-nzb']
-                or entry.get('filename')
-                and entry['filename'].endswith('.nzb')
+            if entry.get('mime-type') in ['text/nzb', 'application/x-nzb'] or (
+                entry.get('filename') and entry['filename'].endswith('.nzb')
             ):
                 if 'file' not in entry:
                     logger.warning(

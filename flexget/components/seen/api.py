@@ -152,7 +152,7 @@ class SeenSearchAPI(APIResource):
         for se in seen_entries_list:
             db.forget_by_id(se.id, session=session)
             deleted += 1
-        return success_response('successfully deleted %i entries' % deleted)
+        return success_response(f'successfully deleted {deleted} entries')
 
 
 @seen_api.route('/<int:seen_entry_id>/')

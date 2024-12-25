@@ -11,7 +11,7 @@ jobs:
     env:
       PYTHON_VERSION: "3.11"
     steps:
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+    - uses: actions/checkout@v4
       with:
         token: ${{ secrets.flexgetbot_pat }}
         fetch-depth: 0
@@ -19,18 +19,12 @@ jobs:
       run: |
         git config user.email ${{ secrets.git_email }}
         git config user.name ${{ secrets.git_user }}
-    - name: Set up Python ${{ env.PYTHON_VERSION }}
-      uses: actions/setup-python@v5
-      with:
-        python-version: ${{ env.PYTHON_VERSION }}
     - name: Install uv
-      uses: astral-sh/setup-uv@v3
+      uses: astral-sh/setup-uv@v5
       with:
-        # Install a specific version of uv.
-        version: "0.4.27"
         enable-cache: true
-        cache-dependency-glob: 'uv.lock'
-    - name: Install dev dependencies
+        python-version: ${{ env.PYTHON_VERSION }}
+    - name: Install release dependencies
       run: |
         uv sync --only-group release --frozen
     - name: Set Deployment Status Pending

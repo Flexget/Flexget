@@ -4,7 +4,7 @@ import time
 from collections import defaultdict
 from copy import copy
 from datetime import datetime
-from typing import List, Union
+from typing import Union
 
 from loguru import logger
 from sqlalchemy import not_
@@ -651,12 +651,12 @@ class FilterSeries(FilterSeriesBase):
         :param series_entries: dict mapping Episodes or Seasons to entries for that episode or season_pack
         :param config: Series configuration
         """
-        accepted_seasons: List[int] = []
+        accepted_seasons: list[int] = []
 
         def _exclude_season_on_accept(
             *args,
             series_entity: Union[db.Season, db.Episode],
-            accepted_seasons_list: List[int],
+            accepted_seasons_list: list[int],
             **kwargs,
         ) -> None:
             # need to reject all other episode/season packs for an accepted season during the task,

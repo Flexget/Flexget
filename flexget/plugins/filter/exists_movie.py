@@ -1,6 +1,5 @@
 import re
 from pathlib import Path
-from typing import Dict
 
 from loguru import logger
 
@@ -12,7 +11,7 @@ from flexget.utils.tools import TimedDict
 logger = logger.bind(name='exists_movie')
 
 
-def merge_found_qualities(existing_qualities: Dict[str, set], new_qualities: Dict[str, set]):
+def merge_found_qualities(existing_qualities: dict[str, set], new_qualities: dict[str, set]):
     """Merge the qualities from new_qualities dict into existing_qualities dict."""
     for movie_id, quals in new_qualities.items():
         existing_qualities.setdefault(movie_id, set()).update(quals)
@@ -55,7 +54,7 @@ class FilterExistsMovie:
     file_pattern = re.compile(r'\.(avi|mkv|mp4|mpg|webm)$', re.IGNORECASE)
 
     def __init__(self):
-        self.cache: Dict[Path, Dict[str, set]] = TimedDict(cache_time='1 hour')
+        self.cache: dict[Path, dict[str, set]] = TimedDict(cache_time='1 hour')
 
     def prepare_config(self, config):
         # if config is not a dict, assign value to 'path' key
@@ -85,7 +84,7 @@ class FilterExistsMovie:
         count_files = 0
 
         # Maps movie identifier: set of found qualitites
-        existing_qualities: Dict[str, set] = {}
+        existing_qualities: dict[str, set] = {}
 
         for folder in config['path']:
             folder = Path(folder).expanduser()
@@ -96,7 +95,7 @@ class FilterExistsMovie:
                 merge_found_qualities(existing_qualities, cached_qualities)
                 continue
 
-            path_qualities: Dict[str, set] = {}
+            path_qualities: dict[str, set] = {}
 
             if not folder.is_dir():
                 logger.critical('Path {} does not exist', folder)

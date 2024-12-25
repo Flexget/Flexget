@@ -149,7 +149,7 @@ class TaskStatusAPI(APIResource):
         try:
             task = session.query(db.StatusTask).filter(db.StatusTask.id == task_id).one()
         except NoResultFound:
-            raise NotFoundError('task status with id %d not found' % task_id)
+            raise NotFoundError(f'task status with id {task_id} not found')
 
         args = tasks_parser.parse_args()
         include_execution = args.get('include_execution')
@@ -211,7 +211,7 @@ class TaskStatusExecutionsAPI(APIResource):
         try:
             task = session.query(db.StatusTask).filter(db.StatusTask.id == task_id).one()
         except NoResultFound:
-            raise NotFoundError('task status with id %d not found' % task_id)
+            raise NotFoundError(f'task status with id {task_id} not found')
 
         args = executions_parser.parse_args()
 

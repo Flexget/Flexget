@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from functools import partial
 from pathlib import Path, PurePath, PurePosixPath
 from stat import S_ISLNK
-from typing import Callable, List, Optional
+from typing import Callable, Optional
 from urllib.parse import quote, urljoin
 
 from loguru import logger
@@ -116,12 +116,12 @@ class SftpClient:
 
     def list_directories(
         self,
-        directories: List[str],
+        directories: list[str],
         recursive: bool,
         get_size: bool,
         files_only: bool,
         dirs_only: bool,
-    ) -> List[Entry]:
+    ) -> list[Entry]:
         """
         Build a list of entries from a provided list of directories on an SFTP server
         :param directories: list of directories to generate entries for
@@ -132,7 +132,7 @@ class SftpClient:
         :return: a list of entries describing the contents of the provided directories
         """
 
-        entries: List[Entry] = []
+        entries: list[Entry] = []
 
         dir_handler: NodeHandler = self._handler_builder.get_dir_handler(
             get_size, files_only, entries
@@ -539,7 +539,7 @@ class Handlers:
         private_key: Optional[str],
         private_key_pass: Optional[str],
         host_key: Optional[HostKey],
-        entry_accumulator: List[Entry],
+        entry_accumulator: list[Entry],
         path: str,
     ) -> None:
         """
@@ -575,7 +575,7 @@ class Handlers:
         private_key: Optional[str],
         private_key_pass: Optional[str],
         host_key: Optional[HostKey],
-        entry_accumulator: List[Entry],
+        entry_accumulator: list[Entry],
         path: str,
     ) -> None:
         """
@@ -658,7 +658,7 @@ class Handlers:
 
     @classmethod
     def _dir_size(cls, sftp: 'pysftp.Connection', path: str) -> int:
-        sizes: List[int] = []
+        sizes: list[int] = []
 
         size_accumulator = partial(cls._accumulate_file_size, sftp, sizes)
         sftp.walktree(path, size_accumulator, size_accumulator, size_accumulator, True)
@@ -667,7 +667,7 @@ class Handlers:
 
     @classmethod
     def _accumulate_file_size(
-        cls, sftp: 'pysftp.Connection', size_accumulator: List[int], path: str
+        cls, sftp: 'pysftp.Connection', size_accumulator: list[int], path: str
     ) -> None:
         size_accumulator.append(cls._file_size(sftp, path))
 

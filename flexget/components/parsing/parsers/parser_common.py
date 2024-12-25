@@ -1,7 +1,7 @@
 import datetime
 import re
 from string import capwords
-from typing import List, Optional, Tuple, Union
+from typing import Optional, Union
 
 from loguru import logger
 
@@ -41,14 +41,11 @@ def old_assume_quality(guessed_quality: Quality, assumed_quality: Quality) -> Qu
 
 
 def remove_dirt(name: str) -> str:
-    if name:
-        name = re.sub(r'[_.,\[\]\(\): ]+', ' ', name).strip().lower()
-    return name
+    return re.sub(r'[_.,\[\]\(\): ]+', ' ', name).strip().lower() if name else name
 
 
 def normalize_name(name: str) -> str:
-    name = capwords(name)
-    return name
+    return capwords(name)
 
 
 class MovieParseResult:
@@ -72,10 +69,8 @@ class MovieParseResult:
 
     @property
     def identifier(self) -> str:
-        if self.name and self.year:
-            return (f'{self.name} {self.year}').strip().lower()
-        elif self.name:
-            return self.name.lower()
+        if self.name:
+            return (f'{self.name} {self.year}').strip().lower() if self.year else self.name.lower()
 
     @property
     def proper(self) -> bool:
@@ -98,7 +93,11 @@ class MovieParseResult:
 
     def __str__(self) -> str:
         valid = 'OK' if self.valid else 'INVALID'
-        return f'<MovieParseResult(data={self.data},name={self.name},year={self.year},id={self.identifier},quality={self.quality},proper={self.proper_count},release_group={self.release_group},status={valid})>'
+        return (
+            f'<MovieParseResult(data={self.data},name={self.name},year={self.year},'
+            f'id={self.identifier},quality={self.quality},proper={self.proper_count},'
+            f'release_group={self.release_group},status={valid})>'
+        )
 
 
 class SeriesParseResult:
@@ -108,7 +107,7 @@ class SeriesParseResult:
         name: Optional[str] = None,
         identified_by: Optional[str] = None,
         id_type: Optional[str] = None,
-        id: Optional[Union[Tuple[int, int], str, int, datetime.date]] = None,
+        id: Optional[Union[tuple[int, int], str, int, datetime.date]] = None,
         episodes: int = 1,
         season_pack: bool = False,
         strict_name: bool = False,
@@ -123,7 +122,7 @@ class SeriesParseResult:
         self.episodes: int = episodes
         self.season_pack: bool = season_pack
         self.identified_by: str = identified_by
-        self.id: Union[Tuple[int, int], str, int, datetime.date] = id
+        self.id: Union[tuple[int, int], str, int, datetime.date] = id
         self.id_type: str = id_type
         self.quality: Quality = quality if quality is not None else Quality()
         self.proper_count: int = proper_count
@@ -138,6 +137,7 @@ class SeriesParseResult:
 
     @property
     def season(self) -> Optional[int]:
+        # TODO Use match-case statement after Python 3.9 is dropped
         if self.id_type == 'ep':
             return self.id[0]
         if self.id_type == 'date':
@@ -155,15 +155,17 @@ class SeriesParseResult:
         return None
 
     @property
-    def identifiers(self) -> List[str]:
+    def identifiers(self) -> list[str]:
         """Return all identifiers this parser represents. (for packs)"""
         # Currently 'ep' is the only id type that supports packs
         if not self.valid:
             raise Exception('Series flagged invalid')
         if self.id_type == 'ep':
-            if self.season_pack:
-                return ['S%02d' % self.season]
-            return ['S%02dE%02d' % (self.season, self.episode + x) for x in range(self.episodes)]
+            return (
+                [f'S{self.season:02d}']
+                if self.season_pack
+                else [f'S{self.season:02d}E{self.episode + x:02d}' for x in range(self.episodes)]
+            )
         elif self.id_type == 'date':
             return [self.id.strftime('%Y-%m-%d')]
         if self.id is None:
@@ -182,21 +184,16 @@ class SeriesParseResult:
     def pack_identifier(self) -> str:
         """Return a combined identifier for the whole pack if this has more than one episode."""
         # Currently only supports ep mode
-        if self.id_type == 'ep':
-            if self.episodes > 1:
-                return 'S%02dE%02d-E%02d' % (
-                    self.season,
-                    self.episode,
-                    self.episode + self.episodes - 1,
-                )
-            else:
-                return self.identifier
-        else:
-            return self.identifier
+        return (
+            f'S{self.season:02d}E{self.episode:02d}-E{self.episode + self.episodes - 1:02d}'
+            if self.id_type == 'ep' and self.episodes > 1
+            else self.identifier
+        )
 
     def __str__(self) -> str:
         valid = 'OK' if self.valid else 'INVALID'
         return (
-            f'<SeriesParseResult(data={self.data},name={self.name},id={self.id!s},season={self.season},season_pack={self.season_pack},episode={self.episode},quality={self.quality},proper={self.proper_count},'
-            f'special={self.special},status={valid})>'
+            f'<SeriesParseResult(data={self.data},name={self.name},id={self.id!s},season={self.season},'
+            f'season_pack={self.season_pack},episode={self.episode},quality={self.quality},'
+            f'proper={self.proper_count},special={self.special},status={valid})>'
         )

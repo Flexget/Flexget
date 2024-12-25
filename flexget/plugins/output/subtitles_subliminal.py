@@ -1,7 +1,6 @@
 import collections
 import logging
 import os
-import sys
 import tempfile
 
 from loguru import logger
@@ -77,10 +76,6 @@ class PluginSubliminal:
     }
 
     def on_task_start(self, task, config):
-        if list(sys.version_info) < [2, 7]:
-            raise plugin.DependencyError(
-                'subliminal', 'Python 2.7', 'Subliminal plugin requires python 2.7.'
-            )
         try:
             import babelfish  # noqa
         except ImportError as e:

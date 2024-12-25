@@ -1,11 +1,11 @@
 FlexGet
 =======
-.. image:: https://github.com/Flexget/Flexget/actions/workflows/main.yml/badge.svg?branch=develop
-    :target: https://github.com/Flexget/Flexget/actions/workflows/main.yml?query=branch%3Adevelop
+.. image:: https://github.com/Flexget/Flexget/actions/workflows/test.yml/badge.svg?branch=develop
+    :target: https://github.com/Flexget/Flexget/actions/workflows/test.yml?query=branch%3Adevelop
 
 .. image:: https://img.shields.io/pypi/v/Flexget.svg
     :target: https://pypi.python.org/pypi/Flexget
-    
+
 ..
     Commenting these out for now, as they seem to be broken.
     .. image:: https://api.codacy.com/project/badge/Grade/86bb847efe984c12948bdeccabcbccad

@@ -133,7 +133,7 @@ class EntryListListAPI(APIResource):
         try:
             list = db.get_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
-            raise NotFoundError('list_id %d does not exist' % list_id)
+            raise NotFoundError(f'list_id {list_id} does not exist')
         return jsonify(list.to_dict())
 
     @api.response(200, description='list successfully deleted', model=base_message_schema)
@@ -143,7 +143,7 @@ class EntryListListAPI(APIResource):
         try:
             db.delete_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
-            raise NotFoundError('list_id %d does not exist' % list_id)
+            raise NotFoundError(f'list_id {list_id} does not exist')
         return success_response('list successfully deleted')
 
 
@@ -170,7 +170,7 @@ class EntryListEntriesAPI(APIResource):
         try:
             list = db.get_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
-            raise NotFoundError('list_id %d does not exist' % list_id)
+            raise NotFoundError(f'list_id {list_id} does not exist')
 
         args = entries_parser.parse_args()
 
@@ -234,7 +234,7 @@ class EntryListEntriesAPI(APIResource):
         try:
             db.get_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
-            raise NotFoundError('list_id %d does not exist' % list_id)
+            raise NotFoundError(f'list_id {list_id} does not exist')
         data = request.json
         title = data.get('title')
         entry_object = db.get_entry_by_title(list_id=list_id, title=title, session=session)
@@ -259,7 +259,7 @@ class EntryListEntryAPI(APIResource):
         try:
             entry = db.get_entry_by_id(list_id=list_id, entry_id=entry_id, session=session)
         except NoResultFound:
-            raise NotFoundError('could not find entry with id %d in list %d' % (entry_id, list_id))
+            raise NotFoundError(f'could not find entry with id {entry_id} in list {list_id}')
 
         return jsonify(entry.to_dict())
 
@@ -269,10 +269,10 @@ class EntryListEntryAPI(APIResource):
         try:
             entry = db.get_entry_by_id(list_id=list_id, entry_id=entry_id, session=session)
         except NoResultFound:
-            raise NotFoundError('could not find entry with id %d in list %d' % (entry_id, list_id))
+            raise NotFoundError(f'could not find entry with id {entry_id} in list {list_id}')
         logger.debug('deleting movie {}', entry.id)
         session.delete(entry)
-        return success_response('successfully deleted entry %d' % entry.id)
+        return success_response(f'successfully deleted entry {entry.id}')
 
     @api.validate(model=base_entry_schema)
     @api.response(201, model=entry_list_entry_base_schema)
@@ -284,9 +284,8 @@ class EntryListEntryAPI(APIResource):
         try:
             entry = db.get_entry_by_id(list_id=list_id, entry_id=entry_id, session=session)
         except NoResultFound:
-            raise NotFoundError('could not find entry with id %d in list %d' % (entry_id, list_id))
-        data = request.json
-        entry.entry = data
+            raise NotFoundError(f'could not find entry with id {entry_id} in list {list_id}')
+        entry.entry = data = request.json
         if data.get('title'):
             entry.title = data['title']
         if data.get('original_url'):

@@ -23,7 +23,7 @@ requests.headers.update(
 # this makes most of the titles to be returned in english translation, but not all of them
 requests.headers.update({'Accept-Language': 'en-US,en;q=0.8'})
 requests.headers.update(
-    {'X-Forwarded-For': '24.110.%d.%d' % (random.randint(0, 254), random.randint(0, 254))}
+    {'X-Forwarded-For': f'24.110.{random.randint(0, 254)}.{random.randint(0, 254)}'}
 )
 
 # give imdb a little break between requests (see: http://flexget.com/ticket/129#comment:1)

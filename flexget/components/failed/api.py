@@ -120,7 +120,7 @@ class RetryFailed(APIResource):
         """Clear all failed entries"""
         logger.debug('deleting all failed entries')
         deleted = session.query(db.FailedEntry).delete()
-        return success_response('successfully deleted %d failed entries' % deleted)
+        return success_response(f'successfully deleted {deleted} failed entries')
 
 
 @retry_failed_api.route('/<int:failed_entry_id>/')
@@ -136,7 +136,7 @@ class RetryFailedID(APIResource):
                 session.query(db.FailedEntry).filter(db.FailedEntry.id == failed_entry_id).one()
             )
         except NoResultFound:
-            raise NotFoundError('could not find entry with ID %i' % failed_entry_id)
+            raise NotFoundError(f'could not find entry with ID {failed_entry_id}')
         return jsonify(failed_entry.to_dict())
 
     @api.response(200, 'successfully delete failed entry', model=base_message_schema)
@@ -147,7 +147,7 @@ class RetryFailedID(APIResource):
                 session.query(db.FailedEntry).filter(db.FailedEntry.id == failed_entry_id).one()
             )
         except NoResultFound:
-            raise NotFoundError('could not find entry with ID %i' % failed_entry_id)
+            raise NotFoundError(f'could not find entry with ID {failed_entry_id}')
         logger.debug('deleting failed entry: "{}"', failed_entry.title)
         session.delete(failed_entry)
-        return success_response('successfully delete failed entry %d' % failed_entry_id)
+        return success_response(f'successfully delete failed entry {failed_entry_id}')

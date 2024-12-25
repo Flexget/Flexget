@@ -1,7 +1,6 @@
 import pytest
 
 
-@pytest.mark.usefixtures('tmpdir')
 class TestMove:
     config = """
         tasks:
@@ -16,8 +15,8 @@ class TestMove:
     """
 
     @pytest.mark.filecopy('movie.mkv', '__tmp__/movie.mkv')
-    def test_move(self, execute_task, tmpdir):
-        assert (tmpdir / 'movie.mkv').exists()
+    def test_move(self, execute_task, tmp_path):
+        assert tmp_path.joinpath('movie.mkv').exists()
         execute_task('test_move')
-        assert not (tmpdir / 'movie.mkv').exists()
-        assert (tmpdir / 'newdir/movie.mkv').exists()
+        assert not tmp_path.joinpath('movie.mkv').exists()
+        assert tmp_path.joinpath('newdir/movie.mkv').exists()

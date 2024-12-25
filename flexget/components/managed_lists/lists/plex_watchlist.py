@@ -1,6 +1,6 @@
 import typing
 from collections.abc import MutableSet
-from typing import List, Optional, Type, Union
+from typing import Optional, Union
 
 from loguru import logger
 
@@ -18,7 +18,7 @@ if typing.TYPE_CHECKING:
     from plexapi.video import Movie, Show
 
 
-def import_plexaccount() -> "Type[MyPlexAccount]":
+def import_plexaccount() -> "type[MyPlexAccount]":
     try:
         from plexapi.myplex import MyPlexAccount
 
@@ -87,7 +87,7 @@ class PlexManagedWatchlist(MutableSet):
         self.token = token
         self.type = type
         self.filter = filter
-        self._items: Optional[List[Entry]] = None
+        self._items: Optional[list[Entry]] = None
         self._account: Optional[MyPlexAccount] = None
 
     @property
@@ -98,7 +98,7 @@ class PlexManagedWatchlist(MutableSet):
         return self._account
 
     @property
-    def items(self) -> List[Entry]:
+    def items(self) -> list[Entry]:
         if self._items is None:
             watchlist = self.account.watchlist(filter=self.filter, libtype=self.type)
             self._items = []
@@ -156,7 +156,7 @@ class PlexManagedWatchlist(MutableSet):
     def _find_entry(self, entry):
         return self._match_entry(entry, self.items)
 
-    def _match_entry(self, entry: Entry, entries: List[Entry]):
+    def _match_entry(self, entry: Entry, entries: list[Entry]):
         for item in entries:
             # match on supported ids
             if any(entry.get(id) is not None and entry[id] == item[id] for id in SUPPORTED_IDS):

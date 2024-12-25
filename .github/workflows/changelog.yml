@@ -17,10 +17,10 @@ jobs:
     env:
       PYTHON_VERSION: 3.11
     steps:
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+    - uses: actions/checkout@v4
       with:
         fetch-depth: 0
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+    - uses: actions/checkout@v4
       with:
         repository: Flexget/wiki
         path: wiki
@@ -31,14 +31,9 @@ jobs:
         git config --global user.email ${{ secrets.git_email }}
         git config --global user.name ${{ secrets.git_user }}
     - name: Install uv
-      uses: astral-sh/setup-uv@v3
+      uses: astral-sh/setup-uv@v5
       with:
-        version: "0.4.27"
         enable-cache: true
-        cache-dependency-glob: 'uv.lock'
-    - name: Set up Python ${{ env.PYTHON_VERSION }}
-      uses: actions/setup-python@v5
-      with:
         python-version: ${{ env.PYTHON_VERSION }}
     - name: Install dev dependencies
       run: |

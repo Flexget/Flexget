@@ -219,7 +219,7 @@ class InputRSS:
         # Parse filename from enclosure url
         basename = posixpath.basename(urlsplit(entry['url']).path)
         # If enclosure has size OR there are multiple enclosures use filename from url
-        if (entry.get('size') or multiple and basename) and filename:
+        if (entry.get('size') or (multiple and basename)) and filename:
             entry['filename'] = basename
             logger.trace('filename `{}` from enclosure', entry['filename'])
 

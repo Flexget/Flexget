@@ -109,8 +109,8 @@ class ImdbWatchlist:
             raise plugin.PluginError(str(e))
         if page.status_code != 200:
             raise plugin.PluginError(
-                'Unable to get imdb list. Either list is private or does not exist.'
-                + ' Html status code was: %d.' % page.status_code
+                f'Unable to get imdb list. Either list is private or does not exist. '
+                f'Html status code was: {page.status_code}.'
             )
         return page
 

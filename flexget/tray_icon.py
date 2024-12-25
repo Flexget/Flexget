@@ -2,7 +2,7 @@ import logging
 import webbrowser
 from functools import partial, wraps
 from pathlib import Path
-from typing import Callable, List, Optional
+from typing import Callable, Optional
 
 from loguru import logger
 
@@ -43,7 +43,7 @@ class TrayIcon:
         self.path_to_image: Path = path_to_image
         self.icon: Optional[Icon] = None
         self._menu: Optional[Menu] = None
-        self.menu_items: List[MenuItem] = []
+        self.menu_items: list[MenuItem] = []
 
         self.active: bool = _import_success
         self.running: bool = False

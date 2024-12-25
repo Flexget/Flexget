@@ -143,7 +143,4 @@ class Symlink:
 
 @event('plugin.register')
 def register_plugin():
-    if os.name == 'nt':
-        logger.trace('Symlinks not supported on Windows. Skipping Symlink plugin register.')
-        return
     plugin.register(Symlink, 'symlink', api_ver=2)

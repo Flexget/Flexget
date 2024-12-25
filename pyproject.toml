@@ -6,13 +6,13 @@ description = """\
     different sources like RSS-feeds, html-pages, various sites and more.\
 """
 readme = "README.rst"
-requires-python = ">=3.8,<4.0"
+requires-python = ">=3.9"
 authors = [
     { name = "Marko Koivusalo", email = "marko.koivusalo@gmail.com" },
     { name = "Chase Sterling", email = "chase.sterling@gmail.com" },
 ]
 license = { file = "LICENSE" }
-dynamic = ["version", "optional-dependencies"]
+dynamic = ["version"]
 dependencies = [
     "apscheduler >=3.10.0",
     "beautifulsoup4 >=4.5",
@@ -52,7 +52,6 @@ dependencies = [
     "zxcvbn >=4.4.24",
     "pendulum >=3.0.0",
 ]
-
 [dependency-groups]
 dev = [
     "codacy-coverage >=1.2.18",
@@ -60,9 +59,9 @@ dev = [
     "gitpython >=3.1.18",
     "pre-commit >=3.2.0",
     "pytest-cov >=3.0.0",
-    "pytest-runner ~=6.0.0",
+    "pytest-runner ~=6.0",
     "pytest-xdist >=2.4.0",
-    "pytest >=6.2.4,<8",  # TODO: Tests break on pytest 8+, investigate why.
+    "pytest >8",
     "ruff >=0.6.0",
     "sphinx >=5.0.0",
     "vcrpy >=4.1.1",
@@ -87,7 +86,7 @@ docker = [
     "qbittorrent-api ~=2024.0",
     "deluge-client ~=1.9",
     "cloudscraper >=1.2.69",
-    "python-telegram-bot ~=12.8",
+    "python-telegram-bot[http2,socks] >=21.9",
 ]
 
 [project.urls]
@@ -103,11 +102,8 @@ flexget = "flexget:main"
 flexget-headless = "flexget:main"  # This is useful on Windows to avoid a cmd popup
 
 [build-system]
-requires = ["hatchling", "hatch-requirements-txt"]
+requires = ["hatchling"]
 build-backend = "hatchling.build"
-
-[tool.hatch.metadata.hooks.requirements_txt.optional-dependencies]
-locked = ["requirements.txt"]
 
 [tool.hatch.version]
 path = "flexget/_version.py"
@@ -125,6 +121,7 @@ exclude = ["flexget/tests"]
 ## Other tool settings
 
 [tool.pytest.ini_options]
+addopts = '-p no:legacypath'
 testpaths = ["flexget/tests"]
 
 # We switched to using ruff for formatting, but leaving this in for now
@@ -132,7 +129,7 @@ testpaths = ["flexget/tests"]
 [tool.black]
 line-length = 99
 skip-string-normalization = true
-target-version = ['py38', 'py39', 'py310', 'py311', 'py312']
+target-version = ['py39', 'py310', 'py311', 'py312', 'py313']
 # Only include files in /flexget/, or directly in project root
 include = '^/(flexget/.*)?[^/]*\.pyi?$'
 exclude = '''

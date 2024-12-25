@@ -1,3 +1,8 @@
+import platform
+
+import pytest
+
+
 class TestTorrentMatch:
     config = """
         tasks:
@@ -70,18 +75,36 @@ class TestTorrentMatch:
 
     """
 
+    @pytest.mark.skipif(
+        platform.system() == 'Windows',
+        reason='Due to the different file size calculation methods for torrents'
+        ' created on Windows and Linux, allowing this test to pass on'
+        'Windows will inevitably cause it to fail on Linux.',
+    )
     def test_multi_torrent_empty_name(self, execute_task):
         task = execute_task('test_multi_torrent_empty_name')
 
         assert len(task.accepted) == 1, 'Should have accepted torrent1.mkv'
         assert task.accepted[0]['path'] == 'torrent_match_test_dir/torrent1'
 
+    @pytest.mark.skipif(
+        platform.system() == 'Windows',
+        reason='Due to the different file size calculation methods for torrents'
+        ' created on Windows and Linux, allowing this test to pass on'
+        'Windows will inevitably cause it to fail on Linux.',
+    )
     def test_single_torrent(self, execute_task):
         task = execute_task('test_single_torrent')
 
         assert len(task.accepted) == 1, 'Should have accepted torrent1.mkv'
         assert task.accepted[0]['path'] == 'torrent_match_test_dir'
 
+    @pytest.mark.skipif(
+        platform.system() == 'Windows',
+        reason='Due to the different file size calculation methods for torrents'
+        ' created on Windows and Linux, allowing this test to pass on'
+        'Windows will inevitably cause it to fail on Linux.',
+    )
     def test_single_torrent_in_other_dir(self, execute_task):
         task = execute_task('test_single_torrent_in_other_dir')
 
@@ -118,6 +141,12 @@ class TestTorrentMatch:
         ), 'Should have accepted multi_file_with_diff because its size is within threshold'
         assert task.accepted[0]['path'] == 'torrent_match_test_dir'
 
+    @pytest.mark.skipif(
+        platform.system() == 'Windows',
+        reason='Due to the different file size calculation methods for torrents'
+        ' created on Windows and Linux, allowing this test to pass on'
+        'Windows will inevitably cause it to fail on Linux.',
+    )
     def test_with_filesystem(self, execute_task):
         task = execute_task('test_with_filesystem')
         assert (

@@ -43,8 +43,6 @@ ENV PATH $PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH
 
 # Install the required python versions (this takes a bit usually) so we do lots of cacheing
 RUN --mount=type=cache,target=/home/vscode/.pyenv/cache,uid=1000 \
-    pyenv install -s 3.7.13 && \
-    pyenv install -s 3.8.13 && \
     pyenv install -s 3.9.12 && \
     pyenv install -s 3.10.4 && \
     pyenv global 3.9.12 && \

@@ -101,7 +101,7 @@ class CrossMatch:
                 v2 = e2[field]
 
             try:
-                if v1 == v2 or not exact and (v2 in v1 or v1 in v2):
+                if v1 == v2 or (not exact and (v2 in v1 or v1 in v2)):
                     common_fields.append(field)
                 else:
                     logger.trace('not matching')

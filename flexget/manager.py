@@ -12,17 +12,12 @@ import signal
 import sys
 import threading
 import traceback
+from collections.abc import Iterator, Sequence
 from contextlib import contextmanager
 from datetime import datetime, timedelta
 from typing import (
     TYPE_CHECKING,
-    Dict,
-    Iterator,
-    List,
     Optional,
-    Sequence,
-    Tuple,
-    Type,
     Union,
 )
 
@@ -38,7 +33,7 @@ from flexget.utils.sqlalchemy_utils import ContextSession
 from flexget.utils.tools import get_current_flexget_version, io_encoding, pid_exists
 
 Base = declarative_base()
-Session: Type[ContextSession] = sessionmaker(class_=ContextSession)
+Session: type[ContextSession] = sessionmaker(class_=ContextSession)
 
 import flexget.log  # noqa
 from flexget import config_schema, db_schema, plugin  # noqa
@@ -118,7 +113,7 @@ class Manager:
     unit_test = False
     options: argparse.Namespace
 
-    def __init__(self, args: List[str]) -> None:
+    def __init__(self, args: list[str]) -> None:
         """
         :param args: CLI args
         """
@@ -147,7 +142,7 @@ class Manager:
         self.persist: SimplePersistence
         self.initialized = False
 
-        self.config: Dict = {}
+        self.config: dict = {}
 
         self.options = self.parse_initial_options(args)
         self._init_config(create=False)
@@ -178,7 +173,7 @@ class Manager:
         tray_icon.add_menu_separator(index=4)
 
     @staticmethod
-    def parse_initial_options(args: List[str]) -> argparse.Namespace:
+    def parse_initial_options(args: list[str]) -> argparse.Namespace:
         """Parse what we can from cli args before plugins are loaded."""
         try:
             options = CoreArgumentParser().parse_known_args(args, do_help=False)[0]
@@ -243,7 +238,7 @@ class Manager:
         self.initialized = True
 
     @property
-    def tasks(self) -> List[str]:
+    def tasks(self) -> list[str]:
         """A list of tasks in the config"""
         if not self.config:
             return []
@@ -258,7 +253,7 @@ class Manager:
         options: Optional[Union[dict, argparse.Namespace]] = None,
         priority: int = 1,
         suppress_warnings: Optional[Sequence[str]] = None,
-    ) -> List[Tuple[str, str, threading.Event]]:
+    ) -> list[tuple[str, str, threading.Event]]:
         """
         Run all (can be limited with options) tasks from the config.
 
@@ -830,7 +825,7 @@ class Manager:
         Read the values from the lock file. Returns None if there is no current lock file.
         """
         if self.lockfile and os.path.exists(self.lockfile):
-            result: Dict[str, Union[str, int]] = {}
+            result: dict[str, Union[str, int]] = {}
             with open(self.lockfile, encoding='utf-8') as f:
                 lines = [line for line in f.readlines() if line]
             for line in lines:
@@ -1035,7 +1030,7 @@ class Manager:
         global manager
         manager = None
 
-    def matching_tasks(self, task: str) -> Optional[List[str]]:
+    def matching_tasks(self, task: str) -> Optional[list[str]]:
         """Create list of tasks to run, preserving order"""
         task_names = [t for t in self.tasks if fnmatch.fnmatchcase(str(t).lower(), task.lower())]
         if not task_names:

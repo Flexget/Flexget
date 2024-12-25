@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Callable, Dict, List, Optional, Union
+from typing import Any, Callable, Optional, Union
 
 import sqlalchemy.event
 from loguru import logger
@@ -18,7 +18,7 @@ from flexget.utils.tools import get_current_flexget_version
 logger = logger.bind(name='schema')
 
 # Stores a mapping of {plugin: {'version': version, 'tables': ['table_names'])}
-plugin_schemas: Dict[str, Dict[str, Any]] = {}
+plugin_schemas: dict[str, dict[str, Any]] = {}
 
 
 class FlexgetVersion(Base):
@@ -259,7 +259,7 @@ def versioned_base(plugin: str, version: int) -> VersionedBaseMeta:
 
 
 @sqlalchemy.event.listens_for(Base.metadata, "after_create")
-def after_table_create(target, connection, tables: Optional[List[Table]] = None, **kw) -> None:
+def after_table_create(target, connection, tables: Optional[list[Table]] = None, **kw) -> None:
     """Sets the schema version to most recent for a plugin when it's tables are freshly created."""
     if tables:
         # TODO: Detect if any database upgrading is needed and acquire the lock only in one place

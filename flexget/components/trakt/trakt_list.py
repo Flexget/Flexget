@@ -29,8 +29,7 @@ def generate_episode_title(item):
     episode_info = item['episode']
     if show_info['year'] and not item['strip_dates']:
         return (
-            '%s (%s) S%02dE%02d %s'
-            % (
+            '{} ({}) S{:02d}E{:02d} {}'.format(
                 show_info['title'],
                 show_info['year'],
                 episode_info['season'],
@@ -40,8 +39,7 @@ def generate_episode_title(item):
         ).strip()
     else:
         return (
-            '%s S%02dE%02d %s'
-            % (
+            '{} S{:02d}E{:02d} {}'.format(
                 show_info['title'],
                 episode_info['season'],
                 episode_info['number'],
@@ -85,7 +83,9 @@ field_maps = {
         'trakt_series_year': 'show.year',
         'series_season': 'episode.season',
         'series_episode': 'episode.number',
-        'series_id': lambda i: 'S%02dE%02d' % (i['episode']['season'], i['episode']['number']),
+        'series_id': lambda i: 'S{:02d}E{:02d}'.format(
+            i['episode']['season'], i['episode']['number']
+        ),
         'imdb_id': 'show.ids.imdb',
         'tvdb_id': 'show.ids.tvdb',
         'tvrage_id': 'show.ids.tvrage',

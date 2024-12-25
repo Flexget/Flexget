@@ -1,7 +1,7 @@
 import difflib
 import time
 from datetime import datetime, timedelta
-from typing import Any, Dict, Optional, Type
+from typing import Any, Optional
 from urllib.error import URLError
 from urllib.parse import quote_plus
 
@@ -17,7 +17,7 @@ from flexget.utils.database import text_date_synonym, with_session
 from flexget.utils.sqlalchemy_utils import table_add_column, table_schema
 
 logger = logger.bind(name='api_rottentomatoes')
-Base: Type[db_schema.VersionedBaseMeta] = db_schema.versioned_base('api_rottentomatoes', 2)
+Base: type[db_schema.VersionedBaseMeta] = db_schema.versioned_base('api_rottentomatoes', 2)
 session = requests.Session()
 # There is a 5 call per second rate limit per api key with multiple users on the same api key, this can be problematic
 session.add_domain_limiter(requests.TimedLimiter('api.rottentomatoes.com', '0.4 seconds'))
@@ -93,11 +93,11 @@ Base.register_table(directors_table)
 class RottenTomatoesContainer:
     """Base class for RottenTomatoes objects"""
 
-    def __init__(self, init_dict: Optional[Dict[str, Any]] = None) -> None:
+    def __init__(self, init_dict: Optional[dict[str, Any]] = None) -> None:
         if isinstance(init_dict, dict):
             self.update_from_dict(init_dict)
 
-    def update_from_dict(self, update_dict: Dict[str, Any]) -> None:
+    def update_from_dict(self, update_dict: dict[str, Any]) -> None:
         """Populates any simple (string or number) attributes from a dict"""
         for col in self.__table__.columns:
             if isinstance(update_dict.get(col.name), (str, int, float)):
@@ -475,7 +475,7 @@ def lookup_movie(
 def _set_movie_details(
     movie: RottenTomatoesMovie,
     session: Session,
-    movie_data: Optional[Dict[str, Any]] = None,
+    movie_data: Optional[dict[str, Any]] = None,
     api_key: Optional[str] = None,
 ) -> Any:
     """
@@ -618,7 +618,7 @@ def movies_search(
         return results
 
 
-def get_json(url: str) -> Optional[Dict[str, Any]]:
+def get_json(url: str) -> Optional[dict[str, Any]]:
     try:
         logger.debug('fetching json at {}', url)
         data = session.get(url)

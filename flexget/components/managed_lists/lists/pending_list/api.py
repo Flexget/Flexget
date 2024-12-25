@@ -170,7 +170,7 @@ class PendingListListAPI(APIResource):
         try:
             list = db.get_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
-            raise NotFoundError('list_id %d does not exist' % list_id)
+            raise NotFoundError(f'list_id {list_id} does not exist')
         return jsonify(list.to_dict())
 
     @api.response(200, description='list successfully deleted', model=base_message_schema)
@@ -180,7 +180,7 @@ class PendingListListAPI(APIResource):
         try:
             db.delete_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
-            raise NotFoundError('list_id %d does not exist' % list_id)
+            raise NotFoundError(f'list_id {list_id} does not exist')
         return success_response('list successfully deleted')
 
 
@@ -208,7 +208,7 @@ class PendingListEntriesAPI(APIResource):
         try:
             list = db.get_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
-            raise NotFoundError('list_id %d does not exist' % list_id)
+            raise NotFoundError(f'list_id {list_id} does not exist')
 
         args = entries_parser.parse_args()
 
@@ -275,7 +275,7 @@ class PendingListEntriesAPI(APIResource):
         try:
             db.get_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
-            raise NotFoundError('list_id %d does not exist' % list_id)
+            raise NotFoundError(f'list_id {list_id} does not exist')
         data = request.json
         title = data.get('title')
         entry_object = db.get_entry_by_title(list_id=list_id, title=title, session=session)
@@ -349,7 +349,7 @@ class PendingListEntryAPI(APIResource):
         try:
             entry = db.get_entry_by_id(list_id=list_id, entry_id=entry_id, session=session)
         except NoResultFound:
-            raise NotFoundError('could not find entry with id %d in list %d' % (entry_id, list_id))
+            raise NotFoundError(f'could not find entry with id {entry_id} in list {list_id}')
 
         return jsonify(entry.to_dict())
 
@@ -359,10 +359,10 @@ class PendingListEntryAPI(APIResource):
         try:
             entry = db.get_entry_by_id(list_id=list_id, entry_id=entry_id, session=session)
         except NoResultFound:
-            raise NotFoundError('could not find entry with id %d in list %d' % (entry_id, list_id))
-        logger.debug('deleting movie {}', entry.id)
+            raise NotFoundError(f'could not find entry with id {entry_id} in list {list_id}')
+        logger.debug(f'deleting movie {entry.id}')
         session.delete(entry)
-        return success_response('successfully deleted entry %d' % entry.id)
+        return success_response(f'successfully deleted entry {entry.id}')
 
     @api.response(201, model=pending_list_entry_base_schema)
     @api.validate(model=pending_list_operation_schema)
@@ -372,7 +372,7 @@ class PendingListEntryAPI(APIResource):
         try:
             entry = db.get_entry_by_id(list_id=list_id, entry_id=entry_id, session=session)
         except NoResultFound:
-            raise NotFoundError('could not find entry with id %d in list %d' % (entry_id, list_id))
+            raise NotFoundError(f'could not find entry with id {entry_id} in list {list_id}')
         data = request.json
         approved = data['operation'] == 'approve'
         operation_text = 'approved' if approved else 'pending'

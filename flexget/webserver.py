@@ -2,7 +2,7 @@ import hashlib
 import random
 import socket
 import threading
-from typing import Dict, Optional, Tuple
+from typing import Optional
 
 import cherrypy
 import zxcvbn
@@ -18,7 +18,7 @@ from flexget.utils.database import with_session
 logger = logger.bind(name='web_server')
 
 _home: Optional[str] = None
-_app_register: Dict[str, Tuple[Flask, str]] = {}
+_app_register: dict[str, tuple[Flask, str]] = {}
 _default_app = Flask(__name__)
 
 rand = random.SystemRandom()
