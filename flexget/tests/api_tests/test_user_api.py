@@ -1,3 +1,8 @@
+import platform
+import sys
+
+import pytest
+
 from flexget.api.app import base_message
 from flexget.api.core.user import ObjectsContainer as OC
 from flexget.utils import json
@@ -6,6 +11,10 @@ from flexget.utils import json
 class TestUserAPI:
     config = 'tasks: {}'
 
+    @pytest.mark.skipif(
+        sys.version_info < (3, 9, 13) and platform.system() == 'Darwin',
+        reason='After Python 3.9 support is dropped, this can be removed.',
+    )
     def test_change_password(self, execute_task, api_client, schema_match):
         weak_password = {'password': 'weak'}
         medium_password = {'password': 'a.better.password'}

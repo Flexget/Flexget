@@ -8,11 +8,8 @@ repos:
       args: [ --fix, --exit-non-zero-on-fix ]
     - id: ruff-format
 - repo: https://github.com/astral-sh/uv-pre-commit
-  rev: 0.5.11
+  rev: 0.5.13
   hooks:
-    - id: uv-lock
-    - id: uv-export
-      args: ["--frozen", "--no-dev", "--no-emit-project", "--output-file=requirements.txt", "--no-hashes"]
     - id: uv-export
       args: ["--frozen", "--no-emit-project", "--output-file=dev-requirements.txt", "--no-hashes"]
 ci:
