@@ -1,7 +1,7 @@
 import time
 from datetime import date, datetime, timedelta
 from json.decoder import JSONDecodeError
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 from dateutil.parser import parse as dateutil_parse
 from loguru import logger
@@ -42,7 +42,7 @@ def bluray_request(endpoint, **params) -> Any:
             raise PluginError('Could decode json from response blu-ray api')
 
 
-def extract_release_date(bluray_entry: Dict[str, Any]) -> date:
+def extract_release_date(bluray_entry: dict[str, Any]) -> date:
     release_date = bluray_entry.get('reldate')
     if not release_date or release_date.lower() == 'no release date':
         try:

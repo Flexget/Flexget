@@ -130,7 +130,7 @@ class ScheduleAPI(APIResource):
 
         schedule, _ = _schedule_by_id(schedule_id, schedules)
         if schedule is None:
-            raise NotFoundError('schedule %d not found' % schedule_id)
+            raise NotFoundError(f'schedule {schedule_id} not found')
 
         job_id = scheduler_job_map.get(schedule_id)
         if job_id:
@@ -167,7 +167,7 @@ class ScheduleAPI(APIResource):
 
         schedule, idx = _schedule_by_id(schedule_id, self.manager.config['schedules'])
         if not schedule:
-            raise NotFoundError('schedule %d not found' % schedule_id)
+            raise NotFoundError(f'schedule {schedule_id} not found')
 
         new_schedule['id'] = id(schedule)
         self.manager.config['schedules'][idx] = new_schedule
@@ -194,6 +194,6 @@ class ScheduleAPI(APIResource):
                 del self.manager.config['schedules'][i]
                 self.manager.save_config()
                 self.manager.config_changed()
-                return success_response('schedule %d successfully deleted' % schedule_id)
+                return success_response(f'schedule {schedule_id} successfully deleted')
 
-        raise NotFoundError('schedule %d not found' % schedule_id)
+        raise NotFoundError(f'schedule {schedule_id} not found')

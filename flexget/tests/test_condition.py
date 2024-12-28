@@ -98,7 +98,7 @@ class TestQualityCondition:
             task = execute_task(taskname)
             count = len(task.rejected)
             expected = int(taskname[-1])
-            assert count == expected, "Expected %s rejects, got %d" % (expected, count)
+            assert count == expected, f"Expected {expected} rejects, got {count}"
 
 
 class TestDateCondition:

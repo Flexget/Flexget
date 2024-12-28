@@ -97,10 +97,8 @@ class TestSeriesParser:
         s = parse(name='Something', data='Something - This is the Subtitle 14x9 [Group-Name]')
         assert s.season == 14 and s.episode == 9, f'failed to parse {s.data}'
 
-    @pytest.mark.skip(reason='FIX: #402 .. a bit hard to do')
     def test_ep_in_square_brackets(self, parse):
         """SeriesParser: [S01] [E02] NOT IMPLEMENTED"""
-        # FIX: #402 .. a bit hard to do
         s = parse(name='Something', data='Something [S01] [E02]')
         assert s.season == 1 and s.episode == 2, f'failed to parse {s}'
 

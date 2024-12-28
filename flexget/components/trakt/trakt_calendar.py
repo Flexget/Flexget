@@ -77,7 +77,7 @@ class TraktCalendar:
         'trakt_ep_abs_number': 'number_abs',
         'trakt_season': 'season',
         'trakt_episode': 'number',
-        'trakt_ep_id': lambda ep: 'S%02dE%02d' % (ep['season'], ep['number']),
+        'trakt_ep_id': lambda ep: 'S{:02d}E{:02d}'.format(ep['season'], ep['number']),
         'trakt_ep_languages': 'available_translations',
         'trakt_ep_runtime': 'runtime',
         'trakt_ep_updated_at': 'updated_at',

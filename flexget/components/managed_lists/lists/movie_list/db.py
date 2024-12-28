@@ -53,20 +53,16 @@ class MovieListMovie(Base):
     ids = relationship('MovieListID', backref='movie', cascade='all, delete, delete-orphan')
 
     def __repr__(self):
-        return '<MovieListMovie title=%s,year=%s,list_id=%d>' % (
-            self.title,
-            self.year,
-            self.list_id,
-        )
+        return f'<MovieListMovie title={self.title},year={self.year},list_id={self.list_id}>'
 
     def to_entry(self, strip_year=False):
         entry = Entry()
         entry['title'] = entry['movie_name'] = self.title
-        entry['url'] = 'mock://localhost/movie_list/%d' % self.id
+        entry['url'] = f'mock://localhost/movie_list/{self.id}'
         entry['added'] = self.added
         if self.year:
             if strip_year is False:
-                entry['title'] += ' (%d)' % self.year
+                entry['title'] += f' ({self.year})'
             entry['movie_year'] = self.year
         for movie_list_id in self.ids:
             entry[movie_list_id.id_name] = movie_list_id.id_value
@@ -97,11 +93,7 @@ class MovieListID(Base):
     movie_id = Column(Integer, ForeignKey(MovieListMovie.id))
 
     def __repr__(self):
-        return '<MovieListID id_name=%s,id_value=%s,movie_id=%d>' % (
-            self.id_name,
-            self.id_value,
-            self.movie_id,
-        )
+        return f'<MovieListID id_name={self.id_name},id_value={self.id_value},movie_id={self.movie_id}>'
 
     def to_dict(self):
         return {

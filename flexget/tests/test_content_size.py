@@ -1,7 +1,6 @@
 import pytest
 
 
-@pytest.mark.usefixtures('tmpdir')
 class TestTorrentSize:
     config = """
         tasks:
@@ -65,7 +64,6 @@ class TestTorrentSize:
         ), 'should have rejected, size present from the cache'
 
 
-@pytest.mark.usefixtures('tmpdir')
 class TestFileSize:
     """This is to test that content_size is picked up from the file itself when filesystem is used as the input.
     This doesn't do a super job of testing, because we don't have any test files bigger than 1 MB.

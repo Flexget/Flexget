@@ -162,7 +162,7 @@ lazy_lookup_types = {
         'trakt_ep_abs_number': 'number_abs',
         'trakt_season': 'season',
         'trakt_episode': 'number',
-        'trakt_ep_id': lambda ep: 'S%02dE%02d' % (ep.season, ep.number),
+        'trakt_ep_id': lambda ep: f'S{ep.season:02d}E{ep.number:02d}',
     },
     'movie': {
         'movie_name': 'title',

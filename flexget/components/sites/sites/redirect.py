@@ -19,9 +19,7 @@ class UrlRewriteRedirect:
         if not config:
             return
         for entry in task.accepted:
-            if not any(entry['url'].startswith(adapter) for adapter in task.requests.adapters):
-                continue
-            elif entry['url'] in self.processed:
+            if entry['url'] in self.processed:
                 continue
             auth = None
             if 'download_auth' in entry:
@@ -37,6 +35,8 @@ class UrlRewriteRedirect:
             # Some providers also don't allow the HEAD method, so we use GET here for maximum compatibility.
             url = entry['url']
             while True:
+                if not any(url.startswith(adapter) for adapter in task.requests.adapters):
+                    break
                 try:
                     # Use 'stream' to make sure we don't download the content. Do the GET with a context manager
                     # to make sure the connection closes since we aren't getting content.

@@ -4,8 +4,10 @@ import time
 
 # Allow some request objects to be imported from here instead of requests
 import warnings
+from collections.abc import Mapping
 from datetime import datetime, timedelta
-from typing import TYPE_CHECKING, Dict, Optional, Union
+from email.message import EmailMessage
+from typing import TYPE_CHECKING, Optional, Union
 from urllib.parse import urlparse
 from urllib.request import urlopen
 
@@ -80,7 +82,7 @@ class TokenBucketLimiter(DomainLimiter):
 
     # This is just an in memory cache right now, it works for the daemon, and across tasks in a single execution
     # but not for multiple executions via cron. Do we need to store this to db?
-    state_cache: Dict[str, 'StateCacheDict'] = {}
+    state_cache: dict[str, 'StateCacheDict'] = {}
 
     def __init__(
         self,
@@ -170,7 +172,7 @@ def _wrap_urlopen(url: str, timeout: Optional[int] = None) -> requests.Response:
     return resp
 
 
-def limit_domains(url: str, limit_dict: Dict[str, DomainLimiter]) -> None:
+def limit_domains(url: str, limit_dict: dict[str, DomainLimiter]) -> None:
     """
     If this url matches a domain in `limit_dict`, run the limiter.
 
@@ -180,6 +182,16 @@ def limit_domains(url: str, limit_dict: Dict[str, DomainLimiter]) -> None:
         if domain in url:
             limiter()
             break
+
+
+def parse_header(header: str) -> tuple[str, Mapping]:
+    """Parse a MIME header (such as Content-Type) into a main value and a dictionary of parameters.
+
+    Replaces function in the deprecated cgi stdlib module.
+    """
+    msg = EmailMessage()
+    msg['content-type'] = header
+    return msg.get_content_type(), msg['content-type'].params
 
 
 class Session(requests.Session):
@@ -195,7 +207,7 @@ class Session(requests.Session):
         self.timeout = timeout
         self.adapters['http://'].max_retries = max_retries
         # Stores min intervals between requests for certain sites
-        self.domain_limiters: Dict[str, DomainLimiter] = {}
+        self.domain_limiters: dict[str, DomainLimiter] = {}
         self.headers.update({'User-Agent': f'FlexGet/{version} (www.flexget.com)'})
 
     def add_cookiejar(self, cookiejar):

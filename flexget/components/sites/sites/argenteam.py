@@ -72,10 +72,8 @@ class SearchArgenteam:
             logger.debug('{} releases found.', len(response['releases']))
             for release in response['releases']:
                 for torrent in release['torrents']:
-                    if (
-                        config.get('force_subtitles')
-                        and release['subtitles']
-                        or not config.get('force_subtitles')
+                    if (config.get('force_subtitles') and release['subtitles']) or not config.get(
+                        'force_subtitles'
                     ):
                         e = Entry()
 

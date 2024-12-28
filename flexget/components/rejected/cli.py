@@ -28,7 +28,7 @@ def list_rejected(options):
 def clear_rejected(manager):
     with Session() as session:
         results = session.query(db.RememberEntry).delete()
-        console('Cleared %i items.' % results)
+        console(f'Cleared {results} items.')
         session.commit()
         if results:
             manager.config_changed()

@@ -57,8 +57,9 @@ class PluginTryRegexp:
                     match, field = self.matches(entry, s)
                     if match:
                         console(
-                            'Title: %-40s URL: %-30s From: %s'
-                            % (entry['title'], entry['url'], field)
+                            'Title: {:40s} URL: {:30s} From: {}'.format(
+                                entry['title'], entry['url'], field
+                            )
                         )
                         count += 1
                 except re.error:

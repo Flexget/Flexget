@@ -264,10 +264,8 @@ class ParserGuessit:
                         break
             # Check the name doesn't end mid-word (guessit might put the border before or after the space after title)
             if (
-                data[title_end - 1].isalnum()
-                and len(data) <= title_end
-                or not self._is_valid_name(data, guessit_options=guessit_options)
-            ):
+                data[title_end - 1].isalnum() and len(data) <= title_end
+            ) or not self._is_valid_name(data, guessit_options=guessit_options):
                 valid = False
             # If we are in exact mode, make sure there is nothing after the title
             if kwargs.get('strict_name'):

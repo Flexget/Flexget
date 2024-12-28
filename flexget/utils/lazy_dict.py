@@ -1,5 +1,5 @@
-from collections.abc import MutableMapping
-from typing import Any, Callable, Iterable, List, Mapping, NamedTuple, Sequence
+from collections.abc import Iterable, Mapping, MutableMapping, Sequence
+from typing import Any, Callable, NamedTuple
 
 from loguru import logger
 
@@ -21,7 +21,7 @@ class LazyLookup:
 
     def __init__(self, store: 'LazyDict') -> None:
         self.store = store
-        self.callee_list: List[LazyCallee] = []
+        self.callee_list: list[LazyCallee] = []
 
     def add_func(self, func: Callable, keys: Sequence, args: Sequence, kwargs: Mapping) -> None:
         self.callee_list.append(LazyCallee(func, keys, args, kwargs))

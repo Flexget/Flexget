@@ -1,4 +1,3 @@
-import collections
 import contextlib
 import functools
 import logging
@@ -8,7 +7,9 @@ import sys
 import threading
 import uuid
 import warnings
-from typing import Callable, Deque, Iterator, List, Optional, Union
+from collections import deque
+from collections.abc import Iterator
+from typing import Callable, Optional, Union
 
 import loguru
 from loguru import logger
@@ -90,11 +91,11 @@ class InterceptHandler(logging.Handler):
 
 
 _logging_configured = False
-_startup_buffer: List['loguru.Record'] = []
+_startup_buffer: list['loguru.Record'] = []
 _startup_buffer_id: Optional[int] = None
 _logging_started = False
 # Stores the last 100 debug messages
-debug_buffer: Deque['loguru.Message'] = collections.deque(maxlen=100)
+debug_buffer: deque['loguru.Message'] = deque(maxlen=100)
 _log_filters = []  # Stores filter functions
 
 

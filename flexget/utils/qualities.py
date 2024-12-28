@@ -1,7 +1,8 @@
 import copy
 import functools
 import re
-from typing import Dict, Iterator, List, Optional, Set, Tuple, Union
+from collections.abc import Iterator
+from typing import Optional, Union
 
 from loguru import logger
 
@@ -21,7 +22,7 @@ class QualityComponent:
         name: str,
         regexp: Optional[str] = None,
         modifier: Optional[int] = None,
-        defaults: Optional[List['QualityComponent']] = None,
+        defaults: Optional[list['QualityComponent']] = None,
     ) -> None:
         """
         :param type: Type of quality component. (resolution, source, codec, color_range or audio)
@@ -45,7 +46,7 @@ class QualityComponent:
             regexp = re.escape(name)
         self.regexp = re.compile(r'(?<![^\W_])(' + regexp + r')(?![^\W_])', re.IGNORECASE)
 
-    def matches(self, text: str) -> Tuple[bool, str]:
+    def matches(self, text: str) -> tuple[bool, str]:
         """Test if quality matches to text.
 
         :param string text: data te be tested against
@@ -192,7 +193,7 @@ _UNKNOWNS = {
     'audio': QualityComponent('audio', 0, 'unknown'),
 }
 
-_registry: Dict[str, QualityComponent] = {}
+_registry: dict[str, QualityComponent] = {}
 for items in (_resolutions, _sources, _codecs, _color_ranges, _audios):
     for item in items:
         _registry[item.name] = item
@@ -242,7 +243,7 @@ class Quality(Serializer):
 
     def _find_best(
         self,
-        qlist: List[QualityComponent],
+        qlist: list[QualityComponent],
         default: QualityComponent,
         strip_all: bool = True,
     ) -> QualityComponent:
@@ -273,7 +274,7 @@ class Quality(Serializer):
         return name or 'unknown'
 
     @property
-    def components(self) -> List[QualityComponent]:
+    def components(self) -> list[QualityComponent]:
         return [self.resolution, self.source, self.codec, self.color_range, self.audio]
 
     @classmethod
@@ -285,7 +286,7 @@ class Quality(Serializer):
         return cls(data)
 
     @property
-    def _comparator(self) -> List:
+    def _comparator(self) -> list:
         modifier = sum(c.modifier for c in self.components if c.modifier)
         return [modifier, *self.components]
 
@@ -357,8 +358,8 @@ class RequirementComponent:
         self.type = type
         self.min: Optional[QualityComponent] = None
         self.max: Optional[QualityComponent] = None
-        self.acceptable: Set[QualityComponent] = set()
-        self.none_of: Set[QualityComponent] = set()
+        self.acceptable: set[QualityComponent] = set()
+        self.none_of: set[QualityComponent] = set()
 
     def reset(self) -> None:
         self.min = None
@@ -446,7 +447,7 @@ class Requirements:
             self.parse_requirements(req)
 
     @property
-    def components(self) -> List[RequirementComponent]:
+    def components(self) -> list[RequirementComponent]:
         return [self.resolution, self.source, self.codec, self.color_range, self.audio]
 
     def parse_requirements(self, text: str) -> None:

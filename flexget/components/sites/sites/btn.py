@@ -70,7 +70,7 @@ class SearchBTN:
             elif 'series_id' in entry:
                 # BTN wants an ep style identifier even for sequence shows
                 if entry.get('series_id_type') == 'sequence':
-                    search['name'] = 'S01E%02d' % entry['series_id']
+                    search['name'] = 'S01E{:02d}'.format(entry['series_id'])
                 else:
                     search['name'] = (
                         entry['series_id'] + '%'

@@ -7,7 +7,7 @@ from jinja2 import Template
 from .test_sftp_server import TestSFTPFileSystem, TestSFTPServerController
 
 
-@pytest.mark.usefixtures('tmpdir')
+@pytest.mark.xdist_group(name="sftp")
 class TestSftpDownload:
     _config = """
         templates:

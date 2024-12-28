@@ -5,7 +5,6 @@ import shutil
 import socket
 import sys
 import tempfile
-from cgi import parse_header
 from http.client import BadStatusLine
 from urllib.parse import unquote
 
@@ -15,6 +14,7 @@ from requests import RequestException
 from flexget import options, plugin
 from flexget.event import event
 from flexget.utils.pathscrub import pathscrub
+from flexget.utils.requests import parse_header
 from flexget.utils.template import RenderError
 from flexget.utils.tools import decode_html
 

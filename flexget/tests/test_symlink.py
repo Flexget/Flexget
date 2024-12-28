@@ -14,7 +14,6 @@ def is_hard_link(file1, file2):
     return (s1[stat.ST_INO], s1[stat.ST_DEV]) == (s2[stat.ST_INO], s2[stat.ST_DEV])
 
 
-@pytest.mark.skipif(os.name == 'nt', reason='symlinks do not work on windows')
 class TestSymlink:
     _config = """
         templates:
@@ -71,75 +70,80 @@ class TestSymlink:
     """
 
     @pytest.fixture
-    def config(self, tmpdir):
-        test_dir = tmpdir.mkdir(dirname)
-        test_dir.mkdir('hardlink')
-        test_dir.mkdir('softlink')
+    def config(self, tmp_path):
+        test_dir = tmp_path.joinpath(dirname)
+        test_dir.joinpath('hardlink').mkdir(parents=True)
+        test_dir.joinpath('softlink').mkdir(parents=True)
 
-        return Template(self._config).render({'tmpdir_1': test_dir.strpath})
+        return Template(self._config).render({'tmpdir_1': test_dir.as_posix()})
 
-    def test_hardlink(self, execute_task, tmpdir):
-        tmpdir.join(dirname).join('test1.mkv').write('')
+    def test_hardlink(self, execute_task, tmp_path):
+        tmp_path.joinpath(dirname).joinpath('test1.mkv').write_text('')
         execute_task('test_hardlink')
-        hardlink = tmpdir.join(dirname).join('hardlink').join('test1.mkv')
+        hardlink = tmp_path.joinpath(dirname).joinpath('hardlink').joinpath('test1.mkv')
 
-        assert os.path.exists(hardlink.strpath), f'{hardlink.strpath} should exist'
-        assert is_hard_link(tmpdir.join(dirname).join('test1.mkv').strpath, hardlink.strpath)
+        assert os.path.exists(hardlink.as_posix()), f'{hardlink.as_posix()} should exist'
+        assert is_hard_link(
+            tmp_path.joinpath(dirname).joinpath('test1.mkv').as_posix(), hardlink.as_posix()
+        )
 
-    def test_hardlink_rename(self, execute_task, tmpdir):
-        tmpdir.join(dirname).join('test1.mkv').write('')
+    def test_hardlink_rename(self, execute_task, tmp_path):
+        tmp_path.joinpath(dirname).joinpath('test1.mkv').write_text('')
         execute_task('test_hardlink_rename')
-        hardlink = tmpdir.join(dirname).join('hardlink').join('rename.mkv')
+        hardlink = tmp_path.joinpath(dirname).joinpath('hardlink').joinpath('rename.mkv')
 
-        assert os.path.exists(hardlink.strpath), f'{hardlink.strpath} should exist'
-        assert is_hard_link(tmpdir.join(dirname).join('test1.mkv').strpath, hardlink.strpath)
+        assert os.path.exists(hardlink.as_posix()), f'{hardlink.as_posix()} should exist'
+        assert is_hard_link(
+            tmp_path.joinpath(dirname).joinpath('test1.mkv').as_posix(), hardlink.as_posix()
+        )
 
-    def test_hardlink_dir(self, execute_task, tmpdir):
-        tmp = tmpdir.join(dirname).mkdir('test2')
-        test2 = tmp.join('test2.mkv')
-        test2.write('')
+    def test_hardlink_dir(self, execute_task, tmp_path):
+        tmp = tmp_path.joinpath(dirname).joinpath('test2')
+        tmp.mkdir()
+        test2 = tmp.joinpath('test2.mkv')
+        test2.write_text('')
         execute_task('test_hardlink_dir')
-        hardlink_dir = tmpdir.join(dirname).join('hardlink').join('test2')
+        hardlink_dir = tmp_path.joinpath(dirname).joinpath('hardlink').joinpath('test2')
 
-        assert os.path.exists(hardlink_dir.strpath), f'{hardlink_dir.strpath} should exist'
-        assert is_hard_link(test2.strpath, hardlink_dir.join('test2.mkv').strpath)
+        assert os.path.exists(hardlink_dir.as_posix()), f'{hardlink_dir.as_posix()} should exist'
+        assert is_hard_link(test2.as_posix(), hardlink_dir.joinpath('test2.mkv').as_posix())
 
-    def test_hardlink_fail(self, execute_task, tmpdir):
-        tmpdir.join(dirname).join('test1.mkv').write('')
-        hardlink = tmpdir.join(dirname).join('hardlink').join('test1.mkv')
-        hardlink.write('')
+    def test_hardlink_fail(self, execute_task, tmp_path):
+        tmp_path.joinpath(dirname).joinpath('test1.mkv').write_text('')
+        hardlink = tmp_path.joinpath(dirname).joinpath('hardlink').joinpath('test1.mkv')
+        hardlink.write_text('')
         task = execute_task('test_hardlink')
 
         assert len(task.failed) == 1, 'should have failed test1.mkv'
 
-    def test_softlink(self, execute_task, tmpdir):
-        tmpdir.join(dirname).join('test1.mkv').write('')
-        tmpdir.join(dirname).mkdir('test1')
+    def test_softlink(self, execute_task, tmp_path):
+        tmp_path.joinpath(dirname).joinpath('test1.mkv').write_text('')
+        tmp_path.joinpath(dirname).joinpath('test1').mkdir()
         execute_task('test_softlink')
 
-        softlink = tmpdir.join(dirname).join('softlink')
-        f = softlink.join('test1.mkv')
-        d = softlink.join('test1')
-        assert os.path.exists(f.strpath), f'{f.strpath} should exist'
-        assert os.path.exists(d.strpath), f'{d.strpath} should exist'
-        assert os.path.islink(f.strpath), f'{f.strpath} should be a softlink'
-        assert os.path.islink(d.strpath), f'{d.strpath} should be a softlink'
+        softlink = tmp_path.joinpath(dirname).joinpath('softlink')
+        f = softlink.joinpath('test1.mkv')
+        d = softlink.joinpath('test1')
+        assert os.path.exists(f.as_posix()), f'{f.as_posix()} should exist'
+        assert os.path.exists(d.as_posix()), f'{d.as_posix()} should exist'
+        assert os.path.islink(f.as_posix()), f'{f.as_posix()} should be a softlink'
+        assert os.path.islink(d.as_posix()), f'{d.as_posix()} should be a softlink'
 
-    def test_softlink_rename(self, execute_task, tmpdir):
-        tmpdir.join(dirname).join('test1.mkv').write('')
+    def test_softlink_rename(self, execute_task, tmp_path):
+        tmp_path.joinpath(dirname).joinpath('test1.mkv').write_text('')
         execute_task('test_softlink_rename')
 
-        softlink = tmpdir.join(dirname).join('softlink')
-        f = softlink.join('rename.mkv')
-        assert os.path.exists(f.strpath), f'{f.strpath} should exist'
-        assert os.path.islink(f.strpath), f'{f.strpath} should be a softlink'
+        softlink = tmp_path.joinpath(dirname).joinpath('softlink')
+        f = softlink.joinpath('rename.mkv')
+        assert os.path.exists(f.as_posix()), f'{f.as_posix()} should exist'
+        assert os.path.islink(f.as_posix()), f'{f.as_posix()} should be a softlink'
 
-    def test_softlink_fail(self, execute_task, tmpdir):
-        tmpdir.join(dirname).join('test1.mkv').write('')
-        tmpdir.join(dirname).mkdir('test1')
+    def test_softlink_fail(self, execute_task, tmp_path):
+        tmp_path.joinpath(dirname).joinpath('test1.mkv').write_text('')
+        tmp_path.joinpath(dirname).joinpath('test1').mkdir()
 
-        tmpdir.join(dirname).join('softlink').join('test1.mkv').write('')
-        tmpdir.join(dirname).join('softlink').mkdir('test1')
+        tmp_path.joinpath(dirname).joinpath('softlink').joinpath('test1.mkv').write_text('')
+        tmp_path.joinpath(dirname).joinpath('softlink').joinpath('test1').mkdir()
         task = execute_task('test_softlink_fail')
 
         assert len(task.failed) == 2, 'Should have failed both entries since they already exist'

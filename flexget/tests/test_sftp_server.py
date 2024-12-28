@@ -7,7 +7,7 @@ import socket
 import threading
 import time
 from logging import Logger
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 from paramiko import (
     RSAKey,
@@ -117,8 +117,8 @@ class TestSFTPFileSystem:
 
     def __init__(self, root: Path, username: str) -> None:
         self.__root = root
-        self.__home = self.create_dir(f'/home/{username}')
         self.__cwd = None
+        self.__home = self.create_dir(f'/home/{username}')
 
     def create_file(self, path: str, size: int = 0) -> Path:
         """Create a file on the :class: `StubSFTPServer` instance, if the path is
@@ -170,7 +170,7 @@ class TestSFTPFileSystem:
 
     def canonicalize(self, path: str, resolve: bool = True) -> Path:
         """
-        Canonicalizes the given SFTP path to the local file system either from the the cwd, or the user home if none is set.
+        Canonicalizes the given SFTP path to the local file system either from the cwd, or the user home if none is set.
 
         :param path: The path to canonicalize.
         :param resolve: If symlinks shoul be resovled.
@@ -178,7 +178,7 @@ class TestSFTPFileSystem:
         :return: An :class:`pathlib.Path` of the canonicalized path.
         """
         canonicalized: Path
-        if Path(path).is_absolute():
+        if PurePosixPath(path).is_absolute():
             path = path[1:]
             canonicalized = Path(posixpath.normpath((self.__root / path).as_posix()))
         else:
@@ -463,7 +463,9 @@ class TestSFTPServer(SFTPServerInterface):
 
     def canonicalize(self, path: str) -> str:
         logger.debug('canonicalize(%s)', path)
-        return '/' + str(self.__fs.canonicalize(path).resolve().relative_to(self.__fs.root()))
+        return (
+            '/' + self.__fs.canonicalize(path).resolve().relative_to(self.__fs.root()).as_posix()
+        )
 
     @staticmethod
     def log_and_return_error_code(e: OSError) -> int:

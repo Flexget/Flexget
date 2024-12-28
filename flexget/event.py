@@ -2,7 +2,7 @@
 Provides small event framework
 """
 
-from typing import Any, Callable, Dict, List
+from typing import Any, Callable
 
 from loguru import logger
 
@@ -38,7 +38,7 @@ class Event:
         return hash((self.name, self.func, self.priority))
 
 
-_events: Dict[str, List[Event]] = {}
+_events: dict[str, list[Event]] = {}
 
 
 def event(name: str, priority: int = 128) -> Callable[[Callable], Callable]:
@@ -51,7 +51,7 @@ def event(name: str, priority: int = 128) -> Callable[[Callable], Callable]:
     return decorator
 
 
-def get_events(name: str) -> List[Event]:
+def get_events(name: str) -> list[Event]:
     """
     :param String name: event name
     :return: List of :class:`Event` for *name* ordered by priority

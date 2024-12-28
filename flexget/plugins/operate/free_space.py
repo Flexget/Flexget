@@ -1,8 +1,10 @@
-import os
+import shutil
+from pathlib import Path
 
 from loguru import logger
 
 from flexget import plugin
+from flexget.config_schema import parse_size
 from flexget.event import event
 
 logger = logger.bind(name='free_space')
@@ -49,17 +51,10 @@ def get_free_space(config, task):
             logger.error('Non-integer was returned when calculating disk usage.')
             task.abort('Error with remote host.')
         return free
-    elif os.name == 'nt':
-        import ctypes
-
-        free_bytes = ctypes.c_ulonglong(0)
-        ctypes.windll.kernel32.GetDiskFreeSpaceExW(
-            ctypes.c_wchar_p(config['path']), None, None, ctypes.pointer(free_bytes)
-        )
-        return free_bytes.value / (1024 * 1024)
     else:
-        stats = os.statvfs(config['path'])
-        return (stats.f_bavail * stats.f_frsize) / (1024 * 1024)
+        path = Path(config['path']).expanduser().absolute()
+        usage = shutil.disk_usage(path)
+        return usage.free / 1024 / 1024
 
 
 class PluginFreeSpace:
@@ -71,7 +66,7 @@ class PluginFreeSpace:
             {
                 'type': 'object',
                 'properties': {
-                    'space': {'type': 'number'},
+                    'space': {'oneOf': [{'type': 'number'}, {'type': 'string', 'format': 'size'}]},
                     'abort_if': {
                         'type': 'string',
                         'enum': [ABORT_BELOW, ABORT_ABOVE],
@@ -95,6 +90,8 @@ class PluginFreeSpace:
     def prepare_config(config, task):
         if isinstance(config, (float, int)):
             config = {'space': config}
+        if isinstance(config['space'], str):
+            config['space'] = parse_size(config['space']) / 1024 / 1024
         # Use config path if none is specified
         if not config.get('path'):
             config['path'] = task.manager.config_base

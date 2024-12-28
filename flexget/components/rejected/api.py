@@ -131,7 +131,7 @@ class Rejected(APIResource):
         if entries:
             session.commit()
             self.manager.config_changed()
-        return success_response('successfully deleted %i rejected entries' % entries)
+        return success_response(f'successfully deleted {entries} rejected entries')
 
 
 @rejected_api.route('/<int:rejected_entry_id>/')
@@ -148,7 +148,7 @@ class RejectedEntry(APIResource):
                 .one()
             )
         except NoResultFound:
-            raise NotFoundError('rejected entry ID %d not found' % rejected_entry_id)
+            raise NotFoundError(f'rejected entry ID {rejected_entry_id} not found')
         return jsonify(rejected_entry_to_dict(entry))
 
     @api.response(200, model=base_message_schema)
@@ -161,6 +161,6 @@ class RejectedEntry(APIResource):
                 .one()
             )
         except NoResultFound:
-            raise NotFoundError('rejected entry ID %d not found' % rejected_entry_id)
+            raise NotFoundError(f'rejected entry ID {rejected_entry_id} not found')
         session.delete(entry)
-        return success_response('successfully deleted rejected entry %i' % rejected_entry_id)
+        return success_response(f'successfully deleted rejected entry {rejected_entry_id}')

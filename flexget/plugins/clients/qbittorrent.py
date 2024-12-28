@@ -9,6 +9,7 @@ from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.template import RenderError
+from flexget.utils.tools import parse_timedelta
 
 logger = logger.bind(name='qbittorrent')
 
@@ -30,6 +31,8 @@ class OutputQBitTorrent:
         maxupspeed: <torrent upload speed limit> (default: 0)
         maxdownspeed: <torrent download speed limit> (default: 0)
         add_paused: <ADD_PAUSED> (default: False)
+        ratio_limit: <RATIO_LIMIT> (default: -2)
+        seeding_time_limit: <SEEDING_TIME_LIMIT> (default: -1)
     """
 
     schema = {
@@ -52,6 +55,8 @@ class OutputQBitTorrent:
                     'fail_html': {'type': 'boolean'},
                     'add_paused': {'type': 'boolean'},
                     'skip_check': {'type': 'boolean'},
+                    'ratio_limit': {'type': 'number'},
+                    'seeding_time_limit': {'type': 'string', 'format': 'interval'},
                 },
                 'additionalProperties': False,
             },
@@ -262,6 +267,16 @@ class OutputQBitTorrent:
             if maxdownspeed:
                 form_data['dlLimit'] = maxdownspeed * 1024
 
+            ratio_limit = entry.get('ratio_limit', config.get('ratio_limit'))
+            if ratio_limit:
+                form_data['ratioLimit'] = ratio_limit
+
+            seeding_time_limit = entry.get('seeding_time_limit', config.get('seeding_time_limit'))
+            if seeding_time_limit:
+                form_data['seedingTimeLimit'] = int(
+                    parse_timedelta(seeding_time_limit).total_seconds() / 60
+                )
+
             is_magnet = entry['url'].startswith('magnet:')
 
             if task.manager.options.test:
@@ -280,6 +295,10 @@ class OutputQBitTorrent:
                     logger.info('Upload Speed Limit: {}', form_data.get('upLimit'))
                 if maxdownspeed:
                     logger.info('Download Speed Limit: {}', form_data.get('dlLimit'))
+                logger.info('Ratio limit: {}', form_data.get('ratio_limit', -2))
+                logger.info(
+                    'Seeding time limit: {} minutes', form_data.get('seeding_time_limit', -1)
+                )
                 continue
 
             if self.check_torrent_exists(

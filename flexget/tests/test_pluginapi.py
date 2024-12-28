@@ -72,9 +72,9 @@ class TestExternalPluginLoading:
 
     @pytest.fixture()
     def config(self, request):
-        os.environ['FLEXGET_PLUGIN_PATH'] = (
-            request.fspath.dirpath().join('external_plugins').strpath
-        )
+        os.environ['FLEXGET_PLUGIN_PATH'] = request.node.path.parent.joinpath(
+            'external_plugins'
+        ).as_posix()
         plugin.load_plugins()
         # fire the config register event again so that task schema is rebuilt with new plugin
         fire_event('config.register')

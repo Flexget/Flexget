@@ -5,8 +5,9 @@ import itertools
 import random
 import string
 import threading
+from collections.abc import Iterable
 from functools import total_ordering, wraps
-from typing import TYPE_CHECKING, Iterable, List, Optional, Union
+from typing import TYPE_CHECKING, Optional, Union
 
 from loguru import logger
 from sqlalchemy import Column, Integer, String, Unicode
@@ -93,7 +94,7 @@ def use_task_logging(func):
 class EntryIterator:
     """An iterator over a subset of entries to emulate old task.accepted/rejected/failed/entries properties."""
 
-    def __init__(self, entries: List[Entry], states: Union[EntryState, Iterable[EntryState]]):
+    def __init__(self, entries: list[Entry], states: Union[EntryState, Iterable[EntryState]]):
         self.all_entries = entries
         if isinstance(states, EntryState):
             states = [states]

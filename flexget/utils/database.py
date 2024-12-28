@@ -1,6 +1,6 @@
 import functools
 from datetime import datetime
-from typing import Any, List, Optional, Union
+from typing import Any, Optional, Union
 
 from sqlalchemy import extract, func
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
@@ -45,13 +45,13 @@ def with_session(*args, **kwargs):
 def pipe_list_synonym(name: str) -> SynonymProperty:
     """Converts pipe separated text into a list"""
 
-    def getter(self) -> Optional[List[str]]:
+    def getter(self) -> Optional[list[str]]:
         attr = getattr(self, name)
         if attr:
             return attr.strip('|').split('|')
         return None
 
-    def setter(self, value: Union[str, List[str]]) -> None:
+    def setter(self, value: Union[str, list[str]]) -> None:
         if isinstance(value, str):
             setattr(self, name, value)
         else:

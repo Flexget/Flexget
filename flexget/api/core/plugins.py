@@ -1,5 +1,5 @@
 from math import ceil
-from typing import TYPE_CHECKING, List, Optional
+from typing import TYPE_CHECKING, Optional
 
 from flask import Response, jsonify, request
 from flask_restx import inputs
@@ -75,8 +75,8 @@ if TYPE_CHECKING:
         builtin: bool
         category: Optional[str]
         debug: bool
-        interfaces: Optional[List[str]]
-        phase_handlers: List[_PhaseHandler]
+        interfaces: Optional[list[str]]
+        phase_handlers: list[_PhaseHandler]
         schema: Optional[JsonSchema]
 
 

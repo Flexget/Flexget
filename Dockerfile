@@ -1,5 +1,5 @@
 FROM docker.io/python:3.11-alpine as builder
-ENV PYTHONUNBUFFERED 1
+ENV PYTHONUNBUFFERED=1
 
 RUN --mount=type=cache,target=/var/cache/apk \
     apk add --upgrade \
@@ -25,8 +25,9 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen --no-dev
 
 # Final image without uv
-FROM docker.io/python:3.11-alpine
-ENV PYTHONUNBUFFERED 1
+# TODO: Alpine version is pinned due to https://github.com/Flexget/Flexget/issues/4085
+FROM docker.io/python:3.11-alpine3.20
+ENV PYTHONUNBUFFERED=1
 
 RUN --mount=type=cache,target=/var/cache/apk \
     apk add --upgrade \

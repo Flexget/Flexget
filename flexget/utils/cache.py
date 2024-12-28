@@ -1,6 +1,5 @@
 import hashlib
 import os
-from typing import Tuple
 
 import requests
 from loguru import logger
@@ -15,7 +14,7 @@ def cached_resource(
     force: bool = False,
     max_size: int = 250,
     directory: str = 'cached_resources',
-) -> Tuple[str, str]:
+) -> tuple[str, str]:
     """
     Caches a remote resource to local filesystem. Return a tuple of local file name and mime type, use primarily
     for API/WebUI.

@@ -31,13 +31,16 @@ def welcome_message(manager):
     scheduler = 'scheduler' if sys.platform.startswith('win') else 'crontab'
     if not count:
         logger.info(
-            'FlexGet has been successfully started from {} (--cron). I hope you have {} under control now. This message will not be repeated again.',
+            'FlexGet has been successfully started from {} (--cron). '
+            'I hope you have {} under control now. This message will not be repeated again.',
             scheduler,
             scheduler,
         )
     else:
         logger.info(
-            '%sFlexGet has been successfully started from %s (--cron). This message will be repeated %i times for your set up verification conveniences.'
-            % ('Congratulations! ' if count == 4 else '', scheduler, count)
+            '{}FlexGet has been successfully started from {} (--cron). '
+            'This message will be repeated {} times for your set up verification conveniences.'.format(
+                'Congratulations! ' if count == 4 else '', scheduler, count
+            )
         )
     persistence['count'] = count
