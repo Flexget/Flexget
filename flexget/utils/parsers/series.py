@@ -400,7 +400,9 @@ class SeriesParser(TitleParser):
                 #        season 11 though
                 logger.trace('ep identifier expected. Attempting SEE format parsing.')
                 # remove obvious date format from this desperate try
-                desperate = re.sub(r'\d{4}\s\d{1,2}\s\d{1,2}', '', data_stripped)
+                desperate = re.sub(
+                    r'\d{4}\s\d{1,2}\s\d{1,2}|\b(?:19|20)\d{2}\b', '', data_stripped
+                )
                 match = re.search(
                     self.re_not_in_word(r'(\d?\d)(\d\d)'),
                     desperate,
