@@ -1,6 +1,6 @@
 name: Build and release to PyPI
-on: ['deployment']
-permissions: {}
+on: [ deployment ]
+permissions: { }
 jobs:
   release:
     permissions:
@@ -9,56 +9,57 @@ jobs:
 
     runs-on: ubuntu-latest
     env:
-      PYTHON_VERSION: "3.11"
+      PYTHON_VERSION: '3.13' # renovate: datasource=python-version depName=python
+      UV_VERSION: 0.5.14 # renovate: datasource=pypi depName=uv
     steps:
-    - uses: actions/checkout@v4
-      with:
-        token: ${{ secrets.flexgetbot_pat }}
-        fetch-depth: 0
-    - name: Setup Git User
-      run: |
-        git config user.email ${{ secrets.git_email }}
-        git config user.name ${{ secrets.git_user }}
-    - name: Set up Python ${{ env.PYTHON_VERSION }}
-      uses: actions/setup-python@v5
-      with:
-        python-version: ${{ env.PYTHON_VERSION }}
-        cache: 'pip'
-        cache-dependency-path: 'dev-requirements.txt'
-    - name: Install dev dependencies
-      run: |
-        pip install -r requirements-release.txt
-    - name: Set Deployment Status Pending
-      uses: justacodename/deployment-status@v2
-      with:
-        state: pending
-    - name: Run release script
-      env:
-        TWINE_USERNAME: "__token__"
-        TWINE_PASSWORD: ${{ secrets.pypi_token }}
-      run: |
-        ./release.sh
-    - name: Build Changelog
-      id: changelog
-      if: env.release_tag
-      run: |
-        echo 'CHANGELOG_BODY<<EOF' >> $GITHUB_ENV
-        python dev_tools.py get-changelog ${{ env.release_tag }} >> $GITHUB_ENV
-        echo 'EOF' >> $GITHUB_ENV
-    - name: Create GitHub Release
-      uses: ncipollo/release-action@v1
-      if: env.release_tag
-      with:
-        tag: ${{ env.release_tag }}
-        artifacts: "dist/*"
-        token: ${{ secrets.GITHUB_TOKEN }}
-        body: ${{ env.CHANGELOG_BODY }}
-    - name: Set Deployment Status Success
-      uses: justacodename/deployment-status@v2
-      with:
-        state: success
-    - name: Set Deployment Status Failure
-      if: failure() || cancelled()
-      uses: justacodename/deployment-status@v2
-      with:
-        state: failure
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        with:
+          token: ${{ secrets.flexgetbot_pat }}
+          fetch-depth: 0
+      - name: Setup Git User
+        run: |
+          git config user.email ${{ secrets.git_email }}
+          git config user.name ${{ secrets.git_user }}
+      - name: Install uv
+        uses: astral-sh/setup-uv@887a942a15af3a7626099df99e897a18d9e5ab3a # v5
+        with:
+          enable-cache: true
+          python-version: ${{ env.PYTHON_VERSION }}
+          version: ${{ env.UV_VERSION }}
+      - name: Install release dependencies
+        run: |
+          uv sync --only-group release --frozen
+      - name: Set Deployment Status Pending
+        uses: justacodename/deployment-status@f758c04198a9855518022f1e3b990989381d9543 # v2
+        with:
+          state: pending
+      - name: Run release script
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.pypi_token }}
+        run: |
+          ./release.sh
+      - name: Build Changelog
+        id: changelog
+        if: env.release_tag
+        run: |
+          echo 'CHANGELOG_BODY<<EOF' >> $GITHUB_ENV
+          uv run --no-project dev_tools.py get-changelog ${{ env.release_tag }} >> $GITHUB_ENV
+          echo 'EOF' >> $GITHUB_ENV
+      - name: Create GitHub Release
+        uses: ncipollo/release-action@2c591bcc8ecdcd2db72b97d6147f871fcd833ba5 # v1
+        if: env.release_tag
+        with:
+          tag: ${{ env.release_tag }}
+          artifacts: dist/*
+          token: ${{ secrets.GITHUB_TOKEN }}
+          body: ${{ env.CHANGELOG_BODY }}
+      - name: Set Deployment Status Success
+        uses: justacodename/deployment-status@f758c04198a9855518022f1e3b990989381d9543 # v2
+        with:
+          state: success
+      - name: Set Deployment Status Failure
+        if: failure() || cancelled()
+        uses: justacodename/deployment-status@f758c04198a9855518022f1e3b990989381d9543 # v2
+        with:
+          state: failure

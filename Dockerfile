@@ -1,48 +1,45 @@
-# TODO: Alpine version is pinned due to https://github.com/Flexget/Flexget/issues/4085
-FROM docker.io/python:3.11-alpine3.20
+FROM docker.io/python:3.11-alpine@sha256:bc84eb94541f34a0e98535b130ea556ae85f6a431fdb3095762772eeb260ffc3 AS builder
 ENV PYTHONUNBUFFERED=1
 
-RUN apk add --no-cache --upgrade \
+RUN --mount=type=cache,target=/var/cache/apk \
+    apk add --upgrade \
         ca-certificates \
         nodejs \
         build-base \
         libffi-dev \
         openssl-dev \
-        unzip && \
-    rm -rf /var/cache/apk/*
+        unzip
 
-RUN pip install -U pip
+COPY --from=ghcr.io/astral-sh/uv:latest@sha256:f0786ad49e2e684c18d38697facb229f538a6f5e374c56f54125aabe7d14b3f7 /uv /uvx /bin/
+ENV UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy
+WORKDIR /flexget
+RUN --mount=type=cache,target=/root/.cache/uv \
+    --mount=type=bind,source=dev_tools.py,target=dev_tools.py \
+    uv run --with click --with requests dev_tools.py bundle-webui --version=v2
+RUN --mount=type=cache,target=/root/.cache/uv \
+    --mount=type=bind,source=uv.lock,target=uv.lock \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    uv sync --frozen --no-install-project --no-dev --group docker
+ADD . /flexget
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen --no-dev
 
-COPY requirements-docker.txt /flexget/
-RUN pip wheel --wheel-dir /dep-wheels -r /flexget/requirements-docker.txt
-
-COPY dev_tools.py /flexget/
-RUN pip install -f /dep-wheels click requests && python /flexget/dev_tools.py bundle-webui --version=v2
-COPY . /flexget
-RUN pip wheel --no-deps --wheel-dir /wheels -e /flexget
-
+# Final image without uv
 # TODO: Alpine version is pinned due to https://github.com/Flexget/Flexget/issues/4085
-FROM docker.io/python:3.11-alpine3.20
+FROM docker.io/python:3.11-alpine3.20@sha256:fbcb089a803d5673f225dc923b8e29ecc7945e9335465037b6961107b9da3d61
 ENV PYTHONUNBUFFERED=1
 
-RUN apk add --no-cache --upgrade \
+RUN --mount=type=cache,target=/var/cache/apk \
+    apk add --upgrade \
         ca-certificates \
         nodejs \
-        tzdata && \
-    rm -rf /var/cache/apk/*
+        tzdata
 
-COPY --from=0 /dep-wheels /dep-wheels
-COPY --from=0 /flexget/requirements-docker.txt /requirements-docker.txt
-COPY --from=0 /wheels /wheels
+# Copy the application from the builder
+COPY --from=builder --chown=app:app /flexget /flexget
 
-RUN pip install -U pip && \
-    pip install --no-cache-dir \
-                --no-index \
-                -f /dep-wheels \
-                -f /wheels \
-                FlexGet \
-                -r /requirements-docker.txt && \
-    rm -rf /wheels /dep-wheels /requirements-docker.txt
+# Place executables in the environment at the front of the path
+ENV PATH="/flexget/.venv/bin:$PATH"
 
 VOLUME /config
 WORKDIR /config
