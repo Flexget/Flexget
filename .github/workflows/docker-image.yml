@@ -51,8 +51,8 @@ jobs:
         uses: docker/metadata-action@369eb591f429131d6889c46b94e711f089e6ca96 # v5
         with:
           images: |
-            flexget/flexget
-            ghcr.io/flexget/flexget
+            ${{ secrets.DOCKERHUB_USERNAME }}/flexget
+            ghcr.io/${{ github.repository_owner }}/flexget
           tags: |
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
