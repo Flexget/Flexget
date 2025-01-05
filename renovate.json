@@ -36,6 +36,9 @@
   "pip_requirements": {
     "enabled": false
   },
+  "lockFileMaintenance": {
+    "enabled": true
+  },
   "packageRules": [
     {
       "extends": [
