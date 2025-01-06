@@ -99,8 +99,8 @@ flexget-headless = "flexget:main"  # This is useful on Windows to avoid a cmd po
 requires = ["hatchling", "hatch-requirements-txt"]
 build-backend = "hatchling.build"
 
-#[tool.hatch.metadata.hooks.requirements_txt.optional-dependencies]
-#locked = ["requirements.txt"]
+[tool.hatch.metadata.hooks.requirements_txt.optional-dependencies]
+locked = ["requirements.txt"]
 
 [tool.hatch.version]
 path = "flexget/_version.py"
