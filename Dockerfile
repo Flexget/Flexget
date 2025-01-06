@@ -15,7 +15,7 @@ ENV UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy
 WORKDIR /flexget
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=dev_tools.py,target=dev_tools.py \
-    uv run --with click --with requests dev_tools.py bundle-webui --version=v2
+    uv run dev_tools.py bundle-webui --version=v2
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
