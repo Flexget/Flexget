@@ -68,11 +68,6 @@ dev = [
     "sphinx ~=8.1; python_version >= '3.10'",
     "vcrpy ~=7.0",
 ]
-release = [
-    "build ~=1.2",
-    "click ~=8.1",
-    "twine ~=6.0",
-]
 plugin-test = [
     # These are optional dependencies for plugins that have tests in the test suite
     "boto3 ~=1.35",

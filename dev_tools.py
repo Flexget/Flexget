@@ -1,3 +1,10 @@
+# /// script
+# requires-python = ">=3.11"
+# dependencies = [
+#     "click~=8.1",
+#     "requests~=2.32",
+# ]
+# ///
 import fileinput
 import io
 import os

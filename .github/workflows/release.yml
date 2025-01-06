@@ -26,9 +26,6 @@ jobs:
           enable-cache: true
           python-version: ${{ env.PYTHON_VERSION }}
           version: ${{ env.UV_VERSION }}
-      - name: Install release dependencies
-        run: |
-          uv sync --only-group release --frozen
       - name: Set Deployment Status Pending
         uses: justacodename/deployment-status@f758c04198a9855518022f1e3b990989381d9543 # v2
         with:

@@ -19,11 +19,11 @@ fi
 if git log --skip 1 origin/master..origin/develop|grep '^commit '; then
 
   # Bump to new release version
-  python dev_tools.py bump-version release
+  uv run --no-project dev_tools.py bump-version release
   export VERSION=`python dev_tools.py version`
 
   # Package WebUI
-  python dev_tools.py bundle-webui
+  uv run dev_tools.py bundle-webui
 
   # Build and upload to pypi.
   uv build
@@ -39,6 +39,7 @@ if git log --skip 1 origin/master..origin/develop|grep '^commit '; then
 
   # Bump to new dev version, then commit again
   python dev_tools.py bump-version dev
+  uv run --no-project dev_tools.py bump-version dev
   git add flexget/_version.py
   git commit -m "Prepare v`python dev_tools.py version`"
 
