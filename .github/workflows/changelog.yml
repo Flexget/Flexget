@@ -37,9 +37,6 @@ jobs:
           enable-cache: true
           python-version: ${{ env.PYTHON_VERSION }}
           version: ${{ env.UV_VERSION }}
-      - name: Install dev dependencies
-        run: |
-          uv sync --only-dev
       - name: Update the Changelog
         run: |
           set -x

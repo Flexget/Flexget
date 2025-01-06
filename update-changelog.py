@@ -1,3 +1,10 @@
+# /// script
+# requires-python = ">=3.11"
+# dependencies = [
+#     "gitpython ~=3.1",
+# ]
+# ///
+
 import collections
 import re
 import sys
