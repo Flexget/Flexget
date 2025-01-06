@@ -40,7 +40,7 @@ dependencies = [
     # require urllib3 <2 on python < 3.10. In order to not be running different versions of urllib on different
     # versions of python, this is pinned in our deps. This can be removed completely if the issue gets solved.
     # https://github.com/kevin1024/vcrpy/issues/719
-    "urllib3 <3",
+    "urllib3 <2",
     # WebUI/API Deps
     "cherrypy ~=18.10",
     "flask-compress ~=1.17",
