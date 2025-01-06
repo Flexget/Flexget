@@ -20,7 +20,7 @@ dependencies = [
     "feedparser ~=6.0",
     "guessit ~=3.8",
     "html5lib ~=1.1",
-    "importlib-metadata ~=8.5; python_version <'3.10'",  # TODO: remove this after we drop python3.9
+    "importlib-metadata ~=8.5; python_version <'3.10'", # TODO: remove this after we drop python3.9
     "jinja2 ~=3.1",
     "jsonschema ~=4.23",
     "loguru ~=0.7.3",
@@ -75,14 +75,11 @@ plugin-test = [
     "pysftp ~=0.2.9",
     "subliminal ~= 2.1",
 ]
-docker = [
-    "cloudscraper ~=1.2",
-    "deluge-client ~=1.10",
-    "python-telegram-bot[http2,socks] ~=21.9",
-    "qbittorrent-api ~=2024.12",
-    "transmission-rpc ~=7.0",
-]
-
+cloudscraper = ['cloudscraper~=1.2']
+deluge = ['deluge-client~=1.10']
+qbittorrent = ['qbittorrent-api~=2024.12']
+telegram = ['python-telegram-bot[http2,socks]~=21.9']
+transmission = ['transmission-rpc~=7.0']
 [project.urls]
 "Homepage" = "https://flexget.com"
 "Issue Tracker" = "https://github.com/Flexget/Flexget/issues"
@@ -100,7 +97,13 @@ requires = ["hatchling", "hatch-requirements-txt"]
 build-backend = "hatchling.build"
 
 [tool.hatch.metadata.hooks.requirements_txt.optional-dependencies]
-locked = ["requirements.txt"]
+cloudscraper = ['requirements/cloudscraper.txt']
+deluge = ['requirements/deluge.txt']
+locked = ['requirements.txt']
+qbittorrent = ['requirements/qbittorrent.txt']
+telegram = ['requirements/telegram.txt']
+transmission = ['requirements/transmission.txt']
+all = ['requirements/cloudscraper.txt', 'requirements/deluge.txt', 'requirements/qbittorrent.txt', 'requirements/telegram.txt', 'requirements/transmission.txt']
 
 [tool.hatch.version]
 path = "flexget/_version.py"
@@ -148,11 +151,11 @@ extend-exclude = ["flexget/ui"]
 [tool.ruff.lint]
 select = ["C4", "E", "F", "I", "ISC", "PLE", "RUF", "TCH", "UP"]
 ignore = [
-    "E501",  # We leave line length up to black
-    "E711", "E712",  # Comparisons to True/False/None are valid for sqlalchemy
-    "ISC001",  # Ruff recommends disabling this when using the ruff formatter
-    "PLE1205",  # Thinks we are using stdlib logging rather than loguru
-    "RUF001",  # Some of these ambiguous unicode are in tests on purpose
+    "E501", # We leave line length up to black
+    "E711", "E712", # Comparisons to True/False/None are valid for sqlalchemy
+    "ISC001", # Ruff recommends disabling this when using the ruff formatter
+    "PLE1205", # Thinks we are using stdlib logging rather than loguru
+    "RUF001", # Some of these ambiguous unicode are in tests on purpose
     "RUF012", # Maybe can re-enable after https://github.com/astral-sh/ruff/issues/5243
 ]
 
