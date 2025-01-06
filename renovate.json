@@ -9,7 +9,7 @@
   "gitIgnoredAuthors": [
     "66853113+pre-commit-ci[bot]@users.noreply.github.com"
   ],
-  "rangeStrategy": "update-lockfile",
+  "rangeStrategy": "replace",
   "customManagers": [
     {
       "customType": "regex",
@@ -35,6 +35,9 @@
   },
   "pip_requirements": {
     "enabled": false
+  },
+  "lockFileMaintenance": {
+    "enabled": true
   },
   "packageRules": [
     {
