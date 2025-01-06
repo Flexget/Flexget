@@ -12,7 +12,7 @@ authors = [
     { name = "Chase Sterling", email = "chase.sterling@gmail.com" },
 ]
 license = { file = "LICENSE" }
-dynamic = ["version"]
+dynamic = ["version", "optional-dependencies"]
 dependencies = [
     "apscheduler ~=3.11",
     "beautifulsoup4 ~=4.12",
@@ -96,8 +96,11 @@ flexget = "flexget:main"
 flexget-headless = "flexget:main"  # This is useful on Windows to avoid a cmd popup
 
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling", "hatch-requirements-txt"]
 build-backend = "hatchling.build"
+
+#[tool.hatch.metadata.hooks.requirements_txt.optional-dependencies]
+#locked = ["requirements.txt"]
 
 [tool.hatch.version]
 path = "flexget/_version.py"
