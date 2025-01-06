@@ -27,7 +27,7 @@ if git log --skip 1 origin/master..origin/develop|grep '^commit '; then
 
   # Build and upload to pypi.
   uv build
-  twine upload --skip-existing dist/*
+  uv publish
 
   # Commit and tag released version
   git add flexget/_version.py

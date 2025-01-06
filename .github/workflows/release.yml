@@ -32,8 +32,7 @@ jobs:
           state: pending
       - name: Run release script
         env:
-          TWINE_USERNAME: __token__
-          TWINE_PASSWORD: ${{ secrets.pypi_token }}
+          UV_PUBLISH_TOKEN: ${{ secrets.pypi_token }}
         run: |
           ./release.sh
       - name: Build Changelog
