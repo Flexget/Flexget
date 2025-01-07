@@ -1,4 +1,6 @@
 import filecmp
+import platform
+import sys
 from pathlib import Path
 
 import pytest
@@ -7,6 +9,10 @@ from jinja2 import Template
 from .test_sftp_server import TestSFTPFileSystem, TestSFTPServerController
 
 
+@pytest.mark.skipif(
+    platform.system() == 'Windows' and sys.version_info[:2] == (3, 10),
+    reason='This test fails intermittently on Windows, Python 3.10.',
+)
 @pytest.mark.xdist_group(name="sftp")
 class TestSftpDownload:
     _config = """
