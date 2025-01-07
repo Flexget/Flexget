@@ -75,7 +75,6 @@ plugin-test = [
     "pysftp ~=0.2.9",
     "subliminal ~= 2.1",
 ]
-cloudscraper = ['cloudscraper~=1.2']
 deluge = ['deluge-client~=1.10']
 qbittorrent = ['qbittorrent-api~=2024.12']
 telegram = ['python-telegram-bot[http2,socks]~=21.9']
@@ -97,13 +96,12 @@ requires = ["hatchling", "hatch-requirements-txt"]
 build-backend = "hatchling.build"
 
 [tool.hatch.metadata.hooks.requirements_txt.optional-dependencies]
-cloudscraper = ['requirements/cloudscraper.txt']
 deluge = ['requirements/deluge.txt']
 locked = ['requirements.txt']
 qbittorrent = ['requirements/qbittorrent.txt']
 telegram = ['requirements/telegram.txt']
 transmission = ['requirements/transmission.txt']
-all = ['requirements/cloudscraper.txt', 'requirements/deluge.txt', 'requirements/qbittorrent.txt', 'requirements/telegram.txt', 'requirements/transmission.txt']
+all = ['requirements/deluge.txt', 'requirements/qbittorrent.txt', 'requirements/telegram.txt', 'requirements/transmission.txt']
 
 [tool.hatch.version]
 path = "flexget/_version.py"
