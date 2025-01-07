@@ -1,8 +1,10 @@
 version = 1
 requires-python = ">=3.9"
 resolution-markers = [
-    "python_full_version >= '3.10' and platform_python_implementation == 'PyPy'",
-    "python_full_version >= '3.10' and platform_python_implementation != 'PyPy'",
+    "python_full_version >= '3.13' and platform_python_implementation == 'PyPy'",
+    "python_full_version >= '3.10' and python_full_version < '3.13' and platform_python_implementation == 'PyPy'",
+    "python_full_version >= '3.13' and platform_python_implementation != 'PyPy'",
+    "python_full_version >= '3.10' and python_full_version < '3.13' and platform_python_implementation != 'PyPy'",
     "python_full_version < '3.10' and platform_python_implementation == 'PyPy'",
     "python_full_version < '3.10' and platform_python_implementation != 'PyPy'",
 ]
@@ -25,8 +27,10 @@ name = "alabaster"
 version = "1.0.0"
 source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
-    "python_full_version >= '3.10' and platform_python_implementation == 'PyPy'",
-    "python_full_version >= '3.10' and platform_python_implementation != 'PyPy'",
+    "python_full_version >= '3.13' and platform_python_implementation == 'PyPy'",
+    "python_full_version >= '3.10' and python_full_version < '3.13' and platform_python_implementation == 'PyPy'",
+    "python_full_version >= '3.13' and platform_python_implementation != 'PyPy'",
+    "python_full_version >= '3.10' and python_full_version < '3.13' and platform_python_implementation != 'PyPy'",
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/a6/f8/d9c74d0daf3f742840fd818d69cfae176fa332022fd44e3469487d5a9420/alabaster-1.0.0.tar.gz", hash = "sha256:c00dca57bca26fa62a6d7d0a9fcce65f3e026e9bfe33e9c538fd3fbb2144fd9e", size = 24210 }
 wheels = [
@@ -123,8 +127,10 @@ name = "babelfish"
 version = "0.6.1"
 source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
-    "python_full_version >= '3.10' and platform_python_implementation == 'PyPy'",
-    "python_full_version >= '3.10' and platform_python_implementation != 'PyPy'",
+    "python_full_version >= '3.13' and platform_python_implementation == 'PyPy'",
+    "python_full_version >= '3.10' and python_full_version < '3.13' and platform_python_implementation == 'PyPy'",
+    "python_full_version >= '3.13' and platform_python_implementation != 'PyPy'",
+    "python_full_version >= '3.10' and python_full_version < '3.13' and platform_python_implementation != 'PyPy'",
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/c5/8f/17ff889327f8a1c36a28418e686727dabc06c080ed49c95e3e2424a77aa6/babelfish-0.6.1.tar.gz", hash = "sha256:decb67a4660888d48480ab6998309837174158d0f1aa63bebb1c2e11aab97aab", size = 87706 }
 wheels = [
@@ -917,6 +923,45 @@ dependencies = [
 ]
 
 [package.optional-dependencies]
+all = [
+    { name = "anyio" },
+    { name = "certifi" },
+    { name = "charset-normalizer" },
+    { name = "cloudscraper" },
+    { name = "deluge-client" },
+    { name = "exceptiongroup", marker = "python_full_version < '3.11'" },
+    { name = "h11" },
+    { name = "h2" },
+    { name = "hpack" },
+    { name = "httpcore" },
+    { name = "httpx" },
+    { name = "hyperframe" },
+    { name = "idna" },
+    { name = "packaging" },
+    { name = "pyparsing" },
+    { name = "python-telegram-bot" },
+    { name = "qbittorrent-api" },
+    { name = "requests" },
+    { name = "requests-toolbelt" },
+    { name = "sniffio" },
+    { name = "socksio" },
+    { name = "transmission-rpc" },
+    { name = "typing-extensions" },
+    { name = "urllib3" },
+]
+cloudscraper = [
+    { name = "certifi" },
+    { name = "charset-normalizer" },
+    { name = "cloudscraper" },
+    { name = "idna" },
+    { name = "pyparsing" },
+    { name = "requests" },
+    { name = "requests-toolbelt" },
+    { name = "urllib3" },
+]
+deluge = [
+    { name = "deluge-client" },
+]
 locked = [
     { name = "aniso8601" },
     { name = "apscheduler" },
@@ -1000,8 +1045,48 @@ locked = [
     { name = "zstandard" },
     { name = "zxcvbn" },
 ]
+qbittorrent = [
+    { name = "certifi" },
+    { name = "charset-normalizer" },
+    { name = "idna" },
+    { name = "packaging" },
+    { name = "qbittorrent-api" },
+    { name = "requests" },
+    { name = "urllib3" },
+]
+telegram = [
+    { name = "anyio" },
+    { name = "certifi" },
+    { name = "exceptiongroup", marker = "python_full_version < '3.11'" },
+    { name = "h11" },
+    { name = "h2" },
+    { name = "hpack" },
+    { name = "httpcore" },
+    { name = "httpx" },
+    { name = "hyperframe" },
+    { name = "idna" },
+    { name = "python-telegram-bot" },
+    { name = "sniffio" },
+    { name = "socksio" },
+    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
+]
+transmission = [
+    { name = "certifi" },
+    { name = "charset-normalizer" },
+    { name = "idna" },
+    { name = "requests" },
+    { name = "transmission-rpc" },
+    { name = "typing-extensions" },
+    { name = "urllib3" },
+]
 
 [package.dev-dependencies]
+cloudscraper = [
+    { name = "cloudscraper" },
+]
+deluge = [
+    { name = "deluge-client" },
+]
 dev = [
     { name = "codacy-coverage" },
     { name = "coverage" },
@@ -1016,13 +1101,6 @@ dev = [
     { name = "sphinx", version = "8.1.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
     { name = "vcrpy" },
 ]
-docker = [
-    { name = "cloudscraper" },
-    { name = "deluge-client" },
-    { name = "python-telegram-bot", extra = ["http2", "socks"] },
-    { name = "qbittorrent-api" },
-    { name = "transmission-rpc" },
-]
 plugin-test = [
     { name = "boto3" },
     { name = "plexapi" },
@@ -1030,10 +1108,21 @@ plugin-test = [
     { name = "subliminal", version = "2.1.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
     { name = "subliminal", version = "2.2.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
 ]
+qbittorrent = [
+    { name = "qbittorrent-api" },
+]
+telegram = [
+    { name = "python-telegram-bot", extra = ["http2", "socks"] },
+]
+transmission = [
+    { name = "transmission-rpc" },
+]
 
 [package.metadata]
 requires-dist = [
     { name = "aniso8601", marker = "extra == 'locked'", specifier = "==9.0.1" },
+    { name = "anyio", marker = "extra == 'all'", specifier = "==4.8.0" },
+    { name = "anyio", marker = "extra == 'telegram'", specifier = "==4.8.0" },
     { name = "apscheduler", specifier = "~=3.11" },
     { name = "apscheduler", marker = "extra == 'locked'", specifier = "==3.11.0" },
     { name = "attrs", marker = "extra == 'locked'", specifier = "==24.3.0" },
@@ -1046,15 +1135,30 @@ requires-dist = [
     { name = "blinker", marker = "extra == 'locked'", specifier = "==1.9.0" },
     { name = "brotli", marker = "platform_python_implementation != 'PyPy' and extra == 'locked'", specifier = "==1.1.0" },
     { name = "brotlicffi", marker = "platform_python_implementation == 'PyPy' and extra == 'locked'", specifier = "==1.1.0.0" },
+    { name = "certifi", marker = "extra == 'all'", specifier = "==2024.12.14" },
+    { name = "certifi", marker = "extra == 'cloudscraper'", specifier = "==2024.12.14" },
     { name = "certifi", marker = "extra == 'locked'", specifier = "==2024.12.14" },
+    { name = "certifi", marker = "extra == 'qbittorrent'", specifier = "==2024.12.14" },
+    { name = "certifi", marker = "extra == 'telegram'", specifier = "==2024.12.14" },
+    { name = "certifi", marker = "extra == 'transmission'", specifier = "==2024.12.14" },
     { name = "cffi", marker = "platform_python_implementation == 'PyPy' and extra == 'locked'", specifier = "==1.17.1" },
+    { name = "charset-normalizer", marker = "extra == 'all'", specifier = "==3.4.1" },
+    { name = "charset-normalizer", marker = "extra == 'cloudscraper'", specifier = "==3.4.1" },
     { name = "charset-normalizer", marker = "extra == 'locked'", specifier = "==3.4.1" },
+    { name = "charset-normalizer", marker = "extra == 'qbittorrent'", specifier = "==3.4.1" },
+    { name = "charset-normalizer", marker = "extra == 'transmission'", specifier = "==3.4.1" },
     { name = "cheroot", marker = "extra == 'locked'", specifier = "==10.0.1" },
     { name = "cherrypy", specifier = "~=18.10" },
     { name = "cherrypy", marker = "extra == 'locked'", specifier = "==18.10.0" },
     { name = "click", marker = "extra == 'locked'", specifier = "==8.1.8" },
+    { name = "cloudscraper", marker = "extra == 'all'", specifier = "==1.2.71" },
+    { name = "cloudscraper", marker = "extra == 'cloudscraper'", specifier = "==1.2.71" },
     { name = "colorama", specifier = "~=0.4.6" },
     { name = "colorama", marker = "extra == 'locked'", specifier = "==0.4.6" },
+    { name = "deluge-client", marker = "extra == 'all'", specifier = "==1.10.2" },
+    { name = "deluge-client", marker = "extra == 'deluge'", specifier = "==1.10.2" },
+    { name = "exceptiongroup", marker = "python_full_version < '3.11' and extra == 'all'", specifier = "==1.2.2" },
+    { name = "exceptiongroup", marker = "python_full_version < '3.11' and extra == 'telegram'", specifier = "==1.2.2" },
     { name = "feedparser", specifier = "~=6.0" },
     { name = "feedparser", marker = "extra == 'locked'", specifier = "==6.0.11" },
     { name = "flask", specifier = "~=3.1" },
@@ -1070,9 +1174,26 @@ requires-dist = [
     { name = "greenlet", marker = "(python_full_version < '3.13' and platform_machine == 'AMD64' and extra == 'locked') or (python_full_version < '3.13' and platform_machine == 'WIN32' and extra == 'locked') or (python_full_version < '3.13' and platform_machine == 'aarch64' and extra == 'locked') or (python_full_version < '3.13' and platform_machine == 'amd64' and extra == 'locked') or (python_full_version < '3.13' and platform_machine == 'ppc64le' and extra == 'locked') or (python_full_version < '3.13' and platform_machine == 'win32' and extra == 'locked') or (python_full_version < '3.13' and platform_machine == 'x86_64' and extra == 'locked')", specifier = "==3.1.1" },
     { name = "guessit", specifier = "~=3.8" },
     { name = "guessit", marker = "extra == 'locked'", specifier = "==3.8.0" },
+    { name = "h11", marker = "extra == 'all'", specifier = "==0.14.0" },
+    { name = "h11", marker = "extra == 'telegram'", specifier = "==0.14.0" },
+    { name = "h2", marker = "extra == 'all'", specifier = "==4.1.0" },
+    { name = "h2", marker = "extra == 'telegram'", specifier = "==4.1.0" },
+    { name = "hpack", marker = "extra == 'all'", specifier = "==4.0.0" },
+    { name = "hpack", marker = "extra == 'telegram'", specifier = "==4.0.0" },
     { name = "html5lib", specifier = "~=1.1" },
     { name = "html5lib", marker = "extra == 'locked'", specifier = "==1.1" },
+    { name = "httpcore", marker = "extra == 'all'", specifier = "==1.0.7" },
+    { name = "httpcore", marker = "extra == 'telegram'", specifier = "==1.0.7" },
+    { name = "httpx", marker = "extra == 'all'", specifier = "==0.28.1" },
+    { name = "httpx", marker = "extra == 'telegram'", specifier = "==0.28.1" },
+    { name = "hyperframe", marker = "extra == 'all'", specifier = "==6.0.1" },
+    { name = "hyperframe", marker = "extra == 'telegram'", specifier = "==6.0.1" },
+    { name = "idna", marker = "extra == 'all'", specifier = "==3.10" },
+    { name = "idna", marker = "extra == 'cloudscraper'", specifier = "==3.10" },
     { name = "idna", marker = "extra == 'locked'", specifier = "==3.10" },
+    { name = "idna", marker = "extra == 'qbittorrent'", specifier = "==3.10" },
+    { name = "idna", marker = "extra == 'telegram'", specifier = "==3.10" },
+    { name = "idna", marker = "extra == 'transmission'", specifier = "==3.10" },
     { name = "importlib-metadata", marker = "python_full_version < '3.10'", specifier = "~=8.5" },
     { name = "importlib-metadata", marker = "python_full_version < '3.10' and extra == 'locked'", specifier = "==8.5.0" },
     { name = "importlib-resources", marker = "extra == 'locked'", specifier = "==6.5.2" },
@@ -1093,7 +1214,9 @@ requires-dist = [
     { name = "mdurl", marker = "extra == 'locked'", specifier = "==0.1.2" },
     { name = "more-itertools", marker = "extra == 'locked'", specifier = "==10.5.0" },
     { name = "packaging", specifier = "~=24.2" },
+    { name = "packaging", marker = "extra == 'all'", specifier = "==24.2" },
     { name = "packaging", marker = "extra == 'locked'", specifier = "==24.2" },
+    { name = "packaging", marker = "extra == 'qbittorrent'", specifier = "==24.2" },
     { name = "pendulum", specifier = "~=3.0" },
     { name = "pendulum", marker = "extra == 'locked'", specifier = "==3.0.0" },
     { name = "plumbum", marker = "extra == 'locked'", specifier = "==1.9.0" },
@@ -1105,20 +1228,32 @@ requires-dist = [
     { name = "pynzb", specifier = "~=0.1.0" },
     { name = "pynzb", marker = "extra == 'locked'", specifier = "==0.1.0" },
     { name = "pyparsing", specifier = "~=3.2" },
+    { name = "pyparsing", marker = "extra == 'all'", specifier = "==3.2.1" },
+    { name = "pyparsing", marker = "extra == 'cloudscraper'", specifier = "==3.2.1" },
     { name = "pyparsing", marker = "extra == 'locked'", specifier = "==3.2.1" },
     { name = "pyrss2gen", specifier = "~=1.1" },
     { name = "pyrss2gen", marker = "extra == 'locked'", specifier = "==1.1" },
     { name = "python-dateutil", specifier = "~=2.9" },
     { name = "python-dateutil", marker = "extra == 'locked'", specifier = "==2.9.0.post0" },
+    { name = "python-telegram-bot", marker = "extra == 'all'", specifier = "==21.10" },
+    { name = "python-telegram-bot", marker = "extra == 'telegram'", specifier = "==21.10" },
     { name = "pytz", marker = "extra == 'locked'", specifier = "==2024.2" },
     { name = "pywin32", marker = "(python_full_version < '3.10' and implementation_name == 'cpython' and sys_platform == 'win32' and extra == 'locked') or (platform_python_implementation != 'PyPy' and sys_platform == 'win32' and extra == 'locked')", specifier = "==308" },
     { name = "pyyaml", specifier = "~=6.0" },
     { name = "pyyaml", marker = "extra == 'locked'", specifier = "==6.0.2" },
+    { name = "qbittorrent-api", marker = "extra == 'all'", specifier = "==2024.12.71" },
+    { name = "qbittorrent-api", marker = "extra == 'qbittorrent'", specifier = "==2024.12.71" },
     { name = "rebulk", specifier = "~=3.2" },
     { name = "rebulk", marker = "extra == 'locked'", specifier = "==3.2.0" },
     { name = "referencing", marker = "extra == 'locked'", specifier = "==0.35.1" },
     { name = "requests", specifier = "~=2.32" },
+    { name = "requests", marker = "extra == 'all'", specifier = "==2.32.3" },
+    { name = "requests", marker = "extra == 'cloudscraper'", specifier = "==2.32.3" },
     { name = "requests", marker = "extra == 'locked'", specifier = "==2.32.3" },
+    { name = "requests", marker = "extra == 'qbittorrent'", specifier = "==2.32.3" },
+    { name = "requests", marker = "extra == 'transmission'", specifier = "==2.32.3" },
+    { name = "requests-toolbelt", marker = "extra == 'all'", specifier = "==1.0.0" },
+    { name = "requests-toolbelt", marker = "extra == 'cloudscraper'", specifier = "==1.0.0" },
     { name = "rich", specifier = "~=13.9" },
     { name = "rich", marker = "extra == 'locked'", specifier = "==13.9.4" },
     { name = "rpds-py", marker = "extra == 'locked'", specifier = "==0.22.3" },
@@ -1127,16 +1262,30 @@ requires-dist = [
     { name = "setuptools", marker = "extra == 'locked'", specifier = "==75.7.0" },
     { name = "sgmllib3k", marker = "extra == 'locked'", specifier = "==1.0.0" },
     { name = "six", marker = "extra == 'locked'", specifier = "==1.17.0" },
+    { name = "sniffio", marker = "extra == 'all'", specifier = "==1.3.1" },
+    { name = "sniffio", marker = "extra == 'telegram'", specifier = "==1.3.1" },
+    { name = "socksio", marker = "extra == 'all'", specifier = "==1.0.0" },
+    { name = "socksio", marker = "extra == 'telegram'", specifier = "==1.0.0" },
     { name = "soupsieve", marker = "extra == 'locked'", specifier = "==2.6" },
     { name = "sqlalchemy", specifier = "~=2.0" },
     { name = "sqlalchemy", marker = "extra == 'locked'", specifier = "==2.0.36" },
     { name = "tempora", marker = "extra == 'locked'", specifier = "==5.8.0" },
     { name = "time-machine", marker = "implementation_name != 'pypy' and extra == 'locked'", specifier = "==2.16.0" },
+    { name = "transmission-rpc", marker = "extra == 'all'", specifier = "==7.0.11" },
+    { name = "transmission-rpc", marker = "extra == 'transmission'", specifier = "==7.0.11" },
+    { name = "typing-extensions", marker = "python_full_version < '3.13' and extra == 'all'", specifier = "==4.12.2" },
+    { name = "typing-extensions", marker = "python_full_version < '3.13' and extra == 'telegram'", specifier = "==4.12.2" },
+    { name = "typing-extensions", marker = "extra == 'all'", specifier = "==4.12.2" },
     { name = "typing-extensions", marker = "extra == 'locked'", specifier = "==4.12.2" },
+    { name = "typing-extensions", marker = "extra == 'transmission'", specifier = "==4.12.2" },
     { name = "tzdata", marker = "extra == 'locked'", specifier = "==2024.2" },
     { name = "tzlocal", marker = "extra == 'locked'", specifier = "==5.2" },
     { name = "urllib3", specifier = "<2" },
+    { name = "urllib3", marker = "extra == 'all'", specifier = "==1.26.20" },
+    { name = "urllib3", marker = "extra == 'cloudscraper'", specifier = "==1.26.20" },
     { name = "urllib3", marker = "extra == 'locked'", specifier = "==1.26.20" },
+    { name = "urllib3", marker = "extra == 'qbittorrent'", specifier = "==1.26.20" },
+    { name = "urllib3", marker = "extra == 'transmission'", specifier = "==1.26.20" },
     { name = "webencodings", marker = "extra == 'locked'", specifier = "==0.5.1" },
     { name = "werkzeug", specifier = "~=3.1" },
     { name = "werkzeug", marker = "extra == 'locked'", specifier = "==3.1.3" },
@@ -1149,6 +1298,8 @@ requires-dist = [
 ]
 
 [package.metadata.requires-dev]
+cloudscraper = [{ name = "cloudscraper", specifier = "~=1.2" }]
+deluge = [{ name = "deluge-client", specifier = "~=1.10" }]
 dev = [
     { name = "codacy-coverage", specifier = "~=1.3" },
     { name = "coverage", specifier = "~=7.6" },
@@ -1163,19 +1314,15 @@ dev = [
     { name = "sphinx", marker = "python_full_version >= '3.10'", specifier = "~=8.1" },
     { name = "vcrpy", specifier = "~=7.0" },
 ]
-docker = [
-    { name = "cloudscraper", specifier = "~=1.2" },
-    { name = "deluge-client", specifier = "~=1.10" },
-    { name = "python-telegram-bot", extras = ["http2", "socks"], specifier = "~=21.9" },
-    { name = "qbittorrent-api", specifier = "~=2024.12" },
-    { name = "transmission-rpc", specifier = "~=7.0" },
-]
 plugin-test = [
     { name = "boto3", specifier = "~=1.35" },
     { name = "plexapi", specifier = "~=4.16" },
     { name = "pysftp", specifier = "~=0.2.9" },
     { name = "subliminal", specifier = "~=2.1" },
 ]
+qbittorrent = [{ name = "qbittorrent-api", specifier = "~=2024.12" }]
+telegram = [{ name = "python-telegram-bot", extras = ["http2", "socks"], specifier = "~=21.9" }]
+transmission = [{ name = "transmission-rpc", specifier = "~=7.0" }]
 
 [[package]]
 name = "greenlet"
@@ -2587,8 +2734,10 @@ name = "sphinx"
 version = "8.1.3"
 source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
-    "python_full_version >= '3.10' and platform_python_implementation == 'PyPy'",
-    "python_full_version >= '3.10' and platform_python_implementation != 'PyPy'",
+    "python_full_version >= '3.13' and platform_python_implementation == 'PyPy'",
+    "python_full_version >= '3.10' and python_full_version < '3.13' and platform_python_implementation == 'PyPy'",
+    "python_full_version >= '3.13' and platform_python_implementation != 'PyPy'",
+    "python_full_version >= '3.10' and python_full_version < '3.13' and platform_python_implementation != 'PyPy'",
 ]
 dependencies = [
     { name = "alabaster", version = "1.0.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
@@ -2773,8 +2922,10 @@ name = "subliminal"
 version = "2.2.1"
 source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
-    "python_full_version >= '3.10' and platform_python_implementation == 'PyPy'",
-    "python_full_version >= '3.10' and platform_python_implementation != 'PyPy'",
+    "python_full_version >= '3.13' and platform_python_implementation == 'PyPy'",
+    "python_full_version >= '3.10' and python_full_version < '3.13' and platform_python_implementation == 'PyPy'",
+    "python_full_version >= '3.13' and platform_python_implementation != 'PyPy'",
+    "python_full_version >= '3.10' and python_full_version < '3.13' and platform_python_implementation != 'PyPy'",
 ]
 dependencies = [
     { name = "babelfish", version = "0.6.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
