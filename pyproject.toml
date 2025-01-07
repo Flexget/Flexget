@@ -113,10 +113,25 @@ skip-excluded-dirs = true
 
 [tool.hatch.build.targets.sdist]
 include = [
-    "flexget/*",
-    "/*requirements*.txt"
+    "/flexget",
+    "/*.py"
 ]
-exclude = ["flexget/tests"]
+# Cassettes will take up all our room on pypi faster
+exclude = ["/flexget/tests/cassettes"]
+artifacts = [
+    "/flexget/ui/v1/app",
+    "/flexget/ui/v2/dist"
+]
+
+[tool.hatch.build.targets.wheel]
+include = [
+    "/flexget",
+]
+exclude = ["/flexget/tests"]
+artifacts = [
+    "/flexget/ui/v1/app",
+    "/flexget/ui/v2/dist"
+]
 
 ## Other tool settings
 
