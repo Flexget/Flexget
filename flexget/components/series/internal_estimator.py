@@ -27,7 +27,7 @@ class EstimatesSeriesInternal:
             episodes = (
                 session.query(db.Episode)
                 .join(db.Episode.series)
-                .filter(db.Episode.season != None)  # noqa: E711
+                .filter(db.Episode.season.is_not(None))
                 .filter(db.Series.id == series.id)
                 .filter(db.Episode.season == func.max(db.Episode.season).select())
                 .order_by(desc(db.Episode.number))

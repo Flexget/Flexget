@@ -72,7 +72,7 @@ def do_cli_summary(manager, options):
             ok = (
                 session.query(db.TaskExecution)
                 .filter(db.TaskExecution.task_id == task.id)
-                .filter(db.TaskExecution.succeeded == True)  # noqa: E712
+                .filter(db.TaskExecution.succeeded)
                 .filter(db.TaskExecution.produced > 0)
                 .order_by(db.TaskExecution.start.desc())
                 .first()

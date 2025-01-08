@@ -61,7 +61,7 @@ class EstimatesSeriesTVMaze:
             logger.debug('received air-date: {}', entity.airdate)
             entity_data['entity_date'] = entity.airdate
 
-        if entity_data['data_exists'] is False:
+        if not entity_data['data_exists']:
             # Make Lookup to series to see if failed because of no episode or no data
             lookup = api_tvmaze.series_lookup
             series = {}

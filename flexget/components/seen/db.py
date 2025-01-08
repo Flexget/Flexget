@@ -67,7 +67,7 @@ def upgrade(ver, session):
         # setting the default to False in the last migration was broken, fix the data
         logger.info('Repairing seen table')
         entry_table = table_schema('seen_entry', session)
-        session.execute(update(entry_table, entry_table.c.local == None, {'local': False}))  # noqa: E711
+        session.execute(update(entry_table, entry_table.c.local.is_(None), {'local': False}))
         ver = 4
 
     return ver
@@ -236,7 +236,7 @@ def search_by_field_values(field_value_list, task_name, local=False, session=Non
         found = found.filter(SeenEntry.task == task_name)
     else:
         # Entries added from CLI were having local marked as None rather than False for a while gh#879
-        found = found.filter(or_(SeenEntry.local == False, SeenEntry.local == None))  # noqa: E711, E712
+        found = found.filter(or_(~SeenEntry.local, SeenEntry.local.is_(None)))
     return found.first()
 
 

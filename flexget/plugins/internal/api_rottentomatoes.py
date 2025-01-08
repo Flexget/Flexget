@@ -55,7 +55,7 @@ def upgrade(ver: int, session: Session) -> int:
         ver = 1
     if ver == 1:
         table = table_schema('rottentomatoes_search_results', session)
-        session.execute(sql.delete(table, table.c.movie_id == None))  # noqa: E711
+        session.execute(sql.delete(table, table.c.movie_id.is_(None)))
         ver = 2
     return ver
 
