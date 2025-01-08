@@ -161,7 +161,7 @@ class FilterImdb:
                     if genre in accepted:
                         accept_genre = True
                         break
-                if accept_genre == False:
+                if accept_genre is False:
                     reasons.append('accept_genres')
 
             if 'reject_genres' in config:

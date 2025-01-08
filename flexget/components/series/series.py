@@ -43,7 +43,7 @@ def repair(manager):
         try:
             # For some reason at least I have some releases in database which don't belong to any episode.
             for release in (
-                session.query(db.EpisodeRelease).filter(db.EpisodeRelease.episode == None).all()
+                session.query(db.EpisodeRelease).filter(db.EpisodeRelease.episode == None).all()  # noqa: E711
             ):
                 logger.info('Purging orphan release {} from database', release.title)
                 session.delete(release)

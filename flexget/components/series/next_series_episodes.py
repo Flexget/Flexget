@@ -181,7 +181,7 @@ class NextSeriesEpisodes:
                         if latest_ep_this_season:
                             downloaded_this_season = (
                                 episodes_this_season.join(db.Episode.releases)
-                                .filter(db.EpisodeRelease.downloaded == True)
+                                .filter(db.EpisodeRelease.downloaded == True)  # noqa: E712
                                 .all()
                             )
                             # Calculate the episodes we still need to get from this season

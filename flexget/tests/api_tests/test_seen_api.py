@@ -330,13 +330,13 @@ class TestSeenPagination:
         assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
         data = json.loads(rsp.get_data(as_text=True))
 
-        assert data[0]['local'] == True
+        assert data[0]['local'] is True
 
         rsp = api_client.get('/seen/?sort_by=local&order=asc')
         assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
         data = json.loads(rsp.get_data(as_text=True))
 
-        assert data[0]['local'] == False
+        assert data[0]['local'] is False
 
         # Combine sorting and pagination
         rsp = api_client.get('/seen/?sort_by=reason&per_page=2&page=2')

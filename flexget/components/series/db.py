@@ -650,9 +650,9 @@ def upgrade(ver: Optional[int], session: Session) -> int:
         ep_mode_series = select(series_table.c.id).where(series_table.c.identified_by == 'ep')
         where_clause = and_(
             ep_table.c.series_id.in_(ep_mode_series),
-            ep_table.c.season != None,
-            ep_table.c.number != None,
-            ep_table.c.identified_by == None,
+            ep_table.c.season != None,  # noqa: E711
+            ep_table.c.number != None,  # noqa: E711
+            ep_table.c.identified_by == None,  # noqa: E711
         )
         session.execute(
             update(ep_table).where(where_clause).values({ep_table.c.identified_by: 'ep'})
@@ -711,7 +711,7 @@ def upgrade(ver: Optional[int], session: Session) -> int:
         series_table = table_schema('series', session)
         session.execute(
             update(series_table)
-            .where(series_table.c.identified_by == None)
+            .where(series_table.c.identified_by == None)  # noqa: E711
             .values({series_table.c.identified_by: 'auto'})
         )
         ver = 13
@@ -727,7 +727,7 @@ def db_cleanup(manager, session: Session) -> None:
     # Clean up old undownloaded releases
     result = (
         session.query(EpisodeRelease)
-        .filter(EpisodeRelease.downloaded == False)
+        .filter(EpisodeRelease.downloaded == False)  # noqa: E712
         .filter(EpisodeRelease.first_seen < datetime.now() - timedelta(days=120))
         .delete(False)
     )
@@ -963,7 +963,7 @@ def get_series_summary(
     if premieres:
         query = (
             query.having(func.max(Episode.season) <= 1).having(func.max(Episode.number) <= 2)
-        ).filter(EpisodeRelease.downloaded == True)
+        ).filter(EpisodeRelease.downloaded == True)  # noqa: E712
     if count:
         return query.group_by(Series).count()
     if sort_by == 'show_name':
@@ -1042,7 +1042,7 @@ def get_latest_season_pack_release(
     )
 
     if downloaded:
-        releases = releases.filter(SeasonRelease.downloaded == True)
+        releases = releases.filter(SeasonRelease.downloaded == True)  # noqa: E712
 
     if season is not None:
         releases = releases.filter(Season.season == season)
@@ -1083,7 +1083,7 @@ def get_latest_episode_release(
     )
 
     if downloaded:
-        releases = releases.filter(EpisodeRelease.downloaded == True)
+        releases = releases.filter(EpisodeRelease.downloaded == True)  # noqa: E712
 
     if season is not None:
         releases = releases.filter(Episode.season == season)
@@ -1437,7 +1437,7 @@ def store_parser(
         series = (
             session.query(Series)
             .filter(Series.name == parser.name)
-            .filter(Series.id != None)
+            .filter(Series.id != None)  # noqa: E711
             .first()
         )
         if not series:
@@ -1480,7 +1480,7 @@ def store_parser(
                 session.query(Episode)
                 .filter(Episode.series_id == series.id)
                 .filter(Episode.identifier == identifier)
-                .filter(Episode.series_id != None)
+                .filter(Episode.series_id != None)  # noqa: E711
                 .first()
             )
             if not episode:
@@ -1518,7 +1518,7 @@ def store_parser(
             .filter(table.title == parser.data)
             .filter(table.quality == quality)
             .filter(table.proper_count == parser.proper_count)
-            .filter(filter_by != None)
+            .filter(filter_by != None)  # noqa: E711
             .first()
         )
         if not release:

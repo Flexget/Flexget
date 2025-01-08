@@ -87,7 +87,7 @@ def manage_entries(options, selection, approved):
 def clear_entries(options):
     """Clear pending entries"""
     with Session() as session:
-        query = session.query(db.PendingEntry).filter(db.PendingEntry.approved == False)
+        query = session.query(db.PendingEntry).filter(db.PendingEntry.approved == False)  # noqa: E712
         if options.task_name:
             query = query.filter(db.PendingEntry.task_name == options.task_name)
         deleted = query.delete()

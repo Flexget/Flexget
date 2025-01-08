@@ -334,7 +334,7 @@ class TestTraktWatchedAndCollected:
         entry = task.accepted[0]
         assert entry['title'] == 'Hawaii.Five-0.S04E13.HDTV-FlexGet', 'title was not accepted?'
         assert entry['series_name'] == 'Hawaii Five-0', 'wrong series was returned by lookup'
-        assert entry['trakt_watched'] == True, 'episode should be marked as watched'
+        assert entry['trakt_watched'] is True, 'episode should be marked as watched'
 
     def test_trakt_collected_lookup(self, execute_task):
         task = execute_task('test_trakt_collected')
@@ -342,7 +342,7 @@ class TestTraktWatchedAndCollected:
         entry = task.accepted[0]
         assert entry['title'] == 'Homeland.2011.S02E01.HDTV-FlexGet', 'title was not accepted?'
         assert entry['series_name'] == 'Homeland 2011', 'wrong series was returned by lookup'
-        assert entry['trakt_collected'] == True, 'episode should be marked as collected'
+        assert entry['trakt_collected'] is True, 'episode should be marked as collected'
 
     def test_trakt_watched_movie_lookup(self, execute_task):
         task = execute_task('test_trakt_watched_movie')
@@ -352,7 +352,7 @@ class TestTraktWatchedAndCollected:
         entry = task.accepted[0]
         assert entry['title'] == 'Inside.Out.2015.1080p.BDRip-FlexGet', 'title was not accepted?'
         assert entry['movie_name'] == 'Inside Out', 'wrong movie name'
-        assert entry['trakt_watched'] == True, 'movie should be marked as watched'
+        assert entry['trakt_watched'] is True, 'movie should be marked as watched'
 
     def test_trakt_collected_movie_lookup(self, execute_task):
         task = execute_task('test_trakt_collected_movie')
@@ -362,7 +362,7 @@ class TestTraktWatchedAndCollected:
         entry = task.accepted[0]
         assert entry['title'] == 'Inside.Out.2015.1080p.BDRip-FlexGet', 'title was not accepted?'
         assert entry['movie_name'] == 'Inside Out', 'wrong movie name'
-        assert entry['trakt_collected'] == True, 'movie should be marked as collected'
+        assert entry['trakt_collected'] is True, 'movie should be marked as collected'
 
     def test_trakt_show_watched_progress(self, execute_task):
         task = execute_task('test_trakt_show_watched_progress')
@@ -371,7 +371,7 @@ class TestTraktWatchedAndCollected:
         ), 'One show should have been accepted as it is watched on Trakt profile'
         entry = task.accepted[0]
         assert entry['trakt_series_name'] == 'Chuck', 'wrong series was accepted'
-        assert entry['trakt_watched'] == True, 'the whole series should be marked as watched'
+        assert entry['trakt_watched'] is True, 'the whole series should be marked as watched'
 
     def test_trakt_show_collected_progress(self, execute_task):
         task = execute_task('test_trakt_show_collected_progress')
@@ -380,21 +380,21 @@ class TestTraktWatchedAndCollected:
         ), 'One show should have been accepted as it is collected on Trakt profile'
         entry = task.accepted[0]
         assert entry['trakt_series_name'] == 'White Collar', 'wrong series was accepted'
-        assert entry['trakt_collected'] == True, 'the whole series should be marked as collected'
+        assert entry['trakt_collected'] is True, 'the whole series should be marked as collected'
 
     def test_trakt_season_collected(self, execute_task):
         task = execute_task('test_trakt_season_collected')
         assert len(task.accepted) == 1, 'Entry should have been accepted as it has been collected'
         entry = task.accepted[0]
         assert entry['trakt_series_name'] == 'The Expanse', 'wrong series was accepted'
-        assert entry['trakt_collected'] == True, 'the whole season should be marked as collected'
+        assert entry['trakt_collected'] is True, 'the whole season should be marked as collected'
 
     def test_trakt_season_watched(self, execute_task):
         task = execute_task('test_trakt_season_watched')
         assert len(task.accepted) == 1, 'Entry should have been accepted as it has been watched'
         entry = task.accepted[0]
         assert entry['trakt_series_name'] == 'Into the Badlands', 'wrong series was accepted'
-        assert entry['trakt_watched'] == True, 'the whole season should be marked as watched'
+        assert entry['trakt_watched'] is True, 'the whole season should be marked as watched'
 
     def test_trakt_user_lookup_fail(self, execute_task):
         # Just making sure we don't crash. See #2606
