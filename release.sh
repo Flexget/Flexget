@@ -23,9 +23,6 @@ if git log --skip 1 origin/master..origin/develop|grep '^commit '; then
   export VERSION=$(uv run --no-project dev_tools.py version)
   uv lock --upgrade-package flexget
 
-  # Package WebUI
-  uv run dev_tools.py bundle-webui
-
   # Build and upload to pypi.
   uv build
   uv publish

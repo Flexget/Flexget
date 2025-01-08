@@ -116,20 +116,16 @@ include = [
 ]
 # Cassettes will take up all our room on pypi faster
 exclude = ["/flexget/tests/cassettes"]
-artifacts = [
-    "/flexget/ui/v1/app",
-    "/flexget/ui/v2/dist"
-]
+
+[tool.hatch.build.targets.wheel.hooks.custom]
+path = "bundle_webui.py"
 
 [tool.hatch.build.targets.wheel]
+dependencies = ["requests"]
 include = [
-    "/flexget",
+    "/flexget"
 ]
 exclude = ["/flexget/tests"]
-artifacts = [
-    "/flexget/ui/v1/app",
-    "/flexget/ui/v2/dist"
-]
 
 ## Other tool settings
 
