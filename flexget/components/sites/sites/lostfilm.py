@@ -13,14 +13,6 @@ from flexget.utils import qualities
 from flexget.utils.requests import RequestException
 from flexget.utils.soup import get_soup
 
-try:
-    from cloudscraper.exceptions import CaptchaException, CloudflareException
-
-    cf_exceptions = (CloudflareException, CaptchaException)
-except ModuleNotFoundError:
-    cf_exceptions = ()
-    pass  # cloudscraper module is optional
-
 __authors__ = 'danfocus, Karlson2k'
 
 logger = logger.bind(name='lostfilm')
@@ -317,12 +309,6 @@ class LostFilm:
                     logger.verbose(
                         'Failed to get the redirect page from {}. Error: {}', redirect_url, e
                     )
-                except cf_exceptions as e:
-                    logger.verbose(
-                        'Cannot bypass CF page protection to get the redirect page {}. Error: {}',
-                        redirect_url,
-                        e,
-                    )
                 except Exception as e:
                     # Catch other errors related to download to avoid crash
                     logger.warning(
@@ -382,13 +368,6 @@ class LostFilm:
                 response = task.requests.get(download_page_url)
             except RequestException as e:
                 logger.error('Failed to get the download page {}. Error: {}', download_page_url, e)
-                continue
-            except cf_exceptions as e:
-                logger.error(
-                    'Cannot pass CF page protection to get the download page {}. Error: {}',
-                    download_page_url,
-                    e,
-                )
                 continue
             except Exception as e:
                 # Catch other errors related to download to avoid crash

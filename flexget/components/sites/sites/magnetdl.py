@@ -9,6 +9,7 @@ from requests import RequestException
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
+from flexget.utils import requests
 from flexget.utils.cached_input import cached
 from flexget.utils.simple_persistence import SimplePersistence
 from flexget.utils.soup import get_soup
@@ -46,10 +47,10 @@ class MagnetDL:
     def _url(self, category, page):
         return self.url + '/download/' + category + '/' + (str(page) if page > 0 else '')
 
-    def parse_page(self, scraper, url: str):
+    def parse_page(self, url: str):
         try:
             logger.debug('page url: {}', url)
-            page = scraper.get(url)
+            page = requests.get(url)
         except RequestException as e:
             raise plugin.PluginError(str(e))
         if page.status_code == 404:
@@ -97,17 +98,6 @@ class MagnetDL:
 
     @cached('magnetdl', persist='4 minutes')
     def on_task_input(self, task, config):
-        try:
-            import cloudscraper
-        except ImportError as e:
-            logger.debug('Error importing cloudscraper: {}', e)
-            raise plugin.DependencyError(
-                issued_by='cfscraper',
-                missing='cloudscraper',
-                message=f'CLOudscraper module required. ImportError: {e}',
-            )
-
-        scraper = cloudscraper.create_scraper()
         category = config['category']
         persistence = SimplePersistence(plugin='magnetdl')
         last_magnet = persistence.get(category, None)
@@ -120,7 +110,7 @@ class MagnetDL:
             url = self._url(category, page)
             logger.debug('Url: {}', url)
             try:
-                for entry in self.parse_page(scraper, url):
+                for entry in self.parse_page(url):
                     if first_magnet is None:
                         first_magnet = entry['url']
                         logger.debug('Set first_magnet to {}', first_magnet)
@@ -140,16 +130,6 @@ class MagnetDL:
     def search(self, task, entry, config):
         if not config:
             return
-        try:
-            import cloudscraper
-        except ImportError as e:
-            logger.debug('Error importing cloudscraper: {}', e)
-            raise plugin.DependencyError(
-                issued_by='cfscraper',
-                missing='cloudscraper',
-                message=f'CLOudscraper module required. ImportError: {e}',
-            )
-        scraper = cloudscraper.create_scraper()
         entries = []
         for search_string in entry.get('search_strings', [entry['title']]):
             logger.debug('Searching `{}`', search_string)
@@ -165,7 +145,7 @@ class MagnetDL:
                 # note: weird url convention, uses first letter of search term
                 slash = term[0]
                 url = f'https://www.magnetdl.com/{slash}/{term}/'
-                for entry in self.parse_page(scraper, url):
+                for entry in self.parse_page(url):
                     entries.append(entry)
             except Page404Error:
                 logger.warning('Url {} returned 404', url)

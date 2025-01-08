@@ -13,8 +13,6 @@ repos:
     hooks:
       - id: uv-lock
       - id: uv-export
-        args: [ --frozen, --no-hashes, --only-group=cloudscraper, --output-file=requirements/cloudscraper.txt ]
-      - id: uv-export
         args: [ --frozen, --no-hashes, --only-group=deluge, --output-file=requirements/deluge.txt ]
       - id: uv-export
         args: [ --frozen, --no-dev, --no-emit-project, --no-hashes, --output-file=requirements.txt ]
