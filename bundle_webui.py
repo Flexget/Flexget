@@ -8,7 +8,7 @@ import io
 import shutil
 import zipfile
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional
 
 import requests
 
@@ -38,7 +38,7 @@ else:
             build_data["force_include"]["flexget/ui/v2/dist"] = "/flexget/ui/v2/dist"
 
 
-def bundle_webui(ui_version: str | None = None):
+def bundle_webui(ui_version: Optional[str] = None):
     """Bundle webui for release packaging"""
     ui_path = Path(__file__).resolve().parent / "flexget" / "ui"
 
@@ -48,7 +48,7 @@ def bundle_webui(ui_version: str | None = None):
         z = zipfile.ZipFile(io.BytesIO(r.content))
         z.extractall(dest_path)
 
-    if ui_version in [None, 'v1']:
+    if not ui_version or ui_version == 'v1':
         # WebUI V1
         print('Bundle WebUI v1...')
         try:
@@ -66,7 +66,7 @@ def bundle_webui(ui_version: str | None = None):
         except OSError as e:
             raise RuntimeError(f'Unable to download and extract WebUI v1 due to {e!s}')
 
-    if ui_version in [None, 'v2']:
+    if not ui_version or ui_version == 'v2':
         # WebUI V2
         try:
             print('Bundle WebUI v2...')
