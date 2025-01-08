@@ -14,8 +14,8 @@ COPY --from=ghcr.io/astral-sh/uv:0.5.15@sha256:ea861f8e28b5c0e85ec14dc0f367d9d5c
 ENV UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy
 WORKDIR /flexget
 RUN --mount=type=cache,target=/root/.cache/uv \
-    --mount=type=bind,source=dev_tools.py,target=dev_tools.py \
-    uv run dev_tools.py bundle-webui --version=v2
+    --mount=type=bind,source=bundle_webui.py,target=bundle_webui.py \
+    uv run bundle_webui.py
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
