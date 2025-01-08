@@ -162,7 +162,6 @@ extend-exclude = ["flexget/ui"]
 select = ["C4", "E", "F", "I", "ISC", "PLE", "RUF", "TCH", "UP"]
 ignore = [
     "E501", # We leave line length up to black
-    "E711", "E712", # Comparisons to True/False/None are valid for sqlalchemy
     "ISC001", # Ruff recommends disabling this when using the ruff formatter
     "PLE1205", # Thinks we are using stdlib logging rather than loguru
     "RUF001", # Some of these ambiguous unicode are in tests on purpose

@@ -34,7 +34,7 @@ class PendingApproval:
             for approved_entry in (
                 session.query(db.PendingEntry)
                 .filter(db.PendingEntry.task_name == task.name)
-                .filter(db.PendingEntry.approved == True)
+                .filter(db.PendingEntry.approved)
                 .all()
             ):
                 e = approved_entry.entry

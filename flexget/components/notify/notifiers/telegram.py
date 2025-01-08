@@ -387,14 +387,15 @@ class TelegramNotifier:
         chat_id_entries = []
         cached_usernames = {
             x.username: x
-            for x in session.query(ChatIdEntry).filter(ChatIdEntry.username != None).all()
+            for x in session.query(ChatIdEntry).filter(ChatIdEntry.username.is_not(None)).all()
         }
         cached_fullnames = {
             (x.firstname, x.surname): x
-            for x in session.query(ChatIdEntry).filter(ChatIdEntry.firstname != None).all()
+            for x in session.query(ChatIdEntry).filter(ChatIdEntry.firstname.is_not(None)).all()
         }
         cached_groups = {
-            x.group: x for x in session.query(ChatIdEntry).filter(ChatIdEntry.group != None).all()
+            x.group: x
+            for x in session.query(ChatIdEntry).filter(ChatIdEntry.group.is_not(None)).all()
         }
 
         len_ = len(usernames)
