@@ -14,7 +14,10 @@ class CFScraper:
     This plugin is deprecated and slated for removal in FlexGet v3.14.0.
     """
 
-    schema = {'type': 'boolean'}
+    schema = {
+        'type': 'boolean',
+        'deprecated': 'cfscraper is deprecated and slated for removal in v3.14.0.',
+    }
 
     @plugin.priority(253)
     def on_task_start(self, task, config):
