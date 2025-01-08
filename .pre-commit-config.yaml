@@ -30,7 +30,7 @@ repos:
       - id: uv-export
         args: [ --frozen, --no-hashes, --no-emit-project, --output-file=requirements/dev.txt ]
   - repo: https://github.com/renovatebot/pre-commit-hooks
-    rev: 39.91.4
+    rev: 39.93.0
     hooks:
       - id: renovate-config-validator
         args: [ --strict ]
