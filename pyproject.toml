@@ -118,6 +118,8 @@ include = [
 exclude = ["/flexget/tests/cassettes"]
 
 [tool.hatch.build.targets.wheel.hooks.custom]
+# build with env variable HATCH_BUILD_HOOKS_ENABLE=true to bundle the webui when building
+enable-by-default = false
 path = "bundle_webui.py"
 
 [tool.hatch.build.targets.wheel]

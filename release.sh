@@ -24,7 +24,8 @@ if git log --skip 1 origin/master..origin/develop|grep '^commit '; then
   uv lock --upgrade-package flexget
 
   # Build and upload to pypi.
-  uv build
+  # Enabling hatch hooks bundles the webui.
+  HATCH_BUILD_HOOKS_ENABLE=true uv build
   uv publish
 
   # Commit and tag released version
