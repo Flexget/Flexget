@@ -13,7 +13,7 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref || github.run_id }}
   cancel-in-progress: true
 env:
-  UV_VERSION: 0.5.15 # renovate: datasource=pypi depName=uv
+  UV_VERSION: 0.5.16 # renovate: datasource=pypi depName=uv
 jobs:
   check-lockfile-status:
     name: Check Lockfile Status
