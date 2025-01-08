@@ -123,7 +123,6 @@ enable-by-default = false
 path = "bundle_webui.py"
 
 [tool.hatch.build.targets.wheel]
-dependencies = ["requests"]
 include = [
     "/flexget"
 ]

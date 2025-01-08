@@ -10,8 +10,6 @@ import zipfile
 from pathlib import Path
 from typing import Any, Optional
 
-import requests
-
 # If hatchling is available (like in the build environment) this file provides
 # a hook for bundling the webui into our wheel release.
 try:
@@ -22,6 +20,9 @@ else:
 
     class CustomBuildHook(BuildHookInterface):
         PLUGIN_NAME = "bundle-webui"
+
+        def dependencies(self) -> list[str]:
+            return ["requests"]
 
         def clean(self, versions: list[str]) -> None:
             p = Path(__file__).resolve().parent
@@ -40,6 +41,10 @@ else:
 
 def bundle_webui(ui_version: Optional[str] = None):
     """Bundle webui for release packaging"""
+    # We delay this import so that the hatchling build hook can register itself without requests installed.
+    # once it is registered it can install the dep automatically during the build process.
+    import requests
+
     ui_path = Path(__file__).resolve().parent / "flexget" / "ui"
 
     def download_extract(url, dest_path):
