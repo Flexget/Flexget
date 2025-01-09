@@ -58,6 +58,13 @@
       "schedule": [
         "* 21-23 * * 0"
       ]
+    },
+    {
+      "groupName": "ruff",
+      "matchPackageNames": [
+        "ruff",
+        "astral-sh/ruff-pre-commit"
+      ]
     }
   ]
 }
