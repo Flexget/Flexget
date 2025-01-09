@@ -371,7 +371,7 @@ def api_errors(error: APIError) -> tuple[dict, int]:
 @with_session
 def api_key(session: Session = None) -> str:
     logger.debug('fetching token for internal lookup')
-    return session.query(User).first().token  # type: ignore
+    return session.query(User).first().token
 
 
 def etag(method: Optional[Callable] = None, cache_age: int = 0):

@@ -155,7 +155,7 @@ class ReList(list):
             self.flags = kwargs.pop('flags')
         list.__init__(self, *args, **kwargs)
 
-    def __getitem__(self, k) -> Pattern:  # type: ignore
+    def __getitem__(self, k) -> Pattern:
         # Doesn't support slices. Do we care?
         item = list.__getitem__(self, k)
         if isinstance(item, str):
@@ -203,7 +203,7 @@ def parse_timedelta(value: Union[timedelta, str, None]) -> timedelta:
         unit += 's'
     params = {unit: float(amount)}
     try:
-        return timedelta(**params)  # type: ignore
+        return timedelta(**params)
     except TypeError:
         raise ValueError(f"Invalid time format '{value}'")
 

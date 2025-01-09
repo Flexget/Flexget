@@ -35,14 +35,19 @@ from flexget.utils.tools import get_current_flexget_version, io_encoding, pid_ex
 Base = declarative_base()
 Session: type[ContextSession] = sessionmaker(class_=ContextSession)
 
-import flexget.log  # noqa
-from flexget import config_schema, db_schema, plugin  # noqa
-from flexget.event import fire_event  # noqa
-from flexget.ipc import IPCClient, IPCServer  # noqa
-from flexget.options import CoreArgumentParser, ParserError, get_parser, manager_parser  # noqa
-from flexget.task import Task  # noqa
-from flexget.task_queue import TaskQueue  # noqa
-from flexget.terminal import console, get_console_output  # noqa
+import flexget.log  # noqa: E402
+from flexget import config_schema, db_schema, plugin  # noqa: E402
+from flexget.event import fire_event  # noqa: E402
+from flexget.ipc import IPCClient, IPCServer  # noqa: E402
+from flexget.options import (  # noqa: E402
+    CoreArgumentParser,
+    ParserError,
+    get_parser,
+    manager_parser,
+)
+from flexget.task import Task  # noqa: E402
+from flexget.task_queue import TaskQueue  # noqa: E402
+from flexget.terminal import console, get_console_output  # noqa: E402
 
 if TYPE_CHECKING:
     from sqlalchemy.engine import Engine

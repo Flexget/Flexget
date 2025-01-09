@@ -57,7 +57,7 @@ class SNSNotification:
     def on_task_start(self, task, config):
         # verify that we actually support Boto 3
         try:
-            import boto3  # noqa
+            import boto3  # noqa: F401
         except ImportError as e:
             logger.debug('Error importing boto3: {}', e)
             raise plugin.DependencyError(

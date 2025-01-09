@@ -193,13 +193,13 @@ class SftpDownload:
             to = render_from_entry(to, entry)
         except RenderError as e:
             logger.error('Could not render path: {}', to)
-            entry.fail(str(e))  # type: ignore
+            entry.fail(str(e))
             return
 
         try:
             sftp.download(path, to, recursive, delete_origin)
         except SftpError as e:
-            entry.fail(e)  # type: ignore
+            entry.fail(e)
 
     @classmethod
     def on_task_output(cls, task: Task, config: dict) -> None:
@@ -349,20 +349,20 @@ class SftpUpload:
                 to = render_from_entry(to, entry)
             except RenderError as e:
                 logger.error('Could not render path: {}', to)
-                entry.fail(str(e))  # type: ignore
+                entry.fail(str(e))
                 return
 
         try:
             sftp.upload(location, to)
         except SftpError as e:
-            entry.fail(str(e))  # type: ignore
+            entry.fail(str(e))
             return
 
         if delete_origin and Path(location).is_file():
             try:
                 Path(location).unlink()
             except Exception as e:
-                logger.warning('Failed to delete file {} ({})', location, e)  # type: ignore
+                logger.warning('Failed to delete file {} ({})', location, e)
 
     @classmethod
     def on_task_output(cls, task: Task, config: dict) -> None:

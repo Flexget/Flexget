@@ -288,7 +288,7 @@ class TestSFTPServer(SFTPServerInterface):
             return SFTPServer.convert_errno(e.errno)
 
         if (flags & os.O_CREAT) and (attr is not None):
-            attr._flags &= ~attr.FLAG_PERMISSIONS  # type: ignore
+            attr._flags &= ~attr.FLAG_PERMISSIONS
             SFTPServer.set_file_attr(path, attr)
         if flags & os.O_WRONLY:
             if flags & os.O_APPEND:

@@ -49,7 +49,7 @@ class PluginPeriscope:
 
     def on_task_start(self, task, config):
         try:
-            import periscope  # noqa
+            import periscope  # noqa: F401
         except ImportError as e:
             logger.debug('Error importing Periscope: {}', e)
             raise plugin.DependencyError(

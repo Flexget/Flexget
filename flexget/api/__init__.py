@@ -1,5 +1,5 @@
-from .app import APIClient, APIResource, api, api_app  # noqa
-from .core import (  # noqa
+from .app import APIClient, APIResource, api, api_app  # noqa: F401
+from .core import (  # noqa: F401
     authentication,
     cached,
     database,

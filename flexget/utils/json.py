@@ -16,11 +16,11 @@ try:
     import simplejson as json
 except ImportError:
     try:
-        import json  # type: ignore  # python/mypy#1153
+        import json
     except ImportError:
         try:
             # Google Appengine offers simplejson via django
-            from django.utils import simplejson as json  # type: ignore
+            from django.utils import simplejson as json
         except ImportError:
             raise DependencyError(missing='simplejson')
 
