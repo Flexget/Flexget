@@ -1221,7 +1221,7 @@ requires-dist = [
     { name = "typing-extensions", marker = "extra == 'transmission'", specifier = "==4.12.2" },
     { name = "tzdata", marker = "extra == 'locked'", specifier = "==2024.2" },
     { name = "tzlocal", marker = "extra == 'locked'", specifier = "==5.2" },
-    { name = "urllib3", specifier = "<2" },
+    { name = "urllib3", specifier = "~=1.26" },
     { name = "urllib3", marker = "extra == 'all'", specifier = "==1.26.20" },
     { name = "urllib3", marker = "extra == 'locked'", specifier = "==1.26.20" },
     { name = "urllib3", marker = "extra == 'qbittorrent'", specifier = "==1.26.20" },
