@@ -281,8 +281,9 @@ class InputGazelle:
 
                 yield Entry(
                     title="{groupName} ({groupId} - {torrentId}).torrent".format(**temp),
-                    url="{}/torrents.php?action=download&id={}&authkey={}&torrent_pass={}"
-                    "".format(self.base_url, temp['torrentId'], self.authkey, self.passkey),
+                    url="{}/torrents.php?action=download&id={}&authkey={}&torrent_pass={}".format(
+                        self.base_url, temp['torrentId'], self.authkey, self.passkey
+                    ),
                     torrent_seeds=tor['seeders'],
                     torrent_leeches=tor['leechers'],
                     # Size is returned in bytes
@@ -428,8 +429,9 @@ class InputGazelleMusic(InputGazelle):
                 yield Entry(
                     title="{artist} - {groupName} - {groupYear} "
                     "({media} - {format} - {encoding})-{torrentId}.torrent".format(**temp),
-                    url="{}/torrents.php?action=download&id={}&authkey={}&torrent_pass={}"
-                    "".format(self.base_url, temp['torrentId'], self.authkey, self.passkey),
+                    url="{}/torrents.php?action=download&id={}&authkey={}&torrent_pass={}".format(
+                        self.base_url, temp['torrentId'], self.authkey, self.passkey
+                    ),
                     torrent_seeds=tor['seeders'],
                     torrent_leeches=tor['leechers'],
                     # Size is returned in bytes

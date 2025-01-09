@@ -129,9 +129,9 @@ class TestQuality:
     def test_exact_quality(self, execute_task):
         """Series plugin: choose by quality"""
         task = execute_task('exact_quality')
-        assert task.find_entry(
-            'accepted', title='QTest.S01E01.720p.XViD-FlexGet'
-        ), '720p should have been accepted'
+        assert task.find_entry('accepted', title='QTest.S01E01.720p.XViD-FlexGet'), (
+            '720p should have been accepted'
+        )
         assert len(task.accepted) == 1, 'should have accepted only one'
 
     def test_quality_fail(self, execute_task):
@@ -141,25 +141,25 @@ class TestQuality:
     def test_min_quality(self, execute_task):
         """Series plugin: min_quality"""
         task = execute_task('min_quality')
-        assert task.find_entry(
-            'accepted', title='MinQTest.S01E01.1080p.XViD-FlexGet'
-        ), 'MinQTest.S01E01.1080p.XViD-FlexGet should have been accepted'
+        assert task.find_entry('accepted', title='MinQTest.S01E01.1080p.XViD-FlexGet'), (
+            'MinQTest.S01E01.1080p.XViD-FlexGet should have been accepted'
+        )
         assert len(task.accepted) == 1, 'should have accepted only one'
 
     def test_max_quality(self, execute_task):
         """Series plugin: max_quality"""
         task = execute_task('max_quality')
-        assert task.find_entry(
-            'accepted', title='MaxQTest.S01E01.HDTV.XViD-FlexGet'
-        ), 'MaxQTest.S01E01.HDTV.XViD-FlexGet should have been accepted'
+        assert task.find_entry('accepted', title='MaxQTest.S01E01.HDTV.XViD-FlexGet'), (
+            'MaxQTest.S01E01.HDTV.XViD-FlexGet should have been accepted'
+        )
         assert len(task.accepted) == 1, 'should have accepted only one'
 
     def test_min_max_quality(self, execute_task):
         """Series plugin: min_quality with max_quality"""
         task = execute_task('min_max_quality')
-        assert task.find_entry(
-            'accepted', title='MinMaxQTest.S01E01.HR.XViD-FlexGet'
-        ), 'MinMaxQTest.S01E01.HR.XViD-FlexGet should have been accepted'
+        assert task.find_entry('accepted', title='MinMaxQTest.S01E01.HR.XViD-FlexGet'), (
+            'MinMaxQTest.S01E01.HR.XViD-FlexGet should have been accepted'
+        )
         assert len(task.accepted) == 1, 'should have accepted only one'
 
     def test_max_unknown_quality(self, execute_task):
@@ -170,19 +170,19 @@ class TestQuality:
     def test_group_quality(self, execute_task):
         """Series plugin: quality from group name"""
         task = execute_task('quality_from_group')
-        assert task.find_entry(
-            'accepted', title='GroupQual.S01E01.720p.XViD-FlexGet'
-        ), 'GroupQual.S01E01.720p.XViD-FlexGet should have been accepted'
-        assert (
-            len(task.accepted) == 1
-        ), 'should have accepted only one (no entries should pass for series `other`'
+        assert task.find_entry('accepted', title='GroupQual.S01E01.720p.XViD-FlexGet'), (
+            'GroupQual.S01E01.720p.XViD-FlexGet should have been accepted'
+        )
+        assert len(task.accepted) == 1, (
+            'should have accepted only one (no entries should pass for series `other`'
+        )
 
     def test_quality_in_series_name(self, execute_task):
         """Make sure quality in title does not get parsed as quality"""
         task = execute_task('quality_in_series_name')
-        assert task.find_entry(
-            'accepted', title='my 720p show S01E01'
-        ), 'quality in title should not have been parsed'
+        assert task.find_entry('accepted', title='my 720p show S01E01'), (
+            'quality in title should not have been parsed'
+        )
         assert len(task.accepted) == 1, 'should not have accepted 720p entry'
 
 
@@ -220,17 +220,17 @@ class TestDatabase:
 
         task = execute_task('test_1')
         task = execute_task('test_2')
-        assert task.find_entry(
-            'rejected', title='Some.Series.S01E20.720p.XViD-DoppelGanger'
-        ), 'failed basic download remembering'
+        assert task.find_entry('rejected', title='Some.Series.S01E20.720p.XViD-DoppelGanger'), (
+            'failed basic download remembering'
+        )
 
     def test_doppelgangers(self, execute_task):
         """Series plugin: doppelganger releases (dupes)"""
 
         task = execute_task('progress_1')
-        assert task.find_entry(
-            'accepted', title='Progress.S01E20.720p-FlexGet'
-        ), 'best quality not accepted'
+        assert task.find_entry('accepted', title='Progress.S01E20.720p-FlexGet'), (
+            'best quality not accepted'
+        )
         # should not accept anything
         task = execute_task('progress_1')
         assert not task.accepted, 'repeated execution accepted'
@@ -316,14 +316,14 @@ class TestFilterSeries:
         task = execute_task('test')
 
         # normal passing
-        assert task.find_entry(
-            title='Another.Series.S01E20.720p.XViD-FlexGet'
-        ), 'Another.Series.S01E20.720p.XViD-FlexGet should have passed'
+        assert task.find_entry(title='Another.Series.S01E20.720p.XViD-FlexGet'), (
+            'Another.Series.S01E20.720p.XViD-FlexGet should have passed'
+        )
 
         # series with brackets
-        assert task.find_entry(
-            'accepted', title='Some.Series.S01E20.720p.XViD-FlexGet'
-        ), 'Some.Series.S01E20.720p.XViD-FlexGet should have been accepted'
+        assert task.find_entry('accepted', title='Some.Series.S01E20.720p.XViD-FlexGet'), (
+            'Some.Series.S01E20.720p.XViD-FlexGet should have been accepted'
+        )
 
         # date formats
         df = [
@@ -337,9 +337,9 @@ class TestFilterSeries:
             entry = task.find_entry(title=d)
             assert entry, f'Date format did not match {d}'
             assert 'series_parser' in entry, f'series_parser missing from {d}'
-            assert (
-                entry['series_parser'].id_type == 'date'
-            ), f'{d} did not return three groups for dates'
+            assert entry['series_parser'].id_type == 'date', (
+                f'{d} did not return three groups for dates'
+            )
 
         # parse from filename
         assert task.find_entry(filename='Filename.Series.S01E26.XViD'), 'Filename parsing failed'
@@ -348,9 +348,9 @@ class TestFilterSeries:
         assert task.find_entry(title='Empty.Description.S01E22.XViD'), 'Empty Description failed'
 
         # chaining with regexp plugin
-        assert task.find_entry(
-            'rejected', title='Another.Series.S01E21.1080p.H264-FlexGet'
-        ), 'regexp chaining'
+        assert task.find_entry('rejected', title='Another.Series.S01E21.1080p.H264-FlexGet'), (
+            'regexp chaining'
+        )
 
     def test_metainfo_series_override(self, execute_task):
         """Series plugin: override metainfo_series"""
@@ -368,11 +368,11 @@ class TestFilterSeries:
             'accepted', title='Test.Series.with.extra.crap.S01E02.PDTV.XViD-FlexGet'
         )
         assert not entry.get('series_guessed'), 'series plugin should override series_guessed'
-        assert (
-            entry['series_name'] == entry['series_parser'].name == 'Test Series'
-        ), 'Series name should be \'Test Series\', was: entry: {}, parser: {}'.format(
-            entry['series_name'],
-            entry['series_parser'].name,
+        assert entry['series_name'] == entry['series_parser'].name == 'Test Series', (
+            'Series name should be \'Test Series\', was: entry: {}, parser: {}'.format(
+                entry['series_name'],
+                entry['series_parser'].name,
+            )
         )
 
     def test_all_series_mode(self, execute_task):
@@ -387,9 +387,9 @@ class TestFilterSeries:
         assert entry.get('series_guessed')
         entry2 = task.find_entry('accepted', title='other show season 2 episode 2')
         # Make sure case is normalized so series are marked with the same name no matter the case in the title
-        assert (
-            entry.get('series_name') == entry2.get('series_name') == 'Other Show'
-        ), 'Series names should be in title case'
+        assert entry.get('series_name') == entry2.get('series_name') == 'Other Show', (
+            'Series names should be in title case'
+        )
         entry = task.find_entry('accepted', title='Date.Show.03-29-2012.HDTV.XViD-FlexGet')
         assert entry.get('series_guessed')
         assert entry.get('series_name') == 'Date Show'
@@ -432,12 +432,12 @@ class TestFilterSeriesPriority:
     def test_priorities(self, execute_task):
         """Series plugin: regexp plugin is able to reject before series plugin"""
         task = execute_task('test')
-        assert task.find_entry(
-            'rejected', title='foobar 720p s01e01'
-        ), 'foobar 720p s01e01 should have been rejected'
-        assert task.find_entry(
-            'accepted', title='foobar hdtv s01e01'
-        ), 'foobar hdtv s01e01 is not accepted'
+        assert task.find_entry('rejected', title='foobar 720p s01e01'), (
+            'foobar 720p s01e01 should have been rejected'
+        )
+        assert task.find_entry('accepted', title='foobar hdtv s01e01'), (
+            'foobar hdtv s01e01 is not accepted'
+        )
 
 
 class TestPropers:
@@ -557,17 +557,17 @@ class TestPropers:
     def test_propers_timeframe(self, execute_task):
         """Series plugin: propers timeframe"""
         task = execute_task('proper_timeframe_1')
-        assert task.find_entry(
-            'accepted', title='TFTest.S01E01.720p-FlexGet'
-        ), 'Did not accept before timeframe'
+        assert task.find_entry('accepted', title='TFTest.S01E01.720p-FlexGet'), (
+            'Did not accept before timeframe'
+        )
 
         # let 6 hours pass
         age_series(hours=6)
 
         task = execute_task('proper_timeframe_2')
-        assert task.find_entry(
-            'rejected', title='TFTest.S01E01.720p.proper-FlexGet'
-        ), 'Did not reject after proper timeframe'
+        assert task.find_entry('rejected', title='TFTest.S01E01.720p.proper-FlexGet'), (
+            'Did not reject after proper timeframe'
+        )
 
     def test_no_propers(self, execute_task):
         """Series plugin: no propers at all"""
@@ -599,40 +599,40 @@ class TestPropers:
         """Series plugin: proper accepted after episode is downloaded"""
         # start with normal download ...
         task = execute_task('propers_1')
-        assert task.find_entry(
-            'accepted', title='Test.S01E01.720p-FlexGet'
-        ), 'Test.S01E01-FlexGet should have been accepted'
+        assert task.find_entry('accepted', title='Test.S01E01.720p-FlexGet'), (
+            'Test.S01E01-FlexGet should have been accepted'
+        )
 
         # rejects downloaded
         task = execute_task('propers_1')
-        assert task.find_entry(
-            'rejected', title='Test.S01E01.720p-FlexGet'
-        ), 'Test.S01E01-FlexGet should have been rejected'
+        assert task.find_entry('rejected', title='Test.S01E01.720p-FlexGet'), (
+            'Test.S01E01-FlexGet should have been rejected'
+        )
 
         # accepts proper
         task = execute_task('propers_2')
-        assert task.find_entry(
-            'accepted', title='Test.S01E01.720p.Proper-FlexGet'
-        ), 'new undownloaded proper should have been accepted'
+        assert task.find_entry('accepted', title='Test.S01E01.720p.Proper-FlexGet'), (
+            'new undownloaded proper should have been accepted'
+        )
 
         # reject downloaded proper
         task = execute_task('propers_2')
-        assert task.find_entry(
-            'rejected', title='Test.S01E01.720p.Proper-FlexGet'
-        ), 'downloaded proper should have been rejected'
+        assert task.find_entry('rejected', title='Test.S01E01.720p.Proper-FlexGet'), (
+            'downloaded proper should have been rejected'
+        )
 
         # reject episode that has been downloaded normally and with proper
         task = execute_task('propers_3')
-        assert task.find_entry(
-            'rejected', title='Test.S01E01.FlexGet'
-        ), 'Test.S01E01.FlexGet should have been rejected'
+        assert task.find_entry('rejected', title='Test.S01E01.FlexGet'), (
+            'Test.S01E01.FlexGet should have been rejected'
+        )
 
     def test_proper_available(self, execute_task):
         """Series plugin: proper available immediately"""
         task = execute_task('proper_at_first')
-        assert task.find_entry(
-            'accepted', title='Foobar.S01E01.720p.proper.FlexGet'
-        ), 'Foobar.S01E01.720p.proper.FlexGet should have been accepted'
+        assert task.find_entry('accepted', title='Foobar.S01E01.720p.proper.FlexGet'), (
+            'Foobar.S01E01.720p.proper.FlexGet should have been accepted'
+        )
 
     def test_proper_upgrade(self, execute_task):
         """Series plugin: real proper after proper"""
@@ -690,12 +690,12 @@ class TestSimilarNames:
         """Series plugin: similar namings"""
         task = execute_task('test')
         assert task.find_entry('accepted', title='FooBar.S03E01.DSR-FlexGet'), 'Standard failed?'
-        assert task.find_entry(
-            'accepted', title='FooBar: FirstAlt.S02E01.DSR-FlexGet'
-        ), 'FirstAlt failed'
-        assert task.find_entry(
-            'accepted', title='FooBar: SecondAlt.S01E01.DSR-FlexGet'
-        ), 'SecondAlt failed'
+        assert task.find_entry('accepted', title='FooBar: FirstAlt.S02E01.DSR-FlexGet'), (
+            'FirstAlt failed'
+        )
+        assert task.find_entry('accepted', title='FooBar: SecondAlt.S01E01.DSR-FlexGet'), (
+            'SecondAlt failed'
+        )
 
     def test_ambiguous(self, execute_task):
         task = execute_task('test_ambiguous')
@@ -859,37 +859,37 @@ class TestQualities:
         """Series plugin: qualities"""
         task = execute_task('test_1')
 
-        assert task.find_entry(
-            'accepted', title='FooBar.S01E01.PDTV-FlexGet'
-        ), "Didn't accept FooBar.S01E01.PDTV-FlexGet"
-        assert task.find_entry(
-            'accepted', title='FooBar.S01E01.1080p-FlexGet'
-        ), "Didn't accept FooBar.S01E01.1080p-FlexGet"
+        assert task.find_entry('accepted', title='FooBar.S01E01.PDTV-FlexGet'), (
+            "Didn't accept FooBar.S01E01.PDTV-FlexGet"
+        )
+        assert task.find_entry('accepted', title='FooBar.S01E01.1080p-FlexGet'), (
+            "Didn't accept FooBar.S01E01.1080p-FlexGet"
+        )
 
-        assert not task.find_entry(
-            'accepted', title='FooBar.S01E01.HR-FlexGet'
-        ), 'Accepted FooBar.S01E01.HR-FlexGet'
+        assert not task.find_entry('accepted', title='FooBar.S01E01.HR-FlexGet'), (
+            'Accepted FooBar.S01E01.HR-FlexGet'
+        )
 
         task = execute_task('test_2')
 
-        assert task.find_entry(
-            'accepted', title='FooBar.S01E01.720p-FlexGet'
-        ), "Didn't accept FooBar.S01E01.720p-FlexGet"
+        assert task.find_entry('accepted', title='FooBar.S01E01.720p-FlexGet'), (
+            "Didn't accept FooBar.S01E01.720p-FlexGet"
+        )
 
         # test that it rejects them afterwards
 
         task = execute_task('test_1')
 
-        assert task.find_entry(
-            'rejected', title='FooBar.S01E01.PDTV-FlexGet'
-        ), 'Didn\'t reject FooBar.S01E01.PDTV-FlexGet'
-        assert task.find_entry(
-            'rejected', title='FooBar.S01E01.1080p-FlexGet'
-        ), 'Didn\'t reject FooBar.S01E01.1080p-FlexGet'
+        assert task.find_entry('rejected', title='FooBar.S01E01.PDTV-FlexGet'), (
+            'Didn\'t reject FooBar.S01E01.PDTV-FlexGet'
+        )
+        assert task.find_entry('rejected', title='FooBar.S01E01.1080p-FlexGet'), (
+            'Didn\'t reject FooBar.S01E01.1080p-FlexGet'
+        )
 
-        assert not task.find_entry(
-            'accepted', title='FooBar.S01E01.HR-FlexGet'
-        ), 'Accepted FooBar.S01E01.HR-FlexGet'
+        assert not task.find_entry('accepted', title='FooBar.S01E01.HR-FlexGet'), (
+            'Accepted FooBar.S01E01.HR-FlexGet'
+        )
 
     def test_propers(self, execute_task):
         """Series plugin: qualities + propers"""
@@ -902,14 +902,14 @@ class TestQualities:
 
     def test_qualities_upgrade(self, execute_task):
         task = execute_task('upgrade_1')
-        assert task.find_entry(
-            'accepted', title='FooBaz.S01E02.HR-FlexGet'
-        ), 'HR quality should be accepted'
+        assert task.find_entry('accepted', title='FooBaz.S01E02.HR-FlexGet'), (
+            'HR quality should be accepted'
+        )
         assert len(task.accepted) == 1, 'Only best quality should be accepted'
         task = execute_task('upgrade_2')
-        assert task.find_entry(
-            'accepted', title='FooBaz.S01E02.720p-FlexGet'
-        ), '720p quality should be accepted'
+        assert task.find_entry('accepted', title='FooBaz.S01E02.720p-FlexGet'), (
+            '720p quality should be accepted'
+        )
         assert len(task.accepted) == 1, 'Only best quality should be accepted'
         task = execute_task('upgrade_3')
         assert not task.accepted, 'Should not have accepted worse qualities'
@@ -1182,22 +1182,22 @@ class TestTimeframe:
     def test_no_waiting(self, execute_task):
         """Series plugin: no timeframe waiting needed"""
         task = execute_task('test_no_waiting')
-        assert task.find_entry(
-            'accepted', title='Test.S01E01.720p-FlexGet'
-        ), '720p not accepted immediattely'
+        assert task.find_entry('accepted', title='Test.S01E01.720p-FlexGet'), (
+            '720p not accepted immediattely'
+        )
 
     def test_stop_waiting(self, execute_task):
         """Series plugin: timeframe quality appears, stop waiting, proper appears"""
         task = execute_task('test_stop_waiting_1')
         assert task.entries and not task.accepted
         task = execute_task('test_stop_waiting_2')
-        assert task.find_entry(
-            'accepted', title='Test.S01E02.720p-FlexGet'
-        ), '720p should have caused stop waiting'
+        assert task.find_entry('accepted', title='Test.S01E02.720p-FlexGet'), (
+            '720p should have caused stop waiting'
+        )
         task = execute_task('test_proper_afterwards')
-        assert task.find_entry(
-            'accepted', title='Test.S01E02.720p.Proper-FlexGet'
-        ), 'proper should have been accepted'
+        assert task.find_entry('accepted', title='Test.S01E02.720p.Proper-FlexGet'), (
+            'proper should have been accepted'
+        )
 
     def test_expires(self, execute_task):
         """Series plugin: timeframe expires"""
@@ -1236,9 +1236,9 @@ class TestTimeframe:
 
     def test_qualities_fail(self, execute_task):
         task = execute_task('test_qualities_fail')
-        assert task.find_entry(
-            'accepted', title='Q Test.S01E02.1080p-FlexGet'
-        ), 'should have accepted wanted quality'
+        assert task.find_entry('accepted', title='Q Test.S01E02.1080p-FlexGet'), (
+            'should have accepted wanted quality'
+        )
         assert len(task.accepted) == 1
 
         # Let 6 hours pass, timeframe should not even been started, as we already have one of our qualities
@@ -1463,48 +1463,48 @@ class TestBegin:
 
     def test_season_id(self, execute_task):
         task = execute_task('season_id_test')
-        assert task.find_entry(
-            'accepted', title='WTest.S02E03.HDTV.XViD-FlexGet'
-        ), 'Entry should have been accepted, it\'s after the begin episode'
-        assert task.find_entry(
-            'rejected', title='W2Test.S02E03.HDTV.XViD-FlexGet'
-        ), 'Entry should have been rejected, it\'s before the begin episode'
+        assert task.find_entry('accepted', title='WTest.S02E03.HDTV.XViD-FlexGet'), (
+            'Entry should have been accepted, it\'s after the begin episode'
+        )
+        assert task.find_entry('rejected', title='W2Test.S02E03.HDTV.XViD-FlexGet'), (
+            'Entry should have been rejected, it\'s before the begin episode'
+        )
 
     def test_before_ep(self, execute_task):
         task = execute_task('before_ep_test')
-        assert (
-            not task.accepted
-        ), 'No entries should have been accepted, they are before the begin episode'
+        assert not task.accepted, (
+            'No entries should have been accepted, they are before the begin episode'
+        )
 
     def test_after_ep(self, execute_task):
         task = execute_task('after_ep_test')
-        assert (
-            len(task.accepted) == 2
-        ), 'Entries should have been accepted, they are not before the begin episode'
+        assert len(task.accepted) == 2, (
+            'Entries should have been accepted, they are not before the begin episode'
+        )
 
     def test_before_seq(self, execute_task):
         task = execute_task('before_seq_test')
-        assert (
-            not task.accepted
-        ), 'No entries should have been accepted, they are before the begin episode'
+        assert not task.accepted, (
+            'No entries should have been accepted, they are before the begin episode'
+        )
 
     def test_after_seq(self, execute_task):
         task = execute_task('after_seq_test')
-        assert (
-            len(task.accepted) == 2
-        ), 'Entries should have been accepted, they are not before the begin episode'
+        assert len(task.accepted) == 2, (
+            'Entries should have been accepted, they are not before the begin episode'
+        )
 
     def test_before_date(self, execute_task):
         task = execute_task('before_date_test')
-        assert (
-            not task.accepted
-        ), 'No entries should have been accepted, they are before the begin episode'
+        assert not task.accepted, (
+            'No entries should have been accepted, they are before the begin episode'
+        )
 
     def test_after_date(self, execute_task):
         task = execute_task('after_date_test')
-        assert (
-            len(task.accepted) == 2
-        ), 'Entries should have been accepted, they are not before the begin episode'
+        assert len(task.accepted) == 2, (
+            'Entries should have been accepted, they are not before the begin episode'
+        )
 
 
 class TestSeriesPremiere:
@@ -1583,9 +1583,9 @@ class TestImportSeries:
         assert not task.accepted, 'Entry shouldnot have been accepted on first run.'
         age_series(minutes=6)
         task = execute_task('timeframe_max')
-        assert task.find_entry(
-            'accepted', title='the show s03e02 hdtv'
-        ), 'hdtv should have been accepted after timeframe.'
+        assert task.find_entry('accepted', title='the show s03e02 hdtv'), (
+            'hdtv should have been accepted after timeframe.'
+        )
 
     def test_import_altnames(self, execute_task):
         """Tests configure_series with alternate_name."""
@@ -1599,9 +1599,9 @@ class TestImportSeries:
         task = execute_task('test_manual_config_override')
         series_config = task.config['series'][0]['my show']
         assert series_config['quality'] == '720p', 'configure_series settings should be merged in'
-        assert (
-            series_config['identified_by'] == 'sequence'
-        ), 'series plugin settings should override configure_series ones'
+        assert series_config['identified_by'] == 'sequence', (
+            'series plugin settings should override configure_series ones'
+        )
 
 
 class TestIDTypes:
@@ -1751,15 +1751,15 @@ class TestAutoLockin:
 
     def test_ep_lockin(self, execute_task):
         task = execute_task('try_date_1')
-        assert task.find_entry(
-            'accepted', title='FooBar 2012-10-10 HDTV'
-        ), 'dates should be accepted before locked in on an identifier type'
+        assert task.find_entry('accepted', title='FooBar 2012-10-10 HDTV'), (
+            'dates should be accepted before locked in on an identifier type'
+        )
         task = execute_task('lock_ep')
         assert len(task.accepted) == 3, 'All ep mode episodes should have been accepted'
         task = execute_task('try_date_2')
-        assert not task.find_entry(
-            'accepted', title='FooBar 2012-10-11 HDTV'
-        ), 'dates should not be accepted after series has locked in to ep mode'
+        assert not task.find_entry('accepted', title='FooBar 2012-10-11 HDTV'), (
+            'dates should not be accepted after series has locked in to ep mode'
+        )
 
     def test_special_lock(self, execute_task):
         """Make sure series plugin does not lock in to type 'special'"""
@@ -1842,34 +1842,34 @@ class TestSpecials:
         # Test that an entry matching both ep and special is flagged as a special when prefer_specials is True
         task = execute_task('preferspecials')
         entry = task.find_entry('accepted', title='the show s03e04 unaired special')
-        assert (
-            entry.get('series_id_type') == 'special'
-        ), 'Entry which should have been flagged a special was not.'
+        assert entry.get('series_id_type') == 'special', (
+            'Entry which should have been flagged a special was not.'
+        )
 
     def test_not_prefer_specials(self, execute_task):
         # Test that an entry matching both ep and special is flagged as an ep when prefer_specials is False
         task = execute_task('nopreferspecials')
         entry = task.find_entry('accepted', title='the show s03e05 special')
-        assert (
-            entry.get('series_id_type') != 'special'
-        ), 'Entry which should not have been flagged a special was.'
+        assert entry.get('series_id_type') != 'special', (
+            'Entry which should not have been flagged a special was.'
+        )
 
     def test_assume_special(self, execute_task):
         # Test that an entry with no ID found gets flagged as a special and accepted if assume_special is True
         task = execute_task('assumespecial')
         entry = task.find_entry(title='the show SOMETHING')
-        assert (
-            entry.get('series_id_type') == 'special'
-        ), 'Entry which should have been flagged as a special was not.'
+        assert entry.get('series_id_type') == 'special', (
+            'Entry which should have been flagged as a special was not.'
+        )
         assert entry.accepted, 'Entry which should have been accepted was not.'
 
     def test_not_assume_special(self, execute_task):
         # Test that an entry with no ID found does not get flagged as a special and accepted if assume_special is False
         task = execute_task('noassumespecial')
         entry = task.find_entry(title='the show SOMETHING')
-        assert (
-            entry.get('series_id_type') != 'special'
-        ), 'Entry which should not have been flagged as a special was.'
+        assert entry.get('series_id_type') != 'special', (
+            'Entry which should not have been flagged as a special was.'
+        )
         assert not entry.accepted, 'Entry which should not have been accepted was.'
 
     def test_special_looks_like_a_season_pack(self, execute_task):
@@ -1878,9 +1878,9 @@ class TestSpecials:
         entry = task.find_entry(
             title='Doctor.Who.S07.Special.The.Science.of.Doctor.Who.WS.XviD-Flexget'
         )
-        assert (
-            entry.get('series_id_type') == 'special'
-        ), 'Entry should have been flagged as a special'
+        assert entry.get('series_id_type') == 'special', (
+            'Entry should have been flagged as a special'
+        )
         assert not entry['season_pack'], 'Entry should not have been flagged as a season pack'
         assert entry.accepted, 'Entry which should not have been accepted was.'
 
@@ -1923,21 +1923,21 @@ class TestAlternateNames:
         # Tests that old alternate names are not kept in the database.
         task = execute_task('alternate_name')
         task = execute_task('set_other_alternate_name')
-        assert task.find_entry(
-            'accepted', title='Third.Show.S01E01'
-        ), 'A new alternate name should have been associated with the series.'
-        assert task.find_entry(
-            'undecided', title='Other.Show.S01E01'
-        ), 'The old alternate name for the series is still present.'
+        assert task.find_entry('accepted', title='Third.Show.S01E01'), (
+            'A new alternate name should have been associated with the series.'
+        )
+        assert task.find_entry('undecided', title='Other.Show.S01E01'), (
+            'The old alternate name for the series is still present.'
+        )
 
     def test_duplicate_alternate_names_in_different_series(self, execute_task):
         with pytest.raises(TaskAbort) as ex:
             execute_task('duplicate_names_in_different_series')
         # only test that the reason is about alternate names, not which names.
         reason = 'Error adding alternate name'
-        assert (
-            ex.value.reason[:27] == reason
-        ), 'Wrong reason for task abortion. Should be about duplicate alternate names.'
+        assert ex.value.reason[:27] == reason, (
+            'Wrong reason for task abortion. Should be about duplicate alternate names.'
+        )
 
     # Test the DB behaves like we expect ie. alternate names cannot
     def test_alternate_names_are_removed_from_db(self, execute_task):
@@ -1946,21 +1946,21 @@ class TestAlternateNames:
         with Session() as session:
             execute_task('alternate_name')
             # test the current state of alternate names
-            assert (
-                len(session.query(db.AlternateNames).all()) == 1
-            ), 'There should be one alternate name present.'
-            assert (
-                session.query(db.AlternateNames).first().alt_name == 'Other Show'
-            ), 'Alternate name should have been Other Show.'
+            assert len(session.query(db.AlternateNames).all()) == 1, (
+                'There should be one alternate name present.'
+            )
+            assert session.query(db.AlternateNames).first().alt_name == 'Other Show', (
+                'Alternate name should have been Other Show.'
+            )
 
             # run another task that overwrites the alternate names
             execute_task('another_alternate_name')
-            assert (
-                len(session.query(db.AlternateNames).all()) == 1
-            ), 'The old alternate name should have been removed from the database.'
-            assert (
-                session.query(db.AlternateNames).first().alt_name == 'Good Show'
-            ), 'The alternate name in the database should be the new one, Good Show.'
+            assert len(session.query(db.AlternateNames).all()) == 1, (
+                'The old alternate name should have been removed from the database.'
+            )
+            assert session.query(db.AlternateNames).first().alt_name == 'Good Show', (
+                'The alternate name in the database should be the new one, Good Show.'
+            )
 
 
 class TestCLI:
@@ -2359,23 +2359,23 @@ class TestSeriesDDAudio:
     def test_min_quality(self, execute_task):
         """Series plugin: min_quality"""
         task = execute_task('min_quality')
-        assert task.find_entry(
-            'accepted', title='MinQATest.S01E01.720p.XViD.DDP5.1-FlexGet'
-        ), 'MinQATest.S01E01.720p.XViD.DDP5.1-FlexGet should have been accepted'
+        assert task.find_entry('accepted', title='MinQATest.S01E01.720p.XViD.DDP5.1-FlexGet'), (
+            'MinQATest.S01E01.720p.XViD.DDP5.1-FlexGet should have been accepted'
+        )
         assert len(task.accepted) == 1, 'should have accepted only two'
 
     def test_max_quality(self, execute_task):
         """Series plugin: max_quality"""
         task = execute_task('max_quality')
-        assert task.find_entry(
-            'accepted', title='MaxQATest.S01E01.720p.XViD.DD5.1-FlexGet'
-        ), 'MaxQATest.S01E01.720p.XViD.DD5.1-FlexGet should have been accepted'
+        assert task.find_entry('accepted', title='MaxQATest.S01E01.720p.XViD.DD5.1-FlexGet'), (
+            'MaxQATest.S01E01.720p.XViD.DD5.1-FlexGet should have been accepted'
+        )
         assert len(task.accepted) == 1, 'should have accepted only one'
 
     def test_channels(self, execute_task):
         """Series plugin: max_quality"""
         task = execute_task('test_channels')
-        assert task.find_entry(
-            title='Channels.S01E01.1080p.HDTV.DD+7.1-FlexGet'
-        ), 'Channels.S01E01.1080p.HDTV.DD+7.1-FlexGet should have been accepted'
+        assert task.find_entry(title='Channels.S01E01.1080p.HDTV.DD+7.1-FlexGet'), (
+            'Channels.S01E01.1080p.HDTV.DD+7.1-FlexGet should have been accepted'
+        )
         assert len(task.accepted) == 1, 'should have accepted only one'

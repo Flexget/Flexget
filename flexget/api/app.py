@@ -456,9 +456,9 @@ def pagination_headers(
     link_string = ''
 
     if page > 1:
-        link_string += f'{link_with_params}&page={page-1}>; rel="prev", '
+        link_string += f'{link_with_params}&page={page - 1}>; rel="prev", '
     if page < total_pages:
-        link_string += f'{link_with_params}&page={page+1}>; rel="next", '
+        link_string += f'{link_with_params}&page={page + 1}>; rel="next", '
     link_string += f'{link_with_params}&page={total_pages}>; rel="last"'
 
     return {'Link': link_string, 'Total-Count': total_items, 'Count': page_count}

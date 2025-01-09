@@ -141,9 +141,9 @@ class TestDiscover:
         for epnum in range(1, 5):
             title = f'My Show S01E0{epnum}'
             assert any(e['title'] == title for e in task.mock_output), f'{title} not accepted'
-        assert (
-            len(task.mock_output) == 4
-        ), f'4 episodes should have been accepted, not {len(task.mock_output)}'
+        assert len(task.mock_output) == 4, (
+            f'4 episodes should have been accepted, not {len(task.mock_output)}'
+        )
 
     def test_next_series_episodes_multiple_results(self, execute_task):
         # Makes sure the next episode is being searched for on reruns, even when there are multiple search

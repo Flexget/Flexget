@@ -46,9 +46,9 @@ class TestExec:
         task = execute_task('replace_from_entry')
         assert len(task.accepted) == 2, "not all entries were accepted"
         for entry in task.accepted:
-            assert tmp_path.joinpath(
-                entry['title']
-            ).exists(), "exec.py did not create a file for {}".format(entry['title'])
+            assert tmp_path.joinpath(entry['title']).exists(), (
+                "exec.py did not create a file for {}".format(entry['title'])
+            )
 
     def test_adv_format(self, execute_task, tmp_path):
         task = execute_task('test_adv_format')
@@ -61,9 +61,9 @@ class TestExec:
                 line = infile.readline().rstrip('\n')
                 assert line == 'a with\'quote', f'{line} != a with\'quote'
                 line = infile.readline().rstrip('\n')
-                assert (
-                    line == '/a hybrid/path/with spaces'
-                ), f'{line} != /a hybrid/path/with spaces'
+                assert line == '/a hybrid/path/with spaces', (
+                    f'{line} != /a hybrid/path/with spaces'
+                )
 
     # TODO: This doesn't work on linux.
     @pytest.mark.skip(reason='This doesn\'t work on linux')

@@ -295,9 +295,9 @@ def assert_entries(
         assert entry, f"Expected entry with title {matcher['title']}, but found none"
         for k, v in matcher.items():
             assert k in entry.store, f"Expected entry {matcher['title']} to have attribute {k}"
-            assert (
-                entry[k] == v
-            ), f"Expected entry {matcher['title']} to have value {v} for attribute {k}, but was {entry[k]}"
+            assert entry[k] == v, (
+                f"Expected entry {matcher['title']} to have value {v} for attribute {k}, but was {entry[k]}"
+            )
 
 
 def assert_no_entries(task: Task):
@@ -306,6 +306,6 @@ def assert_no_entries(task: Task):
 
     :param task: Task to assert no entires are generated for.
     """
-    assert (
-        len(task.all_entries) == 0
-    ), f"Expected no entries, but found {[m['title'] for m in task.all_entries]}"
+    assert len(task.all_entries) == 0, (
+        f"Expected no entries, but found {[m['title'] for m in task.all_entries]}"
+    )

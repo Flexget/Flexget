@@ -215,9 +215,9 @@ class TestNextSeriesEpisodes:
         assert len(task.mock_output) == 1
         # duplicate alternate names should only result in 1
         # even if it is not a 'complete match' (eg. My Show == My SHOW)
-        assert (
-            len(task.mock_output[0].get('series_alternate_names')) == 1
-        ), 'Duplicate alternate names.'
+        assert len(task.mock_output[0].get('series_alternate_names')) == 1, (
+            'Duplicate alternate names.'
+        )
 
     def test_next_series_episodes_search_strings(self, execute_task):
         # This test makes sure that the number of search strings increases when the amount of alt names increases.
