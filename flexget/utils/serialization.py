@@ -196,7 +196,7 @@ class TupleSerializer(Serializer):
 
     @classmethod
     def deserialize(cls, data: list, version: int) -> tuple:
-        return tuple(deserialize(data))  # type: ignore
+        return tuple(deserialize(data))
 
 
 def _serializer_for(value) -> Optional[type[Serializer]]:

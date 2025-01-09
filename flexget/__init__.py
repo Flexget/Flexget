@@ -5,7 +5,7 @@ from collections.abc import Sequence
 from typing import Optional
 
 # __version__ import need to be first in order to avoid circular import within logger
-from ._version import __version__  # noqa
+from ._version import __version__  # noqa: F401
 
 # isort: split
 from flexget import log

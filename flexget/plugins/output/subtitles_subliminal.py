@@ -77,14 +77,14 @@ class PluginSubliminal:
 
     def on_task_start(self, task, config):
         try:
-            import babelfish  # noqa
+            import babelfish  # noqa: F401
         except ImportError as e:
             logger.debug('Error importing Babelfish: {}', e)
             raise plugin.DependencyError(
                 'subliminal', 'babelfish', f'Babelfish module required. ImportError: {e}'
             )
         try:
-            import subliminal  # noqa
+            import subliminal  # noqa: F401
         except ImportError as e:
             logger.debug('Error importing Subliminal: {}', e)
             raise plugin.DependencyError(

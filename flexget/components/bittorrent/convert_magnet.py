@@ -76,7 +76,7 @@ class ConvertMagnet:
         if config is False:
             return
         try:
-            import libtorrent  # noqa
+            import libtorrent  # noqa: F401
         except ImportError:
             raise plugin.DependencyError(
                 'convert_magnet', 'libtorrent', 'libtorrent package required', logger

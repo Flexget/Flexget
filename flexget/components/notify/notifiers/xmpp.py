@@ -52,10 +52,10 @@ class XMPPNotifier:
                 plugin_name, 'sleekxmpp', f'SleekXMPP module required. ImportError: {e}'
             )
         try:
-            import dns  # noqa
+            import dns  # noqa: F401
         except ImportError:
             try:
-                import dnspython  # noqa
+                import dnspython  # noqa: F401
             except ImportError as e:
                 logger.debug('Error importing dnspython: {}', e)
                 raise DependencyError(

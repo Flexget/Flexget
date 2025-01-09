@@ -159,7 +159,7 @@ line-length = 99
 extend-exclude = ["flexget/ui"]
 
 [tool.ruff.lint]
-select = ["C4", "E", "F", "I", "ISC", "PLE", "RUF", "TCH", "UP"]
+select = ["C4", "E", "F", "I", "ISC", "PGH", "PLE", "RUF", "TCH", "UP"]
 ignore = [
     "E501", # We leave line length up to black
     "ISC001", # Ruff recommends disabling this when using the ruff formatter

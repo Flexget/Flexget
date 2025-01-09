@@ -43,7 +43,7 @@ class FilmwebWatchlist:
     def on_task_start(self, task, config):
         """Raise a DependencyError if our dependencies aren't available"""
         try:
-            from filmweb.filmweb import Filmweb as FilmwebAPI  # noqa
+            from filmweb.filmweb import Filmweb as FilmwebAPI  # noqa: F401
         except ImportError as e:
             logger.debug('Error importing pyfilmweb: {}', e)
             raise plugin.DependencyError(

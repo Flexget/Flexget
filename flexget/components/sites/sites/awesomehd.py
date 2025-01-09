@@ -48,7 +48,7 @@ class SearchAwesomeHD:
         """
         # need lxml to parse xml
         try:
-            import lxml  # noqa
+            import lxml  # noqa: F401
         except ImportError as e:
             logger.debug('Error importing lxml: {}', e)
             raise plugin.DependencyError(
