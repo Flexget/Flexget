@@ -34,18 +34,18 @@ class TestMetainfoImdb:
     def test_imdb(self, execute_task):
         """Metainfo: imdb url"""
         task = execute_task('test')
-        assert task.find_entry(
-            imdb_url='https://www.imdb.com/title/tt0330793/'
-        ), 'Failed to pick url from test 1'
-        assert task.find_entry(
-            imdb_url='https://www.imdb.com/title/tt0472198/'
-        ), 'Failed to pick url from test 2'
-        assert not task.find_entry(
-            imdb_url='https://www.imdb.com/title/tt66666/'
-        ), 'Failed to ignore multiple imdb urls in test 4'
-        assert not task.find_entry(
-            imdb_url='https://www.imdb.com/title/tt99999/'
-        ), 'Failed to ignore multiple imdb urls in test 4'
+        assert task.find_entry(imdb_url='https://www.imdb.com/title/tt0330793/'), (
+            'Failed to pick url from test 1'
+        )
+        assert task.find_entry(imdb_url='https://www.imdb.com/title/tt0472198/'), (
+            'Failed to pick url from test 2'
+        )
+        assert not task.find_entry(imdb_url='https://www.imdb.com/title/tt66666/'), (
+            'Failed to ignore multiple imdb urls in test 4'
+        )
+        assert not task.find_entry(imdb_url='https://www.imdb.com/title/tt99999/'), (
+            'Failed to ignore multiple imdb urls in test 4'
+        )
 
 
 class TestMetainfoQuality:
@@ -69,9 +69,9 @@ class TestMetainfoQuality:
         entry = task.find_entry(title='ShowB.S04E19.Name of Ep.720p.WEB-DL.DD5.1.H.264')
         assert entry, 'entry not found?'
         assert 'quality' in entry, 'failed to pick up quality'
-        assert (
-            entry['quality'].name == '720p webdl h264 dd5.1'
-        ), 'picked up wrong quality {}'.format(entry.get('quality', None))
+        assert entry['quality'].name == '720p webdl h264 dd5.1', (
+            'picked up wrong quality {}'.format(entry.get('quality', None))
+        )
         # quality in description should not override one found in title
         entry = task.find_entry(title='Good.Movie.hdtv')
         assert 'quality' in entry, 'failed to pick up quality'

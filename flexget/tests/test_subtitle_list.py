@@ -238,12 +238,12 @@ class TestSubtitleList:
         with Session() as session:
             s = session.query(SubtitleListLanguage).all()
 
-            assert (
-                s[0].file.title != s[1].file.title
-            ), 'There should only be one row per entry as "en" and "eng" are eq'
-            assert (
-                len(s) == 2
-            ), 'Language "en" and "eng" are equivalent and only one should exist per entry'
+            assert s[0].file.title != s[1].file.title, (
+                'There should only be one row per entry as "en" and "eng" are eq'
+            )
+            assert len(s) == 2, (
+                'Language "en" and "eng" are equivalent and only one should exist per entry'
+            )
 
     def test_subtitle_list_old(self, execute_task):
         task = execute_task('subtitle_test_expiration_add')
@@ -279,9 +279,9 @@ class TestSubtitleList:
         except OSError:
             pass
 
-        assert (
-            len(task.failed) == 1
-        ), 'Only one language should have been downloaded which results in failure'
+        assert len(task.failed) == 1, (
+            'Only one language should have been downloaded which results in failure'
+        )
 
     def test_subtitle_list_subliminal_success(self, execute_task):
         task = execute_task('subtitle_add_local_file')
@@ -300,9 +300,9 @@ class TestSubtitleList:
             os.utime('subtitle_list_test_dir/Marvels.Jessica.Jones.S01E02-FlexGet.en.srt', None)
 
         task = execute_task('subtitle_simulate_success')
-        assert (
-            len(task.rejected) == 1
-        ), 'Should have found both languages for walking dead but not for jessica jones'
+        assert len(task.rejected) == 1, (
+            'Should have found both languages for walking dead but not for jessica jones'
+        )
 
         task = execute_task('subtitle_emit')
         assert len(task.entries) == 1, 'Walking Dead should have been removed from the list'
@@ -325,24 +325,24 @@ class TestSubtitleList:
         task = execute_task('subtitle_add_a_third_local_file')
 
         task = execute_task('subtitle_emit')
-        assert (
-            len(task.entries) == 2
-        ), 'Big Bang Theory already has a local subtitle and should have been removed.'
+        assert len(task.entries) == 2, (
+            'Big Bang Theory already has a local subtitle and should have been removed.'
+        )
 
     def test_subtitle_list_local_dir(self, execute_task):
         task = execute_task('subtitle_add_local_dir')
 
         with Session() as session:
             s = session.query(SubtitleListFile).first()
-            assert (
-                s.title == 'My Videos'
-            ), 'Should have added the dir with title "My Videos" to the list'
+            assert s.title == 'My Videos', (
+                'Should have added the dir with title "My Videos" to the list'
+            )
 
         task = execute_task('subtitle_emit_dir')
 
-        assert (
-            len(task.entries) == 3
-        ), 'Should have found 3 video files and the containing dir should not be included.'
+        assert len(task.entries) == 3, (
+            'Should have found 3 video files and the containing dir should not be included.'
+        )
 
     def test_subtitle_list_subliminal_dir_success(self, execute_task):
         task = execute_task('subtitle_add_local_dir')
@@ -362,9 +362,9 @@ class TestSubtitleList:
 
         with Session() as session:
             s = session.query(SubtitleListFile).first()
-            assert (
-                s is None
-            ), '"My Videos" and contained files should have been deleted from the list'
+            assert s is None, (
+                '"My Videos" and contained files should have been deleted from the list'
+            )
 
         try:
             os.remove('subtitle_list_test_dir/The.Walking.Dead.S06E08-FlexGet.ja.srt')
@@ -390,9 +390,9 @@ class TestSubtitleList:
 
         task = execute_task('subtitle_emit_force_no')
 
-        assert (
-            len(task.entries) == 0
-        ), 'List should not be empty, but since file does not exist it isn\' returned'
+        assert len(task.entries) == 0, (
+            'List should not be empty, but since file does not exist it isn\' returned'
+        )
 
         with Session() as session:
             s = session.query(SubtitleListFile).first()
@@ -405,9 +405,9 @@ class TestSubtitleList:
 
         with Session() as session:
             s = session.query(SubtitleListFile).first()
-            assert (
-                s is None
-            ), 'The file should not have been added to the list as it does not exist'
+            assert s is None, (
+                'The file should not have been added to the list as it does not exist'
+            )
 
         task = execute_task('subtitle_emit')
 
@@ -428,9 +428,9 @@ class TestSubtitleList:
 
         with Session() as session:
             s = session.query(SubtitleListFile).first()
-            assert (
-                s is None
-            ), 'The file should have been removed from the list since it does not exist'
+            assert s is None, (
+                'The file should have been removed from the list since it does not exist'
+            )
 
     def test_subtitle_list_path(self, execute_task):
         execute_task('subtitle_path')

@@ -70,9 +70,9 @@ class TestTVDBLookup:
 
         task = execute_task('test')
 
-        assert task.find_entry(
-            tvdb_ep_name='School Reunion'
-        ), 'Failed imdb lookup Doctor Who 2005 S02E03'
+        assert task.find_entry(tvdb_ep_name='School Reunion'), (
+            'Failed imdb lookup Doctor Who 2005 S02E03'
+        )
 
         entry = task.find_entry(title='House.S01E02.HDTV.XViD-FlexGet')
         assert entry['tvdb_id'] == 73255
@@ -321,15 +321,15 @@ class TestTVDBList:
         persist['auth_tokens'] = {'default': None}
 
         task = execute_task('test')
-        assert task.find_entry(
-            'accepted', title='House.S01E02.HDTV.XViD-FlexGet'
-        ), 'series House should have been accepted'
-        assert task.find_entry(
-            'accepted', title='Doctor.Who.2005.S02E03.PDTV.XViD-FlexGet'
-        ), 'series Doctor Who 2005 should have been accepted'
-        assert task.find_entry(
-            'accepted', title='Breaking.Bad.S02E02.720p.x264'
-        ), 'series Breaking Bad should have been accepted'
+        assert task.find_entry('accepted', title='House.S01E02.HDTV.XViD-FlexGet'), (
+            'series House should have been accepted'
+        )
+        assert task.find_entry('accepted', title='Doctor.Who.2005.S02E03.PDTV.XViD-FlexGet'), (
+            'series Doctor Who 2005 should have been accepted'
+        )
+        assert task.find_entry('accepted', title='Breaking.Bad.S02E02.720p.x264'), (
+            'series Breaking Bad should have been accepted'
+        )
         entry = task.find_entry(title='Lost.S03E02.720p-FlexGet')
         assert entry, 'Entry not found?'
         assert entry not in task.accepted, 'series Lost should not have been accepted'
@@ -338,9 +338,9 @@ class TestTVDBList:
         persist['auth_tokens'] = {'default': None}
 
         task = execute_task('test_strip_dates')
-        assert task.find_entry(
-            title='Hawaii Five-0'
-        ), 'series Hawaii Five-0 (2010) should have date stripped'
+        assert task.find_entry(title='Hawaii Five-0'), (
+            'series Hawaii Five-0 (2010) should have date stripped'
+        )
 
 
 @mock.patch('flexget.components.thetvdb.api_tvdb.mark_expired')
@@ -380,15 +380,15 @@ class TestTVDBFavorites:
         persist['auth_tokens'] = {'default': None}
 
         task = execute_task('test')
-        assert task.find_entry(
-            'accepted', title='House.S01E02.HDTV.XViD-FlexGet'
-        ), 'series House should have been accepted'
-        assert task.find_entry(
-            'accepted', title='Doctor.Who.2005.S02E03.PDTV.XViD-FlexGet'
-        ), 'series Doctor Who 2005 should have been accepted'
-        assert task.find_entry(
-            'accepted', title='Breaking.Bad.S02E02.720p.x264'
-        ), 'series Breaking Bad should have been accepted'
+        assert task.find_entry('accepted', title='House.S01E02.HDTV.XViD-FlexGet'), (
+            'series House should have been accepted'
+        )
+        assert task.find_entry('accepted', title='Doctor.Who.2005.S02E03.PDTV.XViD-FlexGet'), (
+            'series Doctor Who 2005 should have been accepted'
+        )
+        assert task.find_entry('accepted', title='Breaking.Bad.S02E02.720p.x264'), (
+            'series Breaking Bad should have been accepted'
+        )
         entry = task.find_entry(title='Lost.S03E02.720p-FlexGet')
         assert entry, 'Entry not found?'
         assert entry not in task.accepted, 'series Lost should not have been accepted'
@@ -397,9 +397,9 @@ class TestTVDBFavorites:
         persist['auth_tokens'] = {'default': None}
 
         task = execute_task('test_strip_dates')
-        assert task.find_entry(
-            title='Hawaii Five-0'
-        ), 'series Hawaii Five-0 (2010) should have date stripped'
+        assert task.find_entry(title='Hawaii Five-0'), (
+            'series Hawaii Five-0 (2010) should have date stripped'
+        )
 
 
 @mock.patch('flexget.components.thetvdb.api_tvdb.mark_expired')

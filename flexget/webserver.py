@@ -136,8 +136,7 @@ def setup_server(config):
     user = get_user()
     if not user or not user.password:
         logger.warning(
-            'No password set for web server, create one by using'
-            ' `flexget web passwd <password>`'
+            'No password set for web server, create one by using `flexget web passwd <password>`'
         )
 
     if _app_register:

@@ -59,9 +59,9 @@ class TestTorrentSize:
 
         # Make sure remember_rejected rejects on the second execution
         task = execute_task('test_cache')
-        assert task.find_entry(
-            'rejected', title='test', rejected_by='remember_rejected'
-        ), 'should have rejected, size present from the cache'
+        assert task.find_entry('rejected', title='test', rejected_by='remember_rejected'), (
+            'should have rejected, size present from the cache'
+        )
 
 
 class TestFileSize:
@@ -110,6 +110,6 @@ class TestFileSize:
     def test_torrent(self, execute_task):
         task = execute_task('test_torrent')
         entry = task.find_entry('entries', title='test')
-        assert (
-            'content_size' not in entry
-        ), 'size of .torrent file should not be read as content_size'
+        assert 'content_size' not in entry, (
+            'size of .torrent file should not be read as content_size'
+        )

@@ -490,8 +490,7 @@ class APITVMaze:
                 return series
             elif series and not search:
                 logger.debug(
-                    'mismatch between search title {} and series title {}. '
-                    'saving in lookup table',
+                    'mismatch between search title {} and series title {}. saving in lookup table',
                     title,
                     series.name,
                 )

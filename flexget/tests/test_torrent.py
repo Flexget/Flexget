@@ -27,9 +27,9 @@ class TestInfoHash:
         """Torrent: infohash parsing"""
         task = execute_task('test')
         info_hash = task.entries[0].get('torrent_info_hash')
-        assert (
-            info_hash == '14FFE5DD23188FD5CB53A1D47F1289DB70ABF31E'
-        ), f'InfoHash does not match (got {info_hash})'
+        assert info_hash == '14FFE5DD23188FD5CB53A1D47F1289DB70ABF31E', (
+            f'InfoHash does not match (got {info_hash})'
+        )
 
     def test_magnet_infohash(self, execute_task):
         """Tests metainfo/magnet_btih plugin"""
@@ -66,21 +66,21 @@ class TestSeenInfoHash:
     @pytest.mark.filecopy('test.torrent', '__tmp__/test.torrent')
     def test_seen_info_hash(self, execute_task):
         task = execute_task('test')
-        assert task.find_entry(
-            'accepted', title='test'
-        ), 'torrent should have been accepted on first run'
+        assert task.find_entry('accepted', title='test'), (
+            'torrent should have been accepted on first run'
+        )
         task = execute_task('test2')
-        assert task.find_entry(
-            'rejected', title='test2'
-        ), 'torrent should have been rejected on second run'
+        assert task.find_entry('rejected', title='test2'), (
+            'torrent should have been rejected on second run'
+        )
 
     def test_same_run(self, execute_task):
         # Test that 2 entries with the same info hash don't get accepted on the same run.
         # Also tests that the plugin compares info hash case insensitively.
         task = execute_task('test_same_run')
-        assert (
-            len(task.accepted) == 1
-        ), 'Should not have accepted both entries with the same info hash'
+        assert len(task.accepted) == 1, (
+            'Should not have accepted both entries with the same info hash'
+        )
 
 
 class TestModifyTrackers:
@@ -125,9 +125,9 @@ class TestModifyTrackers:
     def test_add_trackers(self, execute_task, tmp_path):
         task = execute_task('test_add_trackers')
         torrent = self.load_torrent(os.path.join(tmp_path.as_posix(), 'test.torrent'))
-        assert (
-            'udp://thetracker.com/announce' in torrent.trackers
-        ), 'udp://thetracker.com/announce should have been added to trackers'
+        assert 'udp://thetracker.com/announce' in torrent.trackers, (
+            'udp://thetracker.com/announce should have been added to trackers'
+        )
         # Check magnet url
         assert 'tr=udp://thetracker.com/announce' in task.find_entry(title='test_magnet')['url']
 
@@ -135,9 +135,9 @@ class TestModifyTrackers:
     def test_remove_trackers(self, execute_task, tmp_path):
         task = execute_task('test_remove_trackers')
         torrent = self.load_torrent(os.path.join(tmp_path.as_posix(), 'test.torrent'))
-        assert (
-            'http://ipv6.torrent.ubuntu.com:6969/announce' not in torrent.trackers
-        ), 'ipv6 tracker should have been removed'
+        assert 'http://ipv6.torrent.ubuntu.com:6969/announce' not in torrent.trackers, (
+            'ipv6 tracker should have been removed'
+        )
 
         # Check magnet url
         assert (
@@ -149,9 +149,9 @@ class TestModifyTrackers:
     def test_modify_trackers(self, execute_task, tmp_path):
         execute_task('test_modify_trackers')
         torrent = self.load_torrent(tmp_path.joinpath('test.torrent'))
-        assert (
-            'http://torrent.replaced.com:6969/announce' in torrent.trackers
-        ), 'ubuntu tracker should have been added'
+        assert 'http://torrent.replaced.com:6969/announce' in torrent.trackers, (
+            'ubuntu tracker should have been added'
+        )
 
 
 class TestPrivateTorrents:
@@ -272,9 +272,9 @@ class TestTorrentScrub:
         for filename in self.test_files:
             osize = os.path.getsize(filename)
             msize = tmp_path.joinpath(filename).stat().st_size
-            assert (
-                osize == msize
-            ), f"Filesizes aren't supposed to differ ({filename!r} {osize}, {self.__tmp__ + filename!r} {msize})!"
+            assert osize == msize, (
+                f"Filesizes aren't supposed to differ ({filename!r} {osize}, {self.__tmp__ + filename!r} {msize})!"
+            )
 
 
 class TestTorrentAlive:
@@ -298,9 +298,9 @@ class TestTorrentAlive:
     def test_torrent_alive_fail(self, mocked_request, execute_task):
         task = execute_task('test_torrent_alive_fail')
         assert not task.accepted, 'Torrent should not have met seed requirement.'
-        assert (
-            task._rerun_count == 1
-        ), f'Task should have been rerun 1 time. Was rerun {task._rerun_count} times.'
+        assert task._rerun_count == 1, (
+            f'Task should have been rerun 1 time. Was rerun {task._rerun_count} times.'
+        )
 
         # Run it again to make sure remember_rejected prevents a rerun from occurring
         task = execute_task('test_torrent_alive_fail')

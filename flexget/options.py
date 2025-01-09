@@ -449,8 +449,7 @@ manager_parser.add_argument(
     '--logfile',
     '-l',
     default='flexget.log',
-    help='Specify a custom logfile name/location. '
-    'Default: %(default)s in the config directory.',
+    help='Specify a custom logfile name/location. Default: %(default)s in the config directory.',
 )
 manager_parser.add_argument(
     '--loglevel',
