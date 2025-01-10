@@ -19,10 +19,10 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv sync --all-extras --frozen --no-dev --no-install-project
+    uv sync --frozen --group deluge --group qbittorrent --group telegram --group transmission --no-dev --no-install-project
 ADD . /flexget
 RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync --frozen --no-dev
+    uv sync --frozen --group deluge --group qbittorrent --group telegram --group transmission --no-dev
 
 # Final image without uv
 # TODO: Alpine version is pinned due to https://github.com/Flexget/Flexget/issues/4085

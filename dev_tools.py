@@ -3,6 +3,7 @@
 # dependencies = [
 #     "click~=8.1",
 #     "requests~=2.32",
+#     "tomlkit",
 # ]
 # ///
 import fileinput
@@ -12,6 +13,7 @@ from typing import Optional
 
 import click
 import requests
+from tomlkit.toml_file import TOMLFile
 
 from bundle_webui import bundle_webui
 
@@ -71,6 +73,14 @@ def bump_version(bump_type):
             line = f"__version__ = '{new_version}'\n"
         print(line, end='')
     click.echo(f'new version: {new_version}')
+
+
+@cli.command()
+def add_extras():
+    file = TOMLFile('pyproject.toml')
+    doc = file.read()
+    doc['tool']['hatch']['metadata'] = doc['_tool']['hatch']['metadata']
+    file.write(doc)
 
 
 @cli.command("bundle-webui")

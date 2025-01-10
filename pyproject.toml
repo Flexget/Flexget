@@ -95,7 +95,7 @@ flexget-headless = "flexget:main"  # This is useful on Windows to avoid a cmd po
 requires = ["hatchling", "hatch-requirements-txt"]
 build-backend = "hatchling.build"
 
-[tool.hatch.metadata.hooks.requirements_txt.optional-dependencies]
+[_tool.hatch.metadata.hooks.requirements_txt.optional-dependencies]
 deluge = ['requirements/deluge.txt']
 locked = ['requirements.txt']
 qbittorrent = ['requirements/qbittorrent.txt']

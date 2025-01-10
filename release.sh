@@ -25,7 +25,10 @@ if git log --skip 1 origin/master..origin/develop|grep '^commit '; then
 
   # Build and upload to pypi.
   # Enabling hatch hooks bundles the webui.
+  cp pyproject.toml unmodified.toml
+  uv run dev_tools.py add_extras
   HATCH_BUILD_HOOKS_ENABLE=true uv build
+  mv unmodified.toml pyproject.toml
   uv publish
 
   # Commit and tag released version
