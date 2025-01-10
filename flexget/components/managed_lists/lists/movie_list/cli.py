@@ -221,8 +221,7 @@ def register_parser_arguments():
         metavar='<identifiers>',
         nargs='+',
         type=movie_list_keyword_type,
-        help='Can be a string or a list of string with the format imdb_id=XXX,'
-        ' tmdb_id=XXX, etc',
+        help='Can be a string or a list of string with the format imdb_id=XXX, tmdb_id=XXX, etc',
     )
     list_name_parser = ArgumentParser(add_help=False)
     list_name_parser.add_argument(

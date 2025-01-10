@@ -35,10 +35,10 @@ class TestCouchpotato:
         assert mock_get.called, 'Did not access Couchpotato results.'
         assert len(task._all_entries) == 31, 'Did not produce 31 entries'
         for entry in task._all_entries:
-            assert (
-                entry['quality_req'] == ''
-            ), 'Quality for entry {} should be empty, instead its {}'.format(
-                entry['title'], entry['quality_req']
+            assert entry['quality_req'] == '', (
+                'Quality for entry {} should be empty, instead its {}'.format(
+                    entry['title'], entry['quality_req']
+                )
             )
 
 
@@ -87,9 +87,9 @@ class TestCouchpotatoWithQuality:
         """
 
     def quality_assertion(self, entry):
-        assert (
-            entry['title'] in self.expected_qualities
-        ), f'Could not find entry {entry} in qualities list.'
+        assert entry['title'] in self.expected_qualities, (
+            f'Could not find entry {entry} in qualities list.'
+        )
         expected_quality = self.expected_qualities[entry['title']]
 
         # Must do this as the order is not guaranteed
@@ -97,10 +97,10 @@ class TestCouchpotatoWithQuality:
 
         assert len(expected_quality) == len(entry_quality)
 
-        assert all(
-            q in expected_quality for q in entry_quality
-        ), 'Expected Quality for entry {} should be {}, instead its {}'.format(
-            entry['title'], expected_quality, entry.store['quality_req']
+        assert all(q in expected_quality for q in entry_quality), (
+            'Expected Quality for entry {} should be {}, instead its {}'.format(
+                entry['title'], expected_quality, entry.store['quality_req']
+            )
         )
 
     @mock.patch('flexget.components.managed_lists.lists.couchpotato_list.CouchPotatoBase.get_json')

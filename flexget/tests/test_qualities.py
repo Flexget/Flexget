@@ -110,9 +110,9 @@ class TestQualityParser:
         if not guessit and parser.__name__ == 'ParserGuessit':
             return
         quality = parser().parse_movie(test_quality[0]).quality
-        assert (
-            str(quality) == test_quality[1]
-        ), f'`{test_quality[0]}` quality should be `{test_quality[1]}` not `{quality}`'
+        assert str(quality) == test_quality[1], (
+            f'`{test_quality[0]}` quality should be `{test_quality[1]}` not `{quality}`'
+        )
 
 
 class TestQualityInternalParser:
@@ -130,9 +130,9 @@ class TestQualityInternalParser:
     )
     def test_quality_failures(self, test_quality):
         quality = ParserInternal().parse_movie(test_quality[0]).quality
-        assert (
-            str(quality) == test_quality[1]
-        ), f'`{test_quality[0]}` quality should be `{test_quality[1]}` not `{quality}`'
+        assert str(quality) == test_quality[1], (
+            f'`{test_quality[0]}` quality should be `{test_quality[1]}` not `{quality}`'
+        )
 
 
 class TestFilterQuality:
@@ -218,9 +218,9 @@ class TestFilterQuality:
     def test_quality_string(self, execute_task):
         task = execute_task('quality_str')
         entry = task.find_entry('accepted', title='Test S01E01 HDTV 1080p')
-        assert isinstance(
-            entry['quality'], Quality
-        ), 'Wrong quality type, should be Quality not str'
+        assert isinstance(entry['quality'], Quality), (
+            'Wrong quality type, should be Quality not str'
+        )
         assert str(entry['quality']) == '1080p hdtv dd+5.1'
 
 
@@ -249,14 +249,14 @@ class TestQualityAudio:
         task = execute_task('test_dd_audio_channels')
         entry = task.find_entry('undecided', title='My Show S01E05 720p HDTV DD+7.1')
         assert entry, 'Entry "My Show S01E05 720p HDTV DD+7.1" should not have been rejected'
-        assert (
-            entry['quality'].audio == 'dd+5.1'
-        ), 'audio "dd+7.1" should have been parsed as dd+5.1'
+        assert entry['quality'].audio == 'dd+5.1', (
+            'audio "dd+7.1" should have been parsed as dd+5.1'
+        )
 
         entry = task.find_entry('undecided', title='My Show S01E05 720p HDTV DD+5.0')
-        assert (
-            entry['quality'].audio == 'dd+5.1'
-        ), 'audio "dd+5.0" should have been parsed as dd+5.1'
+        assert entry['quality'].audio == 'dd+5.1', (
+            'audio "dd+5.0" should have been parsed as dd+5.1'
+        )
 
     def test_dd_audio_min(self, execute_task):
         task = execute_task('test_dd_audio_min')

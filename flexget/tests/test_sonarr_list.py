@@ -113,15 +113,15 @@ class TestSonarrListActions:
         # By using the list as the input we verify that the
         # series added above is returned to us
         task = execute_task('sonarr_list_as_input_plugin')
-        assert task.find_entry(
-            series_name='Breaking Bad'
-        ), "series should have been present in the list but it wasn't"
-        assert task.find_entry(
-            series_name='The Walking Dead'
-        ), "series should have been present in the list but it wasn't"
-        assert task.find_entry(
-            series_name='Game of Thrones'
-        ), "series should have been present in the list but it wasn't"
+        assert task.find_entry(series_name='Breaking Bad'), (
+            "series should have been present in the list but it wasn't"
+        )
+        assert task.find_entry(series_name='The Walking Dead'), (
+            "series should have been present in the list but it wasn't"
+        )
+        assert task.find_entry(series_name='Game of Thrones'), (
+            "series should have been present in the list but it wasn't"
+        )
 
         # Now we will attempt to remove one existing and one
         # non-existing series which should not affect anything at all
@@ -130,15 +130,15 @@ class TestSonarrListActions:
         # And to verify the list we fetch the list again
         # Sinister 2 should now be missing
         task = execute_task('sonarr_list_as_input_plugin')
-        assert task.find_entry(
-            series_name='The Walking Dead'
-        ), "series should have been present in the list but it wasn't"
-        assert task.find_entry(
-            series_name='Game of Thrones'
-        ), "series should have been present in the list but it wasn't"
-        assert not task.find_entry(
-            series_name='Breaking Bad'
-        ), "series should not be present in the list but it was"
+        assert task.find_entry(series_name='The Walking Dead'), (
+            "series should have been present in the list but it wasn't"
+        )
+        assert task.find_entry(series_name='Game of Thrones'), (
+            "series should have been present in the list but it wasn't"
+        )
+        assert not task.find_entry(series_name='Breaking Bad'), (
+            "series should not be present in the list but it was"
+        )
 
         # Now we will try to match a bunch of input entries with
         # the list. Two of the series should not have been matched.

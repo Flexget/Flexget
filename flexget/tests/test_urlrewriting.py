@@ -35,15 +35,15 @@ class TestURLRewriters:
         entry = task.find_entry(title='tpb page')
         assert urlrewriter.url_rewritable(task, entry)
         entry = task.find_entry(title='tbp torrent')
-        assert not urlrewriter.url_rewritable(
-            task, entry
-        ), 'TPB direct torrent link should not be url_rewritable'
+        assert not urlrewriter.url_rewritable(task, entry), (
+            'TPB direct torrent link should not be url_rewritable'
+        )
         entry = task.find_entry(title='tbp apibay')
         assert urlrewriter.url_rewritable(task, entry)
         entry = task.find_entry(title='tbp torrent bad subdomain')
-        assert not urlrewriter.url_rewritable(
-            task, entry
-        ), 'TPB link with invalid subdomain should not be url_rewritable'
+        assert not urlrewriter.url_rewritable(task, entry), (
+            'TPB link with invalid subdomain should not be url_rewritable'
+        )
 
     def test_piratebay_search(self, execute_task):
         task = execute_task('test')
@@ -114,6 +114,6 @@ class TestRegexpurlrewriter:
 
     def test_newzleech(self, execute_task):
         task = execute_task('test')
-        assert task.find_entry(
-            url='http://newzleech.com/?m=gen&dl=1&post=123'
-        ), 'did not url_rewrite properly'
+        assert task.find_entry(url='http://newzleech.com/?m=gen&dl=1&post=123'), (
+            'did not url_rewrite properly'
+        )

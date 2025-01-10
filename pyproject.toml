@@ -61,7 +61,7 @@ dev = [
     "pytest-cov ~=6.0",
     "pytest-runner ~=6.0",
     "pytest-xdist ~=3.6",
-    "ruff ~=0.8.4",
+    "ruff ~=0.9.0",
     "vcrpy ~=7.0",
 ]
 docs = [

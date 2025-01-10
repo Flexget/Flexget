@@ -92,9 +92,9 @@ class TestPriority:
 
     def test_smoke(self, execute_task):
         task = execute_task('test')
-        assert (
-            task.accepted
-        ), 'set plugin should have changed quality before quality plugin was run'
+        assert task.accepted, (
+            'set plugin should have changed quality before quality plugin was run'
+        )
         task = execute_task('test2')
         assert task.rejected, 'quality plugin should have rejected Smoke as hdtv'
 
@@ -143,9 +143,9 @@ class TestDownload:
         testfile = task.entries[0]['location']
         assert os.path.exists(testfile), 'download file does not exists'
         testfile_stat = os.stat(testfile)
-        assert 0o666 & ~curr_umask == stat.S_IMODE(
-            testfile_stat.st_mode
-        ), 'download file mode not honoring umask'
+        assert 0o666 & ~curr_umask == stat.S_IMODE(testfile_stat.st_mode), (
+            'download file mode not honoring umask'
+        )
 
 
 class TestEntryUnicodeError:
@@ -194,20 +194,20 @@ class TestFilterRequireField:
 
     def test_field_required(self, execute_task):
         task = execute_task('test')
-        assert not task.find_entry(
-            'rejected', title='Taken[2008]DvDrip[Eng]-FOO'
-        ), 'Taken should NOT have been rejected'
-        assert task.find_entry(
-            'rejected', title='ASDFASDFASDF'
-        ), 'ASDFASDFASDF should have been rejected'
+        assert not task.find_entry('rejected', title='Taken[2008]DvDrip[Eng]-FOO'), (
+            'Taken should NOT have been rejected'
+        )
+        assert task.find_entry('rejected', title='ASDFASDFASDF'), (
+            'ASDFASDFASDF should have been rejected'
+        )
 
         task = execute_task('test2')
-        assert not task.find_entry(
-            'rejected', title='Entry.S01E05.720p'
-        ), 'Entry should NOT have been rejected'
-        assert task.find_entry(
-            'rejected', title='Entry2.is.a.Movie'
-        ), 'Entry2 should have been rejected'
+        assert not task.find_entry('rejected', title='Entry.S01E05.720p'), (
+            'Entry should NOT have been rejected'
+        )
+        assert task.find_entry('rejected', title='Entry2.is.a.Movie'), (
+            'Entry2 should have been rejected'
+        )
 
 
 class TestHtmlUtils:
@@ -309,17 +309,17 @@ class TestSetPlugin:
     def test_lazy_err(self, execute_task):
         task = execute_task('test_lazy_err')
         entry = task.find_entry('entries', title='Entry 1')
-        assert (
-            entry['title'] == 'Entry 1'
-        ), 'should fall back to original value when template fails'
+        assert entry['title'] == 'Entry 1', (
+            'should fall back to original value when template fails'
+        )
         assert entry['other'] is None
 
     def test_native_types(self, execute_task):
         task = execute_task('test_native_types')
         entry = task.find_entry('entries', title='Entry 1')
-        assert isinstance(
-            entry['int_field'], int
-        ), 'should allow setting values as integers rather than strings'
+        assert isinstance(entry['int_field'], int), (
+            'should allow setting values as integers rather than strings'
+        )
         assert entry['int_field'] == 3
 
     def test_now(self, execute_task):

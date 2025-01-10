@@ -418,8 +418,7 @@ def register_parser_arguments():
     forget_parser = subparsers.add_parser(
         'forget',
         parents=[series_parser],
-        help='Removes episodes or whole series from the entire database '
-        '(including seen plugin)',
+        help='Removes episodes or whole series from the entire database (including seen plugin)',
     )
     forget_parser.add_argument(
         'episode_id', nargs='*', default=None, help='Entity ID(s) to forget (optional)'

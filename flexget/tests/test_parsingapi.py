@@ -8,16 +8,16 @@ class TestParsingAPI:
         method_handlers = {
             m[6:] for m in dir(plugin.get('parsing', 'tests')) if m.startswith('parse_')
         }
-        assert set(declared_types) == set(
-            method_handlers
-        ), f'declared parser types: {declared_types}, handled types: {method_handlers}'
+        assert set(declared_types) == set(method_handlers), (
+            f'declared parser types: {declared_types}, handled types: {method_handlers}'
+        )
 
     def test_parsing_plugins_have_parse_methods(self):
         for parser_type in plugin_parsing.PARSER_TYPES:
             for p in plugin.get_plugins(interface=f'{parser_type}_parser'):
-                assert hasattr(
-                    p.instance, f'parse_{parser_type}'
-                ), f'{parser_type} parsing plugin {p.name} has no parse_{parser_type} method'
+                assert hasattr(p.instance, f'parse_{parser_type}'), (
+                    f'{parser_type} parsing plugin {p.name} has no parse_{parser_type} method'
+                )
 
 
 class TestTaskParsing:

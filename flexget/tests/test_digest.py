@@ -90,6 +90,6 @@ class TestDigest:
         execute_task('different states')
         task = execute_task('emit state')
         for entry in task.all_entries:
-            assert (
-                str(entry.state) == entry['title']
-            ), 'Should have been emitted in same state as when digested'
+            assert str(entry.state) == entry['title'], (
+                'Should have been emitted in same state as when digested'
+            )

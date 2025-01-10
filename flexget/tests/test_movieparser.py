@@ -23,9 +23,9 @@ class TestParser:
 
         movie = parse('WALL-E 720p BluRay x264-FlexGet')
         assert movie.name == 'WALL-E', f'failed to parse {movie.data}'
-        assert (
-            movie.quality.name == '720p bluray h264'
-        ), f'failed to parse quality from {movie.data}'
+        assert movie.quality.name == '720p bluray h264', (
+            f'failed to parse quality from {movie.data}'
+        )
 
         movie = parse('The.Pianist.2002.HDDVD.1080p.DTS.x264-FlexGet')
         assert movie.name == 'The Pianist', f'failed to parse {movie.data}'
@@ -35,15 +35,15 @@ class TestParser:
         movie = parse("Howl's_Moving_Castle_(2004)_[720p,HDTV,x264,DTS]-FlexGet")
         assert movie.name == "Howl's Moving Castle", f'failed to parse {movie.data}'
         assert movie.year == 2004, f'failed to parse year from {movie.data}'
-        assert (
-            movie.quality.name == '720p hdtv h264 dts'
-        ), f'failed to parse quality from {movie.data}'
+        assert movie.quality.name == '720p hdtv h264 dts', (
+            f'failed to parse quality from {movie.data}'
+        )
 
         movie = parse('Coraline.3D.1080p.BluRay.x264-FlexGet')
         assert movie.name == 'Coraline', f'failed to parse {movie.data}'
-        assert (
-            movie.quality.name == '1080p bluray h264'
-        ), f'failed to parse quality from {movie.data}'
+        assert movie.quality.name == '1080p bluray h264', (
+            f'failed to parse quality from {movie.data}'
+        )
 
         movie = parse('Slumdog.Millionaire.DVDRip.XviD-FlexGet')
         assert movie.name == 'Slumdog Millionaire', f'failed to parse {movie.data}'
