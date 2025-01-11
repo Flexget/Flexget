@@ -10,7 +10,7 @@ RUN --mount=type=cache,target=/var/cache/apk \
         openssl-dev \
         unzip
 
-COPY --from=ghcr.io/astral-sh/uv:0.5.17@sha256:9717ecdb1c2fd58eee3fcfd6e2008413a392f31294857500ea4869c87a16d601 /uv /uvx /bin/
+COPY --from=ghcr.io/astral-sh/uv:0.5.18@sha256:e2101b9e627153b8fe4e8a1249cc4194f1b38ece7f28a5a9b8f958e3b560e69c /uv /uvx /bin/
 ENV UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy
 WORKDIR /flexget
 RUN --mount=type=cache,target=/root/.cache/uv \
