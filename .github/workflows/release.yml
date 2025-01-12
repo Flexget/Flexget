@@ -43,7 +43,7 @@ jobs:
           uv run --no-project dev_tools.py get-changelog ${{ env.release_tag }} >> $GITHUB_ENV
           echo 'EOF' >> $GITHUB_ENV
       - name: Create GitHub Release
-        uses: ncipollo/release-action@2c591bcc8ecdcd2db72b97d6147f871fcd833ba5 # v1
+        uses: ncipollo/release-action@cdcc88a9acf3ca41c16c37bb7d21b9ad48560d87 # v1
         if: env.release_tag
         with:
           tag: ${{ env.release_tag }}
