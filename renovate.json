@@ -60,19 +60,23 @@
       ]
     },
     {
+      "description": "Group all ruff updates together. Wait before merge so both sources are out.",
       "groupName": "ruff",
       "matchPackageNames": [
         "ruff",
         "astral-sh/ruff-pre-commit"
-      ]
+      ],
+      "minimumReleaseAge": "6 hours"
     },
     {
+      "description": "Group all uv updates together. Wait before merge so both sources are out.",
       "groupName": "uv",
       "matchPackageNames": [
         "uv",
         "ghcr.io/astral-sh/uv",
         "astral-sh/uv-pre-commit"
-      ]
+      ],
+      "minimumReleaseAge": "6 hours"
     }
   ]
 }
