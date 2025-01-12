@@ -217,8 +217,8 @@ class OutputRSS:
             if 'rss_pubdate' in entry:
                 rss.published = entry['rss_pubdate']
 
-            rss.enc_length = entry['size'] if 'size' in entry else None
-            rss.enc_type = entry['type'] if 'type' in entry else None
+            rss.enc_length = entry.get('size', None)
+            rss.enc_type = entry.get('type', None)
 
             # TODO: check if this exists and suggest disabling history if it does since it shouldn't happen normally ...
             logger.debug('Saving {} into rss database', entry['title'])
@@ -241,15 +241,13 @@ class OutputRSS:
         rss_items = []
         for db_item in db_items:
             add = True
-            if config['items'] != -1:
-                if len(rss_items) > config['items']:
-                    add = False
-            if config['days'] != -1:
-                if (
-                    datetime.datetime.today() - datetime.timedelta(days=config['days'])
-                    > db_item.published
-                ):
-                    add = False
+            if config['items'] != -1 and len(rss_items) > config['items']:
+                add = False
+            if config['days'] != -1 and (
+                datetime.datetime.today() - datetime.timedelta(days=config['days'])
+                > db_item.published
+            ):
+                add = False
             if add:
                 # add into generated feed
                 hasher = hashlib.sha1()

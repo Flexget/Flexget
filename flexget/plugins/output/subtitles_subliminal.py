@@ -1,4 +1,5 @@
 import collections
+import contextlib
 import logging
 import os
 import tempfile
@@ -124,7 +125,7 @@ class PluginSubliminal:
         from subliminal.score import episode_scores, movie_scores
         from subliminal.video import VIDEO_EXTENSIONS
 
-        try:
+        with contextlib.suppress(RegionAlreadyConfigured):
             subliminal.region.configure(
                 'dogpile.cache.dbm',
                 arguments={
@@ -132,8 +133,6 @@ class PluginSubliminal:
                     'lock_factory': MutexLock,
                 },
             )
-        except RegionAlreadyConfigured:
-            pass
 
         # Let subliminal be more verbose if our logger is set to DEBUG
         if logger.level(task.manager.options.loglevel).no <= logger.level('DEBUG').no:

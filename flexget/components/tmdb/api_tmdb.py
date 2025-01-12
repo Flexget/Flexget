@@ -52,9 +52,7 @@ class TMDBConfig(Base):
 
     @property
     def expired(self):
-        if self.updated < datetime.now() - timedelta(days=5):
-            return True
-        return False
+        return self.updated < datetime.now() - timedelta(days=5)
 
 
 def get_tmdb_config():

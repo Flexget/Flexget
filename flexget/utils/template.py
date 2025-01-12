@@ -192,10 +192,7 @@ def filter_parsedate(val):
 def filter_date_suffix(date_str: str):
     """Returns a date suffix for a given date"""
     day = int(date_str[-2:])
-    if 4 <= day <= 20 or 24 <= day <= 30:
-        suffix = "th"
-    else:
-        suffix = ["st", "nd", "rd"][day % 10 - 1]
+    suffix = 'th' if 4 <= day <= 20 or 24 <= day <= 30 else ['st', 'nd', 'rd'][day % 10 - 1]
     return date_str + suffix
 
 

@@ -113,7 +113,7 @@ def pre_check_config(config_path):
             )
 
         # notify if user is trying to set same key multiple times in a task (a common mistake)
-        for level in duplicates.keys():
+        for level in duplicates:
             # when indentation goes down, delete everything indented more than that
             if indentation < level:
                 duplicates[level] = {}

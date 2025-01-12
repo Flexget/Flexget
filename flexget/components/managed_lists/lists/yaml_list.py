@@ -27,16 +27,14 @@ class YamlManagedList(MutableSet):
 
         self.entries = []
         try:
-            content = open(self.filename, encoding=self.encoding)
+            with open(self.filename, encoding=self.encoding) as content:
+                try:
+                    # TODO: use the load from our serialization system if that goes in
+                    entries = load_yaml(content)
+                except Exception as exc:
+                    raise PluginError(f'Error opening yaml file `{self.filename}`: {exc}')
         except FileNotFoundError:
             entries = []
-            pass
-        else:
-            try:
-                # TODO: use the load from our serialization system if that goes in
-                entries = load_yaml(content)
-            except Exception as exc:
-                raise PluginError(f'Error opening yaml file `{self.filename}`: {exc}')
         if not entries:
             return
         if isinstance(entries, list):

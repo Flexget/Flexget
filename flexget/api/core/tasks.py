@@ -427,21 +427,17 @@ class TaskExecutionAPI(APIResource):
         """Execute task and stream results"""
         data = request.json
         for task in data.get('tasks'):
-            if task.lower() not in [
-                t.lower() for t in self.manager.user_config.get('tasks', {}).keys()
-            ]:
+            if task.lower() not in [t.lower() for t in self.manager.user_config.get('tasks', {})]:
                 raise NotFoundError(f'task {task} does not exist')
 
         queue = ExecuteLog()
         output = queue if data.get('loglevel') else None
-        stream = (
-            True
-            if any(
+        stream = bool(
+            any(
                 arg[0] in ['progress', 'summary', 'loglevel', 'entry_dump']
                 for arg in data.items()
                 if arg[1]
             )
-            else False
         )
         loglevel = data.pop('loglevel', None)
 

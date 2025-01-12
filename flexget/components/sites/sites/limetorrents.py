@@ -71,9 +71,8 @@ class Limetorrents:
             config = {'category': config}
 
         order_by = ''
-        if isinstance(config.get('order_by'), str):
-            if config['order_by'] != 'date':
-                order_by = '{}/1'.format(config['order_by'])
+        if isinstance(config.get('order_by'), str) and config['order_by'] != 'date':
+            order_by = '{}/1'.format(config['order_by'])
 
         category = 'all'
         if isinstance(config.get('category'), str):

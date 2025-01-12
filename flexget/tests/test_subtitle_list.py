@@ -1,3 +1,4 @@
+import contextlib
 import datetime
 import os
 
@@ -274,10 +275,8 @@ class TestSubtitleList:
         task = execute_task('subtitle_fail')
 
         # cleanup
-        try:
+        with contextlib.suppress(OSError):
             os.remove('subtitle_list_test_dir/The.Walking.Dead.S06E08-FlexGet.en.srt')
-        except OSError:
-            pass
 
         assert len(task.failed) == 1, (
             'Only one language should have been downloaded which results in failure'
@@ -306,18 +305,12 @@ class TestSubtitleList:
 
         task = execute_task('subtitle_emit')
         assert len(task.entries) == 1, 'Walking Dead should have been removed from the list'
-        try:
+        with contextlib.suppress(OSError):
             os.remove('subtitle_list_test_dir/The.Walking.Dead.S06E08-FlexGet.en.srt')
-        except OSError:
-            pass
-        try:
+        with contextlib.suppress(OSError):
             os.remove('subtitle_list_test_dir/The.Walking.Dead.S06E08-FlexGet.ja.srt')
-        except OSError:
-            pass
-        try:
+        with contextlib.suppress(OSError):
             os.remove('subtitle_list_test_dir/Marvels.Jessica.Jones.S01E02-FlexGet.en.srt')
-        except OSError:
-            pass
 
     def test_subtitle_list_local_subtitles(self, execute_task):
         task = execute_task('subtitle_add_local_file')
@@ -366,18 +359,12 @@ class TestSubtitleList:
                 '"My Videos" and contained files should have been deleted from the list'
             )
 
-        try:
+        with contextlib.suppress(OSError):
             os.remove('subtitle_list_test_dir/The.Walking.Dead.S06E08-FlexGet.ja.srt')
-        except OSError:
-            pass
-        try:
+        with contextlib.suppress(OSError):
             os.remove('subtitle_list_test_dir/Marvels.Jessica.Jones.S01E02-FlexGet.ja.srt')
-        except OSError:
-            pass
-        try:
+        with contextlib.suppress(OSError):
             os.remove('subtitle_list_test_dir/The.Big.Bang.Theory.S09E09-FlexGet.ja.srt')
-        except OSError:
-            pass
 
     def test_subtitle_list_force_file_existence_no(self, execute_task):
         task = execute_task('subtitle_add_force_file_no')

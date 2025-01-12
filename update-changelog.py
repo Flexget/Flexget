@@ -6,6 +6,7 @@
 # ///
 
 import collections
+import contextlib
 import re
 import sys
 from collections.abc import Generator, Iterable
@@ -145,10 +146,8 @@ if __name__ == '__main__':
 
             verfile = repo.tree('HEAD')['flexget/_version.py'].data_stream.read()
             __version__: Optional[str] = None
-            try:
-                exec(verfile)  # pylint: disable=W0122
-            except Exception:
-                pass
+            with contextlib.suppress(Exception):
+                exec(verfile)
             new_version_header = f'## {__version__} (unreleased)\n'
             if new_version_header != cur_ver.version_header:
                 cur_ver.version_header = new_version_header

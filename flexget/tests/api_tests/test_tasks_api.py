@@ -264,4 +264,4 @@ class TestDisabledTasks:
         data = json.loads(rsp.get_data(as_text=True))
 
         assert len(data) == 1
-        assert not data[0].get('name') == '_disabled_task'
+        assert data[0].get('name') != '_disabled_task'

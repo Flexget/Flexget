@@ -262,7 +262,7 @@ class TraktMovieTranslation(Base):
         self.update(translation, session)
 
     def update(self, translation, session):
-        for col in translation.keys():
+        for col in translation:
             setattr(self, col, translation.get(col))
 
 
@@ -280,7 +280,7 @@ class TraktShowTranslation(Base):
         self.update(translation, session)
 
     def update(self, translation, session):
-        for col in translation.keys():
+        for col in translation:
             setattr(self, col, translation.get(col))
 
 

@@ -23,9 +23,7 @@ class UrlRewriteGoogleCse:
     def url_rewritable(self, task, entry):
         if entry['url'].startswith('http://www.google.com/cse?'):
             return True
-        if entry['url'].startswith('http://www.google.com/custom?'):
-            return True
-        return False
+        return bool(entry['url'].startswith('http://www.google.com/custom?'))
 
     # urlrewriter API
     def url_rewrite(self, task, entry):
@@ -55,9 +53,7 @@ class UrlRewriteGoogle:
     # urlrewriter API
 
     def url_rewritable(self, task, entry):
-        if entry['url'].startswith('https://www.google.com/search?q='):
-            return True
-        return False
+        return bool(entry['url'].startswith('https://www.google.com/search?q='))
 
     # urlrewriter API
     def url_rewrite(self, task, entry):

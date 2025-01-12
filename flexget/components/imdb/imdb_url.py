@@ -18,9 +18,8 @@ class MetainfoImdbUrl:
 
     def on_task_metainfo(self, task, config):
         # check if disabled (value set to false)
-        if 'scan_imdb' in task.config:
-            if not task.config['scan_imdb']:
-                return
+        if 'scan_imdb' in task.config and not task.config['scan_imdb']:
+            return
 
         for entry in task.entries:
             # Don't override already populated imdb_ids

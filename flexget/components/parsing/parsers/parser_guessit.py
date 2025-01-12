@@ -88,7 +88,7 @@ class ParserGuessit:
             'allowed_countries': ['us', 'uk', 'gb'],
             'single_value': True,
         }
-        options['episode_prefer_number'] = not options.get('identified_by') == 'ep'
+        options['episode_prefer_number'] = options.get('identified_by') != 'ep'
         if options.get('allow_groups'):
             options['expected_group'] = options['allow_groups']
         if 'date_yearfirst' in options:
@@ -304,9 +304,7 @@ class ParserGuessit:
                 serie_country = str(serie_result.get('country', ''))
                 allowed_countries = guessit_options.get('allowed_countries', [])
 
-                if country != serie_country:
-                    valid = False
-                elif (
+                if country != serie_country or (
                     not serie_country
                     and allowed_countries
                     and country.lower() not in allowed_countries
@@ -336,10 +334,9 @@ class ParserGuessit:
 
         identified_by = kwargs.get('identified_by', 'auto')
         identifier_type, identifier, season_pack = None, None, False
-        if identified_by in ['date', 'auto']:
-            if date:
-                identifier_type = 'date'
-                identifier = date
+        if identified_by in ['date', 'auto'] and date:
+            identifier_type = 'date'
+            identifier = date
         if not identifier_type and identified_by in ['ep', 'auto']:
             if episode is not None:
                 if season is None and kwargs.get('allow_seasonless', True):
@@ -360,14 +357,16 @@ class ParserGuessit:
                 identifier_type = 'ep'
                 identifier = (season, 0)
 
-        if not identifier_type and identified_by in ['id', 'auto']:
-            if guess_result.matches['regexpId']:
-                identifier_type = 'id'
-                identifier = '-'.join(match.value for match in guess_result.matches['regexpId'])
-        if not identifier_type and identified_by in ['sequence', 'auto']:
-            if episode is not None:
-                identifier_type = 'sequence'
-                identifier = episode
+        if (
+            not identifier_type
+            and identified_by in ['id', 'auto']
+            and guess_result.matches['regexpId']
+        ):
+            identifier_type = 'id'
+            identifier = '-'.join(match.value for match in guess_result.matches['regexpId'])
+        if not identifier_type and identified_by in ['sequence', 'auto'] and episode is not None:
+            identifier_type = 'sequence'
+            identifier = episode
         if (not identifier_type or guessit_options.get('prefer_specials')) and (
             special or guessit_options.get('assume_special')
         ):

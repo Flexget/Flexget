@@ -188,10 +188,12 @@ class FilterExistsMovie:
                     if all(entry['quality'] > qual for qual in existing_qualities[movie_id]):
                         logger.trace('better quality')
                         continue
-                elif config.get('allow_different_qualities'):
-                    if entry['quality'] not in existing_qualities[movie_id]:
-                        logger.trace('wrong quality')
-                        continue
+                elif (
+                    config.get('allow_different_qualities')
+                    and entry['quality'] not in existing_qualities[movie_id]
+                ):
+                    logger.trace('wrong quality')
+                    continue
 
                 entry.reject('movie exists')
 

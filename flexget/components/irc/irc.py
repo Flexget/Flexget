@@ -1,3 +1,4 @@
+import contextlib
 import os
 import re
 import threading
@@ -174,10 +175,7 @@ class IRCConnection(SimpleIRCBot):
             # Validate config with the settings in the torrent file
             for param in self.tracker_config.find('settings'):
                 # Handle textbox entries
-                if param.tag == 'textbox':
-                    value_name = param.get('name')
-                else:
-                    value_name = param.tag
+                value_name = param.get('name') if param.tag == 'textbox' else param.tag
 
                 # Strip the gazelle prefix
                 if value_name.startswith('gazelle_'):
@@ -326,10 +324,8 @@ class IRCConnection(SimpleIRCBot):
             'Tracker file not found on disk. Attempting to fetch tracker config file from Github.'
         )
         tracker = None
-        try:
+        with contextlib.suppress(requests.RequestException, OSError):
             tracker = requests.get(base_url + tracker_config_file)
-        except (requests.RequestException, OSError):
-            pass
         if not tracker:
             try:
                 logger.debug('Trying to search list of tracker files on Github')
@@ -379,7 +375,7 @@ class IRCConnection(SimpleIRCBot):
         for pattern in patterns:
             rx = re.compile(pattern.find('regex').get('value'), re.UNICODE | re.MULTILINE)
             vals = [var.get('name') for idx, var in enumerate(pattern.find('vars'))]
-            optional = True if pattern.get('optional', 'false').lower() == 'true' else False
+            optional = pattern.get('optional', 'false').lower() == 'true'
             result.append((rx, vals, optional))
         return result
 
@@ -967,7 +963,7 @@ class IRCConnectionManager:
         if name:
             self.stop_connection(name, wait)
         else:
-            for name in irc_connections.keys():
+            for name in irc_connections:
                 self.stop_connection(name, wait)
 
     def stop_connection(self, name, wait=False):
@@ -987,7 +983,7 @@ class IRCConnectionManager:
             else:
                 status.append(self.status_dict(name))
         else:
-            for n in irc_connections.keys():
+            for n in irc_connections:
                 status.append(self.status_dict(n))
         return status
 
@@ -1085,7 +1081,7 @@ def stop_irc(manager, wait=False):
         irc_manager.stop(wait)
         # this check is necessary for when the irc manager is the one shutting down the daemon
         # a thread can't join itself
-        if not threading.current_thread() == irc_manager.thread:
+        if threading.current_thread() != irc_manager.thread:
             # It's important to give the threads time to shut down to avoid socket issues later (eg. quick restart)
             irc_manager.thread.join(len(irc_connections.keys()) * 11)
 

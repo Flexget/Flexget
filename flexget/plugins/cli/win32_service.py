@@ -53,14 +53,13 @@ def do_cli(manager, options):
     import win32file
     import win32serviceutil
 
-    if hasattr(sys, 'real_prefix'):
-        # We are in a virtualenv, there is some special setup
-        if not os.path.exists(os.path.join(sys.prefix, 'python.exe')):
-            console('Creating a hard link to virtualenv python.exe in root of virtualenv')
-            win32file.CreateHardLink(
-                os.path.join(sys.prefix, 'python.exe'),
-                os.path.join(sys.prefix, 'Scripts', 'python.exe'),
-            )
+    # We are in a virtualenv, there is some special setup
+    if hasattr(sys, 'real_prefix') and not os.path.exists(os.path.join(sys.prefix, 'python.exe')):
+        console('Creating a hard link to virtualenv python.exe in root of virtualenv')
+        win32file.CreateHardLink(
+            os.path.join(sys.prefix, 'python.exe'),
+            os.path.join(sys.prefix, 'Scripts', 'python.exe'),
+        )
 
     argv = options.args
     if options.help:

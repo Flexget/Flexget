@@ -71,15 +71,14 @@ class MovieParser(TitleParser):
                 continue
             # check for year
             num = str_to_int(part)
-            if num is not None:
-                if 1930 < num <= datetime.now().year:
-                    if self.year_pos == cut_part:
-                        # Looks like a year, but we already set the cutpoint to a year, let's move it forward
-                        cut_part = part_pos
+            if num is not None and 1930 < num <= datetime.now().year:
+                if self.year_pos == cut_part:
+                    # Looks like a year, but we already set the cutpoint to a year, let's move it forward
+                    cut_part = part_pos
 
-                    self.year = num
-                    self.year_pos = part_pos
-                    cut = True
+                self.year = num
+                self.year_pos = part_pos
+                cut = True
             # Don't consider all caps words cut words if the whole title has been all caps
             if not part.isupper():
                 all_caps = False
@@ -89,12 +88,12 @@ class MovieParser(TitleParser):
             # check for cutoff words
             if part.lower() in self.cutoffs:
                 cut = True
-            # check for propers
-            if part.lower() in self.propers:
-                # 'real' and 'final' are too common in movie parsers, only cut if it comes after year
-                if part.lower() not in ['real', 'final'] or self.year:
-                    self.proper_count += 1
-                    cut = True
+            # check for propers, 'real' and 'final' are too common in movie parsers, only cut if it comes after year
+            if (
+                part.lower() in self.propers and part.lower() not in ['real', 'final']
+            ) or self.year:
+                self.proper_count += 1
+                cut = True
             # update cut position
             if cut and parts.index(part) < cut_part:
                 cut_part = part_pos

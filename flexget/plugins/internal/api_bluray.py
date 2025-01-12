@@ -75,10 +75,7 @@ class BlurayMovie(Base):
     updated = Column(DateTime, default=datetime.now, nullable=False)
 
     def __init__(self, title: str, year: Optional[int]) -> None:
-        if year:
-            title_year = f'{title} ({year})'
-        else:
-            title_year = title
+        title_year = f'{title} ({year})' if year else title
 
         params = {
             'section': 'bluraymovies',

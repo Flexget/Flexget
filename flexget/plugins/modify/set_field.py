@@ -1,3 +1,5 @@
+import contextlib
+
 from loguru import logger
 
 from flexget import plugin
@@ -37,10 +39,8 @@ class ModifySet:
             # themselves.
             else:
                 orig_value = entry.get(field, UNSET, eval_lazy=False)
-                try:
+                with contextlib.suppress(KeyError):
                     del entry[field]
-                except KeyError:
-                    pass
                 entry.add_lazy_fields(
                     self.lazy_set,
                     [field],

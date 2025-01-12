@@ -529,10 +529,9 @@ class APITVMaze:
         )
 
         # Logic for cache only mode
-        if only_cached:
-            if season:
-                logger.debug('forcing cache for season {} of show {}', season_number, series.name)
-                return season
+        if only_cached and season:
+            logger.debug('forcing cache for season {} of show {}', season_number, series.name)
+            return season
 
         if season and not series.expired:
             logger.debug('returning season {} of show {}', season_number, series.name)
@@ -568,9 +567,9 @@ class APITVMaze:
             raise LookupError('Not enough parameters to lookup episode')
         if lookup_type == 'sequence':
             raise LookupError('TVMaze does not support sequence type searches')
-        if lookup_type == 'ep' and not all([season_number, episode_number]):
-            raise LookupError('Not enough parameters to lookup episode')
-        elif lookup_type == 'date' and not episode_date:
+        if (lookup_type == 'ep' and not all([season_number, episode_number])) or (
+            lookup_type == 'date' and not episode_date
+        ):
             raise LookupError('Not enough parameters to lookup episode')
 
         # Get series
@@ -595,16 +594,15 @@ class APITVMaze:
         )
 
         # Logic for cache only mode
-        if only_cached:
-            if episode:
-                logger.debug(
-                    'forcing cache for episode id {3}, number{0}, season {1} for show {2}',
-                    episode.number,
-                    episode.season_number,
-                    series.name,
-                    episode.tvmaze_id,
-                )
-                return episode
+        if only_cached and episode:
+            logger.debug(
+                'forcing cache for episode id {3}, number{0}, season {1} for show {2}',
+                episode.number,
+                episode.season_number,
+                series.name,
+                episode.tvmaze_id,
+            )
+            return episode
         if episode and not episode.expired:
             logger.debug(
                 'found episode id {3}, number {0}, season {1} for show {2} in cache',

@@ -16,9 +16,7 @@ class UrlRewriteKoreus:
     # urlrewriter API
     def url_rewritable(self, task, entry):
         url = entry['url']
-        if url.startswith('http://www.koreus.com'):
-            return True
-        return False
+        return bool(url.startswith('http://www.koreus.com'))
 
     # urlrewriter API
     def url_rewrite(self, task, entry):

@@ -14,11 +14,10 @@ from flexget.utils.requests import parse_header
 
 @event('manager.subcommand.inject')
 def do_cli(manager, options):
-    if not options.url:
-        # Determine if first positional argument is a URL or a title
-        if '://' in options.title:
-            options.url = options.title
-            options.title = None
+    # Determine if first positional argument is a URL or a title
+    if not options.url and '://' in options.title:
+        options.url = options.title
+        options.title = None
 
     if options.url and not options.title:
         # Attempt to get a title from the URL response's headers

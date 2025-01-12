@@ -110,12 +110,8 @@ class FilterRegexp:
                     regexp = regexp_item
                     regexp_item = {regexp: {}}
                 regexp, opts = next(iter(regexp_item.items()))
-                # Parse custom settings for this regexp
-                if not isinstance(opts, dict):
-                    opts = {'path': opts}
-                else:
-                    # We don't want to modify original config
-                    opts = opts.copy()
+                # Parse custom settings for this regexp, and we don't want to modify original config
+                opts = {'path': opts} if not isinstance(opts, dict) else opts.copy()
                 # advanced configuration
                 if config.get('from'):
                     opts.setdefault('from', config['from'])

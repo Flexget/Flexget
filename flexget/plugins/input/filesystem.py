@@ -182,25 +182,20 @@ class Filesystem:
                     continue
                 entry = None
                 object_depth = len(path_object.parts)
-                if object_depth <= max_depth:
-                    if match(str(path_object)):
-                        if (
-                            (path_object.is_dir() and get_dirs)
-                            or (path_object.is_symlink() and get_symlinks)
-                            or (
-                                path_object.is_file()
-                                and not path_object.is_symlink()
-                                and get_files
-                            )
-                        ):
-                            entry = self.create_entry(path_object, test_mode)
-                        else:
-                            logger.debug(
-                                "Path object's {} type doesn't match requested object types.",
-                                path_object,
-                            )
-                        if entry and entry not in entries:
-                            entries.append(entry)
+                if object_depth <= max_depth and match(str(path_object)):
+                    if (
+                        (path_object.is_dir() and get_dirs)
+                        or (path_object.is_symlink() and get_symlinks)
+                        or (path_object.is_file() and not path_object.is_symlink() and get_files)
+                    ):
+                        entry = self.create_entry(path_object, test_mode)
+                    else:
+                        logger.debug(
+                            "Path object's {} type doesn't match requested object types.",
+                            path_object,
+                        )
+                    if entry and entry not in entries:
+                        entries.append(entry)
 
         return entries
 

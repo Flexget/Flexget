@@ -42,13 +42,12 @@ class TorrentFilename:
                     # a small torrent file since it starts with TORRENT_RE
                     data = f.read()
 
-                if 'content-length' in entry:
-                    if len(data) != entry['content-length']:
-                        entry.fail(
-                            'Torrent file length doesn\'t match to the one reported by the server'
-                        )
-                        self.purge(entry)
-                        continue
+                if 'content-length' in entry and len(data) != entry['content-length']:
+                    entry.fail(
+                        'Torrent file length doesn\'t match to the one reported by the server'
+                    )
+                    self.purge(entry)
+                    continue
 
                 # construct torrent object
                 try:
@@ -76,12 +75,11 @@ class TorrentFilename:
     @plugin.priority(TORRENT_PRIO)
     def on_task_output(self, task, config):
         for entry in task.entries:
-            if 'torrent' in entry:
-                if entry['torrent'].modified:
-                    # re-write data into a file
-                    logger.debug('Writing modified torrent file for {}', entry['title'])
-                    with open(entry['file'], 'wb+') as f:
-                        f.write(entry['torrent'].encode())
+            if 'torrent' in entry and entry['torrent'].modified:
+                # re-write data into a file
+                logger.debug('Writing modified torrent file for {}', entry['title'])
+                with open(entry['file'], 'wb+') as f:
+                    f.write(entry['torrent'].encode())
 
     def make_filename(self, torrent, entry):
         """Build a filename for this torrent"""

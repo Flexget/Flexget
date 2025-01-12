@@ -52,10 +52,7 @@ class Torznab:
                 entry, ['rid', 'tvdbid', 'traktid', 'tvmazeid', 'imdbid', 'tmdbid', 'season', 'ep']
             )
 
-        if 'q' not in params.keys():
-            query = entry['title']
-        else:
-            query = params['q']
+        query = entry['title'] if 'q' not in params else params['q']
 
         entries = []
         for search_string in entry.get('search_strings', [query]):
@@ -131,7 +128,7 @@ class Torznab:
     def _check_searcher(self, searchers, searcher):
         """Check if the given searchers is in the list, available and has supported params"""
         return (
-            searcher in searchers.keys()
+            searcher in searchers
             and searchers[searcher]['available'] == 'yes'
             and searchers[searcher]['supportedParams']
         )
@@ -222,7 +219,7 @@ class Torznab:
         misc = {}
         for attr in attrs:
             name = attr.get('name')
-            if name in dictionary.keys():
+            if name in dictionary:
                 entry[dictionary[name]['name']] = dictionary[name]['type'](attr.get('value'))
             elif name == 'peers':
                 misc['peers'] = int(attr.get('value'))
@@ -231,19 +228,19 @@ class Torznab:
             elif name == 'size':
                 misc['size'] = int(attr.get('value'))
 
-        if 'imdb_id' not in entry.keys() and 'imdb' in misc.keys():
+        if 'imdb_id' not in entry and 'imdb' in misc:
             entry['imdb_id'] = 'tt{}'.format(misc['imdb'])
 
-        if 'peers' in misc.keys():
-            if 'torrent_leeches' not in entry.keys() and 'torrent_seeds' in entry.keys():
+        if 'peers' in misc:
+            if 'torrent_leeches' not in entry and 'torrent_seeds' in entry:
                 entry['torrent_leeches'] = misc['peers'] - entry['torrent_seeds']
-            if 'torrent_leeches' in entry.keys() and 'torrent_seeds' not in entry.keys():
+            if 'torrent_leeches' in entry and 'torrent_seeds' not in entry:
                 entry['torrent_seeds'] = misc['peers'] - entry['torrent_leeches']
 
-        if 'content_size' not in entry.keys() and 'size' in misc.keys():
+        if 'content_size' not in entry and 'size' in misc:
             entry['content_size'] = misc['size']
 
-        if 'torrent_seeds' in entry.keys() and 'torrent_leeches' in entry.keys():
+        if 'torrent_seeds' in entry and 'torrent_leeches' in entry:
             entry['torrent_availability'] = torrent_availability(
                 entry['torrent_seeds'], entry['torrent_leeches']
             )
@@ -269,7 +266,7 @@ class Torznab:
         for k, v in dictionary.items():
             if k not in self.supported_params or k not in fields:
                 continue
-            if v in entry.keys() and entry[v]:
+            if entry.get(v):
                 params[k] = entry[v]
         for k in [
             'tvdb_series_name',
@@ -278,7 +275,7 @@ class Torznab:
             'imdb_name',
             'series_name',
         ]:
-            if k in entry.keys() and entry[k]:
+            if entry.get(k):
                 params['q'] = entry[k]
                 break
 

@@ -248,10 +248,7 @@ class Torrent:
         else:
             # multifile torrent
             for item in self.content['info']['files']:
-                if 'path.utf-8' in item:
-                    path = item['path.utf-8']
-                else:
-                    path = item['path']
+                path = item['path.utf-8'] if 'path.utf-8' in item else item['path']
                 t = {'path': '/'.join(path[:-1]), 'name': path[-1], 'size': item['length']}
                 files.append(t)
 

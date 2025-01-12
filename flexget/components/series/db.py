@@ -966,10 +966,7 @@ def get_series_summary(
         ).filter(EpisodeRelease.downloaded)
     if count:
         return query.group_by(Series).count()
-    if sort_by == 'show_name':
-        order_by = Series.name
-    else:
-        order_by = func.max(EpisodeRelease.first_seen)
+    order_by = Series.name if sort_by == 'show_name' else func.max(EpisodeRelease.first_seen)
     query = query.order_by(desc(order_by)) if descending else query.order_by(order_by)
 
     return query.slice(start, stop)
@@ -1177,10 +1174,7 @@ def new_seasons_after(series: Series, since_season: Season, session: Session) ->
 def new_entities_after(since_entity: Union[Season, Episode]) -> tuple[int, str]:
     session = Session.object_session(since_entity)
     series = since_entity.series
-    if since_entity.is_season:
-        func = new_seasons_after
-    else:
-        func = new_eps_after
+    func = new_seasons_after if since_entity.is_season else new_eps_after
     return func(series, since_entity, session)
 
 
@@ -1201,11 +1195,10 @@ def set_series_begin(series: Series, ep_id: Union[str, int]) -> tuple[str, str]:
         ep_id = ep_id.upper()
         if entity_type == 'season':
             ep_id += 'E01'
-    if series.identified_by not in ['auto', '', None]:
-        if identified_by != series.identified_by:
-            raise ValueError(
-                f'`begin` value `{ep_id}` does not match identifier type for identified_by `{series.identified_by}`'
-            )
+    if series.identified_by not in ['auto', '', None] and identified_by != series.identified_by:
+        raise ValueError(
+            f'`begin` value `{ep_id}` does not match identifier type for identified_by `{series.identified_by}`'
+        )
     series.identified_by = identified_by
     episode = (
         session.query(Episode)

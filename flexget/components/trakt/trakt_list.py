@@ -404,12 +404,11 @@ class TraktSet(MutableSet):
             for id in ['trakt_movie_id', 'imdb_id', 'tmdb_id']
         ):
             return True
-        if entry1.get('movie_name') and (
-            (entry1.get('movie_name'), entry1.get('movie_year'))
+        return bool(
+            entry1.get('movie_name')
+            and (entry1.get('movie_name'), entry1.get('movie_year'))
             == (entry2.get('movie_name'), entry2.get('movie_year'))
-        ):
-            return True
-        return False
+        )
 
     def submit(self, entries, remove=False):
         """Submits movies or episodes to trakt api."""

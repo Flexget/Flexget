@@ -62,9 +62,8 @@ class PluginTemplate:
         if config is False:  # handles 'template: no' form to turn off template on this task
             return
         # implements --template NAME
-        if task.options.template:
-            if not config or task.options.template not in config:
-                task.abort(f'does not use `{task.options.template}` template', silent=True)
+        if task.options.template and (not config or task.options.template not in config):
+            task.abort(f'does not use `{task.options.template}` template', silent=True)
 
         config = self.prepare_config(config)
 

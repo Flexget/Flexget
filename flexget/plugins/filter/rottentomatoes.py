@@ -104,27 +104,33 @@ class FilterRottenTomatoes:
 
             # Check defined conditions, TODO: rewrite into functions?
             reasons = []
-            if 'min_critics_score' in config:
-                if entry.get('rt_critics_score', 0) < config['min_critics_score']:
-                    reasons.append(
-                        'min_critics_score ({} < {})'.format(
-                            entry.get('rt_critics_score'), config['min_critics_score']
-                        )
+            if (
+                'min_critics_score' in config
+                and entry.get('rt_critics_score', 0) < config['min_critics_score']
+            ):
+                reasons.append(
+                    'min_critics_score ({} < {})'.format(
+                        entry.get('rt_critics_score'), config['min_critics_score']
                     )
-            if 'min_audience_score' in config:
-                if entry.get('rt_audience_score', 0) < config['min_audience_score']:
-                    reasons.append(
-                        'min_audience_score ({} < {})'.format(
-                            entry.get('rt_audience_score'), config['min_audience_score']
-                        )
+                )
+            if (
+                'min_audience_score' in config
+                and entry.get('rt_audience_score', 0) < config['min_audience_score']
+            ):
+                reasons.append(
+                    'min_audience_score ({} < {})'.format(
+                        entry.get('rt_audience_score'), config['min_audience_score']
                     )
-            if 'min_average_score' in config:
-                if entry.get('rt_average_score', 0) < config['min_average_score']:
-                    reasons.append(
-                        'min_average_score ({} < {})'.format(
-                            entry.get('rt_average_score'), config['min_average_score']
-                        )
+                )
+            if (
+                'min_average_score' in config
+                and entry.get('rt_average_score', 0) < config['min_average_score']
+            ):
+                reasons.append(
+                    'min_average_score ({} < {})'.format(
+                        entry.get('rt_average_score'), config['min_average_score']
                     )
+                )
             if 'min_critics_rating' in config:
                 if not entry.get('rt_critics_rating'):
                     reasons.append('min_critics_rating (no rt_critics_rating)')
@@ -149,16 +155,14 @@ class FilterRottenTomatoes:
                             entry.get('rt_audience_rating').lower(), config['min_audience_rating']
                         )
                     )
-            if 'min_year' in config:
-                if entry.get('rt_year', 0) < config['min_year']:
-                    reasons.append(
-                        'min_year ({} < {})'.format(entry.get('rt_year'), config['min_year'])
-                    )
-            if 'max_year' in config:
-                if entry.get('rt_year', 0) > config['max_year']:
-                    reasons.append(
-                        'max_year ({} > {})'.format(entry.get('rt_year'), config['max_year'])
-                    )
+            if 'min_year' in config and entry.get('rt_year', 0) < config['min_year']:
+                reasons.append(
+                    'min_year ({} < {})'.format(entry.get('rt_year'), config['min_year'])
+                )
+            if 'max_year' in config and entry.get('rt_year', 0) > config['max_year']:
+                reasons.append(
+                    'max_year ({} > {})'.format(entry.get('rt_year'), config['max_year'])
+                )
             if 'reject_genres' in config:
                 rejected = config['reject_genres']
                 for genre in entry.get('rt_genres', []):

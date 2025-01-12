@@ -17,10 +17,7 @@ def do_cli(manager, options):
         if options.task:
             query = query.filter(db.History.task.like('%' + options.task + '%'))
         query = query.order_by(desc(db.History.time)).limit(options.limit)
-        if options.short:
-            headers = ['Time', 'Title']
-        else:
-            headers = ['Field', 'Value']
+        headers = ['Time', 'Title'] if options.short else ['Field', 'Value']
         title = f'Showing {query.count()} entries from History'
         table = TerminalTable(*headers, table_type=options.table_type, title=title)
         for item in reversed(query.all()):

@@ -88,9 +88,7 @@ class UrlRewriteTorrentday:
         url = entry['url']
         if url.find('.torrent'):
             return False
-        if url.startswith('https://www.torrentday.com'):
-            return True
-        return False
+        return bool(url.startswith('https://www.torrentday.com'))
 
     # urlrewriter API
     def url_rewrite(self, task, entry):
