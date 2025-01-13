@@ -224,8 +224,8 @@ class TestTVDBExpire:
                 side_effect=Exception(
                     'Tried to expire or lookup, less then an hour since last check'
                 ),
-            )
-            and Session() as session
+            ),
+            Session() as session,
         ):  # Ensure series is not marked as expired
             mark_expired(session)
             ep = (
