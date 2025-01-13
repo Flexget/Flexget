@@ -68,14 +68,13 @@ class FilterUpgrade:
 
         for entry in entries:
             # Filter out entries within target
-            if target:
-                if not target_requirement.allows(entry['quality']):
-                    logger.debug(
-                        'Skipping {} as does not meet upgrade quality requirements', entry['title']
-                    )
-                    if action_on_lower:
-                        action_on_lower(entry, 'does not meet upgrade quality requirements')
-                    continue
+            if target and not target_requirement.allows(entry['quality']):
+                logger.debug(
+                    'Skipping {} as does not meet upgrade quality requirements', entry['title']
+                )
+                if action_on_lower:
+                    action_on_lower(entry, 'does not meet upgrade quality requirements')
+                continue
 
             if entry['quality'] < existing.quality:
                 logger.debug('Skipping {} as lower quality then existing', entry['title'])

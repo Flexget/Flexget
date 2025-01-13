@@ -1,3 +1,4 @@
+import contextlib
 import re
 
 from loguru import logger
@@ -189,10 +190,8 @@ class NextSeriesEpisodes:
                                 start_at_ep = max(start_at_ep, series.begin.number)
                             eps_to_get = list(range(start_at_ep, latest_ep_this_season.number + 1))
                             for ep in downloaded_this_season:
-                                try:
+                                with contextlib.suppress(ValueError):
                                     eps_to_get.remove(ep.number)
-                                except ValueError:
-                                    pass
                             entries.extend(
                                 self.search_entry(series, season, x, task, rerun=False)
                                 for x in eps_to_get

@@ -135,9 +135,8 @@ class Subtitles:
                     '^attachment; filename="(.*)"$', f.headers['content-disposition']
                 ).group(1)
                 outfile = os.path.join(config['output'], subfilename)
-                fp = open(outfile, 'w')
-                fp.write(f.raw)
-                fp.close()
+                with open(outfile, 'w') as fp:
+                    fp.write(f.raw)
                 f.close()
 
         s.LogOut(token)

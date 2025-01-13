@@ -374,16 +374,17 @@ class FilterSeries(FilterSeriesBase):
         # scan for problematic names, enable exact mode for them
         for series_name, series_config in all_series.items():
             for name in list(all_series.keys()):
-                if (name.lower().startswith(series_name.lower())) and (
-                    name.lower() != series_name.lower()
+                if (
+                    (name.lower().startswith(series_name.lower()))
+                    and (name.lower() != series_name.lower())
+                    and 'exact' not in series_config
                 ):
-                    if 'exact' not in series_config:
-                        logger.verbose(
-                            'Auto enabling exact matching for series `{}` (reason: `{}`)',
-                            series_name,
-                            name,
-                        )
-                        series_config['exact'] = True
+                    logger.verbose(
+                        'Auto enabling exact matching for series `{}` (reason: `{}`)',
+                        series_name,
+                        name,
+                    )
+                    series_config['exact'] = True
 
     # Run after metainfo_quality and before metainfo_series
     @plugin.priority(125)
@@ -714,13 +715,12 @@ class FilterSeries(FilterSeriesBase):
                 continue
 
             # reject entity that have been marked as watched in config file
-            if entity.series.begin:
-                if entity < entity.series.begin:
-                    for entry in entries:
-                        entry.reject(
-                            f'Entity `{entity.identifier}` is before begin value of `{entity.series.begin.identifier}`'
-                        )
-                    continue
+            if entity.series.begin and entity < entity.series.begin:
+                for entry in entries:
+                    entry.reject(
+                        f'Entity `{entity.identifier}` is before begin value of `{entity.series.begin.identifier}`'
+                    )
+                continue
 
             # skip special episodes if special handling has been turned off
             if not config.get('specials', True) and entity.identified_by == 'special':
@@ -804,9 +804,8 @@ class FilterSeries(FilterSeriesBase):
                 if 'target' in config:
                     if self.process_timeframe_target(config, entries, downloaded):
                         continue
-                elif 'qualities' in config:
-                    if self.process_qualities(config, entries, downloaded):
-                        continue
+                elif 'qualities' in config and self.process_qualities(config, entries, downloaded):
+                    continue
 
                 # We didn't make a quality target match, check timeframe to see
                 # if we should get something anyway
@@ -884,10 +883,9 @@ class FilterSeries(FilterSeriesBase):
         :return: True if accepted something
         """
         req = qualities.Requirements(config['target'])
-        if downloaded:
-            if any(req.allows(release.quality) for release in downloaded):
-                logger.debug('Target quality already achieved.')
-                return True
+        if downloaded and any(req.allows(release.quality) for release in downloaded):
+            logger.debug('Target quality already achieved.')
+            return True
         # scan for quality
         for entry in entries:
             if req.allows(entry['quality']):
@@ -971,19 +969,23 @@ class FilterSeries(FilterSeriesBase):
                 )
             return True
 
-        if latest.identified_by == entity.identified_by and latest.identified_by not in [
-            "date",
-            "auto",
-        ]:
-            if entity < begin:
-                logger.debug(
-                    f'episode {entity.identifier} before begin {begin.identifier}! rejecting all occurrences'
+        if (
+            latest.identified_by == entity.identified_by
+            and latest.identified_by
+            not in [
+                "date",
+                "auto",
+            ]
+            and entity < begin
+        ):
+            logger.debug(
+                f'episode {entity.identifier} before begin {begin.identifier}! rejecting all occurrences'
+            )
+            for entry in entries:
+                entry.reject(
+                    f'Episode `{{entity.identifier}}` is from before series begin value `{begin.identifier}`. '
                 )
-                for entry in entries:
-                    entry.reject(
-                        f'Episode `{{entity.identifier}}` is from before series begin value `{begin.identifier}`. '
-                    )
-                return True
+            return True
 
         # TODO: should not be in tracking ?
         if (
@@ -1088,9 +1090,12 @@ class FilterSeries(FilterSeriesBase):
                 continue
             if any(req.allows(quality) for req in still_needed):
                 # Don't get worse qualities in upgrade mode
-                if config.get('upgrade'):
-                    if downloaded_qualities and quality < max(downloaded_qualities):
-                        continue
+                if (
+                    config.get('upgrade')
+                    and downloaded_qualities
+                    and quality < max(downloaded_qualities)
+                ):
+                    continue
                 entry.accept('quality wanted')
                 downloaded_qualities.append(quality)
                 downloaded.append(entry)

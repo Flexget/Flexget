@@ -134,10 +134,7 @@ class TVDBTokens(Base):
             return True
 
         seconds = (datetime.now() - self.refreshed).total_seconds()
-        if seconds >= 86400:
-            return True
-
-        return False
+        return seconds >= 86400
 
 
 class TVDBSeries(Base):
@@ -498,7 +495,7 @@ def find_series_id(name, language=None):
         s['names'] = [a.lower() for a in s.get('aliases')] if s.get('aliases') else []
         if s.get('seriesName'):
             s['names'].append(s.get('seriesName').lower())
-        s['running'] = True if s['status'] == 'Continuing' else False
+        s['running'] = s['status'] == 'Continuing'
 
         for n in s['names']:
             # Exact matching by stripping our the year

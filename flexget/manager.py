@@ -859,9 +859,7 @@ class Manager:
         if not lock_info:
             return False
         # Don't count it if we hold the lock
-        if os.getpid() == lock_info['pid']:
-            return False
-        return True
+        return os.getpid() != lock_info['pid']
 
     def check_ipc_info(self) -> Optional[dict]:
         """If a daemon has a lock on the database, return info to connect to IPC."""
@@ -967,12 +965,14 @@ class Manager:
         # redirect standard file descriptors
         sys.stdout.flush()
         sys.stderr.flush()
-        si = open(os.devnull)
-        so = open(os.devnull, 'ab+')
-        se = open(os.devnull, 'ab+', 0)
-        os.dup2(si.fileno(), sys.stdin.fileno())
-        os.dup2(so.fileno(), sys.stdout.fileno())
-        os.dup2(se.fileno(), sys.stderr.fileno())
+        with (
+            open(os.devnull) as si,
+            open(os.devnull, 'ab+') as so,
+            open(os.devnull, 'ab+', 0) as se,
+        ):
+            os.dup2(si.fileno(), sys.stdin.fileno())
+            os.dup2(so.fileno(), sys.stdout.fileno())
+            os.dup2(se.fileno(), sys.stderr.fileno())
 
         # If we have a lock, update the lock file with our new pid
         if self._has_lock:

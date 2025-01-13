@@ -115,10 +115,7 @@ class PluginDownload:
         :param tmp_path:
           path to use for temporary files while downloading
         """
-        if entry.get('urls'):
-            urls = entry.get('urls')
-        else:
-            urls = [entry['url']]
+        urls = entry.get('urls') if entry.get('urls') else [entry['url']]
         errors = []
         for url in urls:
             if url.startswith('magnet:'):

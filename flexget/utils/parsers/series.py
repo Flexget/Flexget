@@ -341,9 +341,8 @@ class SeriesParser(TitleParser):
         if self.identified_by in ['date', 'auto']:
             date_match = self.parse_date(data_stripped)
             if date_match:
-                if self.strict_name:
-                    if date_match['match'].start() > 1:
-                        return
+                if self.strict_name and date_match['match'].start() > 1:
+                    return
                 self.id = date_match['date']
                 self.id_groups = date_match['match'].groups()
                 self.id_type = 'date'
@@ -357,9 +356,8 @@ class SeriesParser(TitleParser):
             ep_match = self.parse_episode(data_stripped)
             if ep_match:
                 # strict_name
-                if self.strict_name:
-                    if ep_match['match'].start() > 1:
-                        return
+                if self.strict_name and ep_match['match'].start() > 1:
+                    return
 
                 if ep_match['end_episode'] and ep_match['end_episode'] > ep_match['episode'] + 2:
                     # This is a pack of too many episodes, ignore it.
@@ -411,9 +409,8 @@ class SeriesParser(TitleParser):
                 if match:
                     logger.trace('-> had luck with SEE')
                     # strict_name
-                    if self.strict_name:
-                        if match.start() > 1:
-                            return
+                    if self.strict_name and match.start() > 1:
+                        return
 
                     self.season = int(match.group(1))
                     self.episode = int(match.group(2))
@@ -431,9 +428,8 @@ class SeriesParser(TitleParser):
                 match = re.search(id_re, data_stripped)
                 if match:
                     # strict_name
-                    if self.strict_name:
-                        if match.start() > 1:
-                            return
+                    if self.strict_name and match.start() > 1:
+                        return
                     found_id = '-'.join(g for g in match.groups() if g)
                     if not found_id:
                         # If match groups were all blank, don't accept this match
@@ -459,9 +455,8 @@ class SeriesParser(TitleParser):
                 match = re.search(sequence_re, data_stripped)
                 if match:
                     # strict_name
-                    if self.strict_name:
-                        if match.start() > 1:
-                            return
+                    if self.strict_name and match.start() > 1:
+                        return
                     # First matching group is the sequence number
                     try:
                         self.id = int(match.group(1))
@@ -470,9 +465,8 @@ class SeriesParser(TitleParser):
                     self.season = 0
                     self.episode = self.id
                     # If anime style version was found, overwrite the proper count with it
-                    if 'version' in match.groupdict():
-                        if match.group('version'):
-                            self.proper_count = int(match.group('version')) - 1
+                    if 'version' in match.groupdict() and match.group('version'):
+                        self.proper_count = int(match.group('version')) - 1
                     self.id_type = 'sequence'
                     self.valid = True
                     logger.trace("found id '{}' with regexp '{}'", self.id, sequence_re.pattern)

@@ -290,10 +290,7 @@ class RTorrent:
             self._server.network.xmlrpc.size_limit.set('', xmlrpc_size)
 
         # Call load method and return the response
-        if start:
-            result = self._server.load.raw_start(*params)
-        else:
-            result = self._server.load.raw(*params)
+        result = self._server.load.raw_start(*params) if start else self._server.load.raw(*params)
 
         if xmlrpc_size > 524288:
             self._server.network.xmlrpc.size_limit.set('', prev_size)
@@ -630,30 +627,29 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
             entry.fail(f"failed to render properties {e!s}")
             return
 
-        if existing and 'directory' in options:
-            # Check if changing to another directory which requires a move
-            if options['directory'] != existing['base_path'] and options[
-                'directory'
-            ] != os.path.dirname(existing['base_path']):
-                try:
-                    logger.verbose(
-                        "Path is changing, moving files from '{}' to '{}'",
-                        existing['base_path'],
-                        options['directory'],
-                    )
-                    client.move(info_hash, options['directory'])
-                except xmlrpc_client.Error as e:
-                    entry.fail(f'Failed moving torrent: {e!s}')
-                    return
+        # Check if changing to another directory which requires a move
+        if (
+            existing
+            and 'directory' in options
+            and options['directory'] != existing['base_path']
+            and options['directory'] != os.path.dirname(existing['base_path'])
+        ):
+            try:
+                logger.verbose(
+                    "Path is changing, moving files from '{}' to '{}'",
+                    existing['base_path'],
+                    options['directory'],
+                )
+                client.move(info_hash, options['directory'])
+            except xmlrpc_client.Error as e:
+                entry.fail(f'Failed moving torrent: {e!s}')
+                return
 
         # Remove directory from update otherwise rTorrent will append the title to the directory path
         if 'directory' in options:
             del options['directory']
 
-        if 'custom_fields' in options:
-            custom_fields = options.pop('custom_fields')
-        else:
-            custom_fields = {}
+        custom_fields = options.pop('custom_fields') if 'custom_fields' in options else {}
 
         try:
             client.update(info_hash=info_hash, fields=options, custom_fields=custom_fields)

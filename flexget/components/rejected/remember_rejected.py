@@ -89,9 +89,8 @@ class FilterRememberRejected:
         if not entry.get('title') or not entry.get('original_url'):
             logger.debug('Can\'t remember rejection for entry without title or url.')
             return
-        if remember_time:
-            if isinstance(remember_time, str):
-                remember_time = parse_timedelta(remember_time)
+        if remember_time and isinstance(remember_time, str):
+            remember_time = parse_timedelta(remember_time)
         message = 'Remembering rejection of `{}`'.format(entry['title'])
         if remember_time:
             message += f' for {remember_time.seconds / 60} minutes'

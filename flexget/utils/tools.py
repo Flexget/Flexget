@@ -1,6 +1,7 @@
 """Contains miscellaneous helpers"""
 
 import ast
+import contextlib
 import copy
 import hashlib
 import locale
@@ -173,10 +174,8 @@ io_encoding = ''
 if hasattr(sys.stdout, 'encoding'):
     io_encoding = sys.stdout.encoding
 if not io_encoding:
-    try:
+    with contextlib.suppress(Exception):
         io_encoding = locale.getpreferredencoding()
-    except Exception:
-        pass
 if not io_encoding:
     # Default to utf8 if nothing can be determined
     io_encoding = 'utf8'
@@ -422,7 +421,7 @@ def get_config_hash(config: Any) -> str:
     :param dict config: Configuration
     :return: MD5 hash for *config*
     """
-    if isinstance(config, dict) or isinstance(config, list):
+    if isinstance(config, (dict, list)):
         # this does in fact support nested dicts, they're sorted too!
         return hashlib.md5(pformat(config).encode('utf-8')).hexdigest()
     else:

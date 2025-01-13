@@ -89,10 +89,7 @@ class UrlRewriteAllyoulike:
             if len(links) > num_links:
                 link_list = links
                 num_links = len(links)
-        if 'urls' in entry:
-            urls = list(entry['urls'])
-        else:
-            urls = []
+        urls = list(entry['urls']) if 'urls' in entry else []
         if link_list is not None:
             for link in link_list:
                 urls.append(normalize_unicode(link['href']))

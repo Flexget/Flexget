@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import contextlib
 import logging
 import os
 import posixpath
@@ -100,10 +101,8 @@ class TestSFTPServerController:
             logger.critical(e, exc_info=True)
 
     def kill(self) -> None:
-        try:
+        with contextlib.suppress(OSError):
             self.__server_socket.shutdown(socket.SHUT_RDWR)
-        except OSError:
-            pass
         self.__server_socket.close()
         logger.setLevel(logging.INFO)
 
@@ -291,15 +290,9 @@ class TestSFTPServer(SFTPServerInterface):
             attr._flags &= ~attr.FLAG_PERMISSIONS
             SFTPServer.set_file_attr(path, attr)
         if flags & os.O_WRONLY:
-            if flags & os.O_APPEND:
-                file_mode = 'ab'
-            else:
-                file_mode = 'wb'
+            file_mode = "ab" if flags & os.O_APPEND else "wb"
         elif flags & os.O_RDWR:
-            if flags & os.O_APPEND:
-                file_mode = 'a+b'
-            else:
-                file_mode = 'r+b'
+            file_mode = "a+b" if flags & os.O_APPEND else "r+b"
         else:
             # O_RDONLY
             file_mode = 'rb'

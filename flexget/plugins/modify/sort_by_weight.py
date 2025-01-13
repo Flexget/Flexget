@@ -103,16 +103,15 @@ class PluginSortByWeight:
     def prepare_config(self, config):
         settings = {}
         for entry in config:
-            if isinstance(entry, dict):
-                if entry.get('field') and not entry.get('field').isspace():
-                    key = entry.get('field')
-                    settings[key] = entry
-                    delta = settings[key].get('delta_distance')
-                    if delta and isinstance(delta, str):
-                        settings[key]['delta_distance'] = parse_timedelta(delta)
-                    limit = settings[key].get('upper_limit')
-                    if limit and isinstance(limit, str):
-                        settings[key]['upper_limit'] = parse_timedelta(limit)
+            if isinstance(entry, dict) and entry.get('field') and not entry.get('field').isspace():
+                key = entry.get('field')
+                settings[key] = entry
+                delta = settings[key].get('delta_distance')
+                if delta and isinstance(delta, str):
+                    settings[key]['delta_distance'] = parse_timedelta(delta)
+                limit = settings[key].get('upper_limit')
+                if limit and isinstance(limit, str):
+                    settings[key]['upper_limit'] = parse_timedelta(limit)
         return settings
 
     @plugin.priority(127)  # run after default filters

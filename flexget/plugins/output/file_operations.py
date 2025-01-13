@@ -302,11 +302,14 @@ class TransformingOps(BaseFileOps):
         dst_file, dst_ext = os.path.splitext(dst)
 
         # Check dst contains src_ext
-        if config.get('keep_extension', entry.get('keep_extension', True)):
-            if not src_isdir and dst_ext != src_ext:
-                self.logger.verbose('Adding extension `{}` to dst `{}`', src_ext, dst)
-                dst += src_ext
-                dst_file += dst_ext  # this is used for sibling files. dst_ext turns out not to be an extension!
+        if (
+            config.get('keep_extension', entry.get('keep_extension', True))
+            and not src_isdir
+            and dst_ext != src_ext
+        ):
+            self.logger.verbose('Adding extension `{}` to dst `{}`', src_ext, dst)
+            dst += src_ext
+            dst_file += dst_ext  # this is used for sibling files. dst_ext turns out not to be an extension!
 
         funct_name = 'move' if self.move else 'copy'
         funct_done = 'moved' if self.move else 'copied'

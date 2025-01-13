@@ -130,20 +130,20 @@ class TransmissionBase:
 
         if torrent.get('seedRatioMode') == 1:  # use torrent's own seed ratio limit
             seed_limit_ok = torrent.upload_ratio >= torrent.seed_ratio_limit
-        elif torrent.get('seedRatioMode') == 0:  # use global rules
-            if session.seed_ratio_limited:
-                seed_limit_ok = torrent.upload_ratio >= session.seed_ratio_limit
+        elif torrent.get('seedRatioMode') == 0 and session.seed_ratio_limited:  # use global rules
+            seed_limit_ok = torrent.upload_ratio >= session.seed_ratio_limit
 
         if torrent.get('seedIdleMode') == 1:  # use torrent's own idle limit
             idle_limit_ok = (
                 torrent.activity_date + timedelta(minutes=torrent.seed_idle_limit) < pendulum.now()
             )
-        elif torrent.get('seedIdleMode') == 0:  # use global rules
-            if session.idle_seeding_limit_enabled:
-                idle_limit_ok = (
-                    torrent.activity_date + timedelta(minutes=session.idle_seeding_limit)
-                    < pendulum.now()
-                )
+        elif (
+            torrent.get('seedIdleMode') == 0 and session.idle_seeding_limit_enabled
+        ):  # use global rules
+            idle_limit_ok = (
+                torrent.activity_date + timedelta(minutes=session.idle_seeding_limit)
+                < pendulum.now()
+            )
 
         return seed_limit_ok, idle_limit_ok
 
@@ -163,14 +163,13 @@ class TransmissionBase:
         # Mark rpc client for garbage collector so every task can start
         # a fresh new according its own config - fix to bug #2804
         config = self.prepare_config(config)
-        if config['enabled']:
-            if task.options.test:
-                logger.info('Trying to connect to transmission...')
-                client = self.create_rpc_client(config)
-                if client:
-                    logger.info('Successfully connected to transmission.')
-                else:
-                    logger.error('It looks like there was a problem connecting to transmission.')
+        if config['enabled'] and task.options.test:
+            logger.info('Trying to connect to transmission...')
+            client = self.create_rpc_client(config)
+            if client:
+                logger.info('Successfully connected to transmission.')
+            else:
+                logger.error('It looks like there was a problem connecting to transmission.')
 
 
 class PluginTransmissionInput(TransmissionBase):
@@ -522,20 +521,20 @@ class PluginTransmission(TransmissionBase):
                         if find_main_file and file.size > total_size * main_ratio:
                             main_id = file_id
 
-                        if 'include_files' in options['post']:
-                            if any(
+                        if 'include_files' in options['post'] and (
+                            any(
                                 fnmatch(file.name, mask)
                                 for mask in options['post']['include_files']
-                            ):
-                                dl_list.append(file_id)
-                            elif options['post'].get('include_subs') and any(
-                                fnmatch(file.name, mask) for mask in ext_list
-                            ):
-                                dl_list.append(file_id)
+                            )
+                            or (
+                                options['post'].get('include_subs')
+                                and any(fnmatch(file.name, mask) for mask in ext_list)
+                            )
+                        ):
+                            dl_list.append(file_id)
 
-                        if skip_files:
-                            if any(fnmatch(file.name, mask) for mask in skip_files):
-                                skip_list.append(file_id)
+                        if skip_files and any(fnmatch(file.name, mask) for mask in skip_files):
+                            skip_list.append(file_id)
 
                     if main_id is not None:
                         # Look for files matching main ID title but with a different extension
@@ -902,27 +901,26 @@ class PluginTransmissionClean(TransmissionBase):
                 seed_ratio_ok, idle_limit_ok = self.check_seed_limits(torrent, session)
                 if not seed_ratio_ok or not idle_limit_ok:
                     continue
-            if 'min_ratio' in config:
-                if torrent.ratio < config['min_ratio']:
-                    continue
+            if 'min_ratio' in config and torrent.ratio < config['min_ratio']:
+                continue
             if 'finished_for' in config:
                 # done date might be invalid if this torrent was added to transmission when already completed
                 started_seeding = max(torrent.added_date, torrent.done_date)
                 if started_seeding + parse_timedelta(config['finished_for']) > datetime.now():
                     continue
             tracker_hosts = [urlparse(tracker.announce).hostname for tracker in torrent.trackers]
-            if 'tracker' in config:
-                if not any(tracker_re.search(tracker) for tracker in tracker_hosts):
-                    continue
-            if 'preserve_tracker' in config:
-                if any(preserve_tracker_re.search(tracker) for tracker in tracker_hosts):
-                    continue
-            if config.get('directories'):
-                if not any(
-                    re.search(d, torrent.download_dir, re.IGNORECASE)
-                    for d in config['directories']
-                ):
-                    continue
+            if 'tracker' in config and not any(
+                tracker_re.search(tracker) for tracker in tracker_hosts
+            ):
+                continue
+            if 'preserve_tracker' in config and any(
+                preserve_tracker_re.search(tracker) for tracker in tracker_hosts
+            ):
+                continue
+            if config.get('directories') and not any(
+                re.search(d, torrent.download_dir, re.IGNORECASE) for d in config['directories']
+            ):
+                continue
             if task.options.test:
                 logger.info('Would remove finished torrent `{}` from transmission', torrent.name)
                 continue

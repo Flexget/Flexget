@@ -280,9 +280,7 @@ class Entry(LazyDict, Serializer):
             return False
         if not isinstance(self['url'], str):
             return False
-        if not isinstance(self['title'], str):
-            return False
-        return True
+        return isinstance(self['title'], str)
 
     def update_using_map(
         self, field_map: dict, source_item: Union[dict, object], ignore_none: bool = False

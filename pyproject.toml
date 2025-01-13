@@ -134,37 +134,15 @@ exclude = ["/flexget/tests"]
 addopts = '-p no:legacypath'
 testpaths = ["flexget/tests"]
 
-# We switched to using ruff for formatting, but leaving this in for now
-# for anybody that's using black manually.
-[tool.black]
-line-length = 99
-skip-string-normalization = true
-target-version = ['py39', 'py310', 'py311', 'py312', 'py313']
-# Only include files in /flexget/, or directly in project root
-include = '^/(flexget/.*)?[^/]*\.pyi?$'
-exclude = '''
-(
-  /(
-      \.git
-    | \.venv
-    | \.idea
-    | dist
-    | flexget/ui
-  )/
-)
-'''
-
 [tool.ruff]
 line-length = 99
 extend-exclude = ["flexget/ui"]
 
 [tool.ruff.lint]
-select = ["C4", "E", "F", "I", "ISC", "PGH", "PLE", "RUF", "TCH", "UP"]
+select = ["C4", "E", "F", "I", "ISC", "PGH", "PLE", "RUF", "SIM", "TCH", "UP"]
 ignore = [
-    "E501", # We leave line length up to black
-    "ISC001", # Ruff recommends disabling this when using the ruff formatter
-    "PLE1205", # Thinks we are using stdlib logging rather than loguru
-    "RUF001", # Some of these ambiguous unicode are in tests on purpose
+    "E501", # TODO: enable this rule (requires a lot of manual work)
+    "PLE1205", # Maybe can re-enable after https://github.com/astral-sh/ruff/issues/13390
     "RUF012", # Maybe can re-enable after https://github.com/astral-sh/ruff/issues/5243
 ]
 

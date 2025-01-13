@@ -469,23 +469,25 @@ class RadarrSet(MutableSet):
         for movie_entry in self.items:
             # First check if any of the id attributes match
             for id_attribute in ["tmdb_id", "imdb_id", "radarr_id"]:
-                if id_attribute in entry and id_attribute in movie_entry:
-                    if entry[id_attribute] == movie_entry[id_attribute]:
-                        # Perfect match!
-                        return movie_entry
+                if (
+                    id_attribute in entry
+                    and id_attribute in movie_entry
+                    and entry[id_attribute] == movie_entry[id_attribute]
+                ):
+                    # Perfect match!
+                    return movie_entry
 
             # Then we check if the title matches
             movie_name = entry.get("movie_name")
             movie_year = entry.get("movie_year")
-            if movie_name:
-                if movie_name.lower() == movie_entry["movie_name"].lower():
-                    # The name matches. If we also have a year lets check that as well.
-                    if movie_year == movie_entry.get("movie_year", object()):
-                        # Movie name and year matches
-                        return movie_entry
-                    else:
-                        # The movie had no year present
-                        return movie_entry
+            if movie_name and movie_name.lower() == movie_entry["movie_name"].lower():
+                # The name matches. If we also have a year lets check that as well.
+                if movie_year == movie_entry.get("movie_year", object()):
+                    # Movie name and year matches
+                    return movie_entry
+                else:
+                    # The movie had no year present
+                    return movie_entry
 
             # Last resort is just to compare the title straight off
             title = entry.get("title").lower()

@@ -128,11 +128,8 @@ class InputRSS:
 
     def build_config(self, config):
         """Set default values to config"""
-        if isinstance(config, str):
-            config = {'url': config}
-        else:
-            # Make a copy so that original config is not modified
-            config = dict(config)
+        # Make a copy so that original config is not modified
+        config = {'url': config} if isinstance(config, str) else dict(config)
         # set the default link value to 'auto'
         config.setdefault('link', 'auto')
         # Convert any field names from the config to format feedparser will use for 'link', 'title' and 'other_fields'
@@ -373,7 +370,7 @@ class InputRSS:
                             task.name, config['url']
                         )
                     )
-                elif isinstance(ex, http.client.BadStatusLine) or isinstance(ex, OSError):
+                elif isinstance(ex, (http.client.BadStatusLine, OSError)):
                     raise ex  # let the @internet decorator handle
                 else:
                     # all other bozo errors
@@ -392,10 +389,9 @@ class InputRSS:
                 rss.entries
                 and rss.entries[0].get('published_parsed')
                 and rss.entries[-1].get('published_parsed')
-            ):
-                if rss.entries[0]['published_parsed'] < rss.entries[-1]['published_parsed']:
-                    # Sort them if they are not
-                    rss.entries.sort(key=lambda x: x['published_parsed'], reverse=True)
+            ) and rss.entries[0]['published_parsed'] < rss.entries[-1]['published_parsed']:
+                # Sort them if they are not
+                rss.entries.sort(key=lambda x: x['published_parsed'], reverse=True)
             last_entry_id = task.simple_persistence.get(f'{url_hash}_last_entry')
 
         # new entries to be created
@@ -580,12 +576,11 @@ class InputRSS:
                     'rss feed location saving skipped: no title information in first entry'
                 )
 
-        if ignored:
-            if not config.get('silent'):
-                logger.warning(
-                    'Skipped %s RSS-entries without required information (title, link or enclosures)',
-                    ignored,
-                )
+        if ignored and not config.get('silent'):
+            logger.warning(
+                'Skipped %s RSS-entries without required information (title, link or enclosures)',
+                ignored,
+            )
 
         return entries
 

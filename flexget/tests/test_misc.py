@@ -349,8 +349,8 @@ class TestCoercingDateTime:
 
     def test_ne(self):
         now = CoercingDateTime.now()
-        assert not (now != now.naive())
-        assert not (now.naive() != now)
+        assert now == now.naive()
+        assert now.naive() == now
 
     def test_sub(self):
         now = CoercingDateTime.now()

@@ -106,7 +106,7 @@ class ClientService(rpyc.Service):
         self._conn = conn
         """Make sure the client version matches our own."""
         daemon_version = self._conn.root.version()
-        if IPC_VERSION != daemon_version:
+        if daemon_version != IPC_VERSION:
             self._conn.close()
             raise ValueError('Daemon is different version than client.')
         super().on_connect(conn)

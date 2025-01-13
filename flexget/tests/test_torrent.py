@@ -224,7 +224,7 @@ class TestTorrentScrub:
             msize = tmp_path.joinpath(filename).stat().st_size
 
             # Dump small torrents on demand
-            if 0 and not clean:
+            if False:
                 print(f"original={original.content!r}")
                 print(f"modified={modified.content!r}")
 

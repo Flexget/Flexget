@@ -15,9 +15,9 @@ class UrlRewriteFTDB:
 
     def url_rewritable(self, task, entry):
         # url = entry['url']
-        if re.match(r'^http://www\.frenchtorrentdb\.com/[^/]+(?!/)[^/]+&rss=1', entry['url']):
-            return True
-        return False
+        return bool(
+            re.match('^http://www\\.frenchtorrentdb\\.com/[^/]+(?!/)[^/]+&rss=1', entry['url'])
+        )
 
     def url_rewrite(self, task, entry):
         old_url = entry['url']

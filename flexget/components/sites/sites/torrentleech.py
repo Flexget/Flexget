@@ -72,9 +72,7 @@ class UrlRewriteTorrentleech:
         url = entry['url']
         if url.endswith('.torrent'):
             return False
-        if url.startswith('https://www.torrentleech.org/'):
-            return True
-        return False
+        return bool(url.startswith('https://www.torrentleech.org/'))
 
     # urlrewriter API
     def url_rewrite(self, task, entry):

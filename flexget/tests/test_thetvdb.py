@@ -218,22 +218,25 @@ class TestTVDBExpire:
 
         # Should not expire as it was checked less then an hour ago
         persist['last_check'] = datetime.utcnow() - timedelta(hours=1)
-        with mock.patch(
-            'requests.sessions.Session.request',
-            side_effect=Exception('Tried to expire or lookup, less then an hour since last check'),
-        ):
-            # Ensure series is not marked as expired
-            with Session() as session:
-                mark_expired(session)
-                ep = (
-                    session.query(TVDBEpisode)
-                    .filter(TVDBEpisode.series_id == 73255)
-                    .filter(TVDBEpisode.episode_number == 2)
-                    .filter(TVDBEpisode.season_number == 2)
-                    .first()
-                )
-                assert not ep.expired
-                assert not ep.series.expired
+        with (
+            mock.patch(
+                'requests.sessions.Session.request',
+                side_effect=Exception(
+                    'Tried to expire or lookup, less then an hour since last check'
+                ),
+            ),
+            Session() as session,
+        ):  # Ensure series is not marked as expired
+            mark_expired(session)
+            ep = (
+                session.query(TVDBEpisode)
+                .filter(TVDBEpisode.series_id == 73255)
+                .filter(TVDBEpisode.episode_number == 2)
+                .filter(TVDBEpisode.season_number == 2)
+                .first()
+            )
+            assert not ep.expired
+            assert not ep.series.expired
 
     def test_expire_check(self, execute_task):
         persist['auth_tokens'] = {'default': None}
@@ -256,18 +259,20 @@ class TestTVDBExpire:
         ]
 
         # Ensure series is marked as expired
-        with mock.patch.object(TVDBRequest, 'get', side_effect=[expired_data]):
-            with Session() as session:
-                mark_expired(session)
-                ep = (
-                    session.query(TVDBEpisode)
-                    .filter(TVDBEpisode.series_id == 73255)
-                    .filter(TVDBEpisode.episode_number == 2)
-                    .filter(TVDBEpisode.season_number == 2)
-                    .first()
-                )
-                assert ep.expired
-                assert ep.series.expired
+        with (
+            mock.patch.object(TVDBRequest, 'get', side_effect=[expired_data]),
+            Session() as session,
+        ):
+            mark_expired(session)
+            ep = (
+                session.query(TVDBEpisode)
+                .filter(TVDBEpisode.series_id == 73255)
+                .filter(TVDBEpisode.episode_number == 2)
+                .filter(TVDBEpisode.season_number == 2)
+                .first()
+            )
+            assert ep.expired
+            assert ep.series.expired
 
         # Run the task again, should be re-populated from tvdb
         test_run()

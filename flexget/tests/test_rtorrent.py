@@ -39,7 +39,7 @@ class TestRTorrentClient:
 
         called_args = mocked_proxy.load.raw_start.call_args_list[0][0]
         assert len(called_args) == 5
-        assert '' == called_args[0]
+        assert called_args[0] == ''
         assert xmlrpc_client.Binary(torrent_raw) in called_args
 
         fields = list(called_args[2:])

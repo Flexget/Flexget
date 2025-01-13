@@ -339,10 +339,7 @@ class PluginInfo(dict):
                 if not callable(method):
                     continue
                 # check for priority decorator
-                if hasattr(method, 'priority'):
-                    handler_prio = method.priority
-                else:
-                    handler_prio = PRIORITY_DEFAULT
+                handler_prio = method.priority if hasattr(method, 'priority') else PRIORITY_DEFAULT
                 event = add_phase_handler(f'plugin.{self.name}.{phase}', method, handler_prio)
                 # provides backwards compatibility
                 event.plugin = self
@@ -589,13 +586,11 @@ def get_plugins(
             return False
         if interface and interface not in plugin.interfaces:
             return False
-        if category and not category == plugin.category:
+        if category and category != plugin.category:
             return False
         if name is not None and name != plugin.name:
             return False
-        if min_api is not None and plugin.api_ver < min_api:
-            return False
-        return True
+        return not (min_api is not None and plugin.api_ver < min_api)
 
     return filter(matches, iter(plugins.values()))
 

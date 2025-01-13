@@ -65,7 +65,7 @@ class FilterIf:
                 requirement, action = next(iter(item.items()))
                 passed_entries = (e for e in task.entries if self.check_condition(requirement, e))
                 if isinstance(action, str):
-                    if not phase == 'filter':
+                    if phase != 'filter':
                         continue
                     # Simple entry action (accept, reject or fail) was specified as a string
                     for entry in passed_entries:

@@ -416,13 +416,13 @@ class PluginSubtitleList:
     @classmethod
     def _expired(cls, file, config):
         added_interval = file['added'].diff()
-        if file['remove_after'] and added_interval > parse_timedelta(file['remove_after']):
-            return True
-        elif config.get('remove_after') and added_interval > parse_timedelta(
-            config['remove_after']
-        ):
-            return True
-        return False
+        return bool(
+            (file['remove_after'] and added_interval > parse_timedelta(file['remove_after']))
+            or (
+                config.get('remove_after')
+                and added_interval > parse_timedelta(config['remove_after'])
+            )
+        )
 
 
 @event('plugin.register')

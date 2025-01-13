@@ -1,3 +1,5 @@
+import contextlib
+
 from loguru import logger
 
 from flexget import plugin
@@ -97,10 +99,8 @@ class Letterboxd:
         entry = Entry(result)
         entry['url'] = url
         entry['letterboxd_list'] = '{} ({})'.format(config['list'], config['username'])
-        try:
+        with contextlib.suppress(AttributeError):
             entry['letterboxd_score'] = float(soup.find(itemprop='average').get('content'))
-        except AttributeError:
-            pass
         if config['list'] == 'diary':
             entry['letterboxd_uscore'] = int(
                 film.find_next(attrs={'data-rating': True}).get('data-rating')

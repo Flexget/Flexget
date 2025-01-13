@@ -53,10 +53,7 @@ class OutputFtp:
         return config
 
     def ftp_connect(self, config, ftp_url, current_path):
-        if config['use-ssl']:
-            ftp = ftplib.FTP_TLS()
-        else:
-            ftp = ftplib.FTP()
+        ftp = ftplib.FTP_TLS() if config['use-ssl'] else ftplib.FTP()
 
         # ftp.set_debuglevel(2)
         logger.debug('Connecting to ' + ftp_url.hostname)
@@ -177,7 +174,7 @@ class OutputFtp:
         if not os.path.exists(tmp_path):
             os.makedirs(tmp_path)
 
-        local_file = open(os.path.join(tmp_path, file_name), 'a+b')
+        local_file = open(os.path.join(tmp_path, file_name), 'a+b')  # noqa: SIM115
         ftp = self.check_connection(ftp, config, ftp_url, current_path)
         try:
             ftp.sendcmd("TYPE I")
@@ -203,7 +200,7 @@ class OutputFtp:
                         # Delete the downloaded file and try again from the beginning.
                         local_file.close()
                         os.remove(os.path.join(tmp_path, file_name))
-                        local_file = open(os.path.join(tmp_path, file_name), 'a+b')
+                        local_file = open(os.path.join(tmp_path, file_name), 'a+b')  # noqa: SIM115
                         max_attempts -= 1
 
                     size_at_last_err = local_file.tell()

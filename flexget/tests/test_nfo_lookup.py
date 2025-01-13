@@ -78,7 +78,7 @@ class TestNfoLookupWithMovies:
         task = execute_task('test_1')
         for entry in task.entries:
             # Get all 'nfo' keys in the entry. In this test the info file only has the 'id' field
-            nfo_keys = sorted([i for i in entry.keys() if i[:3] == 'nfo'])
+            nfo_keys = sorted([i for i in entry if i[:3] == 'nfo'])
             assert nfo_keys == ['nfo_id']
 
             assert entry['title'] == 'A Bela e a Fera'  # This will be == to filename
@@ -98,7 +98,7 @@ class TestNfoLookupWithMovies:
         task = execute_task('test_2')
         for entry in task.entries:
             # Get all 'nfo' keys in the entry
-            nfo_keys = sorted([i for i in entry.keys() if i[:3] == 'nfo'])
+            nfo_keys = sorted([i for i in entry if i[:3] == 'nfo'])
             assert nfo_keys == ['nfo_id', 'nfo_title']
 
             assert entry['title'] == 'Bela e Fera'  # This will be == to filename
@@ -114,7 +114,7 @@ class TestNfoLookupWithMovies:
             assert entry['title'] == 'A Bela e a Fera'  # This will be == to filename
 
             # Get all 'nfo' keys in the entry
-            nfo_keys = sorted([i for i in entry.keys() if i[:3] == 'nfo'])
+            nfo_keys = sorted([i for i in entry if i[:3] == 'nfo'])
             assert nfo_keys == ['nfo_id', 'nfo_originaltitle', 'nfo_title']
 
             assert entry['title'] == 'A Bela e a Fera'  # This will be == to filename
@@ -129,7 +129,7 @@ class TestNfoLookupWithMovies:
         task = execute_task('test_4')
         for entry in task.entries:
             # Get all 'nfo' keys in the entry
-            nfo_keys = sorted([i for i in entry.keys() if i[:3] == 'nfo'])
+            nfo_keys = sorted([i for i in entry if i[:3] == 'nfo'])
             assert nfo_keys == ['nfo_id', 'nfo_plot', 'nfo_title']
 
             assert entry['title'] == 'A Bela e a Fera'  # This will be == to filename
@@ -148,7 +148,7 @@ class TestNfoLookupWithMovies:
         task = execute_task('test_5')
         for entry in task.entries:
             # Get all 'nfo' keys in the entry
-            nfo_keys = sorted([i for i in entry.keys() if i[:3] == 'nfo'])
+            nfo_keys = sorted([i for i in entry if i[:3] == 'nfo'])
             assert nfo_keys == ['nfo_genre', 'nfo_id']
 
             # Check that the 'nfo_id' field is set to the correct movie
@@ -160,7 +160,7 @@ class TestNfoLookupWithMovies:
         task = execute_task('test_6')
         for entry in task.entries:
             # Get all 'nfo' keys in the entry
-            nfo_keys = sorted([i for i in entry.keys() if i[:3] == 'nfo'])
+            nfo_keys = sorted([i for i in entry if i[:3] == 'nfo'])
             assert nfo_keys == []
 
             assert entry['title'] == 'A Bela e a Fera'  # This will be == to filename
@@ -177,7 +177,7 @@ class TestNfoLookupWithMovies:
         # This is the same as not having an nfo file
         for entry in task.entries:
             # Get all 'nfo' keys in the entry
-            nfo_keys = sorted([i for i in entry.keys() if i[:3] == 'nfo'])
+            nfo_keys = sorted([i for i in entry if i[:3] == 'nfo'])
             assert nfo_keys == []
 
             # Since there is no nfo file then an IMDB search is performed only with the filename. That means that we
@@ -218,17 +218,17 @@ class TestNfoLookupWithMovies:
         task = execute_task('test_9')
         for entry in task.entries:
             # Get all 'nfo' keys in the entry
-            nfo_keys = [i for i in entry.keys() if i[:3] == 'nfo']
+            nfo_keys = [i for i in entry if i[:3] == 'nfo']
             assert nfo_keys == []
 
-            imdb_keys = [i for i in entry.keys() if i[:4] == 'imdb']
+            imdb_keys = [i for i in entry if i[:4] == 'imdb']
             assert imdb_keys == []
 
     def test_nfo_with_id_title_and_actors(self, execute_task):
         task = execute_task('test_10')
         for entry in task.entries:
             # Get all 'nfo' keys in the entry
-            nfo_keys = sorted([i for i in entry.keys() if i[:3] == 'nfo'])
+            nfo_keys = sorted([i for i in entry if i[:3] == 'nfo'])
             assert nfo_keys == ['nfo_actor', 'nfo_id', 'nfo_title']
 
             # Check that the 'nfo_id' field is set to the correct movie
@@ -258,7 +258,7 @@ class TestNfoLookupWithMovies:
         task = execute_task('test_11')
         for entry in task.entries:
             # Get all 'nfo' keys in the entry
-            nfo_keys = sorted([i for i in entry.keys() if i[:3] == 'nfo'])
+            nfo_keys = sorted([i for i in entry if i[:3] == 'nfo'])
             assert nfo_keys == [
                 'nfo_actor',
                 'nfo_country',
@@ -326,18 +326,18 @@ class TestNfoLookupWithMovies:
         task = execute_task('test_12')
         for entry in task.entries:
             # Get all 'nfo' keys in the entry. In this test the info file only has the 'id' field
-            nfo_keys = sorted([i for i in entry.keys() if i[:3] == 'nfo'])
+            nfo_keys = sorted([i for i in entry if i[:3] == 'nfo'])
             # Since the nfo file is invalid (there was some parse error) then there is no nfo fields.
             assert nfo_keys == []
 
     def test_nfo_with_invalid_imdb_id(self, execute_task):
         task = execute_task('test_13')
         for entry in task.entries:
-            nfo_keys = sorted([i for i in entry.keys() if i[:3] == 'nfo'])
+            nfo_keys = sorted([i for i in entry if i[:3] == 'nfo'])
             assert nfo_keys == ['nfo_id', 'nfo_title']
 
             # Since the id in the nfo file is not a valid IMDB Id then it was not added to the entry
-            imdb_keys = sorted([i for i in entry.keys() if i[:4] == 'imdb'])
+            imdb_keys = sorted([i for i in entry if i[:4] == 'imdb'])
             assert imdb_keys == []
 
             assert entry['title'] == 'A Bela e a Fera'  # This will be == to filename

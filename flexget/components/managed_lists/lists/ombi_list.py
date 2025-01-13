@@ -112,10 +112,9 @@ class OmbiRequest:
 
             raise e
 
-        if isinstance(result, dict):
-            if result.get('isError'):
-                log.debug(result)
-                raise ApiError(result)
+        if isinstance(result, dict) and result.get('isError'):
+            log.debug(result)
+            raise ApiError(result)
 
         return result
 
@@ -765,11 +764,11 @@ class OmbiSet(MutableSet):
         for item in self.items:
             # Search with all the supported ids
             for id in SUPPORTED_IDS:
-                # First find the correct show
-                if entry.get(id, False) == item.get(id, True):
-                    # Then find the correct season
-                    if entry.get('tmdb_season', False) == item.get('tmdb_season', True):
-                        return item
+                # First find the correct show, then find the correct season
+                if entry.get(id, False) == item.get(id, True) and entry.get(
+                    'tmdb_season', False
+                ) == item.get('tmdb_season', True):
+                    return item
 
         return None
 
@@ -779,13 +778,13 @@ class OmbiSet(MutableSet):
         for item in self.items:
             # Search with all the supported ids
             for id in SUPPORTED_IDS:
-                # First find the correct show
-                if entry.get(id, False) == item.get(id, True):
-                    # Then find the correct season
-                    if entry.get('tmdb_season', False) == item.get('tmdb_season', True):
-                        # Then find the correct episode
-                        if entry.get('tmdb_episode', False) == item.get('tmdb_episode', True):
-                            return item
+                # First find the correct show, then find the correct season and the correct episode
+                if (
+                    entry.get(id, False) == item.get(id, True)
+                    and entry.get('tmdb_season', False) == item.get('tmdb_season', True)
+                    and entry.get('tmdb_episode', False) == item.get('tmdb_episode', True)
+                ):
+                    return item
 
         return None
 
@@ -814,9 +813,8 @@ class OmbiSet(MutableSet):
 
         if season or episode:
             temptitle = temptitle + ' ' + self.generate_series_id(season, episode)
-            if episode:
-                if episode.get('title') and self.config.get('include_ep_title'):
-                    temptitle = temptitle + ' ' + episode.get('title')
+            if episode and episode.get('title') and self.config.get('include_ep_title'):
+                temptitle = temptitle + ' ' + episode.get('title')
 
         return temptitle
 

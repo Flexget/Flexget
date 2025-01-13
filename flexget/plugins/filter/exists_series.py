@@ -118,10 +118,12 @@ class FilterExistsSeries:
                                 if entry['series_parser'].quality > disk_parser.quality:
                                     logger.trace('better quality')
                                     continue
-                            elif config.get('allow_different_qualities'):
-                                if disk_parser.quality != entry['series_parser'].quality:
-                                    logger.trace('wrong quality')
-                                    continue
+                            elif (
+                                config.get('allow_different_qualities')
+                                and disk_parser.quality != entry['series_parser'].quality
+                            ):
+                                logger.trace('wrong quality')
+                                continue
                             logger.debug(
                                 'entry parser.proper_count = {}',
                                 entry['series_parser'].proper_count,

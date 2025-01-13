@@ -1,3 +1,4 @@
+import contextlib
 import logging
 import os
 import tempfile
@@ -33,7 +34,7 @@ class MetainfoSubs:
         from dogpile.cache.exception import RegionAlreadyConfigured
         from subliminal.cli import MutexLock
 
-        try:
+        with contextlib.suppress(RegionAlreadyConfigured):
             subliminal.region.configure(
                 'dogpile.cache.dbm',
                 arguments={
@@ -41,8 +42,6 @@ class MetainfoSubs:
                     'lock_factory': MutexLock,
                 },
             )
-        except RegionAlreadyConfigured:
-            pass
         logging.getLogger("subliminal").setLevel(logging.CRITICAL)
         logging.getLogger("enzyme").setLevel(logging.WARNING)
 

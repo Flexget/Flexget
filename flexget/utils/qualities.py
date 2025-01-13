@@ -379,12 +379,8 @@ class RequirementComponent:
         if self.min or self.max:
             if self.min and comp < self.min:
                 return False
-            if self.max and comp > self.max:
-                return False
-            return True
-        if not self.acceptable:
-            return True
-        return False
+            return not (self.max and comp > self.max)
+        return bool(not self.acceptable)
 
     def add_requirement(self, text: str) -> None:
         if '-' in text:

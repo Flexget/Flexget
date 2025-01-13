@@ -572,7 +572,7 @@ class CoreArgumentParser(ArgumentParser):
     def parse_args(self, *args, **kwargs):
         result = super().parse_args(*args, **kwargs)
         # Make sure we always have execute parser settings even when other commands called
-        if not result.cli_command == 'execute':
+        if result.cli_command != 'execute':
             exec_options = get_parser('execute').parse_args([])
             if hasattr(result, 'execute'):
                 exec_options.__dict__.update(result.execute.__dict__)

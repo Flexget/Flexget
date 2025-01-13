@@ -205,9 +205,9 @@ class SearchAlphaRatio:
         """Finds the index of the tag containing the text"""
         for i in range(0, len(soup)):
             img = soup[i].find('img')
-            if soup[i].text.strip() == '' and img and text.lower() in img.get('title').lower():
-                return i
-            elif text.lower() in soup[i].text.lower():
+            if (
+                soup[i].text.strip() == '' and img and text.lower() in img.get('title').lower()
+            ) or text.lower() in soup[i].text.lower():
                 return i
 
         raise plugin.PluginError(

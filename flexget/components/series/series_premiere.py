@@ -56,21 +56,18 @@ class FilterSeriesPremiere(plugin_series.FilterSeriesBase):
         # Make a set of unique series according to series name normalization rules
         guessed_series = {}
         for entry in task.entries:
-            if guess_entry(entry, allow_seasonless=allow_seasonless, config=group_settings):
-                if (
-                    not entry['season_pack']
-                    and entry['series_season'] == 1
-                    and entry['series_episode'] in desired_eps
-                ):
-                    normalized_name = plugin_series.normalize_series_name(entry['series_name'])
-                    db_series = (
-                        task.session.query(db.Series)
-                        .filter(db.Series.name == normalized_name)
-                        .first()
-                    )
-                    if db_series and db_series.in_tasks:
-                        continue
-                    guessed_series.setdefault(normalized_name, entry['series_name'])
+            if guess_entry(entry, allow_seasonless=allow_seasonless, config=group_settings) and (
+                not entry['season_pack']
+                and entry['series_season'] == 1
+                and entry['series_episode'] in desired_eps
+            ):
+                normalized_name = plugin_series.normalize_series_name(entry['series_name'])
+                db_series = (
+                    task.session.query(db.Series).filter(db.Series.name == normalized_name).first()
+                )
+                if db_series and db_series.in_tasks:
+                    continue
+                guessed_series.setdefault(normalized_name, entry['series_name'])
         # Reject any further episodes in those series
         for entry in task.entries:
             for series in guessed_series.values():

@@ -69,10 +69,7 @@ class UrlRewriteRmz:
         except Exception as e:
             raise UrlRewritingError(str(e))
         link_elements = soup.find_all('pre', class_='links')
-        if 'urls' in entry:
-            urls = list(entry['urls'])
-        else:
-            urls = []
+        urls = list(entry['urls']) if 'urls' in entry else []
         for element in link_elements:
             urls.extend(element.text.splitlines())
         regexps = self.config.get('filehosters_re', [])
