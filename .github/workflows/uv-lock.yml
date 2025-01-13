@@ -1,0 +1,21 @@
+# pre-commit.ci does not allow network access, so we run this on github actions
+name: Update uv.lock
+
+on:
+  pull_request:
+  push:
+    branches: [develop]
+
+jobs:
+  pre-commit:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ github.head_ref }}
+    - uses: tox-dev/action-pre-commit-uv@v1
+      with:
+        extra_args: uv-lock
+    - uses: stefanzweifel/git-auto-commit-action@v5
+      with:
+        commit_message: Update uv lock file
