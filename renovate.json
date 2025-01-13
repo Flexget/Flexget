@@ -51,12 +51,12 @@
       ]
     },
     {
-      "description": "This gets bumped constantly. Limit it to Sunday nights (9 PM - 12 AM)",
+      "description": "This pre-commit env takes a long time to rebuild. Limit updates to monthly.",
       "matchPackageNames": [
         "renovatebot/pre-commit-hooks"
       ],
-      "schedule": [
-        "* 21-23 * * 0"
+      "extends": [
+        "schedule:monthly"
       ]
     },
     {
