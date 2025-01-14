@@ -55,7 +55,7 @@ dependencies = [
 [dependency-groups]
 dev = [
     "codacy-coverage ~=1.3",
-    "coverage ~=7.6",
+    "coverage ~=7.5",
     "pre-commit ~=4.0",
     "pytest ~=8.3",
     "pytest-cov ~=6.0",
