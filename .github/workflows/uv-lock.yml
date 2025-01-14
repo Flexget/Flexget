@@ -2,7 +2,6 @@
 name: Update uv.lock
 
 on:
-  pull_request:
   pull_request_target:
   push:
     branches: [develop]
@@ -13,6 +12,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       with:
+        repository: ${{ github.event.pull_request.head.repo.full_name }}
         ref: ${{ github.head_ref }}
     - name: Install uv
       uses: astral-sh/setup-uv@v5
