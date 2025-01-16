@@ -852,7 +852,6 @@ wheels = [
 
 [[package]]
 name = "flexget"
-version = "3.13.16.dev0"
 source = { editable = "." }
 dependencies = [
     { name = "apscheduler" },
