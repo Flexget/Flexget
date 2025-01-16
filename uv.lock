@@ -1074,7 +1074,7 @@ requires-dist = [
     { name = "aniso8601", marker = "extra == 'locked'", specifier = "==9.0.1" },
     { name = "anyio", marker = "extra == 'all'", specifier = "==4.8.0" },
     { name = "anyio", marker = "extra == 'telegram'", specifier = "==4.8.0" },
-    { name = "apscheduler", specifier = "~=3.11" },
+    { name = "apscheduler", specifier = "~=3.10" },
     { name = "apscheduler", marker = "extra == 'locked'", specifier = "==3.11.0" },
     { name = "attrs", marker = "extra == 'locked'", specifier = "==24.3.0" },
     { name = "autocommand", marker = "extra == 'locked'", specifier = "==2.2.2" },
