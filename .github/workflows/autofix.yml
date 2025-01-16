@@ -9,7 +9,7 @@ concurrency:
   cancel-in-progress: true
 env:
   PYTHON_VERSION: '3.13' # renovate: datasource=python-version depName=python
-  UV_VERSION: 0.5.18 # renovate: datasource=pypi depName=uv
+  UV_VERSION: 0.5.20 # renovate: datasource=pypi depName=uv
 jobs:
   uv-lock:
     name: Update uv.lock
