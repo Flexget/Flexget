@@ -1,0 +1,104 @@
+name: Autofix
+on:
+  push:
+    branches:
+      - develop
+  pull_request_target:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref || github.run_id }}
+  cancel-in-progress: true
+env:
+  PYTHON_VERSION: '3.13' # renovate: datasource=python-version depName=python
+  UV_VERSION: 0.5.18 # renovate: datasource=pypi depName=uv
+jobs:
+  uv-lock:
+    name: Update uv.lock
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        with:
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.head_ref }}
+          token: ${{ secrets.FLEXGETBOT_PAT }}
+      - id: resolve-merge-commit
+        if: github.event_name == 'pull_request_target'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          retryCount=3
+          retryInterval=5
+          while true; do
+            echo "Checking whether the pull request can be merged"
+            prInfo=$(gh api \
+              -H "Accept: application/vnd.github+json" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              /repos/"$GITHUB_REPOSITORY"/pulls/${{ github.event.pull_request.number }})
+            mergeable=$(jq -r .mergeable <<< "$prInfo")
+            mergedSha=$(jq -r .merge_commit_sha <<< "$prInfo")
+            if [[ "$mergeable" == "null" ]]; then
+              if (( retryCount == 0 )); then
+                echo "Not retrying anymore, probably GitHub is having internal issues"
+                exit 1
+              else
+                (( retryCount -= 1 )) || true
+                echo "GitHub is still computing whether this PR can be merged, waiting $retryInterval seconds before trying again ($retryCount retries left)"
+                sleep "$retryInterval"
+                (( retryInterval *= 2 )) || true
+              fi
+            else
+              break
+            fi
+          done
+          if [[ "$mergeable" == "true" ]]; then
+            echo "The PR can be merged, checking the merge commit $mergedSha"
+          else
+            echo "The PR cannot be merged, it has a merge conflict, cancelling the workflow..."
+            gh api \
+              --method POST \
+              -H "Accept: application/vnd.github+json" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              /repos/"$GITHUB_REPOSITORY"/actions/runs/"$GITHUB_RUN_ID"/cancel
+            sleep 60
+            exit 1
+          fi
+          echo "merge-sha=$mergedSha" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        if: github.event_name == 'pull_request_target'
+        with:
+          ref: ${{ steps.resolve-merge-commit.outputs.merge-sha }}
+          path: merge
+      - name: Install uv
+        uses: astral-sh/setup-uv@887a942a15af3a7626099df99e897a18d9e5ab3a # v5
+        with:
+          enable-cache: true
+          python-version: ${{ env.PYTHON_VERSION }}
+          version: ${{ env.UV_VERSION }}
+      - id: push
+        run: |
+          if [[ ${{github.event_name}} == "push" ]]; then
+            uv lock
+          else
+            uv lock --directory merge
+            mv merge/uv.lock uv.lock
+          fi
+          if ! git diff --exit-code; then
+            git config user.email github-actions[bot]@users.noreply.github.com
+            git config user.name github-actions[bot]
+            git add uv.lock
+            git commit -m "Autofix: update uv.lock"
+            if ! git push; then
+              echo "failed=true" >> "$GITHUB_OUTPUT"
+            fi
+          fi
+      - uses: actions/github-script@v7
+        if: steps.push.outputs.failed == 'true'
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `The \`uv.lock\` file is missing or needs to be updated and we can't auto-fix it for you because you didn't check the 'Allow edits by maintainers' box.
+            
+            Please check the box and push again or manually run \`uv lock\`.`
+            })
