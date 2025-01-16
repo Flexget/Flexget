@@ -13,22 +13,8 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref || github.run_id }}
   cancel-in-progress: true
 env:
-  UV_VERSION: 0.5.16 # renovate: datasource=pypi depName=uv
+  UV_VERSION: 0.5.18 # renovate: datasource=pypi depName=uv
 jobs:
-  check-lockfile-status:
-    name: Check Lockfile Status
-    runs-on: ubuntu-latest
-    env:
-      PYTHON_VERSION: '3.13' # renovate: datasource=python-version depName=python
-    steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
-      - name: Install uv
-        uses: astral-sh/setup-uv@887a942a15af3a7626099df99e897a18d9e5ab3a # v5
-        with:
-          enable-cache: true
-          python-version: ${{ env.PYTHON_VERSION }}
-          version: ${{ env.UV_VERSION }}
-      - run: uv lock --locked
   tests:
     name: Run Tests
     runs-on: ${{ matrix.operating-system }}
@@ -52,7 +38,7 @@ jobs:
           uv run pytest -n logical --dist loadgroup --junit-xml=test-results.xml
       - name: Upload Test Results
         if: always()
-        uses: actions/upload-artifact@6f51ac03b9356f520e9adb1b1b7802705f340c2b # v4
+        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4
         with:
           name: Test Results (Python ${{ matrix.python-version }} ${{ matrix.operating-system }})
           path: test-results.xml

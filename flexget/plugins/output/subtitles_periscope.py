@@ -57,10 +57,7 @@ class PluginPeriscope:
             )
 
     def subbed(self, filename):
-        for ext in self.exts:
-            if os.path.exists(os.path.splitext(filename)[0] + ext):
-                return True
-        return False
+        return any(os.path.exists(os.path.splitext(filename)[0] + ext) for ext in self.exts)
 
     def on_task_output(self, task, config):
         """

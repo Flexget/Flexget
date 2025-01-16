@@ -126,33 +126,31 @@ class FilterImdb:
 
             # Check defined conditions, TODO: rewrite into functions?
             reasons = []
-            if 'min_score' in config:
-                if entry.get('imdb_score', 0) < config['min_score']:
-                    reasons.append(
-                        'min_score ({} < {})'.format(entry.get('imdb_score'), config['min_score'])
+            if 'min_score' in config and entry.get('imdb_score', 0) < config['min_score']:
+                reasons.append(
+                    'min_score ({} < {})'.format(entry.get('imdb_score'), config['min_score'])
+                )
+            if 'min_votes' in config and entry.get('imdb_votes', 0) < config['min_votes']:
+                reasons.append(
+                    'min_votes ({} < {})'.format(entry.get('imdb_votes'), config['min_votes'])
+                )
+            if (
+                'min_meta_score' in config
+                and entry.get('imdb_meta_score', 0) < config['min_meta_score']
+            ):
+                reasons.append(
+                    'min_meta_score ({} < {})'.format(
+                        entry.get('imdb_meta_score'), config['min_meta_score']
                     )
-            if 'min_votes' in config:
-                if entry.get('imdb_votes', 0) < config['min_votes']:
-                    reasons.append(
-                        'min_votes ({} < {})'.format(entry.get('imdb_votes'), config['min_votes'])
-                    )
-            if 'min_meta_score' in config:
-                if entry.get('imdb_meta_score', 0) < config['min_meta_score']:
-                    reasons.append(
-                        'min_meta_score ({} < {})'.format(
-                            entry.get('imdb_meta_score'), config['min_meta_score']
-                        )
-                    )
-            if 'min_year' in config:
-                if entry.get('imdb_year', 0) < config['min_year']:
-                    reasons.append(
-                        'min_year ({} < {})'.format(entry.get('imdb_year'), config['min_year'])
-                    )
-            if 'max_year' in config:
-                if entry.get('imdb_year', 0) > config['max_year']:
-                    reasons.append(
-                        'max_year ({} > {})'.format(entry.get('imdb_year'), config['max_year'])
-                    )
+                )
+            if 'min_year' in config and entry.get('imdb_year', 0) < config['min_year']:
+                reasons.append(
+                    'min_year ({} < {})'.format(entry.get('imdb_year'), config['min_year'])
+                )
+            if 'max_year' in config and entry.get('imdb_year', 0) > config['max_year']:
+                reasons.append(
+                    'max_year ({} > {})'.format(entry.get('imdb_year'), config['max_year'])
+                )
 
             if 'accept_genres' in config:
                 accepted = config['accept_genres']

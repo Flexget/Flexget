@@ -108,9 +108,7 @@ class UrlRewriteIPTorrents:
         url = entry['url']
         if url.startswith(BASE_URL + '/download.php/'):
             return False
-        if url.startswith(BASE_URL + '/'):
-            return True
-        return False
+        return bool(url.startswith(BASE_URL + '/'))
 
     # urlrewriter API
     def url_rewrite(self, task, entry):

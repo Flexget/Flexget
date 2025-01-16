@@ -93,28 +93,25 @@ class FilterContentFilter:
 
             # Avoid confusion by printing a reject message to info log, as
             # download plugin has already printed a downloading message.
-            if config.get('require'):
-                if not any(
-                    any(matching_mask(file, mask) for file in files) for mask in config['require']
-                ):
-                    logger.info(
-                        'Entry {} does not have any of the required files, rejecting',
-                        entry['title'],
-                    )
-                    entry.reject('does not have any of the required files', remember=True)
-                    return True
-            if config.get('require_all'):
-                # Make sure each mask matches at least one of the contained files
-                if not all(
-                    any(matching_mask(file, mask) for file in files)
-                    for mask in config['require_all']
-                ):
-                    logger.info(
-                        'Entry {} does not have all of the required files, rejecting',
-                        entry['title'],
-                    )
-                    entry.reject('does not have all of the required files', remember=True)
-                    return True
+            if config.get('require') and not any(
+                any(matching_mask(file, mask) for file in files) for mask in config['require']
+            ):
+                logger.info(
+                    'Entry {} does not have any of the required files, rejecting',
+                    entry['title'],
+                )
+                entry.reject('does not have any of the required files', remember=True)
+                return True
+            # Make sure each mask matches at least one of the contained files
+            if config.get('require_all') and not all(
+                any(matching_mask(file, mask) for file in files) for mask in config['require_all']
+            ):
+                logger.info(
+                    'Entry {} does not have all of the required files, rejecting',
+                    entry['title'],
+                )
+                entry.reject('does not have all of the required files', remember=True)
+                return True
             if config.get('reject'):
                 for mask in config['reject']:
                     if any(matching_mask(file, mask) for file in files):
@@ -130,20 +127,18 @@ class FilterContentFilter:
                     logger.info('Entry {} does not have a main file, rejecting', entry['title'])
                     entry.reject('does not have a main file', remember=True)
                     return True
-            if config.get('min_files'):
-                if len(files) < config['min_files']:
-                    logger.info(
-                        f'Entry {entry["title"]} has {len(files)} files. Minimum is {config["min_files"]}. Rejecting.'
-                    )
-                    entry.reject(f'Has less than {config["min_files"]} files', remember=True)
-                    return True
-            if config.get('max_files'):
-                if len(files) > config['max_files']:
-                    logger.info(
-                        f'Entry {entry["title"]} has {len(files)} files. Maximum is {config["max_files"]}. Rejecting.'
-                    )
-                    entry.reject(f'Has more than {config["max_files"]} files', remember=True)
-                    return True
+            if config.get('min_files') and len(files) < config['min_files']:
+                logger.info(
+                    f'Entry {entry["title"]} has {len(files)} files. Minimum is {config["min_files"]}. Rejecting.'
+                )
+                entry.reject(f'Has less than {config["min_files"]} files', remember=True)
+                return True
+            if config.get('max_files') and len(files) > config['max_files']:
+                logger.info(
+                    f'Entry {entry["title"]} has {len(files)} files. Maximum is {config["max_files"]}. Rejecting.'
+                )
+                entry.reject(f'Has more than {config["max_files"]} files', remember=True)
+                return True
 
     @plugin.priority(150)
     def on_task_modify(self, task, config):

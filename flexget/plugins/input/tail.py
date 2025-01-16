@@ -86,10 +86,7 @@ class InputTail:
                 .filter(TailPosition.filename == filename)
                 .first()
             )
-            if db_pos:
-                last_pos = db_pos.position
-            else:
-                last_pos = 0
+            last_pos = db_pos.position if db_pos else 0
 
             with open(filename, encoding=encoding, errors='replace') as file:
                 if task.options.tail_reset == filename or task.options.tail_reset == task.name:

@@ -169,7 +169,7 @@ class SearchFileList:
         except RequestException as e:
             raise plugin.PluginError(f'FileList.ro login failed: {e}')
 
-        if 'https://filelist.ro/my.php' != response.url:
+        if response.url != 'https://filelist.ro/my.php':
             raise plugin.PluginError(
                 'FileList.ro login failed: Your username or password was incorrect.'
             )

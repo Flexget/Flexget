@@ -104,7 +104,7 @@ class OutputQBitTorrent:
                 self.api_url_info = '/query/torrents'
                 return response
 
-            msg = f'Failure. URL: {url}' if not msg_on_fail else msg_on_fail
+            msg = msg_on_fail if msg_on_fail else f'Failure. URL: {url}'
         except RequestException as e:
             msg = str(e)
         raise plugin.PluginError(f'Error when trying to send request to qBittorrent: {msg}')
@@ -380,10 +380,9 @@ class FromQBitTorrent:
                 if torrent['category'] != config['category']:
                     continue
 
-            if 'completed' in config:
-                if not torrent.state_enum.is_complete:
-                    logger.debug("filtered `{}` by not completed".format(torrent['name']))
-                    continue
+            if 'completed' in config and not torrent.state_enum.is_complete:
+                logger.debug("filtered `{}` by not completed".format(torrent['name']))
+                continue
 
             yield Entry(
                 title=torrent['name'],

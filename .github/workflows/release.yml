@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       PYTHON_VERSION: '3.13' # renovate: datasource=python-version depName=python
-      UV_VERSION: 0.5.16 # renovate: datasource=pypi depName=uv
+      UV_VERSION: 0.5.18 # renovate: datasource=pypi depName=uv
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
         with:
@@ -18,8 +18,8 @@ jobs:
           fetch-depth: 0
       - name: Setup Git User
         run: |
-          git config user.email ${{ secrets.git_email }}
-          git config user.name ${{ secrets.git_user }}
+          git config user.email github-actions[bot]@users.noreply.github.com
+          git config user.name github-actions[bot]
       - name: Install uv
         uses: astral-sh/setup-uv@887a942a15af3a7626099df99e897a18d9e5ab3a # v5
         with:
@@ -40,10 +40,10 @@ jobs:
         if: env.release_tag
         run: |
           echo 'CHANGELOG_BODY<<EOF' >> $GITHUB_ENV
-          uv run --no-project dev_tools.py get-changelog ${{ env.release_tag }} >> $GITHUB_ENV
+          uv run dev_tools.py get-changelog ${{ env.release_tag }} >> $GITHUB_ENV
           echo 'EOF' >> $GITHUB_ENV
       - name: Create GitHub Release
-        uses: ncipollo/release-action@2c591bcc8ecdcd2db72b97d6147f871fcd833ba5 # v1
+        uses: ncipollo/release-action@cdcc88a9acf3ca41c16c37bb7d21b9ad48560d87 # v1
         if: env.release_tag
         with:
           tag: ${{ env.release_tag }}

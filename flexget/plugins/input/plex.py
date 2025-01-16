@@ -358,9 +358,7 @@ class InputPlex:
                 for part in media.getElementsByTagName('Part'):
                     if config['fetch'] == "file" or not config['fetch']:
                         key = part.getAttribute('key')
-                    elif config['fetch'] == "art":
-                        key = node.getAttribute(arttag)
-                    elif config['fetch'] == "cover":
+                    elif config['fetch'] == "art" or config['fetch'] == "cover":
                         key = node.getAttribute(arttag)
                     elif config['fetch'] == "season_cover":
                         key = node.getAttribute(seasoncovertag)

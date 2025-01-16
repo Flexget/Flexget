@@ -68,10 +68,11 @@ def bump_version(bump_type):
         if bump_type == 'dev':
             ver_split.append('dev')
     new_version = '.'.join(ver_split)
-    for line in fileinput.FileInput('flexget/_version.py', inplace=1):
-        if line.startswith('__version__ ='):
-            line = f"__version__ = '{new_version}'\n"
-        print(line, end='')
+    with fileinput.input('flexget/_version.py', inplace=True) as input:
+        for line in input:
+            if line.startswith('__version__ ='):
+                line = f"__version__ = '{new_version}'\n"
+            print(line, end='')
     click.echo(f'new version: {new_version}')
 
 

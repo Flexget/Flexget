@@ -5,7 +5,7 @@ import os
 import re
 import shutil
 import sys
-from contextlib import contextmanager
+from contextlib import contextmanager, suppress
 from http import client
 from pathlib import Path
 from typing import Any, Callable, Optional, Union
@@ -106,10 +106,8 @@ def execute_task(manager: Manager) -> Callable[..., Task]:
             else:
                 task.execute()
         finally:
-            try:
+            with suppress(Exception):
                 task.session.close()
-            except Exception:
-                pass
         return task
 
     return execute

@@ -138,36 +138,44 @@ class FilterTvdb:
 
             # Check defined conditions
             reasons = []
-            if 'min_series_rating' in config:
-                if entry['tvdb_rating'] < config['min_series_rating']:
-                    reasons.append(
-                        'series_rating ({} < {})'.format(
-                            entry['tvdb_rating'], config['min_series_rating']
-                        )
+            if (
+                'min_series_rating' in config
+                and entry['tvdb_rating'] < config['min_series_rating']
+            ):
+                reasons.append(
+                    'series_rating ({} < {})'.format(
+                        entry['tvdb_rating'], config['min_series_rating']
                     )
-            if 'min_episode_rating' in config:
-                if entry['tvdb_ep_rating'] < config['min_episode_rating']:
-                    reasons.append(
-                        'tvdb_ep_rating ({} < {})'.format(
-                            entry['tvdb_ep_rating'], config['min_episode_rating']
-                        )
+                )
+            if (
+                'min_episode_rating' in config
+                and entry['tvdb_ep_rating'] < config['min_episode_rating']
+            ):
+                reasons.append(
+                    'tvdb_ep_rating ({} < {})'.format(
+                        entry['tvdb_ep_rating'], config['min_episode_rating']
                     )
-            if 'min_episode_air_year' in config:
-                if entry['tvdb_ep_air_date'].strftime("%Y") < config['min_episode_air_year']:
-                    reasons.append(
-                        'tvdb_ep_air_date ({} < {})'.format(
-                            entry['tvdb_ep_air_date'].strftime("%Y"),
-                            config['min_episode_air_year'],
-                        )
+                )
+            if (
+                'min_episode_air_year' in config
+                and entry['tvdb_ep_air_date'].strftime("%Y") < config['min_episode_air_year']
+            ):
+                reasons.append(
+                    'tvdb_ep_air_date ({} < {})'.format(
+                        entry['tvdb_ep_air_date'].strftime("%Y"),
+                        config['min_episode_air_year'],
                     )
-            if 'max_episode_air_year' in config:
-                if entry['tvdb_ep_air_date'].strftime("%Y") > config['max_episode_air_year']:
-                    reasons.append(
-                        'tvdb_ep_air_date ({} < {})'.format(
-                            entry['tvdb_ep_air_date'].strftime("%Y"),
-                            config['max_episode_air_year'],
-                        )
+                )
+            if (
+                'max_episode_air_year' in config
+                and entry['tvdb_ep_air_date'].strftime("%Y") > config['max_episode_air_year']
+            ):
+                reasons.append(
+                    'tvdb_ep_air_date ({} < {})'.format(
+                        entry['tvdb_ep_air_date'].strftime("%Y"),
+                        config['max_episode_air_year'],
                     )
+                )
 
             if self.is_in_set(config, 'reject_content_rating', entry['tvdb_content_rating']):
                 reasons.append('reject_content_rating')

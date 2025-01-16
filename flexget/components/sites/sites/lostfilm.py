@@ -578,7 +578,7 @@ class LostFilm:
         for s_item in cfg_list:
             if isinstance(s_item, str):
                 names_list.add(LostFilm._simplify_name(s_item))
-            elif isinstance(s_item, int) or isinstance(s_item, float):
+            elif isinstance(s_item, (int, float)):
                 # The name is something like '365' or '36.6'
                 names_list.add(LostFilm._simplify_name(str(s_item)))
             elif isinstance(s_item, dict):

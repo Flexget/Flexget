@@ -171,10 +171,7 @@ class EmbyAuth(EmbyApiBase):
     _login_type = None
 
     def __init__(self, **kwargs):
-        if 'server' in kwargs:
-            server = kwargs.get('server')
-        else:
-            server = kwargs
+        server = kwargs.get('server') if 'server' in kwargs else kwargs
 
         EmbyApiBase.update_using_map(self, EmbyAuth.field_map, server)
 
@@ -848,9 +845,7 @@ class EmbyApiLibrary(EmbyApiListBase):
             ):
                 continue
 
-            if search_list['Type'] != 'CollectionFolder':
-                continue
-            elif (
+            if search_list['Type'] != 'CollectionFolder' or (
                 search_list['CollectionType'] != 'tvshows'
                 and search_list['CollectionType'] != 'movies'
             ):
@@ -866,10 +861,7 @@ class EmbyApiLibrary(EmbyApiListBase):
         list_name = kwargs.get('list')
 
         list_data = EmbyApiLibrary._get_list_data(auth, list=list_name)
-        if not list_data:
-            return False
-
-        return True
+        return bool(list_data)
 
     @property
     def fullname(self):
@@ -1230,10 +1222,7 @@ class EmbyApiPlayList(EmbyApiListBase):
         list_name = kwargs.get('list')
 
         list_data = EmbyApiPlayList._get_list_data(auth, list=list_name)
-        if not list_data:
-            return False
-
-        return True
+        return bool(list_data)
 
     @staticmethod
     def create(item, **kwargs):
@@ -1628,7 +1617,7 @@ class EmbyApiMedia(EmbyApiBase):
                 EmbyApi.set_provideres_search_arg(args, **kwargs)
             else:
                 args['SearchTerm'], year = EmbyApiMedia.parse_string(
-                    parameters.get('search_string', parameters.get('base_name', None))
+                    parameters.get('search_string', parameters.get('base_name'))
                 )
 
                 if not args['SearchTerm']:
@@ -1801,7 +1790,7 @@ class EmbyApiSerie(EmbyApiMedia):
                 EmbyApi.set_provideres_search_arg(args, **parameters)
             else:
                 args['SearchTerm'], year = EmbyApiSerie.parse_string(
-                    parameters.get('search_string', parameters.get('base_name', None)), True
+                    parameters.get('search_string', parameters.get('base_name')), True
                 )
 
                 if not args['SearchTerm']:
@@ -1860,13 +1849,8 @@ class EmbyApiSerie(EmbyApiMedia):
         if kwargs.get('series_name'):
             return True
 
-        serie, _ = EmbyApiSerie.parse_string(
-            kwargs.get('search_string', kwargs.get('title', None))
-        )
-        if serie:
-            return True
-
-        return False
+        serie, _ = EmbyApiSerie.parse_string(kwargs.get('search_string', kwargs.get('title')))
+        return bool(serie)
 
 
 class EmbyApiSeason(EmbyApiMedia):
@@ -1999,10 +1983,7 @@ class EmbyApiSeason(EmbyApiMedia):
         if EmbyApiSeason.parse_string(kwargs.get('title')):
             return True
 
-        if EmbyApiSeason.parse_string(kwargs.get('search_string')):
-            return True
-
-        return False
+        return bool(EmbyApiSeason.parse_string(kwargs.get('search_string')))
 
     @staticmethod
     def parse_string(string: str):
@@ -2067,10 +2048,10 @@ class EmbyApiSeason(EmbyApiMedia):
 
         seasons = seasons['Items']
 
-        target_season = parameters.get('season', None)
+        target_season = parameters.get('season')
         if not target_season:
             target_season = EmbyApiSeason.parse_string(
-                parameters.get('search_string', parameters.get('base_name', None))
+                parameters.get('search_string', parameters.get('base_name'))
             )
 
         if target_season:
@@ -2309,7 +2290,7 @@ class EmbyApiEpisode(EmbyApiMedia):
 
         if not target_episode:
             target_episode = EmbyApiEpisode.parse_string(
-                parameters.get('search_string', parameters.get('base_name', None))
+                parameters.get('search_string', parameters.get('base_name'))
             )
 
         episode = []
@@ -2368,10 +2349,7 @@ class EmbyApiEpisode(EmbyApiMedia):
         ):
             return True
 
-        if EmbyApiEpisode.parse_string(kwargs.get('search_string', kwargs.get('title'))):
-            return True
-
-        return False
+        return bool(EmbyApiEpisode.parse_string(kwargs.get('search_string', kwargs.get('title'))))
 
 
 class EmbyApiMovie(EmbyApiMedia):
@@ -2501,7 +2479,7 @@ class EmbyApiMovie(EmbyApiMedia):
                 EmbyApi.set_provideres_search_arg(args, **parameters)
             else:
                 args['SearchTerm'], year = EmbyApiMovie.parse_string(
-                    parameters.get('search_string', parameters.get('base_name', None))
+                    parameters.get('search_string', parameters.get('base_name'))
                 )
 
                 if not args['SearchTerm']:
@@ -2560,13 +2538,8 @@ class EmbyApiMovie(EmbyApiMedia):
         if kwargs.get('movie_name'):
             return True
 
-        movie, _ = EmbyApiMovie.parse_string(
-            kwargs.get('title', kwargs.get('search_string', None))
-        )
-        if movie:
-            return True
-
-        return False
+        movie, _ = EmbyApiMovie.parse_string(kwargs.get('title', kwargs.get('search_string')))
+        return bool(movie)
 
 
 class EmbyApi(EmbyApiBase):
@@ -2631,10 +2604,7 @@ class EmbyApi(EmbyApiBase):
         providers = {}
         EmbyApi.set_provideres_search_arg(providers, **kwargs)
 
-        if providers and providers['AnyProviderIdEquals']:
-            return True
-
-        return False
+        return bool(providers and providers['AnyProviderIdEquals'])
 
     @staticmethod
     def get_auth(**kwargs) -> EmbyAuth:
@@ -2734,7 +2704,7 @@ class EmbyApi(EmbyApiBase):
         emby_connect=False,
         **kwargs,
     ):
-        verify_certificates = True if emby_connect else False
+        verify_certificates = bool(emby_connect)
 
         if not auth:
             auth = EmbyApi.get_auth(**kwargs)

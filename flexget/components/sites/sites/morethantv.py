@@ -307,15 +307,13 @@ class SearchMoreThanTV:
                 e['torrent_snatches'] = int(torrent_info[1].text)
                 e['torrent_seeds'] = int(torrent_info[2].text)
                 e['torrent_leeches'] = int(torrent_info[3].text)
-                e['torrent_internal'] = (
-                    True if group_info.find('span', attrs={'class': 'flag_internal'}) else False
+                e['torrent_internal'] = bool(
+                    group_info.find('span', attrs={'class': 'flag_internal'})
                 )
-                e['torrent_fast_server'] = (
-                    True if group_info.find('span', attrs={'class': 'flag_fast'}) else False
+                e['torrent_fast_server'] = bool(
+                    group_info.find('span', attrs={'class': 'flag_fast'})
                 )
-                e['torrent_sticky'] = (
-                    True if group_info.find('span', attrs={'class': 'flag_sticky'}) else False
-                )
+                e['torrent_sticky'] = bool(group_info.find('span', attrs={'class': 'flag_sticky'}))
                 e['torrent_tags'] = torrent_tags
 
                 e['content_size'] = parse_filesize(size.group(0))

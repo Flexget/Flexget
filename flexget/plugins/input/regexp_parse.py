@@ -164,7 +164,8 @@ class RegexpParse:
 
         # if it's a file open it and read into content (assume utf-8 encoding)
         if os.path.isfile(os.path.expanduser(url)):
-            content = codecs.open(url, 'r', encoding=encoding or 'utf-8').read()
+            with codecs.open(url, 'r', encoding=encoding or 'utf-8') as u:
+                content = u.read()
         # else use requests to get the data
         else:
             resp = task.requests.get(url)

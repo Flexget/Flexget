@@ -122,13 +122,11 @@ class PluginCookies:
                     def to_hex(x):
                         return ''.join([hex(ord(c))[2:].zfill(2) for c in x])
 
-                    i = 0
-                    for val in item:
+                    for i, val in enumerate(item):
                         if isinstance(val, str):
                             logger.debug('item[{}]: {}', i, to_hex(val))
                         else:
                             logger.debug('item[{}]: {}', i, val)
-                        i += 1
                     failed += 1
 
             except UnicodeDecodeError:

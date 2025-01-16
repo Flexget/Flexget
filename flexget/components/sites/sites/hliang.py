@@ -16,9 +16,7 @@ class UrlRewriteHliang:
     # urlrewriter API
     def url_rewritable(self, task, entry):
         url = entry['url']
-        if url.startswith('http://bt.hliang.com/show-'):
-            return True
-        return False
+        return bool(url.startswith('http://bt.hliang.com/show-'))
 
     # urlrewriter API
     def url_rewrite(self, task, entry):

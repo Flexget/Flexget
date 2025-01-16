@@ -45,9 +45,7 @@ class Site1337x:
         url = entry['url']
         if url.endswith('.torrent'):
             return False
-        if url.startswith('http://1337x.to/'):
-            return True
-        return False
+        return bool(url.startswith('http://1337x.to/'))
 
     def url_rewrite(self, task, entry):
         """
@@ -85,10 +83,9 @@ class Site1337x:
 
         order_by = ''
         sort_order = ''
-        if isinstance(config.get('order_by'), str):
-            if config['order_by'] != 'leechers':
-                order_by = '/{}/desc'.format(config['order_by'])
-                sort_order = 'sort-'
+        if isinstance(config.get('order_by'), str) and config['order_by'] != 'leechers':
+            order_by = '/{}/desc'.format(config['order_by'])
+            sort_order = 'sort-'
 
         entries = set()
 

@@ -471,24 +471,23 @@ class Task:
         if phase not in phase_methods:
             raise Exception(f'{phase} is not a valid task phase')
         # warn if no inputs, filters or outputs in the task
-        if phase in ['input', 'filter', 'output']:
-            if not self.manager.unit_test:
-                # Check that there is at least one manually configured plugin for these phases
-                for p in self.plugins(phase):
-                    if not p.builtin:
-                        break
-                else:
-                    if phase not in self.suppress_warnings:
-                        if phase == 'filter':
-                            logger.warning(
-                                'Task does not have any filter plugins to accept entries. '
-                                'You need at least one to accept the entries you want.'
-                            )
-                        else:
-                            logger.warning(
-                                'Task doesn\'t have any {} plugins, you should add (at least) one!',
-                                phase,
-                            )
+        if phase in ['input', 'filter', 'output'] and not self.manager.unit_test:
+            # Check that there is at least one manually configured plugin for these phases
+            for p in self.plugins(phase):
+                if not p.builtin:
+                    break
+            else:
+                if phase not in self.suppress_warnings:
+                    if phase == 'filter':
+                        logger.warning(
+                            'Task does not have any filter plugins to accept entries. '
+                            'You need at least one to accept the entries you want.'
+                        )
+                    else:
+                        logger.warning(
+                            'Task doesn\'t have any {} plugins, you should add (at least) one!',
+                            phase,
+                        )
 
         for plugin in self.plugins(phase):
             # Abort this phase if one of the plugins disables it

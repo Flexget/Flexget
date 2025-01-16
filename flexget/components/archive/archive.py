@@ -25,10 +25,7 @@ class Archive:
     def on_task_learn(self, task, config):
         """Add new entries into archive. We use learn phase in case the task corrects title or url via some plugins."""
 
-        if isinstance(config, bool):
-            tag_names = []
-        else:
-            tag_names = config
+        tag_names = [] if isinstance(config, bool) else config
 
         tags = []
         for tag_name in set(tag_names):
@@ -102,10 +99,7 @@ class UrlrewriteArchive:
 
         session = Session()
         entries = set()
-        if isinstance(config, bool):
-            tag_names = None
-        else:
-            tag_names = config
+        tag_names = None if isinstance(config, bool) else config
         try:
             for query in entry.get('search_strings', [entry['title']]):
                 # clean some characters out of the string for better results

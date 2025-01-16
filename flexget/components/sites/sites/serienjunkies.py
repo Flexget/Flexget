@@ -61,11 +61,10 @@ class UrlRewriteSerienjunkies:
     # urlrewriter API
     def url_rewritable(self, task, entry):
         url = entry['url']
-        if url.startswith('http://www.serienjunkies.org/') or url.startswith(
-            'http://serienjunkies.org/'
-        ):
-            return True
-        return False
+        return bool(
+            url.startswith('http://www.serienjunkies.org/')
+            or url.startswith('http://serienjunkies.org/')
+        )
 
     # urlrewriter API
     def url_rewrite(self, task, entry):
@@ -193,9 +192,12 @@ class UrlRewriteSerienjunkies:
             elif self.config['language'] == 'subtitle':
                 if len(language_list) > 1 and regex_is_subtitle.search(language_list[1]):
                     return True
-            elif self.config['language'] == 'dual':
-                if len(language_list) > 1 and not regex_is_subtitle.search(language_list[1]):
-                    return True
+            elif (
+                self.config['language'] == 'dual'
+                and len(language_list) > 1
+                and not regex_is_subtitle.search(language_list[1])
+            ):
+                return True
         except (KeyError, re.error):
             pass
 

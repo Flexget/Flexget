@@ -21,10 +21,7 @@ class RpcClient:
             self.token = 'token:' + secret
         else:
             self.token = ''
-        if username and password:
-            userpass = f'{username}:{password}@'
-        else:
-            userpass = ''
+        userpass = f'{username}:{password}@' if username and password else ''
         self.url = f'{scheme}://{userpass}{server}:{port}/{rpc_path}'
         logger.debug('aria2 url: {}', self.url)
 

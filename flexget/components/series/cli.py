@@ -53,14 +53,12 @@ def display_summary(options):
     """
     porcelain = options.table_type == 'porcelain'
     configured = options.configured or os.environ.get(ENV_LIST_CONFIGURED, 'configured')
-    premieres = (
-        True if (os.environ.get(ENV_LIST_PREMIERES) == 'yes' or options.premieres) else False
-    )
+    premieres = bool(os.environ.get(ENV_LIST_PREMIERES) == 'yes' or options.premieres)
     sort_by = options.sort_by or os.environ.get(ENV_LIST_SORTBY_FIELD, 'name')
     if options.order is not None:
-        descending = True if options.order == 'desc' else False
+        descending = options.order == 'desc'
     else:
-        descending = True if os.environ.get(ENV_LIST_SORTBY_ORDER) == 'desc' else False
+        descending = os.environ.get(ENV_LIST_SORTBY_ORDER) == 'desc'
     with Session() as session:
         kwargs = {
             'configured': configured,
@@ -106,9 +104,8 @@ def display_summary(options):
                     elif latest.age_timedelta > timedelta(days=400):
                         age_col = colorize(OLD_EP_COLOR, latest.age)
                 episode_id = latest.identifier
-            if not porcelain:
-                if behind[0] > 0:
-                    name_column += colorize(BEHIND_EP_COLOR, f' {behind[0]} {behind[1]} behind')
+            if not porcelain and behind[0] > 0:
+                name_column += colorize(BEHIND_EP_COLOR, f' {behind[0]} {behind[1]} behind')
 
             table.add_row(name_column, begin, episode_id, age_col, latest_release, identifier_type)
     console(table)
@@ -203,9 +200,9 @@ def display_details(options):
     name = options.series_name
     sort_by = options.sort_by or os.environ.get(ENV_SHOW_SORTBY_FIELD, 'age')
     if options.order is not None:
-        reverse = True if options.order == 'desc' else False
+        reverse = options.order == 'desc'
     else:
-        reverse = True if os.environ.get(ENV_SHOW_SORTBY_ORDER) == 'desc' else False
+        reverse = os.environ.get(ENV_SHOW_SORTBY_ORDER) == 'desc'
     with Session() as session:
         name = flexget.components.series.utils.normalize_series_name(name)
         # Sort by length of name, so that partial matches always show shortest matching title
@@ -223,7 +220,7 @@ def display_details(options):
                 'Be more specific to see the results of other matches:\n\n'
                 ' {}'.format(name, ', '.join(s.name for s in matches[1:]))
             )
-            if not options.table_type == 'porcelain':
+            if options.table_type != 'porcelain':
                 console(warning)
         header = ['Identifier', 'Last seen', 'Release titles', 'Quality', 'Proper']
         table_data = []
@@ -277,7 +274,7 @@ def display_details(options):
     for row in table_data:
         table.add_row(*row)
     console(table)
-    if not options.table_type == 'porcelain':
+    if options.table_type != 'porcelain':
         console(footer)
 
 

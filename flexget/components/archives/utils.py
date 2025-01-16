@@ -142,9 +142,8 @@ class Archive:
     def extract_file(self, member, destination):
         """Extract a member file to the specified destination"""
         try:
-            with self.open(member) as source:
-                with open(destination, 'wb') as target:
-                    shutil.copyfileobj(source, target)
+            with self.open(member) as source, open(destination, 'wb') as target:
+                shutil.copyfileobj(source, target)
         except OSError as error:
             raise FSError(error)
 

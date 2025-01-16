@@ -388,10 +388,10 @@ class TestSeriesParser:
             'Test.Revealed.WS.PDTV.XviD-aAF.5190458.TPB.torrent', name='test', identified_by='ep'
         )
         # assert_raises(ParseWarning, s.parse)
-        assert not s.season == 5, 'confused, got season'
-        assert not s.season == 4, 'confused, got season'
-        assert not s.episode == 19, 'confused, got episode'
-        assert not s.episode == 58, 'confused, got episode'
+        assert s.season != 5, 'confused, got season'
+        assert s.season != 4, 'confused, got season'
+        assert s.episode != 19, 'confused, got episode'
+        assert s.episode != 58, 'confused, got episode'
 
     def test_zeroes(self, parse):
         """SeriesParser: test zeroes as a season, episode"""
