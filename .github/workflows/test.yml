@@ -26,7 +26,7 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
       - name: Install uv
-        uses: astral-sh/setup-uv@887a942a15af3a7626099df99e897a18d9e5ab3a # v5
+        uses: astral-sh/setup-uv@4e3dbecc19008549e0deaff33911d7a8662627b2 # v5
         with:
           enable-cache: true
           python-version: ${{ matrix.python-version }}
