@@ -54,7 +54,7 @@ class TestRegexp:
               reject:
               - reject
               rest: reject
-              
+
           test_only_rest:
             regexp:
               rest: reject

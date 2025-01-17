@@ -41,7 +41,7 @@ class TestSftpList:
               <<: *sftp_basic_auth
               dirs:
                 - '/downloads'
-          
+
           sftp_list_recursive_true:
             sftp_list:
               <<: *base_sftp_list

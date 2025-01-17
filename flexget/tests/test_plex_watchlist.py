@@ -16,7 +16,7 @@ class TestPlex:
             password: {PLEX_PASSWORD}
       tasks:
         plex_watchlist:
-          plex_watchlist: 
+          plex_watchlist:
             <<: *plex_def
           accept_all: true
         test_list_add:

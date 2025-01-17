@@ -83,7 +83,7 @@ PORCELAIN_BOX: rich.box.Box = rich.box.Box(
     
   | 
     
-""",
+""",  # noqa: W291, W293
     ascii=True,
 )
 
@@ -97,7 +97,7 @@ GITHUB_BOX: rich.box.Box = rich.box.Box(
 |-||
 | ||
     
-""",
+""",  # noqa: W293
     ascii=True,
 )
 

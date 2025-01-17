@@ -68,7 +68,7 @@ class TestContentFilter:
             accept_all: yes
             content_filter:
               reject: ['*.iso']
-              
+
           test_min_files:
             max_reruns: 0
             mock:
@@ -77,7 +77,7 @@ class TestContentFilter:
             accept_all: yes
             content_filter:
               min_files: 4
-              
+
           test_max_files:
             max_reruns: 0
             mock:

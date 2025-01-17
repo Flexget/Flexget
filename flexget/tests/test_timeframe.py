@@ -23,14 +23,14 @@ class TestTimeFrame:
               target: 1080p
             mock:
               - {title: 'Movie.BRRip.x264.720p', 'media_id': 'Movie'}
-              - {title: 'Movie.720p WEB-DL X264 AC3', 'media_id': 'Movie'} 
+              - {title: 'Movie.720p WEB-DL X264 AC3', 'media_id': 'Movie'}
           reached_and_backlog:
             timeframe:
               wait: 1 hour
               target: 1080p
               on_reached: accept
             mock:
-              - {title: 'Movie.720p WEB-DL X264 AC3', 'media_id': 'Movie'} 
+              - {title: 'Movie.720p WEB-DL X264 AC3', 'media_id': 'Movie'}
               - {title: 'Movie.BRRip.x264.720p', 'media_id': 'Movie'}
           target1:
             timeframe:
@@ -38,7 +38,7 @@ class TestTimeFrame:
               target: 1080p
               on_reached: accept
             mock:
-              - {title: 'Movie.720p WEB-DL X264 AC3', 'media_id': 'Movie'} 
+              - {title: 'Movie.720p WEB-DL X264 AC3', 'media_id': 'Movie'}
               - {title: 'Movie.BRRip.x264.720p', 'media_id': 'Movie'}
           target2:
             timeframe:
@@ -46,7 +46,7 @@ class TestTimeFrame:
               target: 1080p
               on_reached: accept
             mock:
-              - {title: 'Movie.1080p WEB-DL X264 AC3', 'media_id': 'Movie'} 
+              - {title: 'Movie.1080p WEB-DL X264 AC3', 'media_id': 'Movie'}
     """
 
     def test_wait(self, execute_task):
@@ -99,14 +99,14 @@ class TestTimeFrameActions:
               on_waiting: reject
             mock:
               - {title: 'Movie.BRRip.x264.720p', 'id': 'Movie'}
-              - {title: 'Movie.720p WEB-DL X264 AC3', 'id': 'Movie'} 
+              - {title: 'Movie.720p WEB-DL X264 AC3', 'id': 'Movie'}
           reached_accept:
             timeframe:
               wait: 1 hour
               target: 1080p
               on_reached: accept
             mock:
-              - {title: 'Movie.720p WEB-DL X264 AC3', 'id': 'Movie'} 
+              - {title: 'Movie.720p WEB-DL X264 AC3', 'id': 'Movie'}
               - {title: 'Movie.BRRip.x264.720p', 'id': 'Movie'}
     """
 

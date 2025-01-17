@@ -52,7 +52,7 @@ class TestRadarrListActions:
                   api_key: {RADARR_API_KEY}
                   port: {RADARR_PORT}
                   tags: ["movies", "othertag"]
-                      
+
           radarr_list_as_input_plugin:
             radarr_list:
               base_url: {RADARR_BASE_URL}
@@ -60,7 +60,7 @@ class TestRadarrListActions:
               port: {RADARR_PORT}
               include_data: True
             accept_all: yes
-    
+
           remove_from_radarr_list:
             mock:
               - {{ title: "Ocean\'s Twelve (2004)", imdb_id: 'tt0349903', tmdb_id: 163 }}
@@ -71,7 +71,7 @@ class TestRadarrListActions:
                   base_url: {RADARR_BASE_URL}
                   api_key: {RADARR_API_KEY}
                   port: {RADARR_PORT}
-    
+
           match_radarr_list:
             mock:
               - {{ title: 'Despicable.Me.2.2013.1080p.BluRay.x264-FlexGet', imdb_id: 'tt1690953', tmdb_id: 93456 }}

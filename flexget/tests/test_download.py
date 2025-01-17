@@ -146,12 +146,12 @@ class TestDownloadAuth:
             download:
               path: __tmp__
               temp: __tmp__
-            
+
         tasks:
           no_auth:
             template:
             - download
-            
+
           with_auth:
             template:
             - download
@@ -162,7 +162,7 @@ class TestDownloadAuth:
                 type: digest
             - basic-auth:
                 username: user
-                password: passwd       
+                password: passwd
     """
 
     def test_download_auth(self, execute_task):

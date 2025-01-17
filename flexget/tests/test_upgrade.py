@@ -15,7 +15,7 @@ class TestUpgrade:
             upgrade:
               tracking: yes
             mock:
-              - {title: 'Movie.1080p WEB-DL X264 AC3', 'media_id': 'Movie'} 
+              - {title: 'Movie.1080p WEB-DL X264 AC3', 'media_id': 'Movie'}
           upgrade_quality:
             upgrade:
               target: 1080p

@@ -19,20 +19,20 @@ class TestYamlLists:
 
             accept_all: yes
             list_add:
-              - yaml_list: 
-                  fields: 
+              - yaml_list:
+                  fields:
                     - data
                     - quality
                   path: '{{yaml_dir}}/yaml_list1.yaml'
 
 
-          yaml_list_remove:  
+          yaml_list_remove:
             disable: seen
             mock:
               - {'title':'My Entry 1 1080p HDTV','url':'mock://myentry1'}
 
             accept_all: yes
-            list_remove: 
+            list_remove:
               - yaml_list: '{{yaml_dir}}/yaml_list1.yaml'
 
           yaml_list_match:
@@ -57,7 +57,7 @@ class TestYamlLists:
               newfield: 'new'
 
             list_add:
-              - yaml_list: 
+              - yaml_list:
                   path: '{{yaml_dir}}/yaml_list1.yaml'
                   fields:
                     - newfield
