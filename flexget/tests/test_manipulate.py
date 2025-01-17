@@ -42,7 +42,7 @@ class TestManipulate:
               - {title: 'abc', description: 'def'}
             manipulate:
               - description: { remove: yes }
-              
+
           test_replace_with_group:
             mock:
               - {title: '1234-7890'}

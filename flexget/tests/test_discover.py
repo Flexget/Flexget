@@ -223,7 +223,7 @@ class TestEmitSeriesInDiscover:
                 begin: s02e01
                 identified_by: ep
                 season_packs: yes
-            max_reruns: 0          
+            max_reruns: 0
     """
 
     def test_next_series_episodes_rerun(self, execute_task):

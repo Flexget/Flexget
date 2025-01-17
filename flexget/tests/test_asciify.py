@@ -4,9 +4,9 @@ class TestAsciifyFilter:
           asscify_me:
             mock:
               - {"title":"[My](Tìtlê)-ìs a' me^ss", "url":"mock://local" }
-                
+
             accept_all: yes
-                
+
             set:
               title1: "{{title|asciify|replace('is','is still')}}"
               title2: "{{title|strip_symbols|replace('ìs','ìs still')}}"

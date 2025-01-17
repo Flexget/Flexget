@@ -325,7 +325,7 @@ class TestTraktWatchedAndCollected:
               username: flexgettest
             mock:
               - title: aoetaraeha aeotrae taetaeor
-          
+
     """
 
     def test_trakt_watched_lookup(self, execute_task):

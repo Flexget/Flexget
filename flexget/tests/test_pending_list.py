@@ -16,17 +16,17 @@ class TestListInterface:
             pending_list:
               list_name: 'test_list'
               include: 'pending'
-               
+
           list_get_approved:
             pending_list:
               list_name: 'test_list'
               include: 'approved'
-               
+
           list_get_all:
             pending_list:
               list_name: 'test_list'
               include: 'all'
-               
+
           pending_list_add:
             mock:
               - {title: 'title 1', url: "http://mock.url/file1.torrent"}

@@ -246,7 +246,7 @@ class TestFilterSeries:
             parsing:
               series: {{parser}}
         tasks:
-        
+
           test:
             mock:
               - {title: 'Some.Series.S01E20.720p.XViD-FlexGet'}
@@ -1829,13 +1829,13 @@ class TestSpecials:
             series:
             - the show:
                 assume_special: False
-                
+
           special_looks_like_season_pack:
             mock:
             - title: Doctor.Who.S07.Special.The.Science.of.Doctor.Who.WS.XviD-Flexget
             series:
             - Doctor Who
-            
+
     """
 
     def test_prefer_specials(self, execute_task):
@@ -2154,7 +2154,7 @@ class TestSeriesSeasonPack:
         test_with_dict_config_2:
           mock:
           - title: bro.s02.720p.HDTV-Flexget
-          
+
     """
 
     @pytest.fixture()
@@ -2301,7 +2301,7 @@ class TestSeriesSeasonPackAdvanced:
               identified_by: ep
               quality: 720p|1080p webrip+
               timeframe: 4 hours
-              target: 720p webrip+ h264+      
+              target: 720p webrip+ h264+
               season_packs: true
     """
 

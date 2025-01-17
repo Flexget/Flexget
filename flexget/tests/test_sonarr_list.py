@@ -51,7 +51,7 @@ class TestSonarrListActions:
                   api_key: {SONARR_API_KEY}
                   port: {SONARRR_PORT}
                   tags: ["tv", "othertag"]
-                      
+
           sonarr_list_as_input_plugin:
             sonarr_list:
               base_url: {SONARR_BASE_URL}
@@ -59,7 +59,7 @@ class TestSonarrListActions:
               port: {SONARRR_PORT}
               include_data: True
             accept_all: yes
-    
+
           remove_from_sonarr_list:
             mock:
               - {{ title: 'Breaking Bad', imdb_id: 'tt0903747', tvdb_id: 81189 }}
@@ -70,7 +70,7 @@ class TestSonarrListActions:
                   base_url: {SONARR_BASE_URL}
                   api_key: {SONARR_API_KEY}
                   port: {SONARRR_PORT}
-    
+
           match_sonarr_list:
             mock:
               - {{ title: 'Game.Of.Thrones.S01E01.1080p.BluRay.x264-FlexGet', imdb_id: 'tt0944947', tvdb_id: 121361 }}
