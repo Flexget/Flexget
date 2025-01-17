@@ -10,6 +10,7 @@
     ":rebaseStalePrs"
   ],
   "gitIgnoredAuthors": [
+    "github-actions[bot]@users.noreply.github.com",
     "66853113+pre-commit-ci[bot]@users.noreply.github.com"
   ],
   "customManagers": [
