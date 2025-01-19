@@ -13,7 +13,7 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref || github.run_id }}
   cancel-in-progress: true
 env:
-  UV_VERSION: 0.5.20 # renovate: datasource=pypi depName=uv
+  UV_VERSION: 0.5.21 # renovate: datasource=pypi depName=uv
 jobs:
   tests:
     name: Run Tests
