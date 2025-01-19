@@ -1,3 +1,4 @@
+# If you rename or move this file, you MUST update the filename used for YAML parsing below.
 name: Autofix
 on:
   push:
@@ -9,6 +10,7 @@ concurrency:
   cancel-in-progress: true
 env:
   PYTHON_VERSION: '3.13' # renovate: datasource=python-version depName=python
+  # If you rename env.UV_VERSION, you MUST update the YAML parsing below as well.
   UV_VERSION: 0.5.20 # renovate: datasource=pypi depName=uv
 jobs:
   uv-lock:
@@ -67,12 +69,18 @@ jobs:
         with:
           ref: ${{ steps.resolve-merge-commit.outputs.merge-sha }}
           path: merge
+      - name: Extract uv version in the PR
+        if: github.event_name == 'pull_request_target'
+        id: uv-version-in-pr
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq .env.UV_VERSION merge/.github/workflows/autofix.yml
       - name: Install uv
         uses: astral-sh/setup-uv@b5f58b2abc5763ade55e4e9d0fe52cd1ff7979ca # v5
         with:
           enable-cache: true
           python-version: ${{ env.PYTHON_VERSION }}
-          version: ${{ env.UV_VERSION }}
+          version: ${{ steps.uv-version-in-pr.outputs.result || env.UV_VERSION }}
       - id: push
         run: |
           if [[ ${{github.event_name}} == "push" ]]; then
@@ -81,17 +89,17 @@ jobs:
             uv lock --directory merge
             mv merge/uv.lock uv.lock
           fi
-          if ! git diff --exit-code; then
+          git add uv.lock
+          if ! git diff --cached --exit-code; then
             git config user.email github-actions[bot]@users.noreply.github.com
             git config user.name github-actions[bot]
-            git add uv.lock
             git commit -m "Autofix: update uv.lock"
             if ! git push; then
-              echo "failed=true" >> "$GITHUB_OUTPUT"
+              exit 1
             fi
           fi
       - uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7
-        if: steps.push.outputs.failed == 'true'
+        if: failure() && steps.push.conclusion == 'failure'
         with:
           script: |
             github.rest.issues.createComment({
