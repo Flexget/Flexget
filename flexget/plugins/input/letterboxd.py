@@ -79,15 +79,13 @@ class Letterboxd:
             logger.warning('Error searching tmdb: {}', e)
             return None
 
-        result = {
+        return {
             'title': f'{tmdb.name} ({tmdb.year})',
             'imdb_id': tmdb.imdb_id,
             'tmdb_id': tmdb.id,
             'movie_name': tmdb.name,
             'movie_year': tmdb.year,
         }
-
-        return result
 
     def parse_film(self, film, config):
         url = base_url + "/film/" + film.get(config['f_slug'])

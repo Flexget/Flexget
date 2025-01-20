@@ -57,8 +57,7 @@ class OmbiRequest:
         if "api_key" in self.config:
             log.debug('Authenticating via api_key')
             api_key = self.config['api_key']
-            header = {'ApiKey': api_key}
-            return header
+            return {'ApiKey': api_key}
 
         if self.config.get('username') and self.config.get('password'):
             log.debug('Authenticating via username: %s', self.config.get('username'))
@@ -72,10 +71,7 @@ class OmbiRequest:
         data = {'username': self.config.get('username'), 'password': self.config.get('password')}
         headers = self.create_json_headers()
         try:
-            access_token = self._request('post', endpoint, data=data, headers=headers).get(
-                'access_token'
-            )
-            return access_token
+            return self._request('post', endpoint, data=data, headers=headers).get('access_token')
         except (HTTPError, RequestException, ValueError) as e:
             raise plugin.PluginError('Ombi username and password login failed') from e
 
@@ -119,16 +115,13 @@ class OmbiRequest:
         return result
 
     def get(self, endpoint, **params):
-        result = self._request('get', endpoint, **params)
-        return result
+        return self._request('get', endpoint, **params)
 
     def post(self, endpoint, **params):
-        result = self._request('post', endpoint, **params)
-        return result
+        return self._request('post', endpoint, **params)
 
     def put(self, endpoint, **params):
-        result = self._request('put', endpoint, **params)
-        return result
+        return self._request('put', endpoint, **params)
 
     def delete(self, endpoint, **params):
         return self._request('delete', endpoint, **params)
@@ -823,10 +816,7 @@ class OmbiSet(MutableSet):
         data = {'username': self.config.get('username'), 'password': self.config.get('password')}
         headers = {'Content-Type': 'application/json', 'Accept': 'application/json'}
         try:
-            access_token = (
-                requests.post(url, json=data, headers=headers).json().get('access_token')
-            )
-            return access_token
+            return requests.post(url, json=data, headers=headers).json().get('access_token')
         except (RequestException, ValueError) as e:
             raise plugin.PluginError(f'Ombi username and password login failed: {e}')
 
@@ -843,8 +833,7 @@ class OmbiSet(MutableSet):
         if "api_key" in self.config:
             log.debug('Authenticating via api_key')
             api_key = self.config['api_key']
-            header = {'ApiKey': api_key}
-            return header
+            return {'ApiKey': api_key}
 
         if self.config.get('username') and self.config.get('password'):
             log.debug('Authenticating via username: %s', self.config.get('username'))
@@ -1018,20 +1007,15 @@ def filter_ombi_items(items: list[dict[str, Any]], config: Config) -> list[dict[
         return filtered_items
 
     if config['status'] == 'approved':
-        filtered_items = [
-            item for item in filtered_items if item.get('approved') and not item.get('denied')
-        ]
-        return filtered_items
+        return [item for item in filtered_items if item.get('approved') and not item.get('denied')]
 
     if config['status'] == 'denied':
-        filtered_items = [item for item in filtered_items if item.get('denied')]
-        return filtered_items
+        return [item for item in filtered_items if item.get('denied')]
 
     if config['status'] == 'requested':
-        filtered_items = [
+        return [
             item for item in filtered_items if not item.get('approved') and not item.get('denied')
         ]
-        return filtered_items
 
     # We shouldn't get here, but just in case...
     raise plugin.PluginError('Error: Unknown status {}.'.format(config.get('status')))

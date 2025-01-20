@@ -26,6 +26,7 @@ class EstimatesReleasedMovies:
             'Unable to check release for {}, tmdb_release and movie_year fields are not defined',
             entry['title'],
         )
+        return None
 
 
 @event('plugin.register')

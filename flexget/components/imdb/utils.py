@@ -65,6 +65,7 @@ def extract_id(url):
     m = re.search(r'((?:nm|tt)\d{7,8})', url)
     if m:
         return m.group(1)
+    return None
 
 
 def make_url(imdb_id):

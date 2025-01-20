@@ -221,8 +221,7 @@ class SonarrSet(MutableSet):
         }
 
         logger.debug('adding show {} to sonarr', show)
-        returned_show = self._sonarr_request(SERIES_ENDPOINT, method='post', data=show)
-        return returned_show
+        return self._sonarr_request(SERIES_ENDPOINT, method='post', data=show)
 
     def remove_show(self, show):
         logger.debug('sending sonarr delete show request')
@@ -241,6 +240,7 @@ class SonarrSet(MutableSet):
                 return show
             if entry.get('title').lower() == show.get('title').lower():
                 return show
+        return None
 
     def _from_iterable(self, it):
         # TODO: is this the right answer? the returned object won't have our custom __contains__ logic

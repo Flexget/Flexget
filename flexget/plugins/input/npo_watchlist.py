@@ -297,8 +297,7 @@ class NPOWatchlist:
         if 'profileId' not in profilejson:
             raise plugin.PluginError('Failed to fetch profile for NPO account')
         profileId = profilejson['profileId']
-        entries = self._get_favourites_entries(task, config, profileId)
-        return entries
+        return self._get_favourites_entries(task, config, profileId)
 
     def entry_complete(self, e, task=None):
         if not e.accepted:

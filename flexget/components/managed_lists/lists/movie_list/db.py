@@ -175,6 +175,7 @@ def get_movie_by_title_and_year(list_id, title, year=None, session=None):
             )
             .one_or_none()
         )
+    return None
 
 
 @with_session
@@ -193,6 +194,7 @@ def get_movie_identifier(identifier_name, identifier_value, movie_id=None, sessi
     if db_movie_id:
         logger.debug('fetching movie identifier {}: {}', db_movie_id.id_name, db_movie_id.id_value)
         return db_movie_id
+    return None
 
 
 @with_session

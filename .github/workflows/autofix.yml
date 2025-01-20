@@ -17,12 +17,14 @@ jobs:
     name: Update uv.lock
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      - name: Checkout the HEAD commit
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
         with:
           repository: ${{ github.event.pull_request.head.repo.full_name }}
           ref: ${{ github.head_ref }}
           token: ${{ secrets.FLEXGETBOT_PAT }}
-      - id: resolve-merge-commit
+      - name: Resolve the merge commit
+        id: resolve-merge-commit
         if: github.event_name == 'pull_request_target'
         env:
           GH_TOKEN: ${{ github.token }}
@@ -64,31 +66,34 @@ jobs:
             exit 1
           fi
           echo "merge-sha=$mergedSha" >> "$GITHUB_OUTPUT"
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      - name: Checkout the merge commit
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
         if: github.event_name == 'pull_request_target'
         with:
           ref: ${{ steps.resolve-merge-commit.outputs.merge-sha }}
           path: merge
-      - name: Extract uv version in the PR
+      - name: Get the uv version in the PR
         if: github.event_name == 'pull_request_target'
-        id: uv-version-in-pr
+        id: merge-commit-uv-version
         uses: mikefarah/yq@master
         with:
           cmd: yq .env.UV_VERSION merge/.github/workflows/autofix.yml
-      - name: Install uv
+      - name: Install uv and Python
         uses: astral-sh/setup-uv@b5f58b2abc5763ade55e4e9d0fe52cd1ff7979ca # v5
         with:
           enable-cache: true
           python-version: ${{ env.PYTHON_VERSION }}
-          version: ${{ steps.uv-version-in-pr.outputs.result || env.UV_VERSION }}
-      - run: |
+          version: ${{ steps.merge-commit-uv-version.outputs.result || env.UV_VERSION }}
+      - name: Run uv lock
+        run: |
           if [[ ${{github.event_name}} == "push" ]]; then
             uv lock
           else
             uv lock --directory merge
             mv merge/uv.lock uv.lock
           fi
-      - id: push
+      - name: Push changes
+        id: push
         run: |
           git add uv.lock
           if ! git diff --cached --exit-code; then
@@ -97,7 +102,8 @@ jobs:
             git commit -m "Autofix: update uv.lock"
             git push
           fi
-      - uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7
+      - name: Create a comment for no permission
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7
         if: failure() && steps.push.conclusion == 'failure'
         with:
           script: |

@@ -100,6 +100,7 @@ class TraktSet(MutableSet):
     def immutable(self):
         if self.config['list'] in IMMUTABLE_LISTS:
             return '{} list is not modifiable'.format(self.config['list'])
+        return None
 
     schema = {
         'type': 'object',
@@ -165,6 +166,7 @@ class TraktSet(MutableSet):
                 return item
             if self.config['type'] in ['movies', 'auto'] and self.movie_match(entry, item):
                 return item
+        return None
 
     def __contains__(self, entry):
         return self._find_entry(entry) is not None

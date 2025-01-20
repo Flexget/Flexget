@@ -102,7 +102,7 @@ class SeenEntry(Base):
         for field in self.fields:
             fields.append(field.to_dict())
 
-        seen_entry_object = {
+        return {
             'id': self.id,
             'title': self.title,
             'reason': self.reason,
@@ -111,7 +111,6 @@ class SeenEntry(Base):
             'local': self.local,
             'fields': fields,
         }
-        return seen_entry_object
 
 
 class SeenField(Base):

@@ -506,6 +506,7 @@ class EmbyAuth(EmbyApiBase):
         for user in useres:
             if user.get('Name').lower() == name.lower():
                 return user
+        return None
 
     @staticmethod
     def get_last_auth():
@@ -748,6 +749,7 @@ class EmbyApiList(EmbyApiBase, MutableSet):
         if EmbyApiPlayList.is_type(**kwargs) or EmbyApiPlayList.allow_create:
             logger.debug('Creating a playlist')
             return EmbyApiPlayList(**kwargs)
+        return None
 
 
 class EmbyApiLibrary(EmbyApiListBase):
@@ -853,6 +855,7 @@ class EmbyApiLibrary(EmbyApiListBase):
 
             if search_list['Name'].lower() == list_name.lower():
                 return search_list
+        return None
 
     @staticmethod
     def is_type(**kwargs):
@@ -1214,6 +1217,7 @@ class EmbyApiPlayList(EmbyApiListBase):
         for search_list in search_list_data['Items']:
             if search_list['Name'].lower() == list_name.lower():
                 return search_list
+        return None
 
     @staticmethod
     def is_type(**kwargs):
@@ -1383,9 +1387,7 @@ class EmbyApiMedia(EmbyApiBase):
 
         parent = parents[len(parents) - 2]
 
-        library = EmbyApiLibrary(auth=self.auth, **parent)
-
-        return library
+        return EmbyApiLibrary(auth=self.auth, **parent)
 
     def to_entry(self) -> Entry:
         field_map = get_field_map(**self.to_dict())
@@ -1493,11 +1495,13 @@ class EmbyApiMedia(EmbyApiBase):
         year = split_title_year(self.base_name).year
         if year:
             return year
+        return None
 
     @property
     def imdb_url(self) -> str:
         if self.imdb_id:
             return f'http://www.imdb.com/title/{self.imdb_id}'
+        return None
 
     @property
     def filename(self) -> str:
@@ -1507,6 +1511,7 @@ class EmbyApiMedia(EmbyApiBase):
         filename = re.search('([^\\/\\\\]+)$', self.path)
         if filename:
             return filename.group(1)
+        return None
 
     @property
     def file_extension(self) -> str:
@@ -1516,6 +1521,7 @@ class EmbyApiMedia(EmbyApiBase):
         ext = re.search('\\.([^\\/\\\\]+)$', self.path)
         if ext:
             return ext.group(1)
+        return None
 
     @property
     def host(self) -> str:
@@ -1569,6 +1575,7 @@ class EmbyApiMedia(EmbyApiBase):
             season = cls.cast(**parent)
             if isinstance(season, cls):
                 return season
+        return None
 
     @staticmethod
     def cast(**kwargs) -> 'EmbyApiMedia':
@@ -1834,6 +1841,7 @@ class EmbyApiSerie(EmbyApiMedia):
         if serie_api:
             logger.debug('Found serie \'{}\' in emby server', serie_api.fullname)
             return serie_api
+        return None
 
     @staticmethod
     def is_type(**kwargs) -> bool:
@@ -2072,6 +2080,7 @@ class EmbyApiSeason(EmbyApiMedia):
         if season_api:
             logger.debug('Found season \'{}\' in emby server', season_api.fullname)
             return season_api
+        return None
 
 
 class EmbyApiEpisode(EmbyApiMedia):
@@ -2315,6 +2324,7 @@ class EmbyApiEpisode(EmbyApiMedia):
         if episode_api:
             logger.debug('Found episode \'{}\' in emby server', episode_api.fullname)
             return episode_api
+        return None
 
     @staticmethod
     def parse_string(string: str):
@@ -2523,6 +2533,7 @@ class EmbyApiMovie(EmbyApiMedia):
         if movie_api:
             logger.debug('Found movie {} in emby server', movie_api.fullname)
             return movie_api
+        return None
 
     @staticmethod
     def is_type(**kwargs) -> bool:

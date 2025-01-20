@@ -111,7 +111,7 @@ class DBEntrySet(MutableSet):
                 session.add(EntryListList(name=self.config))
 
     def _entry_query(self, session, entry):
-        db_entry = (
+        return (
             session.query(EntryListEntry)
             .filter(
                 and_(
@@ -127,8 +127,6 @@ class DBEntrySet(MutableSet):
             )
             .first()
         )
-
-        return db_entry
 
     def __iter__(self):
         with Session() as session:
@@ -245,6 +243,7 @@ def get_entry_by_title(list_id, title, session=None):
             .filter(and_(EntryListEntry.title == title, EntryListEntry.list_id == list_id))
             .first()
         )
+    return None
 
 
 @with_session

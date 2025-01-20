@@ -40,6 +40,7 @@ def bluray_request(endpoint, **params) -> Any:
             return response.json(strict=False)
         except JSONDecodeError:
             raise PluginError('Could decode json from response blu-ray api')
+    return None
 
 
 def extract_release_date(bluray_entry: dict[str, Any]) -> date:

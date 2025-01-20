@@ -195,8 +195,7 @@ class TVMazeSeries(Base):
             logger.debug('no last update attribute, series set for update')
             return True
         time_dif = datetime.now() - self.last_update
-        expiration = time_dif.days > UPDATE_INTERVAL
-        return expiration
+        return time_dif.days > UPDATE_INTERVAL
 
     def populate_seasons(self, series=None):
         if series and '_embedded' in series and series['_embedded'].get('seasons'):
@@ -368,12 +367,11 @@ def from_cache(session=None, search_params=None, cache_type=None):
         cache_type.__tablename__,
         list(search_params.items()),
     )
-    result = (
+    return (
         session.query(cache_type)
         .filter(or_(getattr(cache_type, col) == val for col, val in search_params.items() if val))
         .first()
     )
-    return result
 
 
 @with_session
@@ -546,6 +544,7 @@ class APITVMaze:
         )
         if season:
             return season
+        return None
 
     @staticmethod
     @with_session

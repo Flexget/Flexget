@@ -171,8 +171,7 @@ class UrlRewritePirateBay:
     def info_hash_to_magnet(info_hash: str, name: str) -> str:
         magnet = {'xt': f'urn:btih:{info_hash}', 'dn': name, 'tr': TRACKERS}
         magnet_qs = urlencode(magnet, doseq=True, safe=':')
-        magnet_uri = f'magnet:?{magnet_qs}'
-        return magnet_uri
+        return f'magnet:?{magnet_qs}'
 
     # convert a single json result to an Entry
     def json_to_entry(self, json_result: dict) -> Entry:

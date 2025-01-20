@@ -41,6 +41,7 @@ def spec_exception_from_response_ex(radarr_request_ex):
 
     if error_message.lower() == "this movie has already been added":
         return RadarrMovieAlreadyExistsError()
+    return None
 
 
 def request_get_json(url, headers):
@@ -487,6 +488,7 @@ class RadarrSet(MutableSet):
             title = entry.get("title").lower()
             if title == movie_entry["title"].lower():
                 return movie_entry
+        return None
 
     def _get_movie_entries(self):
         """
@@ -587,6 +589,7 @@ class RadarrSet(MutableSet):
                     return results[0]
             except RadarrRequestError as ex:
                 logger.error('Radarr search term lookup failed: {}', ex)
+        return None
 
 
 class RadarrList:

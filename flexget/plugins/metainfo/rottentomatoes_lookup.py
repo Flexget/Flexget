@@ -18,6 +18,7 @@ def get_rt_url(movie):
     for link in movie.links:
         if link.name == 'alternate':
             return link.url
+    return None
 
 
 class PluginRottenTomatoesLookup:

@@ -157,6 +157,7 @@ def get_index_by_name(table: Table, name: str) -> Optional[Index]:
     for index in table.indexes:
         if index.name == name:
             return index
+    return None
 
 
 def create_index(table_name: str, session: Session, *column_names: str) -> None:

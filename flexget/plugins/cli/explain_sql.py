@@ -19,8 +19,7 @@ class Explain(Executable, ClauseElement):
 
 @compiles(Explain)
 def explain(element, compiler, **kw):
-    text = 'EXPLAIN QUERY PLAN ' + compiler.process(element.statement)
-    return text
+    return 'EXPLAIN QUERY PLAN ' + compiler.process(element.statement)
 
 
 class ExplainQuery(Query):

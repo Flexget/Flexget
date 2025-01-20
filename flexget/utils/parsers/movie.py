@@ -17,6 +17,7 @@ def diff_pos(string1, string2):
             return count
         if string2[count] != c:
             return count
+    return None
 
 
 class MovieParser(TitleParser):

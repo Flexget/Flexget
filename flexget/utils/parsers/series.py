@@ -227,6 +227,7 @@ class SeriesParser(TitleParser):
             name = capwords(name)
             self.name = name
             return name
+        return None
 
     def parse(self, data=None, field=None, quality=None):
         # Clear the output variables before parsing
@@ -499,6 +500,7 @@ class SeriesParser(TitleParser):
             if match:
                 logger.trace('unwanted regexp {} matched {}', unwanted_re.pattern, match.groups())
                 return True
+        return None
 
     def parse_unwanted_sequence(self, data):
         """Parses data for an unwanted id hits. Return True if the data contains unwanted hits."""
@@ -507,6 +509,7 @@ class SeriesParser(TitleParser):
             if match:
                 logger.trace('unwanted id regexp {} matched {}', seq_unwanted_re, match.groups())
                 return True
+        return None
 
     def parse_date(self, data):
         """
@@ -634,6 +637,7 @@ class SeriesParser(TitleParser):
                 if len(matches) == 2:
                     # TODO support other formats of season packs: 1xall, s01-PART1, etc.
                     pass
+        return None
 
     def roman_to_int(self, roman):
         """Converts roman numerals up to 39 to integers"""

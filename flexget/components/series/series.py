@@ -894,6 +894,7 @@ class FilterSeries(FilterSeriesBase):
                 )
                 entry.accept('target quality')
                 return True
+        return None
 
     def process_quality(self, config, entries):
         """
@@ -996,6 +997,8 @@ class FilterSeries(FilterSeriesBase):
                 entry.reject(
                     f'Episode `{{entity.identifier}}` doesn\'t match series format `{entity.series.identified_by}`. '
                 )
+            return None
+        return None
 
     def process_timeframe(self, task, config, episode, entries):
         """

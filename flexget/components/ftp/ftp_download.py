@@ -165,8 +165,7 @@ class OutputFtp:
                 ftp = self.ftp_down(
                     ftp, os.path.basename(file_name), tmp_path, config, ftp_url, current_path
                 )
-        ftp = self.check_connection(ftp, config, ftp_url, current_path)
-        return ftp
+        return self.check_connection(ftp, config, ftp_url, current_path)
 
     def ftp_down(self, ftp, file_name, tmp_path, config, ftp_url, current_path):
         logger.debug('Downloading {} into {}', file_name, tmp_path)

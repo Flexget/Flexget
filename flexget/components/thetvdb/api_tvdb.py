@@ -231,6 +231,7 @@ class TVDBSeries(Base):
     def banner(self):
         if self._banner:
             return TVDBRequest.BANNER_URL + self._banner
+        return None
 
     @property
     def actors(self):
@@ -381,6 +382,7 @@ class TVDBEpisode(Base):
     def image(self):
         if self._image:
             return TVDBRequest.BANNER_URL + self._image
+        return None
 
 
 class TVDBSearchResult(Base):
@@ -442,6 +444,7 @@ class TVDBSeriesSearchResult(Base):
     def banner(self):
         if self._banner:
             return TVDBRequest.BANNER_URL + self._banner
+        return None
 
     def to_dict(self):
         return {

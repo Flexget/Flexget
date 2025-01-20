@@ -129,8 +129,7 @@ def get_source(name, session):
     try:
         return session.query(ArchiveSource).filter(ArchiveSource.name == name).one()
     except NoResultFound:
-        source = ArchiveSource(name)
-        return source
+        return ArchiveSource(name)
 
 
 def get_tag(name, session):
@@ -142,8 +141,7 @@ def get_tag(name, session):
     try:
         return session.query(ArchiveTag).filter(ArchiveTag.name == name).one()
     except NoResultFound:
-        source = ArchiveTag(name)
-        return source
+        return ArchiveTag(name)
 
 
 def search(session, text, tags=None, sources=None, desc=False):

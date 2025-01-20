@@ -191,6 +191,7 @@ class InputHtml:
             for entry in queue:
                 if entry['title'] == title:
                     return True
+            return None
 
         for link in soup.find_all('a'):
             # not a valid link

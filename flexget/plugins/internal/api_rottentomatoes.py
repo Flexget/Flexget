@@ -566,6 +566,7 @@ def movies_info(id, api_key: Optional[str] = None):
     result = get_json(url)
     if isinstance(result, dict) and result.get('id'):
         return result
+    return None
 
 
 def lists(
@@ -595,6 +596,7 @@ def lists(
     results = get_json(url)
     if isinstance(results, dict) and len(results.get('movies')):
         return results
+    return None
 
 
 def movies_search(
@@ -615,6 +617,7 @@ def movies_search(
     results = get_json(url)
     if isinstance(results, dict) and results.get('total') and results.get('movies'):
         return results
+    return None
 
 
 def get_json(url: str) -> Optional[dict[str, Any]]:

@@ -172,6 +172,7 @@ class PlexManagedWatchlist(MutableSet):
             # title matching sucks but lets try as last resort
             if entry.get('title').lower() == item['title'].lower():
                 return item
+        return None
 
 
 class PlexWatchlist:

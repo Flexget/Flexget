@@ -341,8 +341,7 @@ def file_inode(filename: str) -> int:
     fd = None
     try:
         fd = os.open(filename, os.O_RDONLY)
-        inode = os.fstat(fd).st_ino
-        return inode
+        return os.fstat(fd).st_ino
     except OSError:
         return 0
     finally:

@@ -111,6 +111,7 @@ class PogcalAcquired:
             db_sess.add(PogcalShow(id=id, name=show_name))
             return id
         logger.verbose('Could not find pogdesign calendar id for show `{}`', show_re)
+        return None
 
 
 @event('plugin.register')

@@ -196,6 +196,7 @@ class FromIMDB:
             character = self.ia.get_character(imdb_id[2:])
             logger.info('Starting to retrieve items for Character: {}', character)
             return 'Character', character
+        return None
 
     def get_items_by_entity(
         self, entity_type, entity_object, content_types, job_types, match_type
@@ -211,6 +212,7 @@ class FromIMDB:
 
         if entity_type == 'Person':
             return self.items_by_person(entity_object, job_types, content_types, match_type)
+        return None
 
     def flatten_list(self, _list):
         """

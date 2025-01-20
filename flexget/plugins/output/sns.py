@@ -94,8 +94,7 @@ class SNSNotificationEmitter:
     def get_topic(self):
         self.build_session()
         sns = self.session.resource('sns')
-        topic = sns.Topic(self.config['sns_topic_arn'])
-        return topic
+        return sns.Topic(self.config['sns_topic_arn'])
 
     def send_notifications(self, task):
         topic = self.get_topic()

@@ -401,8 +401,7 @@ class ArgumentParser(ArgParser):
         """
         if not self.subparsers:
             raise TypeError('This parser does not have subparsers')
-        result = self.subparsers.add_parser(name, **kwargs)
-        return result
+        return self.subparsers.add_parser(name, **kwargs)
 
     def get_subparser(self, name: str, default=_UNSET):
         if not self.subparsers:

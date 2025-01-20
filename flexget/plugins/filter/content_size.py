@@ -54,6 +54,8 @@ class FilterContentSize:
                     remember=remember,
                 )
                 return True
+            return None
+        return None
 
     @plugin.priority(130)
     def on_task_filter(self, task, config):
