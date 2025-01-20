@@ -76,7 +76,7 @@ class ImdbWatchlist:
         return config
 
     @cached('imdb_watchlist', persist='2 hours')
-    def on_task_input(self, task, config):
+    def on_task_input(self, task, config) -> list[Entry]:
         config = self.prepare_config(config)
 
         # Create movie entries by parsing imdb list page(s) html using beautifulsoup
@@ -114,7 +114,7 @@ class ImdbWatchlist:
             )
         return page
 
-    def parse_react_widget(self, task, config, url, params, headers):
+    def parse_react_widget(self, task, config, url, params, headers) -> list[Entry]:
         page = self.fetch_page(task, url, params, headers)
         try:
             json_vars = json.loads(
@@ -175,7 +175,7 @@ class ImdbWatchlist:
             entries.append(entry)
         return entries
 
-    def parse_html_list(self, task, config, url, params, headers):
+    def parse_html_list(self, task, config, url, params, headers) -> list[Entry]:
         page = self.fetch_page(task, url, params, headers)
         soup = get_soup(page.text)
         try:
@@ -196,7 +196,7 @@ class ImdbWatchlist:
 
         if not total_item_count:
             logger.verbose('No movies were found in imdb list: {}', config['list'])
-            return None
+            return []
 
         entries = []
         items_processed = 0
