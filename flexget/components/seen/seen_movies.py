@@ -63,8 +63,7 @@ class FilterSeenMovies(plugin_seen.FilterSeen):
                     if entry[field] in accepted_ids[field]:
                         entry.reject(f'already accepted {field} {entry[field]} once in task')
                         break
-                    else:
-                        accepted_ids[field].add(entry[field])
+                    accepted_ids[field].add(entry[field])
 
     def on_task_learn(self, task, config):
         if not isinstance(config, dict):

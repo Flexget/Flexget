@@ -77,7 +77,7 @@ def device_auth():
             )
             if polling_request.status_code == 200:  # success
                 return polling_request.json()
-            elif polling_request.status_code == 400:  # pending -- waiting for user
+            if polling_request.status_code == 400:  # pending -- waiting for user
                 console('...', end='')
             elif polling_request.status_code == 404:  # not found -- invalid device_code
                 raise plugin.PluginError('Invalid device code. Open an issue on Github.')
@@ -128,46 +128,41 @@ def get_access_token(account, token=None, refresh=False, re_auth=False, called_f
         acc = session.query(TraktUserAuth).filter(TraktUserAuth.account == account).first()
         if acc and datetime.now() < acc.expires and not refresh and not re_auth:
             return acc.access_token
+        if acc and (refresh or datetime.now() >= acc.expires - timedelta(days=5)) and not re_auth:
+            logger.debug('Using refresh token to re-authorize account {}.', account)
+            data['refresh_token'] = acc.refresh_token
+            data['grant_type'] = 'refresh_token'
+            token_dict = token_oauth(data)
+        elif token:
+            # We are only in here if a pin was specified, so it's safe to use console instead of logging
+            console(
+                'Warning: PIN authorization has been deprecated. Use Device Authorization instead.'
+            )
+            data['code'] = token
+            data['grant_type'] = 'authorization_code'
+            token_dict = token_oauth(data)
+        elif called_from_cli:
+            logger.debug(
+                'No pin specified for an unknown account {}. Attempting to authorize device.',
+                account,
+            )
+            token_dict = device_auth()
         else:
-            if (
-                acc
-                and (refresh or datetime.now() >= acc.expires - timedelta(days=5))
-                and not re_auth
-            ):
-                logger.debug('Using refresh token to re-authorize account {}.', account)
-                data['refresh_token'] = acc.refresh_token
-                data['grant_type'] = 'refresh_token'
-                token_dict = token_oauth(data)
-            elif token:
-                # We are only in here if a pin was specified, so it's safe to use console instead of logging
-                console(
-                    'Warning: PIN authorization has been deprecated. Use Device Authorization instead.'
-                )
-                data['code'] = token
-                data['grant_type'] = 'authorization_code'
-                token_dict = token_oauth(data)
-            elif called_from_cli:
-                logger.debug(
-                    'No pin specified for an unknown account {}. Attempting to authorize device.',
-                    account,
-                )
-                token_dict = device_auth()
-            else:
-                raise plugin.PluginError(
-                    f'Account {account} has not been authorized. See `flexget trakt auth -h` on how to.'
-                )
-            try:
-                new_acc = TraktUserAuth(
-                    account,
-                    token_dict['access_token'],
-                    token_dict['refresh_token'],
-                    token_dict.get('created_at', time.time()),
-                    token_dict['expires_in'],
-                )
-                session.merge(new_acc)
-                return new_acc.access_token
-            except requests.RequestException as e:
-                raise plugin.PluginError(f'Token exchange with trakt failed: {e}')
+            raise plugin.PluginError(
+                f'Account {account} has not been authorized. See `flexget trakt auth -h` on how to.'
+            )
+        try:
+            new_acc = TraktUserAuth(
+                account,
+                token_dict['access_token'],
+                token_dict['refresh_token'],
+                token_dict.get('created_at', time.time()),
+                token_dict['expires_in'],
+            )
+            session.merge(new_acc)
+            return new_acc.access_token
+        except requests.RequestException as e:
+            raise plugin.PluginError(f'Token exchange with trakt failed: {e}')
 
 
 def make_list_slug(name):
@@ -355,7 +350,7 @@ class TraktActor(Base):
     def update(self, actor, session):
         if self.id and self.id != actor.get('ids').get('trakt'):
             raise Exception('Tried to update db actors with different actor data')
-        elif not self.id:
+        if not self.id:
             self.id = actor.get('ids').get('trakt')
         self.name = actor.get('name')
         ids = actor.get('ids')
@@ -466,7 +461,7 @@ class TraktEpisode(Base):
         """Updates this record from the trakt media object `trakt_episode` returned by the trakt api."""
         if self.id and self.id != trakt_episode['ids']['trakt']:
             raise Exception('Tried to update db ep with different ep data')
-        elif not self.id:
+        if not self.id:
             self.id = trakt_episode['ids']['trakt']
         self.imdb_id = trakt_episode['ids']['imdb']
         self.tmdb_id = trakt_episode['ids']['tmdb']
@@ -515,7 +510,7 @@ class TraktSeason(Base):
         """Updates this record from the trakt media object `trakt_episode` returned by the trakt api."""
         if self.id and self.id != trakt_season['ids']['trakt']:
             raise Exception('Tried to update db season with different season data')
-        elif not self.id:
+        if not self.id:
             self.id = trakt_season['ids']['trakt']
         self.tmdb_id = trakt_season['ids']['tmdb']
         self.tvrage_id = trakt_season['ids']['tvrage']
@@ -621,7 +616,7 @@ class TraktShow(Base):
         """Updates this record from the trakt media object `trakt_show` returned by the trakt api."""
         if self.id and self.id != trakt_show['ids']['trakt']:
             raise Exception('Tried to update db show with different show data')
-        elif not self.id:
+        if not self.id:
             self.id = trakt_show['ids']['trakt']
         self.slug = trakt_show['ids']['slug']
         self.imdb_id = trakt_show['ids']['imdb']
@@ -822,7 +817,7 @@ class TraktMovie(Base):
         """Updates this record from the trakt media object `trakt_movie` returned by the trakt api."""
         if self.id and self.id != trakt_movie['ids']['trakt']:
             raise Exception('Tried to update db movie with different movie data')
-        elif not self.id:
+        if not self.id:
             self.id = trakt_movie['ids']['trakt']
         self.slug = trakt_movie['ids']['slug']
         self.imdb_id = trakt_movie['ids']['imdb']

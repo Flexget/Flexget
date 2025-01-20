@@ -43,12 +43,11 @@ class UrlRewriteFTDB:
                                          check if your cookie for\
                                          authentication is up to date'
                 )
-            else:
-                raise UrlRewritingError(
-                    'You have reached your download\
-                                        limit per 24hours, so I cannot\
-                                        get the torrent'
-                )
+            raise UrlRewritingError(
+                'You have reached your download\
+                                    limit per 24hours, so I cannot\
+                                    get the torrent'
+            )
         torrent_url = "http://www.frenchtorrentdb.com" + tag_a.get('href') + "&js=1"
         logger.debug('TORRENT URL is : {}', torrent_url)
         return torrent_url

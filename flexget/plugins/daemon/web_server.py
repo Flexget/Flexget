@@ -43,7 +43,7 @@ web_config_schema = {
 
 def prepare_config(config):
     if not config:
-        return
+        return None
     if isinstance(config, bool):
         config = {}
     if isinstance(config, int):

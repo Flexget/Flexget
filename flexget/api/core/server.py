@@ -555,8 +555,7 @@ class LogParser:
 
         if not self._query_parser:
             return True
-        else:
-            return self.evaluate(self._query_parser)
+        return self.evaluate(self._query_parser)
 
     def json_string(self, line):
         try:

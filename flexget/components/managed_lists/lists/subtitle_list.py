@@ -234,17 +234,17 @@ class SubtitleList(MutableSet):
 
             if not path:
                 logger.error('Entry {} does not represent a local file/dir.', entry['title'])
-                return
+                return None
 
             path_exists = os.path.exists(path)
             if self.config['force_file_existence'] and not path_exists:
                 logger.error('Path {} does not exist. Not adding to list.', path)
-                return
-            elif path_exists and not self.config.get('allow_dir') and os.path.isdir(path):
+                return None
+            if path_exists and not self.config.get('allow_dir') and os.path.isdir(path):
                 logger.error(
                     'Path {} is a directory and "allow_dir"={}.', path, self.config['allow_dir']
                 )
-                return
+                return None
 
             # Check if this is already in the list, refresh info if so
             db_list = self._db_list(session=session)

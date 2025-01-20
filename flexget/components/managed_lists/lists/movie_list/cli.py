@@ -26,7 +26,7 @@ def lookup_movie(title, session, identifiers=None):
         tmdb_lookup = None
 
     if not (imdb_lookup or tmdb_lookup):
-        return
+        return None
 
     entry = Entry(title=title)
     if identifiers:
@@ -42,7 +42,7 @@ def lookup_movie(title, session, identifiers=None):
     # Return only if lookup was successful
     if entry.get('movie_name'):
         return entry
-    return
+    return None
 
 
 def movie_list_keyword_type(identifier):
@@ -187,9 +187,8 @@ def movie_list_del(options):
         if not movie_exist:
             console(f'Could not find movie with title {options.movie} in list {options.list_name}')
             return
-        else:
-            console(f'Removing movie {movie_exist.title} from list {options.list_name}')
-            session.delete(movie_exist)
+        console(f'Removing movie {movie_exist.title} from list {options.list_name}')
+        session.delete(movie_exist)
 
 
 def movie_list_purge(options):

@@ -39,7 +39,7 @@ jobs:
             mergedSha=$(jq -r .merge_commit_sha <<< "$prInfo")
             if [[ "$mergeable" == "null" ]]; then
               if (( retryCount == 0 )); then
-                echo "Not retrying anymore, probably GitHub is having internal issues"
+                echo "Not retrying anymore, this PR may have already been closed"
                 exit 1
               else
                 (( retryCount -= 1 )) || true
@@ -81,22 +81,21 @@ jobs:
           enable-cache: true
           python-version: ${{ env.PYTHON_VERSION }}
           version: ${{ steps.uv-version-in-pr.outputs.result || env.UV_VERSION }}
-      - id: push
-        run: |
+      - run: |
           if [[ ${{github.event_name}} == "push" ]]; then
             uv lock
           else
             uv lock --directory merge
             mv merge/uv.lock uv.lock
           fi
+      - id: push
+        run: |
           git add uv.lock
           if ! git diff --cached --exit-code; then
             git config user.email github-actions[bot]@users.noreply.github.com
             git config user.name github-actions[bot]
             git commit -m "Autofix: update uv.lock"
-            if ! git push; then
-              exit 1
-            fi
+            git push
           fi
       - uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7
         if: failure() && steps.push.conclusion == 'failure'

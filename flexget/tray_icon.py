@@ -25,7 +25,7 @@ def check_if_tray_is_active(f):
     @wraps(f)
     def wrapped(self, *args, **kwargs):
         if not self.active:
-            return
+            return None
         return f(self, *args, **kwargs)
 
     return wrapped

@@ -26,10 +26,10 @@ def open_archive_entry(entry):
     archive_path = entry.get('location', '')
     if not archive_path:
         logger.error('Entry does not appear to represent a local file.')
-        return
+        return None
     if not os.path.exists(archive_path):
         logger.error('File no longer exists: {}', entry['location'])
-        return
+        return None
     try:
         archive = archiveutil.open_archive(archive_path)
     except archiveutil.BadArchive as error:
@@ -47,8 +47,7 @@ def get_output_path(to, entry):
     try:
         if to:
             return render_from_entry(to, entry)
-        else:
-            return os.path.dirname(entry.get('location'))
+        return os.path.dirname(entry.get('location'))
     except RenderError:
         raise plugin.PluginError(f'Could not render path: {to}')
 

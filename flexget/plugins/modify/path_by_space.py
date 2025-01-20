@@ -28,9 +28,8 @@ def os_disk_stats(folder):
         )
 
         return free_bytes.value, total_bytes.value
-    else:
-        stats = os.statvfs(folder)
-        return stats.f_bavail * stats.f_frsize, stats.f_blocks * stats.f_frsize
+    stats = os.statvfs(folder)
+    return stats.f_bavail * stats.f_frsize, stats.f_blocks * stats.f_frsize
 
 
 def disk_stats(folder):

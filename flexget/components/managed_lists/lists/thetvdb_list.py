@@ -128,7 +128,7 @@ class TheTVDBSet(MutableSet):
     def _find_entry(self, entry):
         if not entry.get('tvdb_id'):
             logger.debug('entry does not have `tvdb_id`, skipping: {}', entry)
-            return
+            return None
         for item in self.items:
             if item['tvdb_id'] == entry['tvdb_id']:
                 return item

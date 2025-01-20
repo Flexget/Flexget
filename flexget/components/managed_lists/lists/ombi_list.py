@@ -920,7 +920,7 @@ class OmbiSet(MutableSet):
                 ombi_status=parent_request.get('status'),
                 ombi_request_id=parent_request.get('id'),
             )
-        elif self.config.get('type') == 'seasons':
+        if self.config.get('type') == 'seasons':
             log.debug('Found: %s S%s', parent_request.get('title'), season.get('seasonNumber'))
             if not parent_request.get('imdbId'):
                 simdburl = ''
@@ -943,7 +943,7 @@ class OmbiSet(MutableSet):
                 ombi_status=parent_request.get('status'),
                 ombi_request_id=parent_request.get('id'),
             )
-        elif self.config.get('type') == 'episodes':
+        if self.config.get('type') == 'episodes':
             log.debug(
                 'Found: %s S%sE%s',
                 parent_request.get('title'),
@@ -977,10 +977,7 @@ class OmbiSet(MutableSet):
                 ombi_available=episode.get('available'),
                 ombi_requested=episode.get('requested'),
             )
-        else:
-            raise plugin.PluginError(
-                'Error: Unknown list type {}.'.format(self.config.get('type'))
-            )
+        raise plugin.PluginError('Error: Unknown list type {}.'.format(self.config.get('type')))
 
 
 class OmbiList:

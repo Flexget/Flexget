@@ -82,7 +82,7 @@ class HorribleSubs:
     @cached('horriblesubs')
     def on_task_input(self, task, config):
         if not config:
-            return
+            return None
         return HorribleSubs.horrible_entries(
             task.requests, 'https://horriblesubs.info/api.php?method=getlatest'
         )
@@ -90,7 +90,7 @@ class HorribleSubs:
     # Search API method
     def search(self, task, entry, config):
         if not config:
-            return
+            return None
         entries = []
         for search_string in entry.get('search_strings', [entry['title']]):
             logger.debug('Searching `{}`', search_string)

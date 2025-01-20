@@ -48,8 +48,7 @@ class FilterSeen:
         elif isinstance(config, bool):
             if config is False:
                 return config
-            else:
-                config = {'local': False}
+            config = {'local': False}
         elif isinstance(config, str):
             config = {'local': config == 'local'}
 

@@ -71,8 +71,7 @@ class NewTorrents:
             raise UrlRewritingError(
                 'Failed to get url from download page. Plugin may need a update.'
             )
-        else:
-            return f.group(1)
+        return f.group(1)
 
     @plugin.internet(logger)
     def entries_from_search(self, name, url=None):
@@ -125,16 +124,14 @@ class NewTorrents:
             dashindex = name.rfind('-')
             if dashindex != -1:
                 return self.entries_from_search(name[:dashindex])
-            else:
-                return torrents
-        else:
-            if len(torrents) == 1:
-                logger.debug('found only one matching search result.')
-            else:
-                logger.debug(
-                    'search result contains multiple matches, sorted {} by most seeders', torrents
-                )
             return torrents
+        if len(torrents) == 1:
+            logger.debug('found only one matching search result.')
+        else:
+            logger.debug(
+                'search result contains multiple matches, sorted {} by most seeders', torrents
+            )
+        return torrents
 
 
 @event('plugin.register')

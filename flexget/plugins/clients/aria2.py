@@ -73,8 +73,7 @@ class JsonRpcClient(RpcClient):
         result = resp.json()
         if "error" in result:
             return on_fail(result["error"]["code"], result["error"]["message"])
-        else:
-            return on_success(resp)
+        return on_success(resp)
 
     def add_uri(self, uris, options):
         # https://aria2.github.io/manual/en/html/aria2c.html#aria2.addUri
@@ -244,7 +243,7 @@ class OutputAria2:
             options['dir'] = os.path.expanduser(entry.render(path).rstrip('/'))
         except RenderError as e:
             entry.fail(f'failed to render \'path\': {e}')
-            return
+            return None
 
         filename = entry.get('content_filename', config.get('filename', None))
         add_extension = entry.get('content_extension', config.get('add_extension', False))
@@ -265,7 +264,7 @@ class OutputAria2:
                         entry.fail(
                             'Not possible to retrive file info from `{}`'.format(entry['url'])
                         )
-                        return
+                        return None
 
                     if content_disposition:
                         fname_match = re.findall(
@@ -289,7 +288,7 @@ class OutputAria2:
                 if not ext:
                     logger.warning('Not possible to retrive extension')
                     entry.fail('Not possible to retrive extension')
-                    return
+                    return None
 
                 logger.debug('Adding extension `{}` to file `{}`', ext, filename)
 
@@ -299,7 +298,7 @@ class OutputAria2:
                 options['out'] = os.path.expanduser(entry.render(filename))
             except RenderError as e:
                 entry.fail(f'failed to render \'filename\': {e}')
-                return
+                return None
 
         # handle torrent files
         if 'torrent' in entry:
@@ -310,7 +309,7 @@ class OutputAria2:
                 torrent_file = entry['location']
             else:
                 entry.fail('Cannot find torrent file')
-                return
+                return None
             return aria2.add_torrent(
                 xmlrpc.client.Binary(open(torrent_file, mode='rb').read()), options
             )

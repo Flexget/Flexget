@@ -67,7 +67,7 @@ class NextTraktEpisodes:
             raise plugin.PluginError('Unable to get trakt list `{}`: {}'.format(config['list'], e))
         if not data:
             logger.warning('The list "{}" is empty.', config['list'])
-            return
+            return None
         for item in data:
             if item.get('show'):
                 if not item['show']['title']:

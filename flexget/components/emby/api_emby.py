@@ -292,7 +292,7 @@ class EmbyAuth(EmbyApiBase):
 
                     if not login_data and optional:
                         return
-                    elif not login_data:
+                    if not login_data:
                         self.logout()
                         raise PluginError('Could not login to Emby')
 
@@ -307,7 +307,7 @@ class EmbyAuth(EmbyApiBase):
 
         if not userdata and optional:
             return
-        elif not userdata:
+        if not userdata:
             self.logout()
             raise PluginError('Could not login to Emby')
 
@@ -501,7 +501,7 @@ class EmbyAuth(EmbyApiBase):
         args = {'IsDisabled': False}
         useres = EmbyApi.resquest_emby(EMBY_ENDPOINT_GETUSERS, self, 'GET', **args)
         if not useres:
-            return
+            return None
 
         for user in useres:
             if user.get('Name').lower() == name.lower():
@@ -720,16 +720,16 @@ class EmbyApiList(EmbyApiBase, MutableSet):
         if EmbyApiRootList.is_type(**kwargs):
             logger.debug('List is a root list')
             return EmbyApiRootList(**kwargs)
-        elif EmbyApiWatchedList.is_type(**kwargs):
+        if EmbyApiWatchedList.is_type(**kwargs):
             logger.debug('List is a watched list')
             return EmbyApiWatchedList(**kwargs)
-        elif EmbyApiFavoriteList.is_type(**kwargs):
+        if EmbyApiFavoriteList.is_type(**kwargs):
             logger.debug('List is a favorite list')
             return EmbyApiFavoriteList(**kwargs)
-        elif EmbyApiLibrary.is_type(**kwargs):
+        if EmbyApiLibrary.is_type(**kwargs):
             logger.debug('List is a library')
             return EmbyApiLibrary(**kwargs)
-        elif EmbyApiPlayList.is_type(**kwargs):
+        if EmbyApiPlayList.is_type(**kwargs):
             logger.debug('List is a playlist')
             return EmbyApiPlayList(**kwargs)
 
@@ -739,13 +739,13 @@ class EmbyApiList(EmbyApiBase, MutableSet):
         if EmbyApiWatchedList.is_type(**kwargs) or EmbyApiWatchedList.allow_create:
             logger.debug('Creating a watched list')
             return EmbyApiWatchedList(**kwargs)
-        elif EmbyApiFavoriteList.is_type(**kwargs) or EmbyApiFavoriteList.allow_create:
+        if EmbyApiFavoriteList.is_type(**kwargs) or EmbyApiFavoriteList.allow_create:
             logger.debug('Creating a favorite list')
             return EmbyApiFavoriteList(**kwargs)
-        elif EmbyApiLibrary.is_type(**kwargs) or EmbyApiLibrary.allow_create:
+        if EmbyApiLibrary.is_type(**kwargs) or EmbyApiLibrary.allow_create:
             logger.debug('Creating a library')
             return EmbyApiLibrary(**kwargs)
-        elif EmbyApiPlayList.is_type(**kwargs) or EmbyApiPlayList.allow_create:
+        if EmbyApiPlayList.is_type(**kwargs) or EmbyApiPlayList.allow_create:
             logger.debug('Creating a playlist')
             return EmbyApiPlayList(**kwargs)
 
@@ -835,7 +835,7 @@ class EmbyApiLibrary(EmbyApiListBase):
         logger.debug('Search Library name list with: {}', args)
         search_list_data = EmbyApi.resquest_emby(EMBY_ENDPOINT_LIBRARY, auth, 'GET', **args)
         if not search_list_data or not search_list_data['Items']:
-            return
+            return None
 
         for search_list in search_list_data['Items']:
             if (
@@ -1209,7 +1209,7 @@ class EmbyApiPlayList(EmbyApiListBase):
         logger.debug('Search Playlist Name list with: {}', args)
         search_list_data = EmbyApi.resquest_emby(EMBY_ENDPOINT_SEARCH, auth, 'GET', **args)
         if not search_list_data or not search_list_data['Items']:
-            return
+            return None
 
         for search_list in search_list_data['Items']:
             if search_list['Name'].lower() == list_name.lower():
@@ -1238,14 +1238,14 @@ class EmbyApiPlayList(EmbyApiListBase):
         items = EmbyApi.resquest_emby(EMBY_ENDPOINT_NEW_PLAYLIST, auth, 'POST', **args)
         if not items:
             logger.warning('Not possible to create playlist \'{}\'', list_name)
-            return
+            return None
 
         logger.debug('Returning information of new playlist \'{}\'', items)
 
         new_playlist = EmbyApiPlayList(auth=auth, **items)
         if not new_playlist.created:
             logger.warning('Not possible to create playlist \'{}\'', list_name)
-            return
+            return None
 
         logger.debug('Created playlist \'{}\' with id {}', new_playlist.name, new_playlist.id)
 
@@ -1362,24 +1362,24 @@ class EmbyApiMedia(EmbyApiBase):
 
     def _get_parents(self) -> dict:
         if not self.id or not self.auth or not self.auth.uid:
-            return
+            return None
 
         args = {'userid': self.auth.uid}
 
         endpoint = EMBY_ENDPOINT_PARENTS.format(itemid=self.id)
         parents = EmbyApi.resquest_emby(endpoint, self.auth, 'GET', **args)
         if not parents:
-            return
+            return None
 
         return parents
 
     def get_libary(self) -> 'EmbyApiLibrary':
         parents = self._get_parents()
         if not parents:
-            return
+            return None
 
         if len(parents) < 2:
-            return
+            return None
 
         parent = parents[len(parents) - 2]
 
@@ -1469,17 +1469,17 @@ class EmbyApiMedia(EmbyApiBase):
     @property
     def library_name(self) -> str:
         if not self.library:
-            return
+            return None
 
         return self.library.name
 
     @property
     def download_url(self) -> str:
         if not self.auth or not self.auth.token or not self.id:
-            return
+            return None
 
         if not self.auth.can_download:
-            return
+            return None
 
         endpoint = EMBY_ENDPOINT_DOWNLOAD.format(itemid=self.id)
         qstr = urlencode({'api_key': self.auth.token, 'mediaSourceId': self.source_id})
@@ -1502,7 +1502,7 @@ class EmbyApiMedia(EmbyApiBase):
     @property
     def filename(self) -> str:
         if not self.path:
-            return
+            return None
 
         filename = re.search('([^\\/\\\\]+)$', self.path)
         if filename:
@@ -1511,7 +1511,7 @@ class EmbyApiMedia(EmbyApiBase):
     @property
     def file_extension(self) -> str:
         if not self.path:
-            return
+            return None
 
         ext = re.search('\\.([^\\/\\\\]+)$', self.path)
         if ext:
@@ -1622,7 +1622,7 @@ class EmbyApiMedia(EmbyApiBase):
 
                 if not args['SearchTerm']:
                     logger.warning('Not possible to search media, no search term')
-                    return
+                    return None
 
                 if parameters.get('year'):
                     args['Years'] = parameters['year']
@@ -1637,7 +1637,7 @@ class EmbyApiMedia(EmbyApiBase):
                 return EmbyApiMedia.search(**parameters)
 
             logger.warning('No media found')
-            return
+            return None
 
         media = medias['Items'][0]
 
@@ -1645,8 +1645,7 @@ class EmbyApiMedia(EmbyApiBase):
 
         if media_api.mtype and media_api.mtype != EmbyApiMedia.TYPE:
             return EmbyApi.search(auth=auth, **media_api.to_dict())
-        else:
-            logger.debug('Found media \'{}\' in emby server', media_api.fullname)
+        logger.debug('Found media \'{}\' in emby server', media_api.fullname)
 
         return media_api
 
@@ -1756,8 +1755,7 @@ class EmbyApiSerie(EmbyApiMedia):
                 if force_parse:
                     # I assume that it's only a serie if contains pathern, but I might need to assume it's a serie
                     return split_title_year(string)
-                else:
-                    return None, None
+                return None, None
 
         try:
             info = info.group(1)
@@ -1795,7 +1793,7 @@ class EmbyApiSerie(EmbyApiMedia):
 
                 if not args['SearchTerm']:
                     logger.warning('Not possible to search series, no search term')
-                    return
+                    return None
 
                 if parameters.get('year'):
                     args['Years'] = parameters['year']
@@ -1812,7 +1810,7 @@ class EmbyApiSerie(EmbyApiMedia):
                 return EmbyApiSerie.search(**parameters)
 
             logger.warning('No serie found')
-            return
+            return None
 
         if len(series['Items']) == 1:
             serie = series['Items'][0]
@@ -1830,7 +1828,7 @@ class EmbyApiSerie(EmbyApiMedia):
                 serie = serie_filter[0]
             else:
                 logger.warning('More than one serie found')
-                return
+                return None
 
         serie_api = EmbyApiSerie(auth=auth, **serie)
         if serie_api:
@@ -1917,9 +1915,9 @@ class EmbyApiSeason(EmbyApiMedia):
     def fullname(self) -> str:
         if not self.serie:
             return self.name
-        elif self.season == 0:
+        if self.season == 0:
             return f'{self.serie.fullname} S00'
-        elif not self.season:
+        if not self.season:
             return f'{self.serie.fullname} Sxx'
 
         return f'{self.serie.fullname} S{self.season:02d}'
@@ -2029,7 +2027,7 @@ class EmbyApiSeason(EmbyApiMedia):
 
         if not season_serie:
             logger.warning('Not possible to determine season, serie not found')
-            return
+            return None
 
         if 'season_id' in parameters:
             args['Ids'] = parameters.get('season_id')
@@ -2044,7 +2042,7 @@ class EmbyApiSeason(EmbyApiMedia):
         seasons = EmbyApi.resquest_emby(EMBY_ENDPOINT_SEARCH, auth, 'GET', **args)
         if not seasons or 'Items' not in seasons or not seasons['Items']:
             logger.warning('No season found')
-            return
+            return None
 
         seasons = seasons['Items']
 
@@ -2065,10 +2063,10 @@ class EmbyApiSeason(EmbyApiMedia):
             logger.warning(
                 'More than one season found for {} {}', season_serie.fullname, target_season
             )
-            return
+            return None
         else:
             logger.warning('No season found')
-            return
+            return None
 
         season_api = EmbyApiSeason(auth=auth, api_serie=season_serie, **season)
         if season_api:
@@ -2154,11 +2152,11 @@ class EmbyApiEpisode(EmbyApiMedia):
     def fullname(self) -> str:
         if not self.serie:
             return self.name
-        elif not self.season:
+        if not self.season:
             return f'{self.serie.fullname} SxxExx'
-        elif self.episode == 0:
+        if self.episode == 0:
             return f'{self.serie.fullname} S{self.season.season:02d}E00'
-        elif not self.episode:
+        if not self.episode:
             return f'{self.serie.fullname} S{self.season.season:02d}Exx'
 
         return f'{self.serie.fullname} S{self.season.season:02d}E{self.episode:02d} {self.name}'
@@ -2246,7 +2244,7 @@ class EmbyApiEpisode(EmbyApiMedia):
 
         if not episode_serie:
             logger.warning('Not possible to determine episode, serie not found')
-            return
+            return None
 
         # We need to have information regarding the season
         if 'api_season' in kwargs:
@@ -2257,7 +2255,7 @@ class EmbyApiEpisode(EmbyApiMedia):
 
         if not episode_season:
             logger.warning('Not possible to determine episode, season not found')
-            return
+            return None
 
         # We need to return all the episodes for that show/season
         if 'ep_id' in parameters:
@@ -2274,12 +2272,12 @@ class EmbyApiEpisode(EmbyApiMedia):
         response = EmbyApi.resquest_emby(EMBY_ENDPOINT_SEARCH, auth, 'GET', **args)
         if not response or 'Items' not in response or not response['Items']:
             logger.warning('No episode found')
-            return
+            return None
 
         episodes = response['Items']
         if len(episodes) == 0:
             logger.warning('No episode found')
-            return
+            return None
 
         target_episode = None
         if 'Ids' in args:
@@ -2298,14 +2296,14 @@ class EmbyApiEpisode(EmbyApiMedia):
 
         if len(episode) > 1:
             logger.warning("More than one episode found")
-            return
-        elif len(episode) == 0:
+            return None
+        if len(episode) == 0:
             logger.warning(
                 'Episodes found for {} but none matches {}',
                 episode_season.fullname,
                 target_episode,
             )
-            return
+            return None
 
         episode_api = EmbyApiEpisode(
             auth=auth,
@@ -2484,7 +2482,7 @@ class EmbyApiMovie(EmbyApiMedia):
 
                 if not args['SearchTerm']:
                     logger.warning('Not possible to search movie, no search term')
-                    return
+                    return None
 
                 if parameters.get('year'):
                     args['Years'] = parameters['year']
@@ -2501,7 +2499,7 @@ class EmbyApiMovie(EmbyApiMedia):
                 return EmbyApiMovie.search(**parameters)
 
             logger.warning('No movie found')
-            return
+            return None
 
         if len(movies['Items']) == 1:
             movie = movies['Items'][0]
@@ -2519,7 +2517,7 @@ class EmbyApiMovie(EmbyApiMedia):
                 movie = movie_filter[0]
             else:
                 logger.warning("More than one movie found")
-                return
+                return None
 
         movie_api = EmbyApiMovie(auth=auth, **movie)
         if movie_api:
@@ -2610,9 +2608,9 @@ class EmbyApi(EmbyApiBase):
     def get_auth(**kwargs) -> EmbyAuth:
         if 'auth' in kwargs:
             return kwargs['auth']
-        elif EmbyApi._last_auth:
+        if EmbyApi._last_auth:
             return EmbyApi._last_auth
-        elif EmbyAuth.get_last_auth():
+        if EmbyAuth.get_last_auth():
             return EmbyAuth.get_last_auth()
 
         return EmbyAuth(**kwargs)
@@ -2645,10 +2643,9 @@ class EmbyApi(EmbyApiBase):
 
         if isinstance(search_result, dict):
             return search_result
-        elif isinstance(search_result, EmbyApiMedia):
+        if isinstance(search_result, EmbyApiMedia):
             return search_result.to_dict()
-        else:
-            return None
+        return None
 
     @staticmethod
     def search_list(**kwargs):
@@ -2671,9 +2668,9 @@ class EmbyApi(EmbyApiBase):
 
         if not date:
             return None
-        elif isinstance(date, datetime):
+        if isinstance(date, datetime):
             return pendulum.instance(date)
-        elif not isinstance(date, str):
+        if not isinstance(date, str):
             return None
 
         try:
@@ -2687,11 +2684,11 @@ class EmbyApi(EmbyApiBase):
     def get_type(**kwargs) -> bool:
         if EmbyApiEpisode.is_type(**kwargs):
             return EmbyApiEpisode.TYPE
-        elif EmbyApiSeason.is_type(**kwargs):
+        if EmbyApiSeason.is_type(**kwargs):
             return EmbyApiSeason.TYPE
-        elif EmbyApiSerie.is_type(**kwargs):
+        if EmbyApiSerie.is_type(**kwargs):
             return EmbyApiSerie.TYPE
-        elif EmbyApiMovie.is_type(**kwargs):
+        if EmbyApiMovie.is_type(**kwargs):
             return EmbyApiMovie.TYPE
 
         return EmbyApiMedia.TYPE
@@ -2708,7 +2705,7 @@ class EmbyApi(EmbyApiBase):
 
         if not auth:
             auth = EmbyApi.get_auth(**kwargs)
-            return
+            return None
 
         if not auth.host:
             raise PluginError('No Emby server information')
@@ -2757,8 +2754,7 @@ class EmbyApi(EmbyApiBase):
             if e.response.status_code == 401:
                 logger.error('Autentication Error: {}', str(e))
                 return False
-            else:
-                raise PluginError(f'Could not connect to Emby Server: {e!s}') from e
+            raise PluginError(f'Could not connect to Emby Server: {e!s}') from e
 
         except RequestException as e:
             raise PluginError(f'Could not connect to Emby Server: {e!s}') from e

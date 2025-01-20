@@ -48,8 +48,7 @@ def variables_from_db():
         variables = session.query(Variables).first()
         if variables:
             return variables.variables
-        else:
-            return {}
+        return {}
 
 
 def variables_to_db(variables_dict):
@@ -71,7 +70,7 @@ def process_variables(config, manager):
         'variable_end_string': '?}',
     }
     if 'variables' not in config or config.get('variables') is False:
-        return
+        return None
     env = NativeEnvironment(**env_params)
     if isinstance(config['variables'], bool):
         logger.debug('trying to load variables from DB')

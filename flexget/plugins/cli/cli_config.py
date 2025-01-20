@@ -35,21 +35,20 @@ def replace_in_item(replaces, item):
         for key, val in replaces.items():
             item = item.replace(f'${key}', val)
         return item
-    elif isinstance(item, list):
+    if isinstance(item, list):
         # Make a new list with replacements done on each item
         return list(map(replace, item))
-    elif isinstance(item, dict):
+    if isinstance(item, dict):
         # Make a new dict with replacements done on keys and values
         return dict(list(map(replace, kv_pair)) for kv_pair in item.items())
-    else:
-        # We don't know how to do replacements on this item, just return it
-        return item
+    # We don't know how to do replacements on this item, just return it
+    return item
 
 
 @event('manager.before_config_validate')
 def substitute_cli_variables(config, manager):
     if not manager.options.execute.cli_config:
-        return
+        return None
     return replace_in_item(dict(manager.options.execute.cli_config), config)
 
 

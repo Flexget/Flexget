@@ -37,11 +37,11 @@ def is_movie(entry: Entry) -> bool:
 def get_media_type_for_entry(entry: Entry) -> Optional[str]:
     if is_episode(entry):
         return 'episode'
-    elif is_season(entry):
+    if is_season(entry):
         return 'season'
-    elif is_show(entry):
+    if is_show(entry):
         return 'show'
-    elif is_movie(entry):
+    if is_movie(entry):
         return 'movie'
     return None
 

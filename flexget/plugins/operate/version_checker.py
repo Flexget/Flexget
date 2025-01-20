@@ -94,7 +94,7 @@ class VersionChecker:
         if not latest_version:
             logger.warning('Could not get latest version of flexget')
             return
-        elif latest_version != current_version:
+        if latest_version != current_version:
             logger.warning(
                 'You are not running latest Flexget Version. Current is {} and latest is {}',
                 current_version,

@@ -217,8 +217,7 @@ class ArchiveInfo:
 
         if hasattr(self.info, 'isdir'):
             return self.info.isdir()
-        else:
-            return not self.filename
+        return not self.filename
 
     def extract(self, archive, destination):
         """Extract ArchiveInfo object to the specified destination"""

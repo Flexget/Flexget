@@ -92,13 +92,12 @@ class RlsLog:
             except RequestException as e:
                 if number == 1:
                     raise
-                else:
-                    logger.verbose(
-                        'Error receiving content, retrying in 5s. Try [{} of 2]. Error: {}',
-                        number + 1,
-                        e,
-                    )
-                    time.sleep(5)
+                logger.verbose(
+                    'Error receiving content, retrying in 5s. Try [{} of 2]. Error: {}',
+                    number + 1,
+                    e,
+                )
+                time.sleep(5)
 
         # Construct entry from release
         for release in releases:

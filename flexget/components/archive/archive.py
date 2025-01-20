@@ -37,8 +37,7 @@ class Archive:
             # I think entry can be in multiple of those lists .. not sure though!
             if entry in processed:
                 continue
-            else:
-                processed.append(entry)
+            processed.append(entry)
 
             ae = (
                 task.session.query(db.ArchiveEntry)

@@ -131,9 +131,8 @@ class FilterExistsSeries:
                             if disk_parser.proper_count >= entry['series_parser'].proper_count:
                                 entry.reject('episode already exists')
                                 continue
-                            else:
-                                logger.trace('new one is better proper, allowing')
-                                continue
+                            logger.trace('new one is better proper, allowing')
+                            continue
 
 
 @event('plugin.register')

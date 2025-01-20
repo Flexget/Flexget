@@ -20,8 +20,7 @@ def generate_show_title(item):
     show_info = item['show']
     if show_info['year'] and not item['strip_dates']:
         return '{} ({})'.format(show_info['title'], show_info['year'])
-    else:
-        return show_info['title']
+    return show_info['title']
 
 
 def generate_episode_title(item):
@@ -37,15 +36,14 @@ def generate_episode_title(item):
                 episode_info['title'] or '',
             )
         ).strip()
-    else:
-        return (
-            '{} S{:02d}E{:02d} {}'.format(
-                show_info['title'],
-                episode_info['season'],
-                episode_info['number'],
-                episode_info['title'] or '',
-            )
-        ).strip()
+    return (
+        '{} S{:02d}E{:02d} {}'.format(
+            show_info['title'],
+            episode_info['season'],
+            episode_info['number'],
+            episode_info['title'] or '',
+        )
+    ).strip()
 
 
 field_maps = {
@@ -333,10 +331,9 @@ class TraktSet(MutableSet):
                 raise plugin.PluginError('`type` cannot be `episodes` for collection list.')
             if self.config.get('account'):
                 return ('sync', 'history', 'episodes')
-            else:
-                raise plugin.PluginError(
-                    'A trakt `account` needs to be configured to get the episode history.'
-                )
+            raise plugin.PluginError(
+                'A trakt `account` needs to be configured to get the episode history.'
+            )
 
         if self.config['list'] in ['collection', 'watchlist', 'watched', 'ratings']:
             if self.config.get('account'):

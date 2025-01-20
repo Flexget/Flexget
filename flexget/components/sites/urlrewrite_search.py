@@ -73,8 +73,7 @@ class PluginSearch:
                             logger.debug('Found url: {}', result['url'])
                             entry['url'] = result['url']
                             break
-                        else:
-                            logger.debug('Match {} is not close enough', result['title'])
+                        logger.debug('Match {} is not close enough', result['title'])
                     else:
                         continue
                     break

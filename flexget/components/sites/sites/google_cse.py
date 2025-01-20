@@ -80,8 +80,7 @@ class UrlRewriteGoogle:
                 logger.debug('--> rewriting {} (known url pattern)', href)
                 entry['url'] = href
                 return
-            else:
-                logger.debug('<-- ignoring {} (unknown url pattern)', href)
+            logger.debug('<-- ignoring {} (unknown url pattern)', href)
         raise UrlRewritingError('Unable to resolve')
 
 

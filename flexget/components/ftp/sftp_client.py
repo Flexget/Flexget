@@ -332,15 +332,14 @@ class SftpClient:
                 logger.debug('Caught exception: {}', e)
                 if not tries:
                     raise TaskAbort(f'Failed to connect to {self.host}')
-                else:
-                    logger.debug('Caught exception: {}', e)
-                    logger.warning(
-                        'Failed to connect to {}; waiting {} seconds before retrying.',
-                        self.host,
-                        retry_interval,
-                    )
-                    time.sleep(retry_interval)
-                    retry_interval += RETRY_STEP_SEC
+                logger.debug('Caught exception: {}', e)
+                logger.warning(
+                    'Failed to connect to {}; waiting {} seconds before retrying.',
+                    self.host,
+                    retry_interval,
+                )
+                time.sleep(retry_interval)
+                retry_interval += RETRY_STEP_SEC
 
         return sftp
 
@@ -417,16 +416,14 @@ class SftpClient:
         def get_login_string() -> str:
             if self.username and self.password:
                 return f'{self.username}:{self.password}@'
-            elif self.username:
+            if self.username:
                 return f'{self.username}@'
-            else:
-                return ''
+            return ''
 
         def get_port_string() -> str:
             if self.port and self.port != 22:
                 return f':{self.port}'
-            else:
-                return ''
+            return ''
 
         login_string = get_login_string()
         host = self.host

@@ -161,11 +161,10 @@ def get_http_seeds(url, info_hash):
 def get_tracker_seeds(url, info_hash):
     if url.startswith('udp'):
         return get_udp_seeds(url, info_hash)
-    elif url.startswith('http'):
+    if url.startswith('http'):
         return get_http_seeds(url, info_hash)
-    else:
-        logger.warning('There is a problem with the get_tracker_seeds')
-        return 0
+    logger.warning('There is a problem with the get_tracker_seeds')
+    return 0
 
 
 class TorrentAlive:

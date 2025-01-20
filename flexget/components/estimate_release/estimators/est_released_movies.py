@@ -16,7 +16,7 @@ class EstimatesReleasedMovies:
             logger.verbose('Querying release estimation for {}', entry['title'])
             entity_data['entity_date'] = entry['tmdb_released']
             return entity_data
-        elif 'movie_year' in entry and entry['movie_year'] is not None:
+        if 'movie_year' in entry and entry['movie_year'] is not None:
             try:
                 entity_data['entity_date'] = datetime(year=entry['movie_year'], month=1, day=1)
                 return entity_data

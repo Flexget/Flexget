@@ -74,7 +74,7 @@ class NextSeriesSeasons:
 
     def on_task_input(self, task, config):
         if not config:
-            return
+            return None
         if isinstance(config, bool):
             config = {}
 
@@ -83,8 +83,7 @@ class NextSeriesSeasons:
             entries = self.rerun_entries
             self.rerun_entries = []
             return entries
-        else:
-            self.rerun_entries = []
+        self.rerun_entries = []
 
         threshold = config.get('threshold')
 
@@ -227,23 +226,20 @@ class NextSeriesSeasons:
                         'season lookup produced an episode result; assuming no season match, no need to rerun'
                     )
                     return
-                else:
-                    logger.debug(
-                        '{} {} was accepted, rerunning to look for next season.',
-                        entry['series_name'],
-                        entry['series_id'],
-                    )
-                    if not any(
-                        e.get('series_season') == latest.season + 1 for e in self.rerun_entries
-                    ):
-                        self.rerun_entries.append(
-                            self.search_entry(series, latest.season + 1, task)
-                        )
-                    # Increase rerun limit by one if we have matches, this way
-                    # we keep searching as long as matches are found!
-                    # TODO: this should ideally be in discover so it would be more generic
-                    task.max_reruns += 1
-                    task.rerun(plugin=plugin_name, reason='Look for next season')
+                logger.debug(
+                    '{} {} was accepted, rerunning to look for next season.',
+                    entry['series_name'],
+                    entry['series_id'],
+                )
+                if not any(
+                    e.get('series_season') == latest.season + 1 for e in self.rerun_entries
+                ):
+                    self.rerun_entries.append(self.search_entry(series, latest.season + 1, task))
+                # Increase rerun limit by one if we have matches, this way
+                # we keep searching as long as matches are found!
+                # TODO: this should ideally be in discover so it would be more generic
+                task.max_reruns += 1
+                task.rerun(plugin=plugin_name, reason='Look for next season')
             elif latest and not latest.completed:
                 # There are known releases of this season, but none were accepted
                 return

@@ -77,14 +77,13 @@ class NotifyMyAndroidNotifier:
         error = request_status.find('error')
         if error is not None:
             raise PluginWarning(error.text)
-        else:
-            success = request_status.find('success').attrib
-            logger.debug(
-                'notifymyandroid notification sent. Notifications remaining until next reset: {}. '
-                'Next reset will occur in {} minutes',
-                success['remaining'],
-                success['resettimer'],
-            )
+        success = request_status.find('success').attrib
+        logger.debug(
+            'notifymyandroid notification sent. Notifications remaining until next reset: {}. '
+            'Next reset will occur in {} minutes',
+            success['remaining'],
+            success['resettimer'],
+        )
 
 
 @event('plugin.register')

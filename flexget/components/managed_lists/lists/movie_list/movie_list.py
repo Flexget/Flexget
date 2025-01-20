@@ -127,7 +127,7 @@ class MovieList(MutableSet):
             year = entry.get('movie_year') if entry.get('movie_year') else None
         else:
             logger.warning('Could not get a movie name, skipping')
-            return
+            return None
         logger.debug('trying to match movie based of name: {} and year: {}', name, year)
         res = (
             self._db_list(session)

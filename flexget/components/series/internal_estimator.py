@@ -17,13 +17,13 @@ class EstimatesSeriesInternal:
     @plugin.priority(0)  # Should always be last priority
     def estimate(self, entry):
         if not all(field in entry for field in ['series_name', 'series_season', 'series_episode']):
-            return
+            return None
         with Session() as session:
             series = (
                 session.query(db.Series).filter(db.Series.name == entry['series_name']).first()
             )
             if not series:
-                return
+                return None
             episodes = (
                 session.query(db.Episode)
                 .join(db.Episode.series)
@@ -36,19 +36,19 @@ class EstimatesSeriesInternal:
             )
 
             if len(episodes) < 2:
-                return
+                return None
             # If last two eps were not contiguous, don't guess
             if episodes[0].number != episodes[1].number + 1:
-                return
+                return None
             # If first_seen in None, return
             if episodes[0].first_seen is None or episodes[1].first_seen is None:
-                return
+                return None
             last_diff = episodes[0].first_seen - episodes[1].first_seen
             # If last eps were grabbed close together, we might be catching up, don't guess
             # Or, if last eps were too far apart, don't guess
             # TODO: What range?
             if last_diff < timedelta(days=2) or last_diff > timedelta(days=10):
-                return
+                return None
             # Estimate next season somewhat more than a normal episode break
             if entry['series_season'] > episodes[0].season:
                 # TODO: How big should this be?

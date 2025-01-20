@@ -199,7 +199,7 @@ class SeriesParser(TitleParser):
         # We don't remove anything, as the match positions should line up with the original title
         clean_title = re.sub(r'[_.,\[\]\(\):]', ' ', self.data)
         if self.parse_unwanted(clean_title):
-            return
+            return None
         match = self.parse_date(clean_title)
         if match:
             self.identified_by = 'date'
@@ -209,7 +209,7 @@ class SeriesParser(TitleParser):
                 match = self.parse_episode(clean_title)
             self.identified_by = 'ep'
         if not match:
-            return
+            return None
         if match['match'].start() > 1:
             # We start using the original title here, so we can properly ignore unwanted prefixes.
             # Look for unwanted prefixes to find out where the series title starts
@@ -419,8 +419,7 @@ class SeriesParser(TitleParser):
                     self.id_type = 'ep'
                     self.valid = True
                     return
-                else:
-                    logger.trace('-> no luck with SEE')
+                logger.trace('-> no luck with SEE')
 
         # Check id regexps
         if self.identified_by in ['id', 'auto'] and not self.valid:
@@ -440,8 +439,7 @@ class SeriesParser(TitleParser):
                     logger.trace("found id '{}' with regexp '{}'", self.id, id_re.pattern)
                     if not (self.special and self.prefer_specials):
                         return
-                    else:
-                        break
+                    break
             else:
                 logger.trace('-> no luck with id_regexps')
 
@@ -472,8 +470,7 @@ class SeriesParser(TitleParser):
                     logger.trace("found id '{}' with regexp '{}'", self.id, sequence_re.pattern)
                     if not (self.special and self.prefer_specials):
                         return
-                    else:
-                        break
+                    break
             else:
                 logger.trace('-> no luck with sequence_regexps')
 
@@ -634,7 +631,7 @@ class SeriesParser(TitleParser):
                     # Single season full pack, no parts etc
                     season = int(matches[0])
                     return {'season': season, 'match': match}
-                elif len(matches) == 2:
+                if len(matches) == 2:
                     # TODO support other formats of season packs: 1xall, s01-PART1, etc.
                     pass
 

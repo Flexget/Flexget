@@ -126,8 +126,7 @@ class InputPlex:
         ].firstChild.nodeValue
         if not globalaccesstoken:
             raise plugin.PluginError('Myplex: could not find a server!')
-        else:
-            logger.debug('Myplex: Got global accesstoken: {}', globalaccesstoken)
+        logger.debug('Myplex: Got global accesstoken: {}', globalaccesstoken)
         return globalaccesstoken
 
     def plex_get_accesstoken(self, config, globalaccesstoken=""):
@@ -158,8 +157,7 @@ class InputPlex:
             raise plugin.PluginError(
                 'Could not retrieve accesstoken for {}.'.format(config['server'])
             )
-        else:
-            return accesstoken
+        return accesstoken
 
     def plex_format_server(self, config):
         if gethostbyname(config['server']) != config['server']:

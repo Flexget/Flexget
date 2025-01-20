@@ -86,12 +86,11 @@ def _htmldecode(text: str) -> str:
         entity = match.group(1)
         if entity.startswith('#x'):
             return uchr(int(entity[2:], 16))
-        elif entity.startswith('#'):
+        if entity.startswith('#'):
             return uchr(int(entity[1:]))
-        elif entity in name2codepoint:
+        if entity in name2codepoint:
             return uchr(name2codepoint[entity])
-        else:
-            return match.group(0)
+        return match.group(0)
 
     return charrefpat.sub(entitydecode, text)
 
@@ -424,8 +423,7 @@ def get_config_hash(config: Any) -> str:
     if isinstance(config, (dict, list)):
         # this does in fact support nested dicts, they're sorted too!
         return hashlib.md5(pformat(config).encode('utf-8')).hexdigest()
-    else:
-        return hashlib.md5(str(config).encode('utf-8')).hexdigest()
+    return hashlib.md5(str(config).encode('utf-8')).hexdigest()
 
 
 def get_config_as_array(config: dict, key: str) -> list:

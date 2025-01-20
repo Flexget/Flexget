@@ -455,20 +455,19 @@ def lookup_movie(
 
     if not movie:
         raise PluginError(f'No results found from rotten tomatoes for {id_str()}')
-    else:
-        # Access attributes to force the relationships to eager load before we detach from session
-        for attr in [
-            'alternate_ids',
-            'cast',
-            'directors',
-            'genres',
-            'links',
-            'posters',
-            'release_dates',
-        ]:
-            getattr(movie, attr)
-        session.commit()
-        return movie
+    # Access attributes to force the relationships to eager load before we detach from session
+    for attr in [
+        'alternate_ids',
+        'cast',
+        'directors',
+        'genres',
+        'links',
+        'posters',
+        'release_dates',
+    ]:
+        getattr(movie, attr)
+    session.commit()
+    return movie
 
 
 # TODO: get rid of or heavily refactor

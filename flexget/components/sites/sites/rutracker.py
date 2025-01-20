@@ -73,16 +73,14 @@ class RutrackerAuth(AuthBase):
 
         if url:
             return url
-        else:
-            raise PluginError('Host unreachable.')
+        raise PluginError('Host unreachable.')
 
     def try_authenticate(self, payload):
         for _ in range(5):
             self.requests.post(f'{self.base_url}/forum/login.php', data=payload)
             if self.requests.cookies and len(self.requests.cookies) > 0:
                 return self.requests.cookies
-            else:
-                sleep(3)
+            sleep(3)
         raise PluginError('unable to obtain cookies from rutracker')
 
     def __init__(self, requests, login, password, cookies=None, db_session=None):
@@ -169,8 +167,7 @@ class RutrackerUrlrewrite:
                 db_session.commit()
                 return None
             return account.cookies
-        else:
-            return None
+        return None
 
 
 @event('plugin.register')

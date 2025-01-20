@@ -72,8 +72,7 @@ class Eztv:
         except RequestException as e:
             if entry:
                 raise plugin.PluginWarning(f'Error searching for `{entry["title"]}`: {e}')
-            else:
-                raise plugin.PluginWarning(f'Request error: {e}')
+            raise plugin.PluginWarning(f'Request error: {e}')
 
     def get_results(self, task, entry=None, imdb_id=None):
         query = {'limit': 100}

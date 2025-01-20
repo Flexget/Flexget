@@ -49,7 +49,7 @@ class FilterUpgrade:
 
     def prepare_config(self, config):
         if not config or config is False:
-            return
+            return None
 
         if config is True:
             config = {}

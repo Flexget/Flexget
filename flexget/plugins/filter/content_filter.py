@@ -88,8 +88,7 @@ class FilterContentFilter:
                 """Returns matching mask if any files match any of the masks, false otherwise"""
                 if config.get('regexp_mode'):
                     return re.search(mask, file, re.IGNORECASE)
-                else:
-                    return fnmatch(file, mask)
+                return fnmatch(file, mask)
 
             # Avoid confusion by printing a reject message to info log, as
             # download plugin has already printed a downloading message.

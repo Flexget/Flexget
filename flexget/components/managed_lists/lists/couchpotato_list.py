@@ -41,14 +41,13 @@ class CouchPotatoBase:
     def build_url(base_url, request_type, port, api_key):
         if request_type == 'active':
             return CouchPotatoBase.movie_list_request(base_url, port, api_key)
-        elif request_type == 'profiles':
+        if request_type == 'profiles':
             return CouchPotatoBase.profile_list_request(base_url, port, api_key)
-        elif request_type == 'add':
+        if request_type == 'add':
             return CouchPotatoBase.movie_add_request(base_url, port, api_key)
-        elif request_type == 'delete':
+        if request_type == 'delete':
             return CouchPotatoBase.movie_delete_request(base_url, port, api_key)
-        else:
-            raise plugin.PluginError('Received unknown API request, aborting.')
+        raise plugin.PluginError('Received unknown API request, aborting.')
 
     @staticmethod
     def get_json(url):
@@ -151,7 +150,7 @@ class CouchPotatoBase:
     def add_movie(config, entry, test_mode=None):
         if not entry.get('imdb_id'):
             logger.error('Cannot add movie to couchpotato without an imdb ID: {}', entry)
-            return
+            return None
         logger.verbose('Connection to CouchPotato to add a movie to list.')
         add_movie_url = CouchPotatoBase.build_url(
             config.get('base_url'), 'add', config.get('port'), config.get('api_key')
