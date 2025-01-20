@@ -19,9 +19,9 @@ class SearchPlugin:
     def search(self, task, entry, config=None):
         if not config:
             return []
-        elif config == 'fail':
+        if config == 'fail':
             raise plugin.PluginError('search plugin failure')
-        elif isinstance(config, list):
+        if isinstance(config, list):
             return [Entry({**entry, 'title': entry['title'] + suffix}) for suffix in config]
         return [Entry(entry)]
 

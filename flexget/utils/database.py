@@ -36,10 +36,9 @@ def with_session(*args, **kwargs):
         # We default to expire_on_commit being false, in case the decorated function returns db instances
         _Session = functools.partial(Session, expire_on_commit=False)
         return decorator(args[0])
-    else:
-        # Arguments were specified, turn them into arguments for Session creation e.g. @with_session(autocommit=True)
-        _Session = functools.partial(Session, *args, **kwargs)
-        return decorator
+    # Arguments were specified, turn them into arguments for Session creation e.g. @with_session(autocommit=True)
+    _Session = functools.partial(Session, *args, **kwargs)
+    return decorator
 
 
 def pipe_list_synonym(name: str) -> SynonymProperty:
@@ -124,8 +123,7 @@ class CaseInsensitiveWord(Comparator):
     def lower(self) -> str:
         if isinstance(self.word, str):
             return self.word.lower()
-        else:
-            return func.lower(self.word)
+        return func.lower(self.word)
 
     def operate(self, op, other):
         if not isinstance(other, CaseInsensitiveWord):

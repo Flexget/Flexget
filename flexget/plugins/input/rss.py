@@ -160,8 +160,7 @@ class InputRSS:
         if data is None:
             logger.critical('Received empty page - no content')
             return
-        else:
-            data = bytes(data)  # ahem, dunno about this?
+        data = bytes(data)  # ahem, dunno about this?
 
         ext = 'xml'
         if b'<html>' in data.lower():
@@ -287,23 +286,23 @@ class InputRSS:
                 # Let details plugin know that it is ok if this feed doesn't produce any entries
                 task.no_entries_ok = True
                 return []
-            elif status == 401:
+            if status == 401:
                 raise plugin.PluginError(
                     'Authentication needed for task {} ({}): {}'.format(
                         task.name, config['url'], response.headers['www-authenticate']
                     ),
                     logger,
                 )
-            elif status == 404:
+            if status == 404:
                 raise plugin.PluginError(
                     'RSS Feed {} ({}) not found'.format(task.name, config['url']), logger
                 )
-            elif status == 500:
+            if status == 500:
                 raise plugin.PluginError(
                     'Internal server exception on task {} ({})'.format(task.name, config['url']),
                     logger,
                 )
-            elif status != 200:
+            if status != 200:
                 raise plugin.PluginError(
                     'HTTP error {} received from {}'.format(status, config['url']), logger
                 )

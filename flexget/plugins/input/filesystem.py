@@ -138,17 +138,15 @@ class Filesystem:
                 logger.info(' Location: {}', entry['location'])
                 logger.info(' Timestamp: {}', entry['timestamp'])
             return entry
-        else:
-            logger.error('Non valid entry created: {} ', entry)
-            return
+        logger.error('Non valid entry created: {} ', entry)
+        return None
 
     def get_max_depth(self, recursion, base_depth):
         if recursion is False:
             return base_depth + 1
-        elif recursion is True:
+        if recursion is True:
             return float('inf')
-        else:
-            return base_depth + recursion
+        return base_depth + recursion
 
     @staticmethod
     def get_folder_objects(folder: Path, recursion: bool):

@@ -76,8 +76,7 @@ def get_version(plugin: str, session=None) -> Optional[int]:
     if not schema:
         logger.debug('No schema version stored for {}', plugin)
         return None
-    else:
-        return schema.version
+    return schema.version
 
 
 @with_session

@@ -124,10 +124,9 @@ class PluginDownload:
                     logger.debug('Accepting magnet url for {}', entry['title'])
                     entry['url'] = url
                     break
-                else:
-                    logger.warning('Can\'t download magnet url')
-                    errors.append('Magnet URL')
-                    continue
+                logger.warning('Can\'t download magnet url')
+                errors.append('Magnet URL')
+                continue
             if require_path and 'path' not in entry:
                 # Don't fail here, there might be a magnet later in the list of urls
                 logger.debug('Skipping url {} because there is no path for download', url)
@@ -147,8 +146,7 @@ class PluginDownload:
                 logger.debug('Successfully retrieved {} from {}', entry['title'], url)
                 entry['url'] = url
                 break
-            else:
-                errors.append(error)
+            errors.append(error)
         else:
             # check if entry must have a path (download: yes)
             if require_path and 'path' not in entry:

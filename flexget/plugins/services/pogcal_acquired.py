@@ -49,7 +49,7 @@ class PogcalAcquired:
         if 'logout' not in result.text:
             logger.error('Username/password for pogdesign calendar appear to be incorrect.')
             return
-        elif task.options.test:
+        if task.options.test:
             logger.verbose('Successfully logged in to pogdesign calendar.')
         for entry in task.accepted:
             if not entry.get('series_name') or entry.get('series_id_type') != 'ep':
@@ -65,12 +65,11 @@ class PogcalAcquired:
                     entry['series_id'],
                 )
                 continue
-            else:
-                logger.verbose(
-                    'Marking {} {} in pogdesign calenadar.',
-                    entry['series_name'],
-                    entry['series_id'],
-                )
+            logger.verbose(
+                'Marking {} {} in pogdesign calenadar.',
+                entry['series_name'],
+                entry['series_id'],
+            )
             shid = '{}-{}-{}/{}-{}'.format(
                 show_id,
                 entry['series_season'],
@@ -101,7 +100,7 @@ class PogcalAcquired:
             page = session.get('http://www.pogdesign.co.uk/cat/showselect.php')
         except requests.RequestException as e:
             logger.error('Error looking up show show list from pogdesign calendar: {}', e)
-            return
+            return None
         # Try to find the show id from pogdesign show list
         show_re = name_to_re(show_name)
         soup = get_soup(page.content)
@@ -111,8 +110,7 @@ class PogcalAcquired:
             id = int(show.find_previous('input')['value'])
             db_sess.add(PogcalShow(id=id, name=show_name))
             return id
-        else:
-            logger.verbose('Could not find pogdesign calendar id for show `{}`', show_re)
+        logger.verbose('Could not find pogdesign calendar id for show `{}`', show_re)
 
 
 @event('plugin.register')

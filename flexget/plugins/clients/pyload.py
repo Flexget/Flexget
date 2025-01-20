@@ -27,8 +27,7 @@ class PyloadApi:
 
         if isinstance(response, str):
             return response.replace('"', '')
-        else:
-            return response
+        return response
 
     def get(self, method):
         try:

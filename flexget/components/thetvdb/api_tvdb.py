@@ -706,8 +706,7 @@ def lookup_episode(
             raise LookupError(f'Error looking up episode from TVDb ({e})')
     if episode:
         return episode
-    else:
-        raise LookupError(f'No results found for {ep_description}')
+    raise LookupError(f'No results found for {ep_description}')
 
 
 @with_session

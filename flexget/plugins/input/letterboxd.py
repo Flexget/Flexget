@@ -71,13 +71,13 @@ class Letterboxd:
     def tmdb_lookup(self, search):
         if not search:
             logger.warning('Can\'t search tmdb, no tmdb_id')
-            return
+            return None
 
         try:
             tmdb = plugin.get('api_tmdb', self).lookup(tmdb_id=search)
         except LookupError as e:
             logger.warning('Error searching tmdb: {}', e)
-            return
+            return None
 
         result = {
             'title': f'{tmdb.name} ({tmdb.year})',
@@ -94,7 +94,7 @@ class Letterboxd:
         soup = get_soup(requests.get(url).content)
         result = self.tmdb_lookup(soup.find(attrs={'data-tmdb-id': True}).get('data-tmdb-id'))
         if not result:
-            return
+            return None
 
         entry = Entry(result)
         entry['url'] = url

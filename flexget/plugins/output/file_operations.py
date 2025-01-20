@@ -62,8 +62,8 @@ class BaseFileOps:
     def prepare_config(self, config):
         if config is True:
             return {}
-        elif config is False:
-            return
+        if config is False:
+            return None
 
         if 'along' not in config:
             return config

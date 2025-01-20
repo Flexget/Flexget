@@ -218,10 +218,9 @@ def _yaml_representer(dumper, data):
         tag = f"!{data['serializer']}.v{data['version']}"
         if isinstance(data['value'], dict):
             return dumper.represent_mapping(tag, data['value'])
-        elif isinstance(data['value'], list):
+        if isinstance(data['value'], list):
             return dumper.represent_sequence(tag, data['value'])
-        else:
-            return dumper.represent_scalar(tag, data['value'])
+        return dumper.represent_scalar(tag, data['value'])
     return dumper.represent_dict(data)
 
 

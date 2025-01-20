@@ -76,14 +76,13 @@ class ProwlNotifier:
         error = request_status.find('error')
         if error is not None:
             raise PluginWarning(error.text)
-        else:
-            success = request_status.find('success').attrib
-            logger.debug(
-                'prowl notification sent. Notifications remaining until next reset: {}. '
-                'Next reset will occur in {} minutes',
-                success['remaining'],
-                success['resetdate'],
-            )
+        success = request_status.find('success').attrib
+        logger.debug(
+            'prowl notification sent. Notifications remaining until next reset: {}. '
+            'Next reset will occur in {} minutes',
+            success['remaining'],
+            success['resetdate'],
+        )
 
 
 @event('plugin.register')

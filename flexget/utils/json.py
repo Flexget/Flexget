@@ -49,7 +49,7 @@ class DTDecoder(json.JSONDecoder):
 def _datetime_encoder(obj: Union[datetime.datetime, datetime.date]) -> str:
     if isinstance(obj, datetime.datetime):
         return obj.strftime(ISO8601_FMT)
-    elif isinstance(obj, datetime.date):
+    if isinstance(obj, datetime.date):
         return obj.strftime(DATE_FMT)
     raise TypeError
 

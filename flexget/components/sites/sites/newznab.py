@@ -100,16 +100,15 @@ class Newznab:
         url, params = self.get_url_and_params(config)
         if config['category'] == 'movie':
             return self.do_search_movie(entry, task, url, params)
-        elif config['category'] in ('tv', 'tvsearch'):
+        if config['category'] in ('tv', 'tvsearch'):
             return self.do_search_tvsearch(entry, task, url, params)
-        elif config['category'] == 'all':
+        if config['category'] == 'all':
             return self.do_search_all(entry, task, url, params)
-        else:
-            entries = []
-            logger.warning(
-                "Work in progress. Searching for the specified category is not supported yet..."
-            )
-            return entries
+        entries = []
+        logger.warning(
+            "Work in progress. Searching for the specified category is not supported yet..."
+        )
+        return entries
 
     def do_search_tvsearch(self, arg_entry, task, url, params):
         logger.info('Searching for {}', arg_entry['title'])

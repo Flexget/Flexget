@@ -45,7 +45,7 @@ class SearchArgenteam:
                 response = resp.json()
             except RequestException as e:
                 logger.error('Argenteam request failed: {}', e)
-                return
+                return None
 
             if not response:
                 logger.debug('Empty response from Argenteam')
@@ -67,7 +67,7 @@ class SearchArgenteam:
                 response = resp.json()
             except RequestException as e:
                 logger.error('Argenteam request failed: {}', e)
-                return
+                return None
 
             logger.debug('{} releases found.', len(response['releases']))
             for release in response['releases']:

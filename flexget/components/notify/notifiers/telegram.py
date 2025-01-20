@@ -335,7 +335,7 @@ class TelegramNotifier:
             raise PluginError(
                 'no chat id found, try manually sending the bot any message to initialize the chat'
             )
-        elif chat_id_entries:
+        if chat_id_entries:
             if usernames:
                 logger.warning(f'no chat id found for usernames: {usernames}')
             if fullnames:

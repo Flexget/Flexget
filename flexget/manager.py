@@ -357,7 +357,7 @@ class Manager:
                     )
                 except EOFError:
                     logger.error('Connection from daemon was severed.')
-            return
+            return None
         if self.options.test:
             logger.info('Test mode, creating a copy from database ...')
             db_test_filename = os.path.join(self.config_base, f'test-{self.config_name}.sqlite')
@@ -454,7 +454,7 @@ class Manager:
             if self.is_daemon:
                 logger.error('Daemon already running for this config.')
                 return
-            elif self.task_queue.is_alive():
+            if self.task_queue.is_alive():
                 logger.error(
                     'Non-daemon execution of FlexGet is running. Cannot start daemon until it is finished.'
                 )
@@ -765,8 +765,7 @@ class Manager:
             err = ConfigError('Did not pass schema validation.')
             err.errors = errors
             raise err
-        else:
-            return conf
+        return conf
 
     def init_sqlalchemy(self) -> None:
         """Initialize SQLAlchemy"""

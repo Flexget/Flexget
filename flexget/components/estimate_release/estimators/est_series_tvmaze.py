@@ -11,7 +11,7 @@ class EstimatesSeriesTVMaze:
     @plugin.priority(2)
     def estimate(self, entry):
         if not all(field in entry for field in ['series_name', 'series_season']):
-            return
+            return None
         series_name = entry['series_name']
         season = entry['series_season']
         episode_number = entry.get('series_episode')

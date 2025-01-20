@@ -472,8 +472,7 @@ class IRCConnection(SimpleIRCBot):
                 result.update(dict(zip(val_names, val_values)))
                 logger.debug('Found: {}', dict(zip(val_names, val_values)))
                 break
-            else:
-                logger.debug('No matches found for {} in {}', rx.pattern, msg)
+            logger.debug('No matches found for {} in {}', rx.pattern, msg)
         return result
 
     def process_tracker_config_rules(self, entry, rules=None):
@@ -980,8 +979,7 @@ class IRCConnectionManager:
         if name:
             if name not in irc_connections:
                 raise ValueError(f'{name} is not a valid irc connection')
-            else:
-                status.append(self.status_dict(name))
+            status.append(self.status_dict(name))
         else:
             for n in irc_connections:
                 status.append(self.status_dict(n))

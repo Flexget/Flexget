@@ -318,7 +318,7 @@ class Episode(Base):
     def is_premiere(self):
         if self.season == 1 and self.number in (0, 1):
             return 'Series Premiere'
-        elif self.number in (0, 1):
+        if self.number in (0, 1):
             return 'Season Premiere'
         return False
 
@@ -352,7 +352,7 @@ class Episode(Base):
         if isinstance(other, Season):
             logger.trace('comparing {} to Season', self)
             return False
-        elif not isinstance(other, Episode):
+        if not isinstance(other, Episode):
             logger.error('Cannot compare Episode with {}', other)
             return NotImplemented
         if self.identified_by != other.identified_by:
@@ -367,7 +367,7 @@ class Episode(Base):
         if other is None:
             logger.trace('comparing {} to None', self)
             return False
-        elif isinstance(other, Episode):
+        if isinstance(other, Episode):
             if self.identified_by is None or other.identified_by is None:
                 bad_ep = other if other.identified_by is None else self
                 logger.error('cannot compare episode without an identifier type: {}', bad_ep)
@@ -383,21 +383,19 @@ class Episode(Base):
                 return self.season < other.season or (
                     self.season == other.season and self.number < other.number
                 )
-            elif self.identified_by == 'date':
+            if self.identified_by == 'date':
                 logger.trace('comparing {} and {}', self.identifier, other.identifier)
                 return self.identifier < other.identifier
-            else:
-                logger.error('cannot compare when identifier is {}', self.identified_by)
-                return NotImplemented
-        elif isinstance(other, Season):
+            logger.error('cannot compare when identifier is {}', self.identified_by)
+            return NotImplemented
+        if isinstance(other, Season):
             if self.identified_by != 'ep':
                 logger.error('cannot compare season when identifier is not \'ep\'')
                 return NotImplemented
             logger.trace('comparing {} with {}', self.season, other.season)
             return self.season < other.season
-        else:
-            logger.error('can only compare with Episode or Season, not {}', other)
-            return NotImplemented
+        logger.error('can only compare with Episode or Season, not {}', other)
+        return NotImplemented
 
     def __hash__(self):
         return self.id
@@ -765,13 +763,12 @@ def set_alt_names(alt_names: Iterable[str], db_series: Series, session: Session)
                     f'Error adding alternate name for `{db_series.name}`: `{alt_name}` is already associated with `{db_series_alt.series.name}`. '
                     'Check your settings.'
                 )
-            else:
-                logger.debug(
-                    'alternate name `{}` already associated with series `{}`, no change needed',
-                    alt_name,
-                    db_series.name,
-                )
-                db_alt_names.append(db_series_alt)
+            logger.debug(
+                'alternate name `{}` already associated with series `{}`, no change needed',
+                alt_name,
+                db_series.name,
+            )
+            db_alt_names.append(db_series_alt)
         else:
             db_alt_names.append(AlternateNames(alt_name))
             logger.debug('adding alternate name `{}` to series `{}`', alt_name, db_series.name)
@@ -1052,7 +1049,7 @@ def get_latest_season_pack_release(
             season,
             downloaded,
         )
-        return
+        return None
     logger.debug(
         'latest season pack for series {}, with downloaded set to {} and season set to {}',
         series,
@@ -1107,7 +1104,7 @@ def get_latest_episode_release(
             season,
             downloaded,
         )
-        return
+        return None
     logger.debug(
         'latest episode for series {}, with downloaded set to {} and season set to {}',
         series,
@@ -1547,7 +1544,6 @@ def add_series_entity(
     added = store_parser(session, parsed, series=series)
     if not added:
         raise ValueError(f'Unable to add `{identifier}` to series `{series.name.capitalize()}`.')
-    else:
-        for release in added:
-            release.downloaded = True
-        logger.debug('Entity `{}` from series `{}` added to database.', identifier, series.name)
+    for release in added:
+        release.downloaded = True
+    logger.debug('Entity `{}` from series `{}` added to database.', identifier, series.name)

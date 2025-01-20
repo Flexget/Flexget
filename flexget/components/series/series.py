@@ -215,7 +215,7 @@ class FilterSeriesBase:
         opts = {'threshold': 0, 'reject_eps': False}
         if season_packs is True:
             return opts
-        elif isinstance(season_packs, int):
+        if isinstance(season_packs, int):
             opts['threshold'] = season_packs
         elif isinstance(season_packs, str):
             if season_packs == 'always':
@@ -776,7 +776,7 @@ class FilterSeries(FilterSeriesBase):
                     logger.debug('-' * 20 + ' process_qualities -->')
                     self.process_qualities(config, entries, downloaded)
                     continue
-                elif config.get('upgrade'):
+                if config.get('upgrade'):
                     entries[0].accept('is an upgrade to existing quality')
                     continue
 
@@ -1030,26 +1030,25 @@ class FilterSeries(FilterSeriesBase):
             # Expire timeframe, accept anything
             logger.info('Timeframe expired, releasing quality restriction.')
             return False
-        else:
-            # verbose waiting, add to backlog
-            diff = expires - datetime.now()
+        # verbose waiting, add to backlog
+        diff = expires - datetime.now()
 
-            hours, remainder = divmod(diff.seconds, 3600)
-            hours += diff.days * 24
-            minutes, _ = divmod(remainder, 60)
+        hours, remainder = divmod(diff.seconds, 3600)
+        hours += diff.days * 24
+        minutes, _ = divmod(remainder, 60)
 
-            logger.info(
-                '`{}`: timeframe waiting for {:02d}h:{:02d}min. Currently best is `{}`.',
-                episode.series.name,
-                hours,
-                minutes,
-                best['title'],
-            )
+        logger.info(
+            '`{}`: timeframe waiting for {:02d}h:{:02d}min. Currently best is `{}`.',
+            episode.series.name,
+            hours,
+            minutes,
+            best['title'],
+        )
 
-            # add best entry to backlog (backlog is able to handle duplicate adds)
-            plugin.get('backlog', self).add_backlog(task, best, session=object_session(episode))
+        # add best entry to backlog (backlog is able to handle duplicate adds)
+        plugin.get('backlog', self).add_backlog(task, best, session=object_session(episode))
 
-            return True
+        return True
 
     def process_qualities(self, config, entries, downloaded):
         """

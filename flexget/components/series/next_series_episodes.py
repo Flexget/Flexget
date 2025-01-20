@@ -85,7 +85,7 @@ class NextSeriesEpisodes:
 
     def on_task_input(self, task, config):
         if not config:
-            return
+            return None
         if isinstance(config, bool):
             config = {}
         self.config = config
@@ -94,8 +94,7 @@ class NextSeriesEpisodes:
             entries = self.rerun_entries
             self.rerun_entries = []
             return entries
-        else:
-            self.rerun_entries = []
+        self.rerun_entries = []
 
         entries = []
         impossible = {}
@@ -273,7 +272,7 @@ class NextSeriesEpisodes:
                 if latest.is_season:
                     # A season pack was picked up in the task, no need to look for more episodes
                     return
-                elif (
+                if (
                     not self.config.get('only_same_season')
                     and identified_by == 'ep'
                     and (

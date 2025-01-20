@@ -200,7 +200,7 @@ class PluginTransmissionInput(TransmissionBase):
     def on_task_input(self, task, config):
         config = self.prepare_config(config)
         if not config['enabled']:
-            return
+            return None
 
         client = self.create_rpc_client(config)
         entries = []

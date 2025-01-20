@@ -363,19 +363,16 @@ def from_cache(session=None, search_params=None, cache_type=None):
     """
     if not any(search_params.values()):
         raise LookupError('No parameters sent for cache lookup')
-    else:
-        logger.debug(
-            'searching db {} for the values {}',
-            cache_type.__tablename__,
-            list(search_params.items()),
-        )
-        result = (
-            session.query(cache_type)
-            .filter(
-                or_(getattr(cache_type, col) == val for col, val in search_params.items() if val)
-            )
-            .first()
-        )
+    logger.debug(
+        'searching db {} for the values {}',
+        cache_type.__tablename__,
+        list(search_params.items()),
+    )
+    result = (
+        session.query(cache_type)
+        .filter(or_(getattr(cache_type, col) == val for col, val in search_params.items() if val))
+        .first()
+    )
     return result
 
 
@@ -488,7 +485,7 @@ class APITVMaze:
         if title:
             if series and title.lower() == series.name.lower():
                 return series
-            elif series and not search:
+            if series and not search:
                 logger.debug(
                     'mismatch between search title {} and series title {}. saving in lookup table',
                     title,
@@ -701,7 +698,7 @@ def get_show(show_name=None, tvmaze_id=None, imdb_id=None, tvrage_id=None, thetv
 def get_episode(series_id, date=None, number=None, season=None):
     if date:
         return tvmaze_lookup(TVMAZE_EPISODES_BY_DATE_PATH.format(series_id), params={'date': date})
-    elif number and season:
+    if number and season:
         return tvmaze_lookup(
             TVMAZE_EPISODES_BY_NUMBER_PATH.format(series_id),
             params={'season': season, 'number': number},

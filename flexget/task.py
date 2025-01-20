@@ -726,7 +726,7 @@ class Task:
                     self._all_entries = EntryContainer()
                     self._rerun = False
                     continue
-                elif self._rerun:
+                if self._rerun:
                     logger.info(
                         'Task has been re-run {} times already, stopping for now',
                         self._rerun_count,

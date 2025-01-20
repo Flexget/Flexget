@@ -56,9 +56,8 @@ class QualityComponent:
         match = self.regexp.search(text)
         if not match:
             return False, ""
-        else:
-            # remove matching part from the text
-            text = text[: match.start()] + text[match.end() :]
+        # remove matching part from the text
+        text = text[: match.start()] + text[match.end() :]
         return True, text
 
     def __hash__(self) -> int:
@@ -74,8 +73,7 @@ class QualityComponent:
             raise TypeError(f'Cannot compare {self!r} and {other!r}')
         if other.type == self.type:
             return self.value == other.value
-        else:
-            raise TypeError(f'Cannot compare {self.type} and {other.type}')
+        raise TypeError(f'Cannot compare {self.type} and {other.type}')
 
     def __lt__(self, other) -> bool:
         if isinstance(other, str):
@@ -84,8 +82,7 @@ class QualityComponent:
             raise TypeError(f'Cannot compare {self!r} and {other!r}')
         if other.type == self.type:
             return self.value < other.value
-        else:
-            raise TypeError(f'Cannot compare {self.type} and {other.type}')
+        raise TypeError(f'Cannot compare {self.type} and {other.type}')
 
     def __add__(self, other):
         if not isinstance(other, int):

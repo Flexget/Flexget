@@ -187,8 +187,8 @@ class SonarrSet(MutableSet):
         lookup_results = self._sonarr_request(LOOKUP_ENDPOINT, term=term)
         if not lookup_results:
             logger.debug('could not find series match to {}', entry)
-            return
-        elif len(lookup_results) > 1:
+            return None
+        if len(lookup_results) > 1:
             logger.debug('got multiple results for Sonarr, using first one')
         show = lookup_results[0]
 

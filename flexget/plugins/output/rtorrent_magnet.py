@@ -60,8 +60,7 @@ class PluginRtorrentMagnet:
                     if pat.search(url):
                         self.write_torrent_file(task, entry, entry.get('path', config))
                         break
-                    else:
-                        logger.warning('Unrecognized Magnet URI Format: {}', url)
+                    logger.warning('Unrecognized Magnet URI Format: {}', url)
 
 
 @event('plugin.register')

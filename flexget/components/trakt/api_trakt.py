@@ -183,7 +183,7 @@ class ApiTrakt:
             series = session.merge(db.TraktShow(trakt_show, session))
             if series and title.lower() == series.title.lower():
                 return series
-            elif series and title and not found:
+            if series and title and not found:
                 if (
                     not session.query(db.TraktShowSearchResult)
                     .filter(db.TraktShowSearchResult.search == title.lower())

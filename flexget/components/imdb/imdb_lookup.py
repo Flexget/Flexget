@@ -161,11 +161,10 @@ class ImdbLookup:
                     # this movie cannot be found, not worth trying again ...
                     logger.debug('{} will fail lookup', entry['title'])
                     raise plugin.PluginError('IMDB lookup failed for {}'.format(entry['title']))
-                else:
-                    if result.url:
-                        logger.trace('Setting imdb url for {} from db', entry['title'])
-                        entry['imdb_id'] = result.imdb_id
-                        entry['imdb_url'] = result.url
+                if result.url:
+                    logger.trace('Setting imdb url for {} from db', entry['title'])
+                    entry['imdb_id'] = result.imdb_id
+                    entry['imdb_url'] = result.url
 
         # no imdb url, but information required, try searching
         if not entry.get('imdb_url', eval_lazy=False) and search_allowed:

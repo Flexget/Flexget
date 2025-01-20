@@ -129,7 +129,7 @@ class MagnetDL:
     # Search API method
     def search(self, task, entry, config):
         if not config:
-            return
+            return None
         entries = []
         for search_string in entry.get('search_strings', [entry['title']]):
             logger.debug('Searching `{}`', search_string)

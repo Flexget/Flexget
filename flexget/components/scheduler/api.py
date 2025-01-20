@@ -186,7 +186,7 @@ class ScheduleAPI(APIResource):
         # Checks for boolean config
         if schedules is True:
             raise Conflict('Schedules usage is set to default, cannot delete')
-        elif schedules is False:
+        if schedules is False:
             raise Conflict('Schedules are disables in config')
 
         for i in range(len(self.manager.config.get('schedules', []))):

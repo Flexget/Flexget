@@ -579,7 +579,7 @@ class OutputDeluge(DelugePlugin):
                 # Checks the download path as well as the move completed path for existence of the file
                 if os.path.exists(os.path.join(status['save_path'], filename)):
                     return True
-                elif status.get('move_on_completed') and status.get('move_on_completed_path'):
+                if status.get('move_on_completed') and status.get('move_on_completed_path'):
                     if os.path.exists(os.path.join(status['move_on_completed_path'], filename)):
                         return True
                 else:

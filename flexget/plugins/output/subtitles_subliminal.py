@@ -204,52 +204,49 @@ class PluginSubliminal:
                         )
                         entry['subtitles_missing'] = set()
                         continue  # subs for preferred lang(s) already exists
-                    else:
-                        # Gather the subtitles for the alternative languages too, to avoid needing to search the sites
-                        # again. They'll just be ignored if the main languages are found.
-                        all_subtitles = provider_pool.list_subtitles(
-                            video, entry_languages | alternative_languages
+                    # Gather the subtitles for the alternative languages too, to avoid needing to search the sites
+                    # again. They'll just be ignored if the main languages are found.
+                    all_subtitles = provider_pool.list_subtitles(
+                        video, entry_languages | alternative_languages
+                    )
+                    try:
+                        subtitles = provider_pool.download_best_subtitles(
+                            all_subtitles,
+                            video,
+                            entry_languages,
+                            min_score=msc,
+                            hearing_impaired=hearing_impaired,
                         )
-                        try:
-                            subtitles = provider_pool.download_best_subtitles(
-                                all_subtitles,
-                                video,
-                                entry_languages,
-                                min_score=msc,
-                                hearing_impaired=hearing_impaired,
-                            )
-                        except TypeError as e:
-                            logger.error(
-                                'Downloading subtitles failed due to a bug in subliminal. Please seehttps://github.com/Diaoul/subliminal/issues/921. Error: {}',
-                                e,
-                            )
-                            subtitles = []
+                    except TypeError as e:
+                        logger.error(
+                            'Downloading subtitles failed due to a bug in subliminal. Please seehttps://github.com/Diaoul/subliminal/issues/921. Error: {}',
+                            e,
+                        )
+                        subtitles = []
+                    if subtitles:
+                        downloaded_subtitles[video].extend(subtitles)
+                        logger.info('Subtitles found for {}', entry['location'])
+                    else:
+                        # only try to download for alternatives that aren't already downloaded
+                        subtitles = provider_pool.download_best_subtitles(
+                            all_subtitles,
+                            video,
+                            alternative_languages,
+                            min_score=msc,
+                            hearing_impaired=hearing_impaired,
+                        )
+
                         if subtitles:
                             downloaded_subtitles[video].extend(subtitles)
-                            logger.info('Subtitles found for {}', entry['location'])
+                            entry.reject('subtitles found for a second-choice language.')
                         else:
-                            # only try to download for alternatives that aren't already downloaded
-                            subtitles = provider_pool.download_best_subtitles(
-                                all_subtitles,
-                                video,
-                                alternative_languages,
-                                min_score=msc,
-                                hearing_impaired=hearing_impaired,
-                            )
+                            entry.reject('cannot find any subtitles for now.')
 
-                            if subtitles:
-                                downloaded_subtitles[video].extend(subtitles)
-                                entry.reject('subtitles found for a second-choice language.')
-                            else:
-                                entry.reject('cannot find any subtitles for now.')
-
-                        downloaded_languages = {
-                            Language.fromietf(str(s.language)) for s in subtitles
-                        }
-                        if entry_languages:
-                            entry['subtitles_missing'] = entry_languages - downloaded_languages
-                            if len(entry['subtitles_missing']) > 0:
-                                entry.reject('Subtitles for all primary languages not found')
+                    downloaded_languages = {Language.fromietf(str(s.language)) for s in subtitles}
+                    if entry_languages:
+                        entry['subtitles_missing'] = entry_languages - downloaded_languages
+                        if len(entry['subtitles_missing']) > 0:
+                            entry.reject('Subtitles for all primary languages not found')
                 except ValueError as e:
                     logger.error('subliminal error: {}', e)
                     entry.fail()

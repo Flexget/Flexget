@@ -795,7 +795,7 @@ class RTorrentInputPlugin(RTorrentPluginBase):
             torrents = client.torrents(config['view'], fields=fields, custom_fields=custom_fields)
         except (OSError, xmlrpc_client.Error) as e:
             task.abort('Could not get torrents ({}): {}'.format(config['view'], e))
-            return
+            return None
 
         entries = []
 

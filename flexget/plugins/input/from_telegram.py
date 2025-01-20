@@ -172,7 +172,7 @@ class TelegramInput:
                     if 'username' in check and check['username'] == message_from['username']:
                         logger.debug("WhiteListing: Username {}", message_from['username'])
                         break
-                    elif (
+                    if (
                         'fullname' in check
                         and check['fullname']['first'] == message_from['first_name']
                         and check['fullname']['sur'] == message_from['last_name']
@@ -183,13 +183,11 @@ class TelegramInput:
                             message_from['last_name'],
                         )
                         break
-                    elif 'group' in check:
-                        if (
-                            message_chat['type'] == 'group'
-                            and message_chat['title'] == check['group']
-                        ):
-                            logger.debug("WhiteListing: Group {}", message_chat['title'])
-                            break
+                    if 'group' in check and (
+                        message_chat['type'] == 'group' and message_chat['title'] == check['group']
+                    ):
+                        logger.debug("WhiteListing: Group {}", message_chat['title'])
+                        break
                 else:
                     logger.debug("Ignoring message because of no whitelist match {}", message)
                     continue

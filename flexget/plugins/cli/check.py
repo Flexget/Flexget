@@ -71,15 +71,14 @@ def pre_check_config(config_path):
                 list_open = False
                 # print 'closed list at line %s' % line
             continue
-        else:
-            list_open = line.strip().endswith(': [') or line.strip().endswith(':[')
-            if list_open:
-                # print 'list open at line %s' % line
-                continue
+        list_open = line.strip().endswith(': [') or line.strip().endswith(':[')
+        if list_open:
+            # print 'list open at line %s' % line
+            continue
 
-                # print '#%i: %s' % (line_num, line)
-                # print 'indentation: %s, prev_ind: %s, prev_mapping: %s, prev_list: %s, cur_list: %s' % \
-                #        (indentation, prev_indentation, prev_mapping, prev_list, cur_list)
+            # print '#%i: %s' % (line_num, line)
+            # print 'indentation: %s, prev_ind: %s, prev_mapping: %s, prev_list: %s, cur_list: %s' % \
+            #        (indentation, prev_indentation, prev_mapping, prev_list, cur_list)
 
         if ':\t' in line:
             logger.critical(

@@ -27,7 +27,7 @@ class PendingApproval:
 
     def on_task_input(self, task, config):
         if not config:
-            return
+            return None
 
         approved_entries = []
         with Session() as session:

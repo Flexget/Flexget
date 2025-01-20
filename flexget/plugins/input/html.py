@@ -142,8 +142,7 @@ class InputHtml:
                     break
                 current += step
             return entries
-        else:
-            return self._request_url(task, config, base_url, auth, dump_name=config.get('dump'))
+        return self._request_url(task, config, base_url, auth, dump_name=config.get('dump'))
 
     def _request_url(self, task, config, url, auth, dump_name=None):
         logger.verbose('Requesting: {}', url)

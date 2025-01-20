@@ -166,12 +166,11 @@ class SeriesParseResult:
                 if self.season_pack
                 else [f'S{self.season:02d}E{self.episode + x:02d}' for x in range(self.episodes)]
             )
-        elif self.id_type == 'date':
+        if self.id_type == 'date':
             return [self.id.strftime('%Y-%m-%d')]
         if self.id is None:
             raise Exception('Series is missing identifier')
-        else:
-            return [self.id]
+        return [self.id]
 
     @property
     def identifier(self) -> str:

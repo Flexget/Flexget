@@ -260,8 +260,7 @@ class ParserGuessit:
                         return SeriesParseResult(data=data, valid=False)
                     if char.isspace() or char in '._':
                         continue
-                    else:
-                        break
+                    break
             # Check the name doesn't end mid-word (guessit might put the border before or after the space after title)
             if (
                 data[title_end - 1].isalnum() and len(data) <= title_end

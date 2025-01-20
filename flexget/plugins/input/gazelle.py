@@ -94,7 +94,7 @@ class InputGazelle:
             # The str cast converts bools to 'True'/'False' for use as keys
             # This allows for options that have True/False/Other values
             return opts[str(val)]
-        elif isinstance(val, list):
+        if isinstance(val, list):
             # Fix yaml parser making a list out of a string
             return ",".join(val)
         return val

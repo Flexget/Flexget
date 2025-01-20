@@ -188,11 +188,11 @@ class FromIMDB:
             person = self.ia.get_person(imdb_id[2:])
             logger.info('Starting to retrieve items for person: {}', person)
             return 'Person', person
-        elif imdb_id.startswith('co'):
+        if imdb_id.startswith('co'):
             company = self.ia.get_company(imdb_id[2:])
             logger.info('Starting to retrieve items for company: {}', company)
             return 'Company', company
-        elif imdb_id.startswith('ch'):
+        if imdb_id.startswith('ch'):
             character = self.ia.get_character(imdb_id[2:])
             logger.info('Starting to retrieve items for Character: {}', character)
             return 'Character', character
@@ -209,7 +209,7 @@ class FromIMDB:
         if entity_type == 'Character':
             return self.items_by_character(entity_object, content_types, match_type)
 
-        elif entity_type == 'Person':
+        if entity_type == 'Person':
             return self.items_by_person(entity_object, job_types, content_types, match_type)
 
     def flatten_list(self, _list):
@@ -319,14 +319,14 @@ class FromIMDB:
             logger.error(
                 'IMDBPY is required for this plugin. Please install using "pip install imdbpy"'
             )
-            return
+            return None
 
         entries = []
         config = self.prepare_config(config)
         items = self.get_items(config)
         if not items:
             logger.error('Could not get IMDB item list, check your configuration.')
-            return
+            return None
         for item in items:
             entry = Entry(
                 title=item['title'],
@@ -346,14 +346,13 @@ class FromIMDB:
                 logger.error('Invalid entry created? {}', entry)
         if len(entries) <= config.get('max_entries'):
             return entries
-        else:
-            logger.warning(
-                'Number of entries ({}) exceeds maximum allowed value {}. '
-                'Edit your filters or raise the maximum value by entering a higher "max_entries"',
-                len(entries),
-                config.get('max_entries'),
-            )
-            return
+        logger.warning(
+            'Number of entries ({}) exceeds maximum allowed value {}. '
+            'Edit your filters or raise the maximum value by entering a higher "max_entries"',
+            len(entries),
+            config.get('max_entries'),
+        )
+        return None
 
 
 @event('plugin.register')

@@ -61,16 +61,15 @@ class NfoLookup:
                     "Entry {} didn't come from the filesystem plugin", entry.get('title')
                 )
                 continue
-            else:
-                # This will be None if there is no nfo file
-                nfo_filename = self.get_nfo_filename(entry)
-                if nfo_filename is None:
-                    logger.warning(
-                        'Entry {} has no corresponding {} file',
-                        entry.get('title'),
-                        self.nfo_file_extension,
-                    )
-                    continue
+            # This will be None if there is no nfo file
+            nfo_filename = self.get_nfo_filename(entry)
+            if nfo_filename is None:
+                logger.warning(
+                    'Entry {} has no corresponding {} file',
+                    entry.get('title'),
+                    self.nfo_file_extension,
+                )
+                continue
 
             # Populate the fields from the information in the .nfo file Note that at this point `nfo_filename` has the
             # name of an existing '.nfo' file

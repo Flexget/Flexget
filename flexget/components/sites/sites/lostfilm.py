@@ -139,7 +139,7 @@ class LostFilm:
         config = self.build_config(config)
         logger.trace('Config is {}', config)
         if not config['enabled']:
-            return
+            return None
         if config.get('lf_session') is not None:
             task.requests.cookies.set('lf_session', config['lf_session'])
             logger.debug('lf_session is set')
@@ -237,10 +237,9 @@ class LostFilm:
                                 series_name_org,
                             )
                             continue
-                        else:
-                            logger.debug(
-                                'Force adding the last RSS item to the result to avoid warning of empty output'
-                            )
+                        logger.debug(
+                            'Force adding the last RSS item to the result to avoid warning of empty output'
+                        )
                     else:
                         logger.trace(
                             '"{}" was found in the list of configured series', series_name_org

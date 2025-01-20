@@ -49,8 +49,7 @@ def request_get_json(url, headers):
         response = requests.get(url, headers=headers, timeout=10)  # TODO: HANGS HERE
         if response.status_code == 200:
             return response.json()
-        else:
-            raise RadarrRequestError(f"Invalid response received from Radarr: {response.content}")
+        raise RadarrRequestError(f"Invalid response received from Radarr: {response.content}")
     except RequestException as e:
         raise RadarrRequestError(f"Unable to connect to Radarr at {url}. Error: {e}")
 
@@ -61,8 +60,7 @@ def request_delete_json(url, headers):
         response = requests.delete(url, headers=headers, timeout=10)
         if response.status_code == 200:
             return response.json()
-        else:
-            raise RadarrRequestError(f"Invalid response received from Radarr: {response.content}")
+        raise RadarrRequestError(f"Invalid response received from Radarr: {response.content}")
     except RequestException as e:
         raise RadarrRequestError(f"Unable to connect to Radarr at {url}. Error: {e}")
 
@@ -73,22 +71,21 @@ def request_post_json(url, headers, data):
         response = requests.post(url, headers=headers, json=data, timeout=10)
         if response.status_code == 201:
             return response.json()
-        else:
-            error_message = None
-            try:
-                json_response = response.json()
-                if len(json_response) > 0 and "errorMessage" in json_response[0]:
-                    error_message = json_response[0]["errorMessage"]
-            except ValueError:
-                # Raised by response.json() if JSON couln't be decoded
-                logger.error('Radarr returned non-JSON error result: {}', response.content)
+        error_message = None
+        try:
+            json_response = response.json()
+            if len(json_response) > 0 and "errorMessage" in json_response[0]:
+                error_message = json_response[0]["errorMessage"]
+        except ValueError:
+            # Raised by response.json() if JSON couln't be decoded
+            logger.error('Radarr returned non-JSON error result: {}', response.content)
 
-            raise RadarrRequestError(
-                f"Invalid response received from Radarr: {response.content}",
-                logger,
-                status_code=response.status_code,
-                error_message=error_message,
-            )
+        raise RadarrRequestError(
+            f"Invalid response received from Radarr: {response.content}",
+            logger,
+            status_code=response.status_code,
+            error_message=error_message,
+        )
 
     except RequestException as e:
         raise RadarrRequestError(f"Unable to connect to Radarr at {url}. Error: {e}")
@@ -100,8 +97,7 @@ def request_put_json(url, headers):
         response = requests.put(url, headers=headers)
         if response.status_code == 200:
             return response.json()
-        else:
-            raise RadarrRequestError(f"Invalid response received from Radarr: {response.content}")
+        raise RadarrRequestError(f"Invalid response received from Radarr: {response.content}")
     except RequestException as e:
         raise RadarrRequestError(f"Unable to connect to Radarr at {url}. Error: {e}")
 
@@ -213,8 +209,7 @@ class RadarrAPIService:
             spec_ex = spec_exception_from_response_ex(ex)
             if spec_ex:
                 raise spec_ex
-            else:
-                raise
+            raise
 
         return json_response
 
@@ -485,9 +480,8 @@ class RadarrSet(MutableSet):
                 if movie_year == movie_entry.get("movie_year", object()):
                     # Movie name and year matches
                     return movie_entry
-                else:
-                    # The movie had no year present
-                    return movie_entry
+                # The movie had no year present
+                return movie_entry
 
             # Last resort is just to compare the title straight off
             title = entry.get("title").lower()

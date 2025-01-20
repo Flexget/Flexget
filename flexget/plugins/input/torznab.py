@@ -176,13 +176,12 @@ class Torznab:
                     "Item '{}' does not contain a bittorent enclosure.", item.title.string
                 )
                 continue
-            else:
-                entry['url'] = enclosure.attrib['url']
-                try:
-                    entry['content_size'] = int(enclosure.attrib['length'])
-                except ValueError:
-                    entry['content_size'] = 0
-                entry['type'] = enclosure.attrib['type']
+            entry['url'] = enclosure.attrib['url']
+            try:
+                entry['content_size'] = int(enclosure.attrib['length'])
+            except ValueError:
+                entry['content_size'] = 0
+            entry['type'] = enclosure.attrib['type']
 
             ns = {'torznab': 'http://torznab.com/schemas/2015/feed'}
             self._parse_torznab_attrs(entry, item.findall('torznab:attr', ns))
@@ -190,9 +189,8 @@ class Torznab:
             for child in item.iter():
                 if child.tag in ['{http://torznab.com/schemas/2015/feed}attr', 'enclosure']:
                     continue
-                else:
-                    if child.tag in ['description', 'title'] and child.text:
-                        entry[child.tag] = child.text
+                if child.tag in ['description', 'title'] and child.text:
+                    entry[child.tag] = child.text
             entries.append(entry)
         return entries
 

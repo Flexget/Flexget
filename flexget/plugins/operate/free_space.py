@@ -51,10 +51,9 @@ def get_free_space(config, task):
             logger.error('Non-integer was returned when calculating disk usage.')
             task.abort('Error with remote host.')
         return free
-    else:
-        path = Path(config['path']).expanduser().absolute()
-        usage = shutil.disk_usage(path)
-        return usage.free / 1024 / 1024
+    path = Path(config['path']).expanduser().absolute()
+    usage = shutil.disk_usage(path)
+    return usage.free / 1024 / 1024
 
 
 class PluginFreeSpace:

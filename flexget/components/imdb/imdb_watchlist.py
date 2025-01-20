@@ -196,7 +196,7 @@ class ImdbWatchlist:
 
         if not total_item_count:
             logger.verbose('No movies were found in imdb list: {}', config['list'])
-            return
+            return None
 
         entries = []
         items_processed = 0

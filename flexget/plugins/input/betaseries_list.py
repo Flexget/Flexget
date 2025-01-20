@@ -192,8 +192,7 @@ def query_series(api_key, user_token, member_name=None):
         logger.error(str(err))
     if not error_list:
         return [x['title'] for x in j['shows'] if x['user']['archived'] is False]
-    else:
-        return []
+    return []
 
 
 @event('plugin.register')

@@ -33,7 +33,7 @@ requests.add_domain_limiter(TimedLimiter('imdb.com', '3 seconds'))
 def is_imdb_url(url):
     """Tests the url to see if it's for imdb.com."""
     if not isinstance(url, str):
-        return
+        return None
     # Probably should use urlparse.
     return re.match(r'https?://[^/]*imdb\.com/', url)
 
@@ -61,7 +61,7 @@ def is_valid_imdb_person_id(value):
 def extract_id(url):
     """Return IMDb ID of the given URL. Return None if not valid or if URL is not a string."""
     if not isinstance(url, str):
-        return
+        return None
     m = re.search(r'((?:nm|tt)\d{7,8})', url)
     if m:
         return m.group(1)
@@ -155,8 +155,7 @@ class ImdbSearch:
             for m in movies:
                 logger.debug('remain: {} (match: {}) {}', m['name'], m['match'], m['url'])
             return None
-        else:
-            return movies[0] if single_match else movies
+        return movies[0] if single_match else movies
 
     def search(self, name, year=None):
         """Return array of movie details (dict)"""
