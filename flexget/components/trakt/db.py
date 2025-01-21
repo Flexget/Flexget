@@ -173,8 +173,7 @@ def make_list_slug(name):
         slug = slug.replace(char, '')
     # These characters get replaced
     slug = slug.replace('&', 'and')
-    slug = slug.replace(' ', '-')
-    return slug
+    return slug.replace(' ', '-')
 
 
 def get_session(account=None, token=None):
@@ -208,8 +207,7 @@ def get_api_url(*endpoint):
     if len(endpoint) == 1 and not isinstance(endpoint[0], str):
         endpoint = endpoint[0]
     # Make sure integer portions are turned into strings first too
-    url = API_URL + '/'.join(map(str, endpoint))
-    return url
+    return API_URL + '/'.join(map(str, endpoint))
 
 
 @db_schema.upgrade('api_trakt')
@@ -1026,6 +1024,7 @@ def get_trakt_id_from_id(trakt_ids, media_type):
             if result['type'] != media_type:
                 continue
             return result[media_type]['ids']['trakt']
+    return None
 
 
 def get_trakt_id_from_title(title, media_type, year=None):
@@ -1050,6 +1049,7 @@ def get_trakt_id_from_title(title, media_type, year=None):
     # grab the first result if there is no exact match
     if results:
         return results[0][media_type]['ids']['trakt']
+    return None
 
 
 def get_trakt_data(media_type, title=None, year=None, trakt_ids=None):

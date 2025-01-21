@@ -138,6 +138,7 @@ def simplify_text(text: str) -> str:
     result = re.sub(r"[^a-zA-Z0-9 ]", "", result)
     # Replace multiple white spaces with one
     result = ' '.join(result.split())
+    return None
 
 
 def get_field_map(**kwargs):

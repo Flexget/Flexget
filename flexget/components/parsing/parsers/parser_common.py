@@ -21,8 +21,7 @@ def clean_value(name: str) -> str:
         name = name.replace('-', ' ')
 
     # MovieParser.strip_spaces
-    name = ' '.join(name.split())
-    return name
+    return ' '.join(name.split())
 
 
 def old_assume_quality(guessed_quality: Quality, assumed_quality: Quality) -> Quality:
@@ -71,6 +70,7 @@ class MovieParseResult:
     def identifier(self) -> str:
         if self.name:
             return (f'{self.name} {self.year}').strip().lower() if self.year else self.name.lower()
+        return None
 
     @property
     def proper(self) -> bool:

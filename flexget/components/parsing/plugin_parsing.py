@@ -48,8 +48,7 @@ class PluginParsing:
                 for p in plugin.get_plugins(interface=parser_type + '_parser')
             ]
             properties[parser_type] = {'type': 'string', 'enum': parser_names}
-        s = {'type': 'object', 'properties': properties, 'additionalProperties': False}
-        return s
+        return {'type': 'object', 'properties': properties, 'additionalProperties': False}
 
     def on_task_start(self, task, config):
         # Set up user selected parsers from config for this task run

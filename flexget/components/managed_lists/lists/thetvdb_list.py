@@ -132,6 +132,7 @@ class TheTVDBSet(MutableSet):
         for item in self.items:
             if item['tvdb_id'] == entry['tvdb_id']:
                 return item
+        return None
 
     @property
     def online(self):

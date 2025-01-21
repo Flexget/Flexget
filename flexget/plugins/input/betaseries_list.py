@@ -122,6 +122,7 @@ def create_token(api_key, login, password):
         logger.error(str(err))
     if not error_list:
         return j['token']
+    return None
 
 
 def query_member_id(api_key, user_token, login_name):

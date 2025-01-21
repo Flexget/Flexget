@@ -23,7 +23,7 @@ class Torznab:
     @property
     def schema(self):
         """The schema of the plugin"""
-        schema = {
+        return {
             'type': 'object',
             'properties': {
                 'apikey': {'type': 'string'},
@@ -39,7 +39,6 @@ class Torznab:
             'required': ['website', 'apikey'],
             'additionalProperties': False,
         }
-        return schema
 
     def search(self, task, entry, config=None):
         """Search interface"""
@@ -67,8 +66,7 @@ class Torznab:
         params.update(kwargs)
         logger.debug('Configured parameters: {}', params)
         url = f'{self.base_url}/api?'
-        url = f'{url}{urlencode(params)}'
-        return url
+        return f'{url}{urlencode(params)}'
 
     def _setup(self, task, config):
         """Set up parameters"""

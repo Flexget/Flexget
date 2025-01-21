@@ -103,6 +103,7 @@ def get_regexp(list_id, regexp, session=None):
             )
             .first()
         )
+    return None
 
 
 @with_session

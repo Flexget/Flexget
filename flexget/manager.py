@@ -370,6 +370,7 @@ class Manager:
             self.initialize()
             self.handle_cli()
             self._shutdown()
+            return None
 
     def handle_cli(self, options: Optional[argparse.Namespace] = None) -> None:
         """

@@ -355,6 +355,7 @@ class ImdbEntrySet(MutableSet):
     def immutable(self):
         if self.config['list'] in IMMUTABLE_LISTS:
             return '{} list is not modifiable'.format(self.config['list'])
+        return None
 
     def _from_iterable(cls, it):
         # TODO: is this the right answer? the returned object won't have our custom __contains__ logic

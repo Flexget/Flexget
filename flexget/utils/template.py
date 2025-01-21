@@ -240,8 +240,7 @@ def filter_asciify(text: str) -> str:
     result = normalize('NFD', text)
     result = result.encode('ascii', 'ignore')
     result = result.decode("utf-8")
-    result = str(result)
-    return result
+    return str(result)
 
 
 def filter_strip_symbols(text: str) -> str:
@@ -255,9 +254,7 @@ def filter_strip_symbols(text: str) -> str:
     # Leftovers
     result = re.sub(r"[^\w\d\s]", "", result, flags=re.UNICODE)
     # Replace multiple white spaces with one
-    result = ' '.join(result.split())
-
-    return result
+    return ' '.join(result.split())
 
 
 def filter_strip_year(name: str) -> str:

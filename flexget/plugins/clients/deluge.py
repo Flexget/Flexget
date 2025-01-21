@@ -84,6 +84,7 @@ class DelugePlugin:
                 if lsplit[0] == 'localclient':
                     username, password = lsplit[:2]
                     return username, password
+            return None
 
 
 class InputDeluge(DelugePlugin):
@@ -582,8 +583,8 @@ class OutputDeluge(DelugePlugin):
                 if status.get('move_on_completed') and status.get('move_on_completed_path'):
                     if os.path.exists(os.path.join(status['move_on_completed_path'], filename)):
                         return True
-                else:
-                    return False
+                    return None
+                return False
 
             def unused_name(name):
                 # If on local computer, tries appending a (#) suffix until a unique filename is found

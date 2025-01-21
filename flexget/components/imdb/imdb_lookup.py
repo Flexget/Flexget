@@ -109,6 +109,7 @@ class ImdbLookup:
             fake_entry = Entry(raw_title, '')
             self.lookup(fake_entry)
             return fake_entry['imdb_id']
+        return None
 
     @plugin.internet(logger)
     @with_session

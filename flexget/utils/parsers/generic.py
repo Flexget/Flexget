@@ -55,5 +55,4 @@ def name_to_re(name, ignore_prefixes=None, parser=None):
         # so that 'Show (US)' is not accepted as 'Show (UK)'
         if parser:
             parser.strict_name = True
-    res = '^' + ignore + blank + '*' + '(' + res + ')(?:\\b|_)' + blank + '*'
-    return res
+    return '^' + ignore + blank + '*' + '(' + res + ')(?:\\b|_)' + blank + '*'

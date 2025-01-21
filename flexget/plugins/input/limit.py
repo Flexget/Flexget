@@ -42,6 +42,7 @@ class PluginLimit:
             if config['amount'] < 1:
                 return result
             return itertools.islice(result, config['amount'])
+        return None
 
 
 @event('plugin.register')

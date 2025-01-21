@@ -26,6 +26,7 @@ class TestQualityParser:
             return ParserInternal
         if request.param == 'guessit':
             return ParserGuessit
+        return None
 
     @pytest.mark.parametrize(
         "test_quality",

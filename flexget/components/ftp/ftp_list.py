@@ -74,6 +74,7 @@ class FTPList:
         if entry.isvalid():
             return entry
         logger.warning('tried to return an illegal entry: {}', entry)
+        return None
 
     def get_content(self, path, recursion, recursion_depth, content_types):
         content_list = []

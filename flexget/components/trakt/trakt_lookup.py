@@ -100,6 +100,7 @@ def get_db_data_for(data_type: str, entry: Entry, session: Session):
         return show.get_season(entry['series_season'], session)
     if data_type == 'episode':
         return show.get_episode(entry['series_season'], entry['series_episode'], session)
+    return None
 
 
 lazy_lookup_types = {

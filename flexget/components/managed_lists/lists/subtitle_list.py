@@ -292,7 +292,7 @@ class SubtitleList(MutableSet):
 
     @with_session
     def _find_language(self, file_id, language, session=None):
-        res = (
+        return (
             session.query(SubtitleListLanguage)
             .filter(
                 and_(
@@ -302,7 +302,6 @@ class SubtitleList(MutableSet):
             )
             .first()
         )
-        return res
 
     @property
     def immutable(self):

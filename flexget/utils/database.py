@@ -161,8 +161,7 @@ def quality_property(text_attr):
         return QualComparator(getattr(self, text_attr))
 
     prop = hybrid_property(getter, setter)
-    prop = prop.comparator(comparator)
-    return prop
+    return prop.comparator(comparator)
 
 
 def quality_requirement_property(text_attr):
@@ -175,8 +174,7 @@ def quality_requirement_property(text_attr):
         else:
             setattr(self, text_attr, value.text)
 
-    prop = hybrid_property(getter, setter)
-    return prop
+    return hybrid_property(getter, setter)
 
 
 def ignore_case_property(text_attr):

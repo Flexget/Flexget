@@ -129,6 +129,7 @@ class NfoLookup:
         )
         if os.path.isfile(movie_nfo_filename):
             return movie_nfo_filename
+        return None
 
 
 class BadXmlFile(Exception):
@@ -209,6 +210,7 @@ class NfoReader:
         f = self._root.find(name)
         if f is not None:
             return getter_func(f)
+        return None
 
     def _extract_multiple_field(self, name, getter_func):
         """
@@ -219,6 +221,7 @@ class NfoReader:
 
         if len(values) > 0:
             return values
+        return None
 
     def get_fields_from_nfo_file(self):
         """

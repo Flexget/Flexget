@@ -156,6 +156,7 @@ def get_entry_by_title(list_id, title, session=None):
             .filter(and_(PendingListEntry.title == title, PendingListEntry.list_id == list_id))
             .first()
         )
+    return None
 
 
 @with_session

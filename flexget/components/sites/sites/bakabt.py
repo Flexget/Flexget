@@ -35,8 +35,7 @@ class UrlRewriteBakaBT:
         tag_a = soup.find('a', attrs={'class': 'download_link'})
         if not tag_a:
             raise UrlRewritingError(f'Unable to locate download link from url {url}')
-        torrent_url = 'https://bakabt.me/' + tag_a.get('href')
-        return torrent_url
+        return 'https://bakabt.me/' + tag_a.get('href')
 
 
 @event('plugin.register')

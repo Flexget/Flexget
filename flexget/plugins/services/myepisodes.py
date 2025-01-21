@@ -172,6 +172,7 @@ class MyEpisodes:
         )
         if info:
             return info.myepisodes_id
+        return None
 
     def _retrieve_id_from_website(self, entry):
         """

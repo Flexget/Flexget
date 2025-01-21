@@ -130,6 +130,7 @@ def irc_prefix(var):
     """
     if isinstance(var, str):
         return f'irc_{var.lower()}'
+    return None
 
 
 def strip_whitespace(value):

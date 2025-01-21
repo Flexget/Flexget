@@ -121,8 +121,7 @@ def resolve_ref(uri: str) -> JsonSchema:
         schema = schema_paths[parsed.path]
         if callable(schema):
             schema = schema(**dict(parse_qsl(parsed.query)))
-        schema = {'$schema': BASE_SCHEMA_URI, **schema}
-        return schema
+        return {'$schema': BASE_SCHEMA_URI, **schema}
     raise Unresolvable(f"{uri} could not be resolved")
 
 

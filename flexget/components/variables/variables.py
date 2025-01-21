@@ -98,17 +98,20 @@ def _process(element, environment):
             val = _process(v, environment)
             if val:
                 element[k] = val
-    elif isinstance(element, list):
+        return None
+    if isinstance(element, list):
         for i, v in enumerate(element):
             val = _process(v, environment)
             if val:
                 element[i] = val
-    elif isinstance(element, str) and '{?' in element:
+        return None
+    if isinstance(element, str) and '{?' in element:
         try:
             template = environment.from_string(element)
             return template.render()
         except (TemplateError, TypeError):
             return None
+    return None
 
 
 variables_config_schema = {'type': ['string', 'boolean', 'object']}

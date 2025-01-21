@@ -147,6 +147,7 @@ class FilterSeen:
             logger.debug("Forgotten '{}' ({} fields)", title, len(se.fields))
             task.session.delete(se)
             return True
+        return None
 
 
 @event('plugin.register')

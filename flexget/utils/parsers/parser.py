@@ -52,8 +52,7 @@ class TitleParser:
         for word in words:
             text = TitleParser.ireplace(text, word, '', not_in_word=not_in_word)
         # remove duplicate spaces
-        text = ' '.join(text.split())
-        return text
+        return ' '.join(text.split())
 
     @staticmethod
     def ireplace(data, old, new, count=0, not_in_word=False):

@@ -105,8 +105,7 @@ class InputPlex:
 
     def prepare_config(self, config):
         config['plexserver'] = config['server']
-        config = self.plex_format_server(config)
-        return config
+        return self.plex_format_server(config)
 
     def plex_get_globalaccesstoken(self, config):
         header = {'X-Plex-Client-Identifier': 'flexget'}

@@ -189,6 +189,7 @@ class FilterRegexp:
                             break
                     else:  # None of the not_regexps matched
                         return field
+        return None
 
     def filter(self, entries, operation, regexps):
         """

@@ -138,6 +138,8 @@ class FilterContentFilter:
                 )
                 entry.reject(f'Has more than {config["max_files"]} files', remember=True)
                 return True
+            return None
+        return None
 
     @plugin.priority(150)
     def on_task_modify(self, task, config):

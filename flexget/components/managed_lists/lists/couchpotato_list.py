@@ -198,6 +198,7 @@ class CouchPotatoSet(MutableSet):
                     entry.get(sup_id) is not None and entry[sup_id] == cp_entry[sup_id]
                 ) or entry.get('title').lower() == cp_entry.get('title').lower():
                     return cp_entry
+        return None
 
     def __init__(self, config):
         self.config = config

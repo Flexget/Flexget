@@ -10,5 +10,4 @@ def normalize_series_name(name):
     name = name.lower()
     name = name.replace('&amp;', ' and ')
     name = name.translate(TRANSLATE_MAP)  # Replaced some symbols with spaces
-    name = ' '.join(name.split())
-    return name
+    return ' '.join(name.split())
