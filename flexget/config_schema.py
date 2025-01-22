@@ -16,8 +16,10 @@ from referencing import Registry as _Registry
 from referencing import Resource
 from referencing.exceptions import Unresolvable
 
-from flexget.event import fire_event
-from flexget.utils import qualities, template
+from flexget import options
+from flexget.event import event, fire_event
+from flexget.terminal import console
+from flexget.utils import json, qualities, template
 from flexget.utils.template import get_template
 from flexget.utils.tools import parse_episode_identifier, parse_filesize, parse_timedelta
 
@@ -457,3 +459,76 @@ jsonschema.validators.validates(BASE_SCHEMA_NAME)(SchemaValidator)
 SchemaValidatorWDefaults = jsonschema.validators.extend(
     SchemaValidator, {'properties': validate_properties_w_defaults}
 )
+
+
+def deep_in(path: str, dictionary: dict) -> bool:
+    for part in path.split('/'):
+        if part not in dictionary:
+            return False
+        dictionary = dictionary[part]
+    return True
+
+
+def deep_set(path: str, dictionary: dict, value: Any) -> None:
+    parts = path.split('/')
+    for part in parts[:-1]:
+        dictionary = dictionary.setdefault(part, {})
+    dictionary[parts[-1]] = value
+
+
+def _rewrite_ref(identifier: str, definition_path: str, defs: dict) -> str:
+    """
+    The refs in the schemas are arbitrary identifiers, and cannot be used as-is as real network locations.
+    This rewrites any of those arbitrary refs to be real urls servable by this endpoint.
+    """
+    if identifier.startswith('/schema/'):
+        path = identifier[len('/schema/') :]
+        if not deep_in(path, defs):
+            new_def = resolve_ref(identifier)
+            new_def.pop('$schema', None)
+            # We have to set this before we recurse to stop infinite recursion
+            deep_set(path, defs, new_def)
+            deep_set(path, defs, _inline_refs(new_def, path, defs))
+        return "#/definitions/" + path
+    if identifier.startswith('#'):
+        return "#/definitions/" + definition_path + identifier[1:]
+    return identifier
+
+
+def _inline_refs(schema: JsonSchema, definition_path: str, defs: dict) -> Union[JsonSchema, list]:
+    if isinstance(schema, dict):
+        if '$ref' in schema:
+            return {'$ref': _rewrite_ref(schema['$ref'], definition_path, defs)}
+        return {k: _inline_refs(v, definition_path, defs) for k, v in schema.items()}
+    if isinstance(schema, list):
+        return [_inline_refs(v, definition_path, defs) for v in schema]
+    return schema
+
+
+def inline_refs(schema: JsonSchema) -> JsonSchema:
+    """Includes all $refs to subschemas in the definitions section of the schema, and rewrites
+    the $refs to point to the right place."""
+    definitions = {}
+    schema = _inline_refs(schema, "", definitions)
+    schema.setdefault('definitions', {}).update(definitions)
+    return schema
+
+
+def export_schema(manager, namespace):
+    schema = inline_refs(get_schema())
+    if namespace.output_file:
+        with open(namespace.output_file, 'w') as f:
+            f.write(json.dumps(schema, indent=2))
+        console(f'Schema written to {namespace.output_file}')
+        return
+    console(json.dumps(schema, indent=2))
+
+
+@event('options.register')
+def register_parser_arguments():
+    parser = options.register_command(
+        'export-schema',
+        export_schema,
+        help='Output the JSON schema for the config',
+    )
+    parser.add_argument('--output-file', '-o', help='Write the exported schema to the given file')
