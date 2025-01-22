@@ -776,7 +776,7 @@ class Task:
 def register_config_key():
     task_config_schema = {
         'type': 'object',
-        'additionalProperties': plugin_schemas(interface='task'),
+        'additionalProperties': {'$ref': '/schema/plugins?interface=task'},
     }
 
     config_schema.register_config_key('tasks', task_config_schema, required=True)
