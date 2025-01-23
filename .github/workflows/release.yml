@@ -45,6 +45,7 @@ jobs:
       - name: Export config schema
         if: env.release_tag
         run: |
+          echo 'tasks: {}' > config.yml
           uv run flexget export-schema --output-file flexget-config.schema.json
       - name: Create GitHub Release
         uses: ncipollo/release-action@cdcc88a9acf3ca41c16c37bb7d21b9ad48560d87 # v1
