@@ -22,16 +22,14 @@ if git log --skip 1 origin/master..origin/develop|grep '^commit '; then
   uv run dev_tools.py bump-version release
   VERSION=$(uv run dev_tools.py version)
   export VERSION
-  uv lock --upgrade-package flexget
 
   # Build and upload to pypi.
-  # Enabling hatch hooks bundles the webui.
-  HATCH_BUILD_HOOKS_ENABLE=true uv build
+  # These env variables activate hatch build hooks to modify the release
+  BUNDLE_WEBUI=true BUILD_LOCKED_EXTRAS=true uv build
   uv publish
 
   # Commit and tag released version
   git add flexget/_version.py
-  git add uv.lock
   git commit -m "v${VERSION}"
   git tag -a -f "v${VERSION}" -m "v${VERSION} release"
 
@@ -40,9 +38,7 @@ if git log --skip 1 origin/master..origin/develop|grep '^commit '; then
 
   # Bump to new dev version, then commit again
   uv run dev_tools.py bump-version dev
-  uv lock --upgrade-package flexget
   git add flexget/_version.py
-  git add uv.lock
   git commit -m "Prepare v$(uv run dev_tools.py version)"
 
   # master branch should be at the release we tagged

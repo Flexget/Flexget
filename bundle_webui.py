@@ -5,6 +5,7 @@
 # ]
 # ///
 import io
+import os
 import shutil
 import zipfile
 from pathlib import Path
@@ -22,6 +23,8 @@ else:
         PLUGIN_NAME = "bundle-webui"
 
         def dependencies(self) -> list[str]:
+            if os.environ.get("BUNDLE_WEBUI") not in ["1", "true"]:
+                return []
             return ["requests"]
 
         def clean(self, versions: list[str]) -> None:
@@ -34,6 +37,8 @@ else:
                 shutil.rmtree(v2_path)
 
         def initialize(self, version: str, build_data: dict[str, Any]) -> None:
+            if os.environ.get("BUNDLE_WEBUI") not in ["1", "true"]:
+                return
             bundle_webui()
             build_data["force_include"]["flexget/ui/v1/app"] = "/flexget/ui/v1/app"
             build_data["force_include"]["flexget/ui/v2/dist"] = "/flexget/ui/v2/dist"
@@ -55,7 +60,7 @@ def bundle_webui(ui_version: Optional[str] = None):
 
     if not ui_version or ui_version == 'v1':
         # WebUI V1
-        print('Bundle WebUI v1...')
+        print('Bundling WebUI v1...')
         try:
             # Remove existing
             app_path = ui_path / "v1" / "app"
@@ -74,7 +79,7 @@ def bundle_webui(ui_version: Optional[str] = None):
     if not ui_version or ui_version == 'v2':
         # WebUI V2
         try:
-            print('Bundle WebUI v2...')
+            print('Bundling WebUI v2...')
             # Remove existing
             app_path = ui_path / "v2" / "dist"
             if app_path.exists():

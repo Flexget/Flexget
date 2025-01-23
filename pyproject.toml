@@ -1,6 +1,6 @@
 ## Build settings
 [project]
-name = "FlexGet"
+name = "flexget"
 description = """\
     FlexGet is a program aimed to automate downloading or processing content (torrents, podcasts, etc.) from \
     different sources like RSS-feeds, html-pages, various sites and more.\
@@ -92,16 +92,13 @@ flexget = "flexget:main"
 flexget-headless = "flexget:main"  # This is useful on Windows to avoid a cmd popup
 
 [build-system]
-requires = ["hatchling", "hatch-requirements-txt"]
+requires = ["hatchling"]
 build-backend = "hatchling.build"
 
-[tool.hatch.metadata.hooks.requirements_txt.optional-dependencies]
-deluge = ['requirements/deluge.txt']
-locked = ['requirements.txt']
-qbittorrent = ['requirements/qbittorrent.txt']
-telegram = ['requirements/telegram.txt']
-transmission = ['requirements/transmission.txt']
-all = ['requirements/deluge.txt', 'requirements/qbittorrent.txt', 'requirements/telegram.txt', 'requirements/transmission.txt']
+[tool.hatch.metadata.hooks.custom]
+# Extras with locked dependencies will be generated if BUILD_LOCKED env variable is specified
+path = "build_locked_extras.py"
+locked-groups = ["deluge", "qbittorrent", "telegram", "transmission"]
 
 [tool.hatch.version]
 path = "flexget/_version.py"
@@ -118,8 +115,7 @@ include = [
 exclude = ["/flexget/tests/cassettes"]
 
 [tool.hatch.build.targets.wheel.hooks.custom]
-# build with env variable HATCH_BUILD_HOOKS_ENABLE=true to bundle the webui when building
-enable-by-default = false
+# The webui will be bundled when the BUNDLE_WEBUI env variable is defined
 path = "bundle_webui.py"
 
 [tool.hatch.build.targets.wheel]
