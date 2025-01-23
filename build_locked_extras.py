@@ -3,7 +3,7 @@ import subprocess
 import sys
 from collections.abc import MutableMapping
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional
 
 try:
     import tomllib
@@ -14,7 +14,7 @@ from hatchling.metadata.plugin.interface import MetadataHookInterface
 
 
 def update_metadata_with_locked(
-    metadata: MutableMapping[str, Any], root: Path, groups: list[str] | None = None
+    metadata: MutableMapping[str, Any], root: Path, groups: Optional[list[str]] = None
 ) -> None:  # pragma: no cover
     """Inplace update the metadata(pyproject.toml) with the locked dependencies.
 
