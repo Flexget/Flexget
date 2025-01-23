@@ -18,6 +18,8 @@ class TestMigrate:
         filename = db_filename.as_posix()
         database_uri = f'sqlite:///{filename}'
         # This will raise an error if the upgrade wasn't successful
-        mockmanager = MockManager(self.config, request.cls.__name__, db_uri=database_uri)
+        mockmanager = MockManager(
+            self.config, request.cls.__name__, db_uri=database_uri, tmp_path=tmp_path
+        )
         mockmanager.shutdown()
         # TODO: verify we actually loaded the old config, and didn't just create a new one or something

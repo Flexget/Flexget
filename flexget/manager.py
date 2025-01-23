@@ -132,9 +132,7 @@ class Manager:
         self.args = args
         self.autoreload_config = False
         self.config_file_hash: Optional[str] = None
-        self.config_base: str = ''
-        self.config_name: str = ''
-        self.config_path: str = ''
+        self._config_path: Optional[Path] = None
         self.log_filename: str = ''
         self.db_filename: str = ''
         self.engine: Optional[Engine] = None
@@ -149,6 +147,8 @@ class Manager:
         self.initialized = False
 
         self.config: dict = {}
+        # user_config is exactly as loaded from the user's config file. No defaults set or manipulation done.
+        self.user_config: Optional[dict] = None
 
         self.options = self.parse_initial_options(args)
         self._init_config(create=False)
@@ -172,6 +172,18 @@ class Manager:
                 'disk will not work properly for filenames containing non-ascii characters. Make sure your '
                 'locale env variables are set up correctly for the environment which is launching FlexGet.'
             )
+
+    @property
+    def config_path(self) -> Path:
+        return self._config_path
+
+    @property
+    def config_name(self) -> str:
+        return self.config_path.stem
+
+    @property
+    def config_base(self) -> Path:
+        return self.config_path.parent.resolve()
 
     def _add_tray_icon_items(self, tray_icon: 'TrayIcon'):
         tray_icon.add_menu_item(text='Shutdown', action=self.shutdown, index=2)
@@ -604,23 +616,14 @@ class Manager:
             raise OSError(f'Config `{config}` does not appear to be a file.')
 
         logger.debug('Config file {} selected', config)
-        config_base = config.parent.resolve()
-        self.config_path = str(config)
-        self.config_name = config.stem
-        self.config_base = str(config_base)
-        self.lockfile = str(config_base / f'.{self.config_name}-lock')
-        self.db_filename = str(config_base / f'db-{self.config_name}.sqlite')
+        self._config_path = config
+        self.lockfile = str(self.config_base / f'.{self.config_name}-lock')
+        self.db_filename = str(self.config_base / f'db-{self.config_name}.sqlite')
 
     def hash_config(self) -> Optional[str]:
-        if not self.config_path:
+        if not self.user_config:
             return None
-        sha1_hash = hashlib.sha1()
-        with open(self.config_path, 'rb') as f:
-            while True:
-                data = f.read(65536)
-                if not data:
-                    break
-                sha1_hash.update(data)
+        sha1_hash = hashlib.sha1(yaml.dump(self.user_config).encode('utf-8'))
         return sha1_hash.hexdigest()
 
     def load_config(
