@@ -79,6 +79,13 @@ deluge = ['deluge-client~=1.10']
 qbittorrent = ['qbittorrent-api~=2024.12']
 telegram = ['python-telegram-bot[http2,socks]~=21.9']
 transmission = ['transmission-rpc~=7.0']
+# This is all our optional deps installable via extras. Not actually 'all'
+all = [
+    {include-group = "deluge"},
+    {include-group = "qbittorrent"},
+    {include-group = "telegram"},
+    {include-group = "transmission"}
+]
 [project.urls]
 "Homepage" = "https://flexget.com"
 "Issue Tracker" = "https://github.com/Flexget/Flexget/issues"
@@ -98,7 +105,7 @@ build-backend = "hatchling.build"
 [tool.hatch.metadata.hooks.custom]
 # Extras with locked dependencies will be generated if BUILD_LOCKED env variable is specified
 path = "build_locked_extras.py"
-locked-groups = ["deluge", "qbittorrent", "telegram", "transmission"]
+locked-groups = ["deluge", "qbittorrent", "telegram", "transmission", "all"]
 
 [tool.hatch.version]
 path = "flexget/_version.py"

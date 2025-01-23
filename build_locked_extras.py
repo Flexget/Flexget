@@ -35,16 +35,10 @@ def update_metadata_with_locked(
         print(f"`{metadata['name']}` not found in the lock file")
         return
     groups = groups or []
-    groups_plus_default = groups
-    if groups:
-        groups_plus_default.append("all")
-    groups_plus_default.append("locked")
-    print(f"Adding extras with locked dependencies: {', '.join(groups_plus_default)}")
-    for group in groups_plus_default:
+    print(f"Adding extras with locked dependencies: {', '.join(groups)}")
+    for group in [*groups, "locked"]:
         if group == "locked":
             args = []
-        elif group == "all":
-            args = [f"--only-group={g}" for g in groups]
         else:
             # TODO: This check (and the above code to read lockfile_metadata) can come out if uv starts handling it
             # https://github.com/astral-sh/uv/issues/10882
