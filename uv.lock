@@ -907,6 +907,7 @@ dev = [
     { name = "pytest-runner" },
     { name = "pytest-xdist" },
     { name = "ruff" },
+    { name = "tomli", marker = "python_full_version < '3.11'" },
     { name = "vcrpy" },
 ]
 docs = [
@@ -982,6 +983,7 @@ dev = [
     { name = "pytest-runner", specifier = "~=6.0" },
     { name = "pytest-xdist", specifier = "~=3.6" },
     { name = "ruff", specifier = "~=0.9.0" },
+    { name = "tomli", marker = "python_full_version < '3.11'", specifier = "~=2.2" },
     { name = "vcrpy", specifier = "~=7.0" },
 ]
 docs = [{ name = "sphinx", marker = "python_full_version >= '3.10'", specifier = "~=8.1" }]

@@ -5,7 +5,11 @@ from collections.abc import MutableMapping
 from pathlib import Path
 from typing import Any
 
-import tomllib
+try:
+    import tomllib
+except ImportError:
+    import tomli as tomllib
+
 from hatchling.metadata.plugin.interface import MetadataHookInterface
 
 

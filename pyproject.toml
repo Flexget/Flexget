@@ -63,6 +63,8 @@ dev = [
     "pytest-xdist ~=3.6",
     "ruff ~=0.9.0",
     "vcrpy ~=7.0",
+    # TODO: This is just for build_locked_extras, should be removable soon
+    "tomli ~=2.2; python_version < '3.11'",
 ]
 docs = [
     # TODO: remove python_version after we drop python 3.9
