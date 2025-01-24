@@ -841,8 +841,10 @@ class PluginTransmissionClean(TransmissionBase):
     """
 
     schema = {
-        "deprecated": "The clean_transmission plugin is deprecated. Configure a new task using the from_transmission "
-        "plugin as well as the transmission plugin using the remove or purge action.",
+        "deprecated": True,
+        "deprecationMessage": "The clean_transmission plugin is deprecated. Configure a new task using the "
+        "from_transmission plugin as well as the transmission plugin using the remove or purge "
+        "action.",
         "anyOf": [
             {"type": "boolean"},
             {

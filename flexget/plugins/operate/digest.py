@@ -110,7 +110,8 @@ class FromDigest:
         'properties': {
             'list': {'type': 'string'},
             'limit': {
-                'deprecated': 'The `limit` option of from_digest is deprecated. Use the `limit` plugin instead.',
+                'deprecated': True,
+                'deprecationMessage': 'The `limit` option of from_digest is deprecated. Use the `limit` plugin instead.',
                 'type': 'integer',
             },
             'expire': {

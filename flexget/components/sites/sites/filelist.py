@@ -73,7 +73,8 @@ class SearchFileList:
 
     schema = {
         'type': 'object',
-        'deprecated': 'plugin filelist is deprecated, please consider using plugin filelist_api',
+        'deprecated': True,
+        'deprecationMessage': 'plugin filelist is deprecated, please consider using plugin filelist_api',
         'properties': {
             'username': {'type': 'string'},
             'password': {'type': 'string'},

@@ -446,12 +446,22 @@ def validate_oneOf(validator, oneOf, instance, schema):
     yield from select_child_errors(validator, errors)
 
 
-def validate_deprecated(validator, message, instance, schema):
+def validate_deprecated(validator, deprecated, instance, schema):
+    if "deprecationMessage" not in schema and isinstance(deprecated, str):
+        logger.warning(deprecated)
+
+
+def validate_deprecationMessage(validator, message, instance, schema):
     """Not really a validator, just warns if deprecated section of config is being used."""
     logger.warning(message)
 
 
-validators = {'anyOf': validate_anyOf, 'oneOf': validate_oneOf, 'deprecated': validate_deprecated}
+validators = {
+    'anyOf': validate_anyOf,
+    'oneOf': validate_oneOf,
+    'deprecated': validate_deprecated,
+    'deprecationMessage': validate_deprecationMessage,
+}
 
 SchemaValidator = jsonschema.validators.extend(BaseValidator, validators)
 jsonschema.validators.validates(BASE_SCHEMA_NAME)(SchemaValidator)
@@ -497,7 +507,7 @@ def _rewrite_ref(identifier: str, definition_path: str, defs: dict) -> str:
 def _inline_refs(schema: JsonSchema, definition_path: str, defs: dict) -> Union[JsonSchema, list]:
     if isinstance(schema, dict):
         if '$ref' in schema:
-            return {'$ref': _rewrite_ref(schema['$ref'], definition_path, defs)}
+            return {**schema, '$ref': _rewrite_ref(schema['$ref'], definition_path, defs)}
         return {k: _inline_refs(v, definition_path, defs) for k, v in schema.items()}
     if isinstance(schema, list):
         return [_inline_refs(v, definition_path, defs) for v in schema]

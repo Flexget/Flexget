@@ -12,7 +12,8 @@ logger = logger.bind(name='pending_approval')
 class PendingApproval:
     schema = {
         'type': 'boolean',
-        'deprecated': 'pending_approval is deprecated, switch to using pending_list',
+        'deprecated': True,
+        'deprecationMessage': 'pending_approval is deprecated, switch to using pending_list',
     }
 
     @staticmethod

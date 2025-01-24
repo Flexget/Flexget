@@ -27,7 +27,8 @@ web_config_schema = {
                 'base_url': {'type': 'string'},
                 'run_v2': {
                     'type': 'boolean',
-                    'deprecated': 'v2 is registered by default if web_ui: true so `run_v2` is now redundant. To run v1 alongside, use the `run_v1`.',
+                    'deprecated': True,
+                    'deprecationMessage': 'v2 is registered by default if web_ui: true so `run_v2` is now redundant. To run v1 alongside, use the `run_v1`.',
                 },
                 'run_v1': {'type': 'boolean'},
             },
