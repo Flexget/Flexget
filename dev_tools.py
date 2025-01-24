@@ -81,7 +81,7 @@ def cli_bundle_webui(ui_version: Optional[str] = None):
         bundle_webui(ui_version)
     except RuntimeError as exc:
         click.echo(exc.args[0], err=True)
-        raise click.Abort()
+        raise click.Abort
 
 
 @cli.command()

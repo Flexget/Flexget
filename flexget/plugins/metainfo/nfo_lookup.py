@@ -154,13 +154,13 @@ class NfoReader:
             tree = ET.parse(filename)
             root = tree.getroot()
         except ET.ParseError:
-            raise BadXmlFile()
+            raise BadXmlFile
 
         if os.path.exists(filename):
             self._nfo_filename = filename
             self._root = root
         else:
-            raise BadXmlFile()
+            raise BadXmlFile
 
         # Each key in the dictionary correspond to a field that should be read from the nfo file. The values are a tuple
         # with a boolean and a callable. The boolean indicates if the field can appear multiple times, while the

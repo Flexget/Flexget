@@ -162,7 +162,7 @@ class BaseFileOps:
             self.logger.warning('Unable to delete path `{}`: {}', base_path, err)
 
     def handle_entry(self, task, config, entry, siblings):
-        raise NotImplementedError()
+        raise NotImplementedError
 
 
 class DeleteFiles(BaseFileOps):
