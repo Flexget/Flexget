@@ -776,7 +776,12 @@ class Task:
 def register_config_key():
     task_config_schema = {
         'type': 'object',
-        'additionalProperties': {'$ref': '/schema/plugins?interface=task'},
+        'title': 'tasks',
+        'description': 'All tasks which can be run by FlexGet are defined in this section',
+        'additionalProperties': {
+            '$ref': '/schema/plugins?interface=task',
+            'description': 'The name of the task',
+        },
     }
 
     config_schema.register_config_key('tasks', task_config_schema, required=True)

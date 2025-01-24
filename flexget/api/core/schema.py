@@ -30,7 +30,7 @@ def rewrite_refs(schema, base_url: str):
     """Make sure any $refs in the schema point properly back to this endpoint."""
     if isinstance(schema, dict):
         if '$ref' in schema:
-            return {'$ref': rewrite_ref(schema['$ref'], base_url)}
+            return {**schema, '$ref': rewrite_ref(schema['$ref'], base_url)}
         return {k: rewrite_refs(v, base_url) for k, v in schema.items()}
     if isinstance(schema, list):
         return [rewrite_refs(v, base_url) for v in schema]

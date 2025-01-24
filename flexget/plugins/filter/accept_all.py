@@ -15,7 +15,7 @@ class FilterAcceptAll:
       accept_all: true
     """
 
-    schema = {'type': 'boolean'}
+    schema = {'type': 'boolean', 'description': 'Accepts all entries'}
 
     def on_task_filter(self, task, config):
         if config:
