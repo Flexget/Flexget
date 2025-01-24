@@ -5,8 +5,6 @@ on:
     branches:
       - develop
   pull_request:
-    branches:
-      - '*'
 permissions:
   contents: read
 concurrency:
@@ -24,8 +22,9 @@ jobs:
         operating-system: [ windows-latest, macos-latest, ubuntu-latest ]
       fail-fast: false
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
-      - name: Install uv
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      - name: Install uv and Python
         uses: astral-sh/setup-uv@b5f58b2abc5763ade55e4e9d0fe52cd1ff7979ca # v5
         with:
           enable-cache: true
