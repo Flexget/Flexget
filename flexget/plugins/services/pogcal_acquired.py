@@ -104,7 +104,7 @@ class PogcalAcquired:
         # Try to find the show id from pogdesign show list
         show_re = name_to_re(show_name)
         soup = get_soup(page.content)
-        search = re.compile(show_re, flags=re.I)
+        search = re.compile(show_re, flags=re.IGNORECASE)
         show = soup.find(text=search)
         if show:
             id = int(show.find_previous('input')['value'])

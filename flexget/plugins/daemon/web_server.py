@@ -60,8 +60,7 @@ def prepare_config(config):
     if config['base_url']:
         if not config['base_url'].startswith('/'):
             config['base_url'] = '/' + config['base_url']
-        if config['base_url'].endswith('/'):
-            config['base_url'] = config['base_url'][:-1]
+        config['base_url'] = config['base_url'].removesuffix('/')
 
     return config
 

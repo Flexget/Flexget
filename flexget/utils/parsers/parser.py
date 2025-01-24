@@ -60,5 +60,5 @@ class TitleParser:
         old = re.escape(old)
         if not_in_word:
             old = TitleParser.re_not_in_word(old)
-        pattern = re.compile(old, re.I)
+        pattern = re.compile(old, re.IGNORECASE)
         return re.sub(pattern, new, data, count=count)
