@@ -445,7 +445,7 @@ class TestNextSeriesEpisodesSeasonPack:
             max_reruns: 0
     """
 
-    @pytest.fixture()
+    @pytest.fixture
     def config(self):
         """Season packs aren't supported by guessit yet."""
         return self._config
@@ -457,7 +457,7 @@ class TestNextSeriesEpisodesSeasonPack:
         )
 
     @pytest.mark.parametrize(
-        "task_name,inject,result_find",
+        ('task_name', 'inject', 'result_find'),
         [
             (
                 'test_next_series_episodes_season_pack',

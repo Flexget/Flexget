@@ -102,7 +102,7 @@ class TestSortBy:
         return '|'
 
     @pytest.mark.parametrize(
-        'task_name,result_titles,fail_reason',
+        ('task_name', 'result_titles', 'fail_reason'),
         [
             (
                 'test_title',

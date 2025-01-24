@@ -22,7 +22,7 @@ def register_plugin():
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 def debug_notifications(manager):
     notifications = get_plugin_by_name('debug_notification').instance.notifications = []
     return notifications

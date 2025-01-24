@@ -10,7 +10,7 @@ class TestDatabaseAPI:
     config = 'tasks: {}'
 
     @pytest.mark.parametrize(
-        'operation, plugin_name, status, schema',
+        ('operation', 'plugin_name', 'status', 'schema'),
         [
             ('cleanup', None, 200, base_message),
             ('vacuum', None, 200, base_message),

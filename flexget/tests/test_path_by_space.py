@@ -95,7 +95,7 @@ class TestPathSelect:
                 - /data/90.5GB,100GB
     """
 
-    @pytest.fixture()
+    @pytest.fixture
     def no_path_validation(self, monkeypatch):
         from flexget.config_schema import format_checker
 
