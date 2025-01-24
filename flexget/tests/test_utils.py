@@ -53,7 +53,7 @@ class TestParseFilesize:
         assert parse_filesize(size_text) == pytest.approx(expected)
 
     def test_parse_filesize_ib_not_valid(self):
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match='100 ib does not look like a file size'):
             parse_filesize('100 ib')
 
 

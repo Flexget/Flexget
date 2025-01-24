@@ -49,7 +49,10 @@ class TestFilterSeen:
         # test that we don't filter reject on non-string fields (ie, seen same imdb_score)
 
         task = execute_task('test_number')
-        assert task.find_entry(title='New title 1') and task.find_entry(title='New title 2'), (
+        assert task.find_entry(title='New title 1'), (
+            'Item should not have been rejected because of number field'
+        )
+        assert task.find_entry(title='New title 2'), (
             'Item should not have been rejected because of number field'
         )
 

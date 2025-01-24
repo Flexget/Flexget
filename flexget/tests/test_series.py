@@ -1293,7 +1293,8 @@ class TestBacklog:
     def testBacklog(self, manager, execute_task):
         """Series plugin: backlog"""
         task = execute_task('backlog')
-        assert task.entries and not task.accepted, 'no entries at the start'
+        assert task.entries, 'no entries at the start'
+        assert not task.accepted, 'no entries at the start'
         # simulate test going away from the task
         del manager.config['tasks']['backlog']['mock']
         age_series(hours=12)

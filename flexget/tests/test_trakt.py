@@ -216,7 +216,8 @@ class TestTraktShowLookup:
         entry = task.entries[0]
 
         assert entry['series_name'] == 'Fargo', 'series lookup failed'
-        assert entry['series_season'] == 1 and entry['season_pack'], 'season lookup failed'
+        assert entry['series_season'] == 1, 'season lookup failed'
+        assert entry['season_pack'], 'season lookup failed'
         assert entry['trakt_season_id'] == 61286, 'season lookup failed'
 
 
