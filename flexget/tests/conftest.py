@@ -58,7 +58,7 @@ def config(request):
     return request.cls.config
 
 
-@pytest.fixture()
+@pytest.fixture
 def manager(
     request, config, caplog, monkeypatch, filecopy, tmp_path_factory
 ):  # enforce filecopy is run before manager
@@ -76,7 +76,7 @@ def manager(
     mockmanager.shutdown()
 
 
-@pytest.fixture()
+@pytest.fixture
 def execute_task(manager: Manager) -> Callable[..., Task]:
     """
     A function that can be used to execute and return a named task in `config` argument.
@@ -112,7 +112,7 @@ def execute_task(manager: Manager) -> Callable[..., Task]:
     return execute
 
 
-@pytest.fixture()
+@pytest.fixture
 def use_vcr(request, monkeypatch):
     """
     This fixture is applied automatically to any test using the `online` mark. It will record and playback network
@@ -140,7 +140,7 @@ def use_vcr(request, monkeypatch):
             yield cassette
 
 
-@pytest.fixture()
+@pytest.fixture
 def api_client(manager) -> 'APIClient':
     with Session() as session:
         user = session.query(User).first()
@@ -151,7 +151,7 @@ def api_client(manager) -> 'APIClient':
         return APIClient(user.token)
 
 
-@pytest.fixture()
+@pytest.fixture
 def schema_match(manager) -> Callable[[dict, Any], list[dict]]:
     """
     This fixture enables verifying JSON Schema. Return a list of validation error dicts. List is empty if no errors
@@ -166,7 +166,7 @@ def schema_match(manager) -> Callable[[dict, Any], list[dict]]:
     return match
 
 
-@pytest.fixture()
+@pytest.fixture
 def link_headers(manager) -> Callable[[flask.Response], dict[str, dict]]:
     """
     Parses link headers and return them in dict form
@@ -244,7 +244,7 @@ def pytest_runtest_setup(item):
         item.fixturenames.append('no_requests')
 
 
-@pytest.fixture()
+@pytest.fixture
 def filecopy(request):
     out_files = []
     for marker in request.node.iter_markers('filecopy'):
@@ -279,7 +279,7 @@ def filecopy(request):
                 print(f"couldn't remove {f}: {e}")
 
 
-@pytest.fixture()
+@pytest.fixture
 def no_requests(monkeypatch):
     online_funcs = ['requests.sessions.Session.request', 'http.client.HTTPConnection.request']
 

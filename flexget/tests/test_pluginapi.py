@@ -70,7 +70,7 @@ class TestExternalPluginLoading:
             external_plugin: yes
     """
 
-    @pytest.fixture()
+    @pytest.fixture
     def config(self, request):
         os.environ['FLEXGET_PLUGIN_PATH'] = request.node.path.parent.joinpath(
             'external_plugins'

@@ -53,14 +53,14 @@ class TestConfigureSeriesBetaSeriesList:
                     - other_member_2
     """
 
-    @pytest.fixture()
+    @pytest.fixture
     def create_token_mock(self, monkeypatch):
         # mock create_token
         the_mock = mock.Mock(return_value='token_foo')
         monkeypatch.setattr('flexget.plugins.input.betaseries_list.create_token', the_mock)
         return the_mock
 
-    @pytest.fixture()
+    @pytest.fixture
     def query_series_mock(self, monkeypatch):
         # mock query_series
         the_mock = mock.Mock(return_value=[])
