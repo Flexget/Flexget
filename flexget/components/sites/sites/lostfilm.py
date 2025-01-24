@@ -482,9 +482,7 @@ class LostFilm:
                     logger.info('Download item has unknown quality indicator: {}', lf_quality)
                     quality = lf_quality
                 if series_name_org:
-                    new_title = '.'.join(
-                        [series_name_org, episode_id, quality, r_type, 'LostFilm.TV']
-                    )
+                    new_title = f'{series_name_org}.{episode_id}.{quality}.{r_type}.LostFilm.TV'
                 else:
                     new_title = '{} {}'.format(item['title'], quality).strip()
                 new_entry = Entry()
@@ -507,7 +505,7 @@ class LostFilm:
                 new_entry['release_group'] = 'LostFilm.TV'
                 if quality_map.get(lf_quality):
                     if r_type:
-                        new_entry['quality'] = qualities.Quality('.'.join([quality, r_type]))
+                        new_entry['quality'] = qualities.Quality(f'{quality}.{r_type}')
                     else:
                         new_entry['quality'] = qualities.Quality(quality)
                 if series_name_rus:
