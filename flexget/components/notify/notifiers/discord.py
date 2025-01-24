@@ -171,7 +171,7 @@ class DiscordNotifier:
             web_hook['flags'] = 4096  # Suppress notification bitfield
 
         # Send the request and handle the rate-limit response.
-        for i in range(3):
+        for _ in range(3):
             try:
                 req = session.post(config['web_hook_url'], json=web_hook)
                 tokens = int(req.headers.get('x-ratelimit-remaining', 1))

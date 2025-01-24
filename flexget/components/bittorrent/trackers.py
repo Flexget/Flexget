@@ -54,7 +54,7 @@ class RemoveTrackers:
             if 'torrent' in entry:
                 for tracker in entry['torrent'].trackers:
                     for regexp in config or []:
-                        if re.search(regexp, tracker, re.IGNORECASE | re.UNICODE):
+                        if re.search(regexp, tracker, re.IGNORECASE):
                             logger.debug(
                                 'remove_trackers removing {} because of {}', tracker, regexp
                             )
@@ -65,7 +65,7 @@ class RemoveTrackers:
                 for regexp in config:
                     # Replace any tracker strings that match the regexp with nothing
                     tr_search = rf'&tr=([^&]*{regexp}[^&]*)'
-                    entry['url'] = re.sub(tr_search, '', entry['url'], re.IGNORECASE | re.UNICODE)
+                    entry['url'] = re.sub(tr_search, '', entry['url'], flags=re.IGNORECASE)
 
 
 class ModifyTrackers:

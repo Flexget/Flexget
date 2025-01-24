@@ -405,7 +405,7 @@ class SeriesParser(TitleParser):
                 match = re.search(
                     self.re_not_in_word(r'(\d?\d)(\d\d)'),
                     desperate,
-                    re.IGNORECASE | re.UNICODE,
+                    re.IGNORECASE,
                 )
                 if match:
                     logger.trace('-> had luck with SEE')

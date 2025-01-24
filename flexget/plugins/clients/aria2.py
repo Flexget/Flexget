@@ -46,7 +46,9 @@ class JsonRpcClient(RpcClient):
         # trigger _default_error_handle on failure
         self.get_global_stat()
 
-    def _get_req_params(self, method, params=[]):
+    def _get_req_params(self, method, params=None):
+        if params is None:
+            params = []
         req_params = {
             'jsonrpc': JsonRpcClient.RPC_VERSION,
             'id': JsonRpcClient.RPC_ID,

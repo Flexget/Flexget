@@ -252,7 +252,7 @@ def filter_strip_symbols(text: str) -> str:
     # Symbols that should be converted to white space
     result = re.sub(r'[ \(\)\-_\[\]\.]+', ' ', text)
     # Leftovers
-    result = re.sub(r"[^\w\d\s]", "", result, flags=re.UNICODE)
+    result = re.sub(r"[^\w\d\s]", "", result)
     # Replace multiple white spaces with one
     return ' '.join(result.split())
 

@@ -56,9 +56,9 @@ class TitleParser:
 
     @staticmethod
     def ireplace(data, old, new, count=0, not_in_word=False):
-        """Case insensitive string replace"""
+        """Case-insensitive string replace"""
         old = re.escape(old)
         if not_in_word:
             old = TitleParser.re_not_in_word(old)
         pattern = re.compile(old, re.I)
-        return re.sub(pattern, new, data, count)
+        return re.sub(pattern, new, data, count=count)
