@@ -10,7 +10,7 @@ from flexget.utils.tools import format_filesize, parse_filesize
 
 logger = logger.bind(name='metanfo_csize')
 
-SIZE_RE = re.compile(r'Size[^\d]{0,7}(\d*\.?\d+).{0,5}(MB|GB)', re.IGNORECASE | re.UNICODE)
+SIZE_RE = re.compile(r'Size[^\d]{0,7}(\d*\.?\d+).{0,5}(MB|GB)', re.IGNORECASE)
 
 
 class MetainfoContentSize:

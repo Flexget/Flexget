@@ -49,7 +49,7 @@ EMBY_ENDPOINT_LIBRARY_REFRESH = '/emby/Library/Refresh'
 logger = logger.bind(name='api_emby')
 
 
-class EmbyApiBase(ABC):
+class EmbyApiBase(ABC):  # noqa: B024 The correct fix for it requires a thorough understanding of the code.
     """
     Base Class to all API integratios
     """

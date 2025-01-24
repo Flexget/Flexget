@@ -19,6 +19,7 @@ from flexget.utils.template import RenderError
 from flexget.utils.tools import decode_html
 
 logger = logger.bind(name='download')
+tmpdir = tempfile.gettempdir()
 
 
 class PluginDownload:
@@ -99,7 +100,7 @@ class PluginDownload:
         require_path=False,
         handle_magnets=False,
         fail_html=True,
-        tmp_path=tempfile.gettempdir(),
+        tmp_path=tmpdir,
     ):
         """
         Download entry content and store in temporary folder.
@@ -174,7 +175,7 @@ class PluginDownload:
         require_path=False,
         handle_magnets=False,
         fail_html=True,
-        tmp_path=tempfile.gettempdir(),
+        tmp_path=tmpdir,
     ):
         """Download all task content and store in temporary folder.
 

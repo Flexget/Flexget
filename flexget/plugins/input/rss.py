@@ -435,7 +435,7 @@ class InputRSS:
             # helper
             # TODO: confusing? refactor into class member ...
 
-            def add_entry(ea):
+            def add_entry(ea, entry=entry):
                 ea['title'] = entry.title
 
                 # fields dict may be modified during this loop, so loop over a copy (fields.items())

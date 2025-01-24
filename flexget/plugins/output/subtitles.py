@@ -107,8 +107,8 @@ class Subtitles:
                 # did we find any subs for this language?
                 if langsubs:
 
-                    def seqmatch(subfile):
-                        s = difflib.SequenceMatcher(lambda x: x in " ._", entry['title'], subfile)
+                    def seqmatch(subfile, entry=entry):
+                        s = difflib.SequenceMatcher(lambda x: x in " ._", entry['title'], subfile)  # noqa: B023 This is a false positive, see https://github.com/astral-sh/ruff/issues/15716
                         # print "matching: ", entry['title'], subfile, s.ratio()
                         return s.ratio() > match_limit
 

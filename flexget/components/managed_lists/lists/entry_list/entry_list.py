@@ -27,6 +27,7 @@ class EntryList:
                 entry_list = db.get_list_by_exact_name(config, session=session)
             except NoResultFound:
                 logger.warning("Entry list with name '{}' does not exist", config)
+                return entries
             else:
                 for search_string in entry.get('search_strings', [entry['title']]):
                     logger.debug(
@@ -39,7 +40,6 @@ class EntryList:
                         db.EntryListEntry.title.like('%' + search_string + '%')
                     )
                     entries += [e.entry for e in query.all()]
-            finally:
                 return entries
 
 

@@ -26,12 +26,8 @@ except ImportError:
 
 logger = logger.bind(name='irc')
 
-MESSAGE_CLEAN = re.compile(
-    r"\x0f|\x1f|\x02|\x03(?:[\d]{1,2}(?:,[\d]{1,2})?)?", re.MULTILINE | re.UNICODE
-)
-URL_MATCHER = re.compile(
-    r'(https?://[\da-z\.-]+\.[a-z\.]{2,6}[/\w\.-\?&]*/?)', re.MULTILINE | re.UNICODE
-)
+MESSAGE_CLEAN = re.compile(r"\x0f|\x1f|\x02|\x03(?:[\d]{1,2}(?:,[\d]{1,2})?)?", re.MULTILINE)
+URL_MATCHER = re.compile(r'(https?://[\da-z\.-]+\.[a-z\.]{2,6}[/\w\.-\?&]*/?)', re.MULTILINE)
 
 channel_pattern = {
     'type': 'string',
@@ -202,7 +198,7 @@ class IRCConnection(SimpleIRCBot):
 
             # Process ignore lines
             for regex_values in self.tracker_config.findall('parseinfo/ignore/regex'):
-                rx = re.compile(regex_values.get('value'), re.UNICODE | re.MULTILINE)
+                rx = re.compile(regex_values.get('value'), re.MULTILINE)
                 self.ignore_lines.append((rx, regex_values.get('expected') != 'false'))
 
             # Parse patterns
@@ -374,7 +370,7 @@ class IRCConnection(SimpleIRCBot):
         """
         result = []
         for pattern in patterns:
-            rx = re.compile(pattern.find('regex').get('value'), re.UNICODE | re.MULTILINE)
+            rx = re.compile(pattern.find('regex').get('value'), re.MULTILINE)
             vals = [var.get('name') for idx, var in enumerate(pattern.find('vars'))]
             optional = pattern.get('optional', 'false').lower() == 'true'
             result.append((rx, vals, optional))
@@ -956,7 +952,7 @@ class IRCConnectionManager:
                     del irc_connections[conn_name]  # remove it from the list of connections
 
         # Now we can start
-        for conn_name, connection in irc_connections.items():
+        for _conn_name, connection in irc_connections.items():
             connection.thread.start()
 
     def stop_connections(self, wait, name=None):

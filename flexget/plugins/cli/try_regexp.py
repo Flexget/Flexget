@@ -22,7 +22,7 @@ class PluginTryRegexp:
         for field, value in entry.items():
             if not isinstance(value, str):
                 continue
-            if re.search(regexp, value, re.IGNORECASE | re.UNICODE):
+            if re.search(regexp, value, re.IGNORECASE):
                 return (True, field)
         return (False, None)
 

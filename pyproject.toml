@@ -139,8 +139,9 @@ line-length = 99
 extend-exclude = ["flexget/ui"]
 
 [tool.ruff.lint]
-select = ["C4", "E", "F", "I", "ISC", "PGH", "PLE", "RET", "RUF", "SIM", "TCH", "UP", "W"]
+select = ["B", "C4", "E", "F", "I", "ISC", "PGH", "PLE", "RET", "RUF", "SIM", "TCH", "UP", "W"]
 ignore = [
+    "B904", # TODO: enable this rule (requires a lot of manual work)
     "E501", # TODO: enable this rule (requires a lot of manual work)
     "PLE1205", # Maybe can re-enable after https://github.com/astral-sh/ruff/issues/13390
     "RUF012", # Maybe can re-enable after https://github.com/astral-sh/ruff/issues/5243

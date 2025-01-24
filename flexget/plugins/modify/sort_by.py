@@ -75,7 +75,7 @@ class PluginSortBy:
 
             re_articles = RE_ARTICLES if ignore_articles is True else ignore_articles
 
-            def sort_key(entry):
+            def sort_key(entry, field=field, re_articles=re_articles, reverse=reverse):
                 val = evaluate_expression(field, entry)
                 if isinstance(val, str) and re_articles:
                     val = re.sub(re_articles, '', val, flags=re.IGNORECASE)
