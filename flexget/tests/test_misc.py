@@ -40,13 +40,11 @@ class TestDisableBuiltins:
         # Execute the task once, then we'll make sure seen plugin isn't rejecting on future executions
         execute_task('test')
         task = execute_task('test')
-        assert task.find_entry('accepted', title='dupe1') and task.find_entry(
-            'accepted', title='dupe2'
-        ), 'disable is not working?'
+        assert task.find_entry('accepted', title='dupe1'), 'disable is not working?'
+        assert task.find_entry('accepted', title='dupe2'), 'disable is not working?'
         task = execute_task('test2')
-        assert task.find_entry(title='dupe1').accepted and task.find_entry(
-            'accepted', title='dupe2'
-        ), 'disable is not working?'
+        assert task.find_entry(title='dupe1').accepted, 'disable is not working?'
+        assert task.find_entry('accepted', title='dupe2'), 'disable is not working?'
 
 
 @pytest.mark.online

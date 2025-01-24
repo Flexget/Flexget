@@ -139,7 +139,7 @@ line-length = 99
 extend-exclude = ["flexget/ui"]
 
 [tool.ruff.lint]
-select = ["B", "C4", "E", "F", "I", "ISC", "PGH", "PLE", "RET", "RUF", "SIM", "TCH", "UP", "W"]
+select = ["B", "C4", "E", "F", "I", "ISC", "PGH", "PLE", "PT", "RET", "RUF", "SIM", "TCH", "UP", "W"]
 ignore = [
     "B904", # TODO: enable this rule (requires a lot of manual work)
     "E501", # TODO: enable this rule (requires a lot of manual work)

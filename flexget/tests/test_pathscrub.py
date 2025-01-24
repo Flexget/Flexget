@@ -36,7 +36,10 @@ class TestPathscrub:
 
     def test_degenerate(self):
         # If path is reduced to nothing, make sure it complains
-        with pytest.raises(ValueError):
+        with pytest.raises(
+            ValueError,
+            match='Nothing was left after stripping invalid characters from path `<<<<:>>>>`!',
+        ):
             pathscrub('<<<<:>>>>', os='windows', filename=True)
 
     def test_space_around(self):
