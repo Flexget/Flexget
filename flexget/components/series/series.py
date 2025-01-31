@@ -198,11 +198,7 @@ class FilterSeriesBase:
                 'timeframe': {
                     'oneOf': [{'required': ['target']}, {'required': ['qualities']}],
                     'error': 'A `target` should be specified along with a timeframe.',
-                },
-                'target': {
-                    'required': ['timeframe'],
-                    'error': 'A `timeframe` should be specified along with a `target`',
-                },
+                }
             },
             'additionalProperties': False,
         }
