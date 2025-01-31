@@ -6,6 +6,7 @@ from copy import copy
 from datetime import datetime
 from typing import Union
 
+import pendulum
 from loguru import logger
 from sqlalchemy import not_
 from sqlalchemy.orm import joinedload, object_session
@@ -1032,26 +1033,20 @@ class FilterSeries(FilterSeriesBase):
             seen_times = [rls.first_seen for rls in episode.releases]
         # Somehow we can get here without having qualifying releases (#2779) make sure min doesn't crash
         first_seen = min(seen_times) if seen_times else datetime.now()
-        expires = first_seen + timeframe
+        expires = pendulum.instance(first_seen, tz='local') + timeframe
         logger.debug('timeframe: {}, first_seen: {}, expires: {}', timeframe, first_seen, expires)
 
         stop = normalize_series_name(task.options.stop_waiting) == episode.series._name_normalized
-        if expires <= datetime.now() or stop:
+        if expires.is_past() or stop:
             # Expire timeframe, accept anything
             logger.info('Timeframe expired, releasing quality restriction.')
             return False
         # verbose waiting, add to backlog
-        diff = expires - datetime.now()
-
-        hours, remainder = divmod(diff.seconds, 3600)
-        hours += diff.days * 24
-        minutes, _ = divmod(remainder, 60)
-
         logger.info(
-            '`{}`: timeframe waiting for {:02d}h:{:02d}min. Currently best is `{}`.',
+            '`{}`: Timeframe will expire {}. Waiting for target `{}`, current best is `{}`.',
             episode.series.name,
-            hours,
-            minutes,
+            expires.diff_for_humans(),
+            config.get('target', ' or '.join(config.get('qualities', []))),
             best['title'],
         )
 
