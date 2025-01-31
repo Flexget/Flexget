@@ -5,11 +5,6 @@ from collections.abc import MutableMapping
 from pathlib import Path
 from typing import Any, Optional
 
-try:
-    import tomllib
-except ImportError:
-    import tomli as tomllib
-
 from hatchling.metadata.plugin.interface import MetadataHookInterface
 
 
@@ -24,35 +19,10 @@ def update_metadata_with_locked(
         groups (list[str], optional): The groups to lock.
 
     """
-    lockfile = root / "uv.lock"
-    if not lockfile.exists():
-        print(f"The lockfile doesn't exist, skip locking dependencies {root}")
-        sys.exit(1)
-    with lockfile.open("rb") as f:
-        lockfile_content = tomllib.load(f)
-
-    for pkg in lockfile_content["package"]:
-        if pkg["name"] == metadata["name"]:
-            lockfile_metadata = pkg
-            break
-    else:
-        print(f"`{metadata['name']}` not found in the lock file")
-        return
     groups = groups or []
     print(f"Adding extras with locked dependencies: {', '.join(groups)}")
     for group in [*groups, "locked"]:
-        if group == "locked":
-            args = []
-        else:
-            # TODO: This check (and the above code to read lockfile_metadata) can come out if uv starts handling it
-            # https://github.com/astral-sh/uv/issues/10882
-            if group not in lockfile_metadata["dev-dependencies"]:
-                print(
-                    f"Group `{group}` is not defined in the project's `dependency-group` table "
-                    "(or the lock file is stale)"
-                )
-                sys.exit(1)
-            args = [f"--only-group={group}"]
+        args = [] if group == "locked" else [f"--only-group={group}"]
         try:
             export = subprocess.check_output(
                 [
@@ -73,6 +43,13 @@ def update_metadata_with_locked(
             print(f"Failed to export locked dependencies for `{group}`: {exc.stderr}")
             sys.exit(1)
         requirements = [line for line in export.splitlines() if not line.startswith("#")]
+        if not requirements:
+            # TODO: We can remove this if uv starts checking the existence of groups itself.
+            # https://github.com/astral-sh/uv/issues/10882
+            print(
+                f"There does not appear to be any requirements for group `{group}`, does it exist?"
+            )
+            sys.exit(1)
         metadata.setdefault("optional-dependencies", {})[group] = requirements
 
 
