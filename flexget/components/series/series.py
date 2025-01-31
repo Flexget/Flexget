@@ -1033,7 +1033,7 @@ class FilterSeries(FilterSeriesBase):
         logger.debug('timeframe: {}, first_seen: {}, expires: {}', timeframe, first_seen, expires)
 
         stop = normalize_series_name(task.options.stop_waiting) == episode.series._name_normalized
-        if expires.is_past() or stop:
+        if expires <= pendulum.now() or stop:
             # Expire timeframe, accept anything
             logger.info('Timeframe expired, releasing quality restriction.')
             return False
