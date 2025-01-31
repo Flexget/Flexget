@@ -80,7 +80,7 @@ jobs:
         with:
           cmd: yq .env.UV_VERSION merge/.github/workflows/autofix.yml
       - name: Install uv and Python
-        uses: astral-sh/setup-uv@b5f58b2abc5763ade55e4e9d0fe52cd1ff7979ca # v5
+        uses: astral-sh/setup-uv@4db96194c378173c656ce18a155ffc14a9fc4355 # v5
         with:
           enable-cache: true
           python-version: ${{ env.PYTHON_VERSION }}
