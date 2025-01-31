@@ -193,6 +193,16 @@ class FilterSeriesBase:
                     ]
                 },
             },
+            'dependencies': {
+                'timeframe': {
+                    'oneOf': [{'required': ['target']}, {'required': ['qualities']}],
+                    'error': 'A `target` should be specified along with a timeframe.',
+                },
+                'target': {
+                    'required': ['timeframe'],
+                    'error': 'A `timeframe` should be specified along with a `target`',
+                },
+            },
             'additionalProperties': False,
         }
 
@@ -272,9 +282,6 @@ class FilterSeriesBase:
                         'Series setting `enough` has been renamed to `target`. Please update your config.'
                     )
                     series_settings.setdefault('target', series_settings['enough'])
-                # Add quality: 720p if timeframe is specified with no target
-                if 'timeframe' in series_settings and 'qualities' not in series_settings:
-                    series_settings.setdefault('target', '720p hdtv+')
 
                 group_series.append({series: series_settings})
             config[group_name] = group_series
