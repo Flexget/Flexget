@@ -206,6 +206,6 @@ def start(
     if _startup_buffer:
         for record in _startup_buffer:
             level, message = record['level'].name, record['message']
-            logger.patch(lambda r: r.update(record)).log(level, message)
+            logger.patch(lambda r, record=record: r.update(record)).log(level, message)
         _startup_buffer = []
     _logging_started = True

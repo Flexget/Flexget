@@ -99,7 +99,6 @@ class TestQualityParser:
             ('Test.File.truehd', 'truehd'),
             ('Test.File.truehd7.1', 'truehd'),
             ('Test.File.truehd.7.1', 'truehd'),
-            ('Test.File.DTSHDMA', 'dtshd'),
             ('Test.File.DTSHDMA5.1', 'dtshd'),
             ('Test.File.DD2.0', 'dd5.1', False),
             ('Test.File.AC35.1', 'ac3', False),

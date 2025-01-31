@@ -533,7 +533,7 @@ def setup_params(mgr):
         # Ignore list for irrelevant actions
         ignore = ['help', 'verbose', 'silent', 'try-regexp', 'dump-config', 'dump']
 
-        name = action.option_strings[-1].strip('--')
+        name = action.option_strings[-1].strip('-')
         if name in ignore or action.help == '==SUPPRESS==':
             continue
 

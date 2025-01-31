@@ -43,12 +43,12 @@ def name_to_re(name, ignore_prefixes=None, parser=None):
     # Blanks are any non word characters except & and _
     blank = r'(?:[^\w&]|_)'
     ignore = '(?:' + '|'.join(ignore_prefixes) + ')?'
-    res = re.sub(re.compile(blank + '+', re.UNICODE), ' ', name)
+    res = re.sub(re.compile(blank + '+'), ' ', name)
     res = res.strip()
     # accept either '&' or 'and'
-    res = re.sub(' (&|and) ', ' (?:and|&) ', res, re.UNICODE)
+    res = re.sub(' (&|and) ', ' (?:and|&) ', res)
     # The replacement has a regex escape in it (\w) which needs to be escaped again in python 3.7+
-    res = re.sub(' +', blank.replace('\\', '\\\\') + '*', res, re.UNICODE)
+    res = re.sub(' +', blank.replace('\\', '\\\\') + '*', res)
     if parenthetical:
         res += '(?:' + blank + '+' + parenthetical + ')?'
         # Turn on exact mode for series ending with a parenthetical,

@@ -123,13 +123,11 @@ class FilterRegexp:
 
                 # compile `not` option regexps
                 if 'not' in opts:
-                    opts['not'] = [
-                        re.compile(not_re, re.IGNORECASE | re.UNICODE) for not_re in opts['not']
-                    ]
+                    opts['not'] = [re.compile(not_re, re.IGNORECASE) for not_re in opts['not']]
 
                 # compile regexp and make sure regexp is a string for series like '24'
                 try:
-                    regexp = re.compile(str(regexp), re.IGNORECASE | re.UNICODE)
+                    regexp = re.compile(str(regexp), re.IGNORECASE)
                 except re.error as e:
                     # Since validator can't validate dict keys (when an option is defined for the pattern) make sure we
                     # raise a proper error here.

@@ -435,7 +435,9 @@ class EpisodeRelease(Base):
         # TODO: TEMP
         import warnings
 
-        warnings.warn("accessing deprecated release.proper, use release.proper_count instead")
+        warnings.warn(
+            "accessing deprecated release.proper, use release.proper_count instead", stacklevel=2
+        )
         return self.proper_count > 0
 
     def __str__(self):
@@ -477,7 +479,9 @@ class SeasonRelease(Base):
         # TODO: TEMP
         import warnings
 
-        warnings.warn("accessing deprecated release.proper, use release.proper_count instead")
+        warnings.warn(
+            "accessing deprecated release.proper, use release.proper_count instead", stacklevel=2
+        )
         return self.proper_count > 0
 
     def __str__(self):

@@ -3,13 +3,13 @@ ci:
   skip: [ uv-lock ]
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.9.2
+    rev: v0.9.3
     hooks:
       - id: ruff
         args: [ --fix ]
       - id: ruff-format
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.5.22
+    rev: 0.5.26
     hooks:
       - id: uv-lock
       - id: uv-export

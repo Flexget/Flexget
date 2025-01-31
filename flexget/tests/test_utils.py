@@ -37,11 +37,10 @@ class TestJson:
 
 class TestParseFilesize:
     @pytest.mark.parametrize(
-        'size_text, expected',
+        ('size_text', 'expected'),
         [
             ('200KB', 200 * 1000),
             ('200.0 KB', 200 * 1000),
-            ('1234 GB', 1234 * 1000**3),
             ('1234 GB', 1234 * 1000**3),
             ('1234 GiB', 1234 * 1024**3),
             ('1234 MiB', 1234 * 1024**2),
@@ -54,13 +53,13 @@ class TestParseFilesize:
         assert parse_filesize(size_text) == pytest.approx(expected)
 
     def test_parse_filesize_ib_not_valid(self):
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match='100 ib does not look like a file size'):
             parse_filesize('100 ib')
 
 
 class TestSplitYearTitle:
     @pytest.mark.parametrize(
-        'title, expected_title, expected_year',
+        ('title', 'expected_title', 'expected_year'),
         [
             ('The Matrix', 'The Matrix', None),
             ('The Matrix 1999', 'The Matrix', 1999),

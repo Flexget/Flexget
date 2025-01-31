@@ -16,7 +16,8 @@ class CFScraper:
 
     schema = {
         'type': 'boolean',
-        'deprecated': 'cfscraper is deprecated and slated for removal in v3.14.0.',
+        'deprecated': True,
+        'deprecationMessage': 'cfscraper is deprecated and slated for removal in v3.14.0.',
     }
 
     @plugin.priority(253)

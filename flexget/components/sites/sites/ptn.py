@@ -63,7 +63,8 @@ class SearchPTN:
             'categories': {
                 'type': 'array',
                 'items': {'type': 'string', 'enum': list(categories)},
-                'deprecated': 'PtN category filtering is broken. Someone open a PR!',
+                'deprecated': True,
+                'deprecationMessage': 'PtN category filtering is broken. Someone open a PR!',
             },
         },
         'required': ['username', 'login_key', 'password'],

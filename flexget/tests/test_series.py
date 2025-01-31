@@ -1189,7 +1189,8 @@ class TestTimeframe:
     def test_stop_waiting(self, execute_task):
         """Series plugin: timeframe quality appears, stop waiting, proper appears"""
         task = execute_task('test_stop_waiting_1')
-        assert task.entries and not task.accepted
+        assert task.entries
+        assert not task.accepted
         task = execute_task('test_stop_waiting_2')
         assert task.find_entry('accepted', title='Test.S01E02.720p-FlexGet'), (
             '720p should have caused stop waiting'
@@ -1222,7 +1223,8 @@ class TestTimeframe:
         # Let 6 hours pass, timeframe should not even been started, as pdtv doesn't meet min_quality
         age_series(hours=6)
         task = execute_task('test_min_max_fail')
-        assert task.entries and not task.accepted
+        assert task.entries
+        assert not task.accepted
 
     def test_min_max_pass(self, execute_task):
         task = execute_task('test_min_max_pass')
@@ -1244,7 +1246,8 @@ class TestTimeframe:
         # Let 6 hours pass, timeframe should not even been started, as we already have one of our qualities
         age_series(hours=6)
         task = execute_task('test_qualities_fail')
-        assert task.entries and not task.accepted
+        assert task.entries
+        assert not task.accepted
 
     def test_qualities_pass(self, execute_task):
         task = execute_task('test_qualities_pass')
@@ -1290,7 +1293,8 @@ class TestBacklog:
     def testBacklog(self, manager, execute_task):
         """Series plugin: backlog"""
         task = execute_task('backlog')
-        assert task.entries and not task.accepted, 'no entries at the start'
+        assert task.entries, 'no entries at the start'
+        assert not task.accepted, 'no entries at the start'
         # simulate test going away from the task
         del manager.config['tasks']['backlog']['mock']
         age_series(hours=12)
@@ -2157,7 +2161,7 @@ class TestSeriesSeasonPack:
 
     """
 
-    @pytest.fixture()
+    @pytest.fixture
     def config(self):
         """Overrides outer config fixture since season pack support does not work with guessit parser"""
         return self._config
@@ -2305,7 +2309,7 @@ class TestSeriesSeasonPackAdvanced:
               season_packs: true
     """
 
-    @pytest.fixture()
+    @pytest.fixture
     def config(self):
         """Overrides outer config fixture since season pack support does not work with guessit parser"""
         return self._config
@@ -2351,7 +2355,7 @@ class TestSeriesDDAudio:
 
     """
 
-    @pytest.fixture()
+    @pytest.fixture
     def config(self):
         """Overrides outer config fixture since DD+ and arbitrary channels support does not work with guessit parser"""
         return self._config

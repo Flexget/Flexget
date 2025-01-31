@@ -7,7 +7,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from loguru import logger
 
-from flexget.config_schema import format_checker, register_config_key, register_schema
+from flexget.config_schema import format_checker, one_or_more, register_config_key, register_schema
 from flexget.event import event
 from flexget.manager import manager
 from flexget.utils import json
@@ -63,10 +63,10 @@ cron_schema = {
 
 schedule_schema = {
     'type': 'object',
-    'title': 'Schedule',
-    'description': 'A schedule which runs specified tasks periodically.',
+    'title': 'schedule',
+    'description': 'A schedule which runs specified tasks periodically',
     'properties': {
-        'tasks': {'type': ['array', 'string'], 'items': {'type': 'string'}},
+        'tasks': one_or_more({'type': 'string'}),
         'interval': interval_schema,
         'schedule': cron_schema,
     },
@@ -79,10 +79,12 @@ schedule_schema = {
 }
 
 main_schema = {
+    'title': 'scheduler',
+    'description': 'Runs tasks periodically (when FlexGet is run as a daemon)',
     'oneOf': [
-        {'type': 'array', 'title': 'Enable', 'items': schedule_schema},
-        {'type': 'boolean', 'title': 'Disable', 'description': 'Disable task schedules'},
-    ]
+        {'type': 'array', 'items': schedule_schema},
+        {'type': 'boolean'},
+    ],
 }
 
 scheduler = None

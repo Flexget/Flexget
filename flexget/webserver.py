@@ -210,7 +210,7 @@ class WebServer(threading.Thread):
 
         server_url = f'{protocol}://{host}:{self.port}{self.base_url}'
         logger.info('Web server started at {}', server_url)
-        for path, (registered_app, name) in _app_register.items():
+        for path, (_registered_app, name) in _app_register.items():
             logger.info('{} available at {}{}', name, server_url, path)
 
         # Start the CherryPy WSGI web server

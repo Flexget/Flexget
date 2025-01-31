@@ -173,7 +173,7 @@ class OutputFtp:
         if not os.path.exists(tmp_path):
             os.makedirs(tmp_path)
 
-        local_file = open(os.path.join(tmp_path, file_name), 'a+b')  # noqa: SIM115
+        local_file = open(os.path.join(tmp_path, file_name), 'a+b')  # noqa: SIM115 The correct fix for it requires code refactoring.
         ftp = self.check_connection(ftp, config, ftp_url, current_path)
         try:
             ftp.sendcmd("TYPE I")
@@ -199,7 +199,7 @@ class OutputFtp:
                         # Delete the downloaded file and try again from the beginning.
                         local_file.close()
                         os.remove(os.path.join(tmp_path, file_name))
-                        local_file = open(os.path.join(tmp_path, file_name), 'a+b')  # noqa: SIM115
+                        local_file = open(os.path.join(tmp_path, file_name), 'a+b')  # noqa: SIM115 The correct fix for it requires code refactoring.
                         max_attempts -= 1
 
                     size_at_last_err = local_file.tell()

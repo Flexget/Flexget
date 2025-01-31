@@ -15,6 +15,7 @@ import traceback
 from collections.abc import Iterator, Sequence
 from contextlib import contextmanager
 from datetime import datetime, timedelta
+from pathlib import Path
 from typing import (
     TYPE_CHECKING,
     Optional,
@@ -131,9 +132,7 @@ class Manager:
         self.args = args
         self.autoreload_config = False
         self.config_file_hash: Optional[str] = None
-        self.config_base: str = ''
-        self.config_name: str = ''
-        self.config_path: str = ''
+        self._config_path: Optional[Path] = None
         self.log_filename: str = ''
         self.db_filename: str = ''
         self.engine: Optional[Engine] = None
@@ -148,6 +147,8 @@ class Manager:
         self.initialized = False
 
         self.config: dict = {}
+        # user_config is exactly as loaded from the user's config file. No defaults set or manipulation done.
+        self.user_config: Optional[dict] = None
 
         self.options = self.parse_initial_options(args)
         self._init_config(create=False)
@@ -171,6 +172,18 @@ class Manager:
                 'disk will not work properly for filenames containing non-ascii characters. Make sure your '
                 'locale env variables are set up correctly for the environment which is launching FlexGet.'
             )
+
+    @property
+    def config_path(self) -> Path:
+        return self._config_path
+
+    @property
+    def config_name(self) -> str:
+        return self.config_path.stem
+
+    @property
+    def config_base(self) -> Path:
+        return self.config_path.parent.resolve()
 
     def _add_tray_icon_items(self, tray_icon: 'TrayIcon'):
         tray_icon.add_menu_item(text='Shutdown', action=self.shutdown, index=2)
@@ -552,75 +565,65 @@ class Manager:
         :param bool create: If a config file is not found, and create is True, one will be created in the home folder
         :raises: `OSError` when no config file could be found, and `create` is False.
         """
-        home_path = os.path.join(os.path.expanduser('~'), '.flexget')
-        options_config = os.path.expanduser(self.options.config)
+        home_path = Path('~/.flexget').expanduser()
+        options_config = Path(self.options.config).expanduser()
 
         possible = []
-        if os.path.isabs(options_config):
+        if options_config.is_absolute():
             # explicit path given, don't try anything
             config = options_config
             possible = [config]
         else:
             logger.debug('Figuring out config load paths')
             try:
-                possible.append(os.getcwd())
+                possible.append(Path.cwd())
             except OSError:
                 logger.debug('current directory invalid, not searching for config there')
             # for virtualenv / dev sandbox
             if hasattr(sys, 'real_prefix'):
                 logger.debug('Adding virtualenv path')
-                possible.append(sys.prefix)
+                possible.append(Path(sys.prefix))
             # normal lookup locations
             possible.append(home_path)
             if sys.platform.startswith('win'):
                 # On windows look in ~/flexget as well, as explorer does not let you create a folder starting with a dot
-                home_path = os.path.join(os.path.expanduser('~'), 'flexget')
+                home_path = Path('~/flexget').expanduser()
                 possible.append(home_path)
             else:
                 # The freedesktop.org standard config location
-                xdg_config = os.environ.get(
-                    'XDG_CONFIG_HOME', os.path.join(os.path.expanduser('~'), '.config')
-                )
-                possible.append(os.path.join(xdg_config, 'flexget'))
+                xdg_config = os.environ.get('XDG_CONFIG_HOME', '~/.config')
+                possible.append(Path(xdg_config, 'flexget').expanduser())
 
             for path in possible:
-                config = os.path.join(path, options_config)
-                if os.path.exists(config):
+                config = path / options_config
+                if config.exists():
                     logger.debug('Found config: {}', config)
                     break
             else:
                 config = None
 
-        if create and not (config and os.path.exists(config)):
-            config = os.path.join(home_path, options_config)
+        if create and not (config and config.exists()):
+            config = home_path / options_config
             logger.info('Config file {} not found. Creating new config {}', options_config, config)
-            with open(config, 'w') as newconfig:
+            with config.open('w') as newconfig:
                 # Write empty tasks to the config
                 newconfig.write(yaml.dump({'tasks': {}}))
         elif not config:
             logger.critical('Failed to find configuration file {}', options_config)
-            logger.info('Tried to read from: {}', ', '.join(possible))
+            logger.info('Tried to read from: {}', ', '.join(str(p) for p in possible))
             raise OSError('No configuration file found.')
         if not os.path.isfile(config):
             raise OSError(f'Config `{config}` does not appear to be a file.')
 
         logger.debug('Config file {} selected', config)
-        self.config_path = config
-        self.config_name = os.path.splitext(os.path.basename(config))[0]
-        self.config_base = os.path.normpath(os.path.dirname(config))
-        self.lockfile = os.path.join(self.config_base, f'.{self.config_name}-lock')
-        self.db_filename = os.path.join(self.config_base, f'db-{self.config_name}.sqlite')
+        self._config_path = config
+        self.lockfile = str(self.config_base / f'.{self.config_name}-lock')
+        self.db_filename = str(self.config_base / f'db-{self.config_name}.sqlite')
 
     def hash_config(self) -> Optional[str]:
-        if not self.config_path:
+        if not self.user_config:
             return None
-        sha1_hash = hashlib.sha1()
-        with open(self.config_path, 'rb') as f:
-            while True:
-                data = f.read(65536)
-                if not data:
-                    break
-                sha1_hash.update(data)
+        sha1_hash = hashlib.sha1(yaml.dump(self.user_config).encode('utf-8'))
         return sha1_hash.hexdigest()
 
     def load_config(

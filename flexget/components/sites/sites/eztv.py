@@ -1,5 +1,6 @@
 import re
 from math import ceil
+from typing import Optional
 from urllib.parse import urlparse, urlunparse
 
 from loguru import logger
@@ -63,7 +64,9 @@ class Eztv:
         entry['urls'] = [m.get('href') for m in mirrors]
         entry['url'] = mirrors[0].get('href')
 
-    def api_call(self, task, entry=None, query: dict = {}) -> dict:
+    def api_call(self, task, entry=None, query: Optional[dict] = None) -> dict:
+        if query is None:
+            query = {}
         try:
             return task.requests.get(
                 'https://eztvx.to/api/get-torrents',
@@ -107,7 +110,7 @@ class Eztv:
         task.requests.add_domain_limiter(TimedLimiter('eztvx.to', '2 seconds'))
         if not entry.get('imdb_id'):
             raise plugin.PluginWarning(f'Entry `{entry["title"]}` has no `imdb_id` set')
-        yield from self.get_results(task, entry, entry['imdb_id'].lstrip('tt'))
+        yield from self.get_results(task, entry, entry['imdb_id'].lstrip('t'))
 
     @cached('eztv', persist='2 hours')
     def on_task_input(self, task, config=None):

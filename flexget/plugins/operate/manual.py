@@ -9,7 +9,12 @@ logger = logger.bind(name='manual')
 class ManualTask:
     """Only execute task when specified with --tasks"""
 
-    schema = {'type': 'boolean'}
+    schema = {
+        'type': 'boolean',
+        'title': 'manual',
+        'description': 'Prevents this task from running unless it is explicitly specified with --tasks, '
+        'or in a schedule',
+    }
 
     @plugin.priority(plugin.PRIORITY_FIRST)
     def on_task_start(self, task, config):

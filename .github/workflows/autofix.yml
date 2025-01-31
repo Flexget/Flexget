@@ -11,7 +11,7 @@ concurrency:
 env:
   PYTHON_VERSION: '3.13' # renovate: datasource=python-version depName=python
   # If you rename env.UV_VERSION, you MUST update the YAML parsing below as well.
-  UV_VERSION: 0.5.22 # renovate: datasource=pypi depName=uv
+  UV_VERSION: 0.5.26 # renovate: datasource=pypi depName=uv
 jobs:
   uv-lock:
     name: Update uv.lock
@@ -23,6 +23,7 @@ jobs:
           repository: ${{ github.event.pull_request.head.repo.full_name }}
           ref: ${{ github.head_ref }}
           token: ${{ secrets.FLEXGETBOT_PAT }}
+          path: HEAD
       - name: Resolve the merge commit
         id: resolve-merge-commit
         if: github.event_name == 'pull_request_target'
@@ -72,7 +73,7 @@ jobs:
         with:
           ref: ${{ steps.resolve-merge-commit.outputs.merge-sha }}
           path: merge
-      - name: Get the uv version in the PR
+      - name: Extract the uv version in the merge commit
         if: github.event_name == 'pull_request_target'
         id: merge-commit-uv-version
         uses: mikefarah/yq@master
@@ -87,14 +88,15 @@ jobs:
       - name: Run uv lock
         run: |
           if [[ ${{github.event_name}} == "push" ]]; then
-            uv lock
+            uv lock --directory HEAD
           else
             uv lock --directory merge
-            mv merge/uv.lock uv.lock
+            mv merge/uv.lock HEAD/uv.lock
           fi
       - name: Push changes
         id: push
         run: |
+          cd HEAD
           git add uv.lock
           if ! git diff --cached --exit-code; then
             git config user.email github-actions[bot]@users.noreply.github.com
@@ -102,7 +104,7 @@ jobs:
             git commit -m "Autofix: update uv.lock"
             git push
           fi
-      - name: Create a comment for no permission
+      - name: Add a comment if permission denied
         uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7
         if: failure() && steps.push.conclusion == 'failure'
         with:

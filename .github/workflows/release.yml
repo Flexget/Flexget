@@ -10,9 +10,10 @@ jobs:
     runs-on: ubuntu-latest
     env:
       PYTHON_VERSION: '3.13' # renovate: datasource=python-version depName=python
-      UV_VERSION: 0.5.22 # renovate: datasource=pypi depName=uv
+      UV_VERSION: 0.5.26 # renovate: datasource=pypi depName=uv
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
         with:
           token: ${{ secrets.flexgetbot_pat }}
           fetch-depth: 0
@@ -20,7 +21,7 @@ jobs:
         run: |
           git config user.email github-actions[bot]@users.noreply.github.com
           git config user.name github-actions[bot]
-      - name: Install uv
+      - name: Install uv and Python
         uses: astral-sh/setup-uv@b5f58b2abc5763ade55e4e9d0fe52cd1ff7979ca # v5
         with:
           enable-cache: true
@@ -42,12 +43,17 @@ jobs:
           echo 'CHANGELOG_BODY<<EOF' >> $GITHUB_ENV
           uv run dev_tools.py get-changelog ${{ env.release_tag }} >> $GITHUB_ENV
           echo 'EOF' >> $GITHUB_ENV
+      - name: Export config schema
+        if: env.release_tag
+        run: |
+          echo 'tasks: {}' > config.yml
+          uv run flexget export-schema --output-file flexget-config.schema.json
       - name: Create GitHub Release
         uses: ncipollo/release-action@cdcc88a9acf3ca41c16c37bb7d21b9ad48560d87 # v1
         if: env.release_tag
         with:
           tag: ${{ env.release_tag }}
-          artifacts: dist/*
+          artifacts: dist/*,flexget-config.schema.json
           token: ${{ secrets.GITHUB_TOKEN }}
           body: ${{ env.CHANGELOG_BODY }}
       - name: Set Deployment Status Success

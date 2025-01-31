@@ -62,7 +62,7 @@ def purge(manager, session: Session) -> None:
 @with_session
 def log_once(
     message: str,
-    logger: 'loguru.Logger' = logger.bind(name='log_once'),
+    logger: Optional['loguru.Logger'] = None,
     once_level: str = 'INFO',
     suppressed_level: str = 'VERBOSE',
     session: Session = None,
@@ -71,6 +71,8 @@ def log_once(
     Log message only once using given logger`. Returns False if suppressed logging.
     When suppressed, `suppressed_level` level is still logged.
     """
+    if logger is None:
+        logger = globals()['logger'].bind(name='log_once')
     # If there is no active manager, don't access the db
     from flexget.manager import manager
 

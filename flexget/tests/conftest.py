@@ -4,7 +4,6 @@ import logging
 import os
 import re
 import shutil
-import sys
 from contextlib import contextmanager, suppress
 from http import client
 from pathlib import Path
@@ -59,16 +58,16 @@ def config(request):
     return request.cls.config
 
 
-@pytest.fixture()
+@pytest.fixture
 def manager(
-    request, config, caplog, monkeypatch, filecopy
+    request, config, caplog, monkeypatch, filecopy, tmp_path_factory
 ):  # enforce filecopy is run before manager
     """
     Create a :class:`MockManager` for this test based on `config` argument.
     """
     config = config.replace('__tmp__', request.getfixturevalue('tmp_path').as_posix())
     try:
-        mockmanager = MockManager(config, request.cls.__name__)
+        mockmanager = MockManager(config, request.cls.__name__, tmp_path_factory.mktemp('manager'))
     except Exception:
         # Since we haven't entered the test function yet, pytest won't print the logs on failure. Print them manually.
         print(caplog.text)
@@ -77,7 +76,7 @@ def manager(
     mockmanager.shutdown()
 
 
-@pytest.fixture()
+@pytest.fixture
 def execute_task(manager: Manager) -> Callable[..., Task]:
     """
     A function that can be used to execute and return a named task in `config` argument.
@@ -113,7 +112,7 @@ def execute_task(manager: Manager) -> Callable[..., Task]:
     return execute
 
 
-@pytest.fixture()
+@pytest.fixture
 def use_vcr(request, monkeypatch):
     """
     This fixture is applied automatically to any test using the `online` mark. It will record and playback network
@@ -141,7 +140,7 @@ def use_vcr(request, monkeypatch):
             yield cassette
 
 
-@pytest.fixture()
+@pytest.fixture
 def api_client(manager) -> 'APIClient':
     with Session() as session:
         user = session.query(User).first()
@@ -152,7 +151,7 @@ def api_client(manager) -> 'APIClient':
         return APIClient(user.token)
 
 
-@pytest.fixture()
+@pytest.fixture
 def schema_match(manager) -> Callable[[dict, Any], list[dict]]:
     """
     This fixture enables verifying JSON Schema. Return a list of validation error dicts. List is empty if no errors
@@ -167,7 +166,7 @@ def schema_match(manager) -> Callable[[dict, Any], list[dict]]:
     return match
 
 
-@pytest.fixture()
+@pytest.fixture
 def link_headers(manager) -> Callable[[flask.Response], dict[str, dict]]:
     """
     Parses link headers and return them in dict form
@@ -245,7 +244,7 @@ def pytest_runtest_setup(item):
         item.fixturenames.append('no_requests')
 
 
-@pytest.fixture()
+@pytest.fixture
 def filecopy(request):
     out_files = []
     for marker in request.node.iter_markers('filecopy'):
@@ -280,7 +279,7 @@ def filecopy(request):
                 print(f"couldn't remove {f}: {e}")
 
 
-@pytest.fixture()
+@pytest.fixture
 def no_requests(monkeypatch):
     online_funcs = ['requests.sessions.Session.request', 'http.client.HTTPConnection.request']
 
@@ -304,11 +303,11 @@ def no_requests(monkeypatch):
 
 
 @pytest.fixture(scope='session', autouse=True)
-def setup_once(pytestconfig, request):
+def setup_once(pytestconfig, request, tmp_path_factory):
     #    os.chdir(os.path.join(pytestconfig.rootdir.strpath, 'flexget', 'tests'))
     flexget.log.initialize(True)
     m = MockManager(
-        'tasks: {}', 'init'
+        'tasks: {}', 'init', tmp_path_factory.mktemp('manager')
     )  # This makes sure our template environment is set up before any tests are run
     m.shutdown()
     logging.getLogger().setLevel(logging.DEBUG)
@@ -343,11 +342,14 @@ class CrashReport(Exception):
 class MockManager(Manager):
     unit_test = True
 
-    def __init__(self, config_text: str, config_name: str, db_uri: Optional[str] = None):
+    def __init__(
+        self, config_text: str, config_name: str, tmp_path: Path, db_uri: Optional[str] = None
+    ):
+        self._config_name = config_name
+        self._tmp_path = tmp_path
         self.config_text = config_text
         self._db_uri = db_uri or 'sqlite:///:memory:'
         super().__init__(['execute'])
-        self.config_name = config_name
         self.database_uri = self._db_uri
         logger.debug('database_uri: {}', self.database_uri)
         self.initialize()
@@ -356,7 +358,7 @@ class MockManager(Manager):
         """
         Override configuration loading
         """
-        self.config_base = os.path.dirname(os.path.abspath(sys.path[0]))
+        self._config_path = self._tmp_path / self._config_name
 
     def load_config(self, *args, **kwargs):
         """

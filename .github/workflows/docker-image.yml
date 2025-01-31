@@ -7,8 +7,6 @@ on:
     tags:
       - v*.*.*
   pull_request:
-    branches:
-      - '*'
 permissions: { }
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref || github.run_id }}
@@ -20,7 +18,8 @@ jobs:
       packages: write # to push to ghcr.io
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
 
       - name: Setup QEMU
         uses: docker/setup-qemu-action@53851d14592bedcffcf25ea515637cff71ef929a # v3
@@ -61,7 +60,7 @@ jobs:
 
       - name: Build Base Docker Image
         id: docker_build
-        uses: docker/build-push-action@67a2d409c0a876cbe6b11854e3e25193efe4e62d # v6
+        uses: docker/build-push-action@ca877d9245402d1537745e0e356eab47c3520991 # v6
         with:
           context: ./
           file: ./Dockerfile

@@ -1,5 +1,6 @@
 import json
 import os
+from pathlib import Path
 from unittest.mock import patch
 
 import pytest
@@ -77,7 +78,7 @@ class TestServerAPI:
         }
 
     def test_get_raw_config(self, manager, api_client, schema_match):
-        manager.config_path = os.path.join(os.path.dirname(__file__), 'raw_config.yml')
+        manager._config_path = Path(__file__).parent / 'raw_config.yml'
 
         rsp = api_client.get('/server/raw_config/')
         assert rsp.status_code == 200
@@ -119,7 +120,7 @@ class TestServerAPI:
         assert not data
 
     def test_crash_logs_with_crashes(self, api_client, schema_match, manager):
-        manager.config_base = os.path.join(os.path.dirname(__file__))
+        manager._config_path = Path(__file__).parent / 'fakeconfig.yml'
         rsp = api_client.get('/server/crash_logs')
         assert rsp.status_code == 200
         data = json.loads(rsp.get_data(as_text=True))
