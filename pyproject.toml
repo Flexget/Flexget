@@ -1,6 +1,6 @@
 ## Build settings
 [project]
-name = "FlexGet"
+name = "flexget"
 description = """\
     FlexGet is a program aimed to automate downloading or processing content (torrents, podcasts, etc.) from \
     different sources like RSS-feeds, html-pages, various sites and more.\
@@ -63,6 +63,8 @@ dev = [
     "pytest-xdist ~=3.6",
     "ruff ~=0.9.0",
     "vcrpy ~=7.0",
+    # TODO: This is just for build_locked_extras, should be removable soon
+    "tomli ~=2.2; python_version < '3.11'",
 ]
 docs = [
     # TODO: remove python_version after we drop python 3.9
@@ -79,6 +81,13 @@ deluge = ['deluge-client~=1.10']
 qbittorrent = ['qbittorrent-api~=2024.12']
 telegram = ['python-telegram-bot[http2,socks]~=21.9']
 transmission = ['transmission-rpc~=7.0']
+# This is all our optional deps installable via extras. Not actually 'all'
+all = [
+    {include-group = "deluge"},
+    {include-group = "qbittorrent"},
+    {include-group = "telegram"},
+    {include-group = "transmission"}
+]
 [project.urls]
 "Homepage" = "https://flexget.com"
 "Issue Tracker" = "https://github.com/Flexget/Flexget/issues"
@@ -92,16 +101,13 @@ flexget = "flexget:main"
 flexget-headless = "flexget:main"  # This is useful on Windows to avoid a cmd popup
 
 [build-system]
-requires = ["hatchling", "hatch-requirements-txt"]
+requires = ["hatchling"]
 build-backend = "hatchling.build"
 
-[tool.hatch.metadata.hooks.requirements_txt.optional-dependencies]
-deluge = ['requirements/deluge.txt']
-locked = ['requirements.txt']
-qbittorrent = ['requirements/qbittorrent.txt']
-telegram = ['requirements/telegram.txt']
-transmission = ['requirements/transmission.txt']
-all = ['requirements/deluge.txt', 'requirements/qbittorrent.txt', 'requirements/telegram.txt', 'requirements/transmission.txt']
+[tool.hatch.metadata.hooks.custom]
+# Extras with locked dependencies will be generated if BUILD_LOCKED env variable is specified
+path = "build_locked_extras.py"
+locked-groups = ["deluge", "qbittorrent", "telegram", "transmission", "all"]
 
 [tool.hatch.version]
 path = "flexget/_version.py"
@@ -118,8 +124,7 @@ include = [
 exclude = ["/flexget/tests/cassettes"]
 
 [tool.hatch.build.targets.wheel.hooks.custom]
-# build with env variable HATCH_BUILD_HOOKS_ENABLE=true to bundle the webui when building
-enable-by-default = false
+# The webui will be bundled when the BUNDLE_WEBUI env variable is defined
 path = "bundle_webui.py"
 
 [tool.hatch.build.targets.wheel]
