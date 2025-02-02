@@ -1,16 +1,14 @@
 import shutil
+from enum import Enum
 from pathlib import Path
 
 from loguru import logger
+from pydantic import BaseModel, ByteSize, ConfigDict, TypeAdapter
 
 from flexget import plugin
-from flexget.config_schema import parse_size
 from flexget.event import event
 
 logger = logger.bind(name='free_space')
-
-ABORT_BELOW = 'below'
-ABORT_ABOVE = 'above'
 
 
 def get_free_space(config, task):
@@ -56,46 +54,48 @@ def get_free_space(config, task):
     return usage.free / 1024 / 1024
 
 
+class AbortMode(str, Enum):
+    BELOW = 'below'
+    ABOVE = 'above'
+
+
+class ConfigModel(BaseModel):
+    space: ByteSize
+    abort_if: AbortMode = AbortMode.BELOW
+    path: str = None
+    port: int = 22
+    host: str = None
+    user: str = None
+    ssh_key_filepath: str = None
+    allotment: ByteSize = -1
+
+    model_config = ConfigDict(
+        extra='forbid',
+        json_schema_extra={"dependentRequired": {"host": ["user", "ssh_key_filepath", "path"]}},
+    )
+
+
+ConfigTA = TypeAdapter(int | float | ConfigModel)
+
+
 class PluginFreeSpace:
     """Aborts a task if an entry is accepted and there is less than a certain amount of space free on a drive."""
 
-    schema = {
-        'oneOf': [
-            {'type': 'number'},
-            {
-                'type': 'object',
-                'properties': {
-                    'space': {'oneOf': [{'type': 'number'}, {'type': 'string', 'format': 'size'}]},
-                    'abort_if': {
-                        'type': 'string',
-                        'enum': [ABORT_BELOW, ABORT_ABOVE],
-                        'default': ABORT_BELOW,
-                    },
-                    'path': {'type': 'string'},
-                    'port': {'type': 'integer', 'default': 22},
-                    'host': {'type': 'string'},
-                    'user': {'type': 'string'},
-                    'ssh_key_filepath': {'type': 'string'},
-                    'allotment': {'type': 'number', 'default': -1},
-                },
-                'required': ['space'],
-                'dependencies': {'host': ['user', 'ssh_key_filepath', 'path']},
-                'additionalProperties': False,
-            },
-        ]
-    }
+    schema = ConfigTA.json_schema()
 
     @staticmethod
-    def prepare_config(config, task):
+    def prepare_config(config, task) -> ConfigModel:
         if isinstance(config, (float, int)):
             config = {'space': config}
-        if isinstance(config['space'], str):
-            config['space'] = parse_size(config['space']) / 1024 / 1024
+        if isinstance(config['space'], (int, float)):
+            config['space'] = config['space'] * 1024 * 1024
+        if isinstance(config.get('allotment'), (int, float)):
+            config['allotment'] = config['allotment'] * 1024 * 1024
         # Use config path if none is specified
         if not config.get('path'):
             config['path'] = task.manager.config_base
 
-        return config
+        return ConfigModel(**config)
 
     @plugin.priority(plugin.PRIORITY_FIRST)
     def on_task_download(self, task, config):
@@ -106,11 +106,11 @@ class PluginFreeSpace:
         path = config['path']
         abort_if = config['abort_if']
 
-        if free_space < space and abort_if == ABORT_BELOW:
+        if free_space < space and abort_if == AbortMode.BELOW:
             logger.error('Less than {} MB of free space in {} aborting task.', space, path)
             # backlog plugin will save and restore the task content, if available
             task.abort(f"Less than {space} MB of free space in {path}")
-        elif free_space > space and abort_if == ABORT_ABOVE:
+        elif free_space > space and abort_if == AbortMode.ABOVE:
             logger.error('Over than {} MB of free space in {} aborting task.', space, path)
             # backlog plugin will save and restore the task content, if available
             task.abort(f"Over than {space} MB of free space in {path}")

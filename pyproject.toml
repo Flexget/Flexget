@@ -51,6 +51,7 @@ dependencies = [
     "pyparsing ~=3.2",
     "werkzeug ~=3.1",
     "zxcvbn ~=4.4",
+    "pydantic ~= 2.10.6",
 ]
 [dependency-groups]
 dev = [
