@@ -1287,7 +1287,7 @@ class TestBacklog:
             mock:
               - {title: 'Test.S01E01.hdtv-FlexGet'}
             series:
-              - test: {timeframe: 6 hours}
+              - test: {timeframe: 6 hours, target: 720p hdtv+}
     """
 
     def testBacklog(self, manager, execute_task):
