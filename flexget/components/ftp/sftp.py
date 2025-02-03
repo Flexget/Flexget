@@ -90,7 +90,7 @@ class SftpList:
                 'additionalProperties': False,
             },
         },
-        'additionProperties': False,
+        'additionalProperties': False,
         'required': ['host', 'username'],
     }
 
@@ -322,7 +322,7 @@ class SftpUpload:
             'socket_timeout_sec': {'type': 'integer', 'default': DEFAULT_SOCKET_TIMEOUT_SEC},
             'connection_tries': {'type': 'integer', 'default': DEFAULT_CONNECT_TRIES},
         },
-        'additionProperties': False,
+        'additionalProperties': False,
         'required': ['host', 'username'],
     }
 

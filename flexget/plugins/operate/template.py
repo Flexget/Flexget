@@ -45,7 +45,6 @@ class PluginTemplate:
             'template': {
                 'type': 'string',
                 'description': 'Name of a template which will be applied to this task.',
-                'links': [{'rel': 'settings', 'href': '/api/config/templates/{$}'}],
             }
         },
     }

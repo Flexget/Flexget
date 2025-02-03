@@ -86,7 +86,7 @@ class TelegramInput:
             },
         },
         'required': ['token'],
-        'additonalProperties': False,
+        'additionalProperties': False,
     }
 
     @plugin.internet(logger)
