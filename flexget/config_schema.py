@@ -498,9 +498,9 @@ def _rewrite_ref(identifier: str, definition_path: str, defs: dict) -> str:
             # We have to set this before we recurse to stop infinite recursion
             deep_set(path, defs, new_def)
             deep_set(path, defs, _inline_refs(new_def, path, defs))
-        return "#/definitions/" + path
+        return "#/$defs/" + path
     if identifier.startswith('#'):
-        return "#/definitions/" + definition_path + identifier[1:]
+        return "#/$defs/" + definition_path + identifier[1:]
     return identifier
 
 
@@ -515,7 +515,7 @@ def _inline_refs(schema: JsonSchema, definition_path: str, defs: dict) -> Union[
 
 
 def inline_refs(schema: JsonSchema) -> JsonSchema:
-    """Includes all $refs to subschemas in the definitions section of the schema, and rewrites
+    """Includes all $refs to subschemas in the $defs section of the schema, and rewrites
     the $refs to point to the right place."""
     definitions = {}
     schema = _inline_refs(schema, "", definitions)
