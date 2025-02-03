@@ -549,14 +549,11 @@ class Manager:
         yaml.add_representer(collections.OrderedDict, represent_dict_order)
 
         # Set up the dumper to increase the indent for lists
-        def increase_indent_wrapper(func):
-            def increase_indent(self, flow=False, indentless=False):
-                func(self, flow, False)
+        def increase_indent(self, flow=False, indentless=False):
+            yaml.emitter.Emitter.increase_indent(self, flow, False)
 
-            return increase_indent
-
-        yaml.Dumper.increase_indent = increase_indent_wrapper(yaml.Dumper.increase_indent)
-        yaml.SafeDumper.increase_indent = increase_indent_wrapper(yaml.SafeDumper.increase_indent)
+        yaml.Dumper.increase_indent = increase_indent
+        yaml.SafeDumper.increase_indent = increase_indent
 
     def _init_config(self, create: bool = False) -> None:
         """
