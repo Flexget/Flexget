@@ -503,9 +503,14 @@ class Task:
                 # backwards compatibility
                 # pass method only task (old behaviour)
                 args = (self,)
-            else:
+            elif plugin.api_ver == 2:
                 # pass method task, copy of config (so plugin cannot modify it)
                 args = (self, copy.copy(self.config.get(plugin.name)))
+            else:
+                args = (
+                    self,
+                    plugin.instance.config_model.model_validate(self.config.get(plugin.name)),
+                )
 
             # Hack to make task.session only active for a single plugin
             with Session() as session:

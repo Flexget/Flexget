@@ -2,8 +2,9 @@ import shutil
 from enum import Enum
 from pathlib import Path, PurePath
 
+from datamodel_code_generator.util import field_validator, model_validator
 from loguru import logger
-from pydantic import BaseModel, ByteSize, ConfigDict, TypeAdapter
+from pydantic import BaseModel, ByteSize, ConfigDict
 
 from flexget import plugin
 from flexget.event import event
@@ -16,26 +17,43 @@ class AbortMode(str, Enum):
     ABOVE = 'above'
 
 
-class ConfigModel(BaseModel):
-    space: ByteSize
+class Config(BaseModel):
+    space: ByteSize | float
     abort_if: AbortMode = AbortMode.BELOW
     path: PurePath = None
     port: int = 22
     host: str = None
     user: str = None
     ssh_key_filepath: str = None
-    allotment: ByteSize = None
+    allotment: ByteSize | float = None
+
+    @field_validator('space', 'allotment', mode='wrap')
+    @classmethod
+    def convert_to_mb(cls, v, handler):
+        # Original config had these fields as MiB, but using ByteSize returns bytes if the field was a str
+        r = handler(v)
+        if not isinstance(v, (int, float)):
+            return r / 1024 / 1024
+        return r
+
+    @model_validator(mode='before')
+    @classmethod
+    def standardize(cls, data):
+        """Converts to the full form of the config from simplified form."""
+        if isinstance(data, (float, int)):
+            data = {'space': data}
+        return data
 
     model_config = ConfigDict(
         extra='forbid',
-        json_schema_extra={"dependentRequired": {"host": ["user", "ssh_key_filepath", "path"]}},
+        json_schema_extra={
+            "type": ["object", "string", "number"],
+            "dependentRequired": {"host": ["user", "ssh_key_filepath", "path"]},
+        },
     )
 
 
-ConfigTA = TypeAdapter(int | float | ConfigModel)
-
-
-def get_free_space(config: ConfigModel, task) -> int:
+def get_free_space(config: Config, task) -> int:
     """Return folder/drive free space (in megabytes)"""
     if 'host' in config:
         import paramiko
@@ -81,25 +99,13 @@ def get_free_space(config: ConfigModel, task) -> int:
 class PluginFreeSpace:
     """Aborts a task if an entry is accepted and there is less than a certain amount of space free on a drive."""
 
-    schema = ConfigTA.json_schema()
-
-    @staticmethod
-    def prepare_config(config, task) -> ConfigModel:
-        if isinstance(config, (float, int)):
-            config = {'space': config}
-        if isinstance(config['space'], (int, float)):
-            config['space'] = config['space'] * 1024 * 1024
-        if isinstance(config.get('allotment'), (int, float)):
-            config['allotment'] = config['allotment'] * 1024 * 1024
-        # Use config path if none is specified
-        if not config.get('path'):
-            config['path'] = task.manager.config_base
-
-        return ConfigModel(**config)
+    config_model = Config
 
     @plugin.priority(plugin.PRIORITY_FIRST)
-    def on_task_download(self, task, config):
-        config = self.prepare_config(config, task)
+    def on_task_download(self, task, config: Config):
+        # Use config path if none is specified
+        if not config.path:
+            config.path = task.manager.config_base
 
         free_space = get_free_space(config, task)
         space = config.space
@@ -118,4 +124,4 @@ class PluginFreeSpace:
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(PluginFreeSpace, 'free_space', api_ver=2)
+    plugin.register(PluginFreeSpace, 'free_space', api_ver=3)
