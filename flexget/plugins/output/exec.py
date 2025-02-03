@@ -56,11 +56,11 @@ class PluginExec:
             {
                 'type': 'object',
                 'properties': {
-                    'on_start': {'$ref': '#/definitions/phaseSettings'},
-                    'on_input': {'$ref': '#/definitions/phaseSettings'},
-                    'on_filter': {'$ref': '#/definitions/phaseSettings'},
-                    'on_output': {'$ref': '#/definitions/phaseSettings'},
-                    'on_exit': {'$ref': '#/definitions/phaseSettings'},
+                    'on_start': {'$ref': '#/$defs/phaseSettings'},
+                    'on_input': {'$ref': '#/$defs/phaseSettings'},
+                    'on_filter': {'$ref': '#/$defs/phaseSettings'},
+                    'on_output': {'$ref': '#/$defs/phaseSettings'},
+                    'on_exit': {'$ref': '#/$defs/phaseSettings'},
                     'fail_entries': {'type': 'boolean'},
                     'auto_escape': {'type': 'boolean'},
                     'encoding': {'type': 'string'},
@@ -69,7 +69,7 @@ class PluginExec:
                 'additionalProperties': False,
             },
         ],
-        'definitions': {
+        '$defs': {
             'phaseSettings': {
                 'type': 'object',
                 'properties': {

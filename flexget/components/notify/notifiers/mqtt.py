@@ -74,7 +74,7 @@ class MQTTNotifier:
         },
         'additionalProperties': False,
         'required': ['broker_address', 'topic'],
-        'dependencies': {'password': ['username']},
+        'dependentRequired': {'password': ['username']},
     }
 
     def notify(self, title, message, config):

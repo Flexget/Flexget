@@ -41,15 +41,15 @@ class FilterRegexp:
     schema = {
         'type': 'object',
         'properties': {
-            'accept': {'$ref': '#/definitions/regex_list'},
-            'reject': {'$ref': '#/definitions/regex_list'},
-            'accept_excluding': {'$ref': '#/definitions/regex_list'},
-            'reject_excluding': {'$ref': '#/definitions/regex_list'},
+            'accept': {'$ref': '#/$defs/regex_list'},
+            'reject': {'$ref': '#/$defs/regex_list'},
+            'accept_excluding': {'$ref': '#/$defs/regex_list'},
+            'reject_excluding': {'$ref': '#/$defs/regex_list'},
             'rest': {'type': 'string', 'enum': ['accept', 'reject']},
             'from': one_or_more({'type': 'string'}),
         },
         'additionalProperties': False,
-        'definitions': {
+        '$defs': {
             # The validator for a list of regexps, each with or without settings
             'regex_list': {
                 'type': 'array',

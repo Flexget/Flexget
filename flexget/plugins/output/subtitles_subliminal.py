@@ -68,7 +68,7 @@ class PluginSubliminal:
             'exact_match': {'type': 'boolean', 'default': True},
             'providers': {'type': 'array', 'items': {'type': 'string', 'enum': PROVIDERS}},
             'single': {'type': 'boolean', 'default': True},
-            'directory': {'type:': 'string'},
+            'directory': {'type': 'string'},
             'hearing_impaired': {'type': 'boolean', 'default': False},
             'authentication': {'type': 'object', 'properties': AUTHENTICATION_SCHEMA},
         },

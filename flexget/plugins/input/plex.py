@@ -99,7 +99,7 @@ class InputPlex:
             'anyOf': [{'required': ['token', 'username']}, {'required': ['token', 'password']}]
         },
         'error_not': 'Cannot specify `username` and `password` with `token`',
-        'dependencies': {'username': ['password'], 'password': ['username']},
+        'dependentRequired': {'username': ['password'], 'password': ['username']},
         'additionalProperties': False,
     }
 
