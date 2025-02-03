@@ -1,10 +1,11 @@
 import shutil
 from enum import Enum
 from pathlib import Path, PurePath
+from typing import Annotated, TypeAlias
 
-from datamodel_code_generator.util import field_validator, model_validator
+from datamodel_code_generator.util import model_validator
 from loguru import logger
-from pydantic import BaseModel, ByteSize, ConfigDict
+from pydantic import BaseModel, BeforeValidator, ByteSize, ConfigDict, Field
 
 from flexget import plugin
 from flexget.event import event
@@ -17,24 +18,29 @@ class AbortMode(str, Enum):
     ABOVE = 'above'
 
 
+# Original config had these fields as MiB when a raw number was supplied, but we want bytes now
+def convert_to_bytes(val):
+    if isinstance(val, (int, float)):
+        return val * 1024 * 1024
+    return val
+
+
+BackCompatByteSize: TypeAlias = Annotated[
+    ByteSize,
+    Field(json_schema_extra=lambda s: s['anyOf'].append({'type': 'number'})),
+    BeforeValidator(convert_to_bytes),
+]
+
+
 class Config(BaseModel):
-    space: ByteSize | float
+    space: BackCompatByteSize
     abort_if: AbortMode = AbortMode.BELOW
     path: PurePath = None
     port: int = 22
     host: str = None
     user: str = None
     ssh_key_filepath: str = None
-    allotment: ByteSize | float = None
-
-    @field_validator('space', 'allotment', mode='wrap')
-    @classmethod
-    def convert_to_mb(cls, v, handler):
-        # Original config had these fields as MiB, but using ByteSize returns bytes if the field was a str
-        r = handler(v)
-        if not isinstance(v, (int, float)):
-            return r / 1024 / 1024
-        return r
+    allotment: BackCompatByteSize = None
 
     @model_validator(mode='before')
     @classmethod
