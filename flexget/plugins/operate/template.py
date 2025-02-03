@@ -29,11 +29,11 @@ class PluginTemplate:
             {
                 'description': 'Apply multiple templates to this task.',
                 'type': 'array',
-                'items': {'$ref': '#/definitions/template'},
+                'items': {'$ref': '#/$defs/template'},
             },
             {
                 'description': 'Apply a single template to this task.',
-                'allOf': [{'$ref': '#/definitions/template'}],
+                'allOf': [{'$ref': '#/$defs/template'}],
             },
             {
                 'description': 'Disable all templates on this task.',
@@ -41,7 +41,7 @@ class PluginTemplate:
                 'enum': [False],
             },
         ],
-        'definitions': {
+        '$defs': {
             'template': {
                 'type': 'string',
                 'description': 'Name of a template which will be applied to this task.',

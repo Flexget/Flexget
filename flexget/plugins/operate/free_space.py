@@ -79,7 +79,7 @@ class PluginFreeSpace:
                     'allotment': {'type': 'number', 'default': -1},
                 },
                 'required': ['space'],
-                'dependencies': {'host': ['user', 'ssh_key_filepath', 'path']},
+                'dependentRequired': {'host': ['user', 'ssh_key_filepath', 'path']},
                 'additionalProperties': False,
             },
         ]

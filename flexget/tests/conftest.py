@@ -159,7 +159,7 @@ def schema_match(manager) -> Callable[[dict, Any], list[dict]]:
     """
 
     def match(schema: dict, response: Any) -> list[dict]:
-        validator = jsonschema.Draft4Validator(schema)
+        validator = jsonschema.Draft202012Validator(schema)
         errors = list(validator.iter_errors(response))
         return [{'value': list(e.path), 'message': e.message} for e in errors]
 

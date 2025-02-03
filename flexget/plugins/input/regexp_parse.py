@@ -82,7 +82,7 @@ class RegexpParse:
     FLAG_REGEX = r'^(\s?({})\s?(,|$))+$'.format('|'.join(FLAG_VALUES))
 
     schema = {
-        'definitions': {
+        '$defs': {
             'regex_list': {
                 'type': 'array',
                 'items': {
@@ -109,14 +109,14 @@ class RegexpParse:
                 ]
             },
             'encoding': {'type': 'string'},
-            'sections': {'$ref': '#/definitions/regex_list'},
+            'sections': {'$ref': '#/$defs/regex_list'},
             'keys': {
                 'type': 'object',
                 'additionalProperties': {
                     'type': 'object',
                     'properties': {
                         'required': {'type': 'boolean'},
-                        'regexps': {'$ref': '#/definitions/regex_list'},
+                        'regexps': {'$ref': '#/$defs/regex_list'},
                     },
                     'required': ['regexps'],
                     'additionalProperties': False,

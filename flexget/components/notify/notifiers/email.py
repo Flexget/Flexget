@@ -145,7 +145,7 @@ class EmailNotifier:
             'html': {'type': 'boolean', 'default': False},
         },
         'required': ['to'],
-        'dependencies': {
+        'dependentRequired': {
             'smtp_username': ['smtp_password'],
             'smtp_password': ['smtp_username'],
             'smtp_ssl': ['smtp_tls'],

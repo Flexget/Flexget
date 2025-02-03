@@ -25,11 +25,11 @@ from flexget.utils.tools import parse_episode_identifier, parse_filesize, parse_
 
 logger = logger.bind(name='config_schema')
 
-BASE_SCHEMA_NAME = 'draft4'
-BASE_SCHEMA_URI = 'http://json-schema.org/draft-04/schema#'
-BaseValidator = jsonschema.Draft4Validator
+BASE_SCHEMA_NAME = 'draft2020-12'
+BASE_SCHEMA_URI = 'https://json-schema.org/draft/2020-12/schema'
+BaseValidator = jsonschema.Draft202012Validator
 # Type hint for json schemas. (If we upgrade to a newer json schema version, the type might allow more than dicts.)
-JsonSchema = dict[str, Any]
+JsonSchema = Union[dict[str, Any], bool]
 schema_paths: dict[str, Union[JsonSchema, Callable[..., JsonSchema]]] = {}
 
 
@@ -519,7 +519,7 @@ def inline_refs(schema: JsonSchema) -> JsonSchema:
     the $refs to point to the right place."""
     definitions = {}
     schema = _inline_refs(schema, "", definitions)
-    schema.setdefault('definitions', {}).update(definitions)
+    schema.setdefault('$defs', {}).update(definitions)
     return schema
 
 
