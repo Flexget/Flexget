@@ -1,6 +1,7 @@
 from datetime import timedelta
 
 import jsonschema
+from jsonschema.validators import validator_for
 
 from flexget import config_schema
 
@@ -13,15 +14,39 @@ def iter_registered_schemas():
 
 class TestSchemaValidator:
     def test_registered_schemas_are_valid(self):
+        # Create a stricter metaschema to identify typos in the schemas
+        meta_schema = config_schema.BaseValidator.META_SCHEMA
+        format_checker = config_schema.BaseValidator.FORMAT_CHECKER
+        # We have some extra properties recognized in our schema
+        custom_properties = {
+            "deprecationMessage": {"type": "string"},
+            "error": {"type": "string"},
+        }
+        for keyword in config_schema.BaseValidator.VALIDATORS:
+            if not keyword.startswith('$'):
+                custom_properties[f"error_{keyword}"] = {"type": "string"}
+        strict = {
+            "$schema": meta_schema["$id"],
+            "$id": "https://json-schema.org/draft/2020-12/strict",
+            "$dynamicAnchor": "meta",
+            "$ref": meta_schema["$id"],
+            "properties": custom_properties,
+            "unevaluatedProperties": False,
+        }
+        Validator = validator_for(meta_schema)
+        validator = Validator(
+            schema=strict,
+            format_checker=format_checker,
+        )
         for path, schema in iter_registered_schemas():
             try:
-                config_schema.SchemaValidator.check_schema(schema)
-            except jsonschema.SchemaError as e:
+                validator.validate(schema)
+            except jsonschema.ValidationError as e:
                 raise AssertionError(
                     'plugin `{}` has an invalid schema. {} {} {}'.format(
                         path, '/'.join(str(p) for p in e.path), e.validator, e.message
                     )
-                )
+                ) from None
             except Exception as e:
                 raise AssertionError(f'plugin `{path}` has an invalid schema. {e}')
 

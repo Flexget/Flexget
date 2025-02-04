@@ -194,7 +194,7 @@ class FilterSeriesBase:
                     ]
                 },
             },
-            'dependencies': {
+            'dependentSchemas': {
                 'timeframe': {
                     'oneOf': [{'required': ['target']}, {'required': ['qualities']}],
                     'error': 'A `target` should be specified along with a timeframe.',

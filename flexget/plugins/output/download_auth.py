@@ -23,7 +23,7 @@ class DownloadAuth:
             'required': ['username', 'password'],
         }
     }
-    schema = {'type': 'array', 'items': host_schema, 'minimumItems': 1}
+    schema = {'type': 'array', 'items': host_schema, 'minItems': 1}
 
     auth_mapper = {'basic': HTTPBasicAuth, 'digest': HTTPDigestAuth}
 

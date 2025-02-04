@@ -33,7 +33,7 @@ web_config_schema = {
                 'run_v1': {'type': 'boolean'},
             },
             'additionalProperties': False,
-            'dependencies': {
+            'dependentRequired': {
                 'ssl_certificate': ['ssl_private_key'],
                 'ssl_private_key': ['ssl_certificate'],
             },

@@ -60,7 +60,7 @@ class Text:
             'format': {'type': 'object', 'additionalProperties': {'type': 'string'}},
         },
         'required': ['entry', 'url'],
-        'additonalProperties': False,
+        'additionalProperties': False,
     }
 
     def format_entry(self, entry, d):
