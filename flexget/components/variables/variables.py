@@ -15,6 +15,7 @@ from flexget.event import event
 from flexget.manager import Session
 from flexget.plugin import PluginError
 from flexget.utils.database import json_synonym
+from flexget.utils.template import get_filters
 
 logger = logger.bind(name='variables')
 
@@ -72,6 +73,7 @@ def process_variables(config, manager):
     if 'variables' not in config or config.get('variables') is False:
         return None
     env = NativeEnvironment(**env_params)
+    env.filters.update(get_filters())
     if isinstance(config['variables'], bool):
         logger.debug('trying to load variables from DB')
         variables = variables_from_db()
