@@ -2,16 +2,16 @@
 #    uv export --frozen --no-dev --no-emit-project --no-hashes --output-file=requirements.txt
 aniso8601==10.0.0
 apscheduler==3.11.0
-attrs==24.3.0
+attrs==25.1.0
 autocommand==2.2.2
 babelfish==0.6.0 ; python_full_version < '3.10'
 babelfish==0.6.1 ; python_full_version >= '3.10'
 backports-tarfile==1.2.0 ; python_full_version < '3.12'
-beautifulsoup4==4.12.3
+beautifulsoup4==4.13.1
 blinker==1.9.0
 brotli==1.1.0 ; platform_python_implementation != 'PyPy'
 brotlicffi==1.1.0.0 ; platform_python_implementation == 'PyPy'
-certifi==2024.12.14
+certifi==2025.1.31
 cffi==1.17.1 ; platform_python_implementation == 'PyPy'
 charset-normalizer==3.4.1
 cheroot==10.0.1
@@ -54,11 +54,11 @@ pynzb==0.1.0
 pyparsing==3.2.1
 pyrss2gen==1.1
 python-dateutil==2.9.0.post0
-pytz==2024.2
+pytz==2025.1
 pywin32==308 ; (python_full_version < '3.10' and implementation_name == 'cpython' and sys_platform == 'win32') or (platform_python_implementation != 'PyPy' and sys_platform == 'win32')
 pyyaml==6.0.2
 rebulk==3.2.0
-referencing==0.36.1
+referencing==0.36.2
 requests==2.32.3
 rich==13.9.4
 rpds-py==0.22.3
