@@ -126,12 +126,16 @@ class Manipulate:
                         logger.warning('Cannot extract, field `{}` is not present', from_field)
                         continue
                     if config.get('find_all'):
-                        match = re.findall(config['extract'], field_value, re.I | re.U)
+                        match = re.findall(
+                            config['extract'], field_value, re.IGNORECASE | re.UNICODE
+                        )
                         logger.debug('all matches: {}', match)
                         field_value = config.get('separator', ' ').join(match).strip()
                         logger.debug('field `{}` after extract: `{}`', field, field_value)
                     else:
-                        match = re.search(config['extract'], field_value, re.I | re.U)
+                        match = re.search(
+                            config['extract'], field_value, re.IGNORECASE | re.UNICODE
+                        )
                         if match:
                             groups = [x for x in match.groups() if x is not None]
                             logger.debug('groups: {}', groups)
@@ -143,7 +147,7 @@ class Manipulate:
                         logger.warning('Cannot replace, field `{}` is not present', from_field)
                         continue
                     replace_config = config['replace']
-                    regexp = re.compile(replace_config['regexp'], flags=re.I | re.U)
+                    regexp = re.compile(replace_config['regexp'], flags=re.IGNORECASE | re.UNICODE)
                     field_value = regexp.sub(replace_config['format'], field_value).strip()
                     logger.debug('field `{}` after replace: `{}`', field, field_value)
 

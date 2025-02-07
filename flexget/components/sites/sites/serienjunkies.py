@@ -10,18 +10,20 @@ from flexget.utils.soup import get_soup
 
 logger = logger.bind(name='serienjunkies')
 
-regex_single_ep = re.compile(r'(S\d+E\d\d+)(?!-E)', re.I)
-regex_multi_ep = re.compile(r'(?P<season>S\d\d)E(?P<startep>\d\d+)-E?(?P<stopep>\d\d+)', re.I)
-regex_season = re.compile(r'(?<=\.|\-)S\d\d(?:[-\.]S\d\d)*(?!E\d\d+)', re.I)
+regex_single_ep = re.compile(r'(S\d+E\d\d+)(?!-E)', re.IGNORECASE)
+regex_multi_ep = re.compile(
+    r'(?P<season>S\d\d)E(?P<startep>\d\d+)-E?(?P<stopep>\d\d+)', re.IGNORECASE
+)
+regex_season = re.compile(r'(?<=\.|\-)S\d\d(?:[-\.]S\d\d)*(?!E\d\d+)', re.IGNORECASE)
 
 regex_language_container = re.compile(r'Sprache')
 
-regex_is_german = re.compile(r'german|deutsch', re.I)
+regex_is_german = re.compile(r'german|deutsch', re.IGNORECASE)
 regex_is_foreign = re.compile(
     r'englisc?h|französisch|japanisch|dänisch|norwegisch|niederländisch|ungarisch|italienisch|portugiesisch',
-    re.I,
+    re.IGNORECASE,
 )
-regex_is_subtitle = re.compile(r'Untertitel|Subs?|UT', re.I)
+regex_is_subtitle = re.compile(r'Untertitel|Subs?|UT', re.IGNORECASE)
 
 LANGUAGE = ['german', 'foreign', 'subtitle', 'dual']
 HOSTER = ['ul', 'cz', 'so', 'all']
@@ -99,7 +101,7 @@ class UrlRewriteSerienjunkies:
 
         for ep_title in episode_titles:
             # find matching download
-            episode_title = soup.find('strong', text=re.compile(ep_title, re.I))
+            episode_title = soup.find('strong', text=re.compile(ep_title, re.IGNORECASE))
             if not episode_title:
                 continue
 

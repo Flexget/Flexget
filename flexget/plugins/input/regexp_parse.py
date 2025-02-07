@@ -65,17 +65,17 @@ class RegexpParse:
     # dict used to convert string values of regexp flags to int
     FLAG_VALUES = {
         'DEBUG': re.DEBUG,
-        'I': re.I,
+        'I': re.IGNORECASE,
         'IGNORECASE': re.IGNORECASE,
-        'L': re.L,
+        'L': re.LOCALE,
         'LOCALE': re.LOCALE,
-        'M': re.M,
+        'M': re.MULTILINE,
         'MULTILINE': re.MULTILINE,
-        'S': re.S,
+        'S': re.DOTALL,
         'DOTALL': re.DOTALL,
-        'U': re.U,
+        'U': re.UNICODE,
         'UNICODE': re.UNICODE,
-        'X': re.X,
+        'X': re.VERBOSE,
         'VERBOSE': re.VERBOSE,
     }
 

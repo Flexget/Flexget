@@ -87,7 +87,7 @@ class ImdbSearch:
 
     def ireplace(self, text, old, new, count=0):
         """Case insensitive string replace"""
-        pattern = re.compile(re.escape(old), re.I)
+        pattern = re.compile(re.escape(old), re.IGNORECASE)
         return re.sub(pattern, new, text, count=count)
 
     def smart_match(self, raw_name, single_match=True):
