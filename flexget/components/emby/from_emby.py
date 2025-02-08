@@ -89,7 +89,6 @@ class EmbyInput:
 
         s_list = EmbyApiList.get_api_list(**config)
 
-        entries = []
         entries_obj = {}
 
         for search_string in entry.get('search_strings', [entry['title']]):
@@ -104,10 +103,7 @@ class EmbyInput:
 
             entries_obj[new_entry['emby_id']] = new_entry
 
-        for _, new_entry in entries_obj.items():
-            entries.append(new_entry)
-
-        return entries
+        return list(entries_obj.values())
 
 
 @event('plugin.register')

@@ -145,8 +145,7 @@ class MagnetDL:
                 # note: weird url convention, uses first letter of search term
                 slash = term[0]
                 url = f'https://www.magnetdl.com/{slash}/{term}/'
-                for entry in self.parse_page(url):
-                    entries.append(entry)
+                entries.extend(list(self.parse_page(url)))
             except Page404Error:
                 logger.warning('Url {} returned 404', url)
                 return entries

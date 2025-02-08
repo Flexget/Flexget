@@ -127,9 +127,7 @@ def tag_source(source_name, tag_names=None):
             return
 
         # construct tags list
-        tags = []
-        for tag_name in tag_names:
-            tags.append(flexget.components.archive.db.get_tag(tag_name, session))
+        tags = [flexget.components.archive.db.get_tag(tag_name, session) for tag_name in tag_names]
 
         # tag 'em
         logger.verbose('Please wait while adding tags {} ...', ', '.join(tag_names))

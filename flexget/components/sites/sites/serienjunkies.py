@@ -152,25 +152,33 @@ class UrlRewriteSerienjunkies:
             first_ep = int(regex_multi_ep.search(search_title).group('startep'))
             last_ep = int(regex_multi_ep.search(search_title).group('stopep'))
             season = regex_multi_ep.search(search_title).group('season') + 'E'
-            for i in range(first_ep, last_ep + 1):
-                # ToDO: Umlaute , Mehrzeilig etc.
-                search_titles.append(
+            # ToDO: Umlaute , Mehrzeilig etc.
+            search_titles.extend(
+                [
                     regex_multi_ep.sub(
                         season + str(i).zfill(2) + '[\\\\w\\\\.\\\\(\\\\)]*', search_title
                     )
-                )
+                    for i in range(first_ep, last_ep + 1)
+                ]
+            )
         elif regex_season.search(search_title):
             logger.debug('Title seems to describe one or more season')
             search_string = regex_season.search(search_title).group(0)
-            for s in re.findall(r'(?<!\-)S\d\d(?!\-)', search_string):
-                search_titles.append(regex_season.sub(s + '[\\\\w\\\\.]*', search_title))
+            search_titles.extend(
+                [
+                    regex_season.sub(s + '[\\\\w\\\\.]*', search_title)
+                    for s in re.findall(r'(?<!\-)S\d\d(?!\-)', search_string)
+                ]
+            )
             for s in re.finditer(r'(?<!\-)S(\d\d)-S(\d\d)(?!\-)', search_string):
                 season_start = int(s.group(1))
                 season_end = int(s.group(2))
-                for i in range(season_start, season_end + 1):
-                    search_titles.append(
+                search_titles.extend(
+                    [
                         regex_season.sub('S' + str(i).zfill(2) + '[\\\\w\\\\.]*', search_title)
-                    )
+                        for i in range(season_start, season_end + 1)
+                    ]
+                )
         else:
             logger.debug('Title seems to describe a single episode')
             search_titles.append(re.escape(search_title))

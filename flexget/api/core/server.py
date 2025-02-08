@@ -158,9 +158,7 @@ class ServerReloadAPI(APIResource):
                         )
                     raise APIError(message='Invalid YAML syntax', payload=error)
             except ConfigError as e:
-                errors = []
-                for er in e.errors:
-                    errors.append({'error': er.message, 'config_path': er.json_pointer})
+                errors = [{'error': er.message, 'config_path': er.json_pointer} for er in e.errors]
                 raise APIError(f'Error loading config: {e.args[0]}', payload={'errors': errors})
             response = 'Config successfully reloaded from disk'
         else:
@@ -232,9 +230,7 @@ class ServerRawConfigAPI(APIResource):
         try:
             backup_path = self.manager.update_config(config)
         except ConfigError as e:
-            errors = []
-            for er in e.errors:
-                errors.append({'error': er.message, 'config_path': er.json_pointer})
+            errors = [{'error': er.message, 'config_path': er.json_pointer} for er in e.errors]
             raise BadRequest(
                 message=f'Error loading config: {e.args[0]}', payload={'errors': errors}
             )

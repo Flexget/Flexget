@@ -29,11 +29,11 @@ logging.getLogger('guessit').setLevel(logging.WARNING)
 
 
 def _id_regexps_function(input_string, context):
-    ret = []
-    for regexp in context.get('id_regexps'):
-        for match in RePattern(regexp, children=True).matches(input_string, context):
-            ret.append(match.span)
-    return ret
+    return [
+        match.span
+        for regexp in context.get('id_regexps')
+        for match in RePattern(regexp, children=True).matches(input_string, context)
+    ]
 
 
 _id_regexps = Rebulk().functional(

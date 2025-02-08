@@ -61,12 +61,9 @@ def table_columns(table: Union[str, Table], session: Session) -> list[str]:
     :returns: List of column names in the table or empty list
     """
 
-    res = []
     if isinstance(table, str):
         table = table_schema(table, session)
-    for column in table.columns:
-        res.append(column.name)
-    return res
+    return [column.name for column in table.columns]
 
 
 def table_index(table_name: str, index_name: str, session: Session) -> Index:

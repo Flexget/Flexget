@@ -98,9 +98,7 @@ class SeenEntry(Base):
         return f'<SeenEntry(title={self.title},reason={self.reason},task={self.task},added={self.added})>'
 
     def to_dict(self):
-        fields = []
-        for field in self.fields:
-            fields.append(field.to_dict())
+        fields = [field.to_dict() for field in self.fields]
 
         return {
             'id': self.id,

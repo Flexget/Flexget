@@ -334,10 +334,13 @@ class RTorrent:
 
         params = [f'd.{field}=' for field in fields]
 
-        # Set custom fields
-        for custom_field in custom_fields:
-            # Values must be escaped if within params
-            params.append('d.custom={}'.format(custom_field.replace('"', '\\"')))
+        # Set custom fields, and values must be escaped if within params
+        params.extend(
+            [
+                'd.custom={}'.format(custom_field.replace('"', '\\"'))
+                for custom_field in custom_fields
+            ]
+        )
 
         params.insert(0, view)
 

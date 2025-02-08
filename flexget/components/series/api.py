@@ -355,9 +355,7 @@ class SeriesGetShowsAPI(APIResource):
         begin = args.get('begin')
         latest = args.get('latest')
 
-        shows = []
-        for match in matches:
-            shows.append(series_details(match, begin, latest))
+        shows = [series_details(match, begin, latest) for match in matches]
 
         return jsonify(shows)
 
@@ -830,14 +828,15 @@ class SeriesSeasonsReleasesAPI(APIResource):
 
         args = release_delete_parser.parse_args()
         downloaded = args.get('downloaded') is True if args.get('downloaded') is not None else None
-        release_items = []
-        for release in season.releases:
+        release_items = [
+            release
+            for release in season.releases
             if (
                 (downloaded and release.downloaded)
                 or (downloaded is False and not release.downloaded)
                 or not downloaded
-            ):
-                release_items.append(release)
+            )
+        ]
 
         for release in release_items:
             if args.get('forget'):
@@ -1083,14 +1082,15 @@ class SeriesEpisodeReleasesAPI(APIResource):
 
         args = release_delete_parser.parse_args()
         downloaded = args.get('downloaded') is True if args.get('downloaded') is not None else None
-        release_items = []
-        for release in episode.releases:
+        release_items = [
+            release
+            for release in episode.releases
             if (
                 (downloaded and release.downloaded)
                 or (downloaded is False and not release.downloaded)
                 or not downloaded
-            ):
-                release_items.append(release)
+            )
+        ]
 
         for release in release_items:
             if args.get('forget'):

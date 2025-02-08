@@ -156,11 +156,11 @@ class FTPList:
         except FTPOSError as e:
             raise PluginError(f'Could not connect to FTP: {e.args[0]}')
 
-        entries = []
-        for d in directories:
-            for content in self.get_content(d, recursion, recursion_depth, content_types):
-                entries.append(self._to_entry(content))
-        return entries
+        return [
+            self._to_entry(content)
+            for d in directories
+            for content in self.get_content(d, recursion, recursion_depth, content_types)
+        ]
 
 
 @event('plugin.register')

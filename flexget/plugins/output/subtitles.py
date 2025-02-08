@@ -78,9 +78,7 @@ class Subtitles:
                 logger.debug('no match for {}', entry['title'])
                 continue
 
-            query = []
-            for language in languages:
-                query.append({'sublanguageid': language, 'imdbid': imdbid})
+            query = [{'sublanguageid': language, 'imdbid': imdbid} for language in languages]
 
             subtitles = s.SearchSubtitles(token, query)
             subtitles = subtitles['data']
