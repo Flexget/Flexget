@@ -12,13 +12,12 @@ def do_cli(manager, options):
         console(f'{num} entries cleared from backlog.')
     else:
         header = ['Title', 'Task', 'Expires']
-        table_data = []
         with Session() as session:
             entries = db.get_entries(options.task, session=session)
-            for entry in entries:
-                table_data.append(
-                    [entry.title, entry.task, entry.expire.strftime('%Y-%m-%d %H:%M')]
-                )
+            table_data = [
+                [entry.title, entry.task, entry.expire.strftime('%Y-%m-%d %H:%M')]
+                for entry in entries
+            ]
         table = TerminalTable(*header, table_type=options.table_type)
         for row in table_data:
             table.add_row(*row)

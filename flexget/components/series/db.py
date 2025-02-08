@@ -1240,9 +1240,13 @@ def remove_series(name: str, forget: bool = False) -> None:
         if series:
             for s in series:
                 if forget:
-                    for entity in s.episodes + s.seasons:
-                        for release in entity.downloaded_releases:
-                            downloaded_releases.append(release.title)
+                    downloaded_releases.extend(
+                        [
+                            release.title
+                            for entity in s.episodes + s.seasons
+                            for release in entity.downloaded_releases
+                        ]
+                    )
                 session.delete(s)
             session.commit()
             logger.debug('Removed series `{}` from database.', name)

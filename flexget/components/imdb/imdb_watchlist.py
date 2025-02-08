@@ -132,10 +132,11 @@ class ImdbWatchlist:
         if not total_item_count:
             logger.verbose('No movies were found in imdb list: {}', config['list'])
             return []
-        imdb_ids = []
-        for item in json_vars['list']['items']:
-            if is_valid_imdb_title_id(item.get('const')):
-                imdb_ids.append(item['const'])
+        imdb_ids = [
+            item['const']
+            for item in json_vars['list']['items']
+            if is_valid_imdb_title_id(item.get('const'))
+        ]
         params = {'ids': ','.join(imdb_ids)}
         url = 'http://www.imdb.com/title/data'
         try:

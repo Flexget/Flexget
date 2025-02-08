@@ -310,8 +310,7 @@ class Torrent:
         # funny iteration because of nesting, ie:
         # [ [ tracker1, tracker2 ], [backup1] ]
         for tl in self.content.get('announce-list', []):
-            for t in tl:
-                trackers.append(t)
+            trackers.extend(tl.copy())
         if self.content.get('announce') not in trackers:
             trackers.append(self.content.get('announce'))
         return trackers

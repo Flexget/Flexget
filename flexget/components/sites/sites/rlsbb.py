@@ -96,10 +96,7 @@ class UrlRewriteRlsbb:
         soup = self._get_soup(task, url)
         link_list = soup.find('ol')
         link_divs = link_list.find_all('div')
-        links = []
-        for link in link_divs:
-            links.append(link.string())
-        return links
+        return [link.string() for link in link_divs]
 
     @plugin.internet(logger)
     # urlrewriter API

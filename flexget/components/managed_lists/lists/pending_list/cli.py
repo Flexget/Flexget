@@ -130,8 +130,7 @@ def pending_list_add(options):
         if options.attributes:
             console(f'Adding attributes to entry `{title}`')
             for identifier in options.attributes:
-                for k, v in identifier.items():
-                    entry[k] = v
+                entry.update(identifier)
             db_entry.entry = entry
         console(f'Successfully {operation} entry `{title}` to pending list `{pending_list.name}` ')
 

@@ -144,10 +144,11 @@ line-length = 99
 extend-exclude = ["flexget/ui"]
 
 [tool.ruff.lint]
-select = ["B", "C4", "E", "F", "FLY", "FURB", "I", "ISC", "PGH", "PLE", "PT", "RET", "RSE", "RUF", "SIM", "TCH", "UP", "W", "YTT"]
+select = ["B", "C4", "E", "F", "FLY", "FURB", "I", "ISC", "PERF", "PGH", "PLE", "PT", "RET", "RSE", "RUF", "SIM", "TCH", "UP", "W", "YTT"]
 ignore = [
     "B904", # TODO: enable this rule (requires a lot of manual work)
     "E501", # TODO: enable this rule (requires a lot of manual work)
+    "PERF203", # TODO: remove this after Python 3.10 is dropped
     "PLE1205", # Maybe can re-enable after https://github.com/astral-sh/ruff/issues/13390
     "RUF012", # Maybe can re-enable after https://github.com/astral-sh/ruff/issues/5243
 ]
