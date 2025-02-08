@@ -219,11 +219,10 @@ class FilterRottenTomatoes:
                 )
                 if task.options.debug:
                     logger.debug(msg)
+                elif task.options.cron:
+                    log_once(msg, logger)
                 else:
-                    if task.options.cron:
-                        log_once(msg, logger)
-                    else:
-                        logger.info(msg)
+                    logger.info(msg)
             else:
                 logger.debug('Accepting {}', entry['title'])
                 entry.accept()

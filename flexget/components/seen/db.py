@@ -243,7 +243,6 @@ def search_by_field_values(field_value_list, task_name, local=False, session=Non
 def db_cleanup(manager, session):
     # TODO: Look into this, is it still valid?
     logger.debug('TODO: Disabled because of ticket #1321')
-    return
 
     # Remove seen fields over a year old
     # result = session.query(SeenField).filter(SeenField.added < datetime.now() - timedelta(days=365)).delete()

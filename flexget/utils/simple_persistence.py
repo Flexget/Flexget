@@ -58,7 +58,7 @@ def upgrade(ver, session):
         logger.info('Creating index on simple_persistence table.')
         create_index('simple_persistence', session, 'feed', 'plugin', 'key')
         ver = 2
-    if ver == 2 or ver == 3:
+    if ver in (2, 3):
         table = table_schema('simple_persistence', session)
         table_add_column(table, 'json', Unicode, session)
         # Make sure we get the new schema with the added column

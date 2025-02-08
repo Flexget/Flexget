@@ -82,14 +82,12 @@ class PendingEntriesAPI(APIResource):
         sort_order = args['order']
 
         # Handle max size limit
-        if per_page > 100:
-            per_page = 100
+        per_page = min(per_page, 100)
 
         descending = sort_order == 'desc'
 
         # Handle max size limit
-        if per_page > 100:
-            per_page = 100
+        per_page = min(per_page, 100)
 
         start = per_page * (page - 1)
         stop = start + per_page

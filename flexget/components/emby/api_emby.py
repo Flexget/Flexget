@@ -367,16 +367,15 @@ class EmbyAuth(EmbyApiBase):
             ):
                 self.logout()
                 return False
-        else:
-            if (
-                'token' not in token_data
-                or 'userid' not in token_data
-                or token_data.get('username') != self._username
-                or token_data.get('host') != self.host
-                or login_type != token_data.get('login_type')
-            ):
-                self.logout()
-                return False
+        elif (
+            'token' not in token_data
+            or 'userid' not in token_data
+            or token_data.get('username') != self._username
+            or token_data.get('host') != self.host
+            or login_type != token_data.get('login_type')
+        ):
+            self.logout()
+            return False
 
         self._userid = token_data.get('userid')
         self._token = token_data.get('token')
@@ -1619,22 +1618,21 @@ class EmbyApiMedia(EmbyApiBase):
 
         if 'id' in parameters:
             args['Ids'] = parameters.get('id')
+        elif EmbyApi.has_provideres_search_arg(**kwargs):
+            EmbyApi.set_provideres_search_arg(args, **kwargs)
         else:
-            if EmbyApi.has_provideres_search_arg(**kwargs):
-                EmbyApi.set_provideres_search_arg(args, **kwargs)
-            else:
-                args['SearchTerm'], year = EmbyApiMedia.parse_string(
-                    parameters.get('search_string', parameters.get('base_name'))
-                )
+            args['SearchTerm'], year = EmbyApiMedia.parse_string(
+                parameters.get('search_string', parameters.get('base_name'))
+            )
 
-                if not args['SearchTerm']:
-                    logger.warning('Not possible to search media, no search term')
-                    return None
+            if not args['SearchTerm']:
+                logger.warning('Not possible to search media, no search term')
+                return None
 
-                if parameters.get('year'):
-                    args['Years'] = parameters['year']
-                elif year:
-                    args['Years'] = year
+            if parameters.get('year'):
+                args['Years'] = parameters['year']
+            elif year:
+                args['Years'] = year
 
         logger.debug('Search media with: {}', args)
         medias = EmbyApi.resquest_emby(EMBY_ENDPOINT_SEARCH, auth, 'GET', **args)
@@ -1790,22 +1788,21 @@ class EmbyApiSerie(EmbyApiMedia):
 
         if 'serie_id' in parameters:
             args['Ids'] = parameters.get('serie_id')
+        elif EmbyApi.has_provideres_search_arg(**parameters):
+            EmbyApi.set_provideres_search_arg(args, **parameters)
         else:
-            if EmbyApi.has_provideres_search_arg(**parameters):
-                EmbyApi.set_provideres_search_arg(args, **parameters)
-            else:
-                args['SearchTerm'], year = EmbyApiSerie.parse_string(
-                    parameters.get('search_string', parameters.get('base_name')), True
-                )
+            args['SearchTerm'], year = EmbyApiSerie.parse_string(
+                parameters.get('search_string', parameters.get('base_name')), True
+            )
 
-                if not args['SearchTerm']:
-                    logger.warning('Not possible to search series, no search term')
-                    return None
+            if not args['SearchTerm']:
+                logger.warning('Not possible to search series, no search term')
+                return None
 
-                if parameters.get('year'):
-                    args['Years'] = parameters['year']
-                elif year:
-                    args['Years'] = year
+            if parameters.get('year'):
+                args['Years'] = parameters['year']
+            elif year:
+                args['Years'] = year
 
         args['IncludeItemTypes'] = 'Series'
 
@@ -2482,22 +2479,21 @@ class EmbyApiMovie(EmbyApiMedia):
             args['Ids'] = parameters.get('movie_id')
         elif 'id' in parameters:
             args['Ids'] = parameters.get('id')
+        elif EmbyApi.has_provideres_search_arg(**parameters):
+            EmbyApi.set_provideres_search_arg(args, **parameters)
         else:
-            if EmbyApi.has_provideres_search_arg(**parameters):
-                EmbyApi.set_provideres_search_arg(args, **parameters)
-            else:
-                args['SearchTerm'], year = EmbyApiMovie.parse_string(
-                    parameters.get('search_string', parameters.get('base_name'))
-                )
+            args['SearchTerm'], year = EmbyApiMovie.parse_string(
+                parameters.get('search_string', parameters.get('base_name'))
+            )
 
-                if not args['SearchTerm']:
-                    logger.warning('Not possible to search movie, no search term')
-                    return None
+            if not args['SearchTerm']:
+                logger.warning('Not possible to search movie, no search term')
+                return None
 
-                if parameters.get('year'):
-                    args['Years'] = parameters['year']
-                elif year:
-                    args['Years'] = year
+            if parameters.get('year'):
+                args['Years'] = parameters['year']
+            elif year:
+                args['Years'] = year
 
         args['IncludeItemTypes'] = 'Movie'
 
@@ -2770,7 +2766,7 @@ class EmbyApi(EmbyApiBase):
         except RequestException as e:
             raise PluginError(f'Could not connect to Emby Server: {e!s}') from e
 
-        if response.status_code == 200 or response.status_code == 204:
+        if response.status_code in (200, 204):
             try:
                 return response.json()
             except ValueError:

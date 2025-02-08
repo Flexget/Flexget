@@ -433,11 +433,10 @@ class RTorrentPluginBase:
                     options[opt_key] = entry.render(entry_value)
                 elif config_value:
                     options[opt_key] = entry.render(config_value)
-            else:
-                if config_value:
-                    options[opt_key] = entry.render(config_value)
-                elif entry_value:
-                    options[opt_key] = entry.render(entry_value)
+            elif config_value:
+                options[opt_key] = entry.render(config_value)
+            elif entry_value:
+                options[opt_key] = entry.render(entry_value)
 
         # Add custom fields on to options
         entry_custom_fields = entry.get('custom_fields', {})

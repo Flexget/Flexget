@@ -369,11 +369,10 @@ def get_template(template_name: str, scope: Optional[str] = 'task') -> FlexGetTe
         if environment is not None:
             with suppress(TemplateNotFound):
                 return cast(FlexGetTemplate, environment.get_template(location))
-    else:
-        err = f'Template not found in templates dir: {template_name}'
-        if scope:
-            err += f' ({scope})'
-        raise ValueError(err)
+    err = f'Template not found in templates dir: {template_name}'
+    if scope:
+        err += f' ({scope})'
+    raise ValueError(err)
 
 
 def render(template: Union[FlexGetTemplate, str], context: Mapping, native: bool = False) -> str:

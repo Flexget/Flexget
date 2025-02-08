@@ -555,10 +555,9 @@ class FilterSeries(FilterSeriesBase):
                         auto_begin = True
 
                 # Remove begin episode if identified_by has now been set to a different type than begin ep
-                if (
-                    db_series.begin
-                    and db_series.identified_by != 'auto'
-                    and db_series.identified_by != db_series.begin.identified_by
+                if db_series.begin and db_series.identified_by not in (
+                    'auto',
+                    db_series.begin.identified_by,
                 ):
                     logger.warning(
                         f'Removing begin episode for {series_name} ({db_series.begin.identifier}) because '
@@ -993,10 +992,7 @@ class FilterSeries(FilterSeriesBase):
             return True
 
         # TODO: should not be in tracking ?
-        if (
-            entity.identified_by != entity.series.identified_by
-            and entity.series.identified_by != "auto"
-        ):
+        if entity.series.identified_by not in (entity.identified_by, "auto"):
             for entry in entries:
                 entry.reject(
                     f'Episode `{{entity.identifier}}` doesn\'t match series format `{entity.series.identified_by}`. '

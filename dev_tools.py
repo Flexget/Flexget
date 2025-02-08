@@ -56,13 +56,12 @@ def bump_version(bump_type):
         if len(ver_split) == 2:
             # We don't have a revision number, assume 0
             ver_split.append('1')
+        elif 'b' in ver_split[2]:
+            # beta version
+            minor, beta = ver_split[-1].split('b')
+            ver_split[-1] = f'{minor}b{int(beta) + 1}'
         else:
-            if 'b' in ver_split[2]:
-                # beta version
-                minor, beta = ver_split[-1].split('b')
-                ver_split[-1] = f'{minor}b{int(beta) + 1}'
-            else:
-                ver_split[-1] = str(int(ver_split[-1]) + 1)
+            ver_split[-1] = str(int(ver_split[-1]) + 1)
         if bump_type == 'dev':
             ver_split.append('dev')
     new_version = '.'.join(ver_split)

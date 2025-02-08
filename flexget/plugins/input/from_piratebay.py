@@ -145,13 +145,12 @@ class FromPirateBay:
                 list_url = f'{url}/precompiled/data_top100_48h_{category}.json'
             else:
                 list_url = f'{url}/precompiled/data_top100_48h.json'
-        else:  # list == 'recent'
-            if category:
-                list_url = f'{url}/q.php?q=category:{category}'
-            else:
-                # top100_recent has multiple pages, starting at data_top100_recent.json, then data_top100_recent_1.json
-                # to 30, and appears not filtered by categories
-                list_url = f'{url}/precompiled/data_top100_recent.json'
+        elif category:
+            list_url = f'{url}/q.php?q=category:{category}'
+        else:
+            # top100_recent has multiple pages, starting at data_top100_recent.json, then data_top100_recent_1.json
+            # to 30, and appears not filtered by categories
+            list_url = f'{url}/precompiled/data_top100_recent.json'
 
         json_results = task.requests.get(list_url).json()
 
