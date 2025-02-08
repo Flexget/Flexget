@@ -95,12 +95,11 @@ class ParserGuessit:
             options['date_year_first'] = options['date_yearfirst']
         if 'date_dayfirst' in options:
             options['date_day_first'] = options['date_dayfirst']
-        else:
-            # See https://github.com/guessit-io/guessit/issues/329
-            # https://github.com/guessit-io/guessit/pull/333
-            # They made changes that break backward compatibility, so we have to make do this hackery
-            if options.get('date_year_first'):
-                options['date_day_first'] = True
+        # See https://github.com/guessit-io/guessit/issues/329
+        # https://github.com/guessit-io/guessit/pull/333
+        # They made changes that break backward compatibility, so we have to make do this hackery
+        elif options.get('date_year_first'):
+            options['date_day_first'] = True
         settings.update(options)
         return settings
 
@@ -419,8 +418,7 @@ class ParserGuessit:
             if match:
                 match_end = match.end(1 if re_from_name else 0)
                 # Always pick the longest matching regex
-                if match_end > name_end:
-                    name_end = match_end
+                name_end = max(name_end, match_end)
                 logger.debug('NAME SUCCESS: {} matched to {}', name_re.pattern, data)
         if not name_end:
             # leave this invalid

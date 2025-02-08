@@ -55,19 +55,18 @@ class KodiLibrary:
                         config['action'],
                         config['category'],
                     )
+                elif r.get('error'):
+                    logger.error(
+                        'Kodi JSONRPC failed. Error {}: {}',
+                        r['error']['code'],
+                        r['error']['message'],
+                    )
                 else:
-                    if r.get('error'):
-                        logger.error(
-                            'Kodi JSONRPC failed. Error {}: {}',
-                            r['error']['code'],
-                            r['error']['message'],
-                        )
-                    else:
-                        # this should never happen as Kodi say they follow the JSON-RPC 2.0 spec
-                        logger.debug('Received error response {}', json.dumps(r))
-                        logger.error(
-                            'Kodi JSONRPC failed with unrecognized message: {}', json.dumps(r)
-                        )
+                    # this should never happen as Kodi say they follow the JSON-RPC 2.0 spec
+                    logger.debug('Received error response {}', json.dumps(r))
+                    logger.error(
+                        'Kodi JSONRPC failed with unrecognized message: {}', json.dumps(r)
+                    )
             except RequestException as e:
                 raise plugin.PluginError(f'Failed to send request to Kodi: {e.args[0]}')
         else:

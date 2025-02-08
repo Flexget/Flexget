@@ -256,9 +256,8 @@ def open_archive(archive_path):
     elif rarfile and rarfile.is_rarfile(archive_path):
         archive = RarArchive(archive_path)
         logger.debug('Successfully opened RAR: {}', archive_path)
-    else:
-        if not rarfile:
-            logger.warning('Rarfile module not installed; unable to handle RAR archives.')
+    elif not rarfile:
+        logger.warning('Rarfile module not installed; unable to handle RAR archives.')
 
     return archive
 

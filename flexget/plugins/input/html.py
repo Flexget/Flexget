@@ -260,7 +260,7 @@ class InputHtml:
                         config['title_from'] = switch_to
                         # start from the beginning  ...
                         return self.create_entries(page_url, soup, config)
-            elif title_from == 'link' or title_from == 'contents':
+            elif title_from in ('link', 'contents'):
                 # link from link name
                 title = self._title_from_link(link, log_link)
                 if title is None:

@@ -183,20 +183,21 @@ class NextSeriesSeasons:
                     elif latest:
                         entries.append(self.search_entry(series, latest.season, task))
                     # First iteration of a new season with no show begin and show has downloads
-                    elif new_season and season == new_season:
+                    elif (
+                        (new_season and season == new_season)
+                        or config.get('from_start')
+                        or config.get('backfill')
+                    ):
                         entries.append(self.search_entry(series, season, task))
                     else:
-                        if config.get('from_start') or config.get('backfill'):
-                            entries.append(self.search_entry(series, season, task))
-                        else:
-                            logger.verbose(
-                                'Series `{}` has no history. Set the begin option in your config, '
-                                'or use the CLI subcommand `series begin "{}" <SxxExx>` '
-                                'to set the first episode to emit',
-                                series.name,
-                                series.name,
-                            )
-                            break
+                        logger.verbose(
+                            'Series `{}` has no history. Set the begin option in your config, '
+                            'or use the CLI subcommand `series begin "{}" <SxxExx>` '
+                            'to set the first episode to emit',
+                            series.name,
+                            series.name,
+                        )
+                        break
                     # Skip older seasons if we are not in backfill mode
                     if not config.get('backfill'):
                         logger.debug('backfill is not enabled; skipping older seasons')

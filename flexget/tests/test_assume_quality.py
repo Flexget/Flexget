@@ -1,8 +1,8 @@
 import pytest
 from jinja2 import Template
 
-import flexget.utils.qualities as qualities
 from flexget.task import TaskAbort
+from flexget.utils import qualities
 
 
 class TestAssumeQuality:

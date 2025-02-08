@@ -98,14 +98,13 @@ class Symlink:
             try:
                 if config['link_type'] == 'soft':
                     os.symlink(linkfrom, linkto)
+                elif os.path.isdir(linkfrom):
+                    self.hard_link_dir(linkfrom, linkto, existing)
                 else:
-                    if os.path.isdir(linkfrom):
-                        self.hard_link_dir(linkfrom, linkto, existing)
-                    else:
-                        dirname = os.path.dirname(linkto)
-                        if not os.path.exists(dirname):
-                            os.makedirs(dirname)
-                        os.link(linkfrom, linkto)
+                    dirname = os.path.dirname(linkto)
+                    if not os.path.exists(dirname):
+                        os.makedirs(dirname)
+                    os.link(linkfrom, linkto)
             except OSError as e:
                 entry.fail('Failed to create {}link, {}'.format(config['link_type'], e))
 

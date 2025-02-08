@@ -2,9 +2,9 @@ from collections import namedtuple
 
 from loguru import logger
 
-import flexget.utils.qualities as qualities
 from flexget import plugin
 from flexget.event import event
+from flexget.utils import qualities
 
 logger = logger.bind(name='assume_quality')
 

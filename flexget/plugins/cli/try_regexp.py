@@ -45,7 +45,7 @@ class PluginTryRegexp:
                 s = input('--> ')
                 if s == 'exit':
                     break
-                if s == 'abort' or s == 'continue':
+                if s in ('abort', 'continue'):
                     self.abort = True
                     break
             except EOFError:

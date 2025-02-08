@@ -347,37 +347,36 @@ class InputRSS:
                     logger.debug(msg)
                 else:
                     logger.verbose(msg)
+            elif isinstance(ex, feedparser.NonXMLContentType):
+                # see: http://www.feedparser.org/docs/character-encoding.html#advanced.encoding.nonxml
+                logger.debug('ignoring feedparser.NonXMLContentType')
+            elif isinstance(ex, feedparser.CharacterEncodingOverride):
+                # see: ticket 88
+                logger.debug('ignoring feedparser.CharacterEncodingOverride')
+            elif isinstance(ex, UnicodeEncodeError):
+                raise plugin.PluginError('Feed has UnicodeEncodeError while parsing...')
+            elif isinstance(
+                ex, (xml.sax._exceptions.SAXParseException, xml.sax._exceptions.SAXException)
+            ):
+                # save invalid data for review, this is a bit ugly but users seem to really confused when
+                # html pages (login pages) are received
+                self.process_invalid_content(task, content, config['url'])
+                if task.options.debug:
+                    logger.error('bozo error parsing rss: {}', ex)
+                raise plugin.PluginError(
+                    'Received invalid RSS content from task {} ({})'.format(
+                        task.name, config['url']
+                    )
+                )
+            elif isinstance(ex, (http.client.BadStatusLine, OSError)):
+                raise ex  # let the @internet decorator handle
             else:
-                if isinstance(ex, feedparser.NonXMLContentType):
-                    # see: http://www.feedparser.org/docs/character-encoding.html#advanced.encoding.nonxml
-                    logger.debug('ignoring feedparser.NonXMLContentType')
-                elif isinstance(ex, feedparser.CharacterEncodingOverride):
-                    # see: ticket 88
-                    logger.debug('ignoring feedparser.CharacterEncodingOverride')
-                elif isinstance(ex, UnicodeEncodeError):
-                    raise plugin.PluginError('Feed has UnicodeEncodeError while parsing...')
-                elif isinstance(
-                    ex, (xml.sax._exceptions.SAXParseException, xml.sax._exceptions.SAXException)
-                ):
-                    # save invalid data for review, this is a bit ugly but users seem to really confused when
-                    # html pages (login pages) are received
-                    self.process_invalid_content(task, content, config['url'])
-                    if task.options.debug:
-                        logger.error('bozo error parsing rss: {}', ex)
-                    raise plugin.PluginError(
-                        'Received invalid RSS content from task {} ({})'.format(
-                            task.name, config['url']
-                        )
-                    )
-                elif isinstance(ex, (http.client.BadStatusLine, OSError)):
-                    raise ex  # let the @internet decorator handle
-                else:
-                    # all other bozo errors
-                    self.process_invalid_content(task, content, config['url'])
-                    raise plugin.PluginError(
-                        f'Unhandled bozo_exception. Type: {ex.__class__.__name__} (task: {task.name})',
-                        logger,
-                    )
+                # all other bozo errors
+                self.process_invalid_content(task, content, config['url'])
+                raise plugin.PluginError(
+                    f'Unhandled bozo_exception. Type: {ex.__class__.__name__} (task: {task.name})',
+                    logger,
+                )
 
         logger.debug('encoding {}', rss.encoding)
 
@@ -531,9 +530,8 @@ class InputRSS:
                             if entry.get(field):
                                 e['url'] = entry[field]
                                 break
-                else:
-                    if entry.get(config['link']):
-                        e['url'] = entry[config['link']]
+                elif entry.get(config['link']):
+                    e['url'] = entry[config['link']]
             else:
                 # If link was passed as a list, we create a list of urls
                 for field in config['link']:

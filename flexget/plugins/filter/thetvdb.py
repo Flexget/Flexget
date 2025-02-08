@@ -118,9 +118,8 @@ class FilterTvdb:
                 for item in entryitem:
                     if item in configlist:
                         return True
-            else:
-                if entryitem in configlist:
-                    return True
+            elif entryitem in configlist:
+                return True
         return False
 
     @plugin.priority(126)
