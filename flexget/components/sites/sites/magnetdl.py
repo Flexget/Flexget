@@ -54,7 +54,7 @@ class MagnetDL:
         except RequestException as e:
             raise plugin.PluginError(str(e))
         if page.status_code == 404:
-            raise Page404Error()
+            raise Page404Error
         if page.status_code != 200:
             raise plugin.PluginError(f'HTTP Request failed {page.status_code}. Url: {url}')
 

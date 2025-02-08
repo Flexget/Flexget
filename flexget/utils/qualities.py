@@ -86,7 +86,7 @@ class QualityComponent:
 
     def __add__(self, other):
         if not isinstance(other, int):
-            raise TypeError()
+            raise TypeError
         component_list = globals().get('_' + self.type + 's')
         index = component_list.index(self) + other
         if index >= len(component_list):
@@ -95,7 +95,7 @@ class QualityComponent:
 
     def __sub__(self, other):
         if not isinstance(other, int):
-            raise TypeError()
+            raise TypeError
         component_list = globals().get('_' + self.type + 's')
         index = component_list.index(self) - other
         if index < 0:
