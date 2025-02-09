@@ -186,8 +186,8 @@ class InputPlex:
             logger.debug('Got accesstoken: {}', accesstoken)
             urlconfig['X-Plex-Token'] = accesstoken
 
-        for key in urlconfig:
-            urlappend += f'{key}={urlconfig[key]}&'
+        for key, value in urlconfig.items():
+            urlappend += f'{key}={value}&'
         if not self.plex_section_is_int(config['section']):
             try:
                 path = "/library/sections/"

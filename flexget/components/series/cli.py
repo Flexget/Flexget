@@ -243,11 +243,9 @@ def display_details(options):
                 quality = release.quality.name
                 if not release.downloaded:
                     title = colorize(UNDOWNLOADED_RELEASE_COLOR, title)
-                    quality = quality
                 else:
                     title += ' *'
                     title = colorize(DOWNLOADED_RELEASE_COLOR, title)
-                    quality = quality
                 release_titles.append(title)
                 release_qualities.append(quality)
                 release_propers.append('Yes' if release.proper_count > 0 else '')

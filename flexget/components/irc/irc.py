@@ -1027,7 +1027,7 @@ def irc_start(manager):
 
 @event('manager.config_updated')
 def irc_update_config(manager):
-    global irc_manager, config_hash
+    global irc_manager
 
     # Exit if we're not running daemon mode
     if not manager.is_daemon:

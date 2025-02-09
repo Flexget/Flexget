@@ -18,9 +18,9 @@ class TestPathscrub:
             'something *': 'something',  # Don't leave spaces at the end
             'aoeu. > * . * <': 'aoeu',  # Really don't leave spaces or dots at the end
         }
-        for test in win_fn:
+        for test, value in win_fn.items():
             result = pathscrub(test, os='windows', filename=True)
-            assert result == win_fn[test], f'{result} != {win_fn[test]}'
+            assert result == value, f'{result} != {value}'
 
     def test_windows_paths(self):
         win_path = {
@@ -30,9 +30,9 @@ class TestPathscrub:
             'aoeu \\aoeu ': 'aoeu\\aoeu',
             'aoeu./aoeu.\\aoeu.': 'aoeu/aoeu\\aoeu',  # Or dots
         }
-        for test in win_path:
+        for test, value in win_path.items():
             result = pathscrub(test, os='windows', filename=False)
-            assert result == win_path[test], f'{result} != {win_path[test]}'
+            assert result == value, f'{result} != {value}'
 
     def test_degenerate(self):
         # If path is reduced to nothing, make sure it complains
@@ -46,9 +46,9 @@ class TestPathscrub:
         # We don't want folder or file names to end or start with spaces on any platform
         space_paths = {' / aoeu /aoeu ': '/aoeu/aoeu', '/   a/a   ': '/a/a', '/a  /': '/a/'}
         for platform in ['windows', 'linux', 'mac']:
-            for test in space_paths:
+            for test, value in space_paths.items():
                 result = pathscrub(test, filename=False)
-                assert result == space_paths[test], f'{result} != {space_paths[test]} ({platform})'
+                assert result == value, f'{result} != {value} ({platform})'
 
         # Windows only should also use backslashes as dir separators
         test = ['c:\\ aoeu \\aoeu /aoeu ', 'c:\\aoeu\\aoeu/aoeu']

@@ -155,7 +155,7 @@ class TestEntryUnicodeError:
 
 class TestEntryCoercion:
     class MyStr(str):
-        pass
+        __slots__ = ()
 
     def test_string_coercion(self):
         e = Entry('title', 'url')
