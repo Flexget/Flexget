@@ -3,7 +3,6 @@ import re
 from loguru import logger
 
 from flexget import plugin
-from flexget.components.imdb.utils import extract_id, is_valid_imdb_title_id
 from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
@@ -96,7 +95,7 @@ class ImdbWatchlist:
             params['sort'] = 'list_order%2Casc'
 
         if config['list'] == 'watchlist':
-            entries = self.parse_react_widget(task, config, url, params, headers)
+            entries = self.parse_html_list(task, config, url, params, headers, listKey='predefinedList')
         else:
             entries = self.parse_html_list(task, config, url, params, headers)
         return entries
@@ -114,133 +113,55 @@ class ImdbWatchlist:
             )
         return page
 
-    def parse_react_widget(self, task, config, url, params, headers) -> list[Entry]:
-        page = self.fetch_page(task, url, params, headers)
-        try:
-            json_vars = json.loads(
-                re.search(r'IMDbReactInitialState.push\((.+?)\);\n', page.text).group(1)
-            )
-        except (TypeError, AttributeError, ValueError) as e:
-            raise plugin.PluginError(
-                'Unable to get imdb list from imdb react widget. '
-                'Either the list is empty or the imdb parser of the imdb_watchlist plugin is broken. '
-                f'Original error: {e!s}.'
-            )
-        total_item_count = 0
-        if 'list' in json_vars and 'items' in json_vars['list']:
-            total_item_count = len(json_vars['list']['items'])
-        if not total_item_count:
-            logger.verbose('No movies were found in imdb list: {}', config['list'])
-            return []
-        imdb_ids = []
-        for item in json_vars['list']['items']:
-            if is_valid_imdb_title_id(item.get('const')):
-                imdb_ids.append(item['const'])
-        params = {'ids': ','.join(imdb_ids)}
-        url = 'http://www.imdb.com/title/data'
-        try:
-            json_data = self.fetch_page(task, url, params, headers).json()
-        except (ValueError, TypeError) as e:
-            raise plugin.PluginError(
-                'Unable to get imdb list from imdb JSON API. '
-                'Either the list is empty or the imdb parser of the imdb_watchlist plugin is broken. '
-                f'Original error: {e!s}.'
-            )
-        logger.verbose('imdb list contains {} items', len(json_data))
-        logger.debug(
-            'First entry (imdb id: {}) looks like this: {}', imdb_ids[0], json_data[imdb_ids[0]]
-        )
-        entries = []
-        for imdb_id in imdb_ids:
-            entry = Entry()
-            if not (
-                'title' in json_data[imdb_id]
-                and 'primary' in json_data[imdb_id]['title']
-                and 'href' in json_data[imdb_id]['title']['primary']
-                and 'title' in json_data[imdb_id]['title']['primary']
-            ):
-                logger.debug('no title or link found for item {}, skipping', imdb_id)
-                continue
-            if 'type' in json_data[imdb_id]['title']:
-                entry['imdb_type'] = json_data[imdb_id]['title']['type']
-            title = json_data[imdb_id]['title']['primary']['title']
-            entry['title'] = title
-            if 'year' in json_data[imdb_id]['title']['primary']:
-                year = json_data[imdb_id]['title']['primary']['year'][0]
-                entry['title'] += f' ({year})'
-                entry['imdb_year'] = year
-            entry['url'] = json_data[imdb_id]['title']['primary']['href']
-            entry['imdb_id'] = imdb_id
-            entry['imdb_name'] = entry['title']
-            entries.append(entry)
-        return entries
-
-    def parse_html_list(self, task, config, url, params, headers) -> list[Entry]:
+    def parse_html_list(self, task, config, url, params, headers, listKey='predefinedList') -> list[Entry]:
         page = self.fetch_page(task, url, params, headers)
         soup = get_soup(page.text)
         try:
-            item_text = soup.find(
-                'div', {'class': ['lister-list-length', 'lister-total-num-results']}
-            ).text.split()
-            total_item_count = int(item_text[0].replace(',', ''))
+            query_result = json.loads(soup.find('script', id='__NEXT_DATA__', type='application/json').string)
+            total_item_count = query_result['props']['pageProps']['totalItems']
+            items = query_result['props']['pageProps']['mainColumnData'][listKey]['titleListItemSearch']['edges']
             logger.verbose('imdb list contains {} items', total_item_count)
-        except AttributeError:
+        except Exception:
             total_item_count = 0
-        except (ValueError, TypeError) as e:
-            # TODO Something is wrong if we get a ValueError, I think
-            raise plugin.PluginError(
-                'Received invalid movie count: {} ; {}'.format(
-                    soup.find('div', class_='lister-total-num-results').string, e
-                )
-            )
+            items = []
 
         if not total_item_count:
-            logger.verbose('No movies were found in imdb list: {}', config['list'])
+            logger.verbose('Nothing found in imdb list: {}', config['list'])
             return []
 
         entries = []
-        items_processed = 0
         page_no = 1
-        while items_processed < total_item_count:
-            # Fetch the next page unless we've just begun
-            if items_processed:
-                page_no += 1
-                params['page'] = page_no
-                page = self.fetch_page(task, url, params, headers)
-                soup = get_soup(page.text)
 
-            items = soup.find_all('div', class_='lister-item')
-            if not items:
-                logger.debug('no items found on page: {}, aborting.', url)
-                break
-            logger.debug('{} items found on page {}', len(items), page_no)
+        while len(items) < total_item_count:
+            page_no += 1
+            params['page'] = page_no
+            page = self.fetch_page(task, url, params, headers)
+            soup = get_soup(page.text)
+            try:
+                query_result = json.loads(soup.find('script', id='__NEXT_DATA__', type='application/json').string)
+                items.extend(query_result['props']['pageProps']['mainColumnData'][listKey]['titleListItemSearch']['edges'])
+            except Exception:
+                raise plugin.PluginError('Received invalid list data')
 
-            for item in items:
-                items_processed += 1
-                a = item.find('h3', class_='lister-item-header').find('a')
-                if not a:
-                    logger.debug('no title link found for row, skipping')
-                    continue
+        for item in items:
+            link = 'http://www.imdb.com/title/' + item['listItem']['id']
+            entry = Entry()
+            entry['title'] = item['listItem']['titleText']['text']
+            try:
+                year = int(item['listItem']['releaseYear'])
+                entry['title'] += f' ({year})'
+                entry['imdb_year'] = year
+            except (ValueError, TypeError):
+                pass
+            entry['url'] = link
+            entry['imdb_id'] = item['listItem']['id']
+            entry['imdb_name'] = entry['title']
+            try:
+                entry['imdb_user_score'] = int(item['listItem']['ratingsSummary']['aggregateRating'])
+            except (ValueError, TypeError):
+                pass
 
-                link = ('http://www.imdb.com' + a.get('href')).rstrip('/')
-                entry = Entry()
-                entry['title'] = a.text
-                try:
-                    year = int(item.find('span', class_='lister-item-year').text)
-                    entry['title'] += f' ({year})'
-                    entry['imdb_year'] = year
-                except (ValueError, TypeError):
-                    pass
-                entry['url'] = link
-                entry['imdb_id'] = extract_id(link)
-                entry['imdb_name'] = entry['title']
-
-                rating_spans = item.findAll('span', class_="ipl-rating-star__rating")
-                logger.debug("rating_spans: {}", len(rating_spans))
-                # There should be 24 ratings spans and the user score should be in the second
-                if len(rating_spans) == 24:
-                    entry['imdb_user_score'] = int(rating_spans[1].text)
-                entries.append(entry)
+            entries.append(entry)
 
         return entries
 
