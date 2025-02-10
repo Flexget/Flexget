@@ -109,7 +109,7 @@ class FilterExistsMovie:
 
             # scan through
             items = []
-            for p in folder.iterdir():
+            for p in folder.rglob('*'):
                 if config.get('type') == 'dirs' and p.is_dir():
                     if self.dir_pattern.search(p.name):
                         continue
