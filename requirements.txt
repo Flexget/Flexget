@@ -7,7 +7,7 @@ autocommand==2.2.2
 babelfish==0.6.0 ; python_full_version < '3.10'
 babelfish==0.6.1 ; python_full_version >= '3.10'
 backports-tarfile==1.2.0 ; python_full_version < '3.12'
-beautifulsoup4==4.13.1
+beautifulsoup4==4.13.3
 blinker==1.9.0
 brotli==1.1.0 ; platform_python_implementation != 'PyPy'
 brotlicffi==1.1.0.0 ; platform_python_implementation == 'PyPy'
@@ -67,7 +67,7 @@ setuptools==75.8.0
 sgmllib3k==1.0.0
 six==1.17.0
 soupsieve==2.6
-sqlalchemy==2.0.37
+sqlalchemy==2.0.38
 tempora==5.8.0
 time-machine==2.16.0 ; implementation_name != 'pypy'
 typing-extensions==4.12.2
