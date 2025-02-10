@@ -88,8 +88,6 @@ class Filesystem:
     def prepare_config(self, config):
         from fnmatch import translate
 
-        config = config
-
         # Converts config to a dict with a list of paths
         if not isinstance(config, dict):
             config = {'path': config}

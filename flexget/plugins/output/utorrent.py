@@ -101,9 +101,9 @@ class PluginUtorrent:
             if path:
                 path_normcase = os.path.normcase(path)
 
-                for dir in download_dirs:
+                for dir, value in download_dirs.items():
                     if path_normcase.startswith(dir.lower()):
-                        folder = download_dirs[dir]
+                        folder = value
                         path = path[len(dir) :].lstrip('\\')
                         break
                 else:

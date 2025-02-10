@@ -12,8 +12,6 @@ class TestSimplePersistence:
     def test_setdefault(self, execute_task):
         task = execute_task('test')
 
-        task = task
-
         value1 = task.simple_persistence.setdefault('test', 'abc')
         value2 = task.simple_persistence.setdefault('test', 'def')
 

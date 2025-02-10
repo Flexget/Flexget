@@ -152,7 +152,7 @@ class UrlRewriteSerienjunkies:
             first_ep = int(regex_multi_ep.search(search_title).group('startep'))
             last_ep = int(regex_multi_ep.search(search_title).group('stopep'))
             season = regex_multi_ep.search(search_title).group('season') + 'E'
-            # ToDO: Umlaute , Mehrzeilig etc.
+            # TODO: Umlaute , Mehrzeilig etc.
             search_titles.extend(
                 [
                     regex_multi_ep.sub(

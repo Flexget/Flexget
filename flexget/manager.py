@@ -840,9 +840,9 @@ class Manager:
                     logger.debug('Invalid line in lock file: {}', line)
                     continue
                 result[key.strip().lower()] = value.strip()
-            for key in result:
-                if result[key].isdigit():
-                    result[key] = int(result[key])
+            for key, value in result.items():
+                if value.isdigit():
+                    result[key] = int(value)
             result.setdefault('pid', None)
             if not result['pid']:
                 logger.error(
