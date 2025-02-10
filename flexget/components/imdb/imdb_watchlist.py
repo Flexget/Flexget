@@ -1,3 +1,5 @@
+import contextlib
+
 from loguru import logger
 
 from flexget import plugin
@@ -159,21 +161,17 @@ class ImdbWatchlist:
             link = 'http://www.imdb.com/title/' + item['listItem']['id']
             entry = Entry()
             entry['title'] = item['listItem']['titleText']['text']
-            try:
+            with contextlib.suppress(ValueError, TypeError):
                 year = int(item['listItem']['releaseYear'])
                 entry['title'] += f' ({year})'
                 entry['imdb_year'] = year
-            except (ValueError, TypeError):
-                pass
             entry['url'] = link
             entry['imdb_id'] = item['listItem']['id']
             entry['imdb_name'] = entry['title']
-            try:
+            with contextlib.suppress(ValueError, TypeError):
                 entry['imdb_user_score'] = int(
                     item['listItem']['ratingsSummary']['aggregateRating']
                 )
-            except (ValueError, TypeError):
-                pass
 
             entries.append(entry)
 
