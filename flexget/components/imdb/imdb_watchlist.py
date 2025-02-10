@@ -1,5 +1,3 @@
-import re
-
 from loguru import logger
 
 from flexget import plugin
@@ -95,7 +93,9 @@ class ImdbWatchlist:
             params['sort'] = 'list_order%2Casc'
 
         if config['list'] == 'watchlist':
-            entries = self.parse_html_list(task, config, url, params, headers, listKey='predefinedList')
+            entries = self.parse_html_list(
+                task, config, url, params, headers, listKey='predefinedList'
+            )
         else:
             entries = self.parse_html_list(task, config, url, params, headers)
         return entries
@@ -113,13 +113,19 @@ class ImdbWatchlist:
             )
         return page
 
-    def parse_html_list(self, task, config, url, params, headers, listKey='predefinedList') -> list[Entry]:
+    def parse_html_list(
+        self, task, config, url, params, headers, listKey='predefinedList'
+    ) -> list[Entry]:
         page = self.fetch_page(task, url, params, headers)
         soup = get_soup(page.text)
         try:
-            query_result = json.loads(soup.find('script', id='__NEXT_DATA__', type='application/json').string)
+            query_result = json.loads(
+                soup.find('script', id='__NEXT_DATA__', type='application/json').string
+            )
             total_item_count = query_result['props']['pageProps']['totalItems']
-            items = query_result['props']['pageProps']['mainColumnData'][listKey]['titleListItemSearch']['edges']
+            items = query_result['props']['pageProps']['mainColumnData'][listKey][
+                'titleListItemSearch'
+            ]['edges']
             logger.verbose('imdb list contains {} items', total_item_count)
         except Exception:
             total_item_count = 0
@@ -138,8 +144,14 @@ class ImdbWatchlist:
             page = self.fetch_page(task, url, params, headers)
             soup = get_soup(page.text)
             try:
-                query_result = json.loads(soup.find('script', id='__NEXT_DATA__', type='application/json').string)
-                items.extend(query_result['props']['pageProps']['mainColumnData'][listKey]['titleListItemSearch']['edges'])
+                query_result = json.loads(
+                    soup.find('script', id='__NEXT_DATA__', type='application/json').string
+                )
+                items.extend(
+                    query_result['props']['pageProps']['mainColumnData'][listKey][
+                        'titleListItemSearch'
+                    ]['edges']
+                )
             except Exception:
                 raise plugin.PluginError('Received invalid list data')
 
@@ -157,7 +169,9 @@ class ImdbWatchlist:
             entry['imdb_id'] = item['listItem']['id']
             entry['imdb_name'] = entry['title']
             try:
-                entry['imdb_user_score'] = int(item['listItem']['ratingsSummary']['aggregateRating'])
+                entry['imdb_user_score'] = int(
+                    item['listItem']['ratingsSummary']['aggregateRating']
+                )
             except (ValueError, TypeError):
                 pass
 
