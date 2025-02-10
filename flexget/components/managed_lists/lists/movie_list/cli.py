@@ -112,8 +112,12 @@ def movie_list_list(options):
     table = TerminalTable(*header, table_type=options.table_type, title=title)
     for movie in movies:
         movie_row = [str(movie.id), movie.title, str(movie.year) or '']
-        for identifier in db.MovieListBase().supported_ids:
-            movie_row.append(str(movie.identifiers.get(identifier, '')))
+        movie_row.extend(
+            [
+                str(movie.identifiers.get(identifier, ''))
+                for identifier in db.MovieListBase().supported_ids
+            ]
+        )
         table.add_row(*movie_row)
     console(table)
 

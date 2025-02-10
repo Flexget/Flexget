@@ -123,8 +123,7 @@ class EntryIterator:
         for index, entry in enumerate(self):
             if index == item:
                 return entry
-        else:
-            raise IndexError(f'{item} is out of bounds')
+        raise IndexError(f'{item} is out of bounds')
 
     def reverse(self):
         self.all_entries.sort(reverse=True)

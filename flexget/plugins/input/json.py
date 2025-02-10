@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-import dateutil.parser as parser
+from dateutil import parser
 from loguru import logger
 
 from flexget import plugin

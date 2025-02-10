@@ -241,8 +241,7 @@ class SeriesAPI(APIResource):
         name = normalize_series_name(args['query']) if args['query'] else None
 
         # Handle max size limit
-        if per_page > 100:
-            per_page = 100
+        per_page = min(per_page, 100)
 
         descending = sort_order == 'desc'
 
@@ -355,9 +354,7 @@ class SeriesGetShowsAPI(APIResource):
         begin = args.get('begin')
         latest = args.get('latest')
 
-        shows = []
-        for match in matches:
-            shows.append(series_details(match, begin, latest))
+        shows = [series_details(match, begin, latest) for match in matches]
 
         return jsonify(shows)
 
@@ -459,8 +456,7 @@ class SeriesSeasonsAPI(APIResource):
         sort_order = args['order']
 
         # Handle max size limit
-        if per_page > 100:
-            per_page = 100
+        per_page = min(per_page, 100)
 
         descending = sort_order == 'desc'
 
@@ -592,8 +588,7 @@ class SeriesEpisodesAPI(APIResource):
         sort_order = args['order']
 
         # Handle max size limit
-        if per_page > 100:
-            per_page = 100
+        per_page = min(per_page, 100)
 
         descending = sort_order == 'desc'
 
@@ -765,8 +760,7 @@ class SeriesSeasonsReleasesAPI(APIResource):
         descending = sort_order == 'desc'
 
         # Handle max size limit
-        if per_page > 100:
-            per_page = 100
+        per_page = min(per_page, 100)
 
         start = per_page * (page - 1)
         stop = start + per_page
@@ -830,14 +824,15 @@ class SeriesSeasonsReleasesAPI(APIResource):
 
         args = release_delete_parser.parse_args()
         downloaded = args.get('downloaded') is True if args.get('downloaded') is not None else None
-        release_items = []
-        for release in season.releases:
+        release_items = [
+            release
+            for release in season.releases
             if (
                 (downloaded and release.downloaded)
                 or (downloaded is False and not release.downloaded)
                 or not downloaded
-            ):
-                release_items.append(release)
+            )
+        ]
 
         for release in release_items:
             if args.get('forget'):
@@ -1018,8 +1013,7 @@ class SeriesEpisodeReleasesAPI(APIResource):
         descending = sort_order == 'desc'
 
         # Handle max size limit
-        if per_page > 100:
-            per_page = 100
+        per_page = min(per_page, 100)
 
         start = per_page * (page - 1)
         stop = start + per_page
@@ -1083,14 +1077,15 @@ class SeriesEpisodeReleasesAPI(APIResource):
 
         args = release_delete_parser.parse_args()
         downloaded = args.get('downloaded') is True if args.get('downloaded') is not None else None
-        release_items = []
-        for release in episode.releases:
+        release_items = [
+            release
+            for release in episode.releases
             if (
                 (downloaded and release.downloaded)
                 or (downloaded is False and not release.downloaded)
                 or not downloaded
-            ):
-                release_items.append(release)
+            )
+        ]
 
         for release in release_items:
             if args.get('forget'):

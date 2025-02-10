@@ -80,9 +80,9 @@ class FilterExistsSeries:
 
         # scan through
         # For speed, only test accepted entries since our priority should be after everything is accepted.
-        for series in accepted_series:
+        for series, value in accepted_series.items():
             # make new parser from parser in entry
-            series_parser = accepted_series[series][0]['series_parser']
+            series_parser = value[0]['series_parser']
             for folder in paths:
                 folder = Path(folder).expanduser()
                 if not folder.is_dir():
@@ -104,7 +104,7 @@ class FilterExistsSeries:
                         logger.debug('disk_parser.quality = {}', disk_parser.quality)
                         logger.debug('disk_parser.proper_count = {}', disk_parser.proper_count)
 
-                        for entry in accepted_series[series]:
+                        for entry in value:
                             logger.debug(
                                 'series_parser.identifier = {}', entry['series_parser'].identifier
                             )

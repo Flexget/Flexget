@@ -86,7 +86,7 @@ class QualityComponent:
 
     def __add__(self, other):
         if not isinstance(other, int):
-            raise TypeError()
+            raise TypeError
         component_list = globals().get('_' + self.type + 's')
         index = component_list.index(self) + other
         if index >= len(component_list):
@@ -95,11 +95,10 @@ class QualityComponent:
 
     def __sub__(self, other):
         if not isinstance(other, int):
-            raise TypeError()
+            raise TypeError
         component_list = globals().get('_' + self.type + 's')
         index = component_list.index(self) - other
-        if index < 0:
-            index = 0
+        index = max(index, 0)
         return component_list[index]
 
     def __repr__(self) -> str:
@@ -398,17 +397,16 @@ class RequirementComponent:
                 raise ValueError('Component type mismatch!')
             if text in _registry:
                 self.acceptable.add(qual)
-            else:
-                if text[0] == '<':
-                    if text[1] != '=':
-                        qual -= 1
-                    self.max = qual
-                elif text[0] == '>' or text.endswith('+'):
-                    if text[1] != '=' and not text.endswith('+'):
-                        qual += 1
-                    self.min = qual
-                elif text[0] == '!':
-                    self.none_of.add(qual)
+            elif text[0] == '<':
+                if text[1] != '=':
+                    qual -= 1
+                self.max = qual
+            elif text[0] == '>' or text.endswith('+'):
+                if text[1] != '=' and not text.endswith('+'):
+                    qual += 1
+                self.min = qual
+            elif text[0] == '!':
+                self.none_of.add(qual)
 
     def __eq__(self, other) -> bool:
         if not isinstance(other, RequirementComponent):

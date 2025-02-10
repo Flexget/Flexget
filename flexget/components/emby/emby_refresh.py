@@ -57,8 +57,6 @@ class EmbyRefreshLibrary:
         if when and not isinstance(when, list):
             config['when'] = [when]
 
-        return
-
     def library_refresh(self):
         EmbyApiLibrary.library_refresh(self.auth)
 

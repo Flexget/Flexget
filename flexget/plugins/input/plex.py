@@ -186,8 +186,8 @@ class InputPlex:
             logger.debug('Got accesstoken: {}', accesstoken)
             urlconfig['X-Plex-Token'] = accesstoken
 
-        for key in urlconfig:
-            urlappend += f'{key}={urlconfig[key]}&'
+        for key, value in urlconfig.items():
+            urlappend += f'{key}={value}&'
         if not self.plex_section_is_int(config['section']):
             try:
                 path = "/library/sections/"
@@ -227,7 +227,7 @@ class InputPlex:
         viewgroup = dom.getElementsByTagName('MediaContainer')[0].getAttribute('viewGroup')
 
         logger.debug('Plex section "{}" is a "{}" section', plexsectionname, viewgroup)
-        if viewgroup != "movie" and viewgroup != "show" and viewgroup != "episode":
+        if viewgroup not in ("movie", "show", "episode"):
             raise plugin.PluginError("Section is neither a movie nor tv show section!")
         domroot = "Directory"
         titletag = "title"
@@ -371,27 +371,26 @@ class InputPlex:
                             filename += ".jpg"
                         else:
                             filename = f"{filename}{fileext}"
-                    else:
-                        if viewgroup == "episode":
-                            filename = filenamemap % (
-                                title.replace(" ", "."),
-                                season,
-                                episode,
-                                resolution,
-                                vcodec,
-                                acodec,
-                                container,
-                            )
-                            entry['title'] = filename
-                        elif viewgroup == "movie":
-                            filename = filenamemap % (
-                                title.replace(" ", "."),
-                                resolution,
-                                vcodec,
-                                acodec,
-                                container,
-                            )
-                            entry['title'] = filename
+                    elif viewgroup == "episode":
+                        filename = filenamemap % (
+                            title.replace(" ", "."),
+                            season,
+                            episode,
+                            resolution,
+                            vcodec,
+                            acodec,
+                            container,
+                        )
+                        entry['title'] = filename
+                    elif viewgroup == "movie":
+                        filename = filenamemap % (
+                            title.replace(" ", "."),
+                            resolution,
+                            vcodec,
+                            acodec,
+                            container,
+                        )
+                        entry['title'] = filename
                     entry['plex_url'] = "http://{}:{}{}{}".format(
                         config['server'],
                         config['port'],

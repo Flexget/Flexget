@@ -510,7 +510,7 @@ class PluginDownload:
 
                     if not os.path.exists(destfile):
                         raise plugin.PluginError(f'Unable to write {destfile}: {err}')
-                    if err.errno != errno.EPERM and err.errno != errno.EACCES:
+                    if err.errno not in (errno.EPERM, errno.EACCES):
                         raise
 
             # store final destination as output key

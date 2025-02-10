@@ -646,11 +646,11 @@ class Manager:
             msg = ' '.join(msg.split())
             logger.critical(msg)
             if output_to_console:
-                print('')
+                print()
                 print('-' * 79)
                 print(' Malformed configuration file (check messages above). Common reasons:')
                 print('-' * 79)
-                print('')
+                print()
                 print(' o Indentation error')
                 print(' o Missing : from end of the line')
                 print(' o Non ASCII characters (use UTF8)')
@@ -667,7 +667,7 @@ class Manager:
                         print(f' Reason: {e.problem}\n')
                         if e.problem == 'mapping values are not allowed here':
                             print(' ----> MOST LIKELY REASON: Missing : from end of the line!')
-                            print('')
+                            print()
                     if e.context_mark is not None:
                         print(
                             f' Check configuration near line {e.context_mark.line}, column {e.context_mark.column}'
@@ -679,7 +679,7 @@ class Manager:
                         )
                         lines += 1
                     if lines:
-                        print('')
+                        print()
                     if lines == 1:
                         print(' Fault is almost always in this or previous line\n')
                     if lines == 2:
@@ -832,7 +832,7 @@ class Manager:
         if self.lockfile and os.path.exists(self.lockfile):
             result: dict[str, Union[str, int]] = {}
             with open(self.lockfile, encoding='utf-8') as f:
-                lines = [line for line in f.readlines() if line]
+                lines = [line for line in f if line]
             for line in lines:
                 try:
                     key, value = line.split(':', 1)
@@ -840,9 +840,9 @@ class Manager:
                     logger.debug('Invalid line in lock file: {}', line)
                     continue
                 result[key.strip().lower()] = value.strip()
-            for key in result:
-                if result[key].isdigit():
-                    result[key] = int(result[key])
+            for key, value in result.items():
+                if value.isdigit():
+                    result[key] = int(value)
             result.setdefault('pid', None)
             if not result['pid']:
                 logger.error(

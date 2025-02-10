@@ -150,11 +150,9 @@ class PluginSortByWeight:
             # auto handle datetime
             if isinstance(value, datetime) and isinstance(limit, timedelta):
                 if config[key]['inverse'] is True:
-                    if (datetime.now() - limit) > value:
-                        value = datetime.now() - limit
-                else:
-                    if (datetime.now() + limit) < value:
-                        value = datetime.now() + limit
+                    value = max(value, datetime.now() - limit)
+                elif (datetime.now() + limit) < value:
+                    value = datetime.now() + limit
             elif value > limit:
                 value = limit
         return value

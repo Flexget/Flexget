@@ -54,7 +54,7 @@ class MagnetDL:
         except RequestException as e:
             raise plugin.PluginError(str(e))
         if page.status_code == 404:
-            raise Page404Error()
+            raise Page404Error
         if page.status_code != 200:
             raise plugin.PluginError(f'HTTP Request failed {page.status_code}. Url: {url}')
 
@@ -145,8 +145,7 @@ class MagnetDL:
                 # note: weird url convention, uses first letter of search term
                 slash = term[0]
                 url = f'https://www.magnetdl.com/{slash}/{term}/'
-                for entry in self.parse_page(url):
-                    entries.append(entry)
+                entries.extend(list(self.parse_page(url)))
             except Page404Error:
                 logger.warning('Url {} returned 404', url)
                 return entries

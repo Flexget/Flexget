@@ -128,8 +128,7 @@ def entry_list_add(options):
         if options.attributes:
             console(f'Adding attributes to entry `{title}`')
             for identifier in options.attributes:
-                for k, v in identifier.items():
-                    entry[k] = v
+                entry.update(identifier)
             db_entry.entry = entry
         console(output)
 

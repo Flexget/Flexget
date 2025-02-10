@@ -19,8 +19,7 @@ class ModifyExtension:
 
     def on_task_modify(self, task, config):
         ext = str(config)
-        if ext.startswith('.'):
-            ext = ext[1:]
+        ext = ext.removeprefix('.')
 
         for entry in task.entries:
             logger.debug('`{}` filename is `{}`', entry['title'], entry.get('filename', 'N/A'))

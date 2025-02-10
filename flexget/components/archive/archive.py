@@ -27,9 +27,7 @@ class Archive:
 
         tag_names = [] if isinstance(config, bool) else config
 
-        tags = []
-        for tag_name in set(tag_names):
-            tags.append(db.get_tag(tag_name, task.session))
+        tags = [db.get_tag(tag_name, task.session) for tag_name in set(tag_names)]
 
         count = 0
         processed = []

@@ -118,7 +118,7 @@ def initialize(unit_test: bool = False) -> None:
     """Prepare logging."""
     # Remove default loguru sinks
     logger.remove()
-    global _logging_configured, _logging_started, _buff_handler
+    global _logging_configured, _logging_started
 
     if _logging_configured:
         return

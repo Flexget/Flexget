@@ -31,7 +31,7 @@ class KodiLibrary:
     def on_task_exit(self, task, config):
         if task.accepted or not config['only_on_accepted']:
             # make the url without trailing slash
-            base_url = config['url'][:-1] if config['url'].endswith('/') else config['url']
+            base_url = config['url'].removesuffix('/')
             base_url += ':{}'.format(config['port'])
 
             url = base_url + JSON_URI
@@ -55,19 +55,18 @@ class KodiLibrary:
                         config['action'],
                         config['category'],
                     )
+                elif r.get('error'):
+                    logger.error(
+                        'Kodi JSONRPC failed. Error {}: {}',
+                        r['error']['code'],
+                        r['error']['message'],
+                    )
                 else:
-                    if r.get('error'):
-                        logger.error(
-                            'Kodi JSONRPC failed. Error {}: {}',
-                            r['error']['code'],
-                            r['error']['message'],
-                        )
-                    else:
-                        # this should never happen as Kodi say they follow the JSON-RPC 2.0 spec
-                        logger.debug('Received error response {}', json.dumps(r))
-                        logger.error(
-                            'Kodi JSONRPC failed with unrecognized message: {}', json.dumps(r)
-                        )
+                    # this should never happen as Kodi say they follow the JSON-RPC 2.0 spec
+                    logger.debug('Received error response {}', json.dumps(r))
+                    logger.error(
+                        'Kodi JSONRPC failed with unrecognized message: {}', json.dumps(r)
+                    )
             except RequestException as e:
                 raise plugin.PluginError(f'Failed to send request to Kodi: {e.args[0]}')
         else:

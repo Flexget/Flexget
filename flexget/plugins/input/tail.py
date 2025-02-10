@@ -89,7 +89,7 @@ class InputTail:
             last_pos = db_pos.position if db_pos else 0
 
             with open(filename, encoding=encoding, errors='replace') as file:
-                if task.options.tail_reset == filename or task.options.tail_reset == task.name:
+                if task.options.tail_reset in (filename, task.name):
                     if last_pos == 0:
                         logger.info('Task {} tail position is already zero', task.name)
                     else:

@@ -952,7 +952,7 @@ class IRCConnectionManager:
                     del irc_connections[conn_name]  # remove it from the list of connections
 
         # Now we can start
-        for _conn_name, connection in irc_connections.items():
+        for connection in irc_connections.values():
             connection.thread.start()
 
     def stop_connections(self, wait, name=None):
@@ -972,14 +972,12 @@ class IRCConnectionManager:
         self.shutdown_event.set()
 
     def status(self, name=None):
-        status = []
         if name:
             if name not in irc_connections:
                 raise ValueError(f'{name} is not a valid irc connection')
-            status.append(self.status_dict(name))
+            status = [self.status_dict(name)]
         else:
-            for n in irc_connections:
-                status.append(self.status_dict(n))
+            status = [self.status_dict(n) for n in irc_connections]
         return status
 
     def status_dict(self, name):
@@ -1029,7 +1027,7 @@ def irc_start(manager):
 
 @event('manager.config_updated')
 def irc_update_config(manager):
-    global irc_manager, config_hash
+    global irc_manager
 
     # Exit if we're not running daemon mode
     if not manager.is_daemon:

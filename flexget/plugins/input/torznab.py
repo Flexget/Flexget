@@ -1,5 +1,5 @@
 from urllib.parse import urlencode
-from xml.etree import ElementTree
+from xml.etree import ElementTree as ET
 
 from loguru import logger
 
@@ -88,7 +88,7 @@ class Torznab:
 
         response = task.requests.get(self._build_url(t='caps'), timeout=self.timeout)
         logger.debug('Raw caps response {}', response.content)
-        root = ElementTree.fromstring(response.content)
+        root = ET.fromstring(response.content)
         self._setup_searcher(root, searcher, categories)
 
     def _setup_searcher(self, xml_root, searcher, categories):
@@ -165,7 +165,7 @@ class Torznab:
             raise PluginError(f"Failed fetching '{url}': {e}")
 
         entries = []
-        root = ElementTree.fromstring(response.content)
+        root = ET.fromstring(response.content)
         for item in root.findall('.//item'):
             entry = Entry()
             enclosure = item.find("enclosure[@type='application/x-bittorrent']")

@@ -59,8 +59,7 @@ class HistoryAPI(APIResource):
         sort_order = args['order']
 
         # Hard limit results per page to 100
-        if per_page > 100:
-            per_page = 100
+        per_page = min(per_page, 100)
 
         # Filter param
         task = args['task']

@@ -736,7 +736,7 @@ class TraktShow(Base):
             return True
         refresh_interval = 2
         # if show has been cancelled or ended, then it is unlikely to be updated often
-        if self.year and (self.status == 'ended' or self.status == 'canceled'):
+        if self.year and (self.status in ('ended', 'canceled')):
             # Make sure age is not negative
             age = max((datetime.now().year - self.year), 0)
             refresh_interval += age * 5

@@ -831,7 +831,6 @@ def get_episode_releases(
         releases = releases.filter(EpisodeRelease.downloaded == downloaded)
     if count:
         return releases.count()
-    releases = releases
     if descending:
         releases = releases.order_by(getattr(EpisodeRelease, sort_by).desc())
     else:
@@ -855,7 +854,6 @@ def get_season_releases(
         releases = releases.filter(SeasonRelease.downloaded == downloaded)
     if count:
         return releases.count()
-    releases = releases
     if descending:
         releases = releases.order_by(getattr(SeasonRelease, sort_by).desc())
     else:
@@ -1240,9 +1238,13 @@ def remove_series(name: str, forget: bool = False) -> None:
         if series:
             for s in series:
                 if forget:
-                    for entity in s.episodes + s.seasons:
-                        for release in entity.downloaded_releases:
-                            downloaded_releases.append(release.title)
+                    downloaded_releases.extend(
+                        [
+                            release.title
+                            for entity in s.episodes + s.seasons
+                            for release in entity.downloaded_releases
+                        ]
+                    )
                 session.delete(s)
             session.commit()
             logger.debug('Removed series `{}` from database.', name)

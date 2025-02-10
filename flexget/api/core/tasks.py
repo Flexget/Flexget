@@ -451,8 +451,7 @@ class TaskExecutionAPI(APIResource):
             'allow_manual': True,
         }
 
-        for option, value in data.items():
-            options[option] = value
+        options.update(data)
 
         if data.get('inject'):
             entries = []

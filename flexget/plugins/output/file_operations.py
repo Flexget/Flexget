@@ -162,7 +162,7 @@ class BaseFileOps:
             self.logger.warning('Unable to delete path `{}`: {}', base_path, err)
 
     def handle_entry(self, task, config, entry, siblings):
-        raise NotImplementedError()
+        raise NotImplementedError
 
 
 class DeleteFiles(BaseFileOps):
@@ -193,7 +193,7 @@ class DeleteFiles(BaseFileOps):
                 self.logger.info('Would delete `{}` and all its content.', src)
             else:
                 self.logger.info('Would delete `{}`', src)
-                for s, _ in siblings.items():
+                for s in siblings:
                     self.logger.info('Would also delete `{}`', s)
             return
         # IO errors will have the entry mark failed in the base class
@@ -204,7 +204,7 @@ class DeleteFiles(BaseFileOps):
             os.remove(src)
             self.logger.info('`{}` has been deleted.', src)
         # further errors will not have any effect (the entry does not exists anymore)
-        for s, _ in siblings.items():
+        for s in siblings:
             try:
                 os.remove(s)
                 self.logger.info('`{}` has been deleted as well.', s)

@@ -227,8 +227,7 @@ class TaskStatusExecutionsAPI(APIResource):
         start_date = args.get('start_date')
         end_date = args.get('end_date')
 
-        if per_page > 100:
-            per_page = 100
+        per_page = min(per_page, 100)
 
         start = per_page * (page - 1)
         stop = start + per_page

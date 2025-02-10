@@ -83,10 +83,10 @@ telegram = ['python-telegram-bot[http2,socks]~=21.9']
 transmission = ['transmission-rpc~=7.0']
 # This is all our optional deps installable via extras. Not actually 'all'
 all = [
-    {include-group = "deluge"},
-    {include-group = "qbittorrent"},
-    {include-group = "telegram"},
-    {include-group = "transmission"}
+    { include-group = "deluge" },
+    { include-group = "qbittorrent" },
+    { include-group = "telegram" },
+    { include-group = "transmission" }
 ]
 [project.urls]
 "Homepage" = "https://flexget.com"
@@ -144,11 +144,51 @@ line-length = 99
 extend-exclude = ["flexget/ui"]
 
 [tool.ruff.lint]
-select = ["B", "C4", "E", "F", "I", "ISC", "PGH", "PLE", "PT", "RET", "RUF", "SIM", "TCH", "UP", "W"]
+select = [
+    "ASYNC",
+    "B",
+    "C4",
+    "E",
+    "EXE",
+    "F",
+    "FLY",
+    "FURB",
+    "I",
+    "ICN",
+    "ISC",
+    "LOG",
+    "PERF",
+    "PGH",
+    "PL",
+    "PT",
+    "RET",
+    "RSE",
+    "RUF",
+    "SIM",
+    "SLOT",
+    "T10",
+    "TC",
+    "TCH",
+    "TID",
+    "UP",
+    "W",
+    "YTT",
+]
 ignore = [
     "B904", # TODO: enable this rule (requires a lot of manual work)
     "E501", # TODO: enable this rule (requires a lot of manual work)
+    "PERF203", # TODO: remove this after Python 3.10 is dropped
     "PLE1205", # Maybe can re-enable after https://github.com/astral-sh/ruff/issues/13390
+    # Enabling these PL rules would require extensive code refactoring, which may not be worth the effort.
+    "PLR0911",
+    "PLR0912",
+    "PLR0913",
+    "PLR0915",
+    "PLR1704",
+    "PLR2004",
+    "PLW0603",
+    "PLW0642",
+    "PLW2901",
     "RUF012", # Maybe can re-enable after https://github.com/astral-sh/ruff/issues/5243
 ]
 

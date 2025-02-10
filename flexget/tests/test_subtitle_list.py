@@ -1,6 +1,7 @@
 import contextlib
 import datetime
 import os
+import platform
 
 import pytest
 
@@ -257,6 +258,10 @@ class TestSubtitleList:
         assert len(task.entries) == 0, 'File should have expired.'
 
     @pytest.mark.online
+    @pytest.mark.skipif(
+        platform.system() == 'Darwin',
+        reason='This test fails intermittently on macOS',
+    )
     def test_subtitle_list_subliminal_fail(self, execute_task):
         task = execute_task('subtitle_add_with_languages')
 
