@@ -96,7 +96,7 @@ class ImdbWatchlist:
 
         if config['list'] == 'watchlist':
             entries = self.parse_html_list(
-                task, config, url, params, headers, listKey='predefinedList'
+                task, config, url, params, headers, kind='predefinedList'
             )
         else:
             entries = self.parse_html_list(task, config, url, params, headers)
@@ -116,7 +116,7 @@ class ImdbWatchlist:
         return page
 
     def parse_html_list(
-        self, task, config, url, params, headers, listKey='predefinedList'
+        self, task, config, url, params, headers, kind='predefinedList'
     ) -> list[Entry]:
         page = self.fetch_page(task, url, params, headers)
         soup = get_soup(page.text)
@@ -125,7 +125,7 @@ class ImdbWatchlist:
                 soup.find('script', id='__NEXT_DATA__', type='application/json').string
             )
             total_item_count = query_result['props']['pageProps']['totalItems']
-            items = query_result['props']['pageProps']['mainColumnData'][listKey][
+            items = query_result['props']['pageProps']['mainColumnData'][kind][
                 'titleListItemSearch'
             ]['edges']
             logger.verbose('imdb list contains {} items', total_item_count)
@@ -150,7 +150,7 @@ class ImdbWatchlist:
                     soup.find('script', id='__NEXT_DATA__', type='application/json').string
                 )
                 items.extend(
-                    query_result['props']['pageProps']['mainColumnData'][listKey][
+                    query_result['props']['pageProps']['mainColumnData'][kind][
                         'titleListItemSearch'
                     ]['edges']
                 )
