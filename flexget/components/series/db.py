@@ -894,7 +894,7 @@ def _add_alt_name(alt: str, db_series: Series, series_name: str, session: Sessio
     db_series_alt = session.query(AlternateNames).filter(AlternateNames.alt_name == alt).first()
     if db_series_alt and db_series_alt.series_id == db_series.id:
         # Already exists, no need to create it then
-        # TODO is checking the list for duplicates faster/better than querying the DB?
+        # TODO: is checking the list for duplicates faster/better than querying the DB?
         db_series_alt.alt_name = alt
     elif db_series_alt:
         if not db_series_alt.series:

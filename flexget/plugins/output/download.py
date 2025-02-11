@@ -258,7 +258,7 @@ class PluginDownload:
             )
 
         # expand ~ in temp path
-        # TODO jinja?
+        # TODO: jinja?
         try:
             tmp_path = os.path.expanduser(tmp_path)
         except RenderError as e:

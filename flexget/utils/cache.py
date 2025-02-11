@@ -7,7 +7,7 @@ from loguru import logger
 logger = logger.bind(name='utils.cache')
 
 
-# TODO refactor this to use lru_cache
+# TODO: refactor this to use lru_cache
 def cached_resource(
     url: str,
     base_dir: str,

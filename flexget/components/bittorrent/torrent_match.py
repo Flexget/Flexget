@@ -187,7 +187,7 @@ class TorrentMatch:
                         entry['path'] = path
 
                         logger.debug('Torrent {} matched path {}', entry['title'], entry['path'])
-                        # TODO keep searching for even better matches?
+                        # TODO: keep searching for even better matches?
                         break
 
         for entry in set(task.accepted).difference(matched_entries):

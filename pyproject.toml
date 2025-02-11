@@ -169,6 +169,7 @@ select = [
     "T10",
     "TC",
     "TCH",
+    "TD",
     "TID",
     "UP",
     "W",
@@ -190,6 +191,8 @@ ignore = [
     "PLW0642",
     "PLW2901",
     "RUF012", # Maybe can re-enable after https://github.com/astral-sh/ruff/issues/5243
+    "TD002", # Check for missing author in TODO
+    "TD003", # Check for missing issue link for this TODO
 ]
 
 [tool.ruff.lint.isort]

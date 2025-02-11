@@ -114,7 +114,7 @@ class TraktUserCache(TimedDict):
 
 
 # Global user cache
-# TODO better idea?
+# TODO: better idea?
 user_cache = TraktUserCache(cache_time=USER_CACHE_DURATION)
 
 

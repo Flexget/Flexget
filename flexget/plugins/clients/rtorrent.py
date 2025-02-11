@@ -699,7 +699,7 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
                             entry['torrent'].name, relative_file_path
                         )
                     file_path = os.path.join(base, relative_file_path)
-                    # TODO should it simply add the torrent anyway?
+                    # TODO: should it simply add the torrent anyway?
                     if not os.path.exists(file_path) and not os.path.isfile(file_path):
                         entry.fail(f'{file_path} does not exist. Cannot add fast resume data.')
                         return

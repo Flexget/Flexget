@@ -4,7 +4,7 @@ import pytest
 from jinja2 import Template
 
 
-# TODO more checks: fail_html, etc.
+# TODO: more checks: fail_html, etc.
 @pytest.mark.online
 class TestDownload:
     _config = """

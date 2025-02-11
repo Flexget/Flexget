@@ -163,7 +163,7 @@ class TestSFTPFileSystem:
         canonicalized: Path = self.canonicalize(path)
         canonicalized.parent.mkdir(parents=True, exist_ok=True)
 
-        # TODO(kingamajick) check that the target is with in the server
+        # TODO(kingamajick): check that the target is with in the server
         canonicalized.symlink_to(target, target.is_dir())
         return canonicalized
 
