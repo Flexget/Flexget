@@ -305,7 +305,7 @@ class MovieListMovieAPI(APIResource):
             movie = db.get_movie_by_id(list_id=list_id, movie_id=movie_id, session=session)
         except NoResultFound:
             raise NotFoundError(f'could not find movie with id {movie_id} in list {list_id}')
-        logger.debug(f'deleting movie {movie.id}')
+        logger.debug('deleting movie {}', movie.id)
         session.delete(movie)
         return success_response(f'successfully deleted movie {movie_id}')
 

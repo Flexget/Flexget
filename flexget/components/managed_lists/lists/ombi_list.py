@@ -188,7 +188,7 @@ class OmbiEntry:
     def mark_requested(self, endpoint: str, data: dict[str, Any]):
         """Mark an entry in Ombi as being requested."""
 
-        log.info(f"Requesting {self.ombi_title} in Ombi.")
+        log.info("Requesting {} in Ombi.", self.ombi_title)
 
         headers = self._request.create_json_headers()
 
@@ -199,7 +199,7 @@ class OmbiEntry:
 
             self.requestId = response['requestId']
 
-            log.info(f"{self.ombi_title} was requested in Ombi.")
+            log.info("{} was requested in Ombi.", self.ombi_title)
             return True
 
         except (HTTPError, ApiError) as error:
@@ -214,7 +214,7 @@ class OmbiEntry:
                     log.verbose(f"{self.ombi_title} already requested in Ombi.")
                     return True
 
-            log.error(f"Failed to mark {self.ombi_title} as requested in Ombi.")
+            log.error("Failed to mark {} as requested in Ombi.", self.ombi_title)
             log.verbose(error.response)
             return False
 
@@ -225,7 +225,7 @@ class OmbiEntry:
             log.verbose(f"{self.ombi_title} already available in Ombi.")
             return
 
-        log.info(f"Marking {self.ombi_title} as available in Ombi.")
+        log.info("Marking {} as available in Ombi.", self.ombi_title)
 
         api_endpoint = f"api/v1/Request/{self.entry_type}/available"
 
@@ -236,10 +236,10 @@ class OmbiEntry:
         try:
             self._request.post(api_endpoint, data=data, headers=headers)
 
-            log.info(f"{self.ombi_title} has been marked available.")
+            log.info("{} has been marked available.", self.ombi_title)
             return
         except (HTTPError, ApiError) as e:
-            log.error(f"Failed to mark {self.ombi_title} as available in Ombi.")
+            log.error("Failed to mark {} as available in Ombi.", self.ombi_title)
             log.debug(e)
             return
 
@@ -250,7 +250,7 @@ class OmbiEntry:
             log.verbose(f"{self.ombi_title} is not requested in Ombi, unable to delete it.")
             return
 
-        log.info(f"Marking {self.ombi_title} as deleted in Ombi.")
+        log.info("Marking {} as deleted in Ombi.", self.ombi_title)
 
         api_endpoint = f"api/v1/Request/{self.entry_type}/{self.requestId}"
 
@@ -259,10 +259,10 @@ class OmbiEntry:
         try:
             self._request.delete(api_endpoint, headers=headers)
 
-            log.info(f"{self.ombi_title} has been marked deleted.")
+            log.info("{} has been marked deleted.", self.ombi_title)
             return
         except (HTTPError, ApiError) as e:
-            log.error(f"Failed to mark {self.ombi_title} as deleted in Ombi.")
+            log.error("Failed to mark {} as deleted in Ombi.", self.ombi_title)
             log.debug(e)
             return
 
@@ -277,7 +277,7 @@ class OmbiEntry:
             log.verbose(f"{self.ombi_title} is not requested in Ombi, unable to mark unavailable.")
             return
 
-        log.info(f"Marking {self.ombi_title} as unavailable in Ombi.")
+        log.info("Marking {} as unavailable in Ombi.", self.ombi_title)
 
         api_endpoint = f"api/v1/Request/{self.entry_type}/unavailable"
 
@@ -288,10 +288,10 @@ class OmbiEntry:
         try:
             self._request.post(api_endpoint, data=data, headers=headers)
 
-            log.info(f"{self.ombi_title} has been marked unavailable.")
+            log.info("{} has been marked unavailable.", self.ombi_title)
             return
         except (HTTPError, ApiError) as e:
-            log.error(f"Failed to mark {self.ombi_title} as unavailable in Ombi.")
+            log.error("Failed to mark {} as unavailable in Ombi.", self.ombi_title)
             log.debug(e)
             return
 
@@ -302,7 +302,7 @@ class OmbiEntry:
             log.verbose(f"{self.ombi_title} already denied in Ombi.")
             return
 
-        log.info(f"Marking {self.ombi_title} as denied in Ombi.")
+        log.info("Marking {} as denied in Ombi.", self.ombi_title)
 
         api_endpoint = f"api/v1/Request/{self.entry_type}/deny"
 
@@ -314,10 +314,10 @@ class OmbiEntry:
         try:
             self._request.put(api_endpoint, data=data, headers=headers)
 
-            log.info(f"{self.ombi_title} has been marked denied.")
+            log.info("{} has been marked denied.", self.ombi_title)
             return
         except (HTTPError, ApiError) as e:
-            log.error(f"Failed to mark {self.ombi_title} as denied in Ombi.")
+            log.error("Failed to mark {} as denied in Ombi.", self.ombi_title)
             log.debug(e)
             return
 
@@ -328,7 +328,7 @@ class OmbiEntry:
             log.verbose(f"{self.ombi_title} already approved in Ombi.")
             return
 
-        log.info(f"Marking {self.ombi_title} as approved in Ombi.")
+        log.info("Marking {} as approved in Ombi.", self.ombi_title)
 
         api_endpoint = f"api/v1/Request/{self.entry_type}/approve"
 
@@ -340,10 +340,10 @@ class OmbiEntry:
         try:
             self._request.post(api_endpoint, data=data, headers=headers)
 
-            log.info(f"{self.ombi_title} has been marked approved.")
+            log.info("{} has been marked approved.", self.ombi_title)
             return
         except (HTTPError, ApiError) as e:
-            log.error(f"Failed to mark {self.ombi_title} as approved in Ombi.")
+            log.error("Failed to mark {} as approved in Ombi.", self.ombi_title)
             log.debug(e)
             return
 
@@ -393,7 +393,7 @@ class OmbiMovie(OmbiEntry):
 
             return OmbiMovie(request, data)
         except (HTTPError, ApiError) as e:
-            log.error(f"Failed to get Ombi movie by imdb_id: {imdb_id}")
+            log.error("Failed to get Ombi movie by imdb_id: {}", imdb_id)
             log.debug(e)
             return None
 
@@ -410,7 +410,7 @@ class OmbiMovie(OmbiEntry):
 
             return OmbiMovie(request, data)
         except (HTTPError, ApiError) as e:
-            log.error(f"Failed to get Ombi movie by tmdb_id: {tmdb_id}")
+            log.error("Failed to get Ombi movie by tmdb_id: {}", tmdb_id)
             log.debug(e)
             return None
 
@@ -493,7 +493,7 @@ class OmbiTv(OmbiEntry):
 
             return OmbiTv(request, entry, sub_type)
         except (HTTPError, ApiError) as e:
-            log.error(f"Failed to get Ombi movie by tmdb_id: {tmdb_id}")
+            log.error("Failed to get Ombi movie by tmdb_id: {}", tmdb_id)
             log.debug(e)
             return None
 
@@ -544,14 +544,14 @@ class OmbiSet(MutableSet):
         return len(self.items)
 
     def add(self, entry: Entry):
-        log.info(f"Adding {entry['title']} to Ombi as {self.config['status']}.")
+        log.info("Adding {} to Ombi as {}.", entry['title'], self.config['status'])
 
-        log.debug(f"Getting OMBI entry for {entry['title']}.")
+        log.debug("Getting OMBI entry for {}.", entry['title'])
 
         ombi_entry = self._get_ombi_entry(entry)
 
         if not ombi_entry:
-            log.error(f"Failed to find OMBI entry for {entry['title']}.")
+            log.error("Failed to find OMBI entry for {}.", entry['title'])
             return
 
         # To set a status like approved or denied, we need to mark the entry as requested first
@@ -575,7 +575,9 @@ class OmbiSet(MutableSet):
 
         if not mark_status:
             log.error(
-                f"Failed to find correct method to mark {entry['title']} as {self.config['status']}."
+                "Failed to find correct method to mark {} as {}.",
+                entry['title'],
+                self.config['status'],
             )
             return
 
@@ -598,21 +600,23 @@ class OmbiSet(MutableSet):
         # I'm wondering if we should be checking if the entry is already
         # in the list of _items first.
 
-        log.info(f"Removing {entry['title']} from ombi_list.")
+        log.info("Removing {} from ombi_list.", entry['title'])
 
-        log.debug(f"Getting OMBI entry for {entry['title']}.")
+        log.debug("Getting OMBI entry for {}.", entry['title'])
 
         ombi_entry = self._get_ombi_entry(entry)
 
         if not ombi_entry:
-            log.error(f"Failed to find OMBI entry for {entry['title']}.")
+            log.error("Failed to find OMBI entry for {}.", entry['title'])
             return
 
         unmark_status = getattr(ombi_entry, f"mark_{self.config['on_remove']}", None)
 
         if not unmark_status:
             log.error(
-                f"Failed to find correct method to mark {entry['title']} as {self.config['on_remove']}."
+                "Failed to find correct method to mark {} as {}.",
+                entry['title'],
+                self.config['on_remove'],
             )
             return
 
@@ -857,7 +861,7 @@ class OmbiSet(MutableSet):
             "/api/v1/Request/movie" if self.config['type'] == 'movies' else "/api/v1/Request/tv"
         )
 
-        log.debug(f"Connecting to Ombi to retrieve list of {self.config['type']} requests.")
+        log.debug("Connecting to Ombi to retrieve list of {} requests.", self.config['type'])
 
         try:
             headers = request.create_json_headers()

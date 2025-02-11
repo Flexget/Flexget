@@ -722,11 +722,11 @@ class Manager:
             f'{self.config_name}-{datetime.now().strftime("%y%m%d%H%M%S")}.bak',
         )
 
-        logger.debug(f'backing up old config to {backup_path} before new save')
+        logger.debug('backing up old config to {} before new save', backup_path)
         try:
             shutil.copy(self.config_path, backup_path)
         except OSError as e:
-            logger.warning(f'Config backup creation failed: {e}')
+            logger.warning('Config backup creation failed: {}', e)
             raise
         return backup_path
 
@@ -916,9 +916,9 @@ class Manager:
         except OSError as e:
             if e.errno != errno.ENOENT:
                 raise
-            logger.debug(f'Lockfile {self.lockfile} not found')
+            logger.debug('Lockfile {} not found', self.lockfile)
         else:
-            logger.debug(f'Removed {self.lockfile}')
+            logger.debug('Removed {}', self.lockfile)
 
     def daemonize(self) -> None:
         """Daemonizes the current process. Returns the new pid"""
@@ -961,7 +961,7 @@ class Manager:
             sys.stderr.write(f'fork #2 failed: {e.errno} ({e.strerror})\n')
             sys.exit(1)
 
-        logger.info(f'Daemonize complete. New PID: {os.getpid()}')
+        logger.info('Daemonize complete. New PID: {}', os.getpid())
         # redirect standard file descriptors
         sys.stdout.flush()
         sys.stderr.flush()

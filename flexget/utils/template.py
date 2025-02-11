@@ -399,7 +399,7 @@ def render(template: Union[FlexGetTemplate, str], context: Mapping, native: bool
         result = template.render(context)
     except Exception as e:
         error = RenderError(f'({type(e).__name__}) {e}')
-        logger.debug(f'Error during rendering: {error}')
+        logger.debug('Error during rendering: {}', error)
         raise error
 
     return result

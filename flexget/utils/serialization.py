@@ -144,7 +144,7 @@ class DateTimeSerializer(Serializer):
         try:
             return datetime.datetime.strptime(data, DATETIME_FMT)
         except ValueError:
-            logger.error(f'Error deserializing datetime `{data}`')
+            logger.error('Error deserializing datetime `{}`', data)
             return datetime.datetime.min
 
 
@@ -167,7 +167,7 @@ class DateSerializer(Serializer):
         try:
             return datetime.datetime.strptime(data, DATE_FMT).date()
         except ValueError:
-            logger.error(f'Error deserializing date `{data}`')
+            logger.error('Error deserializing date `{}`', data)
             return datetime.date.min
 
 

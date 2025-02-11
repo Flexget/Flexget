@@ -195,7 +195,7 @@ def forget(value, tasks=None, test=False):
 
             if test:
                 logger.info(
-                    f'Testing: would forget entry with title `{se.title}` of task `{se.task}`'
+                    'Testing: would forget entry with title `{}` of task `{}`', se.title, se.task
                 )
             else:
                 logger.debug('forgetting {}', se)
@@ -210,7 +210,11 @@ def forget(value, tasks=None, test=False):
 
             if test:
                 logger.info(
-                    f'Testing: would forget entry `{se.title}` of task `{se.task}` based on field `{sf.field}` with value `{sf.value}`'
+                    'Testing: would forget entry `{}` of task `{}` based on field `{}` with value `{}`',
+                    se.title,
+                    se.task,
+                    sf.field,
+                    sf.value,
                 )
             else:
                 logger.debug('forgetting {}', se)

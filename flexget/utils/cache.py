@@ -31,7 +31,7 @@ def cached_resource(
     directory = os.path.dirname(file_path)
 
     if not os.path.exists(file_path) or force:
-        logger.debug(f'caching {url}')
+        logger.debug('caching {}', url)
         response = requests.get(url)
         response.raise_for_status()
         mime_type = response.headers.get('content-type')
@@ -44,7 +44,7 @@ def cached_resource(
         if not force:
             while size >= max_size:
                 logger.debug(
-                    f'directory {size} size is over the allowed limit of {max_size}, trimming'
+                    'directory {} size is over the allowed limit of {}, trimming', size, max_size
                 )
                 trim_dir(directory)
                 size = dir_size(directory) / (1024 * 1024.0)

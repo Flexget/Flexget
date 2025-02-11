@@ -143,8 +143,9 @@ class PluginThetvdbLookup:
                 episode_offset = 0
             if season_offset != 0 or episode_offset != 0:
                 logger.debug(
-                    f'Using offset for tvdb lookup: season: {season_offset}, '
-                    f'episode: {episode_offset}'
+                    'Using offset for tvdb lookup: season: {}, episode: {}',
+                    season_offset,
+                    episode_offset,
                 )
 
             lookupargs = {

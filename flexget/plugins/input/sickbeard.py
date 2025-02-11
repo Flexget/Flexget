@@ -102,7 +102,7 @@ class Sickbeard:
             )
         entries = []
         for _, show in list(json['data'].items()):
-            logger.debug(f'processing show: {show}')
+            logger.debug('processing show: {}', show)
             fg_qualities = ''  # Initializes the quality parameter
             if show['paused'] and config.get('only_monitored'):
                 continue
