@@ -28,6 +28,7 @@ class FilterExistsMovie:
         [type: {dirs|files}]
         [allow_different_qualities: {better|yes|no}]
         [lookup: {imdb|no}]
+        [recursive: {yes|no}]
     """
 
     schema = {
@@ -43,6 +44,7 @@ class FilterExistsMovie:
                     },
                     'type': {'enum': ['files', 'dirs'], 'default': 'dirs'},
                     'lookup': {'enum': ['imdb', False], 'default': False},
+                    'recursive': {'type': 'boolean', 'default': False},
                 },
                 'required': ['path'],
                 'additionalProperties': False,
@@ -109,7 +111,7 @@ class FilterExistsMovie:
 
             # scan through
             items = []
-            for p in folder.rglob('*'):
+            for p in folder.rglob('*') if config.get('recursive') else folder.iterdir():
                 if config.get('type') == 'dirs' and p.is_dir():
                     if self.dir_pattern.search(p.name):
                         continue
