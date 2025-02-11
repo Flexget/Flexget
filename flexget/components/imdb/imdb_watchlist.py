@@ -188,7 +188,7 @@ class ImdbWatchlist:
         except AttributeError:
             total_item_count = 0
         except (ValueError, TypeError) as e:
-            # TODO Something is wrong if we get a ValueError, I think
+            # TODO: Something is wrong if we get a ValueError, I think
             raise plugin.PluginError(
                 'Received invalid movie count: {} ; {}'.format(
                     soup.find('div', class_='lister-total-num-results').string, e

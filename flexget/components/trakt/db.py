@@ -476,7 +476,7 @@ class TraktEpisode(Base):
 
     @property
     def expired(self):
-        # TODO should episode have its own expiration function?
+        # TODO: should episode have its own expiration function?
         return False
 
 
@@ -531,7 +531,7 @@ class TraktSeason(Base):
 
     @property
     def expired(self):
-        # TODO should season have its own expiration function?
+        # TODO: should season have its own expiration function?
         return False
 
 
@@ -730,7 +730,7 @@ class TraktShow(Base):
         """
         :return: True if show details are considered to be expired, ie. need of update
         """
-        # TODO stolen from imdb plugin, maybe there's a better way?
+        # TODO: stolen from imdb plugin, maybe there's a better way?
         if self.cached_at is None:
             logger.debug('cached_at is None: {}', self)
             return True
@@ -845,7 +845,7 @@ class TraktMovie(Base):
         """
         :return: True if movie details are considered to be expired, ie. need of update
         """
-        # TODO stolen from imdb plugin, maybe there's a better way?
+        # TODO: stolen from imdb plugin, maybe there's a better way?
         if self.updated_at is None:
             logger.debug('updated_at is None: {}', self)
             return True

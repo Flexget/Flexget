@@ -3,7 +3,7 @@ import pytest
 from flexget.entry import Entry
 
 
-# TODO Add more standard tests
+# TODO: Add more standard tests
 class TestNextSeriesSeasonSeasonsPack:
     _config = """
         templates:

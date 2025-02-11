@@ -615,7 +615,7 @@ class APITVMaze:
             episode_date = datetime.strftime(episode_date, '%Y-%m-%d')
             tvmaze_episode = get_episode(series.tvmaze_id, date=episode_date)[0]
         else:
-            # TODO will this match all series_id types?
+            # TODO: will this match all series_id types?
             logger.debug(
                 'fetching episode {0} season {1} for series_id {2} for tvmaze',
                 episode_number,
