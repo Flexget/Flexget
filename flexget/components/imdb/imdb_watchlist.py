@@ -116,7 +116,7 @@ class ImdbWatchlist:
         return page
 
     def parse_html_list(
-        self, task, config, url, params, headers, kind='predefinedList'
+        self, task, config, url, params, headers, kind='list'
     ) -> list[Entry]:
         page = self.fetch_page(task, url, params, headers)
         soup = get_soup(page.text)
