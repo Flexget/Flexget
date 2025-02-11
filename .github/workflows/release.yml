@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       PYTHON_VERSION: '3.13' # renovate: datasource=python-version depName=python
-      UV_VERSION: 0.5.29 # renovate: datasource=pypi depName=uv
+      UV_VERSION: 0.5.30 # renovate: datasource=pypi depName=uv
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
