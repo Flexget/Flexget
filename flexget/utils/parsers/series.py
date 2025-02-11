@@ -635,7 +635,7 @@ class SeriesParser(TitleParser):
                     season = int(matches[0])
                     return {'season': season, 'match': match}
                 if len(matches) == 2:
-                    # TODO support other formats of season packs: 1xall, s01-PART1, etc.
+                    # TODO: support other formats of season packs: 1xall, s01-PART1, etc.
                     pass
         return None
 

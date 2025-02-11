@@ -137,7 +137,7 @@ class SeriesParseResult:
 
     @property
     def season(self) -> Optional[int]:
-        # TODO Use match-case statement after Python 3.9 is dropped
+        # TODO: Use match-case statement after Python 3.9 is dropped
         if self.id_type == 'ep':
             return self.id[0]
         if self.id_type == 'date':

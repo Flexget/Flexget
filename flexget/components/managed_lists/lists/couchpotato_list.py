@@ -77,8 +77,8 @@ class CouchPotatoBase:
         resolutions = {'1080p': '1080p', '720p': '720p'}
 
         # Separate strings are needed for each QualityComponent
-        # TODO list is converted to set because if a quality has 3d type in CP, it gets duplicated during the conversion
-        # TODO when (and if) 3d is supported in flexget this will be needed to removed
+        # TODO: list is converted to set because if a quality has 3d type in CP, it gets duplicated during the conversion
+        # TODO: when (and if) 3d is supported in flexget this will be needed to removed
         res_string = '|'.join(
             {
                 resolutions[quality]

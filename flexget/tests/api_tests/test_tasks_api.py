@@ -20,7 +20,7 @@ class TestTaskAPI:
         rsp = api_client.get('/tasks/')
         data = json.loads(rsp.get_data(as_text=True))
 
-        # TODO Need to figure out how to do this
+        # TODO: Need to figure out how to do this
         # errors = schema_match(OC.tasks_list_object, data)
         # assert not errors
         assert data == [
