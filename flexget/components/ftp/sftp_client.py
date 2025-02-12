@@ -346,7 +346,7 @@ class SftpClient:
     def _get_cnopts(self) -> Optional['pysftp.CnOpts']:
         if not self.host_key:
             return None
-        KeyClass = getattr(
+        KeyClass = getattr(  # noqa: N806 It's a class
             importlib.import_module("paramiko"), HOST_KEY_TYPES[self.host_key.key_type]
         )
         key = KeyClass(data=b64decode(self.host_key.public_key))

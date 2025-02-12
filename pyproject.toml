@@ -157,6 +157,7 @@ select = [
     "ICN",
     "ISC",
     "LOG",
+    "N",
     "PERF",
     "PGH",
     "PL",
@@ -178,21 +179,22 @@ select = [
 ignore = [
     "B904", # TODO: enable this rule (requires a lot of manual work)
     "E501", # TODO: enable this rule (requires a lot of manual work)
+    "N817", # camelcase-imported-as-acronym
+    "N818", # error-suffix-on-exception-name
     "PERF203", # TODO: remove this after Python 3.10 is dropped
     "PLE1205", # Maybe can re-enable after https://github.com/astral-sh/ruff/issues/13390
-    # Enabling these PL rules would require extensive code refactoring, which may not be worth the effort.
-    "PLR0911",
-    "PLR0912",
-    "PLR0913",
-    "PLR0915",
-    "PLR1704",
-    "PLR2004",
-    "PLW0603",
-    "PLW0642",
-    "PLW2901",
+    "PLR0911", # too-many-return-statements
+    "PLR0912", # too-many-branches
+    "PLR0913", # too-many-arguments
+    "PLR0915", # too-many-statements
+    "PLR1704", # redefined-argument-from-local
+    "PLR2004", # magic-value-comparison
+    "PLW0603", # global-statement
+    "PLW0642", # self-or-cls-assignment
+    "PLW2901", # redefined-loop-name
     "RUF012", # Maybe can re-enable after https://github.com/astral-sh/ruff/issues/5243
-    "TD002", # Check for missing author in TODO
-    "TD003", # Check for missing issue link for this TODO
+    "TD002", # missing-todo-author
+    "TD003", # missing-todo-link
 ]
 
 [tool.ruff.lint.isort]

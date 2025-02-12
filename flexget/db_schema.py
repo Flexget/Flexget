@@ -224,23 +224,23 @@ def register_plugin_table(tablename: str, plugin: str, version: int):
 class VersionedBaseMeta(DeclarativeMeta):
     """Metaclass for objects returned by versioned_base factory"""
 
-    def __new__(mcs, metaname, bases, dict_):
+    def __new__(cls, metaname, bases, dict_):
         """This gets called when a class that subclasses VersionedBase is defined."""
-        new_class = super().__new__(mcs, str(metaname), bases, dict_)
+        new_class = super().__new__(cls, str(metaname), bases, dict_)
         if metaname != 'VersionedBase':
             register_plugin_table(new_class.__tablename__, new_class._plugin, new_class._version)
         return new_class
 
-    def register_table(cls, table: Union[str, Table]) -> None:
+    def register_table(self, table: Union[str, Table]) -> None:
         """
         This can be used if a plugin is declaring non-declarative sqlalchemy tables.
 
         :param table: Can either be the name of the table, or an :class:`sqlalchemy.Table` instance.
         """
         if isinstance(table, str):
-            register_plugin_table(table, cls._plugin, cls._version)
+            register_plugin_table(table, self._plugin, self._version)
         else:
-            register_plugin_table(table.name, cls._plugin, cls._version)
+            register_plugin_table(table.name, self._plugin, self._version)
 
 
 def versioned_base(plugin: str, version: int) -> VersionedBaseMeta:

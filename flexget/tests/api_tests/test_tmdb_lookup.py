@@ -1,7 +1,7 @@
 import pytest
 
 from flexget.api.app import base_message
-from flexget.components.tmdb.api import ObjectsContainer as oc
+from flexget.components.tmdb.api import ObjectsContainer as OC
 from flexget.utils import json
 
 
@@ -21,7 +21,7 @@ class TestTMDBMovieLookupAPI:
         assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
-        errors = schema_match(oc.movie_object, data)
+        errors = schema_match(OC.movie_object, data)
         assert not errors
 
         values = {'id': 603, 'name': 'The Matrix', 'year': 1999, 'imdb_id': 'tt0133093'}
@@ -33,7 +33,7 @@ class TestTMDBMovieLookupAPI:
         assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
-        errors = schema_match(oc.movie_object, data)
+        errors = schema_match(OC.movie_object, data)
         assert not errors
 
         values = {'id': 604, 'name': 'The Matrix Reloaded', 'year': 2003, 'imdb_id': 'tt0234215'}
@@ -45,7 +45,7 @@ class TestTMDBMovieLookupAPI:
         assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
-        errors = schema_match(oc.movie_object, data)
+        errors = schema_match(OC.movie_object, data)
         assert not errors
 
         assert 'posters' in data
@@ -56,7 +56,7 @@ class TestTMDBMovieLookupAPI:
         assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
-        errors = schema_match(oc.movie_object, data)
+        errors = schema_match(OC.movie_object, data)
         assert not errors
 
         assert 'backdrops' in data

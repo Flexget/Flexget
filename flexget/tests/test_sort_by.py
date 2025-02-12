@@ -96,6 +96,7 @@ class TestSortBy:
               dict_field: {a: 2, b: 0}
     """
 
+    @staticmethod
     def generate_test_ids(param):
         if param[0:5] == 'test_' or not isinstance(param, list):
             return param

@@ -47,10 +47,10 @@ class StatusTask(Base):
         return max(execution.start for execution in self.executions)
 
     @last_execution_time.expression
-    def last_execution_time(cls):
+    def last_execution_time(self):
         return (
             select(func.max(TaskExecution.start))
-            .where(TaskExecution.task_id == cls.id)
+            .where(TaskExecution.task_id == self.id)
             .correlate(StatusTask.__table__)
             .label('last_execution_time')
         )

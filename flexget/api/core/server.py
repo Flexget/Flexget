@@ -280,13 +280,13 @@ class ServerDumpThreads(APIResource):
         """Dump Server threads for debugging"""
         id2name = {th.ident: th.name for th in threading.enumerate()}
         threads = []
-        for threadId, stack in sys._current_frames().items():
+        for thread_id, stack in sys._current_frames().items():
             dump = []
             for filename, lineno, name, line in traceback.extract_stack(stack):
                 dump.append(f'File: "{filename}", line {lineno}, in {name}')
                 if line:
                     dump.append(line.strip())
-            threads.append({'name': id2name.get(threadId), 'id': threadId, 'dump': dump})
+            threads.append({'name': id2name.get(thread_id), 'id': thread_id, 'dump': dump})
 
         return jsonify(threads=threads)
 

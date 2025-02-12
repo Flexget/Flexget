@@ -124,7 +124,7 @@ class NPOWatchlist:
         except RequestException as e:
             raise plugin.PluginError(f'Request error: {e!s}')
 
-    def _get_favourites_entries(self, task, config, profileId):
+    def _get_favourites_entries(self, task, config, profile_id):
         # Details of profile using the $profileId:
         # https://www.npostart.nl/api/account/@me/profile/$profileId  (?refresh=1)
         # XMLHttpRequest could also be done on, but is not reliable, because if a series is
@@ -134,7 +134,7 @@ class NPOWatchlist:
 
         entries = []
         try:
-            profile = requests.get(profile_details_url + profileId).json()
+            profile = requests.get(profile_details_url + profile_id).json()
             logger.info('Retrieving favorites for profile {}', profile['name'])
             for favourite in profile['favourites']:
                 if favourite['mediaType'] == 'series':
@@ -143,7 +143,7 @@ class NPOWatchlist:
             raise plugin.PluginError(f'Request error: {e!s}')
         return entries
 
-    def _get_series_episodes(self, task, config, mediaId, series_info=None, page=1):
+    def _get_series_episodes(self, task, config, media_id, series_info=None, page=1):
         episode_tiles_url = 'https://www.npostart.nl/media/series/{0}/episodes'
         episode_tiles_parameters = {
             'page': str(page),
@@ -153,9 +153,11 @@ class NPOWatchlist:
         entries = []
 
         if not series_info:
-            series_info = self._get_series_info(task, config, mediaId)
+            series_info = self._get_series_info(task, config, media_id)
             if not series_info:  # if fetching series_info failed, return empty entries
-                logger.error('Failed to fetch series information for {}, skipping series', mediaId)
+                logger.error(
+                    'Failed to fetch series information for {}, skipping series', media_id
+                )
                 return entries
 
         headers = {
@@ -165,15 +167,17 @@ class NPOWatchlist:
         }
         if page > 1:
             headers['Referer'] = (
-                episode_tiles_url.format(mediaId) + f'?page={page - 1}'
+                episode_tiles_url.format(media_id) + f'?page={page - 1}'
             )  # referer from prev page
 
         logger.debug(
-            'Retrieving episodes page {} for {} ({})', page, series_info['npo_name'], mediaId
+            'Retrieving episodes page {} for {} ({})', page, series_info['npo_name'], media_id
         )
         try:
             episodes = requests.get(
-                episode_tiles_url.format(mediaId), params=episode_tiles_parameters, headers=headers
+                episode_tiles_url.format(media_id),
+                params=episode_tiles_parameters,
+                headers=headers,
             ).json()
             new_entries = self._parse_tiles(task, config, episodes['tiles'], series_info)
             entries += new_entries
@@ -185,7 +189,7 @@ class NPOWatchlist:
                 entries += self._get_series_episodes(
                     task,
                     config,
-                    mediaId,
+                    media_id,
                     series_info,
                     page=int(episodes['nextLink'].rsplit('page=')[1]),
                 )
@@ -193,15 +197,15 @@ class NPOWatchlist:
             logger.error('Request error: {}', str(e))  # if it fails, just go to next favourite
 
         if not entries and page == 1:
-            logger.verbose('No new episodes found for {} ({})', series_info['npo_name'], mediaId)
+            logger.verbose('No new episodes found for {} ({})', series_info['npo_name'], media_id)
         return entries
 
-    def _get_series_info(self, task, config, mediaId):
+    def _get_series_info(self, task, config, media_id):
         series_info_url = 'https://www.npostart.nl/{0}'
         series_info = None
-        logger.verbose('Retrieving series info for {}', mediaId)
+        logger.verbose('Retrieving series info for {}', media_id)
         try:
-            response = requests.get(series_info_url.format(mediaId))
+            response = requests.get(series_info_url.format(media_id))
             logger.debug('Series info found at: {}', response.url)
             page = get_soup(response.content)
             series = page.find('section', class_='npo-header-episode-meta')
@@ -216,7 +220,7 @@ class NPOWatchlist:
                     'npo_language': 'nl',  # hard-code the language as if in NL, for lookup plugins
                     'npo_version': page.find('meta', attrs={'name': 'generator'})['content'],
                 }  # include NPO website version
-                logger.debug('Parsed series info for: {} ({})', series_info['npo_name'], mediaId)
+                logger.debug('Parsed series info for: {} ({})', series_info['npo_name'], media_id)
         except RequestException as e:
             logger.error('Request error: {}', str(e))
         return series_info
@@ -296,8 +300,8 @@ class NPOWatchlist:
         profilejson = self._get_page(task, config, account_profile_url).json()
         if 'profileId' not in profilejson:
             raise plugin.PluginError('Failed to fetch profile for NPO account')
-        profileId = profilejson['profileId']
-        return self._get_favourites_entries(task, config, profileId)
+        profile_id = profilejson['profileId']
+        return self._get_favourites_entries(task, config, profile_id)
 
     def entry_complete(self, e, task=None):
         if not e.accepted:

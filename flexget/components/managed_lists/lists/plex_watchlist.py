@@ -92,7 +92,7 @@ class PlexManagedWatchlist(MutableSet):
 
     @property
     def account(self) -> "MyPlexAccount":
-        MyPlexAccount = import_plexaccount()
+        MyPlexAccount = import_plexaccount()  # noqa: N806 It's a class
         if self._account is None:
             self._account = MyPlexAccount(self.username, self.password, self.token)
         return self._account

@@ -152,7 +152,7 @@ class OmbiEntry:
             self.ombi_title = self.ombi_title + ' E' + str(data['tmdb_episode']).zfill(2)
 
     @property
-    def requestId(self) -> str:
+    def request_id(self) -> str:
         if "requestId" in self.data:
             return self.data['requestId']
 
@@ -160,8 +160,8 @@ class OmbiEntry:
         self.data = new_data
         return self.data['requestId']
 
-    @requestId.setter
-    def requestId(self, value: str):
+    @request_id.setter
+    def request_id(self, value: str):
         self.data['requestId'] = value
 
     def already_requested(self) -> tuple[bool, str]:
@@ -197,7 +197,7 @@ class OmbiEntry:
                 endpoint=endpoint, data=data, headers=headers
             )
 
-            self.requestId = response['requestId']
+            self.request_id = response['requestId']
 
             log.info(f"{self.ombi_title} was requested in Ombi.")
             return True
@@ -229,7 +229,7 @@ class OmbiEntry:
 
         api_endpoint = f"api/v1/Request/{self.entry_type}/available"
 
-        data = {"id": self.requestId}
+        data = {"id": self.request_id}
 
         headers = self._request.create_json_headers()
 
@@ -252,7 +252,7 @@ class OmbiEntry:
 
         log.info(f"Marking {self.ombi_title} as deleted in Ombi.")
 
-        api_endpoint = f"api/v1/Request/{self.entry_type}/{self.requestId}"
+        api_endpoint = f"api/v1/Request/{self.entry_type}/{self.request_id}"
 
         headers = self._request.create_json_headers()
 
@@ -281,7 +281,7 @@ class OmbiEntry:
 
         api_endpoint = f"api/v1/Request/{self.entry_type}/unavailable"
 
-        data = {"id": self.requestId}
+        data = {"id": self.request_id}
 
         headers = self._request.create_json_headers()
 
@@ -307,7 +307,7 @@ class OmbiEntry:
         api_endpoint = f"api/v1/Request/{self.entry_type}/deny"
 
         # In the future, we might want to allow the user to specify a reason.
-        data = {"id": self.requestId, "reason": "Denied by Flexget automation."}
+        data = {"id": self.request_id, "reason": "Denied by Flexget automation."}
 
         headers = self._request.create_json_headers()
 
@@ -333,7 +333,7 @@ class OmbiEntry:
         api_endpoint = f"api/v1/Request/{self.entry_type}/approve"
 
         # In the future, we might want to allow the user to specify a reason.
-        data = {"id": self.requestId}
+        data = {"id": self.request_id}
 
         headers = self._request.create_json_headers()
 

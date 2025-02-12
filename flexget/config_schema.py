@@ -436,13 +436,13 @@ def validate_properties_w_defaults(validator, properties, instance, schema):
     yield from BaseValidator.VALIDATORS["properties"](validator, properties, instance, schema)
 
 
-def validate_anyOf(validator, anyOf, instance, schema):
-    errors = BaseValidator.VALIDATORS["anyOf"](validator, anyOf, instance, schema)
+def validate_any_of(validator, any_of, instance, schema):
+    errors = BaseValidator.VALIDATORS["anyOf"](validator, any_of, instance, schema)
     yield from select_child_errors(validator, errors)
 
 
-def validate_oneOf(validator, oneOf, instance, schema):
-    errors = BaseValidator.VALIDATORS["oneOf"](validator, oneOf, instance, schema)
+def validate_one_of(validator, one_of, instance, schema):
+    errors = BaseValidator.VALIDATORS["oneOf"](validator, one_of, instance, schema)
     yield from select_child_errors(validator, errors)
 
 
@@ -451,16 +451,16 @@ def validate_deprecated(validator, deprecated, instance, schema):
         logger.warning(deprecated)
 
 
-def validate_deprecationMessage(validator, message, instance, schema):
+def validate_deprecation_message(validator, message, instance, schema):
     """Not really a validator, just warns if deprecated section of config is being used."""
     logger.warning(message)
 
 
 validators = {
-    'anyOf': validate_anyOf,
-    'oneOf': validate_oneOf,
+    'anyOf': validate_any_of,
+    'oneOf': validate_one_of,
     'deprecated': validate_deprecated,
-    'deprecationMessage': validate_deprecationMessage,
+    'deprecationMessage': validate_deprecation_message,
 }
 
 SchemaValidator = jsonschema.validators.extend(BaseValidator, validators)

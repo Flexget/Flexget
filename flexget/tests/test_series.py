@@ -1290,7 +1290,7 @@ class TestBacklog:
               - test: {timeframe: 6 hours, target: 720p hdtv+}
     """
 
-    def testBacklog(self, manager, execute_task):
+    def test_backlog(self, manager, execute_task):
         """Series plugin: backlog"""
         task = execute_task('backlog')
         assert task.entries, 'no entries at the start'
@@ -1326,7 +1326,7 @@ class TestManipulate:
                   extract: '^PREFIX: (.*)'
     """
 
-    def testManipulate(self, execute_task):
+    def test_manipulate(self, execute_task):
         """Series plugin: test manipulation priority"""
         # should not work with the prefix
         task = execute_task('test_1')
@@ -1527,7 +1527,7 @@ class TestSeriesPremiere:
               - {title: 'Foobar.S02E02.HR-FlexGet'}
     """
 
-    def testOnlyPremieres(self, execute_task):
+    def test_only_premieres(self, execute_task):
         """Test series premiere"""
         task = execute_task('test')
         assert task.find_entry(

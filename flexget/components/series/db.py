@@ -172,10 +172,10 @@ class Season(Base):
         return min(release.first_seen for release in self.releases)
 
     @first_seen.expression
-    def first_seen(cls):
+    def first_seen(self):
         return (
             select(func.min(SeasonRelease.first_seen))
-            .where(SeasonRelease.season_id == cls.id)
+            .where(SeasonRelease.season_id == self.id)
             .correlate(Season.__table__)
             .label('first_seen')
         )
@@ -281,10 +281,10 @@ class Episode(Base):
         return min(release.first_seen for release in self.releases)
 
     @first_seen.expression
-    def first_seen(cls):
+    def first_seen(self):
         return (
             select(func.min(EpisodeRelease.first_seen))
-            .where(EpisodeRelease.episode_id == cls.id)
+            .where(EpisodeRelease.episode_id == self.id)
             .correlate(Episode.__table__)
             .label('first_seen')
         )
