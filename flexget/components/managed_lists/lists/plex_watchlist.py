@@ -132,10 +132,10 @@ class PlexManagedWatchlist(MutableSet):
 
         if item:
             if self.account.onWatchlist(item):
-                logger.debug(f'"{item.title}" is already on the watchlist')
+                logger.debug('"{}" is already on the watchlist', item.title)
                 return
 
-            logger.debug(f'Adding "{item.title}" to the watchlist')
+            logger.debug('Adding "{}" to the watchlist', item.title)
             self.account.addToWatchlist(item)
 
     def discard(self, entry) -> None:

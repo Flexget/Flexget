@@ -142,7 +142,7 @@ class OutputQBitTorrent:
 
         hash_torrent = hash_torrent.lower()
 
-        logger.debug(f'Checking if torrent with hash {hash!r} already in session.')
+        logger.debug('Checking if torrent with hash {!r} already in session.', hash)
 
         url = f'{self.url}{self.api_url_info}'
         params = {'hashes': hash_torrent}
@@ -376,12 +376,12 @@ class FromQBitTorrent:
 
         for torrent in client.torrents_info():
             if 'category' in config:
-                logger.debug("filtered `{}` by wrong category".format(torrent['name']))
+                logger.debug("filtered `{}` by wrong category", torrent['name'])
                 if torrent['category'] != config['category']:
                     continue
 
             if 'completed' in config and not torrent.state_enum.is_complete:
-                logger.debug("filtered `{}` by not completed".format(torrent['name']))
+                logger.debug("filtered `{}` by not completed", torrent['name'])
                 continue
 
             yield Entry(

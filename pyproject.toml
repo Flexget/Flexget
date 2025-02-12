@@ -148,11 +148,13 @@ select = [
     "ASYNC",
     "B",
     "C4",
+    "COM",
     "E",
     "EXE",
     "F",
     "FLY",
     "FURB",
+    "G",
     "I",
     "ICN",
     "ISC",
@@ -178,6 +180,7 @@ select = [
 ]
 ignore = [
     "B904", # TODO: enable this rule (requires a lot of manual work)
+    "COM812", # May cause conflicts when used with the Ruff formatter, so Ruff recommends disabling this rule
     "E501", # TODO: enable this rule (requires a lot of manual work)
     "N817", # camelcase-imported-as-acronym
     "N818", # error-suffix-on-exception-name

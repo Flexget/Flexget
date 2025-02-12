@@ -272,7 +272,9 @@ class Session(requests.Session):
             return _wrap_urlopen(url, timeout=kwargs['timeout'])
 
         try:
-            logger.debug(f'{method.upper()}ing URL {url} with args {args} and kwargs {kwargs}')
+            logger.debug(
+                '{}ing URL {} with args {} and kwargs {}', method.upper(), url, args, kwargs
+            )
             result = super().request(method, url, *args, **kwargs)
         except requests.Timeout:
             # Mark this site in known unresponsive list

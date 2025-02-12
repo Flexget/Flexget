@@ -239,9 +239,14 @@ class TelegramNotifier:
         self.socks_proxy = config.get(_SOCKSPROXY_ATTR)
         self._images = config.get(_IMAGES_ATTR)
         logger.debug(
-            f'token={self._token}, parse_mode={self._parse_mode}, '
-            f'disable_previews={self._disable_previews}, usernames={self._usernames}, '
-            f'fullnames={self._fullnames}, groups={self._groups}, images={self._images}'
+            'token={}, parse_mode={}, disable_previews={}, usernames={}, fullnames={}, groups={}, images={}',
+            self._token,
+            self._parse_mode,
+            self._disable_previews,
+            self._usernames,
+            self._fullnames,
+            self._groups,
+            self._images,
         )
 
     async def _check_token(self) -> None:
@@ -252,7 +257,8 @@ class TelegramNotifier:
             raise plugin.PluginWarning('invalid bot token')
         except (NetworkError, TelegramError) as e:
             logger.error(
-                f'Could not connect Telegram servers at this time, please try again later: {e.message}'
+                'Could not connect Telegram servers at this time, please try again later: {}',
+                e.message,
             )
 
     async def _replace_chat_id(
@@ -278,10 +284,10 @@ class TelegramNotifier:
         for chat_id in chat_ids:
             for paragraph in wrap(msg, _TEXT_LIMIT, replace_whitespace=False):
                 try:
-                    logger.debug(f'sending paragraph to telegram servers: {paragraph}')
+                    logger.debug('sending paragraph to telegram servers: {}', paragraph)
                     await self._bot.send_message(chat_id=chat_id, text=paragraph, **kwargs)
                 except ChatMigrated as e:
-                    logger.debug(f"Chat migrated to id {e.new_chat_id}")
+                    logger.debug("Chat migrated to id {}", e.new_chat_id)
                     await self._bot.send_message(chat_id=e.new_chat_id, text=paragraph, **kwargs)
                     await self._replace_chat_id(chat_id, e.new_chat_id, session)
                 except TelegramError as e:
@@ -324,7 +330,7 @@ class TelegramNotifier:
         chat_id_entries, has_new_chat_ids = await self._get_chat_id_entries(
             session, usernames, fullnames, groups
         )
-        logger.debug(f'chat_id_entries={chat_id_entries}')
+        logger.debug('chat_id_entries={}', chat_id_entries)
 
         # TODO: The situation where the new chat_id from `ChatMigrated` exception needs to be written to the
         #  database if the chat_id specified directly in the configuration file is migrated is not considered.
@@ -337,11 +343,11 @@ class TelegramNotifier:
             )
         if chat_id_entries:
             if usernames:
-                logger.warning(f'no chat id found for usernames: {usernames}')
+                logger.warning('no chat id found for usernames: {}', usernames)
             if fullnames:
-                logger.warning(f'no chat id found for fullnames: {fullnames}')
+                logger.warning('no chat id found for fullnames: {}', fullnames)
             if groups:
-                logger.warning(f'no chat id found for groups: {groups}')
+                logger.warning('no chat id found for groups: {}', groups)
             if has_new_chat_ids:
                 self._update_db(session, chat_id_entries)
         return chat_ids
@@ -359,9 +365,7 @@ class TelegramNotifier:
         logger.debug('loading cached chat ids')
         chat_id_entries = self._get_cached_chat_id_entries(session, usernames, fullnames, groups)
         logger.debug(
-            'found {} cached chat_ids: {}'.format(
-                len(chat_id_entries), [f'{x}' for x in chat_id_entries]
-            )
+            'found {} cached chat_ids: {}', len(chat_id_entries), [f'{x}' for x in chat_id_entries]
         )
         if not (usernames or fullnames or groups):
             logger.debug('all chat ids found in cache')
@@ -371,7 +375,7 @@ class TelegramNotifier:
             e async for e in self._get_new_chat_id_entries(usernames, fullnames, groups)
         ]
         logger.debug(
-            'found {} new chat_ids: {}'.format(len(new_chat_ids), [f'{x}' for x in new_chat_ids])
+            'found {} new chat_ids: {}', len(new_chat_ids), [f'{x}' for x in new_chat_ids]
         )
         chat_id_entries += new_chat_ids
         return chat_id_entries, bool(new_chat_ids)
@@ -489,7 +493,7 @@ class TelegramNotifier:
             elif update.channel_post:
                 chat = update.channel_post.chat
             else:
-                logger.warning(f'Unknown update type encountered: {update}')
+                logger.warning('Unknown update type encountered: {}', update)
                 continue
             if chat.type == 'private':
                 usernames[chat.username] = chat

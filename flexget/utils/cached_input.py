@@ -47,7 +47,7 @@ def upgrade(ver: int, session: DBSession) -> int:
                     .values(json=json.dumps(p, encode_datetime=True))
                 )
             except KeyError as ex:
-                logger.error(f'Unable error upgrading input_cache pickle object due to {ex}')
+                logger.error('Unable error upgrading input_cache pickle object due to {}', ex)
         ver = 1
     if ver == 1:
         table = table_schema('input_cache_entry', session)
@@ -183,7 +183,7 @@ class cached:  # noqa: N801 It acts like a function in usage
 
     def store_to_db(self, entries: list[str]):
         # Store to database
-        logger.debug(f'Storing cache {self.cache_name} to database.')
+        logger.debug('Storing cache {} to database.', self.cache_name)
         with Session() as session:
             db_cache = (
                 session.query(InputCache)

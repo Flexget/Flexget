@@ -560,8 +560,10 @@ class FilterSeries(FilterSeriesBase):
                     db_series.begin.identified_by,
                 ):
                     logger.warning(
-                        f'Removing begin episode for {series_name} ({db_series.begin.identifier}) because '
-                        f'it does not match the identified_by type for series ({db_series.identified_by})'
+                        'Removing begin episode for {} ({}) because it does not match the identified_by type for series ({})',
+                        series_name,
+                        db_series.begin.identifier,
+                        db_series.identified_by,
                     )
                     del db_series.begin
                     auto_begin = True
@@ -744,7 +746,7 @@ class FilterSeries(FilterSeriesBase):
             downloaded_qualities = [rls.quality for rls in downloaded]
 
             # proper handling
-            logger.debug('-' * 20 + ' process_propers -->')
+            logger.debug('{} process_propers -->', '-' * 20)
             entries = self.process_propers(config, entity, entries)
             if not entries:
                 continue
@@ -776,7 +778,7 @@ class FilterSeries(FilterSeriesBase):
                     continue
                 if 'qualities' in config:
                     # Grab any additional wanted qualities
-                    logger.debug('-' * 20 + ' process_qualities -->')
+                    logger.debug('{} process_qualities -->', '-' * 20)
                     self.process_qualities(config, entries, downloaded)
                     continue
                 if config.get('upgrade'):
@@ -794,7 +796,7 @@ class FilterSeries(FilterSeriesBase):
 
             # episode tracking. used only with season and sequence based series
             if entity.identified_by in ['ep', 'sequence']:
-                logger.debug('-' * 20 + ' tracking -->')
+                logger.debug('{} tracking -->', '-' * 20)
                 if self.process_entity_tracking(
                     entity,
                     entries,
@@ -983,7 +985,9 @@ class FilterSeries(FilterSeriesBase):
             and entity < begin
         ):
             logger.debug(
-                f'episode {entity.identifier} before begin {begin.identifier}! rejecting all occurrences'
+                'episode {} before begin {}! rejecting all occurrences',
+                entity.identifier,
+                begin.identifier,
             )
             for entry in entries:
                 entry.reject(

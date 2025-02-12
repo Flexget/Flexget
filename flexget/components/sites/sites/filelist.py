@@ -153,7 +153,7 @@ class SearchFileList:
 
             if not login_validator:
                 raise plugin.PluginError('FileList.ro could not get login validator')
-            logger.debug('Login Validator: {}'.format(login_validator.get('value')))
+            logger.debug('Login Validator: {}', login_validator.get('value'))
             logger.debug('Attempting to retrieve FileList.ro cookie')
 
             response = requests.post(

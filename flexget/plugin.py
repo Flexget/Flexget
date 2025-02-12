@@ -448,7 +448,7 @@ def _load_plugins_from_dirs(dirs: list[str]) -> None:
     :param list dirs: Directories from where plugins are loaded from
     """
 
-    logger.debug(f'Trying to load plugins from: {dirs}')
+    logger.debug('Trying to load plugins from: {}', dirs)
     dir_paths = [Path(d) for d in dirs if os.path.isdir(d)]
     # add all dirs to plugins_pkg load path so that imports work properly from any of the plugin dirs
     plugins_pkg.__path__ = [str(d) for d in dir_paths]

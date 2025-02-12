@@ -90,7 +90,7 @@ class Medusa:
             if entry.isvalid():
                 entries.append(entry)
             else:
-                logger.error(f'Invalid entry created? {entry}')
+                logger.error('Invalid entry created? {}', entry)
 
         return entries
 

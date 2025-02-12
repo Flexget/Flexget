@@ -101,9 +101,10 @@ class TorrentScrub:
                 entry["torrent"].content = metainfo
                 entry["torrent"].modified = True
                 logger.info(
-                    ('Key {} was' if len(modified) == 1 else 'Keys {} were')
-                    + " scrubbed from torrent '{}'!",
+                    "{} {} {} scrubbed from torrent '{}'!",
+                    'Key' if len(modified) == 1 else 'Keys',
                     ', '.join(sorted(modified)),
+                    'was' if len(modified) == 1 else 'were',
                     entry['title'],
                 )
                 new_infohash = entry["torrent"].info_hash

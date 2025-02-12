@@ -161,7 +161,7 @@ class FromPirateBay:
             if RANKS.index(result['status'].lower()) < rank:
                 # filter by rank/status, useful for recent torrents
                 logger.debug(
-                    f"{result['name']} has been dropped due to low rank ({result['status']})."
+                    "{} has been dropped due to low rank ({}).", result['name'], result['status']
                 )
                 continue
             yield self.json_to_entry(result)

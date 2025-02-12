@@ -238,7 +238,8 @@ class Entry(LazyDict, Serializer):
             value = CoercingDateTime.instance(value)
             if not value.tzinfo:
                 logger.warning(
-                    f"{key} was set to a naive datetime. Plugin should be updated to provide a timezone aware datetime"
+                    "{} was set to a naive datetime. Plugin should be updated to provide a timezone aware datetime",
+                    key,
                 )
         elif isinstance(value, date):
             value = pendulum.instance(value)

@@ -188,7 +188,7 @@ class Decompress:
             if not test:
                 archive.delete()
             else:
-                logger.info(f'Would delete archive {archive.path}')
+                logger.info('Would delete archive {}', archive.path)
                 archive.close()
         else:
             archive.close()
