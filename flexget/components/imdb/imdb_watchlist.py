@@ -160,7 +160,7 @@ class ImdbWatchlist:
             entry = Entry()
             entry['title'] = item['listItem']['titleText']['text']
             with contextlib.suppress(ValueError, TypeError):
-                year = int(item['listItem']['releaseYear'])
+                year = int(item['listItem']['releaseYear']['year'])
                 entry['title'] += f' ({year})'
                 entry['imdb_year'] = year
             entry['url'] = link
