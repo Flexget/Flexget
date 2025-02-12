@@ -160,16 +160,15 @@ class ImdbWatchlist:
             entry = Entry()
             entry['title'] = item['listItem']['titleText']['text']
             with contextlib.suppress(ValueError, TypeError):
-                year = int(item['listItem']['releaseYear']['year'])
+                year = item['listItem']['releaseYear']['year']
                 entry['title'] += f' ({year})'
                 entry['imdb_year'] = year
             entry['url'] = link
             entry['imdb_id'] = item['listItem']['id']
             entry['imdb_name'] = entry['title']
             with contextlib.suppress(ValueError, TypeError):
-                entry['imdb_user_score'] = int(
-                    item['listItem']['ratingsSummary']['aggregateRating']
-                )
+                entry['imdb_user_score'] = float(item['listItem']['ratingsSummary']['aggregateRating'])
+                
 
             entries.append(entry)
 
