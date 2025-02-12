@@ -191,10 +191,17 @@ class NextSeriesEpisodes:
                             for ep in downloaded_this_season:
                                 with contextlib.suppress(ValueError):
                                     eps_to_get.remove(ep.number)
-                            entries.extend(
-                                self.search_entry(series, season, x, task, rerun=False)
-                                for x in eps_to_get
-                            )
+                            if len(eps_to_get) > 50:
+                                logger.warning(
+                                    'Series {} has more than 50 episodes to backfill. Assuming this is an '
+                                    'error and not searching for them.',
+                                    series.name,
+                                )
+                            else:
+                                entries.extend(
+                                    self.search_entry(series, season, x, task, rerun=False)
+                                    for x in eps_to_get
+                                )
                             # If we have already downloaded the latest known episode, try the next episode
                             if latest_ep_this_season.releases:
                                 entries.append(
