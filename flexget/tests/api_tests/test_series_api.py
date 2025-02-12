@@ -14,8 +14,8 @@ from flexget.components.series.db import (
     Series,
     SeriesTask,
 )
-from flexget.components.thetvdb.api import ObjectsContainer as tvdb
-from flexget.components.tvmaze.api import ObjectsContainer as tvmaze
+from flexget.components.thetvdb.api import ObjectsContainer as TvdbOC
+from flexget.components.tvmaze.api import ObjectsContainer as TvmazeOC
 from flexget.manager import Session
 from flexget.utils import json
 
@@ -221,12 +221,12 @@ class TestSeriesRootAPI:
         for show in data:
             tvdb_lookup = show['lookup']['tvdb']
             assert tvdb_lookup
-            errors = schema_match(tvdb.tvdb_series_object, tvdb_lookup)
+            errors = schema_match(TvdbOC.tvdb_series_object, tvdb_lookup)
             assert not errors
 
             tvmaze_lookup = show['lookup']['tvmaze']
             assert tvmaze_lookup
-            errors = schema_match(tvmaze.tvmaze_series_object, tvmaze_lookup)
+            errors = schema_match(TvmazeOC.tvmaze_series_object, tvmaze_lookup)
             assert not errors
 
     def test_series_post(self, api_client, schema_match):

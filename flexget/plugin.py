@@ -108,7 +108,7 @@ class PluginError(Exception):
 
 
 # TODO: move to utils or somewhere more appropriate
-class internet:
+class internet:  # noqa: N801 It acts like a function in usage
     """@internet decorator for plugin phase methods.
 
     Catches all internet related exceptions and raises PluginError with relevant message.

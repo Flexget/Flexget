@@ -172,6 +172,7 @@ class Season(Base):
         return min(release.first_seen for release in self.releases)
 
     @first_seen.expression
+    @classmethod
     def first_seen(cls):
         return (
             select(func.min(SeasonRelease.first_seen))
@@ -281,6 +282,7 @@ class Episode(Base):
         return min(release.first_seen for release in self.releases)
 
     @first_seen.expression
+    @classmethod
     def first_seen(cls):
         return (
             select(func.min(EpisodeRelease.first_seen))

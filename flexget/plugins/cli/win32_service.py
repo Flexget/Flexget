@@ -29,14 +29,14 @@ try:
             socket.setdefaulttimeout(60)
             self.manager = None
 
-        def SvcStop(self):
+        def SvcStop(self):  # noqa: N802
             self.ReportServiceStatus(win32service.SERVICE_STOP_PENDING)
             from flexget.manager import manager
 
             manager.shutdown(finish_queue=False)
             self.ReportServiceStatus(win32service.SERVICE_STOPPED)
 
-        def SvcDoRun(self):
+        def SvcDoRun(self):  # noqa: N802
             servicemanager.LogMsg(
                 servicemanager.EVENTLOG_INFORMATION_TYPE,
                 servicemanager.PYS_SERVICE_STARTED,

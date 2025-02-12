@@ -55,7 +55,7 @@ def seen_forget(manager: Manager, options):
 
 
 def seen_add(manager: Manager, options):
-    DEFAULT_TASK = 'cli_add'
+    default_task = 'cli_add'
 
     seen_name = options.add_value
     if is_imdb_url(seen_name):
@@ -78,13 +78,13 @@ def seen_add(manager: Manager, options):
             console('No specified tasks in config.')
             return
     else:
-        tasks = [DEFAULT_TASK]
+        tasks = [default_task]
         local = None
 
     for task in tasks:
         db.add(seen_name, task, {'cli_add': seen_name}, local=local)
 
-    if tasks == [DEFAULT_TASK]:
+    if tasks == [default_task]:
         console(f'Added `{seen_name}` as seen. This will affect all tasks.')
     else:
         console(

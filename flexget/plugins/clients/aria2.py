@@ -61,10 +61,12 @@ class JsonRpcClient(RpcClient):
             del req_params['params']
         return req_params
 
+    @staticmethod
     def _default_error_handle(code, message):
         logger.critical('Fault code {} message {}', code, message)
         raise plugin.PluginError(f'Fault code {code} message {message}', logger)
 
+    @staticmethod
     def _default_success_handle(response):
         return response.text
 

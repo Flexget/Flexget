@@ -218,7 +218,7 @@ def pid_exists(pid: int):
         return False
 
 
-_binOps = {
+_bin_ops = {
     ast.Add: operator.add,
     ast.Sub: operator.sub,
     ast.Mult: operator.mul,

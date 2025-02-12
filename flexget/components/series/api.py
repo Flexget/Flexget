@@ -24,14 +24,14 @@ from .utils import normalize_series_name
 
 try:
     # NOTE: Importing other plugins is discouraged!
-    from flexget.components.thetvdb.api import ObjectsContainer as tvdb
+    from flexget.components.thetvdb.api import ObjectsContainer as TvdbOC
 except ImportError:
     raise plugin.DependencyError(issued_by=__name__, missing='tvdb_lookup')
 
 
 try:
     # NOTE: Importing other plugins is discouraged!
-    from flexget.components.tvmaze.api import ObjectsContainer as tvmaze
+    from flexget.components.tvmaze.api import ObjectsContainer as TvmazeOC
 except ImportError:
     raise plugin.DependencyError(issued_by=__name__, missing='tvmaze_lookup')
 
@@ -129,8 +129,8 @@ class ObjectsContainer:
             'lookup': {
                 'type': 'object',
                 'properties': {
-                    'tvmaze': tvmaze.tvmaze_series_object,
-                    'tvdb': tvdb.tvdb_series_object,
+                    'tvmaze': TvmazeOC.tvmaze_series_object,
+                    'tvdb': TvdbOC.tvdb_series_object,
                 },
             },
             'latest_episode': episode_object,

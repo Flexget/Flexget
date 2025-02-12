@@ -85,7 +85,7 @@ class UrlRewriteNcore:
         page = task.requests.post(URL + "/login.php", data=data, headers=HEADERS)
         soup = get_soup(page.content)
         passkey_line = str(soup.find('link', href=re.compile(r'rss\.php\?key=')))
-        PASSKEY = passkey_line[passkey_line.find("key=") : passkey_line.find('"', 20, 90)]
+        passkey = passkey_line[passkey_line.find("key=") : passkey_line.find('"', 20, 90)]
 
         for search_string in entry.get('search_strings', [entry['title']]):
             data = {
@@ -113,7 +113,7 @@ class UrlRewriteNcore:
                     id = href[href.find("id=") + 3 :]
 
                     e['title'] = a.get('title')
-                    e['url'] = URL + f'/torrents.php?action=download&id={id}&' + PASSKEY
+                    e['url'] = URL + f'/torrents.php?action=download&id={id}&' + passkey
 
                     parent = a.parent.parent.parent.parent
 
