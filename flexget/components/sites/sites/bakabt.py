@@ -16,9 +16,7 @@ class UrlRewriteBakaBT:
         url = entry['url']
         if url.startswith('https://bakabt.me/download/'):
             return False
-        return bool(
-            url.startswith('https://www.bakabt.me/') or url.startswith('https://bakabt.me/')
-        )
+        return bool(url.startswith(('https://www.bakabt.me/', 'https://bakabt.me/')))
 
     # urlrewriter API
     def url_rewrite(self, task, entry):

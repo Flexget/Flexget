@@ -137,8 +137,6 @@ class BadXmlFile(Exception):
     Exception that is raised if the nfo file can't be parsed due to some invalid nfo file.
     """
 
-    pass
-
 
 class NfoReader:
     """

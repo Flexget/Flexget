@@ -105,7 +105,7 @@ class MagnetDL:
         first_magnet = None
         stop = False
 
-        for page in range(0, config['pages']):
+        for page in range(config['pages']):
             logger.verbose('Retrieving {} page {}', category, page + 1)
             url = self._url(category, page)
             logger.debug('Url: {}', url)

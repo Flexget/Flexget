@@ -203,7 +203,7 @@ class SearchAlphaRatio:
 
     def find_index(self, soup, text):
         """Finds the index of the tag containing the text"""
-        for i in range(0, len(soup)):
+        for i in range(len(soup)):
             img = soup[i].find('img')
             if (
                 soup[i].text.strip() == '' and img and text.lower() in img.get('title').lower()

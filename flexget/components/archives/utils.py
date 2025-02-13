@@ -22,43 +22,29 @@ logger = logger.bind(name='archive')
 class ArchiveError(Exception):
     """Base exception for archive"""
 
-    pass
-
 
 class NeedRarFile(ArchiveError):
     """Exception to be raised when rarfile module is missing"""
-
-    pass
 
 
 class BadArchive(ArchiveError):
     """Wrapper exception for BadZipFile and BadRarFile"""
 
-    pass
-
 
 class NeedFirstVolume(ArchiveError):
     """Wrapper exception for rarfile.NeedFirstVolume"""
-
-    pass
 
 
 class PathError(ArchiveError):
     """Exception to be raised when an archive file doesn't exist"""
 
-    pass
-
 
 class FSError(ArchiveError):
     """Exception to be raised on OS/IO exceptions"""
 
-    pass
-
 
 class FileAlreadyExists(ArchiveError):
     """Exception to be raised when destination file already exists"""
-
-    pass
 
 
 def rarfile_set_tool_path(config):

@@ -106,7 +106,7 @@ class TestPathSelect:
         assert task.entries[0].get('path') == "/data/1GB,100GB"
 
     def test_most_free_within(self, disk_static_func, no_path_validation, execute_task):
-        for _ in range(0, 3):
+        for _ in range(3):
             task = execute_task('test_most_free_within')
             assert task.entries[0].get('path') in [
                 "/data/49.5GB,100GB",
@@ -115,7 +115,7 @@ class TestPathSelect:
             ], "path {} not in list".format(task.entries[0].get('path'))
 
     def test_most_free_percent(self, disk_static_func, no_path_validation, execute_task):
-        for _ in range(0, 2):
+        for _ in range(2):
             task = execute_task('test_most_free_percent')
             assert task.entries[0].get('path') in [
                 '/data/50.5GB,100GB',
@@ -123,7 +123,7 @@ class TestPathSelect:
             ], "path {} not in list".format(task.entries[0].get('path'))
 
     def test_most_free_percent_within(self, disk_static_func, no_path_validation, execute_task):
-        for _ in range(0, 2):
+        for _ in range(2):
             task = execute_task('test_most_free_percent_within')
             assert task.entries[0].get('path') in [
                 '/data/50GB,100GB',
@@ -132,7 +132,7 @@ class TestPathSelect:
             ], "path {} not in list".format(task.entries[0].get('path'))
 
     def test_most_used_percent(self, disk_static_func, no_path_validation, execute_task):
-        for _ in range(0, 2):
+        for _ in range(2):
             task = execute_task('test_most_used_percent')
             assert task.entries[0].get('path') in [
                 '/data/99GB,100GB',
@@ -140,7 +140,7 @@ class TestPathSelect:
             ], "path {} not in list".format(task.entries[0].get('path'))
 
     def test_most_used(self, disk_static_func, no_path_validation, execute_task):
-        for _ in range(0, 2):
+        for _ in range(2):
             task = execute_task('test_most_used')
             assert task.entries[0].get('path') in [
                 '/data/90GB,100GB',

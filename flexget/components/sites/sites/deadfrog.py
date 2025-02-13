@@ -18,9 +18,7 @@ class UrlRewriteDeadFrog:
         url = entry['url']
         if url.startswith('http://www.deadfrog.us/download/'):
             return False
-        return bool(
-            url.startswith('http://www.deadfrog.us/') or url.startswith('http://deadfrog.us/')
-        )
+        return bool(url.startswith(('http://www.deadfrog.us/', 'http://deadfrog.us/')))
 
     # urlrewriter API
     def url_rewrite(self, task, entry):

@@ -505,7 +505,7 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
 
     def _verify_load(self, client, info_hash):
         ex = xmlrpc_client.Error()
-        for _ in range(0, 5):
+        for _ in range(5):
             try:
                 return client.torrent(info_hash, fields=['hash'])
             except xmlrpc_client.Error as e:

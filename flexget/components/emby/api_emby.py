@@ -1686,18 +1686,16 @@ class EmbyApiSerie(EmbyApiMedia):
 
         return {
             **EmbyApiMedia.to_dict(self),
-            **{
-                'serie_id': self.serie_id,
-                'serie_name': self.serie_name,
-                'serie_imdb_id': self.serie_imdb_id,
-                'serie_tmdb_id': self.serie_tmdb_id,
-                'serie_tvdb_id': self.serie_tvdb_id,
-                'serie_aired_date': self.serie_aired_date,
-                'serie_year': self.serie_year,
-                'serie_overview': self.serie_overview,
-                'serie_photo': self.serie_photo,
-                'serie_page': self.serie_page,
-            },
+            'serie_id': self.serie_id,
+            'serie_name': self.serie_name,
+            'serie_imdb_id': self.serie_imdb_id,
+            'serie_tmdb_id': self.serie_tmdb_id,
+            'serie_tvdb_id': self.serie_tvdb_id,
+            'serie_aired_date': self.serie_aired_date,
+            'serie_year': self.serie_year,
+            'serie_overview': self.serie_overview,
+            'serie_photo': self.serie_photo,
+            'serie_page': self.serie_page,
         }
 
     @property
@@ -1904,16 +1902,14 @@ class EmbyApiSeason(EmbyApiMedia):
         return {
             **EmbyApiSerie.to_dict(self.serie),
             **EmbyApiMedia.to_dict(self),
-            **{
-                'season': self.season,
-                'season_id': self.season_id,
-                'season_name': self.season_name,
-                'season_page': self.season_page,
-                'season_photo': self.season_photo,
-                'season_imdb_id': self.season_imdb_id,
-                'season_tmdb_id': self.season_tmdb_id,
-                'season_tvdb_id': self.season_tvdb_id,
-            },
+            'season': self.season,
+            'season_id': self.season_id,
+            'season_name': self.season_name,
+            'season_page': self.season_page,
+            'season_photo': self.season_photo,
+            'season_imdb_id': self.season_imdb_id,
+            'season_tmdb_id': self.season_tmdb_id,
+            'season_tvdb_id': self.season_tvdb_id,
         }
 
     @property
@@ -2108,8 +2104,6 @@ class EmbyApiEpisode(EmbyApiMedia):
         'episode': ['episode', 'series_episode'],
     }
 
-    episode = None
-
     def __init__(self, **kwargs):
         EmbyApiMedia.__init__(self, field_map=self.field_map_up, **kwargs)
 
@@ -2140,18 +2134,16 @@ class EmbyApiEpisode(EmbyApiMedia):
             **EmbyApiSeason.to_dict(self.season),
             **EmbyApiSerie.to_dict(self.serie),
             **EmbyApiMedia.to_dict(self),
-            **{
-                'episode': self.episode,
-                'ep_id': self.ep_id,
-                'ep_name': self.ep_name,
-                'ep_page': self.ep_page,
-                'ep_photo': self.ep_photo,
-                'ep_imdb_id': self.ep_imdb_id,
-                'ep_tmdb_id': self.ep_tmdb_id,
-                'ep_tvdb_id': self.ep_tvdb_id,
-                'ep_aired_date': self.ep_aired_date,
-                'ep_overview': self.ep_overview,
-            },
+            'episode': self.episode,
+            'ep_id': self.ep_id,
+            'ep_name': self.ep_name,
+            'ep_page': self.ep_page,
+            'ep_photo': self.ep_photo,
+            'ep_imdb_id': self.ep_imdb_id,
+            'ep_tmdb_id': self.ep_tmdb_id,
+            'ep_tvdb_id': self.ep_tvdb_id,
+            'ep_aired_date': self.ep_aired_date,
+            'ep_overview': self.ep_overview,
         }
 
     @property
@@ -2391,18 +2383,16 @@ class EmbyApiMovie(EmbyApiMedia):
 
         return {
             **EmbyApiMedia.to_dict(self),
-            **{
-                'movie_id': self.movie_id,
-                'movie_name': self.movie_name,
-                'movie_imdb_id': self.movie_imdb_id,
-                'movie_tmdb_id': self.movie_tmdb_id,
-                'movie_tvdb_id': self.movie_tvdb_id,
-                'movie_aired_date': self.movie_aired_date,
-                'movie_year': self.movie_year,
-                'movie_photo': self.movie_photo,
-                'movie_page': self.movie_page,
-                'movie_overview': self.movie_overview,
-            },
+            'movie_id': self.movie_id,
+            'movie_name': self.movie_name,
+            'movie_imdb_id': self.movie_imdb_id,
+            'movie_tmdb_id': self.movie_tmdb_id,
+            'movie_tvdb_id': self.movie_tvdb_id,
+            'movie_aired_date': self.movie_aired_date,
+            'movie_year': self.movie_year,
+            'movie_photo': self.movie_photo,
+            'movie_page': self.movie_page,
+            'movie_overview': self.movie_overview,
         }
 
     @property

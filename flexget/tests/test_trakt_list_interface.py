@@ -146,22 +146,20 @@ class TestTraktList:
         trakt_set.clear()
 
         entry = Entry(
-            **{
-                'trakt_show_slug': 'game-of-thrones',
-                'original_url': 'https://trakt.tv/shows/game-of-thrones/seasons/4/episodes/5',
-                'url': 'https://trakt.tv/shows/game-of-thrones/seasons/4/episodes/5',
-                'series_season': 4,
-                'tvdb_id': 121361,
-                'series_name': 'Game of Thrones (2011)',
-                'imdb_id': 'tt0944947',
-                'series_id': 'S04E05',
-                'series_episode': 5,
-                'trakt_episode_id': 73674,
-                'title': 'Game of Thrones (2011) S04E05 First of His Name',
-                'trakt_show_id': 1390,
-                'trakt_ep_name': 'First of His Name',
-                'tvrage_id': 24493,
-            }
+            trakt_show_slug='game-of-thrones',
+            original_url='https://trakt.tv/shows/game-of-thrones/seasons/4/episodes/5',
+            url='https://trakt.tv/shows/game-of-thrones/seasons/4/episodes/5',
+            series_season=4,
+            tvdb_id=121361,
+            series_name='Game of Thrones (2011)',
+            imdb_id='tt0944947',
+            series_id='S04E05',
+            series_episode=5,
+            trakt_episode_id=73674,
+            title='Game of Thrones (2011) S04E05 First of His Name',
+            trakt_show_id=1390,
+            trakt_ep_name='First of His Name',
+            tvrage_id=24493,
         )
 
         assert entry not in trakt_set
@@ -177,13 +175,11 @@ class TestTraktList:
         trakt_set.clear()
 
         entry = Entry(
-            **{
-                'series_name': 'Game of Thrones (2011)',
-                'series_id': 'S04E05',
-                'series_episode': 5,
-                'series_season': 4,
-                'title': 'Game of Thrones (2011) S04E05 First of His Name',
-            }
+            series_name='Game of Thrones (2011)',
+            series_id='S04E05',
+            series_episode=5,
+            series_season=4,
+            title='Game of Thrones (2011) S04E05 First of His Name',
         )
 
         assert entry not in trakt_set
