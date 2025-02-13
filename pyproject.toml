@@ -198,6 +198,7 @@ ignore = [
     "RUF012", # Maybe can re-enable after https://github.com/astral-sh/ruff/issues/5243
     "TD002", # missing-todo-author
     "TD003", # missing-todo-link
+    "TRY400", # error-instead-of-exception
 ]
 
 [tool.ruff.lint.isort]

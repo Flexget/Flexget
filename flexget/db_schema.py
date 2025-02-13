@@ -206,7 +206,7 @@ def reset_schema(plugin: str, session=None) -> None:
         except OperationalError as e:
             if 'no such table' in str(e):
                 continue
-            raise e  # Remove the plugin from schema table
+            raise  # Remove the plugin from schema table
     session.query(PluginSchema).filter(PluginSchema.plugin == plugin).delete()
     # We need to commit our current changes to close the session before calling create_all
     session.commit()

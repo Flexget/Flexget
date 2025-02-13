@@ -300,7 +300,7 @@ class TelegramNotifier:
                         del kwargs['parse_mode']
                         await self._bot.send_message(chat_id=chat_id, text=paragraph, **kwargs)
                     else:
-                        raise e
+                        raise
 
     async def _send_images(self, chat_ids: set[int], session: sqlalchemy.orm.Session) -> None:
         for chat_id in chat_ids:

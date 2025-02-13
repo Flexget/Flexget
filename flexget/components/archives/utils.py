@@ -232,12 +232,12 @@ class ArchiveInfo:
         try:
             archive.extract_file(self.info, destination)
             logger.verbose('Extracted: {} to {}', self.path, destination)
-        except Exception as error:
+        except Exception:
             if os.path.exists(destination):
                 logger.debug('Cleaning up partially extracted file: {}', destination)
                 os.remove(destination)
 
-            raise error
+            raise
 
 
 def open_archive(archive_path):
