@@ -55,6 +55,7 @@ class ImdbWatchlist:
                     {'type': 'string', 'enum': ['all']},
                 ]
             },
+            'strip_dates': {'type': 'boolean', 'default': False},
         },
         'additionalProperties': False,
         'required': ['list'],
@@ -161,7 +162,8 @@ class ImdbWatchlist:
             entry['title'] = item['listItem']['titleText']['text']
             with contextlib.suppress(ValueError, TypeError):
                 year = item['listItem']['releaseYear']['year']
-                entry['title'] += f' ({year})'
+                if not config.get('strip_dates'):
+                    entry['title'] += f' ({year})'
                 entry['imdb_year'] = year
             entry['url'] = link
             entry['imdb_id'] = item['listItem']['id']
