@@ -293,7 +293,7 @@ def is_url(instance) -> Union[None, bool, Match]:
     if not isinstance(instance, str):
         return True
     # Allow looser validation if this appears to start with jinja
-    if instance.startswith('{{') or instance.startswith('{%'):
+    if instance.startswith(('{{', '{%')):
         return True
     regexp = (
         '('

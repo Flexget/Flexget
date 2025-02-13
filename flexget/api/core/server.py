@@ -369,7 +369,7 @@ class ServerLogAPI(APIResource):
             yield '{"stream": ['  # Start of the json stream
 
             # Read back in the logs until we find enough lines
-            for i in range(0, 9):
+            for i in range(9):
                 log_file = (f'{base_log_file}.{i}').rstrip('.0')  # 1st log file has no number
 
                 if not os.path.isfile(log_file):
