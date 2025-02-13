@@ -400,7 +400,7 @@ class SftpClient:
             if Path(destination_path).exists():
                 logger.debug('Removing partially downloaded file {}', destination_path)
                 Path(destination_path).unlink()
-            raise e
+            raise
 
         if delete_origin:
             self.remove_file(source)

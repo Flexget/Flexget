@@ -131,7 +131,7 @@ class InputHtml:
                 except HTTPError as e:
                     if stop_when_404 and e.response.status_code == 404:
                         break
-                    raise e
+                    raise
                 if not entries:
                     entries = new_entries
                 else:

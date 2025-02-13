@@ -106,7 +106,7 @@ class OmbiRequest:
                 log.debug(result.get('title'))
                 log.debug(result.get('errors'))
 
-            raise e
+            raise
 
         if isinstance(result, dict) and result.get('isError'):
             log.debug(result)
