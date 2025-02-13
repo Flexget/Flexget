@@ -164,6 +164,7 @@ select = [
     "PGH",
     "PL",
     "PT",
+    "PYI",
     "RET",
     "RSE",
     "RUF",

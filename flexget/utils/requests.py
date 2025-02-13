@@ -87,7 +87,7 @@ class TokenBucketLimiter(DomainLimiter):
     def __init__(
         self,
         domain: str,
-        tokens: Union[float, int],
+        tokens: float,
         rate: Union[str, timedelta],
         wait: bool = True,
     ) -> None:
@@ -110,7 +110,7 @@ class TokenBucketLimiter(DomainLimiter):
         return min(self.max_tokens, self.state['tokens'])
 
     @tokens.setter
-    def tokens(self, value: Union[float, int]) -> None:
+    def tokens(self, value: float) -> None:
         self.state['tokens'] = value
 
     @property

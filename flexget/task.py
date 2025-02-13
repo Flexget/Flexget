@@ -5,7 +5,7 @@ import itertools
 import random
 import string
 import threading
-from collections.abc import Iterable
+from collections.abc import Iterable, Iterator
 from functools import total_ordering, wraps
 from typing import TYPE_CHECKING, Optional, Union
 
@@ -100,7 +100,7 @@ class EntryIterator:
             states = [states]
         self.filter = lambda e: e._state in states
 
-    def __iter__(self) -> Iterable[Entry]:
+    def __iter__(self) -> Iterator[Entry]:
         return filter(self.filter, self.all_entries)
 
     def __bool__(self):

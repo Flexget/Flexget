@@ -1,6 +1,7 @@
+import ctypes
 import os
 import random
-from collections import namedtuple
+from typing import NamedTuple, Union
 
 from loguru import logger
 
@@ -10,17 +11,19 @@ from flexget.event import event
 
 logger = logger.bind(name='path_by_space')
 
-disk_stats_tuple = namedtuple(
-    'disk_stats',
-    ['path', 'free_bytes', 'used_bytes', 'total_bytes', 'free_percent', 'used_percent'],
-)
+
+class DiskStats(NamedTuple):
+    path: str
+    free_bytes: Union[ctypes.c_ulonglong, int]
+    used_bytes: Union[ctypes.c_ulonglong, int]
+    total_bytes: Union[ctypes.c_ulonglong, int]
+    free_percent: float
+    used_percent: float
 
 
 def os_disk_stats(folder):
     """Return drive free, used and total bytes"""
     if os.name == 'nt':
-        import ctypes
-
         free_bytes = ctypes.c_ulonglong(0)
         total_bytes = ctypes.c_ulonglong(0)
         ctypes.windll.kernel32.GetDiskFreeSpaceExW(
@@ -38,9 +41,7 @@ def disk_stats(folder):
     free_percent = 0.0 if total_bytes == 0 else 100 * free_bytes / total_bytes
     used_percent = 0.0 if total_bytes == 0 else 100 * used_bytes / total_bytes
 
-    return disk_stats_tuple(
-        folder, free_bytes, used_bytes, total_bytes, free_percent, used_percent
-    )
+    return DiskStats(folder, free_bytes, used_bytes, total_bytes, free_percent, used_percent)
 
 
 def _path_selector(paths, within, stat_attr):
