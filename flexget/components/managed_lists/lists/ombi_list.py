@@ -200,7 +200,6 @@ class OmbiEntry:
             self.request_id = response['requestId']
 
             log.info("{} was requested in Ombi.", self.ombi_title)
-            return True
 
         except (HTTPError, ApiError) as error:
             if isinstance(error, ApiError):
@@ -217,6 +216,7 @@ class OmbiEntry:
             log.error("Failed to mark {} as requested in Ombi.", self.ombi_title)
             log.verbose(error.response)
             return False
+        return True
 
     def mark_available(self):
         """Mark an entry in Ombi as avaliable."""
@@ -237,11 +237,9 @@ class OmbiEntry:
             self._request.post(api_endpoint, data=data, headers=headers)
 
             log.info("{} has been marked available.", self.ombi_title)
-            return
         except (HTTPError, ApiError) as e:
             log.error("Failed to mark {} as available in Ombi.", self.ombi_title)
             log.debug(e)
-            return
 
     def mark_deleted(self):
         """Mark an entry in Ombi as deleted."""
@@ -260,11 +258,9 @@ class OmbiEntry:
             self._request.delete(api_endpoint, headers=headers)
 
             log.info("{} has been marked deleted.", self.ombi_title)
-            return
         except (HTTPError, ApiError) as e:
             log.error("Failed to mark {} as deleted in Ombi.", self.ombi_title)
             log.debug(e)
-            return
 
     def mark_unavailable(self):
         """Mark an entry in Ombi as unavaliable."""
@@ -289,11 +285,9 @@ class OmbiEntry:
             self._request.post(api_endpoint, data=data, headers=headers)
 
             log.info("{} has been marked unavailable.", self.ombi_title)
-            return
         except (HTTPError, ApiError) as e:
             log.error("Failed to mark {} as unavailable in Ombi.", self.ombi_title)
             log.debug(e)
-            return
 
     def mark_denied(self):
         """Mark an entry in Ombi as denied."""
@@ -315,11 +309,9 @@ class OmbiEntry:
             self._request.put(api_endpoint, data=data, headers=headers)
 
             log.info("{} has been marked denied.", self.ombi_title)
-            return
         except (HTTPError, ApiError) as e:
             log.error("Failed to mark {} as denied in Ombi.", self.ombi_title)
             log.debug(e)
-            return
 
     def mark_approved(self):
         """Mark an entry in Ombi as approved."""
@@ -341,11 +333,9 @@ class OmbiEntry:
             self._request.post(api_endpoint, data=data, headers=headers)
 
             log.info("{} has been marked approved.", self.ombi_title)
-            return
         except (HTTPError, ApiError) as e:
             log.error("Failed to mark {} as approved in Ombi.", self.ombi_title)
             log.debug(e)
-            return
 
 
 class OmbiMovie(OmbiEntry):

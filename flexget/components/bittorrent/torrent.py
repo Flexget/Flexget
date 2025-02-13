@@ -69,8 +69,8 @@ class TorrentFilename:
                 else:
                     # generate filename from torrent or fall back to title plus extension
                     entry['filename'] = self.make_filename(torrent, entry)
-            except Exception as e:
-                logger.exception(e)
+            except Exception:
+                logger.exception('Found an error')
 
     @plugin.priority(TORRENT_PRIO)
     def on_task_output(self, task, config):

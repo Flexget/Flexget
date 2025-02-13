@@ -65,9 +65,10 @@ def _set_authentication_patch(self, password, private_key, private_key_pass):
                     self._tconnect['pkey'] = key.from_private_key_file(
                         private_key_file, private_key_pass
                     )
-                    return
                 except paramiko.SSHException:  # if it fails, try dss
                     pass
+                else:
+                    return
             raise paramiko.SSHException(f'Unknown key type: {private_key}')
 
 

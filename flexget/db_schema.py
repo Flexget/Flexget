@@ -161,8 +161,8 @@ def upgrade(plugin: str) -> Callable:
                     )
                     reset_schema(plugin, session=session)
                     manager.db_upgraded = True
-                except Exception as e:
-                    logger.exception('Failed to upgrade database for plugin {}: {}', plugin, e)
+                except Exception:
+                    logger.exception('Failed to upgrade database for plugin {}', plugin)
                     session.rollback()
                     manager.shutdown(finish_queue=False)
                 else:
@@ -217,7 +217,7 @@ def reset_schema(plugin: str, session=None) -> None:
 def register_plugin_table(tablename: str, plugin: str, version: int):
     plugin_schemas.setdefault(plugin, {'version': version, 'tables': []})
     if plugin_schemas[plugin]['version'] != version:
-        raise Exception(f'Two different schema versions received for plugin {plugin}')
+        raise RuntimeError(f'Two different schema versions received for plugin {plugin}')
     plugin_schemas[plugin]['tables'].append(tablename)
 
 

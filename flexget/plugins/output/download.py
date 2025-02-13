@@ -391,9 +391,9 @@ class PluginDownload:
             except plugin.PluginWarning as e:
                 entry.fail()
                 logger.error('Plugin error while writing: {}', e)
-            except Exception as e:
+            except Exception:
                 entry.fail()
-                logger.exception('Exception while writing: {}', e)
+                logger.exception('Exception while writing')
 
     def output(self, task, entry, config):
         """Moves temp-file into final destination

@@ -92,7 +92,7 @@ def autoformat(files):
         files = (project_root,)
     venv_path = os.environ['VIRTUAL_ENV']
     if not venv_path:
-        raise Exception('Virtualenv and activation required')
+        raise RuntimeError('Virtualenv and activation required')
 
     # ruff config is in pyproject.toml
     subprocess.call(('ruff', 'check', '--fix', *files))

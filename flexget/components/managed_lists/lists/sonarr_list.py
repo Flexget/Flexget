@@ -70,7 +70,6 @@ class SonarrSet(MutableSet):
             rsp = requests.request(method, url, headers=headers, json=data)
             data = rsp.json()
             logger.trace('sonarr response: {}', data)
-            return data
         except RequestException as e:
             base_msg = 'Sonarr returned an error. {}'
             if e.response is not None:
@@ -81,6 +80,7 @@ class SonarrSet(MutableSet):
             else:
                 error = str(e)
             raise plugin.PluginError(base_msg.format(error))
+        return data
 
     def translate_quality(self, quality_name):
         """

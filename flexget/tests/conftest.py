@@ -400,7 +400,7 @@ class DoublePhaseChecker:
     @staticmethod
     def on_phase(task, phase):
         if getattr(task, f'did_{phase}', None):
-            raise Exception(f'{phase} phase should not run twice')
+            raise RuntimeError(f'{phase} phase should not run twice')
         setattr(task, f'did_{phase}', True)
 
     def on_task_start(self, task, config):

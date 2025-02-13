@@ -119,7 +119,7 @@ class EntryIterator:
         if isinstance(item, slice):
             return list(itertools.islice(self, item.start, item.stop))
         if not isinstance(item, int):
-            raise ValueError('Index must be integer.')
+            raise TypeError('Index must be integer.')
         for index, entry in enumerate(self):
             if index == item:
                 return entry
@@ -468,7 +468,7 @@ class Task:
         :param string phase: Name of the phase
         """
         if phase not in phase_methods:
-            raise Exception(f'{phase} is not a valid task phase')
+            raise ValueError(f'{phase} is not a valid task phase')
         # warn if no inputs, filters or outputs in the task
         if phase in ['input', 'filter', 'output'] and not self.manager.unit_test:
             # Check that there is at least one manually configured plugin for these phases
@@ -548,7 +548,6 @@ class Task:
             # We exhaust any iterator inputs here to make sure we catch exceptions properly.
             if isinstance(result, collections.abc.Iterable):
                 result = list(result)
-            return result
         except TaskAbort:
             raise
         except PluginWarning as warn:
@@ -580,6 +579,8 @@ class Task:
             logger.opt(exception=True).critical(msg)
             traceback = self.manager.crash_report()
             self.abort(msg, traceback=traceback)
+        else:
+            return result
 
     def rerun(self, plugin=None, reason=None):
         """
@@ -689,8 +690,8 @@ class Task:
         except TaskAbort:
             try:
                 self.__run_task_phase('abort')
-            except TaskAbort as e:
-                logger.exception('abort handlers aborted: {}', e)
+            except TaskAbort:
+                logger.exception('abort handlers aborted')
             raise
 
     @use_task_logging
@@ -764,7 +765,7 @@ class Task:
         :raises RenderError: If there is a problem.
         """
         if not isinstance(template, (str, FlexGetTemplate)):
-            raise ValueError(
+            raise TypeError(
                 f'Trying to render non string template or unrecognized template format, got {template!r}'
             )
         logger.trace('rendering: {}', template)

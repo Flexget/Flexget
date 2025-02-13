@@ -80,9 +80,9 @@ class NPOWatchlist:
             page_response = requests.get(url)
             if page_response.url != url:
                 raise plugin.PluginError(f'Unexpected page: {page_response.url} (expected {url})')
-            return page_response
         except RequestException as e:
             raise plugin.PluginError(f'Request error: {e!s}')
+        return page_response
 
     def _login(self, task, config):
         if 'isAuthenticatedUser' in requests.cookies:

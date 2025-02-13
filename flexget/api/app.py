@@ -16,6 +16,7 @@ from flask_restx.reqparse import RequestParser
 from jsonschema.exceptions import ValidationError as SchemaValidationError
 from loguru import logger
 from referencing.exceptions import Unresolvable
+from requests import HTTPError
 from sqlalchemy.orm import Session
 from werkzeug.http import generate_etag
 
@@ -68,7 +69,7 @@ class APIClient:
         result = json.loads(response.get_data(as_text=True))
         # TODO: Proper exceptions
         if 200 > response.status_code >= 300:
-            raise Exception(result['error'])
+            raise HTTPError(result['error'])
         return result
 
 
