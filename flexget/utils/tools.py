@@ -206,7 +206,7 @@ def parse_timedelta(value: Union[timedelta, str, None]) -> timedelta:
         raise ValueError(f"Invalid time format '{value}'")
 
 
-def multiply_timedelta(interval: timedelta, number: Union[int, float]) -> timedelta:
+def multiply_timedelta(interval: timedelta, number: float) -> timedelta:
     """`timedelta`s can not normally be multiplied by floating points. This does that."""
     return timedelta(seconds=interval.total_seconds() * number)
 
@@ -373,9 +373,7 @@ def parse_filesize(
     return int(amount * (base**order))
 
 
-def format_filesize(
-    num_bytes: Union[int, float], si: bool = False, unit: Optional[str] = None
-) -> str:
+def format_filesize(num_bytes: float, si: bool = False, unit: Optional[str] = None) -> str:
     """
     Returns given bytes as prettified string.
 

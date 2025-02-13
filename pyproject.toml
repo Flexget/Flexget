@@ -164,6 +164,7 @@ select = [
     "PIE",
     "PL",
     "PT",
+    "PYI",
     "RET",
     "RSE",
     "RUF",

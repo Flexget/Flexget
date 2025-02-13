@@ -1,7 +1,6 @@
-from collections import namedtuple
 from itertools import groupby
 from pathlib import Path
-from typing import Optional
+from typing import NamedTuple, Optional
 from urllib.parse import unquote, urlparse
 
 from loguru import logger
@@ -22,10 +21,14 @@ DEFAULT_CONNECT_TRIES: int = 3
 DEFAULT_SOCKET_TIMEOUT_SEC: int = 15
 
 
-SftpConfig = namedtuple(
-    'SftpConfig',
-    ['host', 'port', 'username', 'password', 'private_key', 'private_key_pass', 'host_key'],
-)
+class SftpConfig(NamedTuple):
+    host: str
+    port: int
+    username: str
+    password: str
+    private_key: str
+    private_key_pass: str
+    host_key: HostKey
 
 
 class SftpList:
