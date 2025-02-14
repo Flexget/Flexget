@@ -430,7 +430,6 @@ class TestSeriesParser:
 
     def test_zeroes(self, parse):
         """SeriesParser: test zeroes as a season, episode"""
-
         for data in ['Test.S00E00-FlexGet', 'Test.S00E01-FlexGet', 'Test.S01E00-FlexGet']:
             s = parse(name='Test', data=data)
             id = s.identifier
@@ -441,7 +440,6 @@ class TestSeriesParser:
 
     def test_exact_name(self, parse):
         """SeriesParser: test exact/strict name parsing"""
-
         s = parse('Test.Foobar.S01E02.720p-FlexGet', name='test')
         assert s.valid, 'normal failed'
 

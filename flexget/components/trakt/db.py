@@ -111,8 +111,7 @@ def delete_account(account):
 
 
 def get_access_token(account, token=None, refresh=False, re_auth=False, called_from_cli=False):
-    """
-    Gets authorization info from a pin or refresh token.
+    """Gets authorization info from a pin or refresh token.
     :param account: Arbitrary account name to attach authorization to.
     :param unicode token: The pin or refresh token, as supplied by the trakt website.
     :param bool refresh: If True, refresh the access token using refresh_token from db.
@@ -177,8 +176,7 @@ def make_list_slug(name):
 
 
 def get_session(account=None, token=None):
-    """
-    Creates a requests session ready to talk to trakt API with FlexGet's api key.
+    """Creates a requests session ready to talk to trakt API with FlexGet's api key.
     Can also add user level authentication if `account` parameter is given.
     :param account: An account authorized via `flexget trakt auth` CLI command. If given, returned session will be
         authenticated for that account.
@@ -198,8 +196,7 @@ def get_session(account=None, token=None):
 
 
 def get_api_url(*endpoint):
-    """
-    Get the address of a trakt API endpoint.
+    """Get the address of a trakt API endpoint.
     :param endpoint: Can by a string endpoint (e.g. 'sync/watchlist') or an iterable (e.g. ('sync', 'watchlist')
         Multiple parameters can also be specified instead of a single iterable.
     :returns: The absolute url to the specified API endpoint.
@@ -727,9 +724,7 @@ class TraktShow(Base):
 
     @property
     def expired(self):
-        """
-        :return: True if show details are considered to be expired, ie. need of update
-        """
+        """:return: True if show details are considered to be expired, ie. need of update"""
         # TODO: stolen from imdb plugin, maybe there's a better way?
         if self.cached_at is None:
             logger.debug('cached_at is None: {}', self)
@@ -842,9 +837,7 @@ class TraktMovie(Base):
 
     @property
     def expired(self):
-        """
-        :return: True if movie details are considered to be expired, ie. need of update
-        """
+        """:return: True if movie details are considered to be expired, ie. need of update"""
         # TODO: stolen from imdb plugin, maybe there's a better way?
         if self.updated_at is None:
             logger.debug('updated_at is None: {}', self)
@@ -975,8 +968,7 @@ class TraktShowIds:
 
 
 def get_item_from_cache(table, session, title=None, year=None, trakt_ids=None):
-    """
-    Get the cached info for a given show/movie from the database.
+    """Get the cached info for a given show/movie from the database.
     :param table: Either TraktMovie or TraktShow
     :param title: Title of the show/movie
     :param year: First release year
@@ -1080,8 +1072,7 @@ def get_trakt_data(media_type, title=None, year=None, trakt_ids=None):
 
 
 def get_user_data(data_type, media_type, session, username):
-    """
-    Fetches user data from Trakt.tv on the /users/<username>/<data_type>/<media_type> end point. Eg. a user's
+    """Fetches user data from Trakt.tv on the /users/<username>/<data_type>/<media_type> end point. Eg. a user's
     movie collection is fetched from /users/<username>/collection/movies.
     :param data_type: Name of the data type eg. collection, watched etc.
     :param media_type: Type of media we want <data_type> for eg. shows, episodes, movies.
@@ -1089,7 +1080,6 @@ def get_user_data(data_type, media_type, session, username):
     :param username: Username of the user to fetch data
     :return:
     """
-
     endpoint = f'{data_type}/{media_type}'
     try:
         data = session.get(get_api_url('users', username, data_type, media_type)).json()

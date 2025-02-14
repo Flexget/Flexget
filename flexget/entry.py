@@ -61,8 +61,7 @@ class EntryUnicodeError(Exception):
 
 
 class Entry(LazyDict, Serializer):
-    """
-    Represents one item in task. Must have `url` and *title* fields.
+    """Represents one item in task. Must have `url` and *title* fields.
 
     Stores automatically *original_url* key, which is necessary because
     plugins (eg. urlrewriters) may change *url* into something else
@@ -96,8 +95,7 @@ class Entry(LazyDict, Serializer):
         operation: Optional[str] = None,
         plugin: Optional[str] = None,
     ) -> None:
-        """
-        Adds trace message to the entry which should contain useful information about why
+        """Adds trace message to the entry which should contain useful information about why
         plugin did not operate on entry. Accept and Reject messages are added to trace automatically.
 
         :param string message: Message to add into entry trace.
@@ -111,8 +109,7 @@ class Entry(LazyDict, Serializer):
             self.traces.append(item)
 
     def run_hooks(self, action: str, **kwargs) -> None:
-        """
-        Run hooks that have been registered for given ``action``.
+        """Run hooks that have been registered for given ``action``.
 
         :param action: Name of action to run hooks for
         :param kwargs: Keyword arguments that should be passed to the registered functions
@@ -121,8 +118,7 @@ class Entry(LazyDict, Serializer):
             func(self, **kwargs)
 
     def add_hook(self, action: str, func: Callable, **kwargs) -> None:
-        """
-        Add a hook for ``action`` to this entry.
+        """Add a hook for ``action`` to this entry.
 
         :param string action: One of: 'accept', 'reject', 'fail', 'complete'
         :param func: Function to execute when event occurs
@@ -135,8 +131,7 @@ class Entry(LazyDict, Serializer):
             raise ValueError(f'`{action}` is not a valid entry action')
 
     def on_accept(self, func: Callable, **kwargs) -> None:
-        """
-        Register a function to be called when this entry is accepted.
+        """Register a function to be called when this entry is accepted.
 
         :param func: The function to call
         :param kwargs: Keyword arguments that should be passed to the registered function
@@ -144,8 +139,7 @@ class Entry(LazyDict, Serializer):
         self.add_hook('accept', func, **kwargs)
 
     def on_reject(self, func: Callable, **kwargs) -> None:
-        """
-        Register a function to be called when this entry is rejected.
+        """Register a function to be called when this entry is rejected.
 
         :param func: The function to call
         :param kwargs: Keyword arguments that should be passed to the registered function
@@ -153,8 +147,7 @@ class Entry(LazyDict, Serializer):
         self.add_hook('reject', func, **kwargs)
 
     def on_fail(self, func: Callable, **kwargs) -> None:
-        """
-        Register a function to be called when this entry is failed.
+        """Register a function to be called when this entry is failed.
 
         :param func: The function to call
         :param kwargs: Keyword arguments that should be passed to the registered function
@@ -162,8 +155,7 @@ class Entry(LazyDict, Serializer):
         self.add_hook('fail', func, **kwargs)
 
     def on_complete(self, func: Callable, **kwargs) -> None:
-        """
-        Register a function to be called when a :class:`Task` has finished processing this entry.
+        """Register a function to be called when a :class:`Task` has finished processing this entry.
 
         :param func: The function to call
         :param kwargs: Keyword arguments that should be passed to the registered function
@@ -271,8 +263,7 @@ class Entry(LazyDict, Serializer):
     # TODO: this is too manual, maybe we should somehow check this internally and throw some exception if
     # application is trying to operate on invalid entry
     def isvalid(self) -> bool:
-        """
-        :return: True if entry is valid. Return False if this cannot be used.
+        """:return: True if entry is valid. Return False if this cannot be used.
         :rtype: bool
         """
         if 'title' not in self:
@@ -286,8 +277,7 @@ class Entry(LazyDict, Serializer):
     def update_using_map(
         self, field_map: dict, source_item: Union[dict, object], ignore_none: bool = False
     ):
-        """
-        Populates entry fields from a source object using a dictionary that maps from entry field names to
+        """Populates entry fields from a source object using a dictionary that maps from entry field names to
         attributes (or keys) in the source object.
 
         :param dict field_map:
@@ -310,8 +300,7 @@ class Entry(LazyDict, Serializer):
             self[field] = v
 
     def render(self, template: Union[str, FlexGetTemplate], native: bool = False) -> str:
-        """
-        Renders a template string based on fields in the entry.
+        """Renders a template string based on fields in the entry.
 
         :param template: A template string or FlexGetTemplate that uses jinja2 or python string replacement format.
         :param native: If True, and the rendering result can be all native python types, not just strings.
@@ -363,8 +352,7 @@ class Entry(LazyDict, Serializer):
         args: Optional[Sequence] = None,
         kwargs: Optional[Mapping] = None,
     ):
-        """
-        Add lazy fields to an entry.
+        """Add lazy fields to an entry.
         :param lazy_func: should be a funciton previously registered with the `register_lazy_func` decorator,
             or the name it was registered under.
         :param fields: list of fields this function will fill
@@ -385,9 +373,7 @@ class Entry(LazyDict, Serializer):
         self.lazy_lookups.append((lazy_func, fields, args, kwargs))
 
     def register_lazy_func(self, func, keys):
-        """
-        DEPRECATED. Use `add_lazy_fields` instead.
-        """
+        """DEPRECATED. Use `add_lazy_fields` instead."""
         warnings.warn(
             '`register_lazy_func` is deprecated. `add_lazy_fields` should be used instead. '
             'This plugin should be updated to work with the latest versions of FlexGet',

@@ -9,8 +9,7 @@ logger = logger.bind(name='metainfo_quality')
 
 
 class MetainfoQuality:
-    """
-    Utility:
+    """Utility:
 
     Set quality attribute for entries.
     """

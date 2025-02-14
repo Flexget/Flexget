@@ -14,8 +14,7 @@ def on_entry_action(entry, act=None, task=None, reason=None, **kwargs):
 
 
 class EntryOperations:
-    """
-    Records accept, reject and fail metainfo into entries.
+    """Records accept, reject and fail metainfo into entries.
 
     Creates fields::
 

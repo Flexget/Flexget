@@ -11,8 +11,7 @@ logger = logger.bind(name='kitsu')
 
 
 class KitsuAnime:
-    """
-    Creates an entry for each item in your kitsu.io list.
+    """Creates an entry for each item in your kitsu.io list.
 
     Syntax:
 

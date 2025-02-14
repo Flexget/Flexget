@@ -15,24 +15,23 @@ logger = logger.bind(name='qbittorrent')
 
 
 class OutputQBitTorrent:
-    """
-    Example:
+    """Example:
 
-      qbittorrent:
-        username: <USERNAME> (default: (none))
-        password: <PASSWORD> (default: (none))
-        host: <HOSTNAME> (default: localhost)
-        port: <PORT> (default: 8080)
-        use_ssl: <SSL> (default: False)
-        verify_cert: <VERIFY> (default: True)
-        path: <OUTPUT_DIR> (default: (none))
-        label: <LABEL> (default: (none))
-        tags: <TAGS> (default: (none))
-        maxupspeed: <torrent upload speed limit> (default: 0)
-        maxdownspeed: <torrent download speed limit> (default: 0)
-        add_paused: <ADD_PAUSED> (default: False)
-        ratio_limit: <RATIO_LIMIT> (default: -2)
-        seeding_time_limit: <SEEDING_TIME_LIMIT> (default: -1)
+    qbittorrent:
+      username: <USERNAME> (default: (none))
+      password: <PASSWORD> (default: (none))
+      host: <HOSTNAME> (default: localhost)
+      port: <PORT> (default: 8080)
+      use_ssl: <SSL> (default: False)
+      verify_cert: <VERIFY> (default: True)
+      path: <OUTPUT_DIR> (default: (none))
+      label: <LABEL> (default: (none))
+      tags: <TAGS> (default: (none))
+      maxupspeed: <torrent upload speed limit> (default: 0)
+      maxdownspeed: <torrent download speed limit> (default: 0)
+      add_paused: <ADD_PAUSED> (default: False)
+      ratio_limit: <RATIO_LIMIT> (default: -2)
+      seeding_time_limit: <SEEDING_TIME_LIMIT> (default: -1)
     """
 
     schema = {
@@ -110,8 +109,7 @@ class OutputQBitTorrent:
         raise plugin.PluginError(f'Error when trying to send request to qBittorrent: {msg}')
 
     def connect(self, config):
-        """
-        Connect to qBittorrent Web UI. Username and password not necessary
+        """Connect to qBittorrent Web UI. Username and password not necessary
         if 'Bypass authentication for localhost' is checked and host is
         'localhost'.
         """
@@ -322,8 +320,7 @@ class OutputQBitTorrent:
 
     @plugin.priority(120)
     def on_task_download(self, task, config):
-        """
-        Call download plugin to generate torrent files to load into
+        """Call download plugin to generate torrent files to load into
         qBittorrent.
         """
         config = self.prepare_config(config)
@@ -359,9 +356,7 @@ class FromQBitTorrent:
 
     @staticmethod
     def client(host: str, port: int, username: str, password: str):
-        """
-        Import client or abort task
-        """
+        """Import client or abort task"""
         try:
             import qbittorrentapi
         except ImportError:

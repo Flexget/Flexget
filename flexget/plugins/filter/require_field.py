@@ -8,8 +8,7 @@ logger = logger.bind(name='require_field')
 
 
 class FilterRequireField:
-    """
-    Rejects entries without defined field.
+    """Rejects entries without defined field.
 
     Example::
 

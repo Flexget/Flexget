@@ -14,17 +14,16 @@ logger = logger.bind(name=plugin_name)
 
 
 class MsTeamsNotifier:
-    """
-    Example::
+    """Example::
 
-      notify:
-        entries:
-          via:
-            ms_teams:
-              web_hook_url: <string>
-              [message: <string>]
-              [title: <string>]
-              [theme_color: <string>]
+    notify:
+      entries:
+        via:
+          ms_teams:
+            web_hook_url: <string>
+            [message: <string>]
+            [title: <string>]
+            [theme_color: <string>]
     """
 
     schema = {
@@ -39,9 +38,7 @@ class MsTeamsNotifier:
     }
 
     def notify(self, web_hook_url, message, config, title=None, themecolor=None):
-        """
-        Send notification to Microsoft Teams
-        """
+        """Send notification to Microsoft Teams"""
         notification = {'text': message, 'title': title, 'theme_color': themecolor}
 
         try:

@@ -8,8 +8,7 @@ logger = logger.bind(name='verify_ssl')
 
 
 class VerifySSLCertificates:
-    """
-    Plugin that can off SSL certificate verification.
+    """Plugin that can off SSL certificate verification.
 
     Example::
       verify_ssl_certificates: no

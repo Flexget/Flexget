@@ -56,8 +56,7 @@ SCHEMA = {
 
 
 class LogFilter:
-    """
-    Prevent entries with specific text from being logged.
+    """Prevent entries with specific text from being logged.
 
     Example::
       log_filter:

@@ -3,8 +3,7 @@ from flexget.event import event
 
 
 class AbortPlugin:
-    """
-    abort plugin for debug purposes.
+    """abort plugin for debug purposes.
 
     Usage::
 

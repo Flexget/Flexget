@@ -7,8 +7,7 @@ logger = logger.bind(name='limit_new')
 
 
 class FilterLimitNew:
-    """
-    Limit number of new items.
+    """Limit number of new items.
 
     Example::
 

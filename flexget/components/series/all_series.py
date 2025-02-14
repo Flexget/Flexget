@@ -5,8 +5,7 @@ from . import series as plugin_series
 
 
 class FilterAllSeries(plugin_series.FilterSeriesBase):
-    """
-    Grabs all entries that appear to be series episodes in a task.
+    """Grabs all entries that appear to be series episodes in a task.
 
     This plugin just configures the series plugin dynamically with all series from the task.
     It can take any of the options of the series plugin.

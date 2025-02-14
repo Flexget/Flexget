@@ -82,7 +82,6 @@ class ChatIdEntry(ChatIdsBase):
 class TelegramNotifier:
     """Send a message to one or more Telegram users or groups upon accepting a download.
 
-
     Preparations::
 
     * Install 'python-telegram-bot' python pkg (i.e. `pip install python-telegram-bot`)
@@ -359,7 +358,7 @@ class TelegramNotifier:
         fullnames: list[tuple[str, str]],
         groups: list[str],
     ) -> (list[ChatIdEntry], bool):
-        """get chat ids for `usernames`, `fullnames` & `groups`.
+        """Get chat ids for `usernames`, `fullnames` & `groups`.
         entries with a matching chat ids will be removed from the input lists.
         """
         logger.debug('loading cached chat ids')
@@ -387,7 +386,7 @@ class TelegramNotifier:
         fullnames: list[tuple[str, str]],
         groups: list[str],
     ) -> list[ChatIdEntry]:
-        """get chat ids from the cache (DB). remove found entries from `usernames`, `fullnames` & `groups`"""
+        """Get chat ids from the cache (DB). remove found entries from `usernames`, `fullnames` & `groups`"""
         chat_id_entries = []
         cached_usernames = {
             x.username: x
@@ -428,7 +427,7 @@ class TelegramNotifier:
     async def _get_new_chat_id_entries(
         self, usernames: list[str], fullnames: list[tuple[str, str]], groups: list[str]
     ) -> AsyncGenerator[ChatIdEntry, None]:
-        """get chat ids by querying the telegram `bot`"""
+        """Get chat ids by querying the telegram `bot`"""
         upd_usernames, upd_fullnames, upd_groups = await self._get_bot_updates()
 
         len_ = len(usernames)
@@ -468,7 +467,7 @@ class TelegramNotifier:
     async def _get_bot_updates(
         self,
     ) -> (dict[str, telegram.Chat], dict[(str, str), telegram.Chat], dict[str, telegram.Chat]):
-        """get updated chats info from telegram"""
+        """Get updated chats info from telegram"""
         # highly unlikely, but if there are more than `telegram.constants.PollingLimit.MAX_LIMIT`
         # msgs waiting for the bot, we should not miss one
         total_updates = []

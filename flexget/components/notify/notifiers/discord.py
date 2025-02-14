@@ -18,18 +18,17 @@ session.add_domain_limiter(TokenBucketLimiter('discord.com', 6, '3 seconds'))
 
 
 class DiscordNotifier:
-    """
-    Example::
+    """Example::
 
-      notify:
-        entries:
-          via:
-            - discord:
-                web_hook_url: <string>
-                [silent: <boolean>] (suppress notification)
-                [username: <string>] (override the default username of the webhook)
-                [avatar_url: <string>] (override the default avatar of the webhook)
-                [embeds: <arrays>[<object>]] (override embeds)
+    notify:
+      entries:
+        via:
+          - discord:
+              web_hook_url: <string>
+              [silent: <boolean>] (suppress notification)
+              [username: <string>] (override the default username of the webhook)
+              [avatar_url: <string>] (override the default avatar of the webhook)
+              [embeds: <arrays>[<object>]] (override embeds)
     """
 
     schema = {
@@ -122,13 +121,11 @@ class DiscordNotifier:
     }
 
     def notify(self, title, message, config):
-        """
-        Send discord notification
+        """Send discord notification
 
         :param str message: message body
         :param dict config: discord plugin config
         """
-
         for embed in config.get('embeds', []):
             ts = embed.get('timestamp')
             if ts:

@@ -41,6 +41,7 @@ class DependencyError(Exception):
         message: customized user readable error message
 
     All args are optional.
+
     """
 
     def __init__(
@@ -234,8 +235,7 @@ def register_task_phase(name: str, before: Optional[str] = None, after: Optional
 
 @total_ordering
 class PluginInfo(dict):
-    """
-    Allows accessing key/value pairs of this dictionary subclass via
+    """Allows accessing key/value pairs of this dictionary subclass via
     attributes. Also instantiates a plugin and initializes properties.
     """
 
@@ -252,8 +252,7 @@ class PluginInfo(dict):
         api_ver: int = 1,
         category: Optional[str] = None,
     ) -> None:
-        """
-        Register a plugin.
+        """Register a plugin.
 
         :param plugin_class: The plugin factory.
         :param string name: Name of the plugin (if not given, default to factory class name in underscore form).
@@ -372,9 +371,7 @@ register = PluginInfo
 
 
 def _get_standard_plugins_path() -> list[str]:
-    """
-    :returns: List of directories where traditional plugins should be tried to load from.
-    """
+    """:returns: List of directories where traditional plugins should be tried to load from."""
     # Get basic path from environment
     paths = []
     env_path = os.environ.get('FLEXGET_PLUGIN_PATH')
@@ -387,9 +384,7 @@ def _get_standard_plugins_path() -> list[str]:
 
 
 def _get_standard_components_path() -> list[str]:
-    """
-    :returns: List of directories where component plugins should be tried to load from.
-    """
+    """:returns: List of directories where component plugins should be tried to load from."""
     # Get basic path from environment
     paths = []
     env_path = os.environ.get('FLEXGET_COMPONENT_PATH')
@@ -444,10 +439,7 @@ def _import_plugin(module_name: str, plugin_path: Union[str, Path]) -> None:
 
 
 def _load_plugins_from_dirs(dirs: list[str]) -> None:
-    """
-    :param list dirs: Directories from where plugins are loaded from
-    """
-
+    """:param list dirs: Directories from where plugins are loaded from"""
     logger.debug('Trying to load plugins from: {}', dirs)
     dir_paths = [Path(d) for d in dirs if os.path.isdir(d)]
     # add all dirs to plugins_pkg load path so that imports work properly from any of the plugin dirs
@@ -467,9 +459,7 @@ def _load_plugins_from_dirs(dirs: list[str]) -> None:
 
 # TODO: this is now identical to _load_plugins_from_dirs, REMOVE
 def _load_components_from_dirs(dirs: list[str]) -> None:
-    """
-    :param list dirs: Directories where plugin components are loaded from
-    """
+    """:param list dirs: Directories where plugin components are loaded from"""
     logger.debug('Trying to load components from: {}', dirs)
     dir_paths = [Path(d) for d in dirs if os.path.isdir(d)]
     for component_dir in dir_paths:
@@ -524,8 +514,7 @@ def _load_plugins_from_packages() -> None:
 def load_plugins(
     extra_plugins: Optional[list[str]] = None, extra_components: Optional[list[str]] = None
 ) -> None:
-    """
-    Load plugins from the standard plugin and component paths.
+    """Load plugins from the standard plugin and component paths.
 
     :param list extra_plugins: Extra directories from where plugins are loaded.
     :param list extra_components: Extra directories from where components are loaded.
@@ -567,8 +556,7 @@ def get_plugins(
     name: Optional[str] = None,
     min_api: Optional[int] = None,
 ) -> Iterable[PluginInfo]:
-    """
-    Query other plugins characteristics.
+    """Query other plugins characteristics.
 
     :param string phase: Require phase
     :param string interface: Plugin must implement this interface.
@@ -617,8 +605,7 @@ def get_phases_by_plugin(name: str) -> list[str]:
 
 
 def get_plugin_by_name(name: str, issued_by: str = '???') -> PluginInfo:
-    """
-    Get plugin by name, preferred way since this structure may be changed at some point.
+    """Get plugin by name, preferred way since this structure may be changed at some point.
 
     Getting plugin via `.get` function is recommended for normal use.
 
@@ -640,9 +627,7 @@ def get_plugin_by_name(name: str, issued_by: str = '???') -> PluginInfo:
 
 
 def get(name: str, requested_by: Union[str, object]) -> object:
-    """
-
-    :param str name: Name of the requested plugin
+    """:param str name: Name of the requested plugin
     :param requested_by: Plugin class instance OR string value who is making the request.
     :return: Instance of Plugin class
     """

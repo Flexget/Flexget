@@ -40,8 +40,7 @@ def get_parser(command: Optional[str] = None) -> 'ArgumentParser':
 def register_command(
     command: str, callback: Callable[['flexget.manager.Manager', Namespace], Any], **kwargs
 ) -> 'ArgumentParser':
-    """
-    Register a callback function to be executed when flexget is launched with the given `command`.
+    """Register a callback function to be executed when flexget is launched with the given `command`.
 
     :param command: The command being defined.
     :param callback: Callback function executed when this command is invoked from the CLI. Should take manager instance
@@ -249,8 +248,7 @@ class ParserError(Exception):
 
 
 class ArgumentParser(ArgParser):
-    """
-    Mimics the default :class:`argparse.ArgumentParser` class, with a few distinctions, mostly to ease subparser usage:
+    """Mimics the default :class:`argparse.ArgumentParser` class, with a few distinctions, mostly to ease subparser usage:
 
     - If `add_subparsers` is called with the `nested_namespaces` kwarg, all subcommand options will be stored in a
       nested namespace based on the command name for the subparser
@@ -274,11 +272,9 @@ class ArgumentParser(ArgParser):
     do_help = True
 
     def __init__(self, **kwargs):
+        """:param nested_namespace_name: When used as a subparser, options from this parser will be stored nested under
+        this attribute name in the root parser's namespace
         """
-        :param nested_namespace_name: When used as a subparser, options from this parser will be stored nested under
-            this attribute name in the root parser's namespace
-        """
-
         self.subparsers = None
         self.raise_errors = None
         add_help = kwargs.pop('add_help', True)
@@ -342,9 +338,7 @@ class ArgumentParser(ArgParser):
         raise_errors: bool = False,
         file: Optional[TextIO] = None,
     ):  # pylint: disable=W0221
-        """
-        :param raise_errors: If this is true, errors will be raised as `ParserError`s instead of calling sys.exit
-        """
+        """:param raise_errors: If this is true, errors will be raised as `ParserError`s instead of calling sys.exit"""
         ArgumentParser.file = file
         try:
             return super().parse_args(args, namespace)
@@ -381,9 +375,8 @@ class ArgumentParser(ArgParser):
         return namespace, args
 
     def add_subparsers(self, **kwargs):
-        """
-        :param nested_namespaces: If True, options from subparsers will appear in nested namespace under the subparser
-            name.
+        """:param nested_namespaces: If True, options from subparsers will appear in nested namespace under the subparser
+        name.
         """
         # Set the parser class so subparsers don't end up being an instance of a subclass, like CoreArgumentParser
         kwargs.setdefault('parser_class', ArgumentParser)
@@ -392,8 +385,7 @@ class ArgumentParser(ArgParser):
         return self.subparsers
 
     def add_subparser(self, name: str, **kwargs):
-        """
-        Adds a parser for a new subcommand and returns it.
+        """Adds a parser for a new subcommand and returns it.
 
         :param name: Name of the subcommand
         :param parent_defaults: Default argument values which should be supplied to the parent parser if this subparser
@@ -482,8 +474,7 @@ manager_parser.add_argument(
 
 
 class CoreArgumentParser(ArgumentParser):
-    """
-    The core argument parser, contains the manager arguments, command parsers, and plugin arguments.
+    """The core argument parser, contains the manager arguments, command parsers, and plugin arguments.
 
     Warning: Only gets plugin arguments if instantiated after plugins have been loaded.
 

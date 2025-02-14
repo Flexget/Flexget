@@ -8,9 +8,7 @@ logger = logger.bind(name='metainfo_media_id')
 
 
 class MetainfoMediaId:
-    """
-    Populate media_id field based on media type etc.
-    """
+    """Populate media_id field based on media type etc."""
 
     schema = {'type': 'boolean'}
 

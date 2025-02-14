@@ -46,8 +46,7 @@ CATEGORIES = {
 
 
 class UrlRewriteTorrentday:
-    """
-    Torrentday urlrewriter and search plugin.
+    """Torrentday urlrewriter and search plugin.
 
     torrentday:
       uid: xxxxxxxxxxxxx  (required)    NOT YOUR LOGIN. find this in your browser's cookies
@@ -105,10 +104,7 @@ class UrlRewriteTorrentday:
 
     @plugin.internet(logger)
     def search(self, task, entry, config=None):
-        """
-        Search for name from torrentday.
-        """
-
+        """Search for name from torrentday."""
         categories = config.get('category', 'all')
         # Make sure categories is a list
         if not isinstance(categories, list):

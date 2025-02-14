@@ -16,15 +16,13 @@ platform_replaces = {
 
 
 def pathscrub(dirty_path: str, os: Optional[str] = None, filename: bool = False) -> str:
-    """
-    Strips illegal characters for a given os from a path.
+    """Strips illegal characters for a given os from a path.
 
     :param dirty_path: Path to be scrubbed.
     :param os: Defines which os mode should be used, can be 'windows', 'mac', 'linux', or None to auto-detect
     :param filename: If this is True, path separators will be replaced with '-'
     :return: A valid path.
     """
-
     # See if global os_mode has been defined by pathscrub plugin
     if os_mode and not os:
         os = os_mode

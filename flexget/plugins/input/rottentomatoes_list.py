@@ -15,8 +15,7 @@ logger = logger.bind(name='rottentomatoes_list')
 
 
 class RottenTomatoesList:
-    """
-    Emits an entry for each movie in a Rotten Tomatoes list.
+    """Emits an entry for each movie in a Rotten Tomatoes list.
 
     Configuration:
 

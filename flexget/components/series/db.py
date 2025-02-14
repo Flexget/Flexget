@@ -154,9 +154,7 @@ class Season(Base):
 
     @property
     def completed(self):
-        """
-        Return True if the season has any released marked as downloaded
-        """
+        """Return True if the season has any released marked as downloaded"""
         if not self.releases:
             return False
         return any(release.downloaded for release in self.releases)
@@ -183,9 +181,7 @@ class Season(Base):
 
     @property
     def age(self):
-        """
-        :return: Pretty string representing age of episode. eg "23d 12h" or "No releases seen"
-        """
+        """:return: Pretty string representing age of episode. eg "23d 12h" or "No releases seen" """
         if not self.first_seen:
             return 'No releases seen'
         diff = datetime.now() - self.first_seen
@@ -199,9 +195,7 @@ class Season(Base):
 
     @property
     def age_timedelta(self):
-        """
-        :return: Timedelta or None if seasons is never seen
-        """
+        """:return: Timedelta or None if seasons is never seen"""
         if not self.first_seen:
             return None
         return datetime.now() - self.first_seen
@@ -245,9 +239,7 @@ class Season(Base):
 
     @property
     def latest_release(self):
-        """
-        :return: Latest downloaded Release or None
-        """
+        """:return: Latest downloaded Release or None"""
         if not self.releases:
             return None
         return sorted(
@@ -293,9 +285,7 @@ class Episode(Base):
 
     @property
     def age(self):
-        """
-        :return: Pretty string representing age of episode. eg "23d 12h" or "No releases seen"
-        """
+        """:return: Pretty string representing age of episode. eg "23d 12h" or "No releases seen" """
         if not self.first_seen:
             return 'No releases seen'
         diff = datetime.now() - self.first_seen
@@ -309,9 +299,7 @@ class Episode(Base):
 
     @property
     def age_timedelta(self):
-        """
-        :return: Timedelta or None if episode is never seen
-        """
+        """:return: Timedelta or None if episode is never seen"""
         if not self.first_seen:
             return None
         return datetime.now() - self.first_seen
@@ -330,9 +318,7 @@ class Episode(Base):
 
     @property
     def latest_release(self):
-        """
-        :return: Latest downloaded Release or None
-        """
+        """:return: Latest downloaded Release or None"""
         if not self.releases:
             return None
         return sorted(
@@ -932,8 +918,7 @@ def get_series_summary(
     session: Session = None,
     name: Optional[str] = None,
 ) -> Union[int, Iterable[Series]]:
-    """
-    Return a query with results for all series.
+    """Return a query with results for all series.
 
     :param configured: 'configured' for shows in config, 'unconfigured' for shows not in config, 'all' for both.
         Default is 'all'
@@ -974,13 +959,11 @@ def get_series_summary(
 
 
 def auto_identified_by(series: Series) -> str:
-    """
-    Determine if series `name` should be considered identified by episode or id format
+    """Determine if series `name` should be considered identified by episode or id format
 
     Returns 'ep', 'sequence', 'date' or 'id' if enough history is present to identify the series' id type.
     Returns 'auto' if there is not enough history to determine the format yet
     """
-
     session = Session.object_session(series)
     type_totals = dict(
         session.query(Episode.identified_by, func.count(Episode.identified_by))
@@ -1023,8 +1006,7 @@ def auto_identified_by(series: Series) -> str:
 def get_latest_season_pack_release(
     series: Series, downloaded: bool = True, season: Optional[int] = None
 ) -> Optional[Season]:
-    """
-    Return the latest season pack release for a series
+    """Return the latest season pack release for a series
 
     :param Series series: Series object
     :param bool downloaded: Flag to return only downloaded season packs
@@ -1066,8 +1048,7 @@ def get_latest_season_pack_release(
 def get_latest_episode_release(
     series: Series, downloaded: bool = True, season: Optional[int] = None
 ) -> Optional[Episode]:
-    """
-    :param series series: SQLAlchemy session
+    """:param series series: SQLAlchemy session
     :param downloaded: find only downloaded releases
     :param season: season to find newest release for
     :return: Instance of Episode or None if not found.
@@ -1121,8 +1102,7 @@ def get_latest_episode_release(
 def get_latest_release(
     series: Series, downloaded: bool = True, season: Optional[int] = None
 ) -> Union[EpisodeRelease, SeasonRelease, None]:
-    """
-    Return the latest downloaded entity of a series, either season pack or episode
+    """Return the latest downloaded entity of a series, either season pack or episode
 
     :param Series series: Series object
     :param bool downloaded: Downloaded flag
@@ -1138,8 +1118,7 @@ def get_latest_release(
 
 
 def new_eps_after(series: Series, since_ep: Episode, session: Session) -> tuple[int, str]:
-    """
-    :param since_ep: Episode instance
+    """:param since_ep: Episode instance
     :return: Number of episodes since then
     """
     series_eps = session.query(Episode).join(Episode.series).filter(Series.id == series.id)
@@ -1180,8 +1159,7 @@ def new_entities_after(since_entity: Union[Season, Episode]) -> tuple[int, str]:
 
 
 def set_series_begin(series: Series, ep_id: Union[str, int]) -> tuple[str, str]:
-    """
-    Set beginning for series
+    """Set beginning for series
 
     :param Series series: Series instance
     :param ep_id: Integer for sequence mode, SxxEyy for episodic and yyyy-mm-dd for date.
@@ -1228,8 +1206,7 @@ def set_series_begin(series: Series, ep_id: Union[str, int]) -> tuple[str, str]:
 
 
 def remove_series(name: str, forget: bool = False) -> None:
-    """
-    Remove a whole series `name` from database.
+    """Remove a whole series `name` from database.
 
     :param name: Name of series to be removed
     :param forget: Indication whether or not to fire a 'forget' event
@@ -1257,8 +1234,7 @@ def remove_series(name: str, forget: bool = False) -> None:
 
 
 def remove_series_entity(name: str, identifier: str, forget: bool = False) -> None:
-    """
-    Remove all entities by `identifier` from series `name` from database.
+    """Remove all entities by `identifier` from series `name` from database.
 
     :param name: Name of series to be removed
     :param identifier: Series identifier to be deleted,
@@ -1419,8 +1395,7 @@ def show_episodes(
 def store_parser(
     session: Session, parser: 'SeriesParseResult', series: Series = None, quality: 'Quality' = None
 ) -> list[Union[SeasonRelease, EpisodeRelease]]:
-    """
-    Push series information into database. Returns added/existing release.
+    """Push series information into database. Returns added/existing release.
 
     :param session: Database session to use
     :param parser: parser for release that should be added to database
@@ -1535,8 +1510,7 @@ def store_parser(
 def add_series_entity(
     session: Session, series: Series, identifier: str, quality: 'Quality' = None
 ) -> None:
-    """
-    Adds entity identified by `identifier` to series `name` in database.
+    """Adds entity identified by `identifier` to series `name` in database.
 
     :param series: Series in database to add entity to.
     :param identifier: Series identifier to be added.

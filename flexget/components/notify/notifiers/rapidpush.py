@@ -20,19 +20,18 @@ requests.add_domain_limiter(TimedLimiter('rapidpush.net', '5 seconds'))
 
 
 class RapidpushNotifier:
-    """
-    Example::
+    """Example::
 
-      notify:
-        entries:
-          via:
-            - rapidpush:
-                apikey: xxxxxxx (can also be a list of api keys)
-                [category: category, default FlexGet]
-                [group: device group, default no group]
-                [channel: the broadcast notif. channel; if provided it will be send to the channel subscribers instead of
-                    your devices, default no channel]
-                [priority: 0 - 6 (6 = highest), default 2 (normal)]
+    notify:
+      entries:
+        via:
+          - rapidpush:
+              apikey: xxxxxxx (can also be a list of api keys)
+              [category: category, default FlexGet]
+              [group: device group, default no group]
+              [channel: the broadcast notif. channel; if provided it will be send to the channel subscribers instead of
+                  your devices, default no channel]
+              [priority: 0 - 6 (6 = highest), default 2 (normal)]
     """
 
     schema = {
@@ -57,9 +56,7 @@ class RapidpushNotifier:
     }
 
     def notify(self, title, message, config):
-        """
-        Send a Rapidpush notification
-        """
+        """Send a Rapidpush notification"""
         notification = {'title': title, 'message': message}
         if not isinstance(config['api_key'], list):
             config['api_key'] = [config['api_key']]

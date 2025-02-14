@@ -46,8 +46,7 @@ class MDChangeSet:
         return instance
 
     def parse_message(self, message: str) -> bool:
-        """
-        Parses a git commit message and formats and adds any tagged messages to this changeset.
+        """Parses a git commit message and formats and adds any tagged messages to this changeset.
         Returns True if one or more changelog messages was found.
         """
         found = False

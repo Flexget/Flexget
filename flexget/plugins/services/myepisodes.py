@@ -33,8 +33,7 @@ class MyEpisodesInfo(Base):
 
 
 class MyEpisodes:
-    """
-    Marks a series episode as acquired in your myepisodes.com account.
+    """Marks a series episode as acquired in your myepisodes.com account.
 
     Simple Example:
 
@@ -84,10 +83,7 @@ class MyEpisodes:
 
     @plugin.priority(plugin.PRIORITY_LAST)
     def on_task_output(self, task, config):
-        """
-        Mark all accepted episodes as acquired on MyEpisodes
-        """
-
+        """Mark all accepted episodes as acquired on MyEpisodes"""
         if not task.accepted:
             # Nothing accepted, don't do anything
             return
@@ -119,8 +115,7 @@ class MyEpisodes:
                 logger.warning(w)
 
     def _validate_entry(self, entry):
-        """
-        Checks an entry for all of the fields needed to comunicate with myepidoes
+        """Checks an entry for all of the fields needed to comunicate with myepidoes
         Return: boolean
         """
         if (
@@ -135,11 +130,9 @@ class MyEpisodes:
             )
 
     def _lookup_myepisodes_id(self, entry):
-        """
-        Attempts to find the myepisodes id for the series
+        """Attempts to find the myepisodes id for the series
         Return: myepisode id or None
         """
-
         # Do we already have the id?
         myepisodes_id = entry.get('myepisodes_id')
         if myepisodes_id:
@@ -160,8 +153,7 @@ class MyEpisodes:
         )
 
     def _retrieve_id_from_database(self, entry):
-        """
-        Attempts to find the myepisodes id in the database
+        """Attempts to find the myepisodes id in the database
         Return: myepisode id or None
         """
         lc_series_name = entry['series_name'].lower()
@@ -175,8 +167,7 @@ class MyEpisodes:
         return None
 
     def _retrieve_id_from_website(self, entry):
-        """
-        Attempts to find the myepisodes id for the series for the website itself
+        """Attempts to find the myepisodes id for the series for the website itself
         Return: myepisode id or None
         """
         myepisodes_id = None
@@ -199,8 +190,7 @@ class MyEpisodes:
         return myepisodes_id
 
     def _generate_search_value(self, entry):
-        """
-        Find the TVDB name for searching myepisodes with.
+        """Find the TVDB name for searching myepisodes with.
 
         myepisodes.com is backed by tvrage, so this will not be perfect.
 
@@ -225,11 +215,9 @@ class MyEpisodes:
         return search_value
 
     def _save_id(self, series_name, myepisodes_id):
-        """
-        Save the myepisodes id in the database.
+        """Save the myepisodes id in the database.
         This will help prevent unecceary communication with the website
         """
-
         # if we already have the a record for that id, update the name so that we find it next time
         db_item = (
             self.db_session.query(MyEpisodesInfo)
@@ -256,8 +244,8 @@ class MyEpisodes:
 
         Raises:
             PluginWarning if operation fails
-        """
 
+        """
         url = "http://www.myepisodes.com/ajax/service.php?mode=eps_update"
         myepisodes_id = entry['myepisodes_id']
         season = entry['series_season']
@@ -294,8 +282,8 @@ class MyEpisodes:
         Raises:
             PluginWarning if login fails
             PluginError if http communication fails
-        """
 
+        """
         url = "https://www.myepisodes.com/login.php"
         session = requests.Session()
 

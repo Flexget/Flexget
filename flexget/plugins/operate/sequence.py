@@ -15,6 +15,7 @@ class PluginSequence:
     sequence:
       - rss: http://feeda.com
       - rss: http://feedb.com
+
     """
 
     schema = {'type': 'array', 'items': {'$ref': '/schema/plugins'}}

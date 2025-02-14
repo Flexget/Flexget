@@ -22,8 +22,7 @@ def get_rt_url(movie):
 
 
 class PluginRottenTomatoesLookup:
-    """
-    Retrieves Rotten Tomatoes information for entries.
+    """Retrieves Rotten Tomatoes information for entries.
 
     Example::
         rottentomatoes_lookup: yes
@@ -82,8 +81,7 @@ class PluginRottenTomatoesLookup:
             log_once(e.value.capitalize(), logger=logger)
 
     def lookup(self, entry, search_allowed=True, key=None):
-        """
-        Perform Rotten Tomatoes lookup for entry.
+        """Perform Rotten Tomatoes lookup for entry.
 
         :param entry: Entry instance
         :param search_allowed: Allow fallback to search

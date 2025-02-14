@@ -12,17 +12,13 @@ logger = logger.bind(name='decompress')
 
 
 def fail_entry_with_error(entry, error):
-    """
-    Log error message at error level and fail the entry
-    """
+    """Log error message at error level and fail the entry"""
     logger.error(error)
     entry.fail(error)
 
 
 def open_archive_entry(entry):
-    """
-    Convenience function for opening archives from entries. Returns an archive.Archive object
-    """
+    """Convenience function for opening archives from entries. Returns an archive.Archive object"""
     archive_path = entry.get('location', '')
     if not archive_path:
         logger.error('Entry does not appear to represent a local file.')
@@ -54,7 +50,6 @@ def get_output_path(to, entry):
 
 def extract_info(info, archive, to, keep_dirs, test=False):
     """Extract ArchiveInfo object"""
-
     destination = get_destination_path(info, to, keep_dirs)
 
     if test:
@@ -73,7 +68,6 @@ def extract_info(info, archive, to, keep_dirs, test=False):
 
 def get_destination_path(info, to, keep_dirs):
     """Generate the destination path for a given file"""
-
     path_suffix = info.path if keep_dirs else os.path.basename(info.path)
 
     return os.path.join(to, path_suffix)
@@ -93,8 +87,7 @@ def is_match(info, pattern):
 
 
 class Decompress:
-    r"""
-    Extracts files from Zip or RAR archives. By default this plugin will extract to the same
+    r"""Extracts files from Zip or RAR archives. By default this plugin will extract to the same
     directory as the source archive, preserving directory structure from the archive.
 
     This plugin requires the rarfile Python module and unrar command line utility to extract RAR
@@ -118,11 +111,11 @@ class Decompress:
 
 
     Example:
-
       decompress:
         to: '/Volumes/External/TV/{{series_name}}/Season {{series_season}}/'
         keep_dirs: yes
         regexp: '.*s\d{1,2}e\d{1,2}.*\.mkv'
+
     """
 
     schema = {
@@ -167,12 +160,10 @@ class Decompress:
 
     @staticmethod
     def handle_entry(entry, config, test=False):
-        """
-        Extract matching files into the directory specified
+        """Extract matching files into the directory specified
 
         Optionally delete the original archive if config.delete_archive is True
         """
-
         archive = open_archive_entry(entry)
 
         if not archive:

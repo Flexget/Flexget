@@ -85,7 +85,6 @@ class Torznab:
     @plugin.internet(logger)
     def _setup_caps(self, task, searcher, categories):
         """Gets the capabilities of the torznab indexer and matches it with the provided configuration"""
-
         response = task.requests.get(self._build_url(t='caps'), timeout=self.timeout)
         logger.debug('Raw caps response {}', response.content)
         root = ET.fromstring(response.content)
@@ -156,7 +155,6 @@ class Torznab:
     @plugin.internet(logger)
     def create_entries_from_query(self, url, task):
         """Fetch feed and fill entries from"""
-
         logger.info('Fetching URL: {}', url)
 
         try:

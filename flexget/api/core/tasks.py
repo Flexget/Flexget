@@ -202,7 +202,6 @@ class TasksAPI(APIResource):
     @api.doc(expect=[tasks_parser])
     def get(self, session: Session = None) -> Response:
         """List all tasks"""
-
         active_tasks = {
             task: task_data
             for task, task_data in self.manager.user_config.get('tasks', {}).items()

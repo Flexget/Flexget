@@ -10,8 +10,7 @@ logger = logger.bind(name='sabnzbd')
 
 
 class OutputSabnzbd:
-    """
-    Example::
+    """Example::
 
       sabnzbd:
         apikey: 123456

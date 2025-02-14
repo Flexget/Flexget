@@ -15,6 +15,7 @@ class PluginBlurayLookup:
 
     Example:
         tmdb_lookup: yes
+
     """
 
     field_map = {
@@ -51,8 +52,7 @@ class PluginBlurayLookup:
             log_once('Bluray lookup failed for {}'.format(entry['title']), logger, 'WARNING')
 
     def lookup(self, entry):
-        """
-        Populates all lazy fields to an Entry. May be called by other plugins
+        """Populates all lazy fields to an Entry. May be called by other plugins
         requiring bluray info on an Entry
 
         :param entry: Entry instance

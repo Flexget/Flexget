@@ -17,8 +17,7 @@ MAX_SEASON_DIFF_WITH_BEGIN = 30
 
 
 class NextSeriesSeasons:
-    """
-    Emit next season number from all series configured in this task.
+    """Emit next season number from all series configured in this task.
 
     Supports only 'ep' mode series.
     """

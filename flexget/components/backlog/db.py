@@ -96,8 +96,7 @@ def get_entries(task=None, session=None):
 
 @with_session
 def clear_entries(task=None, all=False, session=None):
-    """
-    Clear entries from backlog.
+    """Clear entries from backlog.
 
     :param task: If given, only entries from specified task will be cleared.
     :param all: If True, all entries will be cleared, otherwise only expired entries will be cleared.

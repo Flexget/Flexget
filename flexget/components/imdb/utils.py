@@ -39,9 +39,7 @@ def is_imdb_url(url):
 
 
 def is_valid_imdb_title_id(value):
-    """
-    Return True if `value` is a valid IMDB ID for titles (movies, series, etc).
-    """
+    """Return True if `value` is a valid IMDB ID for titles (movies, series, etc)."""
     if not isinstance(value, str):
         raise TypeError(f"is_valid_imdb_title_id expects a string but got {type(value)}")
     # IMDB IDs for titles have 'tt' followed by 7 or 8 digits
@@ -49,9 +47,7 @@ def is_valid_imdb_title_id(value):
 
 
 def is_valid_imdb_person_id(value):
-    """
-    Return True if `value` is a valid IMDB ID for a person.
-    """
+    """Return True if `value` is a valid IMDB ID for a person."""
     if not isinstance(value, str):
         raise TypeError(f"is_valid_imdb_person_id expects a string but got {type(value)}")
     # An IMDB ID for a person is formed by 'nm' followed by 7 digits

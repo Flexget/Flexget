@@ -10,8 +10,7 @@ logger = logger.bind(name='emby_reload')
 
 
 class EmbyRefreshLibrary:
-    """
-    Refresh Emby Library
+    """Refresh Emby Library
 
     Example:
         emby_refresh:
@@ -21,6 +20,7 @@ class EmbyRefreshLibrary:
                 apikey: <apikey>
                 return_host: wan
             when: accepted
+
     """
 
     auth = None

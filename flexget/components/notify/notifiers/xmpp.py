@@ -13,8 +13,7 @@ logger = logger.bind(name=plugin_name)
 
 
 class XMPPNotifier:
-    """
-    Sends messages via XMPP. The sleekxmpp library is required to be installed.
+    """Sends messages via XMPP. The sleekxmpp library is required to be installed.
     Install it with: `pip install sleekxmpp`
 
     All fields are required.

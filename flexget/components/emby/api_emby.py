@@ -50,16 +50,13 @@ logger = logger.bind(name='api_emby')
 
 
 class EmbyApiBase(ABC):  # noqa: B024 The correct fix for it requires a thorough understanding of the code.
-    """
-    Base Class to all API integratios
-    """
+    """Base Class to all API integratios"""
 
     EMBY_PREF = 'emby_'
 
     @staticmethod
     def merge_field_map(dst: dict, *arg: dict, **kwargs):
         """Merge field maps from clild and parent class"""
-
         allow_new = kwargs.get('allow_new', False)
 
         destination = copy.deepcopy(dst)
@@ -89,10 +86,7 @@ class EmbyApiBase(ABC):  # noqa: B024 The correct fix for it requires a thorough
 
     @staticmethod
     def update_using_map(target, field_map: dict, source_item, **kwargs):
-        """
-        Updates based on field map with source
-        """
-
+        """Updates based on field map with source"""
         allow_new = kwargs.get('allow_new', False)
 
         my_field_map = field_map.copy()
@@ -130,9 +124,7 @@ class EmbyApiBase(ABC):  # noqa: B024 The correct fix for it requires a thorough
 
 
 class EmbyAuth(EmbyApiBase):
-    """
-    Manage API Authorizations
-    """
+    """Manage API Authorizations"""
 
     _last_auth = None
 
@@ -180,8 +172,8 @@ class EmbyAuth(EmbyApiBase):
 
         Returns:
             bool: Is emby connect server
-        """
 
+        """
         regexp = (
             '('
             'http|https'
@@ -191,7 +183,6 @@ class EmbyAuth(EmbyApiBase):
 
     def login(self, optional=False):
         """Login user to API"""
-
         userdata = None
 
         if not self._apikey:
@@ -406,7 +397,6 @@ class EmbyAuth(EmbyApiBase):
 
     def save_token_data(self):
         """Saves token data to Data Base"""
-
         if self._apikey or not self.host or not self.username:
             return
 
@@ -496,7 +486,6 @@ class EmbyAuth(EmbyApiBase):
 
     def get_user_by_name(self, name: str) -> dict:
         """Gets user by username"""
-
         args = {'IsDisabled': False}
         useres = EmbyApi.resquest_emby(EMBY_ENDPOINT_GETUSERS, self, 'GET', **args)
         if not useres:
@@ -616,7 +605,6 @@ class EmbyApiListBase(EmbyApiBase):
 
     def get(self, item) -> 'EmbyApiMedia':
         """Get Item from list"""
-
         if isinstance(item, EmbyApiMedia):
             s_item = item
         else:
@@ -2538,9 +2526,7 @@ class EmbyApiMovie(EmbyApiMedia):
 
 
 class EmbyApi(EmbyApiBase):
-    """
-    Class to interact with Emby API
-    """
+    """Class to interact with Emby API"""
 
     _last_auth = None
 

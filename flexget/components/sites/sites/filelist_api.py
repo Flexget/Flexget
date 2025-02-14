@@ -14,9 +14,7 @@ requests = RequestSession()
 
 
 class SearchFileList:
-    """
-    FileList search plugin w/ API w00t.
-    """
+    """FileList search plugin w/ API w00t."""
 
     api_url = 'https://filelist.io/api.php'
 
@@ -85,9 +83,7 @@ class SearchFileList:
 
     @plugin.internet(logger)
     def search(self, task, entry, config):
-        """
-        Search for entries on FileList
-        """
+        """Search for entries on FileList"""
         entries = []
 
         # mandatory params

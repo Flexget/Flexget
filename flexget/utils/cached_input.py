@@ -105,8 +105,7 @@ def db_cleanup(manager, session: DBSession) -> None:
 
 
 class cached:  # noqa: N801 It acts like a function in usage
-    """
-    Implements transparent caching decorator @cached for inputs.
+    """Implements transparent caching decorator @cached for inputs.
 
     Decorator has two parameters:
 
@@ -217,8 +216,7 @@ class cached:  # noqa: N801 It acts like a function in usage
 
 
 class IterableCache:
-    """
-    Can cache any iterable (including generators) without immediately evaluating all entries.
+    """Can cache any iterable (including generators) without immediately evaluating all entries.
     If `finished_hook` is supplied, it will be called the first time the iterable is run to the end.
     """
 

@@ -26,15 +26,12 @@ AUTH_SUCCESS = b'authentication success'
 
 
 class RemoteStream:
-    """
-    Used as a filelike to stream text to remote client. If client disconnects while this is in use, an error will be
+    """Used as a filelike to stream text to remote client. If client disconnects while this is in use, an error will be
     logged, but no exception raised.
     """
 
     def __init__(self, writer: Optional[Callable]):
-        """
-        :param writer: A function which writes a line of text to remote client.
-        """
+        """:param writer: A function which writes a line of text to remote client."""
         self.buffer = ''
         self.writer = writer
 

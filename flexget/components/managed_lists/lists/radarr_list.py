@@ -252,11 +252,9 @@ QUALITIES_MAP = {
 
 
 def radarr_quality_to_flexget_quality_req(radarr_quality):
-    """
-    Translates the provided Radarr quality string to a Flexget Requirement instance.
+    """Translates the provided Radarr quality string to a Flexget Requirement instance.
     Returns None if translation is unsuccessful
     """
-
     # QUALITIES_MAP has its keys in lower case
     radarr_quality = radarr_quality.lower()
     if radarr_quality not in QUALITIES_MAP:
@@ -456,8 +454,7 @@ class RadarrSet(MutableSet):
         return True
 
     def _find_matching_entry(self, entry):
-        """
-        Finds a movie by first checking against the ids of the
+        """Finds a movie by first checking against the ids of the
         provided entry, and if none matches, check by title name
 
         :returns entry or None
@@ -491,8 +488,7 @@ class RadarrSet(MutableSet):
         return None
 
     def _get_movie_entries(self):
-        """
-        Returns a collection of Entry instances
+        """Returns a collection of Entry instances
         that represents the entries in the Radarr
         movie list
 
@@ -549,8 +545,7 @@ class RadarrSet(MutableSet):
 
     # TODO: this fails
     def _lookup_movie(self, title=None, imdb_id=None, tmdb_id=None):
-        """
-        Uses Radarr's API to lookup a movie, prioritizing IMDB/TMDB
+        """Uses Radarr's API to lookup a movie, prioritizing IMDB/TMDB
         ids and as a last resort search for the title
         """
         # If the entry has a IMDB id, use that for lookup

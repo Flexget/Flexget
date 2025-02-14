@@ -120,9 +120,7 @@ class Manager:
     options: argparse.Namespace
 
     def __init__(self, args: list[str]) -> None:
-        """
-        :param args: CLI args
-        """
+        """:param args: CLI args"""
         global manager
         if not self.unit_test:
             assert not manager, 'Only one instance of Manager should be created at a time!'
@@ -215,8 +213,7 @@ class Manager:
         self.log_filename = log_file
 
     def initialize(self) -> None:
-        """
-        Load plugins, database, and config. Also initializes (but does not start) the task queue and ipc server.
+        """Load plugins, database, and config. Also initializes (but does not start) the task queue and ipc server.
         This should only be called after obtaining a lock.
         """
         if self.initialized:
@@ -272,8 +269,7 @@ class Manager:
         priority: int = 1,
         suppress_warnings: Optional[Sequence[str]] = None,
     ) -> list[tuple[str, str, threading.Event]]:
-        """
-        Run all (can be limited with options) tasks from the config.
+        """Run all (can be limited with options) tasks from the config.
 
         :param options: Either an :class:`argparse.Namespace` instance, or a dict, containing options for execution
         :param priority: If there are other executions waiting to be run, they will be run in priority order,
@@ -336,8 +332,7 @@ class Manager:
         return finished_events
 
     def start(self) -> None:
-        """
-        Starting point when executing from commandline, dispatch execution to correct destination.
+        """Starting point when executing from commandline, dispatch execution to correct destination.
 
         If there is a FlexGet process with an ipc server already running, the command will be sent there for execution
         and results will be streamed back.
@@ -386,8 +381,7 @@ class Manager:
             return None
 
     def handle_cli(self, options: Optional[argparse.Namespace] = None) -> None:
-        """
-        Dispatch a cli command to the appropriate function.
+        """Dispatch a cli command to the appropriate function.
 
         * :meth:`.execute_command`
         * :meth:`.daemon_command`
@@ -414,8 +408,7 @@ class Manager:
             options.cli_command_callback(self, command_options)
 
     def execute_command(self, options: argparse.Namespace) -> None:
-        """
-        Handles the 'execute' CLI command.
+        """Handles the 'execute' CLI command.
 
         If there is already a task queue running in this process, adds the execution to the queue.
         If FlexGet is being invoked with this command, starts up a task queue and runs the execution.
@@ -452,8 +445,7 @@ class Manager:
         fire_event('manager.execute.completed', self, options)
 
     def daemon_command(self, options: argparse.Namespace) -> None:
-        """
-        Handles the 'daemon' CLI command.
+        """Handles the 'daemon' CLI command.
 
         Fires events:
 
@@ -462,7 +454,6 @@ class Manager:
 
         :param options: argparse options
         """
-
         # Import API so it can register to daemon.started event
         if options.action == 'start':
             if self.is_daemon:
@@ -556,8 +547,7 @@ class Manager:
         yaml.SafeDumper.increase_indent = increase_indent
 
     def _init_config(self, create: bool = False) -> None:
-        """
-        Find and load the configuration file.
+        """Find and load the configuration file.
 
         :param bool create: If a config file is not found, and create is True, one will be created in the home folder
         :raises: `OSError` when no config file could be found, and `create` is False.
@@ -626,8 +616,7 @@ class Manager:
     def load_config(
         self, output_to_console: bool = True, config_file_hash: Optional[str] = None
     ) -> None:
-        """
-        Loads the config file from disk, validates and activates it.
+        """Loads the config file from disk, validates and activates it.
 
         :raises: `ValueError` if there is a problem loading the config file
         """
@@ -697,8 +686,7 @@ class Manager:
         self.update_config(config)
 
     def update_config(self, config: dict) -> None:
-        """
-        Provide a new config for the manager to use.
+        """Provide a new config for the manager to use.
 
         :raises: `ValueError` and rolls back to previous config if the provided config is not valid.
         """
@@ -744,15 +732,15 @@ class Manager:
 
     def config_changed(self) -> None:
         """Makes sure that all tasks will have the config_modified flag come out true on the next run.
-        Useful when changing the db and all tasks need to be completely reprocessed."""
+        Useful when changing the db and all tasks need to be completely reprocessed.
+        """
         from flexget.task import config_changed
 
         config_changed()
         fire_event('manager.config_updated', self)
 
     def validate_config(self, config: Optional[dict] = None) -> dict:
-        """
-        Check all root level keywords are valid. Config may be modified by before_config_validate hooks. Modified
+        """Check all root level keywords are valid. Config may be modified by before_config_validate hooks. Modified
         config will be returned.
 
         :param config: Config to check. If not provided, current manager config will be checked.
@@ -826,9 +814,7 @@ class Manager:
             raise
 
     def _read_lock(self) -> Optional[dict]:
-        """
-        Read the values from the lock file. Returns None if there is no current lock file.
-        """
+        """Read the values from the lock file. Returns None if there is no current lock file."""
         if self.lockfile and os.path.exists(self.lockfile):
             result: dict[str, Union[str, int]] = {}
             with open(self.lockfile, encoding='utf-8') as f:
@@ -870,9 +856,7 @@ class Manager:
 
     @contextmanager
     def acquire_lock(self, event: bool = True) -> Iterator:
-        """
-        :param bool event: If True, the 'manager.lock_acquired' event will be fired after a lock is obtained
-        """
+        """:param bool event: If True, the 'manager.lock_acquired' event will be fired after a lock is obtained"""
         acquired = False
         try:
             # Don't do anything if we already have a lock. This means only the outermost call will release the lock file
@@ -979,8 +963,7 @@ class Manager:
             self.write_lock()
 
     def db_cleanup(self, force: bool = False) -> None:
-        """
-        Perform database cleanup if cleanup interval has been met.
+        """Perform database cleanup if cleanup interval has been met.
 
         Fires events:
 
@@ -1007,8 +990,7 @@ class Manager:
             logger.debug('Not running db cleanup, last run {}', self.persist.get('last_cleanup'))
 
     def shutdown(self, finish_queue: bool = True) -> None:
-        """
-        Request manager shutdown.
+        """Request manager shutdown.
 
         :param bool finish_queue: Should scheduler finish the task queue
         """
@@ -1044,8 +1026,7 @@ class Manager:
         return task_names
 
     def crash_report(self) -> str:
-        """
-        This should be called when handling an unexpected exception. Will create a new log file containing the last 50
+        """This should be called when handling an unexpected exception. Will create a new log file containing the last 50
         debug messages as well as the crash traceback.
         """
         if not self.unit_test:

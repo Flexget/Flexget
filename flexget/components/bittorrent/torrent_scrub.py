@@ -20,6 +20,7 @@ class TorrentScrub:
         tasks:
           rutorrent-fast-resume-infected-task:
             torrent_scrub: resume
+
     """
 
     # Scrub at high level, but BELOW "torrent"

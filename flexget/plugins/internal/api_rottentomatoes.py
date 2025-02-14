@@ -142,9 +142,7 @@ class RottenTomatoesMovie(RottenTomatoesContainer, Base):
 
     @property
     def expired(self) -> bool:
-        """
-        :return: True if movie details are considered to be expired, ie. need of update
-        """
+        """:return: True if movie details are considered to be expired, ie. need of update"""
         if self.updated is None:
             logger.debug('updated is None: {}', self)
             return True
@@ -267,8 +265,7 @@ def lookup_movie(
     session: Optional[Session] = None,
     api_key: Optional[str] = None,
 ) -> RottenTomatoesMovie:
-    """
-    Do a lookup from Rotten Tomatoes for the movie matching the passed arguments.
+    """Do a lookup from Rotten Tomatoes for the movie matching the passed arguments.
     Any combination of criteria can be passed, the most specific criteria specified will be used.
 
     :param rottentomatoes_id: rottentomatoes_id of desired movie
@@ -477,15 +474,13 @@ def _set_movie_details(
     movie_data: Optional[dict[str, Any]] = None,
     api_key: Optional[str] = None,
 ) -> Any:
-    """
-    Populate ``movie`` object from given data
+    """Populate ``movie`` object from given data
 
     :param movie: movie object to update
     :param session: session to use, returned Movie will be live in that session
     :param api_key: optionally specify an API key to use
     :param movie_data: data to copy into the :movie:
     """
-
     if not movie_data:
         if not movie.id:
             raise PluginError('Cannot get rotten tomatoes details without rotten tomatoes id')

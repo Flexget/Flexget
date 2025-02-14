@@ -18,8 +18,7 @@ logger = logger.bind(name='sceper')
 
 
 class InputSceper:
-    """
-    Uses sceper.ws category url as input.
+    """Uses sceper.ws category url as input.
 
     Example::
 
@@ -30,7 +29,6 @@ class InputSceper:
 
     def parse_site(self, url, task):
         """Parse configured url and return releases array"""
-
         try:
             page = task.requests.get(url).content
         except RequestException as e:

@@ -15,8 +15,7 @@ logger = logger.bind(name='imdb_lookup')
 
 
 class ImdbLookup:
-    """
-    Retrieves imdb information for entries.
+    """Retrieves imdb information for entries.
     Also provides imdb lookup functionality to all other imdb related plugins.
 
     Example::
@@ -70,8 +69,7 @@ class ImdbLookup:
 
     @with_session
     def imdb_id_lookup(self, movie_title=None, movie_year=None, raw_title=None, session=None):
-        """
-        Perform faster lookup providing just imdb_id.
+        """Perform faster lookup providing just imdb_id.
         Falls back to using basic lookup if data cannot be found from cache.
 
         .. note::
@@ -114,14 +112,12 @@ class ImdbLookup:
     @plugin.internet(logger)
     @with_session
     def lookup(self, entry, search_allowed=True, session=None):
-        """
-        Perform imdb lookup for entry.
+        """Perform imdb lookup for entry.
 
         :param entry: Entry instance
         :param search_allowed: Allow fallback to search
         :raises PluginError: Failure reason
         """
-
         from flexget.manager import manager
 
         if entry.get('imdb_id', eval_lazy=False):
@@ -254,8 +250,7 @@ class ImdbLookup:
         entry.update_using_map(self.field_map, movie)
 
     def _parse_new_movie(self, imdb_url, session):
-        """
-        Get Movie object by parsing imdb page and save movie into the database.
+        """Get Movie object by parsing imdb page and save movie into the database.
 
         :param imdb_url: IMDB url
         :param session: Session to be used

@@ -14,8 +14,7 @@ class LazyCallee(NamedTuple):
 
 
 class LazyLookup:
-    """
-    This class stores the information to do a lazy lookup for a LazyDict. An instance is stored as a placeholder value
+    """This class stores the information to do a lazy lookup for a LazyDict. An instance is stored as a placeholder value
     for any key that can be lazily looked up. There should be one instance of this class per LazyDict.
     """
 
@@ -83,8 +82,7 @@ class LazyDict(MutableMapping):
     copy = __copy__
 
     def get(self, key, default: Any = None, eval_lazy: bool = True) -> Any:  # pylint: disable=W0221
-        """
-        Adds the `eval_lazy` keyword argument to the normal :func:`dict.get` method.
+        """Adds the `eval_lazy` keyword argument to the normal :func:`dict.get` method.
 
         :param bool eval_lazy: If False, the default will be returned rather than evaluating a lazy field.
         """
@@ -101,8 +99,7 @@ class LazyDict(MutableMapping):
 
     @property
     def _lazy_lookup(self) -> LazyLookup:
-        """
-        The LazyLookup instance for this LazyDict.
+        """The LazyLookup instance for this LazyDict.
         If one is already stored in this LazyDict, it is returned, otherwise a new one is instantiated.
         """
         for val in self.store.values():
@@ -131,8 +128,7 @@ class LazyDict(MutableMapping):
                 self[key] = ll
 
     def is_lazy(self, key) -> bool:
-        """
-        :param key: Key to check
+        """:param key: Key to check
         :return: True if value for key is lazy loading.
         :rtype: bool
         """

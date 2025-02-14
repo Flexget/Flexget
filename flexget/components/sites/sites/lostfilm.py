@@ -74,11 +74,9 @@ class TextProcessingError(Exception):
 
 
 class LostFilm:
-    """
-    Grab new torrents from lostfilm RSS feed
+    """Grab new torrents from lostfilm RSS feed
 
     Example:
-
       lostfilm: yes
 
     or
@@ -93,6 +91,7 @@ class LostFilm:
         site_urls:
           - "http://www.example.com/"
           - "https://www.example.org/"
+
     """
 
     schema = {

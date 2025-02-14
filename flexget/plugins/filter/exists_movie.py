@@ -18,8 +18,7 @@ def merge_found_qualities(existing_qualities: dict[str, set], new_qualities: dic
 
 
 class FilterExistsMovie:
-    """
-    Reject existing movies.
+    """Reject existing movies.
 
     Syntax:
 

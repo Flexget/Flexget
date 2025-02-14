@@ -16,8 +16,7 @@ logger = logger.bind(name='failed')
 
 
 class PluginFailed:
-    """
-    Records entry failures and stores them for trying again after a certain interval.
+    """Records entry failures and stores them for trying again after a certain interval.
     Rejects them after they have failed too many times.
 
     """

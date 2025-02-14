@@ -33,8 +33,7 @@ DEFAULT_HOSTER = 'ul'
 
 
 class UrlRewriteSerienjunkies:
-    """
-    Serienjunkies urlrewriter
+    """Serienjunkies urlrewriter
     Version 1.0.2
 
     Language setting works like a whitelist, the selected is needed,

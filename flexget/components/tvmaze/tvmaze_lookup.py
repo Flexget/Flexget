@@ -13,7 +13,6 @@ class PluginTVMazeLookup:
     series_season, series_episode from series plugin.
 
     Example:
-
     tvmaze_lookup: yes
 
     Primarily used for passing tvmaze information to other plugins.

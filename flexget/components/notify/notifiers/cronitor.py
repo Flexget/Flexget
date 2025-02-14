@@ -16,8 +16,7 @@ logger = logger.bind(name=plugin_name)
 
 
 class Cronitor:
-    """
-    Example::
+    """Example::
       cronitor: ABC123
 
     Or:

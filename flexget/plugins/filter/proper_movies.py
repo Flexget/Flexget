@@ -40,8 +40,7 @@ Index(
 
 
 class FilterProperMovies:
-    """
-    Automatically download proper movies.
+    """Automatically download proper movies.
 
     Configuration:
 
