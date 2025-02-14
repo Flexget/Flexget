@@ -1,4 +1,4 @@
-FROM docker.io/python:3.11-alpine@sha256:9af3561825050da182afc74b106388af570b99c500a69c8216263aa245a2001b AS builder
+FROM docker.io/python:3.13-alpine@sha256:b6f01a01e34091438a29b6dda4664199e34731fb2581ebb6fe255a2ebf441099 AS builder
 ENV PYTHONUNBUFFERED=1
 
 RUN --mount=type=cache,target=/var/cache/apk \
@@ -26,7 +26,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 
 # Final image without uv
 # TODO: Alpine version is pinned due to https://github.com/Flexget/Flexget/issues/4085
-FROM docker.io/python:3.11-alpine3.20@sha256:6e18772230b36e78251ed179a2a2a2b3cc94726f02e1fddccdcfbe05b17bdc96
+FROM docker.io/python:3.13-alpine3.20@sha256:9ab3b6ef4afb7582afaa84e97d40a36f192595bb0578561c282cecc22a45de49
 ENV PYTHONUNBUFFERED=1
 
 RUN --mount=type=cache,target=/var/cache/apk \
