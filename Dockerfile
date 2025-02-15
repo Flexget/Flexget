@@ -26,7 +26,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 
 # Final image without uv
 # TODO: Alpine version is pinned due to https://github.com/Flexget/Flexget/issues/4085
-FROM docker.io/python:3.11-alpine3.20@sha256:6e18772230b36e78251ed179a2a2a2b3cc94726f02e1fddccdcfbe05b17bdc96
+FROM docker.io/python:3.11-alpine3.20@sha256:520924f35357a374aa1beaa81b867f449f9f12a53f00b69ad03c3d697fdf4aad
 ENV PYTHONUNBUFFERED=1
 
 RUN --mount=type=cache,target=/var/cache/apk \
