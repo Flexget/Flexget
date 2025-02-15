@@ -172,17 +172,16 @@ class ImdbWatchlist:
 
         entry['imdb_name'] = title
         entry['imdb_original_name'] = item['originalTitleText']['text']
-        if title_type in ['movie' , 'tvMovie']:
+        if title_type in ['movie', 'tvMovie']:
             entry['movie_name'] = title
         elif title_type in ['tvSeries', 'tvMiniSeries']:
             entry['series_name'] = title
-
 
         with contextlib.suppress(ValueError, TypeError):
             year = item['releaseYear']['year']
             entry['imdb_year'] = year
 
-            if title_type in ['movie' , 'tvMovie']:
+            if title_type in ['movie', 'tvMovie']:
                 entry['movie_year'] = year
             elif title_type in ['tvSeries', 'tvMiniSeries']:
                 entry['series_year'] = year
