@@ -136,7 +136,6 @@ class ImdbWatchlist:
             logger.verbose('Nothing found in imdb list: {}', config['list'])
             return []
 
-        entries = []
         page_no = 1
 
         while len(items) < total_item_count:
@@ -156,10 +155,7 @@ class ImdbWatchlist:
             except Exception:
                 raise plugin.PluginError('Received invalid list data')
 
-        for item in items:
-            entries.append(self.parse_entry(item['listItem'], config))
-
-        return entries
+        return [self.parse_entry(item['listItem'], config) for item in items]
 
     def parse_entry(self, item, config) -> Entry:
         entry = Entry()
