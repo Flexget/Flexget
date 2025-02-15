@@ -29,7 +29,7 @@ TITLE_TYPE_MAP = {
 
 
 class ImdbWatchlist:
-    """ "Creates an entry for each movie in your imdb list."""
+    """Creates an entry for each movie in your imdb list."""
 
     schema = {
         'type': 'object',
@@ -84,7 +84,7 @@ class ImdbWatchlist:
 
         headers = {'Accept-Language': config.get('force_language')}
         params = {'view': 'detail', 'page': 1}
-        if config['list'] in ['watchlist', 'ratings', 'checkins']:
+        if config['list'] in USER_LISTS:
             url = 'http://www.imdb.com/user/{}/{}'.format(config['user_id'], config['list'])
             if config['list'] == 'watchlist':
                 params = {'view': 'detail'}
@@ -157,25 +157,46 @@ class ImdbWatchlist:
                 raise plugin.PluginError('Received invalid list data')
 
         for item in items:
-            link = 'http://www.imdb.com/title/' + item['listItem']['id']
-            entry = Entry()
-            entry['title'] = item['listItem']['titleText']['text']
-            with contextlib.suppress(ValueError, TypeError):
-                year = item['listItem']['releaseYear']['year']
-                if not config.get('strip_dates'):
-                    entry['title'] += f' ({year})'
-                entry['imdb_year'] = year
-            entry['url'] = link
-            entry['imdb_id'] = item['listItem']['id']
-            entry['imdb_name'] = entry['title']
-            with contextlib.suppress(ValueError, TypeError):
-                entry['imdb_user_score'] = float(
-                    item['listItem']['ratingsSummary']['aggregateRating']
-                )
-
-            entries.append(entry)
+            entries.append(self.parse_entry(item['listItem'], config))
 
         return entries
+
+    def parse_entry(self, item, config) -> Entry:
+        entry = Entry()
+        title = item['titleText']['text']
+        title_type = item['titleType']['id']
+
+        entry['title'] = title
+        entry['url'] = entry['imdb_url'] = f"https://www.imdb.com/title/{item['id']}/"
+        entry['imdb_id'] = item['id']
+
+        entry['imdb_name'] = title
+        entry['imdb_original_name'] = item['originalTitleText']['text']
+        if title_type in ['movie' , 'tvMovie']:
+            entry['movie_name'] = title
+        elif title_type in ['tvSeries', 'tvMiniSeries']:
+            entry['series_name'] = title
+
+
+        with contextlib.suppress(ValueError, TypeError):
+            year = item['releaseYear']['year']
+            entry['imdb_year'] = year
+
+            if title_type in ['movie' , 'tvMovie']:
+                entry['movie_year'] = year
+            elif title_type in ['tvSeries', 'tvMiniSeries']:
+                entry['series_year'] = year
+
+            if not config.get('strip_dates'):
+                entry['title'] += f' ({year})'
+
+        with contextlib.suppress(ValueError, TypeError):
+            entry['imdb_user_score'] = entry['imdb_score'] = float(
+                item['ratingsSummary']['aggregateRating']
+            )
+            entry['imdb_votes'] = item['ratingsSummary']['voteCount']
+
+        return entry
 
 
 @event('plugin.register')
