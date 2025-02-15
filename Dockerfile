@@ -1,4 +1,4 @@
-FROM docker.io/python:3.11-alpine@sha256:9af3561825050da182afc74b106388af570b99c500a69c8216263aa245a2001b AS builder
+FROM docker.io/python:3.11-alpine@sha256:b63c01a3575a5e28694458ee2af4ffb8803ef39d404c1f2d98ca204ed41c81d9 AS builder
 ENV PYTHONUNBUFFERED=1
 
 RUN --mount=type=cache,target=/var/cache/apk \
