@@ -17,7 +17,7 @@ charset-normalizer==3.4.1
 cheroot==10.0.1
 cherrypy==18.10.0
 click==8.1.8
-colorama==0.4.6
+colorama==0.4.6 ; sys_platform == 'win32'
 feedparser==6.0.11
 flask==3.1.0
 flask-compress==1.17
