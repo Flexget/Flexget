@@ -32,4 +32,6 @@ class TestTransmissionTorrentPlugin:
         task = execute_task('test_input')
 
         assert len(task.all_entries) == 1
-        mocked_client.change_torrent.assert_called_with('321', labels=['3', '1', 'z', 'aaa', 'title1'])
+        mocked_client.change_torrent.assert_called_with(
+            '321', labels=['3', '1', 'z', 'aaa', 'title1']
+        )
