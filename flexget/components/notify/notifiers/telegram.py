@@ -15,18 +15,19 @@ from sqlalchemy import Column, Integer, String
 from flexget import db_schema, plugin
 from flexget.event import event
 from flexget.manager import Session
-from flexget.plugin import PluginError
+from flexget.plugin import DependencyError, PluginError
 
 if TYPE_CHECKING:
     from collections.abc import AsyncGenerator
 
 try:
-    if Version(version("python-telegram-bot")) < Version('21.9'):
-        raise plugin.PluginWarning('obsolete python-telegram-bot pkg')
-except PackageNotFoundError:
-    pass
-else:
     import telegram
+
+    if Version(version("python-telegram-bot")) < Version('21.9'):
+        raise ImportError
+except (ImportError, PackageNotFoundError):
+    telegram = None
+else:
     from telegram.error import ChatMigrated, NetworkError, TelegramError
     from telegram.ext import ApplicationBuilder
 
@@ -201,6 +202,11 @@ class TelegramNotifier:
     }
 
     def notify(self, title: str, message: str, config: dict) -> None:
+        if telegram == None:
+            raise PluginError(
+                DependencyError(_PLUGIN_NAME, 'python-telegram-bot >= 21.9')._get_message()
+            )
+
         self._load_config(config)
         asyncio.run(self.main(message))
 
@@ -358,7 +364,7 @@ class TelegramNotifier:
         usernames: list[str],
         fullnames: list[tuple[str, str]],
         groups: list[str],
-    ) -> (list[ChatIdEntry], bool):
+    ) -> tuple[list[ChatIdEntry], bool]:
         """get chat ids for `usernames`, `fullnames` & `groups`.
         entries with a matching chat ids will be removed from the input lists.
         """
@@ -467,7 +473,9 @@ class TelegramNotifier:
 
     async def _get_bot_updates(
         self,
-    ) -> (dict[str, telegram.Chat], dict[(str, str), telegram.Chat], dict[str, telegram.Chat]):
+    ) -> tuple[
+        dict[str, telegram.Chat], dict[(str, str), telegram.Chat], dict[str, telegram.Chat]  # type: ignore
+    ]:
         """get updated chats info from telegram"""
         # highly unlikely, but if there are more than `telegram.constants.PollingLimit.MAX_LIMIT`
         # msgs waiting for the bot, we should not miss one
