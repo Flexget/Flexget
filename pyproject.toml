@@ -136,7 +136,12 @@ exclude = ["/flexget/tests"]
 ## Other tool settings
 
 [tool.pytest.ini_options]
-addopts = '-p no:legacypath'
+addopts = '-p no:legacypath --strict-markers'
+markers = [
+    'extras: mark test to require optional dependencies',
+    'filecopy(src, dst): mark test to copy a file from `src` to `dst` before running',
+    'online: mark a test that goes online. VCR will automatically be used.',
+]
 testpaths = ["flexget/tests"]
 
 [tool.ruff]

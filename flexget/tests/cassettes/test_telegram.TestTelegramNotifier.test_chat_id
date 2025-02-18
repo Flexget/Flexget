@@ -1,0 +1,131 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate, br, zstd
+      connection:
+      - keep-alive
+      content-length:
+      - '0'
+      host:
+      - api.telegram.org
+      user-agent:
+      - python-telegram-bot v21.10 (https://python-telegram-bot.org)
+    method: POST
+    uri: https://api.telegram.org/bot7617087239:AAGUy118YHbBvGNwkDo4CDehF4gFgXq2ZqE/getMe
+  response:
+    body:
+      string: '{"ok":true,"result":{"id":7617087239,"is_bot":true,"first_name":"lk","username":"dddxgggfx_bot","can_join_groups":true,"can_read_all_group_messages":false,"supports_inline_queries":false,"can_connect_to_business":false,"has_main_web_app":false}}'
+    headers:
+      Access-Control-Allow-Methods:
+      - GET, POST, OPTIONS
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Expose-Headers:
+      - Content-Length,Content-Type,Date,Server,Connection
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '245'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 18 Feb 2025 08:52:44 GMT
+      Server:
+      - nginx/1.18.0
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+    status:
+      code: 200
+      message: OK
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate, br, zstd
+      connection:
+      - keep-alive
+      content-length:
+      - '0'
+      host:
+      - api.telegram.org
+      user-agent:
+      - python-telegram-bot v21.10 (https://python-telegram-bot.org)
+    method: POST
+    uri: https://api.telegram.org/bot7617087239:AAGUy118YHbBvGNwkDo4CDehF4gFgXq2ZqE/getMe
+  response:
+    body:
+      string: '{"ok":true,"result":{"id":7617087239,"is_bot":true,"first_name":"lk","username":"dddxgggfx_bot","can_join_groups":true,"can_read_all_group_messages":false,"supports_inline_queries":false,"can_connect_to_business":false,"has_main_web_app":false}}'
+    headers:
+      Access-Control-Allow-Methods:
+      - GET, POST, OPTIONS
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Expose-Headers:
+      - Content-Length,Content-Type,Date,Server,Connection
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '245'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 18 Feb 2025 08:52:44 GMT
+      Server:
+      - nginx/1.18.0
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+    status:
+      code: 200
+      message: OK
+- request:
+    body: chat_id=1394032416&text=Notification+body&link_preview_options=%7B%22is_disabled%22%3A+false%7D
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate, br, zstd
+      connection:
+      - keep-alive
+      content-length:
+      - '95'
+      content-type:
+      - application/x-www-form-urlencoded
+      host:
+      - api.telegram.org
+      user-agent:
+      - python-telegram-bot v21.10 (https://python-telegram-bot.org)
+    method: POST
+    uri: https://api.telegram.org/bot7617087239:AAGUy118YHbBvGNwkDo4CDehF4gFgXq2ZqE/sendMessage
+  response:
+    body:
+      string: '{"ok":true,"result":{"message_id":3,"from":{"id":7617087239,"is_bot":true,"first_name":"lk","username":"dddxgggfx_bot"},"chat":{"id":1394032416,"first_name":"o","last_name":"0","username":"chehxlpp","type":"private"},"date":1739868765,"text":"Notification
+        body"}}'
+    headers:
+      Access-Control-Allow-Methods:
+      - GET, POST, OPTIONS
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Expose-Headers:
+      - Content-Length,Content-Type,Date,Server,Connection
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '263'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 18 Feb 2025 08:52:45 GMT
+      Server:
+      - nginx/1.18.0
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+    status:
+      code: 200
+      message: OK
+version: 1

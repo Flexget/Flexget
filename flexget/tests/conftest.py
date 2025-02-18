@@ -210,17 +210,6 @@ def sftp(sftp_root: Path):
 # --- End Public Fixtures ---
 
 
-def pytest_configure(config):
-    # register the filecopy marker
-    config.addinivalue_line(
-        'markers',
-        'filecopy(src, dst): mark test to copy a file from `src` to `dst` before running.',
-    )
-    config.addinivalue_line(
-        'markers', 'online: mark a test that goes online. VCR will automatically be used.'
-    )
-
-
 def pytest_runtest_setup(item):
     # Add the filcopy fixture to any test marked with filecopy
     if item.get_closest_marker('filecopy'):
