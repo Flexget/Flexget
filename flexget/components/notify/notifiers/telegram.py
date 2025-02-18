@@ -357,7 +357,7 @@ class TelegramNotifier:
         usernames: list[str],
         fullnames: list[tuple[str, str]],
         groups: list[str],
-    ) -> (list[ChatIdEntry], bool):
+    ) -> tuple[list[ChatIdEntry], bool]:
         """Get chat ids for `usernames`, `fullnames` & `groups`.
         entries with a matching chat ids will be removed from the input lists.
         """
@@ -466,7 +466,9 @@ class TelegramNotifier:
 
     async def _get_bot_updates(
         self,
-    ) -> (dict[str, telegram.Chat], dict[(str, str), telegram.Chat], dict[str, telegram.Chat]):
+    ) -> tuple[
+        dict[str, telegram.Chat], dict[tuple[str, str], telegram.Chat], dict[str, telegram.Chat]
+    ]:
         """Get updated chats info from telegram"""
         # highly unlikely, but if there are more than `telegram.constants.PollingLimit.MAX_LIMIT`
         # msgs waiting for the bot, we should not miss one
