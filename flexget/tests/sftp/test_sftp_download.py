@@ -1,14 +1,20 @@
+from __future__ import annotations
+
 import filecmp
 import platform
 import sys
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pytest
 from jinja2 import Template
 
-from .test_sftp_server import TestSFTPFileSystem, TestSFTPServerController
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from .test_sftp_server import TestSFTPFileSystem, TestSFTPServerController
 
 
+@pytest.mark.require_optional_deps
 @pytest.mark.skipif(
     platform.system() == 'Windows' and sys.version_info[:2] == (3, 10),
     reason='This test fails intermittently on Windows, Python 3.10.',

@@ -33,7 +33,7 @@ interactions:
       Content-Type:
       - application/json
       Date:
-      - Wed, 19 Feb 2025 01:42:58 GMT
+      - Wed, 19 Feb 2025 02:27:19 GMT
       Server:
       - nginx/1.18.0
       Strict-Transport-Security:
@@ -75,7 +75,7 @@ interactions:
       Content-Type:
       - application/json
       Date:
-      - Wed, 19 Feb 2025 01:42:58 GMT
+      - Wed, 19 Feb 2025 02:27:20 GMT
       Server:
       - nginx/1.18.0
       Strict-Transport-Security:
@@ -104,7 +104,7 @@ interactions:
     uri: https://api.telegram.org/bot7617087239:AAGUy118YHbBvGNwkDo4CDehF4gFgXq2ZqE/sendMessage
   response:
     body:
-      string: '{"ok":true,"result":{"message_id":28,"from":{"id":7617087239,"is_bot":true,"first_name":"lk","username":"dddxgggfx_bot"},"chat":{"id":1394032416,"first_name":"o","last_name":"0","username":"chehxlpp","type":"private"},"date":1739929379,"text":"message"}}'
+      string: '{"ok":true,"result":{"message_id":33,"from":{"id":7617087239,"is_bot":true,"first_name":"lk","username":"dddxgggfx_bot"},"chat":{"id":1394032416,"first_name":"o","last_name":"0","username":"chehxlpp","type":"private"},"date":1739932040,"text":"message"}}'
     headers:
       Access-Control-Allow-Methods:
       - GET, POST, OPTIONS
@@ -119,7 +119,58 @@ interactions:
       Content-Type:
       - application/json
       Date:
-      - Wed, 19 Feb 2025 01:42:59 GMT
+      - Wed, 19 Feb 2025 02:27:20 GMT
+      Server:
+      - nginx/1.18.0
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+    status:
+      code: 200
+      message: OK
+- request:
+    body: !!binary |
+      LS01NjgyMzgxMmIzZDY5MDNlNTcyOWFmZTk3NmYwNTc5ZA0KQ29udGVudC1EaXNwb3NpdGlvbjog
+      Zm9ybS1kYXRhOyBuYW1lPSJjaGF0X2lkIg0KDQoxMzk0MDMyNDE2DQotLTU2ODIzODEyYjNkNjkw
+      M2U1NzI5YWZlOTc2ZjA1NzlkDQpDb250ZW50LURpc3Bvc2l0aW9uOiBmb3JtLWRhdGE7IG5hbWU9
+      InBob3RvIjsgZmlsZW5hbWU9InBob3RvLnBuZyINCkNvbnRlbnQtVHlwZTogaW1hZ2UvcG5nDQoN
+      ColQTkcNChoKAAAADUlIRFIAAAAKAAAACggGAAAAjTLPvQAAAAFzUkdCAK7OHOkAAAAEZ0FNQQAA
+      sY8L/GEFAAAACXBIWXMAABJ0AAASdAHeZh94AAAAF0lEQVQoU2P4TyRgQBfABUYV4gVEKwQAI/uO
+      gGmFXSwAAAAASUVORK5CYIINCi0tNTY4MjM4MTJiM2Q2OTAzZTU3MjlhZmU5NzZmMDU3OWQtLQ0K
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate, br, zstd
+      connection:
+      - keep-alive
+      content-length:
+      - '399'
+      content-type:
+      - multipart/form-data; boundary=56823812b3d6903e5729afe976f0579d
+      host:
+      - api.telegram.org
+      user-agent:
+      - python-telegram-bot v21.10 (https://python-telegram-bot.org)
+    method: POST
+    uri: https://api.telegram.org/bot7617087239:AAGUy118YHbBvGNwkDo4CDehF4gFgXq2ZqE/sendPhoto
+  response:
+    body:
+      string: '{"ok":true,"result":{"message_id":34,"from":{"id":7617087239,"is_bot":true,"first_name":"lk","username":"dddxgggfx_bot"},"chat":{"id":1394032416,"first_name":"o","last_name":"0","username":"chehxlpp","type":"private"},"date":1739932041,"photo":[{"file_id":"AgACAgUAAxkDAAMQZ7UfroOtgSz6hrRE2WMhNA6LJtcAAnbAMRsjC6lVDC7s3wsnx9EBAAMCAANtAAM2BA","file_unique_id":"AQADdsAxGyMLqVVy","file_size":285,"width":10,"height":10}]}}'
+    headers:
+      Access-Control-Allow-Methods:
+      - GET, POST, OPTIONS
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Expose-Headers:
+      - Content-Length,Content-Type,Date,Server,Connection
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '419'
+      Content-Type:
+      - application/json
+      Date:
+      - Wed, 19 Feb 2025 02:27:21 GMT
       Server:
       - nginx/1.18.0
       Strict-Transport-Security:

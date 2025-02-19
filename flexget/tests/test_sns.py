@@ -1,9 +1,12 @@
 from unittest.mock import Mock, patch
 
+import pytest
+
 from flexget.plugins.output import sns
 from flexget.task import Task
 
 
+@pytest.mark.require_optional_deps
 class TestNotifySNS:
     @patch('boto3.Session')
     def test_emitter_build_session_from_empty_config(self, session):

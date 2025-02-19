@@ -1,12 +1,16 @@
-from typing import Any, Callable
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any, Callable
 
 import pytest
 
 from flexget.task import Task, TaskAbort
 
-from .test_sftp_server import TestSFTPFileSystem, TestSFTPServerController
+if TYPE_CHECKING:
+    from .test_sftp_server import TestSFTPFileSystem, TestSFTPServerController
 
 
+@pytest.mark.require_optional_deps
 @pytest.mark.xdist_group(name="sftp")
 class TestSftpList:
     config = """

@@ -73,9 +73,12 @@ docs = [
 plugin-test = [
     # These are optional dependencies for plugins that have tests in the test suite
     "boto3 ~=1.35",
+    'rarfile~=4.0',
+    "pillow~=11.0",
     "plexapi ~=4.16",
     "pysftp ~=0.2.9",
     "subliminal ~= 2.1",
+    { include-group = "telegram" }
 ]
 deluge = ['deluge-client~=1.10']
 qbittorrent = ['qbittorrent-api~=2025.2']
@@ -138,9 +141,9 @@ exclude = ["/flexget/tests"]
 [tool.pytest.ini_options]
 addopts = '-p no:legacypath --strict-markers'
 markers = [
-    'extras: mark test to require optional dependencies',
     'filecopy(src, dst): mark test to copy a file from `src` to `dst` before running',
-    'online: mark a test that goes online. VCR will automatically be used.',
+    'online: mark test that goes online. VCR will automatically be used.',
+    'require_optional_deps: mark test as requiring additional dependencies'
 ]
 testpaths = ["flexget/tests"]
 
