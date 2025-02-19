@@ -315,7 +315,9 @@ class PluginInfo(dict):
         self.instance.logger = logger.bind(
             name=getattr(self.instance, "LOGGER_NAME", None) or self.name
         )
-        if hasattr(self.instance, 'schema'):
+        if self.api_ver == 3:
+            self.schema = self.instance.config_model.model_json_schema()
+        elif hasattr(self.instance, 'schema'):
             self.schema = self.instance.schema
         elif hasattr(self.instance, 'validator'):
             self.schema = self.instance.validator().schema()
