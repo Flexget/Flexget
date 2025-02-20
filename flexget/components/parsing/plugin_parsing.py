@@ -72,8 +72,7 @@ class PluginParsing:
         return {}
 
     def parse_series(self, data, name=None, **kwargs):
-        """
-        Use the selected series parser to parse series information from `data`
+        """Use the selected series parser to parse series information from `data`
 
         :param data: The raw string to parse information from.
         :param name: The series name to parse data for. If not supplied, parser will attempt to guess series name
@@ -85,8 +84,7 @@ class PluginParsing:
         return parser.parse_series(data, name=name, **kwargs)
 
     def parse_movie(self, data, **kwargs):
-        """
-        Use the selected movie parser to parse movie information from `data`
+        """Use the selected movie parser to parse movie information from `data`
 
         :param data: The raw string to parse information from
 

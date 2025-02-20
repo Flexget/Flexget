@@ -78,9 +78,7 @@ class MovieParseResult:
 
     @property
     def fields(self) -> dict:
-        """
-        Return a dict of all parser fields
-        """
+        """Return a dict of all parser fields"""
         return {
             'id': self.identifier,
             'movie_parser': self,

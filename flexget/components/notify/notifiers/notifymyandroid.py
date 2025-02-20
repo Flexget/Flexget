@@ -16,8 +16,7 @@ NOTIFYMYANDROID_URL = 'https://www.notifymyandroid.com/publicapi/notify'
 
 
 class NotifyMyAndroidNotifier:
-    """
-    Example::
+    """Example::
 
       notify:
         entries:
@@ -46,9 +45,7 @@ class NotifyMyAndroidNotifier:
     }
 
     def notify(self, title, message, config):
-        """
-        Send a Notifymyandroid notification
-        """
+        """Send a Notifymyandroid notification"""
         notification = {
             'event': title,
             'description': message,

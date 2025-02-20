@@ -494,7 +494,8 @@ class TraktSet(MutableSet):
     @property
     def online(self):
         """Set the online status of the plugin, online plugin should be treated differently in certain situations,
-        like test mode"""
+        like test mode
+        """
         return True
 
 

@@ -206,8 +206,7 @@ def lazy_lookup(entry, lazy_lookup_name, media_type):
 
 
 def add_lazy_fields(entry: Entry, lazy_lookup_name: str, media_type: str) -> None:
-    """
-    Adds lazy fields for one of the lookups in our `lazy_lookup_types` dict.
+    """Adds lazy fields for one of the lookups in our `lazy_lookup_types` dict.
 
     :param entry: The entry to add lazy fields to.
     :param lazy_lookup_name: One of the keys in `lazy_lookup_types` dict.
@@ -233,8 +232,7 @@ user_data_fields = {
 def add_lazy_user_fields(
     entry: Entry, data_type: str, media_type: str, username: str, account: str
 ) -> None:
-    """
-    Adds one of the user field lazy lookups to an entry.
+    """Adds one of the user field lazy lookups to an entry.
 
     :param entry: Entry to add lazy fields to
     :param data_type: ratings/collected/watched (one of the keys in `user_data_fields` dict.)
@@ -257,7 +255,6 @@ class PluginTraktLookup:
     series_season, series_episode from series plugin.
 
     Example:
-
     trakt_lookup: yes
 
     Primarily used for passing trakt information to other plugins.

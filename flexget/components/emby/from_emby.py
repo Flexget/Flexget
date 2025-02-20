@@ -10,8 +10,7 @@ logger = logger.bind(name='from_emby')
 
 
 class EmbyInput:
-    """
-    Returns Emby Inputs
+    """Returns Emby Inputs
 
     Example:
         from_emby:
@@ -22,6 +21,7 @@ class EmbyInput:
                 return_host: wan
             list: TV
             types: series
+
     """
 
     auth = None

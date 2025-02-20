@@ -169,8 +169,8 @@ class OmbiEntry:
 
         Returns:
             tuple[bool, str]: A tuple containing a boolean indicating if the entry has already been requested and a string indicating the status of the entry.
-        """
 
+        """
         if self.data['requested']:
             return True, 'requested'
 
@@ -187,7 +187,6 @@ class OmbiEntry:
 
     def mark_requested(self, endpoint: str, data: dict[str, Any]):
         """Mark an entry in Ombi as being requested."""
-
         log.info("Requesting {} in Ombi.", self.ombi_title)
 
         headers = self._request.create_json_headers()
@@ -220,7 +219,6 @@ class OmbiEntry:
 
     def mark_available(self):
         """Mark an entry in Ombi as avaliable."""
-
         if self.data['available']:
             log.verbose(f"{self.ombi_title} already available in Ombi.")
             return
@@ -243,7 +241,6 @@ class OmbiEntry:
 
     def mark_deleted(self):
         """Mark an entry in Ombi as deleted."""
-
         if not self.data['requested']:
             log.verbose(f"{self.ombi_title} is not requested in Ombi, unable to delete it.")
             return
@@ -264,7 +261,6 @@ class OmbiEntry:
 
     def mark_unavailable(self):
         """Mark an entry in Ombi as unavaliable."""
-
         if not self.data['available']:
             log.verbose(f"{self.ombi_title} already unavailable in Ombi.")
             return
@@ -291,7 +287,6 @@ class OmbiEntry:
 
     def mark_denied(self):
         """Mark an entry in Ombi as denied."""
-
         if self.data.get('denied'):
             log.verbose(f"{self.ombi_title} already denied in Ombi.")
             return
@@ -315,7 +310,6 @@ class OmbiEntry:
 
     def mark_approved(self):
         """Mark an entry in Ombi as approved."""
-
         if self.data.get('approved'):
             log.verbose(f"{self.ombi_title} already approved in Ombi.")
             return
@@ -348,7 +342,6 @@ class OmbiMovie(OmbiEntry):
 
     def mark_requested(self):
         """Mark an entry in Ombi as being requested."""
-
         # A status such as approved, denied and avaiable are a sub status of requested.
         # Which means you can not mark an entry as approved, denied or available without first marking it as requested.
         # You also can not mark an entry as requested if it is already approved, denied or available.
@@ -370,7 +363,6 @@ class OmbiMovie(OmbiEntry):
     @classmethod
     def from_imdb_id(cls, request: OmbiRequest, imdb_id: str):
         """Create a Ombi Entry from an IMDB ID."""
-
         headers = request.create_json_headers()
 
         endpoint = f"api/v2/Search/{cls.entry_type}/imdb/{imdb_id}"
@@ -390,7 +382,6 @@ class OmbiMovie(OmbiEntry):
     @classmethod
     def from_tmdb_id(cls, request: OmbiRequest, tmdb_id: str):
         """Create a Ombi Entry from an TMDB ID."""
-
         headers = request.create_json_headers()
 
         endpoint = f"/api/v2/Search/{cls.entry_type}/{tmdb_id}"
@@ -407,7 +398,6 @@ class OmbiMovie(OmbiEntry):
     @classmethod
     def from_id(cls, request: OmbiRequest, entry: Entry):
         """Create a Ombi Entry from an OMBI ID."""
-
         if entry.get('tmdb_id'):
             return cls.from_tmdb_id(request, entry['tmdb_id'])
 
@@ -437,7 +427,6 @@ class OmbiTv(OmbiEntry):
 
     def mark_requested(self):
         """Mark an entry in Ombi as being requested."""
-
         api_endpoint = "api/v2/Requests/TV"
 
         payload = {"theMovieDbId": self.data["id"]}
@@ -465,7 +454,6 @@ class OmbiTv(OmbiEntry):
         cls, request: OmbiRequest, entry: Entry, sub_type: Literal['show', 'season', 'episode']
     ):
         """Create a Ombi Entry from an TVDB ID."""
-
         headers = request.create_json_headers()
 
         if not entry.get('tmdb_id'):
@@ -585,8 +573,8 @@ class OmbiSet(MutableSet):
 
         Args:
             entry (Entry): An item from a task.
-        """
 
+        """
         # I'm wondering if we should be checking if the entry is already
         # in the list of _items first.
 
@@ -716,7 +704,8 @@ class OmbiSet(MutableSet):
     @property
     def online(self):
         """Set the online status of the plugin, online plugin should be treated differently in certain situations,
-        like test mode"""
+        like test mode
+        """
         return True
 
     # -- Public interface ends here -- #
@@ -822,8 +811,8 @@ class OmbiSet(MutableSet):
 
         Returns:
             dict[str, str]: Authorization headers.
-        """
 
+        """
         if "api_key" in self.config:
             log.debug('Authenticating via api_key')
             api_key = self.config['api_key']
@@ -844,6 +833,7 @@ class OmbiSet(MutableSet):
 
         Returns:
             dict[str, Any]: A dictionary containing all the items that have been requested in Ombi.
+
         """
         request = OmbiRequest(self.config)
 
@@ -990,8 +980,8 @@ def filter_ombi_items(items: list[dict[str, Any]], config: Config) -> list[dict[
 
     Returns:
         list[dict[str, Any]] -- The filtered list of items.
-    """
 
+    """
     filtered_items = items
 
     if config['hide_available']:

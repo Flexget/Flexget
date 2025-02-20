@@ -217,7 +217,6 @@ class TestDatabase:
 
     def test_database(self, execute_task):
         """Series plugin: simple database"""
-
         task = execute_task('test_1')
         task = execute_task('test_2')
         assert task.find_entry('rejected', title='Some.Series.S01E20.720p.XViD-DoppelGanger'), (
@@ -226,7 +225,6 @@ class TestDatabase:
 
     def test_doppelgangers(self, execute_task):
         """Series plugin: doppelganger releases (dupes)"""
-
         task = execute_task('progress_1')
         assert task.find_entry('accepted', title='Progress.S01E20.720p-FlexGet'), (
             'best quality not accepted'
@@ -760,7 +758,6 @@ class TestDuplicates:
 
     def test_downloaded(self, execute_task):
         """Series plugin: multiple downloaded and new episodes are handled correctly"""
-
         task = execute_task('test_1')
         task = execute_task('test_2')
 
@@ -952,7 +949,6 @@ class TestIdioticNumbering:
 
     def test_idiotic(self, execute_task):
         """Series plugin: idiotic numbering scheme"""
-
         task = execute_task('test_1')
         task = execute_task('test_2')
         entry = task.find_entry(title='FooBar.102.PDTV-FlexGet')
@@ -1026,7 +1022,6 @@ class TestMixedNumbering:
 
     def test_mixednumbering(self, execute_task):
         """Series plugin: Mixed series numbering"""
-
         task = execute_task('test_1')
         assert task.find_entry('accepted', title='FooBar.S03E07.PDTV-FlexGet')
         task = execute_task('test_2')

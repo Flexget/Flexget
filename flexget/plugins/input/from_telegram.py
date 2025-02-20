@@ -16,8 +16,7 @@ _TELEGRAM_API_URL = "https://api.telegram.org/"
 
 
 class TelegramInput:
-    """
-    Parse any messages from Telegram and fills fields with regex
+    """Parse any messages from Telegram and fills fields with regex
 
     Example:
       token: <token>
@@ -32,6 +31,7 @@ class TelegramInput:
         <field>: <regexp to match value>
 
     Note: If not declared, title will be the message
+
     """
 
     schema = {

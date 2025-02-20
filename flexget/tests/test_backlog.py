@@ -15,7 +15,6 @@ class TestBacklog:
 
     def test_backlog(self, manager, execute_task):
         """Tests backlog (and snapshot) functionality."""
-
         # Test entry comes out as expected on first run
         task = execute_task('test')
         entry = task.find_entry(title='Test.S01E01.hdtv-FlexGet')

@@ -19,7 +19,6 @@ class PluginThetvdbLookup:
     series_season, series_episode from series plugin.
 
     Example:
-
     thetvdb_lookup: yes
 
     Primarily used for passing thetvdb information to other plugins.
@@ -53,6 +52,7 @@ class PluginThetvdbLookup:
       tvdb_ep_rating
       tvdb_ep_guest_stars
       tvdb_ep_image
+
     """
 
     # Series info

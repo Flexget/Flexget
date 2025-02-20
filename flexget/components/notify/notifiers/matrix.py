@@ -14,8 +14,7 @@ logger = logger.bind(name=plugin_name)
 
 
 def urljoin(*args):
-    """
-    Author: Rune Kaagaard
+    """Author: Rune Kaagaard
     Joins given arguments into an url. Trailing but not leading slashes are
     stripped for each argument.
     """
@@ -23,8 +22,7 @@ def urljoin(*args):
 
 
 class MatrixNotifier:
-    """
-    Sends messages via Matrix. The MatrixHttpApi library is required to be installed.
+    """Sends messages via Matrix. The MatrixHttpApi library is required to be installed.
     Install it with: `pip install matrix_client`
 
     All fields are required.
@@ -58,9 +56,7 @@ class MatrixNotifier:
     __version__ = '0.3'
 
     def notify(self, title, message, config):
-        """
-        Send notification to Matrix Room
-        """
+        """Send notification to Matrix Room"""
         notification = {'body': message, 'msgtype': "m.text"}
         room = urljoin(
             config['server'],

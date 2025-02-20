@@ -292,8 +292,7 @@ class TestTVDBExpire:
 @mock.patch('flexget.components.thetvdb.api_tvdb.mark_expired')
 @pytest.mark.online
 class TestTVDBList:
-    """
-    Tests thetvdb list plugin with a test user at thetvdb.
+    """Tests thetvdb list plugin with a test user at thetvdb.
     Test user info:
     username: flexget
     password: flexget
@@ -351,8 +350,7 @@ class TestTVDBList:
 @mock.patch('flexget.components.thetvdb.api_tvdb.mark_expired')
 @pytest.mark.online
 class TestTVDBFavorites:
-    """
-    Tests thetvdb list plugin with a test user at thetvdb.
+    """Tests thetvdb list plugin with a test user at thetvdb.
     Test user info:
     username: flexget
     password: flexget

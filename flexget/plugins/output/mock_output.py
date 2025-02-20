@@ -7,8 +7,7 @@ logger = logger.bind(name='mock_output')
 
 
 class MockOutput:
-    """
-    Debugging plugin which records a copy of all accepted entries into a list stored in `mock_output` attribute
+    """Debugging plugin which records a copy of all accepted entries into a list stored in `mock_output` attribute
     of the task.
     """
 

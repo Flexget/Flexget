@@ -9,8 +9,7 @@ logger = logger.bind(name='manipulate')
 
 
 class Manipulate:
-    r"""
-    Usage:
+    r"""Usage:
 
       manipulate:
         - <destination field>:
@@ -25,10 +24,10 @@ class Manipulate:
             [remove]: <boolean>
 
     Example:
-
       manipulate:
         - title:
             extract: \[\d\d\d\d\](.*)
+
     """
 
     schema = {
@@ -60,8 +59,7 @@ class Manipulate:
     }
 
     def on_task_start(self, task, config):
-        """
-        Separates the config into a dict with a list of jobs per phase.
+        """Separates the config into a dict with a list of jobs per phase.
         Allows us to skip phases without any jobs in them.
         """
         self.phase_jobs = {'filter': [], 'metainfo': [], 'modify': []}
@@ -102,7 +100,6 @@ class Manipulate:
         :param jobs: Config items to run on this entry
         :return: True if any fields were modified
         """
-
         modified = False
         for item in jobs:
             for field, config in item.items():

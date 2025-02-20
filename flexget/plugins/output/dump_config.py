@@ -12,9 +12,7 @@ logger = logger.bind(name='dump_config')
 
 
 class OutputDumpConfig:
-    """
-    Dumps task config in STDOUT in yaml at exit or abort event.
-    """
+    """Dumps task config in STDOUT in yaml at exit or abort event."""
 
     @plugin.priority(plugin.PRIORITY_LAST)
     def on_task_start(self, task, config):

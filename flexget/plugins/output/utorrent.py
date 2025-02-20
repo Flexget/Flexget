@@ -12,8 +12,7 @@ logger = logger.bind(name='utorrent')
 
 
 class PluginUtorrent:
-    """
-    Parse task content or url for hoster links and adds them to utorrent.
+    """Parse task content or url for hoster links and adds them to utorrent.
 
     Example::
 
@@ -42,8 +41,7 @@ class PluginUtorrent:
 
     @plugin.priority(120)
     def on_task_download(self, task, config):
-        """
-        Call download plugin to generate the temp files we will load
+        """Call download plugin to generate the temp files we will load
         into deluge then verify they are valid torrents
         """
         # If the download plugin is not enabled, we need to call it to get

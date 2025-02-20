@@ -17,9 +17,9 @@ class ModifySet:
     """Allows adding information to a task entry for use later.
 
     Example:
-
     set:
       path: ~/download/path/
+
     """
 
     schema = {'type': 'object', "minProperties": 1}

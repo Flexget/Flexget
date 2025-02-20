@@ -10,9 +10,7 @@ logger = logger.bind(name='try_regexp')
 
 
 class PluginTryRegexp:
-    """
-    This plugin allows user to test regexps for a task.
-    """
+    """This plugin allows user to test regexps for a task."""
 
     def __init__(self):
         self.abort = False

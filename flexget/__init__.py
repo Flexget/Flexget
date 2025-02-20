@@ -13,7 +13,6 @@ from flexget.manager import Manager
 
 def main(args: Optional[Sequence[str]] = None):
     """Main entry point for Command Line Interface"""
-
     if args is None:
         args = sys.argv[1:]
     try:

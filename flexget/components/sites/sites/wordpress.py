@@ -47,8 +47,7 @@ def get_valid_cookies(cookies):
 
 
 class PluginWordPress:
-    """
-    Supports accessing feeds and media that require wordpress account credentials
+    """Supports accessing feeds and media that require wordpress account credentials
     Usage:
 
     wordpress_auth:

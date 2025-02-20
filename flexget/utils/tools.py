@@ -96,16 +96,14 @@ def _htmldecode(text: str) -> str:
 
 
 def decode_html(value: str) -> str:
-    """
-    :param string value: String to be html-decoded
+    """:param string value: String to be html-decoded
     :returns: Html decoded string
     """
     return _htmldecode(value)
 
 
 def encode_html(unicode_data: str, encoding: str = 'ascii') -> bytes:
-    """
-    Encode unicode_data for use as XML or HTML, with characters outside
+    """Encode unicode_data for use as XML or HTML, with characters outside
     of the encoding converted to XML numeric character references.
     """
     return unicode_data.encode(encoding, 'xmlcharrefreplace')
@@ -138,8 +136,7 @@ def merge_dict_from_to(d1: dict, d2: dict) -> None:
 
 
 class ReList(list):
-    """
-    A list that stores regexps.
+    """A list that stores regexps.
 
     You can add compiled or uncompiled regexps to the list.
     It will always return the compiled version.
@@ -274,8 +271,7 @@ class TimedDict(MutableMapping):
 
     @classmethod
     def clear_all(cls):
-        """
-        Clears all instantiated TimedDicts.
+        """Clears all instantiated TimedDicts.
         Used by tests to make sure artifacts don't leak between tests.
         """
         for store in cls._instances.values():
@@ -323,9 +319,7 @@ def split_title_year(title: str) -> TitleYear:
 
 
 def get_latest_flexget_version_number() -> Optional[str]:
-    """
-    Return latest Flexget version from https://pypi.python.org/pypi/FlexGet/json
-    """
+    """Return latest Flexget version from https://pypi.python.org/pypi/FlexGet/json"""
     try:
         data = requests.get('https://pypi.python.org/pypi/FlexGet/json').json()
         return data.get('info', {}).get('version')
@@ -340,8 +334,7 @@ def get_current_flexget_version() -> str:
 def parse_filesize(
     text_size: str, si: bool = True, match_re: Optional[Union[str, Pattern[str]]] = None
 ) -> int:
-    """
-    Parses a data size and returns its value in bytes
+    """Parses a data size and returns its value in bytes
 
     :param string text_size: string containing the data size to parse i.e. "5 GB"
     :param bool si: If True, possibly ambiguous units like KB, MB, GB will be assumed to be base 10 units,
@@ -374,14 +367,12 @@ def parse_filesize(
 
 
 def format_filesize(num_bytes: float, si: bool = False, unit: Optional[str] = None) -> str:
-    """
-    Returns given bytes as prettified string.
+    """Returns given bytes as prettified string.
 
     :param bool si: If true, decimal based units will be used rather than binary.
     :param str unit: If a specific unit is specified it will be used. Otherwise,
         an appropriate unit will be picked automatically based on size.
     """
-
     if unit:
         all_units = [f'{p}b' for p in 'kmgtp'] + [f'{p}ib' for p in 'kmgtp'] + ['b']
         if unit.lower() not in all_units:
@@ -414,8 +405,7 @@ def format_filesize(num_bytes: float, si: bool = False, unit: Optional[str] = No
 
 
 def get_config_hash(config: Any) -> str:
-    """
-    :param dict config: Configuration
+    """:param dict config: Configuration
     :return: MD5 hash for *config*
     """
     if isinstance(config, (dict, list)):
@@ -425,8 +415,7 @@ def get_config_hash(config: Any) -> str:
 
 
 def get_config_as_array(config: dict, key: str) -> list:
-    """
-    Return configuration key as array, even if given as a single string
+    """Return configuration key as array, even if given as a single string
     :param dict config: Configuration
     :param string key: Configuration
     :return: Array
@@ -440,8 +429,7 @@ def get_config_as_array(config: dict, key: str) -> list:
 def parse_episode_identifier(
     ep_id: Union[str, int], identify_season: bool = False
 ) -> tuple[str, str]:
-    """
-    Parses series episode identifier, raises ValueError if it fails
+    """Parses series episode identifier, raises ValueError if it fails
 
     :param ep_id: Value to parse
     :return: Return identifier type: `sequence`, `ep` or `date`

@@ -27,8 +27,7 @@ class EscapingEntry(Entry):
 
 
 class PluginExec:
-    """
-    Execute commands
+    """Execute commands
 
     Simple example, xecute command for entries that reach output::
 

@@ -29,8 +29,7 @@ PORT = 40022
 
 
 class TestSFTPServerController:
-    """
-    Manages a test SFTP server instance running on 127.0.0.1:40022 intended
+    """Manages a test SFTP server instance running on 127.0.0.1:40022 intended
     to be used as a pytest fixture.
     """
 
@@ -47,8 +46,7 @@ class TestSFTPServerController:
         key_only: bool = False,
         log_level: int = logging.DEBUG,
     ) -> TestSFTPFileSystem:
-        """
-        Start the test SFTP server
+        """Start the test SFTP server
 
         :param username: Username for test server, defaults to 'test_user'
         :param password: Password for the test server, defaults to 'test_pass'
@@ -108,9 +106,7 @@ class TestSFTPServerController:
 
 
 class TestSFTPFileSystem:
-    """
-    Provides access to the filesystem on a :class: StubSFTPServer instance.
-    """
+    """Provides access to the filesystem on a :class: StubSFTPServer instance."""
 
     __test__ = False
 
@@ -129,7 +125,6 @@ class TestSFTPFileSystem:
         :return: An :class: `pathlib.Path` of file created.
 
         """
-
         canonicalized: Path = self.canonicalize(path)
         canonicalized.parent.mkdir(parents=True, exist_ok=True)
         with open(canonicalized, 'wb') as file:
@@ -137,8 +132,7 @@ class TestSFTPFileSystem:
         return canonicalized
 
     def create_dir(self, path: str) -> Path:
-        """
-        Create a dir on the :class:`StubSFTPServer` instance, if the path is
+        """Create a dir on the :class:`StubSFTPServer` instance, if the path is
         relative it will be created in relation to the users home directory
 
         :param path: The path of the dir to create absolute or relative.
@@ -150,8 +144,7 @@ class TestSFTPFileSystem:
         return canonicalized
 
     def create_symlink(self, path: str, target: Path) -> Path:
-        """
-        Create a symlink on the :class:`StubSFTPServer` instance, if the
+        """Create a symlink on the :class:`StubSFTPServer` instance, if the
         path or target is relative, it will be done so in relation to the
         users home directory.
 
@@ -168,8 +161,7 @@ class TestSFTPFileSystem:
         return canonicalized
 
     def canonicalize(self, path: str, resolve: bool = True) -> Path:
-        """
-        Canonicalizes the given SFTP path to the local file system either from the cwd, or the user home if none is set.
+        """Canonicalizes the given SFTP path to the local file system either from the cwd, or the user home if none is set.
 
         :param path: The path to canonicalize.
         :param resolve: If symlinks shoul be resovled.
@@ -195,9 +187,7 @@ class TestSFTPFileSystem:
 
 
 class TestServer(ServerInterface):
-    """
-    Handlers authonitcation to the test server
-    """
+    """Handlers authonitcation to the test server"""
 
     __test__ = False
 

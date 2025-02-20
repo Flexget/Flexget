@@ -32,8 +32,7 @@ def fp_field_name(name):
 
 
 class InputRSS:
-    """
-    Parses RSS feed.
+    """Parses RSS feed.
 
     Hazzlefree configuration for public rss feeds::
 
@@ -156,7 +155,6 @@ class InputRSS:
 
     def process_invalid_content(self, task, data, url):
         """If feedparser reports error, save the received data and log error."""
-
         if data is None:
             logger.critical('Received empty page - no content')
             return

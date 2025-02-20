@@ -120,9 +120,7 @@ class UrlRewriteFuzer:
 
     @plugin.internet(logger)
     def search(self, task, entry, config=None):
-        """
-        Search for name from fuzer.
-        """
+        """Search for name from fuzer."""
         self.rss_key = config['rss_key']
         self.user_id = config['user_id']
 

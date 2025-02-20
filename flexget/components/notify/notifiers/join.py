@@ -18,19 +18,18 @@ JOIN_URL = 'https://joinjoaomgcd.appspot.com/_ah/api/messaging/v1/sendPush'
 
 
 class JoinNotifier:
-    """
-    Example::
+    """Example::
 
-      notify:
-        entries:
-          via:
-            - join:
-                [api_key: <API_KEY> (your join api key. Only required for 'group' notifications)]
-                [group: <GROUP_NAME> (name of group of join devices to notify. 'all', 'android', etc.)
-                [device: <DEVICE_ID> (can also be a list of device ids)]
-                [url: <NOTIFICATION_URL>]
-                [sms_number: <NOTIFICATION_SMS_NUMBER>]
-                [icon: <NOTIFICATION_ICON>]
+    notify:
+      entries:
+        via:
+          - join:
+              [api_key: <API_KEY> (your join api key. Only required for 'group' notifications)]
+              [group: <GROUP_NAME> (name of group of join devices to notify. 'all', 'android', etc.)
+              [device: <DEVICE_ID> (can also be a list of device ids)]
+              [url: <NOTIFICATION_URL>]
+              [sms_number: <NOTIFICATION_SMS_NUMBER>]
+              [icon: <NOTIFICATION_ICON>]
     """
 
     schema = {
@@ -55,9 +54,7 @@ class JoinNotifier:
     }
 
     def notify(self, title, message, config):
-        """
-        Send Join notifications.
-        """
+        """Send Join notifications."""
         notification = {
             'title': title,
             'text': message,

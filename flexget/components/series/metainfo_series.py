@@ -15,9 +15,7 @@ logger = logger.bind(name='metainfo_series')
 
 
 class MetainfoSeries:
-    """
-    Check if entry appears to be a series, and populate series info if so.
-    """
+    """Check if entry appears to be a series, and populate series info if so."""
 
     schema = {'type': 'boolean'}
 
@@ -34,8 +32,7 @@ class MetainfoSeries:
             self.guess_entry(entry)
 
     def guess_entry(self, entry, allow_seasonless=False, config=None):
-        """
-        Populates series_* fields for entries that are successfully parsed.
+        """Populates series_* fields for entries that are successfully parsed.
 
         :param dict config: A series config to be used. This will also cause 'path' and 'set' fields to be populated.
         """

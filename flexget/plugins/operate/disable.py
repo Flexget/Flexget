@@ -13,8 +13,7 @@ def all_builtins():
 
 
 class DisablePlugin:
-    """
-    Allows disabling built-ins, or plugins referenced by template/include plugin.
+    """Allows disabling built-ins, or plugins referenced by template/include plugin.
 
     Example::
 

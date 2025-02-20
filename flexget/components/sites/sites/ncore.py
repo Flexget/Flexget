@@ -70,10 +70,7 @@ class UrlRewriteNcore:
 
     @plugin.internet(logger)
     def search(self, task, entry, config):
-        """
-        Search for name from ncore.
-        """
-
+        """Search for name from ncore."""
         data = {
             "set_lang": "hu",
             "submitted": "1",

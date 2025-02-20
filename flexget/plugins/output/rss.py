@@ -47,8 +47,7 @@ class RSSEntry(Base):
 
 
 class OutputRSS:
-    """
-    Write RSS containing succeeded (downloaded) entries.
+    """Write RSS containing succeeded (downloaded) entries.
 
     Example::
 

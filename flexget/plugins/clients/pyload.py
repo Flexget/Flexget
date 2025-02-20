@@ -49,8 +49,7 @@ class PyloadApi:
 
 
 class PluginPyLoad:
-    """
-    Parse task content or url for hoster links and adds them to pyLoad.
+    """Parse task content or url for hoster links and adds them to pyLoad.
 
     Example::
 
@@ -122,7 +121,6 @@ class PluginPyLoad:
 
     def add_entries(self, task, config):
         """Adds accepted entries"""
-
         apiurl = config.get('api', self.DEFAULT_API)
         api = PyloadApi(task.requests, apiurl)
 

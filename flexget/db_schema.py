@@ -121,8 +121,7 @@ def upgrade_required(session=None) -> bool:
 
 
 class UpgradeImpossible(Exception):
-    """
-    Exception to be thrown during a db upgrade function which will cause the old tables to be removed and recreated from
+    """Exception to be thrown during a db upgrade function which will cause the old tables to be removed and recreated from
     the new model.
     """
 
@@ -189,8 +188,7 @@ def upgrade(plugin: str) -> Callable:
 
 @with_session
 def reset_schema(plugin: str, session=None) -> None:
-    """
-    Removes all tables from given plugin from the database,
+    """Removes all tables from given plugin from the database,
     as well as removing current stored schema number.
 
     :param plugin: The plugin whose schema should be reset
@@ -232,8 +230,7 @@ class VersionedBaseMeta(DeclarativeMeta):
         return new_class
 
     def register_table(self, table: Union[str, Table]) -> None:
-        """
-        This can be used if a plugin is declaring non-declarative sqlalchemy tables.
+        """This can be used if a plugin is declaring non-declarative sqlalchemy tables.
 
         :param table: Can either be the name of the table, or an :class:`sqlalchemy.Table` instance.
         """
@@ -244,8 +241,7 @@ class VersionedBaseMeta(DeclarativeMeta):
 
 
 def versioned_base(plugin: str, version: int) -> VersionedBaseMeta:
-    """
-    Returns a class which can be used like Base,
+    """Returns a class which can be used like Base,
     but automatically stores schema version when tables are created.
     """
 

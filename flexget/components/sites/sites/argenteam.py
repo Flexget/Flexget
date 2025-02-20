@@ -16,9 +16,10 @@ class SearchArgenteam:
     Configuration:
       - force_subtitles: [yes/no] #Force download release with subtitles made by aRGENTeaM. Default is yes
 
-    Example
+    Example:
       argenteam:
         force_subtitles: yes
+
     """
 
     schema = {
@@ -31,10 +32,7 @@ class SearchArgenteam:
 
     @plugin.internet(logger)
     def search(self, task, entry, config):
-        """
-        Search for releases
-        """
-
+        """Search for releases"""
         entries = set()
 
         for search_string in entry.get('search_strings', [entry['title']]):

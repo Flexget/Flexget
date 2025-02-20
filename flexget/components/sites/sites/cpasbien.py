@@ -75,7 +75,6 @@ class SearchCPASBIEN:
             series-vostfr
             ebook
         """
-
         base_url = 'http://www.cpasbien.io'
         entries = set()
         for search_string in entry.get('search_strings', [entry['title']]):

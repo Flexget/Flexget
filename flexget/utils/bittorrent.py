@@ -302,9 +302,7 @@ class Torrent:
 
     @property
     def trackers(self) -> list[str]:
-        """
-        :returns: List of trackers, supports single-tracker and multi-tracker implementations
-        """
+        """:returns: List of trackers, supports single-tracker and multi-tracker implementations"""
         trackers = []
         # the spec says, if announce-list present use ONLY that
         # funny iteration because of nesting, ie:

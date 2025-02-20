@@ -8,8 +8,7 @@ logger = logger.bind(name='crossmatch')
 
 
 class CrossMatch:
-    """
-    Perform action based on item on current task and other inputs.
+    """Perform action based on item on current task and other inputs.
 
     Example::
 
@@ -73,13 +72,11 @@ class CrossMatch:
                         entry.accept(msg)
 
     def entry_intersects(self, e1, e2, fields=None, exact=True, case_sensitive=True):
-        """
-        :param e1: First :class:`flexget.entry.Entry`
+        """:param e1: First :class:`flexget.entry.Entry`
         :param e2: Second :class:`flexget.entry.Entry`
         :param fields: List of fields which are checked
         :return: List of field names in common
         """
-
         if fields is None:
             fields = []
 

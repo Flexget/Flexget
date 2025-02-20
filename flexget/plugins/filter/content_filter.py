@@ -11,8 +11,7 @@ logger = logger.bind(name='content_filter')
 
 
 class FilterContentFilter:
-    """
-    Rejects entries based on the filenames in the content. Torrent files only right now.
+    """Rejects entries based on the filenames in the content. Torrent files only right now.
 
     Example::
 
@@ -73,8 +72,7 @@ class FilterContentFilter:
     }
 
     def process_entry(self, task, entry, config):
-        """
-        Process an entry and reject it if it doesn't pass filter.
+        """Process an entry and reject it if it doesn't pass filter.
 
         :param task: Task entry belongs to.
         :param entry: Entry to process

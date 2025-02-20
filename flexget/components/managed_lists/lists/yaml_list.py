@@ -57,6 +57,7 @@ class YamlManagedList(MutableSet):
 
         Returns:
             dict: Item with limited keys
+
         """
         required_fields = ['title']
         if not self.fields:
@@ -80,6 +81,7 @@ class YamlManagedList(MutableSet):
 
         Raises:
             PluginError: Error
+
         """
         top_fields = ['title', 'url']
 

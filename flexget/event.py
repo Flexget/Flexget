@@ -1,6 +1,4 @@
-"""
-Provides small event framework
-"""
+"""Provides small event framework"""
 
 from typing import Any, Callable
 
@@ -52,8 +50,7 @@ def event(name: str, priority: int = 128) -> Callable[[Callable], Callable]:
 
 
 def get_events(name: str) -> list[Event]:
-    """
-    :param String name: event name
+    """:param String name: event name
     :return: List of :class:`Event` for *name* ordered by priority
     """
     if name not in _events:
@@ -63,8 +60,7 @@ def get_events(name: str) -> list[Event]:
 
 
 def add_event_handler(name: str, func: Callable, priority: int = 128) -> Event:
-    """
-    :param string name: Event name
+    """:param string name: Event name
     :param function func: Function that acts as event handler
     :param priority: Priority for this hook
     :return: Event created
@@ -96,8 +92,7 @@ def remove_event_handler(name: str, func: Callable) -> None:
 
 
 def fire_event(name: str, *args, **kwargs) -> Any:
-    """
-    Trigger an event with *name*. If event is not hooked by anything nothing happens. If a function that hooks an event
+    """Trigger an event with *name*. If event is not hooked by anything nothing happens. If a function that hooks an event
     returns a value, it will replace the first argument when calling next function.
 
     :param name: Name of event to be called

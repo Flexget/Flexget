@@ -18,8 +18,7 @@ logger = logger.bind(name='plex')
 
 
 class InputPlex:
-    """
-    Uses a plex media server (www.plexapp.com) tv section as an input.
+    """Uses a plex media server (www.plexapp.com) tv section as an input.
 
     'section'           Required parameter, numerical (/library/sections/<num>) or section name.
     'selection'         Can be set to different keys:
@@ -64,12 +63,12 @@ class InputPlex:
       fetch            : file
 
     Example:
-
       plex:
         server: 192.168.1.23
         section: 3
         selection: recentlyAdded
         fetch: series_art
+
     """
 
     schema = {

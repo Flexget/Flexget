@@ -10,8 +10,7 @@ logger = logger.bind(name='mock')
 
 
 class Mock:
-    """
-    Allows adding mock input entries.
+    """Allows adding mock input entries.
 
     Example::
 

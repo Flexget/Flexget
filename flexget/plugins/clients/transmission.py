@@ -282,8 +282,7 @@ class PluginTransmissionInput(TransmissionBase):
 
 
 class PluginTransmission(TransmissionBase):
-    """
-    Add url from entry url to transmission
+    """Add url from entry url to transmission
 
     Example::
 
@@ -356,8 +355,7 @@ class PluginTransmission(TransmissionBase):
 
     @plugin.priority(120)
     def on_task_download(self, task, config):
-        """
-        Call download plugin to generate the temp files we will load
+        """Call download plugin to generate the temp files we will load
         into deluge then verify they are valid torrents
         """
         config = self.prepare_config(config)
@@ -809,8 +807,7 @@ class PluginTransmission(TransmissionBase):
 
 
 class PluginTransmissionClean(TransmissionBase):
-    """
-    DEPRECATED: A separate task using from_transmission and transmission with remove action should be used instead.
+    """DEPRECATED: A separate task using from_transmission and transmission with remove action should be used instead.
 
     Remove completed torrents from Transmission.
 

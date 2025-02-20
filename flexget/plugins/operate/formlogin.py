@@ -17,9 +17,7 @@ logger = logger.bind(name='formlogin')
 
 
 class FormLogin:
-    """
-    Login on form
-    """
+    """Login on form"""
 
     schema = {
         'type': 'object',

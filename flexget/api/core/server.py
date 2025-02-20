@@ -301,7 +301,7 @@ server_log_parser.add_argument('search', help='Search filter support google like
 def reverse_readline(
     fh: IO, start_byte: int = 0, buf_size: int = 8192
 ) -> Generator[str, None, None]:
-    """a generator that returns the lines of a file in reverse order"""
+    """A generator that returns the lines of a file in reverse order"""
     segment: OptionalType[str] = None
     offset = 0
     if start_byte:
@@ -432,8 +432,7 @@ class ServerLogAPI(APIResource):
 
 
 class LogParser:
-    """
-    Filter log file.
+    """Filter log file.
 
     Supports
       * 'and', 'or' and implicit 'and' operators;

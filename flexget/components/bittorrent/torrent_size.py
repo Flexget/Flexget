@@ -8,9 +8,7 @@ logger = logger.bind(name='torrent_size')
 
 
 class TorrentSize:
-    """
-    Provides file size information when dealing with torrents
-    """
+    """Provides file size information when dealing with torrents"""
 
     @plugin.priority(200)
     def on_task_modify(self, task, config):

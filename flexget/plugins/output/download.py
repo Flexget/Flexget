@@ -23,8 +23,7 @@ tmpdir = tempfile.gettempdir()
 
 
 class PluginDownload:
-    """
-    Downloads content from entry url and writes it into a file.
+    """Downloads content from entry url and writes it into a file.
 
     Example::
 
@@ -102,8 +101,7 @@ class PluginDownload:
         fail_html=True,
         tmp_path=tmpdir,
     ):
-        """
-        Download entry content and store in temporary folder.
+        """Download entry content and store in temporary folder.
         Fails entry with a reason if there was problem.
 
         :param bool require_path:
@@ -194,8 +192,7 @@ class PluginDownload:
 
     # TODO: a bit silly method, should be get rid of now with simplier exceptions ?
     def process_entry(self, task, entry, url, tmp_path):
-        """
-        Processes `entry` by using `url`. Does not use entry['url'].
+        """Processes `entry` by using `url`. Does not use entry['url'].
         Does not fail the `entry` if there is a network issue, instead just logs and returns a string error.
 
         :param task: Task
@@ -237,7 +234,6 @@ class PluginDownload:
         :raises: Several types of exceptions ...
         :raises: PluginWarning
         """
-
         logger.debug("Downloading url '{}'", url)
 
         # get content
@@ -400,8 +396,8 @@ class PluginDownload:
 
         Raises:
             PluginError if operation fails
-        """
 
+        """
         if 'file' not in entry and not task.options.test:
             logger.debug('file missing, entry: {}', entry)
             raise plugin.PluginError(

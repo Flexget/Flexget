@@ -7,8 +7,7 @@ logger = logger.bind(name='inputs')
 
 
 class PluginInputs:
-    """
-    Allows the same input plugin to be configured multiple times in a task.
+    """Allows the same input plugin to be configured multiple times in a task.
 
     Example::
 

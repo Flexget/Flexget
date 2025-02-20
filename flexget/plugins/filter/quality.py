@@ -9,8 +9,7 @@ logger = logger.bind(name='quality')
 
 
 class FilterQuality:
-    """
-    Rejects all entries that don't have one of the specified qualities
+    """Rejects all entries that don't have one of the specified qualities
 
     Example::
 

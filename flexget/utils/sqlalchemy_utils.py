@@ -1,6 +1,4 @@
-"""
-Miscellaneous SQLAlchemy helpers.
-"""
+"""Miscellaneous SQLAlchemy helpers."""
 
 from typing import Any, Optional, Union
 
@@ -15,8 +13,7 @@ logger = logger.bind(name='sql_utils')
 
 
 def table_exists(name: str, session: Session) -> bool:
-    """
-    Use SQLAlchemy reflect to check table existences.
+    """Use SQLAlchemy reflect to check table existences.
 
     :param string name: Table name to check
     :param Session session: Session to use
@@ -31,8 +28,7 @@ def table_exists(name: str, session: Session) -> bool:
 
 
 def index_exists(table_name: str, index_name: str, session: Session) -> bool:
-    """
-    Use SQLAlchemy reflect to check index existences.
+    """Use SQLAlchemy reflect to check index existences.
 
     :param string table_name: Table name to check
     :param string index_name: Index name to check
@@ -47,20 +43,17 @@ def index_exists(table_name: str, index_name: str, session: Session) -> bool:
 
 
 def table_schema(name: str, session: Session) -> Table:
-    """
-    :returns: Table schema using SQLAlchemy reflect as it currently exists in the db
+    """:returns: Table schema using SQLAlchemy reflect as it currently exists in the db
     :rtype: Table
     """
     return Table(name, MetaData(), autoload_with=session.bind)
 
 
 def table_columns(table: Union[str, Table], session: Session) -> list[str]:
-    """
-    :param string table: Name of table or table schema
+    """:param string table: Name of table or table schema
     :param Session session: SQLAlchemy Session
     :returns: List of column names in the table or empty list
     """
-
     if isinstance(table, str):
         table = table_schema(table, session)
     return [column.name for column in table.columns]
@@ -74,7 +67,6 @@ def table_index(table_name: str, index_name: str, session: Session) -> Index:
     :param Session session: SQLAlchemy Session
     :returns: The requested index
     """
-
     table = table_schema(table_name, session)
     return get_index_by_name(table, index_name)
 
@@ -86,7 +78,6 @@ def drop_index(table_name: str, index_name: str, session: Session) -> None:
     :param string index_name: Name of the index
     :param Session session: SQLAlchemy Session
     """
-
     index = table_index(table_name, index_name, session)
     index.drop(bind=session.bind)
 
@@ -144,8 +135,7 @@ def drop_tables(names: list[str], session: Session) -> None:
 
 
 def get_index_by_name(table: Table, name: str) -> Optional[Index]:
-    """
-    Find declaratively defined index from table by name
+    """Find declaratively defined index from table by name
 
     :param table: Table object
     :param string name: Name of the index to get
@@ -158,8 +148,7 @@ def get_index_by_name(table: Table, name: str) -> Optional[Index]:
 
 
 def create_index(table_name: str, session: Session, *column_names: str) -> None:
-    """
-    Creates an index on specified `columns` in `table_name`
+    """Creates an index on specified `columns` in `table_name`
 
     :param table_name: Name of table to create the index on.
     :param session: Session object which should be used

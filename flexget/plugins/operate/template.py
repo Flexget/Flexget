@@ -10,8 +10,7 @@ logger = logger.bind(name=plugin_name)
 
 
 class PluginTemplate:
-    """
-    Appyly templates with preconfigured plugins to a task config.
+    """Appyly templates with preconfigured plugins to a task config.
 
     Example::
 

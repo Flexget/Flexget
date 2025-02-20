@@ -121,8 +121,7 @@ def upgrade(ver, session):
 
 
 def get_source(name, session):
-    """
-    :param string name: Source name
+    """:param string name: Source name
     :param session: SQLAlchemy session
     :return: ArchiveSource from db or new one
     """
@@ -133,8 +132,7 @@ def get_source(name, session):
 
 
 def get_tag(name, session):
-    """
-    :param string name: Tag name
+    """:param string name: Tag name
     :param session: SQLAlchemy session
     :return: ArchiveTag from db or new one
     """
@@ -145,8 +143,7 @@ def get_tag(name, session):
 
 
 def search(session, text, tags=None, sources=None, desc=False):
-    """
-    Search from the archive.
+    """Search from the archive.
 
     :param string text: Search text, spaces and dots are tried to be ignored.
     :param Session session: SQLAlchemy session, should not be closed while iterating results.

@@ -18,8 +18,7 @@ logger = logger.bind(name=plugin_name)
 
 
 class EmailNotifier:
-    """
-    Send an e-mail with the list of all succeeded (downloaded) entries.
+    """Send an e-mail with the list of all succeeded (downloaded) entries.
 
     Configuration options
 
@@ -154,14 +153,12 @@ class EmailNotifier:
     }
 
     def notify(self, title, message, config):
-        """
-        Send an email notification
+        """Send an email notification
 
         :param str message: message body
         :param str title: message subject
         :param dict config: email plugin config
         """
-
         if not isinstance(config['to'], list):
             config['to'] = [config['to']]
 

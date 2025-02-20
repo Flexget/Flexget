@@ -8,8 +8,7 @@ logger = logger.bind(name='unique')
 
 
 class Unique:
-    """
-    Take action on entries with duplicate fields, except for the first item
+    """Take action on entries with duplicate fields, except for the first item
 
     Reject the second+ instance of every movie:
 

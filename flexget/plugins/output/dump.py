@@ -14,8 +14,7 @@ logger = logger.bind(name='dump')
 
 
 def dump(entries, debug=False, eval_lazy=False, trace=False, title_only=False):
-    """
-    Dump *entries* to stdout
+    """Dump *entries* to stdout
 
     :param list entries: Entries to be dumped.
     :param bool debug: Print non printable fields as well.
@@ -99,9 +98,7 @@ def dump(entries, debug=False, eval_lazy=False, trace=False, title_only=False):
 
 
 class OutputDump:
-    """
-    Outputs all entries to console
-    """
+    """Outputs all entries to console"""
 
     schema = {'type': 'boolean'}
 

@@ -11,8 +11,7 @@ logger = logger.bind(name='subtitles')
 
 
 class PluginPeriscope:
-    r"""
-    Search and download subtitles using Periscope by Patrick Dessalle
+    r"""Search and download subtitles using Periscope by Patrick Dessalle
     (http://code.google.com/p/periscope/).
 
     Example (complete task)::
@@ -60,14 +59,13 @@ class PluginPeriscope:
         return any(os.path.exists(os.path.splitext(filename)[0] + ext) for ext in self.exts)
 
     def on_task_output(self, task, config):
-        """
-        Configuration::
-            periscope:
-                languages: List of languages in order of preference (at least one is required).
-                alternatives: List of second-choice languages; subs will be downloaded but entries rejected.
-                overwrite: If yes it will try to download even for videos that are already subbed. Default: no.
-                subexts: List of subtitles file extensions to check (only useful with overwrite=no).
-                    Default: srt, stp, sub, stl, ssa.
+        """Configuration::
+        periscope:
+            languages: List of languages in order of preference (at least one is required).
+            alternatives: List of second-choice languages; subs will be downloaded but entries rejected.
+            overwrite: If yes it will try to download even for videos that are already subbed. Default: no.
+            subexts: List of subtitles file extensions to check (only useful with overwrite=no).
+                Default: srt, stp, sub, stl, ssa.
         """
         if not task.accepted:
             logger.debug('nothing accepted, aborting')

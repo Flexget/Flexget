@@ -16,8 +16,7 @@ ID_TYPES = ['ep', 'date', 'sequence', 'id']  # may also be 'special'
 
 
 class SeriesParser(TitleParser):
-    """
-    Parse series.
+    """Parse series.
 
     :name: series name
     :data: data to parse
@@ -115,8 +114,7 @@ class SeriesParser(TitleParser):
         prefer_specials=False,
         assume_special=False,
     ):
-        """
-        Init SeriesParser.
+        """Init SeriesParser.
 
         :param string name: Name of the series parser is going to try to parse. If not supplied series name will be
             guessed from data.
@@ -142,7 +140,6 @@ class SeriesParser(TitleParser):
         :param boolean prefer_specials: If True, label entry which matches both a series identifier and a special
             identifier as a special.
         """
-
         self.episodes = 1
         self.name = name
         self.alternate_names = alternate_names or []
@@ -512,8 +509,7 @@ class SeriesParser(TitleParser):
         return None
 
     def parse_date(self, data):
-        """
-        Parses :data: for a date identifier.
+        """Parses :data: for a date identifier.
         If found, returns the date and regexp match object
         If no date is found returns False
         """
@@ -561,12 +557,10 @@ class SeriesParser(TitleParser):
         return False
 
     def parse_episode(self, data):
-        """
-        Parses :data: for an episode identifier.
+        """Parses :data: for an episode identifier.
         If found, returns a dict with keys for season, episode, end_episode and the regexp match object
         If no episode id is found returns False
         """
-
         # search for season and episode number
         for ep_re in self.ep_regexps:
             match = re.search(ep_re, data)
@@ -641,7 +635,6 @@ class SeriesParser(TitleParser):
 
     def roman_to_int(self, roman):
         """Converts roman numerals up to 39 to integers"""
-
         roman_map = [('X', 10), ('IX', 9), ('V', 5), ('IV', 4), ('I', 1)]
         roman = roman.upper()
 

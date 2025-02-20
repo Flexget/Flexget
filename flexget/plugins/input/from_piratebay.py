@@ -84,8 +84,7 @@ TRACKERS = [
 
 
 class FromPirateBay:
-    """
-    Return torrent listing from piratebay api.
+    """Return torrent listing from piratebay api.
 
     ::
 

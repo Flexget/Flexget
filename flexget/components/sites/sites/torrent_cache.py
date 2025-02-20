@@ -20,8 +20,7 @@ class TorrentCache:
     """Adds urls to torrent cache sites to the urls list."""
 
     def infohash_urls(self, info_hash):
-        """
-        Other plugins may use this to make downloadable URLs
+        """Other plugins may use this to make downloadable URLs
         from infohash.
 
         :param str info_hash: Torrent infohash

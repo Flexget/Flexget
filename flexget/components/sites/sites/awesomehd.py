@@ -14,9 +14,7 @@ logger = logger.bind(name='awesomehd')
 
 
 class SearchAwesomeHD:
-    """
-    AwesomeHD search plugin.
-    """
+    """AwesomeHD search plugin."""
 
     schema = {
         'oneOf': [
@@ -43,9 +41,7 @@ class SearchAwesomeHD:
 
     @plugin.internet(logger)
     def search(self, task, entry, config):
-        """
-        Search for entries on AwesomeHD
-        """
+        """Search for entries on AwesomeHD"""
         # need lxml to parse xml
         try:
             import lxml  # noqa: F401

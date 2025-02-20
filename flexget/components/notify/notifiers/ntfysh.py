@@ -15,8 +15,7 @@ requests = RequestSession(max_retries=3)
 
 
 class NtfyshNotifier:
-    """
-    Example::
+    """Example::
 
     notify:
       entries:
@@ -43,9 +42,7 @@ class NtfyshNotifier:
     }
 
     def notify(self, title, message, config):
-        """
-        Send a Ntfy.sh notification
-        """
+        """Send a Ntfy.sh notification"""
         base_url = config['url']
         topic = config['topic']
         url = urljoin(base_url, topic)
