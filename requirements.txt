@@ -47,7 +47,7 @@ packaging==24.2
 pendulum==3.0.0
 plumbum==1.9.0
 portend==3.2.0
-psutil==6.1.1
+psutil==7.0.0
 pycparser==2.22 ; platform_python_implementation == 'PyPy'
 pygments==2.19.1
 pynzb==0.1.0
