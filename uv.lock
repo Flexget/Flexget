@@ -973,7 +973,7 @@ requires-dist = [
 all = [
     { name = "deluge-client", specifier = "~=1.10" },
     { name = "python-telegram-bot", extras = ["http2", "socks"], specifier = "~=21.9" },
-    { name = "qbittorrent-api", specifier = "~=2024.12" },
+    { name = "qbittorrent-api", specifier = "~=2025.2" },
     { name = "transmission-rpc", specifier = "~=7.0" },
 ]
 deluge = [{ name = "deluge-client", specifier = "~=1.10" }]
@@ -996,7 +996,7 @@ plugin-test = [
     { name = "pysftp", specifier = "~=0.2.9" },
     { name = "subliminal", specifier = "~=2.1" },
 ]
-qbittorrent = [{ name = "qbittorrent-api", specifier = "~=2024.12" }]
+qbittorrent = [{ name = "qbittorrent-api", specifier = "~=2025.2" }]
 telegram = [{ name = "python-telegram-bot", extras = ["http2", "socks"], specifier = "~=21.9" }]
 transmission = [{ name = "transmission-rpc", specifier = "~=7.0" }]
 
@@ -1197,7 +1197,7 @@ name = "importlib-metadata"
 version = "8.6.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "zipp" },
+    { name = "zipp", marker = "python_full_version < '3.10'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/33/08/c1395a292bb23fd03bdf572a1357c5a733d3eecbab877641ceacab23db6e/importlib_metadata-8.6.1.tar.gz", hash = "sha256:310b41d755445d74569f993ccfc22838295d9fe005425094fad953d7f15c8580", size = 55767 }
 wheels = [
@@ -2072,16 +2072,16 @@ wheels = [
 
 [[package]]
 name = "qbittorrent-api"
-version = "2024.12.71"
+version = "2025.2.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "packaging" },
     { name = "requests" },
     { name = "urllib3" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/d6/a9/88fce9b8c5e79bac74b0e9624ec8af2da8280dddc87f91298178aafb7759/qbittorrent_api-2024.12.71.tar.gz", hash = "sha256:4bb62ac075826d47529de562896bd97fe8527d2f55851ac3611d7b221c4507e2", size = 1321301 }
+sdist = { url = "https://files.pythonhosted.org/packages/ca/35/e418ed612741db3baf149b938d9705bedae3790d979b50e0bf57f6c1ae91/qbittorrent_api-2025.2.0.tar.gz", hash = "sha256:7bb30c883c6027147bd9d301ab26525c0b2b2f4ebb002b3cdd636ccebfb3d26b", size = 1321806 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/fa/94/6a2bddc909463ab4072a0d2378d75df12f2bfb9264de11354e3e34a31435/qbittorrent_api-2024.12.71-py3-none-any.whl", hash = "sha256:edfa030e93c5ebe6ba8d1ff0c9254152781a857bf688cc00633d73916650b168", size = 65600 },
+    { url = "https://files.pythonhosted.org/packages/9b/27/8e255054adae0123b0be967de3185a8ba491eb1457a308871407681c3428/qbittorrent_api-2025.2.0-py3-none-any.whl", hash = "sha256:d910f9924f42c0471f798b1116e87de7cd48710bee29aafb52230009d19e0fd1", size = 65866 },
 ]
 
 [[package]]
