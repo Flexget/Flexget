@@ -59,8 +59,9 @@ class TaskConfigHash(Base):
 
 @with_session
 def config_changed(task: Optional[str] = None, session: ContextSession = None) -> None:
-    """Forces config_modified flag to come out true on next run of `task`. Used when the db changes, and all
-    entries need to be reprocessed.
+    """Force config_modified flag to come out true on next run of `task`.
+
+    Used when the db changes, and all entries need to be reprocessed.
 
     .. WARNING: DO NOT (FURTHER) USE FROM PLUGINS
 
@@ -215,7 +216,9 @@ class Task:
         priority=None,
         suppress_warnings=None,
     ):
-        """:param Manager manager: Manager instance.
+        """Init a Task instance.
+
+        :param Manager manager: Manager instance.
         :param string name: Name of the task.
         :param dict config: Task configuration.
         :param options: dict or argparse namespace with options for this task
@@ -289,24 +292,24 @@ class Task:
 
     @property
     def max_reruns(self):
-        """How many times task can be rerunned before stopping"""
+        """How many times task can be rerunned before stopping."""
         return self._max_reruns
 
     @max_reruns.setter
     def max_reruns(self, value):
-        """Set new maximum value for reruns unless property has been locked"""
+        """Set new maximum value for reruns unless property has been locked."""
         if not self._reruns_locked:
             self._max_reruns = value
         else:
             logger.debug('max_reruns is locked, {} tried to modify it', self.current_plugin)
 
     def lock_reruns(self):
-        """Prevent modification of max_reruns property"""
+        """Prevent modification of max_reruns property."""
         logger.debug('Enabling rerun lock')
         self._reruns_locked = True
 
     def unlock_reruns(self):
-        """Allow modification of max_reruns property"""
+        """Allow modification of max_reruns property."""
         logger.debug('Releasing rerun lock')
         self._reruns_locked = False
 
@@ -324,7 +327,7 @@ class Task:
 
     @property
     def undecided(self):
-        """.. deprecated:: Use API v3
+        """.. deprecated:: Use API v3.
 
         .. note:: We did not migrate to v3
 
@@ -342,27 +345,27 @@ class Task:
 
     @property
     def failed(self):
-        """.. deprecated:: Use API v3"""
+        """.. deprecated:: Use API v3."""
         return self.all_entries.failed
 
     @property
     def rejected(self):
-        """.. deprecated:: Use API v3"""
+        """.. deprecated:: Use API v3."""
         return self.all_entries.rejected
 
     @property
     def accepted(self):
-        """.. deprecated:: Use API v3"""
+        """.. deprecated:: Use API v3."""
         return self.all_entries.accepted
 
     @property
     def entries(self):
-        """.. deprecated:: Use API v3"""
+        """.. deprecated:: Use API v3."""
         return self.all_entries.entries
 
     @property
     def all_entries(self):
-        """.. deprecated:: Use API v3"""
+        """.. deprecated:: Use API v3."""
         return self._all_entries
 
     def __lt__(self, other):
@@ -409,7 +412,7 @@ class Task:
         raise TaskAbort(reason, silent=silent)
 
     def find_entry(self, category='entries', **values):
-        """Find and return :class:`~flexget.entry.Entry` with given attributes from task or None
+        """Find and return :class:`~flexget.entry.Entry` with given attributes from task or None.
 
         :param string category: entries, accepted, rejected or failed. Defaults to entries.
         :param values: Key values of entries to be searched
@@ -443,7 +446,7 @@ class Task:
         return (p for p in plugins if p.name in self.config or p.builtin)
 
     def __run_task_phase(self, phase):
-        """Executes task phase, ie. call all enabled plugins on the task.
+        """Execute task phase, ie. call all enabled plugins on the task.
 
         Fires events:
 
@@ -511,6 +514,7 @@ class Task:
 
     def __run_plugin(self, plugin, phase, args=None, kwargs=None):
         """Execute given plugins phase method, with supplied args and kwargs.
+
         If plugin throws unexpected exceptions :meth:`abort` will be called.
 
         :param PluginInfo plugin: Plugin to be executed
@@ -567,8 +571,7 @@ class Task:
             return result
 
     def rerun(self, plugin=None, reason=None):
-        """Immediately re-run the task after execute has completed,
-        task can be re-run up to :attr:`.max_reruns` times.
+        """Immediately re-run the task after execute has completed, task can be re-run up to :attr:`.max_reruns` times.
 
         :param str plugin: Plugin name
         :param str reason: Why the rerun is done
@@ -584,7 +587,8 @@ class Task:
         self._rerun = True
 
     def config_changed(self):
-        """Sets config_modified flag to True for the remainder of this run.
+        """Set config_modified flag to True for the remainder of this run.
+
         Used when the db changes, and all entries need to be reprocessed.
         """
         self.config_modified = True
@@ -596,7 +600,7 @@ class Task:
             raise PluginError(f'Failed to merge configs for task {self.name}: {e}')
 
     def check_config_hash(self):
-        """Checks the task's config hash and updates the hash if necessary."""
+        """Check the task's config hash and update the hash if necessary."""
         # Save current config hash and set config_modified flag
         config_hash = get_config_hash(self.config)
         if self.is_rerun:
@@ -617,7 +621,7 @@ class Task:
                 self.config_changed()
 
     def _execute(self):
-        """Executes the task without rerunning."""
+        """Execute the task without rerunning."""
         if not self.enabled:
             logger.debug('Not running disabled task {}', self.name)
             return
@@ -676,7 +680,7 @@ class Task:
 
     @use_task_logging
     def execute(self):
-        """Executes the the task.
+        """Execute the task.
 
         If :attr:`.enabled` is False task is not executed. Certain :attr:`.options`
         affect how execution is handled.
@@ -734,7 +738,7 @@ class Task:
     copy = __copy__
 
     def render(self, template):
-        """Renders a template string based on fields in the entry.
+        """Render a template string based on fields in the entry.
 
         :param template: A template string or FlexGetTemplate that uses jinja2 or python string replacement format.
         :return: The result of the rendering.

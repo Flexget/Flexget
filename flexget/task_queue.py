@@ -68,7 +68,7 @@ class TaskQueue:
         return self._thread and self._thread.is_alive()
 
     def put(self, task: Task):
-        """Adds a task to be executed to the queue."""
+        """Add a task to be executed to the queue."""
         self.run_queue.put(task)
 
     def __len__(self) -> int:
@@ -91,9 +91,9 @@ class TaskQueue:
             self._shutdown_now = True
 
     def wait(self) -> None:
-        """Waits for the thread to exit.
+        """Wait for the thread to exit.
 
-        Allows abortion of task queue with ctrl-c
+        Allow abortion of task queue with ctrl-c
         """
         try:
             while self._thread.is_alive():

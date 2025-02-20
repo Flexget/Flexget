@@ -1,4 +1,4 @@
-"""Input plugin for www.betaseries.com"""
+"""Input plugin for www.betaseries.com."""
 
 from hashlib import md5
 
@@ -16,7 +16,8 @@ API_URL_PREFIX = 'https://api.betaseries.com/'
 
 
 class BetaSeriesList:
-    """Emits an entry for each serie followed by one or more BetaSeries account.
+    """Emit an entry for each serie followed by one or more BetaSeries account.
+
     See https://www.betaseries.com/
 
     Configuration examples:
@@ -97,6 +98,7 @@ class BetaSeriesList:
 
 def create_token(api_key, login, password):
     """Login in and request an new API token.
+
     https://www.betaseries.com/wiki/Documentation#cat-members
 
     :param string api_key: Api key requested at https://www.betaseries.com/api
@@ -156,7 +158,7 @@ def query_member_id(api_key, user_token, login_name):
 
 
 def query_series(api_key, user_token, member_name=None):
-    """Get the list of series followed by the authenticated user
+    """Get the list of series followed by the authenticated user.
 
     :param string api_key: Api key requested at https://www.betaseries.com/api
     :param string user_token: Obtained with a call to create_token()

@@ -14,7 +14,9 @@ requests = RequestSession(max_retries=3)
 
 
 class GotifyNotifier:
-    """Example::
+    """Send a Gotify notification.
+
+    Example::
 
     notify:
       entries:
@@ -43,7 +45,7 @@ class GotifyNotifier:
     }
 
     def notify(self, title, message, config):
-        """Send a Gotify notification"""
+        """Send a Gotify notification."""
         base_url = config['url']
         api_endpoint = '/message'
         url = urljoin(base_url, api_endpoint)

@@ -58,7 +58,7 @@ class NewTorrents:
 
     @plugin.internet(logger)
     def url_from_page(self, url):
-        """Parses torrent url from newtorrents download page"""
+        """Parse torrent url from newtorrents download page."""
         try:
             page = requests.get(url)
             data = page.text
@@ -75,7 +75,7 @@ class NewTorrents:
 
     @plugin.internet(logger)
     def entries_from_search(self, name, url=None):
-        """Parses torrent download url from search results"""
+        """Parse torrent download url from search results."""
         name = normalize_unicode(name)
         if not url:
             url = 'http://www.newtorrents.info/search/{}'.format(

@@ -102,9 +102,7 @@ def encode_header(key, value):
 
 
 class SCGITransport(xmlrpc_client.Transport):
-    """Public domain SCGITrannsport implementation from:
-    https://github.com/JohnDoee/autotorrent/blob/develop/autotorrent/scgitransport.py
-    """
+    """Public domain SCGITrannsport implementation from: https://github.com/JohnDoee/autotorrent/blob/develop/autotorrent/scgitransport.py."""
 
     def __init__(self, *args, **kwargs):
         self.socket_path = kwargs.pop('socket_path', '')
@@ -159,7 +157,7 @@ def create_proxy(url):
 
 
 class RTorrent:
-    """rTorrent API client"""
+    """rTorrent API client."""
 
     default_fields = (
         'hash',
@@ -188,7 +186,7 @@ class RTorrent:
     required_fields = ('hash', 'name', 'base_path')
 
     def __init__(self, uri, username=None, password=None, digest_auth=None, session=None):
-        """New connection to rTorrent
+        """Create new connection to rTorrent.
 
         :param uri: RTorrent URL. Supports both http(s) and scgi
         :param username: Username for basic auth over http(s)
@@ -297,7 +295,7 @@ class RTorrent:
         return self._server.get_directory()
 
     def torrent(self, info_hash, fields=None, custom_fields=None):
-        """Get the details of a torrent"""
+        """Get the details of a torrent."""
         if not fields:
             fields = list(self.default_fields)
 
@@ -752,7 +750,7 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
             logger.warning('Failed to verify torrent {} loaded: {}', entry['title'], str(e))
 
     def on_task_learn(self, task, config):
-        """Make sure all temp files are cleaned up when entries are learned"""
+        """Make sure all temp files are cleaned up when entries are learned."""
         # If download plugin is enabled, it will handle cleanup.
         if 'download' not in task.config:
             download = plugin.get('download', self)

@@ -59,7 +59,7 @@ class PluginTmdbLookup:
 
     @register_lazy_lookup('tmdb_lookup')
     def lazy_loader(self, entry, language):
-        """Does the lookup for this entry and populates the entry fields."""
+        """Do the lookup for this entry and populate the entry fields."""
         lookup = plugin.get('api_tmdb', self).lookup
 
         imdb_id = entry.get('imdb_id', eval_lazy=False) or extract_id(
@@ -79,8 +79,9 @@ class PluginTmdbLookup:
             log_once('TMDB lookup failed for {}'.format(entry['title']), logger, 'WARNING')
 
     def lookup(self, entry, language):
-        """Populates all lazy fields to an Entry. May be called by other plugins
-        requiring tmdb info on an Entry
+        """Populate all lazy fields to an Entry.
+
+        May be called by other plugins requiring tmdb info on an Entry
 
         :param entry: Entry instance
         """
@@ -96,7 +97,7 @@ class PluginTmdbLookup:
 
     @property
     def movie_identifier(self):
-        """Returns the plugin main identifier type"""
+        """Return the plugin main identifier type."""
         return 'tmdb_id'
 
 

@@ -10,13 +10,13 @@ logger = logger.bind(name='try_regexp')
 
 
 class PluginTryRegexp:
-    """This plugin allows user to test regexps for a task."""
+    """Allows user to test regexps for a task."""
 
     def __init__(self):
         self.abort = False
 
     def matches(self, entry, regexp):
-        """Return True if any of the entry string fields match given regexp"""
+        """Return True if any of the entry string fields match given regexp."""
         for field, value in entry.items():
             if not isinstance(value, str):
                 continue

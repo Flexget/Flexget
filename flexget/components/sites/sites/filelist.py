@@ -90,7 +90,7 @@ class SearchFileList:
     errors = False
 
     def get(self, url, params, username, password, force=False):
-        """Wrapper to allow refreshing the cookie if it is invalid for some reason
+        """Allow refreshing the cookie if it is invalid for some reason.
 
         :param str url:
         :param list params:
@@ -117,7 +117,7 @@ class SearchFileList:
         return response
 
     def get_login_cookie(self, username, password, force=False):
-        """Retrieves login cookie
+        """Retrieve login cookie.
 
         :param str username:
         :param str password:
@@ -187,7 +187,7 @@ class SearchFileList:
 
     @plugin.internet(logger)
     def search(self, task, entry, config):
-        """Search for entries on FileList.ro"""
+        """Search for entries on FileList.ro."""
         entries = []
 
         params = {

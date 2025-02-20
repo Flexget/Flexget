@@ -1,4 +1,6 @@
-"""Listens events:
+"""Provide functionality for managing a database of seen entries and fields.
+
+Listens events:
 
 forget (string)
 
@@ -139,7 +141,7 @@ class SeenField(Base):
 
 @with_session
 def add(title, task_name, fields, reason=None, local=None, session=None):
-    """Adds seen entries to DB
+    """Add seen entries to DB.
 
     :param title: name of title to be added
     :param task_name: name of task to be added
@@ -157,7 +159,7 @@ def add(title, task_name, fields, reason=None, local=None, session=None):
 
 @event('forget')
 def forget(value, tasks=None, test=False):
-    """See module docstring
+    """See module docstring.
 
     :param string value: Can be entry title or field value
     :return: count, field_count where count is number of entries removed and field_count number of fields
@@ -221,7 +223,8 @@ def forget(value, tasks=None, test=False):
 
 @with_session
 def search_by_field_values(field_value_list, task_name, local=False, session=None):
-    """Return a SeenEntry instance if it matches field values
+    """Return a SeenEntry instance if it matches field values.
+
     :param field_value_list: List of field values to match
     :param task_name: Name of task to compare to in case local flag is sent
     :param local: Local flag
@@ -291,7 +294,8 @@ def get_entry_by_id(entry_id, session=None):
 
 @with_session
 def forget_by_id(entry_id, session=None):
-    """Delete SeenEntry via its ID
+    """Delete SeenEntry via its ID.
+
     :param entry_id: SeenEntry ID
     :param session: DB Session
     """

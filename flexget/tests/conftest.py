@@ -50,6 +50,7 @@ vcr = VCR(
 @pytest.fixture(scope='class')
 def config(request):
     """If used inside a test class, uses the `config` class attribute of the class.
+
     This is used by `manager` fixture, and can be parametrized.
     """
     return request.cls.config
@@ -73,7 +74,7 @@ def manager(
 
 @pytest.fixture
 def execute_task(manager: Manager) -> Callable[..., Task]:
-    """A function that can be used to execute and return a named task in `config` argument."""
+    """Can be used to execute and return a named task in `config` argument."""
 
     def execute(
         task_name: str,
@@ -106,8 +107,9 @@ def execute_task(manager: Manager) -> Callable[..., Task]:
 
 @pytest.fixture
 def use_vcr(request, monkeypatch):
-    """This fixture is applied automatically to any test using the `online` mark. It will record and playback network
-    sessions using VCR.
+    """Be applied automatically to any test using the `online` mark.
+
+    It will record and playback network sessions using VCR.
 
     The record mode of VCR can be set using the VCR_RECORD_MODE environment variable when running tests.
     """
@@ -144,8 +146,9 @@ def api_client(manager) -> 'APIClient':
 
 @pytest.fixture
 def schema_match(manager) -> Callable[[dict, Any], list[dict]]:
-    """This fixture enables verifying JSON Schema. Return a list of validation error dicts. List is empty if no errors
-    occurred.
+    """Enable verifying JSON Schema.
+
+    Return a list of validation error dicts. List is empty if no errors occurred.
     """
 
     def match(schema: dict, response: Any) -> list[dict]:
@@ -158,7 +161,7 @@ def schema_match(manager) -> Callable[[dict, Any], list[dict]]:
 
 @pytest.fixture
 def link_headers(manager) -> Callable[[flask.Response], dict[str, dict]]:
-    """Parses link headers and return them in dict form"""
+    """Parse link headers and return them in dict form."""
 
     def headers(response: flask.Response) -> dict[str, dict]:
         links = {}
@@ -277,9 +280,9 @@ def setup_once(pytestconfig, request, tmp_path_factory):
 
 @pytest.fixture(autouse=True)
 def chdir(pytestconfig, request):
-    """By marking test with chdir flag we will change current working directory
-    to that module location. Task configuration can then assume this being
-    location for relative paths
+    """Change current working directory to that module location by marking test with chdir flag.
+
+    Task configuration can then assume this being location for relative paths
     """
     if 'chdir' in request.fixturenames:
         os.chdir(os.path.dirname(request.module.__file__))
@@ -315,11 +318,11 @@ class MockManager(Manager):
         self.initialize()
 
     def _init_config(self, *args, **kwargs):
-        """Override configuration loading"""
+        """Override configuration loading."""
         self._config_path = self._tmp_path / self._config_name
 
     def load_config(self, *args, **kwargs):
-        """Just load our config from the text passed in on init"""
+        """Just load our config from the text passed in on init."""
         config = yaml.safe_load(self.config_text) or {}
         self.update_config(config)
 

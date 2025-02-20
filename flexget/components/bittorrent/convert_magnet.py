@@ -13,7 +13,7 @@ logger = logger.bind(name='convert_magnet')
 
 
 class ConvertMagnet:
-    """Convert magnet only entries to a torrent file"""
+    """Convert magnet only entries to a torrent file."""
 
     schema = {
         "oneOf": [

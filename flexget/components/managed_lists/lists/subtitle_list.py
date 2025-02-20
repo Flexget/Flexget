@@ -282,7 +282,7 @@ class SubtitleList(MutableSet):
 
     @with_session
     def _find_entry(self, entry, match_file_to_dir=False, session=None):
-        """Finds `SubtitleListFile` corresponding to this entry, if it exists."""
+        """Find `SubtitleListFile` corresponding to this entry, if it exists."""
         path = self._extract_path(entry)
         res = self._db_list(session).files.filter(SubtitleListFile.location == path).first()
         if not res and match_file_to_dir:
@@ -309,8 +309,9 @@ class SubtitleList(MutableSet):
 
     @property
     def online(self):
-        """Set the online status of the plugin, online plugin should be treated differently in certain situations,
-        like test mode
+        """Set the online status of the plugin.
+
+        Online plugin should be treated differently in certain situations, like test mode
         """
         return False
 
@@ -321,7 +322,7 @@ class SubtitleList(MutableSet):
 
 
 class PluginSubtitleList:
-    """Subtitle list"""
+    """Subtitle list."""
 
     schema = SubtitleList.schema
 

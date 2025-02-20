@@ -105,7 +105,7 @@ class SearchAlphaRatio:
     errors = False
 
     def get(self, url, params, username, password, force=False):
-        """Wrapper to allow refreshing the cookie if it is invalid for some reason
+        """Allow refreshing the cookie if it is invalid for some reason.
 
         :param unicode url:
         :param dict params:
@@ -140,7 +140,7 @@ class SearchAlphaRatio:
         return response
 
     def get_login_cookie(self, username, password, force=False):
-        """Retrieves login cookie
+        """Retrieve login cookie.
 
         :param str username:
         :param str password:
@@ -198,7 +198,7 @@ class SearchAlphaRatio:
             return cookie.cookie
 
     def find_index(self, soup, text):
-        """Finds the index of the tag containing the text"""
+        """Find the index of the tag containing the text."""
         for i in range(len(soup)):
             img = soup[i].find('img')
             if (
@@ -212,7 +212,7 @@ class SearchAlphaRatio:
 
     @plugin.internet(logger)
     def search(self, task, entry, config):
-        """Search for entries on AlphaRatio"""
+        """Search for entries on AlphaRatio."""
         params = {}
 
         if 'category' in config:

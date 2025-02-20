@@ -23,7 +23,7 @@ class Page404Error(Exception):
 
 
 class MagnetDL:
-    """Creates entries from magnetdl categories"""
+    """Creates entries from magnetdl categories."""
 
     url = 'https://www.magnetdl.com'
 

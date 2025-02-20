@@ -8,6 +8,7 @@ logger = logger.bind(name='rerun')
 
 class Rerun:
     """Force a task to rerun for debugging purposes.
+
     Configured value will set max_rerun value and enables a lock
     that prevents other plugins modifying it.
     """

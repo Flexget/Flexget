@@ -159,7 +159,7 @@ class internet:  # noqa: N801 It acts like a function in usage
 
 
 def priority(value: int) -> Callable[[Callable], Callable]:
-    """Priority decorator for phase methods"""
+    """Priority decorator for phase methods."""
 
     def decorator(target: Callable) -> Callable:
         target.priority = value
@@ -202,7 +202,7 @@ _new_phase_queue: dict[str, list[Optional[str]]] = {}
 
 
 def register_task_phase(name: str, before: Optional[str] = None, after: Optional[str] = None):
-    """Adds a new task phase to the available phases."""
+    """Add a new task phase to the available phases."""
     if before and after:
         raise RegisterException('You can only give either before or after for a phase.')
     if not before and not after:
@@ -235,8 +235,9 @@ def register_task_phase(name: str, before: Optional[str] = None, after: Optional
 
 @total_ordering
 class PluginInfo(dict):
-    """Allows accessing key/value pairs of this dictionary subclass via
-    attributes. Also instantiates a plugin and initializes properties.
+    """Allow accessing key/value pairs of this dictionary subclass via attributes.
+
+    Also instantiate a plugin and initialize properties.
     """
 
     # Counts duplicate registrations
@@ -329,7 +330,7 @@ class PluginInfo(dict):
         self.build_phase_handlers()
 
     def build_phase_handlers(self) -> None:
-        """(Re)build phase_handlers in this plugin"""
+        """(Re)build phase_handlers in this plugin."""
         for phase, method_name in phase_methods.items():
             if phase in self.phase_handlers:
                 continue
@@ -371,7 +372,7 @@ register = PluginInfo
 
 
 def _get_standard_plugins_path() -> list[str]:
-    """:returns: List of directories where traditional plugins should be tried to load from."""
+    """Return list of directories where traditional plugins should be tried to load from."""
     # Get basic path from environment
     paths = []
     env_path = os.environ.get('FLEXGET_PLUGIN_PATH')
@@ -384,7 +385,7 @@ def _get_standard_plugins_path() -> list[str]:
 
 
 def _get_standard_components_path() -> list[str]:
-    """:returns: List of directories where component plugins should be tried to load from."""
+    """Return list of directories where component plugins should be tried to load from."""
     # Get basic path from environment
     paths = []
     env_path = os.environ.get('FLEXGET_COMPONENT_PATH')
@@ -478,7 +479,7 @@ def _load_components_from_dirs(dirs: list[str]) -> None:
 
 
 def _load_plugins_from_packages() -> None:
-    """Load plugins installed via PIP"""
+    """Load plugins installed via PIP."""
     for entrypoint in entry_points(group='FlexGet.plugins'):
         try:
             plugin_module = entrypoint.load()
@@ -584,7 +585,7 @@ def get_plugins(
 
 
 def plugin_schemas(**kwargs) -> 'config_schema.JsonSchema':
-    """Create a dict schema that matches plugins specified by `kwargs`"""
+    """Create a dict schema that matches plugins specified by `kwargs`."""
     return {
         'type': 'object',
         'properties': {p.name: {'$ref': p.schema_id} for p in get_plugins(**kwargs)},
@@ -600,7 +601,7 @@ def register_schema():
 
 
 def get_phases_by_plugin(name: str) -> list[str]:
-    """Return all phases plugin :name: hooks"""
+    """Return all phases plugin :name: hooks."""
     return list(get_plugin_by_name(name).phase_handlers)
 
 
@@ -627,9 +628,10 @@ def get_plugin_by_name(name: str, issued_by: str = '???') -> PluginInfo:
 
 
 def get(name: str, requested_by: Union[str, object]) -> object:
-    """:param str name: Name of the requested plugin
+    """Return instance of Plugin class.
+
+    :param str name: Name of the requested plugin
     :param requested_by: Plugin class instance OR string value who is making the request.
-    :return: Instance of Plugin class
     """
     if name not in plugins:
         if hasattr(requested_by, 'plugin_info'):

@@ -74,7 +74,7 @@ class TextProcessingError(Exception):
 
 
 class LostFilm:
-    """Grab new torrents from lostfilm RSS feed
+    """Grab new torrents from lostfilm RSS feed.
 
     Example:
       lostfilm: yes
@@ -109,7 +109,7 @@ class LostFilm:
     }
 
     def build_config(self, config):
-        """Set defaults to config"""
+        """Set defaults to config."""
         cfg = {}
         if isinstance(config, bool):
             cfg['enabled'] = bool(config)

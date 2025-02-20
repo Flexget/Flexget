@@ -31,7 +31,7 @@ def do_cli(manager, options):
 
 
 def consolidate():
-    """Converts previous archive data model to new one."""
+    """Convert previous archive data model to new one."""
     session = Session()
     try:
         logger.verbose('Checking archive size ...')
@@ -91,7 +91,7 @@ def consolidate():
 
 
 def tag_source(source_name, tag_names=None):
-    """Tags all archived entries within a source with supplied tags
+    """Tag all archived entries within a source with supplied tags.
 
     :param string source_name: Source name
     :param list tag_names: List of tag names to add

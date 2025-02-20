@@ -167,7 +167,7 @@ class TraktSeriesSearchApi(APIResource):
     @api.response(NotFoundError)
     @api.doc(expect=[lookup_parser])
     def get(self, session=None):
-        """Trakt series lookup"""
+        """Trakt series lookup."""
         args = lookup_parser.parse_args()
         include_actors = args.pop('include_actors')
         include_translations = args.pop('include_translations')
@@ -202,7 +202,7 @@ class TraktMovieSearchApi(APIResource):
     @api.response(NotFoundError)
     @api.doc(expect=[lookup_parser])
     def get(self, session=None):
-        """Trakt movie lookup"""
+        """Trakt movie lookup."""
         args = lookup_parser.parse_args()
         include_actors = args.pop('include_actors')
         include_translations = args.pop('include_translations')

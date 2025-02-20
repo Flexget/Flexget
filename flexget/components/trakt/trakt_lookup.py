@@ -206,7 +206,7 @@ def lazy_lookup(entry, lazy_lookup_name, media_type):
 
 
 def add_lazy_fields(entry: Entry, lazy_lookup_name: str, media_type: str) -> None:
-    """Adds lazy fields for one of the lookups in our `lazy_lookup_types` dict.
+    """Add lazy fields for one of the lookups in our `lazy_lookup_types` dict.
 
     :param entry: The entry to add lazy fields to.
     :param lazy_lookup_name: One of the keys in `lazy_lookup_types` dict.
@@ -232,7 +232,7 @@ user_data_fields = {
 def add_lazy_user_fields(
     entry: Entry, data_type: str, media_type: str, username: str, account: str
 ) -> None:
-    """Adds one of the user field lazy lookups to an entry.
+    """Add one of the user field lazy lookups to an entry.
 
     :param entry: Entry to add lazy fields to
     :param data_type: ratings/collected/watched (one of the keys in `user_data_fields` dict.)
@@ -251,8 +251,9 @@ def add_lazy_user_fields(
 
 
 class PluginTraktLookup:
-    """Retrieves trakt information for entries. Uses series_name,
-    series_season, series_episode from series plugin.
+    """Retrieve trakt information for entries.
+
+    Use series_name, eries_season, series_episode from series plugin.
 
     Example:
     trakt_lookup: yes
@@ -356,12 +357,12 @@ class PluginTraktLookup:
 
     @property
     def series_identifier(self):
-        """Returns the plugin main identifier type"""
+        """Return the plugin main identifier type."""
         return 'trakt_show_id'
 
     @property
     def movie_identifier(self):
-        """Returns the plugin main identifier type"""
+        """Return the plugin main identifier type."""
         return 'trakt_movie_id'
 
 

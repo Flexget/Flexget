@@ -21,7 +21,7 @@ def attribute_type(attribute):
 
 
 def do_cli(manager, options):
-    """Handle entry-list subcommand"""
+    """Handle entry-list subcommand."""
     if options.list_action == 'all':
         entry_list_lists(options)
         return
@@ -48,7 +48,7 @@ def do_cli(manager, options):
 
 
 def entry_list_lists(options):
-    """Show all entry lists"""
+    """Show all entry lists."""
     with Session() as session:
         lists = db.get_entry_lists(session=session)
         table = TerminalTable('#', 'List Name', table_type=options.table_type)
@@ -58,7 +58,7 @@ def entry_list_lists(options):
 
 
 def entry_list_list(options):
-    """List entry list"""
+    """List entry list."""
     with Session() as session:
         try:
             entry_list = db.get_list_by_exact_name(options.list_name, session=session)

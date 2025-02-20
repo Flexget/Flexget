@@ -23,7 +23,7 @@ def attribute_type(attribute):
 
 
 def do_cli(manager, options):
-    """Handle entry-list subcommand"""
+    """Handle entry-list subcommand."""
     if hasattr(options, 'table_type') and options.table_type == 'porcelain':
         disable_colors()
 
@@ -42,7 +42,7 @@ def do_cli(manager, options):
 
 
 def pending_list_lists(options):
-    """Show all pending lists"""
+    """Show all pending lists."""
     with Session() as session:
         lists = db.get_pending_lists(session=session)
         header = ['#', 'List Name']
@@ -53,7 +53,7 @@ def pending_list_lists(options):
 
 
 def pending_list_list(options):
-    """List pending list entries"""
+    """List pending list entries."""
     highlighter = ReprHighlighter()
     with Session() as session:
         try:

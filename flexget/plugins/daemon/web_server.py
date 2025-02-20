@@ -73,7 +73,7 @@ def register_config():
 @event('manager.config_updated')
 @event('manager.daemon.started')
 def register_web_server(manager):
-    """Registers Web Server and loads API (always) and WebUi via config"""
+    """Register Web Server and load API (always) and WebUi via config."""
     global web_server, config_hash
 
     if not manager.is_daemon:
@@ -116,7 +116,7 @@ def register_web_server(manager):
 
 @event('manager.shutdown')
 def stop_server(manager):
-    """Sets up and starts/restarts the webui."""
+    """Set up and start/restart the webui."""
     global web_server
 
     if not manager.is_daemon:

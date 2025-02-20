@@ -20,7 +20,9 @@ requests.add_domain_limiter(TimedLimiter('pushover.net', '5 seconds'))
 
 
 class PushoverNotifier:
-    """Example::
+    """Send a Pushover notification.
+
+    Example::
 
     notify:
       entries:
@@ -61,7 +63,7 @@ class PushoverNotifier:
     }
 
     def notify(self, title, message, config):
-        """Sends a Pushover notification
+        """Send a Pushover notification.
 
         :param str title: the message's title
         :param str message: the message to send

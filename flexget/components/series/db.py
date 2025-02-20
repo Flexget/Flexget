@@ -62,7 +62,7 @@ class NormalizedComparator(Comparator):
 
 
 class Series(Base):
-    """Name is handled case insensitively transparently"""
+    """Name is handled case insensitively transparently."""
 
     __tablename__ = 'series'
 
@@ -154,7 +154,7 @@ class Season(Base):
 
     @property
     def completed(self):
-        """Return True if the season has any released marked as downloaded"""
+        """Return True if the season has any released marked as downloaded."""
         if not self.releases:
             return False
         return any(release.downloaded for release in self.releases)
@@ -181,7 +181,10 @@ class Season(Base):
 
     @property
     def age(self):
-        """:return: Pretty string representing age of episode. eg "23d 12h" or "No releases seen" """
+        """Return Pretty string representing age of episode.
+
+        Example: "23d 12h" or "No releases seen"
+        """
         if not self.first_seen:
             return 'No releases seen'
         diff = datetime.now() - self.first_seen
@@ -285,7 +288,10 @@ class Episode(Base):
 
     @property
     def age(self):
-        """:return: Pretty string representing age of episode. eg "23d 12h" or "No releases seen" """
+        """Return Pretty string representing age of episode.
+
+        Exmaple: "23d 12h" or "No releases seen"
+        """
         if not self.first_seen:
             return 'No releases seen'
         diff = datetime.now() - self.first_seen
@@ -775,7 +781,7 @@ def show_seasons(
     descending: bool = False,
     session: Session = None,
 ) -> Union[int, list[Season]]:
-    """Return all seasons of a given series"""
+    """Return all seasons of a given series."""
     seasons = session.query(Season).filter(Season.series_id == series.id)
     if count:
         return seasons.count()
@@ -813,7 +819,7 @@ def get_episode_releases(
     sort_by: Optional[str] = None,
     session: Session = None,
 ) -> list[EpisodeRelease]:
-    """Return all releases for a given episode"""
+    """Return all releases for a given episode."""
     releases = session.query(EpisodeRelease).filter(EpisodeRelease.episode_id == episode.id)
     if downloaded is not None:
         releases = releases.filter(EpisodeRelease.downloaded == downloaded)
@@ -836,7 +842,7 @@ def get_season_releases(
     sort_by: Optional[str] = None,
     session: Session = None,
 ) -> Union[int, list[SeasonRelease]]:
-    """Return all releases for a given season"""
+    """Return all releases for a given season."""
     releases = session.query(SeasonRelease).filter(SeasonRelease.season_id == season.id)
     if downloaded is not None:
         releases = releases.filter(SeasonRelease.downloaded == downloaded)
@@ -850,28 +856,28 @@ def get_season_releases(
 
 
 def episode_in_show(series_id: int, episode_id: int) -> bool:
-    """Return True if `episode_id` is part of show with `series_id`, else return False"""
+    """Return True if `episode_id` is part of show with `series_id`, else return False."""
     with Session() as session:
         episode = session.query(Episode).filter(Episode.id == episode_id).one()
         return episode.series_id == series_id
 
 
 def season_in_show(series_id: int, season_id: int) -> bool:
-    """Return True if `episode_id` is part of show with `series_id`, else return False"""
+    """Return True if `episode_id` is part of show with `series_id`, else return False."""
     with Session() as session:
         season = session.query(Season).filter(Season.id == season_id).one()
         return season.series_id == series_id
 
 
 def release_in_episode(episode_id: int, release_id: int) -> bool:
-    """Return True if `release_id` is part of episode with `episode_id`, else return False"""
+    """Return True if `release_id` is part of episode with `episode_id`, else return False."""
     with Session() as session:
         release = session.query(EpisodeRelease).filter(EpisodeRelease.id == release_id).one()
         return release.episode_id == episode_id
 
 
 def release_in_season(season_id: int, release_id: int) -> bool:
-    """Return True if `release_id` is part of episode with `episode_id`, else return False"""
+    """Return True if `release_id` is part of episode with `episode_id`, else return False."""
     with Session() as session:
         release = session.query(SeasonRelease).filter(SeasonRelease.id == release_id).one()
         return release.season_id == season_id
@@ -959,7 +965,7 @@ def get_series_summary(
 
 
 def auto_identified_by(series: Series) -> str:
-    """Determine if series `name` should be considered identified by episode or id format
+    """Determine if series `name` should be considered identified by episode or id format.
 
     Returns 'ep', 'sequence', 'date' or 'id' if enough history is present to identify the series' id type.
     Returns 'auto' if there is not enough history to determine the format yet
@@ -1006,7 +1012,7 @@ def auto_identified_by(series: Series) -> str:
 def get_latest_season_pack_release(
     series: Series, downloaded: bool = True, season: Optional[int] = None
 ) -> Optional[Season]:
-    """Return the latest season pack release for a series
+    """Return the latest season pack release for a series.
 
     :param Series series: Series object
     :param bool downloaded: Flag to return only downloaded season packs
@@ -1048,10 +1054,11 @@ def get_latest_season_pack_release(
 def get_latest_episode_release(
     series: Series, downloaded: bool = True, season: Optional[int] = None
 ) -> Optional[Episode]:
-    """:param series series: SQLAlchemy session
+    """Return instance of Episode or None if not found.
+
+    :param series series: SQLAlchemy session
     :param downloaded: find only downloaded releases
     :param season: season to find newest release for
-    :return: Instance of Episode or None if not found.
     """
     session = Session.object_session(series)
     releases = (
@@ -1102,7 +1109,7 @@ def get_latest_episode_release(
 def get_latest_release(
     series: Series, downloaded: bool = True, season: Optional[int] = None
 ) -> Union[EpisodeRelease, SeasonRelease, None]:
-    """Return the latest downloaded entity of a series, either season pack or episode
+    """Return the latest downloaded entity of a series, either season pack or episode.
 
     :param Series series: Series object
     :param bool downloaded: Downloaded flag
@@ -1118,8 +1125,9 @@ def get_latest_release(
 
 
 def new_eps_after(series: Series, since_ep: Episode, session: Session) -> tuple[int, str]:
-    """:param since_ep: Episode instance
-    :return: Number of episodes since then
+    """Return number of episodes since then.
+
+    :param since_ep: Episode instance
     """
     series_eps = session.query(Episode).join(Episode.series).filter(Series.id == series.id)
     if series.identified_by == 'ep':
@@ -1159,7 +1167,7 @@ def new_entities_after(since_entity: Union[Season, Episode]) -> tuple[int, str]:
 
 
 def set_series_begin(series: Series, ep_id: Union[str, int]) -> tuple[str, str]:
-    """Set beginning for series
+    """Set beginning for series.
 
     :param Series series: Series instance
     :param ep_id: Integer for sequence mode, SxxEyy for episodic and yyyy-mm-dd for date.
@@ -1314,7 +1322,7 @@ def delete_season_release_by_id(release_id: int) -> None:
 
 
 def shows_by_name(normalized_name: str, session: Session = None) -> list[Series]:
-    """Returns all series matching `normalized_name`"""
+    """Return all series matching `normalized_name`."""
     return (
         session.query(Series)
         .filter(Series._name_normalized.contains(normalized_name))
@@ -1324,7 +1332,7 @@ def shows_by_name(normalized_name: str, session: Session = None) -> list[Series]
 
 
 def shows_by_exact_name(normalized_name: str, session: Session = None) -> list[Series]:
-    """Returns all series matching `normalized_name`"""
+    """Return all series matching `normalized_name`."""
     return (
         session.query(Series)
         .filter(Series._name_normalized == normalized_name)
@@ -1334,27 +1342,27 @@ def shows_by_exact_name(normalized_name: str, session: Session = None) -> list[S
 
 
 def show_by_id(show_id: int, session: Session = None) -> Series:
-    """Return an instance of a show by querying its ID"""
+    """Return an instance of a show by querying its ID."""
     return session.query(Series).filter(Series.id == show_id).one()
 
 
 def season_by_id(season_id: int, session: Session = None) -> Season:
-    """Return an instance of an season by querying its ID"""
+    """Return an instance of an season by querying its ID."""
     return session.query(Season).filter(Season.id == season_id).one()
 
 
 def episode_by_id(episode_id: int, session: Session = None) -> Episode:
-    """Return an instance of an episode by querying its ID"""
+    """Return an instance of an episode by querying its ID."""
     return session.query(Episode).filter(Episode.id == episode_id).one()
 
 
 def episode_release_by_id(release_id: int, session: Session = None) -> EpisodeRelease:
-    """Return an instance of an episode release by querying its ID"""
+    """Return an instance of an episode release by querying its ID."""
     return session.query(EpisodeRelease).filter(EpisodeRelease.id == release_id).one()
 
 
 def season_release_by_id(release_id: int, session: Session = None) -> SeasonRelease:
-    """Return an instance of an episode release by querying its ID"""
+    """Return an instance of an episode release by querying its ID."""
     return session.query(SeasonRelease).filter(SeasonRelease.id == release_id).one()
 
 
@@ -1366,7 +1374,7 @@ def show_episodes(
     descending: bool = False,
     session: Session = None,
 ) -> Union[int, list[Episode]]:
-    """Return all episodes of a given series"""
+    """Return all episodes of a given series."""
     episodes = session.query(Episode).filter(Episode.series_id == series.id)
     if count:
         return episodes.count()
@@ -1510,7 +1518,7 @@ def store_parser(
 def add_series_entity(
     session: Session, series: Series, identifier: str, quality: 'Quality' = None
 ) -> None:
-    """Adds entity identified by `identifier` to series `name` in database.
+    """Add entity identified by `identifier` to series `name` in database.
 
     :param series: Series in database to add entity to.
     :param identifier: Series identifier to be added.

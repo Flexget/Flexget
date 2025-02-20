@@ -12,8 +12,9 @@ logger = logger.bind(name='csv')
 
 
 class InputCSV:
-    """Adds support for CSV format. Configuration may seem a bit complex,
-    but this has advantage of being universal solution regardless of CSV
+    """Add support for CSV format.
+
+    Configuration may seem a bit complex, but this has advantage of being universal solution regardless of CSV
     and internal entry fields.
 
     Configuration format:

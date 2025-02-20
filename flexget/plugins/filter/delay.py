@@ -102,7 +102,7 @@ class FilterDelay:
 
     @plugin.priority(-1)
     def on_task_input(self, task, config):
-        """Captures the current input then replaces it with entries that have passed the delay."""
+        """Capture the current input then replaces it with entries that have passed the delay."""
         if task.entries:
             logger.verbose('Delaying {} new entries for {}', len(task.entries), config)
             # Let details plugin know that it is ok if this task doesn't produce any entries

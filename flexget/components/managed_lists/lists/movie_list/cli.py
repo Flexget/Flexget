@@ -62,7 +62,7 @@ def movie_list_keyword_type(identifier):
 
 
 def do_cli(manager, options):
-    """Handle movie-list subcommand"""
+    """Handle movie-list subcommand."""
     if options.list_action == 'all':
         movie_list_lists(options)
         return
@@ -85,7 +85,7 @@ def do_cli(manager, options):
 
 
 def movie_list_lists(options):
-    """Show all movie lists"""
+    """Show all movie lists."""
     lists = db.get_movie_lists()
     header = ['#', 'List Name']
     table = TerminalTable(*header, table_type=options.table_type)
@@ -96,7 +96,7 @@ def movie_list_lists(options):
 
 
 def movie_list_list(options):
-    """List movie list"""
+    """List movie list."""
     with Session() as session:
         try:
             movie_list = db.get_list_by_exact_name(options.list_name)

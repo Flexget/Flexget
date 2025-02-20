@@ -63,7 +63,7 @@ DB_CLEANUP_INTERVAL = timedelta(days=7)
 
 
 class Manager:
-    """Manager class for FlexGet
+    """Manager class for FlexGet.
 
     Fires events:
 
@@ -205,7 +205,7 @@ class Manager:
         return options
 
     def _init_logging(self) -> None:
-        """Initialize logging variables"""
+        """Initialize logging variables."""
         log_file = os.path.expanduser(self.options.logfile)
         # If an absolute path is not specified, use the config directory.
         if not os.path.isabs(log_file):
@@ -213,7 +213,9 @@ class Manager:
         self.log_filename = log_file
 
     def initialize(self) -> None:
-        """Load plugins, database, and config. Also initializes (but does not start) the task queue and ipc server.
+        """Load plugins, database, and config.
+
+        Also initialize (but do not start) the task queue and ipc server.
         This should only be called after obtaining a lock.
         """
         if self.initialized:
@@ -254,7 +256,7 @@ class Manager:
 
     @property
     def tasks(self) -> list[str]:
-        """A list of tasks in the config"""
+        """A list of tasks in the config."""
         if not self.config:
             return []
         return list(self.config.get('tasks', {}).keys())
@@ -332,7 +334,7 @@ class Manager:
         return finished_events
 
     def start(self) -> None:
-        """Starting point when executing from commandline, dispatch execution to correct destination.
+        """Run as the starting point when executing from commandline, dispatch execution to correct destination.
 
         If there is a FlexGet process with an ipc server already running, the command will be sent there for execution
         and results will be streamed back.
@@ -408,7 +410,7 @@ class Manager:
             options.cli_command_callback(self, command_options)
 
     def execute_command(self, options: argparse.Namespace) -> None:
-        """Handles the 'execute' CLI command.
+        """Handle the 'execute' CLI command.
 
         If there is already a task queue running in this process, adds the execution to the queue.
         If FlexGet is being invoked with this command, starts up a task queue and runs the execution.
@@ -445,7 +447,7 @@ class Manager:
         fire_event('manager.execute.completed', self, options)
 
     def daemon_command(self, options: argparse.Namespace) -> None:
-        """Handles the 'daemon' CLI command.
+        """Handle the 'daemon' CLI command.
 
         Fires events:
 
@@ -530,7 +532,7 @@ class Manager:
         self.shutdown(finish_queue=False)
 
     def setup_yaml(self) -> None:
-        """Customize the yaml loader/dumper behavior"""
+        """Customize the yaml loader/dumper behavior."""
 
         # Represent OrderedDict as a regular dict (but don't sort it alphabetically)
         # This lets us order a dict in a yaml file for easier human consumption
@@ -616,7 +618,7 @@ class Manager:
     def load_config(
         self, output_to_console: bool = True, config_file_hash: Optional[str] = None
     ) -> None:
-        """Loads the config file from disk, validates and activates it.
+        """Load the config file from disk, validate and activate it.
 
         :raises: `ValueError` if there is a problem loading the config file
         """
@@ -719,7 +721,7 @@ class Manager:
         return backup_path
 
     def save_config(self) -> None:
-        """Dumps current config to yaml config file"""
+        """Dump current config to yaml config file."""
         # TODO: Only keep x number of backups..
 
         # Back up the user's current config before overwriting
@@ -731,7 +733,8 @@ class Manager:
             config_file.write(yaml.dump(self.user_config, default_flow_style=False))
 
     def config_changed(self) -> None:
-        """Makes sure that all tasks will have the config_modified flag come out true on the next run.
+        """Make sure that all tasks will have the config_modified flag come out true on the next run.
+
         Useful when changing the db and all tasks need to be completely reprocessed.
         """
         from flexget.task import config_changed
@@ -740,8 +743,9 @@ class Manager:
         fire_event('manager.config_updated', self)
 
     def validate_config(self, config: Optional[dict] = None) -> dict:
-        """Check all root level keywords are valid. Config may be modified by before_config_validate hooks. Modified
-        config will be returned.
+        """Check all root level keywords are valid.
+
+        Config may be modified by before_config_validate hooks. Modified config will be returned.
 
         :param config: Config to check. If not provided, current manager config will be checked.
         :raises: `ValueError` when config fails validation. There will be an `errors` attribute with the schema errors.
@@ -757,7 +761,7 @@ class Manager:
         return conf
 
     def init_sqlalchemy(self) -> None:
-        """Initialize SQLAlchemy"""
+        """Initialize SQLAlchemy."""
         try:
             if [int(part) for part in sqlalchemy.__version__.split('.')] < [0, 7, 0]:
                 print(
@@ -840,7 +844,7 @@ class Manager:
         return None
 
     def check_lock(self) -> bool:
-        """Returns True if there is a lock on the database."""
+        """Return True if there is a lock on the database."""
         lock_info = self._read_lock()
         if not lock_info:
             return False
@@ -905,7 +909,7 @@ class Manager:
             logger.debug('Removed {}', self.lockfile)
 
     def daemonize(self) -> None:
-        """Daemonizes the current process. Returns the new pid"""
+        """Daemonizes the current process. Returns the new pid."""
         if sys.platform.startswith('win'):
             logger.error('Cannot daemonize on windows')
             return
@@ -1000,7 +1004,7 @@ class Manager:
         self.task_queue.shutdown(finish_queue)
 
     def _shutdown(self) -> None:
-        """Runs when the manager is done processing everything."""
+        """Run when the manager is done processing everything."""
         if self.ipc_server:
             self.ipc_server.shutdown()
         fire_event('manager.shutdown', self)
@@ -1018,7 +1022,7 @@ class Manager:
         manager = None
 
     def matching_tasks(self, task: str) -> Optional[list[str]]:
-        """Create list of tasks to run, preserving order"""
+        """Create list of tasks to run, preserving order."""
         task_names = [t for t in self.tasks if fnmatch.fnmatchcase(str(t).lower(), task.lower())]
         if not task_names:
             raise ValueError(f'`{task}` does not match any tasks')
@@ -1026,8 +1030,9 @@ class Manager:
         return task_names
 
     def crash_report(self) -> str:
-        """This should be called when handling an unexpected exception. Will create a new log file containing the last 50
-        debug messages as well as the crash traceback.
+        """Be called when handling an unexpected exception.
+
+        Will create a new log file containing the last 50 debug messages as well as the crash traceback.
         """
         if not self.unit_test:
             log_dir = os.path.dirname(self.log_filename)

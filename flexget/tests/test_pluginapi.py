@@ -8,7 +8,7 @@ from flexget.event import event, fire_event
 
 
 class TestPluginApi:
-    """Contains plugin api related tests"""
+    """Contain plugin api related tests."""
 
     config = 'tasks: {}'
 

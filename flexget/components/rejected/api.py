@@ -68,7 +68,7 @@ class Rejected(APIResource):
     @api.response(200, model=rejected_entries_list_schema)
     @api.doc(expect=[rejected_parser])
     def get(self, session=None):
-        """List all rejected entries"""
+        """List all rejected entries."""
         args = rejected_parser.parse_args()
 
         # Pagination and sorting params
@@ -124,7 +124,7 @@ class Rejected(APIResource):
 
     @api.response(200, model=base_message_schema)
     def delete(self, session=None):
-        """Clears all rejected entries"""
+        """Clear all rejected entries."""
         entries = session.query(db.RememberEntry).delete()
         if entries:
             session.commit()
@@ -138,7 +138,7 @@ class RejectedEntry(APIResource):
     @etag
     @api.response(200, model=rejected_entry_schema)
     def get(self, rejected_entry_id, session=None):
-        """Returns a rejected entry"""
+        """Return a rejected entry."""
         try:
             entry = (
                 session.query(db.RememberEntry)
@@ -151,7 +151,7 @@ class RejectedEntry(APIResource):
 
     @api.response(200, model=base_message_schema)
     def delete(self, rejected_entry_id, session=None):
-        """Deletes a rejected entry"""
+        """Delete a rejected entry."""
         try:
             entry = (
                 session.query(db.RememberEntry)

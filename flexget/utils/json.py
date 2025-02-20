@@ -1,4 +1,5 @@
 """Helper module that can load whatever version of the json module is available.
+
 Plugins can just import the methods from this module.
 
 Also allows date and datetime objects to be encoded/decoded.
@@ -94,9 +95,7 @@ def dump(*args, **kwargs) -> None:
 
 
 def loads(*args, **kwargs) -> Any:
-    """:param bool decode_datetime: If `True`, dates in ISO8601 format will be deserialized to :class:`datetime.datetime`
-    objects.
-    """
+    """:param bool decode_datetime: If `True`, dates in ISO8601 format will be deserialized to :class:`datetime.datetime` objects."""
     if kwargs.pop('decode_datetime', False):
         kwargs['object_hook'] = _datetime_decoder
         kwargs['cls'] = DTDecoder
@@ -106,9 +105,7 @@ def loads(*args, **kwargs) -> Any:
 
 
 def load(*args, **kwargs) -> Any:
-    """:param bool decode_datetime: If `True`, dates in ISO8601 format will be deserialized to :class:`datetime.datetime`
-    objects.
-    """
+    """:param bool decode_datetime: If `True`, dates in ISO8601 format will be deserialized to :class:`datetime.datetime` objects."""
     if kwargs.pop('decode_datetime', False):
         kwargs['object_hook'] = _datetime_decoder
         kwargs['cls'] = DTDecoder

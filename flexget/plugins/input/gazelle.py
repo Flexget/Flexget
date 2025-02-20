@@ -33,13 +33,13 @@ class GazelleSession(Base):
 
 
 class InputGazelle:
-    """A generic plugin that searches a Gazelle-based website
+    """A generic plugin that searches a Gazelle-based website.
 
     Limited functionality but should work for almost all of them.
     """
 
     def __init__(self):
-        """Set up a plugin that only has the ability to do about basic search"""
+        """Set up a plugin that only has the ability to do about basic search."""
         self.base_url = None
 
         # Aliases for config -> api params
@@ -55,7 +55,7 @@ class InputGazelle:
 
     @property
     def schema(self):
-        """The schema of the plugin
+        """The schema of the plugin.
 
         Subclasses should extend this to implement more params
         """
@@ -77,17 +77,17 @@ class InputGazelle:
         return schema
 
     def _key(self, key):
-        """Gets the API key name from the entered key"""
+        """Get the API key name from the entered key."""
         if key in self.aliases:
             return self.aliases[key]
         return key
 
     def _opts(self, key):
-        """Gets the options for the specified key"""
+        """Get the options for the specified key."""
         return self.params[self._key(key)]
 
     def _getval(self, key, val):
-        """Gets the value for the specified key based on a config option"""
+        """Get the value for the specified key based on a config option."""
         opts = self._opts(key)
         if isinstance(opts, dict):
             # Translate the input value to the API value
@@ -100,7 +100,7 @@ class InputGazelle:
         return val
 
     def params_from_config(self, config):
-        """Filter params and map config values -> api values"""
+        """Filter params and map config values -> api values."""
         ret = {}
         for k, v in config.items():
             key = self._key(k)
@@ -109,7 +109,7 @@ class InputGazelle:
         return ret
 
     def setup(self, task, config):
-        """Set up a session and log in"""
+        """Set up a session and log in."""
         self._session = task.requests
         base_url = config.get('base_url', "").rstrip("/")
         if base_url:
@@ -141,7 +141,7 @@ class InputGazelle:
         task.no_entries_ok = True
 
     def resume_session(self):
-        """Resume an existing session from the datebase
+        """Resume an existing session from the datebase.
 
         Return True on successful recovery, False otherwise
         """
@@ -164,7 +164,7 @@ class InputGazelle:
         return False
 
     def save_current_session(self):
-        """Store the current session in the database so it can be resumed later"""
+        """Store the current session in the database so it can be resumed later."""
         logger.debug("Storing session info in the DB")
         with Session() as session:
             expires = None
@@ -182,7 +182,7 @@ class InputGazelle:
             session.merge(db_session)
 
     def authenticate(self, force=False):
-        """Log in and store auth data from the server
+        """Log in and store auth data from the server.
 
         Adapted from https://github.com/isaaczafuta/whatapi
         """
@@ -215,7 +215,7 @@ class InputGazelle:
         self.save_current_session()
 
     def request(self, no_login=False, **params):
-        """Make an AJAX request to the API
+        """Make an AJAX request to the API.
 
         If `no_login` is True, logging in will not be attempted if the request
         is redirected to the login page.
@@ -249,7 +249,7 @@ class InputGazelle:
             raise PluginError(f"{self.base_url} returned an invalid response")
 
     def search_results(self, params):
-        """Generator that yields search results"""
+        """Yield search results."""
         page = 1
         pages = None
         while page <= self.max_pages:
@@ -269,7 +269,7 @@ class InputGazelle:
             logger.warning('Stopped after {} pages (out of {} total pages)', self.max_pages, pages)
 
     def get_entries(self, search_results):
-        """Generator that yields Entry objects from search results"""
+        """Yield Entry objects from search results."""
         for result in search_results:
             # Get basic information on the release
             info = {k: result[k] for k in ('groupId', 'groupName')}
@@ -292,7 +292,7 @@ class InputGazelle:
 
     @plugin.internet(logger)
     def search(self, task, entry, config):
-        """Search interface"""
+        """Search interface."""
         self.setup(task, config)
 
         entries = set()
@@ -305,7 +305,7 @@ class InputGazelle:
 
     @plugin.internet(logger)
     def on_task_input(self, task, config):
-        """Task input interface"""
+        """Task input interface."""
         self.setup(task, config)
 
         params = self.params_from_config(config)
@@ -313,14 +313,14 @@ class InputGazelle:
 
 
 class InputGazelleMusic(InputGazelle):
-    """A plugin that searches a Gazelle-based music website
+    """A plugin that searches a Gazelle-based music website.
 
     Based on https://github.com/WhatCD/Gazelle since it's the starting point of
     all Gazelle-based music sites.
     """
 
     def __init__(self):
-        """Set up the majority of parameters that these sites support"""
+        """Set up the majority of parameters that these sites support."""
         super().__init__()
 
         self.aliases.update(
@@ -382,7 +382,7 @@ class InputGazelleMusic(InputGazelle):
 
     @property
     def schema(self):
-        """The schema of the plugin
+        """The schema of the plugin.
 
         Extends the super's schema
         """
@@ -416,7 +416,7 @@ class InputGazelleMusic(InputGazelle):
         return schema
 
     def get_entries(self, search_results):
-        """Generator that yields Entry objects from search results"""
+        """Yield Entry objects from search results."""
         for result in search_results:
             # Get basic information on the release
             info = {k: result[k] for k in ('artist', 'groupName', 'groupYear')}
@@ -440,10 +440,10 @@ class InputGazelleMusic(InputGazelle):
 
 
 class InputRedacted(InputGazelleMusic):
-    """A plugin that searches RED"""
+    """A plugin that searches RED."""
 
     def __init__(self):
-        """Set up custom base_url and parameters"""
+        """Set up custom base_url and parameters."""
         super().__init__()
         self.base_url = "https://redacted.ch"
 
@@ -454,10 +454,10 @@ class InputRedacted(InputGazelleMusic):
 
 
 class InputNotWhat(InputGazelleMusic):
-    """A plugin that searches NWCD"""
+    """A plugin that searches NWCD."""
 
     def __init__(self):
-        """Set up custom base_url and parameters"""
+        """Set up custom base_url and parameters."""
         super().__init__()
         self.base_url = "https://notwhat.cd"
 

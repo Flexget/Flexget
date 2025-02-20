@@ -10,8 +10,9 @@ logger = logger.bind(name='modif_torrent')
 
 
 class TorrentFilename:
-    """Makes sure that entries containing torrent-file have .torrent
-    extension. This is enabled always by default (builtins).
+    """Make sure that entries containing torrent-file have .torrent extension.
+
+    This is enabled always by default (builtins).
     """
 
     TORRENT_PRIO = 255
@@ -81,7 +82,7 @@ class TorrentFilename:
                     f.write(entry['torrent'].encode())
 
     def make_filename(self, torrent, entry):
-        """Build a filename for this torrent"""
+        """Build a filename for this torrent."""
         title = entry['title']
         files = torrent.get_filelist()
         if len(files) == 1:

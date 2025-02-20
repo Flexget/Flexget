@@ -8,7 +8,7 @@ logger = logger.bind(name='rt')
 
 
 class FilterRottenTomatoes:
-    """This plugin allows filtering based on Rotten Tomatoes score, votes and genres etc.
+    """Allow filtering based on Rotten Tomatoes score, votes and genres etc.
 
     Configuration:
 

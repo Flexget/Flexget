@@ -9,7 +9,7 @@ logger = logger.bind(name='path_by_ext')
 
 
 class PluginPathByExt:
-    """Allows specifying path based on content-type
+    """Allows specifying path based on content-type.
 
     Example:
     path_by_ext:

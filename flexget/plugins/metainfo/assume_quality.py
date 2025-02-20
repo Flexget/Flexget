@@ -11,7 +11,8 @@ logger = logger.bind(name='assume_quality')
 
 
 class AssumeQuality:
-    """Applies quality components to entries that match specified quality requirements.
+    """Apply quality components to entries that match specified quality requirements.
+
     When a quality is applied, any components which are unknown in the entry are filled from the applied quality.
     Quality requirements are tested in order of increasing precision (ie "720p h264" is more precise than "1080p"
     so gets tested first), and applied as matches are found. Using the simple configuration is the same as specifying

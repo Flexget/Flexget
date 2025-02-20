@@ -121,9 +121,10 @@ def upgrade(ver, session):
 
 
 def get_source(name, session):
-    """:param string name: Source name
+    """Return ArchiveSource from db or new one.
+
+    :param string name: Source name
     :param session: SQLAlchemy session
-    :return: ArchiveSource from db or new one
     """
     try:
         return session.query(ArchiveSource).filter(ArchiveSource.name == name).one()
@@ -132,9 +133,10 @@ def get_source(name, session):
 
 
 def get_tag(name, session):
-    """:param string name: Tag name
+    """Return ArchiveTag from db or new one.
+
+    :param string name: Tag name
     :param session: SQLAlchemy session
-    :return: ArchiveTag from db or new one
     """
     try:
         return session.query(ArchiveTag).filter(ArchiveTag.name == name).one()

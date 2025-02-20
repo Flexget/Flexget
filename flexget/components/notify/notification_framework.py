@@ -1,5 +1,4 @@
-"""This plugin adds a notification framework which can be used by other plugins to send messages to the user,
-via a transport service configurable by the user.
+"""The notification framework can be used by other plugins to send messages to the user, via a transport service configurable by the user.
 
 Sending Messages
 ----------------
@@ -83,6 +82,7 @@ def render_config(config, template_renderer, notifier_name, _path=''):
 class NotificationFramework:
     def send_notification(self, title, message, notifiers, template_renderer=None):
         """Send a notification out to the given `notifiers` with a given `title` and `message`.
+
         If `template_renderer` is specified, `title`, `message`, as well as any string options in a notifier's config
         will be rendered using this function before sending the message.
 

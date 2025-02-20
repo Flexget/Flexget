@@ -120,7 +120,7 @@ class PluginPyLoad:
         self.add_entries(task, config)
 
     def add_entries(self, task, config):
-        """Adds accepted entries"""
+        """Add accepted entries."""
         apiurl = config.get('api', self.DEFAULT_API)
         api = PyloadApi(task.requests, apiurl)
 

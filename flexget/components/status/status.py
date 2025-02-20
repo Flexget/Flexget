@@ -12,7 +12,7 @@ logger = logger.bind(name='status')
 
 
 class Status:
-    """Track health status of tasks"""
+    """Track health status of tasks."""
 
     schema = {'type': 'boolean'}
 

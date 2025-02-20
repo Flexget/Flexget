@@ -46,8 +46,9 @@ class MDChangeSet:
         return instance
 
     def parse_message(self, message: str) -> bool:
-        """Parses a git commit message and formats and adds any tagged messages to this changeset.
-        Returns True if one or more changelog messages was found.
+        """Parse a git commit message and format and add any tagged messages to this changeset.
+
+        Return True if one or more changelog messages was found.
         """
         found = False
         for cat, item in self.change_items(message):
@@ -60,7 +61,7 @@ class MDChangeSet:
         return found
 
     def change_items(self, message: str):
-        """An iterator of changelog updates from a commit message in the form (category, message)"""
+        """Return an iterator of changelog updates from a commit message in the form (category, message)."""
         for line in message.split('\n'):
             for cat_match in re.finditer(r'\[(\w+)\]', line):
                 found_cat = self.cat_lookup(cat_match.group(1))
@@ -76,7 +77,7 @@ class MDChangeSet:
         return None
 
     def to_md_lines(self) -> Generator[str, None, None]:
-        """An iterator over the markdown lines representing this changeset."""
+        """Return an iterator over the markdown lines representing this changeset."""
         yield from self.pre_header
         yield self.version_header
         yield from self.post_header
@@ -89,7 +90,7 @@ class MDChangeSet:
 def isplit(
     start_text: str, iterator: Iterable[str]
 ) -> tuple[list[str], Optional[str], Iterable[str]]:
-    """Returns head, match, tail tuple, where match is the first line that starts with `start_text`"""
+    """Return head, match, tail tuple, where match is the first line that starts with `start_text`."""
     head: list[str] = []
     iterator = iter(iterator)
     for item in iterator:

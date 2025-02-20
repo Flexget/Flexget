@@ -28,7 +28,7 @@ class InputSceper:
     schema = {'type': 'string', 'format': 'url'}
 
     def parse_site(self, url, task):
-        """Parse configured url and return releases array"""
+        """Parse configured url and return releases array."""
         try:
             page = task.requests.get(url).content
         except RequestException as e:

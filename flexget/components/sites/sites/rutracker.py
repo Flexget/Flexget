@@ -56,7 +56,8 @@ class RutrackerAccount(Base):
 
 
 class RutrackerAuth(AuthBase):
-    """Supports downloading of torrents from 'rutracker' tracker
+    """Support downloading of torrents from 'rutracker' tracker.
+
     if you pass cookies (CookieJar) to constructor then authentication will be bypassed and cookies will be just set
     """
 
@@ -125,7 +126,9 @@ class RutrackerAuth(AuthBase):
 
 
 class RutrackerUrlrewrite:
-    """Usage:
+    """Rewrite RuTracker urls.
+
+    Usage:
 
     rutracker_auth:
       username: 'username_here'

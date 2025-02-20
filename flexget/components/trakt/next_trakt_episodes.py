@@ -13,8 +13,7 @@ logger = logger.bind(name='next_trakt_episodes')
 
 
 class NextTraktEpisodes:
-    """Creates an entry for the latest or the next item in your watched or collected
-    episodes in your trakt account.
+    """Create an entry for the latest or the next item in your watched or collected episodes in your trakt account.
 
     Syntax:
 

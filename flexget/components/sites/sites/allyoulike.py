@@ -22,7 +22,8 @@ logger = logger.bind(name='allyoulike')
 
 
 class UrlRewriteAllyoulike:
-    r"""allyoulike.com urlrewriter
+    r"""allyoulike.com urlrewriter.
+
     Version 0.1
 
     Rewrites urls for allyoulike.com

@@ -45,7 +45,7 @@ else:
 
 
 def bundle_webui(ui_version: Optional[str] = None):
-    """Bundle webui for release packaging"""
+    """Bundle webui for release packaging."""
     # We delay this import so that the hatchling build hook can register itself without requests installed.
     # once it is registered it can install the dep automatically during the build process.
     import requests

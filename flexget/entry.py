@@ -50,7 +50,7 @@ class EntryState(Enum):
 
 
 class EntryUnicodeError(Exception):
-    """This exception is thrown when trying to set non-unicode compatible field value to entry."""
+    """Thrown when trying to set non-unicode compatible field value to entry."""
 
     def __init__(self, key: str, value) -> None:
         self.key = key
@@ -95,8 +95,9 @@ class Entry(LazyDict, Serializer):
         operation: Optional[str] = None,
         plugin: Optional[str] = None,
     ) -> None:
-        """Adds trace message to the entry which should contain useful information about why
-        plugin did not operate on entry. Accept and Reject messages are added to trace automatically.
+        """Add trace message to the entry which should contain useful information about why plugin did not operate on entry.
+
+        Accept and Reject messages are added to trace automatically.
 
         :param string message: Message to add into entry trace.
         :param string operation: None, reject, accept or fail
@@ -263,7 +264,8 @@ class Entry(LazyDict, Serializer):
     # TODO: this is too manual, maybe we should somehow check this internally and throw some exception if
     # application is trying to operate on invalid entry
     def isvalid(self) -> bool:
-        """:return: True if entry is valid. Return False if this cannot be used.
+        """Return True if entry is valid. Return False if this cannot be used.
+
         :rtype: bool
         """
         if 'title' not in self:
@@ -277,8 +279,7 @@ class Entry(LazyDict, Serializer):
     def update_using_map(
         self, field_map: dict, source_item: Union[dict, object], ignore_none: bool = False
     ):
-        """Populates entry fields from a source object using a dictionary that maps from entry field names to
-        attributes (or keys) in the source object.
+        """Populate entry fields from a source object using a dictionary that maps from entry field names to attributes (or keys) in the source object.
 
         :param dict field_map:
           A dictionary mapping entry field names to the attribute in source_item (or keys,
@@ -300,7 +301,7 @@ class Entry(LazyDict, Serializer):
             self[field] = v
 
     def render(self, template: Union[str, FlexGetTemplate], native: bool = False) -> str:
-        """Renders a template string based on fields in the entry.
+        """Render a template string based on fields in the entry.
 
         :param template: A template string or FlexGetTemplate that uses jinja2 or python string replacement format.
         :param native: If True, and the rendering result can be all native python types, not just strings.
@@ -352,6 +353,7 @@ class Entry(LazyDict, Serializer):
         kwargs: Optional[Mapping] = None,
     ):
         """Add lazy fields to an entry.
+
         :param lazy_func: should be a funciton previously registered with the `register_lazy_func` decorator,
             or the name it was registered under.
         :param fields: list of fields this function will fill
@@ -372,7 +374,10 @@ class Entry(LazyDict, Serializer):
         self.lazy_lookups.append((lazy_func, fields, args, kwargs))
 
     def register_lazy_func(self, func, keys):
-        """DEPRECATED. Use `add_lazy_fields` instead."""
+        """Do not use this anymore as it is DEPRECATED.
+
+        Use `add_lazy_fields` instead.
+        """
         warnings.warn(
             '`register_lazy_func` is deprecated. `add_lazy_fields` should be used instead. '
             'This plugin should be updated to work with the latest versions of FlexGet',

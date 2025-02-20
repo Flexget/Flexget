@@ -44,7 +44,7 @@ class SearchCPASBIEN:
 
     @plugin.internet(logger)
     def search(self, task, entry, config):
-        """CPASBIEN search plugin
+        """CPASBIEN search plugin.
 
         Config example:
 

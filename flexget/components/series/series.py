@@ -73,7 +73,7 @@ def clean_series(manager):
 
 
 def populate_entry_fields(entry, parser, config):
-    """Populates all series_fields for given entry based on parser.
+    """Populate all series_fields for given entry based on parser.
 
     :param parser: A valid result from a series parser used to populate the fields.
     :config dict: If supplied, will use 'path' and 'set' options to populate specified fields.
@@ -125,9 +125,7 @@ def populate_entry_fields(entry, parser, config):
 
 
 class FilterSeriesBase:
-    """Class that contains helper methods for both filter.series as well as plugins that configure it,
-    such as all_series, series_premiere and configure_series.
-    """
+    """Class that contains helper methods for both filter.series as well as plugins that configure it, such as all_series, series_premiere and configure_series."""
 
     @property
     def settings_schema(self):
@@ -202,7 +200,7 @@ class FilterSeriesBase:
         }
 
     def make_grouped_config(self, config):
-        """Turns a simple series list into grouped format with a empty settings dict"""
+        """Turn a simple series list into grouped format with a empty settings dict."""
         if not isinstance(config, dict):
             # convert simplest configuration internally grouped format
             config = {'simple': config, 'settings': {}}
@@ -230,7 +228,7 @@ class FilterSeriesBase:
         return opts
 
     def apply_group_options(self, config):
-        """Applies group settings to each item in series group and removes settings dict."""
+        """Apply group settings to each item in series group and remove settings dict."""
         # Make sure config is in grouped format first
         config = self.make_grouped_config(config)
         for group_name in config:
@@ -282,14 +280,15 @@ class FilterSeriesBase:
 
     def prepare_config(self, config):
         """Generate a list of unique series from configuration.
+
         This way we don't need to handle two different configuration formats in the logic.
-        Applies group settings with advanced form.
+        Apply group settings with advanced form.
         """
         config = self.apply_group_options(config)
         return self.combine_series_lists(*list(config.values()))
 
     def combine_series_lists(self, *series_lists, **kwargs):
-        """Combines the series from multiple lists, making sure there are no doubles.
+        """Combine the series from multiple lists, making sure there are no doubles.
 
         If keyword argument log_once is set to True, an error message will be printed if a series
         is listed more than once, otherwise log_once will be used.
@@ -316,7 +315,7 @@ class FilterSeriesBase:
         return [{s: unique_series[s]} for s in sorted(unique_series, reverse=True)]
 
     def merge_config(self, task, config):
-        """Merges another series config dict in with the current one."""
+        """Merge another series config dict in with the current one."""
         # Make sure we start with both configs as a list of complex series
         native_series = self.prepare_config(task.config.get('series', {}))
         merging_series = self.prepare_config(config)
@@ -361,7 +360,7 @@ class FilterSeries(FilterSeriesBase):
         }
 
     def auto_exact(self, config):
-        """Automatically enable exact naming option for series that look like a problem"""
+        """Automatically enable exact naming option for series that look like a problem."""
         # generate list of all series in one dict
         all_series = {}
         for series_item in config:
@@ -445,7 +444,7 @@ class FilterSeries(FilterSeriesBase):
         logger.debug('series on_task_metainfo took {} to parse', preferred_clock() - start_time)
 
     def on_task_filter(self, task, config):
-        """Filter series"""
+        """Filter series."""
         # Parsing was done in metainfo phase, create the dicts to pass to process_series from the task entries
         # key: series episode identifier ie. S01E02
         # value: seriesparser
@@ -591,7 +590,7 @@ class FilterSeries(FilterSeriesBase):
         logger.debug('processing series took {}', preferred_clock() - start_time)
 
     def parse_series(self, entries, series_name, config, db_identified_by=None):
-        """Search for `series_name` and populate all `series_*` fields in entries when successfully parsed
+        """Search for `series_name` and populate all `series_*` fields in entries when successfully parsed.
 
         :param entries: List of entries to process
         :param series_name: Series name which is being processed
@@ -817,7 +816,7 @@ class FilterSeries(FilterSeriesBase):
             best.accept(reason)
 
     def process_propers(self, config, episode, entries):
-        """Accepts needed propers. Nukes episodes from which there exists proper.
+        """Accept needed propers. Nuke episodes from which there exists proper.
 
         :returns: A list of episodes to continue processing.
         """
@@ -870,7 +869,7 @@ class FilterSeries(FilterSeriesBase):
         return pass_filter
 
     def process_timeframe_target(self, config, entries, downloaded=None):
-        """Accepts first episode matching the quality configured for the series.
+        """Accept first episode matching the quality configured for the series.
 
         :return: True if accepted something
         """
@@ -889,7 +888,7 @@ class FilterSeries(FilterSeriesBase):
         return None
 
     def process_quality(self, config, entries):
-        """Filters eps that do not fall between within our defined quality standards.
+        """Filter eps that do not fall between within our defined quality standards.
 
         :returns: A list of eps that are in the acceptable range
         """
@@ -989,8 +988,9 @@ class FilterSeries(FilterSeriesBase):
         return None
 
     def process_timeframe(self, task, config, episode, entries):
-        """Runs the timeframe logic to determine if we should wait for a better quality.
-        Saves current best to backlog if timeframe has not expired.
+        """Run the timeframe logic to determine if we should wait for a better quality.
+
+        Save current best to backlog if timeframe has not expired.
 
         :returns: True - if we should keep the quality (or qualities) restriction
                   False - if the quality restriction should be released, due to timeframe expiring
@@ -1034,7 +1034,7 @@ class FilterSeries(FilterSeriesBase):
         return True
 
     def process_qualities(self, config, entries, downloaded):
-        """Handles all modes that can accept more than one quality per episode. (qualities, upgrade)
+        """Handle all modes that can accept more than one quality per episode. (qualities, upgrade).
 
         :returns: True - if at least one wanted quality has been downloaded or accepted.
                   False - if no wanted qualities have been accepted
@@ -1054,7 +1054,7 @@ class FilterSeries(FilterSeriesBase):
         logger.debug('wanted qualities: {}', wanted_qualities)
 
         def wanted(quality):
-            """Returns True if we want this quality based on the config options."""
+            """Return True if we want this quality based on the config options."""
             wanted_q = not wanted_qualities or any(req.allows(quality) for req in wanted_qualities)
             if config.get('upgrade'):
                 wanted_q = wanted_q and quality > max(
@@ -1084,7 +1084,7 @@ class FilterSeries(FilterSeriesBase):
         return bool(downloaded_qualities)
 
     def on_task_learn(self, task, config):
-        """Learn succeeded episodes"""
+        """Learn succeeded episodes."""
         logger.debug('on_task_learn')
         for entry in task.accepted:
             if 'series_releases' in entry:
@@ -1114,7 +1114,7 @@ class FilterSeries(FilterSeriesBase):
 
 
 class SeriesDBManager(FilterSeriesBase):
-    """Update in the database with series info from the config"""
+    """Update in the database with series info from the config."""
 
     @plugin.priority(0)
     def on_task_start(self, task, config):

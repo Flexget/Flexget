@@ -11,7 +11,7 @@ logger = logger.bind(name='configure_series')
 
 
 class ConfigureSeries(plugin_series.FilterSeriesBase):
-    """Generates series configuration from any input (supporting API version 2, soon all)
+    """Generates series configuration from any input (supporting API version 2, soon all).
 
     Configuration::
 

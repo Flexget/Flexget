@@ -80,7 +80,7 @@ class TestImdbParser:
         assert not parser.year
 
     def test_plot_with_links(self):
-        """Make sure plot doesn't terminate at the first link. GitHub #756"""
+        """Make sure plot doesn't terminate at the first link. GitHub #756."""
         parser = ImdbParser()
         parser.parse('tt2503944')
         assert parser.plot_outline == (

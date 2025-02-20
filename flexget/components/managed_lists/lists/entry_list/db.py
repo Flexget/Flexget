@@ -171,8 +171,9 @@ class DBEntrySet(MutableSet):
 
     @property
     def online(self):
-        """Set the online status of the plugin, online plugin should be treated differently in certain situations,
-        like test mode
+        """Set the online status of the plugin.
+
+        Online plugin should be treated differently in certain situations, like test mode
         """
         return False
 

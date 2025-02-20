@@ -18,7 +18,9 @@ requests.add_domain_limiter(TimedLimiter('pushalot.com', '5 seconds'))
 
 
 class PushalotNotifier:
-    """Example::
+    """Send a Pushalot notification.
+
+    Example::
 
     notify:
       entries:
@@ -51,7 +53,7 @@ class PushalotNotifier:
     }
 
     def notify(self, title, message, config):
-        """Send a Pushalot notification"""
+        """Send a Pushalot notification."""
         notification = {
             'Title': title,
             'Body': message,

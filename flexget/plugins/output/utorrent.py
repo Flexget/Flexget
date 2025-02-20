@@ -41,9 +41,7 @@ class PluginUtorrent:
 
     @plugin.priority(120)
     def on_task_download(self, task, config):
-        """Call download plugin to generate the temp files we will load
-        into deluge then verify they are valid torrents
-        """
+        """Call download plugin to generate the temp files we will load into deluge then verify they are valid torrents."""
         # If the download plugin is not enabled, we need to call it to get
         # our temp .torrent files
         if 'download' not in task.config:
@@ -164,7 +162,7 @@ class PluginUtorrent:
                 entry.fail('Fail to add `{}` to utorrent'.format(entry['url']))
 
     def on_task_learn(self, task, config):
-        """Make sure all temp files are cleaned up when entries are learned"""
+        """Make sure all temp files are cleaned up when entries are learned."""
         # If download plugin is enabled, it will handle cleanup.
         if 'download' not in task.config:
             plugin.get('download', self).cleanup_temp_files(task)

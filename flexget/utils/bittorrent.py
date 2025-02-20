@@ -204,7 +204,7 @@ def bencode(data: Union[bytes, str, int, list, dict]) -> bytes:
 
 
 class Torrent:
-    """Represents a torrent"""
+    """Represents a torrent."""
 
     # string type used for keys, if this ever changes, stuff like "x in y"
     # gets broken unless you coerce to this type
@@ -217,7 +217,7 @@ class Torrent:
             return cls(handle.read())
 
     def __init__(self, content: bytes) -> None:
-        """Accepts torrent file as string"""
+        """Accept torrent file as string."""
         # Make sure there is no trailing whitespace. see #1592
         content = content.strip()
         # decoded torrent structure
@@ -235,7 +235,7 @@ class Torrent:
         )
 
     def get_filelist(self) -> list[dict[str, Union[str, int]]]:
-        """Return array containing fileinfo dictionaries (name, length, path)"""
+        """Return array containing fileinfo dictionaries (name, length, path)."""
         files = []
         if 'length' in self.content['info']:
             # single file torrent
@@ -275,17 +275,17 @@ class Torrent:
 
     @property
     def is_multi_file(self) -> bool:
-        """Return True if the torrent is a multi-file torrent"""
+        """Return True if the torrent is a multi-file torrent."""
         return 'files' in self.content['info']
 
     @property
     def name(self) -> str:
-        """Return name of the torrent"""
+        """Return name of the torrent."""
         return self.content['info'].get('name', '')
 
     @property
     def size(self) -> int:
-        """Return total size of the torrent"""
+        """Return total size of the torrent."""
         size = 0
         # single file torrent
         if 'length' in self.content['info']:
@@ -315,7 +315,7 @@ class Torrent:
 
     @property
     def info_hash(self) -> str:
-        """Return Torrent info hash"""
+        """Return Torrent info hash."""
         import hashlib
 
         sha1_hash = hashlib.sha1()
@@ -347,7 +347,7 @@ class Torrent:
         self.modified = True
 
     def remove_multitracker(self, tracker: str) -> None:
-        """Removes passed multi-tracker from this torrent"""
+        """Remove passed multi-tracker from this torrent."""
         for tl in self.content.get('announce-list', [])[:]:
             with suppress(AttributeError, ValueError):
                 tl.remove(tracker)
@@ -357,7 +357,7 @@ class Torrent:
                     self.content['announce-list'].remove(tl)
 
     def add_multitracker(self, tracker: str) -> None:
-        """Appends multi-tracker to this torrent"""
+        """Append multi-tracker to this torrent."""
         self.content.setdefault('announce-list', [])
         self.content['announce-list'].append([tracker])
         self.modified = True

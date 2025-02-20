@@ -31,7 +31,7 @@ requests.add_domain_limiter(TimedLimiter('imdb.com', '3 seconds'))
 
 
 def is_imdb_url(url):
-    """Tests the url to see if it's for imdb.com."""
+    """Test the url to see if it's for imdb.com."""
     if not isinstance(url, str):
         return None
     # Probably should use urlparse.
@@ -65,7 +65,7 @@ def extract_id(url):
 
 
 def make_url(imdb_id):
-    """Return IMDb URL of the given ID"""
+    """Return IMDb URL of the given ID."""
     return f'https://www.imdb.com/title/{imdb_id}/'
 
 
@@ -82,12 +82,12 @@ class ImdbSearch:
         self.max_results = 50
 
     def ireplace(self, text, old, new, count=0):
-        """Case insensitive string replace"""
+        """Case insensitive string replace."""
         pattern = re.compile(re.escape(old), re.IGNORECASE)
         return re.sub(pattern, new, text, count=count)
 
     def smart_match(self, raw_name, single_match=True):
-        """Accepts messy name, cleans it and uses information available to make smartest and best match"""
+        """Accept messy name, clean it and use information available to make smartest and best match."""
         parser = plugin.get('parsing', 'imdb_search').parse_movie(raw_name)
         name = parser.name
         year = parser.year
@@ -98,7 +98,7 @@ class ImdbSearch:
         return self.best_match(name, year, single_match)
 
     def best_match(self, name, year=None, single_match=True):
-        """Return single movie that best matches name criteria or None"""
+        """Return single movie that best matches name criteria or None."""
         movies = self.search(name, year)
 
         if not movies:
@@ -155,7 +155,7 @@ class ImdbSearch:
         return movies[0] if single_match else movies
 
     def search(self, name, year=None):
-        """Return array of movie details (dict)"""
+        """Return array of movie details (dict)."""
         logger.debug('Searching: {}', name)
         # This may include Shorts and TV series in the results
         # It is using the live search suggestions api that populates movies as you type in the search bar
@@ -215,7 +215,7 @@ class ImdbSearch:
 
 
 class ImdbParser:
-    """Quick-hack to parse relevant imdb details"""
+    """Quick-hack to parse relevant imdb details."""
 
     def __init__(self):
         self.genres = []

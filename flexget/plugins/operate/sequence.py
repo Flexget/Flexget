@@ -21,7 +21,7 @@ class PluginSequence:
     schema = {'type': 'array', 'items': {'$ref': '/schema/plugins'}}
 
     def __getattr__(self, item):
-        """Returns a function for all on_task_* events, that runs all the configured plugins."""
+        """Return a function for all on_task_* events, that runs all the configured plugins."""
         for phase, method in plugin.phase_methods.items():
             if item == method and phase not in ['accept', 'reject', 'fail']:
                 break
@@ -29,7 +29,7 @@ class PluginSequence:
             raise AttributeError(item)
 
         def handle_phase(task, config):
-            """Function that runs all of the configured plugins which act on the current phase."""
+            """Run all of the configured plugins which act on the current phase."""
             # Keep a list of all results, for input plugin combining
             results = []
             for item in config:

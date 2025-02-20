@@ -1,4 +1,4 @@
-"""Plugin for telegram input"""
+"""Plugin for telegram input."""
 
 import re
 
@@ -16,7 +16,7 @@ _TELEGRAM_API_URL = "https://api.telegram.org/"
 
 
 class TelegramInput:
-    """Parse any messages from Telegram and fills fields with regex
+    """Parse any messages from Telegram and fills fields with regex.
 
     Example:
       token: <token>

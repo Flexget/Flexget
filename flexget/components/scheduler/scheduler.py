@@ -97,7 +97,7 @@ def job_id(conf):
 
 
 def run_job(tasks):
-    """Add the execution to the queue and waits until it is finished"""
+    """Add the execution to the queue and waits until it is finished."""
     logger.debug('executing tasks: {}', tasks)
     finished_events = manager.execute(
         options={'tasks': tasks, 'cron': True, 'allow_manual': False}, priority=5
@@ -110,7 +110,7 @@ def run_job(tasks):
 
 @event('manager.daemon.started')
 def setup_scheduler(manager):
-    """Configure and start apscheduler"""
+    """Configure and start apscheduler."""
     global scheduler
     if logger.level(manager.options.loglevel).no > logger.level('DEBUG').no:
         logging.getLogger('apscheduler').setLevel(logging.WARNING)

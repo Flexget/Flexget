@@ -12,7 +12,8 @@ logger = logger.bind(name='newznab')
 
 
 class Newznab:
-    """Newznab search plugin
+    """Newznab search plugin.
+
     Provide a url or your website + apikey and a category.
     When a URL is provided it will override website and apikey; category will not be used in the URL
     but is still needed to properly fill out search parameters.

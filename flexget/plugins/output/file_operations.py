@@ -12,8 +12,9 @@ from flexget.utils.template import RenderError
 
 
 def get_directory_size(directory):
-    """:param directory: Path
-    :return: Size in bytes (recursively)
+    """Return size in bytes (recursively).
+
+    :param directory: Path
     """
     dir_size = 0
     for path, _, files in os.walk(directory):

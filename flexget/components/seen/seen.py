@@ -9,9 +9,9 @@ logger = logger.bind(name='seen')
 
 
 class FilterSeen:
-    """Remembers previously downloaded content and rejects them in
-    subsequent executions. Without this plugin FlexGet would
-    download all matching content on every execution.
+    """Remember previously downloaded content and reject them in subsequent executions.
+
+    Without this plugin FlexGet would download all matching content on every execution.
 
     This plugin is enabled on all tasks by default.
     See wiki for more information.
@@ -100,7 +100,7 @@ class FilterSeen:
                     )
 
     def on_task_learn(self, task, config):
-        """Remember succeeded entries"""
+        """Remember succeeded entries."""
         config = self.prepare_config(config)
         if config is False:
             logger.debug('disabled')
@@ -119,7 +119,7 @@ class FilterSeen:
                 logger.info("Learned '{}' (will skip this in the future)", entry['title'])
 
     def learn(self, task, entry, fields=None, reason=None, local=False):
-        """Marks entry as seen"""
+        """Mark entry as seen."""
         # no explicit fields given, use default
         if not fields:
             fields = self.fields

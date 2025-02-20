@@ -15,14 +15,14 @@ logger = logger.bind(name='torznab')
 
 
 class Torznab:
-    """Torznab search plugin
+    """Torznab search plugin.
 
     Handles searching for tv shows and movies, with fallback to simple query strings if these are not available.
     """
 
     @property
     def schema(self):
-        """The schema of the plugin"""
+        """The schema of the plugin."""
         return {
             'type': 'object',
             'properties': {
@@ -41,7 +41,7 @@ class Torznab:
         }
 
     def search(self, task, entry, config=None):
-        """Search interface"""
+        """Search interface."""
         self._setup(task, config)
         params = {}
         if self.params['t'] == 'movie':
@@ -61,7 +61,7 @@ class Torznab:
         return entries
 
     def _build_url(self, **kwargs):
-        """Builds the url with query parameters from the arguments"""
+        """Build the url with query parameters from the arguments."""
         params = self.params.copy()
         params.update(kwargs)
         logger.debug('Configured parameters: {}', params)
@@ -69,7 +69,7 @@ class Torznab:
         return f'{url}{urlencode(params)}'
 
     def _setup(self, task, config):
-        """Set up parameters"""
+        """Set up parameters."""
         self.base_url = config['website'].rstrip('/')
         config.setdefault('timeout', '30 seconds')
         self.timeout = parse_timedelta(config['timeout']).total_seconds()
@@ -84,14 +84,14 @@ class Torznab:
 
     @plugin.internet(logger)
     def _setup_caps(self, task, searcher, categories):
-        """Gets the capabilities of the torznab indexer and matches it with the provided configuration"""
+        """Get the capabilities of the torznab indexer and match it with the provided configuration."""
         response = task.requests.get(self._build_url(t='caps'), timeout=self.timeout)
         logger.debug('Raw caps response {}', response.content)
         root = ET.fromstring(response.content)
         self._setup_searcher(root, searcher, categories)
 
     def _setup_searcher(self, xml_root, searcher, categories):
-        """Gets the available searchers (tv, movie, etc) for the indexer and their supported parameters"""
+        """Get the available searchers (tv, movie, etc) for the indexer and their supported parameters."""
         aliases = {'movie': 'movie-search', 'search': 'search', 'tvsearch': 'tv-search'}
 
         searchers = {item.tag: item.attrib for item in list(xml_root.find('searching'))}
@@ -123,7 +123,7 @@ class Torznab:
             raise PluginError(f'No searcher available on {self.base_url}')
 
     def _check_searcher(self, searchers, searcher):
-        """Check if the given searchers is in the list, available and has supported params"""
+        """Check if the given searchers is in the list, available and has supported params."""
         return (
             searcher in searchers
             and searchers[searcher]['available'] == 'yes'
@@ -131,7 +131,7 @@ class Torznab:
         )
 
     def _setup_categories(self, xml_root, categories):
-        """Gets the available search categories for the indexer"""
+        """Get the available search categories for the indexer."""
         if self.params['t'] == 'movie':
             category_range = range(2000, 3000)
         elif self.params['t'] == 'tvsearch':
@@ -154,7 +154,7 @@ class Torznab:
 
     @plugin.internet(logger)
     def create_entries_from_query(self, url, task):
-        """Fetch feed and fill entries from"""
+        """Fetch feed and fill entries from."""
         logger.info('Fetching URL: {}', url)
 
         try:
@@ -191,7 +191,7 @@ class Torznab:
         return entries
 
     def _parse_torznab_attrs(self, entry, attrs):
-        """Parse the torznab::attr values from the response
+        """Parse the torznab::attr values from the response.
 
         https://github.com/Sonarr/Sonarr/wiki/Implementing-a-Torznab-indexer#torznab-results
         """

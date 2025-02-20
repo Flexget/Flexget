@@ -56,7 +56,7 @@ class TMDBConfig(Base):
 
 
 def get_tmdb_config():
-    """Loads TMDB config and caches it in DB and memory"""
+    """Load TMDB config and cache it in DB and memory."""
     global _tmdb_config
     if _tmdb_config is None:
         logger.debug('no tmdb configuration in memory, checking cache')
@@ -124,7 +124,8 @@ class TMDBMovie(Base):
     updated = Column(DateTime, default=datetime.now, nullable=False)
 
     def __init__(self, id, language):
-        """Looks up movie on tmdb and creates a new database model for it.
+        """Look up movie on tmdb and create a new database model for it.
+
         These instances should only be added to a session via `session.merge`.
         """
         self.id = id

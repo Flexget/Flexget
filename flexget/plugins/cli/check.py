@@ -17,7 +17,7 @@ def before_config_load(manager):
 
 
 def pre_check_config(config_path):
-    """Checks configuration file for common mistakes that are easily detectable"""
+    """Check configuration file for common mistakes that are easily detectable."""
     with codecs.open(config_path, 'r', 'utf-8') as config_file:
         try:
             config = config_file.read()

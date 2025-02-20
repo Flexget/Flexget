@@ -54,7 +54,7 @@ def register_command(
 
 
 def required_length(nmin: int, nmax: int):
-    """Generates a custom Action to validate an arbitrary range of arguments."""
+    """Generate a custom Action to validate an arbitrary range of arguments."""
 
     class RequiredLength(Action):
         def __call__(self, parser: ArgParser, args, values, option_string=None):
@@ -139,7 +139,7 @@ class InjectAction(Action):
 
 
 class ParseExtrasAction(Action):
-    """This action will take extra arguments, and parser them with a different parser."""
+    """Extra arguments are taken, and then parsed with a different parser."""
 
     def __init__(self, option_strings, parser, help=None, metavar=None, dest=None, required=False):
         if metavar is None:
@@ -248,7 +248,9 @@ class ParserError(Exception):
 
 
 class ArgumentParser(ArgParser):
-    """Mimics the default :class:`argparse.ArgumentParser` class, with a few distinctions, mostly to ease subparser usage:
+    """Mimics the default :class:`argparse.ArgumentParser` class.
+
+     There are a few distinctions, mostly to ease subparser usage:
 
     - If `add_subparsers` is called with the `nested_namespaces` kwarg, all subcommand options will be stored in a
       nested namespace based on the command name for the subparser
@@ -272,7 +274,9 @@ class ArgumentParser(ArgParser):
     do_help = True
 
     def __init__(self, **kwargs):
-        """:param nested_namespace_name: When used as a subparser, options from this parser will be stored nested under
+        """Init an ArgumentParser instance.
+
+        :param nested_namespace_name: When used as a subparser, options from this parser will be stored nested under
         this attribute name in the root parser's namespace
         """
         self.subparsers = None
@@ -375,7 +379,9 @@ class ArgumentParser(ArgParser):
         return namespace, args
 
     def add_subparsers(self, **kwargs):
-        """:param nested_namespaces: If True, options from subparsers will appear in nested namespace under the subparser
+        """Add a parser for a new subcommand and return it.
+
+        :param nested_namespaces: If True, options from subparsers will appear in nested namespace under the subparser
         name.
         """
         # Set the parser class so subparsers don't end up being an instance of a subclass, like CoreArgumentParser
@@ -385,7 +391,7 @@ class ArgumentParser(ArgParser):
         return self.subparsers
 
     def add_subparser(self, name: str, **kwargs):
-        """Adds a parser for a new subcommand and returns it.
+        """Add a parser for a new subcommand and return it.
 
         :param name: Name of the subcommand
         :param parent_defaults: Default argument values which should be supplied to the parent parser if this subparser
@@ -404,7 +410,7 @@ class ArgumentParser(ArgParser):
         return p
 
     def _get_values(self, action, arg_strings):
-        """Complete the full name for partial subcommands"""
+        """Complete the full name for partial subcommands."""
         if action.nargs == PARSER and self.subparsers:
             subcommand = arg_strings[0]
             if subcommand not in self.subparsers.choices:

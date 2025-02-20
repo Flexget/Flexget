@@ -569,7 +569,7 @@ class OmbiSet(MutableSet):
             self.add(entry)
 
     def discard(self, entry: Entry):
-        """Removes an entry from OMBI by marking it as available.
+        """Remove an entry from OMBI by marking it as available.
 
         Args:
             entry (Entry): An item from a task.
@@ -703,8 +703,9 @@ class OmbiSet(MutableSet):
 
     @property
     def online(self):
-        """Set the online status of the plugin, online plugin should be treated differently in certain situations,
-        like test mode
+        """Set the online status of the plugin.
+
+        Online plugin should be treated differently in certain situations, like test mode
         """
         return True
 
@@ -804,7 +805,7 @@ class OmbiSet(MutableSet):
             raise plugin.PluginError(f'Ombi username and password login failed: {e}')
 
     def ombi_auth(self) -> dict[str, str]:
-        """Returns a dictionary that contains authrization headers for the OMBI API.
+        """Return a dictionary that contains authrization headers for the OMBI API.
 
         Raises:
             plugin.PluginError: If the api_key or username/password are not defined.
@@ -972,8 +973,8 @@ def filter_ombi_items(items: list[dict[str, Any]], config: Config) -> list[dict[
     """Filter Ombi items based on the config.
 
     Arguments:
-        items {list[dict[str, Any]]} -- The Items returned from the Ombi API.
-        config {Config} -- The config for the Ombi managed list.
+        items: The Items returned from the Ombi API.
+        config: The config for the Ombi managed list.
 
     Raises:
         plugin.PluginError: If an unknown status is specified in the config.

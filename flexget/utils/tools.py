@@ -1,4 +1,4 @@
-"""Contains miscellaneous helpers"""
+"""Contains miscellaneous helpers."""
 
 import ast
 import contextlib
@@ -57,7 +57,7 @@ class MergeException(Exception):
 
 
 def strip_html(text: str) -> str:
-    """Tries to strip all HTML tags from *text*. If unsuccessful returns original text."""
+    """Try to strip all HTML tags from *text*. If unsuccessful returns original text."""
     from bs4 import BeautifulSoup
 
     try:
@@ -96,21 +96,20 @@ def _htmldecode(text: str) -> str:
 
 
 def decode_html(value: str) -> str:
-    """:param string value: String to be html-decoded
-    :returns: Html decoded string
+    """Return Html decoded string.
+
+    :param string value: String to be html-decoded
     """
     return _htmldecode(value)
 
 
 def encode_html(unicode_data: str, encoding: str = 'ascii') -> bytes:
-    """Encode unicode_data for use as XML or HTML, with characters outside
-    of the encoding converted to XML numeric character references.
-    """
+    """Encode unicode_data for use as XML or HTML, with characters outside of the encoding converted to XML numeric character references."""
     return unicode_data.encode(encoding, 'xmlcharrefreplace')
 
 
 def merge_dict_from_to(d1: dict, d2: dict) -> None:
-    """Merges dictionary d1 into dictionary d2. d1 will remain in original form."""
+    """Merge dictionary d1 into dictionary d2. d1 will remain in original form."""
     for k, v in d1.items():
         if k in d2:
             if isinstance(v, type(d2[k])):
@@ -147,7 +146,7 @@ class ReList(list):
     flags = re.IGNORECASE
 
     def __init__(self, *args, **kwargs) -> None:
-        """Optional :flags: keyword argument with regexp flags to compile with"""
+        """Compile with optional :flags: keyword argument with regexp flags."""
         if 'flags' in kwargs:
             self.flags = kwargs.pop('flags')
         list.__init__(self, *args, **kwargs)
@@ -271,7 +270,8 @@ class TimedDict(MutableMapping):
 
     @classmethod
     def clear_all(cls):
-        """Clears all instantiated TimedDicts.
+        """Clear all instantiated TimedDicts.
+
         Used by tests to make sure artifacts don't leak between tests.
         """
         for store in cls._instances.values():
@@ -294,7 +294,7 @@ class TitleYear(NamedTuple):
 
 
 def split_title_year(title: str) -> TitleYear:
-    """Splits title containing a year into a title, year pair."""
+    """Split title containing a year into a title, year pair."""
     if not title:
         return TitleYear('', None)
     if not re.search(r'\d{4}', title):
@@ -319,7 +319,7 @@ def split_title_year(title: str) -> TitleYear:
 
 
 def get_latest_flexget_version_number() -> Optional[str]:
-    """Return latest Flexget version from https://pypi.python.org/pypi/FlexGet/json"""
+    """Return latest Flexget version from https://pypi.python.org/pypi/FlexGet/json."""
     try:
         data = requests.get('https://pypi.python.org/pypi/FlexGet/json').json()
         return data.get('info', {}).get('version')
@@ -334,7 +334,7 @@ def get_current_flexget_version() -> str:
 def parse_filesize(
     text_size: str, si: bool = True, match_re: Optional[Union[str, Pattern[str]]] = None
 ) -> int:
-    """Parses a data size and returns its value in bytes
+    """Parse a data size and returns its value in bytes.
 
     :param string text_size: string containing the data size to parse i.e. "5 GB"
     :param bool si: If True, possibly ambiguous units like KB, MB, GB will be assumed to be base 10 units,
@@ -367,7 +367,7 @@ def parse_filesize(
 
 
 def format_filesize(num_bytes: float, si: bool = False, unit: Optional[str] = None) -> str:
-    """Returns given bytes as prettified string.
+    """Return given bytes as prettified string.
 
     :param bool si: If true, decimal based units will be used rather than binary.
     :param str unit: If a specific unit is specified it will be used. Otherwise,
@@ -405,8 +405,9 @@ def format_filesize(num_bytes: float, si: bool = False, unit: Optional[str] = No
 
 
 def get_config_hash(config: Any) -> str:
-    """:param dict config: Configuration
-    :return: MD5 hash for *config*
+    """Return MD5 hash for *config*.
+
+    :param dict config: Configuration
     """
     if isinstance(config, (dict, list)):
         # this does in fact support nested dicts, they're sorted too!
@@ -415,7 +416,8 @@ def get_config_hash(config: Any) -> str:
 
 
 def get_config_as_array(config: dict, key: str) -> list:
-    """Return configuration key as array, even if given as a single string
+    """Return configuration key as array, even if given as a single string.
+
     :param dict config: Configuration
     :param string key: Configuration
     :return: Array
@@ -429,7 +431,7 @@ def get_config_as_array(config: dict, key: str) -> list:
 def parse_episode_identifier(
     ep_id: Union[str, int], identify_season: bool = False
 ) -> tuple[str, str]:
-    """Parses series episode identifier, raises ValueError if it fails
+    """Parse series episode identifier, raise ValueError if it fails.
 
     :param ep_id: Value to parse
     :return: Return identifier type: `sequence`, `ep` or `date`
@@ -533,6 +535,6 @@ def aggregate_inputs(task: 'Task', inputs: list[dict]) -> list['Entry']:
 # Mainly used due to Too Many Variables error if we use too many variables at a time in the in_ clause.
 # SQLite supports up to 999 by default. Ubuntu, Arch and macOS set this limit to 250,000 though, so it's a rare issue.
 def chunked(seq: Sequence, limit: int = 900) -> Iterator[Sequence]:
-    """Helper to divide our expired lists into sizes sqlite can handle in a query. (<1000)"""
+    """Divide our expired lists into sizes sqlite can handle in a query. (<1000)."""
     for i in range(0, len(seq), limit):
         yield seq[i : i + limit]

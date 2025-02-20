@@ -12,7 +12,7 @@ from flexget.utils.template import CoercingDateTime
 
 
 class TestDisableBuiltins:
-    """Quick a hack, test disable functionality by checking if seen filtering (builtin) is working"""
+    """Quick a hack, test disable functionality by checking if seen filtering (builtin) is working."""
 
     config = """
         tasks:
@@ -208,7 +208,7 @@ class TestFilterRequireField:
 
 class TestHtmlUtils:
     def test_decode_html(self):
-        """Utils decode_html"""
+        """Utils decode_html."""
         from flexget.utils.tools import decode_html
 
         assert decode_html('&lt;&#51;') == '<3'
@@ -216,7 +216,7 @@ class TestHtmlUtils:
 
     @pytest.mark.skip(reason='FAILS - DISABLED')
     def test_encode_html(self):
-        """Utils encode_html (FAILS - DISABLED)"""
+        """Utils encode_html (FAILS - DISABLED)."""
         # why this does not encode < ?
         from flexget.utils.tools import encode_html
 

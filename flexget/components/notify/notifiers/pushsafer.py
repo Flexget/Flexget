@@ -18,7 +18,9 @@ requests.add_domain_limiter(TimedLimiter('pushsafer.com', '5 seconds'))
 
 
 class PushsaferNotifier:
-    """Example::
+    """Send a Pushsafer notification.
+
+    Example::
 
     notify:
       entries:
@@ -68,7 +70,7 @@ class PushsaferNotifier:
     }
 
     def notify(self, title, message, config):
-        """Send a Pushsafer notification"""
+        """Send a Pushsafer notification."""
         notification = {
             't': title,
             'm': message,

@@ -50,7 +50,7 @@ class YamlManagedList(MutableSet):
             raise PluginError(f'List `{self.filename}` must be a yaml list')
 
     def filter_keys(self, item: typing.Mapping) -> dict:
-        """Gets items with limited keys
+        """Get items with limited keys.
 
         Args:
             item (dict): item to return
@@ -77,7 +77,7 @@ class YamlManagedList(MutableSet):
         return bool(self.get(item))
 
     def save_yaml(self):
-        """Saves yaml
+        """Save yaml.
 
         Raises:
             PluginError: Error

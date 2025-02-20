@@ -20,7 +20,8 @@ requests.add_domain_limiter(TimedLimiter('npo.nl', '6 seconds'))
 
 
 class NPOWatchlist:
-    """Produces entries for every episode on the user's npostart.nl watchlist (Dutch public television).
+    """Produce entries for every episode on the user's npostart.nl watchlist (Dutch public television).
+
     Entries can be downloaded using http://arp242.net/code/download-npo
 
     If 'remove_accepted' is set to 'yes', the plugin will delete accepted entries from the watchlist after download

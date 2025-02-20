@@ -49,7 +49,7 @@ class InputBacklog:
 
     @with_session
     def add_backlog(self, task, entry, amount='', session=None):
-        """Add single entry to task backlog
+        """Add single entry to task backlog.
 
         If :amount: is not specified, entry will only be injected on next execution.
         """

@@ -14,7 +14,7 @@ ABORT_ABOVE = 'above'
 
 
 def get_free_space(config, task):
-    """Return folder/drive free space (in megabytes)"""
+    """Return folder/drive free space (in megabytes)."""
     if 'host' in config:
         import paramiko
 

@@ -18,7 +18,9 @@ session.add_domain_limiter(TokenBucketLimiter('discord.com', 6, '3 seconds'))
 
 
 class DiscordNotifier:
-    """Example::
+    """Send notification to Discord.
+
+    Example::
 
     notify:
       entries:
@@ -121,7 +123,7 @@ class DiscordNotifier:
     }
 
     def notify(self, title, message, config):
-        """Send discord notification
+        """Send discord notification.
 
         :param str message: message body
         :param dict config: discord plugin config

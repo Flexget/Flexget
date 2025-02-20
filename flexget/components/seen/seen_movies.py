@@ -11,8 +11,9 @@ logger = logger.bind(name='seen_movies')
 
 
 class FilterSeenMovies(plugin_seen.FilterSeen):
-    """Prevents movies being downloaded twice.
-    Works only on entries which have imdb url available.
+    """Prevent movies being downloaded twice.
+
+    Work only on entries which have imdb url available.
 
     How duplicate movie detection works:
     1) Remember all imdb urls from downloaded entries.

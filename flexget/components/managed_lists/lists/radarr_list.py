@@ -1,4 +1,5 @@
 from collections.abc import MutableSet
+from typing import Optional
 from urllib.parse import quote, urlparse
 
 import requests
@@ -45,7 +46,7 @@ def spec_exception_from_response_ex(radarr_request_ex):
 
 
 def request_get_json(url, headers):
-    """Makes a GET request and returns the JSON response"""
+    """Make a GET request and return the JSON response."""
     try:
         response = requests.get(url, headers=headers, timeout=10)  # TODO: HANGS HERE
         if response.status_code == 200:
@@ -56,7 +57,7 @@ def request_get_json(url, headers):
 
 
 def request_delete_json(url, headers):
-    """Makes a DELETE request and returns the JSON response"""
+    """Make a DELETE request and return the JSON response."""
     try:
         response = requests.delete(url, headers=headers, timeout=10)
         if response.status_code == 200:
@@ -67,7 +68,7 @@ def request_delete_json(url, headers):
 
 
 def request_post_json(url, headers, data):
-    """Makes a POST request and returns the JSON response"""
+    """Make a POST request and return the JSON response."""
     try:
         response = requests.post(url, headers=headers, json=data, timeout=10)
         if response.status_code == 201:
@@ -93,7 +94,7 @@ def request_post_json(url, headers, data):
 
 
 def request_put_json(url, headers):
-    """Makes a PUT request and returns the JSON response"""
+    """Make a PUT request and return the JSON response."""
     try:
         response = requests.put(url, headers=headers)
         if response.status_code == 200:
@@ -104,7 +105,7 @@ def request_put_json(url, headers):
 
 
 class RadarrAPIService:
-    """Handles all communication with the Radarr REST API"""
+    """Handles all communication with the Radarr REST API."""
 
     def __init__(self, api_key, base_url, port=None):
         self.api_key = api_key
@@ -116,58 +117,58 @@ class RadarrAPIService:
         self.api_url = f"{parsed_base_url.scheme}://{parsed_base_url.netloc}:{port}{parsed_base_url.path}/api/v3/"
 
     def get_profiles(self):
-        """Gets all profiles"""
+        """Get all profiles."""
         request_url = self.api_url + "qualityProfile"
         headers = self._default_headers()
         return request_get_json(request_url, headers)
 
     def get_tags(self):
-        """Gets all tags"""
+        """Get all tags."""
         request_url = self.api_url + "tag"
         headers = self._default_headers()
         return request_get_json(request_url, headers)
 
     def add_tag(self, label):
-        """Adds a tag"""
+        """Add a tag."""
         request_url = self.api_url + "tag"
         headers = self._default_headers()
         data = {"label": label}
         return request_post_json(request_url, headers, data)
 
     def get_movies(self):
-        """Gets all movies"""
+        """Get all movies."""
         request_url = self.api_url + "movie"
         headers = self._default_headers()
         return request_get_json(request_url, headers)
 
     def get_root_folders(self):
-        """Gets the root folders"""
+        """Get the root folders."""
         request_url = self.api_url + "rootfolder"
         headers = self._default_headers()
         return request_get_json(request_url, headers)
 
     def delete_movie(self, movie_id):
-        """Deletes a movie provided by its id"""
+        """Delete a movie provided by its id."""
         request_url = self.api_url + "movie/" + str(movie_id)
         headers = self._default_headers()
         return request_delete_json(request_url, headers)
 
     def lookup_by_term(self, term):
-        """Returns all movies that matches the search term"""
+        """Return all movies that matches the search term."""
         term = quote(term)
         request_url = self.api_url + "movie/lookup?term=" + term
         headers = self._default_headers()
         return request_get_json(request_url, headers)
 
     def lookup_by_imdb(self, imdb_id):
-        """Returns all movies that matches the imdb id"""
+        """Return all movies that matches the imdb id."""
         # TODO: make regexp check that imdb_id really is an IMDB_ID
         request_url = self.api_url + "movie/lookup/imdb?imdbId=" + imdb_id
         headers = self._default_headers()
         return request_get_json(request_url, headers)
 
     def lookup_by_tmdb(self, tmdb_id):
-        """Returns all movies that matches the tmdb id"""
+        """Return all movies that matches the tmdb id."""
         tmdb_id = int(tmdb_id)
         request_url = self.api_url + "movie/lookup/tmdb?tmdbId=" + str(tmdb_id)
         headers = self._default_headers()
@@ -186,7 +187,7 @@ class RadarrAPIService:
         add_options=None,
         tags=(),
     ):
-        """Adds a movie"""
+        """Add a movie."""
         request_url = self.api_url + "movie"
         headers = self._default_headers()
         data = {
@@ -215,7 +216,7 @@ class RadarrAPIService:
         return json_response
 
     def _default_headers(self):
-        """Returns a dictionary with default headers"""
+        """Return a dictionary with default headers."""
         return {"X-Api-Key": self.api_key}
 
 
@@ -252,8 +253,9 @@ QUALITIES_MAP = {
 
 
 def radarr_quality_to_flexget_quality_req(radarr_quality):
-    """Translates the provided Radarr quality string to a Flexget Requirement instance.
-    Returns None if translation is unsuccessful
+    """Translate the provided Radarr quality string to a Flexget Requirement instance.
+
+    Return None if translation is unsuccessful
     """
     # QUALITIES_MAP has its keys in lower case
     radarr_quality = radarr_quality.lower()
@@ -292,7 +294,7 @@ def get_flexget_qualities(profile, cutoff_only=False):
 
 
 class RadarrSet(MutableSet):
-    """Accesses the Radarr movies using the provided the config"""
+    """Accesses the Radarr movies using the provided the config."""
 
     def __init__(self, config):
         self.config = config
@@ -419,14 +421,14 @@ class RadarrSet(MutableSet):
 
     @property
     def items(self):
-        """Property that returns all items and only loads them all items when needed"""
+        """Returns all items and only loads them all items when needed."""
         if self._movie_entries is None:
             self._movie_entries = self._get_movie_entries()
         return self._movie_entries
 
     @property
     def tags(self):
-        """Property that returns tag by id"""
+        """Returns tag by id."""
         tags_ids = []
         if self._tags is None:
             existing = {t["label"].lower(): t["id"] for t in self.service.get_tags()}
@@ -453,12 +455,8 @@ class RadarrSet(MutableSet):
         # Radarr is an online service, so yes...
         return True
 
-    def _find_matching_entry(self, entry):
-        """Finds a movie by first checking against the ids of the
-        provided entry, and if none matches, check by title name
-
-        :returns entry or None
-        """
+    def _find_matching_entry(self, entry) -> Optional[Entry]:
+        """Find a movie by first checking against the ids of the  provided entry, and if none matches, check by title name."""
         for movie_entry in self.items:
             # First check if any of the id attributes match
             for id_attribute in ["tmdb_id", "imdb_id", "radarr_id"]:
@@ -487,13 +485,8 @@ class RadarrSet(MutableSet):
                 return movie_entry
         return None
 
-    def _get_movie_entries(self):
-        """Returns a collection of Entry instances
-        that represents the entries in the Radarr
-        movie list
-
-        :returns list of entries
-        """
+    def _get_movie_entries(self) -> list[Entry]:
+        """Return a collection of Entry instances that represents the entries in the Radarr movie list."""
         profiles = self.service.get_profiles()
         movies = self.service.get_movies()
 
@@ -545,9 +538,7 @@ class RadarrSet(MutableSet):
 
     # TODO: this fails
     def _lookup_movie(self, title=None, imdb_id=None, tmdb_id=None):
-        """Uses Radarr's API to lookup a movie, prioritizing IMDB/TMDB
-        ids and as a last resort search for the title
-        """
+        """Use Radarr's API to lookup a movie, prioritizing IMDB/TMDB ids and as a last resort search for the title."""
         # If the entry has a IMDB id, use that for lookup
         if imdb_id:
             try:
@@ -588,7 +579,7 @@ class RadarrSet(MutableSet):
 
 
 class RadarrList:
-    """List plugin for Radarr that also works as an input plugin"""
+    """List plugin for Radarr that also works as an input plugin."""
 
     schema = {
         "type": "object",

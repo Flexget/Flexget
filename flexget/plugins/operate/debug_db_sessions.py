@@ -18,7 +18,7 @@ open_transactions = {}
 
 
 def find_caller(stack):
-    """Finds info about first non-sqlalchemy call in stack"""
+    """Find info about first non-sqlalchemy call in stack."""
     for frame in stack:
         # We don't care about sqlalchemy internals
         module = inspect.getmodule(frame[0])

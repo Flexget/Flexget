@@ -14,9 +14,7 @@ Base = versioned_base('movie_list', 0)
 
 
 class MovieListBase:
-    """Class that contains helper methods for movie list as well as plugins that use it,
-    such as API and CLI.
-    """
+    """Class that contains helper methods for movie list as well as plugins that use it, such as API and CLI."""
 
     @property
     def supported_ids(self):
@@ -79,7 +77,7 @@ class MovieListMovie(Base):
 
     @property
     def identifiers(self):
-        """Return a dict of movie identifiers"""
+        """Return a dict of movie identifiers."""
         return {identifier.id_name: identifier.id_value for identifier in self.ids}
 
 

@@ -19,7 +19,7 @@ class TestSeriesParser:
     @pytest.fixture(scope='class')
     def parse_invalid(self, parse):
         def parse_invalid(name, data, **kwargs):
-            """Makes sure either ParseWarning is raised, or return is invalid."""
+            """Make sure either ParseWarning is raised, or return is invalid."""
             r = parse(data, name, **kwargs)
             assert not r.valid, f'{data} should not be valid'
             return r
@@ -29,7 +29,7 @@ class TestSeriesParser:
     @pytest.fixture(scope='class')
     def parse_valid(self, parse):
         def parse_valid(name, data, **kwargs):
-            """Makes sure return is valid."""
+            """Make sure return is valid."""
             r = parse(data, name, **kwargs)
             assert r.valid, f'{data} should be valid'
             return r
@@ -37,7 +37,7 @@ class TestSeriesParser:
         return parse_valid
 
     def test_proper(self, parse):
-        """SeriesParser: proper"""
+        """SeriesParser: proper."""
         s = parse(name='Something Interesting', data='Something.Interesting.S01E02.Proper-FlexGet')
         assert s.season == 1
         assert s.episode == 2
@@ -47,7 +47,7 @@ class TestSeriesParser:
         assert s.proper, f'did not detect proper from {s.data}'
 
     def test_non_proper(self, parse):
-        """SeriesParser: non-proper"""
+        """SeriesParser: non-proper."""
         s = parse(name='Something Interesting', data='Something.Interesting.S01E02-FlexGet')
         assert s.season == 1
         assert s.episode == 2
@@ -55,7 +55,7 @@ class TestSeriesParser:
         assert not s.proper, 'detected proper'
 
     def test_anime_proper(self, parse):
-        """SeriesParser: anime fansub style proper (13v2)"""
+        """SeriesParser: anime fansub style proper (13v2)."""
         s = parse(name='Anime', data='[aoeu] Anime 19v2 [23BA98]')
         assert s.identifier == 19
         assert s.proper_count == 1
@@ -64,7 +64,7 @@ class TestSeriesParser:
         assert s.proper_count == 2
 
     def test_basic(self, parse, parse_invalid):
-        """SeriesParser: basic parsing"""
+        """SeriesParser: basic parsing."""
         parse_invalid(
             name='Something Interesting', data='The.Something.Interesting.S01E02-FlexGet'
         )
@@ -74,7 +74,7 @@ class TestSeriesParser:
         assert s.identifier == 'S01E02', 'identifier broken'
 
     def test_confusing_date(self, parse):
-        """SeriesParser: confusing (invalid) numbering scheme"""
+        """SeriesParser: confusing (invalid) numbering scheme."""
         s = parse(name='Something', data='Something.2008x12.13-FlexGet')
         assert not s.episode, 'Should not have episode'
         assert s.id_type == 'date'
@@ -82,11 +82,11 @@ class TestSeriesParser:
         assert s.valid, 'should be valid'
 
     def test_unwanted_disc(self, parse_invalid):
-        """SeriesParser: unwanted disc releases"""
+        """SeriesParser: unwanted disc releases."""
         parse_invalid(name='Something', data='Something.S01D2.DVDR-FlexGet')
 
     def test_season_x_ep(self, parse):
-        """SeriesParser: 01x02"""
+        """SeriesParser: 01x02."""
         s = parse(name='Something', data='Something.01x02-FlexGet')
         assert s.season == 1, 'failed to parse 01x02'
         assert s.episode == 2, 'failed to parse 01x02'
@@ -101,19 +101,19 @@ class TestSeriesParser:
         assert s.episode == 9, f'failed to parse {s.data}'
 
     def test_ep_in_square_brackets(self, parse):
-        """SeriesParser: [S01] [E02] NOT IMPLEMENTED"""
+        """SeriesParser: [S01] [E02] NOT IMPLEMENTED."""
         s = parse(name='Something', data='Something [S01] [E02]')
         assert s.season == 1, f'failed to parse {s}'
         assert s.episode == 2, f'failed to parse {s}'
 
     def test_ep_in_parenthesis(self, parse):
-        """SeriesParser: test ep in parenthesis"""
+        """SeriesParser: test ep in parenthesis."""
         s = parse(name='Something', data='Something (S01E02)')
         assert s.season == 1, f'failed to parse {s}'
         assert s.episode == 2, f'failed to parse {s}'
 
     def test_season_episode(self, parse):
-        """SeriesParser: season X, episode Y"""
+        """SeriesParser: season X, episode Y."""
         s = parse(name='Something', data='Something - Season 3, Episode 2')
         assert s.season == 3, f'failed to parse {s}'
         assert s.episode == 2, f'failed to parse {s}'
@@ -128,7 +128,7 @@ class TestSeriesParser:
 
     @pytest.mark.xfail(reason='Not supported in guessit, works for internal parser')
     def test_series_episode(self, parse):
-        """SeriesParser: series X, episode Y"""
+        """SeriesParser: series X, episode Y."""
         s = parse(name='Something', data='Something - Series 2, Episode 2')
         assert s.season == 2, f'failed to parse {s}'
         assert s.episode == 2, f'failed to parse {s}'
@@ -142,7 +142,7 @@ class TestSeriesParser:
         assert s.episode == 2, f'failed to parse {s}'
 
     def test_episode(self, parse):
-        """SeriesParser: episode X (assume season 1)"""
+        """SeriesParser: episode X (assume season 1)."""
         s = parse(name='Something', data='Something - Episode2')
         assert s.season == 1, f'failed to parse {s}'
         assert s.episode == 2, f'failed to parse {s}'
@@ -156,7 +156,7 @@ class TestSeriesParser:
         assert s.episode == 8, f'failed to parse {s}'
 
     def test_ep(self, parse):
-        """SeriesParser: ep X (assume season 1)"""
+        """SeriesParser: ep X (assume season 1)."""
         s = parse(name='Something', data='Something - Ep2')
         assert s.season == 1, f'failed to parse {s}'
         assert s.episode == 2, f'failed to parse {s}'
@@ -174,7 +174,7 @@ class TestSeriesParser:
         assert s.episode == 1, f'failed to parse {s}'
 
     def test_season_episode_of_total(self, parse):
-        """SeriesParser: season X YofZ"""
+        """SeriesParser: season X YofZ."""
         s = parse(name='Something', data='Something Season 2 2of12')
         assert s.season == 2, f'failed to parse {s}'
         assert s.episode == 2, f'failed to parse {s}'
@@ -184,7 +184,7 @@ class TestSeriesParser:
         assert s.episode == 2, f'failed to parse {s}'
 
     def test_episode_of_total(self, parse):
-        """SeriesParser: YofZ (assume season 1)"""
+        """SeriesParser: YofZ (assume season 1)."""
         s = parse(name='Something', data='Something 2of12')
         assert s.season == 1, f'failed to parse {s}'
         assert s.episode == 2, f'failed to parse {s}'
@@ -194,7 +194,7 @@ class TestSeriesParser:
         assert s.episode == 2, f'failed to parse {s}'
 
     def test_part(self, parse):
-        """SeriesParser: test parsing part numeral (assume season 1)"""
+        """SeriesParser: test parsing part numeral (assume season 1)."""
         s = parse(name='Test', data='Test.Pt.I.720p-FlexGet')
         assert s.season == 1, f'failed to parse {s}'
         assert s.episode == 1, f'failed to parse {s}'
@@ -216,7 +216,7 @@ class TestSeriesParser:
         assert s.episode == 1, f'failed to parse {s}'
 
     def test_digits(self, parse):
-        """SeriesParser: digits (UID)"""
+        """SeriesParser: digits (UID)."""
         s = parse(name='Something', data='Something 01 FlexGet')
         assert s.id == 1, f'failed to parse {s.data}'
         assert s.id_type == 'sequence'
@@ -234,7 +234,7 @@ class TestSeriesParser:
         assert s.id_type == 'sequence'
 
     def test_quality(self, parse):
-        """SeriesParser: quality"""
+        """SeriesParser: quality."""
         s = parse(name='Foo Bar', data='Foo.Bar.S01E01.720p.HDTV.x264-FlexGet')
         assert s.season == 1, f'failed to parse episodes from {s.data}'
         assert s.episode == 1, f'failed to parse episodes from {s.data}'
@@ -250,7 +250,7 @@ class TestSeriesParser:
         assert s.quality.name == '720p webdl h264 dd5.1', f'failed to parse quality {s.data}'
 
     def test_quality_parenthesis(self, parse):
-        """SeriesParser: quality in parenthesis"""
+        """SeriesParser: quality in parenthesis."""
         s = parse(name='Foo Bar', data='Foo.Bar.S01E01.[720p].HDTV.x264-FlexGet')
         assert s.season == 1, f'failed to parse episodes from {s.data}'
         assert s.episode == 1, f'failed to parse episodes from {s.data}'
@@ -267,7 +267,7 @@ class TestSeriesParser:
         assert s.quality.name == '720p hdtv h264', f'failed to parse quality from {s.data}'
 
     def test_numeric_names(self, parse):
-        """SeriesParser: numeric names (24)"""
+        """SeriesParser: numeric names (24)."""
         s = parse(name='24', data='24.1x2-FlexGet')
         assert s.season == 1, f'failed to parse {s.data}'
         assert s.episode == 2, f'failed to parse {s.data}'
@@ -277,7 +277,7 @@ class TestSeriesParser:
         assert s.episode == 2, f'failed to parse {s.data}'
 
     def test_group_prefix(self, parse):
-        """SeriesParser: [group] before name"""
+        """SeriesParser: [group] before name."""
         s = parse(name='Foo Bar', data='[l.u.l.z] Foo Bar - 11 (H.264) [5235532D].mkv')
         assert s.id == 11, f'failed to parse {s.data}'
 
@@ -285,20 +285,20 @@ class TestSeriesParser:
         assert s.id == 11, f'failed to parse {s.data}'
 
     def test_hd_prefix(self, parse):
-        """SeriesParser: HD 720p before name"""
+        """SeriesParser: HD 720p before name."""
         s = parse(name='Foo Bar', data='HD 720p: Foo Bar - 11 (H.264) [5235532D].mkv')
         assert s.id == 11, f'failed to parse {s.data}'
         assert s.quality.name == '720p h264', 'failed to pick up quality'
 
     def test_partially_numeric(self, parse):
-        """SeriesParser: partially numeric names"""
+        """SeriesParser: partially numeric names."""
         s = parse(name='Foo 2009', data='Foo.2009.S02E04.HDTV.XviD-2HD[FlexGet]')
         assert s.season == 2, f'failed to parse {s.data}'
         assert s.episode == 4, f'failed to parse {s.data}'
         assert s.quality.name == 'hdtv xvid', f'failed to parse quality from {s.data}'
 
     def test_ignore_seasonpacks_by_default(self, parse, parse_valid, parse_invalid):
-        """SeriesParser: ignoring season packs by default"""
+        """SeriesParser: ignoring season packs by default."""
         assert parse_valid(name='The Foo', data='The.Foo.S04.1080p.FlexGet.5.1').season_pack
         assert parse_valid(
             name='The Foo', data='The Foo S05 720p BluRay DTS x264-FlexGet'
@@ -329,7 +329,7 @@ class TestSeriesParser:
         parse_invalid(name='Something', data='Something_ S01D2 MANofKENT INVICTA RG')
 
     def test_allow_seasonpacks_by_ep(self, parse, parse_valid, parse_invalid):
-        """SeriesParser: allowing season packs by ep"""
+        """SeriesParser: allowing season packs by ep."""
         assert parse_valid(
             name='The Foo', data='The.Foo.S04.1080p.FlexGet.5.1', identified_by='ep'
         ).season_pack
@@ -378,7 +378,7 @@ class TestSeriesParser:
         indirect=["parse"],
     )
     def test_ignore_multi_seasonpacks(self, parse, parse_valid, parse_invalid):
-        """SeriesParser: ignore multi season and multi episode (only supported by guessit)"""
+        """SeriesParser: ignore multi season and multi episode (only supported by guessit)."""
         parse_invalid(
             name='Something', data='Something Seasons 1 & 2 - Complete', identified_by='ep'
         )
@@ -405,20 +405,20 @@ class TestSeriesParser:
         assert not s.valid, 'should not have parser Foo.Bar.Doppelganger'
 
     def test_idiotic_numbering(self, parse):
-        """SeriesParser: idiotic 101, 102, 103, .. numbering"""
+        """SeriesParser: idiotic 101, 102, 103, .. numbering."""
         s = parse('Test.706.720p-FlexGet', name='test', identified_by='ep')
         assert s.season == 7, 'didn\'t pick up season'
         assert s.episode == 6, 'didn\'t pick up episode'
 
     def test_idiotic_numbering_with_zero(self, parse):
-        """SeriesParser: idiotic 0101, 0102, 0103, .. numbering"""
+        """SeriesParser: idiotic 0101, 0102, 0103, .. numbering."""
         s = parse('Test.0706.720p-FlexGet', name='test', identified_by='ep')
         assert s.season == 7, 'season missing'
         assert s.episode == 6, 'episode missing'
         assert s.identifier == 'S07E06', 'identifier broken'
 
     def test_idiotic_invalid(self, parse):
-        """SeriesParser: idiotic confused by invalid"""
+        """SeriesParser: idiotic confused by invalid."""
         s = parse(
             'Test.Revealed.WS.PDTV.XviD-aAF.5190458.TPB.torrent', name='test', identified_by='ep'
         )
@@ -429,7 +429,7 @@ class TestSeriesParser:
         assert s.episode != 58, 'confused, got episode'
 
     def test_zeroes(self, parse):
-        """SeriesParser: test zeroes as a season, episode"""
+        """SeriesParser: test zeroes as a season, episode."""
         for data in ['Test.S00E00-FlexGet', 'Test.S00E01-FlexGet', 'Test.S01E00-FlexGet']:
             s = parse(name='Test', data=data)
             id = s.identifier
@@ -439,7 +439,7 @@ class TestSeriesParser:
             assert isinstance(s.episode, int), f'season is not a int for {data}'
 
     def test_exact_name(self, parse):
-        """SeriesParser: test exact/strict name parsing"""
+        """SeriesParser: test exact/strict name parsing."""
         s = parse('Test.Foobar.S01E02.720p-FlexGet', name='test')
         assert s.valid, 'normal failed'
 
@@ -466,21 +466,21 @@ class TestSeriesParser:
         assert not s.valid, 'word border failed'
 
     def test_quality_as_ep(self, parse):
-        """SeriesParser: test that qualities are not picked as ep"""
+        """SeriesParser: test that qualities are not picked as ep."""
         from flexget.utils import qualities
 
         for quality in qualities.all_components():
             parse(f'FooBar {quality.name} XviD-FlexGet', name='FooBar')
 
     def test_sound_as_ep(self, parse):
-        """SeriesParser: test that sound infos are not picked as ep"""
+        """SeriesParser: test that sound infos are not picked as ep."""
         sounds = ['AC3', 'DD5.1', 'DTS']
         for sound in sounds:
             parse(data=f'FooBar {sound} XViD-FlexGet', name='FooBar')
 
     @pytest.mark.xfail(reason='Bug in guessit, works for internal parser')
     def test_ep_as_quality(self, parse):
-        """SeriesParser: test that eps are not picked as qualities"""
+        """SeriesParser: test that eps are not picked as qualities."""
         from flexget.utils import qualities
 
         for quality1 in qualities.all_components():
@@ -520,11 +520,11 @@ class TestSeriesParser:
                 )
 
     def test_name_with_number(self, parse):
-        """SeriesParser: test number in a name"""
+        """SeriesParser: test number in a name."""
         parse('Storage 13 no ep number', name='Storage 13')
 
     def test_name_uncorrupted(self, parse):
-        """SeriesParser: test name doesn't get corrupted when cleaned"""
+        """SeriesParser: test name doesn't get corrupted when cleaned."""
         s = parse(
             name='The New Adventures of Old Christine',
             data='The.New.Adventures.of.Old.Christine.S05E16.HDTV.XviD-FlexGet',
@@ -535,17 +535,17 @@ class TestSeriesParser:
         assert s.quality.name == 'hdtv xvid'
 
     def test_from_groups(self, parse):
-        """SeriesParser: test from groups"""
+        """SeriesParser: test from groups."""
         s = parse('Test.S01E01-Group', name='Test', allow_groups=['xxxx', 'group'])
         assert s.group.lower() == 'group', 'did not get group'
 
     def test_group_dashes(self, parse):
-        """SeriesParser: group name around extra dashes"""
+        """SeriesParser: group name around extra dashes."""
         s = parse('Test.S01E01-FooBar-Group', name='Test', allow_groups=['xxxx', 'group'])
         assert s.group.lower() == 'group', 'did not get group with extra dashes'
 
     def test_id_and_hash(self, parse):
-        """SeriesParser: Series with confusing hash"""
+        """SeriesParser: Series with confusing hash."""
         s = parse(name='Something', data='Something 63 [560D3414]')
         assert s.id == 63, f'failed to parse {s.data}'
 
@@ -553,13 +553,13 @@ class TestSeriesParser:
         assert s.id == 62, f'failed to parse {s.data}'
 
     def test_ticket_700(self, parse):
-        """SeriesParser: confusing name (#700)"""
+        """SeriesParser: confusing name (#700)."""
         s = parse(name='Something', data='Something 9x02 - Episode 2')
         assert s.season == 9, 'failed to parse season'
         assert s.episode == 2, 'failed to parse episode'
 
     def test_date_id(self, parse):
-        """SeriesParser: Series with dates"""
+        """SeriesParser: Series with dates."""
         s = parse(name='Something', data='Something.2010.10.25')
         assert s.identifier == '2010-10-25', f'failed to parse {s.data}'
         assert s.id_type == 'date'
@@ -623,13 +623,13 @@ class TestSeriesParser:
         assert s.identifier == '2003-01-02', f'failed to parse {s.data}'
 
     def test_season_title_episode(self, parse):
-        """SeriesParser: Series with title between season and episode"""
+        """SeriesParser: Series with title between season and episode."""
         s = parse(name='Something', data='Something.S5.Drunk.Santa.Part1')
         assert s.season == 5, 'failed to parse season'
         assert s.episode == 1, 'failed to parse episode'
 
     def test_specials(self, parse):
-        """SeriesParser: Special episodes with no id"""
+        """SeriesParser: Special episodes with no id."""
         s = parse(
             name='The Show', data='The Show 2005 A Christmas Carol 2010 Special 720p HDTV x264'
         )
@@ -733,7 +733,7 @@ class TestSeriesParser:
         assert not s.valid
 
     def test_long_season(self, parse):
-        """SeriesParser: long season ID Ticket #2197"""
+        """SeriesParser: long season ID Ticket #2197."""
         s = parse(
             name='FlexGet', data='FlexGet.US.S2013E14.Title.Here.720p.HDTV.AAC5.1.x264-NOGRP'
         )
@@ -752,7 +752,7 @@ class TestSeriesParser:
         assert not s.proper, 'detected proper'
 
     def test_episode_with_season_pack_match_is_not_season_pack(self, parse):
-        r"""SeriesParser: Github issue #1986, s\d{1} parses as invalid season"""
+        r"""SeriesParser: Github issue #1986, s\d{1} parses as invalid season."""
         s = parse(name='The Show', data='The.Show.S01E01.eps3.0.some.title.720p.x264-NOGRP')
         assert s.valid
         assert not s.season_pack

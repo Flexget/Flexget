@@ -15,7 +15,7 @@ logger = logger.bind(name='limetorrents')
 
 
 def clean_symbols(text):
-    """Replaces common symbols with spaces. Also normalize unicode strings in decomposed form."""
+    """Replace common symbols with spaces. Also normalize unicode strings in decomposed form."""
     result = text
     if isinstance(result, str):
         result = normalize('NFKD', result)
@@ -60,7 +60,7 @@ class Limetorrents:
 
     @plugin.internet(logger)
     def search(self, task, entry, config):
-        """Search for entries on Limetorrents"""
+        """Search for entries on Limetorrents."""
         if not isinstance(config, dict):
             config = {'category': config}
 

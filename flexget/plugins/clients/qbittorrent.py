@@ -15,8 +15,9 @@ logger = logger.bind(name='qbittorrent')
 
 
 class OutputQBitTorrent:
-    """Example:
+    """The QBitTorrent plugin.
 
+    Example:
     qbittorrent:
       username: <USERNAME> (default: (none))
       password: <PASSWORD> (default: (none))
@@ -32,6 +33,7 @@ class OutputQBitTorrent:
       add_paused: <ADD_PAUSED> (default: False)
       ratio_limit: <RATIO_LIMIT> (default: -2)
       seeding_time_limit: <SEEDING_TIME_LIMIT> (default: -1)
+
     """
 
     schema = {
@@ -109,9 +111,9 @@ class OutputQBitTorrent:
         raise plugin.PluginError(f'Error when trying to send request to qBittorrent: {msg}')
 
     def connect(self, config):
-        """Connect to qBittorrent Web UI. Username and password not necessary
-        if 'Bypass authentication for localhost' is checked and host is
-        'localhost'.
+        """Connect to qBittorrent Web UI.
+
+        Username and password not necessary if 'Bypass authentication for localhost' is checked and host is 'localhost'.
         """
         self.url = '{}://{}:{}'.format(
             'https' if config['use_ssl'] else 'http', config['host'], config['port']
@@ -320,9 +322,7 @@ class OutputQBitTorrent:
 
     @plugin.priority(120)
     def on_task_download(self, task, config):
-        """Call download plugin to generate torrent files to load into
-        qBittorrent.
-        """
+        """Call download plugin to generate torrent files to load into qBittorrent."""
         config = self.prepare_config(config)
         if not config['enabled']:
             return
@@ -356,7 +356,7 @@ class FromQBitTorrent:
 
     @staticmethod
     def client(host: str, port: int, username: str, password: str):
-        """Import client or abort task"""
+        """Import client or abort task."""
         try:
             import qbittorrentapi
         except ImportError:

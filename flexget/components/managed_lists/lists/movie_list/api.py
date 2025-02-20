@@ -128,7 +128,7 @@ class MovieListAPI(APIResource):
     @api.response(200, model=return_lists_schema)
     @api.doc(expect=[movie_list_parser])
     def get(self, session=None):
-        """Gets movies lists"""
+        """Get movies lists."""
         args = movie_list_parser.parse_args()
         name = args.get('name')
         movie_lists = [
@@ -140,7 +140,7 @@ class MovieListAPI(APIResource):
     @api.response(201, model=list_object_schema)
     @api.response(Conflict)
     def post(self, session=None):
-        """Create a new list"""
+        """Create a new list."""
         data = request.json
         name = data.get('name')
         try:
@@ -164,7 +164,7 @@ class MovieListListAPI(APIResource):
     @api.response(NotFoundError)
     @api.response(200, model=list_object_schema)
     def get(self, list_id, session=None):
-        """Get list by ID"""
+        """Get list by ID."""
         try:
             movie_list = db.get_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
@@ -174,7 +174,7 @@ class MovieListListAPI(APIResource):
     @api.response(200, model=base_message_schema)
     @api.response(404)
     def delete(self, list_id, session=None):
-        """Delete list by ID"""
+        """Delete list by ID."""
         try:
             movie_list = db.get_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
@@ -198,7 +198,7 @@ class MovieListMoviesAPI(APIResource):
     @api.response(200, model=return_movies_schema)
     @api.doc(params={'list_id': 'ID of the list'}, expect=[movies_parser])
     def get(self, list_id, session=None):
-        """Get movies by list ID"""
+        """Get movies by list ID."""
         args = movies_parser.parse_args()
 
         # Pagination and sorting params
@@ -255,7 +255,7 @@ class MovieListMoviesAPI(APIResource):
     @api.response(Conflict)
     @api.response(BadRequest)
     def post(self, list_id, session=None):
-        """Add movies to list by ID"""
+        """Add movies to list by ID."""
         try:
             db.get_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
@@ -291,7 +291,7 @@ class MovieListMovieAPI(APIResource):
     @etag
     @api.response(200, model=movie_list_object_schema)
     def get(self, list_id, movie_id, session=None):
-        """Get a movie by list ID and movie ID"""
+        """Get a movie by list ID and movie ID."""
         try:
             movie = db.get_movie_by_id(list_id=list_id, movie_id=movie_id, session=session)
         except NoResultFound:
@@ -300,7 +300,7 @@ class MovieListMovieAPI(APIResource):
 
     @api.response(200, model=base_message_schema)
     def delete(self, list_id, movie_id, session=None):
-        """Delete a movie by list ID and movie ID"""
+        """Delete a movie by list ID and movie ID."""
         try:
             movie = db.get_movie_by_id(list_id=list_id, movie_id=movie_id, session=session)
         except NoResultFound:
@@ -316,7 +316,7 @@ class MovieListMovieAPI(APIResource):
         description='Sent movie identifiers will override any existing identifiers that the movie currently holds'
     )
     def put(self, list_id, movie_id, session=None):
-        """Sets movie identifiers"""
+        """Set movie identifiers."""
         try:
             movie = db.get_movie_by_id(list_id=list_id, movie_id=movie_id, session=session)
         except NoResultFound:
@@ -339,7 +339,7 @@ class MovieListMovieAPI(APIResource):
 class MovieListIdentifiers(APIResource):
     @api.response(200, model=identifiers_schema)
     def get(self, session=None):
-        """Return a list of supported movie list identifiers"""
+        """Return a list of supported movie list identifiers."""
         return jsonify(MovieListBase().supported_ids)
 
 
@@ -351,7 +351,7 @@ class MovieListEntriesBatchAPI(APIResource):
     @api.validate(model=movie_list_batch_remove_schema)
     @api.doc(description='Remove multiple entries')
     def delete(self, list_id, session=None):
-        """Remove multiple entries"""
+        """Remove multiple entries."""
         data = request.json
         movie_ids = data.get('ids')
         try:

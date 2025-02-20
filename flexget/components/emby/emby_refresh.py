@@ -10,7 +10,7 @@ logger = logger.bind(name='emby_reload')
 
 
 class EmbyRefreshLibrary:
-    """Refresh Emby Library
+    """Refresh Emby Library.
 
     Example:
         emby_refresh:

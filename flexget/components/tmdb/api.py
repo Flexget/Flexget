@@ -118,7 +118,7 @@ class TMDBMoviesAPI(APIResource):
     @api.response(BadRequest)
     @api.doc(expect=[tmdb_parser])
     def get(self, session=None):
-        """Get TMDB movie data"""
+        """Get TMDB movie data."""
         args = tmdb_parser.parse_args()
         title = args.get('title')
         tmdb_id = args.get('tmdb_id')

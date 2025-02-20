@@ -19,7 +19,7 @@ logger = logger.bind(name='subtitles')
 
 
 class Subtitles:
-    """Fetch subtitles from opensubtitles.org"""
+    """Fetch subtitles from opensubtitles.org."""
 
     schema = {
         'type': 'object',

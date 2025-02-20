@@ -143,7 +143,7 @@ RPC_CLIENTS = {'xml': XmlRpcClient, 'json': JsonRpcClient}
 
 
 class OutputAria2:
-    """Simple Aria2 output
+    """Simple Aria2 output.
 
     Example::
 
@@ -237,7 +237,7 @@ class OutputAria2:
                 raise
 
     def add_entry(self, aria2: RpcClient, entry, config, task):
-        """Add entry to Aria2"""
+        """Add entry to Aria2."""
         options = config['options']
         try:
             path = entry.get('path', config.get('path', None))

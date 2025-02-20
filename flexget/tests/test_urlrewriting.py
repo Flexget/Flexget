@@ -4,7 +4,7 @@ from flexget.plugin import get_plugin_by_name
 
 
 class TestURLRewriters:
-    """Bad example, does things manually, you should use task.find_entry to check existance"""
+    """Bad example, does things manually, you should use task.find_entry to check existance."""
 
     config = """
         tasks:

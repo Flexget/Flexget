@@ -47,7 +47,7 @@ if TYPE_CHECKING:
 
 
 class APIClient:
-    """This is an client which can be used as a more pythonic interface to the rest api.
+    """A client which can be used as a more pythonic interface to the rest api.
 
     It skips http, and is only usable from within the running flexget process.
     """
@@ -87,7 +87,7 @@ class APIEndpoint:
 
 
 def api_version(f: Callable[..., Response]):
-    """Add the 'API-Version' header to all responses"""
+    """Add the 'API-Version' header to all responses."""
 
     @wraps(f)
     def wrapped(*args, **kwargs):
@@ -109,7 +109,10 @@ class APIResource(Resource):
 
 
 class API(RestxAPI):
-    """Extends a flask restx :class:`flask_restx.Api` with:
+    """Subclass of RestxAPI.
+
+    Extend a flask restx :class:`flask_restx.Api` with:
+
     - methods to make using json schemas easier
     - methods to auto document and handle :class:`ApiError` responses
     """
@@ -120,8 +123,9 @@ class API(RestxAPI):
         schema_override: Optional[dict[str, list[dict[str, str]]]] = None,
         description=None,
     ):
-        """When a method is decorated with this, json data submitted to the endpoint will be validated with the given
-        `model`. This also auto-documents the expected model, as well as the possible :class:`ValidationError` response.
+        """When a method is decorated with this, json data submitted to the endpoint will be validated with the given `model`.
+
+        This also auto-documents the expected model, as well as the possible :class:`ValidationError` response.
         """
 
         def decorator(func):
@@ -145,8 +149,9 @@ class API(RestxAPI):
         return decorator
 
     def response(self, code_or_apierror, description: str = 'Success', model=None, **kwargs):
-        """Extends :meth:`flask_restx.Api.response` to allow passing an :class:`ApiError` class instead of
-        response code. If an `ApiError` is used, the response code, and expected response model, is automatically
+        """Extend :meth:`flask_restx.Api.response` to allow passing an :class:`ApiError` class instead of response code.
+
+        If an `ApiError` is used, the response code, and expected response model, is automatically
         documented.
         """
         with suppress(TypeError):  # If first argument isn't a class this happens
@@ -371,8 +376,7 @@ def api_key(session: Session = None) -> str:
 
 
 def etag(method: Optional[Callable] = None, cache_age: int = 0):
-    """A decorator that add an ETag header to the response and checks for the "If-Match" and "If-Not-Match" headers to
-     return an appropriate response.
+    """Add an ETag header to the response and check for the "If-Match" and "If-Not-Match" headers to return an appropriate response.
 
     :param method: A GET or HEAD flask method to wrap
     :param cache_age: max-age cache age for the content
@@ -421,7 +425,7 @@ def etag(method: Optional[Callable] = None, cache_age: int = 0):
 def pagination_headers(
     total_pages: int, total_items: int, page_count: int, request: Request
 ) -> 'PaginationHeaders':
-    """Creates the `Link`. 'Count' and  'Total-Count' headers, to be used for pagination traversing
+    """Create the `Link`. 'Count' and  'Total-Count' headers, to be used for pagination traversing.
 
     :param total_pages: Total number of pages
     :param total_items: Total number of items in all the pages

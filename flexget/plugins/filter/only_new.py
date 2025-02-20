@@ -12,7 +12,7 @@ class FilterOnlyNew:
     schema = {'type': 'boolean'}
 
     def on_task_start(self, task, config):
-        """Make sure the remember_rejected plugin is available"""
+        """Make sure the remember_rejected plugin is available."""
         # Raises an error if plugin isn't available
         plugin.get('remember_rejected', self)
 
@@ -20,7 +20,7 @@ class FilterOnlyNew:
     # If they run after this, they will think everything has been rejected.
     @plugin.priority(plugin.PRIORITY_LAST)
     def on_task_learn(self, task, config):
-        """Reject all entries so remember_rejected will reject them next time"""
+        """Reject all entries so remember_rejected will reject them next time."""
         if not config or not task.entries:
             return
         logger.verbose(

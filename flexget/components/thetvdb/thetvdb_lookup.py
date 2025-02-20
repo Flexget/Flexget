@@ -15,8 +15,9 @@ logger = logger.bind(name='thetvdb_lookup')
 
 
 class PluginThetvdbLookup:
-    """Retrieves TheTVDB information for entries. Uses series_name,
-    series_season, series_episode from series plugin.
+    """Retrieve TheTVDB information for entries.
+
+    Use series_name, series_season, series_episode from series plugin.
 
     Example:
     thetvdb_lookup: yes
@@ -210,7 +211,7 @@ class PluginThetvdbLookup:
 
     @property
     def series_identifier(self):
-        """Returns the plugin main identifier type"""
+        """Return the plugin main identifier type."""
         return 'tvdb_id'
 
 

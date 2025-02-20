@@ -13,7 +13,8 @@ logger = logger.bind(name='archive')
 
 
 class Archive:
-    """Archives all new items into database where they can be later searched and injected.
+    """Archive all new items into database where they can be later searched and injected.
+
     Stores the entries in the state as they are at the exit phase, this way task cleanup for title
     etc is stored into the database. This may however make injecting them back to the original task work
     wrongly.
@@ -72,9 +73,7 @@ class Archive:
             logger.verbose('Added {} new entries to archive', count)
 
     def on_task_abort(self, task, config):
-        """Archive even on task abort, except if the abort has happened before session
-        was started.
-        """
+        """Archive even on task abort, except if the abort has happened before session was started."""
         if task.session is not None:
             self.on_task_learn(task, config)
 
@@ -87,7 +86,7 @@ class UrlrewriteArchive:
     schema = {'oneOf': [{'type': 'boolean'}, {'type': 'array', 'items': {'type': 'string'}}]}
 
     def search(self, task, entry, config=None):
-        """Search plugin API method"""
+        """Search plugin API method."""
         session = Session()
         entries = set()
         tag_names = None if isinstance(config, bool) else config

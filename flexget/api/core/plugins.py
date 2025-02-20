@@ -103,7 +103,7 @@ class PluginsAPI(APIResource):
     @api.response(NotFoundError)
     @api.doc(expect=[plugins_parser])
     def get(self, session: Session = None) -> Response:
-        """Get list of registered plugins"""
+        """Get list of registered plugins."""
         args = plugins_parser.parse_args()
 
         # Pagination and sorting params
@@ -156,7 +156,7 @@ class PluginAPI(APIResource):
     @api.response(200, model=plugin_schema)
     @api.doc(expect=[plugin_parser], params={'plugin_name': 'Name of the plugin to return'})
     def get(self, plugin_name: str, session=None):
-        """Return plugin data by name"""
+        """Return plugin data by name."""
         args = plugin_parser.parse_args()
         try:
             plugin = get_plugin_by_name(plugin_name, issued_by='plugins API')

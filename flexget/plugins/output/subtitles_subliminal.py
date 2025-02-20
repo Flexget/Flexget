@@ -31,8 +31,7 @@ AUTHENTICATION_SCHEMA = {provider: {'type': 'object'} for provider in PROVIDERS}
 
 
 class PluginSubliminal:
-    r"""Search and download subtitles using Subliminal by Antoine Bertin
-    (https://pypi.python.org/pypi/subliminal).
+    r"""Search and download subtitles using Subliminal by Antoine Bertin (https://pypi.python.org/pypi/subliminal).
 
     Example (complete task)::
 
@@ -92,7 +91,9 @@ class PluginSubliminal:
             )
 
     def on_task_output(self, task, config):
-        """Configuration::
+        """Register this as an output plugin.
+
+        Configuration::
         subliminal:
             languages: List of languages (as IETF codes) in order of preference. At least one is required.
             alternatives: List of second-choice languages; subs will be downloaded but entries rejected.

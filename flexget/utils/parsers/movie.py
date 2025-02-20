@@ -11,7 +11,7 @@ logger = logger.bind(name='movieparser')
 
 
 def diff_pos(string1, string2):
-    """Returns first position where string1 and string2 differ."""
+    """Return first position where string1 and string2 differ."""
     for count, c in enumerate(string1):
         if len(string2) <= count:
             return count
@@ -38,7 +38,7 @@ class MovieParser(TitleParser):
         return f"<MovieParser(name={self.name},year={self.year},quality={self.quality})>"
 
     def parse(self, data=None):
-        """Parse movie name. Populates name, year, quality and proper_count attributes"""
+        """Parse movie name. Populates name, year, quality and proper_count attributes."""
         # Reset before parsing, so the parser can be reused.
         self.reset()
 

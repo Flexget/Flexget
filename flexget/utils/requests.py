@@ -40,7 +40,7 @@ if TYPE_CHECKING:
 
 
 def is_unresponsive(url: str) -> bool:
-    """Checks if host of given url has timed out within WAIT_TIME
+    """Check if host of given url has timed out within WAIT_TIME.
 
     :param url: The url to check
     :return: True if the host has timed out within WAIT_TIME
@@ -51,7 +51,7 @@ def is_unresponsive(url: str) -> bool:
 
 
 def set_unresponsive(url: str) -> None:
-    """Marks the host of a given url as unresponsive
+    """Mark the host of a given url as unresponsive.
 
     :param url: The url that timed out
     """
@@ -68,7 +68,7 @@ class DomainLimiter(abc.ABC):
 
     @abc.abstractmethod
     def __call__(self) -> None:
-        """This method will be called once before every request to the domain."""
+        """Be called once before every request to the domain."""
 
 
 class TokenBucketLimiter(DomainLimiter):
@@ -88,7 +88,9 @@ class TokenBucketLimiter(DomainLimiter):
         rate: Union[str, timedelta],
         wait: bool = True,
     ) -> None:
-        """:param int tokens: Size of bucket
+        """Init a token bucket rate limiter.
+
+        :param int tokens: Size of bucket
         :param rate: Amount of time to accrue 1 token. Either `timedelta` or interval string.
         :param bool wait: If true, will wait for a token to be available. If false, errors when token is not available.
         """
@@ -142,7 +144,7 @@ class TimedLimiter(TokenBucketLimiter):
 
 
 def _wrap_urlopen(url: str, timeout: Optional[int] = None) -> requests.Response:
-    """Handles alternate schemes using urllib, wraps the response in a requests.Response
+    """Handle alternate schemes using urllib, wrap the response in a requests.Response.
 
     This is not installed as an adapter in requests, since urls without network locations
     (e.g. file:///somewhere) will cause errors
@@ -186,10 +188,7 @@ def parse_header(header: str) -> tuple[str, Mapping]:
 
 
 class Session(requests.Session):
-    """Subclass of requests Session class which defines some of our own defaults, records unresponsive sites,
-    and raises errors by default.
-
-    """
+    """Subclass of requests Session class which defines some of our own defaults, records unresponsive sites, and raises errors by default."""
 
     def __init__(self, timeout: int = 30, max_retries: int = 1, **kwargs) -> None:
         """Set some defaults for our session if not explicitly defined."""
@@ -201,7 +200,7 @@ class Session(requests.Session):
         self.headers.update({'User-Agent': f'FlexGet/{version} (www.flexget.com)'})
 
     def add_cookiejar(self, cookiejar):
-        """Merges cookies from `cookiejar` into cookiejar for this session.
+        """Merge cookies from `cookiejar` into cookiejar for this session.
 
         :param cookiejar: CookieJar instance to add to the session.
         """
@@ -209,8 +208,9 @@ class Session(requests.Session):
             self.cookies.set_cookie(cookie)
 
     def set_domain_delay(self, domain, delay):
-        """DEPRECATED, use `add_domain_limiter`
-        Registers a minimum interval between requests to `domain`
+        """Do not use this anymore as it is DEPRECATED. Use `add_domain_limiter`.
+
+        Register a minimum interval between requests to `domain`
 
         :param domain: The domain to set the interval on
         :param delay: The amount of time between requests, can be a timedelta or string like '3 seconds'
@@ -234,7 +234,8 @@ class Session(requests.Session):
         self.domain_limiters[limiter.domain] = limiter
 
     def request(self, method: str, url: str, *args, **kwargs) -> requests.Response:
-        """Does a request, but raises Timeout immediately if site is known to timeout, and records sites that timeout.
+        """Do a request, but raise Timeout immediately if site is known to timeout, and record sites that timeout.
+
         Also raises errors getting the content by default.
 
         :param bool raise_status: If True, non-success status code responses will be raised as errors (True by default)
@@ -282,7 +283,7 @@ def request(method: str, url: str, **kwargs) -> requests.Response:
 
 
 def head(url: str, **kwargs) -> requests.Response:
-    """Sends a HEAD request. Returns :class:`Response` object.
+    """Send a HEAD request. Return :class:`Response` object.
 
     :param url: URL for the new :class:`Request` object.
     :param kwargs: Optional arguments that ``request`` takes.
@@ -292,7 +293,7 @@ def head(url: str, **kwargs) -> requests.Response:
 
 
 def get(url: str, **kwargs) -> requests.Response:
-    """Sends a GET request. Returns :class:`Response` object.
+    """Send a GET request. Return :class:`Response` object.
 
     :param url: URL for the new :class:`Request` object.
     :param kwargs: Optional arguments that ``request`` takes.
@@ -302,7 +303,7 @@ def get(url: str, **kwargs) -> requests.Response:
 
 
 def post(url: str, data=None, **kwargs) -> requests.Response:
-    """Sends a POST request. Returns :class:`Response` object.
+    """Send a POST request. Return :class:`Response` object.
 
     :param url: URL for the new :class:`Request` object.
     :param data: (optional) Dictionary or bytes to send in the body of the :class:`Request`.

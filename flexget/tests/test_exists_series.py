@@ -109,7 +109,7 @@ class TestExistsSeries:
         )
 
     def test_existing(self, execute_task):
-        """Exists_series plugin: existing"""
+        """Exists_series plugin: existing."""
         task = execute_task('test')
         assert not task.find_entry('accepted', title='Foo.Bar.S01E02.XViD'), (
             'Foo.Bar.S01E02.XViD should not have been accepted (exists)'
@@ -119,14 +119,14 @@ class TestExistsSeries:
         )
 
     def test_diff_qualities_allowed(self, execute_task):
-        """Exists_series plugin: existsting but w. diff quality"""
+        """Exists_series plugin: existsting but w. diff quality."""
         task = execute_task('test_diff_qualities_allowed')
         assert task.find_entry('accepted', title='Asdf.S01E02.720p'), (
             'Asdf.S01E02.720p should have been accepted'
         )
 
     def test_diff_qualities_not_allowed(self, execute_task):
-        """Exists_series plugin: existsting but w. diff quality"""
+        """Exists_series plugin: existsting but w. diff quality."""
         task = execute_task('test_diff_qualities_not_allowed')
         assert task.find_entry('rejected', title='Asdf.S01E02.720p'), (
             'Asdf.S01E02.720p should have been rejected'
@@ -147,7 +147,7 @@ class TestExistsSeries:
         )
 
     def test_propers(self, execute_task):
-        """Exists_series plugin: new proper & proper already exists"""
+        """Exists_series plugin: new proper & proper already exists."""
         task = execute_task('test_propers')
         assert task.find_entry('accepted', title='Mock.S01E01.Proper'), 'new proper not accepted'
         assert task.find_entry('rejected', title='Test.S01E01'), (
@@ -155,12 +155,12 @@ class TestExistsSeries:
         )
 
     def test_invalid(self, execute_task):
-        """Exists_series plugin: no episode numbering on the disk"""
+        """Exists_series plugin: no episode numbering on the disk."""
         # shouldn't raise anything
         execute_task('test_invalid')
 
     def test_with_metainfo_series(self, execute_task):
-        """Tests that exists_series works with series data from metainfo_series"""
+        """Tests that exists_series works with series data from metainfo_series."""
         task = execute_task('test_with_metainfo_series')
         assert task.find_entry('rejected', title='Foo.Bar.S01E02.XViD'), (
             'Foo.Bar.S01E02.XViD should have been rejected(exists)'

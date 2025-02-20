@@ -43,12 +43,12 @@ class TitleParser:
 
     @staticmethod
     def strip_spaces(text):
-        """Removes all unnecessary duplicate spaces from a text"""
+        """Remove all unnecessary duplicate spaces from a text."""
         return ' '.join(text.split())
 
     @staticmethod
     def remove_words(text, words, not_in_word=False):
-        """Clean all given :words: from :text: case insensitively"""
+        """Clean all given :words: from :text: case insensitively."""
         for word in words:
             text = TitleParser.ireplace(text, word, '', not_in_word=not_in_word)
         # remove duplicate spaces
@@ -56,7 +56,7 @@ class TitleParser:
 
     @staticmethod
     def ireplace(data, old, new, count=0, not_in_word=False):
-        """Case-insensitive string replace"""
+        """Case-insensitive string replace."""
         old = re.escape(old)
         if not_in_word:
             old = TitleParser.re_not_in_word(old)

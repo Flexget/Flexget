@@ -183,7 +183,7 @@ class TraktSet(MutableSet):
     # -- Public interface ends here -- #
 
     def get_items(self):
-        """Iterator over etrieved itesms from the trakt api."""
+        """Iterate over etrieved itesms from the trakt api."""
         if (
             self.config['list'] in ['collection', 'watched', 'trending', 'popular']
             and self.config['type'] == 'auto'
@@ -410,7 +410,7 @@ class TraktSet(MutableSet):
         )
 
     def submit(self, entries, remove=False):
-        """Submits movies or episodes to trakt api."""
+        """Submit movies or episodes to trakt api."""
         found = {}
         for entry in entries:
             if self.config['type'] in ['auto', 'shows', 'seasons', 'episodes'] and entry.get(
@@ -493,8 +493,9 @@ class TraktSet(MutableSet):
 
     @property
     def online(self):
-        """Set the online status of the plugin, online plugin should be treated differently in certain situations,
-        like test mode
+        """Set the online status of the plugin.
+
+        Online plugin should be treated differently in certain situations, like test mode
         """
         return True
 

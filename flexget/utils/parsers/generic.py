@@ -1,6 +1,4 @@
-"""Collection of generic parser related utilities used by internal parser and with
-parsing plugins.
-"""
+"""Collection of generic parser related utilities used by internal parser and with parsing plugins."""
 
 import re
 
@@ -30,7 +28,7 @@ default_ignore_prefixes = [
 
 
 def name_to_re(name, ignore_prefixes=None, parser=None):
-    """Convert 'foo bar' to '^[^...]*foo[^...]*bar[^...]+"""
+    """Convert 'foo bar' to '^[^...]*foo[^...]*bar[^...]+'."""
     if not ignore_prefixes:
         ignore_prefixes = default_ignore_prefixes
     parenthetical = None

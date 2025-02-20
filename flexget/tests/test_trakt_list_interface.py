@@ -10,7 +10,10 @@ from flexget.manager import Session
 
 @pytest.mark.online
 class TestTraktList:
-    """Credentials for test account are:
+    """Test trakt list.
+
+    Credentials for test account are:
+
     username: flexget_list_test
     password: flexget
     """

@@ -9,8 +9,9 @@ logger = logger.bind(name='tvmaze_lookup')
 
 
 class PluginTVMazeLookup:
-    """Retrieves tvmaze information for entries. Uses series_name,
-    series_season, series_episode from series plugin.
+    """Retrieve tvmaze information for entries.
+
+    Use series_name, series_season, series_episode from series plugin.
 
     Example:
     tvmaze_lookup: yes
@@ -123,7 +124,7 @@ class PluginTVMazeLookup:
 
     @register_lazy_lookup('tvmaze_series_lookup')
     def lazy_series_lookup(self, entry):
-        """Does the lookup for this entry and populates the entry fields."""
+        """Do the lookup for this entry and populate the entry fields."""
         series_lookup = plugin.get('api_tvmaze', self).series_lookup
         with Session() as session:
             lookupargs = {
@@ -210,7 +211,7 @@ class PluginTVMazeLookup:
 
     @property
     def series_identifier(self):
-        """Returns the plugin main identifier type"""
+        """Return the plugin main identifier type."""
         return 'tvmaze_id'
 
 

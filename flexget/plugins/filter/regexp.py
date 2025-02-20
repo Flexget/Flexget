@@ -86,7 +86,7 @@ class FilterRegexp:
     }
 
     def prepare_config(self, config):
-        """Returns the config in standard format.
+        """Return the config in standard format.
 
         All regexps are turned into dictionaries in the form of {compiled regexp: options}
 
@@ -154,7 +154,7 @@ class FilterRegexp:
                 rest_method(entry, 'regexp `rest`')
 
     def matches(self, entry, regexp, find_from=None, not_regexps=None):
-        """Check if :entry: has any string fields or strings in a list field that match :regexp:
+        """Check if :entry: has any string fields or strings in a list field that match :regexp:.
 
         :param entry: Entry instance
         :param regexp: Compiled regexp
@@ -188,12 +188,13 @@ class FilterRegexp:
         return None
 
     def filter(self, entries, operation, regexps):
-        """:param entries: entries to filter
+        """Return set of entries that matched regexps.
+
+        :param entries: entries to filter
         :param operation: one of 'accept' 'reject' 'accept_excluding' and 'reject_excluding'
                           accept and reject will be called on the entry if any of the regexps match
                           *_excluding operations will be called if any of the regexps don't match
         :param regexps: list of {compiled_regexp: options} dictionaries
-        :return: Return set of entries that matched regexps
         """
         matched = set()
         method = Entry.accept if 'accept' in operation else Entry.reject
