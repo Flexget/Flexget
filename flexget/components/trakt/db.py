@@ -160,9 +160,9 @@ def get_access_token(account, token=None, refresh=False, re_auth=False, called_f
                 token_dict['expires_in'],
             )
             session.merge(new_acc)
-            return new_acc.access_token
         except requests.RequestException as e:
             raise plugin.PluginError(f'Token exchange with trakt failed: {e}')
+        return new_acc.access_token
 
 
 def make_list_slug(name):
@@ -300,9 +300,10 @@ def get_translations(ident, style):
                 if not translation:
                     translation = trakt_translation(result, session)
                 translations.append(translation)
-        return translations
     except requests.RequestException as e:
         logger.debug('Error adding translations to trakt id {}: {}', ident, e)
+    else:
+        return translations
 
 
 class TraktGenre(Base):
@@ -347,7 +348,7 @@ class TraktActor(Base):
 
     def update(self, actor, session):
         if self.id and self.id != actor.get('ids').get('trakt'):
-            raise Exception('Tried to update db actors with different actor data')
+            raise ValueError('Tried to update db actors with different actor data')
         if not self.id:
             self.id = actor.get('ids').get('trakt')
         self.name = actor.get('name')
@@ -458,7 +459,7 @@ class TraktEpisode(Base):
     def update(self, trakt_episode, session):
         """Updates this record from the trakt media object `trakt_episode` returned by the trakt api."""
         if self.id and self.id != trakt_episode['ids']['trakt']:
-            raise Exception('Tried to update db ep with different ep data')
+            raise ValueError('Tried to update db ep with different ep data')
         if not self.id:
             self.id = trakt_episode['ids']['trakt']
         self.imdb_id = trakt_episode['ids']['imdb']
@@ -507,7 +508,7 @@ class TraktSeason(Base):
     def update(self, trakt_season, session):
         """Updates this record from the trakt media object `trakt_episode` returned by the trakt api."""
         if self.id and self.id != trakt_season['ids']['trakt']:
-            raise Exception('Tried to update db season with different season data')
+            raise ValueError('Tried to update db season with different season data')
         if not self.id:
             self.id = trakt_season['ids']['trakt']
         self.tmdb_id = trakt_season['ids']['tmdb']
@@ -613,7 +614,7 @@ class TraktShow(Base):
     def update(self, trakt_show, session):
         """Updates this record from the trakt media object `trakt_show` returned by the trakt api."""
         if self.id and self.id != trakt_show['ids']['trakt']:
-            raise Exception('Tried to update db show with different show data')
+            raise ValueError('Tried to update db show with different show data')
         if not self.id:
             self.id = trakt_show['ids']['trakt']
         self.slug = trakt_show['ids']['slug']
@@ -814,7 +815,7 @@ class TraktMovie(Base):
     def update(self, trakt_movie, session):
         """Updates this record from the trakt media object `trakt_movie` returned by the trakt api."""
         if self.id and self.id != trakt_movie['ids']['trakt']:
-            raise Exception('Tried to update db movie with different movie data')
+            raise ValueError('Tried to update db movie with different movie data')
         if not self.id:
             self.id = trakt_movie['ids']['trakt']
         self.slug = trakt_movie['ids']['slug']
@@ -1116,12 +1117,11 @@ def get_user_data(data_type, media_type, session, username):
             if not episode and not season:
                 item.update(show)
 
-        return data
-
     except requests.RequestException as e:
         raise plugin.PluginError(
             f'Error fetching data from trakt.tv endpoint {endpoint} for user {username}: {e}'
         )
+    return data
 
 
 def get_username(username=None, account=None):

@@ -336,9 +336,10 @@ class PluginSubtitleList:
             if wanted_languages and len(wanted_languages - existing_subtitles) == 0:
                 logger.info('Local subtitle(s) already exists for {}.', file)
                 return True
-            return False
         except ImportError:
             logger.warning('Subliminal not found. Unable to check for local subtitles.')
+        else:
+            return False
 
     def on_task_input(self, task, config):
         subtitle_list = SubtitleList(config)

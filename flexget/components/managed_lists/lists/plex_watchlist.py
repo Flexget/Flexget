@@ -21,10 +21,9 @@ if typing.TYPE_CHECKING:
 def import_plexaccount() -> "type[MyPlexAccount]":
     try:
         from plexapi.myplex import MyPlexAccount
-
-        return MyPlexAccount
     except ImportError:
         raise plugin.DependencyError('plex_watchlist', 'plexapi', 'plexapi package required')
+    return MyPlexAccount
 
 
 def to_entry(plex_item: "Union[Movie, Show]") -> Entry:

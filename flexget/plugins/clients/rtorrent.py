@@ -744,7 +744,7 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
             if resp != 0:
                 entry.fail(f'Failed to add to rTorrent invalid return value {resp}')
         except xmlrpc_client.Error as e:
-            logger.exception(e)
+            logger.exception('Found an error')
             entry.fail(f'Failed to add to rTorrent {e!s}')
             return
 

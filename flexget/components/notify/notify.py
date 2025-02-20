@@ -104,8 +104,8 @@ class Notify:
             logger.error(e)
         except plugin.PluginWarning as e:
             logger.warning(e)
-        except Exception as e:
-            logger.exception(e)
+        except Exception:
+            logger.exception('Found an error')
 
     @plugin.priority(0)
     def on_task_output(self, task, config):

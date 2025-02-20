@@ -58,7 +58,7 @@ class Subtitles:
             return
 
         if res['status'] != '200 OK':
-            raise Exception("Login to opensubtitles.org XML-RPC interface failed")
+            raise RuntimeError("Login to opensubtitles.org XML-RPC interface failed")
 
         config = self.prepare_config(config, task)
 

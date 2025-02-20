@@ -229,10 +229,10 @@ class ImdbLookup:
             session.add(movie)
             session.commit()
             raise plugin.PluginError('UnicodeDecodeError')
-        except ValueError as e:
+        except ValueError:
             # TODO: might be a little too broad catch, what was this for anyway? ;P
             if manager.options.debug:
-                logger.exception(e)
+                logger.exception('Found an error')
             raise plugin.PluginError('Invalid parameter: {}'.format(entry['imdb_url']), logger)
 
         for att in [

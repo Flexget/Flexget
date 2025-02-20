@@ -320,7 +320,7 @@ class Entry(LazyDict, Serializer):
         :raises RenderError: If there is a problem.
         """
         if not isinstance(template, (str, FlexGetTemplate)):
-            raise ValueError(
+            raise TypeError(
                 f'Trying to render non string template or unrecognized template format, got {template!r}'
             )
         logger.trace('rendering: {}', template)
@@ -340,10 +340,9 @@ class Entry(LazyDict, Serializer):
         for ll in entry.lazy_lookups:
             try:
                 lazy_lookups.append(serialize(ll))
-            except TypeError as exc:
+            except TypeError:
                 logger.exception(
-                    'BUG: Lazy lookup was not compatible with serialization. Please file a bug report: {}',
-                    exc,
+                    'BUG: Lazy lookup was not compatible with serialization. Please file a bug report'
                 )
         return {'fields': fields, 'lazy_lookups': lazy_lookups}
 
@@ -418,7 +417,7 @@ class LazyFunc:
 
     def __call__(self, func: Callable) -> Callable:
         if self.name in lazy_func_registry:
-            raise Exception(
+            raise RuntimeError(
                 f'The name {self.name} is already registered to another lazy function.'
             )
         func.lazy_func_id = self.name
@@ -434,7 +433,7 @@ class LazyFunc:
             for p in plugin.plugins.values():
                 if p.plugin_class.__name__ == plugin_class_name:
                     return types.MethodType(self._func, p.instance)
-            raise Exception(
+            raise TypeError(
                 f'lazy lookups must be functions, or methods of a registered plugin class. {self._func!r} is not'
             )
         return self._func

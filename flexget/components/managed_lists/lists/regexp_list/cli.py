@@ -94,9 +94,9 @@ def action_purge(options):
 def regexp_type(regexp):
     try:
         re.compile(regexp)
-        return regexp
     except re.error as e:
         raise ArgumentTypeError(e)
+    return regexp
 
 
 @event('options.register')

@@ -655,5 +655,5 @@ def get(name: str, requested_by: Union[str, object]) -> object:
 
     instance = plugins[name].instance
     if instance is None:
-        raise Exception('Plugin referred before system initialized?')
+        raise RuntimeError('Plugin referred before system initialized?')
     return instance

@@ -401,7 +401,7 @@ class Manager:
             options = self.options
         command = options.cli_command
         if command is None:
-            raise Exception('Command missing')
+            raise RuntimeError('Command missing')
         command_options = getattr(options, command)
         # First check for built-in commands
         if command in ['execute', 'daemon']:
@@ -1028,7 +1028,7 @@ class Manager:
         # remove temporary database used in test mode
         if self.options.test:
             if 'test' not in self.db_filename:
-                raise Exception('trying to delete non test database?')
+                raise RuntimeError('trying to delete non test database?')
             if self._has_lock:
                 os.remove(self.db_filename)
                 logger.info('Removed test database')

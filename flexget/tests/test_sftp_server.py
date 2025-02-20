@@ -314,9 +314,9 @@ class TestSFTPServer(SFTPServerInterface):
                 )
                 attr.filename = filename
                 out.append(attr)
-            return out
         except OSError as e:
             return TestSFTPServer.log_and_return_error_code(e)
+        return out
 
     def stat(self, path: str) -> SFTPAttributes | int:
         logger.debug('stat(%s)', path)
