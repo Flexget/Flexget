@@ -29,8 +29,6 @@ from flexget.plugin import load_plugins
 from flexget.task import Task, TaskAbort
 from flexget.webserver import User
 
-from .test_sftp_server import TestSFTPServerController
-
 logger = logger.bind(name='tests')
 
 VCR_CASSETTE_DIR = os.path.join(os.path.dirname(__file__), 'cassettes')
@@ -193,32 +191,7 @@ def caplog(pytestconfig, _caplog):  # noqa: F811
     logger.remove(handler_id)
 
 
-@pytest.fixture
-def sftp_root(tmp_path: Path):
-    sftp_root = tmp_path / 'sftp_root'
-    sftp_root.mkdir()
-    return sftp_root
-
-
-@pytest.fixture
-def sftp(sftp_root: Path):
-    test_server = TestSFTPServerController(sftp_root)
-    yield test_server
-    test_server.kill()
-
-
 # --- End Public Fixtures ---
-
-
-def pytest_configure(config):
-    # register the filecopy marker
-    config.addinivalue_line(
-        'markers',
-        'filecopy(src, dst): mark test to copy a file from `src` to `dst` before running.',
-    )
-    config.addinivalue_line(
-        'markers', 'online: mark a test that goes online. VCR will automatically be used.'
-    )
 
 
 def pytest_runtest_setup(item):

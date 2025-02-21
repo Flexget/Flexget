@@ -30,11 +30,14 @@ jobs:
           enable-cache: true
           python-version: ${{ matrix.python-version }}
           version: ${{ env.UV_VERSION }}
-      - name: Install dependencies
-        run: uv sync --group plugin-test --frozen
-      - name: Test with pytest
-        run: |
-          uv run pytest -n logical --dist loadgroup --junit-xml=test-results.xml
+      - name: Install mandatory dependencies
+        run: uv sync --frozen
+      - name: Run tests not requiring optional dependencies
+        run: uv run pytest -m 'not require_optional_deps' -n logical --dist loadgroup --junit-xml test-results.xml
+      - name: Install optional dependencies
+        run: uv sync --frozen --group plugin-test
+      - name: Run tests requiring optional dependencies
+        run: uv run pytest -m 'require_optional_deps' -n logical --dist loadgroup --junit-xml test-results.xml
       - name: Upload Test Results
         if: always()
         uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4
