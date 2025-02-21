@@ -1,5 +1,4 @@
-"""
-Utilities for handling RAR and ZIP archives
+"""Utilities for handling RAR and ZIP archives
 
 Provides wrapper archive and exception classes to simplify
 archive extraction
@@ -22,48 +21,33 @@ logger = logger.bind(name='archive')
 class ArchiveError(Exception):
     """Base exception for archive"""
 
-    pass
-
 
 class NeedRarFile(ArchiveError):
     """Exception to be raised when rarfile module is missing"""
-
-    pass
 
 
 class BadArchive(ArchiveError):
     """Wrapper exception for BadZipFile and BadRarFile"""
 
-    pass
-
 
 class NeedFirstVolume(ArchiveError):
     """Wrapper exception for rarfile.NeedFirstVolume"""
-
-    pass
 
 
 class PathError(ArchiveError):
     """Exception to be raised when an archive file doesn't exist"""
 
-    pass
-
 
 class FSError(ArchiveError):
     """Exception to be raised on OS/IO exceptions"""
-
-    pass
 
 
 class FileAlreadyExists(ArchiveError):
     """Exception to be raised when destination file already exists"""
 
-    pass
-
 
 def rarfile_set_tool_path(config):
-    """
-    Manually set the path of unrar executable if it can't be resolved from the
+    """Manually set the path of unrar executable if it can't be resolved from the
     PATH environment variable
     """
     unrar_tool = config['unrar_tool']
@@ -77,9 +61,7 @@ def rarfile_set_tool_path(config):
 
 
 def rarfile_set_path_sep(separator):
-    """
-    Set the path separator on rarfile module
-    """
+    """Set the path separator on rarfile module"""
     if rarfile:
         rarfile.PATH_SEP = separator
 
@@ -92,8 +74,7 @@ def makepath(path):
 
 
 class Archive:
-    """
-    Base archive class. Assumes an interface similar to
+    """Base archive class. Assumes an interface similar to
     zipfile.ZipFile or rarfile.RarFile
     """
 
@@ -149,9 +130,7 @@ class Archive:
 
 
 class RarArchive(Archive):
-    """
-    Wrapper class for rarfile.RarFile
-    """
+    """Wrapper class for rarfile.RarFile"""
 
     def __init__(self, path):
         RarArchive.check_import()
@@ -183,9 +162,7 @@ class RarArchive(Archive):
 
 
 class ZipArchive(Archive):
-    """
-    Wrapper class for zipfile.ZipFile
-    """
+    """Wrapper class for zipfile.ZipFile"""
 
     def __init__(self, path):
         try:
@@ -214,7 +191,6 @@ class ArchiveInfo:
 
     def _is_dir(self):
         """Indicates if info object looks to be a directory"""
-
         if hasattr(self.info, 'isdir'):
             return self.info.isdir()
         return not self.filename
@@ -232,19 +208,16 @@ class ArchiveInfo:
         try:
             archive.extract_file(self.info, destination)
             logger.verbose('Extracted: {} to {}', self.path, destination)
-        except Exception as error:
+        except Exception:
             if os.path.exists(destination):
                 logger.debug('Cleaning up partially extracted file: {}', destination)
                 os.remove(destination)
 
-            raise error
+            raise
 
 
 def open_archive(archive_path):
-    """
-    Returns the appropriate archive object
-    """
-
+    """Returns the appropriate archive object"""
     archive = None
 
     if not os.path.exists(archive_path):
@@ -263,10 +236,7 @@ def open_archive(archive_path):
 
 
 def is_archive(path):
-    """
-    Attempts to open an entry as an archive; returns True on success, False on failure.
-    """
-
+    """Attempts to open an entry as an archive; returns True on success, False on failure."""
     archive = None
 
     try:

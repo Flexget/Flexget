@@ -18,18 +18,17 @@ session.add_domain_limiter(TokenBucketLimiter('discord.com', 6, '3 seconds'))
 
 
 class DiscordNotifier:
-    """
-    Example::
+    """Example::
 
-      notify:
-        entries:
-          via:
-            - discord:
-                web_hook_url: <string>
-                [silent: <boolean>] (suppress notification)
-                [username: <string>] (override the default username of the webhook)
-                [avatar_url: <string>] (override the default avatar of the webhook)
-                [embeds: <arrays>[<object>]] (override embeds)
+    notify:
+      entries:
+        via:
+          - discord:
+              web_hook_url: <string>
+              [silent: <boolean>] (suppress notification)
+              [username: <string>] (override the default username of the webhook)
+              [avatar_url: <string>] (override the default avatar of the webhook)
+              [embeds: <arrays>[<object>]] (override embeds)
     """
 
     schema = {
@@ -122,13 +121,11 @@ class DiscordNotifier:
     }
 
     def notify(self, title, message, config):
-        """
-        Send discord notification
+        """Send discord notification
 
         :param str message: message body
         :param dict config: discord plugin config
         """
-
         for embed in config.get('embeds', []):
             ts = embed.get('timestamp')
             if ts:
@@ -138,15 +135,16 @@ class DiscordNotifier:
                             ts = datetime.utcfromtimestamp(int(ts))
                         except (ValueError, OverflowError):
                             logger.info(
-                                f"Value provided for 'timestamp' ({embed['timestamp']}) "
-                                f"is not a timestamp ({int(datetime.now().timestamp())})."
+                                "Value provided for 'timestamp' ({}) is not a timestamp ({}).",
+                                embed['timestamp'],
+                                int(datetime.now().timestamp()),
                             )
                     else:
                         try:
                             ts = isoparse(ts)
                             embed['timestamp'] = ts
                         except (ParserError, ValueError) as e:
-                            logger.info(f"'timestamp' is in an invalid format: {e}")
+                            logger.info("'timestamp' is in an invalid format: {}", e)
                 if not isinstance(ts, datetime):
                     embed.pop('timestamp', None)
                     logger.warning("'timestamp' is invalid, dropping it")
@@ -157,7 +155,7 @@ class DiscordNotifier:
                 try:
                     int(embed['color'], 16)
                 except TypeError:
-                    logger.warning(f"Invalid 'color' for embed ({embed['color']}), ignoring")
+                    logger.warning("Invalid 'color' for embed ({}), ignoring", embed['color'])
                     embed.pop('color', None)
 
         web_hook = {
@@ -192,7 +190,7 @@ class DiscordNotifier:
                             'retry-after', e.response.json().get('retry_after', 3)
                         )
                     )
-                    logger.info(f'Rate-limited, waiting for {timedelta(seconds=timeout)}')
+                    logger.info('Rate-limited, waiting for {}', timedelta(seconds=timeout))
                     wait(timeout)
                     continue
                 raise PluginWarning(e.args[0])

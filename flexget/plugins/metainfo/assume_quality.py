@@ -1,17 +1,17 @@
-from collections import namedtuple
+from typing import NamedTuple
 
 from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 from flexget.utils import qualities
+from flexget.utils.qualities import Quality, Requirements
 
 logger = logger.bind(name='assume_quality')
 
 
 class AssumeQuality:
-    """
-    Applies quality components to entries that match specified quality requirements.
+    """Applies quality components to entries that match specified quality requirements.
     When a quality is applied, any components which are unknown in the entry are filled from the applied quality.
     Quality requirements are tested in order of increasing precision (ie "720p h264" is more precise than "1080p"
     so gets tested first), and applied as matches are found. Using the simple configuration is the same as specifying
@@ -74,7 +74,11 @@ class AssumeQuality:
     def on_task_start(self, task, config):
         if isinstance(config, str):
             config = {'any': config}
-        assume = namedtuple('assume', ['target', 'quality'])
+
+        class Assume(NamedTuple):
+            target: Requirements
+            quality: Quality
+
         self.assumptions = []
         for target, quality in list(config.items()):
             logger.verbose('New assumption: {} is {}', target, quality)
@@ -90,7 +94,7 @@ class AssumeQuality:
                 raise plugin.PluginError(
                     f'{quality} is not a valid quality. Forgetting assumption.'
                 )
-            self.assumptions.append(assume(target, quality))
+            self.assumptions.append(Assume(target, quality))
         self.assumptions.sort(
             key=lambda assumption: self.precision(assumption.target), reverse=True
         )

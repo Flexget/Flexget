@@ -24,15 +24,13 @@ class QualityComponent:
         modifier: Optional[int] = None,
         defaults: Optional[list['QualityComponent']] = None,
     ) -> None:
-        """
-        :param type: Type of quality component. (resolution, source, codec, color_range or audio)
+        """:param type: Type of quality component. (resolution, source, codec, color_range or audio)
         :param value: Value used to sort this component with others of like type.
         :param name: Canonical name for this quality component.
         :param regexp: Regexps used to match this component.
         :param modifier: An integer that affects sorting above all other components.
         :param defaults: An iterable defining defaults for other quality components if this component matches.
         """
-
         if type not in ['resolution', 'source', 'codec', 'color_range', 'audio']:
             raise ValueError(f'{type} is not a valid quality component type.')
         self.type = type
@@ -52,7 +50,6 @@ class QualityComponent:
         :param string text: data te be tested against
         :returns: tuple (matches, remaining text without quality data)
         """
-
         match = self.regexp.search(text)
         if not match:
             return False, ""
@@ -204,9 +201,7 @@ class Quality(Serializer):
     """Parses and stores the quality of an entry in the four component categories."""
 
     def __init__(self, text: str = '') -> None:
-        """
-        :param text: A string to parse quality from
-        """
+        """:param text: A string to parse quality from"""
         self.text = text
         self.clean_text = text
         if text:
@@ -329,7 +324,6 @@ class Quality(Serializer):
 
 def get(quality_name: str) -> Quality:
     """Returns a quality object based on canonical quality name."""
-
     found_components = {}
     for part in quality_name.lower().split():
         component = _registry.get(part)
@@ -348,7 +342,8 @@ def get(quality_name: str) -> Quality:
 
 class RequirementComponent:
     """Represents requirements for a given component type. Can evaluate whether a given QualityComponent
-    meets those requirements."""
+    meets those requirements.
+    """
 
     def __init__(self, type: str) -> None:
         self.type = type
@@ -442,8 +437,7 @@ class Requirements:
         return [self.resolution, self.source, self.codec, self.color_range, self.audio]
 
     def parse_requirements(self, text: str) -> None:
-        """
-        Parses a requirements string.
+        """Parses a requirements string.
 
         :param text: The string containing quality requirements.
         """

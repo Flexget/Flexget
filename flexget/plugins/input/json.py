@@ -14,8 +14,7 @@ logger = logger.bind(name='json')
 
 
 class Json:
-    """
-    Return entries from a json file.
+    """Return entries from a json file.
 
     ::
 

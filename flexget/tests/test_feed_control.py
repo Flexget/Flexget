@@ -2,9 +2,7 @@ import pytest
 
 
 class TestOnlyTask:
-    """
-    Test --task option
-    """
+    """Test --task option"""
 
     config = """
         tasks:
@@ -30,9 +28,7 @@ class TestOnlyTask:
 
 
 class TestManualAutomatic:
-    """
-    Test manual download tasks
-    """
+    """Test manual download tasks"""
 
     config = """
         tasks:
@@ -48,8 +44,7 @@ class TestManualAutomatic:
         assert not task.find_entry(title='nodownload'), 'Manual tasks downloaded on automatic run'
 
     def test_manual_with_startasks(self, execute_task):
-        """
-        Specifying just '*' as the tasks option should be considered
+        """Specifying just '*' as the tasks option should be considered
         the same as not specifying any specific tasks.
         """
         task = execute_task('test', abort=True, options={'tasks': ['*'], 'allow_manual': True})
@@ -58,9 +53,7 @@ class TestManualAutomatic:
 
 
 class TestManualOnlytask:
-    """
-    Test manual download tasks
-    """
+    """Test manual download tasks"""
 
     config = """
         tasks:

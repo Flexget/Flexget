@@ -17,8 +17,7 @@ logger = logger.bind(name='html')
 
 
 class InputHtml:
-    """
-    Parses urls from html page. Usefull on sites which have direct download
+    """Parses urls from html page. Usefull on sites which have direct download
     links of any type (mp3, jpg, torrent, ...).
 
     Many anime-fansubbers do not provide RSS-feed, this works well in many cases.
@@ -131,7 +130,7 @@ class InputHtml:
                 except HTTPError as e:
                     if stop_when_404 and e.response.status_code == 404:
                         break
-                    raise e
+                    raise
                 if not entries:
                     entries = new_entries
                 else:

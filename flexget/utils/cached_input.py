@@ -47,7 +47,7 @@ def upgrade(ver: int, session: DBSession) -> int:
                     .values(json=json.dumps(p, encode_datetime=True))
                 )
             except KeyError as ex:
-                logger.error(f'Unable error upgrading input_cache pickle object due to {ex}')
+                logger.error('Unable error upgrading input_cache pickle object due to {}', ex)
         ver = 1
     if ver == 1:
         table = table_schema('input_cache_entry', session)
@@ -104,9 +104,8 @@ def db_cleanup(manager, session: DBSession) -> None:
         logger.verbose('Removed {} old input caches.', result)
 
 
-class cached:
-    """
-    Implements transparent caching decorator @cached for inputs.
+class cached:  # noqa: N801 It acts like a function in usage
+    """Implements transparent caching decorator @cached for inputs.
 
     Decorator has two parameters:
 
@@ -183,7 +182,7 @@ class cached:
 
     def store_to_db(self, entries: list[str]):
         # Store to database
-        logger.debug(f'Storing cache {self.cache_name} to database.')
+        logger.debug('Storing cache {} to database.', self.cache_name)
         with Session() as session:
             db_cache = (
                 session.query(InputCache)
@@ -217,8 +216,7 @@ class cached:
 
 
 class IterableCache:
-    """
-    Can cache any iterable (including generators) without immediately evaluating all entries.
+    """Can cache any iterable (including generators) without immediately evaluating all entries.
     If `finished_hook` is supplied, it will be called the first time the iterable is run to the end.
     """
 

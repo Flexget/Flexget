@@ -38,8 +38,7 @@ CATEGORIES = {
 
 
 class UrlRewriteTorrentleech:
-    """
-    Torrentleech urlrewriter and search plugin.
+    """Torrentleech urlrewriter and search plugin.
 
     torrentleech:
       rss_key: xxxxxxxxx  (required)
@@ -90,9 +89,7 @@ class UrlRewriteTorrentleech:
 
     @plugin.internet(logger)
     def search(self, task, entry, config=None):
-        """
-        Search for name from torrentleech.
-        """
+        """Search for name from torrentleech."""
         request_headers = {'User-Agent': 'curl/7.54.0'}
         rss_key = config['rss_key']
 

@@ -67,8 +67,7 @@ def log_once(
     suppressed_level: str = 'VERBOSE',
     session: Session = None,
 ) -> Optional[bool]:
-    """
-    Log message only once using given logger`. Returns False if suppressed logging.
+    """Log message only once using given logger`. Returns False if suppressed logging.
     When suppressed, `suppressed_level` level is still logged.
     """
     if logger is None:

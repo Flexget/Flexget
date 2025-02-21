@@ -39,8 +39,9 @@ def welcome_message(manager):
     else:
         logger.info(
             '{}FlexGet has been successfully started from {} (--cron). '
-            'This message will be repeated {} times for your set up verification conveniences.'.format(
-                'Congratulations! ' if count == 4 else '', scheduler, count
-            )
+            'This message will be repeated {} times for your set up verification conveniences.',
+            'Congratulations! ' if count == 4 else '',
+            scheduler,
+            count,
         )
     persistence['count'] = count

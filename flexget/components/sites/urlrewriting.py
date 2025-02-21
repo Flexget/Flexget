@@ -15,9 +15,7 @@ class UrlRewritingError(Exception):
 
 
 class PluginUrlRewriting:
-    """
-    Provides URL rewriting framework
-    """
+    """Provides URL rewriting framework"""
 
     def __init__(self):
         self.disabled_rewriters = []
@@ -75,15 +73,10 @@ class PluginUrlRewriting:
                                 entry['url'],
                                 name,
                             )
-                except UrlRewritingError as r:
-                    # increase failcount
-                    # count = self.shared_cache.storedefault(entry['url'], 1)
-                    # count += 1
-                    raise UrlRewritingError(f'URL rewriting {name} failed: {r.value}')
-                except plugin.PluginError as e:
+                except (UrlRewritingError, plugin.PluginError) as e:
                     raise UrlRewritingError(f'URL rewriting {name} failed: {e.value}')
-                except Exception as e:
-                    logger.exception(e)
+                except Exception:
+                    logger.exception('Found an error')
                     raise UrlRewritingError(
                         '{}: Internal error with url {}'.format(name, entry['url'])
                     )

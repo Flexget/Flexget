@@ -357,7 +357,8 @@ class ImdbEntrySet(MutableSet):
             return '{} list is not modifiable'.format(self.config['list'])
         return None
 
-    def _from_iterable(cls, it):
+    @staticmethod
+    def _from_iterable(it):
         # TODO: is this the right answer? the returned object won't have our custom __contains__ logic
         return set(it)
 
@@ -467,7 +468,8 @@ class ImdbEntrySet(MutableSet):
     @property
     def online(self):
         """Set the online status of the plugin, online plugin should be treated differently in certain situations,
-        like test mode"""
+        like test mode
+        """
         return True
 
     def get(self, entry):

@@ -15,8 +15,7 @@ logger = logger.bind(name='next_series_episodes')
 
 
 class NextSeriesEpisodes:
-    """
-    Emit next episode number from all series configured in this task.
+    """Emit next episode number from all series configured in this task.
 
     Supports only 'ep' and 'sequence' mode series.
     """

@@ -63,8 +63,7 @@ class Interval(_Interval):
 
 
 class CoercingDateTime(DateTime):
-    """
-    Datetime with some features that make it better when used in our templates:
+    """Datetime with some features that make it better when used in our templates:
     - Avoids crashing when comparing tz aware and naive datetimes.
       When this happens, it will assume the naive datetime is in the same timezone as the dt aware one.
     - Allows comparisons with plain dates, where the date is assumed to be at midnight in the same timezone.
@@ -126,9 +125,7 @@ class CoercingDateTime(DateTime):
         return DateTime.__sub__(self, other)
 
     def diff(self, dt: Optional[datetime] = None, abs: bool = True) -> Interval:
-        """
-        Returns the difference between two DateTime objects represented as an Interval.
-        """
+        """Returns the difference between two DateTime objects represented as an Interval."""
         if dt is None:
             dt = self.now(self.tz)
 
@@ -233,7 +230,6 @@ filter_d = filter_default
 
 def filter_asciify(text: str) -> str:
     """Siplify text"""
-
     if not isinstance(text, str):
         return text
 
@@ -245,7 +241,6 @@ def filter_asciify(text: str) -> str:
 
 def filter_strip_symbols(text: str) -> str:
     """Strip Symbols text"""
-
     if not isinstance(text, str):
         return text
 
@@ -276,7 +271,7 @@ def filter_parse_size(val: str, si: bool = False, match_re: Optional[str] = None
         return 0
 
 
-def filter_format_size(size: Union[int, float], si=False, unit=None):
+def filter_format_size(size: float, si=False, unit=None):
     if not isinstance(size, (int, float)):
         return size
     return format_filesize(size, si=si, unit=unit)
@@ -358,7 +353,6 @@ def get_filters() -> dict:
 
 def get_template(template_name: str, scope: Optional[str] = 'task') -> FlexGetTemplate:
     """Loads a template from disk. Looks in both included plugins and users custom scope dir."""
-
     if not template_name.endswith('.template'):
         template_name += '.template'
     locations = []
@@ -376,8 +370,7 @@ def get_template(template_name: str, scope: Optional[str] = 'task') -> FlexGetTe
 
 
 def render(template: Union[FlexGetTemplate, str], context: Mapping, native: bool = False) -> str:
-    """
-    Renders a Template with `context` as its context.
+    """Renders a Template with `context` as its context.
 
     :param template: Template or template string to render.
     :param context: Context to render the template from.
@@ -399,7 +392,7 @@ def render(template: Union[FlexGetTemplate, str], context: Mapping, native: bool
         result = template.render(context)
     except Exception as e:
         error = RenderError(f'({type(e).__name__}) {e}')
-        logger.debug(f'Error during rendering: {error}')
+        logger.debug('Error during rendering: {}', error)
         raise error
 
     return result
@@ -409,7 +402,6 @@ def render_from_entry(
     template: Union[FlexGetTemplate, str], entry: 'Entry', native: bool = False
 ) -> str:
     """Renders a Template or template string with an Entry as its context."""
-
     # Make a copy of the Entry so we can add some more fields
     variables = copy(entry.store)
     variables.update(extra_vars())
@@ -424,8 +416,7 @@ def render_from_entry(
 
 
 def render_from_task(template: Union[FlexGetTemplate, str], task: 'Task') -> str:
-    """
-    Renders a Template with a task as its context.
+    """Renders a Template with a task as its context.
 
     :param template: Template or template string to render.
     :param task: Task to render the template from.
@@ -437,8 +428,7 @@ def render_from_task(template: Union[FlexGetTemplate, str], task: 'Task') -> str
 
 
 def evaluate_expression(expression: str, context: Mapping) -> Any:
-    """
-    Evaluate a jinja `expression` using a given `context` with support for `LazyDict`s (`Entry`s.)
+    """Evaluate a jinja `expression` using a given `context` with support for `LazyDict`s (`Entry`s.)
 
     :param str expression:  A jinja expression to evaluate
     :param context: dictlike, supporting LazyDicts

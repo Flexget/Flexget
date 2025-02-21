@@ -10,8 +10,7 @@ logger = logger.bind(name='emby_lookup')
 
 
 class EmbyLookup:
-    """
-    Preforms Emby Lookup
+    """Preforms Emby Lookup
 
     Example:
         emby_lookup:
@@ -19,6 +18,7 @@ class EmbyLookup:
             username: <username>
             apikey: <apikey>
             return_host: wan
+
     """
 
     auth = {}

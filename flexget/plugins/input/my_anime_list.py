@@ -83,7 +83,7 @@ class MyAnimeList:
                         params={'status': status, 'offset': offset},
                     ).json()
                 except RequestException as e:
-                    logger.error(f'Error finding list on url: {e.request.url}')
+                    logger.error('Error finding list on url: {}', e.request.url)
                     break
                 except (ValueError, TypeError):
                     logger.error('Invalid JSON response')

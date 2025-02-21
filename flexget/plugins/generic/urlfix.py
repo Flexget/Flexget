@@ -8,9 +8,7 @@ logger = logger.bind(name='urlfix')
 
 
 class UrlFix:
-    """
-    Automatically fix broken urls.
-    """
+    """Automatically fix broken urls."""
 
     schema = {'type': 'boolean'}
 

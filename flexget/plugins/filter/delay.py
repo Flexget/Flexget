@@ -82,8 +82,7 @@ def upgrade(ver, session):
 
 
 class FilterDelay:
-    """
-    Add delay to a task. This is useful for de-prioritizing expensive / bad-quality tasks.
+    """Add delay to a task. This is useful for de-prioritizing expensive / bad-quality tasks.
 
     Format: n [minutes|hours|days|weeks]
 

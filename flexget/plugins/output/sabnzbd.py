@@ -10,8 +10,7 @@ logger = logger.bind(name='sabnzbd')
 
 
 class OutputSabnzbd:
-    """
-    Example::
+    """Example::
 
       sabnzbd:
         apikey: 123456
@@ -96,7 +95,7 @@ class OutputSabnzbd:
                 logger.critical('Result was: {}', e.args[0])
                 entry.fail('sabnzbd unreachable')
                 if task.options.debug:
-                    logger.exception(e)
+                    logger.exception('Found an error')
                 continue
 
             if 'error' in response.text.lower():

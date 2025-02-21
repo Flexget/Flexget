@@ -17,7 +17,7 @@ charset-normalizer==3.4.1
 cheroot==10.0.1
 cherrypy==18.10.0
 click==8.1.8
-colorama==0.4.6
+colorama==0.4.6 ; sys_platform == 'win32'
 feedparser==6.0.11
 flask==3.1.0
 flask-compress==1.17
@@ -47,7 +47,7 @@ packaging==24.2
 pendulum==3.0.0
 plumbum==1.9.0
 portend==3.2.0
-psutil==6.1.1
+psutil==7.0.0
 pycparser==2.22 ; platform_python_implementation == 'PyPy'
 pygments==2.19.1
 pynzb==0.1.0
@@ -72,7 +72,7 @@ tempora==5.8.0
 time-machine==2.16.0 ; implementation_name != 'pypy'
 typing-extensions==4.12.2
 tzdata==2025.1
-tzlocal==5.2
+tzlocal==5.3
 urllib3==1.26.20
 webencodings==0.5.1
 werkzeug==3.1.3

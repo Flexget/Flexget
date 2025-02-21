@@ -1,16 +1,19 @@
 from unittest.mock import Mock, patch
 
+import pytest
+
 from flexget.plugins.output import sns
 from flexget.task import Task
 
 
+@pytest.mark.require_optional_deps
 class TestNotifySNS:
     @patch('boto3.Session')
-    def test_emitter_build_session_from_empty_config(self, Session):
+    def test_emitter_build_session_from_empty_config(self, session):
         e = sns.SNSNotificationEmitter({'aws_region': 'test'})
         e.build_session()
-        assert e.session is Session.return_value
-        Session.assert_called_once_with(
+        assert e.session is session.return_value
+        session.assert_called_once_with(
             region_name='test',
             aws_access_key_id=None,
             aws_secret_access_key=None,
@@ -18,7 +21,7 @@ class TestNotifySNS:
         )
 
     @patch('boto3.Session')
-    def test_emitter_uses_config_credentials(self, Session):
+    def test_emitter_uses_config_credentials(self, session):
         e = sns.SNSNotificationEmitter(
             {
                 'aws_region': None,
@@ -28,7 +31,7 @@ class TestNotifySNS:
             }
         )
         e.build_session()
-        Session.assert_called_once_with(
+        session.assert_called_once_with(
             region_name=None,
             aws_access_key_id='DUMMY',
             aws_secret_access_key='DUMMYKEY',
@@ -52,7 +55,7 @@ class TestNotifySNS:
         assert not topic.publish.called
 
     @patch('flexget.plugins.output.sns.SNSNotificationEmitter.get_topic')
-    def test_send_message_for_Event(self, get_topic):
+    def test_send_message_for_event(self, get_topic):
         topic = get_topic.return_value
         manager = Mock()
         manager.config = {'tasks': {}}

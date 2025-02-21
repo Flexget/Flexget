@@ -11,8 +11,7 @@ found_deprecated = False
 
 
 class ChangeWarn:
-    """
-    Gives warning if user has deprecated / changed configuration in the root level.
+    """Gives warning if user has deprecated / changed configuration in the root level.
 
     Will be replaced by root level validation in the future!
 

@@ -72,7 +72,7 @@ def imdb_query(session):
 
     log_query_count('test')
     took = time.time() - start_time
-    logger.debug(f'Took {took:.2f} seconds to query {len(imdb_urls)} movies')
+    logger.debug('Took {:.2f} seconds to query {} movies', took, len(imdb_urls))
 
 
 @event('options.register')

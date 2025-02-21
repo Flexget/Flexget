@@ -7,19 +7,16 @@ logger = logger.bind(name='est_released')
 
 
 class EstimateRelease:
-    """
-    Front-end for estimator plugins that estimate release times
+    """Front-end for estimator plugins that estimate release times
     for various things (series, movies).
     """
 
     def estimate(self, entry):
-        """
-        Estimate release schedule for Entry
+        """Estimate release schedule for Entry
 
         :param entry:
         :return: estimated date of released for the entry, None if it can't figure it out
         """
-
         logger.debug(entry['title'])
         estimators = [
             e.instance.estimate for e in plugin.get_plugins(interface='estimate_release')

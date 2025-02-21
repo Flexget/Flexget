@@ -9,9 +9,7 @@ logger = logger.bind(name='limit')
 
 
 class PluginLimit:
-    """
-    Limits the number of entries an input plugin can produce.
-    """
+    """Limits the number of entries an input plugin can produce."""
 
     schema = {
         'type': 'object',

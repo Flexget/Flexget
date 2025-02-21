@@ -19,7 +19,6 @@ class PluginThetvdbLookup:
     series_season, series_episode from series plugin.
 
     Example:
-
     thetvdb_lookup: yes
 
     Primarily used for passing thetvdb information to other plugins.
@@ -53,6 +52,7 @@ class PluginThetvdbLookup:
       tvdb_ep_rating
       tvdb_ep_guest_stars
       tvdb_ep_image
+
     """
 
     # Series info
@@ -143,8 +143,9 @@ class PluginThetvdbLookup:
                 episode_offset = 0
             if season_offset != 0 or episode_offset != 0:
                 logger.debug(
-                    f'Using offset for tvdb lookup: season: {season_offset}, '
-                    f'episode: {episode_offset}'
+                    'Using offset for tvdb lookup: season: {}, episode: {}',
+                    season_offset,
+                    episode_offset,
                 )
 
             lookupargs = {

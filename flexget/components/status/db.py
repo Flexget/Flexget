@@ -47,6 +47,7 @@ class StatusTask(Base):
         return max(execution.start for execution in self.executions)
 
     @last_execution_time.expression
+    @classmethod
     def last_execution_time(cls):
         return (
             select(func.max(TaskExecution.start))

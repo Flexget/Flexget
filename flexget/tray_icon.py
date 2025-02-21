@@ -59,9 +59,7 @@ class TrayIcon:
         index: Optional[int] = None,
         **kwargs,
     ):
-        """
-        Add a menu item by passing its text and function, or pass a created MenuItem. Force position by sending index
-        """
+        """Add a menu item by passing its text and function, or pass a created MenuItem. Force position by sending index"""
         if not any(v for v in (menu_item, text)):
             raise ValueError("Either 'text' or 'menu_item' are required")
 

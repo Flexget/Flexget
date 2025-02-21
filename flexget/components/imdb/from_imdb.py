@@ -12,8 +12,7 @@ logger = logger.bind(name='from_imdb')
 
 
 class FromIMDB:
-    """
-    This plugin enables generating entries based on an entity, an entity being a person, character or company.
+    """This plugin enables generating entries based on an entity, an entity being a person, character or company.
     It's based on IMDBpy which is required (pip install imdbpy). The basic config required just an IMDB ID of the
     required entity.
 
@@ -127,9 +126,7 @@ class FromIMDB:
     }
 
     def prepare_config(self, config):
-        """
-        Converts config to dict form and sets defaults if needed
-        """
+        """Converts config to dict form and sets defaults if needed"""
         if isinstance(config, str):
             config = {'id': [config]}
         elif isinstance(config, list):
@@ -178,8 +175,7 @@ class FromIMDB:
         return set(items)
 
     def get_entity_type_and_object(self, imdb_id):
-        """
-        Return a tuple of entity type and entity object
+        """Return a tuple of entity type and entity object
         :param imdb_id: string which contains IMDB id
         :return: entity type, entity object (person, company, etc.)
         """
@@ -200,9 +196,7 @@ class FromIMDB:
     def get_items_by_entity(
         self, entity_type, entity_object, content_types, job_types, match_type
     ):
-        """
-        Gets entity object and return movie list using relevant method
-        """
+        """Gets entity object and return movie list using relevant method"""
         if entity_type == 'Company':
             return self.items_by_company(entity_object)
 
@@ -214,9 +208,7 @@ class FromIMDB:
         return None
 
     def flatten_list(self, _list):
-        """
-        Gets a list of lists and returns a flat list
-        """
+        """Gets a list of lists and returns a flat list"""
         for el in _list:
             if isinstance(el, Iterable) and not isinstance(el, str):
                 yield from self.flatten_list(el)
@@ -251,9 +243,7 @@ class FromIMDB:
         return items
 
     def items_by_person(self, person, job_types, content_types, match_type):
-        """
-        Return item list for a person object
-        """
+        """Return item list for a person object"""
         unfiltered_items = self.flat_list(
             [self.items_by_job_type(person, job_type, content_types) for job_type in job_types],
             remove_none=True,
@@ -286,8 +276,7 @@ class FromIMDB:
         return [_f for _f in items if _f]
 
     def items_by_character(self, character, content_types, match_type):
-        """
-        Return items list for a character object
+        """Return items list for a character object
         :param character: character object
         :param content_types: content types as defined in config
         :return:
@@ -303,8 +292,7 @@ class FromIMDB:
         return self.filtered_items(unfiltered_items, content_types, match_type)
 
     def items_by_company(self, company):
-        """
-        Return items list for a company object
+        """Return items list for a company object
         :param company: company object
         :return: company items list
         """

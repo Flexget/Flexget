@@ -78,9 +78,7 @@ class MovieParseResult:
 
     @property
     def fields(self) -> dict:
-        """
-        Return a dict of all parser fields
-        """
+        """Return a dict of all parser fields"""
         return {
             'id': self.identifier,
             'movie_parser': self,
@@ -159,7 +157,7 @@ class SeriesParseResult:
         """Return all identifiers this parser represents. (for packs)"""
         # Currently 'ep' is the only id type that supports packs
         if not self.valid:
-            raise Exception('Series flagged invalid')
+            raise RuntimeError('Series flagged invalid')
         if self.id_type == 'ep':
             return (
                 [f'S{self.season:02d}']
@@ -169,7 +167,7 @@ class SeriesParseResult:
         if self.id_type == 'date':
             return [self.id.strftime('%Y-%m-%d')]
         if self.id is None:
-            raise Exception('Series is missing identifier')
+            raise RuntimeError('Series is missing identifier')
         return [self.id]
 
     @property

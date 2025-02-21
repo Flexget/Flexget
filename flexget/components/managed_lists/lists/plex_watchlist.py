@@ -21,10 +21,9 @@ if typing.TYPE_CHECKING:
 def import_plexaccount() -> "type[MyPlexAccount]":
     try:
         from plexapi.myplex import MyPlexAccount
-
-        return MyPlexAccount
     except ImportError:
         raise plugin.DependencyError('plex_watchlist', 'plexapi', 'plexapi package required')
+    return MyPlexAccount
 
 
 def to_entry(plex_item: "Union[Movie, Show]") -> Entry:
@@ -92,7 +91,7 @@ class PlexManagedWatchlist(MutableSet):
 
     @property
     def account(self) -> "MyPlexAccount":
-        MyPlexAccount = import_plexaccount()
+        MyPlexAccount = import_plexaccount()  # noqa: N806 It's a class
         if self._account is None:
             self._account = MyPlexAccount(self.username, self.password, self.token)
         return self._account
@@ -132,10 +131,10 @@ class PlexManagedWatchlist(MutableSet):
 
         if item:
             if self.account.onWatchlist(item):
-                logger.debug(f'"{item.title}" is already on the watchlist')
+                logger.debug('"{}" is already on the watchlist', item.title)
                 return
 
-            logger.debug(f'Adding "{item.title}" to the watchlist')
+            logger.debug('Adding "{}" to the watchlist', item.title)
             self.account.addToWatchlist(item)
 
     def discard(self, entry) -> None:

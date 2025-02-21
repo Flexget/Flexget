@@ -14,19 +14,18 @@ logger = logger.bind(name=plugin_name)
 
 
 class SlackNotifier:
-    """
-    Example:
+    """Example:
 
-      notify:
-        entries:
-          via:
-            - slack:
-                web_hook_url: <string>
-                [channel: <string>] (override channel, use "@username" or "#channel")
-                [username: <string>] (override username)
-                [icon_emoji: <string>] (override emoji icon)
-                [icon_url: <string>] (override emoji icon)
-                [attachments: <array>[<object>]] (override attachments)
+    notify:
+      entries:
+        via:
+          - slack:
+              web_hook_url: <string>
+              [channel: <string>] (override channel, use "@username" or "#channel")
+              [username: <string>] (override username)
+              [icon_emoji: <string>] (override emoji icon)
+              [icon_url: <string>] (override emoji icon)
+              [attachments: <array>[<object>]] (override attachments)
 
     """
 
@@ -103,9 +102,7 @@ class SlackNotifier:
     }
 
     def notify(self, title, message, config):
-        """
-        Send a Slack notification
-        """
+        """Send a Slack notification"""
         notification = {
             'text': message,
             'username': config.get('username'),

@@ -14,8 +14,7 @@ logger = logger.bind(name='text')
 
 
 class Text:
-    """
-    Parse any text for entries using regular expression.
+    """Parse any text for entries using regular expression.
 
     Example::
 

@@ -8,14 +8,13 @@ logger = logger.bind(name='reorder_quality')
 
 
 class ReorderQuality:
-    """
-    Allows modifying quality priorities from default ordering.
+    """Allows modifying quality priorities from default ordering.
 
     Example:
-
     reorder_quality:
       webrip:
         above: hdtv
+
     """
 
     schema = {

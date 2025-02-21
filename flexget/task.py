@@ -5,7 +5,7 @@ import itertools
 import random
 import string
 import threading
-from collections.abc import Iterable
+from collections.abc import Iterable, Iterator
 from functools import total_ordering, wraps
 from typing import TYPE_CHECKING, Optional, Union
 
@@ -59,8 +59,7 @@ class TaskConfigHash(Base):
 
 @with_session
 def config_changed(task: Optional[str] = None, session: ContextSession = None) -> None:
-    """
-    Forces config_modified flag to come out true on next run of `task`. Used when the db changes, and all
+    """Forces config_modified flag to come out true on next run of `task`. Used when the db changes, and all
     entries need to be reprocessed.
 
     .. WARNING: DO NOT (FURTHER) USE FROM PLUGINS
@@ -100,7 +99,7 @@ class EntryIterator:
             states = [states]
         self.filter = lambda e: e._state in states
 
-    def __iter__(self) -> Iterable[Entry]:
+    def __iter__(self) -> Iterator[Entry]:
         return filter(self.filter, self.all_entries)
 
     def __bool__(self):
@@ -119,7 +118,7 @@ class EntryIterator:
         if isinstance(item, slice):
             return list(itertools.islice(self, item.start, item.stop))
         if not isinstance(item, int):
-            raise ValueError('Index must be integer.')
+            raise TypeError('Index must be integer.')
         for index, entry in enumerate(self):
             if index == item:
                 return entry
@@ -170,8 +169,7 @@ class TaskAbort(Exception):
 
 @total_ordering
 class Task:
-    """
-    Represents one task in the configuration.
+    """Represents one task in the configuration.
 
     **Fires events:**
 
@@ -217,8 +215,7 @@ class Task:
         priority=None,
         suppress_warnings=None,
     ):
-        """
-        :param Manager manager: Manager instance.
+        """:param Manager manager: Manager instance.
         :param string name: Name of the task.
         :param dict config: Task configuration.
         :param options: dict or argparse namespace with options for this task
@@ -327,8 +324,7 @@ class Task:
 
     @property
     def undecided(self):
-        """
-        .. deprecated:: Use API v3
+        """.. deprecated:: Use API v3
 
         .. note:: We did not migrate to v3
 
@@ -346,37 +342,27 @@ class Task:
 
     @property
     def failed(self):
-        """
-        .. deprecated:: Use API v3
-        """
+        """.. deprecated:: Use API v3"""
         return self.all_entries.failed
 
     @property
     def rejected(self):
-        """
-        .. deprecated:: Use API v3
-        """
+        """.. deprecated:: Use API v3"""
         return self.all_entries.rejected
 
     @property
     def accepted(self):
-        """
-        .. deprecated:: Use API v3
-        """
+        """.. deprecated:: Use API v3"""
         return self.all_entries.accepted
 
     @property
     def entries(self):
-        """
-        .. deprecated:: Use API v3
-        """
+        """.. deprecated:: Use API v3"""
         return self.all_entries.entries
 
     @property
     def all_entries(self):
-        """
-        .. deprecated:: Use API v3
-        """
+        """.. deprecated:: Use API v3"""
         return self._all_entries
 
     def __lt__(self, other):
@@ -423,8 +409,7 @@ class Task:
         raise TaskAbort(reason, silent=silent)
 
     def find_entry(self, category='entries', **values):
-        """
-        Find and return :class:`~flexget.entry.Entry` with given attributes from task or None
+        """Find and return :class:`~flexget.entry.Entry` with given attributes from task or None
 
         :param string category: entries, accepted, rejected or failed. Defaults to entries.
         :param values: Key values of entries to be searched
@@ -468,7 +453,7 @@ class Task:
         :param string phase: Name of the phase
         """
         if phase not in phase_methods:
-            raise Exception(f'{phase} is not a valid task phase')
+            raise ValueError(f'{phase} is not a valid task phase')
         # warn if no inputs, filters or outputs in the task
         if phase in ['input', 'filter', 'output'] and not self.manager.unit_test:
             # Check that there is at least one manually configured plugin for these phases
@@ -525,8 +510,7 @@ class Task:
             self.check_config_hash()
 
     def __run_plugin(self, plugin, phase, args=None, kwargs=None):
-        """
-        Execute given plugins phase method, with supplied args and kwargs.
+        """Execute given plugins phase method, with supplied args and kwargs.
         If plugin throws unexpected exceptions :meth:`abort` will be called.
 
         :param PluginInfo plugin: Plugin to be executed
@@ -548,7 +532,6 @@ class Task:
             # We exhaust any iterator inputs here to make sure we catch exceptions properly.
             if isinstance(result, collections.abc.Iterable):
                 result = list(result)
-            return result
         except TaskAbort:
             raise
         except PluginWarning as warn:
@@ -580,10 +563,11 @@ class Task:
             logger.opt(exception=True).critical(msg)
             traceback = self.manager.crash_report()
             self.abort(msg, traceback=traceback)
+        else:
+            return result
 
     def rerun(self, plugin=None, reason=None):
-        """
-        Immediately re-run the task after execute has completed,
+        """Immediately re-run the task after execute has completed,
         task can be re-run up to :attr:`.max_reruns` times.
 
         :param str plugin: Plugin name
@@ -600,8 +584,7 @@ class Task:
         self._rerun = True
 
     def config_changed(self):
-        """
-        Sets config_modified flag to True for the remainder of this run.
+        """Sets config_modified flag to True for the remainder of this run.
         Used when the db changes, and all entries need to be reprocessed.
         """
         self.config_modified = True
@@ -613,9 +596,7 @@ class Task:
             raise PluginError(f'Failed to merge configs for task {self.name}: {e}')
 
     def check_config_hash(self):
-        """
-        Checks the task's config hash and updates the hash if necessary.
-        """
+        """Checks the task's config hash and updates the hash if necessary."""
         # Save current config hash and set config_modified flag
         config_hash = get_config_hash(self.config)
         if self.is_rerun:
@@ -689,14 +670,13 @@ class Task:
         except TaskAbort:
             try:
                 self.__run_task_phase('abort')
-            except TaskAbort as e:
-                logger.exception('abort handlers aborted: {}', e)
+            except TaskAbort:
+                logger.exception('abort handlers aborted')
             raise
 
     @use_task_logging
     def execute(self):
-        """
-        Executes the the task.
+        """Executes the the task.
 
         If :attr:`.enabled` is False task is not executed. Certain :attr:`.options`
         affect how execution is handled.
@@ -706,7 +686,6 @@ class Task:
         - :attr:`.options.inject` is a list of :class:`Entry` instances used instead
           of running input phase.
         """
-
         self.finished_event.clear()
         try:
             if self.options.cron:
@@ -755,8 +734,7 @@ class Task:
     copy = __copy__
 
     def render(self, template):
-        """
-        Renders a template string based on fields in the entry.
+        """Renders a template string based on fields in the entry.
 
         :param template: A template string or FlexGetTemplate that uses jinja2 or python string replacement format.
         :return: The result of the rendering.
@@ -764,7 +742,7 @@ class Task:
         :raises RenderError: If there is a problem.
         """
         if not isinstance(template, (str, FlexGetTemplate)):
-            raise ValueError(
+            raise TypeError(
                 f'Trying to render non string template or unrecognized template format, got {template!r}'
             )
         logger.trace('rendering: {}', template)

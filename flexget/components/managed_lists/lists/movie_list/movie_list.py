@@ -22,8 +22,7 @@ logger = logger.bind(name='movie_list')
 
 
 class MovieListBase:
-    """
-    Class that contains helper methods for movie list as well as plugins that use it,
+    """Class that contains helper methods for movie list as well as plugins that use it,
     such as API and CLI.
     """
 
@@ -154,8 +153,7 @@ class MovieList(MutableSet):
 
     @property
     def online(self):
-        """
-        Set the online status of the plugin, online plugin should be treated
+        """Set the online status of the plugin, online plugin should be treated
         differently in certain situations, like test mode
         """
         return False

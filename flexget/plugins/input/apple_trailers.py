@@ -14,8 +14,7 @@ logger = logger.bind(name='apple_trailers')
 
 
 class AppleTrailers:
-    """
-    Adds support for Apple.com movie trailers.
+    """Adds support for Apple.com movie trailers.
 
     Configuration:
     quality: Set the desired resolution - 480p, 720p or 1080p. default '720p'

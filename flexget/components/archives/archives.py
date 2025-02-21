@@ -8,8 +8,7 @@ logger = logger.bind(name='archives')
 
 
 class FilterArchives:
-    """
-    Accepts entries that are valid Zip or RAR archives
+    """Accepts entries that are valid Zip or RAR archives
 
     This plugin requires the rarfile Python module and unrar command line utility to handle RAR
     archives.
@@ -32,9 +31,7 @@ class FilterArchives:
     }
 
     def prepare_config(self, config):
-        """
-        Prepare config for processing
-        """
+        """Prepare config for processing"""
         if not isinstance(config, dict):
             config = {}
         config.setdefault('unrar_tool', '')
@@ -42,9 +39,7 @@ class FilterArchives:
 
     @plugin.priority(200)
     def on_task_filter(self, task, config):
-        """
-        Task handler for archives
-        """
+        """Task handler for archives"""
         if isinstance(config, bool) and not config:
             return
 

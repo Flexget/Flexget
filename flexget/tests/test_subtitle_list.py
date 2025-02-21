@@ -257,6 +257,7 @@ class TestSubtitleList:
         task = execute_task('subtitle_emit')
         assert len(task.entries) == 0, 'File should have expired.'
 
+    @pytest.mark.require_optional_deps
     @pytest.mark.online
     @pytest.mark.skipif(
         platform.system() == 'Darwin',
@@ -287,6 +288,7 @@ class TestSubtitleList:
             'Only one language should have been downloaded which results in failure'
         )
 
+    @pytest.mark.require_optional_deps
     def test_subtitle_list_subliminal_success(self, execute_task):
         task = execute_task('subtitle_add_local_file')
         assert len(task.entries) == 1, 'Task should have accepted walking dead local file'
@@ -317,6 +319,7 @@ class TestSubtitleList:
         with contextlib.suppress(OSError):
             os.remove('subtitle_list_test_dir/Marvels.Jessica.Jones.S01E02-FlexGet.en.srt')
 
+    @pytest.mark.require_optional_deps
     def test_subtitle_list_local_subtitles(self, execute_task):
         task = execute_task('subtitle_add_local_file')
         task = execute_task('subtitle_add_another_local_file')
@@ -342,6 +345,7 @@ class TestSubtitleList:
             'Should have found 3 video files and the containing dir should not be included.'
         )
 
+    @pytest.mark.require_optional_deps
     def test_subtitle_list_subliminal_dir_success(self, execute_task):
         task = execute_task('subtitle_add_local_dir')
 

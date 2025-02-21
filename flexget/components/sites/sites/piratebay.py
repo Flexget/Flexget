@@ -130,9 +130,7 @@ class UrlRewritePirateBay:
 
     @plugin.internet(logger)
     def search(self, task, entry, config=None):
-        """
-        Search for name from piratebay.
-        """
+        """Search for name from piratebay."""
         if not isinstance(config, dict):
             config = {}
         self.set_urls(config.get('url', URL))

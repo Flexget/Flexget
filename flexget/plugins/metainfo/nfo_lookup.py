@@ -17,8 +17,7 @@ logger = logger.bind(name='nfo_lookup')
 
 
 class NfoLookup:
-    """
-    Retrieves information from a local '.nfo' info file.
+    """Retrieves information from a local '.nfo' info file.
 
     The read metadata will be add as 'nfo_something' in the entry. Also, if an 'id' is found in the '.nfo' file then the
     'imdb_id' field will be set to its value. This means that if the imdb_lookup plugin is used in addition to this
@@ -35,6 +34,7 @@ class NfoLookup:
     https://docs.python.org/3/library/xml.html#xml-vulnerabilities
 
     Use this only with nfo files you have created yourself.
+
     """
 
     schema = {'type': 'boolean'}
@@ -110,13 +110,13 @@ class NfoLookup:
                 )
 
     def get_nfo_filename(self, entry):
-        """
-        Get the filename of the nfo file from the 'location' in the entry.
+        """Get the filename of the nfo file from the 'location' in the entry.
 
         Returns
         -------
         str
             The file name of the 'nfo' file, or None it there is no 'nfo' file.
+
         """
         location = entry.get('location')
         nfo_full_filename = os.path.splitext(location)[0] + self.nfo_file_extension
@@ -133,16 +133,11 @@ class NfoLookup:
 
 
 class BadXmlFile(Exception):
-    """
-    Exception that is raised if the nfo file can't be parsed due to some invalid nfo file.
-    """
-
-    pass
+    """Exception that is raised if the nfo file can't be parsed due to some invalid nfo file."""
 
 
 class NfoReader:
-    """
-    Class in charge of parsing the '.nfo' file and getting a dictionary of fields.
+    """Class in charge of parsing the '.nfo' file and getting a dictionary of fields.
 
     The '.nfo' file is an XML file. Some fields can only appear once, such as 'title', 'id', 'plot', etc., while other
     fields can appear multiple times (with different values), such as 'thumb', 'genre', etc. These fields are listed in
@@ -191,30 +186,23 @@ class NfoReader:
 
     @staticmethod
     def _single_elem_getter_func(x):
-        """
-        Method to get the text value of simple XML element that does not contain child nodes.
-        """
+        """Method to get the text value of simple XML element that does not contain child nodes."""
         return x.text
 
     @staticmethod
     def _composite_elem_getter_func(x):
-        """
-        Method to get XML elements that have children as a dictionary.
-        """
+        """Method to get XML elements that have children as a dictionary."""
         return {i.tag: i.text for i in x}
 
     def _extract_single_field(self, name, getter_func):
-        """
-        Use this method to get fields from the root XML tree that only appear once, such as 'title', 'year', etc.
-        """
+        """Use this method to get fields from the root XML tree that only appear once, such as 'title', 'year', etc."""
         f = self._root.find(name)
         if f is not None:
             return getter_func(f)
         return None
 
     def _extract_multiple_field(self, name, getter_func):
-        """
-        Use this method to get fields from the root XML tree that can appear more than once, such as 'actor', 'genre',
+        """Use this method to get fields from the root XML tree that can appear more than once, such as 'actor', 'genre',
         'director', etc. The result will be a list of values.
         """
         values = [getter_func(i) for i in self._root.findall(name)]
@@ -224,8 +212,7 @@ class NfoReader:
         return None
 
     def get_fields_from_nfo_file(self):
-        """
-        Returns a dictionary with all firlds read from the '.nfo' file.
+        """Returns a dictionary with all firlds read from the '.nfo' file.
 
         The keys are named as 'nfo_something'.
         """

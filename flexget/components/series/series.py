@@ -73,8 +73,7 @@ def clean_series(manager):
 
 
 def populate_entry_fields(entry, parser, config):
-    """
-    Populates all series_fields for given entry based on parser.
+    """Populates all series_fields for given entry based on parser.
 
     :param parser: A valid result from a series parser used to populate the fields.
     :config dict: If supplied, will use 'path' and 'set' options to populate specified fields.
@@ -126,8 +125,7 @@ def populate_entry_fields(entry, parser, config):
 
 
 class FilterSeriesBase:
-    """
-    Class that contains helper methods for both filter.series as well as plugins that configure it,
+    """Class that contains helper methods for both filter.series as well as plugins that configure it,
     such as all_series, series_premiere and configure_series.
     """
 
@@ -214,9 +212,7 @@ class FilterSeriesBase:
         return config
 
     def season_pack_opts(self, season_packs):
-        """
-        Parse the user's `season_packs` option, and turn it in to a more useful form.
-        """
+        """Parse the user's `season_packs` option, and turn it in to a more useful form."""
         if season_packs in [False, None]:
             return False
         opts = {'threshold': 0, 'reject_eps': False}
@@ -235,7 +231,6 @@ class FilterSeriesBase:
 
     def apply_group_options(self, config):
         """Applies group settings to each item in series group and removes settings dict."""
-
         # Make sure config is in grouped format first
         config = self.make_grouped_config(config)
         for group_name in config:
@@ -288,8 +283,8 @@ class FilterSeriesBase:
     def prepare_config(self, config):
         """Generate a list of unique series from configuration.
         This way we don't need to handle two different configuration formats in the logic.
-        Applies group settings with advanced form."""
-
+        Applies group settings with advanced form.
+        """
         config = self.apply_group_options(config)
         return self.combine_series_lists(*list(config.values()))
 
@@ -297,7 +292,8 @@ class FilterSeriesBase:
         """Combines the series from multiple lists, making sure there are no doubles.
 
         If keyword argument log_once is set to True, an error message will be printed if a series
-        is listed more than once, otherwise log_once will be used."""
+        is listed more than once, otherwise log_once will be used.
+        """
         unique_series = {}
         for series_list in series_lists:
             for series in series_list:
@@ -321,7 +317,6 @@ class FilterSeriesBase:
 
     def merge_config(self, task, config):
         """Merges another series config dict in with the current one."""
-
         # Make sure we start with both configs as a list of complex series
         native_series = self.prepare_config(task.config.get('series', {}))
         merging_series = self.prepare_config(config)
@@ -332,8 +327,7 @@ class FilterSeriesBase:
 
 
 class FilterSeries(FilterSeriesBase):
-    """
-    Intelligent filter for tv-series.
+    """Intelligent filter for tv-series.
 
     https://flexget.com/Plugins/series
     """
@@ -368,7 +362,6 @@ class FilterSeries(FilterSeriesBase):
 
     def auto_exact(self, config):
         """Automatically enable exact naming option for series that look like a problem"""
-
         # generate list of all series in one dict
         all_series = {}
         for series_item in config:
@@ -560,8 +553,10 @@ class FilterSeries(FilterSeriesBase):
                     db_series.begin.identified_by,
                 ):
                     logger.warning(
-                        f'Removing begin episode for {series_name} ({db_series.begin.identifier}) because '
-                        f'it does not match the identified_by type for series ({db_series.identified_by})'
+                        'Removing begin episode for {} ({}) because it does not match the identified_by type for series ({})',
+                        series_name,
+                        db_series.begin.identifier,
+                        db_series.identified_by,
                     )
                     del db_series.begin
                     auto_begin = True
@@ -596,15 +591,13 @@ class FilterSeries(FilterSeriesBase):
         logger.debug('processing series took {}', preferred_clock() - start_time)
 
     def parse_series(self, entries, series_name, config, db_identified_by=None):
-        """
-        Search for `series_name` and populate all `series_*` fields in entries when successfully parsed
+        """Search for `series_name` and populate all `series_*` fields in entries when successfully parsed
 
         :param entries: List of entries to process
         :param series_name: Series name which is being processed
         :param config: Series config being processed
         :param db_identified_by: Series config being processed
         """
-
         # set parser flags flags based on config / database
         identified_by = config.get('identified_by', 'auto')
         if identified_by == 'auto':
@@ -648,8 +641,7 @@ class FilterSeries(FilterSeriesBase):
             populate_entry_fields(entry, parsed, config)
 
     def process_series(self, task, series_entries, config):
-        """
-        Accept or Reject episode or season pack from available releases, or postpone choosing.
+        """Accept or Reject episode or season pack from available releases, or postpone choosing.
 
         :param task: Current Task
         :param series_entries: dict mapping Episodes or Seasons to entries for that episode or season_pack
@@ -744,7 +736,7 @@ class FilterSeries(FilterSeriesBase):
             downloaded_qualities = [rls.quality for rls in downloaded]
 
             # proper handling
-            logger.debug('-' * 20 + ' process_propers -->')
+            logger.debug('{} process_propers -->', '-' * 20)
             entries = self.process_propers(config, entity, entries)
             if not entries:
                 continue
@@ -776,7 +768,7 @@ class FilterSeries(FilterSeriesBase):
                     continue
                 if 'qualities' in config:
                     # Grab any additional wanted qualities
-                    logger.debug('-' * 20 + ' process_qualities -->')
+                    logger.debug('{} process_qualities -->', '-' * 20)
                     self.process_qualities(config, entries, downloaded)
                     continue
                 if config.get('upgrade'):
@@ -794,7 +786,7 @@ class FilterSeries(FilterSeriesBase):
 
             # episode tracking. used only with season and sequence based series
             if entity.identified_by in ['ep', 'sequence']:
-                logger.debug('-' * 20 + ' tracking -->')
+                logger.debug('{} tracking -->', '-' * 20)
                 if self.process_entity_tracking(
                     entity,
                     entries,
@@ -825,12 +817,10 @@ class FilterSeries(FilterSeriesBase):
             best.accept(reason)
 
     def process_propers(self, config, episode, entries):
-        """
-        Accepts needed propers. Nukes episodes from which there exists proper.
+        """Accepts needed propers. Nukes episodes from which there exists proper.
 
         :returns: A list of episodes to continue processing.
         """
-
         pass_filter = []
         # First find the best available proper for each quality without modifying incoming entry order
         sorted_entries = sorted(
@@ -880,8 +870,7 @@ class FilterSeries(FilterSeriesBase):
         return pass_filter
 
     def process_timeframe_target(self, config, entries, downloaded=None):
-        """
-        Accepts first episode matching the quality configured for the series.
+        """Accepts first episode matching the quality configured for the series.
 
         :return: True if accepted something
         """
@@ -900,8 +889,7 @@ class FilterSeries(FilterSeriesBase):
         return None
 
     def process_quality(self, config, entries):
-        """
-        Filters eps that do not fall between within our defined quality standards.
+        """Filters eps that do not fall between within our defined quality standards.
 
         :returns: A list of eps that are in the acceptable range
         """
@@ -921,14 +909,12 @@ class FilterSeries(FilterSeriesBase):
         return result
 
     def process_entity_tracking(self, entity, entries, threshold):
-        """
-        Rejects all entity that are too old or new, return True when this happens.
+        """Rejects all entity that are too old or new, return True when this happens.
 
         :param entity: Entity model
         :param list entries: List of entries for given episode.
         :param int threshold: Number of episodes allowed in season
         """
-
         latest: db.Episode = db.get_latest_release(entity.series)
         begin: db.Episode = entity.series.begin
         if begin and (not latest or begin > latest):
@@ -983,7 +969,9 @@ class FilterSeries(FilterSeriesBase):
             and entity < begin
         ):
             logger.debug(
-                f'episode {entity.identifier} before begin {begin.identifier}! rejecting all occurrences'
+                'episode {} before begin {}! rejecting all occurrences',
+                entity.identifier,
+                begin.identifier,
             )
             for entry in entries:
                 entry.reject(
@@ -1001,14 +989,12 @@ class FilterSeries(FilterSeriesBase):
         return None
 
     def process_timeframe(self, task, config, episode, entries):
-        """
-        Runs the timeframe logic to determine if we should wait for a better quality.
+        """Runs the timeframe logic to determine if we should wait for a better quality.
         Saves current best to backlog if timeframe has not expired.
 
         :returns: True - if we should keep the quality (or qualities) restriction
                   False - if the quality restriction should be released, due to timeframe expiring
         """
-
         if 'timeframe' not in config:
             return True
 
@@ -1048,13 +1034,11 @@ class FilterSeries(FilterSeriesBase):
         return True
 
     def process_qualities(self, config, entries, downloaded):
-        """
-        Handles all modes that can accept more than one quality per episode. (qualities, upgrade)
+        """Handles all modes that can accept more than one quality per episode. (qualities, upgrade)
 
         :returns: True - if at least one wanted quality has been downloaded or accepted.
                   False - if no wanted qualities have been accepted
         """
-
         # Get list of already downloaded qualities
         downloaded_qualities = [r.quality for r in downloaded]
         logger.debug('downloaded_qualities: {}', downloaded_qualities)

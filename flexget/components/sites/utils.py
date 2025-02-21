@@ -37,5 +37,4 @@ def torrent_availability(seeds, leeches):
     :param leeches: Number of leeches on the torrent
     :return: A numeric rating
     """
-
     return seeds * 2 + leeches

@@ -9,8 +9,7 @@ logger = logger.bind(name='modify_torrents')
 
 
 class AddTrackers:
-    """
-    Adds tracker URL to torrent files.
+    """Adds tracker URL to torrent files.
 
     Configuration example:
 
@@ -35,8 +34,7 @@ class AddTrackers:
 
 
 class RemoveTrackers:
-    """
-    Removes trackers from torrent files using regexp matching.
+    """Removes trackers from torrent files using regexp matching.
 
     Configuration example:
 
@@ -69,8 +67,7 @@ class RemoveTrackers:
 
 
 class ModifyTrackers:
-    """
-    Modify tracker URL to torrent files.
+    """Modify tracker URL to torrent files.
 
     Configuration example::
 

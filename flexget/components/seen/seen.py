@@ -9,8 +9,7 @@ logger = logger.bind(name='seen')
 
 
 class FilterSeen:
-    """
-    Remembers previously downloaded content and rejects them in
+    """Remembers previously downloaded content and rejects them in
     subsequent executions. Without this plugin FlexGet would
     download all matching content on every execution.
 

@@ -29,8 +29,6 @@ from flexget.plugin import load_plugins
 from flexget.task import Task, TaskAbort
 from flexget.webserver import User
 
-from .test_sftp_server import TestSFTPServerController
-
 logger = logger.bind(name='tests')
 
 VCR_CASSETTE_DIR = os.path.join(os.path.dirname(__file__), 'cassettes')
@@ -51,8 +49,7 @@ vcr = VCR(
 
 @pytest.fixture(scope='class')
 def config(request):
-    """
-    If used inside a test class, uses the `config` class attribute of the class.
+    """If used inside a test class, uses the `config` class attribute of the class.
     This is used by `manager` fixture, and can be parametrized.
     """
     return request.cls.config
@@ -62,9 +59,7 @@ def config(request):
 def manager(
     request, config, caplog, monkeypatch, filecopy, tmp_path_factory
 ):  # enforce filecopy is run before manager
-    """
-    Create a :class:`MockManager` for this test based on `config` argument.
-    """
+    """Create a :class:`MockManager` for this test based on `config` argument."""
     config = config.replace('__tmp__', request.getfixturevalue('tmp_path').as_posix())
     try:
         mockmanager = MockManager(config, request.cls.__name__, tmp_path_factory.mktemp('manager'))
@@ -78,17 +73,14 @@ def manager(
 
 @pytest.fixture
 def execute_task(manager: Manager) -> Callable[..., Task]:
-    """
-    A function that can be used to execute and return a named task in `config` argument.
-    """
+    """A function that can be used to execute and return a named task in `config` argument."""
 
     def execute(
         task_name: str,
         abort: bool = False,
         options: Optional[Union[dict, argparse.Namespace]] = None,
     ) -> Task:
-        """
-        Use to execute one test task from config.
+        """Use to execute one test task from config.
 
         :param task_name: Name of task to execute.
         :param abort: If `True` expect (and require) this task to abort.
@@ -114,8 +106,7 @@ def execute_task(manager: Manager) -> Callable[..., Task]:
 
 @pytest.fixture
 def use_vcr(request, monkeypatch):
-    """
-    This fixture is applied automatically to any test using the `online` mark. It will record and playback network
+    """This fixture is applied automatically to any test using the `online` mark. It will record and playback network
     sessions using VCR.
 
     The record mode of VCR can be set using the VCR_RECORD_MODE environment variable when running tests.
@@ -153,8 +144,7 @@ def api_client(manager) -> 'APIClient':
 
 @pytest.fixture
 def schema_match(manager) -> Callable[[dict, Any], list[dict]]:
-    """
-    This fixture enables verifying JSON Schema. Return a list of validation error dicts. List is empty if no errors
+    """This fixture enables verifying JSON Schema. Return a list of validation error dicts. List is empty if no errors
     occurred.
     """
 
@@ -168,9 +158,7 @@ def schema_match(manager) -> Callable[[dict, Any], list[dict]]:
 
 @pytest.fixture
 def link_headers(manager) -> Callable[[flask.Response], dict[str, dict]]:
-    """
-    Parses link headers and return them in dict form
-    """
+    """Parses link headers and return them in dict form"""
 
     def headers(response: flask.Response) -> dict[str, dict]:
         links = {}
@@ -185,9 +173,7 @@ def link_headers(manager) -> Callable[[flask.Response], dict[str, dict]]:
 
 @pytest.fixture(autouse=True)
 def caplog(pytestconfig, _caplog):  # noqa: F811
-    """
-    Override caplog so that we can send loguru messages to logging for compatibility.
-    """
+    """Override caplog so that we can send loguru messages to logging for compatibility."""
     # set logging level according to pytest verbosity
     level = logger.level('DEBUG')
     if pytestconfig.getoption('verbose') == 1:
@@ -205,32 +191,7 @@ def caplog(pytestconfig, _caplog):  # noqa: F811
     logger.remove(handler_id)
 
 
-@pytest.fixture
-def sftp_root(tmp_path: Path):
-    sftp_root = tmp_path / 'sftp_root'
-    sftp_root.mkdir()
-    return sftp_root
-
-
-@pytest.fixture
-def sftp(sftp_root: Path):
-    test_server = TestSFTPServerController(sftp_root)
-    yield test_server
-    test_server.kill()
-
-
 # --- End Public Fixtures ---
-
-
-def pytest_configure(config):
-    # register the filecopy marker
-    config.addinivalue_line(
-        'markers',
-        'filecopy(src, dst): mark test to copy a file from `src` to `dst` before running.',
-    )
-    config.addinivalue_line(
-        'markers', 'online: mark a test that goes online. VCR will automatically be used.'
-    )
 
 
 def pytest_runtest_setup(item):
@@ -316,8 +277,7 @@ def setup_once(pytestconfig, request, tmp_path_factory):
 
 @pytest.fixture(autouse=True)
 def chdir(pytestconfig, request):
-    """
-    By marking test with chdir flag we will change current working directory
+    """By marking test with chdir flag we will change current working directory
     to that module location. Task configuration can then assume this being
     location for relative paths
     """
@@ -355,15 +315,11 @@ class MockManager(Manager):
         self.initialize()
 
     def _init_config(self, *args, **kwargs):
-        """
-        Override configuration loading
-        """
+        """Override configuration loading"""
         self._config_path = self._tmp_path / self._config_name
 
     def load_config(self, *args, **kwargs):
-        """
-        Just load our config from the text passed in on init
-        """
+        """Just load our config from the text passed in on init"""
         config = yaml.safe_load(self.config_text) or {}
         self.update_config(config)
 
@@ -400,7 +356,7 @@ class DoublePhaseChecker:
     @staticmethod
     def on_phase(task, phase):
         if getattr(task, f'did_{phase}', None):
-            raise Exception(f'{phase} phase should not run twice')
+            raise RuntimeError(f'{phase} phase should not run twice')
         setattr(task, f'did_{phase}', True)
 
     def on_task_start(self, task, config):

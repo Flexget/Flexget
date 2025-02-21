@@ -7,7 +7,7 @@ class OneEntryInput:
 
     def on_task_input(self, task, config):
         yield Entry(title='Test', url='http://test.com')
-        raise Exception('Should not have tried to get second entry.')
+        raise RuntimeError('Should not have tried to get second entry.')
 
 
 plugin.register(OneEntryInput, 'one_entry_input', api_ver=2)

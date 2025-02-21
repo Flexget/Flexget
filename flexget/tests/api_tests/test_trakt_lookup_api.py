@@ -1,7 +1,7 @@
 import pytest
 
 from flexget.api.app import base_message
-from flexget.components.trakt.api import ObjectsContainer as oc
+from flexget.components.trakt.api import ObjectsContainer as OC
 from flexget.utils import json
 
 
@@ -19,7 +19,7 @@ class TestTraktSeriesLookupAPI:
 
         data = json.loads(rsp.get_data(as_text=True))
 
-        errors = schema_match(oc.series_return_object, data)
+        errors = schema_match(OC.series_return_object, data)
         assert not errors
 
         values = {
@@ -52,7 +52,7 @@ class TestTraktSeriesLookupAPI:
         assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
-        errors = schema_match(oc.series_return_object, data)
+        errors = schema_match(OC.series_return_object, data)
         assert not errors
 
         for field, value in values.items():
@@ -66,7 +66,7 @@ class TestTraktSeriesLookupAPI:
 
         data = json.loads(rsp.get_data(as_text=True))
 
-        errors = schema_match(oc.series_return_object, data)
+        errors = schema_match(OC.series_return_object, data)
         assert not errors
 
         for field, value in values.items():
@@ -87,7 +87,7 @@ class TestTraktSeriesLookupAPI:
         assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
-        errors = schema_match(oc.series_return_object, data)
+        errors = schema_match(OC.series_return_object, data)
         assert not errors
 
         for field, value in values.items():
@@ -126,7 +126,7 @@ class TestTraktSeriesLookupAPI:
         assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
-        errors = schema_match(oc.series_return_object, data)
+        errors = schema_match(OC.series_return_object, data)
         assert not errors
 
         for field, value in values.items():
@@ -147,7 +147,7 @@ class TestTraktSeriesLookupAPI:
         assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
-        errors = schema_match(oc.series_return_object, data)
+        errors = schema_match(OC.series_return_object, data)
         assert not errors
 
         for field, value in values.items():
@@ -160,7 +160,7 @@ class TestTraktSeriesLookupAPI:
         assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
-        errors = schema_match(oc.series_return_object, data)
+        errors = schema_match(OC.series_return_object, data)
         assert not errors
 
         for field, value in values.items():
@@ -171,7 +171,7 @@ class TestTraktSeriesLookupAPI:
         assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
-        errors = schema_match(oc.series_return_object, data)
+        errors = schema_match(OC.series_return_object, data)
         assert not errors
 
         assert 'actors' in data
@@ -182,7 +182,7 @@ class TestTraktSeriesLookupAPI:
         assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
-        errors = schema_match(oc.series_return_object, data)
+        errors = schema_match(OC.series_return_object, data)
         assert not errors
 
         assert 'translations' in data
@@ -209,7 +209,7 @@ class TestTraktMovieLookupAPI:
         assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
-        errors = schema_match(oc.movie_return_object, data)
+        errors = schema_match(OC.movie_return_object, data)
         assert not errors
 
         values = {
@@ -227,7 +227,7 @@ class TestTraktMovieLookupAPI:
         assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
-        errors = schema_match(oc.movie_return_object, data)
+        errors = schema_match(OC.movie_return_object, data)
         assert not errors
 
         values = {
@@ -245,7 +245,7 @@ class TestTraktMovieLookupAPI:
         assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
-        errors = schema_match(oc.movie_return_object, data)
+        errors = schema_match(OC.movie_return_object, data)
         assert not errors
 
         values = {
@@ -263,7 +263,7 @@ class TestTraktMovieLookupAPI:
         assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
-        errors = schema_match(oc.movie_return_object, data)
+        errors = schema_match(OC.movie_return_object, data)
         assert not errors
 
         values = {
@@ -284,7 +284,7 @@ class TestTraktMovieLookupAPI:
         assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
 
         data = json.loads(rsp.get_data(as_text=True))
-        errors = schema_match(oc.movie_return_object, data)
+        errors = schema_match(OC.movie_return_object, data)
         assert not errors
 
         values = {

@@ -49,7 +49,6 @@ class TestInputCache:
 
     def test_db_cache(self, execute_task):
         """Test db input caching"""
-
         task = execute_task('test_db')
         assert task.entries, 'should have created entries at the start'
         # Clear out the memory cache to make sure we are loading from db

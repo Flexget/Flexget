@@ -83,10 +83,7 @@ class TestYamlLists:
 
     @pytest.fixture
     def config(self, tmp_path):
-        """
-        Prepare config
-        """
-
+        """Prepare config"""
         yaml_dir = tmp_path.joinpath('yaml_lists')
         yaml_dir.mkdir()
 

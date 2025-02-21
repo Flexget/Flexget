@@ -1,11 +1,10 @@
 # TODO: these tests don't work outside US due imdb implementing geoip based crappy name translation
 # imdb_name needs to be replaced with our own title lookup
 
-"""
-.. NOTE::
+""".. NOTE::
 
-   Added `imdb_original_name` recently, so in case the title lookup translations cause problems
-   switch to find_entry to use that instead!
+Added `imdb_original_name` recently, so in case the title lookup translations cause problems
+switch to find_entry to use that instead!
 """
 
 import pytest

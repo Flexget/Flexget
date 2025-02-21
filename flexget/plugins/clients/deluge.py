@@ -283,8 +283,7 @@ class OutputDeluge(DelugePlugin):
 
     @plugin.priority(120)
     def on_task_download(self, task, config):
-        """
-        Call download plugin to generate the temp files we will load into deluge
+        """Call download plugin to generate the temp files we will load into deluge
         then verify they are valid torrents
         """
         config = self.prepare_config(config)

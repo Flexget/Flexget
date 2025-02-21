@@ -45,8 +45,7 @@ def db_cleanup(manager, session):
 
 
 class Discover:
-    """
-    Discover content based on other inputs material.
+    """Discover content based on other inputs material.
 
     Example::
 
@@ -102,13 +101,11 @@ class Discover:
     }
 
     def execute_searches(self, config, entries, task):
-        """
-        :param config: Discover plugin config
+        """:param config: Discover plugin config
         :param entries: List of pseudo entries to search
         :param task: Task being run
         :return: List of entries found from search engines listed under `from` configuration
         """
-
         result = []
         for index, entry in enumerate(entries):
             entry_results = []
@@ -173,8 +170,7 @@ class Discover:
             query.complete()
 
     def estimated(self, entries, estimation_mode):
-        """
-        :param dict estimation_mode: mode -> loose, strict, ignore
+        """:param dict estimation_mode: mode -> loose, strict, ignore
         :return: Entries that we have estimated to be available
         """
         estimator = plugin.get('estimate_release', self)
@@ -231,8 +227,7 @@ class Discover:
         return result
 
     def interval_expired(self, config, task, entries):
-        """
-        Maintain some limit levels so that we don't hammer search
+        """Maintain some limit levels so that we don't hammer search
         sites with unreasonable amount of queries.
 
         :return: Entries that are up for ``config['interval']``

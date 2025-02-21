@@ -24,7 +24,6 @@ def attribute_type(attribute):
 
 def do_cli(manager, options):
     """Handle entry-list subcommand"""
-
     if hasattr(options, 'table_type') and options.table_type == 'porcelain':
         disable_colors()
 

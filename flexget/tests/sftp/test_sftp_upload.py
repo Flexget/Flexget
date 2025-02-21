@@ -1,12 +1,18 @@
+from __future__ import annotations
+
 import filecmp
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pytest
 from jinja2 import Template
 
-from .test_sftp_server import TestSFTPFileSystem, TestSFTPServerController
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from .test_sftp_server import TestSFTPFileSystem, TestSFTPServerController
 
 
+@pytest.mark.require_optional_deps
 @pytest.mark.xdist_group(name="sftp")
 class TestSftpDownload:
     _config = """

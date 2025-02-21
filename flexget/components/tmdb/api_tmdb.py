@@ -124,8 +124,7 @@ class TMDBMovie(Base):
     updated = Column(DateTime, default=datetime.now, nullable=False)
 
     def __init__(self, id, language):
-        """
-        Looks up movie on tmdb and creates a new database model for it.
+        """Looks up movie on tmdb and creates a new database model for it.
         These instances should only be added to a session via `session.merge`.
         """
         self.id = id
@@ -289,8 +288,7 @@ class ApiTmdb:
         session=None,
         language='en',
     ):
-        """
-        Do a lookup from TMDb for the movie matching the passed arguments.
+        """Do a lookup from TMDb for the movie matching the passed arguments.
 
         Any combination of criteria can be passed, the most specific criteria specified will be used.
 
@@ -309,7 +307,6 @@ class ApiTmdb:
 
         :raises: :class:`LookupError` if a match cannot be found or there are other problems with the lookup
         """
-
         # Populate tmdb config
         get_tmdb_config()
 

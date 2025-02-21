@@ -8,8 +8,7 @@ logger = logger.bind(name='imdb')
 
 
 class FilterImdb:
-    """
-    This plugin allows filtering based on IMDB score, votes and genres etc.
+    """This plugin allows filtering based on IMDB score, votes and genres etc.
 
     Note: All parameters are optional. Some are mutually exclusive.
 

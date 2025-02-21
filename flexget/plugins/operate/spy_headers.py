@@ -7,8 +7,7 @@ logger = logger.bind(name='spy_headers')
 
 
 class PluginSpyHeaders:
-    """
-    Logs all headers sent in http requests. Useful for resolving issues.
+    """Logs all headers sent in http requests. Useful for resolving issues.
 
     WARNING: At the moment this modifies requests somehow!
     """

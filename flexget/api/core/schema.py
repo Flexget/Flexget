@@ -15,8 +15,7 @@ schema_api_list = api.schema_model(
 
 
 def rewrite_ref(identifier: str, base_url: str) -> str:
-    """
-    The refs in the schemas are arbitrary identifiers, and cannot be used as-is as real network locations.
+    """The refs in the schemas are arbitrary identifiers, and cannot be used as-is as real network locations.
     This rewrites any of those arbitrary refs to be real urls servable by this endpoint.
     """
     if not base_url.endswith('/'):
