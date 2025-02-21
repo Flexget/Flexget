@@ -61,6 +61,7 @@ dev = [
 ]
 plugin-test = [
     # These are optional dependencies for plugins that have tests in the test suite
+    # Tests that need these must add the `requires_optional_deps` pytest mark
     "boto3 ~=1.35",
     'rarfile~=4.0',
     "pillow~=11.0",
