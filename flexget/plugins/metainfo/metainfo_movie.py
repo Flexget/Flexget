@@ -13,9 +13,7 @@ logger = logger.bind(name='metainfo_movie')
 
 
 class MetainfoMovie:
-    """
-    Check if entry appears to be a movie, and populate movie info if so.
-    """
+    """Check if entry appears to be a movie, and populate movie info if so."""
 
     schema = {'type': 'boolean'}
 
@@ -31,8 +29,7 @@ class MetainfoMovie:
 
     @staticmethod
     def guess_entry(entry):
-        """
-        Populates movie_* fields for entries that are successfully parsed.
+        """Populates movie_* fields for entries that are successfully parsed.
         :param entry: Entry that's being processed
         :return: True for successful parse
         """

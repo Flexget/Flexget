@@ -13,15 +13,11 @@ mimetypes.add_type('application/x-nzb', '.nzb')
 
 
 class NzbSize:
-    """
-    Provides entry size information when dealing with nzb files
-    """
+    """Provides entry size information when dealing with nzb files"""
 
     @plugin.priority(200)
     def on_task_modify(self, task, config):
-        """
-        The downloaded file is accessible in modify phase
-        """
+        """The downloaded file is accessible in modify phase"""
         try:
             from pynzb import nzb_parser
         except ImportError:

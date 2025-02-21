@@ -11,8 +11,7 @@ logger = logger.bind(name='exists')
 
 
 class FilterExists:
-    """
-    Reject entries that already exist in given path.
+    """Reject entries that already exist in given path.
 
     Example::
 

@@ -96,9 +96,7 @@ class Movie(Base):
 
     @property
     def expired(self):
-        """
-        :return: True if movie details are considered to be expired, ie. need of update
-        """
+        """:return: True if movie details are considered to be expired, ie. need of update"""
         if self.updated is None:
             logger.debug('updated is None: {}', self)
             return True

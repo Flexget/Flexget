@@ -3,6 +3,7 @@ import os.path
 import pytest
 
 
+@pytest.mark.require_optional_deps
 class TestExtract:
     config = """
         templates:

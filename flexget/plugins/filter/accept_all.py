@@ -7,8 +7,7 @@ logger = logger.bind(name='accept_all')
 
 
 class FilterAcceptAll:
-    """
-    Just accepts all entries.
+    """Just accepts all entries.
 
     Example::
 

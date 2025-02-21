@@ -11,8 +11,7 @@ logger = logger.bind(name='regex_extract')
 
 
 class RegexExtract:
-    r"""
-    Updates an entry with the values of regex matched named groups
+    r"""Updates an entry with the values of regex matched named groups
 
     Usage:
 
@@ -24,7 +23,6 @@ class RegexExtract:
 
 
     Example:
-
       regex_extract:
         prefix: f1_
         field: title

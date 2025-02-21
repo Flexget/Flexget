@@ -172,8 +172,7 @@ class TVDBSeries(Base):
     episodes = relationship('TVDBEpisode', backref='series', cascade='all, delete, delete-orphan')
 
     def __init__(self, tvdb_id, language):
-        """
-        Looks up movie on tvdb and creates a new database model for it.
+        """Looks up movie on tvdb and creates a new database model for it.
         These instances should only be added to a session via `session.merge`.
         """
         self.id = tvdb_id
@@ -331,8 +330,7 @@ class TVDBEpisode(Base):
     series_id = Column(Integer, ForeignKey('tvdb_series.id'), nullable=False)
 
     def __init__(self, series_id, ep_id, language=None):
-        """
-        Looks up movie on tvdb and creates a new database model for it.
+        """Looks up movie on tvdb and creates a new database model for it.
         These instances should only be added to a session via `session.merge`.
         """
         self.series_id = series_id
@@ -402,8 +400,7 @@ class TVDBSearchResult(Base):
 
 
 class TVDBSeriesSearchResult(Base):
-    """
-    This table will hold a single result that results from the /search/series endpoint,
+    """This table will hold a single result that results from the /search/series endpoint,
     which return a series with a minimal set of parameters.
     """
 
@@ -536,8 +533,7 @@ def _update_search_strings(series, session, search=None):
 
 @with_session
 def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None, language=None):
-    """
-    Look up information on a series. Will be returned from cache if available, and looked up online and cached if not.
+    """Look up information on a series. Will be returned from cache if available, and looked up online and cached if not.
 
     Either `name` or `tvdb_id` parameter are needed to specify the series.
     :param unicode name: Name of series.
@@ -623,8 +619,7 @@ def lookup_episode(
     session=None,
     language=None,
 ):
-    """
-    Look up information on an episode. Will be returned from cache if available, and looked up online and cached if not.
+    """Look up information on an episode. Will be returned from cache if available, and looked up online and cached if not.
 
     Either `name` or `tvdb_id` parameter are needed to specify the series.
     Either `season_number` and `episode_number`, `absolute_number`, or `first_aired` are required to specify episode
@@ -716,8 +711,7 @@ def lookup_episode(
 def search_for_series(
     search_name=None, imdb_id=None, zap2it_id=None, force_search=None, session=None, language=None
 ):
-    """
-    Search IMDB using a an identifier, return a list of cached search results.
+    """Search IMDB using a an identifier, return a list of cached search results.
     One of `search_name`, `imdb_id` or `zap2it_id` is required.
     :param search_name: Name of search to use
     :param imdb_id: Search via IMDB ID

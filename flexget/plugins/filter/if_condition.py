@@ -43,13 +43,14 @@ class FilterIf:
             passed = evaluate_expression(condition, eval_locals)
             if passed:
                 logger.debug('{} matched requirement {}', entry['title'], condition)
-            return passed
         except UndefinedError as e:
             # Extract the name that did not exist
             missing_field = e.args[0].split('\'')[1]
             logger.debug('{} does not contain the field {}', entry['title'], missing_field)
         except Exception as e:
             logger.error('Error occurred while evaluating statement `{}`. ({})', condition, e)
+        else:
+            return passed
 
     def __getattr__(self, item):
         """Provides handlers for all phases."""

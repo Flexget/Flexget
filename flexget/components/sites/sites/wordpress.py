@@ -47,8 +47,7 @@ def get_valid_cookies(cookies):
 
 
 class PluginWordPress:
-    """
-    Supports accessing feeds and media that require wordpress account credentials
+    """Supports accessing feeds and media that require wordpress account credentials
     Usage:
 
     wordpress_auth:
@@ -77,18 +76,19 @@ class PluginWordPress:
             response = task.requests.send(
                 construct_request(url, username=username, password=password)
             )
-            if not response.ok:
-                raise RequestException(str(response))
-            cookies = collect_cookies(response)
-            if len(get_valid_cookies(cookies)) < 1:
-                raise RequestException(
-                    'No recognized WordPress cookies found. Perhaps username/password is invalid?'
-                )
-            task.requests.add_cookiejar(cookies)
-
         except RequestException as err:
-            logger.error('{}', err)
+            logger.error(err)
             raise PluginError(f'WordPress Authentication at {url} failed')
+        if not response.ok:
+            logger.error(str(response))
+            raise PluginError(f'WordPress Authentication at {url} failed')
+        cookies = collect_cookies(response)
+        if len(get_valid_cookies(cookies)) < 1:
+            logger.error(
+                'No recognized WordPress cookies found. Perhaps username/password is invalid?'
+            )
+            raise PluginError(f'WordPress Authentication at {url} failed')
+        task.requests.add_cookiejar(cookies)
 
 
 @event('plugin.register')

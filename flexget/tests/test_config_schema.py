@@ -33,7 +33,7 @@ class TestSchemaValidator:
             "properties": custom_properties,
             "unevaluatedProperties": False,
         }
-        Validator = validator_for(meta_schema)
+        Validator = validator_for(meta_schema)  # noqa: N806 It's a class
         validator = Validator(
             schema=strict,
             format_checker=format_checker,
@@ -118,7 +118,7 @@ class TestSchemaValidator:
         assert 'object' not in errors[0].message
         assert 'dict' in errors[0].message
 
-    def test_anyOf_branch_is_chosen_based_on_type_errors(self):
+    def test_any_of_branch_is_chosen_based_on_type_errors(self):
         schema = {
             "anyOf": [
                 {"type": ["string", "array"]},
@@ -136,7 +136,7 @@ class TestSchemaValidator:
         assert len(errors) == 1
         assert errors[0].validator == 'minimum'
 
-    def test_oneOf_branch_is_chosen_based_on_type_errors(self):
+    def test_one_of_branch_is_chosen_based_on_type_errors(self):
         schema = {
             "oneOf": [
                 {"type": ["string", "array"]},

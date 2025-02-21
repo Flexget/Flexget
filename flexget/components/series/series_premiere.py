@@ -6,8 +6,7 @@ from . import series as plugin_series
 
 
 class FilterSeriesPremiere(plugin_series.FilterSeriesBase):
-    """
-    Accept an entry that appears to be the first episode of any series.
+    """Accept an entry that appears to be the first episode of any series.
 
     Can be configured with any of the options of series plugin
     Examples:
@@ -24,8 +23,9 @@ class FilterSeriesPremiere(plugin_series.FilterSeriesBase):
     the manipulate plugin to modify the entry title to match this format, if
     necessary.
 
-    TODO:
+    Todo:
         - integrate thetvdb to allow refining by genres, etc.
+
     """
 
     @property

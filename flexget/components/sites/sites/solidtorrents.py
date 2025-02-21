@@ -110,9 +110,7 @@ class UrlRewriteSolidTorrents:
 
     @plugin.internet(logger)
     def search(self, task, entry, config=None):
-        """
-        Search for name from solidtorrents.
-        """
+        """Search for name from solidtorrents."""
         if not isinstance(config, dict):
             config = {}
         self.set_urls(config.get('url', URL))

@@ -1,10 +1,10 @@
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 from flexget.utils.template import RenderError, render_from_entry
 
-log = logging.getLogger('parameterize')
+logger = logger.bind(name='parameterize')
 
 
 class Parameterize:
@@ -23,7 +23,7 @@ class Parameterize:
             try:
                 param_entries = method(task, param_input_config)
             except plugin.PluginError as e:
-                log.warning(f'Error during input plugin {param_input_name}: {e}')
+                logger.warning('Error during input plugin {}: {}', param_input_name, e)
                 continue
             for param_entry in param_entries:
                 for subj_input_name, subj_input_config in config['plugin'].items():
@@ -33,7 +33,7 @@ class Parameterize:
                     try:
                         result = method(task, subj_input_config)
                     except plugin.PluginError as e:
-                        log.warning(f'Error during input plugin {subj_input_name}: {e}')
+                        logger.warning('Error during input plugin {}: {}', subj_input_name, e)
                         continue
                     yield from result
 
@@ -47,7 +47,7 @@ def _parameterize(element, entry):
         try:
             return render_from_entry(element, entry, native=True)
         except (RenderError, TypeError) as e:
-            raise plugin.PluginError(f'Error parameterizing `{element}`: {e}', logger=log)
+            raise plugin.PluginError(f'Error parameterizing `{element}`: {e}', logger=logger)
     return element
 
 

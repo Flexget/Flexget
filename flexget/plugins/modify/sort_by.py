@@ -13,8 +13,7 @@ RE_ARTICLES = r'^(the|a|an)\s'
 
 
 class PluginSortBy:
-    """
-    Sort task entries based on a field
+    """Sort task entries based on a field
 
     Example::
 

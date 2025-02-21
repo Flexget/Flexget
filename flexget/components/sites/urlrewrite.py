@@ -10,8 +10,7 @@ logger = logger.bind(name='urlrewrite')
 
 
 class UrlRewrite:
-    r"""
-    Generic configurable urlrewriter.
+    r"""Generic configurable urlrewriter.
 
     Example::
 

@@ -96,7 +96,8 @@ class TestSortBy:
               dict_field: {a: 2, b: 0}
     """
 
-    def generate_test_ids(param):
+    # TODO: remove noqa and use @staticmethod after we drop Python 3.9
+    def generate_test_ids(param):  # noqa: N805
         if param[0:5] == 'test_' or not isinstance(param, list):
             return param
         return '|'

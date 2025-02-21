@@ -23,8 +23,7 @@ class TailPosition(Base):
 
 
 class InputTail:
-    """
-    Parse any text for entries using regular expression.
+    """Parse any text for entries using regular expression.
 
     ::
 

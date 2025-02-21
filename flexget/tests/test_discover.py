@@ -5,13 +5,12 @@ from flexget.entry import Entry
 
 
 class SearchPlugin:
-    """
-    Fake search plugin. Result differs depending on config value:
-      `'fail'`: raises a PluginError
-      `False`: Returns an empty list
-      list of suffixes:
-        Returns a list of entries with the same title searched for, but with each of the suffixes appended
-      otherwise: Just passes back the entry that was searched for
+    """Fake search plugin. Result differs depending on config value:
+    `'fail'`: raises a PluginError
+    `False`: Returns an empty list
+    list of suffixes:
+      Returns a list of entries with the same title searched for, but with each of the suffixes appended
+    otherwise: Just passes back the entry that was searched for
     """
 
     schema = {}

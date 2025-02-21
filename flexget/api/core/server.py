@@ -280,13 +280,13 @@ class ServerDumpThreads(APIResource):
         """Dump Server threads for debugging"""
         id2name = {th.ident: th.name for th in threading.enumerate()}
         threads = []
-        for threadId, stack in sys._current_frames().items():
+        for thread_id, stack in sys._current_frames().items():
             dump = []
             for filename, lineno, name, line in traceback.extract_stack(stack):
                 dump.append(f'File: "{filename}", line {lineno}, in {name}')
                 if line:
                     dump.append(line.strip())
-            threads.append({'name': id2name.get(threadId), 'id': threadId, 'dump': dump})
+            threads.append({'name': id2name.get(thread_id), 'id': thread_id, 'dump': dump})
 
         return jsonify(threads=threads)
 
@@ -301,7 +301,7 @@ server_log_parser.add_argument('search', help='Search filter support google like
 def reverse_readline(
     fh: IO, start_byte: int = 0, buf_size: int = 8192
 ) -> Generator[str, None, None]:
-    """a generator that returns the lines of a file in reverse order"""
+    """A generator that returns the lines of a file in reverse order"""
     segment: OptionalType[str] = None
     offset = 0
     if start_byte:
@@ -369,7 +369,7 @@ class ServerLogAPI(APIResource):
             yield '{"stream": ['  # Start of the json stream
 
             # Read back in the logs until we find enough lines
-            for i in range(0, 9):
+            for i in range(9):
                 log_file = (f'{base_log_file}.{i}').rstrip('.0')  # 1st log file has no number
 
                 if not os.path.isfile(log_file):
@@ -432,8 +432,7 @@ class ServerLogAPI(APIResource):
 
 
 class LogParser:
-    """
-    Filter log file.
+    """Filter log file.
 
     Supports
       * 'and', 'or' and implicit 'and' operators;

@@ -12,8 +12,7 @@ logger = logger.bind(name='regexp')
 
 
 class FilterRegexp:
-    """
-    All possible forms.
+    """All possible forms.
 
     regexp:
       [operation]:           # operation to perform on matches
@@ -155,8 +154,7 @@ class FilterRegexp:
                 rest_method(entry, 'regexp `rest`')
 
     def matches(self, entry, regexp, find_from=None, not_regexps=None):
-        """
-        Check if :entry: has any string fields or strings in a list field that match :regexp:
+        """Check if :entry: has any string fields or strings in a list field that match :regexp:
 
         :param entry: Entry instance
         :param regexp: Compiled regexp
@@ -190,8 +188,7 @@ class FilterRegexp:
         return None
 
     def filter(self, entries, operation, regexps):
-        """
-        :param entries: entries to filter
+        """:param entries: entries to filter
         :param operation: one of 'accept' 'reject' 'accept_excluding' and 'reject_excluding'
                           accept and reject will be called on the entry if any of the regexps match
                           *_excluding operations will be called if any of the regexps don't match

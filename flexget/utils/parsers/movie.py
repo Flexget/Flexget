@@ -39,7 +39,6 @@ class MovieParser(TitleParser):
 
     def parse(self, data=None):
         """Parse movie name. Populates name, year, quality and proper_count attributes"""
-
         # Reset before parsing, so the parser can be reused.
         self.reset()
 

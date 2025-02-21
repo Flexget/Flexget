@@ -74,11 +74,9 @@ class TextProcessingError(Exception):
 
 
 class LostFilm:
-    """
-    Grab new torrents from lostfilm RSS feed
+    """Grab new torrents from lostfilm RSS feed
 
     Example:
-
       lostfilm: yes
 
     or
@@ -93,6 +91,7 @@ class LostFilm:
         site_urls:
           - "http://www.example.com/"
           - "https://www.example.org/"
+
     """
 
     schema = {
@@ -565,7 +564,7 @@ class LostFilm:
                 logger.warning('Unsupported series configuration type')
                 return None
         except Exception as e:
-            logger.warning(f'Error parsing series config: {e!r:s}')
+            logger.warning('Error parsing series config: {!r:s}', e)
             names_list = None
 
         return names_list

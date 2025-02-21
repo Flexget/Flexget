@@ -16,6 +16,7 @@ from flask_restx.reqparse import RequestParser
 from jsonschema.exceptions import ValidationError as SchemaValidationError
 from loguru import logger
 from referencing.exceptions import Unresolvable
+from requests import HTTPError
 from sqlalchemy.orm import Session
 from werkzeug.http import generate_etag
 
@@ -46,8 +47,7 @@ if TYPE_CHECKING:
 
 
 class APIClient:
-    """
-    This is an client which can be used as a more pythonic interface to the rest api.
+    """This is an client which can be used as a more pythonic interface to the rest api.
 
     It skips http, and is only usable from within the running flexget process.
     """
@@ -68,7 +68,7 @@ class APIClient:
         result = json.loads(response.get_data(as_text=True))
         # TODO: Proper exceptions
         if 200 > response.status_code >= 300:
-            raise Exception(result['error'])
+            raise HTTPError(result['error'])
         return result
 
 
@@ -109,10 +109,9 @@ class APIResource(Resource):
 
 
 class API(RestxAPI):
-    """
-    Extends a flask restx :class:`flask_restx.Api` with:
-      - methods to make using json schemas easier
-      - methods to auto document and handle :class:`ApiError` responses
+    """Extends a flask restx :class:`flask_restx.Api` with:
+    - methods to make using json schemas easier
+    - methods to auto document and handle :class:`ApiError` responses
     """
 
     def validate(
@@ -121,8 +120,7 @@ class API(RestxAPI):
         schema_override: Optional[dict[str, list[dict[str, str]]]] = None,
         description=None,
     ):
-        """
-        When a method is decorated with this, json data submitted to the endpoint will be validated with the given
+        """When a method is decorated with this, json data submitted to the endpoint will be validated with the given
         `model`. This also auto-documents the expected model, as well as the possible :class:`ValidationError` response.
         """
 
@@ -147,8 +145,7 @@ class API(RestxAPI):
         return decorator
 
     def response(self, code_or_apierror, description: str = 'Success', model=None, **kwargs):
-        """
-        Extends :meth:`flask_restx.Api.response` to allow passing an :class:`ApiError` class instead of
+        """Extends :meth:`flask_restx.Api.response` to allow passing an :class:`ApiError` class instead of
         response code. If an `ApiError` is used, the response code, and expected response model, is automatically
         documented.
         """
@@ -173,8 +170,7 @@ class API(RestxAPI):
         default: Optional[str] = None,
         add_sort: Optional[bool] = None,
     ) -> RequestParser:
-        """
-        Return a standardized pagination parser, to be used for any endpoint that has pagination.
+        """Return a standardized pagination parser, to be used for any endpoint that has pagination.
 
         :param RequestParser parser: Can extend a given parser or create a new one
         :param tuple sort_choices: A tuple of strings, to be used as server side attribute searches
@@ -375,15 +371,13 @@ def api_key(session: Session = None) -> str:
 
 
 def etag(method: Optional[Callable] = None, cache_age: int = 0):
-    """
-    A decorator that add an ETag header to the response and checks for the "If-Match" and "If-Not-Match" headers to
+    """A decorator that add an ETag header to the response and checks for the "If-Match" and "If-Not-Match" headers to
      return an appropriate response.
 
     :param method: A GET or HEAD flask method to wrap
     :param cache_age: max-age cache age for the content
     :return: The method's response with the ETag and Cache-Control headers, raises a 412 error or returns a 304 response
     """
-
     # If called without method, we've been called with optional arguments.
     # We return a decorator with the optional arguments filled in.
     # Next time round we'll be decorating method.
@@ -427,8 +421,7 @@ def etag(method: Optional[Callable] = None, cache_age: int = 0):
 def pagination_headers(
     total_pages: int, total_items: int, page_count: int, request: Request
 ) -> 'PaginationHeaders':
-    """
-    Creates the `Link`. 'Count' and  'Total-Count' headers, to be used for pagination traversing
+    """Creates the `Link`. 'Count' and  'Total-Count' headers, to be used for pagination traversing
 
     :param total_pages: Total number of pages
     :param total_items: Total number of items in all the pages
@@ -436,7 +429,6 @@ def pagination_headers(
     :param request: The flask request used, required to build other reoccurring vars like url and such.
     :return:
     """
-
     # Build constant variables from request data
     url = request.url_root + request.path.lstrip('/')
     per_page = request.args.get('per_page', 50)

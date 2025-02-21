@@ -9,8 +9,7 @@ logger = logger.bind(name='emby_list')
 
 
 class PluginEmbyList:
-    """
-    Returns Emby Lists
+    """Returns Emby Lists
 
     Example:
         emby_list:
@@ -20,6 +19,7 @@ class PluginEmbyList:
                 apikey: <apikey>
                 return_host: wan
             list: watched
+
     """
 
     auth = None

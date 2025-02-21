@@ -40,8 +40,7 @@ if TYPE_CHECKING:
 
 
 def is_unresponsive(url: str) -> bool:
-    """
-    Checks if host of given url has timed out within WAIT_TIME
+    """Checks if host of given url has timed out within WAIT_TIME
 
     :param url: The url to check
     :return: True if the host has timed out within WAIT_TIME
@@ -52,8 +51,7 @@ def is_unresponsive(url: str) -> bool:
 
 
 def set_unresponsive(url: str) -> None:
-    """
-    Marks the host of a given url as unresponsive
+    """Marks the host of a given url as unresponsive
 
     :param url: The url that timed out
     """
@@ -74,8 +72,7 @@ class DomainLimiter(abc.ABC):
 
 
 class TokenBucketLimiter(DomainLimiter):
-    """
-    A token bucket rate limiter for domains.
+    """A token bucket rate limiter for domains.
 
     New instances for the same domain will restore previous values.
     """
@@ -87,12 +84,11 @@ class TokenBucketLimiter(DomainLimiter):
     def __init__(
         self,
         domain: str,
-        tokens: Union[float, int],
+        tokens: float,
         rate: Union[str, timedelta],
         wait: bool = True,
     ) -> None:
-        """
-        :param int tokens: Size of bucket
+        """:param int tokens: Size of bucket
         :param rate: Amount of time to accrue 1 token. Either `timedelta` or interval string.
         :param bool wait: If true, will wait for a token to be available. If false, errors when token is not available.
         """
@@ -110,7 +106,7 @@ class TokenBucketLimiter(DomainLimiter):
         return min(self.max_tokens, self.state['tokens'])
 
     @tokens.setter
-    def tokens(self, value: Union[float, int]) -> None:
+    def tokens(self, value: float) -> None:
         self.state['tokens'] = value
 
     @property
@@ -146,8 +142,7 @@ class TimedLimiter(TokenBucketLimiter):
 
 
 def _wrap_urlopen(url: str, timeout: Optional[int] = None) -> requests.Response:
-    """
-    Handles alternate schemes using urllib, wraps the response in a requests.Response
+    """Handles alternate schemes using urllib, wraps the response in a requests.Response
 
     This is not installed as an adapter in requests, since urls without network locations
     (e.g. file:///somewhere) will cause errors
@@ -170,8 +165,7 @@ def _wrap_urlopen(url: str, timeout: Optional[int] = None) -> requests.Response:
 
 
 def limit_domains(url: str, limit_dict: dict[str, DomainLimiter]) -> None:
-    """
-    If this url matches a domain in `limit_dict`, run the limiter.
+    """If this url matches a domain in `limit_dict`, run the limiter.
 
     This is separated in to its own function so that limits can be disabled during unit tests with VCR.
     """
@@ -192,8 +186,7 @@ def parse_header(header: str) -> tuple[str, Mapping]:
 
 
 class Session(requests.Session):
-    """
-    Subclass of requests Session class which defines some of our own defaults, records unresponsive sites,
+    """Subclass of requests Session class which defines some of our own defaults, records unresponsive sites,
     and raises errors by default.
 
     """
@@ -208,8 +201,7 @@ class Session(requests.Session):
         self.headers.update({'User-Agent': f'FlexGet/{version} (www.flexget.com)'})
 
     def add_cookiejar(self, cookiejar):
-        """
-        Merges cookies from `cookiejar` into cookiejar for this session.
+        """Merges cookies from `cookiejar` into cookiejar for this session.
 
         :param cookiejar: CookieJar instance to add to the session.
         """
@@ -217,8 +209,7 @@ class Session(requests.Session):
             self.cookies.set_cookie(cookie)
 
     def set_domain_delay(self, domain, delay):
-        """
-        DEPRECATED, use `add_domain_limiter`
+        """DEPRECATED, use `add_domain_limiter`
         Registers a minimum interval between requests to `domain`
 
         :param domain: The domain to set the interval on
@@ -232,8 +223,7 @@ class Session(requests.Session):
         self.domain_limiters[domain] = TimedLimiter(domain, delay)
 
     def add_domain_limiter(self, limiter: DomainLimiter, replace: bool = True) -> None:
-        """
-        Add a limiter to throttle requests to a specific domain.
+        """Add a limiter to throttle requests to a specific domain.
 
         :param DomainLimiter limiter: The `DomainLimiter` to add to the session.
         :param replace: If `True`, an existing domain limiter for this domain will be replaced.
@@ -244,14 +234,12 @@ class Session(requests.Session):
         self.domain_limiters[limiter.domain] = limiter
 
     def request(self, method: str, url: str, *args, **kwargs) -> requests.Response:
-        """
-        Does a request, but raises Timeout immediately if site is known to timeout, and records sites that timeout.
+        """Does a request, but raises Timeout immediately if site is known to timeout, and records sites that timeout.
         Also raises errors getting the content by default.
 
         :param bool raise_status: If True, non-success status code responses will be raised as errors (True by default)
         :param disable_limiters: If True, any limiters configured for this session will be ignored for this request.
         """
-
         # Raise Timeout right away if site is known to timeout
         if is_unresponsive(url):
             raise requests.Timeout(
@@ -272,7 +260,9 @@ class Session(requests.Session):
             return _wrap_urlopen(url, timeout=kwargs['timeout'])
 
         try:
-            logger.debug(f'{method.upper()}ing URL {url} with args {args} and kwargs {kwargs}')
+            logger.debug(
+                '{}ing URL {} with args {} and kwargs {}', method.upper(), url, args, kwargs
+            )
             result = super().request(method, url, *args, **kwargs)
         except requests.Timeout:
             # Mark this site in known unresponsive list

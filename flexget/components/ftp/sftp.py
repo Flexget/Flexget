@@ -1,7 +1,6 @@
-from collections import namedtuple
 from itertools import groupby
 from pathlib import Path
-from typing import Optional
+from typing import NamedTuple, Optional
 from urllib.parse import unquote, urlparse
 
 from loguru import logger
@@ -22,15 +21,18 @@ DEFAULT_CONNECT_TRIES: int = 3
 DEFAULT_SOCKET_TIMEOUT_SEC: int = 15
 
 
-SftpConfig = namedtuple(
-    'SftpConfig',
-    ['host', 'port', 'username', 'password', 'private_key', 'private_key_pass', 'host_key'],
-)
+class SftpConfig(NamedTuple):
+    host: str
+    port: int
+    username: str
+    password: str
+    private_key: str
+    private_key_pass: str
+    host_key: HostKey
 
 
 class SftpList:
-    """
-    Generate entries from SFTP. This plugin requires the pysftp Python module and its dependencies.
+    """Generate entries from SFTP. This plugin requires the pysftp Python module and its dependencies.
 
     Configuration:
 
@@ -51,7 +53,6 @@ class SftpList:
     host_key:             Specifies a host key not already in known_hosts
 
     Example:
-
       sftp_list:
           host: example.com
           username: Username
@@ -62,6 +63,7 @@ class SftpList:
           dirs:
               - '/path/to/list/'
               - '/another/path/'
+
     """
 
     schema = {
@@ -96,9 +98,7 @@ class SftpList:
 
     @staticmethod
     def prepare_config(config: dict) -> dict:
-        """
-        Sets defaults for the provided configuration
-        """
+        """Sets defaults for the provided configuration"""
         config.setdefault('password', None)
         config.setdefault('private_key', None)
         config.setdefault('private_key_pass', None)
@@ -109,10 +109,7 @@ class SftpList:
 
     @classmethod
     def on_task_input(cls, task: Task, config: dict) -> list[Entry]:
-        """
-        Input task handler
-        """
-
+        """Input task handler"""
         config = cls.prepare_config(config)
 
         files_only: bool = config['files_only']
@@ -145,8 +142,7 @@ class SftpList:
 
 
 class SftpDownload:
-    """
-    Download files from a SFTP server. This plugin requires the pysftp Python module and its
+    """Download files from a SFTP server. This plugin requires the pysftp Python module and its
     dependencies.
 
     Configuration:
@@ -160,10 +156,10 @@ class SftpDownload:
     connection_tries:    Number of times to attempt to connect before failing (default 3).
 
     Example:
-
       sftp_download:
           to: '/Volumes/External/Drobo/downloads'
           delete_origin: False
+
     """
 
     schema = {
@@ -181,9 +177,7 @@ class SftpDownload:
 
     @classmethod
     def download_entry(cls, entry: Entry, config: dict, sftp: SftpClient) -> None:
-        """
-        Downloads the file(s) described in entry
-        """
+        """Downloads the file(s) described in entry"""
         path: str = unquote(urlparse(entry['url']).path) or '.'
         delete_origin: bool = config['delete_origin']
         recursive: bool = config['recursive']
@@ -207,10 +201,7 @@ class SftpDownload:
 
     @classmethod
     def on_task_download(cls, task: Task, config: dict) -> None:
-        """
-        Task handler for sftp_download plugin
-        """
-
+        """Task handler for sftp_download plugin"""
         socket_timeout_sec: int = config['socket_timeout_sec']
         connection_tries: int = config['connection_tries']
 
@@ -236,9 +227,7 @@ class SftpDownload:
 
     @classmethod
     def _get_sftp_config(cls, entry: Entry):
-        """
-        Parses a url and returns a hashable config, source path, and destination path
-        """
+        """Parses a url and returns a hashable config, source path, and destination path"""
         # parse url
         parsed = urlparse(entry['url'])
         host: str = parsed.hostname
@@ -270,8 +259,7 @@ class SftpDownload:
 
 
 class SftpUpload:
-    """
-    Upload files to a SFTP server. This plugin requires the pysftp Python module and its
+    """Upload files to a SFTP server. This plugin requires the pysftp Python module and its
     dependencies.
 
     host:                 Host to connect to
@@ -290,13 +278,13 @@ class SftpUpload:
     host_key:             Specifies a host key not already in known_hosts
 
     Example:
-
       sftp_list:
           host: example.com
           username: Username
           private_key: /Users/username/.ssh/id_rsa
           to: /TV/{{series_name}}/Series {{series_season}}
           delete_origin: False
+
     """
 
     schema = {
@@ -328,9 +316,7 @@ class SftpUpload:
 
     @staticmethod
     def prepare_config(config: dict) -> dict:
-        """
-        Sets defaults for the provided configuration
-        """
+        """Sets defaults for the provided configuration"""
         config.setdefault('password', None)
         config.setdefault('private_key', None)
         config.setdefault('private_key_pass', None)
@@ -367,7 +353,6 @@ class SftpUpload:
     @classmethod
     def on_task_output(cls, task: Task, config: dict) -> None:
         """Uploads accepted entries to the specified SFTP server."""
-
         config = cls.prepare_config(config)
 
         socket_timeout_sec: int = config['socket_timeout_sec']
@@ -385,9 +370,7 @@ class SftpUpload:
 
 
 def task_config_to_sftp_config(config: dict) -> SftpConfig:
-    """
-    Creates an SFTP connection from a Flexget config object
-    """
+    """Creates an SFTP connection from a Flexget config object"""
     host: int = config['host']
     port: int = config['port']
     username: str = config['username']

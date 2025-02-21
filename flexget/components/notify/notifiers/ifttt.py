@@ -12,8 +12,7 @@ logger = logger.bind(name=plugin_name)
 
 
 class IFTTTNotifier:
-    """
-    Push the notification to an IFTTT webhook.
+    """Push the notification to an IFTTT webhook.
 
     Configuration options
 
@@ -47,8 +46,7 @@ class IFTTTNotifier:
     }
 
     def notify(self, title, message, config):
-        """
-        Send notification to ifttt webhook.
+        """Send notification to ifttt webhook.
 
         The notification will be sent to https://maker.ifttt.com/trigger/{event}/with/key/{key}'
         with the values for the config, with a json body setting 'value1' to the message title,

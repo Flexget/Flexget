@@ -80,23 +80,20 @@ def yaml_load(stream):
 
 
 class Serializer(ABC):
-    """
-    Any data types that should be serializable should subclass this, and implement the `serialize` and `deserialize`
+    """Any data types that should be serializable should subclass this, and implement the `serialize` and `deserialize`
     methods. This is important for data that is stored in `Entry` fields so that it can be stored to the database.
     """
 
     @classmethod
     def serializer_name(cls) -> str:
-        """
-        Name of the serializer defaults to class name.
+        """Name of the serializer defaults to class name.
         This can be overridden in subclass implementations if desired.
         """
         return cls.__name__
 
     @classmethod
     def serializer_version(cls) -> int:
-        """
-        If the format of serialization changes, this number should be incremented.
+        """If the format of serialization changes, this number should be incremented.
         The `deserialize` method of this class should continue to handle the old versions as well as the
         current version.
         """
@@ -144,7 +141,7 @@ class DateTimeSerializer(Serializer):
         try:
             return datetime.datetime.strptime(data, DATETIME_FMT)
         except ValueError:
-            logger.error(f'Error deserializing datetime `{data}`')
+            logger.error('Error deserializing datetime `{}`', data)
             return datetime.datetime.min
 
 
@@ -167,7 +164,7 @@ class DateSerializer(Serializer):
         try:
             return datetime.datetime.strptime(data, DATE_FMT).date()
         except ValueError:
-            logger.error(f'Error deserializing date `{data}`')
+            logger.error('Error deserializing date `{}`', data)
             return datetime.date.min
 
 

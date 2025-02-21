@@ -14,8 +14,7 @@ Base = versioned_base('movie_list', 0)
 
 
 class MovieListBase:
-    """
-    Class that contains helper methods for movie list as well as plugins that use it,
+    """Class that contains helper methods for movie list as well as plugins that use it,
     such as API and CLI.
     """
 

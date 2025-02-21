@@ -18,8 +18,7 @@ logger = logger.bind(name='exists_series')
 
 
 class FilterExistsSeries:
-    """
-    Intelligent series aware exists rejecting.
+    """Intelligent series aware exists rejecting.
 
     Example::
 

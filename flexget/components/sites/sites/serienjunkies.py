@@ -33,8 +33,7 @@ DEFAULT_HOSTER = 'ul'
 
 
 class UrlRewriteSerienjunkies:
-    """
-    Serienjunkies urlrewriter
+    """Serienjunkies urlrewriter
     Version 1.0.2
 
     Language setting works like a whitelist, the selected is needed,
@@ -63,10 +62,7 @@ class UrlRewriteSerienjunkies:
     # urlrewriter API
     def url_rewritable(self, task, entry):
         url = entry['url']
-        return bool(
-            url.startswith('http://www.serienjunkies.org/')
-            or url.startswith('http://serienjunkies.org/')
-        )
+        return bool(url.startswith(('http://www.serienjunkies.org/', 'http://serienjunkies.org/')))
 
     # urlrewriter API
     def url_rewrite(self, task, entry):

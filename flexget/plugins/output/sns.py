@@ -22,8 +22,7 @@ DEFAULT_TEMPLATE_VALUE = json.dumps(
 
 
 class SNSNotification:
-    """
-    Emits SNS notifications of entries
+    """Emits SNS notifications of entries
 
     Optionally writes the torrent itself to S3
 

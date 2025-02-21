@@ -19,9 +19,7 @@ logger = logger.bind(name='subtitles')
 
 
 class Subtitles:
-    """
-    Fetch subtitles from opensubtitles.org
-    """
+    """Fetch subtitles from opensubtitles.org"""
 
     schema = {
         'type': 'object',
@@ -58,7 +56,7 @@ class Subtitles:
             return
 
         if res['status'] != '200 OK':
-            raise Exception("Login to opensubtitles.org XML-RPC interface failed")
+            raise RuntimeError("Login to opensubtitles.org XML-RPC interface failed")
 
         config = self.prepare_config(config, task)
 

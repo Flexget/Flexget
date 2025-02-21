@@ -22,19 +22,15 @@ logger = logger.bind(name='rlslog')
 
 
 class RlsLog:
-    """
-    Adds support for rlslog.net as a feed.
-    """
+    """Adds support for rlslog.net as a feed."""
 
     schema = {'type': 'string', 'format': 'url'}
 
     def parse_rlslog(self, rlslog_url, task):
-        """
-        :param rlslog_url: Url to parse from
+        """:param rlslog_url: Url to parse from
         :param task: Task instance
         :return: List of release dictionaries
         """
-
         # BeautifulSoup doesn't seem to work if data is already decoded to unicode :/
         soup = get_soup(task.requests.get(rlslog_url, timeout=25).content)
 

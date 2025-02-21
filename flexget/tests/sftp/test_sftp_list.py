@@ -1,12 +1,16 @@
-from typing import Any, Callable
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any, Callable
 
 import pytest
 
 from flexget.task import Task, TaskAbort
 
-from .test_sftp_server import TestSFTPFileSystem, TestSFTPServerController
+if TYPE_CHECKING:
+    from .test_sftp_server import TestSFTPFileSystem, TestSFTPServerController
 
 
+@pytest.mark.require_optional_deps
 @pytest.mark.xdist_group(name="sftp")
 class TestSftpList:
     config = """
@@ -271,8 +275,7 @@ def assert_entries(
     *argv: dict[str, Any],
     allow_unexpected_entires: bool = False,
 ):
-    """
-    Asserts that the entries generated for a given task match the list of dictionaries given as
+    """Asserts that the entries generated for a given task match the list of dictionaries given as
     entry matches. Only the keys specified will be check for.
 
     :param task: Task to assert the entries from.
@@ -301,8 +304,7 @@ def assert_entries(
 
 
 def assert_no_entries(task: Task):
-    """
-    Asserts that there are no entries generated for a given task.
+    """Asserts that there are no entries generated for a given task.
 
     :param task: Task to assert no entires are generated for.
     """

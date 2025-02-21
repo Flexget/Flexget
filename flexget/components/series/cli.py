@@ -47,8 +47,7 @@ def do_cli(manager, options):
 
 
 def display_summary(options):
-    """
-    Display series summary.
+    """Display series summary.
     :param options: argparse options from the CLI
     """
     porcelain = options.table_type == 'porcelain'
@@ -178,8 +177,7 @@ def remove(manager, options, forget=False):
 
 
 def get_latest_status(episode):
-    """
-    :param episode: Instance of Episode
+    """:param episode: Instance of Episode
     :return: Status string for given episode
     """
     status = ''

@@ -92,7 +92,7 @@ def autoformat(files):
         files = (project_root,)
     venv_path = os.environ['VIRTUAL_ENV']
     if not venv_path:
-        raise Exception('Virtualenv and activation required')
+        raise RuntimeError('Virtualenv and activation required')
 
     # ruff config is in pyproject.toml
     subprocess.call(('ruff', 'check', '--fix', *files))
@@ -115,7 +115,7 @@ def get_changelog(version):
             click.echo(f"Could not find version {version} in changelog", err=True)
             return
         for line in lines:
-            if line.startswith("## ") or line.startswith("<!---"):
+            if line.startswith(("## ", "<!---")):
                 break
             changelog_lines.append(line)
     click.echo("\n".join(changelog_lines).strip())

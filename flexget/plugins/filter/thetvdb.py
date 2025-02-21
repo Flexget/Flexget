@@ -8,8 +8,7 @@ logger = logger.bind(name='thetvdb')
 
 
 class FilterTvdb:
-    """
-    This plugin allows filtering based on thetvdb series rating,
+    """This plugin allows filtering based on thetvdb series rating,
     episode rating, status, genres, runtime, content-rating,
     languages, directors, writers, network, guest stars, episode
     rating, and actors
@@ -104,8 +103,7 @@ class FilterTvdb:
     }
 
     def is_in_set(self, config, configkey, entryitem):
-        """
-        this takes the config object, config key (to a list), and entry
+        """This takes the config object, config key (to a list), and entry
         item so it can return True if the object matches,
         (be that a subset of the list, or if the entry item is contained
         within the config object list) or false if it does not.

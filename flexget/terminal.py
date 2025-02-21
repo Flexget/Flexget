@@ -26,8 +26,7 @@ class _Console(rich.console.Console):
         super().__init__(*args, **kwargs)
 
     def __call__(self, text: Any, *args, **kwargs) -> None:
-        """
-        Print to console safely. Output is able to be captured by different streams in different contexts.
+        """Print to console safely. Output is able to be captured by different streams in different contexts.
 
         Any plugin wishing to output to the user's console should use this function instead of print so that
         output can be redirected when FlexGet is invoked from another process.
@@ -103,8 +102,7 @@ GITHUB_BOX: rich.box.Box = rich.box.Box(
 
 
 class TerminalTable(rich.table.Table):
-    """
-    A data table suited for CLI output, created via its sent parameters. For example::
+    """A data table suited for CLI output, created via its sent parameters. For example::
 
         header = ['Col1', 'Col2']
         table_data = [header]
@@ -198,8 +196,7 @@ def word_wrap(text: str, max_length: int) -> str:
 
 
 def colorize(color: str, text: str) -> str:
-    """
-    A simple override of Color.colorize which sets the default auto colors value to True, since it's the more common
+    """A simple override of Color.colorize which sets the default auto colors value to True, since it's the more common
     use case. When output isn't TTY just return text
 
     :param color: Color tag to use
@@ -211,9 +208,7 @@ def colorize(color: str, text: str) -> str:
 
 
 def disable_colors():
-    """
-    Disables colors to the terminal.
-    """
+    """Disables colors to the terminal."""
     console.no_color = True
 
 

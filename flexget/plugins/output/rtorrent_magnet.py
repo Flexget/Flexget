@@ -11,8 +11,7 @@ pat = re.compile('xt=urn:btih:([^&/]+)')
 
 
 class PluginRtorrentMagnet:
-    """
-    Process Magnet URI's into rtorrent compatible torrent files
+    """Process Magnet URI's into rtorrent compatible torrent files
 
     Magnet URI's will look something like this:
 
@@ -28,6 +27,7 @@ class PluginRtorrentMagnet:
 
     Example:
       rtorrent_magnet: ~/torrents/
+
     """
 
     schema = {'type': 'string', 'format': 'path'}

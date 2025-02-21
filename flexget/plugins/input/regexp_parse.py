@@ -132,15 +132,15 @@ class RegexpParse:
         self.required = []
 
     def flagstr_to_flags(self, flag_str):
-        """turns a comma seperated list of flags into the int value."""
-        COMBIND_FLAGS = 0
+        """Turns a comma seperated list of flags into the int value."""
+        combind_flags = 0
         split_flags = flag_str.split(',')
         for flag in split_flags:
-            COMBIND_FLAGS = COMBIND_FLAGS | RegexpParse.FLAG_VALUES[flag.strip()]
-        return COMBIND_FLAGS
+            combind_flags = combind_flags | RegexpParse.FLAG_VALUES[flag.strip()]
+        return combind_flags
 
     def compile_regexp_dict_list(self, re_list):
-        """turns a list of dicts containing regexps information into a list of compiled regexps."""
+        """Turns a list of dicts containing regexps information into a list of compiled regexps."""
         compiled_regexps = []
         for dic in re_list:
             flags = 0
@@ -150,7 +150,7 @@ class RegexpParse:
         return compiled_regexps
 
     def isvalid(self, entry):
-        """checks to make sure that all required fields are present in the entry."""
+        """Checks to make sure that all required fields are present in the entry."""
         for key in self.required:
             if key not in entry:
                 return False

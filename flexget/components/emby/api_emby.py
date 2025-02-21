@@ -50,16 +50,13 @@ logger = logger.bind(name='api_emby')
 
 
 class EmbyApiBase(ABC):  # noqa: B024 The correct fix for it requires a thorough understanding of the code.
-    """
-    Base Class to all API integratios
-    """
+    """Base Class to all API integratios"""
 
     EMBY_PREF = 'emby_'
 
     @staticmethod
     def merge_field_map(dst: dict, *arg: dict, **kwargs):
         """Merge field maps from clild and parent class"""
-
         allow_new = kwargs.get('allow_new', False)
 
         destination = copy.deepcopy(dst)
@@ -89,10 +86,7 @@ class EmbyApiBase(ABC):  # noqa: B024 The correct fix for it requires a thorough
 
     @staticmethod
     def update_using_map(target, field_map: dict, source_item, **kwargs):
-        """
-        Updates based on field map with source
-        """
-
+        """Updates based on field map with source"""
         allow_new = kwargs.get('allow_new', False)
 
         my_field_map = field_map.copy()
@@ -130,9 +124,7 @@ class EmbyApiBase(ABC):  # noqa: B024 The correct fix for it requires a thorough
 
 
 class EmbyAuth(EmbyApiBase):
-    """
-    Manage API Authorizations
-    """
+    """Manage API Authorizations"""
 
     _last_auth = None
 
@@ -180,8 +172,8 @@ class EmbyAuth(EmbyApiBase):
 
         Returns:
             bool: Is emby connect server
-        """
 
+        """
         regexp = (
             '('
             'http|https'
@@ -191,7 +183,6 @@ class EmbyAuth(EmbyApiBase):
 
     def login(self, optional=False):
         """Login user to API"""
-
         userdata = None
 
         if not self._apikey:
@@ -406,7 +397,6 @@ class EmbyAuth(EmbyApiBase):
 
     def save_token_data(self):
         """Saves token data to Data Base"""
-
         if self._apikey or not self.host or not self.username:
             return
 
@@ -496,7 +486,6 @@ class EmbyAuth(EmbyApiBase):
 
     def get_user_by_name(self, name: str) -> dict:
         """Gets user by username"""
-
         args = {'IsDisabled': False}
         useres = EmbyApi.resquest_emby(EMBY_ENDPOINT_GETUSERS, self, 'GET', **args)
         if not useres:
@@ -616,7 +605,6 @@ class EmbyApiListBase(EmbyApiBase):
 
     def get(self, item) -> 'EmbyApiMedia':
         """Get Item from list"""
-
         if isinstance(item, EmbyApiMedia):
             s_item = item
         else:
@@ -1686,18 +1674,16 @@ class EmbyApiSerie(EmbyApiMedia):
 
         return {
             **EmbyApiMedia.to_dict(self),
-            **{
-                'serie_id': self.serie_id,
-                'serie_name': self.serie_name,
-                'serie_imdb_id': self.serie_imdb_id,
-                'serie_tmdb_id': self.serie_tmdb_id,
-                'serie_tvdb_id': self.serie_tvdb_id,
-                'serie_aired_date': self.serie_aired_date,
-                'serie_year': self.serie_year,
-                'serie_overview': self.serie_overview,
-                'serie_photo': self.serie_photo,
-                'serie_page': self.serie_page,
-            },
+            'serie_id': self.serie_id,
+            'serie_name': self.serie_name,
+            'serie_imdb_id': self.serie_imdb_id,
+            'serie_tmdb_id': self.serie_tmdb_id,
+            'serie_tvdb_id': self.serie_tvdb_id,
+            'serie_aired_date': self.serie_aired_date,
+            'serie_year': self.serie_year,
+            'serie_overview': self.serie_overview,
+            'serie_photo': self.serie_photo,
+            'serie_page': self.serie_page,
         }
 
     @property
@@ -1904,16 +1890,14 @@ class EmbyApiSeason(EmbyApiMedia):
         return {
             **EmbyApiSerie.to_dict(self.serie),
             **EmbyApiMedia.to_dict(self),
-            **{
-                'season': self.season,
-                'season_id': self.season_id,
-                'season_name': self.season_name,
-                'season_page': self.season_page,
-                'season_photo': self.season_photo,
-                'season_imdb_id': self.season_imdb_id,
-                'season_tmdb_id': self.season_tmdb_id,
-                'season_tvdb_id': self.season_tvdb_id,
-            },
+            'season': self.season,
+            'season_id': self.season_id,
+            'season_name': self.season_name,
+            'season_page': self.season_page,
+            'season_photo': self.season_photo,
+            'season_imdb_id': self.season_imdb_id,
+            'season_tmdb_id': self.season_tmdb_id,
+            'season_tvdb_id': self.season_tvdb_id,
         }
 
     @property
@@ -2108,8 +2092,6 @@ class EmbyApiEpisode(EmbyApiMedia):
         'episode': ['episode', 'series_episode'],
     }
 
-    episode = None
-
     def __init__(self, **kwargs):
         EmbyApiMedia.__init__(self, field_map=self.field_map_up, **kwargs)
 
@@ -2140,18 +2122,16 @@ class EmbyApiEpisode(EmbyApiMedia):
             **EmbyApiSeason.to_dict(self.season),
             **EmbyApiSerie.to_dict(self.serie),
             **EmbyApiMedia.to_dict(self),
-            **{
-                'episode': self.episode,
-                'ep_id': self.ep_id,
-                'ep_name': self.ep_name,
-                'ep_page': self.ep_page,
-                'ep_photo': self.ep_photo,
-                'ep_imdb_id': self.ep_imdb_id,
-                'ep_tmdb_id': self.ep_tmdb_id,
-                'ep_tvdb_id': self.ep_tvdb_id,
-                'ep_aired_date': self.ep_aired_date,
-                'ep_overview': self.ep_overview,
-            },
+            'episode': self.episode,
+            'ep_id': self.ep_id,
+            'ep_name': self.ep_name,
+            'ep_page': self.ep_page,
+            'ep_photo': self.ep_photo,
+            'ep_imdb_id': self.ep_imdb_id,
+            'ep_tmdb_id': self.ep_tmdb_id,
+            'ep_tvdb_id': self.ep_tvdb_id,
+            'ep_aired_date': self.ep_aired_date,
+            'ep_overview': self.ep_overview,
         }
 
     @property
@@ -2391,18 +2371,16 @@ class EmbyApiMovie(EmbyApiMedia):
 
         return {
             **EmbyApiMedia.to_dict(self),
-            **{
-                'movie_id': self.movie_id,
-                'movie_name': self.movie_name,
-                'movie_imdb_id': self.movie_imdb_id,
-                'movie_tmdb_id': self.movie_tmdb_id,
-                'movie_tvdb_id': self.movie_tvdb_id,
-                'movie_aired_date': self.movie_aired_date,
-                'movie_year': self.movie_year,
-                'movie_photo': self.movie_photo,
-                'movie_page': self.movie_page,
-                'movie_overview': self.movie_overview,
-            },
+            'movie_id': self.movie_id,
+            'movie_name': self.movie_name,
+            'movie_imdb_id': self.movie_imdb_id,
+            'movie_tmdb_id': self.movie_tmdb_id,
+            'movie_tvdb_id': self.movie_tvdb_id,
+            'movie_aired_date': self.movie_aired_date,
+            'movie_year': self.movie_year,
+            'movie_photo': self.movie_photo,
+            'movie_page': self.movie_page,
+            'movie_overview': self.movie_overview,
         }
 
     @property
@@ -2548,9 +2526,7 @@ class EmbyApiMovie(EmbyApiMedia):
 
 
 class EmbyApi(EmbyApiBase):
-    """
-    Class to interact with Emby API
-    """
+    """Class to interact with Emby API"""
 
     _last_auth = None
 

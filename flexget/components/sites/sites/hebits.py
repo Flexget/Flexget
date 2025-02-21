@@ -41,9 +41,7 @@ class HeBitsSort(Enum):
 
 
 class SearchHeBits:
-    """
-    HeBits search plugin.
-    """
+    """HeBits search plugin."""
 
     schema = {
         'type': 'object',
@@ -93,7 +91,6 @@ class SearchHeBits:
     @plugin.internet(logger)
     def search(self, task, entry, config):
         """Search for entries on HeBits"""
-
         account_info = self._fetch_account_info(self.user_profile_url, config)
         params = {
             'action': 'browse',

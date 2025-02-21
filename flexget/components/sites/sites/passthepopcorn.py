@@ -72,9 +72,7 @@ RELEASE_TYPES = {'non-scene': 0, 'scene': 1, 'golden popcorn': 2}
 
 
 class SearchPassThePopcorn:
-    """
-    PassThePopcorn search plugin.
-    """
+    """PassThePopcorn search plugin."""
 
     schema = {
         'type': 'object',
@@ -98,9 +96,7 @@ class SearchPassThePopcorn:
 
     @plugin.internet(logger)
     def search(self, task, entry, config):
-        """
-        Search for entries on PassThePopcorn
-        """
+        """Search for entries on PassThePopcorn"""
         params = {}
 
         if 'tags' in config:
@@ -146,11 +142,15 @@ class SearchPassThePopcorn:
                     params['year'] = int(entry['movie_year'])
                 else:
                     logger.error(
-                        f"Searching for '{entry['title']}' ignoring invalid movie_year: '{entry['movie_year']}'"
+                        "Searching for '{}' ignoring invalid movie_year: '{}'",
+                        entry['title'],
+                        entry['movie_year'],
                     )
             except ValueError:
                 logger.error(
-                    f"Searching for '{entry['title']}'  ignoring non numeric movie_year: '{entry['movie_year']}'"
+                    "Searching for '{}'  ignoring non numeric movie_year: '{}'",
+                    entry['title'],
+                    entry['movie_year'],
                 )
 
         task.requests.add_domain_limiter(

@@ -359,7 +359,7 @@ class PendingListEntryAPI(APIResource):
             entry = db.get_entry_by_id(list_id=list_id, entry_id=entry_id, session=session)
         except NoResultFound:
             raise NotFoundError(f'could not find entry with id {entry_id} in list {list_id}')
-        logger.debug(f'deleting movie {entry.id}')
+        logger.debug('deleting movie {}', entry.id)
         session.delete(entry)
         return success_response(f'successfully deleted entry {entry.id}')
 

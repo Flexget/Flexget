@@ -25,8 +25,7 @@ class Medusa:
     }
 
     def on_task_input(self, task, config):
-        """
-        This plugin returns ALL of the shows monitored by Medusa.
+        """This plugin returns ALL of the shows monitored by Medusa.
         This includes both ongoing and ended.
         Syntax:
 
@@ -39,8 +38,8 @@ class Medusa:
         Options base_url, username and password are required.
 
         Use with input plugin like discover and/or configure_series.
-        Example:
 
+        Example:
         download-tv-task:
           configure_series:
             from:
@@ -61,6 +60,7 @@ class Medusa:
         you are basically synced to it, so removing a show in Medusa will
         remove it in flexget as well, which could be positive or negative,
         depending on your usage.
+
         """
         parsed_url = urlparse(config.get('base_url'))
         base_url = '{scheme}://{url}:{port}/api/v2'.format(
@@ -90,7 +90,7 @@ class Medusa:
             if entry.isvalid():
                 entries.append(entry)
             else:
-                logger.error(f'Invalid entry created? {entry}')
+                logger.error('Invalid entry created? {}', entry)
 
         return entries
 

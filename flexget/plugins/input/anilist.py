@@ -95,9 +95,9 @@ class AniList:
             selected_list_name = [selected_list_name]
         selected_list_name = [i.lower() for i in selected_list_name]
 
-        logger.debug(f'Selected List Status: {selected_list_status}')
-        logger.debug(f'Selected Release Status: {selected_release_status}')
-        logger.debug(f'Selected Formats: {selected_formats}')
+        logger.debug('Selected List Status: {}', selected_list_status)
+        logger.debug('Selected Release Status: {}', selected_release_status)
+        logger.debug('Selected Formats: {}', selected_formats)
 
         req_variables = {'user': config['username']}
         req_chunk = 1
@@ -163,15 +163,15 @@ class AniList:
                 )
                 list_response = list_response.json()['data']
             except RequestException as e:
-                logger.error(f'Error reading list: {e}')
+                logger.error('Error reading list: {}', e)
                 if hasattr(e.response, 'headers') and e.response.headers.get('Retry-After'):
                     wait = e.response.headers.get('Retry-After')
-                    logger.warning(f'Rate-limited. Waiting {wait} seconds before retrying')
+                    logger.warning('Rate-limited. Waiting {} seconds before retrying', wait)
                     time.sleep(float(wait))
                     continue
                 break
             except ValueError as e:
-                logger.error(f'Invalid JSON response: {e}')
+                logger.error('Invalid JSON response: {}', e)
                 break
 
             logger.trace(f'JSON output: {list_response}')
@@ -198,13 +198,13 @@ class AniList:
                                 'https://relations.yuna.moe/api/v2/ids',
                                 json={'anilist': anime.get('id')},
                             ).json()
-                            logger.debug(f'Additional IDs: {ids}')
+                            logger.debug('Additional IDs: {}', ids)
                         except RequestException as e:
                             logger.verbose(f'Couldn\'t fetch additional IDs: {e}')
                         if not isinstance(ids, dict):
                             ids = {}
 
-                        logger.debug(f'Anime Entry: {anime}')
+                        logger.debug('Anime Entry: {}', anime)
                         entry = Entry()
                         entry['al_id'] = anime.get('id', ids.get('anilist'))
                         entry['anidb_id'] = ids.get('anidb')

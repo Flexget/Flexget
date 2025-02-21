@@ -1,5 +1,4 @@
-"""
-Listens events:
+"""Listens events:
 
 forget (string)
 
@@ -140,8 +139,7 @@ class SeenField(Base):
 
 @with_session
 def add(title, task_name, fields, reason=None, local=None, session=None):
-    """
-    Adds seen entries to DB
+    """Adds seen entries to DB
 
     :param title: name of title to be added
     :param task_name: name of task to be added
@@ -159,8 +157,7 @@ def add(title, task_name, fields, reason=None, local=None, session=None):
 
 @event('forget')
 def forget(value, tasks=None, test=False):
-    """
-    See module docstring
+    """See module docstring
 
     :param string value: Can be entry title or field value
     :return: count, field_count where count is number of entries removed and field_count number of fields
@@ -195,7 +192,7 @@ def forget(value, tasks=None, test=False):
 
             if test:
                 logger.info(
-                    f'Testing: would forget entry with title `{se.title}` of task `{se.task}`'
+                    'Testing: would forget entry with title `{}` of task `{}`', se.title, se.task
                 )
             else:
                 logger.debug('forgetting {}', se)
@@ -210,7 +207,11 @@ def forget(value, tasks=None, test=False):
 
             if test:
                 logger.info(
-                    f'Testing: would forget entry `{se.title}` of task `{se.task}` based on field `{sf.field}` with value `{sf.value}`'
+                    'Testing: would forget entry `{}` of task `{}` based on field `{}` with value `{}`',
+                    se.title,
+                    se.task,
+                    sf.field,
+                    sf.value,
                 )
             else:
                 logger.debug('forgetting {}', se)
@@ -220,8 +221,7 @@ def forget(value, tasks=None, test=False):
 
 @with_session
 def search_by_field_values(field_value_list, task_name, local=False, session=None):
-    """
-    Return a SeenEntry instance if it matches field values
+    """Return a SeenEntry instance if it matches field values
     :param field_value_list: List of field values to match
     :param task_name: Name of task to compare to in case local flag is sent
     :param local: Local flag
@@ -291,8 +291,7 @@ def get_entry_by_id(entry_id, session=None):
 
 @with_session
 def forget_by_id(entry_id, session=None):
-    """
-    Delete SeenEntry via its ID
+    """Delete SeenEntry via its ID
     :param entry_id: SeenEntry ID
     :param session: DB Session
     """

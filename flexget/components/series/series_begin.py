@@ -9,8 +9,7 @@ logger = logger.bind(name='set_series_begin')
 
 
 class SetSeriesBegin:
-    """
-    Set the first episode for series. Uses series_name and series_id.
+    """Set the first episode for series. Uses series_name and series_id.
 
     Example::
 

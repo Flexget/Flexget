@@ -61,10 +61,12 @@ class JsonRpcClient(RpcClient):
             del req_params['params']
         return req_params
 
+    @staticmethod
     def _default_error_handle(code, message):
         logger.critical('Fault code {} message {}', code, message)
         raise plugin.PluginError(f'Fault code {code} message {message}', logger)
 
+    @staticmethod
     def _default_success_handle(response):
         return response.text
 
@@ -141,8 +143,7 @@ RPC_CLIENTS = {'xml': XmlRpcClient, 'json': JsonRpcClient}
 
 
 class OutputAria2:
-    """
-    Simple Aria2 output
+    """Simple Aria2 output
 
     Example::
 
@@ -236,9 +237,7 @@ class OutputAria2:
                 raise
 
     def add_entry(self, aria2: RpcClient, entry, config, task):
-        """
-        Add entry to Aria2
-        """
+        """Add entry to Aria2"""
         options = config['options']
         try:
             path = entry.get('path', config.get('path', None))

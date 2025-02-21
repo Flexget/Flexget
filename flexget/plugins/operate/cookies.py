@@ -10,8 +10,7 @@ logger = logger.bind(name='cookies')
 
 
 class PluginCookies:
-    """
-    Adds cookie to all requests (rss, resolvers, download). Anything
+    """Adds cookie to all requests (rss, resolvers, download). Anything
     that uses urllib2 to be exact.
 
     Currently supports Firefox 3 cookies only.

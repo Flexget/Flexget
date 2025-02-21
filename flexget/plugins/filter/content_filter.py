@@ -11,8 +11,7 @@ logger = logger.bind(name='content_filter')
 
 
 class FilterContentFilter:
-    """
-    Rejects entries based on the filenames in the content. Torrent files only right now.
+    """Rejects entries based on the filenames in the content. Torrent files only right now.
 
     Example::
 
@@ -73,8 +72,7 @@ class FilterContentFilter:
     }
 
     def process_entry(self, task, entry, config):
-        """
-        Process an entry and reject it if it doesn't pass filter.
+        """Process an entry and reject it if it doesn't pass filter.
 
         :param task: Task entry belongs to.
         :param entry: Entry to process
@@ -128,13 +126,19 @@ class FilterContentFilter:
                     return True
             if config.get('min_files') and len(files) < config['min_files']:
                 logger.info(
-                    f'Entry {entry["title"]} has {len(files)} files. Minimum is {config["min_files"]}. Rejecting.'
+                    'Entry {} has {} files. Minimum is {}. Rejecting.',
+                    entry["title"],
+                    len(files),
+                    config["min_files"],
                 )
                 entry.reject(f'Has less than {config["min_files"]} files', remember=True)
                 return True
             if config.get('max_files') and len(files) > config['max_files']:
                 logger.info(
-                    f'Entry {entry["title"]} has {len(files)} files. Maximum is {config["max_files"]}. Rejecting.'
+                    'Entry {} has {} files. Maximum is {}. Rejecting.',
+                    entry["title"],
+                    len(files),
+                    config["max_files"],
                 )
                 entry.reject(f'Has more than {config["max_files"]} files', remember=True)
                 return True

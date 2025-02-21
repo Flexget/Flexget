@@ -104,9 +104,7 @@ class TheTVDBSet(MutableSet):
                 api_key=self.config['api_key'],
             ).put('user/favorites/{}'.format(entry['tvdb_id']))
         except RequestException as e:
-            logger.error(
-                'Could not add tvdb_id {} to favourites list: {}'.format(entry['tvdb_id'], e)
-            )
+            logger.error('Could not add tvdb_id {} to favourites list: {}', entry['tvdb_id'], e)
         self.invalidate_cache()
 
     def discard(self, entry):
@@ -137,7 +135,8 @@ class TheTVDBSet(MutableSet):
     @property
     def online(self):
         """Set the online status of the plugin, online plugin should be treated differently in certain situations,
-        like test mode"""
+        like test mode
+        """
         return True
 
 

@@ -21,6 +21,7 @@ class PluginTmdbLookup:
 
     Example:
         tmdb_lookup: yes
+
     """
 
     field_map = {
@@ -78,8 +79,7 @@ class PluginTmdbLookup:
             log_once('TMDB lookup failed for {}'.format(entry['title']), logger, 'WARNING')
 
     def lookup(self, entry, language):
-        """
-        Populates all lazy fields to an Entry. May be called by other plugins
+        """Populates all lazy fields to an Entry. May be called by other plugins
         requiring tmdb info on an Entry
 
         :param entry: Entry instance

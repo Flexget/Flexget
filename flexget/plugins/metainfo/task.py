@@ -7,9 +7,7 @@ logger = logger.bind(name='metainfo_task')
 
 
 class MetainfoTask:
-    """
-    Set 'task' field for entries.
-    """
+    """Set 'task' field for entries."""
 
     schema = {'type': 'boolean'}
 

@@ -14,8 +14,7 @@ logger = logger.bind(name='ftp')
 
 
 class OutputFtp:
-    """
-    Ftp Download plugin
+    """Ftp Download plugin
 
     input-url: ftp://<user>:<password>@<host>:<port>/<path to file>
     Example: ftp://anonymous:anon@my-ftp-server.com:21/torrent-files-dir
@@ -27,7 +26,7 @@ class OutputFtp:
           delete_origin: <True/False>
           download_empty_dirs: <True/False>
 
-    TODO:
+    Todo:
       - Resume downloads
       - create banlists files
       - validate connection parameters
@@ -56,14 +55,14 @@ class OutputFtp:
         ftp = ftplib.FTP_TLS() if config['use-ssl'] else ftplib.FTP()
 
         # ftp.set_debuglevel(2)
-        logger.debug('Connecting to ' + ftp_url.hostname)
+        logger.debug('Connecting to {}', ftp_url.hostname)
         ftp.connect(ftp_url.hostname, ftp_url.port)
         ftp.login(ftp_url.username, ftp_url.password)
         if config['use-ssl']:
             ftp.prot_p()
         ftp.sendcmd('TYPE I')
         ftp.set_pasv(True)
-        logger.debug('Changing directory to: ' + current_path)
+        logger.debug('Changing directory to: {}', current_path)
         ftp.cwd(current_path)
 
         return ftp
@@ -126,8 +125,8 @@ class OutputFtp:
         """Count this as an output plugin."""
 
     def ftp_walk(self, ftp, tmp_path, config, ftp_url, current_path):
-        logger.debug('DIR->' + ftp.pwd())
-        logger.debug('FTP tmp_path : ' + tmp_path)
+        logger.debug('DIR->{}', ftp.pwd())
+        logger.debug('FTP tmp_path : {}', tmp_path)
         try:
             ftp = self.check_connection(ftp, config, ftp_url, current_path)
             dirs = ftp.nlst(ftp.pwd())

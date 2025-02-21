@@ -14,8 +14,7 @@ logger = logger.bind(name='backlog')
 
 
 class InputBacklog:
-    """
-    Keeps task history for given amount of time.
+    """Keeps task history for given amount of time.
 
     Example::
 
@@ -52,7 +51,8 @@ class InputBacklog:
     def add_backlog(self, task, entry, amount='', session=None):
         """Add single entry to task backlog
 
-        If :amount: is not specified, entry will only be injected on next execution."""
+        If :amount: is not specified, entry will only be injected on next execution.
+        """
         snapshot = entry.get('_backlog_snapshot')
         if not snapshot:
             if task.current_phase != 'input':

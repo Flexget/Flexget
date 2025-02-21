@@ -19,9 +19,10 @@ class EstimatesReleasedMovies:
         if 'movie_year' in entry and entry['movie_year'] is not None:
             try:
                 entity_data['entity_date'] = datetime(year=entry['movie_year'], month=1, day=1)
-                return entity_data
             except ValueError:
                 pass
+            else:
+                return entity_data
         logger.debug(
             'Unable to check release for {}, tmdb_release and movie_year fields are not defined',
             entry['title'],

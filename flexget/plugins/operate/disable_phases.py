@@ -12,9 +12,9 @@ class PluginDisablePhases:
     Mainly meant for advanced users and development.
 
     Example:
-
     disable_phases:
       - download
+
     """
 
     @property

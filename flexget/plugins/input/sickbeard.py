@@ -11,8 +11,7 @@ logger = logger.bind(name='sickbeard')
 
 
 class Sickbeard:
-    """
-    This plugin returns ALL of the shows monitored by Sickbeard.
+    """This plugin returns ALL of the shows monitored by Sickbeard.
     This includes both ongoing and ended.
     Syntax:
 
@@ -24,8 +23,8 @@ class Sickbeard:
     Options base_url and api_key are required.
 
     Use with input plugin like discover and/or configure_series.
-    Example:
 
+    Example:
     download-tv-task:
       configure_series:
         settings:
@@ -48,6 +47,7 @@ class Sickbeard:
     you are basically synced to it, so removing a show in Sickbeard will
     remove it in flexget as well, which could be positive or negative,
     depending on your usage.
+
     """
 
     schema = {
@@ -65,9 +65,7 @@ class Sickbeard:
     }
 
     def quality_requirement_builder(self, quality_list):
-        """
-        Translates sickbeards' qualities into format used by Flexget
-        """
+        """Translates sickbeards' qualities into format used by Flexget"""
         sb_to_fg = {
             'sdtv': 'sdtv',
             'sddvd': 'dvdrip',
@@ -102,7 +100,7 @@ class Sickbeard:
             )
         entries = []
         for _, show in list(json['data'].items()):
-            logger.debug(f'processing show: {show}')
+            logger.debug('processing show: {}', show)
             fg_qualities = ''  # Initializes the quality parameter
             if show['paused'] and config.get('only_monitored'):
                 continue

@@ -14,8 +14,7 @@ logger = logger.bind(name='filesystem')
 
 
 class Filesystem:
-    """
-    Uses local path content as an input. Can use recursion if configured.
+    """Uses local path content as an input. Can use recursion if configured.
     Recursion is False by default. Can be configured to true or get integer that will specify max depth in relation to
         base folder.
     All files/dir/symlinks are retrieved by default. Can be changed by using the 'retrieve' property.
@@ -106,9 +105,7 @@ class Filesystem:
         return config
 
     def create_entry(self, filepath: Path, test_mode):
-        """
-        Creates a single entry using a filepath and a type (file/dir)
-        """
+        """Creates a single entry using a filepath and a type (file/dir)"""
         filepath = filepath.absolute()
         entry = Entry()
         entry['location'] = str(filepath)

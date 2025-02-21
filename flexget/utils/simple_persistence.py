@@ -1,5 +1,4 @@
-"""
-NOTE:
+"""NOTE:
 
 Avoid using this module on your own or in plugins, this was originally made for 0.9 -> 1.0 transition.
 
@@ -123,8 +122,7 @@ Index(
 
 
 class SimplePersistence(MutableMapping):
-    """
-    Store simple values that need to be persisted between FlexGet runs. Interface is like a `dict`.
+    """Store simple values that need to be persisted between FlexGet runs. Interface is like a `dict`.
 
     This should only be used if a plugin needs to store a few values, otherwise it should create a full table in
     the database.

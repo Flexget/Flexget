@@ -61,8 +61,7 @@ DELAY = "2 seconds"
 
 
 class UrlRewriteIPTorrents:
-    """
-    IpTorrents urlrewriter and search plugin.
+    """IpTorrents urlrewriter and search plugin.
 
     iptorrents:
       rss_key: xxxxxxxxx  (required)
@@ -102,9 +101,7 @@ class UrlRewriteIPTorrents:
 
     # urlrewriter API
     def url_rewritable(self, task, entry):
-        """
-        Determines if the entry's URL is rewriteable (not pointing at a downloadable torrent).
-        """
+        """Determines if the entry's URL is rewriteable (not pointing at a downloadable torrent)."""
         url = entry['url']
         if url.startswith(BASE_URL + '/download.php/'):
             return False
@@ -112,9 +109,7 @@ class UrlRewriteIPTorrents:
 
     # urlrewriter API
     def url_rewrite(self, task, entry):
-        """
-        Resets the entry's url to one pointing directly at a torrent.
-        """
+        """Resets the entry's url to one pointing directly at a torrent."""
         if 'url' not in entry:
             logger.error("Didn't actually get a URL...")
         else:
@@ -129,10 +124,7 @@ class UrlRewriteIPTorrents:
 
     @plugin.internet(logger)
     def search(self, task, entry, config=None):
-        """
-        Search for name from iptorrents.
-        """
-
+        """Search for name from iptorrents."""
         categories = config.get('category', 'All')
         # Make sure categories is a list
         if not isinstance(categories, list):
@@ -215,9 +207,7 @@ class UrlRewriteIPTorrents:
 
 @event('plugin.register')
 def register_plugin():
-    """
-    Registers the plugin with FlexGet's plugin system.
-    """
+    """Registers the plugin with FlexGet's plugin system."""
     plugin.register(
         UrlRewriteIPTorrents, 'iptorrents', interfaces=['urlrewriter', 'search'], api_ver=2
     )

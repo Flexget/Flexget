@@ -121,8 +121,7 @@ def upgrade_required(session=None) -> bool:
 
 
 class UpgradeImpossible(Exception):
-    """
-    Exception to be thrown during a db upgrade function which will cause the old tables to be removed and recreated from
+    """Exception to be thrown during a db upgrade function which will cause the old tables to be removed and recreated from
     the new model.
     """
 
@@ -161,8 +160,8 @@ def upgrade(plugin: str) -> Callable:
                     )
                     reset_schema(plugin, session=session)
                     manager.db_upgraded = True
-                except Exception as e:
-                    logger.exception('Failed to upgrade database for plugin {}: {}', plugin, e)
+                except Exception:
+                    logger.exception('Failed to upgrade database for plugin {}', plugin)
                     session.rollback()
                     manager.shutdown(finish_queue=False)
                 else:
@@ -189,8 +188,7 @@ def upgrade(plugin: str) -> Callable:
 
 @with_session
 def reset_schema(plugin: str, session=None) -> None:
-    """
-    Removes all tables from given plugin from the database,
+    """Removes all tables from given plugin from the database,
     as well as removing current stored schema number.
 
     :param plugin: The plugin whose schema should be reset
@@ -206,7 +204,7 @@ def reset_schema(plugin: str, session=None) -> None:
         except OperationalError as e:
             if 'no such table' in str(e):
                 continue
-            raise e  # Remove the plugin from schema table
+            raise  # Remove the plugin from schema table
     session.query(PluginSchema).filter(PluginSchema.plugin == plugin).delete()
     # We need to commit our current changes to close the session before calling create_all
     session.commit()
@@ -217,35 +215,33 @@ def reset_schema(plugin: str, session=None) -> None:
 def register_plugin_table(tablename: str, plugin: str, version: int):
     plugin_schemas.setdefault(plugin, {'version': version, 'tables': []})
     if plugin_schemas[plugin]['version'] != version:
-        raise Exception(f'Two different schema versions received for plugin {plugin}')
+        raise RuntimeError(f'Two different schema versions received for plugin {plugin}')
     plugin_schemas[plugin]['tables'].append(tablename)
 
 
 class VersionedBaseMeta(DeclarativeMeta):
     """Metaclass for objects returned by versioned_base factory"""
 
-    def __new__(mcs, metaname, bases, dict_):
+    def __new__(cls, metaname, bases, dict_):
         """This gets called when a class that subclasses VersionedBase is defined."""
-        new_class = super().__new__(mcs, str(metaname), bases, dict_)
+        new_class = super().__new__(cls, str(metaname), bases, dict_)
         if metaname != 'VersionedBase':
             register_plugin_table(new_class.__tablename__, new_class._plugin, new_class._version)
         return new_class
 
-    def register_table(cls, table: Union[str, Table]) -> None:
-        """
-        This can be used if a plugin is declaring non-declarative sqlalchemy tables.
+    def register_table(self, table: Union[str, Table]) -> None:
+        """This can be used if a plugin is declaring non-declarative sqlalchemy tables.
 
         :param table: Can either be the name of the table, or an :class:`sqlalchemy.Table` instance.
         """
         if isinstance(table, str):
-            register_plugin_table(table, cls._plugin, cls._version)
+            register_plugin_table(table, self._plugin, self._version)
         else:
-            register_plugin_table(table.name, cls._plugin, cls._version)
+            register_plugin_table(table.name, self._plugin, self._version)
 
 
 def versioned_base(plugin: str, version: int) -> VersionedBaseMeta:
-    """
-    Returns a class which can be used like Base,
+    """Returns a class which can be used like Base,
     but automatically stores schema version when tables are created.
     """
 

@@ -37,9 +37,7 @@ class _Method:
 
 
 class HTTPDigestTransport(xmlrpc_client.Transport):
-    """
-    Transport that uses requests to support Digest authentication.
-    """
+    """Transport that uses requests to support Digest authentication."""
 
     def __init__(self, scheme, digest_auth, username, password, session, *args, **kwargs):
         self.__scheme = scheme
@@ -104,8 +102,7 @@ def encode_header(key, value):
 
 
 class SCGITransport(xmlrpc_client.Transport):
-    """
-    Public domain SCGITrannsport implementation from:
+    """Public domain SCGITrannsport implementation from:
     https://github.com/JohnDoee/autotorrent/blob/develop/autotorrent/scgitransport.py
     """
 
@@ -191,8 +188,7 @@ class RTorrent:
     required_fields = ('hash', 'name', 'base_path')
 
     def __init__(self, uri, username=None, password=None, digest_auth=None, session=None):
-        """
-        New connection to rTorrent
+        """New connection to rTorrent
 
         :param uri: RTorrent URL. Supports both http(s) and scgi
         :param username: Username for basic auth over http(s)
@@ -505,7 +501,7 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
 
     def _verify_load(self, client, info_hash):
         ex = xmlrpc_client.Error()
-        for _ in range(0, 5):
+        for _ in range(5):
             try:
                 return client.torrent(info_hash, fields=['hash'])
             except xmlrpc_client.Error as e:
@@ -744,7 +740,7 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
             if resp != 0:
                 entry.fail(f'Failed to add to rTorrent invalid return value {resp}')
         except xmlrpc_client.Error as e:
-            logger.exception(e)
+            logger.exception('Found an error')
             entry.fail(f'Failed to add to rTorrent {e!s}')
             return
 

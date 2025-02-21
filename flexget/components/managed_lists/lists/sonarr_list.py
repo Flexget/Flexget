@@ -70,7 +70,6 @@ class SonarrSet(MutableSet):
             rsp = requests.request(method, url, headers=headers, json=data)
             data = rsp.json()
             logger.trace('sonarr response: {}', data)
-            return data
         except RequestException as e:
             base_msg = 'Sonarr returned an error. {}'
             if e.response is not None:
@@ -81,11 +80,10 @@ class SonarrSet(MutableSet):
             else:
                 error = str(e)
             raise plugin.PluginError(base_msg.format(error))
+        return data
 
     def translate_quality(self, quality_name):
-        """
-        Translate Sonarr's qualities to ones recognize by Flexget
-        """
+        """Translate Sonarr's qualities to ones recognize by Flexget"""
         if quality_name in QUALITY_MAP:
             return QUALITY_MAP[quality_name]
         return quality_name.replace('-', ' ').lower()
@@ -279,7 +277,8 @@ class SonarrSet(MutableSet):
     @property
     def online(self):
         """Set the online status of the plugin, online plugin should be treated differently in certain situations,
-        like test mode"""
+        like test mode
+        """
         return True
 
     def get(self, entry):

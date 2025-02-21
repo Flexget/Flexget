@@ -108,8 +108,7 @@ def get_regexp(list_id, regexp, session=None):
 
 @with_session
 def create_list(list_name, session=None):
-    """
-    Only creates the list if it doesn't exist.
+    """Only creates the list if it doesn't exist.
 
     :param str list_name: Name of the list
     :param Session session:

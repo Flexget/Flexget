@@ -15,7 +15,6 @@ def action_auth(options):
     try:
         db.get_access_token(options.account, options.pin, re_auth=True, called_from_cli=True)
         console('Successfully authorized Flexget app on Trakt.tv. Enjoy!')
-        return
     except plugin.PluginError as e:
         console(f'Authorization failed: {e}')
 
@@ -59,7 +58,6 @@ def action_refresh(options):
     try:
         db.get_access_token(options.account, refresh=True)
         console('Successfully refreshed your access token.')
-        return
     except plugin.PluginError as e:
         console(f'Authorization failed: {e}')
 
@@ -71,7 +69,6 @@ def action_delete(options):
     try:
         db.delete_account(options.account)
         console('Successfully deleted your access token.')
-        return
     except plugin.PluginError as e:
         console(f'Deletion failed: {e}')
 

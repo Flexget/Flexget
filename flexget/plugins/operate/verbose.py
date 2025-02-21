@@ -10,9 +10,7 @@ logger = logger.bind(name='verbose')
 
 
 class Verbose:
-    """
-    Verbose entry accept, reject and failure
-    """
+    """Verbose entry accept, reject and failure"""
 
     # Run first thing after input phase
     @plugin.priority(plugin.PRIORITY_FIRST)

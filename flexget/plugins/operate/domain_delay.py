@@ -8,8 +8,7 @@ logger = logger.bind(name='domain_delay')
 
 
 class DomainDelay:
-    """
-    Sets a minimum interval between requests to specific domains.
+    """Sets a minimum interval between requests to specific domains.
 
     Example::
       domain_delay:

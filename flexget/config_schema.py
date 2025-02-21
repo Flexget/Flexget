@@ -43,8 +43,7 @@ class ConfigError(ValueError):
 
 # TODO: Rethink how config key and schema registration work
 def register_schema(path: str, schema: Union[JsonSchema, Callable[..., JsonSchema]]):
-    """
-    Register `schema` to be available at `path` for $refs
+    """Register `schema` to be available at `path` for $refs
 
     :param path: Path to make schema available
     :param schema: The schema, or function which returns the schema
@@ -89,12 +88,10 @@ def get_schema() -> JsonSchema:
 
 
 def one_or_more(schema: JsonSchema, unique_items: bool = False) -> JsonSchema:
-    """
-    Helper function to construct a schema that validates items matching `schema` or an array
+    """Helper function to construct a schema that validates items matching `schema` or an array
     containing items matching `schema`.
 
     """
-
     schema.setdefault('title', 'single value')
     default = schema.pop('default', None)
     result = {
@@ -115,9 +112,7 @@ def one_or_more(schema: JsonSchema, unique_items: bool = False) -> JsonSchema:
 
 
 def resolve_ref(uri: str) -> JsonSchema:
-    """
-    Finds and returns a schema pointed to by `uri` that has been registered in the register_schema function.
-    """
+    """Finds and returns a schema pointed to by `uri` that has been registered in the register_schema function."""
     parsed = urlparse(uri)
     if parsed.path in schema_paths:
         schema = schema_paths[parsed.path]
@@ -134,8 +129,7 @@ def retrieve_resource(uri: str) -> Resource:
 def process_config(
     config: Any, schema: Optional[JsonSchema] = None, set_defaults: bool = True
 ) -> list[ConfigValidationError]:
-    """
-    Validates the config, and sets defaults within it if `set_defaults` is set.
+    """Validates the config, and sets defaults within it if `set_defaults` is set.
     If schema is not given, uses the root config schema.
 
     :returns: A list with :class:`jsonschema.ValidationError`s if any
@@ -293,7 +287,7 @@ def is_url(instance) -> Union[None, bool, Match]:
     if not isinstance(instance, str):
         return True
     # Allow looser validation if this appears to start with jinja
-    if instance.startswith('{{') or instance.startswith('{%'):
+    if instance.startswith(('{{', '{%')):
         return True
     regexp = (
         '('
@@ -338,10 +332,7 @@ def is_json(instance) -> bool:
 
 
 def set_error_message(error: jsonschema.ValidationError) -> None:
-    """
-    Create user facing error message from a :class:`jsonschema.ValidationError` `error`
-
-    """
+    """Create user facing error message from a :class:`jsonschema.ValidationError` `error`"""
     # First, replace default error messages with our custom ones
     if error.validator == 'type':
         if isinstance(error.validator_value, str):
@@ -387,8 +378,7 @@ def set_error_message(error: jsonschema.ValidationError) -> None:
 
 
 def select_child_errors(validator, errors):
-    """
-    Looks through subschema errors, if any subschema is determined to be the intended one,
+    """Looks through subschema errors, if any subschema is determined to be the intended one,
     (based on 'type' keyword errors,) errors from its branch will be released instead of the parent error.
     """
     for error in errors:
@@ -436,13 +426,13 @@ def validate_properties_w_defaults(validator, properties, instance, schema):
     yield from BaseValidator.VALIDATORS["properties"](validator, properties, instance, schema)
 
 
-def validate_anyOf(validator, anyOf, instance, schema):
-    errors = BaseValidator.VALIDATORS["anyOf"](validator, anyOf, instance, schema)
+def validate_any_of(validator, any_of, instance, schema):
+    errors = BaseValidator.VALIDATORS["anyOf"](validator, any_of, instance, schema)
     yield from select_child_errors(validator, errors)
 
 
-def validate_oneOf(validator, oneOf, instance, schema):
-    errors = BaseValidator.VALIDATORS["oneOf"](validator, oneOf, instance, schema)
+def validate_one_of(validator, one_of, instance, schema):
+    errors = BaseValidator.VALIDATORS["oneOf"](validator, one_of, instance, schema)
     yield from select_child_errors(validator, errors)
 
 
@@ -451,16 +441,16 @@ def validate_deprecated(validator, deprecated, instance, schema):
         logger.warning(deprecated)
 
 
-def validate_deprecationMessage(validator, message, instance, schema):
+def validate_deprecation_message(validator, message, instance, schema):
     """Not really a validator, just warns if deprecated section of config is being used."""
     logger.warning(message)
 
 
 validators = {
-    'anyOf': validate_anyOf,
-    'oneOf': validate_oneOf,
+    'anyOf': validate_any_of,
+    'oneOf': validate_one_of,
     'deprecated': validate_deprecated,
-    'deprecationMessage': validate_deprecationMessage,
+    'deprecationMessage': validate_deprecation_message,
 }
 
 SchemaValidator = jsonschema.validators.extend(BaseValidator, validators)
@@ -486,8 +476,7 @@ def deep_set(path: str, dictionary: dict, value: Any) -> None:
 
 
 def _rewrite_ref(identifier: str, definition_path: str, defs: dict) -> str:
-    """
-    The refs in the schemas are arbitrary identifiers, and cannot be used as-is as real network locations.
+    """The refs in the schemas are arbitrary identifiers, and cannot be used as-is as real network locations.
     This rewrites any of those arbitrary refs to be real urls servable by this endpoint.
     """
     if identifier.startswith('/schema/'):
@@ -516,7 +505,8 @@ def _inline_refs(schema: JsonSchema, definition_path: str, defs: dict) -> Union[
 
 def inline_refs(schema: JsonSchema) -> JsonSchema:
     """Includes all $refs to subschemas in the $defs section of the schema, and rewrites
-    the $refs to point to the right place."""
+    the $refs to point to the right place.
+    """
     definitions = {}
     schema = _inline_refs(schema, "", definitions)
     schema.setdefault('$defs', {}).update(definitions)
