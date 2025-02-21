@@ -13,7 +13,7 @@ from . import db
 
 logger = logger.bind(name='next_series_episodes')
 
-BACKFILL_CAP_DEFAULT = 25
+BACKFILL_LIMIT_DEFAULT = 25
 
 
 class NextSeriesEpisodes:
@@ -30,8 +30,13 @@ class NextSeriesEpisodes:
                 'properties': {
                     'from_start': {'type': 'boolean', 'default': False},
                     'backfill': {'type': 'boolean', 'default': False},
+                    'backfill_limit': {
+                        'type': 'integer',
+                        'default': BACKFILL_LIMIT_DEFAULT,
+                        'description': 'If the gap between episodes is larger than this limit, '
+                        'they will not be emitted.',
+                    },
                     'only_same_season': {'type': 'boolean', 'default': False},
-                    'backfill_cap': {'type': 'integer', 'default': BACKFILL_CAP_DEFAULT},
                 },
                 'additionalProperties': False,
             },
@@ -90,7 +95,7 @@ class NextSeriesEpisodes:
             return None
         if isinstance(config, bool):
             config = {}
-        config.setdefault('backfill_cap', BACKFILL_CAP_DEFAULT)
+        config.setdefault('backfill_limit', BACKFILL_LIMIT_DEFAULT)
         self.config = config
         if task.is_rerun:
             # Just return calculated next eps on reruns
@@ -194,7 +199,7 @@ class NextSeriesEpisodes:
                             for ep in downloaded_this_season:
                                 with contextlib.suppress(ValueError):
                                     eps_to_get.remove(ep.number)
-                            if len(eps_to_get) > config['backfill_cap']:
+                            if len(eps_to_get) > config['backfill_limit']:
                                 logger.warning(
                                     'Series {} has more than 50 episodes to backfill. Assuming this is an '
                                     'error and not searching for them.',
