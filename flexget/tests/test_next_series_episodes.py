@@ -35,6 +35,14 @@ class TestNextSeriesEpisodes:
             series:
             - Test Series 1
             max_reruns: 0
+          test_next_series_episodes_backfill_limit:
+            next_series_episodes:
+              backfill: yes
+              backfill_limit: 10
+            series:
+            - Test Series 1:
+                identified_by: ep
+            max_reruns: 0
           test_next_series_episodes_rejected:
             next_series_episodes:
               backfill: yes
@@ -153,6 +161,15 @@ class TestNextSeriesEpisodes:
         task = execute_task('test_next_series_episodes_no_backfill')
         assert len(task.all_entries) == 1
         assert task.find_entry(title='Test Series 1 S01E06')
+
+    def test_next_series_episodes_backfill_limit(self, execute_task):
+        self.inject_series(execute_task, 'Test Series 1 S01E01')
+        self.inject_series(execute_task, 'Test Series 1 S01E13')
+        task = execute_task('test_next_series_episodes_backfill_limit')
+        assert len(task.all_entries) == 1, "missing episodes over limit. Should not backfill"
+        self.inject_series(execute_task, 'Test Series 1 S01E12')
+        task = execute_task('test_next_series_episodes_backfill_limit')
+        assert len(task.all_entries) == 11, "missing episodes less than limit. Should backfill"
 
     def test_next_series_episodes_rejected(self, execute_task):
         self.inject_series(execute_task, 'Test Series 2 S01E03 720p')
