@@ -1,5 +1,3 @@
-import contextlib
-
 from loguru import logger
 
 from flexget import plugin
