@@ -50,12 +50,8 @@ class QualityComponent:
         :param string text: data te be tested against
         :returns: tuple (matches, remaining text without quality data)
         """
-        match = self.regexp.search(text)
-        if not match:
-            return False, ""
-        # remove matching part from the text
-        text = text[: match.start()] + text[match.end() :]
-        return True, text
+        qual_removed = self.regexp.sub('', text)
+        return text != qual_removed, qual_removed
 
     def __hash__(self) -> int:
         return hash(self.type + str(self.value))
