@@ -173,7 +173,7 @@ class ImdbWatchlist:
         elif title_type in ['tvSeries', 'tvMiniSeries']:
             entry['series_name'] = title
 
-        with contextlib.suppress(ValueError, TypeError):
+        if 'year' in item['releaseYear']:
             year = item['releaseYear']['year']
             entry['imdb_year'] = year
 
@@ -185,10 +185,9 @@ class ImdbWatchlist:
             if not config.get('strip_dates'):
                 entry['title'] += f' ({year})'
 
-        with contextlib.suppress(ValueError, TypeError):
-            entry['imdb_user_score'] = entry['imdb_score'] = float(
-                item['ratingsSummary']['aggregateRating']
-            )
+        rating = item['ratingsSummary']['aggregateRating']
+        if isinstance(rating, float):
+            entry['imdb_user_score'] = entry['imdb_score'] = rating
             entry['imdb_votes'] = item['ratingsSummary']['voteCount']
 
         return entry
