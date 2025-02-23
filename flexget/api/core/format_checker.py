@@ -37,6 +37,6 @@ class SchemaTest(APIResource):
     @api.validate(format_checker_schema)
     @api.response(200, model=base_message_schema)
     def post(self, session: Session = None) -> Response:
-        """Validate flexget custom schema"""
+        """Validate flexget custom schema."""
         # If validation passed, all is well
         return success_response('payload is valid')

@@ -1,11 +1,7 @@
 # TODO: these tests don't work outside US due imdb implementing geoip based crappy name translation
 # imdb_name needs to be replaced with our own title lookup
 
-""".. NOTE::
-
-Added `imdb_original_name` recently, so in case the title lookup translations cause problems
-switch to find_entry to use that instead!
-"""
+"""Added `imdb_original_name` recently, so in case the title lookup translations cause problems switch to find_entry to use that instead."""
 
 import pytest
 
@@ -132,7 +128,7 @@ class TestImdb:
     """
 
     def test_lookup(self, execute_task):
-        """IMDB: Test Lookup (ONLINE)"""
+        """IMDB: Test Lookup (ONLINE)."""
         task = execute_task('test')
         assert task.find_entry(imdb_name='Spirited Away'), (
             'Failed IMDB lookup (search Spirited Away)'

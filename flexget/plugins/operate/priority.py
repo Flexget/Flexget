@@ -11,7 +11,7 @@ logger = logger.bind(name='priority')
 # does nothing but make the config key valid.
 # In daemon mode, schedules should be made which run tasks in the proper order instead of using this.
 class TaskPriority:
-    """Set task priorities"""
+    """Set task priorities."""
 
     schema = {'type': 'integer'}
 

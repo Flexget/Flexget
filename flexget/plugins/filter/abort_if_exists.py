@@ -9,7 +9,7 @@ logger = logger.bind(name='abort_if_exists')
 
 
 class PluginAbortIfExists:
-    """Aborts a task if an entry field matches the regexp"""
+    """Aborts a task if an entry field matches the regexp."""
 
     schema = {
         'type': 'object',

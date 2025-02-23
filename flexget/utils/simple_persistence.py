@@ -1,6 +1,4 @@
-"""NOTE:
-
-Avoid using this module on your own or in plugins, this was originally made for 0.9 -> 1.0 transition.
+"""NOTE: Avoid using this module on your own or in plugins, this was originally made for 0.9 -> 1.0 transition.
 
 You can safely use task.simple_persistence and manager.persist, if we implement something better we
 can replace underlying mechanism in single point (and provide transparent switch).
@@ -207,7 +205,7 @@ class SimpleTaskPersistence(SimplePersistence):
 
 @event('manager.startup')
 def load_taskless(manager):
-    """Loads all key/value pairs into memory which aren't associated with a specific task."""
+    """Load all key/value pairs into memory which aren't associated with a specific task."""
     SimplePersistence.load()
 
 
@@ -218,14 +216,14 @@ def flush_taskless(manager):
 
 @event('task.execute.started')
 def load_task(task):
-    """Loads all key/value pairs into memory before a task starts."""
+    """Load all key/value pairs into memory before a task starts."""
     if not SimplePersistence.class_store[task.name]:
         SimplePersistence.load(task.name)
 
 
 @event('task.execute.completed')
 def flush_task(task):
-    """Stores all in memory key/value pairs to database when a task has completed."""
+    """Store all in memory key/value pairs to database when a task has completed."""
     SimplePersistence.flush(task.name)
     # In daemon mode, we don't want to wait until shutdown to flush taskless
     if task.manager.is_daemon:

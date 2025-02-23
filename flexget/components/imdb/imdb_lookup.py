@@ -15,8 +15,9 @@ logger = logger.bind(name='imdb_lookup')
 
 
 class ImdbLookup:
-    """Retrieves imdb information for entries.
-    Also provides imdb lookup functionality to all other imdb related plugins.
+    """Retrieve imdb information for entries.
+
+    Also provide imdb lookup functionality to all other imdb related plugins.
 
     Example::
 
@@ -61,7 +62,7 @@ class ImdbLookup:
 
     @register_lazy_lookup('imdb_lookup')
     def lazy_loader(self, entry):
-        """Does the lookup for this entry and populates the entry fields."""
+        """Do the lookup for this entry and populate the entry fields."""
         try:
             self.lookup(entry)
         except plugin.PluginError as e:
@@ -70,7 +71,8 @@ class ImdbLookup:
     @with_session
     def imdb_id_lookup(self, movie_title=None, movie_year=None, raw_title=None, session=None):
         """Perform faster lookup providing just imdb_id.
-        Falls back to using basic lookup if data cannot be found from cache.
+
+        Fall back to using basic lookup if data cannot be found from cache.
 
         .. note::
 
@@ -309,7 +311,7 @@ class ImdbLookup:
 
     @property
     def movie_identifier(self):
-        """Returns the plugin main identifier type"""
+        """Returns the plugin main identifier type."""
         return 'imdb_id'
 
 

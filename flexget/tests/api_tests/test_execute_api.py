@@ -7,7 +7,7 @@ from flexget.api.core.tasks import ObjectsContainer as OC
 class TestExecuteAPI:
     @staticmethod
     def get_task_queue(manager):
-        """Used to execute task queue"""
+        """Be used to execute task queue."""
         assert len(manager.task_queue) == 1
         task = manager.task_queue.run_queue.get(timeout=0.5)
         assert task

@@ -33,7 +33,7 @@ def cli():
 
 @cli.command()
 def version():
-    """Prints the version number of the source"""
+    """Print the version number of the source."""
     click.echo(_get_version())
 
 
@@ -86,7 +86,7 @@ def cli_bundle_webui(ui_version: Optional[str] = None):
 @cli.command()
 @click.argument('files', nargs=-1)
 def autoformat(files):
-    """Reformat code with Ruff"""
+    """Reformat code with Ruff."""
     if not files:
         project_root = os.path.dirname(os.path.realpath(__file__))
         files = (project_root,)

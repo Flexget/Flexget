@@ -5,7 +5,9 @@ from flexget.entry import Entry
 
 
 class SearchPlugin:
-    """Fake search plugin. Result differs depending on config value:
+    """Fake search plugin.
+
+    Result differs depending on config value:
     `'fail'`: raises a PluginError
     `False`: Returns an empty list
     list of suffixes:

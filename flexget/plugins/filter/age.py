@@ -11,7 +11,7 @@ logger = logger.bind(name='age')
 
 
 class Age:
-    """Rejects/accepts entries based on date in specified entry field
+    """Rejects/accepts entries based on date in specified entry field.
 
     Example:
       age:

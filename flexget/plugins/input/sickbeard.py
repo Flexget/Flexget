@@ -11,7 +11,8 @@ logger = logger.bind(name='sickbeard')
 
 
 class Sickbeard:
-    """This plugin returns ALL of the shows monitored by Sickbeard.
+    """Return ALL of the shows monitored by Sickbeard.
+
     This includes both ongoing and ended.
     Syntax:
 
@@ -65,7 +66,7 @@ class Sickbeard:
     }
 
     def quality_requirement_builder(self, quality_list):
-        """Translates sickbeards' qualities into format used by Flexget"""
+        """Translate sickbeards' qualities into format used by Flexget."""
         sb_to_fg = {
             'sdtv': 'sdtv',
             'sddvd': 'dvdrip',

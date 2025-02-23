@@ -13,7 +13,7 @@ class TestNpoWatchlistInfo:
     """
 
     def test_npowatchlist_lookup(self, execute_task):
-        """npo_watchlist: Test npo watchlist lookup (ONLINE)"""
+        """npo_watchlist: Test npo watchlist lookup (ONLINE)."""
         task = execute_task('test')
 
         entry = task.find_entry(
@@ -79,7 +79,7 @@ class TestNpoWatchlistPremium:
     """
 
     def test_npowatchlist_lookup(self, execute_task):
-        """npo_watchlist: Test npo watchlist lookup (ONLINE)"""
+        """npo_watchlist: Test npo watchlist lookup (ONLINE)."""
         task = execute_task('test')
         entry = task.find_entry(
             url='https://www.npostart.nl/hollands-hoop/08-02-2020/BV_101396963'
@@ -104,7 +104,7 @@ class TestNpoWatchlistLanguageTheTVDBLookup:
     """
 
     def test_tvdblang_lookup(self, execute_task):
-        """npo_watchlist: Test npo_watchlist tvdb language lookup (ONLINE)"""
+        """npo_watchlist: Test npo_watchlist tvdb language lookup (ONLINE)."""
         task = execute_task('test')
 
         entry = task.find_entry(

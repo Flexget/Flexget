@@ -20,7 +20,9 @@ requests.add_domain_limiter(TimedLimiter('rapidpush.net', '5 seconds'))
 
 
 class RapidpushNotifier:
-    """Example::
+    """Send a Rapidpush notification.
+
+    Example::
 
     notify:
       entries:
@@ -56,7 +58,7 @@ class RapidpushNotifier:
     }
 
     def notify(self, title, message, config):
-        """Send a Rapidpush notification"""
+        """Send a Rapidpush notification."""
         notification = {'title': title, 'message': message}
         if not isinstance(config['api_key'], list):
             config['api_key'] = [config['api_key']]

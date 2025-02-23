@@ -63,7 +63,10 @@ class Interval(_Interval):
 
 
 class CoercingDateTime(DateTime):
-    """Datetime with some features that make it better when used in our templates:
+    """Datetime with some features that make it better when used in our templates.
+
+    The features are:
+
     - Avoids crashing when comparing tz aware and naive datetimes.
       When this happens, it will assume the naive datetime is in the same timezone as the dt aware one.
     - Allows comparisons with plain dates, where the date is assumed to be at midnight in the same timezone.
@@ -125,7 +128,7 @@ class CoercingDateTime(DateTime):
         return DateTime.__sub__(self, other)
 
     def diff(self, dt: Optional[datetime] = None, abs: bool = True) -> Interval:
-        """Returns the difference between two DateTime objects represented as an Interval."""
+        """Return the difference between two DateTime objects represented as an Interval."""
         if dt is None:
             dt = self.now(self.tz)
 
@@ -133,12 +136,12 @@ class CoercingDateTime(DateTime):
 
 
 def filter_pathbase(val: Optional[str]) -> str:
-    """Base name of a path."""
+    """Return base name of a path."""
     return os.path.basename(val or '')
 
 
 def filter_pathname(val: Optional[str]) -> str:
-    """Base name of a path, without its extension."""
+    """Return base name of a path, without its extension."""
     return os.path.splitext(os.path.basename(val or ''))[0]
 
 
@@ -175,26 +178,26 @@ def filter_re_search(val, pattern: str):
 
 
 def filter_formatdate(val, format_str):
-    """Returns a string representation of a datetime object according to format string."""
+    """Return a string representation of a datetime object according to format string."""
     if not isinstance(val, (datetime, date, time)):
         return val
     return val.strftime(format_str)
 
 
 def filter_parsedate(val):
-    """Attempts to parse a date according to the rules in ISO 8601 and RFC 2822"""
+    """Attempt to parse a date according to the rules in ISO 8601 and RFC 2822."""
     return CoercingDateTime.instance(pendulum.parse(val, strict=False, tz=None))
 
 
 def filter_date_suffix(date_str: str):
-    """Returns a date suffix for a given date"""
+    """Return a date suffix for a given date."""
     day = int(date_str[-2:])
     suffix = 'th' if 4 <= day <= 20 or 24 <= day <= 30 else ['st', 'nd', 'rd'][day % 10 - 1]
     return date_str + suffix
 
 
 def filter_format_number(val, places: Optional[int] = None, grouping: bool = True) -> str:
-    """Formats a number according to the user's locale."""
+    """Format a number according to the user's locale."""
     if not isinstance(val, (int, float)):
         return val
     if places is not None:
@@ -209,19 +212,19 @@ def filter_format_number(val, places: Optional[int] = None, grouping: bool = Tru
 
 
 def filter_pad(val: Union[int, str], width: int, fillchar: str = '0') -> str:
-    """Pads a number or string with fillchar to the specified width."""
+    """Pad a number or string with fillchar to the specified width."""
     return str(val).rjust(width, fillchar)
 
 
 def filter_to_date(date_time_val):
-    """Returns the date from any date-time object"""
+    """Return the date from any date-time object."""
     if not isinstance(date_time_val, (datetime, date, time)):
         return date_time_val
     return date_time_val.date()
 
 
 def filter_default(value, default_value: str = '', boolean: bool = True) -> str:
-    """Override the built-in Jinja default filter to set the `boolean` param to True by default"""
+    """Override the built-in Jinja default filter to set the `boolean` param to True by default."""
     return jinja2.filters.do_default(value, default_value, boolean)
 
 
@@ -229,7 +232,7 @@ filter_d = filter_default
 
 
 def filter_asciify(text: str) -> str:
-    """Siplify text"""
+    """Siplify text."""
     if not isinstance(text, str):
         return text
 
@@ -240,7 +243,7 @@ def filter_asciify(text: str) -> str:
 
 
 def filter_strip_symbols(text: str) -> str:
-    """Strip Symbols text"""
+    """Strip Symbols text."""
     if not isinstance(text, str):
         return text
 
@@ -261,7 +264,7 @@ def filter_get_year(name: str) -> str:
 
 
 def filter_parse_size(val: str, si: bool = False, match_re: Optional[str] = None) -> int:
-    """Parse human-readable file size to bytes"""
+    """Parse human-readable file size to bytes."""
     if not isinstance(val, str):
         return val
 
@@ -278,17 +281,17 @@ def filter_format_size(size: float, si=False, unit=None):
 
 
 def is_fs_file(pathname: Union[str, os.PathLike]) -> bool:
-    """Test whether item is existing file in filesystem"""
+    """Test whether item is existing file in filesystem."""
     return os.path.isfile(pathname)
 
 
 def is_fs_dir(pathname: Union[str, os.PathLike]) -> bool:
-    """Test whether item is existing directory in filesystem"""
+    """Test whether item is existing directory in filesystem."""
     return os.path.isdir(pathname)
 
 
 def is_fs_link(pathname: Union[str, os.PathLike]) -> bool:
-    """Test whether item is existing link in filesystem"""
+    """Test whether item is existing link in filesystem."""
     return os.path.islink(pathname)
 
 
@@ -306,14 +309,14 @@ class FlexGetNativeTemplate(FlexGetTemplate, NativeTemplate):
 
 
 class FlexGetEnvironment(Environment):
-    """Environment with template_class support"""
+    """Environment with template_class support."""
 
     template_class: type[FlexGetTemplate]
 
 
 @event('manager.initialize')
 def make_environment(manager: 'Manager') -> None:
-    """Create our environment and add our custom filters"""
+    """Create our environment and add our custom filters."""
     global environment
     environment = FlexGetEnvironment(
         undefined=StrictUndefined,
@@ -335,14 +338,14 @@ def make_environment(manager: 'Manager') -> None:
 
 
 def list_templates(extensions: Optional[list[str]] = None) -> list[str]:
-    """Returns all templates names that are configured under environment loader dirs"""
+    """Return all templates names that are configured under environment loader dirs."""
     if environment is None or not hasattr(environment, 'loader'):
         return []
     return environment.list_templates(extensions=extensions)
 
 
 def get_filters() -> dict:
-    """Returns all built-in and custom Jinja filters in a dict
+    """Return all built-in and custom Jinja filters in a dict.
 
     The key is the name, and the value is the filter func
     """
@@ -352,7 +355,7 @@ def get_filters() -> dict:
 
 
 def get_template(template_name: str, scope: Optional[str] = 'task') -> FlexGetTemplate:
-    """Loads a template from disk. Looks in both included plugins and users custom scope dir."""
+    """Load a template from disk. Looks in both included plugins and users custom scope dir."""
     if not template_name.endswith('.template'):
         template_name += '.template'
     locations = []
@@ -370,7 +373,7 @@ def get_template(template_name: str, scope: Optional[str] = 'task') -> FlexGetTe
 
 
 def render(template: Union[FlexGetTemplate, str], context: Mapping, native: bool = False) -> str:
-    """Renders a Template with `context` as its context.
+    """Render a Template with `context` as its context.
 
     :param template: Template or template string to render.
     :param context: Context to render the template from.
@@ -401,7 +404,7 @@ def render(template: Union[FlexGetTemplate, str], context: Mapping, native: bool
 def render_from_entry(
     template: Union[FlexGetTemplate, str], entry: 'Entry', native: bool = False
 ) -> str:
-    """Renders a Template or template string with an Entry as its context."""
+    """Render a Template or template string with an Entry as its context."""
     # Make a copy of the Entry so we can add some more fields
     variables = copy(entry.store)
     variables.update(extra_vars())
@@ -416,7 +419,7 @@ def render_from_entry(
 
 
 def render_from_task(template: Union[FlexGetTemplate, str], task: 'Task') -> str:
-    """Renders a Template with a task as its context.
+    """Render a Template with a task as its context.
 
     :param template: Template or template string to render.
     :param task: Task to render the template from.
@@ -428,7 +431,7 @@ def render_from_task(template: Union[FlexGetTemplate, str], task: 'Task') -> str
 
 
 def evaluate_expression(expression: str, context: Mapping) -> Any:
-    """Evaluate a jinja `expression` using a given `context` with support for `LazyDict`s (`Entry`s.)
+    """Evaluate a jinja `expression` using a given `context` with support for `LazyDict`s (`Entry`s.).
 
     :param str expression:  A jinja expression to evaluate
     :param context: dictlike, supporting LazyDicts

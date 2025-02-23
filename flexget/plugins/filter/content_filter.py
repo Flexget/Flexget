@@ -83,7 +83,7 @@ class FilterContentFilter:
             logger.debug('{} files: {}', entry['title'], files)
 
             def matching_mask(file, mask):
-                """Returns matching mask if any files match any of the masks, false otherwise"""
+                """Return matching mask if any files match any of the masks, false otherwise."""
                 if config.get('regexp_mode'):
                     return re.search(mask, file, re.IGNORECASE)
                 return fnmatch(file, mask)

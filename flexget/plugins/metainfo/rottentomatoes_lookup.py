@@ -70,7 +70,7 @@ class PluginRottenTomatoesLookup:
 
     @register_lazy_lookup('rottentomatoes_lookup')
     def lazy_loader(self, entry):
-        """Does the lookup for this entry and populates the entry fields.
+        """Do the lookup for this entry and populate the entry fields.
 
         :param entry: entry to perform lookup on
         :returns: the field value
@@ -119,7 +119,7 @@ class PluginRottenTomatoesLookup:
 
     @property
     def movie_identifier(self):
-        """Returns the plugin main identifier type"""
+        """Returns the plugin main identifier type."""
         return 'rt_id'
 
 

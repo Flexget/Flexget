@@ -20,7 +20,8 @@ requests.add_domain_limiter(TimedLimiter('sms.ru', '5 seconds'))
 
 
 class SMSRuNotifier:
-    """Sends SMS notification through sms.ru http api sms/send.
+    """Send SMS notification through sms.ru http api sms/send.
+
     Phone number is a login assigned to sms.ru account.
 
     Example:
@@ -41,7 +42,7 @@ class SMSRuNotifier:
     }
 
     def notify(self, title, message, config):
-        """Send an SMS RU notification"""
+        """Send an SMS RU notification."""
         try:
             token_response = requests.get(SMS_TOKEN_URL)
         except RequestException as e:

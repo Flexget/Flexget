@@ -10,7 +10,8 @@ logger = logger.bind(name='argenteam')
 
 
 class SearchArgenteam:
-    """Argenteam
+    """Argenteam.
+
     Search plugin which gives results from www.argenteam.net, latin american (Argentina) web.
 
     Configuration:
@@ -32,7 +33,7 @@ class SearchArgenteam:
 
     @plugin.internet(logger)
     def search(self, task, entry, config):
-        """Search for releases"""
+        """Search for releases."""
         entries = set()
 
         for search_string in entry.get('search_strings', [entry['title']]):

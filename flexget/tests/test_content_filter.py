@@ -191,12 +191,12 @@ class TestContentFilter:
         )
 
     def test_strict(self, execute_task):
-        """Content Filter: strict enabled"""
+        """Content Filter: strict enabled."""
         task = execute_task('test_strict')
         assert task.find_entry('rejected', title='test'), 'should have rejected non torrent'
 
     def test_cache(self, execute_task):
-        """Content Filter: caching"""
+        """Content Filter: caching."""
         task = execute_task('test_cache')
 
         assert task.find_entry('rejected', title='test'), 'should have rejected, contains *.iso'

@@ -18,7 +18,7 @@ orig_execute = None
 
 
 def log_query_count(name_point):
-    """Debugging purposes, allows logging number of executed queries at :name_point:"""
+    """Debugging purposes, allows logging number of executed queries at :name_point:."""
     logger.info('At point named `{}` total of {} queries were ran', name_point, query_count)
 
 

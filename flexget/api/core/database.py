@@ -32,7 +32,7 @@ class DBOperation(APIResource):
     @api.validate(input_schema)
     @api.response(200, model=base_message_schema)
     def post(self, session: Session = None) -> Response:
-        """Perform DB operations"""
+        """Perform DB operations."""
         msg = ''
         data = request.json
         operation = data['operation']
@@ -61,5 +61,5 @@ class DBOperation(APIResource):
 class DBCleanup(APIResource):
     @api.response(200, model=plugins_schema)
     def get(self, session: Session = None) -> Response:
-        """List resettable DB plugins"""
+        """List resettable DB plugins."""
         return jsonify(sorted(plugin_schemas))

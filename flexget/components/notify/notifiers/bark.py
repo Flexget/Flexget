@@ -14,7 +14,9 @@ logger = logger.bind(name=plugin_name)
 
 
 class BarkNotifier:
-    """Example::
+    """Send notification to Bark.
+
+    Example::
 
       notify:
         entries:
@@ -72,7 +74,7 @@ class BarkNotifier:
         return server, options
 
     def notify(self, title, message, config):
-        """Send notification to Bark"""
+        """Send notification to Bark."""
         notification = {
             'title': title,
             'body': message,

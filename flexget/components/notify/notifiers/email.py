@@ -153,7 +153,7 @@ class EmailNotifier:
     }
 
     def notify(self, title, message, config):
-        """Send an email notification
+        """Send an email notification.
 
         :param str message: message body
         :param str title: message subject

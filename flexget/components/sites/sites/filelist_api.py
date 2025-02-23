@@ -83,7 +83,7 @@ class SearchFileList:
 
     @plugin.internet(logger)
     def search(self, task, entry, config):
-        """Search for entries on FileList"""
+        """Search for entries on FileList."""
         entries = []
 
         # mandatory params

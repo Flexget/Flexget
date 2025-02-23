@@ -31,7 +31,7 @@ class PluginSpyHeaders:
         task.requests.hooks['response'].append(self.log_requests_headers)
 
     def on_task_exit(self, task, config):
-        """Task exiting, remove additions"""
+        """Task exiting, remove additions."""
         if not config:
             return
         task.requests.hooks['response'].remove(self.log_requests_headers)

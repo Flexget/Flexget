@@ -15,6 +15,7 @@ logger = logger.bind(name='remember_rej')
 
 class FilterRememberRejected:
     """Internal.
+
     Rejects entries which have been rejected in the past.
 
     This is enabled when item is rejected with remember=True flag.
@@ -57,7 +58,7 @@ class FilterRememberRejected:
 
     @plugin.priority(plugin.PRIORITY_FIRST)
     def on_task_filter(self, task, config):
-        """Reject any remembered entries from previous runs"""
+        """Reject any remembered entries from previous runs."""
         with Session() as session:
             (task_id,) = (
                 session.query(db.RememberTask.id).filter(db.RememberTask.name == task.name).first()

@@ -151,7 +151,7 @@ class InputDeluge(DelugePlugin):
         return config
 
     def on_task_input(self, task, config):
-        """Generates and returns a list of entries from the deluge daemon."""
+        """Generate and return a list of entries from the deluge daemon."""
         config = self.prepare_config(config)
         # Reset the entries list
         client = self.setup_client(config)
@@ -283,9 +283,7 @@ class OutputDeluge(DelugePlugin):
 
     @plugin.priority(120)
     def on_task_download(self, task, config):
-        """Call download plugin to generate the temp files we will load into deluge
-        then verify they are valid torrents
-        """
+        """Call download plugin to generate the temp files we will load into deluge then verify they are valid torrents."""
         config = self.prepare_config(config)
         if not config['enabled']:
             return
@@ -496,7 +494,7 @@ class OutputDeluge(DelugePlugin):
         client.disconnect()
 
     def on_task_learn(self, task, config):
-        """Make sure all temp files are cleaned up when entries are learned"""
+        """Make sure all temp files are cleaned up when entries are learned."""
         # If download plugin is enabled, it will handle cleanup.
         if 'download' not in task.config:
             download = plugin.get('download', self)
@@ -507,14 +505,14 @@ class OutputDeluge(DelugePlugin):
         self.on_task_learn(task, config)
 
     def _format_label(self, label):
-        """Makes a string compliant with deluge label naming rules"""
+        """Make a string compliant with deluge label naming rules."""
         # "No Label" is a special identifier to unset a label
         if label.lower() == 'no label':
             return 'No Label'
         return re.sub(r'[^\w-]+', '_', label.lower())
 
     def _set_torrent_options(self, client, torrent_id, entry, opts):
-        """Gets called when a torrent was added to the daemon."""
+        """Get called when a torrent was added to the daemon."""
         entry['deluge_id'] = torrent_id
 
         if opts.get('move_completed_path'):

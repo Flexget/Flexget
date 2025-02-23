@@ -15,7 +15,7 @@ class UrlRewritingError(Exception):
 
 
 class PluginUrlRewriting:
-    """Provides URL rewriting framework"""
+    """Provide URL rewriting framework."""
 
     def __init__(self):
         self.disabled_rewriters = []

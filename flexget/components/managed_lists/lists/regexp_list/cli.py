@@ -10,7 +10,7 @@ from . import db
 
 
 def do_cli(manager, options):
-    """Handle regexp-list cli"""
+    """Handle regexp-list cli."""
     action_map = {
         'all': action_all,
         'list': action_list,
@@ -23,7 +23,7 @@ def do_cli(manager, options):
 
 
 def action_all(options):
-    """Show all regexp lists"""
+    """Show all regexp lists."""
     lists = db.get_regexp_lists()
     header = ['#', 'List Name']
     table = TerminalTable(*header, table_type=options.table_type)
@@ -33,7 +33,7 @@ def action_all(options):
 
 
 def action_list(options):
-    """List regexp list"""
+    """List regexp list."""
     with Session() as session:
         regexp_list = db.get_list_by_exact_name(options.list_name)
         if not regexp_list:

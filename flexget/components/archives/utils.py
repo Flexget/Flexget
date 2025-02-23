@@ -1,4 +1,4 @@
-"""Utilities for handling RAR and ZIP archives
+"""Utilities for handling RAR and ZIP archives.
 
 Provides wrapper archive and exception classes to simplify
 archive extraction
@@ -19,37 +19,35 @@ logger = logger.bind(name='archive')
 
 
 class ArchiveError(Exception):
-    """Base exception for archive"""
+    """Base exception for archive."""
 
 
 class NeedRarFile(ArchiveError):
-    """Exception to be raised when rarfile module is missing"""
+    """Exception to be raised when rarfile module is missing."""
 
 
 class BadArchive(ArchiveError):
-    """Wrapper exception for BadZipFile and BadRarFile"""
+    """Wrapper exception for BadZipFile and BadRarFile."""
 
 
 class NeedFirstVolume(ArchiveError):
-    """Wrapper exception for rarfile.NeedFirstVolume"""
+    """Wrapper exception for rarfile.NeedFirstVolume."""
 
 
 class PathError(ArchiveError):
-    """Exception to be raised when an archive file doesn't exist"""
+    """Exception to be raised when an archive file doesn't exist."""
 
 
 class FSError(ArchiveError):
-    """Exception to be raised on OS/IO exceptions"""
+    """Exception to be raised on OS/IO exceptions."""
 
 
 class FileAlreadyExists(ArchiveError):
-    """Exception to be raised when destination file already exists"""
+    """Exception to be raised when destination file already exists."""
 
 
 def rarfile_set_tool_path(config):
-    """Manually set the path of unrar executable if it can't be resolved from the
-    PATH environment variable
-    """
+    """Manually set the path of unrar executable if it can't be resolved from the PATH environment variable."""
     unrar_tool = config['unrar_tool']
 
     if unrar_tool:
@@ -61,22 +59,20 @@ def rarfile_set_tool_path(config):
 
 
 def rarfile_set_path_sep(separator):
-    """Set the path separator on rarfile module"""
+    """Set the path separator on rarfile module."""
     if rarfile:
         rarfile.PATH_SEP = separator
 
 
 def makepath(path):
-    """Make directories as needed"""
+    """Make directories as needed."""
     if not os.path.exists(path):
         logger.debug('Creating path: {}', path)
         os.makedirs(path)
 
 
 class Archive:
-    """Base archive class. Assumes an interface similar to
-    zipfile.ZipFile or rarfile.RarFile
-    """
+    """Base archive class. Assumes an interface similar to zipfile.ZipFile or rarfile.RarFile."""
 
     def __init__(self, archive_object, path):
         self.path = path
@@ -88,7 +84,7 @@ class Archive:
         self.archive.close()
 
     def delete(self):
-        """Delete the volumes that make up this archive"""
+        """Delete the volumes that make up this archive."""
         volumes = self.volumes()
         self.close()
 
@@ -100,11 +96,11 @@ class Archive:
             raise FSError(error)
 
     def volumes(self):
-        """Returns the list of volumes that comprise this archive"""
+        """Return the list of volumes that comprise this archive."""
         return [self.path]
 
     def infolist(self):
-        """Returns a list of info objects describing the contents of this archive"""
+        """Return a list of info objects describing the contents of this archive."""
         infolist = []
 
         for info in self.archive.infolist():
@@ -117,11 +113,11 @@ class Archive:
         return infolist
 
     def open(self, member):
-        """Returns file-like object from where the data of a member file can be read."""
+        """Return file-like object from where the data of a member file can be read."""
         return self.archive.open(member)
 
     def extract_file(self, member, destination):
-        """Extract a member file to the specified destination"""
+        """Extract a member file to the specified destination."""
         try:
             with self.open(member) as source, open(destination, 'wb') as target:
                 shutil.copyfileobj(source, target)
@@ -130,7 +126,7 @@ class Archive:
 
 
 class RarArchive(Archive):
-    """Wrapper class for rarfile.RarFile"""
+    """Wrapper class for rarfile.RarFile."""
 
     def __init__(self, path):
         RarArchive.check_import()
@@ -145,11 +141,11 @@ class RarArchive(Archive):
             raise ArchiveError(error)
 
     def volumes(self):
-        """Returns the list of volumes that comprise this archive"""
+        """Return the list of volumes that comprise this archive."""
         return self.archive.volumelist()
 
     def open(self, member):
-        """Returns file-like object from where the data of a member file can be read."""
+        """Return file-like object from where the data of a member file can be read."""
         try:
             return super().open(member)
         except rarfile.Error as error:
@@ -162,7 +158,7 @@ class RarArchive(Archive):
 
 
 class ZipArchive(Archive):
-    """Wrapper class for zipfile.ZipFile"""
+    """Wrapper class for zipfile.ZipFile."""
 
     def __init__(self, path):
         try:
@@ -171,7 +167,7 @@ class ZipArchive(Archive):
             raise BadArchive(error)
 
     def open(self, member):
-        """Returns file-like object from where the data of a member file can be read."""
+        """Return file-like object from where the data of a member file can be read."""
         try:
             return super().open(member)
         except zipfile.BadZipfile as error:
@@ -179,7 +175,7 @@ class ZipArchive(Archive):
 
 
 class ArchiveInfo:
-    """Wrapper class for  archive info objects"""
+    """Wrapper class for  archive info objects."""
 
     def __init__(self, info):
         self.info = info
@@ -190,13 +186,13 @@ class ArchiveInfo:
             raise ValueError(f'Appears to be a directory: {self.path}')
 
     def _is_dir(self):
-        """Indicates if info object looks to be a directory"""
+        """Indicate if info object looks to be a directory."""
         if hasattr(self.info, 'isdir'):
             return self.info.isdir()
         return not self.filename
 
     def extract(self, archive, destination):
-        """Extract ArchiveInfo object to the specified destination"""
+        """Extract ArchiveInfo object to the specified destination."""
         dest_dir = os.path.dirname(destination)
 
         if os.path.exists(destination):
@@ -217,7 +213,7 @@ class ArchiveInfo:
 
 
 def open_archive(archive_path):
-    """Returns the appropriate archive object"""
+    """Return the appropriate archive object."""
     archive = None
 
     if not os.path.exists(archive_path):
@@ -236,7 +232,7 @@ def open_archive(archive_path):
 
 
 def is_archive(path):
-    """Attempts to open an entry as an archive; returns True on success, False on failure."""
+    """Attempt to open an entry as an archive; return True on success, False on failure."""
     archive = None
 
     try:

@@ -24,7 +24,7 @@ class TestInfoHash:
     """
 
     def test_infohash(self, execute_task):
-        """Torrent: infohash parsing"""
+        """Torrent: infohash parsing."""
         task = execute_task('test')
         info_hash = task.entries[0].get('torrent_info_hash')
         assert info_hash == '14FFE5DD23188FD5CB53A1D47F1289DB70ABF31E', (
@@ -32,7 +32,7 @@ class TestInfoHash:
         )
 
     def test_magnet_infohash(self, execute_task):
-        """Tests metainfo/magnet_btih plugin"""
+        """Test metainfo/magnet_btih plugin."""
         task = execute_task('test_magnet')
         assert (
             task.all_entries[0]['torrent_info_hash'] == '2A8959BED2BE495BB0E3EA96F497D873D5FAED05'

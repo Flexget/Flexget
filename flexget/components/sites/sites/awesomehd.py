@@ -41,7 +41,7 @@ class SearchAwesomeHD:
 
     @plugin.internet(logger)
     def search(self, task, entry, config):
-        """Search for entries on AwesomeHD"""
+        """Search for entries on AwesomeHD."""
         # need lxml to parse xml
         try:
             import lxml  # noqa: F401

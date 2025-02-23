@@ -13,7 +13,8 @@ logger = logger.bind(name='rlsbb')
 
 
 class UrlRewriteRlsbb:
-    r"""rlsbb.ru urlrewriter
+    r"""rlsbb.ru urlrewriter.
+
     Version 0.1
 
     Configuration

@@ -13,7 +13,7 @@ logger = logger.bind(name='horriblesubs')
 
 
 class HorribleSubs:
-    """Give latest horriblesubs releases"""
+    """Give latest horriblesubs releases."""
 
     schema = {'type': 'boolean'}
 

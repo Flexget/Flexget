@@ -186,24 +186,25 @@ class NfoReader:
 
     @staticmethod
     def _single_elem_getter_func(x):
-        """Method to get the text value of simple XML element that does not contain child nodes."""
+        """Get the text value of simple XML element that does not contain child nodes."""
         return x.text
 
     @staticmethod
     def _composite_elem_getter_func(x):
-        """Method to get XML elements that have children as a dictionary."""
+        """Get XML elements that have children as a dictionary."""
         return {i.tag: i.text for i in x}
 
     def _extract_single_field(self, name, getter_func):
-        """Use this method to get fields from the root XML tree that only appear once, such as 'title', 'year', etc."""
+        """Get fields from the root XML tree that only appear once, such as 'title', 'year', etc."""
         f = self._root.find(name)
         if f is not None:
             return getter_func(f)
         return None
 
     def _extract_multiple_field(self, name, getter_func):
-        """Use this method to get fields from the root XML tree that can appear more than once, such as 'actor', 'genre',
-        'director', etc. The result will be a list of values.
+        """Use this method to get fields from the root XML tree that can appear more than once, such as 'actor', 'genre', 'director', etc.
+
+        The result will be a list of values.
         """
         values = [getter_func(i) for i in self._root.findall(name)]
 
@@ -212,7 +213,7 @@ class NfoReader:
         return None
 
     def get_fields_from_nfo_file(self):
-        """Returns a dictionary with all firlds read from the '.nfo' file.
+        """Return a dictionary with all firlds read from the '.nfo' file.
 
         The keys are named as 'nfo_something'.
         """

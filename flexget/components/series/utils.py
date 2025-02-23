@@ -6,7 +6,7 @@ for char in '_./-,[]():':
 
 
 def normalize_series_name(name):
-    """Returns a normalized version of the series name."""
+    """Return a normalized version of the series name."""
     name = name.lower()
     name = name.replace('&amp;', ' and ')
     name = name.translate(TRANSLATE_MAP)  # Replaced some symbols with spaces

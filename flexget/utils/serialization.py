@@ -63,7 +63,7 @@ def dumps(value: Any) -> str:
 
 
 def loads(value: str) -> Any:
-    """Restore an object from JSON text created by `dumps`"""
+    """Restore an object from JSON text created by `dumps`."""
     return deserialize(json.loads(value))
 
 
@@ -75,18 +75,20 @@ def yaml_dump(data, *args, **kwargs):
 
 
 def yaml_load(stream):
-    """Restore an object from YAML text created by `yaml_dump`"""
+    """Restore an object from YAML text created by `yaml_dump`."""
     return yaml.load(stream, Loader=FGLoader)
 
 
 class Serializer(ABC):
-    """Any data types that should be serializable should subclass this, and implement the `serialize` and `deserialize`
-    methods. This is important for data that is stored in `Entry` fields so that it can be stored to the database.
+    """Any data types that should be serializable should subclass this, and implement the `serialize` and `deserialize` methods.
+
+    This is important for data that is stored in `Entry` fields so that it can be stored to the database.
     """
 
     @classmethod
     def serializer_name(cls) -> str:
-        """Name of the serializer defaults to class name.
+        """Return name of the serializer defaults to class name.
+
         This can be overridden in subclass implementations if desired.
         """
         return cls.__name__
@@ -94,6 +96,7 @@ class Serializer(ABC):
     @classmethod
     def serializer_version(cls) -> int:
         """If the format of serialization changes, this number should be incremented.
+
         The `deserialize` method of this class should continue to handle the old versions as well as the
         current version.
         """
@@ -107,12 +110,12 @@ class Serializer(ABC):
     @classmethod
     @abstractmethod
     def serialize(cls, value: Any) -> Any:
-        """This method should be implemented to return a plain python datatype which is json serializable."""
+        """Return a plain python datatype which is json serializable."""
 
     @classmethod
     @abstractmethod
     def deserialize(cls, data: Any, version: int) -> Any:
-        """Returns an instance of the original class, recreated from the serialized form."""
+        """Return an instance of the original class, recreated from the serialized form."""
 
 
 # Dates and DateTimes are not always symmetric using strftime and strptime :eyeroll:

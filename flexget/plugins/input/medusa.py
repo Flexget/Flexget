@@ -25,7 +25,8 @@ class Medusa:
     }
 
     def on_task_input(self, task, config):
-        """This plugin returns ALL of the shows monitored by Medusa.
+        """Return ALL of the shows monitored by Medusa.
+
         This includes both ongoing and ended.
         Syntax:
 

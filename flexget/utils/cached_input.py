@@ -94,7 +94,7 @@ class InputCacheEntry(Base):
 
 @event('manager.db_cleanup')
 def db_cleanup(manager, session: DBSession) -> None:
-    """Removes old input caches from plugins that are no longer configured."""
+    """Remove old input caches from plugins that are no longer configured."""
     result = (
         session.query(InputCache)
         .filter(InputCache.added < datetime.now() - timedelta(days=7))
@@ -217,6 +217,7 @@ class cached:  # noqa: N801 It acts like a function in usage
 
 class IterableCache:
     """Can cache any iterable (including generators) without immediately evaluating all entries.
+
     If `finished_hook` is supplied, it will be called the first time the iterable is run to the end.
     """
 

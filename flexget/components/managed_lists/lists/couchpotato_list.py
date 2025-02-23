@@ -58,7 +58,7 @@ class CouchPotatoBase:
 
     @staticmethod
     def quality_requirement_builder(quality_profile):
-        """Converts CP's quality profile to a format that can be converted to FlexGet QualityRequirement"""
+        """Convert CP's quality profile to a format that can be converted to FlexGet QualityRequirement."""
         # TODO: Not all values have exact matches in flexget, need to update flexget qualities
         sources = {
             'BR-Disk': 'remux',  # Not a perfect match, but as close as currently possible
@@ -236,8 +236,9 @@ class CouchPotatoSet(MutableSet):
 
     @property
     def online(self):
-        """Set the online status of the plugin, online plugin should be treated differently in certain situations,
-        like test mode
+        """Set the online status of the plugin.
+
+        Online plugin should be treated differently in certain situations, like test mode
         """
         return True
 

@@ -96,7 +96,7 @@ class SearchPassThePopcorn:
 
     @plugin.internet(logger)
     def search(self, task, entry, config):
-        """Search for entries on PassThePopcorn"""
+        """Search for entries on PassThePopcorn."""
         params = {}
 
         if 'tags' in config:

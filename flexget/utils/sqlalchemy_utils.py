@@ -43,16 +43,15 @@ def index_exists(table_name: str, index_name: str, session: Session) -> bool:
 
 
 def table_schema(name: str, session: Session) -> Table:
-    """:returns: Table schema using SQLAlchemy reflect as it currently exists in the db
-    :rtype: Table
-    """
+    """Return Table schema using SQLAlchemy reflect as it currently exists in the db."""
     return Table(name, MetaData(), autoload_with=session.bind)
 
 
 def table_columns(table: Union[str, Table], session: Session) -> list[str]:
-    """:param string table: Name of table or table schema
+    """Return list of column names in the table or empty list.
+
+    :param string table: Name of table or table schema
     :param Session session: SQLAlchemy Session
-    :returns: List of column names in the table or empty list
     """
     if isinstance(table, str):
         table = table_schema(table, session)
@@ -60,7 +59,7 @@ def table_columns(table: Union[str, Table], session: Session) -> list[str]:
 
 
 def table_index(table_name: str, index_name: str, session: Session) -> Index:
-    """Finds an index by table name and index name
+    """Find an index by table name and index name.
 
     :param string table_name: Name of table
     :param string index_name: Name of the index
@@ -72,7 +71,7 @@ def table_index(table_name: str, index_name: str, session: Session) -> Index:
 
 
 def drop_index(table_name: str, index_name: str, session: Session) -> None:
-    """Drops an index by table name and index name
+    """Drop an index by table name and index name.
 
     :param string table_name: Name of table
     :param string index_name: Name of the index
@@ -89,7 +88,7 @@ def table_add_column(
     session: Session,
     default: Any = None,
 ) -> None:
-    """Adds a column to a table
+    """Add a column to a table.
 
     .. warning:: Uses raw statements, probably needs to be changed in
                  order to work on other databases besides SQLite
@@ -126,7 +125,7 @@ def table_add_column(
 
 
 def drop_tables(names: list[str], session: Session) -> None:
-    """Takes a list of table names and drops them from the database if they exist."""
+    """Take a list of table names and drops them from the database if they exist."""
     metadata = MetaData()
     metadata.reflect(bind=session.bind)
     for table in metadata.sorted_tables:
@@ -135,7 +134,7 @@ def drop_tables(names: list[str], session: Session) -> None:
 
 
 def get_index_by_name(table: Table, name: str) -> Optional[Index]:
-    """Find declaratively defined index from table by name
+    """Find declaratively defined index from table by name.
 
     :param table: Table object
     :param string name: Name of the index to get
@@ -148,7 +147,7 @@ def get_index_by_name(table: Table, name: str) -> Optional[Index]:
 
 
 def create_index(table_name: str, session: Session, *column_names: str) -> None:
-    """Creates an index on specified `columns` in `table_name`
+    """Create an index on specified `columns` in `table_name`.
 
     :param table_name: Name of table to create the index on.
     :param session: Session object which should be used
@@ -164,7 +163,7 @@ def create_index(table_name: str, session: Session, *column_names: str) -> None:
 
 
 class ContextSession(Session):
-    """:class:`sqlalchemy.orm.Session` which automatically commits when used as context manager without errors"""
+    """:class:`sqlalchemy.orm.Session` which automatically commits when used as context manager without errors."""
 
     # TODO: This auto-committing might be a bad idea and need to be removed
     # might be hard to figure out where exactly code needs to be updated to compensate though.

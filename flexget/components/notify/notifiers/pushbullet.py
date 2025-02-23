@@ -21,7 +21,9 @@ requests.add_domain_limiter(TimedLimiter('pushbullet.com', '5 seconds'))
 
 
 class PushbulletNotifier:
-    """Example::
+    """Send a Pushbullet notification.
+
+    Example::
 
     notify:
       entries:
@@ -65,7 +67,7 @@ class PushbulletNotifier:
     }
 
     def notify(self, title, message, config):
-        """Send a Pushbullet notification"""
+        """Send a Pushbullet notification."""
         if config.get('device') and not isinstance(config['device'], list):
             config['device'] = [config['device']]
 

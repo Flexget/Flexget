@@ -56,7 +56,7 @@ class RetryFailed(APIResource):
     @api.response(200, model=retry_entries_list_schema)
     @api.doc(expect=[failed_parser])
     def get(self, session=None):
-        """List all failed entries"""
+        """List all failed entries."""
         args = failed_parser.parse_args()
 
         # Pagination and sorting params
@@ -115,7 +115,7 @@ class RetryFailed(APIResource):
 
     @api.response(200, 'successfully deleted failed entry', model=base_message_schema)
     def delete(self, session=None):
-        """Clear all failed entries"""
+        """Clear all failed entries."""
         logger.debug('deleting all failed entries')
         deleted = session.query(db.FailedEntry).delete()
         return success_response(f'successfully deleted {deleted} failed entries')
@@ -128,7 +128,7 @@ class RetryFailedID(APIResource):
     @api.doc(params={'failed_entry_id': 'ID of the failed entry'})
     @api.response(200, model=retry_failed_entry_schema)
     def get(self, failed_entry_id, session=None):
-        """Get failed entry by ID"""
+        """Get failed entry by ID."""
         try:
             failed_entry = (
                 session.query(db.FailedEntry).filter(db.FailedEntry.id == failed_entry_id).one()
@@ -139,7 +139,7 @@ class RetryFailedID(APIResource):
 
     @api.response(200, 'successfully delete failed entry', model=base_message_schema)
     def delete(self, failed_entry_id, session=None):
-        """Delete failed entry by ID"""
+        """Delete failed entry by ID."""
         try:
             failed_entry = (
                 session.query(db.FailedEntry).filter(db.FailedEntry.id == failed_entry_id).one()

@@ -78,7 +78,7 @@ class MovieParseResult:
 
     @property
     def fields(self) -> dict:
-        """Return a dict of all parser fields"""
+        """Return a dict of all parser fields."""
         return {
             'id': self.identifier,
             'movie_parser': self,
@@ -154,7 +154,7 @@ class SeriesParseResult:
 
     @property
     def identifiers(self) -> list[str]:
-        """Return all identifiers this parser represents. (for packs)"""
+        """Return all identifiers this parser represents. (for packs)."""
         # Currently 'ep' is the only id type that supports packs
         if not self.valid:
             raise RuntimeError('Series flagged invalid')
@@ -172,8 +172,9 @@ class SeriesParseResult:
 
     @property
     def identifier(self) -> str:
-        """Return String identifier for parsed episode, eg. S01E02
-        (will be the first identifier if this is a pack)
+        """Return String identifier for parsed episode.
+
+        Example: S01E02 (will be the first identifier if this is a pack)
         """
         return self.identifiers[0]
 

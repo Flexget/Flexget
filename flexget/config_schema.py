@@ -43,7 +43,7 @@ class ConfigError(ValueError):
 
 # TODO: Rethink how config key and schema registration work
 def register_schema(path: str, schema: Union[JsonSchema, Callable[..., JsonSchema]]):
-    """Register `schema` to be available at `path` for $refs
+    """Register `schema` to be available at `path` for $refs.
 
     :param path: Path to make schema available
     :param schema: The schema, or function which returns the schema
@@ -56,7 +56,7 @@ _root_config_schema: Optional[JsonSchema] = None
 
 
 def register_config_key(key: str, schema: JsonSchema, required: bool = False):
-    """Registers a valid root level key for the config.
+    """Register a valid root level key for the config.
 
     :param string key:
       Name of the root level key being registered.
@@ -88,10 +88,7 @@ def get_schema() -> JsonSchema:
 
 
 def one_or_more(schema: JsonSchema, unique_items: bool = False) -> JsonSchema:
-    """Helper function to construct a schema that validates items matching `schema` or an array
-    containing items matching `schema`.
-
-    """
+    """Construct a schema that validates items matching `schema` or an array containing items matching `schema`."""
     schema.setdefault('title', 'single value')
     default = schema.pop('default', None)
     result = {
@@ -112,7 +109,7 @@ def one_or_more(schema: JsonSchema, unique_items: bool = False) -> JsonSchema:
 
 
 def resolve_ref(uri: str) -> JsonSchema:
-    """Finds and returns a schema pointed to by `uri` that has been registered in the register_schema function."""
+    """Find and return a schema pointed to by `uri` that has been registered in the register_schema function."""
     parsed = urlparse(uri)
     if parsed.path in schema_paths:
         schema = schema_paths[parsed.path]
@@ -129,7 +126,8 @@ def retrieve_resource(uri: str) -> Resource:
 def process_config(
     config: Any, schema: Optional[JsonSchema] = None, set_defaults: bool = True
 ) -> list[ConfigValidationError]:
-    """Validates the config, and sets defaults within it if `set_defaults` is set.
+    """Validate the config, and set defaults within it if `set_defaults` is set.
+
     If schema is not given, uses the root config schema.
 
     :returns: A list with :class:`jsonschema.ValidationError`s if any
@@ -172,7 +170,7 @@ def parse_time(time_string: str) -> datetime.time:
 
 
 def parse_interval(interval_string: str) -> datetime.timedelta:
-    """Takes an interval string from the config and turns it into a :class:`datetime.timedelta` object."""
+    """Take an interval string from the config and turn it into a :class:`datetime.timedelta` object."""
     regexp = r'^\d+ (second|minute|hour|day|week)s?$'
     if not re.match(regexp, interval_string):
         raise ValueError("should be in format 'x (seconds|minutes|hours|days|weeks)'")
@@ -180,7 +178,7 @@ def parse_interval(interval_string: str) -> datetime.timedelta:
 
 
 def parse_percent(percent_input: str) -> float:
-    """Takes a percent string from the config and turns it into a float."""
+    """Take a percent string from the config and turn it into a float."""
     percent_input = percent_input.rstrip('%')
     try:
         return float(percent_input)
@@ -189,7 +187,7 @@ def parse_percent(percent_input: str) -> float:
 
 
 def parse_size(size_input: str, si: bool = False) -> int:
-    """Takes a size string from the config and turns it into int(bytes)."""
+    """Take a size string from the config and turn it into int(bytes)."""
     try:
         # Bytes
         return int(size_input)
@@ -332,7 +330,7 @@ def is_json(instance) -> bool:
 
 
 def set_error_message(error: jsonschema.ValidationError) -> None:
-    """Create user facing error message from a :class:`jsonschema.ValidationError` `error`"""
+    """Create user facing error message from a :class:`jsonschema.ValidationError` `error`."""
     # First, replace default error messages with our custom ones
     if error.validator == 'type':
         if isinstance(error.validator_value, str):
@@ -378,8 +376,10 @@ def set_error_message(error: jsonschema.ValidationError) -> None:
 
 
 def select_child_errors(validator, errors):
-    """Looks through subschema errors, if any subschema is determined to be the intended one,
-    (based on 'type' keyword errors,) errors from its branch will be released instead of the parent error.
+    """Look through subschema errors.
+
+     If any subschema is determined to be the intended one,
+    (based on 'type' keyword errors) error from its branch will be released instead of the parent error.
     """
     for error in errors:
         if not error.context:
@@ -476,8 +476,9 @@ def deep_set(path: str, dictionary: dict, value: Any) -> None:
 
 
 def _rewrite_ref(identifier: str, definition_path: str, defs: dict) -> str:
-    """The refs in the schemas are arbitrary identifiers, and cannot be used as-is as real network locations.
-    This rewrites any of those arbitrary refs to be real urls servable by this endpoint.
+    """Rewrite all arbitrary refs to be real urls servable by this endpoint.
+
+    The refs in the schemas are arbitrary identifiers, and cannot be used as-is as real network locations.
     """
     if identifier.startswith('/schema/'):
         path = identifier[len('/schema/') :]
@@ -504,9 +505,7 @@ def _inline_refs(schema: JsonSchema, definition_path: str, defs: dict) -> Union[
 
 
 def inline_refs(schema: JsonSchema) -> JsonSchema:
-    """Includes all $refs to subschemas in the $defs section of the schema, and rewrites
-    the $refs to point to the right place.
-    """
+    """Include all $refs to subschemas in the $defs section of the schema, and rewrite the $refs to point to the right place."""
     definitions = {}
     schema = _inline_refs(schema, "", definitions)
     schema.setdefault('$defs', {}).update(definitions)

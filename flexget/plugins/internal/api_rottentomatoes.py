@@ -91,14 +91,14 @@ Base.register_table(directors_table)
 
 # TODO: get rid of
 class RottenTomatoesContainer:
-    """Base class for RottenTomatoes objects"""
+    """Base class for RottenTomatoes objects."""
 
     def __init__(self, init_dict: Optional[dict[str, Any]] = None) -> None:
         if isinstance(init_dict, dict):
             self.update_from_dict(init_dict)
 
     def update_from_dict(self, update_dict: dict[str, Any]) -> None:
-        """Populates any simple (string or number) attributes from a dict"""
+        """Populate any simple (string or number) attributes from a dict."""
         for col in self.__table__.columns:
             if isinstance(update_dict.get(col.name), (str, int, float)):
                 setattr(self, col.name, update_dict[col.name])
@@ -266,6 +266,7 @@ def lookup_movie(
     api_key: Optional[str] = None,
 ) -> RottenTomatoesMovie:
     """Do a lookup from Rotten Tomatoes for the movie matching the passed arguments.
+
     Any combination of criteria can be passed, the most specific criteria specified will be used.
 
     :param rottentomatoes_id: rottentomatoes_id of desired movie
@@ -474,7 +475,7 @@ def _set_movie_details(
     movie_data: Optional[dict[str, Any]] = None,
     api_key: Optional[str] = None,
 ) -> Any:
-    """Populate ``movie`` object from given data
+    """Populate ``movie`` object from given data.
 
     :param movie: movie object to update
     :param session: session to use, returned Movie will be live in that session

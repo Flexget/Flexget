@@ -16,9 +16,9 @@ logger = logger.bind(name='failed')
 
 
 class PluginFailed:
-    """Records entry failures and stores them for trying again after a certain interval.
-    Rejects them after they have failed too many times.
+    """Record entry failures and store them for trying again after a certain interval.
 
+    Reject them after they have failed too many times.
     """
 
     schema = {
@@ -79,7 +79,7 @@ class PluginFailed:
             entry.on_fail(self.add_failed, config=config)
 
     def add_failed(self, entry, reason=None, config=None, **kwargs):
-        """Adds entry to internal failed list, displayed with --failed"""
+        """Add entry to internal failed list, displayed with --failed."""
         # Make sure reason is a string, in case it is set to an exception instance
         reason = str(reason) or 'Unknown'
         with Session() as session:

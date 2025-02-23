@@ -22,7 +22,7 @@ REPUTATIONS = {  # Maps reputation name to feed address
 
 
 class Torrentz:
-    """Torrentz search and urlrewriter"""
+    """Torrentz search and urlrewriter."""
 
     schema = {
         'oneOf': [
@@ -40,7 +40,7 @@ class Torrentz:
     }
 
     def process_config(self, config):
-        """Return plugin configuration in advanced form"""
+        """Return plugin configuration in advanced form."""
         if isinstance(config, str):
             config = {'reputation': config}
         if config.get('extra_terms'):
@@ -52,7 +52,7 @@ class Torrentz:
         return REGEXP.match(entry['url'])
 
     def url_rewrite(self, task, entry):
-        """URL rewrite torrentz domain url with infohash to any torrent cache"""
+        """URL rewrite torrentz domain url with infohash to any torrent cache."""
         thash = REGEXP.match(entry['url']).group(2)
         torrent_cache = plugin.get('torrent_cache', self)
         urls = torrent_cache.infohash_urls(thash)

@@ -172,7 +172,8 @@ class TVDBSeries(Base):
     episodes = relationship('TVDBEpisode', backref='series', cascade='all, delete, delete-orphan')
 
     def __init__(self, tvdb_id, language):
-        """Looks up movie on tvdb and creates a new database model for it.
+        """Look up movie on tvdb and create a new database model for it.
+
         These instances should only be added to a session via `session.merge`.
         """
         self.id = tvdb_id
@@ -330,7 +331,8 @@ class TVDBEpisode(Base):
     series_id = Column(Integer, ForeignKey('tvdb_series.id'), nullable=False)
 
     def __init__(self, series_id, ep_id, language=None):
-        """Looks up movie on tvdb and creates a new database model for it.
+        """Look up movie on tvdb and create a new database model for it.
+
         These instances should only be added to a session via `session.merge`.
         """
         self.series_id = series_id
@@ -400,9 +402,7 @@ class TVDBSearchResult(Base):
 
 
 class TVDBSeriesSearchResult(Base):
-    """This table will hold a single result that results from the /search/series endpoint,
-    which return a series with a minimal set of parameters.
-    """
+    """Table that holds a single result that results from the /search/series endpoint, which return a series with a minimal set of parameters."""
 
     __tablename__ = 'tvdb_series_search_results'
 
@@ -466,7 +466,7 @@ class TVDBSeriesSearchResult(Base):
 
 
 def find_series_id(name, language=None):
-    """Looks up the tvdb id for a series"""
+    """Look up the tvdb id for a series."""
     try:
         series = TVDBRequest().get('search/series', name=name, language=language)
     except requests.RequestException as e:
@@ -712,6 +712,7 @@ def search_for_series(
     search_name=None, imdb_id=None, zap2it_id=None, force_search=None, session=None, language=None
 ):
     """Search IMDB using a an identifier, return a list of cached search results.
+
     One of `search_name`, `imdb_id` or `zap2it_id` is required.
     :param search_name: Name of search to use
     :param imdb_id: Search via IMDB ID
@@ -756,7 +757,7 @@ def search_for_series(
 
 
 def mark_expired(session):
-    """Marks series and episodes that have expired since we cached them"""
+    """Mark series and episodes that have expired since we cached them."""
     # Only get the expired list every hour
     last_check = persist.get('last_check')
 

@@ -275,8 +275,9 @@ def assert_entries(
     *argv: dict[str, Any],
     allow_unexpected_entires: bool = False,
 ):
-    """Asserts that the entries generated for a given task match the list of dictionaries given as
-    entry matches. Only the keys specified will be check for.
+    """Assert that the entries generated for a given task match the list of dictionaries given as entry matches.
+
+    Only the keys specified will be checked for.
 
     :param task: Task to assert the entries from.
     :param entry_matcher: Dict continain the expected entry values, must have at least a 'title'
@@ -304,7 +305,7 @@ def assert_entries(
 
 
 def assert_no_entries(task: Task):
-    """Asserts that there are no entries generated for a given task.
+    """Assert that there are no entries generated for a given task.
 
     :param task: Task to assert no entires are generated for.
     """

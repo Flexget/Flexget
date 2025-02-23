@@ -22,7 +22,7 @@ def translate_type(type):
 
 
 class FilmwebWatchlist:
-    """ "Creates an entry for each movie in your Filmweb list."""
+    """Create an entry for each movie in your Filmweb list."""
 
     schema = {
         'type': 'object',
@@ -41,7 +41,7 @@ class FilmwebWatchlist:
     }
 
     def on_task_start(self, task, config):
-        """Raise a DependencyError if our dependencies aren't available"""
+        """Raise a DependencyError if our dependencies aren't available."""
         try:
             from filmweb.filmweb import Filmweb as FilmwebAPI  # noqa: F401
         except ImportError as e:

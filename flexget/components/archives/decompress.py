@@ -12,13 +12,16 @@ logger = logger.bind(name='decompress')
 
 
 def fail_entry_with_error(entry, error):
-    """Log error message at error level and fail the entry"""
+    """Log error message at error level and fail the entry."""
     logger.error(error)
     entry.fail(error)
 
 
 def open_archive_entry(entry):
-    """Convenience function for opening archives from entries. Returns an archive.Archive object"""
+    """Return an archive.Archive object.
+
+    Convenience function for opening archives from entries.
+    """
     archive_path = entry.get('location', '')
     if not archive_path:
         logger.error('Entry does not appear to represent a local file.')
@@ -39,7 +42,7 @@ def open_archive_entry(entry):
 
 
 def get_output_path(to, entry):
-    """Determine which path to output to"""
+    """Determine which path to output to."""
     try:
         if to:
             return render_from_entry(to, entry)
@@ -49,7 +52,7 @@ def get_output_path(to, entry):
 
 
 def extract_info(info, archive, to, keep_dirs, test=False):
-    """Extract ArchiveInfo object"""
+    """Extract ArchiveInfo object."""
     destination = get_destination_path(info, to, keep_dirs)
 
     if test:
@@ -67,14 +70,14 @@ def extract_info(info, archive, to, keep_dirs, test=False):
 
 
 def get_destination_path(info, to, keep_dirs):
-    """Generate the destination path for a given file"""
+    """Generate the destination path for a given file."""
     path_suffix = info.path if keep_dirs else os.path.basename(info.path)
 
     return os.path.join(to, path_suffix)
 
 
 def is_match(info, pattern):
-    """Returns whether an info record matches the supplied regex"""
+    """Return whether an info record matches the supplied regex."""
     match = re.compile(pattern, re.IGNORECASE).match
     is_match = bool(match(info.filename))
 
@@ -87,8 +90,9 @@ def is_match(info, pattern):
 
 
 class Decompress:
-    r"""Extracts files from Zip or RAR archives. By default this plugin will extract to the same
-    directory as the source archive, preserving directory structure from the archive.
+    r"""Extract files from Zip or RAR archives.
+
+    By default this plugin will extract to the same directory as the source archive, preserving directory structure from the archive.
 
     This plugin requires the rarfile Python module and unrar command line utility to extract RAR
     archives.
@@ -138,7 +142,7 @@ class Decompress:
 
     @staticmethod
     def prepare_config(config):
-        """Prepare config for processing"""
+        """Prepare config for processing."""
         from fnmatch import translate
 
         if not isinstance(config, dict):
@@ -160,7 +164,7 @@ class Decompress:
 
     @staticmethod
     def handle_entry(entry, config, test=False):
-        """Extract matching files into the directory specified
+        """Extract matching files into the directory specified.
 
         Optionally delete the original archive if config.delete_archive is True
         """
@@ -193,7 +197,7 @@ class Decompress:
 
     @plugin.priority(plugin.PRIORITY_FIRST)
     def on_task_output(self, task, config):
-        """Task handler for archive_extract"""
+        """Task handler for archive_extract."""
         if isinstance(config, bool) and not config:
             return
 

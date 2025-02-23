@@ -46,7 +46,7 @@ class Site1337x:
         return bool(url.startswith('http://1337x.to/'))
 
     def url_rewrite(self, task, entry):
-        """Gets the download information for 1337x result"""
+        """Get the download information for 1337x result."""
         url = entry['url']
 
         logger.info('1337x rewriting download url: {}', url)
@@ -69,7 +69,7 @@ class Site1337x:
 
     @plugin.internet(logger)
     def search(self, task, entry, config):
-        """Search for entries on 1337x"""
+        """Search for entries on 1337x."""
         if not isinstance(config, dict):
             config = {}
 

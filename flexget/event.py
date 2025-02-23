@@ -1,4 +1,4 @@
-"""Provides small event framework"""
+"""Provides small event framework."""
 
 from typing import Any, Callable
 
@@ -40,7 +40,7 @@ _events: dict[str, list[Event]] = {}
 
 
 def event(name: str, priority: int = 128) -> Callable[[Callable], Callable]:
-    """Register event to function with a decorator"""
+    """Register event to function with a decorator."""
 
     def decorator(func: Callable) -> Callable:
         add_event_handler(name, func, priority)
@@ -50,8 +50,9 @@ def event(name: str, priority: int = 128) -> Callable[[Callable], Callable]:
 
 
 def get_events(name: str) -> list[Event]:
-    """:param String name: event name
-    :return: List of :class:`Event` for *name* ordered by priority
+    """Return list of :class:`Event` for *name* ordered by priority.
+
+    :param String name: event name
     """
     if name not in _events:
         raise KeyError(f'No such event {name}')
@@ -60,7 +61,9 @@ def get_events(name: str) -> list[Event]:
 
 
 def add_event_handler(name: str, func: Callable, priority: int = 128) -> Event:
-    """:param string name: Event name
+    """Return event created.
+
+    :param string name: Event name
     :param function func: Function that acts as event handler
     :param priority: Priority for this hook
     :return: Event created
@@ -80,7 +83,7 @@ def add_event_handler(name: str, func: Callable, priority: int = 128) -> Event:
 
 
 def remove_event_handlers(name: str) -> None:
-    """Removes all handlers for given event `name`."""
+    """Remove all handlers for given event `name`."""
     _events.pop(name, None)
 
 
@@ -92,7 +95,9 @@ def remove_event_handler(name: str, func: Callable) -> None:
 
 
 def fire_event(name: str, *args, **kwargs) -> Any:
-    """Trigger an event with *name*. If event is not hooked by anything nothing happens. If a function that hooks an event
+    """Trigger an event with *name*.
+
+    If event is not hooked by anything nothing happens. If a function that hooks an event
     returns a value, it will replace the first argument when calling next function.
 
     :param name: Name of event to be called

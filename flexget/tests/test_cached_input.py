@@ -35,7 +35,7 @@ class TestInputCache:
     """
 
     def test_memory_cache(self, execute_task, tmp_path):
-        """Test memory input caching"""
+        """Test memory input caching."""
         task = execute_task('test_memory')
         assert task.entries, 'should have created entries at the start'
         tmp_path.joinpath('cached.xml').unlink()
@@ -48,7 +48,7 @@ class TestInputCache:
         assert not task.entries, 'cache should have been expired'
 
     def test_db_cache(self, execute_task):
-        """Test db input caching"""
+        """Test db input caching."""
         task = execute_task('test_db')
         assert task.entries, 'should have created entries at the start'
         # Clear out the memory cache to make sure we are loading from db

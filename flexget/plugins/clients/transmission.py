@@ -282,7 +282,7 @@ class PluginTransmissionInput(TransmissionBase):
 
 
 class PluginTransmission(TransmissionBase):
-    """Add url from entry url to transmission
+    """Add url from entry url to transmission.
 
     Example::
 
@@ -355,9 +355,7 @@ class PluginTransmission(TransmissionBase):
 
     @plugin.priority(120)
     def on_task_download(self, task, config):
-        """Call download plugin to generate the temp files we will load
-        into deluge then verify they are valid torrents
-        """
+        """Call download plugin to generate the temp files we will load into deluge then verify they are valid torrents."""
         config = self.prepare_config(config)
         if not config['enabled']:
             return
@@ -797,7 +795,7 @@ class PluginTransmission(TransmissionBase):
         return options
 
     def on_task_learn(self, task, config):
-        """Make sure all temp files are cleaned up when entries are learned"""
+        """Make sure all temp files are cleaned up when entries are learned."""
         # If download plugin is enabled, it will handle cleanup.
         if 'download' not in task.config:
             download = plugin.get('download', self)

@@ -31,9 +31,7 @@ else:
     PORT = 40022
 
     class TestSFTPServerController:
-        """Manages a test SFTP server instance running on 127.0.0.1:40022 intended
-        to be used as a pytest fixture.
-        """
+        """Manage a test SFTP server instance running on 127.0.0.1:40022 intended to be used as a pytest fixture."""
 
         logger: Logger = logging.getLogger("TestSFTPServer")
         __test__ = False
@@ -48,7 +46,7 @@ else:
             key_only: bool = False,
             log_level: int = logging.DEBUG,
         ) -> TestSFTPFileSystem:
-            """Start the test SFTP server
+            """Start the test SFTP server.
 
             :param username: Username for test server, defaults to 'test_user'
             :param password: Password for the test server, defaults to 'test_pass'
@@ -117,8 +115,9 @@ else:
             self.__home = self.create_dir(f'/home/{username}')
 
         def create_file(self, path: str, size: int = 0) -> Path:
-            """Create a file on the :class: `StubSFTPServer` instance, if the path is
-            relative it will be created realative to the users home directory
+            """Create a file on the :class: `StubSFTPServer` instance.
+
+            If the path is relative it will be created realative to the users home directory
 
             :param path: The path of the file to create absolute or relative
             :param size: The size in bytes of the file to create, defaults to 0
@@ -133,8 +132,9 @@ else:
             return canonicalized
 
         def create_dir(self, path: str) -> Path:
-            """Create a dir on the :class:`StubSFTPServer` instance, if the path is
-            relative it will be created in relation to the users home directory
+            """Create a dir on the :class:`StubSFTPServer` instance.
+
+            If the path is relative it will be created in relation to the users home directory
 
             :param path: The path of the dir to create absolute or relative.
             :raises ValueError: if it's not possible to canoncalize the path
@@ -145,8 +145,9 @@ else:
             return canonicalized
 
         def create_symlink(self, path: str, target: Path) -> Path:
-            """Create a symlink on the :class:`StubSFTPServer` instance, if the
-            path or target is relative, it will be done so in relation to the
+            """Create a symlink on the :class:`StubSFTPServer` instance.
+
+            If the path or target is relative, it will be done so in relation to the
             users home directory.
 
             :param path: The path of the symlink to create absolute or relative
@@ -187,7 +188,7 @@ else:
             return self.__home
 
     class TestServer(ServerInterface):
-        """Handlers authonitcation to the test server"""
+        """Handlers authentication to the test server."""
 
         __test__ = False
 

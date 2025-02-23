@@ -22,9 +22,7 @@ logger = logger.bind(name='movie_list')
 
 
 class MovieListBase:
-    """Class that contains helper methods for movie list as well as plugins that use it,
-    such as API and CLI.
-    """
+    """Class that contains helper methods for movie list as well as plugins that use it, such as API and CLI."""
 
     @property
     def supported_ids(self):
@@ -99,7 +97,7 @@ class MovieList(MutableSet):
 
     @with_session
     def _find_entry(self, entry, session=None):
-        """Finds `MovieListMovie` corresponding to this entry, if it exists."""
+        """Find `MovieListMovie` corresponding to this entry, if it exists."""
         # Match by supported IDs
         for id_name in MovieListBase().supported_ids:
             if entry.get(id_name):
@@ -153,9 +151,7 @@ class MovieList(MutableSet):
 
     @property
     def online(self):
-        """Set the online status of the plugin, online plugin should be treated
-        differently in certain situations, like test mode
-        """
+        """Set the online status of the plugin, online plugin should be treated differently in certain situations, like test mode."""
         return False
 
     @with_session

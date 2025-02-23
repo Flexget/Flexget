@@ -7,7 +7,7 @@ logger = logger.bind(name='manual')
 
 
 class ManualTask:
-    """Only execute task when specified with --tasks"""
+    """Only execute task when specified with --tasks."""
 
     schema = {
         'type': 'boolean',

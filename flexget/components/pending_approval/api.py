@@ -68,7 +68,7 @@ class PendingEntriesAPI(APIResource):
     @api.response(200, model=pending_entry_list_schema)
     @api.doc(expect=[pending_parser])
     def get(self, session=None):
-        """List all pending entries"""
+        """List all pending entries."""
         args = pending_parser.parse_args()
 
         # Filter params
@@ -133,7 +133,7 @@ class PendingEntriesAPI(APIResource):
     @api.response(204, 'No entries modified')
     @api.doc(expect=[just_task_parser])
     def put(self, session=None):
-        """Approve/Reject the status of pending entries"""
+        """Approve/Reject the status of pending entries."""
         args = filter_parser.parse_args()
 
         data = request.json
@@ -153,7 +153,7 @@ class PendingEntriesAPI(APIResource):
     @api.response(200, model=base_message_schema)
     @api.doc(expect=[filter_parser])
     def delete(self, session=None):
-        """Delete pending entries"""
+        """Delete pending entries."""
         args = filter_parser.parse_args()
 
         # Filter params
@@ -177,7 +177,7 @@ class PendingEntryAPI(APIResource):
     @etag
     @api.response(200, model=pending_entry_schema)
     def get(self, entry_id, session=None):
-        """Get a pending entry by ID"""
+        """Get a pending entry by ID."""
         try:
             entry = db.get_entry_by_id(session, entry_id)
         except NoResultFound:
@@ -188,7 +188,7 @@ class PendingEntryAPI(APIResource):
     @api.response(BadRequest)
     @api.validate(operation_schema, description=description)
     def put(self, entry_id, session=None):
-        """Approve/Reject the status of a pending entry"""
+        """Approve/Reject the status of a pending entry."""
         try:
             entry = db.get_entry_by_id(session, entry_id)
         except NoResultFound:
@@ -208,7 +208,7 @@ class PendingEntryAPI(APIResource):
 
     @api.response(200, model=base_message_schema)
     def delete(self, entry_id, session=None):
-        """Delete a pending entry"""
+        """Delete a pending entry."""
         try:
             entry = db.get_entry_by_id(session, entry_id)
         except NoResultFound:

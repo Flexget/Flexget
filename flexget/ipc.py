@@ -26,7 +26,9 @@ AUTH_SUCCESS = b'authentication success'
 
 
 class RemoteStream:
-    """Used as a filelike to stream text to remote client. If client disconnects while this is in use, an error will be
+    """Used as a filelike to stream text to remote client.
+
+    If client disconnects while this is in use, an error will be
     logged, but no exception raised.
     """
 

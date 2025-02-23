@@ -15,7 +15,7 @@ class VariablesAPI(APIResource):
     @etag
     @api.response(200, model=empty_response)
     def get(self, session=None):
-        """Get variables data from DB"""
+        """Get variables data from DB."""
         return jsonify(variables_from_db())
 
     @api.response(201, 'Successfully updated variables file')
@@ -24,7 +24,7 @@ class VariablesAPI(APIResource):
         description='Note that editing variables may not be persistent, depending on user config'
     )
     def put(self, session=None):
-        """Store variables data to DB"""
+        """Store variables data to DB."""
         data = request.json
         variables_to_db(data)
         # This will trigger reloading the variables file
@@ -39,7 +39,7 @@ class VariablesAPI(APIResource):
         description='Note that editing variables may not be persistent, depending on user config'
     )
     def patch(self, session=None):
-        """Update variables data to DB"""
+        """Update variables data to DB."""
         data = request.json
         existing_variables = variables_from_db()
         existing_variables.update(data)

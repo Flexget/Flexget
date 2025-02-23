@@ -170,7 +170,7 @@ class ImdbEntrySet(MutableSet):
         return user_id_match.group() if user_id_match else None
 
     def authenticate(self):
-        """Authenticates a session with IMDB, and grabs any IDs needed for getting/modifying list."""
+        """Authenticate a session with IMDB, and grab any IDs needed for getting/modifying list."""
         cached_credentials = False
         with Session() as session:
             if self.cookies:
@@ -427,7 +427,7 @@ class ImdbEntrySet(MutableSet):
             )
 
     def _add(self, entry):
-        """Submit a new movie to imdb. (does not update cache)"""
+        """Submit a new movie to imdb. (does not update cache)."""
         if self.config['list'] in IMMUTABLE_LISTS:
             raise plugin.PluginError(
                 '{} lists are not modifiable'.format(' and '.join(IMMUTABLE_LISTS))
@@ -467,8 +467,9 @@ class ImdbEntrySet(MutableSet):
 
     @property
     def online(self):
-        """Set the online status of the plugin, online plugin should be treated differently in certain situations,
-        like test mode
+        """Set the online status of the plugin.
+
+        Online plugin should be treated differently in certain situations, like test mode
         """
         return True
 

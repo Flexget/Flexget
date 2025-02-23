@@ -101,8 +101,9 @@ class TestJinjaFilters:
 
     @pytest.mark.parametrize('test_filter', custom_filters)
     def test_undefined_preserved(self, test_filter):
-        """Test that when an undefined field gets passed to one of our custom jinja filters that it stays undefined,
-        instead of turning into some sort of other error. Covering up the undefined error makes it harder to figure
+        """Test that when an undefined field gets passed to one of our custom jinja filters that it stays undefined, instead of turning into some sort of other error.
+
+        Covering up the undefined error makes it harder to figure
         out what went wrong with the template.
         """
         from flexget.utils.template import environment

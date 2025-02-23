@@ -83,7 +83,7 @@ class SonarrSet(MutableSet):
         return data
 
     def translate_quality(self, quality_name):
-        """Translate Sonarr's qualities to ones recognize by Flexget"""
+        """Translate Sonarr's qualities to ones recognize by Flexget."""
         if quality_name in QUALITY_MAP:
             return QUALITY_MAP[quality_name]
         return quality_name.replace('-', ' ').lower()
@@ -276,8 +276,9 @@ class SonarrSet(MutableSet):
 
     @property
     def online(self):
-        """Set the online status of the plugin, online plugin should be treated differently in certain situations,
-        like test mode
+        """Set the online status of the plugin.
+
+        Online plugin should be treated differently in certain situations, like test mode
         """
         return True
 

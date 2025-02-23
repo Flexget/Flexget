@@ -14,8 +14,9 @@ logger = logger.bind(name=plugin_name)
 
 
 class SlackNotifier:
-    """Example:
+    """Send a Slack notification.
 
+    Example:
     notify:
       entries:
         via:
@@ -102,7 +103,7 @@ class SlackNotifier:
     }
 
     def notify(self, title, message, config):
-        """Send a Slack notification"""
+        """Send a Slack notification."""
         notification = {
             'text': message,
             'username': config.get('username'),

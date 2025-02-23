@@ -7,7 +7,7 @@ logger = logger.bind(name='duplicates')
 
 
 class Duplicates:
-    """Take action on entries with duplicate field values
+    """Take action on entries with duplicate field values.
 
     Example::
 

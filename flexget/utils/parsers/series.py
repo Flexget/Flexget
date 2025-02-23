@@ -187,11 +187,11 @@ class SeriesParser(TitleParser):
         self.valid = False
 
     def remove_dirt(self, data):
-        """Replaces some characters with spaces"""
+        """Replace some characters with spaces."""
         return re.sub(r'[_.,\[\]\(\): ]+', ' ', data).strip().lower()
 
     def guess_name(self):
-        """This will attempt to guess a series name based on the provided data."""
+        """Attempt to guess a series name based on the provided data."""
         # We need to replace certain characters with spaces to make sure episode parsing works right
         # We don't remove anything, as the match positions should line up with the original title
         clean_title = re.sub(r'[_.,\[\]\(\):]', ' ', self.data)
@@ -491,7 +491,7 @@ class SeriesParser(TitleParser):
         raise ParseWarning(self, msg)
 
     def parse_unwanted(self, data):
-        """Parses data for an unwanted hits. Return True if the data contains unwanted hits."""
+        """Parse data for an unwanted hits. Return True if the data contains unwanted hits."""
         for unwanted_re in self.unwanted_regexps:
             match = re.search(unwanted_re, data)
             if match:
@@ -500,7 +500,10 @@ class SeriesParser(TitleParser):
         return None
 
     def parse_unwanted_sequence(self, data):
-        """Parses data for an unwanted id hits. Return True if the data contains unwanted hits."""
+        """Parse data for an unwanted id hits.
+
+        Return True if the data contains unwanted hits.
+        """
         for seq_unwanted_re in self.unwanted_sequence_regexps:
             match = re.search(seq_unwanted_re, data)
             if match:
@@ -509,7 +512,8 @@ class SeriesParser(TitleParser):
         return None
 
     def parse_date(self, data):
-        """Parses :data: for a date identifier.
+        """Parse :data: for a date identifier.
+
         If found, returns the date and regexp match object
         If no date is found returns False
         """
@@ -557,7 +561,8 @@ class SeriesParser(TitleParser):
         return False
 
     def parse_episode(self, data):
-        """Parses :data: for an episode identifier.
+        """Parse :data: for an episode identifier.
+
         If found, returns a dict with keys for season, episode, end_episode and the regexp match object
         If no episode id is found returns False
         """
@@ -616,7 +621,7 @@ class SeriesParser(TitleParser):
         return False
 
     def parse_season_packs(self, data):
-        """Parses data for season packs. Return True if the data contains a hit"""
+        """Parse data for season packs. Return True if the data contains a hit."""
         for season_pack_re in self.season_pack_regexps:
             match = re.search(season_pack_re, data)
             if match:
@@ -634,7 +639,7 @@ class SeriesParser(TitleParser):
         return None
 
     def roman_to_int(self, roman):
-        """Converts roman numerals up to 39 to integers"""
+        """Convert roman numerals up to 39 to integers."""
         roman_map = [('X', 10), ('IX', 9), ('V', 5), ('IV', 4), ('I', 1)]
         roman = roman.upper()
 

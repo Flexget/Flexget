@@ -111,7 +111,7 @@ class TestExistsMovie:
         )
 
     def test_existing_dirs(self, execute_task):
-        """exists_movie plugin: existing"""
+        """exists_movie plugin: existing."""
         task = execute_task('test_dirs')
         assert not task.find_entry('accepted', title='Existence.2012'), (
             'Existence.2012 should not have been accepted (exists)'
@@ -121,7 +121,7 @@ class TestExistsMovie:
         )
 
     def test_existing_files(self, execute_task):
-        """exists_movie plugin: existing"""
+        """exists_movie plugin: existing."""
         task = execute_task('test_files')
         assert not task.find_entry('accepted', title='Downloaded.2013'), (
             'Downloaded.2013 should not have been accepted (exists)'
@@ -131,7 +131,7 @@ class TestExistsMovie:
         )
 
     def test_same_name_diff_year(self, execute_task):
-        """exists_movie plugin: existing with same name with different year"""
+        """exists_movie plugin: existing with same name with different year."""
         task = execute_task('test_same_name_diff_year')
         assert not task.find_entry('accepted', title='Downloaded.2013'), (
             'Downloaded.2013 should not have been accepted (exists)'
@@ -145,7 +145,7 @@ class TestExistsMovie:
 
     @pytest.mark.online
     def test_lookup_imdb(self, execute_task):
-        """exists_movie plugin: existing"""
+        """exists_movie plugin: existing."""
         task = execute_task('test_lookup_imdb')
         assert task.find_entry('accepted', title='The.Matrix.1999')['imdb_id'], (
             'The.Matrix.1999 should have an `imdb_id`'
@@ -155,7 +155,7 @@ class TestExistsMovie:
         )
 
     def test_diff_qualities_allowed(self, execute_task):
-        """exists_movie plugin: existsting but w. diff quality"""
+        """exists_movie plugin: existing but w. diff quality."""
         task = execute_task('test_diff_qualities_allowed')
         assert task.find_entry('accepted', title='Quality.of.Life.480p'), (
             'Quality.of.Life.480p should have been accepted'
@@ -168,7 +168,7 @@ class TestExistsMovie:
         )
 
     def test_diff_qualities_not_allowed(self, execute_task):
-        """exists_movie plugin: existsting but w. diff quality"""
+        """exists_movie plugin: existing but w. diff quality."""
         task = execute_task('test_diff_qualities_not_allowed')
         assert task.find_entry('rejected', title='Quality.of.Life.1080p'), (
             'Quality.of.Life.1080p should have been rejected'
@@ -194,7 +194,7 @@ class TestExistsMovie:
     # TODO: Fix tests
     @pytest.mark.skip(reason='test is broken')
     def test_propers(self, execute_task):
-        """exists_movie plugin: new proper & proper already exists"""
+        """exists_movie plugin: new proper & proper already exists."""
         task = execute_task('test_propers')
         assert task.find_entry('accepted', title='Mock.S01E01.Proper'), 'new proper not accepted'
         assert task.find_entry('rejected', title='Test.S01E01'), (
@@ -202,12 +202,12 @@ class TestExistsMovie:
         )
 
     def test_invalid(self, execute_task):
-        """exists_movie plugin: no episode numbering on the disk"""
+        """exists_movie plugin: no episode numbering on the disk."""
         execute_task('test_invalid')
 
     @pytest.mark.skip(reason='test is broken')
     def test_with_metainfo_series(self, execute_task):
-        """Tests that exists_movie works with series data from metainfo_series"""
+        """Tests that exists_movie works with series data from metainfo_series."""
         task = execute_task('test_with_metainfo_series')
         assert task.find_entry('rejected', title='Foo.Bar.S01E02.XViD'), (
             'Foo.Bar.S01E02.XViD should have been rejected(exists)'

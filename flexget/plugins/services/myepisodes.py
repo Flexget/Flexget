@@ -83,7 +83,7 @@ class MyEpisodes:
 
     @plugin.priority(plugin.PRIORITY_LAST)
     def on_task_output(self, task, config):
-        """Mark all accepted episodes as acquired on MyEpisodes"""
+        """Mark all accepted episodes as acquired on MyEpisodes."""
         if not task.accepted:
             # Nothing accepted, don't do anything
             return
@@ -115,7 +115,8 @@ class MyEpisodes:
                 logger.warning(w)
 
     def _validate_entry(self, entry):
-        """Checks an entry for all of the fields needed to comunicate with myepidoes
+        """Check an entry for all of the fields needed to comunicate with myepidoes.
+
         Return: boolean
         """
         if (
@@ -130,7 +131,8 @@ class MyEpisodes:
             )
 
     def _lookup_myepisodes_id(self, entry):
-        """Attempts to find the myepisodes id for the series
+        """Attempt to find the myepisodes id for the series.
+
         Return: myepisode id or None
         """
         # Do we already have the id?
@@ -153,7 +155,8 @@ class MyEpisodes:
         )
 
     def _retrieve_id_from_database(self, entry):
-        """Attempts to find the myepisodes id in the database
+        """Attempt to find the myepisodes id in the database.
+
         Return: myepisode id or None
         """
         lc_series_name = entry['series_name'].lower()
@@ -167,7 +170,8 @@ class MyEpisodes:
         return None
 
     def _retrieve_id_from_website(self, entry):
-        """Attempts to find the myepisodes id for the series for the website itself
+        """Attempt to find the myepisodes id for the series for the website itself.
+
         Return: myepisode id or None
         """
         myepisodes_id = None
@@ -216,6 +220,7 @@ class MyEpisodes:
 
     def _save_id(self, series_name, myepisodes_id):
         """Save the myepisodes id in the database.
+
         This will help prevent unecceary communication with the website
         """
         # if we already have the a record for that id, update the name so that we find it next time
@@ -274,7 +279,7 @@ class MyEpisodes:
         logger.info('Marked {} of `{}` as acquired.', entry['series_id'], entry['series_name'])
 
     def _login(self, config):
-        """Authenicate with the myepisodes service and return a requests session
+        """Authenicate with the myepisodes service and return a requests session.
 
         Return:
             requests session

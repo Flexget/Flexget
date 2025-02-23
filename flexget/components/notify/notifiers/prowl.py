@@ -20,7 +20,7 @@ requests.add_domain_limiter(TimedLimiter('prowlapp.com', '5 seconds'))
 
 
 class ProwlNotifier:
-    """Send prowl notifications
+    """Send prowl notifications.
 
     Example::
 
@@ -50,7 +50,7 @@ class ProwlNotifier:
     }
 
     def notify(self, title, message, config):
-        """Send a Prowl notification"""
+        """Send a Prowl notification."""
         notification = {
             'application': config.get('application'),
             'event': title,

@@ -352,7 +352,7 @@ def search_params_for_series(**lookup_params):
 
 @with_session
 def from_cache(session=None, search_params=None, cache_type=None):
-    """Returns a result from requested table based on search params
+    """Return a result from requested table based on search params.
 
     :param session: Current session
     :param search_params: Relevant search params. Should match table column names
@@ -394,7 +394,7 @@ def add_to_lookup(session=None, title=None, series=None):
 
 
 def prepare_lookup_for_tvmaze(**lookup_params):
-    """Return a dict of params which is valid with tvmaze API lookups
+    """Return a dict of params which is valid with tvmaze API lookups.
 
     :param lookup_params: Search parameters
     :return: Dict of tvmaze recognizable key words
@@ -708,7 +708,7 @@ def get_seasons(series_id):
 
 
 def tvmaze_lookup(lookup_url, **kwargs):
-    """Build the URL and return the reply from TVMaze API
+    """Build the URL and return the reply from TVMaze API.
 
     :param lookup_type: Selects the endpoint that will be used
     :param lookup_values: A list of values to be used in the URL

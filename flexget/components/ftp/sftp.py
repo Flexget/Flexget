@@ -98,7 +98,7 @@ class SftpList:
 
     @staticmethod
     def prepare_config(config: dict) -> dict:
-        """Sets defaults for the provided configuration"""
+        """Set defaults for the provided configuration."""
         config.setdefault('password', None)
         config.setdefault('private_key', None)
         config.setdefault('private_key_pass', None)
@@ -109,7 +109,7 @@ class SftpList:
 
     @classmethod
     def on_task_input(cls, task: Task, config: dict) -> list[Entry]:
-        """Input task handler"""
+        """Input task handler."""
         config = cls.prepare_config(config)
 
         files_only: bool = config['files_only']
@@ -142,8 +142,9 @@ class SftpList:
 
 
 class SftpDownload:
-    """Download files from a SFTP server. This plugin requires the pysftp Python module and its
-    dependencies.
+    """Download files from a SFTP server.
+
+    This plugin requires the pysftp Python module and its dependencies.
 
     Configuration:
 
@@ -177,7 +178,7 @@ class SftpDownload:
 
     @classmethod
     def download_entry(cls, entry: Entry, config: dict, sftp: SftpClient) -> None:
-        """Downloads the file(s) described in entry"""
+        """Download the file(s) described in entry."""
         path: str = unquote(urlparse(entry['url']).path) or '.'
         delete_origin: bool = config['delete_origin']
         recursive: bool = config['recursive']
@@ -197,11 +198,11 @@ class SftpDownload:
 
     @classmethod
     def on_task_output(cls, task: Task, config: dict) -> None:
-        """Register this as an output plugin"""
+        """Register this as an output plugin."""
 
     @classmethod
     def on_task_download(cls, task: Task, config: dict) -> None:
-        """Task handler for sftp_download plugin"""
+        """Task handler for sftp_download plugin."""
         socket_timeout_sec: int = config['socket_timeout_sec']
         connection_tries: int = config['connection_tries']
 
@@ -227,7 +228,7 @@ class SftpDownload:
 
     @classmethod
     def _get_sftp_config(cls, entry: Entry):
-        """Parses a url and returns a hashable config, source path, and destination path"""
+        """Parse a url and return a hashable config, source path, and destination path."""
         # parse url
         parsed = urlparse(entry['url'])
         host: str = parsed.hostname
@@ -259,8 +260,7 @@ class SftpDownload:
 
 
 class SftpUpload:
-    """Upload files to a SFTP server. This plugin requires the pysftp Python module and its
-    dependencies.
+    """Upload files to a SFTP server. This plugin requires the pysftp Python module and its dependencies.
 
     host:                 Host to connect to
     port:                 Port the remote SSH server is listening on. Defaults to port 22.
@@ -316,7 +316,7 @@ class SftpUpload:
 
     @staticmethod
     def prepare_config(config: dict) -> dict:
-        """Sets defaults for the provided configuration"""
+        """Set defaults for the provided configuration."""
         config.setdefault('password', None)
         config.setdefault('private_key', None)
         config.setdefault('private_key_pass', None)
@@ -352,7 +352,7 @@ class SftpUpload:
 
     @classmethod
     def on_task_output(cls, task: Task, config: dict) -> None:
-        """Uploads accepted entries to the specified SFTP server."""
+        """Upload accepted entries to the specified SFTP server."""
         config = cls.prepare_config(config)
 
         socket_timeout_sec: int = config['socket_timeout_sec']
@@ -370,7 +370,7 @@ class SftpUpload:
 
 
 def task_config_to_sftp_config(config: dict) -> SftpConfig:
-    """Creates an SFTP connection from a Flexget config object"""
+    """Create an SFTP connection from a Flexget config object."""
     host: int = config['host']
     port: int = config['port']
     username: str = config['username']

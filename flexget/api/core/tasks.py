@@ -201,7 +201,7 @@ class TasksAPI(APIResource):
     @api.response(200, model=tasks_list_schema)
     @api.doc(expect=[tasks_parser])
     def get(self, session: Session = None) -> Response:
-        """List all tasks"""
+        """List all tasks."""
         active_tasks = {
             task: task_data
             for task, task_data in self.manager.user_config.get('tasks', {}).items()
@@ -220,7 +220,7 @@ class TasksAPI(APIResource):
     @api.response(Conflict)
     @api.response(APIError)
     def post(self, session: Session = None) -> Response:
-        """Add new task"""
+        """Add new task."""
         data = request.json
 
         task_name = data['name']
@@ -259,7 +259,7 @@ class TaskAPI(APIResource):
     @api.response(200, model=task_return_schema)
     @api.response(NotFoundError, description='task not found')
     def get(self, task, session: Session = None) -> Response:
-        """Get task config"""
+        """Get task config."""
         if task not in self.manager.user_config.get('tasks', {}):
             raise NotFoundError(f'task `{task}` not found')
 
@@ -270,7 +270,7 @@ class TaskAPI(APIResource):
     @api.response(NotFoundError)
     @api.response(BadRequest)
     def put(self, task, session: Session = None) -> Response:
-        """Update tasks config"""
+        """Update tasks config."""
         data = request.json
 
         new_task_name = data['name']
@@ -315,7 +315,7 @@ class TaskAPI(APIResource):
     @api.response(200, model=base_message_schema, description='deleted task')
     @api.response(NotFoundError)
     def delete(self, task, session: Session = None) -> Response:
-        """Delete a task"""
+        """Delete a task."""
         try:
             self.manager.config['tasks'].pop(task)
             self.manager.user_config['tasks'].pop(task)
@@ -372,7 +372,7 @@ def _task_info_dict(task):
 class TaskQueueAPI(APIResource):
     @api.response(200, model=task_api_queue_schema)
     def get(self, session: Session = None) -> Response:
-        """List task(s) in queue for execution"""
+        """List task(s) in queue for execution."""
         tasks = [_task_info_dict(task) for task in self.manager.task_queue.run_queue.queue]
 
         if self.manager.task_queue.current_task:
@@ -382,7 +382,7 @@ class TaskQueueAPI(APIResource):
 
 
 class ExecuteLog(Queue):
-    """Supports task log streaming by acting like a file object"""
+    """Support task log streaming by acting like a file object."""
 
     def write(self, s):
         self.put(json.dumps({'log': s}))
@@ -410,7 +410,7 @@ class TaskExecutionParams(APIResource):
     @etag(cache_age=3600)
     @api.response(200, model=task_execution_params)
     def get(self, session: Session = None) -> Response:
-        """Execute payload parameters"""
+        """Execute payload parameters."""
         return jsonify(ObjectsContainer.task_execution_input)
 
 
@@ -423,7 +423,7 @@ class TaskExecutionAPI(APIResource):
     @api.response(200, model=task_api_execute_schema)
     @api.validate(task_execution_schema)
     def post(self, session: Session = None) -> Response:
-        """Execute task and stream results"""
+        """Execute task and stream results."""
         data = request.json
         for task in data.get('tasks'):
             if task.lower() not in [t.lower() for t in self.manager.user_config.get('tasks', {})]:

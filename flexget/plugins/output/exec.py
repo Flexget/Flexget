@@ -27,7 +27,7 @@ class EscapingEntry(Entry):
 
 
 class PluginExec:
-    """Execute commands
+    """Execute commands.
 
     Simple example, xecute command for entries that reach output::
 
@@ -203,7 +203,7 @@ class PluginExec:
                         self.execute_cmd(cmd, allow_background, config['encoding'])
 
     def __getattr__(self, item):
-        """Creates methods to handle task phases."""
+        """Create methods to handle task phases."""
         for phase in self.HANDLED_PHASES:
             if item == plugin.phase_methods[phase]:
                 # A phase method we handle has been requested

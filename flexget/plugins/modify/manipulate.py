@@ -9,7 +9,9 @@ logger = logger.bind(name='manipulate')
 
 
 class Manipulate:
-    r"""Usage:
+    r"""The manipulate plugin.
+
+    Usage:
 
       manipulate:
         - <destination field>:
@@ -59,8 +61,9 @@ class Manipulate:
     }
 
     def on_task_start(self, task, config):
-        """Separates the config into a dict with a list of jobs per phase.
-        Allows us to skip phases without any jobs in them.
+        """Separate the config into a dict with a list of jobs per phase.
+
+        Allow us to skip phases without any jobs in them.
         """
         self.phase_jobs = {'filter': [], 'metainfo': [], 'modify': []}
         for item in config:

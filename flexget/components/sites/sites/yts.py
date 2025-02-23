@@ -14,7 +14,7 @@ logger = logger.bind(name='yts')
 
 
 class UrlRewriteYTS:
-    """YTS search"""
+    """YTS search."""
 
     schema = {'type': 'boolean'}
 

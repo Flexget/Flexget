@@ -12,8 +12,7 @@ from flexget.utils import json, qualities, serialization
 
 
 def with_session(*args, **kwargs):
-    """ "
-    A decorator which creates a new session if one was not passed via keyword argument to the function.
+    """Use as a decorator which creates a new session if one was not passed via keyword argument to the function.
 
     Automatically commits and closes the session if one was created, caller is responsible for commit if passed in.
 
@@ -42,7 +41,7 @@ def with_session(*args, **kwargs):
 
 
 def pipe_list_synonym(name: str) -> SynonymProperty:
-    """Converts pipe separated text into a list"""
+    """Convert pipe separated text into a list."""
 
     def getter(self) -> Optional[list[str]]:
         attr = getattr(self, name)
@@ -60,7 +59,7 @@ def pipe_list_synonym(name: str) -> SynonymProperty:
 
 
 def text_date_synonym(name: str) -> SynonymProperty:
-    """Converts Y-M-D date strings into datetime objects"""
+    """Convert Y-M-D date strings into datetime objects."""
 
     def getter(self) -> Optional[datetime]:
         return getattr(self, name)

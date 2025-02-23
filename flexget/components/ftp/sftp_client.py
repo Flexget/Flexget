@@ -38,9 +38,7 @@ logger = logger.bind(name='sftp_client')
 
 
 def _set_authentication_patch(self, password, private_key, private_key_pass):
-    """Patch pysftp.Connection._set_authentication to support additional
-    key types
-    """
+    """Patch pysftp.Connection._set_authentication to support additional key types."""
     if password is None:
         # Use Private Key.
         if not private_key:
@@ -120,7 +118,8 @@ class SftpClient:
         files_only: bool,
         dirs_only: bool,
     ) -> list[Entry]:
-        """Build a list of entries from a provided list of directories on an SFTP server
+        """Build a list of entries from a provided list of directories on an SFTP server.
+
         :param directories: list of directories to generate entries for
         :param recursive: boolean indicating whether to list recursively
         :param get_size: boolean indicating whether to compute size for each node (potentially slow for directories)
@@ -157,7 +156,8 @@ class SftpClient:
         return entries
 
     def download(self, source: str, to: str, recursive: bool, delete_origin: bool) -> None:
-        """Downloads the file specified in "source" to the destination specified in "to"
+        """Download the file specified in "source" to the destination specified in "to".
+
         :param source: path of the resource to download
         :param to: path of the directory to download to
         :param recursive: indicates whether to download the contents of "source" recursively
@@ -207,7 +207,8 @@ class SftpClient:
             logger.warning('Skipping unknown file: {}', source)
 
     def upload(self, source: str, to: str) -> None:
-        """Upload files or directories to an SFTP server
+        """Upload files or directories to an SFTP server.
+
         :param source: file or directory to upload
         :param to: destination
         """
@@ -217,7 +218,8 @@ class SftpClient:
             self._upload_file(source, to)
 
     def remove_dir(self, path: str) -> None:
-        """Remove a directory if it's empty
+        """Remove a directory if it's empty.
+
         :param path: directory to remove
         """
         if self._sftp.exists(path) and not self._sftp.listdir(path):
@@ -228,7 +230,8 @@ class SftpClient:
                 logger.error('Failed to delete directory {} ({})', path, str(e))
 
     def remove_file(self, path: str) -> None:
-        """Remove a file if it's empty
+        """Remove a file if it's empty.
+
         :param path: file to remove
         """
         logger.debug('Deleting remote file {}', path)
@@ -239,28 +242,31 @@ class SftpClient:
             return
 
     def is_file(self, path: str) -> bool:
-        """Check if the node at a given path is a file
+        """Check if the node at a given path is a file.
+
         :param path: path to check
         :return: boolean indicating if the path is a file
         """
         return self._sftp.isfile(path)
 
     def is_dir(self, path: str) -> bool:
-        """Check if the node at a given path is a directory
+        """Check if the node at a given path is a directory.
+
         :param path: path to check
         :return: boolean indicating if the path is a directory
         """
         return self._sftp.isdir(path)
 
     def is_link(self, path: str) -> bool:
-        """Check if the node at a given path is a directory
+        """Check if the node at a given path is a directory.
+
         :param path: path to check
         :return: boolean indicating if the path is a directory
         """
         return S_ISLNK(self._sftp.sftp_client.lstat(path).st_mode)
 
     def path_exists(self, path: str) -> bool:
-        """Check of a path exists
+        """Check of a path exists.
 
         :param path: Path to check
         :return: boolean indicating if the path exists
@@ -268,7 +274,7 @@ class SftpClient:
         return self._sftp.lexists(path)
 
     def make_dirs(self, path: str) -> None:
-        """Build directories
+        """Build directories.
 
         :param path: path to build
         """
@@ -279,11 +285,12 @@ class SftpClient:
                 raise SftpError(f'Failed to create remote directory {path} ({e!s})')
 
     def close(self) -> None:
-        """Close the sftp connection"""
+        """Close the sftp connection."""
         self._sftp.close()
 
     def set_socket_timeout(self, socket_timeout_sec):
-        """Sets the SFTP client socket timeout
+        """Set the SFTP client socket timeout.
+
         :param socket_timeout_sec: Socket timeout in seconds
         """
         self._sftp.timeout = socket_timeout_sec
@@ -391,7 +398,7 @@ class SftpClient:
         return self._sftp.put(source, destination)
 
     def _get_prefix(self) -> str:
-        """Generate SFTP URL prefix"""
+        """Generate SFTP URL prefix."""
 
         def get_login_string() -> str:
             if self.username and self.password:
@@ -450,7 +457,7 @@ class HandlerBuilder:
     def get_file_handler(
         self, get_size: bool, dirs_only: bool, entry_accumulator: list
     ) -> NodeHandler:
-        """Builds a file node handler suitable for use with pysftp.Connection.walktree
+        """Build a file node handler suitable for use with pysftp.Connection.walktree.
 
         :param get_size: boolean indicating whether to compute the for each file
         :param dirs_only: boolean indicating whether to skip files
@@ -471,7 +478,7 @@ class HandlerBuilder:
     def get_dir_handler(
         self, get_size: bool, files_only: bool, entry_accumulator: list
     ) -> NodeHandler:
-        """Builds a file node handler suitable for use with pysftp.Connection.walktree
+        """Build a file node handler suitable for use with pysftp.Connection.walktree.
 
         :param get_size: boolean indicating whether to compute the for each file
         :param files_only: Boolean indicating whether to skip directories
@@ -490,11 +497,11 @@ class HandlerBuilder:
         )
 
     def get_unknown_handler(self) -> NodeHandler:
-        """Builds an unknown node handler suitable for use with pysftp.Connection.walktree"""
+        """Build an unknown node handler suitable for use with pysftp.Connection.walktree."""
         return partial(Handlers.handle_unknown)
 
     def get_null_handler(self) -> NodeHandler:
-        """Builds a noop node handler suitable for use with pysftp.Connection.walktree"""
+        """Build a noop node handler suitable for use with pysftp.Connection.walktree."""
         return partial(Handlers.null_node_handler)
 
 
@@ -571,7 +578,7 @@ class Handlers:
 
     @staticmethod
     def handle_unknown(path: str) -> None:
-        """Handler for unknown nodes; logs a warning.
+        """Handle unknown nodes; log a warning.
 
         :param logger: a logger object
         :param path: path to handle
@@ -580,7 +587,7 @@ class Handlers:
 
     @staticmethod
     def null_node_handler(path: str) -> None:
-        """Generic noop node handler
+        """Handle generic noop node.
 
         :param logger: a logger object
         :param path: path to handle
@@ -639,5 +646,5 @@ class Handlers:
 
     @staticmethod
     def _file_size(sftp: 'pysftp.Connection', path: str) -> int:
-        """Helper function to get the size of a file node"""
+        """Get the size of a file node."""
         return sftp.lstat(path).st_size

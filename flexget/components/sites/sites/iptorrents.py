@@ -101,7 +101,7 @@ class UrlRewriteIPTorrents:
 
     # urlrewriter API
     def url_rewritable(self, task, entry):
-        """Determines if the entry's URL is rewriteable (not pointing at a downloadable torrent)."""
+        """Determine if the entry's URL is rewriteable (not pointing at a downloadable torrent)."""
         url = entry['url']
         if url.startswith(BASE_URL + '/download.php/'):
             return False
@@ -109,7 +109,7 @@ class UrlRewriteIPTorrents:
 
     # urlrewriter API
     def url_rewrite(self, task, entry):
-        """Resets the entry's url to one pointing directly at a torrent."""
+        """Reset the entry's url to one pointing directly at a torrent."""
         if 'url' not in entry:
             logger.error("Didn't actually get a URL...")
         else:
@@ -207,7 +207,7 @@ class UrlRewriteIPTorrents:
 
 @event('plugin.register')
 def register_plugin():
-    """Registers the plugin with FlexGet's plugin system."""
+    """Register the plugin with FlexGet's plugin system."""
     plugin.register(
         UrlRewriteIPTorrents, 'iptorrents', interfaces=['urlrewriter', 'search'], api_ver=2
     )

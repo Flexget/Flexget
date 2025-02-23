@@ -48,17 +48,17 @@ class TestDownload:
         )
 
     def test_path_and_temp(self, execute_task):
-        """Download plugin: Path and Temp directories set"""
+        """Download plugin: Path and Temp directories set."""
         task = execute_task('path_and_temp')
         assert not task.aborted, 'Task should not have aborted'
 
     def test_just_path(self, execute_task):
-        """Download plugin: Path directory set as dict"""
+        """Download plugin: Path directory set as dict."""
         task = execute_task('just_path')
         assert not task.aborted, 'Task should not have aborted'
 
     def test_just_string(self, execute_task):
-        """Download plugin: Path directory set as string"""
+        """Download plugin: Path directory set as string."""
         task = execute_task('just_string')
         assert not task.aborted, 'Task should not have aborted'
 
@@ -106,27 +106,27 @@ class TestDownloadTemp:
         """
 
     def test_wrong_permission(self, execute_task):
-        """Download plugin: Temp directory has wrong permissions"""
+        """Download plugin: Temp directory has wrong permissions."""
         task = execute_task('temp_wrong_permission', abort_ok=True)
         assert task.aborted
 
     def test_temp_non_existent(self, execute_task):
-        """Download plugin: Temp directory does not exist"""
+        """Download plugin: Temp directory does not exist."""
         task = execute_task('temp_non_existent', abort_ok=True)
         assert task.aborted
 
     def test_wrong_config_1(self, execute_task):
-        """Download plugin: Temp directory config error [1of3]"""
+        """Download plugin: Temp directory config error [1of3]."""
         task = execute_task('temp_wrong_config_1', abort_ok=True)
         assert task.aborted
 
     def test_wrong_config_2(self, execute_task):
-        """Download plugin: Temp directory config error [2of3]"""
+        """Download plugin: Temp directory config error [2of3]."""
         task = execute_task('temp_wrong_config_2', abort_ok=True)
         assert task.aborted
 
     def test_wrong_config_3(self, execute_task):
-        """Download plugin: Temp directory config error [3of3]"""
+        """Download plugin: Temp directory config error [3of3]."""
         task = execute_task('temp_empty', abort_ok=True)
         assert task.aborted
 
@@ -166,7 +166,7 @@ class TestDownloadAuth:
     """
 
     def test_download_auth(self, execute_task):
-        """Test download basic and digest auth"""
+        """Test download basic and digest auth."""
         task = execute_task('no_auth')
         assert len(task.failed) == 2
 

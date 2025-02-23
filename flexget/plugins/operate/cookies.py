@@ -10,8 +10,7 @@ logger = logger.bind(name='cookies')
 
 
 class PluginCookies:
-    """Adds cookie to all requests (rss, resolvers, download). Anything
-    that uses urllib2 to be exact.
+    """Add cookie to all requests (rss, resolvers, download). Anything that uses urllib2 to be exact.
 
     Currently supports Firefox 3 cookies only.
 
@@ -145,7 +144,7 @@ class PluginCookies:
         return cookie_jar
 
     def on_task_start(self, task, config):
-        """Task starting, install cookiejar"""
+        """Task starting, install cookiejar."""
         import os
 
         config = self.prepare_config(config)

@@ -17,8 +17,9 @@ logger = logger.bind(name='html')
 
 
 class InputHtml:
-    """Parses urls from html page. Usefull on sites which have direct download
-    links of any type (mp3, jpg, torrent, ...).
+    """Parse urls from html page.
+
+    Usefull on sites which have direct download links of any type (mp3, jpg, torrent, ...).
 
     Many anime-fansubbers do not provide RSS-feed, this works well in many cases.
 
@@ -68,7 +69,7 @@ class InputHtml:
 
     def build_config(self, config):
         def get_auth_from_url():
-            """Moves basic authentication from url to username and password fields"""
+            """Move basic authentication from url to username and password fields."""
             parts = list(parse.urlsplit(config['url']))
             split = parts[1].split('@')
             if len(split) > 1:
@@ -186,7 +187,7 @@ class InputHtml:
         duplicate_limit = 4
 
         def title_exists(title):
-            """Helper method. Return True if title is already added to entries"""
+            """Return True if title is already added to entries."""
             for entry in queue:
                 if entry['title'] == title:
                     return True

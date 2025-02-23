@@ -74,7 +74,7 @@ class TasksStatusAPI(APIResource):
     @etag
     @api.response(200, model=task_status_list)
     def get(self, session=None):
-        """Get status tasks"""
+        """Get status tasks."""
         args = tasks_parser.parse_args()
 
         # Pagination and sorting params
@@ -145,7 +145,7 @@ class TaskStatusAPI(APIResource):
     @api.response(200, model=task_status)
     @api.response(NotFoundError)
     def get(self, task_id, session=None):
-        """Get status task by ID"""
+        """Get status task by ID."""
         try:
             task = session.query(db.StatusTask).filter(db.StatusTask.id == task_id).one()
         except NoResultFound:
@@ -207,7 +207,7 @@ class TaskStatusExecutionsAPI(APIResource):
     @api.response(200, model=task_executions)
     @api.response(NotFoundError)
     def get(self, task_id, session=None):
-        """Get task executions by ID"""
+        """Get task executions by ID."""
         try:
             task = session.query(db.StatusTask).filter(db.StatusTask.id == task_id).one()
         except NoResultFound:

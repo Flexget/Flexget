@@ -33,7 +33,7 @@ local_context = threading.local()
 
 @contextlib.contextmanager
 def capture_logs(*args, **kwargs) -> Iterator:
-    """Takes the same arguments as `logger.add`, but this sync will only log messages contained in context."""
+    """Take the same arguments as `logger.add`, but this sync will only log messages contained in context."""
     old_id = get_log_session_id()
     session_id = local_context.session_id = old_id or str(uuid.uuid4())
     existing_filter = kwargs.pop('filter', None)
@@ -100,17 +100,17 @@ _log_filters = []  # Stores filter functions
 
 
 def _log_filterer(record):
-    """This is the function we add to our loguru handlers. It will dynamically use all filters we add later."""
+    """Add the function to our loguru handlers. It will dynamically use all filters we add later."""
     return all(f(record) for f in _log_filters)
 
 
 def add_filter(func: Callable[['loguru.Record'], bool]):
-    """Adds a filter function to the log handlers."""
+    """Add a filter function to the log handlers."""
     _log_filters.append(func)
 
 
 def remove_filter(func: Callable[['loguru.Record'], bool]):
-    """Removes a filter function from the log handlers."""
+    """Remove a filter function from the log handlers."""
     _log_filters.remove(func)
 
 

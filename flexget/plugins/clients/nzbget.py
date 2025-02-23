@@ -7,7 +7,9 @@ logger = logger.bind(name='nzbget')
 
 
 class OutputNzbget:
-    """Example::
+    """The nzbget plugin.
+
+    Example::
 
     nzbget:
       url: http://nzbget:12345@localhost:6789/xmlrpc

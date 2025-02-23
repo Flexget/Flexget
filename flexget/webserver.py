@@ -25,14 +25,14 @@ rand = random.SystemRandom()
 
 
 def generate_key():
-    """Generate key for use to authentication"""
+    """Generate key for use to authentication."""
     return str(hashlib.sha224(str(rand.getrandbits(128)).encode('utf-8')).hexdigest())
 
 
 def get_random_string(
     length=12, allowed_chars='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
 ):
-    """Returns a securely generated random string.
+    """Return a securely generated random string.
 
     The default length of 12 with the a-z, A-Z, 0-9 character set returns
     a 71-bit value. log_2((26+26+10)^12) =~ 71 bits.
@@ -75,7 +75,7 @@ class WeakPassword(Exception):
 
 
 class User(Base, UserMixin):
-    """User class available for flask apps to handle authentication using flask_login"""
+    """User class available for flask apps to handle authentication using flask_login."""
 
     __tablename__ = 'users'
 
@@ -92,7 +92,7 @@ class User(Base, UserMixin):
 
 
 class WebSecret(Base):
-    """Store flask secret in the database"""
+    """Store flask secret in the database."""
 
     __tablename__ = 'secret'
 
@@ -107,21 +107,21 @@ def register_app(path, application, name):
 
 
 def register_home(route):
-    """Registers UI home page"""
+    """Register UI home page."""
     global _home
     _home = route
 
 
 @_default_app.route('/')
 def start_page():
-    """Redirect user to registered UI home"""
+    """Redirect user to registered UI home."""
     if not _home:
         abort(404)
     return redirect(_home)
 
 
 def setup_server(config):
-    """Sets up and starts/restarts the web service."""
+    """Set up and start/restart the web service."""
     web_server = WebServer(
         bind=config['bind'],
         port=config['port'],

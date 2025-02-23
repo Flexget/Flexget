@@ -18,7 +18,9 @@ JOIN_URL = 'https://joinjoaomgcd.appspot.com/_ah/api/messaging/v1/sendPush'
 
 
 class JoinNotifier:
-    """Example::
+    """Send Join notifications.
+
+    Example::
 
     notify:
       entries:

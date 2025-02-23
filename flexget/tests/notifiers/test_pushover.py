@@ -9,7 +9,8 @@ class TestPushoverNotifier:
     config = "{tasks:{}}"
 
     def test_minimal_pushover_config(self, execute_task):
-        """Test pushover account set using `hirabecicr@throwam.com`, password: `flexget`
+        """Test pushover account set using `hirabecicr@throwam.com`, password: `flexget`.
+
         Pushover user key: ua2g3vqjyvqpkyntx19zeruqrn3eim
         Pushover token: aPwSHwkLcNaavShxktBpgJH4bRWc3m
         """

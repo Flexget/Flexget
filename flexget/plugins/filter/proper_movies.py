@@ -141,7 +141,7 @@ class FilterProperMovies:
                 entry.accept('proper version of previously downloaded movie')
 
     def on_task_learn(self, task, config):
-        """Add downloaded movies to the database"""
+        """Add downloaded movies to the database."""
         logger.debug('check for learning')
         for entry in task.accepted:
             if 'imdb_id' not in entry:

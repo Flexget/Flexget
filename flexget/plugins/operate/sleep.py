@@ -9,7 +9,8 @@ logger = logger.bind(name='sleep')
 
 
 class PluginSleep:
-    """Causes a pause in execution to occur at the beginning of the specified phase of a task.
+    """Cause a pause in execution to occur at the beginning of the specified phase of a task.
+
     The point at which the pause occurs can be adjusted using the `plugin_priority` plugin.
     """
 

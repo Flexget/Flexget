@@ -35,7 +35,7 @@ def do_cli(manager, options):
 
 
 def list_entries(options):
-    """List pending entries"""
+    """List pending entries."""
     approved = options.approved
     task_name = options.task_name
 
@@ -56,7 +56,7 @@ def list_entries(options):
 
 
 def manage_entries(options, selection, approved):
-    """Manage pending entries"""
+    """Manage pending entries."""
     approved_text = 'approved' if approved else 'pending'
     with Session() as session:
         if selection == 'all':
@@ -85,7 +85,7 @@ def manage_entries(options, selection, approved):
 
 
 def clear_entries(options):
-    """Clear pending entries"""
+    """Clear pending entries."""
     with Session() as session:
         query = session.query(db.PendingEntry).filter(~db.PendingEntry.approved)
         if options.task_name:

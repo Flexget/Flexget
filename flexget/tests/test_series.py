@@ -127,7 +127,7 @@ class TestQuality:
     """
 
     def test_exact_quality(self, execute_task):
-        """Series plugin: choose by quality"""
+        """Series plugin: choose by quality."""
         task = execute_task('exact_quality')
         assert task.find_entry('accepted', title='QTest.S01E01.720p.XViD-FlexGet'), (
             '720p should have been accepted'
@@ -139,7 +139,7 @@ class TestQuality:
         assert not task.accepted, 'No qualities should have matched'
 
     def test_min_quality(self, execute_task):
-        """Series plugin: min_quality"""
+        """Series plugin: min_quality."""
         task = execute_task('min_quality')
         assert task.find_entry('accepted', title='MinQTest.S01E01.1080p.XViD-FlexGet'), (
             'MinQTest.S01E01.1080p.XViD-FlexGet should have been accepted'
@@ -147,7 +147,7 @@ class TestQuality:
         assert len(task.accepted) == 1, 'should have accepted only one'
 
     def test_max_quality(self, execute_task):
-        """Series plugin: max_quality"""
+        """Series plugin: max_quality."""
         task = execute_task('max_quality')
         assert task.find_entry('accepted', title='MaxQTest.S01E01.HDTV.XViD-FlexGet'), (
             'MaxQTest.S01E01.HDTV.XViD-FlexGet should have been accepted'
@@ -155,7 +155,7 @@ class TestQuality:
         assert len(task.accepted) == 1, 'should have accepted only one'
 
     def test_min_max_quality(self, execute_task):
-        """Series plugin: min_quality with max_quality"""
+        """Series plugin: min_quality with max_quality."""
         task = execute_task('min_max_quality')
         assert task.find_entry('accepted', title='MinMaxQTest.S01E01.HR.XViD-FlexGet'), (
             'MinMaxQTest.S01E01.HR.XViD-FlexGet should have been accepted'
@@ -163,12 +163,12 @@ class TestQuality:
         assert len(task.accepted) == 1, 'should have accepted only one'
 
     def test_max_unknown_quality(self, execute_task):
-        """Series plugin: max quality with unknown quality"""
+        """Series plugin: max quality with unknown quality."""
         task = execute_task('max_unknown_quality')
         assert len(task.accepted) == 1, 'should have accepted'
 
     def test_group_quality(self, execute_task):
-        """Series plugin: quality from group name"""
+        """Series plugin: quality from group name."""
         task = execute_task('quality_from_group')
         assert task.find_entry('accepted', title='GroupQual.S01E01.720p.XViD-FlexGet'), (
             'GroupQual.S01E01.720p.XViD-FlexGet should have been accepted'
@@ -178,7 +178,7 @@ class TestQuality:
         )
 
     def test_quality_in_series_name(self, execute_task):
-        """Make sure quality in title does not get parsed as quality"""
+        """Make sure quality in title does not get parsed as quality."""
         task = execute_task('quality_in_series_name')
         assert task.find_entry('accepted', title='my 720p show S01E01'), (
             'quality in title should not have been parsed'
@@ -216,7 +216,7 @@ class TestDatabase:
     """
 
     def test_database(self, execute_task):
-        """Series plugin: simple database"""
+        """Series plugin: simple database."""
         task = execute_task('test_1')
         task = execute_task('test_2')
         assert task.find_entry('rejected', title='Some.Series.S01E20.720p.XViD-DoppelGanger'), (
@@ -224,7 +224,7 @@ class TestDatabase:
         )
 
     def test_doppelgangers(self, execute_task):
-        """Series plugin: doppelganger releases (dupes)"""
+        """Series plugin: doppelganger releases (dupes)."""
         task = execute_task('progress_1')
         assert task.find_entry('accepted', title='Progress.S01E20.720p-FlexGet'), (
             'best quality not accepted'
@@ -310,7 +310,7 @@ class TestFilterSeries:
     """
 
     def test_smoke(self, execute_task):
-        """Series plugin: test several standard features"""
+        """Series plugin: test several standard features."""
         task = execute_task('test')
 
         # normal passing
@@ -351,7 +351,7 @@ class TestFilterSeries:
         )
 
     def test_metainfo_series_override(self, execute_task):
-        """Series plugin: override metainfo_series"""
+        """Series plugin: override metainfo_series."""
         task = execute_task('metainfo_series_override')
         # Make sure the metainfo_series plugin is working first
         entry = task.find_entry(
@@ -374,7 +374,7 @@ class TestFilterSeries:
         )
 
     def test_all_series_mode(self, execute_task):
-        """Series plugin: test all option"""
+        """Series plugin: test all option."""
         task = execute_task('test_all_series_mode')
         assert task.find_entry('accepted', title='Test.Series.S01E02.PDTV.XViD-FlexGet')
         task.find_entry('accepted', title='Test Series - 1x03 - PDTV XViD-FlexGet')
@@ -428,7 +428,7 @@ class TestFilterSeriesPriority:
     """
 
     def test_priorities(self, execute_task):
-        """Series plugin: regexp plugin is able to reject before series plugin"""
+        """Series plugin: regexp plugin is able to reject before series plugin."""
         task = execute_task('test')
         assert task.find_entry('rejected', title='foobar 720p s01e01'), (
             'foobar 720p s01e01 should have been rejected'
@@ -553,7 +553,7 @@ class TestPropers:
         """
 
     def test_propers_timeframe(self, execute_task):
-        """Series plugin: propers timeframe"""
+        """Series plugin: propers timeframe."""
         task = execute_task('proper_timeframe_1')
         assert task.find_entry('accepted', title='TFTest.S01E01.720p-FlexGet'), (
             'Did not accept before timeframe'
@@ -568,33 +568,33 @@ class TestPropers:
         )
 
     def test_no_propers(self, execute_task):
-        """Series plugin: no propers at all"""
+        """Series plugin: no propers at all."""
         task = execute_task('no_propers_1')
         assert len(task.accepted) == 1, 'broken badly'
         task = execute_task('no_propers_2')
         assert len(task.rejected) == 1, 'accepted proper'
 
     def test_min_max_propers(self, execute_task):
-        """Series plugin: min max propers"""
+        """Series plugin: min max propers."""
         task = execute_task('min_max_quality_1')
         assert len(task.accepted) == 1, 'uhh, broken badly'
         task = execute_task('min_max_quality_2')
         assert len(task.accepted) == 1, 'should have accepted proper'
 
     def test_lot_propers(self, execute_task):
-        """Series plugin: proper flood"""
+        """Series plugin: proper flood."""
         task = execute_task('lot_propers')
         assert len(task.accepted) == 1, 'should have accepted (only) one of the propers'
 
     def test_diff_quality_propers(self, execute_task):
-        """Series plugin: proper in different/wrong quality"""
+        """Series plugin: proper in different/wrong quality."""
         task = execute_task('diff_quality_1')
         assert len(task.accepted) == 1
         task = execute_task('diff_quality_2')
         assert len(task.accepted) == 0, 'should not have accepted lower quality proper'
 
     def test_propers(self, execute_task):
-        """Series plugin: proper accepted after episode is downloaded"""
+        """Series plugin: proper accepted after episode is downloaded."""
         # start with normal download ...
         task = execute_task('propers_1')
         assert task.find_entry('accepted', title='Test.S01E01.720p-FlexGet'), (
@@ -626,14 +626,14 @@ class TestPropers:
         )
 
     def test_proper_available(self, execute_task):
-        """Series plugin: proper available immediately"""
+        """Series plugin: proper available immediately."""
         task = execute_task('proper_at_first')
         assert task.find_entry('accepted', title='Foobar.S01E01.720p.proper.FlexGet'), (
             'Foobar.S01E01.720p.proper.FlexGet should have been accepted'
         )
 
     def test_proper_upgrade(self, execute_task):
-        """Series plugin: real proper after proper"""
+        """Series plugin: real proper after proper."""
         task = execute_task('proper_upgrade_1')
         assert task.find_entry('accepted', title='Test.S02E01.hdtv.proper')
         task = execute_task('proper_upgrade_2')
@@ -685,7 +685,7 @@ class TestSimilarNames:
     """
 
     def test_names(self, execute_task):
-        """Series plugin: similar namings"""
+        """Series plugin: similar namings."""
         task = execute_task('test')
         assert task.find_entry('accepted', title='FooBar.S03E01.DSR-FlexGet'), 'Standard failed?'
         assert task.find_entry('accepted', title='FooBar: FirstAlt.S02E01.DSR-FlexGet'), (
@@ -747,17 +747,17 @@ class TestDuplicates:
     """
 
     def test_dupes(self, execute_task):
-        """Series plugin: dupes with same quality"""
+        """Series plugin: dupes with same quality."""
         task = execute_task('test_dupes')
         assert len(task.accepted) == 1, 'accepted both'
 
     def test_true_dupes(self, execute_task):
-        """Series plugin: true duplicate items"""
+        """Series plugin: true duplicate items."""
         task = execute_task('test_true_dupes')
         assert len(task.accepted) == 1, 'should have accepted (only) one'
 
     def test_downloaded(self, execute_task):
-        """Series plugin: multiple downloaded and new episodes are handled correctly"""
+        """Series plugin: multiple downloaded and new episodes are handled correctly."""
         task = execute_task('test_1')
         task = execute_task('test_2')
 
@@ -853,7 +853,7 @@ class TestQualities:
     """
 
     def test_qualities(self, execute_task):
-        """Series plugin: qualities"""
+        """Series plugin: qualities."""
         task = execute_task('test_1')
 
         assert task.find_entry('accepted', title='FooBar.S01E01.PDTV-FlexGet'), (
@@ -889,7 +889,7 @@ class TestQualities:
         )
 
     def test_propers(self, execute_task):
-        """Series plugin: qualities + propers"""
+        """Series plugin: qualities + propers."""
         task = execute_task('propers_1')
         assert task.accepted
         task = execute_task('propers_2')
@@ -948,7 +948,7 @@ class TestIdioticNumbering:
     """
 
     def test_idiotic(self, execute_task):
-        """Series plugin: idiotic numbering scheme"""
+        """Series plugin: idiotic numbering scheme."""
         task = execute_task('test_1')
         task = execute_task('test_2')
         entry = task.find_entry(title='FooBar.102.PDTV-FlexGet')
@@ -988,7 +988,7 @@ class TestNormalization:
     """
 
     def test_capitalization(self, execute_task):
-        """Series plugin: configuration capitalization"""
+        """Series plugin: configuration capitalization."""
         task = execute_task('test_1')
         assert task.find_entry('accepted', title='FooBar.S01E01.PDTV-FlexGet')
         task = execute_task('test_2')
@@ -1021,7 +1021,7 @@ class TestMixedNumbering:
     """
 
     def test_mixednumbering(self, execute_task):
-        """Series plugin: Mixed series numbering"""
+        """Series plugin: Mixed series numbering."""
         task = execute_task('test_1')
         assert task.find_entry('accepted', title='FooBar.S03E07.PDTV-FlexGet')
         task = execute_task('test_2')
@@ -1062,7 +1062,7 @@ class TestExact:
     """
 
     def test_auto(self, execute_task):
-        """Series plugin: auto enable exact"""
+        """Series plugin: auto enable exact."""
         task = execute_task('auto')
         assert task.find_entry('accepted', title='ABC.S01E01.PDTV-FlexGet')
         assert task.find_entry('accepted', title='ABC.LA.S01E01.PDTV-FlexGet')
@@ -1175,14 +1175,14 @@ class TestTimeframe:
     """
 
     def test_no_waiting(self, execute_task):
-        """Series plugin: no timeframe waiting needed"""
+        """Series plugin: no timeframe waiting needed."""
         task = execute_task('test_no_waiting')
         assert task.find_entry('accepted', title='Test.S01E01.720p-FlexGet'), (
             '720p not accepted immediattely'
         )
 
     def test_stop_waiting(self, execute_task):
-        """Series plugin: timeframe quality appears, stop waiting, proper appears"""
+        """Series plugin: timeframe quality appears, stop waiting, proper appears."""
         task = execute_task('test_stop_waiting_1')
         assert task.entries
         assert not task.accepted
@@ -1196,7 +1196,7 @@ class TestTimeframe:
         )
 
     def test_expires(self, execute_task):
-        """Series plugin: timeframe expires"""
+        """Series plugin: timeframe expires."""
         # first execution should not accept anything
         task = execute_task('test_expires')
         assert not task.accepted
@@ -1286,7 +1286,7 @@ class TestBacklog:
     """
 
     def test_backlog(self, manager, execute_task):
-        """Series plugin: backlog"""
+        """Series plugin: backlog."""
         task = execute_task('backlog')
         assert task.entries, 'no entries at the start'
         assert not task.accepted, 'no entries at the start'
@@ -1298,7 +1298,7 @@ class TestBacklog:
 
 
 class TestManipulate:
-    """Tests that it's possible to manipulate entries before they're parsed by series plugin"""
+    """Test that it's possible to manipulate entries before they're parsed by series plugin."""
 
     config = """
         templates:
@@ -1322,7 +1322,7 @@ class TestManipulate:
     """
 
     def test_manipulate(self, execute_task):
-        """Series plugin: test manipulation priority"""
+        """Series plugin: test manipulation priority."""
         # should not work with the prefix
         task = execute_task('test_1')
         assert not task.accepted, 'series accepted even with prefix?'
@@ -1365,7 +1365,7 @@ class TestFromGroup:
     """
 
     def test_from_group(self, execute_task):
-        """Series plugin: test from_group"""
+        """Series plugin: test from_group."""
         task = execute_task('test')
         assert task.find_entry('accepted', title='[FlexGet] Test 12')
         assert task.find_entry('accepted', title='Test.13.HDTV-FlexGet')
@@ -1523,7 +1523,7 @@ class TestSeriesPremiere:
     """
 
     def test_only_premieres(self, execute_task):
-        """Test series premiere"""
+        """Test series premiere."""
         task = execute_task('test')
         assert task.find_entry(
             'accepted',
@@ -1761,7 +1761,7 @@ class TestAutoLockin:
         )
 
     def test_special_lock(self, execute_task):
-        """Make sure series plugin does not lock in to type 'special'"""
+        """Make sure series plugin does not lock in to type 'special'."""
         task = execute_task('test_special_lock')
         assert len(task.accepted) == 4, 'All specials should have been accepted'
         task = execute_task('try_reg')
@@ -1872,7 +1872,7 @@ class TestSpecials:
         assert not entry.accepted, 'Entry which should not have been accepted was.'
 
     def test_special_looks_like_a_season_pack(self, execute_task):
-        """Make sure special episodes are not being parsed as season packs"""
+        """Make sure special episodes are not being parsed as season packs."""
         task = execute_task('special_looks_like_season_pack')
         entry = task.find_entry(
             title='Doctor.Who.S07.Special.The.Science.of.Doctor.Who.WS.XviD-Flexget'
@@ -2158,7 +2158,7 @@ class TestSeriesSeasonPack:
 
     @pytest.fixture
     def config(self):
-        """Overrides outer config fixture since season pack support does not work with guessit parser"""
+        """Override outer config fixture since season pack support does not work with guessit parser."""
         return self._config
 
     def test_season_pack_simple(self, execute_task):
@@ -2253,12 +2253,12 @@ class TestSeriesSeasonPack:
         assert entry.accepted
 
     def test_proper_season_pack(self, execute_task):
-        """Series plugin: proper available immediately"""
+        """Series plugin: proper available immediately."""
         task = execute_task('test_proper_season_pack')
         assert task.find_entry('accepted', title='foo.s01.720p.proper-flexget')
 
     def test_proper_season_pack_2(self, execute_task):
-        """Series plugin: proper available immediately"""
+        """Series plugin: proper available immediately."""
         task = execute_task('test_proper_season_pack_2')
         assert task.find_entry('accepted', title='foo.s01.720p-flexget')
 
@@ -2306,7 +2306,7 @@ class TestSeriesSeasonPackAdvanced:
 
     @pytest.fixture
     def config(self):
-        """Overrides outer config fixture since season pack support does not work with guessit parser"""
+        """Override outer config fixture since season pack support does not work with guessit parser."""
         return self._config
 
     def test_season_pack_with_timeframe_and_target(self, execute_task):
@@ -2352,11 +2352,11 @@ class TestSeriesDDAudio:
 
     @pytest.fixture
     def config(self):
-        """Overrides outer config fixture since DD+ and arbitrary channels support does not work with guessit parser"""
+        """Override outer config fixture since DD+ and arbitrary channels support does not work with guessit parser."""
         return self._config
 
     def test_min_quality(self, execute_task):
-        """Series plugin: min_quality"""
+        """Series plugin: min_quality."""
         task = execute_task('min_quality')
         assert task.find_entry('accepted', title='MinQATest.S01E01.720p.XViD.DDP5.1-FlexGet'), (
             'MinQATest.S01E01.720p.XViD.DDP5.1-FlexGet should have been accepted'
@@ -2364,7 +2364,7 @@ class TestSeriesDDAudio:
         assert len(task.accepted) == 1, 'should have accepted only two'
 
     def test_max_quality(self, execute_task):
-        """Series plugin: max_quality"""
+        """Series plugin: max_quality."""
         task = execute_task('max_quality')
         assert task.find_entry('accepted', title='MaxQATest.S01E01.720p.XViD.DD5.1-FlexGet'), (
             'MaxQATest.S01E01.720p.XViD.DD5.1-FlexGet should have been accepted'
@@ -2372,7 +2372,7 @@ class TestSeriesDDAudio:
         assert len(task.accepted) == 1, 'should have accepted only one'
 
     def test_channels(self, execute_task):
-        """Series plugin: max_quality"""
+        """Series plugin: max_quality."""
         task = execute_task('test_channels')
         assert task.find_entry(title='Channels.S01E01.1080p.HDTV.DD+7.1-FlexGet'), (
             'Channels.S01E01.1080p.HDTV.DD+7.1-FlexGet should have been accepted'

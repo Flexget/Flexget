@@ -11,7 +11,7 @@ logger = logger.bind(name='FTDB')
 
 
 class UrlRewriteFTDB:
-    """FTDB RSS url_rewrite"""
+    """FTDB RSS url_rewrite."""
 
     def url_rewritable(self, task, entry):
         # url = entry['url']

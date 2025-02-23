@@ -22,7 +22,7 @@ class DiskStats(NamedTuple):
 
 
 def os_disk_stats(folder):
-    """Return drive free, used and total bytes"""
+    """Return drive free, used and total bytes."""
     if os.name == 'nt':
         free_bytes = ctypes.c_ulonglong(0)
         total_bytes = ctypes.c_ulonglong(0)
@@ -90,7 +90,7 @@ selector_map = {
 
 
 class PluginPathBySpace:
-    """Allows setting a field to a folder based on it's space
+    """Allow setting a field to a folder based on it's space.
 
     Path will be selected at random if multiple paths match the within
 

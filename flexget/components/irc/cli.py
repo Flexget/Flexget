@@ -12,7 +12,7 @@ except ImportError:
 
 
 def do_cli(manager, options):
-    """Handle irc cli"""
+    """Handle irc cli."""
     if SimpleIRCBot is None:
         console('irc_bot is not installed. install using `pip install irc_bot`.')
         return

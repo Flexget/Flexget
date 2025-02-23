@@ -3,7 +3,7 @@ import pytest
 
 @pytest.mark.online
 class TestMyEpisodes:
-    """Uses test account at MyEpisodes, username and password are 'flexget'"""
+    """Use test account at MyEpisodes, username and password are 'flexget'."""
 
     config = """
         tasks:

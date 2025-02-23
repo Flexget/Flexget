@@ -13,7 +13,8 @@ logger = logger.bind(name='regexp_parse')
 
 
 class RegexpParse:
-    r"""This plugin is designed to take input from a web resource or a file.
+    r"""Designed to take input from a web resource or a file.
+
     It then parses the text via regexps supplied in the config file.
 
     source: is a file or url to get the data from. You can specify a username:password
@@ -132,7 +133,7 @@ class RegexpParse:
         self.required = []
 
     def flagstr_to_flags(self, flag_str):
-        """Turns a comma seperated list of flags into the int value."""
+        """Turn a comma seperated list of flags into the int value."""
         combind_flags = 0
         split_flags = flag_str.split(',')
         for flag in split_flags:
@@ -140,7 +141,7 @@ class RegexpParse:
         return combind_flags
 
     def compile_regexp_dict_list(self, re_list):
-        """Turns a list of dicts containing regexps information into a list of compiled regexps."""
+        """Turn a list of dicts containing regexps information into a list of compiled regexps."""
         compiled_regexps = []
         for dic in re_list:
             flags = 0
@@ -150,7 +151,7 @@ class RegexpParse:
         return compiled_regexps
 
     def isvalid(self, entry):
-        """Checks to make sure that all required fields are present in the entry."""
+        """Check to make sure that all required fields are present in the entry."""
         for key in self.required:
             if key not in entry:
                 return False

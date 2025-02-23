@@ -10,7 +10,9 @@ logger = logger.bind(name='sabnzbd')
 
 
 class OutputSabnzbd:
-    """Example::
+    """The sabnzbd plugin.
+
+    Example::
 
       sabnzbd:
         apikey: 123456

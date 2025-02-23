@@ -48,6 +48,7 @@ def do_cli(manager, options):
 
 def display_summary(options):
     """Display series summary.
+
     :param options: argparse options from the CLI
     """
     porcelain = options.table_type == 'porcelain'
@@ -177,8 +178,9 @@ def remove(manager, options, forget=False):
 
 
 def get_latest_status(episode):
-    """:param episode: Instance of Episode
-    :return: Status string for given episode
+    """Return status string for given episode.
+
+    :param episode: Instance of Episode
     """
     status = ''
     for release in sorted(episode.releases, key=lambda r: r.quality):
@@ -194,7 +196,7 @@ def get_latest_status(episode):
 
 
 def display_details(options):
-    """Display detailed series information, ie. series show NAME"""
+    """Display detailed series information, ie. series show NAME."""
     name = options.series_name
     sort_by = options.sort_by or os.environ.get(ENV_SHOW_SORTBY_FIELD, 'age')
     if options.order is not None:

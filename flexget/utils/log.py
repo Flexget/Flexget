@@ -1,4 +1,4 @@
-"""Logging utilities"""
+"""Logging utilities."""
 
 import hashlib
 from datetime import datetime, timedelta
@@ -34,7 +34,7 @@ def upgrade(ver: Optional[int], session: Session):
 
 
 class LogMessage(Base):
-    """Declarative"""
+    """Declarative."""
 
     __tablename__ = 'log_once'
 
@@ -51,7 +51,7 @@ class LogMessage(Base):
 
 @event('manager.db_cleanup')
 def purge(manager, session: Session) -> None:
-    """Purge old messages from database"""
+    """Purge old messages from database."""
     old = datetime.now() - timedelta(days=365)
 
     result = session.query(LogMessage).filter(LogMessage.added < old).delete()
@@ -67,7 +67,9 @@ def log_once(
     suppressed_level: str = 'VERBOSE',
     session: Session = None,
 ) -> Optional[bool]:
-    """Log message only once using given logger`. Returns False if suppressed logging.
+    """Log message only once using given logger`.
+
+    Return False if suppressed logging.
     When suppressed, `suppressed_level` level is still logged.
     """
     if logger is None:

@@ -25,12 +25,12 @@ class ModifySet:
     schema = {'type': 'object', "minProperties": 1}
 
     def on_task_metainfo(self, task, config):
-        """Adds the set dict to all accepted entries."""
+        """Add the set dict to all accepted entries."""
         for entry in task.all_entries:
             self.modify(entry, config)
 
     def modify(self, entry, config, errors=True):
-        """This can be called from a plugin to add set values to an entry"""
+        """Can be called from a plugin to add set values to an entry."""
         for field in config:
             # If this doesn't appear to be a jinja template, just set it right away.
             if not isinstance(config[field], str) or '{' not in config[field]:

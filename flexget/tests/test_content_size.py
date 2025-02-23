@@ -36,24 +36,24 @@ class TestTorrentSize:
 
     @pytest.mark.filecopy('test.torrent', '__tmp__/test.torrent')
     def test_min(self, execute_task):
-        """Content Size: torrent with min size"""
+        """Content Size: torrent with min size."""
         task = execute_task('test_min')
         assert task.find_entry('rejected', title='test'), 'should have rejected, minimum size'
 
     @pytest.mark.filecopy('test.torrent', '__tmp__/test.torrent')
     def test_max(self, execute_task):
-        """Content Size: torrent with max size"""
+        """Content Size: torrent with max size."""
         task = execute_task('test_max')
         assert task.find_entry('rejected', title='test'), 'should have rejected, maximum size'
 
     @pytest.mark.filecopy('test.torrent', '__tmp__/test.torrent')
     def test_strict(self, execute_task):
-        """Content Size: strict enabled"""
+        """Content Size: strict enabled."""
         task = execute_task('test_strict')
         assert task.find_entry('rejected', title='test'), 'should have rejected non torrent'
 
     def test_cache(self, execute_task):
-        """Content Size: caching"""
+        """Content Size: caching."""
         task = execute_task('test_cache')
         assert task.find_entry('rejected', title='test'), 'should have rejected, too small'
 
@@ -65,7 +65,8 @@ class TestTorrentSize:
 
 
 class TestFileSize:
-    """This is to test that content_size is picked up from the file itself when filesystem is used as the input.
+    """Test that content_size is picked up from the file itself when filesystem is used as the input.
+
     This doesn't do a super job of testing, because we don't have any test files bigger than 1 MB.
     """
 
@@ -93,7 +94,7 @@ class TestFileSize:
 
     @pytest.mark.filecopy('test.torrent', '__tmp__/test.file')
     def test_min(self, execute_task):
-        """Content Size: torrent with min size"""
+        """Content Size: torrent with min size."""
         task = execute_task('test_min')
         entry = task.find_entry('rejected', title='test')
         assert entry, 'should have rejected, minimum size'
@@ -101,7 +102,7 @@ class TestFileSize:
 
     @pytest.mark.filecopy('test.torrent', '__tmp__/test.file')
     def test_max(self, execute_task):
-        """Content Size: torrent with max size"""
+        """Content Size: torrent with max size."""
         task = execute_task('test_max')
         entry = task.find_entry('accepted', title='test')
         assert entry, 'should have been accepted, it is below maximum size'

@@ -18,7 +18,7 @@ def lazy_b(entry):
 
 class TestLazyFields:
     def test_lazy_queue(self):
-        """Tests behavior when multiple plugins register lazy lookups for the same field"""
+        """Tests behavior when multiple plugins register lazy lookups for the same field."""
 
         def setup_entry():
             entry = Entry()

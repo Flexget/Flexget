@@ -40,7 +40,7 @@ class _Console(rich.console.Console):
         _patchable_console(*args, **kwargs)
 
     def _print(self, *args, **kwargs):
-        """The real parent print function, which can be called internally."""
+        """Be the real parent print function, which can be called internally."""
         super().print(*args, **kwargs)
 
     def rule(
@@ -102,7 +102,9 @@ GITHUB_BOX: rich.box.Box = rich.box.Box(
 
 
 class TerminalTable(rich.table.Table):
-    """A data table suited for CLI output, created via its sent parameters. For example::
+    """A data table suited for CLI output, created via its sent parameters.
+
+    For example::
 
         header = ['Col1', 'Col2']
         table_data = [header]
@@ -184,7 +186,7 @@ table_parser.add_argument(
 
 
 def word_wrap(text: str, max_length: int) -> str:
-    """A helper method designed to return a wrapped string.
+    """Be a helper method designed to return a wrapped string.
 
     :param text: Text to wrap
     :param max_length: Maximum allowed string length
@@ -196,8 +198,9 @@ def word_wrap(text: str, max_length: int) -> str:
 
 
 def colorize(color: str, text: str) -> str:
-    """A simple override of Color.colorize which sets the default auto colors value to True, since it's the more common
-    use case. When output isn't TTY just return text
+    """Override Color.colorize by setting the default auto colors value to True, since it's the more common use case.
+
+    When output isn't TTY just return text
 
     :param color: Color tag to use
     :param text: Text to color

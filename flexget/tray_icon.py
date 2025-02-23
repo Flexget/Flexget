@@ -59,7 +59,7 @@ class TrayIcon:
         index: Optional[int] = None,
         **kwargs,
     ):
-        """Add a menu item by passing its text and function, or pass a created MenuItem. Force position by sending index"""
+        """Add a menu item by passing its text and function, or pass a created MenuItem. Force position by sending index."""
         if not any(v for v in (menu_item, text)):
             raise ValueError("Either 'text' or 'menu_item' are required")
 
@@ -89,7 +89,7 @@ class TrayIcon:
 
     @check_if_tray_is_active
     def run(self):
-        """Run the tray icon. Must be run from the main thread and is blocking"""
+        """Run the tray icon. Must be run from the main thread and is blocking."""
         try:
             logger.verbose('Starting tray icon')
             self.icon = Icon('Flexget', Image.open(self.path_to_image), menu=self.menu)

@@ -69,7 +69,7 @@ class PluginDownload:
     }
 
     def process_config(self, config):
-        """Return plugin configuration in advanced form"""
+        """Return plugin configuration in advanced form."""
         if isinstance(config, str):
             config = {'path': config}
         if not isinstance(config, dict):
@@ -102,7 +102,8 @@ class PluginDownload:
         tmp_path=tmpdir,
     ):
         """Download entry content and store in temporary folder.
-        Fails entry with a reason if there was problem.
+
+        Fail entry with a reason if there was problem.
 
         :param bool require_path:
           whether or not entries without 'path' field are ignored
@@ -192,8 +193,9 @@ class PluginDownload:
 
     # TODO: a bit silly method, should be get rid of now with simplier exceptions ?
     def process_entry(self, task, entry, url, tmp_path):
-        """Processes `entry` by using `url`. Does not use entry['url'].
-        Does not fail the `entry` if there is a network issue, instead just logs and returns a string error.
+        """Process `entry` by using `url`. Do not use entry['url'].
+
+        Do not fail the `entry` if there is a network issue, instead just log and return a string error.
 
         :param task: Task
         :param entry: Entry
@@ -229,7 +231,7 @@ class PluginDownload:
             return msg
 
     def download_entry(self, task, entry, url, tmp_path):
-        """Downloads `entry` by using `url`.
+        """Download `entry` by using `url`.
 
         :raises: Several types of exceptions ...
         :raises: PluginWarning
@@ -342,7 +344,7 @@ class PluginDownload:
         logger.debug('Finishing download_entry() with filename {}', entry.get('filename'))
 
     def filename_from_headers(self, entry, response):
-        """Checks entry filename if it's found from content-disposition"""
+        """Check entry filename if it's found from content-disposition."""
         if not response.headers.get('content-disposition'):
             # No content disposition header, nothing we can do
             return
@@ -360,7 +362,7 @@ class PluginDownload:
             entry['filename'] = filename
 
     def filename_ext_from_mime(self, entry):
-        """Tries to set filename extension from mime-type"""
+        """Try to set filename extension from mime-type."""
         extensions = mimetypes.guess_all_extensions(entry['mime-type'], strict=False)
         if extensions:
             logger.debug('Mimetype guess for {} is {} ', entry['mime-type'], extensions)
@@ -379,7 +381,7 @@ class PluginDownload:
             logger.debug("Python doesn't know extension for mime-type: {}", entry['mime-type'])
 
     def on_task_output(self, task, config):
-        """Move downloaded content from temp folder to final destination"""
+        """Move downloaded content from temp folder to final destination."""
         config = self.process_config(config)
         for entry in task.accepted:
             try:
@@ -392,7 +394,7 @@ class PluginDownload:
                 logger.exception('Exception while writing')
 
     def output(self, task, entry, config):
-        """Moves temp-file into final destination
+        """Move temp-file into final destination.
 
         Raises:
             PluginError if operation fails
@@ -516,7 +518,7 @@ class PluginDownload:
             self.cleanup_temp_file(entry)
 
     def on_task_learn(self, task, config):
-        """Make sure all temp files are cleaned up after output phase"""
+        """Make sure all temp files are cleaned up after output phase."""
         self.cleanup_temp_files(task)
 
     def on_task_abort(self, task, config):
@@ -533,7 +535,7 @@ class PluginDownload:
             del entry['file']
 
     def cleanup_temp_files(self, task):
-        """Checks all entries for leftover temp files and deletes them."""
+        """Check all entries for leftover temp files and deletes them."""
         for entry in task.entries + task.rejected + task.failed:
             self.cleanup_temp_file(entry)
 

@@ -9,10 +9,7 @@ logger = logger.bind(name='metainfo_quality')
 
 
 class MetainfoQuality:
-    """Utility:
-
-    Set quality attribute for entries.
-    """
+    """Utility: Set quality attribute for entries."""
 
     schema = {'type': 'boolean'}
 

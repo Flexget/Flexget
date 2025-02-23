@@ -90,7 +90,7 @@ class SearchHeBits:
 
     @plugin.internet(logger)
     def search(self, task, entry, config):
-        """Search for entries on HeBits"""
+        """Search for entries on HeBits."""
         account_info = self._fetch_account_info(self.user_profile_url, config)
         params = {
             'action': 'browse',

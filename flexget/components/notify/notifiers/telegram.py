@@ -204,7 +204,7 @@ class TelegramNotifier:
         asyncio.run(self.main(message))
 
     async def main(self, message: str) -> None:
-        """Send a Telegram notification"""
+        """Send a Telegram notification."""
         async with (
             ApplicationBuilder()
             .token(self._token)
@@ -359,7 +359,8 @@ class TelegramNotifier:
         groups: list[str],
     ) -> tuple[list[ChatIdEntry], bool]:
         """Get chat ids for `usernames`, `fullnames` & `groups`.
-        entries with a matching chat ids will be removed from the input lists.
+
+        Entries with a matching chat ids will be removed from the input lists.
         """
         logger.debug('loading cached chat ids')
         chat_id_entries = self._get_cached_chat_id_entries(session, usernames, fullnames, groups)
@@ -386,7 +387,7 @@ class TelegramNotifier:
         fullnames: list[tuple[str, str]],
         groups: list[str],
     ) -> list[ChatIdEntry]:
-        """Get chat ids from the cache (DB). remove found entries from `usernames`, `fullnames` & `groups`"""
+        """Get chat ids from the cache (DB). remove found entries from `usernames`, `fullnames` & `groups`."""
         chat_id_entries = []
         cached_usernames = {
             x.username: x
@@ -427,7 +428,7 @@ class TelegramNotifier:
     async def _get_new_chat_id_entries(
         self, usernames: list[str], fullnames: list[tuple[str, str]], groups: list[str]
     ) -> AsyncGenerator[ChatIdEntry, None]:
-        """Get chat ids by querying the telegram `bot`"""
+        """Get chat ids by querying the telegram `bot`."""
         upd_usernames, upd_fullnames, upd_groups = await self._get_bot_updates()
 
         len_ = len(usernames)
@@ -469,7 +470,7 @@ class TelegramNotifier:
     ) -> tuple[
         dict[str, telegram.Chat], dict[tuple[str, str], telegram.Chat], dict[str, telegram.Chat]
     ]:
-        """Get updated chats info from telegram"""
+        """Get updated chats info from telegram."""
         # highly unlikely, but if there are more than `telegram.constants.PollingLimit.MAX_LIMIT`
         # msgs waiting for the bot, we should not miss one
         total_updates = []
@@ -509,7 +510,7 @@ class TelegramNotifier:
     def _update_db(
         self, session: sqlalchemy.orm.Session, chat_id_entries: list[ChatIdEntry]
     ) -> None:
-        """Update the DB with found `chat_ids`"""
+        """Update the DB with found `chat_ids`."""
         logger.info('saving updated chat_ids to db')
 
         # avoid duplicate chat_ids. (this is possible if configuration specified both username & fullname

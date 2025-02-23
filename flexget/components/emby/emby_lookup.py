@@ -10,7 +10,7 @@ logger = logger.bind(name='emby_lookup')
 
 
 class EmbyLookup:
-    """Preforms Emby Lookup
+    """Preforms Emby Lookup.
 
     Example:
         emby_lookup:
@@ -78,12 +78,12 @@ class EmbyLookup:
 
     @property
     def movie_identifier(self):
-        """Returns the plugin main identifier type"""
+        """Returns the plugin main identifier type."""
         return 'emby_movie_id'
 
     @property
     def series_identifier(self):
-        """Returns the plugin main identifier type"""
+        """Returns the plugin main identifier type."""
         return 'emby_serie_id'
 
 

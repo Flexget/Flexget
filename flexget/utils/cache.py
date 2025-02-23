@@ -15,8 +15,9 @@ def cached_resource(
     max_size: int = 250,
     directory: str = 'cached_resources',
 ) -> tuple[str, str]:
-    """Caches a remote resource to local filesystem. Return a tuple of local file name and mime type, use primarily
-    for API/WebUI.
+    """Cache a remote resource to local filesystem.
+
+    Return a tuple of local file name and mime type, use primarily for API/WebUI.
 
     :param url: Resource URL
     :param force: Does not check for existence of cached resource, fetches the remote URL, ignores directory size limit
@@ -54,7 +55,7 @@ def cached_resource(
 
 
 def dir_size(directory: str) -> int:
-    """Sums the size of all files in a given dir. Not recursive.
+    """Sum the size of all files in a given dir. Not recursive.
 
     :param directory: Directory to check
     :return: Summed size of all files in Bytes.
@@ -67,7 +68,7 @@ def dir_size(directory: str) -> int:
 
 
 def trim_dir(directory: str) -> None:
-    """Removed the least accessed file on a given dir
+    """Remove the least accessed file on a given dir.
 
     :param directory: Directory to check
     """

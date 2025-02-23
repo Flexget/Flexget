@@ -14,7 +14,7 @@ logger = logger.bind(name='ftp')
 
 
 class OutputFtp:
-    """Ftp Download plugin
+    """Ftp Download plugin.
 
     input-url: ftp://<user>:<password>@<host>:<port>/<path to file>
     Example: ftp://anonymous:anon@my-ftp-server.com:21/torrent-files-dir

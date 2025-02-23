@@ -19,7 +19,7 @@ class TorrentMatchFile:
 
 
 class TorrentMatch:
-    """Plugin that attempts to match .torrents to local files"""
+    """Plugin that attempts to match .torrents to local files."""
 
     schema = {
         'type': 'object',

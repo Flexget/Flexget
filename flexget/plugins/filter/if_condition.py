@@ -29,7 +29,7 @@ class FilterIf:
     }
 
     def check_condition(self, condition, entry):
-        """Checks if a given `entry` passes `condition`"""
+        """Check if a given `entry` passes `condition`."""
         # Make entry fields and other utilities available in the eval namespace
         # We need our namespace to be an Entry instance for lazy loading to work
         eval_locals = copy(entry)
@@ -53,7 +53,7 @@ class FilterIf:
             return passed
 
     def __getattr__(self, item):
-        """Provides handlers for all phases."""
+        """Provide handlers for all phases."""
         for phase, method in plugin.phase_methods.items():
             if item == method and phase not in ['accept', 'reject', 'fail', 'input']:
                 break

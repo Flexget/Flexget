@@ -12,7 +12,7 @@ class TestMetainfo:
     """
 
     def test_content_size(self, execute_task):
-        """Metainfo: parse content size"""
+        """Metainfo: parse content size."""
         task = execute_task('test_content_size')
         assert task.find_entry(content_size=int(10.2 * 1024**2)), 'Content size 10.2 MB absent'
         assert task.find_entry(content_size=200 * 1024**2), 'Content size 200 MB absent'
@@ -32,7 +32,7 @@ class TestMetainfoImdb:
     """
 
     def test_imdb(self, execute_task):
-        """Metainfo: imdb url"""
+        """Metainfo: imdb url."""
         task = execute_task('test')
         assert task.find_entry(imdb_url='https://www.imdb.com/title/tt0330793/'), (
             'Failed to pick url from test 1'
@@ -123,7 +123,7 @@ class TestMetainfoSeries:
         return self._config.replace('__parser__', request.param)
 
     def test_metainfo_series(self, execute_task):
-        """Metainfo series: name/episode"""
+        """Metainfo series: name/episode."""
         # We search for series name in title case to make sure case is being normalized
         task = execute_task('test')
         assert task.find_entry(
@@ -187,7 +187,7 @@ class TestMetainfoSeries:
         ), 'Failed to parse series pack info'
 
     def test_false_positives(self, execute_task):
-        """Metainfo series: check for false positives"""
+        """Metainfo series: check for false positives."""
         task = execute_task('false_positives')
         for entry in task.entries:
             # None of these should be detected as series

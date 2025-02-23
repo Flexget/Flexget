@@ -12,7 +12,9 @@ logger = logger.bind(name=plugin_name)
 
 
 class MQTTNotifier:
-    """Example::
+    """Send messages via MQTT.
+
+    Example::
     notify:
       entries:
         via:
@@ -77,7 +79,7 @@ class MQTTNotifier:
     }
 
     def notify(self, title, message, config):
-        """Publish to an MQTT topic"""
+        """Publish to an MQTT topic."""
         try:
             import paho.mqtt.client as mqtt
 

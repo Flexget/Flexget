@@ -14,9 +14,8 @@ SIZE_RE = re.compile(r'Size[^\d]{0,7}(\d*\.?\d+).{0,5}(MB|GB)', re.IGNORECASE)
 
 
 class MetainfoContentSize:
-    """Utility:
+    """Utility: Check if content size is mentioned in description and set content_size attribute for entries if it is.
 
-    Check if content size is mentioned in description and set content_size attribute for entries if it is.
     Also sets content_size for entries with local files from input_listdir.
     """
 

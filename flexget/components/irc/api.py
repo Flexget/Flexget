@@ -48,7 +48,7 @@ class IRCStatus(APIResource):
     @api.response(NotFoundError)
     @api.response(BadRequest)
     def get(self, session=None):
-        """Returns status of IRC connections"""
+        """Return status of IRC connections."""
         from .irc import irc_manager
 
         if irc_manager is None:
@@ -67,7 +67,7 @@ class IRCStatus(APIResource):
 class IRCEnums(APIResource):
     @api.response(200, model=empty_response)
     def get(self, session=None):
-        """Get channel status enumeration meaning"""
+        """Get channel status enumeration meaning."""
         try:
             from irc_bot import simple_irc_bot
         except ImportError:
@@ -82,7 +82,7 @@ class IRCRestart(APIResource):
     @api.response(NotFoundError)
     @api.response(BadRequest)
     def get(self, session=None):
-        """Restarts IRC connections"""
+        """Restarts IRC connections."""
         from .irc import irc_manager
 
         if irc_manager is None:
@@ -110,7 +110,7 @@ class IRCStop(APIResource):
     @api.response(NotFoundError)
     @api.response(BadRequest)
     def get(self, session=None):
-        """Stops IRC connections"""
+        """Stop IRC connections."""
         from .irc import irc_manager
 
         if irc_manager is None:

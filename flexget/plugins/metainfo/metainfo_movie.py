@@ -29,7 +29,8 @@ class MetainfoMovie:
 
     @staticmethod
     def guess_entry(entry):
-        """Populates movie_* fields for entries that are successfully parsed.
+        """Populate movie_* fields for entries that are successfully parsed.
+
         :param entry: Entry that's being processed
         :return: True for successful parse
         """

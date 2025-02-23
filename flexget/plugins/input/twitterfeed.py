@@ -17,7 +17,7 @@ MAX_TWEETS = 1000
 
 
 class TwitterFeed:
-    """Parses a twitter feed
+    """Parse a twitter feed.
 
     Example::
 

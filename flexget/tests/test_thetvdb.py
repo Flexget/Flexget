@@ -65,7 +65,7 @@ class TestTVDBLookup:
     """
 
     def test_lookup(self, mocked_expired, execute_task):
-        """thetvdb: Test Lookup (ONLINE)"""
+        """thetvdb: Test Lookup (ONLINE)."""
         persist['auth_tokens'] = {'default': None}
 
         task = execute_task('test')
@@ -292,7 +292,8 @@ class TestTVDBExpire:
 @mock.patch('flexget.components.thetvdb.api_tvdb.mark_expired')
 @pytest.mark.online
 class TestTVDBList:
-    """Tests thetvdb list plugin with a test user at thetvdb.
+    """Test thetvdb list plugin with a test user at thetvdb.
+
     Test user info:
     username: flexget
     password: flexget
@@ -350,7 +351,8 @@ class TestTVDBList:
 @mock.patch('flexget.components.thetvdb.api_tvdb.mark_expired')
 @pytest.mark.online
 class TestTVDBFavorites:
-    """Tests thetvdb list plugin with a test user at thetvdb.
+    """Test thetvdb list plugin with a test user at thetvdb.
+
     Test user info:
     username: flexget
     password: flexget
@@ -425,7 +427,7 @@ class TestTheTVDBLanguages:
     """
 
     def test_language_lookup(self, mocked_expired, execute_task):
-        """thetvdb: Test Lookup (ONLINE)"""
+        """thetvdb: Test Lookup (ONLINE)."""
         persist['auth_tokens'] = {'default': None}
 
         task = execute_task('test')

@@ -111,7 +111,8 @@ def delete_account(account):
 
 
 def get_access_token(account, token=None, refresh=False, re_auth=False, called_from_cli=False):
-    """Gets authorization info from a pin or refresh token.
+    """Get authorization info from a pin or refresh token.
+
     :param account: Arbitrary account name to attach authorization to.
     :param unicode token: The pin or refresh token, as supplied by the trakt website.
     :param bool refresh: If True, refresh the access token using refresh_token from db.
@@ -176,7 +177,8 @@ def make_list_slug(name):
 
 
 def get_session(account=None, token=None):
-    """Creates a requests session ready to talk to trakt API with FlexGet's api key.
+    """Create a requests session ready to talk to trakt API with FlexGet's api key.
+
     Can also add user level authentication if `account` parameter is given.
     :param account: An account authorized via `flexget trakt auth` CLI command. If given, returned session will be
         authenticated for that account.
@@ -197,6 +199,7 @@ def get_session(account=None, token=None):
 
 def get_api_url(*endpoint):
     """Get the address of a trakt API endpoint.
+
     :param endpoint: Can by a string endpoint (e.g. 'sync/watchlist') or an iterable (e.g. ('sync', 'watchlist')
         Multiple parameters can also be specified instead of a single iterable.
     :returns: The absolute url to the specified API endpoint.
@@ -215,7 +218,7 @@ def upgrade(ver, session):
 
 
 def get_entry_ids(entry):
-    """Creates a trakt ids dict from id fields on an entry. Prefers already populated info over lazy lookups."""
+    """Create a trakt ids dict from id fields on an entry. Prefer already populated info over lazy lookups."""
     ids = {}
     for lazy in [False, True]:
         if entry.get('trakt_movie_id', eval_lazy=lazy):
@@ -454,7 +457,7 @@ class TraktEpisode(Base):
         self.update(trakt_episode, session)
 
     def update(self, trakt_episode, session):
-        """Updates this record from the trakt media object `trakt_episode` returned by the trakt api."""
+        """Update this record from the trakt media object `trakt_episode` returned by the trakt api."""
         if self.id and self.id != trakt_episode['ids']['trakt']:
             raise ValueError('Tried to update db ep with different ep data')
         if not self.id:
@@ -503,7 +506,7 @@ class TraktSeason(Base):
         self.update(trakt_season, session)
 
     def update(self, trakt_season, session):
-        """Updates this record from the trakt media object `trakt_episode` returned by the trakt api."""
+        """Update this record from the trakt media object `trakt_episode` returned by the trakt api."""
         if self.id and self.id != trakt_season['ids']['trakt']:
             raise ValueError('Tried to update db season with different season data')
         if not self.id:
@@ -609,7 +612,7 @@ class TraktShow(Base):
         self.update(trakt_show, session)
 
     def update(self, trakt_show, session):
-        """Updates this record from the trakt media object `trakt_show` returned by the trakt api."""
+        """Update this record from the trakt media object `trakt_show` returned by the trakt api."""
         if self.id and self.id != trakt_show['ids']['trakt']:
             raise ValueError('Tried to update db show with different show data')
         if not self.id:
@@ -808,7 +811,7 @@ class TraktMovie(Base):
         }
 
     def update(self, trakt_movie, session):
-        """Updates this record from the trakt media object `trakt_movie` returned by the trakt api."""
+        """Update this record from the trakt media object `trakt_movie` returned by the trakt api."""
         if self.id and self.id != trakt_movie['ids']['trakt']:
             raise ValueError('Tried to update db movie with different movie data')
         if not self.id:
@@ -897,7 +900,7 @@ class TraktMovieSearchResult(Base):
 
 
 class TraktMovieIds:
-    """Simple class that holds a variety of possible IDs that Trakt utilize in their API, eg. imdb id, trakt id"""
+    """Simple class that holds a variety of possible IDs that Trakt utilize in their API, eg. imdb id, trakt id."""
 
     def __init__(self, trakt_id=None, trakt_slug=None, tmdb_id=None, imdb_id=None, **kwargs):
         self.trakt_id = trakt_id
@@ -909,7 +912,7 @@ class TraktMovieIds:
         return self.trakt_id or self.trakt_slug
 
     def to_dict(self):
-        """Returns a dict containing id fields that are relevant for a movie"""
+        """Return a dict containing id fields that are relevant for a movie."""
         return {
             'id': self.trakt_id,
             'slug': self.trakt_slug,
@@ -922,7 +925,7 @@ class TraktMovieIds:
 
 
 class TraktShowIds:
-    """Simple class that holds a variety of possible IDs that Trakt utilize in their API, eg. imdb id, trakt id"""
+    """Simple class that holds a variety of possible IDs that Trakt utilize in their API, eg. imdb id, trakt id."""
 
     def __init__(
         self,
@@ -945,7 +948,7 @@ class TraktShowIds:
         return self.trakt_id or self.trakt_slug
 
     def to_dict(self):
-        """Returns a dict containing id fields that are relevant for a show/season/episode"""
+        """Return a dict containing id fields that are relevant for a show/season/episode."""
         return {
             'id': self.trakt_id,
             'slug': self.trakt_slug,
@@ -970,6 +973,7 @@ class TraktShowIds:
 
 def get_item_from_cache(table, session, title=None, year=None, trakt_ids=None):
     """Get the cached info for a given show/movie from the database.
+
     :param table: Either TraktMovie or TraktShow
     :param title: Title of the show/movie
     :param year: First release year
@@ -1073,8 +1077,10 @@ def get_trakt_data(media_type, title=None, year=None, trakt_ids=None):
 
 
 def get_user_data(data_type, media_type, session, username):
-    """Fetches user data from Trakt.tv on the /users/<username>/<data_type>/<media_type> end point. Eg. a user's
-    movie collection is fetched from /users/<username>/collection/movies.
+    """Fetch user data from Trakt.tv on the /users/<username>/<data_type>/<media_type> end point.
+
+    Example: a user's movie collection is fetched from /users/<username>/collection/movies.
+
     :param data_type: Name of the data type eg. collection, watched etc.
     :param media_type: Type of media we want <data_type> for eg. shows, episodes, movies.
     :param session: A trakt requests session with a valid token
@@ -1115,7 +1121,7 @@ def get_user_data(data_type, media_type, session, username):
 
 
 def get_username(username=None, account=None):
-    """Returns 'me' if account is provided and username is not"""
+    """Return 'me' if account is provided and username is not."""
     if not username and account:
         return 'me'
     return username

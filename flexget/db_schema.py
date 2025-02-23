@@ -107,7 +107,7 @@ def set_version(plugin: str, version: int, session=None) -> None:
 
 @with_session
 def upgrade_required(session=None) -> bool:
-    """Returns true if an upgrade of the database is required."""
+    """Return true if an upgrade of the database is required."""
     old_schemas = session.query(PluginSchema).all()
     if len(old_schemas) < len(plugin_schemas):
         return True
@@ -121,13 +121,11 @@ def upgrade_required(session=None) -> bool:
 
 
 class UpgradeImpossible(Exception):
-    """Exception to be thrown during a db upgrade function which will cause the old tables to be removed and recreated from
-    the new model.
-    """
+    """Exception to be thrown during a db upgrade function which will cause the old tables to be removed and recreated from the new model."""
 
 
 def upgrade(plugin: str) -> Callable:
-    """Used as a decorator to register a schema upgrade function.
+    """Use as a decorator to register a schema upgrade function.
 
     The wrapped function will be passed the current schema version and a session object.
     The function should return the new version of the schema after the upgrade.
@@ -188,8 +186,7 @@ def upgrade(plugin: str) -> Callable:
 
 @with_session
 def reset_schema(plugin: str, session=None) -> None:
-    """Removes all tables from given plugin from the database,
-    as well as removing current stored schema number.
+    """Remove all tables from given plugin from the database, as well as removing current stored schema number.
 
     :param plugin: The plugin whose schema should be reset
     """
@@ -220,17 +217,17 @@ def register_plugin_table(tablename: str, plugin: str, version: int):
 
 
 class VersionedBaseMeta(DeclarativeMeta):
-    """Metaclass for objects returned by versioned_base factory"""
+    """Metaclass for objects returned by versioned_base factory."""
 
     def __new__(cls, metaname, bases, dict_):
-        """This gets called when a class that subclasses VersionedBase is defined."""
+        """Get called when a class that subclasses VersionedBase is defined."""
         new_class = super().__new__(cls, str(metaname), bases, dict_)
         if metaname != 'VersionedBase':
             register_plugin_table(new_class.__tablename__, new_class._plugin, new_class._version)
         return new_class
 
     def register_table(self, table: Union[str, Table]) -> None:
-        """This can be used if a plugin is declaring non-declarative sqlalchemy tables.
+        """Can be used if a plugin is declaring non-declarative sqlalchemy tables.
 
         :param table: Can either be the name of the table, or an :class:`sqlalchemy.Table` instance.
         """
@@ -241,9 +238,7 @@ class VersionedBaseMeta(DeclarativeMeta):
 
 
 def versioned_base(plugin: str, version: int) -> VersionedBaseMeta:
-    """Returns a class which can be used like Base,
-    but automatically stores schema version when tables are created.
-    """
+    """Return a class which can be used like Base, but automatically stores schema version when tables are created."""
 
     @as_declarative(metaclass=VersionedBaseMeta, metadata=Base.metadata)
     class VersionedBase:
@@ -255,7 +250,7 @@ def versioned_base(plugin: str, version: int) -> VersionedBaseMeta:
 
 @sqlalchemy.event.listens_for(Base.metadata, "after_create")
 def after_table_create(target, connection, tables: Optional[list[Table]] = None, **kw) -> None:
-    """Sets the schema version to most recent for a plugin when it's tables are freshly created."""
+    """Set the schema version to most recent for a plugin when it's tables are freshly created."""
     if tables:
         # TODO: Detect if any database upgrading is needed and acquire the lock only in one place
         with flexget.manager.manager.acquire_lock(event=False):

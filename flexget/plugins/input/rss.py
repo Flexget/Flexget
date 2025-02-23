@@ -27,7 +27,7 @@ feedparser.registerDateHandler(
 
 
 def fp_field_name(name):
-    """Translates literal field name to the sanitized one feedparser will use."""
+    """Translate literal field name to the sanitized one feedparser will use."""
     return name.replace(':', '_').lower()
 
 
@@ -126,7 +126,7 @@ class InputRSS:
     }
 
     def build_config(self, config):
-        """Set default values to config"""
+        """Set default values to config."""
         # Make a copy so that original config is not modified
         config = {'url': config} if isinstance(config, str) else dict(config)
         # set the default link value to 'auto'
@@ -199,7 +199,7 @@ class InputRSS:
         return b''.join(future_result)
 
     def add_enclosure_info(self, entry, enclosure, filename=True, multiple=False):
-        """Stores information from an rss enclosure into an Entry."""
+        """Store information from an rss enclosure into an Entry."""
         entry['url'] = enclosure['href']
         # get optional meta-data
         if 'length' in enclosure:

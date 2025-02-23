@@ -173,7 +173,7 @@ class OutputRSS:
         return config
 
     def on_task_exit(self, task, config):
-        """Store finished / downloaded entries at exit"""
+        """Store finished / downloaded entries at exit."""
         if not rss2gen:
             raise plugin.PluginWarning('plugin make_rss requires PyRSS2Gen library.')
         config = self.prepare_config(config)

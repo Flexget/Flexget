@@ -75,7 +75,7 @@ class TestTraktShowLookup:
     """
 
     def test_lookup_name(self, execute_task):
-        """trakt: Test Lookup (ONLINE)"""
+        """trakt: Test Lookup (ONLINE)."""
         task = execute_task('test')
         entry = task.find_entry(title='House.S01E02.HDTV.XViD-FlexGet')
         assert entry['trakt_show_id'] == 1399, 'Trakt_ID should be 1339 is {} for {}'.format(
@@ -87,7 +87,7 @@ class TestTraktShowLookup:
         )
 
     def test_lookup(self, execute_task):
-        """trakt: Test Lookup (ONLINE)"""
+        """trakt: Test Lookup (ONLINE)."""
         task = execute_task('test')
         entry = task.find_entry(title='House.S01E02.HDTV.XViD-FlexGet')
         assert entry['trakt_ep_name'] == 'Paternity', (

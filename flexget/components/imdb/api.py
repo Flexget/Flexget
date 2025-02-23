@@ -35,7 +35,7 @@ class IMDBMovieSearch(APIResource):
     @etag
     @api.response(200, model=return_schema)
     def get(self, title, session=None):
-        """Get a list of IMDB search result by name or ID"""
+        """Get a list of IMDB search result by name or ID."""
         raw_movies = ImdbSearch().smart_match(title, single_match=False)
         if not raw_movies:
             return jsonify([])

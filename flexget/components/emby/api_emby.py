@@ -50,13 +50,13 @@ logger = logger.bind(name='api_emby')
 
 
 class EmbyApiBase(ABC):  # noqa: B024 The correct fix for it requires a thorough understanding of the code.
-    """Base Class to all API integratios"""
+    """Base Class to all API integratios."""
 
     EMBY_PREF = 'emby_'
 
     @staticmethod
     def merge_field_map(dst: dict, *arg: dict, **kwargs):
-        """Merge field maps from clild and parent class"""
+        """Merge field maps from clild and parent class."""
         allow_new = kwargs.get('allow_new', False)
 
         destination = copy.deepcopy(dst)
@@ -86,7 +86,7 @@ class EmbyApiBase(ABC):  # noqa: B024 The correct fix for it requires a thorough
 
     @staticmethod
     def update_using_map(target, field_map: dict, source_item, **kwargs):
-        """Updates based on field map with source"""
+        """Update based on field map with source."""
         allow_new = kwargs.get('allow_new', False)
 
         my_field_map = field_map.copy()
@@ -124,7 +124,7 @@ class EmbyApiBase(ABC):  # noqa: B024 The correct fix for it requires a thorough
 
 
 class EmbyAuth(EmbyApiBase):
-    """Manage API Authorizations"""
+    """Manage API Authorizations."""
 
     _last_auth = None
 
@@ -168,7 +168,7 @@ class EmbyAuth(EmbyApiBase):
         EmbyApiBase.update_using_map(self, EmbyAuth.field_map, server)
 
     def is_connect_server(self) -> bool:
-        """Checks if it's a connect server, if it's a url assumed not a emby connect
+        """Check if it's a connect server, if it's a url assumed not a emby connect.
 
         Returns:
             bool: Is emby connect server
@@ -182,7 +182,7 @@ class EmbyAuth(EmbyApiBase):
         return not re.match(regexp, self.host)
 
     def login(self, optional=False):
-        """Login user to API"""
+        """Login user to API."""
         userdata = None
 
         if not self._apikey:
@@ -330,7 +330,7 @@ class EmbyAuth(EmbyApiBase):
         EmbyAuth._last_auth = self
 
     def logout(self):
-        """Logout user from API"""
+        """Logout user from API."""
         self._token = None
         self._logged = False
         self._connect_username = ''
@@ -343,7 +343,7 @@ class EmbyAuth(EmbyApiBase):
             persist['token_data']['token'] = None
 
     def check_token_data(self, token_data, login_type):
-        """Checks saved tokens"""
+        """Check saved tokens."""
         if not token_data:
             return False
 
@@ -396,7 +396,7 @@ class EmbyAuth(EmbyApiBase):
         return response
 
     def save_token_data(self):
-        """Saves token data to Data Base"""
+        """Save token data to Data Base."""
         if self._apikey or not self.host or not self.username:
             return
 
@@ -452,7 +452,7 @@ class EmbyAuth(EmbyApiBase):
         return self._lanurl
 
     def add_token_header(self, header: dict, emby_connect=False) -> dict:
-        """Adds data to request header"""
+        """Add data to request header."""
         if not header:
             header = {}
 
@@ -485,7 +485,7 @@ class EmbyAuth(EmbyApiBase):
         return header
 
     def get_user_by_name(self, name: str) -> dict:
-        """Gets user by username"""
+        """Get user by username."""
         args = {'IsDisabled': False}
         useres = EmbyApi.resquest_emby(EMBY_ENDPOINT_GETUSERS, self, 'GET', **args)
         if not useres:
@@ -502,7 +502,7 @@ class EmbyAuth(EmbyApiBase):
 
 
 class EmbyApiListBase(EmbyApiBase):
-    """Base class to all API Lists"""
+    """Base class to all API Lists."""
 
     auth = None
 
@@ -560,7 +560,7 @@ class EmbyApiListBase(EmbyApiBase):
             args['IncludeItemTypes'] = ','.join(typ.title() for typ in self.types)
 
     def add(self, entry: Entry):
-        """Adds a item to list"""
+        """Add a item to list."""
         item = EmbyApiMedia.cast(auth=self.auth, **entry)
         if not item:
             logger.warning('Not possible to match \'{}\' in emby', item.fullname)
@@ -578,7 +578,7 @@ class EmbyApiListBase(EmbyApiBase):
         pass
 
     def remove(self, entry: Entry):
-        """Removes a item from list"""
+        """Remove a item from list."""
         item = EmbyApiMedia.cast(auth=self.auth, **entry)
         if not item:
             logger.warning('Not possible to match \'{}\' in emby', item.fullname)
@@ -600,11 +600,11 @@ class EmbyApiListBase(EmbyApiBase):
         pass
 
     def contains(self, item):
-        """Checks if list contains item"""
+        """Check if list contains item."""
         return bool(self.get(item))
 
     def get(self, item) -> 'EmbyApiMedia':
-        """Get Item from list"""
+        """Get Item from list."""
         if isinstance(item, EmbyApiMedia):
             s_item = item
         else:
@@ -654,7 +654,7 @@ class EmbyApiListBase(EmbyApiBase):
 
 
 class EmbyApiList(EmbyApiBase, MutableSet):
-    """Class to interface lists"""
+    """Class to interface lists."""
 
     auth = None
     id = None
@@ -740,7 +740,7 @@ class EmbyApiList(EmbyApiBase, MutableSet):
 
 
 class EmbyApiLibrary(EmbyApiListBase):
-    """Library List"""
+    """Library List."""
 
     def __init__(self, **kwargs):
         EmbyApiListBase.__init__(self, **kwargs)
@@ -867,7 +867,7 @@ class EmbyApiLibrary(EmbyApiListBase):
 
 
 class EmbyApiRootList(EmbyApiListBase):
-    """Root Media List"""
+    """Root Media List."""
 
     def __init__(self, **kwargs):
         EmbyApiListBase.__init__(self, **kwargs)
@@ -922,7 +922,7 @@ class EmbyApiRootList(EmbyApiListBase):
 
 
 class EmbyApiWatchedList(EmbyApiListBase):
-    """Watched Media List"""
+    """Watched Media List."""
 
     def __init__(self, **kwargs):
         EmbyApiListBase.__init__(self, **kwargs)
@@ -995,7 +995,7 @@ class EmbyApiWatchedList(EmbyApiListBase):
 
 
 class EmbyApiFavoriteList(EmbyApiListBase):
-    """Favorite media list"""
+    """Favorite media list."""
 
     def __init__(self, **kwargs):
         EmbyApiListBase.__init__(self, **kwargs)
@@ -1068,7 +1068,7 @@ class EmbyApiFavoriteList(EmbyApiListBase):
 
 
 class EmbyApiPlayList(EmbyApiListBase):
-    """Playlist lists"""
+    """Playlist lists."""
 
     allow_create = True
 
@@ -1131,7 +1131,7 @@ class EmbyApiPlayList(EmbyApiListBase):
             self.destroy()
 
     def contains(self, item):
-        """Checks if list contains item"""
+        """Check if list contains item."""
         self.fill_items()
         return EmbyApiListBase.contains(self, item)
 
@@ -1248,7 +1248,7 @@ class EmbyApiPlayList(EmbyApiListBase):
 
 
 class EmbyApiMedia(EmbyApiBase):
-    """Basic media"""
+    """Basic media."""
 
     TYPE = 'unknown'
 
@@ -1582,7 +1582,7 @@ class EmbyApiMedia(EmbyApiBase):
 
     @staticmethod
     def parse_string(string: str):
-        """Returns Relevante Information from string"""
+        """Return Relevante Information from string."""
         if not string:
             return None, None
 
@@ -1644,7 +1644,7 @@ class EmbyApiMedia(EmbyApiBase):
 
 
 class EmbyApiSerie(EmbyApiMedia):
-    """Series"""
+    """Series."""
 
     TYPE = 'series'
 
@@ -1735,7 +1735,7 @@ class EmbyApiSerie(EmbyApiMedia):
 
     @staticmethod
     def parse_string(string: str, force_parse=False):
-        """Returns Relevante Information from string"""
+        """Return Relevante Information from string."""
         if not string:
             return None, None
 
@@ -1843,7 +1843,7 @@ class EmbyApiSerie(EmbyApiMedia):
 
 
 class EmbyApiSeason(EmbyApiMedia):
-    """Season"""
+    """Season."""
 
     TYPE = 'season'
 
@@ -1974,7 +1974,7 @@ class EmbyApiSeason(EmbyApiMedia):
 
     @staticmethod
     def parse_string(string: str):
-        """Returns Relevante Information from string"""
+        """Return Relevante Information from string."""
         if not string:
             return None
 
@@ -2065,7 +2065,7 @@ class EmbyApiSeason(EmbyApiMedia):
 
 
 class EmbyApiEpisode(EmbyApiMedia):
-    """Episode"""
+    """Episode."""
 
     TYPE = 'episode'
 
@@ -2305,7 +2305,7 @@ class EmbyApiEpisode(EmbyApiMedia):
 
     @staticmethod
     def parse_string(string: str):
-        """Returns Relevante Information from string"""
+        """Return Relevante Information from string."""
         if not string:
             return None
 
@@ -2338,7 +2338,7 @@ class EmbyApiEpisode(EmbyApiMedia):
 
 
 class EmbyApiMovie(EmbyApiMedia):
-    """Movie"""
+    """Movie."""
 
     TYPE = 'movie'
 
@@ -2429,7 +2429,7 @@ class EmbyApiMovie(EmbyApiMedia):
 
     @staticmethod
     def parse_string(string: str):
-        """Returns Relevante Information from string"""
+        """Return Relevante Information from string."""
         if not string:
             return None, None
 
@@ -2526,7 +2526,7 @@ class EmbyApiMovie(EmbyApiMedia):
 
 
 class EmbyApi(EmbyApiBase):
-    """Class to interact with Emby API"""
+    """Class to interact with Emby API."""
 
     _last_auth = None
 
