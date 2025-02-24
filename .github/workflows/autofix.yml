@@ -87,12 +87,7 @@ jobs:
           version: ${{ steps.merge-commit-uv-version.outputs.result || env.UV_VERSION }}
       - name: Run uv lock
         run: |
-          if [[ ${{github.event_name}} == "push" ]]; then
-            uv lock --directory HEAD
-          else
-            uv lock --directory merge
-            mv merge/uv.lock HEAD/uv.lock
-          fi
+          uv lock --directory HEAD
       - name: Push changes
         id: push
         run: |
@@ -102,18 +97,9 @@ jobs:
             git config user.email github-actions[bot]@users.noreply.github.com
             git config user.name github-actions[bot]
             git commit -m "Autofix: update uv.lock"
-            git push
+            if ! git push; then
+              echo "The 'uv.lock' file is missing or needs to be updated and we can't auto-fix it for you because you didn't check the 'Allow edits by maintainers' box."
+              echo "Please check the box and push again or manually run 'uv lock'."
+              exit 1
+            fi
           fi
-      - name: Add a comment if permission denied
-        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7
-        if: failure() && steps.push.conclusion == 'failure'
-        with:
-          script: |
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: `The \`uv.lock\` file is missing or needs to be updated and we can't auto-fix it for you because you didn't check the 'Allow edits by maintainers' box.
-            
-            Please check the box and push again or manually run \`uv lock\`.`
-            })
