@@ -171,7 +171,7 @@ class ImdbWatchlist:
         elif title_type in ['tvSeries', 'tvMiniSeries']:
             entry['series_name'] = title
 
-        if 'year' in item['releaseYear']:
+        if item['releaseYear']:
             year = item['releaseYear']['year']
             entry['imdb_year'] = year
 
