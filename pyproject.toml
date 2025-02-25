@@ -199,6 +199,7 @@ ignore = [
     "PLW0603", # global-statement
     "PLW0642", # self-or-cls-assignment
     "PLW2901", # redefined-loop-name
+    "PTH119", # TODO
     "RUF012", # Maybe can re-enable after https://github.com/astral-sh/ruff/issues/5243
     "TD002", # missing-todo-author
     "TD003", # missing-todo-link

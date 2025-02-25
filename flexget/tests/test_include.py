@@ -13,10 +13,10 @@ class TestInclude:
 
     @pytest.fixture
     def config(self, tmp_path):
-        test_dir = tmp_path.joinpath('include')
+        test_dir = tmp_path / 'include'
         test_dir.mkdir()
-        file_1 = test_dir.joinpath('foo.yml')
-        file_2 = test_dir.joinpath('baz.yml')
+        file_1 = test_dir / 'foo.yml'
+        file_2 = test_dir / 'baz.yml'
         file_1.write_text(
             """
             mock:
@@ -29,9 +29,7 @@ class TestInclude:
             - title: baz
         """
         )
-        return Template(self._config).render(
-            {'tmpfile_1': file_1.as_posix(), 'tmpfile_2': file_2.as_posix()}
-        )
+        return Template(self._config).render({'tmpfile_1': file_1, 'tmpfile_2': file_2})
 
     def test_include(self, execute_task):
         task = execute_task('include_test')
@@ -50,16 +48,16 @@ class TestIncludeChange:
 
     @pytest.fixture
     def config(self, tmp_path):
-        test_dir = tmp_path.joinpath('include')
+        test_dir = tmp_path / 'include'
         test_dir.mkdir()
-        file_1 = test_dir.joinpath('foo.yml')
+        file_1 = test_dir / 'foo.yml'
         file_1.write_text(
             """
             mock:
             - title: foo
         """
         )
-        return Template(self._config).render({'tmpfile_1': file_1.as_posix()})
+        return Template(self._config).render({'tmpfile_1': file_1})
 
     def test_include_update(self, execute_task, manager, tmp_path):
         task = execute_task('include_test')
@@ -71,16 +69,16 @@ class TestIncludeChange:
         assert not task.config_modified
 
         # Change file name
-        test_dir = tmp_path.joinpath('include_changed')
+        test_dir = tmp_path / 'include_changed'
         test_dir.mkdir()
-        file_1 = test_dir.joinpath('foo.yml')
+        file_1 = test_dir / 'foo.yml'
         file_1.write_text(
             """
             mock:
             - title: foo_change_1
         """
         )
-        new_file = Template('{{ tmpfile_1 }}').render({'tmpfile_1': file_1.as_posix()})
+        new_file = Template('{{ tmpfile_1 }}').render({'tmpfile_1': file_1})
         manager.config['tasks']['include_test']['include'].pop()
         manager.config['tasks']['include_test']['include'].append(new_file)
 

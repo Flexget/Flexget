@@ -22,7 +22,7 @@ def test_update_changelog(tmp_path, n):
         tmp_path
     )
     os.chdir(tmp_path)
-    update_changelog('ChangeLog.md')
+    update_changelog(Path('ChangeLog.md'))
     assert filecmp.cmp(
         'ChangeLog.md',
         Path(__file__).parent / 'update_changelog' / f'test_{n}' / 'new_ChangeLog.md',

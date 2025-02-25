@@ -38,8 +38,8 @@ class TestInputCache:
         """Test memory input caching."""
         task = execute_task('test_memory')
         assert task.entries, 'should have created entries at the start'
-        tmp_path.joinpath('cached.xml').unlink()
-        tmp_path.joinpath('cached.xml').write_text('')
+        (tmp_path / 'cached.xml').unlink()
+        (tmp_path / 'cached.xml').write_text('')
         task = execute_task('test_memory')
         assert task.entries, 'should have created entries from the cache'
         # Turn the cache time down and run again to make sure the entries are not created again

@@ -151,7 +151,7 @@ class TestSftpDownload:
     def create_file(root: Path, path: str, size: int = 0) -> Path:
         file_path = root / path
         file_path.parent.mkdir(parents=True, exist_ok=True)
-        with open(file_path, 'wb') as file:
+        with file_path.open('wb') as file:
             file.write(b'\0' * size)
         return file_path
 

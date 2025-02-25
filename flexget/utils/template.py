@@ -1,6 +1,4 @@
 import locale
-import os
-import os.path
 import re
 from contextlib import suppress
 from copy import copy
@@ -32,6 +30,7 @@ from flexget.utils.tools import format_filesize, parse_filesize, split_title_yea
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
+    from pathlib import Path
 
     from flexget.entry import Entry
     from flexget.manager import Manager
@@ -136,24 +135,24 @@ class CoercingDateTime(DateTime):
         return Interval(self, dt, absolute=abs)
 
 
-def filter_pathbase(val: Optional[str]) -> str:
+def filter_pathbase(val: 'Path') -> str:
     """Return base name of a path."""
-    return os.path.basename(val or '')
+    return val.name
 
 
-def filter_pathname(val: Optional[str]) -> str:
+def filter_pathname(val: 'Path') -> str:
     """Return base name of a path, without its extension."""
-    return os.path.splitext(os.path.basename(val or ''))[0]
+    return val.stem
 
 
-def filter_pathext(val: Optional[str]) -> str:
+def filter_pathext(val: 'Path') -> str:
     """Extension of a path (including the '.')."""
-    return os.path.splitext(val or '')[1]
+    return val.suffix
 
 
-def filter_pathdir(val: Optional[str]) -> str:
+def filter_pathdir(val: 'Path') -> 'Path':
     """Directory containing the given path."""
-    return os.path.dirname(val or '')
+    return val.parent
 
 
 def filter_pathscrub(val: str, os_mode: Optional[str] = None) -> str:
@@ -281,19 +280,19 @@ def filter_format_size(size: float, si=False, unit=None):
     return format_filesize(size, si=si, unit=unit)
 
 
-def is_fs_file(pathname: Union[str, os.PathLike]) -> bool:
+def is_fs_file(pathname: 'Path') -> bool:
     """Test whether item is existing file in filesystem."""
-    return os.path.isfile(pathname)
+    return pathname.is_file()
 
 
-def is_fs_dir(pathname: Union[str, os.PathLike]) -> bool:
+def is_fs_dir(pathname: 'Path') -> bool:
     """Test whether item is existing directory in filesystem."""
-    return os.path.isdir(pathname)
+    return pathname.is_dir()
 
 
-def is_fs_link(pathname: Union[str, os.PathLike]) -> bool:
+def is_fs_link(pathname: 'Path') -> bool:
     """Test whether item is existing link in filesystem."""
-    return os.path.islink(pathname)
+    return pathname.is_symlink()
 
 
 class FlexGetTemplate(Template):
@@ -324,7 +323,7 @@ def make_environment(manager: 'Manager') -> None:
         loader=ChoiceLoader(
             [
                 PackageLoader('flexget'),
-                FileSystemLoader(os.path.join(manager.config_base, 'templates')),
+                FileSystemLoader(manager.config_base / 'templates'),
             ]
         ),
         extensions=['jinja2.ext.loopcontrols'],

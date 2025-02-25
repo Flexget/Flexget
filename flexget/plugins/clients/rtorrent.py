@@ -2,6 +2,7 @@ import os
 import re
 import socket
 from io import BytesIO
+from pathlib import Path
 from time import sleep
 from urllib.parse import urljoin, urlparse, urlsplit
 from xmlrpc import client as xmlrpc_client
@@ -672,7 +673,7 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
                 raise plugin.PluginError('Temporary download file is missing from disk')
 
             # Verify valid torrent file
-            if not is_torrent_file(entry['file']):
+            if not is_torrent_file(Path(entry['file'])):
                 entry.fail("Downloaded temp file '{}' is not a torrent file".format(entry['file']))
                 return
 

@@ -1,10 +1,10 @@
-import os
+from pathlib import Path
 
 import pytest
 
 from flexget.manager import Manager
 
-config_utf8 = os.path.join(os.path.dirname(__file__), 'config_utf8.yml')
+config_utf8 = Path(__file__).parent / 'config_utf8.yml'
 
 
 class TestConfig:

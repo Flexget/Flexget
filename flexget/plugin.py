@@ -373,29 +373,29 @@ class PluginInfo(dict):
 register = PluginInfo
 
 
-def _get_standard_plugins_path() -> list[str]:
+def _get_standard_plugins_path() -> list[Path]:
     """Return list of directories where traditional plugins should be tried to load from."""
     # Get basic path from environment
     paths = []
     env_path = os.environ.get('FLEXGET_PLUGIN_PATH')
     if env_path:
-        paths = env_path.split(os.pathsep)
+        paths = [Path(path) for path in env_path.split(os.pathsep)]
 
     # Add flexget.plugins directory (core plugins)
-    paths.append(os.path.abspath(os.path.dirname(plugins_pkg.__file__)))
+    paths.append(Path(plugins_pkg.__file__).parent.resolve())
     return paths
 
 
-def _get_standard_components_path() -> list[str]:
+def _get_standard_components_path() -> list[Path]:
     """Return list of directories where component plugins should be tried to load from."""
     # Get basic path from environment
     paths = []
     env_path = os.environ.get('FLEXGET_COMPONENT_PATH')
     if env_path:
-        paths = env_path.split(os.pathsep)
+        paths = [Path(path) for path in env_path.split(os.pathsep)]
 
     # Add flexget.plugins directory (core plugins)
-    paths.append(os.path.abspath(os.path.dirname(components_pkg.__file__)))
+    paths.append(Path(components_pkg.__file__).parent.resolve())
     return paths
 
 
@@ -441,10 +441,10 @@ def _import_plugin(module_name: str, plugin_path: Union[str, Path]) -> None:
         logger.trace('Loaded module {} from {}', module_name, plugin_path)
 
 
-def _load_plugins_from_dirs(dirs: list[str]) -> None:
+def _load_plugins_from_dirs(dirs: list[Path]) -> None:
     """:param list dirs: Directories from where plugins are loaded from"""
     logger.debug('Trying to load plugins from: {}', dirs)
-    dir_paths = [Path(d) for d in dirs if os.path.isdir(d)]
+    dir_paths = [d for d in dirs if d.is_dir()]
     # add all dirs to plugins_pkg load path so that imports work properly from any of the plugin dirs
     plugins_pkg.__path__ = [str(d) for d in dir_paths]
     for plugins_dir in dir_paths:
@@ -461,10 +461,10 @@ def _load_plugins_from_dirs(dirs: list[str]) -> None:
 
 
 # TODO: this is now identical to _load_plugins_from_dirs, REMOVE
-def _load_components_from_dirs(dirs: list[str]) -> None:
+def _load_components_from_dirs(dirs: list[Path]) -> None:
     """:param list dirs: Directories where plugin components are loaded from"""
     logger.debug('Trying to load components from: {}', dirs)
-    dir_paths = [Path(d) for d in dirs if os.path.isdir(d)]
+    dir_paths = [d for d in dirs if d.is_dir()]
     for component_dir in dir_paths:
         for component_path in component_dir.glob('**/*.py'):
             if component_path.name == '__init__.py':
@@ -515,7 +515,7 @@ def _load_plugins_from_packages() -> None:
 
 
 def load_plugins(
-    extra_plugins: Optional[list[str]] = None, extra_components: Optional[list[str]] = None
+    extra_plugins: Optional[list[Path]] = None, extra_components: Optional[list[Path]] = None
 ) -> None:
     """Load plugins from the standard plugin and component paths.
 

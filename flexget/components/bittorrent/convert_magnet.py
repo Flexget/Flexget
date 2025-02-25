@@ -1,4 +1,3 @@
-import os
 import time
 from urllib.parse import quote
 
@@ -56,9 +55,7 @@ class ConvertMagnet:
         logger.debug('Metadata acquired')
         torrent_info = handle.get_torrent_info()
         torrent_file = libtorrent.create_torrent(torrent_info)
-        torrent_path = pathscrub(
-            os.path.join(destination_folder, torrent_info.name() + ".torrent")
-        )
+        torrent_path = pathscrub(destination_folder / (torrent_info.name() + ".torrent"))
         with open(torrent_path, "wb") as f:
             f.write(libtorrent.bencode(torrent_file.generate()))
         logger.debug('Torrent file wrote to {}', torrent_path)
@@ -88,12 +85,12 @@ class ConvertMagnet:
             return
         config = self.prepare_config(config)
         # Create the conversion target directory
-        converted_path = os.path.join(task.manager.config_base, 'converted')
+        converted_path = task.manager.config_base / 'converted'
 
         timeout = parse_timedelta(config['timeout']).total_seconds()
 
-        if not os.path.isdir(converted_path):
-            os.mkdir(converted_path)
+        if not converted_path.is_dir():
+            converted_path.mkdir()
 
         for entry in task.accepted:
             if entry['url'].startswith('magnet:'):

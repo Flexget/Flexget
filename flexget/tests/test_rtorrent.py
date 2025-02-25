@@ -1,15 +1,15 @@
-import os
 import re
+from pathlib import Path
 from unittest import mock
 from xmlrpc import client as xmlrpc_client
 
 from flexget.plugins.clients.rtorrent import RTorrent
 
-torrent_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'private.torrent')
+torrent_file = Path(__file__).resolve().parent / 'private.torrent'
 torrent_url = f'file:///{torrent_file}'
 torrent_info_hash = '09977FE761B8D293AD8A929CCAF2E9322D525A6C'
 
-with open(torrent_file, 'rb') as tor_file:
+with torrent_file.open('rb') as tor_file:
     torrent_raw = tor_file.read()
 
 

@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 from loguru import logger
 
@@ -40,12 +41,12 @@ class TorrentMatch:
     }
 
     def get_local_files(self, config, task):
-        cwd = os.getcwd()  # save the current working directory
+        cwd = Path.cwd()  # save the current working directory
         entries = aggregate_inputs(task, config['what'])
         result = []
         for entry in entries:
             location = entry.get('location')
-            if not location or not os.path.exists(location):
+            if not location or not Path(location).exists():
                 logger.warning('{} is not a local file. Skipping.', entry['title'])
                 entry.reject('not a local file')
                 continue
@@ -53,8 +54,8 @@ class TorrentMatch:
             result.append(entry)
             entry['files'] = []
 
-            if os.path.isfile(location):
-                entry['files'].append(TorrentMatchFile(location, os.path.getsize(location)))
+            if Path(location).is_file():
+                entry['files'].append(TorrentMatchFile(location, Path(location).stat().st_size))
             else:
                 # change working dir to make things simpler
                 os.chdir(location)
@@ -62,11 +63,11 @@ class TorrentMatch:
                 for root, _, files in os.walk('.'):
                     # we only need to iterate over files
                     for f in files:
-                        file_path = os.path.join(root, f)
+                        file_path = Path(root) / f
                         # We need normpath to strip out the dot
-                        abs_file_path = os.path.normpath(os.path.join(location, file_path))
+                        abs_file_path = os.path.normpath(Path(location) / file_path)
                         entry['files'].append(
-                            TorrentMatchFile(abs_file_path, os.path.getsize(file_path))
+                            TorrentMatchFile(abs_file_path, file_path.stat().st_size)
                         )
 
         # restore the working directory
@@ -107,9 +108,9 @@ class TorrentMatch:
             torrent_files = []
             for item in entry['torrent'].get_filelist():
                 # if torrent is a multi_file, prepend the name
-                path = os.path.join(item['path'], item['name'])
+                path = Path(item['path']) / item['name']
                 if entry['torrent'].is_multi_file:
-                    path = os.path.join(entry['torrent'].name, path)
+                    path = Path(entry['torrent'].name) / path
 
                 torrent_files.append(TorrentMatchFile(path, item['size']))
 
@@ -128,12 +129,12 @@ class TorrentMatch:
                     torrent_file = torrent_files[0]
                     for local_file in local_files:
                         if (
-                            torrent_file.path in str(local_file.path)
+                            str(torrent_file.path) in str(local_file.path)
                             and torrent_file.size == local_file.size
                         ):
                             # if the filename with ext is contained in 'location', we must grab its parent as path
                             if os.path.basename(torrent_file.path) in str(local_entry['location']):
-                                entry['path'] = os.path.dirname(local_entry['location'])
+                                entry['path'] = Path(local_entry['location']).parent
                             else:
                                 entry['path'] = local_entry['location']
                             logger.debug('Path for {} set to {}', entry['title'], entry['path'])
@@ -164,7 +165,7 @@ class TorrentMatch:
                     for torrent_file in torrent_files:
                         for candidate in candidate_files:
                             if (
-                                torrent_file.path in candidate.path
+                                str(torrent_file.path) in candidate.path
                                 and torrent_file.size == candidate.size
                             ):
                                 logger.debug(

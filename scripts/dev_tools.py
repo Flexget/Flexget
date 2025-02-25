@@ -8,6 +8,7 @@
 import fileinput
 import os
 import subprocess
+from pathlib import Path
 from typing import Optional
 
 import click
@@ -20,7 +21,7 @@ else:
 
 
 def _get_version():
-    with open('flexget/_version.py') as f:
+    with Path('flexget/_version.py').open() as f:
         g = globals()
         loc = {}
         exec(f.read(), g, loc)
@@ -91,7 +92,7 @@ def cli_bundle_webui(ui_version: Optional[str] = None):
 def autoformat(files):
     """Reformat code with Ruff."""
     if not files:
-        project_root = os.path.dirname(os.path.realpath(__file__))
+        project_root = Path(__file__).resolve().parent
         files = (project_root,)
     venv_path = os.environ['VIRTUAL_ENV']
     if not venv_path:

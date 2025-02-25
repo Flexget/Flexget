@@ -1,4 +1,3 @@
-import os
 import sys
 
 import pytest
@@ -46,14 +45,14 @@ class TestExec:
         task = execute_task('replace_from_entry')
         assert len(task.accepted) == 2, "not all entries were accepted"
         for entry in task.accepted:
-            assert tmp_path.joinpath(entry['title']).exists(), (
+            assert (tmp_path / entry['title']).exists(), (
                 "exec.py did not create a file for {}".format(entry['title'])
             )
 
     def test_adv_format(self, execute_task, tmp_path):
         task = execute_task('test_adv_format')
         for entry in task.accepted:
-            with tmp_path.joinpath(entry['title']).open('r') as infile:
+            with (tmp_path / entry['title']).open('r') as infile:
                 line = infile.readline().rstrip('\n')
                 assert line == '/path/with spaces', f'{line} != /path/with spaces'
                 line = infile.readline().rstrip('\n')
@@ -70,7 +69,7 @@ class TestExec:
     def test_auto_escape(self, execute_task):
         task = execute_task('test_auto_escape')
         for entry in task.accepted:
-            with open(os.path.join(self.__tmp__, entry['title'])) as infile:
+            with (self.__tmp__ / entry['title']).open() as infile:
                 line = infile.readline().rstrip('\n')
                 assert line == 'single \' double"', f'{line} != single \' double"'
                 line = infile.readline().rstrip('\n')

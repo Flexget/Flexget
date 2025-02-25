@@ -223,8 +223,8 @@ class Manager:
             raise RuntimeError('Cannot call initialize on an already initialized manager.')
 
         plugin.load_plugins(
-            extra_plugins=[os.path.join(self.config_base, 'plugins')],
-            extra_components=[os.path.join(self.config_base, 'components')],
+            extra_plugins=[self.config_base / 'plugins'],
+            extra_components=[self.config_base / 'components'],
         )
 
         # Reparse CLI options now that plugins are loaded
