@@ -1,6 +1,9 @@
+import pytest
+
 from unittest import mock
 
 
+@pytest.mark.require_optional_deps
 @mock.patch('flexget.plugins.clients.transmission.transmission_rpc')
 class TestTransmissionTorrentPlugin:
     config = """
