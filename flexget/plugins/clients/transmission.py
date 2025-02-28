@@ -744,12 +744,12 @@ class PluginTransmission(TransmissionBase):
             change['queuePosition'] = opt_dic['queue_position']
 
         if 'labels' in opt_dic:
-            labels = set()
+            labels = {}
             for obj in [config, entry]:
                 obj_labels = obj.get('labels', [])
                 if not isinstance(obj_labels, list):
                     obj_labels = [obj_labels]
-                labels.update(obj_labels)
+                labels.update({obj_label: None for obj_label in obj_labels})
             rendered_labels = []
             for label in labels:
                 try:

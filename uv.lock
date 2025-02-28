@@ -802,6 +802,7 @@ plugin-test = [
     { name = "rarfile" },
     { name = "subliminal", version = "2.1.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
     { name = "subliminal", version = "2.2.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
+    { name = "transmission-rpc" },
 ]
 qbittorrent = [
     { name = "qbittorrent-api" },
@@ -871,6 +872,7 @@ plugin-test = [
     { name = "python-telegram-bot", extras = ["http2", "socks"], specifier = "~=21.9" },
     { name = "rarfile", specifier = "~=4.0" },
     { name = "subliminal", specifier = "~=2.1" },
+    { name = "transmission-rpc", specifier = "~=7.0" },
 ]
 qbittorrent = [{ name = "qbittorrent-api", specifier = "~=2025.2" }]
 telegram = [{ name = "python-telegram-bot", extras = ["http2", "socks"], specifier = "~=21.9" }]
