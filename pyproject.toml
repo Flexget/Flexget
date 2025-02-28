@@ -61,12 +61,12 @@ dev = [
 ]
 plugin-test = [
     # These are optional dependencies for plugins that have tests in the test suite
-    # Tests that need these must add the `requires_optional_deps` pytest mark
+    # Tests that need these must add the `require_optional_deps` pytest mark
     "boto3 ~=1.35",
-    'rarfile~=4.0',
     "pillow~=11.0",
     "plexapi ~=4.16",
     "pysftp ~=0.2.9",
+    'rarfile~=4.0',
     "subliminal ~= 2.1",
     { include-group = "telegram" }
 ]
@@ -99,7 +99,7 @@ build-backend = "hatchling.build"
 
 [tool.hatch.metadata.hooks.custom]
 # Extras with locked dependencies will be generated if BUILD_LOCKED env variable is specified
-path = "build_locked_extras.py"
+path = "scripts/build_locked_extras.py"
 locked-groups = ["deluge", "qbittorrent", "telegram", "transmission", "all"]
 
 [tool.hatch.version]
@@ -111,14 +111,15 @@ skip-excluded-dirs = true
 [tool.hatch.build.targets.sdist]
 include = [
     "/flexget",
-    "/*.py"
+    "/scripts/build_locked_extras.py",
+    "/scripts/bundle_webui.py"
 ]
 # Cassettes will take up all our room on pypi faster
 exclude = ["/flexget/tests/cassettes"]
 
 [tool.hatch.build.targets.wheel.hooks.custom]
 # The webui will be bundled when the BUNDLE_WEBUI env variable is defined
-path = "bundle_webui.py"
+path = "scripts/bundle_webui.py"
 
 [tool.hatch.build.targets.wheel]
 include = [
