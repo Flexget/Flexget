@@ -34,7 +34,7 @@ jobs:
           git config --global user.email github-actions[bot]@users.noreply.github.com
           git config --global user.name github-actions[bot]
       - name: Install uv and Python
-        uses: astral-sh/setup-uv@1edb52594c857e2b5b13128931090f0640537287 # v5
+        uses: astral-sh/setup-uv@f94ec6bedd8674c4426838e6b50417d36b6ab231 # v5
         with:
           enable-cache: true
           python-version: ${{ env.PYTHON_VERSION }}
