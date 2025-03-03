@@ -1,4 +1,3 @@
-# pylint: disable=no-self-use
 import datetime
 import os
 import stat

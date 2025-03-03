@@ -15,7 +15,7 @@ class FilterSeenInfoHash(plugin_seen.FilterSeen):
         self.keyword = 'seen_info_hash'
 
     @plugin.priority(180)
-    def on_task_filter(self, task, config):  # pylint: disable=W0221
+    def on_task_filter(self, task, config):
         # Return if we are disabled.
         if config is False:
             return

@@ -1476,7 +1476,7 @@ def store_parser(
                 elif parser.id_type == 'sequence':
                     episode.season = 0
                     episode.number = parser.id + ix
-                series.episodes.append(episode)  # pylint:disable=E1103
+                series.episodes.append(episode)
                 logger.debug('-> added `{}`', episode)
             session.flush()
 
@@ -1508,7 +1508,7 @@ def store_parser(
             release.quality = quality
             release.proper_count = parser.proper_count
             release.title = parser.data
-            entity.releases.append(release)  # pylint:disable=E1103
+            entity.releases.append(release)
             logger.debug('-> added `{}`', release)
         releases.append(release)
     session.flush()  # Make sure autonumber ids are populated
