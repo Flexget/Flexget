@@ -22,11 +22,11 @@ jobs:
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
 
       - name: Setup QEMU
-        uses: docker/setup-qemu-action@4574d27a4764455b42196d70a065bc6853246a25 # v3
+        uses: docker/setup-qemu-action@29109295f81e9208d7d86ff1c6c12d2833863392 # v3
 
       - name: Setup Docker Buildx
         id: buildx
-        uses: docker/setup-buildx-action@f7ce87c1d6bead3e36075b2ce75da1f6cc28aaca # v3
+        uses: docker/setup-buildx-action@b5ca514318bd6ebac0fb2aedd5d36ec1b5c232a2 # v3
         with:
           install: true
 
@@ -47,7 +47,7 @@ jobs:
 
       - name: Docker metadata
         id: meta
-        uses: docker/metadata-action@369eb591f429131d6889c46b94e711f089e6ca96 # v5
+        uses: docker/metadata-action@902fa8ec7d6ecbf8d84d538b9b233a880e428804 # v5
         with:
           images: |
             flexget/flexget
@@ -60,7 +60,7 @@ jobs:
 
       - name: Build Base Docker Image
         id: docker_build
-        uses: docker/build-push-action@0adf9959216b96bec444f325f1e493d4aa344497 # v6
+        uses: docker/build-push-action@471d1dc4e07e5cdedd4c2171150001c434f0b7a4 # v6
         with:
           context: ./
           file: ./Dockerfile

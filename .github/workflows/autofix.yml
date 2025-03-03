@@ -11,7 +11,7 @@ concurrency:
 env:
   PYTHON_VERSION: '3.13' # renovate: datasource=python-version depName=python
   # If you rename env.UV_VERSION, you MUST update the YAML parsing below as well.
-  UV_VERSION: 0.6.2 # renovate: datasource=pypi depName=uv
+  UV_VERSION: 0.6.3 # renovate: datasource=pypi depName=uv
 jobs:
   uv-lock:
     name: Update uv.lock
@@ -80,7 +80,7 @@ jobs:
         with:
           cmd: yq .env.UV_VERSION merge/.github/workflows/autofix.yml
       - name: Install uv and Python
-        uses: astral-sh/setup-uv@1edb52594c857e2b5b13128931090f0640537287 # v5
+        uses: astral-sh/setup-uv@f94ec6bedd8674c4426838e6b50417d36b6ab231 # v5
         with:
           enable-cache: true
           python-version: ${{ env.PYTHON_VERSION }}

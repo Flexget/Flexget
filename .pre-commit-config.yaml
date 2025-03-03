@@ -3,19 +3,19 @@ ci:
   skip: [ uv-lock ]
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.9.7
+    rev: v0.9.9
     hooks:
       - id: ruff
         args: [ --fix ]
       - id: ruff-format
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.6.2
+    rev: 0.6.3
     hooks:
       - id: uv-lock
       - id: uv-export
         args: [ --frozen, --no-dev, --no-emit-project, --no-hashes, --output-file=requirements.txt ]
   - repo: https://github.com/renovatebot/pre-commit-hooks
-    rev: 39.156.0
+    rev: 39.156.2
     hooks:
       - id: renovate-config-validator
         args: [ --strict ]
