@@ -30,20 +30,39 @@ jobs:
           enable-cache: true
           python-version: ${{ matrix.python-version }}
           version: ${{ env.UV_VERSION }}
-      - name: Install mandatory dependencies
-        run: uv sync --frozen
       - name: Run tests not requiring optional dependencies
         run: uv run pytest -m 'not require_optional_deps' -n logical --dist loadgroup --junit-xml test-results.xml
-      - name: Install optional dependencies
-        run: uv sync --frozen --group plugin-test
       - name: Run tests requiring optional dependencies
-        run: uv run pytest -m 'require_optional_deps' -n logical --dist loadgroup --junit-xml test-results.xml
+        run: uv run --group plugin-test pytest -m 'require_optional_deps' -n logical --dist loadgroup --junit-xml test-results.xml
       - name: Upload Test Results
         if: always()
         uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4
         with:
           name: Test Results (Python ${{ matrix.python-version }} ${{ matrix.operating-system }})
           path: test-results.xml
+
+  test-scripts:
+    name: Test scripts
+    runs-on: ubuntu-latest
+    env:
+      PYTHON_VERSION: '3.13' # renovate: datasource=python-version depName=python
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      - name: Install uv and Python
+        uses: astral-sh/setup-uv@b5f58b2abc5763ade55e4e9d0fe52cd1ff7979ca # v5
+        with:
+          enable-cache: true
+          python-version: ${{ matrix.python-version }}
+          version: ${{ env.UV_VERSION }}
+      - name: Run tests for scripts
+        run: |
+          uv export --no-hashes --output-file scripts/bundle_webui.txt --script scripts/bundle_webui.py
+          uv run --isolated --no-project --with pytest --with vcrpy --with-requirements scripts/bundle_webui.txt -m pytest scripts/tests/test_bundle_webui.py
+          uv export --no-hashes --output-file scripts/dev_tools.txt --script scripts/dev_tools.py
+          uv run --isolated --no-project --with pytest --with vcrpy --with-requirements scripts/dev_tools.txt -m pytest scripts/tests/test_dev_tools.py
+          uv export --no-hashes --output-file scripts/update_changelog.txt --script scripts/update_changelog.py
+          uv run --isolated --no-project --with pytest --with vcrpy --with-requirements scripts/update_changelog.txt -m pytest scripts/tests/test_update_changelog.py
 
   publish-test-results:
     name: Publish Tests Results
