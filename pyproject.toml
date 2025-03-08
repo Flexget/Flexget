@@ -172,7 +172,6 @@ select = [
     "SLOT",
     "T10",
     "TC",
-    "TCH",
     "TD",
     "TID",
     "TRY",
@@ -183,6 +182,8 @@ select = [
 ignore = [
     "B904", # TODO: enable this rule (requires a lot of manual work)
     "D1", # Missing docstring
+    "D203", # incorrect-blank-line-before-class
+    "D213", # multi-line-summary-second-line
     "E501", # TODO: enable this rule (requires a lot of manual work)
     "N817", # camelcase-imported-as-acronym
     "N818", # error-suffix-on-exception-name
