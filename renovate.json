@@ -7,7 +7,8 @@
     ":enablePreCommit",
     ":maintainLockFilesWeekly",
     ":preserveSemverRanges",
-    ":rebaseStalePrs"
+    ":rebaseStalePrs",
+    "schedule:weekly"
   ],
   "gitIgnoredAuthors": [
     "github-actions[bot]@users.noreply.github.com",
