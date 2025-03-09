@@ -42,7 +42,7 @@ jobs:
       - name: Update the Changelog
         run: |
           set -x
-          uv run update-changelog.py wiki/ChangeLog.md
+          uv run scripts/update_changelog.py wiki/ChangeLog.md
           cd wiki
           git add ChangeLog.md
           if ! git diff --cached --exit-code; then

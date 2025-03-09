@@ -36,6 +36,13 @@
   "npm": {
     "enabled": false
   },
+  "pep723": {
+    "fileMatch": [
+      "scripts/bundle_webui.py",
+      "scripts/dev_tools.py",
+      "scripts/update_changelog.py"
+    ]
+  },
   "pip_requirements": {
     "enabled": false
   },

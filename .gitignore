@@ -9,7 +9,6 @@
 /.Python
 FlexGet.egg-info/
 bin/
-Scripts/
 include/
 lib/
 local
