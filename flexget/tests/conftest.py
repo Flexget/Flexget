@@ -1,4 +1,3 @@
-import argparse
 import itertools
 import logging
 import os
@@ -7,10 +6,9 @@ import shutil
 from contextlib import contextmanager, suppress
 from http import client
 from pathlib import Path
-from typing import Any, Callable, Optional, Union
+from typing import TYPE_CHECKING, Any, Callable, Optional, Union
 from unittest import mock
 
-import flask
 import jsonschema
 import pytest
 import requests
@@ -28,6 +26,11 @@ from flexget.manager import Manager, Session
 from flexget.plugin import load_plugins
 from flexget.task import Task, TaskAbort
 from flexget.webserver import User
+
+if TYPE_CHECKING:
+    import argparse
+
+    import flask
 
 logger = logger.bind(name='tests')
 
@@ -79,7 +82,7 @@ def execute_task(manager: Manager) -> Callable[..., Task]:
     def execute(
         task_name: str,
         abort: bool = False,
-        options: Optional[Union[dict, argparse.Namespace]] = None,
+        options: Optional[Union[dict, 'argparse.Namespace']] = None,
     ) -> Task:
         """Use to execute one test task from config.
 
@@ -160,10 +163,10 @@ def schema_match(manager) -> Callable[[dict, Any], list[dict]]:
 
 
 @pytest.fixture
-def link_headers(manager) -> Callable[[flask.Response], dict[str, dict]]:
+def link_headers(manager) -> Callable[['flask.Response'], dict[str, dict]]:
     """Parse link headers and return them in dict form."""
 
-    def headers(response: flask.Response) -> dict[str, dict]:
+    def headers(response: 'flask.Response') -> dict[str, dict]:
         links = {}
         for link in requests.utils.parse_header_links(response.headers.get('link')):
             url = link['url']
@@ -388,43 +391,43 @@ class APIClient:
 
         kwargs['headers'][key] = value
 
-    def json_post(self, *args, **kwargs) -> flask.Response:
+    def json_post(self, *args, **kwargs) -> 'flask.Response':
         self._append_header('Content-Type', 'application/json', kwargs)
         if kwargs.get('auth', True):
             self._append_header('Authorization', f'Token {self.api_key}', kwargs)
         return self.client.post(*args, **kwargs)
 
-    def json_put(self, *args, **kwargs) -> flask.Response:
+    def json_put(self, *args, **kwargs) -> 'flask.Response':
         self._append_header('Content-Type', 'application/json', kwargs)
         if kwargs.get('auth', True):
             self._append_header('Authorization', f'Token {self.api_key}', kwargs)
         return self.client.put(*args, **kwargs)
 
-    def json_patch(self, *args, **kwargs) -> flask.Response:
+    def json_patch(self, *args, **kwargs) -> 'flask.Response':
         self._append_header('Content-Type', 'application/json', kwargs)
         if kwargs.get('auth', True):
             self._append_header('Authorization', f'Token {self.api_key}', kwargs)
         return self.client.patch(*args, **kwargs)
 
-    def get(self, *args, **kwargs) -> flask.Response:
+    def get(self, *args, **kwargs) -> 'flask.Response':
         if kwargs.get('auth', True):
             self._append_header('Authorization', f'Token {self.api_key}', kwargs)
 
         return self.client.get(*args, **kwargs)
 
-    def delete(self, *args, **kwargs) -> flask.Response:
+    def delete(self, *args, **kwargs) -> 'flask.Response':
         if kwargs.get('auth', True):
             self._append_header('Authorization', f'Token {self.api_key}', kwargs)
 
         return self.client.delete(*args, **kwargs)
 
-    def json_delete(self, *args, **kwargs) -> flask.Response:
+    def json_delete(self, *args, **kwargs) -> 'flask.Response':
         self._append_header('Content-Type', 'application/json', kwargs)
         if kwargs.get('auth', True):
             self._append_header('Authorization', f'Token {self.api_key}', kwargs)
         return self.client.delete(*args, **kwargs)
 
-    def head(self, *args, **kwargs) -> flask.Response:
+    def head(self, *args, **kwargs) -> 'flask.Response':
         if kwargs.get('auth', True):
             self._append_header('Authorization', f'Token {self.api_key}', kwargs)
 

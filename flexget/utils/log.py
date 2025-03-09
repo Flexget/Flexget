@@ -6,7 +6,6 @@ from typing import TYPE_CHECKING, Optional
 
 from loguru import logger
 from sqlalchemy import Column, DateTime, Index, Integer, String
-from sqlalchemy.orm import Session
 
 from flexget import db_schema
 from flexget.event import event
@@ -17,6 +16,7 @@ logger = logger.bind(name='util.log')
 
 if TYPE_CHECKING:
     import loguru
+    from sqlalchemy.orm import Session
 
     Base = object
 else:
@@ -24,7 +24,7 @@ else:
 
 
 @db_schema.upgrade('log_once')
-def upgrade(ver: Optional[int], session: Session):
+def upgrade(ver: Optional[int], session: 'Session'):
     if ver is None:
         logger.info('Adding index to md5sum column of log_once table.')
         table = table_schema('log_once', session)
@@ -50,7 +50,7 @@ class LogMessage(Base):
 
 
 @event('manager.db_cleanup')
-def purge(manager, session: Session) -> None:
+def purge(manager, session: 'Session') -> None:
     """Purge old messages from database."""
     old = datetime.now() - timedelta(days=365)
 
@@ -65,7 +65,7 @@ def log_once(
     logger: Optional['loguru.Logger'] = None,
     once_level: str = 'INFO',
     suppressed_level: str = 'VERBOSE',
-    session: Session = None,
+    session: 'Session' = None,
 ) -> Optional[bool]:
     """Log message only once using given logger`.
 

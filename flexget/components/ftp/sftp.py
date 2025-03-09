@@ -1,6 +1,6 @@
 from itertools import groupby
 from pathlib import Path
-from typing import NamedTuple, Optional
+from typing import TYPE_CHECKING, NamedTuple, Optional
 from urllib.parse import unquote, urlparse
 
 from loguru import logger
@@ -8,10 +8,12 @@ from loguru import logger
 from flexget import plugin
 from flexget.components.ftp.sftp_client import HOST_KEY_TYPES, HostKey, SftpClient, SftpError
 from flexget.config_schema import one_or_more
-from flexget.entry import Entry
 from flexget.event import event
-from flexget.task import Task
 from flexget.utils.template import RenderError, render_from_entry
+
+if TYPE_CHECKING:
+    from flexget.entry import Entry
+    from flexget.task import Task
 
 logger = logger.bind(name='sftp')
 
@@ -108,7 +110,7 @@ class SftpList:
         return config
 
     @classmethod
-    def on_task_input(cls, task: Task, config: dict) -> list[Entry]:
+    def on_task_input(cls, task: 'Task', config: dict) -> list['Entry']:
         """Input task handler."""
         config = cls.prepare_config(config)
 
@@ -177,7 +179,7 @@ class SftpDownload:
     }
 
     @classmethod
-    def download_entry(cls, entry: Entry, config: dict, sftp: SftpClient) -> None:
+    def download_entry(cls, entry: 'Entry', config: dict, sftp: SftpClient) -> None:
         """Download the file(s) described in entry."""
         path: str = unquote(urlparse(entry['url']).path) or '.'
         delete_origin: bool = config['delete_origin']
@@ -197,11 +199,11 @@ class SftpDownload:
             entry.fail(e)
 
     @classmethod
-    def on_task_output(cls, task: Task, config: dict) -> None:
+    def on_task_output(cls, task: 'Task', config: dict) -> None:
         """Register this as an output plugin."""
 
     @classmethod
-    def on_task_download(cls, task: Task, config: dict) -> None:
+    def on_task_download(cls, task: 'Task', config: dict) -> None:
         """Task handler for sftp_download plugin."""
         socket_timeout_sec: int = config['socket_timeout_sec']
         connection_tries: int = config['connection_tries']
@@ -227,7 +229,7 @@ class SftpDownload:
                 sftp.close()
 
     @classmethod
-    def _get_sftp_config(cls, entry: Entry):
+    def _get_sftp_config(cls, entry: 'Entry'):
         """Parse a url and return a hashable config, source path, and destination path."""
         # parse url
         parsed = urlparse(entry['url'])
@@ -325,7 +327,7 @@ class SftpUpload:
         return config
 
     @classmethod
-    def handle_entry(cls, entry: Entry, sftp: SftpClient, config: dict):
+    def handle_entry(cls, entry: 'Entry', sftp: SftpClient, config: dict):
         to: str = config['to']
         location: str = entry['location']
         delete_origin: bool = config['delete_origin']
@@ -351,7 +353,7 @@ class SftpUpload:
                 logger.warning('Failed to delete file {} ({})', location, e)
 
     @classmethod
-    def on_task_output(cls, task: Task, config: dict) -> None:
+    def on_task_output(cls, task: 'Task', config: dict) -> None:
         """Upload accepted entries to the specified SFTP server."""
         config = cls.prepare_config(config)
 

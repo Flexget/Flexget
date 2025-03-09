@@ -6,10 +6,9 @@ import os
 import sys
 import threading
 import traceback
-from collections.abc import Generator
 from pathlib import Path
 from time import sleep
-from typing import IO
+from typing import IO, TYPE_CHECKING
 from typing import Optional as OptionalType
 
 import cherrypy
@@ -34,7 +33,6 @@ from pyparsing import (
     printables,
     rest_of_line,
 )
-from sqlalchemy.orm import Session
 from yaml.error import MarkedYAMLError, YAMLError
 
 from flexget._version import __version__
@@ -51,6 +49,11 @@ from flexget.api.app import (
 from flexget.api.app import __version__ as __api_version__
 from flexget.config_schema import ConfigError
 from flexget.utils.tools import get_latest_flexget_version_number
+
+if TYPE_CHECKING:
+    from collections.abc import Generator
+
+    from sqlalchemy.orm import Session
 
 logger = logger.bind(name='api.server')
 
@@ -137,7 +140,7 @@ class ServerReloadAPI(APIResource):
     @api.response(501, model=yaml_error_schema, description='YAML syntax error')
     @api.response(502, model=config_validation_schema, description='Config validation error')
     @api.response(200, model=base_message_schema)
-    def post(self, session: Session = None) -> Response:
+    def post(self, session: 'Session' = None) -> Response:
         """Manage server operations."""
         data = request.json
         if data['operation'] == 'reload':
@@ -170,7 +173,7 @@ class ServerReloadAPI(APIResource):
 @server_api.route('/pid/')
 class ServerPIDAPI(APIResource):
     @api.response(200, description='Reloaded config', model=pid_schema)
-    def get(self, session: Session = None) -> Response:
+    def get(self, session: 'Session' = None) -> Response:
         """Get server PID."""
         return jsonify({'pid': os.getpid()})
 
@@ -179,7 +182,7 @@ class ServerPIDAPI(APIResource):
 class ServerConfigAPI(APIResource):
     @etag
     @api.response(200, description='Flexget config', model=empty_response)
-    def get(self, session: Session = None) -> Response:
+    def get(self, session: 'Session' = None) -> Response:
         """Get Flexget Config in JSON form."""
         return jsonify(self.manager.config)
 
@@ -191,7 +194,7 @@ class ServerRawConfigAPI(APIResource):
     @api.response(
         200, model=raw_config_schema, description='Flexget raw YAML config file encoded in Base64'
     )
-    def get(self, session: Session = None) -> Response:
+    def get(self, session: 'Session' = None) -> Response:
         """Get raw YAML config file."""
         with open(self.manager.config_path, encoding='utf-8') as f:
             raw_config = base64.b64encode(f.read().encode("utf-8"))
@@ -205,7 +208,7 @@ class ServerRawConfigAPI(APIResource):
         description='Config file must be base64 encoded. A backup will be created, and if successful config will'
         ' be loaded and saved to original file.'
     )
-    def post(self, session: Session = None) -> Response:
+    def post(self, session: 'Session' = None) -> Response:
         """Update config."""
         config = {}
         data = request.json
@@ -261,7 +264,7 @@ class ServerRawConfigAPI(APIResource):
 )
 class ServerVersionAPI(APIResource):
     @api.response(200, description='Flexget version', model=version_schema)
-    def get(self, session: Session = None) -> Response:
+    def get(self, session: 'Session' = None) -> Response:
         """Flexget Version."""
         latest = get_latest_flexget_version_number()
         return jsonify(
@@ -276,7 +279,7 @@ class ServerVersionAPI(APIResource):
 @server_api.route('/dump_threads/', doc=False)
 class ServerDumpThreads(APIResource):
     @api.response(200, description='Flexget threads dump', model=dump_threads_schema)
-    def get(self, session: Session = None) -> Response:
+    def get(self, session: 'Session' = None) -> Response:
         """Dump Server threads for debugging."""
         id2name = {th.ident: th.name for th in threading.enumerate()}
         threads = []
@@ -300,7 +303,7 @@ server_log_parser.add_argument('search', help='Search filter support google like
 
 def reverse_readline(
     fh: IO, start_byte: int = 0, buf_size: int = 8192
-) -> Generator[str, None, None]:
+) -> 'Generator[str, None, None]':
     """Return the lines of a file in reverse order."""
     segment: OptionalType[str] = None
     offset = 0
@@ -349,7 +352,7 @@ def file_inode(filename: str) -> int:
 class ServerLogAPI(APIResource):
     @api.doc(expect=[server_log_parser])
     @api.response(200, description='Streams as line delimited JSON')
-    def get(self, session: Session = None) -> Response:
+    def get(self, session: 'Session' = None) -> Response:
         """Stream Flexget log Streams as line delimited JSON."""
         args = server_log_parser.parse_args()
 
@@ -561,7 +564,7 @@ class LogParser:
 @server_api.route('/crash_logs/')
 class ServerCrashLogAPI(APIResource):
     @api.response(200, 'Succesfully retreived crash logs', model=crash_logs_schema)
-    def get(self, session: Session):
+    def get(self, session: 'Session'):
         """Get Crash logs."""
         path = Path(self.manager.config_base)
         crashes = [

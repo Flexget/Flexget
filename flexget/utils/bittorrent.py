@@ -4,11 +4,13 @@
 # Test scripts and other short code fragments can be considered as being in the public domain.
 import binascii
 import re
-from collections.abc import Generator, Iterator
 from contextlib import suppress
-from typing import Any, Callable, Optional, Union
+from typing import TYPE_CHECKING, Any, Callable, Optional, Union
 
 from loguru import logger
+
+if TYPE_CHECKING:
+    from collections.abc import Generator, Iterator
 
 logger = logger.bind(name='torrent')
 
@@ -103,7 +105,7 @@ def is_torrent_file(metafilepath: str) -> bool:
 def tokenize(
     text: bytes,
     match=re.compile(rb'([idel])|(\d+):|(-?\d+)').match,  # type: Callable[[bytes, int], Match[bytes]]
-) -> Generator[bytes, None, None]:
+) -> 'Generator[bytes, None, None]':
     i = 0
     while i < len(text):
         m = match(text, i)
@@ -117,7 +119,7 @@ def tokenize(
             yield s
 
 
-def decode_item(src_iter: Iterator[bytes], token: bytes) -> Union[bytes, str, int, list, dict]:
+def decode_item(src_iter: 'Iterator[bytes]', token: bytes) -> Union[bytes, str, int, list, dict]:
     data: Union[bytes, str, int, list, dict]
     if token == b'i':
         # integer: "i" value "e"

@@ -4,7 +4,6 @@ from typing import TYPE_CHECKING, Optional
 from flask import Response, jsonify, request
 from flask_restx import inputs
 from loguru import logger
-from sqlalchemy.orm import Session
 
 from flexget.api import APIResource, api
 from flexget.api.app import BadRequest, NotFoundError, etag, pagination_headers
@@ -63,6 +62,8 @@ plugins_parser.add_argument(
 if TYPE_CHECKING:
     from typing import TypedDict
 
+    from sqlalchemy.orm import Session
+
     from flexget.config_schema import JsonSchema
 
     class _PhaseHandler(TypedDict):
@@ -102,7 +103,7 @@ class PluginsAPI(APIResource):
     @api.response(BadRequest)
     @api.response(NotFoundError)
     @api.doc(expect=[plugins_parser])
-    def get(self, session: Session = None) -> Response:
+    def get(self, session: 'Session' = None) -> Response:
         """Get list of registered plugins."""
         args = plugins_parser.parse_args()
 

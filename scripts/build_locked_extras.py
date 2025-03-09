@@ -1,15 +1,17 @@
 import os
 import subprocess
 import sys
-from collections.abc import MutableMapping
 from pathlib import Path
-from typing import Any, Optional
+from typing import TYPE_CHECKING, Any, Optional
 
 from hatchling.metadata.plugin.interface import MetadataHookInterface
 
+if TYPE_CHECKING:
+    from collections.abc import MutableMapping
+
 
 def update_metadata_with_locked(
-    metadata: MutableMapping[str, Any], root: Path, groups: Optional[list[str]] = None
+    metadata: "MutableMapping[str, Any]", root: Path, groups: Optional[list[str]] = None
 ) -> None:  # pragma: no cover
     """Inplace update the metadata(pyproject.toml) with the locked dependencies.
 

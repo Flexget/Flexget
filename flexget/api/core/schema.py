@@ -1,10 +1,14 @@
+from typing import TYPE_CHECKING
+
 from flask import Response, jsonify, request
 from referencing.exceptions import Unresolvable
-from sqlalchemy.orm import Session
 
 from flexget.api import APIResource, api
 from flexget.api.app import NotFoundError
 from flexget.config_schema import resolve_ref, schema_paths
+
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
 
 schema_api = api.namespace('schema', description='Config and plugin schemas')
 
@@ -40,7 +44,7 @@ def rewrite_refs(schema, base_url: str):
 @schema_api.route('/')
 class SchemaAllAPI(APIResource):
     @api.response(200, model=schema_api_list)
-    def get(self, session: Session = None) -> Response:
+    def get(self, session: 'Session' = None) -> Response:
         """List all schema definitions."""
         schemas = []
         for path in schema_paths:
@@ -55,7 +59,7 @@ class SchemaAllAPI(APIResource):
 @api.response(NotFoundError)
 class SchemaAPI(APIResource):
     @api.response(200, model=schema_api_list)
-    def get(self, path: str, session: Session = None) -> Response:
+    def get(self, path: str, session: 'Session' = None) -> Response:
         """Get schema definition."""
         try:
             schema = resolve_ref(request.full_path)

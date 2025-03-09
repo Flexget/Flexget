@@ -7,7 +7,6 @@ from typing import TYPE_CHECKING, Any
 
 from flask import Response, jsonify, request
 from flask_restx import inputs
-from sqlalchemy.orm import Session
 
 from flexget.api import APIResource, api
 from flexget.api.app import (
@@ -29,6 +28,9 @@ from flexget.terminal import capture_console
 from flexget.utils import json, requests
 from flexget.utils.lazy_dict import LazyLookup
 from flexget.utils.requests import parse_header
+
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
 
 # Tasks API
 tasks_api = api.namespace('tasks', description='Manage Tasks')
@@ -200,7 +202,7 @@ class TasksAPI(APIResource):
     @etag
     @api.response(200, model=tasks_list_schema)
     @api.doc(expect=[tasks_parser])
-    def get(self, session: Session = None) -> Response:
+    def get(self, session: 'Session' = None) -> Response:
         """List all tasks."""
         active_tasks = {
             task: task_data
@@ -219,7 +221,7 @@ class TasksAPI(APIResource):
     @api.response(201, description='Newly created task', model=task_return_schema)
     @api.response(Conflict)
     @api.response(APIError)
-    def post(self, session: Session = None) -> Response:
+    def post(self, session: 'Session' = None) -> Response:
         """Add new task."""
         data = request.json
 
@@ -258,7 +260,7 @@ class TaskAPI(APIResource):
     @etag
     @api.response(200, model=task_return_schema)
     @api.response(NotFoundError, description='task not found')
-    def get(self, task, session: Session = None) -> Response:
+    def get(self, task, session: 'Session' = None) -> Response:
         """Get task config."""
         if task not in self.manager.user_config.get('tasks', {}):
             raise NotFoundError(f'task `{task}` not found')
@@ -269,7 +271,7 @@ class TaskAPI(APIResource):
     @api.response(200, model=task_return_schema)
     @api.response(NotFoundError)
     @api.response(BadRequest)
-    def put(self, task, session: Session = None) -> Response:
+    def put(self, task, session: 'Session' = None) -> Response:
         """Update tasks config."""
         data = request.json
 
@@ -314,7 +316,7 @@ class TaskAPI(APIResource):
 
     @api.response(200, model=base_message_schema, description='deleted task')
     @api.response(NotFoundError)
-    def delete(self, task, session: Session = None) -> Response:
+    def delete(self, task, session: 'Session' = None) -> Response:
         """Delete a task."""
         try:
             self.manager.config['tasks'].pop(task)
@@ -371,7 +373,7 @@ def _task_info_dict(task):
 @tasks_api.route('/queue/')
 class TaskQueueAPI(APIResource):
     @api.response(200, model=task_api_queue_schema)
-    def get(self, session: Session = None) -> Response:
+    def get(self, session: 'Session' = None) -> Response:
         """List task(s) in queue for execution."""
         tasks = [_task_info_dict(task) for task in self.manager.task_queue.run_queue.queue]
 
@@ -409,7 +411,7 @@ inject_api = api.namespace('inject', description='Entry injection API')
 class TaskExecutionParams(APIResource):
     @etag(cache_age=3600)
     @api.response(200, model=task_execution_params)
-    def get(self, session: Session = None) -> Response:
+    def get(self, session: 'Session' = None) -> Response:
         """Execute payload parameters."""
         return jsonify(ObjectsContainer.task_execution_input)
 
@@ -422,7 +424,7 @@ class TaskExecutionAPI(APIResource):
     @api.response(BadRequest)
     @api.response(200, model=task_api_execute_schema)
     @api.validate(task_execution_schema)
-    def post(self, session: Session = None) -> Response:
+    def post(self, session: 'Session' = None) -> Response:
         """Execute task and stream results."""
         data = request.json
         for task in data.get('tasks'):

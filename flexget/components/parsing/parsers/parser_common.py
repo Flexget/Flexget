@@ -1,11 +1,13 @@
-import datetime
 import re
 from string import capwords
-from typing import Optional, Union
+from typing import TYPE_CHECKING, Optional, Union
 
 from loguru import logger
 
 from flexget.utils.qualities import Quality
+
+if TYPE_CHECKING:
+    import datetime
 
 logger = logger.bind(name='parser')
 
@@ -105,7 +107,7 @@ class SeriesParseResult:
         name: Optional[str] = None,
         identified_by: Optional[str] = None,
         id_type: Optional[str] = None,
-        id: Optional[Union[tuple[int, int], str, int, datetime.date]] = None,
+        id: Optional[Union[tuple[int, int], str, int, 'datetime.date']] = None,
         episodes: int = 1,
         season_pack: bool = False,
         strict_name: bool = False,

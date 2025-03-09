@@ -2,7 +2,6 @@ import json
 import os
 import re
 from collections import deque
-from collections.abc import Mapping
 from contextlib import suppress
 from functools import partial, wraps
 from typing import TYPE_CHECKING, Callable, Optional, Union
@@ -12,12 +11,9 @@ from flask_compress import Compress
 from flask_cors import CORS
 from flask_restx import Api as RestxAPI
 from flask_restx import Model, Resource
-from flask_restx.reqparse import RequestParser
-from jsonschema.exceptions import ValidationError as SchemaValidationError
 from loguru import logger
 from referencing.exceptions import Unresolvable
 from requests import HTTPError
-from sqlalchemy.orm import Session
 from werkzeug.http import generate_etag
 
 from flexget import manager
@@ -32,7 +28,12 @@ __version__ = '1.8.0'
 logger = logger.bind(name='api')
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping
     from typing import TypedDict
+
+    from flask_restx.reqparse import RequestParser
+    from jsonschema.exceptions import ValidationError as SchemaValidationError
+    from sqlalchemy.orm import Session
 
     class _TypeDict(TypedDict):
         type: str
@@ -170,11 +171,11 @@ class API(RestxAPI):
 
     def pagination_parser(
         self,
-        parser: RequestParser = None,
+        parser: 'RequestParser' = None,
         sort_choices: Optional[list[str]] = None,
         default: Optional[str] = None,
         add_sort: Optional[bool] = None,
-    ) -> RequestParser:
+    ) -> 'RequestParser':
         """Return a standardized pagination parser, to be used for any endpoint that has pagination.
 
         :param RequestParser parser: Can extend a given parser or create a new one
@@ -330,14 +331,14 @@ class ValidationError(APIError):
     )
 
     def __init__(
-        self, validation_errors: list[SchemaValidationError], message: str = 'validation error'
+        self, validation_errors: list['SchemaValidationError'], message: str = 'validation error'
     ) -> None:
         payload = {
             'validation_errors': [self._verror_to_dict(error) for error in validation_errors]
         }
         super().__init__(message, payload=payload)
 
-    def _verror_to_dict(self, error: SchemaValidationError) -> Mapping[str, Union[str, list]]:
+    def _verror_to_dict(self, error: 'SchemaValidationError') -> 'Mapping[str, Union[str, list]]':
         error_dict: dict[str, Union[str, list]] = {}
         for attr in self.verror_attrs:
             if isinstance(getattr(error, attr), deque):
@@ -370,7 +371,7 @@ def api_errors(error: APIError) -> tuple[dict, int]:
 
 
 @with_session
-def api_key(session: Session = None) -> str:
+def api_key(session: 'Session' = None) -> str:
     logger.debug('fetching token for internal lookup')
     return session.query(User).first().token
 

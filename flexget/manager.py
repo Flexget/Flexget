@@ -1,4 +1,3 @@
-import argparse
 import atexit
 import codecs
 import collections
@@ -12,7 +11,6 @@ import signal
 import sys
 import threading
 import traceback
-from collections.abc import Iterator, Sequence
 from contextlib import contextmanager
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -51,6 +49,9 @@ from flexget.task_queue import TaskQueue  # noqa: E402
 from flexget.terminal import console, get_console_output  # noqa: E402
 
 if TYPE_CHECKING:
+    import argparse
+    from collections.abc import Iterator, Sequence
+
     from sqlalchemy.engine import Engine
 
     from flexget.tray_icon import TrayIcon
@@ -117,7 +118,7 @@ class Manager:
     """
 
     unit_test = False
-    options: argparse.Namespace
+    options: 'argparse.Namespace'
 
     def __init__(self, args: list[str]) -> None:
         """:param args: CLI args"""
@@ -189,7 +190,7 @@ class Manager:
         tray_icon.add_menu_separator(index=4)
 
     @staticmethod
-    def parse_initial_options(args: list[str]) -> argparse.Namespace:
+    def parse_initial_options(args: list[str]) -> 'argparse.Namespace':
         """Parse what we can from cli args before plugins are loaded."""
         try:
             options = CoreArgumentParser().parse_known_args(args, do_help=False)[0]
@@ -267,9 +268,9 @@ class Manager:
 
     def execute(
         self,
-        options: Optional[Union[dict, argparse.Namespace]] = None,
+        options: Optional[Union[dict, 'argparse.Namespace']] = None,
         priority: int = 1,
-        suppress_warnings: Optional[Sequence[str]] = None,
+        suppress_warnings: Optional['Sequence[str]'] = None,
     ) -> list[tuple[str, str, threading.Event]]:
         """Run all (can be limited with options) tasks from the config.
 
@@ -382,7 +383,7 @@ class Manager:
             self._shutdown()
             return None
 
-    def handle_cli(self, options: Optional[argparse.Namespace] = None) -> None:
+    def handle_cli(self, options: Optional['argparse.Namespace'] = None) -> None:
         """Dispatch a cli command to the appropriate function.
 
         * :meth:`.execute_command`
@@ -409,7 +410,7 @@ class Manager:
             # Otherwise dispatch the command to the callback function
             options.cli_command_callback(self, command_options)
 
-    def execute_command(self, options: argparse.Namespace) -> None:
+    def execute_command(self, options: 'argparse.Namespace') -> None:
         """Handle the 'execute' CLI command.
 
         If there is already a task queue running in this process, adds the execution to the queue.
@@ -446,7 +447,7 @@ class Manager:
             self.task_queue.wait()
         fire_event('manager.execute.completed', self, options)
 
-    def daemon_command(self, options: argparse.Namespace) -> None:
+    def daemon_command(self, options: 'argparse.Namespace') -> None:
         """Handle the 'daemon' CLI command.
 
         Fires events:
@@ -859,7 +860,7 @@ class Manager:
         return None
 
     @contextmanager
-    def acquire_lock(self, event: bool = True) -> Iterator:
+    def acquire_lock(self, event: bool = True) -> 'Iterator':
         """:param bool event: If True, the 'manager.lock_acquired' event will be fired after a lock is obtained"""
         acquired = False
         try:

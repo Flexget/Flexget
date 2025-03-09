@@ -206,6 +206,9 @@ ignore = [
     "TRY400", # error-instead-of-exception
 ]
 
+[tool.ruff.lint.flake8-type-checking]
+quote-annotations = true
+
 [tool.ruff.lint.isort]
 known-first-party = ['flexget']
 
