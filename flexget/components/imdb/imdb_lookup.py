@@ -277,7 +277,7 @@ class ImdbLookup:
             genre = session.query(db.Genre).filter(db.Genre.name == name).first()
             if not genre:
                 genre = db.Genre(name)
-            movie.genres.append(genre)  # pylint:disable=E1101
+            movie.genres.append(genre)
         for index, name in enumerate(parser.languages):
             language = session.query(db.Language).filter(db.Language.name == name).first()
             if not language:
@@ -287,24 +287,24 @@ class ImdbLookup:
             actor = session.query(db.Actor).filter(db.Actor.imdb_id == imdb_id).first()
             if not actor:
                 actor = db.Actor(imdb_id, name)
-            movie.actors.append(actor)  # pylint:disable=E1101
+            movie.actors.append(actor)
         for imdb_id, name in parser.directors.items():
             director = session.query(db.Director).filter(db.Director.imdb_id == imdb_id).first()
             if not director:
                 director = db.Director(imdb_id, name)
-            movie.directors.append(director)  # pylint:disable=E1101
+            movie.directors.append(director)
         for imdb_id, name in parser.writers.items():
             writer = session.query(db.Writer).filter(db.Writer.imdb_id == imdb_id).first()
             if not writer:
                 writer = db.Writer(imdb_id, name)
-            movie.writers.append(writer)  # pylint:disable=E1101
+            movie.writers.append(writer)
         for name in parser.plot_keywords:
             plot_keyword = (
                 session.query(db.PlotKeyword).filter(db.PlotKeyword.name == name).first()
             )
             if not plot_keyword:
                 plot_keyword = db.PlotKeyword(name)
-            movie.plot_keywords.append(plot_keyword)  # pylint:disable=E1101
+            movie.plot_keywords.append(plot_keyword)
         # so that we can track how long since we've updated the info later
         movie.updated = datetime.now()
         return movie

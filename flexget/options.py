@@ -341,7 +341,7 @@ class ArgumentParser(ArgParser):
         namespace: Optional[Namespace] = None,
         raise_errors: bool = False,
         file: Optional[TextIO] = None,
-    ):  # pylint: disable=W0221
+    ):
         """:param raise_errors: If this is true, errors will be raised as `ParserError`s instead of calling sys.exit"""
         ArgumentParser.file = file
         try:
