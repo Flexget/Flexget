@@ -35,7 +35,7 @@ jaraco-collections==5.1.0
 jaraco-context==6.0.1
 jaraco-functools==4.1.0
 jaraco-text==4.0.0
-jinja2==3.1.5
+jinja2==3.1.6
 jsonschema==4.23.0
 jsonschema-specifications==2024.10.1
 loguru==0.7.3
@@ -55,7 +55,7 @@ pyparsing==3.2.1
 pyrss2gen==1.1
 python-dateutil==2.9.0.post0
 pytz==2025.1
-pywin32==308 ; (python_full_version < '3.10' and implementation_name == 'cpython' and sys_platform == 'win32') or (platform_python_implementation != 'PyPy' and sys_platform == 'win32')
+pywin32==309 ; (python_full_version < '3.10' and implementation_name == 'cpython' and sys_platform == 'win32') or (platform_python_implementation != 'PyPy' and sys_platform == 'win32')
 pyyaml==6.0.2
 rebulk==3.2.0
 referencing==0.36.2
@@ -63,7 +63,7 @@ requests==2.32.3
 rich==13.9.4
 rpds-py==0.23.1
 rpyc==6.0.1
-setuptools==75.8.2
+setuptools==76.0.0
 sgmllib3k==1.0.0
 six==1.17.0
 soupsieve==2.6
@@ -72,7 +72,7 @@ tempora==5.8.0
 time-machine==2.16.0 ; implementation_name != 'pypy'
 typing-extensions==4.12.2
 tzdata==2025.1
-tzlocal==5.3
+tzlocal==5.3.1
 urllib3==1.26.20
 webencodings==0.5.1
 werkzeug==3.1.3
