@@ -114,8 +114,6 @@ include = [
     "/scripts/build_locked_extras.py",
     "/scripts/bundle_webui.py"
 ]
-# Cassettes will take up all our room on pypi faster
-exclude = ["/flexget/tests/cassettes"]
 
 [tool.hatch.build.targets.wheel.hooks.custom]
 # The webui will be bundled when the BUNDLE_WEBUI env variable is defined
@@ -125,7 +123,6 @@ path = "scripts/bundle_webui.py"
 include = [
     "/flexget"
 ]
-exclude = ["/flexget/tests"]
 
 ## Other tool settings
 
@@ -136,7 +133,7 @@ markers = [
     'online: mark test that goes online. VCR will automatically be used.',
     'require_optional_deps: mark test as requiring additional dependencies'
 ]
-testpaths = ["flexget/tests"]
+testpaths = ["tests"]
 
 [tool.ruff]
 line-length = 99
