@@ -5,13 +5,10 @@ on:
     branches:
       - develop
 
-permissions:
-  contents: read
+permissions: {}
 
 jobs:
   update-changelog:
-    permissions:
-      contents: write  # for Git to git push
     name: Update Changelog
     runs-on: ubuntu-latest
     env:
@@ -22,12 +19,14 @@ jobs:
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
         with:
           fetch-depth: 0
+          persist-credentials: false
       - name: Checkout wiki repo
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
         with:
           repository: Flexget/wiki
           path: wiki
           token: ${{ secrets.flexgetbot_pat }}
+          persist-credentials: true
           ref: main
       - name: Setup Git User
         run: |
