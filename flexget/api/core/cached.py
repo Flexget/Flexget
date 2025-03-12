@@ -1,12 +1,16 @@
-from flask import Response
+from typing import TYPE_CHECKING
+
 from flask.helpers import send_file
 from flask_restx import inputs
 from requests import RequestException
-from sqlalchemy.orm import Session
 
 from flexget.api import APIResource, api
 from flexget.api.app import APIError, BadRequest
 from flexget.utils.cache import cached_resource
+
+if TYPE_CHECKING:
+    from flask import Response
+    from sqlalchemy.orm import Session
 
 cached_api = api.namespace('cached', description='Cache remote resources')
 
@@ -24,7 +28,7 @@ class CachedResource(APIResource):
     @api.response(BadRequest)
     @api.response(APIError)
     @api.doc(expect=[cached_parser])
-    def get(self, session: Session = None) -> Response:
+    def get(self, session: 'Session' = None) -> 'Response':
         """Cache remote resources."""
         args = cached_parser.parse_args()
         url = args.get('url')

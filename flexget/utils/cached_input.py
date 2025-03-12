@@ -1,6 +1,5 @@
 import copy
 import pickle
-from collections.abc import Iterable
 from datetime import datetime, timedelta
 from functools import partial
 from typing import TYPE_CHECKING, Callable, Optional
@@ -23,6 +22,7 @@ from flexget.utils.tools import TimedDict, get_config_hash, parse_timedelta
 logger = logger.bind(name='input_cache')
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
 
     class Base:
         def __init__(self, *args, **kwargs) -> None: ...
@@ -221,7 +221,9 @@ class IterableCache:
     If `finished_hook` is supplied, it will be called the first time the iterable is run to the end.
     """
 
-    def __init__(self, iterable: Iterable, finished_hook: Optional[Callable[[list], None]] = None):
+    def __init__(
+        self, iterable: 'Iterable', finished_hook: Optional[Callable[[list], None]] = None
+    ):
         self.iterable = iter(iterable)
         self.cache: list = []
         self.finished_hook = finished_hook

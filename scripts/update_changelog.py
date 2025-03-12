@@ -8,10 +8,12 @@
 import collections
 import re
 import sys
-from collections.abc import Generator, Iterable
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from git import Repo
+
+if TYPE_CHECKING:
+    from collections.abc import Generator, Iterable
 
 
 class MDChangeSet:
@@ -75,7 +77,7 @@ class MDChangeSet:
                 return cat_item[0]
         return None
 
-    def to_md_lines(self) -> Generator[str, None, None]:
+    def to_md_lines(self) -> 'Generator[str, None, None]':
         """Return an iterator over the markdown lines representing this changeset."""
         yield from self.pre_header
         yield self.version_header
@@ -87,8 +89,8 @@ class MDChangeSet:
 
 
 def isplit(
-    start_text: str, iterator: Iterable[str]
-) -> tuple[list[str], Optional[str], Iterable[str]]:
+    start_text: str, iterator: 'Iterable[str]'
+) -> tuple[list[str], Optional[str], 'Iterable[str]']:
     """Return head, match, tail tuple, where match is the first line that starts with `start_text`."""
     head: list[str] = []
     iterator = iter(iterator)

@@ -4,7 +4,6 @@ import time
 
 # Allow some request objects to be imported from here instead of requests
 import warnings
-from collections.abc import Mapping
 from datetime import datetime, timedelta
 from email.message import EmailMessage
 from typing import TYPE_CHECKING, Optional, Union
@@ -32,6 +31,7 @@ WAIT_TIME = timedelta(seconds=60)
 unresponsive_hosts = TimedDict(WAIT_TIME)
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping
     from typing import TypedDict
 
     class StateCacheDict(TypedDict):
@@ -177,7 +177,7 @@ def limit_domains(url: str, limit_dict: dict[str, DomainLimiter]) -> None:
             break
 
 
-def parse_header(header: str) -> tuple[str, Mapping]:
+def parse_header(header: str) -> tuple[str, 'Mapping']:
     """Parse a MIME header (such as Content-Type) into a main value and a dictionary of parameters.
 
     Replaces function in the deprecated cgi stdlib module.

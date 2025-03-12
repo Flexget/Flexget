@@ -1,12 +1,16 @@
+from typing import TYPE_CHECKING
+
 from rich.markup import escape
 
 from flexget import options, plugin
 from flexget.event import event
-from flexget.manager import Manager
 from flexget.terminal import TerminalTable, console, table_parser
 from flexget.utils.database import with_session
 
 from . import db
+
+if TYPE_CHECKING:
+    from flexget.manager import Manager
 
 try:
     # NOTE: Importing other plugins is discouraged!
@@ -24,7 +28,7 @@ def do_cli(manager, options):
         seen_search(manager, options)
 
 
-def seen_forget(manager: Manager, options):
+def seen_forget(manager: 'Manager', options):
     forget_name = options.forget_value
     if is_imdb_url(forget_name):
         imdb_id = extract_id(forget_name)
@@ -54,7 +58,7 @@ def seen_forget(manager: Manager, options):
     manager.config_changed()
 
 
-def seen_add(manager: Manager, options):
+def seen_add(manager: 'Manager', options):
     default_task = 'cli_add'
 
     seen_name = options.add_value
@@ -93,7 +97,7 @@ def seen_add(manager: Manager, options):
 
 
 @with_session
-def seen_search(manager: Manager, options, session=None):
+def seen_search(manager: 'Manager', options, session=None):
     search_term = options.search_term
     if is_imdb_url(search_term):
         console('IMDB url detected, parsing ID')

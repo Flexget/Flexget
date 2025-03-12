@@ -1,13 +1,12 @@
 import base64
 from contextlib import suppress
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from flask import Request, Response, request
 from flask import session as flask_session
 from flask_login import LoginManager
 from flask_login.utils import current_app, current_user, login_user
 from flask_restx import inputs
-from sqlalchemy.orm import Session
 from werkzeug.security import check_password_hash
 
 from flexget.api import api_app
@@ -15,13 +14,16 @@ from flexget.api.app import APIResource, Unauthorized, api, base_message_schema,
 from flexget.utils.database import with_session
 from flexget.webserver import User
 
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
 login_manager = LoginManager()
 login_manager.init_app(api_app)
 
 
 @login_manager.request_loader
 @with_session
-def load_user_from_request(request: Request, session: Session = None) -> Optional[User]:
+def load_user_from_request(request: Request, session: 'Session' = None) -> Optional[User]:
     auth_value = request.headers.get('Authorization')
 
     if not auth_value:
@@ -46,7 +48,7 @@ def load_user_from_request(request: Request, session: Session = None) -> Optiona
 
 @login_manager.user_loader
 @with_session
-def load_user(username: str, session: Session = None) -> Optional[User]:
+def load_user(username: str, session: 'Session' = None) -> Optional[User]:
     return session.query(User).filter(User.name == username).first()
 
 
@@ -96,7 +98,7 @@ class LoginAPI(APIResource):
     @api.response(Unauthorized)
     @api.response(200, 'Login successful', model=base_message_schema)
     @api.doc(expect=[login_parser])
-    def post(self, session: Session = None) -> Response:
+    def post(self, session: 'Session' = None) -> Response:
         """Login with username and password."""
         data = request.json
         user_name = data.get('username')
@@ -122,7 +124,7 @@ class LoginAPI(APIResource):
 @auth_api.route('/logout/')
 class LogoutAPI(APIResource):
     @api.response(200, 'Logout successful', model=base_message_schema)
-    def post(self, session: Session = None) -> Response:
+    def post(self, session: 'Session' = None) -> Response:
         """Logout and clear session cookies."""
         flask_session.clear()
         resp = success_response('User logged out')

@@ -1,9 +1,8 @@
 import contextlib
 import os
 import threading
-from collections.abc import Iterator
 from textwrap import wrap
-from typing import Any, Optional, TextIO, Union
+from typing import TYPE_CHECKING, Any, Optional, TextIO, Union
 
 import rich
 import rich.box
@@ -14,6 +13,9 @@ import rich.table
 import rich.text
 
 from flexget.options import ArgumentParser
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
 
 local_context = threading.local()
 
@@ -216,7 +218,7 @@ def disable_colors():
 
 
 @contextlib.contextmanager
-def capture_console(filelike: TextIO) -> Iterator:
+def capture_console(filelike: TextIO) -> "Iterator":
     old_output = get_console_output()
     local_context.output = filelike
     try:

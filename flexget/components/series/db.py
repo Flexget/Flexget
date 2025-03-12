@@ -1,5 +1,4 @@
 import re
-from collections.abc import Iterable
 from datetime import datetime, timedelta
 from functools import total_ordering
 from typing import TYPE_CHECKING, Optional, Union
@@ -42,6 +41,8 @@ from flexget.utils.sqlalchemy_utils import (
 from flexget.utils.tools import parse_episode_identifier
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
+
     from flexget.components.parsing.parsers.parser_common import SeriesParseResult
     from flexget.utils.qualities import Quality
 
@@ -749,7 +750,7 @@ def db_cleanup(manager, session: Session) -> None:
         logger.verbose('Removed {} series without episodes.', result)
 
 
-def set_alt_names(alt_names: Iterable[str], db_series: Series, session: Session) -> None:
+def set_alt_names(alt_names: 'Iterable[str]', db_series: Series, session: Session) -> None:
     db_alt_names = []
     for alt_name in alt_names:
         db_series_alt = (
@@ -923,7 +924,7 @@ def get_series_summary(
     descending: Optional[bool] = None,
     session: Session = None,
     name: Optional[str] = None,
-) -> Union[int, Iterable[Series]]:
+) -> Union[int, 'Iterable[Series]']:
     """Return a query with results for all series.
 
     :param configured: 'configured' for shows in config, 'unconfigured' for shows not in config, 'all' for both.

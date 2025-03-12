@@ -1,12 +1,11 @@
 import os
 import re
 import time
-from collections.abc import Iterable
 from functools import total_ordering
 from http.client import BadStatusLine
 from importlib import import_module
 from pathlib import Path
-from typing import Callable, Optional, Union
+from typing import TYPE_CHECKING, Callable, Optional, Union
 from urllib.error import HTTPError, URLError
 
 import loguru
@@ -24,6 +23,9 @@ from flexget import config_schema
 from flexget import plugins as plugins_pkg
 from flexget.event import Event, event, fire_event, remove_event_handlers
 from flexget.event import add_event_handler as add_phase_handler
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 logger = loguru.logger.bind(name='plugin')
 
@@ -556,7 +558,7 @@ def get_plugins(
     category: Optional[str] = None,
     name: Optional[str] = None,
     min_api: Optional[int] = None,
-) -> Iterable[PluginInfo]:
+) -> 'Iterable[PluginInfo]':
     """Query other plugins characteristics.
 
     :param string phase: Require phase

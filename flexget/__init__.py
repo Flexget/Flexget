@@ -1,7 +1,6 @@
 import os
 import sys
-from collections.abc import Sequence
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 # __version__ import need to be first in order to avoid circular import within logger
 from ._version import __version__  # noqa: F401
@@ -10,8 +9,11 @@ from ._version import __version__  # noqa: F401
 from flexget import log
 from flexget.manager import Manager
 
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
-def main(args: Optional[Sequence[str]] = None):
+
+def main(args: Optional['Sequence[str]'] = None):
     """Execute as the main entry point for Command Line Interface."""
     if args is None:
         args = sys.argv[1:]

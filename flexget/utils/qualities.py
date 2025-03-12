@@ -1,12 +1,14 @@
 import copy
 import functools
 import re
-from collections.abc import Iterator
-from typing import Optional, Union
+from typing import TYPE_CHECKING, Optional, Union
 
 from loguru import logger
 
 from flexget.utils.serialization import Serializer
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
 
 logger = logger.bind(name='utils.qualities')
 
@@ -188,7 +190,7 @@ for items in (_resolutions, _sources, _codecs, _color_ranges, _audios):
         _registry[item.name] = item
 
 
-def all_components() -> Iterator[QualityComponent]:
+def all_components() -> 'Iterator[QualityComponent]':
     return iter(_registry.values())
 
 

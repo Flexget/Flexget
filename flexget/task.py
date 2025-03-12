@@ -5,7 +5,6 @@ import itertools
 import random
 import string
 import threading
-from collections.abc import Iterable, Iterator
 from functools import total_ordering, wraps
 from typing import TYPE_CHECKING, Optional, Union
 
@@ -30,14 +29,16 @@ from flexget.terminal import capture_console
 from flexget.utils import requests
 from flexget.utils.database import with_session
 from flexget.utils.simple_persistence import SimpleTaskPersistence
-from flexget.utils.sqlalchemy_utils import ContextSession
 from flexget.utils.template import FlexGetTemplate, render_from_task
 from flexget.utils.tools import MergeException, get_config_hash, merge_dict_from_to
 
 logger = logger.bind(name='task')
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable, Iterator
+
     from flexget.db_schema import VersionedBaseMeta
+    from flexget.utils.sqlalchemy_utils import ContextSession
 
     Base = VersionedBaseMeta
 else:
@@ -58,7 +59,7 @@ class TaskConfigHash(Base):
 
 
 @with_session
-def config_changed(task: Optional[str] = None, session: ContextSession = None) -> None:
+def config_changed(task: Optional[str] = None, session: 'ContextSession' = None) -> None:
     """Force config_modified flag to come out true on next run of `task`.
 
     Used when the db changes, and all entries need to be reprocessed.
@@ -94,13 +95,13 @@ def use_task_logging(func):
 class EntryIterator:
     """An iterator over a subset of entries to emulate old task.accepted/rejected/failed/entries properties."""
 
-    def __init__(self, entries: list[Entry], states: Union[EntryState, Iterable[EntryState]]):
+    def __init__(self, entries: list[Entry], states: Union[EntryState, 'Iterable[EntryState]']):
         self.all_entries = entries
         if isinstance(states, EntryState):
             states = [states]
         self.filter = lambda e: e._state in states
 
-    def __iter__(self) -> Iterator[Entry]:
+    def __iter__(self) -> 'Iterator[Entry]':
         return filter(self.filter, self.all_entries)
 
     def __bool__(self):
@@ -115,7 +116,7 @@ class EntryIterator:
     def __radd__(self, other):
         return itertools.chain(other, self)
 
-    def __getitem__(self, item) -> Union[Entry, Iterable[Entry]]:
+    def __getitem__(self, item) -> Union[Entry, 'Iterable[Entry]']:
         if isinstance(item, slice):
             return list(itertools.islice(self, item.start, item.stop))
         if not isinstance(item, int):

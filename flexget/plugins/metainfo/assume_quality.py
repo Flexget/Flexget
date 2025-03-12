@@ -1,11 +1,13 @@
-from typing import NamedTuple
+from typing import TYPE_CHECKING, NamedTuple
 
 from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 from flexget.utils import qualities
-from flexget.utils.qualities import Quality, Requirements
+
+if TYPE_CHECKING:
+    from flexget.utils.qualities import Quality, Requirements
 
 logger = logger.bind(name='assume_quality')
 
@@ -77,8 +79,8 @@ class AssumeQuality:
             config = {'any': config}
 
         class Assume(NamedTuple):
-            target: Requirements
-            quality: Quality
+            target: 'Requirements'
+            quality: 'Quality'
 
         self.assumptions = []
         for target, quality in list(config.items()):

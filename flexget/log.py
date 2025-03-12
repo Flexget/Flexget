@@ -8,13 +8,15 @@ import threading
 import uuid
 import warnings
 from collections import deque
-from collections.abc import Iterator
-from typing import Callable, Optional, Union
+from typing import TYPE_CHECKING, Callable, Optional, Union
 
 import loguru
 from loguru import logger
 
 from flexget import __version__
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
 
 # A level more detailed than INFO
 VERBOSE = 15
@@ -32,7 +34,7 @@ local_context = threading.local()
 
 
 @contextlib.contextmanager
-def capture_logs(*args, **kwargs) -> Iterator:
+def capture_logs(*args, **kwargs) -> 'Iterator':
     """Take the same arguments as `logger.add`, but this sync will only log messages contained in context."""
     old_id = get_log_session_id()
     session_id = local_context.session_id = old_id or str(uuid.uuid4())

@@ -2,7 +2,6 @@ import locale
 import os
 import os.path
 import re
-from collections.abc import Mapping
 from contextlib import suppress
 from copy import copy
 from datetime import date, datetime, time
@@ -32,6 +31,8 @@ from flexget.utils.pathscrub import pathscrub
 from flexget.utils.tools import format_filesize, parse_filesize, split_title_year
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping
+
     from flexget.entry import Entry
     from flexget.manager import Manager
     from flexget.task import Task
@@ -372,7 +373,7 @@ def get_template(template_name: str, scope: Optional[str] = 'task') -> FlexGetTe
     raise ValueError(err)
 
 
-def render(template: Union[FlexGetTemplate, str], context: Mapping, native: bool = False) -> str:
+def render(template: Union[FlexGetTemplate, str], context: 'Mapping', native: bool = False) -> str:
     """Render a Template with `context` as its context.
 
     :param template: Template or template string to render.
@@ -430,7 +431,7 @@ def render_from_task(template: Union[FlexGetTemplate, str], task: 'Task') -> str
     return render(template, variables)
 
 
-def evaluate_expression(expression: str, context: Mapping) -> Any:
+def evaluate_expression(expression: str, context: 'Mapping') -> Any:
     """Evaluate a jinja `expression` using a given `context` with support for `LazyDict`s (`Entry`s.).
 
     :param str expression:  A jinja expression to evaluate

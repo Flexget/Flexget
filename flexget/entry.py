@@ -1,10 +1,9 @@
 import functools
 import types
 import warnings
-from collections.abc import Iterable, Mapping, Sequence
 from datetime import date, datetime
 from enum import Enum
-from typing import Callable, Optional, Union
+from typing import TYPE_CHECKING, Callable, Optional, Union
 
 import pendulum
 from loguru import logger
@@ -13,6 +12,9 @@ from flexget import plugin
 from flexget.utils.lazy_dict import LazyDict, LazyLookup
 from flexget.utils.serialization import Serializer, deserialize, serialize
 from flexget.utils.template import CoercingDateTime, FlexGetTemplate, render_from_entry
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable, Mapping, Sequence
 
 logger = logger.bind(name='entry')
 
@@ -348,9 +350,9 @@ class Entry(LazyDict, Serializer):
     def add_lazy_fields(
         self,
         lazy_func: Union[Callable[['Entry'], None], str],
-        fields: Iterable[str],
-        args: Optional[Sequence] = None,
-        kwargs: Optional[Mapping] = None,
+        fields: 'Iterable[str]',
+        args: Optional['Sequence'] = None,
+        kwargs: Optional['Mapping'] = None,
     ):
         """Add lazy fields to an entry.
 
