@@ -68,8 +68,7 @@ plugin-test = [
     "pysftp ~=0.2.9",
     'rarfile~=4.0',
     "subliminal ~= 2.1",
-    { include-group = "telegram" },
-    { include-group = "transmission" }
+    { include-group = "all" }
 ]
 deluge = ['deluge-client~=1.10']
 qbittorrent = ['qbittorrent-api~=2025.2']
