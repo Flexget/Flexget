@@ -18,5 +18,5 @@ class TestQbittorrent:
         """
 
     def test_ratio_limit(self, execute_task):
-        task=execute_task('ratio_limit')
+        task = execute_task('ratio_limit')
         assert task.accepted
