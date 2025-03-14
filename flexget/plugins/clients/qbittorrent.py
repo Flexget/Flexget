@@ -269,7 +269,7 @@ class OutputQBitTorrent:
 
             ratio_limit = entry.get('ratio_limit', config.get('ratio_limit'))
             if ratio_limit:
-                form_data['ratioLimit'] = ratio_limit
+                form_data['ratioLimit'] = str(ratio_limit)
 
             seeding_time_limit = entry.get('seeding_time_limit', config.get('seeding_time_limit'))
             if seeding_time_limit:
