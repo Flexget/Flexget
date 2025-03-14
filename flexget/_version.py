@@ -10,4 +10,4 @@ and update the version again for continued development.
 NOTE: Should always have all three parts of the version, even on major and minor bumps. i.e. 4.0.0.dev, not 4.0.dev
 """
 
-__version__ = '3.15.26'
+__version__ = '3.15.27.dev'
