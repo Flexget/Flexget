@@ -7,8 +7,7 @@ env:
   DAYS_BEFORE_ISSUE_CLOSE: 30
   DAYS_BEFORE_PR_STALE: 150
   DAYS_BEFORE_PR_CLOSE: 60
-permissions:
-  contents: read
+permissions: { }
 
 jobs:
   stale:
