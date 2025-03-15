@@ -9,8 +9,8 @@ from flexget import __version__
 from flexget.api.app import __version__ as __api_version__
 from flexget.api.app import base_message
 from flexget.api.core.server import ObjectsContainer as OC
-from flexget.tests.conftest import MockManager
 from flexget.utils.tools import get_latest_flexget_version_number
+from tests.conftest import MockManager
 
 
 class TestServerAPI:
