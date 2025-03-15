@@ -171,6 +171,7 @@ select = [
     "SIM",
     "SLOT",
     "T10",
+    "T20",
     "TC",
     "TD",
     "TID",
@@ -210,6 +211,10 @@ quote-annotations = true
 
 [tool.ruff.lint.isort]
 known-first-party = ['flexget']
+
+[tool.ruff.lint.per-file-ignores]
+'scripts/*' = ['T20']
+'flexget/tests/*' = ['T20']
 
 [tool.ruff.format]
 quote-style = "preserve"
