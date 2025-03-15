@@ -14,8 +14,7 @@ class TestMigrate:
 
     @pytest.mark.filecopy('db-r1042.sqlite', '__tmp__/upgrade_test.sqlite')
     def test_upgrade(self, request, tmp_path):
-        db_filename = tmp_path.joinpath('upgrade_test.sqlite')
-        filename = db_filename.as_posix()
+        filename = tmp_path / 'upgrade_test.sqlite'
         database_uri = f'sqlite:///{filename}'
         # This will raise an error if the upgrade wasn't successful
         mockmanager = MockManager(

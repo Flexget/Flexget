@@ -1,9 +1,9 @@
 import json
-import os
 import re
 from collections import deque
 from contextlib import suppress
 from functools import partial, wraps
+from pathlib import Path
 from typing import TYPE_CHECKING, Callable, Optional, Union
 
 from flask import Flask, Request, Response, jsonify, make_response, request
@@ -203,7 +203,7 @@ class API(RestxAPI):
         return pagination
 
 
-api_app = Flask(__name__, template_folder=os.path.join(__path__[0], 'templates'))
+api_app = Flask(__name__, template_folder=Path(__path__[0]) / 'templates')
 api_app.config['REMEMBER_COOKIE_NAME'] = 'flexget.token'
 api_app.config['DEBUG'] = True
 api_app.config['RESTX_ERROR_404_HELP'] = False

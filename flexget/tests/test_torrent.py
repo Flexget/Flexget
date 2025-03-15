@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 from unittest import mock
 
 import pytest
@@ -116,15 +116,15 @@ class TestModifyTrackers:
                   to: replaced
     """
 
-    def load_torrent(self, filename):
-        with open(filename, 'rb') as f:
+    def load_torrent(self, file: Path):
+        with file.open('rb') as f:
             data = f.read()
         return Torrent(data)
 
     @pytest.mark.filecopy('test.torrent', '__tmp__/test.torrent')
     def test_add_trackers(self, execute_task, tmp_path):
         task = execute_task('test_add_trackers')
-        torrent = self.load_torrent(os.path.join(tmp_path.as_posix(), 'test.torrent'))
+        torrent = self.load_torrent(tmp_path / 'test.torrent')
         assert 'udp://thetracker.com/announce' in torrent.trackers, (
             'udp://thetracker.com/announce should have been added to trackers'
         )
@@ -134,7 +134,7 @@ class TestModifyTrackers:
     @pytest.mark.filecopy('test.torrent', '__tmp__/test.torrent')
     def test_remove_trackers(self, execute_task, tmp_path):
         task = execute_task('test_remove_trackers')
-        torrent = self.load_torrent(os.path.join(tmp_path.as_posix(), 'test.torrent'))
+        torrent = self.load_torrent(tmp_path / 'test.torrent')
         assert 'http://ipv6.torrent.ubuntu.com:6969/announce' not in torrent.trackers, (
             'ipv6 tracker should have been removed'
         )
@@ -148,7 +148,7 @@ class TestModifyTrackers:
     @pytest.mark.filecopy('test.torrent', '__tmp__/test.torrent')
     def test_modify_trackers(self, execute_task, tmp_path):
         execute_task('test_modify_trackers')
-        torrent = self.load_torrent(tmp_path.joinpath('test.torrent'))
+        torrent = self.load_torrent(tmp_path / 'test.torrent')
         assert 'http://torrent.replaced.com:6969/announce' in torrent.trackers, (
             'ubuntu tracker should have been added'
         )
@@ -200,9 +200,9 @@ class TestTorrentScrub:
     """
 
     test_cases = (
-        (True, 'test.torrent'),
-        (False, 'LICENSE.torrent'),
-        (False, 'LICENSE-resume.torrent'),
+        (True, Path('test.torrent')),
+        (False, Path('LICENSE.torrent')),
+        (False, Path('LICENSE-resume.torrent')),
     )
     test_files = [i[1] for i in test_cases]
 
@@ -211,22 +211,17 @@ class TestTorrentScrub:
         # Run task
         task = execute_task('test_all')
 
-        for clean, filename in self.test_cases:
-            original = Torrent.from_file(filename)
-            title = os.path.splitext(filename)[0]
+        for clean, file in self.test_cases:
+            original = Torrent.from_file(file)
+            title = file.stem
 
             modified = task.find_entry(title=title)
-            assert modified, f"{title!r} cannot be found in {task!r}"
+            assert modified, f"{title} cannot be found in {task}"
             modified = modified.get('torrent')
-            assert modified, f"No 'torrent' key in {title!r}"
+            assert modified, f"No 'torrent' key in {title}"
 
-            osize = os.path.getsize(filename)
-            msize = tmp_path.joinpath(filename).stat().st_size
-
-            # Dump small torrents on demand
-            if False:
-                print(f"original={original.content!r}")
-                print(f"modified={modified.content!r}")
+            osize = file.stat().st_size
+            msize = (tmp_path / file).stat().st_size
 
             # Make sure essentials survived
             assert 'announce' in modified.content
@@ -238,17 +233,19 @@ class TestTorrentScrub:
             # Check that hashes have changed accordingly
             if clean:
                 assert osize == msize, "Filesizes aren't supposed to differ!"
-                assert original.info_hash == modified.info_hash, 'info dict changed in ' + filename
+                assert original.info_hash == modified.info_hash, 'info dict changed in ' + str(
+                    file
+                )
             else:
                 assert osize > msize, "Filesizes must be different!"
-                assert original.info_hash != modified.info_hash, filename + " wasn't scrubbed!"
+                assert original.info_hash != modified.info_hash, str(file) + " wasn't scrubbed!"
 
             # Check essential keys were scrubbed
-            if filename == 'LICENSE.torrent':
+            if file == 'LICENSE.torrent':
                 assert 'x_cross_seed' in original.content['info']
                 assert 'x_cross_seed' not in modified.content['info']
 
-            if filename == 'LICENSE-resume.torrent':
+            if file == 'LICENSE-resume.torrent':
                 assert 'libtorrent_resume' in original.content
                 assert 'libtorrent_resume' not in modified.content
 
@@ -270,8 +267,8 @@ class TestTorrentScrub:
         execute_task('test_off')
 
         for filename in self.test_files:
-            osize = os.path.getsize(filename)
-            msize = tmp_path.joinpath(filename).stat().st_size
+            osize = filename.stat().st_size
+            msize = (tmp_path / filename).stat().st_size
             assert osize == msize, (
                 f"Filesizes aren't supposed to differ ({filename!r} {osize}, {self.__tmp__ + filename!r} {msize})!"
             )
@@ -339,7 +336,7 @@ class TestRtorrentMagnet:
 
     def test_rtorrent_magnet(self, execute_task, tmp_path):
         execute_task('test')
-        fullpath = tmp_path.joinpath('meta-test.torrent')
+        fullpath = tmp_path / 'meta-test.torrent'
         assert fullpath.is_file()
         assert (
             fullpath.read_text()

@@ -175,7 +175,7 @@ class SftpClient:
         is_symlink: bool = self.is_link(source)
         if self.is_file(source):
             source_file: str = parsed_path.name
-            source_dir: str = parsed_path.parent.as_posix()
+            source_dir: str = str(parsed_path.parent)
             try:
                 self._sftp.cwd(source_dir)
                 self._download_file(to, delete_origin and not is_symlink, source_file)
@@ -186,7 +186,7 @@ class SftpClient:
                 self.remove_file(source)
 
         elif self.is_dir(source):
-            base_path: str = parsed_path.joinpath('..').as_posix()
+            base_path: str = str(parsed_path / '..')
             dir_name: str = parsed_path.name
             handle_file: NodeHandler = partial(
                 self._download_file, to, delete_origin and not is_symlink
@@ -370,7 +370,7 @@ class SftpClient:
 
     def _download_file(self, destination: str, delete_origin: bool, source: str) -> None:
         destination_path: str = self._get_download_path(source, destination)
-        destination_dir: str = Path(destination_path).parent.as_posix()
+        destination_dir: str = str(Path(destination_path).parent)
 
         if Path(destination_path).exists():
             logger.verbose(
@@ -420,12 +420,12 @@ class SftpClient:
 
     @staticmethod
     def _get_download_path(path: str, destination: str) -> str:
-        return PurePosixPath(destination).joinpath(Path(path)).as_posix()
+        return str(PurePosixPath(destination) / path)
 
     @staticmethod
     def _get_upload_path(source: str, to: str):
         basename: str = PurePath(source).name
-        return PurePosixPath(to, basename).as_posix()
+        return str(PurePosixPath(to, basename))
 
 
 class SftpError(Exception):

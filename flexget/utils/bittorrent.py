@@ -11,6 +11,7 @@ from loguru import logger
 
 if TYPE_CHECKING:
     from collections.abc import Generator, Iterator
+    from pathlib import Path
 
 logger = logger.bind(name='torrent')
 
@@ -81,7 +82,7 @@ def clean_meta(
     return modified
 
 
-def is_torrent_file(metafilepath: str) -> bool:
+def is_torrent_file(metafilepath: 'Path') -> bool:
     """Check whether a file looks like a metafile by peeking into its content.
 
     Note that this doesn't ensure that the file is a complete and valid torrent,
@@ -90,7 +91,7 @@ def is_torrent_file(metafilepath: str) -> bool:
     @param metafilepath: Path to the file to check, must have read permissions for it.
     @return: True if there is a high probability this is a metafile.
     """
-    with open(metafilepath, 'rb') as f:
+    with metafilepath.open('rb') as f:
         data = f.read(200)
 
     magic_marker = bool(TORRENT_RE.match(data))
@@ -213,9 +214,9 @@ class Torrent:
     KEY_TYPE = str
 
     @classmethod
-    def from_file(cls, filename: str) -> 'Torrent':
+    def from_file(cls, file: 'Path') -> 'Torrent':
         """Create torrent from file on disk."""
-        with open(filename, 'rb') as handle:
+        with file.open('rb') as handle:
             return cls(handle.read())
 
     def __init__(self, content: bytes) -> None:

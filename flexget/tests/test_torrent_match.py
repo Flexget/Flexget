@@ -1,4 +1,5 @@
 import platform
+from pathlib import Path
 
 import pytest
 
@@ -97,7 +98,7 @@ class TestTorrentMatch:
         task = execute_task('test_single_torrent')
 
         assert len(task.accepted) == 1, 'Should have accepted torrent1.mkv'
-        assert task.accepted[0]['path'] == 'torrent_match_test_dir'
+        assert task.accepted[0]['path'] == Path('torrent_match_test_dir')
 
     @pytest.mark.skipif(
         platform.system() == 'Windows',
@@ -109,7 +110,7 @@ class TestTorrentMatch:
         task = execute_task('test_single_torrent_in_other_dir')
 
         assert len(task.accepted) == 1, 'Should have accepted torrent1.mkv'
-        assert task.accepted[0]['path'] == 'torrent_match_test_dir/torrent1'
+        assert task.accepted[0]['path'] == Path('torrent_match_test_dir/torrent1')
 
     def test_single_torrent_wrong_size(self, execute_task):
         task = execute_task('test_single_torrent_wrong_size')

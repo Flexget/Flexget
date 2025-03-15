@@ -1,15 +1,16 @@
 import os
 from http import client
+from pathlib import Path
 
 import pytest
 from vcr import VCR
 from vcr.stubs import VCRHTTPConnection, VCRHTTPSConnection
 
-VCR_CASSETTE_DIR = os.path.join(os.path.dirname(__file__), 'cassettes')
+VCR_CASSETTE_DIR = Path(__file__).parent / 'cassettes'
 VCR_RECORD_MODE = os.environ.get('VCR_RECORD_MODE', 'once')
 
 vcr = VCR(
-    cassette_library_dir=VCR_CASSETTE_DIR,
+    cassette_library_dir=str(VCR_CASSETTE_DIR),
     record_mode=VCR_RECORD_MODE,
     custom_patches=(
         (client, 'HTTPSConnection', VCRHTTPSConnection),
@@ -32,6 +33,6 @@ def online(request, monkeypatch):
         module = request.module.__name__.split('tests.')[-1]
         class_name = request.cls.__name__
         cassette_name = f'{module}.{class_name}.{request.function.__name__}'
-        cassette_path = os.path.join(VCR_CASSETTE_DIR, cassette_name)
-        with vcr.use_cassette(path=cassette_path) as cassette:
+        cassette_path = VCR_CASSETTE_DIR / cassette_name
+        with vcr.use_cassette(path=str(cassette_path)) as cassette:
             yield cassette

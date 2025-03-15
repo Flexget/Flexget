@@ -1,5 +1,3 @@
-import os
-
 import pytest
 
 
@@ -103,10 +101,8 @@ class TestExistsSeries:
     def config(self, request, tmp_path):
         """Override and parametrize default config fixture for all series tests."""
         for test_dir in self.test_dirs:
-            os.makedirs(tmp_path.joinpath(test_dir).as_posix())
-        return self._config.replace('__parser__', request.param).replace(
-            '__tmp__', tmp_path.as_posix()
-        )
+            (tmp_path / test_dir).mkdir(parents=True)
+        return self._config.replace('__parser__', request.param).replace('__tmp__', str(tmp_path))
 
     def test_existing(self, execute_task):
         """Exists_series plugin: existing."""
