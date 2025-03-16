@@ -71,7 +71,7 @@ class MQTTNotifier:
                 'additionalProperties': False,
             },
             'qos': {'type': 'integer', 'minimum': 0, 'maximum': 2, 'default': 0},
-            "retain": {"type": "boolean", 'default': False},
+            'retain': {'type': 'boolean', 'default': False},
         },
         'additionalProperties': False,
         'required': ['broker_address', 'topic'],
@@ -112,7 +112,7 @@ class MQTTNotifier:
 
         config['title'] = title
         config['message'] = message
-        config['payload'] = f"{config['title']} - {config['message']}"
+        config['payload'] = f'{config["title"]} - {config["message"]}'
 
         conn_rc_description_map = {
             0: 'Connection Accepted',
@@ -210,14 +210,14 @@ class MQTTNotifier:
 
         try:
             logger.verbose(
-                "Connecting to {}:{}", config.get('broker_address'), config.get('broker_port')
+                'Connecting to {}:{}', config.get('broker_address'), config.get('broker_port')
             )
             client.connect(
                 config.get('broker_address'),
                 config.get('broker_port'),
                 config.get('broker_timeout'),
             )
-            logger.verbose("Connected to MQTT broker")
+            logger.verbose('Connected to MQTT broker')
         except Exception as e:
             raise PluginWarning(f'Error connecting to MQTT broker: {e}')
 
@@ -234,7 +234,7 @@ class MQTTNotifier:
                 retain=config.get('retain'),
             )
             logger.verbose(
-                "Notification sent to broker, waiting for callback response to confirm publishing success - rc={}",
+                'Notification sent to broker, waiting for callback response to confirm publishing success - rc={}',
                 publish_info,
             )
         except Exception as e:

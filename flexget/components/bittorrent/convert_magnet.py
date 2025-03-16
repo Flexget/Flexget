@@ -18,16 +18,16 @@ class ConvertMagnet:
     """Convert magnet only entries to a torrent file."""
 
     schema = {
-        "oneOf": [
+        'oneOf': [
             # Allow convert_magnet: no form to turn off plugin altogether
-            {"type": "boolean"},
+            {'type': 'boolean'},
             {
-                "type": "object",
-                "properties": {
-                    "timeout": {"type": "string", "format": "interval"},
-                    "force": {"type": "boolean"},
+                'type': 'object',
+                'properties': {
+                    'timeout': {'type': 'string', 'format': 'interval'},
+                    'force': {'type': 'boolean'},
                 },
-                "additionalProperties": False,
+                'additionalProperties': False,
             },
         ]
     }
@@ -58,8 +58,8 @@ class ConvertMagnet:
         logger.debug('Metadata acquired')
         torrent_info = handle.get_torrent_info()
         torrent_file = libtorrent.create_torrent(torrent_info)
-        torrent_path = destination_folder / (torrent_info.name() + ".torrent")
-        with torrent_path.open("wb") as f:
+        torrent_path = destination_folder / (torrent_info.name() + '.torrent')
+        with torrent_path.open('wb') as f:
             f.write(libtorrent.bencode(torrent_file.generate()))
         logger.debug('Torrent file wrote to {}', torrent_path)
         return str(torrent_path)

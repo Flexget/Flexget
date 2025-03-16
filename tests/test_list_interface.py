@@ -283,7 +283,7 @@ class TestListInterface:
         task = execute_task('test_list_queue')
         assert len(task.accepted) == 1
 
-        assert task.find_entry(title="Drumline 2002 1080p BluRay DTS-HD MA 5 1 x264-FuzerHD")
+        assert task.find_entry(title='Drumline 2002 1080p BluRay DTS-HD MA 5 1 x264-FuzerHD')
 
         task = execute_task('get_for_list_queue')
         assert len(task.entries) == 1
@@ -320,6 +320,6 @@ class TestListInterface:
         assert len(task.all_entries) == 1
         assert len(task.accepted) == 1
 
-        entry = task.find_entry(title="title 1")
+        entry = task.find_entry(title='title 1')
         assert entry
         assert entry['attribute_name'] == 'some data'

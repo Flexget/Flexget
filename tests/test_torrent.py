@@ -216,7 +216,7 @@ class TestTorrentScrub:
             title = file.stem
 
             modified = task.find_entry(title=title)
-            assert modified, f"{title} cannot be found in {task}"
+            assert modified, f'{title} cannot be found in {task}'
             modified = modified.get('torrent')
             assert modified, f"No 'torrent' key in {title}"
 
@@ -237,7 +237,7 @@ class TestTorrentScrub:
                     file
                 )
             else:
-                assert osize > msize, "Filesizes must be different!"
+                assert osize > msize, 'Filesizes must be different!'
                 assert original.info_hash != modified.info_hash, str(file) + " wasn't scrubbed!"
 
             # Check essential keys were scrubbed
@@ -254,7 +254,7 @@ class TestTorrentScrub:
         task = execute_task('test_fields')
         title = 'fields.LICENSE'
         torrent = task.find_entry(title=title)
-        assert torrent, f"{title!r} cannot be found in {task!r}"
+        assert torrent, f'{title!r} cannot be found in {task!r}'
         torrent = torrent.get('torrent')
         assert torrent, f"No 'torrent' key in {title!r}"
 

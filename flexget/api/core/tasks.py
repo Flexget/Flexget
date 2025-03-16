@@ -346,12 +346,12 @@ status_parser.add_argument(
     'start_date',
     type=inputs.datetime_from_iso8601,
     default=default_start_date,
-    help='Filter by minimal start date. Example: \'2012-01-01\'',
+    help="Filter by minimal start date. Example: '2012-01-01'",
 )
 status_parser.add_argument(
     'end_date',
     type=inputs.datetime_from_iso8601,
-    help='Filter by maximal end date. Example: \'2012-01-01\'',
+    help="Filter by maximal end date. Example: '2012-01-01'",
 )
 status_parser.add_argument(
     'limit',
@@ -467,7 +467,7 @@ class TaskExecutionAPI(APIResource):
                         entry['title'] = params['filename']
                     except KeyError:
                         raise BadRequest(
-                            'No title given, and couldn\'t get one from the URL\'s HTTP response'
+                            "No title given, and couldn't get one from the URL's HTTP response"
                         )
 
                 else:

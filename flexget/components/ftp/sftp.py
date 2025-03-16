@@ -124,7 +124,7 @@ class SftpList:
 
         if files_only and dirs_only:
             logger.warning(
-                "Both files_only and dirs_only are set.  This will result in no entries being discovered."
+                'Both files_only and dirs_only are set.  This will result in no entries being discovered.'
             )
 
         if isinstance(config['dirs'], list):

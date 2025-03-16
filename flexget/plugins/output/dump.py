@@ -66,7 +66,7 @@ def dump(entries, debug=False, eval_lazy=False, trace=False, title_only=False):
                         # Make sure we don't try to do anything fancy if the value is None
                         renderable = highlighter(str(value))
                     elif field.rsplit('_', maxsplit=1)[-1] == 'url':
-                        url = quote(value, safe=":/")
+                        url = quote(value, safe=':/')
                         renderable = f'[link={url}][repr.url]{escape(value)}[/repr.url][/link]'
                     elif field == 'content_size':
                         renderable = highlighter(str(value)) + f' ({format_filesize(value)})'

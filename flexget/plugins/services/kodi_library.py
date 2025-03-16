@@ -37,8 +37,8 @@ class KodiLibrary:
             url = base_url + JSON_URI
             # create the params
             params = {
-                "id": 1,
-                "jsonrpc": "2.0",
+                'id': 1,
+                'jsonrpc': '2.0',
                 'method': '{category}Library.{action}'.format(
                     category=config['category'].title(), action=config['action'].title()
                 ),

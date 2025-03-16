@@ -64,7 +64,7 @@ class Newznab:
         params['extended'] = 1
         params['apikey'] = config.get('apikey')
 
-        url = f"{config['website']}/api"
+        url = f'{config["website"]}/api'
 
         return url, params
 
@@ -106,7 +106,7 @@ class Newznab:
             return self.do_search_all(entry, task, url, params)
         entries = []
         logger.warning(
-            "Work in progress. Searching for the specified category is not supported yet..."
+            'Work in progress. Searching for the specified category is not supported yet...'
         )
         return entries
 

@@ -44,7 +44,7 @@ class TorrentFilename:
 
                 if 'content-length' in entry and len(data) != entry['content-length']:
                     entry.fail(
-                        'Torrent file length doesn\'t match to the one reported by the server'
+                        "Torrent file length doesn't match to the one reported by the server"
                     )
                     self.purge(entry)
                     continue

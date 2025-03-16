@@ -95,7 +95,7 @@ def action_stop(options, irc_manager):
 def register_parser_arguments():
     # Common option to be used in multiple subparsers
     irc_parser = ArgumentParser(add_help=False)
-    irc_parser.add_argument('irc_connection', nargs='?', help="Title of the irc connection")
+    irc_parser.add_argument('irc_connection', nargs='?', help='Title of the irc connection')
 
     # Register subcommand
     parser = options.register_command('irc', do_cli, help='View and manage irc connections')

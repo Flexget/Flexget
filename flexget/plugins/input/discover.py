@@ -197,7 +197,7 @@ class Discover:
                     entry.complete()
                 elif estimation_mode['mode'] == 'smart' and not data_exists:
                     logger.debug(
-                        'Discovering because mode is \'{}\' and no data is found for entry',
+                        "Discovering because mode is '{}' and no data is found for entry",
                         estimation_mode['mode'],
                     )
                     result.append(entry)

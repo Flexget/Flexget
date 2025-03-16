@@ -208,13 +208,13 @@ class TestTaskQueue:
 
     def test_task_queue(self, api_client, schema_match, manager):
         entry = {
-            'title': "injected",
+            'title': 'injected',
             'url': 'http://test.com',
             'accept': True,
             'tasks': ['test_task'],
         }
 
-        payload = {"inject": [entry], 'tasks': ['test_task']}
+        payload = {'inject': [entry], 'tasks': ['test_task']}
 
         rsp = api_client.json_post('/tasks/execute/', data=json.dumps(payload))
         assert rsp.status_code == 200

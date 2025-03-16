@@ -165,7 +165,7 @@ class TestContentFilter:
     def test_reject2(self, execute_task):
         task = execute_task('test_reject2')
         assert task.find_entry('accepted', title='test'), (
-            'should have accepted, doesn\'t contain *.avi'
+            "should have accepted, doesn't contain *.avi"
         )
 
     def test_require1(self, execute_task):
@@ -175,7 +175,7 @@ class TestContentFilter:
     def test_require2(self, execute_task):
         task = execute_task('test_require2')
         assert task.find_entry('rejected', title='test'), (
-            'should have rejected, doesn\'t contain *.avi'
+            "should have rejected, doesn't contain *.avi"
         )
 
     def test_require_all1(self, execute_task):
@@ -187,7 +187,7 @@ class TestContentFilter:
     def test_require_all2(self, execute_task):
         task = execute_task('test_require_all2')
         assert task.find_entry('rejected', title='test'), (
-            'should have rejected, one mask isn\'t satisfied'
+            "should have rejected, one mask isn't satisfied"
         )
 
     def test_strict(self, execute_task):
@@ -228,7 +228,7 @@ class TestContentFilter:
         execute_task('test_list_populate_r')
         task = execute_task('test_list_require')
         assert task.find_entry('rejected', title='test'), (
-            'should have rejected, mask isn\'t satisfied'
+            "should have rejected, mask isn't satisfied"
         )
 
     def test_input_require_a(self, execute_task):
@@ -238,13 +238,13 @@ class TestContentFilter:
     def test_input_require_r(self, execute_task):
         task = execute_task('test_input_require_r')
         assert task.find_entry('rejected', title='test'), (
-            'should have rejected, mask isn\'t satisfied'
+            "should have rejected, mask isn't satisfied"
         )
 
     def test_input_require_all(self, execute_task):
         task = execute_task('test_input_require_all')
         assert task.find_entry('rejected', title='test'), (
-            'should have rejected, one mask isn\'t satisfied'
+            "should have rejected, one mask isn't satisfied"
         )
 
     def test_regexp_require_a(self, execute_task):
@@ -254,5 +254,5 @@ class TestContentFilter:
     def test_regexp_require_r(self, execute_task):
         task = execute_task('test_regexp_require_r')
         assert task.find_entry('rejected', title='test'), (
-            'should have rejected, mask isn\'t satisfied'
+            "should have rejected, mask isn't satisfied"
         )

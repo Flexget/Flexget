@@ -161,7 +161,7 @@ class ImdbWatchlist:
         title_type = item['titleType']['id']
 
         entry['title'] = title
-        entry['url'] = entry['imdb_url'] = f"https://www.imdb.com/title/{item['id']}/"
+        entry['url'] = entry['imdb_url'] = f'https://www.imdb.com/title/{item["id"]}/'
         entry['imdb_id'] = item['id']
 
         entry['imdb_name'] = title

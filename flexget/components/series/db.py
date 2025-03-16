@@ -77,7 +77,7 @@ class Series(Base):
     begin = relationship(
         'Episode',
         uselist=False,
-        primaryjoin="Series.begin_episode_id == Episode.id",
+        primaryjoin='Series.begin_episode_id == Episode.id',
         foreign_keys=[begin_episode_id],
         post_update=True,
         backref='begins_series',
@@ -222,7 +222,7 @@ class Season(Base):
             logger.error('Cannot compare Season to {}', other)
             return NotImplemented
         if self.identified_by != 'ep':
-            logger.error('Can only compare with an \'ep\' style identifier')
+            logger.error("Can only compare with an 'ep' style identifier")
             return NotImplemented
         logger.trace('checking if {} is smaller than {}', self.season, other.season)
         return self.season < other.season
@@ -385,7 +385,7 @@ class Episode(Base):
             return NotImplemented
         if isinstance(other, Season):
             if self.identified_by != 'ep':
-                logger.error('cannot compare season when identifier is not \'ep\'')
+                logger.error("cannot compare season when identifier is not 'ep'")
                 return NotImplemented
             logger.trace('comparing {} with {}', self.season, other.season)
             return self.season < other.season
@@ -431,7 +431,7 @@ class EpisodeRelease(Base):
         import warnings
 
         warnings.warn(
-            "accessing deprecated release.proper, use release.proper_count instead", stacklevel=2
+            'accessing deprecated release.proper, use release.proper_count instead', stacklevel=2
         )
         return self.proper_count > 0
 
@@ -475,7 +475,7 @@ class SeasonRelease(Base):
         import warnings
 
         warnings.warn(
-            "accessing deprecated release.proper, use release.proper_count instead", stacklevel=2
+            'accessing deprecated release.proper, use release.proper_count instead', stacklevel=2
         )
         return self.proper_count > 0
 
@@ -604,7 +604,7 @@ def upgrade(ver: Optional[int], session: Session) -> int:
     if ver == 3:
         # Remove index on Series.name
         try:
-            session.execute(text("DROP INDEX ix_series_name"))
+            session.execute(text('DROP INDEX ix_series_name'))
             # This way doesn't work on sqlalchemy 1.4 for some reason
             # Index('ix_series_name').drop(bind=session.bind)
         except OperationalError:

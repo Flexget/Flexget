@@ -38,7 +38,7 @@ class NewTorrents:
         ):
             results = self.entries_from_search(entry['title'], url=url)
             if not results:
-                raise UrlRewritingError("No matches for {}".format(entry['title']))
+                raise UrlRewritingError('No matches for {}'.format(entry['title']))
             url = results[0]['url']
         else:
             url = self.url_from_page(url)
@@ -64,7 +64,7 @@ class NewTorrents:
             data = page.text
         except requests.RequestException:
             raise UrlRewritingError('URLerror when retrieving page')
-        p = re.compile(r"copy\(\'(.*)\'\)", re.IGNORECASE)
+        p = re.compile(r'copy\(\'(.*)\'\)', re.IGNORECASE)
         f = p.search(data)
         if not f:
             # the link in which plugin relies is missing!

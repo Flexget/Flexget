@@ -27,7 +27,7 @@ try:
     import paramiko
     import pysftp
 
-    logging.getLogger("paramiko").setLevel(logging.ERROR)
+    logging.getLogger('paramiko').setLevel(logging.ERROR)
 except ImportError:
     pysftp = None
 
@@ -47,7 +47,7 @@ def _set_authentication_patch(self, password, private_key, private_key_pass):
             elif Path('~/.ssh/id_dsa').expanduser().exists():
                 private_key = '~/.ssh/id_dsa'
             else:
-                raise pysftp.exceptions.CredentialException("No password or key specified.")
+                raise pysftp.exceptions.CredentialException('No password or key specified.')
 
         if isinstance(private_key, (paramiko.AgentKey, paramiko.RSAKey)):
             # use the paramiko agent or rsa key
@@ -335,7 +335,7 @@ class SftpClient:
         if not self.host_key:
             return None
         KeyClass = getattr(  # noqa: N806 It's a class
-            importlib.import_module("paramiko"), HOST_KEY_TYPES[self.host_key.key_type]
+            importlib.import_module('paramiko'), HOST_KEY_TYPES[self.host_key.key_type]
         )
         key = KeyClass(data=b64decode(self.host_key.public_key))
         cnopts = pysftp.CnOpts()

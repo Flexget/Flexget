@@ -69,7 +69,7 @@ class OutputFtp:
 
     def check_connection(self, ftp, config, ftp_url, current_path: Path):
         try:
-            ftp.voidcmd("NOOP")
+            ftp.voidcmd('NOOP')
         except (OSError, ftplib.Error):
             ftp = self.ftp_connect(config, ftp_url, current_path)
         return ftp
@@ -83,7 +83,7 @@ class OutputFtp:
             try:
                 ftp = self.ftp_connect(config, ftp_url, current_path)
             except ftplib.all_errors as e:
-                entry.fail(f"Unable to connect to server : {e}")
+                entry.fail(f'Unable to connect to server : {e}')
                 break
 
             to_path = Path(config['ftp_tmp_path'])
@@ -92,14 +92,14 @@ class OutputFtp:
                 to_path = entry.render(str(to_path))
             except RenderError as err:
                 raise plugin.PluginError(
-                    f"Path value replacement `{to_path}` failed: {err.args[0]}"
+                    f'Path value replacement `{to_path}` failed: {err.args[0]}'
                 )
 
             if not to_path.exists():
                 logger.debug('Creating base path: {}', to_path)
                 to_path.mkdir(parents=True)
             if not to_path.is_dir():
-                raise plugin.PluginWarning(f"Destination `{to_path}` is not a directory.")
+                raise plugin.PluginWarning(f'Destination `{to_path}` is not a directory.')
 
             file_name = Path(ftp_url.path).name
 
@@ -135,7 +135,7 @@ class OutputFtp:
             if config['download_empty_dirs']:
                 tmp_path.mkdir()
             else:
-                logger.debug("Empty directory, skipping.")
+                logger.debug('Empty directory, skipping.')
             return ftp
 
         for file_name in (path for path in dirs if path not in ('.', '..')):
@@ -172,7 +172,7 @@ class OutputFtp:
         local_file = (tmp_path / file_name).open('a+b')
         ftp = self.check_connection(ftp, config, ftp_url, current_path)
         try:
-            ftp.sendcmd("TYPE I")
+            ftp.sendcmd('TYPE I')
             file_size = ftp.size(file_name)
         except Exception:
             file_size = 1

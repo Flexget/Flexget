@@ -23,21 +23,21 @@ TORRENT_RE = re.compile(rb'^d\d{1,3}:')
 METAFILE_STD_KEYS = [
     i.split('.')
     for i in (
-        "announce",
-        "announce-list",  # BEP-0012
-        "comment",
-        "created by",
-        "creation date",
-        "encoding",
-        "info",
-        "info.length",
-        "info.name",
-        "info.piece length",
-        "info.pieces",
-        "info.private",
-        "info.files",
-        "info.files.length",
-        "info.files.path",
+        'announce',
+        'announce-list',  # BEP-0012
+        'comment',
+        'created by',
+        'creation date',
+        'encoding',
+        'info',
+        'info.length',
+        'info.name',
+        'info.piece length',
+        'info.pieces',
+        'info.private',
+        'info.files',
+        'info.files.length',
+        'info.files.path',
     )
 ]
 
@@ -59,25 +59,25 @@ def clean_meta(
     for key in list(meta.keys()):
         if [key] not in METAFILE_STD_KEYS:
             if log_func:
-                log_func(f"Removing key {key!r}...")
+                log_func(f'Removing key {key!r}...')
             del meta[key]
             modified.add(key)
 
     if including_info:
-        for key in list(meta["info"].keys()):
-            if ["info", key] not in METAFILE_STD_KEYS:
+        for key in list(meta['info'].keys()):
+            if ['info', key] not in METAFILE_STD_KEYS:
                 if log_func:
-                    log_func("Removing key {!r}...".format("info." + key))
-                del meta["info"][key]
-                modified.add("info." + key)
+                    log_func('Removing key {!r}...'.format('info.' + key))
+                del meta['info'][key]
+                modified.add('info.' + key)
 
-        for idx, entry in enumerate(meta["info"].get("files", [])):
+        for idx, entry in enumerate(meta['info'].get('files', [])):
             for key in list(entry.keys()):
-                if ["info", "files", key] not in METAFILE_STD_KEYS:
+                if ['info', 'files', key] not in METAFILE_STD_KEYS:
                     if log_func:
-                        log_func(f"Removing key {key!r} from file #{idx + 1}...")
+                        log_func(f'Removing key {key!r} from file #{idx + 1}...')
                     del entry[key]
-                    modified.add("info.files." + key)
+                    modified.add('info.files.' + key)
 
     return modified
 
@@ -153,9 +153,9 @@ def bdecode(text: bytes) -> dict[str, Any]:
         src_iter = tokenize(text)
         data = decode_item(src_iter, next(src_iter))
         for _ in src_iter:  # look for more tokens
-            raise SyntaxError("trailing junk")
+            raise SyntaxError('trailing junk')
     except (AttributeError, ValueError, StopIteration, TypeError) as e:
-        raise SyntaxError(f"syntax error: {e}") from e
+        raise SyntaxError(f'syntax error: {e}') from e
     return data
 
 
@@ -228,13 +228,13 @@ class Torrent:
         self.modified = False
 
     def __repr__(self) -> str:
-        return "{}({}, {})".format(
+        return '{}({}, {})'.format(
             self.__class__.__name__,
-            ", ".join(
-                "{}={!r}".format(key, self.content["info"].get(key))
-                for key in ("name", "length", "private")
+            ', '.join(
+                '{}={!r}'.format(key, self.content['info'].get(key))
+                for key in ('name', 'length', 'private')
             ),
-            ", ".join(f"{key}={self.content.get(key)!r}" for key in ("announce", "comment")),
+            ', '.join(f'{key}={self.content.get(key)!r}' for key in ('announce', 'comment')),
         )
 
     def get_filelist(self) -> list[dict[str, Union[str, int]]]:

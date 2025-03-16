@@ -35,7 +35,7 @@ OTHER_TYPES = ['videogame']
 
 
 class IMDBListUser(Base):
-    __tablename__ = "imdb_list_user"
+    __tablename__ = 'imdb_list_user'
 
     user_id = Column(String, primary_key=True)
     user_name = Column(Unicode)
@@ -51,7 +51,7 @@ class IMDBListUser(Base):
 
 
 class IMDBListList(Base):
-    __tablename__ = "imdb_list_lists"
+    __tablename__ = 'imdb_list_lists'
 
     list_id = Column(Unicode, primary_key=True)
     list_name = Column(Unicode)
@@ -123,7 +123,7 @@ class ImdbEntrySet(MutableSet):
 
         for field in required_fields:
             if field not in new_cookie:
-                raise PluginError(f'Invalid cookies format, missing \'{field}\'')
+                raise PluginError(f"Invalid cookies format, missing '{field}'")
 
         return new_cookie
 

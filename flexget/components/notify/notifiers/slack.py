@@ -97,7 +97,7 @@ class SlackNotifier:
             },
         },
         'not': {'required': ['icon_emoji', 'icon_url']},
-        'error_not': 'Can only use one of \'icon_emoji\' or \'icon_url\'',
+        'error_not': "Can only use one of 'icon_emoji' or 'icon_url'",
         'required': ['web_hook_url'],
         'additionalProperties': False,
     }

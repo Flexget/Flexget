@@ -21,7 +21,7 @@ if TYPE_CHECKING:
     from collections.abc import AsyncGenerator
 
 try:
-    if Version(version("python-telegram-bot")) < Version('21.9'):
+    if Version(version('python-telegram-bot')) < Version('21.9'):
         raise plugin.PluginWarning('obsolete python-telegram-bot pkg')
 except PackageNotFoundError:
     pass
@@ -286,7 +286,7 @@ class TelegramNotifier:
                     logger.debug('sending paragraph to telegram servers: {}', paragraph)
                     await self._bot.send_message(chat_id=chat_id, text=paragraph, **kwargs)
                 except ChatMigrated as e:
-                    logger.debug("Chat migrated to id {}", e.new_chat_id)
+                    logger.debug('Chat migrated to id {}', e.new_chat_id)
                     await self._bot.send_message(chat_id=e.new_chat_id, text=paragraph, **kwargs)
                     await self._replace_chat_id(chat_id, e.new_chat_id, session)
                 except TelegramError as e:

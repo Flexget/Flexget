@@ -332,7 +332,7 @@ class FromIMDB:
                 if entry not in entries:
                     entries.append(entry)
                     if entry and task.options.test:
-                        logger.info("Test mode. Entry includes:")
+                        logger.info('Test mode. Entry includes:')
                         for key, value in list(entry.items()):
                             logger.info('     {}: {}', key.capitalize(), value)
             else:

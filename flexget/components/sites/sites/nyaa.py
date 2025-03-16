@@ -112,7 +112,7 @@ class UrlRewriteNyaa:
         return entry['url'].startswith('https://www.nyaa.si/view/')
 
     def url_rewrite(self, task, entry):
-        entry['url'] = entry['url'].replace('view', 'download') + ".torrent"
+        entry['url'] = entry['url'].replace('view', 'download') + '.torrent'
 
 
 @event('plugin.register')

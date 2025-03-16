@@ -15,7 +15,7 @@ def do_cli(manager, options):
         cat_list.sort(reverse=True)
     header = list(components_by_cat.keys())
     table = TerminalTable(*header, table_type='github')
-    for row in zip_longest(*components_by_cat.values(), fillvalue=""):
+    for row in zip_longest(*components_by_cat.values(), fillvalue=''):
         table.add_row(*[str(i) for i in row])
     console(table)
 

@@ -355,7 +355,7 @@ class Manager:
             except ValueError as e:
                 logger.error(e)
             except ConnectionRefusedError:
-                logger.warning("Remove lock file because connect refused")
+                logger.warning('Remove lock file because connect refused')
                 self.release_lock()
                 return self.start()
             else:
@@ -648,7 +648,7 @@ class Manager:
                 print(' o Non ASCII characters (use UTF8)')
                 print(
                     ' o If text contains any of :[]{}% characters it must be single-quoted '
-                    '(eg. value{1} should be \'value{1}\')\n'
+                    "(eg. value{1} should be 'value{1}')\n"
                 )
 
                 # Not very good practice but we get several kind of exceptions here, I'm not even sure all of them
@@ -794,7 +794,7 @@ class Manager:
             print(
                 'FATAL: Unable to use SQLite. Are you running Python 2.7, 3.3 or newer ?\n'
                 'Python should normally have SQLite support built in.\n'
-                'If you\'re running correct version of Python then it is not equipped with SQLite.\n'
+                "If you're running correct version of Python then it is not equipped with SQLite.\n"
                 'You can try installing `pysqlite`. If you have compiled python yourself, '
                 'recompile it with SQLite support.\n'
                 f'Error: {e}',

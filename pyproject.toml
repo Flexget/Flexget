@@ -210,4 +210,4 @@ quote-annotations = true
 known-first-party = ['flexget']
 
 [tool.ruff.format]
-quote-style = "preserve"
+quote-style = "single"

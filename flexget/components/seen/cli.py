@@ -50,8 +50,8 @@ def seen_forget(manager: 'Manager', options):
 
     # If tasks are specified it should use pattern matching as search
     if tasks:
-        forget_name = forget_name.replace("%", "\\%").replace("_", "\\_")
-        forget_name = forget_name.replace("*", "%").replace("?", "_")
+        forget_name = forget_name.replace('%', '\\%').replace('_', '\\_')
+        forget_name = forget_name.replace('*', '%').replace('?', '_')
 
     count, fcount = db.forget(forget_name, tasks=tasks, test=options.test)
     console(f'Removed {count} titles ({fcount} fields)')
@@ -68,14 +68,14 @@ def seen_add(manager: 'Manager', options):
         if imdb_id:
             seen_name = imdb_id
         else:
-            console("Could not parse IMDB ID")
+            console('Could not parse IMDB ID')
 
     if options.task:
         tasks = []
         local = True
         for task in options.task:
             if task not in manager.tasks:
-                console(f"Task `{task}` not in config")
+                console(f'Task `{task}` not in config')
                 continue
             tasks.append(task)
         if not tasks:
@@ -105,10 +105,10 @@ def seen_search(manager: 'Manager', options, session=None):
         if imdb_id:
             search_term = imdb_id
         else:
-            console("Could not parse IMDB ID")
+            console('Could not parse IMDB ID')
     else:
-        search_term = search_term.replace("%", "\\%").replace("_", "\\_")
-        search_term = search_term.replace("*", "%").replace("?", "_")
+        search_term = search_term.replace('%', '\\%').replace('_', '\\_')
+        search_term = search_term.replace('*', '%').replace('?', '_')
 
     tasks = None
     if options.task:

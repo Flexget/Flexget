@@ -135,12 +135,12 @@ class PluginSubliminal:
 
         # Let subliminal be more verbose if our logger is set to DEBUG
         if logger.level(task.manager.options.loglevel).no <= logger.level('DEBUG').no:
-            logging.getLogger("subliminal").setLevel(logging.INFO)
+            logging.getLogger('subliminal').setLevel(logging.INFO)
         else:
-            logging.getLogger("subliminal").setLevel(logging.CRITICAL)
+            logging.getLogger('subliminal').setLevel(logging.CRITICAL)
 
-        logging.getLogger("dogpile").setLevel(logging.CRITICAL)
-        logging.getLogger("enzyme").setLevel(logging.WARNING)
+        logging.getLogger('dogpile').setLevel(logging.CRITICAL)
+        logging.getLogger('enzyme').setLevel(logging.WARNING)
         try:
             languages = {Language.fromietf(s) for s in config.get('languages', [])}
             alternative_languages = {Language.fromietf(s) for s in config.get('alternatives', [])}

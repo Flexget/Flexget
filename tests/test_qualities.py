@@ -29,7 +29,7 @@ class TestQualityParser:
         return None
 
     @pytest.mark.parametrize(
-        "test_quality",
+        'test_quality',
         [
             ('Test.File.dvdscr', 'dvdscr'),
             ('Test.File 1080p.web.vp9', '1080p webdl vp9'),
@@ -117,7 +117,7 @@ class TestQualityParser:
 
 class TestQualityInternalParser:
     @pytest.mark.parametrize(
-        "test_quality",
+        'test_quality',
         [
             ('Test.File.DD+5.1', 'dd+5.1'),
             ('Test.File.DDP5.1', 'dd+5.1'),

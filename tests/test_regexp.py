@@ -155,43 +155,31 @@ class TestRegexp:
 
     def test_multiple_excluding(self, execute_task):
         task = execute_task('test_multiple_excluding')
-        assert task.find_entry('rejected', title='regexp2'), (
-            '\'regexp2\' should have been rejected'
-        )
-        assert task.find_entry('rejected', title='regexp7'), (
-            '\'regexp7\' should have been rejected'
-        )
-        assert task.find_entry('accepted', title='regexp5'), (
-            '\'regexp5\' should have been accepted'
-        )
+        assert task.find_entry('rejected', title='regexp2'), "'regexp2' should have been rejected"
+        assert task.find_entry('rejected', title='regexp7'), "'regexp7' should have been rejected"
+        assert task.find_entry('accepted', title='regexp5'), "'regexp5' should have been accepted"
 
     def test_complicated(self, execute_task):
         task = execute_task('test_complicated')
-        assert task.find_entry('accepted', title='regular'), (
-            '\'regular\' should have been accepted'
-        )
+        assert task.find_entry('accepted', title='regular'), "'regular' should have been accepted"
         assert task.find_entry('accepted', title='expression'), (
-            '\'expression\' should have been accepted'
+            "'expression' should have been accepted"
         )
-        assert task.find_entry('accepted', title='regexp9'), (
-            '\'regexp9\' should have been accepted'
-        )
-        assert task.find_entry('rejected', title='regexp5'), (
-            '\'regexp5\' should have been rejected'
-        )
+        assert task.find_entry('accepted', title='regexp9'), "'regexp9' should have been accepted"
+        assert task.find_entry('rejected', title='regexp5'), "'regexp5' should have been rejected"
 
     def test_numeric(self, execute_task):
         task = execute_task('test_numeric')
-        msg = '\'regexp9\' should have been accepted because of score regexp'
+        msg = "'regexp9' should have been accepted because of score regexp"
         assert task.find_entry('accepted', title='regexp9'), msg
-        msg = '\'regexp8\' should NOT have been accepted because of score regexp'
+        msg = "'regexp8' should NOT have been accepted because of score regexp"
         assert not task.find_entry('accepted', title='regexp8'), msg
 
     def test_match_in_list(self, execute_task):
         task = execute_task('test_match_in_list')
         assert task.find_entry('accepted', title='expression'), (
-            '\'expression\' should have been accepted'
+            "'expression' should have been accepted"
         )
         assert task.find_entry('entries', title='regular') not in task.accepted, (
-            '\'regular\' should not have been accepted'
+            "'regular' should not have been accepted"
         )

@@ -14,7 +14,7 @@ from flexget.utils.database import json_synonym
 from flexget.utils.requests import TokenBucketLimiter
 from flexget.utils.tools import parse_filesize
 
-DETECT_2FA = "Authenticator Code", "TOTP code"
+DETECT_2FA = 'Authenticator Code', 'TOTP code'
 logger = logger.bind(name='gazelle')
 Base = db_schema.versioned_base('gazelle_session', 0)
 
@@ -44,14 +44,14 @@ class InputGazelle:
 
         # Aliases for config -> api params
         # Extended in subclasses
-        self.aliases = {"search": "searchstr"}
+        self.aliases = {'search': 'searchstr'}
 
         # API parameters
         # None means a raw value entry (no validation other than schema)
         # A dict means an enum with a config -> api mapping
         # A list is an enum with no mapping
         # Extended in subclasses
-        self.params = {"searchstr": None}
+        self.params = {'searchstr': None}
 
     @property
     def schema(self):
@@ -96,7 +96,7 @@ class InputGazelle:
             return opts[str(val)]
         if isinstance(val, list):
             # Fix yaml parser making a list out of a string
-            return ",".join(val)
+            return ','.join(val)
         return val
 
     def params_from_config(self, config):
@@ -111,7 +111,7 @@ class InputGazelle:
     def setup(self, task, config):
         """Set up a session and log in."""
         self._session = task.requests
-        base_url = config.get('base_url', "").rstrip("/")
+        base_url = config.get('base_url', '').rstrip('/')
         if base_url:
             if self.base_url and self.base_url != base_url:
                 logger.warning(
@@ -145,7 +145,7 @@ class InputGazelle:
 
         Return True on successful recovery, False otherwise
         """
-        logger.debug("Attempting to find an existing session in the DB")
+        logger.debug('Attempting to find an existing session in the DB')
         with Session() as session:
             db_session = (
                 session.query(GazelleSession)
@@ -165,11 +165,11 @@ class InputGazelle:
 
     def save_current_session(self):
         """Store the current session in the database so it can be resumed later."""
-        logger.debug("Storing session info in the DB")
+        logger.debug('Storing session info in the DB')
         with Session() as session:
             expires = None
             for c in self._session.cookies:
-                if c.name == "session":
+                if c.name == 'session':
                     expires = datetime.utcfromtimestamp(c.expires)
             db_session = GazelleSession(
                 username=self.username,
@@ -194,15 +194,15 @@ class InputGazelle:
             return
 
         # Forcing a re-login or no session in DB - log in using provided creds
-        url = f"{self.base_url}/login.php"
+        url = f'{self.base_url}/login.php'
         data = {'username': self.username, 'password': self.password, 'keeplogged': 1}
         r = self._session.post(url, data=data, allow_redirects=False, raise_status=True)
-        if not r.is_redirect or r.next.url != f"{self.base_url}/index.php":
-            msg = f"Failed to log into {self.base_url}"
+        if not r.is_redirect or r.next.url != f'{self.base_url}/index.php':
+            msg = f'Failed to log into {self.base_url}'
             for otp_text in DETECT_2FA:
                 # TODO: Find a better signal that 2FA is enabled
                 if otp_text in r.text:
-                    msg += " - Accounts using 2FA are currently not supported"
+                    msg += ' - Accounts using 2FA are currently not supported'
                     break
             raise PluginError(msg)
 
@@ -225,28 +225,28 @@ class InputGazelle:
         if 'action' not in params:
             raise ValueError("An 'action' is required when making a request")
 
-        ajaxpage = f"{self.base_url}/ajax.php"
+        ajaxpage = f'{self.base_url}/ajax.php'
         r = self._session.get(ajaxpage, params=params, allow_redirects=False, raise_status=True)
-        if not no_login and r.is_redirect and r.next.url == f"{self.base_url}/login.php":
-            logger.warning("Redirected to login page, reauthenticating and trying again")
+        if not no_login and r.is_redirect and r.next.url == f'{self.base_url}/login.php':
+            logger.warning('Redirected to login page, reauthenticating and trying again')
             self.authenticate(force=True)
             return self.request(no_login=True, **params)
 
         if r.status_code != 200:
-            raise PluginError(f"{self.base_url} returned a non-200 status code")
+            raise PluginError(f'{self.base_url} returned a non-200 status code')
 
         try:
             json_response = r.json()
-            if json_response['status'] != "success":
+            if json_response['status'] != 'success':
                 # Try to deal with errors returned by the API
                 error = json_response.get('error', json_response.get('status'))
-                if not error or error == "failure":
+                if not error or error == 'failure':
                     error = json_response.get('response', str(json_response))
 
                 raise PluginError(f"{self.base_url} gave a failure response of '{error}'")
             return json_response['response']
         except (ValueError, TypeError, KeyError):
-            raise PluginError(f"{self.base_url} returned an invalid response")
+            raise PluginError(f'{self.base_url} returned an invalid response')
 
     def search_results(self, params):
         """Yield search results."""
@@ -280,14 +280,14 @@ class InputGazelle:
                 temp['torrentId'] = tor['torrentId']
 
                 yield Entry(
-                    title="{groupName} ({groupId} - {torrentId}).torrent".format(**temp),
-                    url="{}/torrents.php?action=download&id={}&authkey={}&torrent_pass={}".format(
+                    title='{groupName} ({groupId} - {torrentId}).torrent'.format(**temp),
+                    url='{}/torrents.php?action=download&id={}&authkey={}&torrent_pass={}'.format(
                         self.base_url, temp['torrentId'], self.authkey, self.passkey
                     ),
                     torrent_seeds=tor['seeders'],
                     torrent_leeches=tor['leechers'],
                     # Size is returned in bytes
-                    content_size=parse_filesize(str(tor['size']) + "b"),
+                    content_size=parse_filesize(str(tor['size']) + 'b'),
                 )
 
     @plugin.internet(logger)
@@ -325,58 +325,58 @@ class InputGazelleMusic(InputGazelle):
 
         self.aliases.update(
             {
-                "artist": "artistname",
-                "album": "groupname",
-                "leech_type": "freetorrent",
-                "release_type": "releasetype",
-                "tags": "taglist",
-                "tag_type": "tags_type",
-                "log": "haslog",
+                'artist': 'artistname',
+                'album': 'groupname',
+                'leech_type': 'freetorrent',
+                'release_type': 'releasetype',
+                'tags': 'taglist',
+                'tag_type': 'tags_type',
+                'log': 'haslog',
             }
         )
 
         self.params.update(
             {
-                "taglist": None,
-                "artistname": None,
-                "groupname": None,
-                "year": None,
-                "tags_type": {"any": 0, "all": 1},
-                "encoding": [
-                    "192",
-                    "APS (VBR)",
-                    "V2 (VBR)",
-                    "V1 (VBR)",
-                    "256",
-                    "APX (VBR)",
-                    "V0 (VBR)",
-                    "q8.x (VBR)",
-                    "320",
-                    "Lossless",
-                    "24bit Lossless",
-                    "Other",
+                'taglist': None,
+                'artistname': None,
+                'groupname': None,
+                'year': None,
+                'tags_type': {'any': 0, 'all': 1},
+                'encoding': [
+                    '192',
+                    'APS (VBR)',
+                    'V2 (VBR)',
+                    'V1 (VBR)',
+                    '256',
+                    'APX (VBR)',
+                    'V0 (VBR)',
+                    'q8.x (VBR)',
+                    '320',
+                    'Lossless',
+                    '24bit Lossless',
+                    'Other',
                 ],
-                "format": ["MP3", "FLAC", "Ogg Vorbis", "AAC", "AC3", "DTS"],
-                "media": ["CD", "DVD", "Vinyl", "Soundboard", "SACD", "DAT", "Cassette", "WEB"],
-                "releasetype": {
-                    "album": 1,
-                    "soundtrack": 3,
-                    "EP": 5,
-                    "anthology": 6,
-                    "compilation": 7,
-                    "single": 9,
-                    "live album": 11,
-                    "remix": 13,
-                    "bootleg": 14,
-                    "interview": 15,
-                    "mixtape": 16,
-                    "unknown": 21,
+                'format': ['MP3', 'FLAC', 'Ogg Vorbis', 'AAC', 'AC3', 'DTS'],
+                'media': ['CD', 'DVD', 'Vinyl', 'Soundboard', 'SACD', 'DAT', 'Cassette', 'WEB'],
+                'releasetype': {
+                    'album': 1,
+                    'soundtrack': 3,
+                    'EP': 5,
+                    'anthology': 6,
+                    'compilation': 7,
+                    'single': 9,
+                    'live album': 11,
+                    'remix': 13,
+                    'bootleg': 14,
+                    'interview': 15,
+                    'mixtape': 16,
+                    'unknown': 21,
                 },
-                "haslog": {"False": 0, "True": 1, "100%": 100, "<100%": -1},
-                "freetorrent": {"freeleech": 1, "neutral": 2, "either": 3, "normal": 0},
-                "hascue": {"False": 0, "True": 1},
-                "scene": {"False": 0, "True": 1},
-                "vanityhouse": {"False": 0, "True": 1},
+                'haslog': {'False': 0, 'True': 1, '100%': 100, '<100%': -1},
+                'freetorrent': {'freeleech': 1, 'neutral': 2, 'either': 3, 'normal': 0},
+                'hascue': {'False': 0, 'True': 1},
+                'scene': {'False': 0, 'True': 1},
+                'vanityhouse': {'False': 0, 'True': 1},
             }
         )
 
@@ -427,15 +427,15 @@ class InputGazelleMusic(InputGazelle):
                 temp.update({k: tor[k] for k in ('media', 'encoding', 'format', 'torrentId')})
 
                 yield Entry(
-                    title="{artist} - {groupName} - {groupYear} "
-                    "({media} - {format} - {encoding})-{torrentId}.torrent".format(**temp),
-                    url="{}/torrents.php?action=download&id={}&authkey={}&torrent_pass={}".format(
+                    title='{artist} - {groupName} - {groupYear} '
+                    '({media} - {format} - {encoding})-{torrentId}.torrent'.format(**temp),
+                    url='{}/torrents.php?action=download&id={}&authkey={}&torrent_pass={}'.format(
                         self.base_url, temp['torrentId'], self.authkey, self.passkey
                     ),
                     torrent_seeds=tor['seeders'],
                     torrent_leeches=tor['leechers'],
                     # Size is returned in bytes
-                    content_size=parse_filesize(str(tor['size']) + "b"),
+                    content_size=parse_filesize(str(tor['size']) + 'b'),
                 )
 
 
@@ -445,12 +445,12 @@ class InputRedacted(InputGazelleMusic):
     def __init__(self):
         """Set up custom base_url and parameters."""
         super().__init__()
-        self.base_url = "https://redacted.ch"
+        self.base_url = 'https://redacted.ch'
 
-        self.params['encoding'].remove("q8.x (VBR)")
-        self.params['format'].remove("Ogg Vorbis")
-        self.params['media'].append("Blu-ray")
-        self.params['releasetype'].update({"demo": 17, "concert recording": 18, "dj mix": 19})
+        self.params['encoding'].remove('q8.x (VBR)')
+        self.params['format'].remove('Ogg Vorbis')
+        self.params['media'].append('Blu-ray')
+        self.params['releasetype'].update({'demo': 17, 'concert recording': 18, 'dj mix': 19})
 
 
 class InputNotWhat(InputGazelleMusic):
@@ -459,21 +459,21 @@ class InputNotWhat(InputGazelleMusic):
     def __init__(self):
         """Set up custom base_url and parameters."""
         super().__init__()
-        self.base_url = "https://notwhat.cd"
+        self.base_url = 'https://notwhat.cd'
 
         self.params['media'].extend(['Blu-ray', 'Unknown'])
         self.params['releasetype'].update({'demo': 22, 'dj mix': 23, 'concert recording': 24})
         self.params['haslog'].update(
             {
-                "gold": 102,
-                "silver": 101,
-                "gold/silver": 100,
-                "lineage": -5,
-                "unscored": -1,
-                "missing lineage": -6,
-                "missing dr score": -7,
-                "missing sample rate": -8,
-                "missing description": -9,
+                'gold': 102,
+                'silver': 101,
+                'gold/silver': 100,
+                'lineage': -5,
+                'unscored': -1,
+                'missing lineage': -6,
+                'missing dr score': -7,
+                'missing sample rate': -8,
+                'missing description': -9,
             }
         )
 

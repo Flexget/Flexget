@@ -31,10 +31,10 @@ def get_free_space(config, task):
                 timeout=5000,
             )
         except Exception as e:
-            logger.error("Issue connecting to remote host. {}", e)
+            logger.error('Issue connecting to remote host. {}', e)
             task.abort('Error with remote host.')
         if config['allotment'] != -1:
-            stdin, stdout, stderr = ssh.exec_command(f"du -s {config['path']} | cut -f 1")
+            stdin, stdout, stderr = ssh.exec_command(f'du -s {config["path"]} | cut -f 1')
         else:
             stdin, stdout, stderr = ssh.exec_command(
                 f"df -k {config['path']} | tail -1 | tr -s ' ' | cut -d' ' -f4"
@@ -109,11 +109,11 @@ class PluginFreeSpace:
         if free_space < space and abort_if == ABORT_BELOW:
             logger.error('Less than {} MB of free space in {} aborting task.', space, path)
             # backlog plugin will save and restore the task content, if available
-            task.abort(f"Less than {space} MB of free space in {path}")
+            task.abort(f'Less than {space} MB of free space in {path}')
         elif free_space > space and abort_if == ABORT_ABOVE:
             logger.error('Over than {} MB of free space in {} aborting task.', space, path)
             # backlog plugin will save and restore the task content, if available
-            task.abort(f"Over than {space} MB of free space in {path}")
+            task.abort(f'Over than {space} MB of free space in {path}')
 
 
 @event('plugin.register')

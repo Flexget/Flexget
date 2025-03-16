@@ -18,7 +18,7 @@ if typing.TYPE_CHECKING:
     from plexapi.video import Movie, Show
 
 
-def import_plexaccount() -> "type[MyPlexAccount]":
+def import_plexaccount() -> 'type[MyPlexAccount]':
     try:
         from plexapi.myplex import MyPlexAccount
     except ImportError:
@@ -26,9 +26,9 @@ def import_plexaccount() -> "type[MyPlexAccount]":
     return MyPlexAccount
 
 
-def to_entry(plex_item: "Union[Movie, Show]") -> Entry:
+def to_entry(plex_item: 'Union[Movie, Show]') -> Entry:
     entry = Entry(
-        title=f"{plex_item.title} ({plex_item.year})" if plex_item.year else plex_item.title,
+        title=f'{plex_item.title} ({plex_item.year})' if plex_item.year else plex_item.title,
         url=plex_item.guid,
     )
 
@@ -47,7 +47,7 @@ def to_entry(plex_item: "Union[Movie, Show]") -> Entry:
 def get_supported_ids_from_plex_object(plex_item):
     ids = {'plex_guid': plex_item.guid}
     for guid in plex_item.guids:
-        x = guid.id.split("://")
+        x = guid.id.split('://')
         try:
             value = int(x[1])
         except ValueError:
@@ -90,7 +90,7 @@ class PlexManagedWatchlist(MutableSet):
         self._account: Optional[MyPlexAccount] = None
 
     @property
-    def account(self) -> "MyPlexAccount":
+    def account(self) -> 'MyPlexAccount':
         MyPlexAccount = import_plexaccount()  # noqa: N806 It's a class
         if self._account is None:
             self._account = MyPlexAccount(self.username, self.password, self.token)

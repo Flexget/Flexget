@@ -37,7 +37,7 @@ class UrlRewriteETTV:
             raise UrlRewritingError(e)
         tag_a = soup.select_one('a[href^="magnet:"]')
         if not tag_a:
-            raise UrlRewritingError(f"Unable to locate download link from url {url}")
+            raise UrlRewritingError(f'Unable to locate download link from url {url}')
         return tag_a.get('href')
 
 

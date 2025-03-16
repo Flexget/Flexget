@@ -57,13 +57,13 @@ def action_add(options):
 
         regexp = db.get_regexp(list_id=regexp_list.id, regexp=options.regexp, session=session)
         if not regexp:
-            console(f"Adding regexp {options.regexp} to list {regexp_list.name}")
+            console(f'Adding regexp {options.regexp} to list {regexp_list.name}')
             db.add_to_list_by_name(regexp_list.name, options.regexp, session=session)
             console(
                 f'Successfully added regexp {options.regexp} to regexp list {regexp_list.name} '
             )
         else:
-            console(f"Regexp {options.regexp} already exists in list {regexp_list.name}")
+            console(f'Regexp {options.regexp} already exists in list {regexp_list.name}')
 
 
 def action_del(options):
@@ -103,7 +103,7 @@ def regexp_type(regexp):
 def register_parser_arguments():
     # Common option to be used in multiple subparsers
     regexp_parser = ArgumentParser(add_help=False)
-    regexp_parser.add_argument('regexp', type=regexp_type, help="The regexp")
+    regexp_parser.add_argument('regexp', type=regexp_type, help='The regexp')
 
     list_name_parser = ArgumentParser(add_help=False)
     list_name_parser.add_argument(

@@ -56,7 +56,7 @@ def reset_plugin(options):
 def register_parser_arguments():
     plugins_parser = ArgumentParser(add_help=False)
     plugins_parser.add_argument(
-        'plugin_name', help="Name of plugin to reset", nargs=1, choices=list(plugin_schemas)
+        'plugin_name', help='Name of plugin to reset', nargs=1, choices=list(plugin_schemas)
     )
 
     parser = options.register_command(

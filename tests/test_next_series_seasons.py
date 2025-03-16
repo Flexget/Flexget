@@ -414,7 +414,7 @@ class TestNextSeriesSeasonSeasonsPack:
     # Tests which require multiple tasks to be executed in order
     # Each run_parameter is a tuple of lists: [task name, list of series ID(s) to inject, list of result(s) to find]
     @pytest.mark.parametrize(
-        "run_parameters",
+        'run_parameters',
         [
             (
                 [

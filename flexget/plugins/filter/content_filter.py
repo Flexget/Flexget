@@ -127,18 +127,18 @@ class FilterContentFilter:
             if config.get('min_files') and len(files) < config['min_files']:
                 logger.info(
                     'Entry {} has {} files. Minimum is {}. Rejecting.',
-                    entry["title"],
+                    entry['title'],
                     len(files),
-                    config["min_files"],
+                    config['min_files'],
                 )
                 entry.reject(f'Has less than {config["min_files"]} files', remember=True)
                 return True
             if config.get('max_files') and len(files) > config['max_files']:
                 logger.info(
                     'Entry {} has {} files. Maximum is {}. Rejecting.',
-                    entry["title"],
+                    entry['title'],
                     len(files),
-                    config["max_files"],
+                    config['max_files'],
                 )
                 entry.reject(f'Has more than {config["max_files"]} files', remember=True)
                 return True

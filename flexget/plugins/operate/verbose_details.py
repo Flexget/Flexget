@@ -15,11 +15,11 @@ class PluginDetails:
     def on_task_input(self, task, config):
         if not task.entries:
             if task.no_entries_ok:
-                logger.verbose('Task didn\'t produce any entries.')
+                logger.verbose("Task didn't produce any entries.")
             else:
                 logger.warning(
                     "Task didn't produce any entries. "
-                    "This is likely due to a mis-configured or non-functional input."
+                    'This is likely due to a mis-configured or non-functional input.'
                 )
         else:
             logger.verbose('Produced {} entries.', len(task.entries))

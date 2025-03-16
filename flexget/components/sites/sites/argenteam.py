@@ -26,7 +26,7 @@ class SearchArgenteam:
     schema = {
         'type': 'object',
         'properties': {'force_subtitles': {'type': 'boolean', 'default': True}},
-        "additionalProperties": False,
+        'additionalProperties': False,
     }
 
     base_url = 'http://www.argenteam.net/api/v1/'

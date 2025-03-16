@@ -25,9 +25,7 @@ def do_cli(manager, options):
             value, params = parse_header(requests.head(options.url).headers['Content-Disposition'])
             options.title = params['filename']
         except KeyError:
-            console(
-                'No title given, and couldn\'t get one from the URL\'s HTTP response. Aborting.'
-            )
+            console("No title given, and couldn't get one from the URL's HTTP response. Aborting.")
             return
 
     entry = Entry(title=options.title)
@@ -69,7 +67,7 @@ def register_parser_arguments():
         '[--fields NAME=VALUE [NAME=VALUE...]] [<execute arguments>]',
         epilog=(
             'If only a URL and no title is given, Flexget will attempt to '
-            'find a title in the URL\'s response headers.'
+            "find a title in the URL's response headers."
         ),
     )
     inject_group = inject_parser.add_argument_group('inject arguments')

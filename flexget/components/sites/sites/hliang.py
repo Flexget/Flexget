@@ -37,7 +37,7 @@ class UrlRewriteHliang:
         except Exception as e:
             raise UrlRewritingError(str(e))
 
-        down_link = soup.find('a', attrs={'href': re.compile(r"down\.php\?.*")})
+        down_link = soup.find('a', attrs={'href': re.compile(r'down\.php\?.*')})
         if not down_link:
             raise UrlRewritingError(f'Unable to locate download link from url "{url}"')
         return 'http://bt.hliang.com/' + down_link.get('href')

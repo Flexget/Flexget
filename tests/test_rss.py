@@ -180,8 +180,8 @@ class TestInputRSS:
         ), 'RSS entry missing: multiple content tags'
 
     def test_pubdate(self, execute_task):
-        task = execute_task("test_pubdate")
-        assert task.entries[0]["rss_pubdate"] == pendulum.datetime(2008, 12, 28, 16, 0, 0)
+        task = execute_task('test_pubdate')
+        assert task.entries[0]['rss_pubdate'] == pendulum.datetime(2008, 12, 28, 16, 0, 0)
 
 
 class TestEscapeInputRSS:

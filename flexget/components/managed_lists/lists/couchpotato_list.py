@@ -123,7 +123,7 @@ class CouchPotatoBase:
                         ):  # Matches movie profile with profile JSON
                             quality_req = CouchPotatoBase.quality_requirement_builder(profile)
                 entry = Entry(
-                    title=movie["title"],
+                    title=movie['title'],
                     url='',
                     imdb_id=movie['info'].get('imdb'),
                     tmdb_id=movie['info'].get('tmdb_id'),
@@ -138,7 +138,7 @@ class CouchPotatoBase:
                     continue
                 # Test mode logging
                 if entry and test_mode:
-                    logger.info("Test mode. Entry includes:")
+                    logger.info('Test mode. Entry includes:')
                     for key, value in entry.items():
                         logger.info('     {}: {}', key.capitalize(), value)
 

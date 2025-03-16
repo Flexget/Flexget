@@ -248,7 +248,7 @@ def versioned_base(plugin: str, version: int) -> VersionedBaseMeta:
     return VersionedBase
 
 
-@sqlalchemy.event.listens_for(Base.metadata, "after_create")
+@sqlalchemy.event.listens_for(Base.metadata, 'after_create')
 def after_table_create(target, connection, tables: Optional[list[Table]] = None, **kw) -> None:
     """Set the schema version to most recent for a plugin when it's tables are freshly created."""
     if tables:

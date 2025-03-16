@@ -428,7 +428,7 @@ class OutputDeluge(DelugePlugin):
                 else:
                     if not os.path.exists(entry['file']):
                         entry.fail(
-                            'Downloaded temp file \'{}\' doesn\'t exist!'.format(entry['file'])
+                            "Downloaded temp file '{}' doesn't exist!".format(entry['file'])
                         )
                         del entry['file']
                         return
@@ -591,7 +591,7 @@ class OutputDeluge(DelugePlugin):
                         name = ''.join(
                             [
                                 os.path.splitext(name)[0],
-                                " (",
+                                ' (',
                                 str(counter),
                                 ')',
                                 os.path.splitext(name)[1],
@@ -616,7 +616,7 @@ class OutputDeluge(DelugePlugin):
                 keep_subs = opts.get('keep_subs')
                 sub_file = None
                 if keep_subs:
-                    sub_exts = [".srt", ".sub"]
+                    sub_exts = ['.srt', '.sub']
                     for file in status['files']:
                         ext = os.path.splitext(file['path'])[1]
                         if ext in sub_exts:
@@ -624,16 +624,16 @@ class OutputDeluge(DelugePlugin):
                             break
 
                 # check for single file torrents so we dont add unnecessary folders
-                top_files_dir = "/"
-                if os.path.dirname(main_file['path']) not in ("", "/"):
+                top_files_dir = '/'
+                if os.path.dirname(main_file['path']) not in ('', '/'):
                     # check for top folder in user config
                     if (
                         opts.get('content_filename')
-                        and os.path.dirname(opts['content_filename']) != ""
+                        and os.path.dirname(opts['content_filename']) != ''
                     ):
-                        top_files_dir = os.path.dirname(opts['content_filename']) + "/"
+                        top_files_dir = os.path.dirname(opts['content_filename']) + '/'
                     else:
-                        top_files_dir = os.path.dirname(main_file['path']) + "/"
+                        top_files_dir = os.path.dirname(main_file['path']) + '/'
 
                 if opts.get('content_filename'):
                     # rename the main file
@@ -677,7 +677,7 @@ class OutputDeluge(DelugePlugin):
                         rename_pairs = [
                             (
                                 f['index'],
-                                top_files_dir + ".sparse_files/" + os.path.basename(f['path']),
+                                top_files_dir + '.sparse_files/' + os.path.basename(f['path']),
                             )
                             for f in sparse_files
                         ]

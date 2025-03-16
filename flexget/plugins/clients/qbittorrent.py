@@ -77,7 +77,7 @@ class OutputQBitTorrent:
     def _request(self, method, url, msg_on_fail=None, **kwargs):
         try:
             response = self.session.request(method, url, **kwargs)
-            if response.text == "Ok.":
+            if response.text == 'Ok.':
                 return True
             msg = msg_on_fail if msg_on_fail else f'Failure. URL: {url}, data: {kwargs}'
         except RequestException as e:
@@ -87,7 +87,7 @@ class OutputQBitTorrent:
 
     def check_api_version(self, msg_on_fail, verify=True):
         try:
-            url = self.url + "/api/v2/app/webapiVersion"
+            url = self.url + '/api/v2/app/webapiVersion'
             response = self.session.request('get', url, verify=verify)
             if response.status_code != 404:
                 self.api_url_login = '/api/v2/auth/login'
@@ -96,7 +96,7 @@ class OutputQBitTorrent:
                 self.api_url_info = '/api/v2/torrents/info'
                 return response
 
-            url = self.url + "/version/api"
+            url = self.url + '/version/api'
             response = self.session.request('get', url, verify=verify)
             if response.status_code != 404:
                 self.api_url_login = '/login'
@@ -245,10 +245,10 @@ class OutputQBitTorrent:
             tags = entry.get('tags', []) + config.get('tags', [])
             if tags:
                 try:
-                    form_data['tags'] = entry.render(",".join(tags))
+                    form_data['tags'] = entry.render(','.join(tags))
                 except RenderError as e:
                     logger.error('Error rendering tags for {}: {}', entry['title'], e)
-                    form_data['tags'] = ",".join(tags)
+                    form_data['tags'] = ','.join(tags)
 
             add_paused = entry.get('add_paused', config.get('add_paused'))
             if add_paused:
@@ -371,12 +371,12 @@ class FromQBitTorrent:
 
         for torrent in client.torrents_info():
             if 'category' in config:
-                logger.debug("filtered `{}` by wrong category", torrent['name'])
+                logger.debug('filtered `{}` by wrong category', torrent['name'])
                 if torrent['category'] != config['category']:
                     continue
 
             if 'completed' in config and not torrent.state_enum.is_complete:
-                logger.debug("filtered `{}` by not completed", torrent['name'])
+                logger.debug('filtered `{}` by not completed', torrent['name'])
                 continue
 
             yield Entry(

@@ -19,7 +19,7 @@ if TYPE_CHECKING:
     platform.system() == 'Windows' and sys.version_info[:2] == (3, 10),
     reason='This test fails intermittently on Windows, Python 3.10.',
 )
-@pytest.mark.xdist_group(name="sftp")
+@pytest.mark.xdist_group(name='sftp')
 class TestSftpDownload:
     _config = """
         templates:

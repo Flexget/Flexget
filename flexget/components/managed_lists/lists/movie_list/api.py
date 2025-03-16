@@ -148,7 +148,7 @@ class MovieListAPI(APIResource):
         except NoResultFound:
             movie_list = None
         if movie_list:
-            raise Conflict(f'list with name \'{name}\' already exists')
+            raise Conflict(f"list with name '{name}' already exists")
         movie_list = db.MovieListList(name=name)
         session.add(movie_list)
         session.commit()

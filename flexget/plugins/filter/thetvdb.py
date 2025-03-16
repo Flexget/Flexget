@@ -153,21 +153,21 @@ class FilterTvdb:
                 )
             if (
                 'min_episode_air_year' in config
-                and entry['tvdb_ep_air_date'].strftime("%Y") < config['min_episode_air_year']
+                and entry['tvdb_ep_air_date'].strftime('%Y') < config['min_episode_air_year']
             ):
                 reasons.append(
                     'tvdb_ep_air_date ({} < {})'.format(
-                        entry['tvdb_ep_air_date'].strftime("%Y"),
+                        entry['tvdb_ep_air_date'].strftime('%Y'),
                         config['min_episode_air_year'],
                     )
                 )
             if (
                 'max_episode_air_year' in config
-                and entry['tvdb_ep_air_date'].strftime("%Y") > config['max_episode_air_year']
+                and entry['tvdb_ep_air_date'].strftime('%Y') > config['max_episode_air_year']
             ):
                 reasons.append(
                     'tvdb_ep_air_date ({} < {})'.format(
-                        entry['tvdb_ep_air_date'].strftime("%Y"),
+                        entry['tvdb_ep_air_date'].strftime('%Y'),
                         config['max_episode_air_year'],
                     )
                 )

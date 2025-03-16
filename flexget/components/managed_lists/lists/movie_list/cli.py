@@ -144,10 +144,10 @@ def movie_list_add(options):
             list_id=movie_list.id, title=title, year=year, session=session
         )
         if not movie:
-            console(f"Adding movie with title {title} to list {movie_list.name}")
+            console(f'Adding movie with title {title} to list {movie_list.name}')
             movie = db.MovieListMovie(title=title, year=year, list_id=movie_list.id)
         else:
-            console(f"Movie with title {title} already exist in list {movie_list.name}")
+            console(f'Movie with title {title} already exist in list {movie_list.name}')
 
         id_list = []
         if options.identifiers:
@@ -210,11 +210,11 @@ def movie_list_purge(options):
 def register_parser_arguments():
     # Common option to be used in multiple subparsers
     movie_parser = ArgumentParser(add_help=False)
-    movie_parser.add_argument('movie_title', metavar='<MOVIE TITLE>', help="Title of the movie")
+    movie_parser.add_argument('movie_title', metavar='<MOVIE TITLE>', help='Title of the movie')
 
     name_or_id_parser = ArgumentParser(add_help=False)
     name_or_id_parser.add_argument(
-        'movie', metavar='<NAME or ID>', help="Title or ID of the movie"
+        'movie', metavar='<NAME or ID>', help='Title or ID of the movie'
     )
 
     identifiers_parser = ArgumentParser(add_help=False)
@@ -232,7 +232,7 @@ def register_parser_arguments():
         nargs='?',
         metavar='<LIST NAME>',
         default='movies',
-        help='Name of movie list to operate on (Default is \'movies\')',
+        help="Name of movie list to operate on (Default is 'movies')",
     )
     # Register subcommand
     parser = options.register_command('movie-list', do_cli, help='View and manage movie lists')

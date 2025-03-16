@@ -315,7 +315,7 @@ class SearchAlphaRatio:
                     try:
                         e[dest] = int(value)
                     except ValueError as e:
-                        logger.debug('Invalid \'{}\' with \'{}\'', dest, value)
+                        logger.debug("Invalid '{}' with '{}'", dest, value)
                         continue
 
                 entries.add(e)

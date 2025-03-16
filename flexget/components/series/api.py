@@ -90,15 +90,15 @@ class ObjectsContainer:
     episode_object = {
         'type': ['object', 'null'],
         'properties': {
-            "first_seen": {'type': ['string', 'null'], 'format': 'date-time'},
-            "id": {'type': 'integer'},
-            "identified_by": {'type': 'string'},
-            "identifier": {'type': 'string'},
-            "premiere": {'type': ['string', 'boolean']},
-            "number": {'type': 'integer'},
-            "season": {'type': 'integer'},
-            "series_id": {'type': 'integer'},
-            "number_of_releases": {'type': 'integer'},
+            'first_seen': {'type': ['string', 'null'], 'format': 'date-time'},
+            'id': {'type': 'integer'},
+            'identified_by': {'type': 'string'},
+            'identifier': {'type': 'string'},
+            'premiere': {'type': ['string', 'boolean']},
+            'number': {'type': 'integer'},
+            'season': {'type': 'integer'},
+            'series_id': {'type': 'integer'},
+            'number_of_releases': {'type': 'integer'},
             'latest_release': episode_release_object,
         },
         'required': [
@@ -201,18 +201,18 @@ series_list_parser.add_argument(
     'in_config',
     choices=('configured', 'unconfigured', 'all'),
     default='configured',
-    help="Filter list if shows are currently in configuration.",
+    help='Filter list if shows are currently in configuration.',
 )
 series_list_parser.add_argument(
-    'premieres', type=inputs.boolean, default=False, help="Filter by downloaded premieres only."
+    'premieres', type=inputs.boolean, default=False, help='Filter by downloaded premieres only.'
 )
 series_list_parser.add_argument(
     'lookup',
     choices=('tvdb', 'tvmaze'),
     action='append',
-    help="Get lookup result for every show by sending another request to lookup API",
+    help='Get lookup result for every show by sending another request to lookup API',
 )
-series_list_parser.add_argument('query', help="Search by name based on the query")
+series_list_parser.add_argument('query', help='Search by name based on the query')
 
 ep_identifier_doc = (
     "'episode_identifier' should be one of SxxExx, integer or date formatted such as 2012-12-12"
@@ -365,7 +365,7 @@ delete_parser.add_argument(
     type=inputs.boolean,
     default=False,
     help="Enabling this will fire a 'forget' event that will delete the downloaded releases "
-    "from the entire DB, enabling to re-download them",
+    'from the entire DB, enabling to re-download them',
 )
 
 
@@ -440,7 +440,7 @@ entity_parser = api.pagination_parser(add_sort=True)
 @series_api.route('/<int:show_id>/seasons/')
 @api.doc(
     params={'show_id': 'ID of the show'},
-    description='The \'Series-ID\' header will be appended to the result headers',
+    description="The 'Series-ID' header will be appended to the result headers",
 )
 class SeriesSeasonsAPI(APIResource):
     @etag
@@ -572,7 +572,7 @@ class SeriesSeasonAPI(APIResource):
 @series_api.route('/<int:show_id>/episodes/')
 @api.doc(
     params={'show_id': 'ID of the show'},
-    description='The \'Series-ID\' header will be appended to the result headers',
+    description="The 'Series-ID' header will be appended to the result headers",
 )
 class SeriesEpisodesAPI(APIResource):
     @etag
@@ -714,7 +714,7 @@ release_delete_parser.add_argument(
     type=inputs.boolean,
     default=False,
     help="Enabling this will for 'forget' event that will delete the downloaded"
-    " releases from the entire DB, enabling to re-download them",
+    ' releases from the entire DB, enabling to re-download them',
 )
 
 
@@ -724,8 +724,8 @@ release_delete_parser.add_argument(
 @api.doc(
     params={'show_id': 'ID of the show', 'season_id': 'Seasons ID'},
     description='Releases are any seen entries that match the seasons. \n'
-    'The \'Series-ID\' header will be appended to the result headers.\n'
-    'The \'Season-ID\' header will be appended to the result headers.',
+    "The 'Series-ID' header will be appended to the result headers.\n"
+    "The 'Season-ID' header will be appended to the result headers.",
 )
 class SeriesSeasonsReleasesAPI(APIResource):
     @etag
@@ -877,8 +877,8 @@ class SeriesSeasonsReleasesAPI(APIResource):
 @api.doc(
     params={'show_id': 'ID of the show', 'season_id': 'Season ID', 'rel_id': 'Release ID'},
     description='Releases are any seen entries that match the season. \n'
-    'The \'Series-ID\' header will be appended to the result headers.\n'
-    'The \'Season-ID\' header will be appended to the result headers.',
+    "The 'Series-ID' header will be appended to the result headers.\n"
+    "The 'Season-ID' header will be appended to the result headers.",
 )
 class SeriesSeasonReleaseAPI(APIResource):
     @etag
@@ -977,8 +977,8 @@ class SeriesSeasonReleaseAPI(APIResource):
 @api.doc(
     params={'show_id': 'ID of the show', 'ep_id': 'Episode ID'},
     description='Releases are any seen entries that match the episode. \n'
-    'The \'Series-ID\' header will be appended to the result headers.\n'
-    'The \'Episode-ID\' header will be appended to the result headers.',
+    "The 'Series-ID' header will be appended to the result headers.\n"
+    "The 'Episode-ID' header will be appended to the result headers.",
 )
 class SeriesEpisodeReleasesAPI(APIResource):
     @etag
@@ -1130,8 +1130,8 @@ class SeriesEpisodeReleasesAPI(APIResource):
 @api.doc(
     params={'show_id': 'ID of the show', 'ep_id': 'Episode ID', 'rel_id': 'Release ID'},
     description='Releases are any seen entries that match the episode. \n'
-    'The \'Series-ID\' header will be appended to the result headers.\n'
-    'The \'Episode-ID\' header will be appended to the result headers.',
+    "The 'Series-ID' header will be appended to the result headers.\n"
+    "The 'Episode-ID' header will be appended to the result headers.",
 )
 class SeriesEpisodeReleaseAPI(APIResource):
     @etag

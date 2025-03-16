@@ -72,15 +72,15 @@ class SearchHeBits:
     def _fetch_account_info(url, config) -> dict:
         logger.debug('Trying to fetch hebits passkey and authkey from user profile')
         authkey, passkey = None, None
-        cookies = {"userid": f"{config['userid']}", "session": f"{config['session']}"}
+        cookies = {'userid': f'{config["userid"]}', 'session': f'{config["session"]}'}
         response = requests.get(url, cookies=cookies, params={'id': config['userid']})
         user_profile_soup = get_soup(response.text)
-        for tag in user_profile_soup.find_all("meta"):
-            if tag.get("name", None) == "authkey":
+        for tag in user_profile_soup.find_all('meta'):
+            if tag.get('name', None) == 'authkey':
                 authkey = tag.get('content')
-        for tag in user_profile_soup.find_all("a"):
-            if tag.get("id", None) == "passkey":
-                passkey = tag.get('onclick').split('\'')[1]
+        for tag in user_profile_soup.find_all('a'):
+            if tag.get('id', None) == 'passkey':
+                passkey = tag.get('onclick').split("'")[1]
         if not authkey or not passkey:
             raise plugin.PluginError('Could not fetch authkey or passkey, layout change?')
         return {
@@ -96,7 +96,7 @@ class SearchHeBits:
             'action': 'browse',
             'group_results': 0,
         }
-        cookies = {"userid": f"{config['userid']}", "session": f"{config['session']}"}
+        cookies = {'userid': f'{config["userid"]}', 'session': f'{config["session"]}'}
 
         if 'category' in config:
             cat = HeBitsCategory[config['category']].value
@@ -139,7 +139,7 @@ class SearchHeBits:
                     torrent_freeleech=result['torrents'][0]['isFreeleech'],
                     torrent_triple_up=result['torrents'][0]['isUploadX3'],
                     torrent_double_up=result['torrents'][0]['isUploadX2'],
-                    url=f"{self.download_url}?action=download&id={torrent_id}&authkey={account_info['authkey']}&torrent_pass={account_info['passkey']}",
+                    url=f'{self.download_url}?action=download&id={torrent_id}&authkey={account_info["authkey"]}&torrent_pass={account_info["passkey"]}',
                 )
                 entries.add(entry)
 

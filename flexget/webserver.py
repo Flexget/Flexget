@@ -200,7 +200,7 @@ class WebServer(threading.Thread):
 
         try:
             host = (
-                self.bind if self.bind != "0.0.0.0" else socket.gethostbyname(socket.gethostname())
+                self.bind if self.bind != '0.0.0.0' else socket.gethostbyname(socket.gethostname())
             )
         except socket.gaierror:
             host = '127.0.0.1'
@@ -245,7 +245,7 @@ def change_password(username='flexget', password='', session=None):
     if check['score'] < 3:
         warning = check['feedback']['warning']
         suggestions = ' '.join(check['feedback']['suggestions'])
-        message = f'Password \'{password}\' is not strong enough. '
+        message = f"Password '{password}' is not strong enough. "
         if warning:
             message += warning + ' '
         if suggestions:

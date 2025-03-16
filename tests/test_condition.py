@@ -53,7 +53,7 @@ class TestCondition:
         assert count == 2
 
     def test_implicit_and(self, execute_task):
-        for i in "12":
+        for i in '12':
             task = execute_task('test_condition_and' + i)
             count = len(task.accepted)
             assert count == int(i)
@@ -98,7 +98,7 @@ class TestQualityCondition:
             task = execute_task(taskname)
             count = len(task.rejected)
             expected = int(taskname[-1])
-            assert count == expected, f"Expected {expected} rejects, got {count}"
+            assert count == expected, f'Expected {expected} rejects, got {count}'
 
 
 class TestDateCondition:
@@ -125,8 +125,8 @@ class TestDateCondition:
 
     def test_tz(self, execute_task):
         # This would end up being false if a naive comparison was done, but with timezones dt1 < dt2
-        dt1 = DateTime.create(2023, 1, 1, 2, tz="America/New_York")
-        dt2 = DateTime.create(2023, 1, 1, 1, tz="America/Los_Angeles")
+        dt1 = DateTime.create(2023, 1, 1, 2, tz='America/New_York')
+        dt2 = DateTime.create(2023, 1, 1, 1, tz='America/Los_Angeles')
         entry = Entry(title='entry', url='', dt_field1=dt1, dt_field2=dt2)
         task = execute_task('test_compare', options={'inject': [entry]})
         assert len(task.accepted) == 1

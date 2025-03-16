@@ -176,7 +176,7 @@ class TestFilterSeenMovies:
         assert not task.find_entry(title='Seen movie title 3'), 'seen movie 3 exists'
         assert not task.find_entry(title='Seen movie title 4'), 'seen movie 4 exists'
         assert not task.find_entry(title='Seen movie title 6'), 'seen movie 6 exists (tmdb_id)'
-        assert task.find_entry(title='Seen movie title 5'), 'unseen movie 5 doesn\'t exist'
+        assert task.find_entry(title='Seen movie title 5'), "unseen movie 5 doesn't exist"
 
     def test_seen_movies_strict(self, execute_task):
         task = execute_task('strict')

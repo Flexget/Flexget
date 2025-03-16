@@ -367,7 +367,7 @@ class TestFilterSeries:
         )
         assert not entry.get('series_guessed'), 'series plugin should override series_guessed'
         assert entry['series_name'] == entry['series_parser'].name == 'Test Series', (
-            'Series name should be \'Test Series\', was: entry: {}, parser: {}'.format(
+            "Series name should be 'Test Series', was: entry: {}, parser: {}".format(
                 entry['series_name'],
                 entry['series_parser'].name,
             )
@@ -878,10 +878,10 @@ class TestQualities:
         task = execute_task('test_1')
 
         assert task.find_entry('rejected', title='FooBar.S01E01.PDTV-FlexGet'), (
-            'Didn\'t reject FooBar.S01E01.PDTV-FlexGet'
+            "Didn't reject FooBar.S01E01.PDTV-FlexGet"
         )
         assert task.find_entry('rejected', title='FooBar.S01E01.1080p-FlexGet'), (
-            'Didn\'t reject FooBar.S01E01.1080p-FlexGet'
+            "Didn't reject FooBar.S01E01.1080p-FlexGet"
         )
 
         assert not task.find_entry('accepted', title='FooBar.S01E01.HR-FlexGet'), (
@@ -1209,7 +1209,7 @@ class TestTimeframe:
         # let another 3 hours pass, should expire now!
         age_series(hours=6)
         task = execute_task('test_expires')
-        assert task.accepted, 'timeframe didn\'t expire'
+        assert task.accepted, "timeframe didn't expire"
 
     def test_min_max_fail(self, execute_task):
         task = execute_task('test_min_max_fail')
@@ -1463,10 +1463,10 @@ class TestBegin:
     def test_season_id(self, execute_task):
         task = execute_task('season_id_test')
         assert task.find_entry('accepted', title='WTest.S02E03.HDTV.XViD-FlexGet'), (
-            'Entry should have been accepted, it\'s after the begin episode'
+            "Entry should have been accepted, it's after the begin episode"
         )
         assert task.find_entry('rejected', title='W2Test.S02E03.HDTV.XViD-FlexGet'), (
-            'Entry should have been rejected, it\'s before the begin episode'
+            "Entry should have been rejected, it's before the begin episode"
         )
 
     def test_before_ep(self, execute_task):
@@ -2311,8 +2311,8 @@ class TestSeriesSeasonPackAdvanced:
 
     def test_season_pack_with_timeframe_and_target(self, execute_task):
         task = execute_task('timeframe_and_target')
-        assert task.find_entry('accepted', title="foo S01 720p hdtv h264")
-        assert not task.find_entry('accepted', title="foo S01E01 720p hdtv h264")
+        assert task.find_entry('accepted', title='foo S01 720p hdtv h264')
+        assert not task.find_entry('accepted', title='foo S01E01 720p hdtv h264')
 
 
 class TestSeriesDDAudio:

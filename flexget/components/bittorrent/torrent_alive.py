@@ -95,19 +95,19 @@ def get_udp_seeds(url, info_hash):
         clisocket.connect((parsed_url.hostname, port))
 
         # build packet with connection_ID, using 0 value for action, giving our transaction ID for this packet
-        packet = struct.pack(b">QLL", connection_id, 0, transaction_id)
+        packet = struct.pack(b'>QLL', connection_id, 0, transaction_id)
         clisocket.send(packet)
 
         # set 16 bytes ["QLL" = 16 bytes] for the fmq for unpack
         res = clisocket.recv(16)
         # check recieved packet for response
-        action, transaction_id, connection_id = struct.unpack(b">LLQ", res)
+        action, transaction_id, connection_id = struct.unpack(b'>LLQ', res)
 
         # build packet hash out of decoded info_hash
         packet_hash = binascii.unhexlify(info_hash)
 
         # construct packet for scrape with decoded info_hash setting action byte to 2 for scape
-        packet = struct.pack(b">QLL", connection_id, 2, transaction_id) + packet_hash
+        packet = struct.pack(b'>QLL', connection_id, 2, transaction_id) + packet_hash
 
         clisocket.send(packet)
         # set recieve size of 8 + 12 bytes
@@ -117,13 +117,13 @@ def get_udp_seeds(url, info_hash):
         logger.warning('Socket Error: {}', e)
         return 0
     # Check for UDP error packet
-    (action,) = struct.unpack(b">L", res[:4])
+    (action,) = struct.unpack(b'>L', res[:4])
     if action == 3:
         logger.error('There was a UDP Packet Error 3')
         return 0
 
     # first 8 bytes are followed by seeders, completed and leechers for requested torrent
-    seeders, _, _ = struct.unpack(b">LLL", res[8:20])
+    seeders, _, _ = struct.unpack(b'>LLL', res[8:20])
     logger.debug('get_udp_seeds is returning: {}', seeders)
     clisocket.close()
     return seeders

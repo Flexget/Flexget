@@ -70,7 +70,7 @@ class IFTTTNotifier:
                 logger.error('Error sending notification to key {}: {}', key, e)
                 errors = True
         if errors:
-            raise PluginWarning("Failed to send notifications")
+            raise PluginWarning('Failed to send notifications')
 
     def prepare_config(self, config):
         if not isinstance(config['keys'], list):

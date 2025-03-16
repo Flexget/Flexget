@@ -200,7 +200,7 @@ class AniList:
                             ).json()
                             logger.debug('Additional IDs: {}', ids)
                         except RequestException as e:
-                            logger.verbose(f'Couldn\'t fetch additional IDs: {e}')
+                            logger.verbose(f"Couldn't fetch additional IDs: {e}")
                         if not isinstance(ids, dict):
                             ids = {}
 
@@ -256,7 +256,7 @@ class AniList:
                             and anime.get('trailer').get('site') in TRAILER_SOURCE
                             else None
                         )
-                        entry['al_season'] = f"{anime.get('seasonYear')} {anime.get('season')}"
+                        entry['al_season'] = f'{anime.get("seasonYear")} {anime.get("season")}'
                         entry['anilist'] = anime
                         entry['alternate_name'] = anime.get('synonyms', [])
                         eng_title = anime.get('title', {}).get('english')

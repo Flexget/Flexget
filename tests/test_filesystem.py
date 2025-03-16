@@ -2,7 +2,7 @@ from pathlib import Path
 
 
 class TestFilesystem:
-    base = "filesystem_test_dir/"
+    base = 'filesystem_test_dir/'
     test1 = base + '/Test1'
     test2 = base + '/Test2'
     test3 = base + '/Test3'

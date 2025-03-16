@@ -160,16 +160,16 @@ class FromPirateBay:
             if RANKS.index(result['status'].lower()) < rank:
                 # filter by rank/status, useful for recent torrents
                 logger.debug(
-                    "{} has been dropped due to low rank ({}).", result['name'], result['status']
+                    '{} has been dropped due to low rank ({}).', result['name'], result['status']
                 )
                 continue
             yield self.json_to_entry(result)
 
     @staticmethod
     def info_hash_to_magnet(info_hash: str, name: str) -> str:
-        magnet = {'xt': f"urn:btih:{info_hash}", 'dn': name, 'tr': TRACKERS}
+        magnet = {'xt': f'urn:btih:{info_hash}', 'dn': name, 'tr': TRACKERS}
         magnet_qs = urlencode(magnet, doseq=True, safe=':')
-        return f"magnet:?{magnet_qs}"
+        return f'magnet:?{magnet_qs}'
 
     def json_to_entry(self, json_result: dict) -> Entry:
         entry = Entry()

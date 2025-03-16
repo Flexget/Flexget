@@ -12,20 +12,20 @@ class ObjectsContainer:
     actor_object = {
         'type': 'object',
         'properties': {
-            "last_update": {'type': 'string', 'format': 'date-time'},
-            "medium_image": {'type': 'string'},
-            "name": {'type': 'string'},
-            "original_image": {'type': 'string'},
-            "tvmaze_id": {'type': 'integer'},
-            "url": {'type': 'string'},
+            'last_update': {'type': 'string', 'format': 'date-time'},
+            'medium_image': {'type': 'string'},
+            'name': {'type': 'string'},
+            'original_image': {'type': 'string'},
+            'tvmaze_id': {'type': 'integer'},
+            'url': {'type': 'string'},
         },
     }
 
     schedule_object = {
         'type': 'object',
         'properties': {
-            "days": {'type': 'array', 'items': {'type': 'string'}},
-            "time": {'type': 'string'},
+            'days': {'type': 'array', 'items': {'type': 'string'}},
+            'time': {'type': 'string'},
         },
     }
 

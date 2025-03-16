@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 
 @pytest.mark.require_optional_deps
-@pytest.mark.xdist_group(name="sftp")
+@pytest.mark.xdist_group(name='sftp')
 class TestSftpDownload:
     _config = """
         templates:

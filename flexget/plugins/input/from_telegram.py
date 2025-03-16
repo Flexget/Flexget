@@ -12,7 +12,7 @@ from flexget.event import event
 
 logger = logger.bind(name='from_telegram')
 
-_TELEGRAM_API_URL = "https://api.telegram.org/"
+_TELEGRAM_API_URL = 'https://api.telegram.org/'
 
 
 class TelegramInput:
@@ -99,7 +99,7 @@ class TelegramInput:
         types = config.get('types', ['private', 'group'])
 
         # Get Last Checked ID
-        persistence_name = f"{token}_update_id"
+        persistence_name = f'{token}_update_id'
         update_id = task.simple_persistence.get(persistence_name)
 
         # Get only new messages
@@ -109,18 +109,18 @@ class TelegramInput:
             params['offset'] = update_id
 
         # The Target URL
-        url = f"{_TELEGRAM_API_URL}bot{token}/getUpdates"
+        url = f'{_TELEGRAM_API_URL}bot{token}/getUpdates'
 
         # Get Telegram Updates
         try:
             response = task.requests.get(url, timeout=60, raise_status=True, params=params).json()
         except HTTPError as e:
-            raise plugin.PluginError(f"Error getting telegram update: {e}")
+            raise plugin.PluginError(f'Error getting telegram update: {e}')
 
         # We have a error
         if not response['ok']:
             raise plugin.PluginError(
-                f"Telegram updater returned error {response['error_code']}: {response['description']}"
+                f'Telegram updater returned error {response["error_code"]}: {response["description"]}'
             )
 
         # Get All New Messages
@@ -132,7 +132,7 @@ class TelegramInput:
             update_id = message['update_id']
 
             # Update the last ID for the Bot
-            logger.debug("Last Update set to {}", update_id)
+            logger.debug('Last Update set to {}', update_id)
             task.simple_persistence[persistence_name] = update_id
 
             # We Don't care if it's not a message or no text
@@ -142,14 +142,14 @@ class TelegramInput:
                 or 'chat' not in message['message']
                 or 'type' not in message['message']['chat']
             ):
-                logger.debug("Invalid message discarted: {}", message)
+                logger.debug('Invalid message discarted: {}', message)
                 continue
 
-            logger.debug("Income message: {}", message)
+            logger.debug('Income message: {}', message)
 
             # Check Types
             if types and message['message']['chat']['type'] not in types:
-                logger.debug("Ignoring message because of invalid type {}", message)
+                logger.debug('Ignoring message because of invalid type {}', message)
                 continue
 
             # Create Base Entry
@@ -158,7 +158,7 @@ class TelegramInput:
             entry['title'] = text
 
             # We need a url, so we add a dummy
-            entry['url'] = f"http://localhost?update_id={update_id!s}"
+            entry['url'] = f'http://localhost?update_id={update_id!s}'
 
             # Store the message if we need to use it in other plugins
             entry['telegram_message'] = message['message']
@@ -170,7 +170,7 @@ class TelegramInput:
             if whitelist:
                 for check in whitelist:
                     if 'username' in check and check['username'] == message_from['username']:
-                        logger.debug("WhiteListing: Username {}", message_from['username'])
+                        logger.debug('WhiteListing: Username {}', message_from['username'])
                         break
                     if (
                         'fullname' in check
@@ -178,7 +178,7 @@ class TelegramInput:
                         and check['fullname']['sur'] == message_from['last_name']
                     ):
                         logger.debug(
-                            "WhiteListing: Full Name {} {}",
+                            'WhiteListing: Full Name {} {}',
                             message_from['first_name'],
                             message_from['last_name'],
                         )
@@ -186,10 +186,10 @@ class TelegramInput:
                     if 'group' in check and (
                         message_chat['type'] == 'group' and message_chat['title'] == check['group']
                     ):
-                        logger.debug("WhiteListing: Group {}", message_chat['title'])
+                        logger.debug('WhiteListing: Group {}', message_chat['title'])
                         break
                 else:
-                    logger.debug("Ignoring message because of no whitelist match {}", message)
+                    logger.debug('Ignoring message because of no whitelist match {}', message)
                     continue
 
             # Process the entry config

@@ -27,7 +27,7 @@ class FilterQuality:
         reqs = [qualities.Requirements(req) for req in config]
         for entry in task.entries:
             if entry.get('quality') is None:
-                entry.reject('Entry doesn\'t have a quality')
+                entry.reject("Entry doesn't have a quality")
                 continue
             if not any(req.allows(entry['quality']) for req in reqs):
                 text_reqs = ', '.join(f'`{req}`' for req in reqs)

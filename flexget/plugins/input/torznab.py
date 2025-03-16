@@ -34,7 +34,7 @@ class Torznab:
                     'default': 'search',
                 },
                 'website': {'type': 'string', 'format': 'url'},
-                'timeout': {"type": "string", "format": "interval"},
+                'timeout': {'type': 'string', 'format': 'interval'},
             },
             'required': ['website', 'apikey'],
             'additionalProperties': False,

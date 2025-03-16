@@ -247,7 +247,7 @@ class FilterImdb:
                     reasons.append('accept_mpaa_ratings {}'.format(entry.get('imdb_mpaa_rating')))
 
             if reasons and not force_accept:
-                msg = 'Didn\'t accept `{}` because of rule(s) {}'.format(
+                msg = "Didn't accept `{}` because of rule(s) {}".format(
                     entry.get('imdb_name', None) or entry['title'],
                     ', '.join(reasons),
                 )

@@ -31,7 +31,7 @@ class PyloadApi:
 
     def get(self, method):
         try:
-            return self.requests.get(self.url.rstrip("/") + "/" + method.strip("/"))
+            return self.requests.get(self.url.rstrip('/') + '/' + method.strip('/'))
         except RequestException as e:
             if e.response and e.response.status_code == 500:
                 raise plugin.PluginError(f'Internal API Error: <{method}> <{self.url}>', logger)
@@ -39,7 +39,7 @@ class PyloadApi:
 
     def post(self, method, data):
         try:
-            return self.requests.post(self.url.rstrip("/") + "/" + method.strip("/"), data=data)
+            return self.requests.post(self.url.rstrip('/') + '/' + method.strip('/'), data=data)
         except RequestException as e:
             if e.response and e.response.status_code == 500:
                 raise plugin.PluginError(
@@ -159,7 +159,7 @@ class PluginPyLoad:
             if description is not None:
                 contents.append(description)
             contents.append(quote(entry['url']))
-            content = " ".join(contents)
+            content = ' '.join(contents)
 
             content = repr(content)
 

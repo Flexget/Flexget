@@ -54,7 +54,7 @@ class RapidpushNotifier:
                 {'required': ['channel', 'priority']},
             ]
         },
-        'error_not': 'Cannot use \'channel\' with \'group\', \'category\' or \'priority\'',
+        'error_not': "Cannot use 'channel' with 'group', 'category' or 'priority'",
     }
 
     def notify(self, title, message, config):

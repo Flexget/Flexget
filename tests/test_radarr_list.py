@@ -89,16 +89,16 @@ class TestRadarrListActions:
 
     def test_radarr_list_tags(self, execute_task, manager):
         radarr = RadarrAPIService(RADARR_API_KEY, RADARR_BASE_URL, RADARR_PORT)
-        tag_by_id = radarr.add_tag('tag_by_id')["id"]
+        tag_by_id = radarr.add_tag('tag_by_id')['id']
         manager.config['tasks']['clear_and_add_to_radarr_with_tags']['list_add'][0]['radarr_list'][
             'tags'
         ].append(tag_by_id)
 
         execute_task('clear_and_add_to_radarr_with_tags')
-        tags = {t["label"].lower(): t["id"] for t in radarr.get_tags()}
+        tags = {t['label'].lower(): t['id'] for t in radarr.get_tags()}
         for movie in radarr.get_movies():
             assert sorted(movie['tags']) == sorted(
-                [tag_by_id, tags.get("movies"), tags.get("othertag")]
+                [tag_by_id, tags.get('movies'), tags.get('othertag')]
             )
 
     # TODO: each action should be own test case
@@ -139,7 +139,7 @@ class TestRadarrListActions:
             "movie should have been present in the list but it wasn't"
         )
         assert not task.find_entry(movie_name='Sinister 2'), (
-            "movie should not be present in the list but it was"
+            'movie should not be present in the list but it was'
         )
 
         # Now we will try to match a bunch of input entries with
@@ -155,13 +155,13 @@ class TestRadarrListActions:
             "movie should have been matched but it wasn't"
         )
         assert task.find_entry('undecided', title='Sinister.2.2015.720p.BluRay.x264-FlexGet'), (
-            "movie should not have been matched but it was"
+            'movie should not have been matched but it was'
         )
         assert task.find_entry(
             'undecided', title='Kung.Fu.Panda.3.2016.720p.BluRay.x264-FlexGet'
-        ), "movie should not have been matched but it was"
+        ), 'movie should not have been matched but it was'
 
         # list_match should have removed all the matched movies
         # so no movies should remain
         task = execute_task('radarr_list_as_input_plugin')
-        assert len(task.all_entries) == 0, "there should be no movies left in the list"
+        assert len(task.all_entries) == 0, 'there should be no movies left in the list'

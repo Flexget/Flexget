@@ -22,26 +22,26 @@ class PluginFailed:
     """
 
     schema = {
-        "oneOf": [
+        'oneOf': [
             # Allow retry_failed: no form to turn off plugin altogether
-            {"type": "boolean"},
+            {'type': 'boolean'},
             {
-                "type": "object",
-                "properties": {
-                    "retry_time": {"type": "string", "format": "interval", "default": "1 hour"},
-                    "max_retries": {
-                        "type": "integer",
-                        "minimum": 0,
-                        "maximum": FAIL_LIMIT,
-                        "default": 3,
+                'type': 'object',
+                'properties': {
+                    'retry_time': {'type': 'string', 'format': 'interval', 'default': '1 hour'},
+                    'max_retries': {
+                        'type': 'integer',
+                        'minimum': 0,
+                        'maximum': FAIL_LIMIT,
+                        'default': 3,
                     },
-                    "retry_time_multiplier": {
+                    'retry_time_multiplier': {
                         # Allow turning off the retry multiplier with 'no' as well as 1
-                        "oneOf": [{"type": "number", "minimum": 0}, {"type": "boolean"}],
-                        "default": 1.5,
+                        'oneOf': [{'type': 'number', 'minimum': 0}, {'type': 'boolean'}],
+                        'default': 1.5,
                     },
                 },
-                "additionalProperties": False,
+                'additionalProperties': False,
             },
         ]
     }

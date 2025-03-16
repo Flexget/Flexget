@@ -75,7 +75,7 @@ class UrlRewriteSerienjunkies:
             entry.reject('No Episode found')
         else:
             entry['url'] = download_urls[-1]
-            entry['description'] = ", ".join(download_urls)
+            entry['description'] = ', '.join(download_urls)
 
         # Debug Information
         logger.debug('TV Show URL: {}', series_url)

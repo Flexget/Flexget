@@ -16,7 +16,7 @@ def valid_entry(value):
         int(value)
     except ValueError:
         if value != 'all':
-            raise ArgumentTypeError('Must select \'all\' or valid entry ID')
+            raise ArgumentTypeError("Must select 'all' or valid entry ID")
     return value
 
 
@@ -50,7 +50,7 @@ def list_entries(options):
                 entry.title,
                 entry.url,
                 colorize('green', 'Yes') if entry.approved else 'No',
-                entry.added.strftime("%c"),
+                entry.added.strftime('%c'),
             )
     console(table)
 
@@ -98,7 +98,7 @@ def clear_entries(options):
 def register_parser_arguments():
     selection_parser = ArgumentParser(add_help=False)
     selection_parser.add_argument(
-        'selection', type=valid_entry, help='Entity ID or \'all\' to approve all pending entries'
+        'selection', type=valid_entry, help="Entity ID or 'all' to approve all pending entries"
     )
 
     filter_parser = ArgumentParser(add_help=False)

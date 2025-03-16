@@ -131,7 +131,7 @@ class YamlManagedList(MutableSet):
     def discard(self, item) -> None:
         title = item.get('title', None)
         if not title:
-            logger.error('Can\'t add entry, no `title` field')
+            logger.error("Can't add entry, no `title` field")
             return
 
         for i, entry in enumerate(self.entries):

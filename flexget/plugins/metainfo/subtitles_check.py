@@ -42,8 +42,8 @@ class MetainfoSubs:
                     'lock_factory': MutexLock,
                 },
             )
-        logging.getLogger("subliminal").setLevel(logging.CRITICAL)
-        logging.getLogger("enzyme").setLevel(logging.WARNING)
+        logging.getLogger('subliminal').setLevel(logging.CRITICAL)
+        logging.getLogger('enzyme').setLevel(logging.WARNING)
 
     def on_task_metainfo(self, task, config):
         # check if explicitly disabled (value set to false)

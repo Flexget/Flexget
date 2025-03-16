@@ -138,7 +138,7 @@ class TVDBTokens(Base):
 
 
 class TVDBSeries(Base):
-    __tablename__ = "tvdb_series"
+    __tablename__ = 'tvdb_series'
 
     id = Column(Integer, primary_key=True, autoincrement=False)
     last_updated = Column(Integer)
@@ -204,7 +204,7 @@ class TVDBSeries(Base):
 
         if not self.name:
             raise LookupError(
-                f'Not possible to get name to series with id {self.id} in language \'{self.language}\''
+                f"Not possible to get name to series with id {self.id} in language '{self.language}'"
             )
 
         if self.first_aired is None:
@@ -481,7 +481,7 @@ def find_series_id(name, language=None):
     for s in series:
         if s['firstAired']:
             try:
-                s['firstAired'] = datetime.strptime(s['firstAired'], "%Y-%m-%d")
+                s['firstAired'] = datetime.strptime(s['firstAired'], '%Y-%m-%d')
             except ValueError:
                 logger.warning(
                     'Invalid firstAired date "{}" when parsing series {} ',

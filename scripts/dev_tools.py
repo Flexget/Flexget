@@ -77,8 +77,8 @@ def bump_version(bump_type):
     click.echo(f'new version: {new_version}')
 
 
-@cli.command("bundle-webui")
-@click.option("--version", 'ui_version', default=None, type=click.Choice(['v2', 'v1', '']))
+@cli.command('bundle-webui')
+@click.option('--version', 'ui_version', default=None, type=click.Choice(['v2', 'v1', '']))
 def cli_bundle_webui(ui_version: Optional[str] = None):
     try:
         bundle_webui(ui_version)
@@ -106,23 +106,23 @@ def autoformat(files):
 @cli.command()
 @click.argument('version')
 def get_changelog(version):
-    version = version.lstrip("v")
+    version = version.lstrip('v')
     changelog_lines = []
     with requests.get(
-        "https://raw.githubusercontent.com/Flexget/wiki/main/ChangeLog.md", stream=True
+        'https://raw.githubusercontent.com/Flexget/wiki/main/ChangeLog.md', stream=True
     ) as resp:
         lines = resp.iter_lines(decode_unicode=True)
         for line in lines:
-            if line.startswith(f"## {version}"):
+            if line.startswith(f'## {version}'):
                 break
         else:
-            click.echo(f"Could not find version {version} in changelog", err=True)
+            click.echo(f'Could not find version {version} in changelog', err=True)
             return
         for line in lines:
-            if line.startswith(("## ", "<!---")):
+            if line.startswith(('## ', '<!---')):
                 break
             changelog_lines.append(line)
-    click.echo("\n".join(changelog_lines).strip())
+    click.echo('\n'.join(changelog_lines).strip())
 
 
 if __name__ == '__main__':

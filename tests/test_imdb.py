@@ -160,7 +160,7 @@ class TestImdb:
 
     def test_year(self, execute_task):
         task = execute_task('year')
-        assert task.find_entry('accepted', imdb_name='Taken'), 'Taken should\'ve been accepted'
+        assert task.find_entry('accepted', imdb_name='Taken'), "Taken should've been accepted"
         # mononoke should not be accepted or rejected
         assert not task.find_entry('accepted', imdb_name='Mononoke-hime'), (
             'Mononoke-hime should not have been accepted'
@@ -183,7 +183,7 @@ class TestImdb:
         assert matrix['imdb_actors']['nm0000206'] == 'Keanu Reeves', 'Keanu Reeves name is missing'
 
         assert task.find_entry('accepted', imdb_name='The Matrix'), (
-            'The Matrix should\'ve been accepted'
+            "The Matrix should've been accepted"
         )
         assert not task.find_entry('rejected', imdb_name='The Terminator'), (
             'The The Terminator have been rejected'
@@ -199,7 +199,7 @@ class TestImdb:
         )
 
         assert task.find_entry('accepted', imdb_name='The Matrix'), (
-            'The Matrix should\'ve been accepted'
+            "The Matrix should've been accepted"
         )
         assert not task.find_entry('rejected', imdb_name='The Terminator'), (
             'The The Terminator have been rejected'
@@ -218,7 +218,7 @@ class TestImdb:
         )
 
         assert task.find_entry('accepted', imdb_name='Hot Fuzz'), (
-            'Hot Fuzz should\'ve been accepted'
+            "Hot Fuzz should've been accepted"
         )
         assert not task.find_entry('rejected', imdb_name='The Terminator'), (
             'The Terminator have been rejected'
@@ -241,10 +241,10 @@ class TestImdb:
             f'Battlefield Earth should have score 2.3 not {bfe}. (Did the rating change?)'
         )
         assert task.find_entry('accepted', imdb_name='The Matrix'), (
-            'The Matrix should\'ve been accepted'
+            "The Matrix should've been accepted"
         )
         assert not task.find_entry('accepted', title='Battlefield Earth'), (
-            'Battlefield Earth shouldn\'t have been accepted'
+            "Battlefield Earth shouldn't have been accepted"
         )
 
     def test_genre(self, execute_task):
@@ -264,7 +264,7 @@ class TestImdb:
         ], 'Could not find genres for Frozen'
 
         assert task.find_entry('accepted', imdb_name='The Matrix'), (
-            'The Matrix should\'ve been accepted'
+            "The Matrix should've been accepted"
         )
         assert not task.find_entry('rejected', title='Terms of Endearment'), (
             'Terms of Endearment should have been rejected'
@@ -276,12 +276,10 @@ class TestImdb:
         matrix = task.find_entry(imdb_name='The Matrix')['imdb_languages']
         assert matrix == ['english'], 'Could not find languages for The Matrix'
         # IMDB may return imdb_name of "L'immortel" for 22 Bullets
-        bullets = task.find_entry(imdb_original_name='L\'immortel')['imdb_languages']
+        bullets = task.find_entry(imdb_original_name="L'immortel")['imdb_languages']
         assert bullets[0] == 'french', 'Could not find languages for 22 Bullets'
         for movie in ['The Matrix', 'Crank', 'The Damned United']:
-            assert task.find_entry('accepted', imdb_name=movie), (
-                f'{movie} should\'ve been accepted'
-            )
+            assert task.find_entry('accepted', imdb_name=movie), f"{movie} should've been accepted"
         assert not task.find_entry('rejected', title='22 Bullets'), (
             '22 Bullets should have been rejected'
         )
@@ -301,13 +299,13 @@ class TestImdb:
         task = execute_task('mpaa')
         aladdin = task.find_entry(imdb_name='Aladdin')
         assert aladdin['imdb_mpaa_rating'] == 'G', (
-            'Didn\'t get right rating for Aladdin. Should be G got {}'.format(
+            "Didn't get right rating for Aladdin. Should be G got {}".format(
                 aladdin['imdb_mpaa_rating']
             )
         )
         assert aladdin.accepted, 'Non R rated movie should have been accepted'
         saw = task.find_entry(imdb_name='Saw')
-        assert saw['imdb_mpaa_rating'] == 'R', 'Didn\'t get right rating for Saw'
+        assert saw['imdb_mpaa_rating'] == 'R', "Didn't get right rating for Saw"
         assert not saw.accepted, 'R rated movie should not have been accepted'
 
 
@@ -335,9 +333,9 @@ class TestImdbLookup:
     def test_invalid_url(self, execute_task):
         task = execute_task('invalid url')
         # check that these were created
-        assert task.entries[0]['imdb_score'], 'didn\'t get score'
-        assert task.entries[0]['imdb_year'], 'didn\'t get year'
-        assert task.entries[0]['imdb_plot_outline'], 'didn\'t get plot'
+        assert task.entries[0]['imdb_score'], "didn't get score"
+        assert task.entries[0]['imdb_year'], "didn't get year"
+        assert task.entries[0]['imdb_plot_outline'], "didn't get plot"
 
     def test_cache(self, execute_task, use_vcr):
         # Hmm, this test doesn't work so well when in vcr 'all' record mode. It records new requests/responses

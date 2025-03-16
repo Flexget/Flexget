@@ -92,7 +92,7 @@ class NotifyToast:
                 plugin_name, 'gi.repository', f'Notify module required. ImportError: {e}'
             )
 
-        if not Notify.init("Flexget"):
+        if not Notify.init('Flexget'):
             raise PluginWarning('Unable to init libnotify.')
 
         n = Notify.Notification.new(title, message, None)
@@ -141,13 +141,13 @@ class NotifyToast:
         # Register the window class.
         wc = WNDCLASS()
         hinst = wc.hInstance = GetModuleHandle(None)
-        wc.lpszClassName = "FlexGetTaskbar"
+        wc.lpszClassName = 'FlexGetTaskbar'
         if not self.windows_classAtom:
             self.windows_classAtom = RegisterClass(wc)
         style = WS_OVERLAPPED | WS_SYSMENU
         hwnd = CreateWindow(
             self.windows_classAtom,
-            "Taskbar",
+            'Taskbar',
             style,
             0,
             0,
@@ -179,7 +179,7 @@ class NotifyToast:
             flags,
             WM_USER + 20,
             hicon,
-            "FlexGet Notification",
+            'FlexGet Notification',
             message,
             config['timeout'] * 1000,
             title,

@@ -148,7 +148,7 @@ class PendingListListsAPI(APIResource):
         except NoResultFound:
             pass
         else:
-            raise Conflict(f'list with name \'{name}\' already exists')
+            raise Conflict(f"list with name '{name}' already exists")
 
         pending_list = db.PendingListList()
         pending_list.name = name
@@ -279,7 +279,7 @@ class PendingListEntriesAPI(APIResource):
         title = data.get('title')
         entry_object = db.get_entry_by_title(list_id=list_id, title=title, session=session)
         if entry_object:
-            raise Conflict(f'entry with title \'{title}\' already exists')
+            raise Conflict(f"entry with title '{title}' already exists")
         entry_object = db.PendingListEntry(entry=data, pending_list_id=list_id)
         if data.get('approved'):
             entry_object.approved = data['approved']
@@ -365,7 +365,7 @@ class PendingListEntryAPI(APIResource):
 
     @api.response(201, model=pending_list_entry_base_schema)
     @api.validate(model=pending_list_operation_schema)
-    @api.doc(description='Approve or reject an entry\'s status')
+    @api.doc(description="Approve or reject an entry's status")
     def put(self, list_id, entry_id, session=None):
         """Set entry object's pending status."""
         try:

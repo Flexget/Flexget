@@ -61,13 +61,13 @@ class MyEpisodesList:
                         logger,
                     )
             except RequestException as e:
-                raise plugin.PluginError(f"Error logging in to myepisodes: {e}")
+                raise plugin.PluginError(f'Error logging in to myepisodes: {e}')
 
-        page = task.requests.get(URL + "myshows/manage/").content
+        page = task.requests.get(URL + 'myshows/manage/').content
         try:
             soup = get_soup(page)
         except Exception as e:
-            raise plugin.PluginError(f"Unable to parse myepisodes.com page: {e}")
+            raise plugin.PluginError(f'Unable to parse myepisodes.com page: {e}')
 
         entries = []
 
@@ -98,7 +98,7 @@ class MyEpisodesList:
 
         if not entries:
             logger.warning(
-                "No shows found on myepisodes.com list. Maybe you need to add some first?"
+                'No shows found on myepisodes.com list. Maybe you need to add some first?'
             )
 
         return entries

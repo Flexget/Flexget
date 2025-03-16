@@ -164,24 +164,24 @@ class NfoReader:
         # In the future we could extend the nfo_lookup plugin to accept 'set' in its configuration to add new entries to
         # this dictionary to handle other tags in the nfo file and add the data to the entry.
         self._fields = {
-            "title": (False, NfoReader._single_elem_getter_func),
-            "originaltitle": (False, NfoReader._single_elem_getter_func),
-            "sorttitle": (False, NfoReader._single_elem_getter_func),
-            "rating": (False, NfoReader._single_elem_getter_func),
-            "year": (False, NfoReader._single_elem_getter_func),
-            "votes": (False, NfoReader._single_elem_getter_func),
-            "plot": (False, NfoReader._single_elem_getter_func),
-            "runtime": (False, NfoReader._single_elem_getter_func),
-            "id": (False, NfoReader._single_elem_getter_func),
-            "filenameandpath": (False, NfoReader._single_elem_getter_func),
-            "trailer": (False, NfoReader._single_elem_getter_func),
-            "thumb": (True, NfoReader._single_elem_getter_func),
-            "genre": (True, NfoReader._single_elem_getter_func),
-            "director": (True, NfoReader._single_elem_getter_func),
+            'title': (False, NfoReader._single_elem_getter_func),
+            'originaltitle': (False, NfoReader._single_elem_getter_func),
+            'sorttitle': (False, NfoReader._single_elem_getter_func),
+            'rating': (False, NfoReader._single_elem_getter_func),
+            'year': (False, NfoReader._single_elem_getter_func),
+            'votes': (False, NfoReader._single_elem_getter_func),
+            'plot': (False, NfoReader._single_elem_getter_func),
+            'runtime': (False, NfoReader._single_elem_getter_func),
+            'id': (False, NfoReader._single_elem_getter_func),
+            'filenameandpath': (False, NfoReader._single_elem_getter_func),
+            'trailer': (False, NfoReader._single_elem_getter_func),
+            'thumb': (True, NfoReader._single_elem_getter_func),
+            'genre': (True, NfoReader._single_elem_getter_func),
+            'director': (True, NfoReader._single_elem_getter_func),
             # Actor field has child elements, such as 'name' and 'role'
-            "actor": (True, NfoReader._composite_elem_getter_func),
-            "studio": (True, NfoReader._single_elem_getter_func),
-            "country": (True, NfoReader._single_elem_getter_func),
+            'actor': (True, NfoReader._composite_elem_getter_func),
+            'studio': (True, NfoReader._single_elem_getter_func),
+            'country': (True, NfoReader._single_elem_getter_func),
         }
 
     @staticmethod

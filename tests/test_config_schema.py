@@ -19,19 +19,19 @@ class TestSchemaValidator:
         format_checker = config_schema.BaseValidator.FORMAT_CHECKER
         # We have some extra properties recognized in our schema
         custom_properties = {
-            "deprecationMessage": {"type": "string"},
-            "error": {"type": "string"},
+            'deprecationMessage': {'type': 'string'},
+            'error': {'type': 'string'},
         }
         for keyword in config_schema.BaseValidator.VALIDATORS:
             if not keyword.startswith('$'):
-                custom_properties[f"error_{keyword}"] = {"type": "string"}
+                custom_properties[f'error_{keyword}'] = {'type': 'string'}
         strict = {
-            "$schema": meta_schema["$id"],
-            "$id": "https://json-schema.org/draft/2020-12/strict",
-            "$dynamicAnchor": "meta",
-            "$ref": meta_schema["$id"],
-            "properties": custom_properties,
-            "unevaluatedProperties": False,
+            '$schema': meta_schema['$id'],
+            '$id': 'https://json-schema.org/draft/2020-12/strict',
+            '$dynamicAnchor': 'meta',
+            '$ref': meta_schema['$id'],
+            'properties': custom_properties,
+            'unevaluatedProperties': False,
         }
         Validator = validator_for(meta_schema)  # noqa: N806 It's a class
         validator = Validator(
@@ -91,9 +91,9 @@ class TestSchemaValidator:
             'error': '{{validator}} failed for {{instance}}',
         }
         errors = config_schema.process_config(13, schema)
-        assert errors[0].message == "type failed for 13"
+        assert errors[0].message == 'type failed for 13'
         errors = config_schema.process_config('aoeu', schema)
-        assert errors[0].message == "minLength failed for aoeu"
+        assert errors[0].message == 'minLength failed for aoeu'
 
     def test_custom_keyword_error(self):
         schema = {'type': 'string', 'error_type': 'This is not okay'}
@@ -120,9 +120,9 @@ class TestSchemaValidator:
 
     def test_any_of_branch_is_chosen_based_on_type_errors(self):
         schema = {
-            "anyOf": [
-                {"type": ["string", "array"]},
-                {"anyOf": [{"type": "integer"}, {"type": "number", "minimum": 5}]},
+            'anyOf': [
+                {'type': ['string', 'array']},
+                {'anyOf': [{'type': 'integer'}, {'type': 'number', 'minimum': 5}]},
             ]
         }
         # If there are type errors on both sides, it should be a virtual type error with all types
@@ -138,9 +138,9 @@ class TestSchemaValidator:
 
     def test_one_of_branch_is_chosen_based_on_type_errors(self):
         schema = {
-            "oneOf": [
-                {"type": ["string", "array"]},
-                {"oneOf": [{"type": "integer"}, {"type": "number", "minimum": 5}]},
+            'oneOf': [
+                {'type': ['string', 'array']},
+                {'oneOf': [{'type': 'integer'}, {'type': 'number', 'minimum': 5}]},
             ]
         }
         errors = config_schema.process_config(True, schema)
@@ -155,16 +155,16 @@ class TestSchemaValidator:
         assert errors[0].validator == 'minimum'
 
     def test_defaults_are_filled(self):
-        schema = {"properties": {"p": {"default": 5}}}
+        schema = {'properties': {'p': {'default': 5}}}
         config = {}
         config_schema.process_config(config, schema)
-        assert config["p"] == 5
+        assert config['p'] == 5
 
     def test_defaults_does_not_override_explicit_value(self):
-        schema = {"properties": {"p": {"default": 5}}}
-        config = {"p": "foo"}
+        schema = {'properties': {'p': {'default': 5}}}
+        config = {'p': 'foo'}
         config_schema.process_config(config, schema)
-        assert config["p"] == "foo"
+        assert config['p'] == 'foo'
 
 
 class TestSchemaFormats:

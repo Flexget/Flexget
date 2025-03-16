@@ -26,20 +26,20 @@ class TestRottenTomatoesLookup:
         # check that these were created
         assert task.find_entry(
             rt_name='Toy Story', rt_year=1995, rt_id=9559, imdb_id='tt0114709'
-        ), 'Didn\'t populate RT info for Toy Story'
-        assert task.find_entry(imdb_id='tt0114709'), 'Didn\'t populate imdb_id info for Toy Story'
+        ), "Didn't populate RT info for Toy Story"
+        assert task.find_entry(imdb_id='tt0114709'), "Didn't populate imdb_id info for Toy Story"
         assert task.find_entry(
             rt_name='The Matrix', rt_year=1999, rt_id=12897, imdb_id='tt0133093'
-        ), 'Didn\'t populate RT info for The Matrix'
+        ), "Didn't populate RT info for The Matrix"
         assert task.find_entry(
             rt_name='Star Wars: Episode I - The Phantom Menace', rt_year=1999, rt_id=10008
-        ), 'Didn\'t populate RT info for Star Wars: Episode I - The Phantom Menace (in 3D)'
+        ), "Didn't populate RT info for Star Wars: Episode I - The Phantom Menace (in 3D)"
         assert task.find_entry(rt_name='Taken', rt_year=2008, rt_id=770680780), (
-            'Didn\'t populate RT info for Taken'
+            "Didn't populate RT info for Taken"
         )
         assert task.find_entry(rt_name='Rush Hour', rt_year=1998, rt_id=10201), (
-            'Didn\'t populate RT info for Rush Hour'
+            "Didn't populate RT info for Rush Hour"
         )
         assert task.find_entry(rt_name='Up', rt_year=2009, rt_id=770671912), (
-            'Didn\'t populate RT info for Up'
+            "Didn't populate RT info for Up"
         )

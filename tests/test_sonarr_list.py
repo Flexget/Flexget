@@ -93,16 +93,16 @@ class TestSonarrListActions:
                 'base_path': '',
             }
         )
-        tag_by_id = sonarr._sonarr_request("tag", method="post", data={"label": 'tag_by_id'})['id']
+        tag_by_id = sonarr._sonarr_request('tag', method='post', data={'label': 'tag_by_id'})['id']
         manager.config['tasks']['clear_and_add_to_sonarr_with_tags']['list_add'][0]['sonarr_list'][
             'tags'
         ].append(tag_by_id)
 
         execute_task('clear_and_add_to_sonarr_with_tags')
-        tags = {t["label"].lower(): t["id"] for t in sonarr._sonarr_request("tag")}
+        tags = {t['label'].lower(): t['id'] for t in sonarr._sonarr_request('tag')}
         for show in sonarr._sonarr_request('series'):
             assert sorted(show['tags']) == sorted(
-                [tag_by_id, tags.get("tv"), tags.get("othertag")]
+                [tag_by_id, tags.get('tv'), tags.get('othertag')]
             )
 
     # TODO: each action should be own test case
@@ -137,7 +137,7 @@ class TestSonarrListActions:
             "series should have been present in the list but it wasn't"
         )
         assert not task.find_entry(series_name='Breaking Bad'), (
-            "series should not be present in the list but it was"
+            'series should not be present in the list but it was'
         )
 
         # Now we will try to match a bunch of input entries with
@@ -151,9 +151,9 @@ class TestSonarrListActions:
         ), "series should have been matched but it wasn't"
         assert task.find_entry(
             'undecided', title='Breaking.Bad.S01E01.1080p.BluRay.x264-FlexGet'
-        ), "series should not have been matched but it was"
+        ), 'series should not have been matched but it was'
 
         # list_match should have removed all the matched series
         # so no series should remain
         task = execute_task('sonarr_list_as_input_plugin')
-        assert len(task.all_entries) == 0, "there should be no series left in the list"
+        assert len(task.all_entries) == 0, 'there should be no series left in the list'

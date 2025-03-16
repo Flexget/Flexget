@@ -166,10 +166,10 @@ class TestNextSeriesEpisodes:
         self.inject_series(execute_task, 'Test Series 1 S01E01')
         self.inject_series(execute_task, 'Test Series 1 S01E13')
         task = execute_task('test_next_series_episodes_backfill_limit')
-        assert len(task.all_entries) == 1, "missing episodes over limit. Should not backfill"
+        assert len(task.all_entries) == 1, 'missing episodes over limit. Should not backfill'
         self.inject_series(execute_task, 'Test Series 1 S01E12')
         task = execute_task('test_next_series_episodes_backfill_limit')
-        assert len(task.all_entries) == 11, "missing episodes less than limit. Should backfill"
+        assert len(task.all_entries) == 11, 'missing episodes less than limit. Should backfill'
 
     def test_next_series_episodes_rejected(self, execute_task):
         self.inject_series(execute_task, 'Test Series 2 S01E03 720p')
@@ -628,7 +628,7 @@ class TestNextSeriesEpisodesSeasonPack:
     # Tests which require multiple tasks to be executed in order
     # Each run_parameter is a tuple of lists: [task name, list of series ID(s) to inject, list of result(s) to find]
     @pytest.mark.parametrize(
-        "run_parameters",
+        'run_parameters',
         [
             (
                 [

@@ -33,10 +33,10 @@ class PluginTryRegexp:
         console('-' * 79)
         console('Hi there, welcome to try regexps in realtime!')
         console(
-            'Press ^D or type \'exit\' to continue. Type \'continue\' to continue non-interactive execution.'
+            "Press ^D or type 'exit' to continue. Type 'continue' to continue non-interactive execution."
         )
         console(
-            f'Task \'{task.name}\' has {len(task.entries)} entries, enter regexp to see what matches it.'
+            f"Task '{task.name}' has {len(task.entries)} entries, enter regexp to see what matches it."
         )
         while True:
             try:

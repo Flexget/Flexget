@@ -46,9 +46,9 @@ class ArchiveEntry(Base):
     task = Column('feed', Unicode)  # DEPRECATED, but SQLite does not support drop column
     added = Column(DateTime, index=True)
 
-    tags = relationship("ArchiveTag", secondary=archive_tags_table)
+    tags = relationship('ArchiveTag', secondary=archive_tags_table)
     sources = relationship(
-        "ArchiveSource", secondary=archive_sources_table, backref='archive_entries'
+        'ArchiveSource', secondary=archive_sources_table, backref='archive_entries'
     )
 
     def __init__(self):

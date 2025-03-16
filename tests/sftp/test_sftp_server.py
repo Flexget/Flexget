@@ -25,7 +25,7 @@ try:
 except ImportError:
     pass
 else:
-    logger = logging.getLogger("StubSFTP")
+    logger = logging.getLogger('StubSFTP')
 
     ADDRESS = '127.0.0.1'
     PORT = 40022
@@ -33,7 +33,7 @@ else:
     class TestSFTPServerController:
         """Manage a test SFTP server instance running on 127.0.0.1:40022 intended to be used as a pytest fixture."""
 
-        logger: Logger = logging.getLogger("TestSFTPServer")
+        logger: Logger = logging.getLogger('TestSFTPServer')
         __test__ = False
 
         def __init__(self, root: Path) -> None:
@@ -281,9 +281,9 @@ else:
                 attr._flags &= ~attr.FLAG_PERMISSIONS
                 SFTPServer.set_file_attr(path, attr)
             if flags & os.O_WRONLY:
-                file_mode = "ab" if flags & os.O_APPEND else "wb"
+                file_mode = 'ab' if flags & os.O_APPEND else 'wb'
             elif flags & os.O_RDWR:
-                file_mode = "a+b" if flags & os.O_APPEND else "r+b"
+                file_mode = 'a+b' if flags & os.O_APPEND else 'r+b'
             else:
                 # O_RDONLY
                 file_mode = 'rb'

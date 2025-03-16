@@ -23,15 +23,15 @@ class TestPluginApi:
     def test_no_dupes(self):
         plugin.load_plugins()
 
-        assert plugin.PluginInfo.dupe_counter == 0, "Duplicate plugin names, see log"
+        assert plugin.PluginInfo.dupe_counter == 0, 'Duplicate plugin names, see log'
 
     def test_load(self):
         plugin.load_plugins()
         plugin_path = Path(plugins.__file__).parent
         plugin_modules = {
-            os.path.basename(i) for k in ("*.py", "*/*.py") for i in plugin_path.glob(k)
+            os.path.basename(i) for k in ('*.py', '*/*.py') for i in plugin_path.glob(k)
         }
-        assert len(plugin_modules) >= 10, "Less than 10 plugin modules looks fishy"
+        assert len(plugin_modules) >= 10, 'Less than 10 plugin modules looks fishy'
         # Hmm, this test isn't good, because we have plugin modules that don't register a class (like cli ones)
         # and one module can load multiple plugins TODO: Maybe consider some replacement
         # assert len(plugin.plugins) >= len(plugin_modules) - 1, "Less plugins than plugin modules"

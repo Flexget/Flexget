@@ -22,7 +22,7 @@ class ModifySet:
 
     """
 
-    schema = {'type': 'object', "minProperties": 1}
+    schema = {'type': 'object', 'minProperties': 1}
 
     def on_task_metainfo(self, task, config):
         """Add the set dict to all accepted entries."""

@@ -178,12 +178,12 @@ executions_parser.add_argument(
     'start_date',
     type=inputs.datetime_from_iso8601,
     default=default_start_date,
-    help='Filter by minimal start date. Example: \'2012-01-01\'. Default is 1 week ago.',
+    help="Filter by minimal start date. Example: '2012-01-01'. Default is 1 week ago.",
 )
 executions_parser.add_argument(
     'end_date',
     type=inputs.datetime_from_iso8601,
-    help='Filter by maximal end date. Example: \'2012-01-01\'',
+    help="Filter by maximal end date. Example: '2012-01-01'",
 )
 
 sort_choices = (

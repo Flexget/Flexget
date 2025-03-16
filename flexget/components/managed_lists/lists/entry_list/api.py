@@ -113,7 +113,7 @@ class EntryListListsAPI(APIResource):
         except NoResultFound:
             new_list = True
         if not new_list:
-            raise Conflict(f'list with name \'{name}\' already exists')
+            raise Conflict(f"list with name '{name}' already exists")
         entry_list = db.EntryListList(name=name)
         session.add(entry_list)
         session.commit()
@@ -238,7 +238,7 @@ class EntryListEntriesAPI(APIResource):
         title = data.get('title')
         entry_object = db.get_entry_by_title(list_id=list_id, title=title, session=session)
         if entry_object:
-            raise Conflict(f'entry with title \'{title}\' already exists')
+            raise Conflict(f"entry with title '{title}' already exists")
         entry_object = db.EntryListEntry(entry=data, entry_list_id=list_id)
         session.add(entry_object)
         session.commit()

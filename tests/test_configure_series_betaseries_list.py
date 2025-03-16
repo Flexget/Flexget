@@ -5,7 +5,7 @@ import pytest
 
 def assert_mock_calls(expected_calls, mock_object):
     assert expected_calls == mock_object.mock_calls, (
-        f"expecting calls {expected_calls!r}, got {mock_object.mock_calls!r} instead"
+        f'expecting calls {expected_calls!r}, got {mock_object.mock_calls!r} instead'
     )
 
 
@@ -16,7 +16,7 @@ def assert_series_count_in_db(expected_count):
     session = Session()
     actual_series_count = session.query(Series).count()
     assert expected_count == actual_series_count, (
-        f"expecting {expected_count} series stored in db, got {actual_series_count} instead"
+        f'expecting {expected_count} series stored in db, got {actual_series_count} instead'
     )
 
 
@@ -68,7 +68,7 @@ class TestConfigureSeriesBetaSeriesList:
         return the_mock
 
     def test_no_members(self, execute_task, create_token_mock, query_series_mock):
-        query_series_mock.return_value = ["Breaking Bad", "Dexter"]
+        query_series_mock.return_value = ['Breaking Bad', 'Dexter']
 
         execute_task('test_no_members')
 
@@ -77,7 +77,7 @@ class TestConfigureSeriesBetaSeriesList:
         assert_mock_calls([mock.call('api_key_foo', 'token_foo', 'user_foo')], query_series_mock)
 
     def test_with_one_members(self, execute_task, create_token_mock, query_series_mock):
-        query_series_mock.return_value = ["Breaking Bad", "Dexter", "The Simpsons"]
+        query_series_mock.return_value = ['Breaking Bad', 'Dexter', 'The Simpsons']
 
         execute_task('test_with_one_members')
 
@@ -90,7 +90,7 @@ class TestConfigureSeriesBetaSeriesList:
     def test_with_two_members(self, execute_task, create_token_mock, query_series_mock):
         return_values_generator = (
             val
-            for val in [["Family guy", "The Simpsons"], ["Breaking Bad", "Dexter", "The Simpsons"]]
+            for val in [['Family guy', 'The Simpsons'], ['Breaking Bad', 'Dexter', 'The Simpsons']]
         )
         query_series_mock.side_effect = lambda *args: next(return_values_generator)
 

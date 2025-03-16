@@ -49,14 +49,14 @@ class Subtitles:
             return
 
         try:
-            s = ServerProxy("http://api.opensubtitles.org/xml-rpc")
-            res = s.LogIn("", "", "en", "FlexGet")
+            s = ServerProxy('http://api.opensubtitles.org/xml-rpc')
+            res = s.LogIn('', '', 'en', 'FlexGet')
         except Exception:
             logger.warning('Error connecting to opensubtitles.org')
             return
 
         if res['status'] != '200 OK':
-            raise RuntimeError("Login to opensubtitles.org XML-RPC interface failed")
+            raise RuntimeError('Login to opensubtitles.org XML-RPC interface failed')
 
         config = self.prepare_config(config, task)
 
@@ -104,7 +104,7 @@ class Subtitles:
                 if langsubs:
 
                     def seqmatch(subfile, entry=entry):
-                        s = difflib.SequenceMatcher(lambda x: x in " ._", entry['title'], subfile)  # noqa: B023 This is a false positive, see https://github.com/astral-sh/ruff/issues/15716
+                        s = difflib.SequenceMatcher(lambda x: x in ' ._', entry['title'], subfile)  # noqa: B023 This is a false positive, see https://github.com/astral-sh/ruff/issues/15716
                         # print "matching: ", entry['title'], subfile, s.ratio()
                         return s.ratio() > match_limit
 
