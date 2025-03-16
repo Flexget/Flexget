@@ -127,7 +127,7 @@ else:
             """
             canonicalized: Path = self.canonicalize(path)
             canonicalized.parent.mkdir(parents=True, exist_ok=True)
-            with open(canonicalized, 'wb') as file:
+            with canonicalized.open('wb') as file:
                 file.write(b'\0' * size)
             return canonicalized
 
@@ -173,7 +173,7 @@ else:
             canonicalized: Path
             if PurePosixPath(path).is_absolute():
                 path = path[1:]
-                canonicalized = Path(posixpath.normpath((self.__root / path).as_posix()))
+                canonicalized = Path(posixpath.normpath(self.__root / path))
             else:
                 canonicalized = Path(posixpath.normpath((self.__cwd or self.__home) / path))
 
@@ -300,9 +300,7 @@ else:
             try:
                 out = []
                 for filename in os.listdir(canonicalized_path):
-                    attr = SFTPAttributes.from_stat(
-                        os.stat(os.path.join(canonicalized_path, filename))
-                    )
+                    attr = SFTPAttributes.from_stat((canonicalized_path / filename).stat())
                     attr.filename = filename
                     out.append(attr)
             except OSError as e:
@@ -313,7 +311,7 @@ else:
             logger.debug('stat(%s)', path)
 
             try:
-                return SFTPAttributes.from_stat(os.stat(self.__fs.canonicalize(path)))
+                return SFTPAttributes.from_stat(self.__fs.canonicalize(path).stat())
             except OSError as e:
                 return TestSFTPServer.log_and_return_error_code(e)
 

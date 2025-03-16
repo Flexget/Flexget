@@ -1,4 +1,3 @@
-import os
 import socket
 
 import requests
@@ -71,11 +70,11 @@ class FormLogin:
                 except mechanicalsoup.LinkNotFoundError:
                     pass
             else:
-                received = os.path.join(task.manager.config_base, 'received')
-                if not os.path.isdir(received):
-                    os.mkdir(received)
-                filename = os.path.join(received, f'{task.name}.formlogin.html')
-                with open(filename, 'wb') as f:
+                received = task.manager.config_base / 'received'
+                if not received.is_dir():
+                    received.mkdir()
+                filename = received / f'{task.name}.formlogin.html'
+                with filename.open('wb') as f:
                     f.write(response.content)
                 logger.critical(
                     'I have saved the login page content to {} for you to view', filename

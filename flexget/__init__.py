@@ -1,4 +1,3 @@
-import os
 import sys
 from typing import TYPE_CHECKING, Optional
 
@@ -50,7 +49,7 @@ def main(args: Optional['Sequence[str]'] = None):
                     'manager.start()',
                     globals(),
                     locals(),
-                    os.path.join(manager.config_base, manager.options.profile),
+                    str(manager.config_base / manager.options.profile),
                 )
             else:
                 manager.start()

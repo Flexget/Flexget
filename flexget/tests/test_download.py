@@ -38,13 +38,13 @@ class TestDownload:
 
     @pytest.fixture
     def config(self, tmp_path):
-        temp_path_1 = tmp_path.joinpath('temp_path_1')
+        temp_path_1 = tmp_path / 'temp_path_1'
         temp_path_1.mkdir()
-        temp_path_2 = tmp_path.joinpath('temp_path_2')
+        temp_path_2 = tmp_path / 'temp_path_2'
         temp_path_2.mkdir()
 
         return Template(self._config).render(
-            {'temp_path_1': temp_path_1.as_posix(), 'temp_path_2': temp_path_2.as_posix()}
+            {'temp_path_1': temp_path_1, 'temp_path_2': temp_path_2}
         )
 
     def test_path_and_temp(self, execute_task):

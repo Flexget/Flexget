@@ -9,7 +9,7 @@ from flexget.utils.tools import io_encoding
 
 
 def print_debug_info(manager, options):
-    install_location = Path(__file__).absolute().parent.parent.parent
+    install_location = Path(__file__).absolute().parents[2]
     console(f'FlexGet Version: {flexget.__version__}')
     console(f'Install location: {install_location}')
     console(f'Config location: {manager.config_path}')

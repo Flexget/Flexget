@@ -11,7 +11,7 @@ from scripts.dev_tools import bump_version, cli_bundle_webui, get_changelog, ver
 
 class TestDevTools:
     def test_version(self, tmp_path):
-        os.makedirs(tmp_path / 'flexget', exist_ok=True)
+        (tmp_path / 'flexget').mkdir(parents=True, exist_ok=True)
         shutil.copy(
             Path(__file__).parent / 'dev_tools' / 'dev_version.py',
             tmp_path / 'flexget' / '_version.py',
@@ -38,7 +38,7 @@ class TestDevTools:
         ],
     )
     def test_bump_version(self, tmp_path, bump_from, bump_to, version):
-        os.makedirs(tmp_path / 'flexget', exist_ok=True)
+        (tmp_path / 'flexget').mkdir(parents=True, exist_ok=True)
         shutil.copy(
             Path(__file__).parent / 'dev_tools' / f'{bump_from}_version.py',
             tmp_path / 'flexget' / '_version.py',
@@ -47,7 +47,7 @@ class TestDevTools:
         runner = CliRunner()
         result = runner.invoke(bump_version, [bump_to])
         assert result.exit_code == 0
-        with open(tmp_path / 'flexget' / '_version.py') as f:
+        with (tmp_path / 'flexget' / '_version.py').open() as f:
             assert f"__version__ = '{version}'\n" in f
 
     @pytest.mark.skipif(
@@ -61,8 +61,8 @@ class TestDevTools:
     )
     def test_cli_bundle_webui(self, args, online):
         os.environ['BUNDLE_WEBUI'] = 'true'
-        v1_path = Path(__file__).parent.parent.parent / 'flexget' / 'ui' / 'v1' / 'app'
-        v2_path = Path(__file__).parent.parent.parent / 'flexget' / 'ui' / 'v2' / 'dist'
+        v1_path = Path(__file__).parents[2] / 'flexget' / 'ui' / 'v1' / 'app'
+        v2_path = Path(__file__).parents[2] / 'flexget' / 'ui' / 'v2' / 'dist'
         shutil.rmtree(v1_path, ignore_errors=True)
         shutil.rmtree(v2_path, ignore_errors=True)
         runner = CliRunner()

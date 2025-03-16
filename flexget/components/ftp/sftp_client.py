@@ -1,6 +1,5 @@
 import importlib
 import logging
-import os
 import time
 from base64 import b64decode
 from dataclasses import dataclass
@@ -43,9 +42,9 @@ def _set_authentication_patch(self, password, private_key, private_key_pass):
         # Use Private Key.
         if not private_key:
             # Try to use default key.
-            if os.path.exists(os.path.expanduser('~/.ssh/id_rsa')):
+            if Path('~/.ssh/id_rsa').expanduser().exists():
                 private_key = '~/.ssh/id_rsa'
-            elif os.path.exists(os.path.expanduser('~/.ssh/id_dsa')):
+            elif Path('~/.ssh/id_dsa').expanduser().exists():
                 private_key = '~/.ssh/id_dsa'
             else:
                 raise pysftp.exceptions.CredentialException("No password or key specified.")
@@ -56,7 +55,7 @@ def _set_authentication_patch(self, password, private_key, private_key_pass):
         else:
             # isn't a paramiko AgentKey or RSAKey, try to build a
             # key from what we assume is a path to a key
-            private_key_file = os.path.expanduser(private_key)
+            private_key_file = Path(private_key).expanduser()
             for key in [paramiko.RSAKey, paramiko.DSSKey, paramiko.Ed25519Key, paramiko.ECDSAKey]:
                 try:  # try all the keys
                     self._tconnect['pkey'] = key.from_private_key_file(
@@ -175,7 +174,7 @@ class SftpClient:
         is_symlink: bool = self.is_link(source)
         if self.is_file(source):
             source_file: str = parsed_path.name
-            source_dir: str = parsed_path.parent.as_posix()
+            source_dir: str = str(parsed_path.parent)
             try:
                 self._sftp.cwd(source_dir)
                 self._download_file(to, delete_origin and not is_symlink, source_file)
@@ -186,7 +185,7 @@ class SftpClient:
                 self.remove_file(source)
 
         elif self.is_dir(source):
-            base_path: str = parsed_path.joinpath('..').as_posix()
+            base_path: str = str(parsed_path.parent)
             dir_name: str = parsed_path.name
             handle_file: NodeHandler = partial(
                 self._download_file, to, delete_origin and not is_symlink
@@ -370,7 +369,7 @@ class SftpClient:
 
     def _download_file(self, destination: str, delete_origin: bool, source: str) -> None:
         destination_path: str = self._get_download_path(source, destination)
-        destination_dir: str = Path(destination_path).parent.as_posix()
+        destination_dir: str = str(Path(destination_path).parent)
 
         if Path(destination_path).exists():
             logger.verbose(
@@ -420,12 +419,12 @@ class SftpClient:
 
     @staticmethod
     def _get_download_path(path: str, destination: str) -> str:
-        return PurePosixPath(destination).joinpath(Path(path)).as_posix()
+        return str(PurePosixPath(destination) / path)
 
     @staticmethod
     def _get_upload_path(source: str, to: str):
         basename: str = PurePath(source).name
-        return PurePosixPath(to, basename).as_posix()
+        return str(PurePosixPath(to, basename))
 
 
 class SftpError(Exception):

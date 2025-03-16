@@ -7,6 +7,7 @@ archive extraction
 import os
 import shutil
 import zipfile
+from pathlib import Path
 
 from loguru import logger
 
@@ -64,11 +65,11 @@ def rarfile_set_path_sep(separator):
         rarfile.PATH_SEP = separator
 
 
-def makepath(path):
+def makepath(path: Path) -> None:
     """Make directories as needed."""
-    if not os.path.exists(path):
+    if not Path(path).exists():
         logger.debug('Creating path: {}', path)
-        os.makedirs(path)
+        Path(path).mkdir(parents=True)
 
 
 class Archive:
@@ -90,7 +91,7 @@ class Archive:
 
         try:
             for volume in volumes:
-                os.remove(volume)
+                Path(volume).unlink()
                 logger.verbose('Deleted archive: {}', volume)
         except OSError as error:
             raise FSError(error)
@@ -116,10 +117,10 @@ class Archive:
         """Return file-like object from where the data of a member file can be read."""
         return self.archive.open(member)
 
-    def extract_file(self, member, destination):
+    def extract_file(self, member, destination: Path):
         """Extract a member file to the specified destination."""
         try:
-            with self.open(member) as source, open(destination, 'wb') as target:
+            with self.open(member) as source, destination.open('wb') as target:
                 shutil.copyfileobj(source, target)
         except OSError as error:
             raise FSError(error)
@@ -191,11 +192,11 @@ class ArchiveInfo:
             return self.info.isdir()
         return not self.filename
 
-    def extract(self, archive, destination):
+    def extract(self, archive, destination: Path):
         """Extract ArchiveInfo object to the specified destination."""
-        dest_dir = os.path.dirname(destination)
+        dest_dir = destination.parent
 
-        if os.path.exists(destination):
+        if destination.exists():
             raise FileAlreadyExists(f'File already exists: {destination}')
 
         logger.debug('Creating path: {}', dest_dir)
@@ -205,9 +206,9 @@ class ArchiveInfo:
             archive.extract_file(self.info, destination)
             logger.verbose('Extracted: {} to {}', self.path, destination)
         except Exception:
-            if os.path.exists(destination):
+            if destination.exists():
                 logger.debug('Cleaning up partially extracted file: {}', destination)
-                os.remove(destination)
+                destination.unlink()
 
             raise
 
@@ -216,7 +217,7 @@ def open_archive(archive_path):
     """Return the appropriate archive object."""
     archive = None
 
-    if not os.path.exists(archive_path):
+    if not Path(archive_path).exists():
         raise PathError('Path doesn\'t exist')
 
     if zipfile.is_zipfile(archive_path):

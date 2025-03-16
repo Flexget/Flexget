@@ -1,4 +1,4 @@
-import os.path
+from pathlib import Path
 
 import pytest
 
@@ -77,12 +77,12 @@ class TestExtract:
     out_file = 'hooray.txt'
 
     # Directories
-    source_dir = 'archives'
-    out_dir = 'directory'
+    source_dir = Path('archives')
+    out_dir = Path('directory')
 
     # Paths
-    rar_path = os.path.join(source_dir, rar_name)
-    zip_path = os.path.join(source_dir, zip_name)
+    rar_path = source_dir / rar_name
+    zip_path = source_dir / zip_name
 
     # Error messages
     error_not_local = 'Entry does not appear to represent a local file.'
@@ -93,31 +93,31 @@ class TestExtract:
         """Test basic RAR extraction."""
         execute_task('test_rar')
 
-        assert tmp_path.joinpath(self.out_file).exists(), (
+        assert (tmp_path / self.out_file).exists(), (
             'Output file does not exist at the correct path.'
         )
-        assert tmp_path.joinpath(self.rar_name).exists(), 'RAR archive should still exist.'
+        assert (tmp_path / self.rar_name).exists(), 'RAR archive should still exist.'
 
     @pytest.mark.filecopy(rar_path, '__tmp__')
     def test_delete_rar(self, execute_task, tmp_path):
         """Test RAR deletion after extraction."""
         execute_task('test_delete_rar')
-        assert not tmp_path.joinpath(self.rar_name).exists(), 'RAR archive was not deleted.'
+        assert not (tmp_path / self.rar_name).exists(), 'RAR archive was not deleted.'
 
     @pytest.mark.filecopy(zip_path, '__tmp__')
     def test_zip(self, execute_task, tmp_path):
         """Test basic Zip extraction."""
         execute_task('test_zip')
-        assert tmp_path.joinpath(self.out_file).exists(), (
+        assert (tmp_path / self.out_file).exists(), (
             'Output file does not exist at the correct path.'
         )
-        assert tmp_path.joinpath(self.zip_name).exists(), 'Zip archive should still exist.'
+        assert (tmp_path / self.zip_name).exists(), 'Zip archive should still exist.'
 
     @pytest.mark.filecopy(zip_path, '__tmp__')
     def test_keep_dirs(self, execute_task, tmp_path):
         """Test directory creation."""
         execute_task('test_keep_dirs')
-        assert tmp_path.joinpath(self.out_dir, self.out_file).exists(), (
+        assert (tmp_path / self.out_dir / self.out_file).exists(), (
             'Output file does not exist at the correct path.'
         )
 
@@ -125,7 +125,7 @@ class TestExtract:
     def test_delete_zip(self, execute_task, tmp_path):
         """Test Zip deletion after extraction."""
         execute_task('test_delete_zip')
-        assert not tmp_path.joinpath(self.zip_name).exists(), 'Zip archive was not deleted.'
+        assert not (tmp_path / self.zip_name).exists(), 'Zip archive was not deleted.'
 
     def test_empty_path(self, execute_task, caplog):
         """Test when an empty location is provided."""

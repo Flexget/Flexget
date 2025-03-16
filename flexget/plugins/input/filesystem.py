@@ -110,7 +110,7 @@ class Filesystem:
         filepath = filepath.absolute()
         entry = Entry()
         entry['location'] = str(filepath)
-        entry['url'] = Path(filepath).absolute().as_uri()
+        entry['url'] = filepath.absolute().as_uri()
         entry['filename'] = filepath.name
         if filepath.is_file():
             entry['title'] = filepath.stem

@@ -8,6 +8,7 @@
 import collections
 import re
 import sys
+from pathlib import Path
 from typing import TYPE_CHECKING, Optional
 
 from git import Repo
@@ -101,8 +102,8 @@ def isplit(
     return head, None, iterator
 
 
-def update_changelog(filename: str) -> None:
-    with open(filename, encoding='utf-8') as logfile:
+def update_changelog(file: Path) -> None:
+    with file.open(encoding='utf-8') as logfile:
         pre_lines, start_comment, tail = isplit('<!---', logfile)
         active_lines, end_comment, tail = isplit('<!---', tail)
         post_lines = list(tail)
@@ -150,7 +151,7 @@ def update_changelog(filename: str) -> None:
 
     if modified:
         print('Writing modified changelog.')
-        with open(filename, 'w', encoding='utf-8') as logfile:
+        with file.open('w', encoding='utf-8') as logfile:
             logfile.writelines(pre_lines)
             logfile.write(f'<!---{commit.hexsha}--->\n')
             logfile.writelines(cur_ver.to_md_lines())
@@ -168,4 +169,4 @@ if __name__ == '__main__':
     except IndexError:
         print('No filename specified, using ChangeLog.md')
         filename = 'ChangeLog.md'
-    update_changelog(filename)
+    update_changelog(Path(filename))

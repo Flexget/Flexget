@@ -1,5 +1,6 @@
 import os
 import re
+from pathlib import Path
 
 from loguru import logger
 
@@ -26,7 +27,7 @@ def open_archive_entry(entry):
     if not archive_path:
         logger.error('Entry does not appear to represent a local file.')
         return None
-    if not os.path.exists(archive_path):
+    if not Path(archive_path).exists():
         logger.error('File no longer exists: {}', entry['location'])
         return None
     try:
@@ -41,17 +42,17 @@ def open_archive_entry(entry):
         return archive
 
 
-def get_output_path(to, entry):
+def get_output_path(to: str, entry) -> Path:
     """Determine which path to output to."""
     try:
         if to:
-            return render_from_entry(to, entry)
-        return os.path.dirname(entry.get('location'))
+            return Path(render_from_entry(to, entry))
+        return Path(entry.get('location')).parent
     except RenderError:
         raise plugin.PluginError(f'Could not render path: {to}')
 
 
-def extract_info(info, archive, to, keep_dirs, test=False):
+def extract_info(info, archive, to: Path, keep_dirs, test=False):
     """Extract ArchiveInfo object."""
     destination = get_destination_path(info, to, keep_dirs)
 
@@ -69,11 +70,10 @@ def extract_info(info, archive, to, keep_dirs, test=False):
         logger.error('Failed to extract file: {} from {} ({})', info.filename, archive.path, error)
 
 
-def get_destination_path(info, to, keep_dirs):
+def get_destination_path(info, to: Path, keep_dirs) -> Path:
     """Generate the destination path for a given file."""
     path_suffix = info.path if keep_dirs else os.path.basename(info.path)
-
-    return os.path.join(to, path_suffix)
+    return to / path_suffix
 
 
 def is_match(info, pattern):
