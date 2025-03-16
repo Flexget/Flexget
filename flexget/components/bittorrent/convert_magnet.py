@@ -1,13 +1,15 @@
-import os
 import time
+from typing import TYPE_CHECKING
 from urllib.parse import quote
 
 from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
-from flexget.utils.pathscrub import pathscrub
 from flexget.utils.tools import parse_timedelta
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 logger = logger.bind(name='convert_magnet')
 
@@ -30,7 +32,7 @@ class ConvertMagnet:
         ]
     }
 
-    def magnet_to_torrent(self, magnet_uri, destination_folder, timeout):
+    def magnet_to_torrent(self, magnet_uri, destination_folder: 'Path', timeout) -> str:
         import libtorrent
 
         params = libtorrent.parse_magnet_uri(magnet_uri)
@@ -44,7 +46,7 @@ class ConvertMagnet:
             params['url'] = magnet_uri
         else:
             params.url = magnet_uri
-        params.save_path = destination_folder
+        params.save_path = str(destination_folder)
         handle = session.add_torrent(params)
         logger.debug('Acquiring torrent metadata for magnet {}', magnet_uri)
         timeout_value = timeout
@@ -56,13 +58,11 @@ class ConvertMagnet:
         logger.debug('Metadata acquired')
         torrent_info = handle.get_torrent_info()
         torrent_file = libtorrent.create_torrent(torrent_info)
-        torrent_path = pathscrub(
-            os.path.join(destination_folder, torrent_info.name() + ".torrent")
-        )
-        with open(torrent_path, "wb") as f:
+        torrent_path = destination_folder / (torrent_info.name() + ".torrent")
+        with torrent_path.open("wb") as f:
             f.write(libtorrent.bencode(torrent_file.generate()))
         logger.debug('Torrent file wrote to {}', torrent_path)
-        return torrent_path
+        return str(torrent_path)
 
     def prepare_config(self, config):
         if not isinstance(config, dict):
@@ -88,12 +88,12 @@ class ConvertMagnet:
             return
         config = self.prepare_config(config)
         # Create the conversion target directory
-        converted_path = os.path.join(task.manager.config_base, 'converted')
+        converted_path = task.manager.config_base / 'converted'
 
         timeout = parse_timedelta(config['timeout']).total_seconds()
 
-        if not os.path.isdir(converted_path):
-            os.mkdir(converted_path)
+        if not converted_path.is_dir():
+            converted_path.mkdir()
 
         for entry in task.accepted:
             if entry['url'].startswith('magnet:'):

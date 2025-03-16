@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 
 import yaml
 from loguru import logger
@@ -34,10 +34,10 @@ class PluginInclude:
             files = [config]
 
         for file_name in files:
-            file = os.path.expanduser(file_name)
-            if not os.path.isabs(file):
-                file = os.path.join(task.manager.config_base, file)
-            with open(file, encoding='utf-8') as inc_file:
+            file = Path(file_name).expanduser()
+            if not file.is_absolute():
+                file = task.manager.config_base / file
+            with file.open(encoding='utf-8') as inc_file:
                 include = yaml.safe_load(inc_file)
                 inc_file.flush()
             errors = process_config(include, plugin.plugin_schemas(interface='task'))

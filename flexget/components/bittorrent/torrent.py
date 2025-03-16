@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 
 from loguru import logger
 
@@ -25,19 +25,19 @@ class TorrentFilename:
             if 'file' not in entry:
                 logger.trace("{} doesn't have a file associated", entry['title'])
                 continue
-            if not os.path.exists(entry['file']):
+            if not Path(entry['file']).exists():
                 logger.debug('File {} does not exist', entry['file'])
                 continue
-            if os.path.getsize(entry['file']) == 0:
+            if Path(entry['file']).stat().st_size == 0:
                 logger.debug('File {} is 0 bytes in size', entry['file'])
                 continue
-            if not is_torrent_file(entry['file']):
+            if not is_torrent_file(Path(entry['file'])):
                 continue
             logger.debug('{} seems to be a torrent', entry['title'])
 
             # create torrent object from torrent
             try:
-                with open(entry['file'], 'rb') as f:
+                with Path(entry['file']).open('rb') as f:
                     # NOTE: this reads entire file into memory, but we're pretty sure it's
                     # a small torrent file since it starts with TORRENT_RE
                     data = f.read()
@@ -78,7 +78,7 @@ class TorrentFilename:
             if 'torrent' in entry and entry['torrent'].modified:
                 # re-write data into a file
                 logger.debug('Writing modified torrent file for {}', entry['title'])
-                with open(entry['file'], 'wb+') as f:
+                with Path(entry['file']).open('wb+') as f:
                     f.write(entry['torrent'].encode())
 
     def make_filename(self, torrent, entry):
@@ -104,9 +104,9 @@ class TorrentFilename:
         return fn
 
     def purge(self, entry):
-        if os.path.exists(entry['file']):
+        if Path(entry['file']).exists():
             logger.debug('removing temp file {} from {}', entry['file'], entry['title'])
-            os.remove(entry['file'])
+            Path(entry['file']).unlink()
         del entry['file']
 
 

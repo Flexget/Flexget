@@ -28,7 +28,7 @@ else:
             return ["requests"]
 
         def clean(self, versions: list[str]) -> None:
-            p = Path(__file__).resolve().parent.parent
+            p = Path(__file__).resolve().parents[1]
             v1_path = p / "flexget" / "ui" / "v1" / "app"
             v2_path = p / "flexget" / "ui" / "v2" / "dist"
             if v1_path.exists():
@@ -50,7 +50,7 @@ def bundle_webui(ui_version: Optional[str] = None):
     # once it is registered it can install the dep automatically during the build process.
     import requests
 
-    ui_path = Path(__file__).resolve().parent.parent / "flexget" / "ui"
+    ui_path = Path(__file__).resolve().parents[1] / "flexget" / "ui"
 
     def download_extract(url, dest_path):
         print(dest_path)

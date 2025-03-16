@@ -1,5 +1,5 @@
-import glob
 import os
+from pathlib import Path
 
 import pytest
 
@@ -27,9 +27,9 @@ class TestPluginApi:
 
     def test_load(self):
         plugin.load_plugins()
-        plugin_path = os.path.dirname(plugins.__file__)
+        plugin_path = Path(plugins.__file__).parent
         plugin_modules = {
-            os.path.basename(i) for k in ("/*.py", "/*/*.py") for i in glob.glob(plugin_path + k)
+            os.path.basename(i) for k in ("*.py", "*/*.py") for i in plugin_path.glob(k)
         }
         assert len(plugin_modules) >= 10, "Less than 10 plugin modules looks fishy"
         # Hmm, this test isn't good, because we have plugin modules that don't register a class (like cli ones)
@@ -70,9 +70,7 @@ class TestExternalPluginLoading:
 
     @pytest.fixture
     def config(self, request):
-        os.environ['FLEXGET_PLUGIN_PATH'] = request.node.path.parent.joinpath(
-            'external_plugins'
-        ).as_posix()
+        os.environ['FLEXGET_PLUGIN_PATH'] = str(request.node.path.parent / 'external_plugins')
         plugin.load_plugins()
         # fire the config register event again so that task schema is rebuilt with new plugin
         fire_event('config.register')

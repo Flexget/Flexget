@@ -100,14 +100,14 @@ class TestExistsMovie:
     def config(self, request, tmp_path):
         """Override and parametrize default config fixture for all series tests."""
         for test_dir in self.test_dirs:
-            tmp_path.joinpath(test_dir).mkdir()
+            (tmp_path / test_dir).mkdir()
         # create test files
         for test_file in self.test_files:
-            tmp_path.joinpath(test_file).write_text('')
+            (tmp_path / test_file).write_text('')
         return (
             Template(self._config)
             .render({'parser': request.param})
-            .replace('__tmp__', tmp_path.as_posix())
+            .replace('__tmp__', str(tmp_path))
         )
 
     def test_existing_dirs(self, execute_task):

@@ -1,18 +1,15 @@
 import json
-import os
+from pathlib import Path
 from unittest import mock
 
-movie_list_file = os.path.join(
-    os.path.dirname(__file__), 'couchpotato_movie_list_test_response.json'
-)
-qualities_profiles_file = os.path.join(
-    os.path.dirname(__file__), 'couchpotato_quality_profile_test_response.json'
-)
+movie_list_file = Path(__file__).parent / 'couchpotato_movie_list_test_response.json'
+qualities_profiles_file = Path(__file__).parent / 'couchpotato_quality_profile_test_response.json'
 
-with open(movie_list_file, encoding='utf-8') as data:
+
+with movie_list_file.open(encoding='utf-8') as data:
     movie_list_response = json.load(data)
 
-with open(qualities_profiles_file) as data:
+with qualities_profiles_file.open() as data:
     qualities_response = json.load(data)
 
 

@@ -2,6 +2,7 @@ import datetime
 import os
 import stat
 import time
+from pathlib import Path
 
 import pendulum
 import pytest
@@ -135,9 +136,9 @@ class TestDownload:
         # executes task and downloads the file
         task = execute_task('test')
         assert task.entries[0]['location'], 'location missing?'
-        testfile = task.entries[0]['location']
-        assert os.path.exists(testfile), 'download file does not exists'
-        testfile_stat = os.stat(testfile)
+        testfile = Path(task.entries[0]['location'])
+        assert testfile.exists(), 'download file does not exists'
+        testfile_stat = testfile.stat()
         assert 0o666 & ~curr_umask == stat.S_IMODE(testfile_stat.st_mode), (
             'download file mode not honoring umask'
         )
