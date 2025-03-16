@@ -4,7 +4,8 @@ on:
   push:
     branches:
       - develop
-  pull_request_target:
+  pull_request_target: # zizmor: ignore[dangerous-triggers]
+permissions: { }
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref || github.run_id }}
   cancel-in-progress: true
@@ -16,6 +17,8 @@ jobs:
   uv-lock:
     name: Update uv.lock
     runs-on: ubuntu-latest
+    permissions:
+      actions: write
     steps:
       - name: Checkout the HEAD commit
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
@@ -23,6 +26,7 @@ jobs:
           repository: ${{ github.event.pull_request.head.repo.full_name }}
           ref: ${{ github.head_ref }}
           token: ${{ secrets.FLEXGETBOT_PAT }}
+          persist-credentials: true
           path: HEAD
       - name: Resolve the merge commit
         id: resolve-merge-commit
@@ -71,12 +75,13 @@ jobs:
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
         if: github.event_name == 'pull_request_target'
         with:
+          persist-credentials: false
           ref: ${{ steps.resolve-merge-commit.outputs.merge-sha }}
           path: merge
       - name: Extract the uv version in the merge commit
         if: github.event_name == 'pull_request_target'
         id: merge-commit-uv-version
-        uses: mikefarah/yq@master
+        uses: mikefarah/yq@8bf425b4d1344db7cd469a8d10a390876e0c77fd # v4
         with:
           cmd: yq .env.UV_VERSION merge/.github/workflows/autofix.yml
       - name: Install uv and Python
