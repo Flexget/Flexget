@@ -10,24 +10,24 @@ from flexget.utils import json, serialization
 from flexget.utils.database import entry_synonym
 from flexget.utils.sqlalchemy_utils import table_schema
 
-logger = logger.bind(name='pending_approval')
-Base = db_schema.versioned_base('pending_approval', 1)
+logger = logger.bind(name="pending_approval")
+Base = db_schema.versioned_base("pending_approval", 1)
 
 
-@db_schema.upgrade('pending_approval')
+@db_schema.upgrade("pending_approval")
 def upgrade(ver, session):
     if ver == 0:
-        table = table_schema('pending_entries', session)
+        table = table_schema("pending_entries", session)
         for row in session.execute(select(table.c.id, table.c.json)):
-            if not row['json']:
+            if not row["json"]:
                 # Seems there could be invalid data somehow. See #2590
                 continue
-            data = json.loads(row['json'], decode_datetime=True)
+            data = json.loads(row["json"], decode_datetime=True)
             # If title looked like a date, make sure it's a string
-            title = str(data.pop('title'))
+            title = str(data.pop("title"))
             e = Entry(title=title, **data)
             session.execute(
-                table.update().where(table.c.id == row['id']).values(json=serialization.dumps(e))
+                table.update().where(table.c.id == row["id"]).values(json=serialization.dumps(e))
             )
 
         ver = 1
@@ -35,39 +35,39 @@ def upgrade(ver, session):
 
 
 class PendingEntry(Base):
-    __tablename__ = 'pending_entries'
+    __tablename__ = "pending_entries"
 
     id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
     task_name = Column(Unicode)
     title = Column(Unicode)
     url = Column(String)
     approved = Column(Boolean)
-    _json = Column('json', Unicode)
-    entry = entry_synonym('_json')
+    _json = Column("json", Unicode)
+    entry = entry_synonym("_json")
     added = Column(DateTime, default=datetime.now)
 
     def __init__(self, task_name, entry):
         self.task_name = task_name
-        self.title = entry['title']
-        self.url = entry['url']
+        self.title = entry["title"]
+        self.url = entry["url"]
         self.approved = False
         self.entry = entry
 
     def __repr__(self):
-        return f'<PendingEntry(task_name={self.task_name},title={self.title},url={self.url},approved={self.approved})>'
+        return f"<PendingEntry(task_name={self.task_name},title={self.title},url={self.url},approved={self.approved})>"
 
     def to_dict(self):
         return {
-            'id': self.id,
-            'task_name': self.task_name,
-            'title': self.title,
-            'url': self.url,
-            'approved': self.approved,
-            'added': self.added,
+            "id": self.id,
+            "task_name": self.task_name,
+            "title": self.title,
+            "url": self.url,
+            "approved": self.approved,
+            "added": self.added,
         }
 
 
-@event('manager.db_cleanup')
+@event("manager.db_cleanup")
 def db_cleanup(manager, session):
     # Clean unapproved entries older than 1 year
     deleted = (
@@ -76,13 +76,13 @@ def db_cleanup(manager, session):
         .delete()
     )
     if deleted:
-        logger.info('Purged {} pending entries older than 1 year', deleted)
+        logger.info("Purged {} pending entries older than 1 year", deleted)
 
 
 def list_pending_entries(
-    session, task_name=None, approved=None, start=None, stop=None, sort_by='added', descending=True
+    session, task_name=None, approved=None, start=None, stop=None, sort_by="added", descending=True
 ):
-    logger.debug('querying pending entries')
+    logger.debug("querying pending entries")
     query = session.query(PendingEntry)
     if task_name:
         query = query.filter(PendingEntry.task_name == task_name)

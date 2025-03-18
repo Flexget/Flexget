@@ -16,8 +16,8 @@ if TYPE_CHECKING:
 
 @pytest.mark.require_optional_deps
 @pytest.mark.skipif(
-    platform.system() == 'Windows' and sys.version_info[:2] == (3, 10),
-    reason='This test fails intermittently on Windows, Python 3.10.',
+    platform.system() == "Windows" and sys.version_info[:2] == (3, 10),
+    reason="This test fails intermittently on Windows, Python 3.10.",
 )
 @pytest.mark.xdist_group(name="sftp")
 class TestSftpDownload:
@@ -84,13 +84,13 @@ class TestSftpDownload:
 
     @pytest.fixture
     def download_path(self, tmp_path: Path):
-        download_path = tmp_path / 'downloads'
+        download_path = tmp_path / "downloads"
         download_path.mkdir()
         return download_path
 
     @pytest.fixture
     def config(self, download_path: Path):
-        return Template(self._config).render({'download_path': str(download_path)})
+        return Template(self._config).render({"download_path": str(download_path)})
 
     @pytest.fixture
     def sftp_fs(self, sftp: TestSFTPServerController) -> TestSFTPFileSystem:
@@ -99,58 +99,58 @@ class TestSftpDownload:
     def test_sftp_download_file(
         self, execute_task, download_path: Path, sftp_fs: TestSFTPFileSystem
     ):
-        remote_file: Path = sftp_fs.create_file('file.mkv', 100)
+        remote_file: Path = sftp_fs.create_file("file.mkv", 100)
 
-        execute_task('sftp_download_file')
-        assert filecmp.cmp(remote_file, download_path / 'file.mkv')
+        execute_task("sftp_download_file")
+        assert filecmp.cmp(remote_file, download_path / "file.mkv")
 
     def test_sftp_download_dir(
         self, execute_task, download_path: Path, sftp_fs: TestSFTPFileSystem
     ):
-        remote_file = sftp_fs.create_file('dir/file.mkv', 100)
-        sftp_fs.create_file('dir/nested/file.mkv', 100)
+        remote_file = sftp_fs.create_file("dir/file.mkv", 100)
+        sftp_fs.create_file("dir/nested/file.mkv", 100)
 
-        execute_task('sftp_download_dir')
-        assert filecmp.dircmp(remote_file, download_path / 'dir/file.mkv')
-        assert not (download_path / 'nested/file.mkv').exists()
+        execute_task("sftp_download_dir")
+        assert filecmp.dircmp(remote_file, download_path / "dir/file.mkv")
+        assert not (download_path / "nested/file.mkv").exists()
 
     def test_sftp_download_dir_recusive(
         self, execute_task, download_path: Path, sftp_fs: TestSFTPFileSystem
     ):
-        remote_dir = sftp_fs.create_dir('dir')
-        sftp_fs.create_file('dir/file.mkv', 100)
-        sftp_fs.create_file('dir/nested/file.mkv', 100)
+        remote_dir = sftp_fs.create_dir("dir")
+        sftp_fs.create_file("dir/file.mkv", 100)
+        sftp_fs.create_file("dir/nested/file.mkv", 100)
 
-        execute_task('sftp_download_dir_recusive_true')
-        assert filecmp.dircmp(remote_dir, download_path / 'dir')
+        execute_task("sftp_download_dir_recusive_true")
+        assert filecmp.dircmp(remote_dir, download_path / "dir")
 
     def test_sftp_download_file_and_delete(
         self, execute_task, download_path: Path, sftp_fs: TestSFTPFileSystem
     ):
-        remote_file: Path = sftp_fs.create_file('file.mkv', 100)
+        remote_file: Path = sftp_fs.create_file("file.mkv", 100)
 
-        execute_task('sftp_download_file_delete_origin_true')
+        execute_task("sftp_download_file_delete_origin_true")
         assert not remote_file.exists()
 
     def test_sftp_download_file_and_delete_when_symlink_deletes_symlink_only(
         self, execute_task, download_path: Path, sftp_fs: TestSFTPFileSystem
     ):
-        remote_file: Path = sftp_fs.create_file('/target.mkv', 100)
-        remote_link: Path = sftp_fs.create_symlink('file.mkv', remote_file)
+        remote_file: Path = sftp_fs.create_file("/target.mkv", 100)
+        remote_link: Path = sftp_fs.create_symlink("file.mkv", remote_file)
 
-        execute_task('sftp_download_file_delete_origin_true')
-        assert remote_file.exists(), '/target.mkv should not have been deleted.'
-        assert not remote_link.exists(), 'file.mkv should have been deleted.'
+        execute_task("sftp_download_file_delete_origin_true")
+        assert remote_file.exists(), "/target.mkv should not have been deleted."
+        assert not remote_link.exists(), "file.mkv should have been deleted."
 
     @pytest.mark.skip(
-        reason='No attempt is made by the sftp_download plugin to remove the directories)'
+        reason="No attempt is made by the sftp_download plugin to remove the directories)"
     )
     def test_sftp_download_dir_and_delete(
         self, execute_task, download_path: Path, sftp_fs: TestSFTPFileSystem
     ):
-        remote_dir = sftp_fs.create_dir('dir')
-        sftp_fs.create_file('dir/file.mkv', 100)
-        sftp_fs.create_file('dir/nested/file.mkv', 100)
+        remote_dir = sftp_fs.create_dir("dir")
+        sftp_fs.create_file("dir/file.mkv", 100)
+        sftp_fs.create_file("dir/nested/file.mkv", 100)
 
-        execute_task('sftp_download_dir_delete_origin_true_recursive_true')
+        execute_task("sftp_download_dir_delete_origin_true_recursive_true")
         assert not remote_dir.exists()

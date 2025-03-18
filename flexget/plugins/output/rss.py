@@ -11,8 +11,8 @@ from flexget.event import event
 from flexget.utils.sqlalchemy_utils import table_add_column, table_columns
 from flexget.utils.template import RenderError, get_template, render_from_entry
 
-logger = logger.bind(name='make_rss')
-Base = db_schema.versioned_base('make_rss', 0)
+logger = logger.bind(name="make_rss")
+Base = db_schema.versioned_base("make_rss", 0)
 
 rss2gen = True
 try:
@@ -21,19 +21,19 @@ except ImportError:
     rss2gen = False
 
 
-@db_schema.upgrade('make_rss')
+@db_schema.upgrade("make_rss")
 def upgrade(ver, session):
     if ver is None:
-        columns = table_columns('make_rss', session)
-        if 'rsslink' not in columns:
-            logger.info('Adding rsslink column to table make_rss.')
-            table_add_column('make_rss', 'rsslink', String, session)
+        columns = table_columns("make_rss", session)
+        if "rsslink" not in columns:
+            logger.info("Adding rsslink column to table make_rss.")
+            table_add_column("make_rss", "rsslink", String, session)
         ver = 0
     return ver
 
 
 class RSSEntry(Base):
-    __tablename__ = 'make_rss'
+    __tablename__ = "make_rss"
 
     id = Column(Integer, primary_key=True)
     title = Column(Unicode)
@@ -129,26 +129,26 @@ class OutputRSS:
     """
 
     schema = {
-        'oneOf': [
-            {'type': 'string'},  # TODO: path / file
+        "oneOf": [
+            {"type": "string"},  # TODO: path / file
             {
-                'type': 'object',
-                'properties': {
-                    'file': {'type': 'string'},
-                    'days': {'type': 'integer'},
-                    'items': {'type': 'integer'},
-                    'history': {'type': 'boolean'},
-                    'timestamp': {'type': 'boolean'},
-                    'rsslink': {'type': 'string'},
-                    'rsstitle': {'type': 'string'},
-                    'rssdesc': {'type': 'string'},
-                    'encoding': {'type': 'string'},  # TODO: only valid choices
-                    'title': {'type': 'string'},
-                    'template': {'type': 'string'},
-                    'link': {'type': 'array', 'items': {'type': 'string'}},
+                "type": "object",
+                "properties": {
+                    "file": {"type": "string"},
+                    "days": {"type": "integer"},
+                    "items": {"type": "integer"},
+                    "history": {"type": "boolean"},
+                    "timestamp": {"type": "boolean"},
+                    "rsslink": {"type": "string"},
+                    "rsstitle": {"type": "string"},
+                    "rssdesc": {"type": "string"},
+                    "encoding": {"type": "string"},  # TODO: only valid choices
+                    "title": {"type": "string"},
+                    "template": {"type": "string"},
+                    "link": {"type": "array", "items": {"type": "string"}},
                 },
-                'required': ['file'],
-                'additionalProperties': False,
+                "required": ["file"],
+                "additionalProperties": False,
             },
         ]
     }
@@ -159,68 +159,68 @@ class OutputRSS:
 
     def prepare_config(self, config):
         if not isinstance(config, dict):
-            config = {'file': config}
-        config.setdefault('days', 7)
-        config.setdefault('items', -1)
-        config.setdefault('history', True)
-        config.setdefault('encoding', 'UTF-8')
-        config.setdefault('timestamp', False)
-        config.setdefault('link', ['imdb_url', 'input_url'])
-        config.setdefault('title', '{{title}} (from {{task}})')
-        config.setdefault('template', 'rss')
+            config = {"file": config}
+        config.setdefault("days", 7)
+        config.setdefault("items", -1)
+        config.setdefault("history", True)
+        config.setdefault("encoding", "UTF-8")
+        config.setdefault("timestamp", False)
+        config.setdefault("link", ["imdb_url", "input_url"])
+        config.setdefault("title", "{{title}} (from {{task}})")
+        config.setdefault("template", "rss")
         # add url as last resort
-        config['link'].append('url')
+        config["link"].append("url")
         return config
 
     def on_task_exit(self, task, config):
         """Store finished / downloaded entries at exit."""
         if not rss2gen:
-            raise plugin.PluginWarning('plugin make_rss requires PyRSS2Gen library.')
+            raise plugin.PluginWarning("plugin make_rss requires PyRSS2Gen library.")
         config = self.prepare_config(config)
 
         # when history is disabled, remove everything from backlog on every run (a bit hackish, rarely useful)
-        if not config['history']:
-            logger.debug('disabling history')
-            for item in task.session.query(RSSEntry).filter(RSSEntry.file == config['file']).all():
+        if not config["history"]:
+            logger.debug("disabling history")
+            for item in task.session.query(RSSEntry).filter(RSSEntry.file == config["file"]).all():
                 task.session.delete(item)
 
         # save entries into db for RSS generation
         for entry in task.accepted:
             rss = RSSEntry()
             try:
-                rss.title = entry.render(config['title'])
+                rss.title = entry.render(config["title"])
             except RenderError as e:
                 logger.error(
-                    'Error rendering jinja title for `{}` falling back to entry title: {}',
-                    entry['title'],
+                    "Error rendering jinja title for `{}` falling back to entry title: {}",
+                    entry["title"],
                     e,
                 )
-                rss.title = entry['title']
-            for field in config['link']:
+                rss.title = entry["title"]
+            for field in config["link"]:
                 if entry.get(field) is not None:
                     rss.link = entry[field]
                     break
 
             try:
-                template = get_template(config['template'], scope='task')
+                template = get_template(config["template"], scope="task")
             except ValueError as e:
-                raise plugin.PluginError(f'Invalid template specified: {e}')
+                raise plugin.PluginError(f"Invalid template specified: {e}")
             try:
                 rss.description = render_from_entry(template, entry)
             except RenderError as e:
                 logger.error(
-                    'Error while rendering entry {}, falling back to plain title: {}', entry, e
+                    "Error while rendering entry {}, falling back to plain title: {}", entry, e
                 )
-                rss.description = entry['title'] + ' - (Render Error)'
-            rss.file = config['file']
-            if 'rss_pubdate' in entry:
-                rss.published = entry['rss_pubdate']
+                rss.description = entry["title"] + " - (Render Error)"
+            rss.file = config["file"]
+            if "rss_pubdate" in entry:
+                rss.published = entry["rss_pubdate"]
 
-            rss.enc_length = entry.get('size', None)
-            rss.enc_type = entry.get('type', None)
+            rss.enc_length = entry.get("size", None)
+            rss.enc_type = entry.get("type", None)
 
             # TODO: check if this exists and suggest disabling history if it does since it shouldn't happen normally ...
-            logger.debug('Saving {} into rss database', entry['title'])
+            logger.debug("Saving {} into rss database", entry["title"])
             task.session.add(rss)
 
         if not rss2gen:
@@ -231,7 +231,7 @@ class OutputRSS:
 
         db_items = (
             task.session.query(RSSEntry)
-            .filter(RSSEntry.file == config['file'])
+            .filter(RSSEntry.file == config["file"])
             .order_by(RSSEntry.published.desc())
             .all()
         )
@@ -240,34 +240,34 @@ class OutputRSS:
         rss_items = []
         for db_item in db_items:
             add = True
-            if config['items'] != -1 and len(rss_items) > config['items']:
+            if config["items"] != -1 and len(rss_items) > config["items"]:
                 add = False
-            if config['days'] != -1 and (
-                datetime.datetime.today() - datetime.timedelta(days=config['days'])
+            if config["days"] != -1 and (
+                datetime.datetime.today() - datetime.timedelta(days=config["days"])
                 > db_item.published
             ):
                 add = False
             if add:
                 # add into generated feed
                 hasher = hashlib.sha1()
-                hasher.update(db_item.title.encode('utf8'))
-                hasher.update(db_item.description.encode('utf8'))
-                hasher.update(db_item.link.encode('utf8'))
-                guid = base64.urlsafe_b64encode(hasher.digest()).decode('ascii')
+                hasher.update(db_item.title.encode("utf8"))
+                hasher.update(db_item.description.encode("utf8"))
+                hasher.update(db_item.link.encode("utf8"))
+                guid = base64.urlsafe_b64encode(hasher.digest()).decode("ascii")
                 guid = PyRSS2Gen.Guid(guid, isPermaLink=False)
 
                 gen = {
-                    'title': db_item.title,
-                    'description': db_item.description,
-                    'link': db_item.link,
-                    'pubDate': db_item.published,
-                    'guid': guid,
+                    "title": db_item.title,
+                    "description": db_item.description,
+                    "link": db_item.link,
+                    "pubDate": db_item.published,
+                    "guid": guid,
                 }
                 if db_item.enc_length is not None and db_item.enc_type is not None:
-                    gen['enclosure'] = PyRSS2Gen.Enclosure(
+                    gen["enclosure"] = PyRSS2Gen.Enclosure(
                         db_item.link, db_item.enc_length, db_item.enc_type
                     )
-                logger.trace('Adding {} into rss {}', gen['title'], config['file'])
+                logger.trace("Adding {} into rss {}", gen["title"], config["file"])
                 rss_items.append(PyRSS2Gen.RSSItem(**gen))
             else:
                 # no longer needed
@@ -275,33 +275,33 @@ class OutputRSS:
 
         # make rss
         rss = PyRSS2Gen.RSS2(
-            title=config.get('rsstitle', 'FlexGet'),
-            link=config.get('rsslink', 'http://flexget.com'),
-            description=config.get('rssdesc', 'FlexGet generated RSS feed'),
-            lastBuildDate=datetime.datetime.utcnow() if config['timestamp'] else None,
+            title=config.get("rsstitle", "FlexGet"),
+            link=config.get("rsslink", "http://flexget.com"),
+            description=config.get("rssdesc", "FlexGet generated RSS feed"),
+            lastBuildDate=datetime.datetime.utcnow() if config["timestamp"] else None,
             items=rss_items,
         )
 
         # don't run with --test
         if task.options.test:
-            logger.info('Would write rss file with {} entries.', len(rss_items))
+            logger.info("Would write rss file with {} entries.", len(rss_items))
             return
 
         # write rss
-        fn = os.path.expanduser(config['file'])
-        with open(fn, 'wb') as file:
+        fn = os.path.expanduser(config["file"])
+        with open(fn, "wb") as file:
             try:
-                logger.verbose('Writing output rss to {}', fn)
-                rss.write_xml(file, encoding=config['encoding'])
+                logger.verbose("Writing output rss to {}", fn)
+                rss.write_xml(file, encoding=config["encoding"])
             except LookupError:
-                logger.critical('Unknown encoding {}', config['encoding'])
+                logger.critical("Unknown encoding {}", config["encoding"])
                 return
             except OSError:
                 # TODO: plugins cannot raise PluginWarnings in terminate event ..
-                logger.critical('Unable to write {}', fn)
+                logger.critical("Unable to write {}", fn)
                 return
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(OutputRSS, 'make_rss', api_ver=2)
+    plugin.register(OutputRSS, "make_rss", api_ver=2)

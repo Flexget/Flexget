@@ -3,7 +3,7 @@ from loguru import logger
 from flexget import plugin
 from flexget.event import event
 
-logger = logger.bind(name='priv_torrents')
+logger = logger.bind(name="priv_torrents")
 
 
 class FilterPrivateTorrents:
@@ -26,24 +26,24 @@ class FilterPrivateTorrents:
     Non-torrent content is not interviened.
     """
 
-    schema = {'type': 'boolean'}
+    schema = {"type": "boolean"}
 
     @plugin.priority(127)
     def on_task_modify(self, task, config):
         private_torrents = config
 
         for entry in task.accepted:
-            if 'torrent' not in entry:
-                logger.debug('`{}` is not a torrent', entry['title'])
+            if "torrent" not in entry:
+                logger.debug("`{}` is not a torrent", entry["title"])
                 continue
-            private = entry['torrent'].private
+            private = entry["torrent"].private
 
             if not private_torrents and private:
-                entry.reject('torrent is marked as private', remember=True)
+                entry.reject("torrent is marked as private", remember=True)
             elif private_torrents and not private:
-                entry.reject('public torrent', remember=True)
+                entry.reject("public torrent", remember=True)
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(FilterPrivateTorrents, 'private_torrents', api_ver=2)
+    plugin.register(FilterPrivateTorrents, "private_torrents", api_ver=2)

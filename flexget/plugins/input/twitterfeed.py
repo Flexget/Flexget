@@ -6,7 +6,7 @@ from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 
-logger = logger.bind(name='twitterfeed')
+logger = logger.bind(name="twitterfeed")
 
 # Size of the chunks when fetching a timeline
 CHUNK_SIZE = 200
@@ -47,83 +47,83 @@ class TwitterFeed:
     """
 
     schema = {
-        'type': 'object',
-        'properties': {
-            'account': {'type': 'string'},
-            'consumer_key': {'type': 'string'},
-            'consumer_secret': {'type': 'string'},
-            'access_token_key': {'type': 'string'},
-            'access_token_secret': {'type': 'string'},
-            'all_entries': {'type': 'boolean', 'default': True},
-            'tweets': {'type': 'number', 'default': 50},
+        "type": "object",
+        "properties": {
+            "account": {"type": "string"},
+            "consumer_key": {"type": "string"},
+            "consumer_secret": {"type": "string"},
+            "access_token_key": {"type": "string"},
+            "access_token_secret": {"type": "string"},
+            "all_entries": {"type": "boolean", "default": True},
+            "tweets": {"type": "number", "default": 50},
         },
-        'required': [
-            'account',
-            'consumer_key',
-            'consumer_secret',
-            'access_token_secret',
-            'access_token_key',
+        "required": [
+            "account",
+            "consumer_key",
+            "consumer_secret",
+            "access_token_secret",
+            "access_token_key",
         ],
-        'additionalProperties': False,
+        "additionalProperties": False,
     }
 
     def on_task_start(self, task, config):
         try:
             import twitter  # noqa: F401
         except ImportError:
-            raise plugin.PluginError('twitter module required', logger=logger)
+            raise plugin.PluginError("twitter module required", logger=logger)
 
     def on_task_input(self, task, config):
         import twitter
 
-        account = config['account']
-        logger.debug('Looking at twitter account `{}`', account)
+        account = config["account"]
+        logger.debug("Looking at twitter account `{}`", account)
 
         try:
             self.api = twitter.Api(
-                consumer_key=config['consumer_key'],
-                consumer_secret=config['consumer_secret'],
-                access_token_key=config['access_token_key'],
-                access_token_secret=config['access_token_secret'],
+                consumer_key=config["consumer_key"],
+                consumer_secret=config["consumer_secret"],
+                access_token_key=config["access_token_key"],
+                access_token_secret=config["access_token_secret"],
             )
         except twitter.TwitterError as ex:
             raise plugin.PluginError(
-                f'Unable to authenticate to twitter for task {task.name}: {ex}'
+                f"Unable to authenticate to twitter for task {task.name}: {ex}"
             )
 
-        if config['all_entries']:
+        if config["all_entries"]:
             logger.debug(
-                'Fetching {} last tweets from {} timeline', config['tweets'], config['account']
+                "Fetching {} last tweets from {} timeline", config["tweets"], config["account"]
             )
-            tweets = self.get_tweets(account, number=config['tweets'])
+            tweets = self.get_tweets(account, number=config["tweets"])
         else:
             # Fetching from where we left off last time
-            since_id = task.simple_persistence.get('since_id', None)
+            since_id = task.simple_persistence.get("since_id", None)
             if since_id:
                 logger.debug(
-                    'Fetching from tweet id {} from {} timeline', since_id, config['account']
+                    "Fetching from tweet id {} from {} timeline", since_id, config["account"]
                 )
-                kwargs = {'since_id': since_id}
+                kwargs = {"since_id": since_id}
             else:
-                logger.debug('No since_id, fetching last {} tweets', config['tweets'])
-                kwargs = {'number': config['tweets']}
+                logger.debug("No since_id, fetching last {} tweets", config["tweets"])
+                kwargs = {"number": config["tweets"]}
 
             tweets = self.get_tweets(account, **kwargs)
-            if task.config_modified and len(tweets) < config['tweets']:
+            if task.config_modified and len(tweets) < config["tweets"]:
                 logger.debug(
-                    'Configuration modified; fetching at least {} tweets', config['tweets']
+                    "Configuration modified; fetching at least {} tweets", config["tweets"]
                 )
                 max_id = tweets[-1].id if tweets else None
-                remaining_tweets = config['tweets'] - len(tweets)
+                remaining_tweets = config["tweets"] - len(tweets)
                 tweets = tweets + self.get_tweets(account, max_id=max_id, number=remaining_tweets)
             if tweets:
                 last_tweet = tweets[0]
-                logger.debug('New last tweet id: {}', last_tweet.id)
-                task.simple_persistence['since_id'] = last_tweet.id
+                logger.debug("New last tweet id: {}", last_tweet.id)
+                task.simple_persistence["since_id"] = last_tweet.id
 
-        logger.debug('{} tweets fetched', len(tweets))
+        logger.debug("{} tweets fetched", len(tweets))
         for t in tweets:
-            logger.debug('id:{}', t.id)
+            logger.debug("id:{}", t.id)
 
         return [self.entry_from_tweet(e) for e in tweets]
 
@@ -143,7 +143,7 @@ class TwitterFeed:
                     max_id=max_id,
                 )
             except twitter.TwitterError as e:
-                raise plugin.PluginError(f'Unable to fetch timeline {account} for {e}')
+                raise plugin.PluginError(f"Unable to fetch timeline {account} for {e}")
 
             if not tweets:
                 break
@@ -156,14 +156,14 @@ class TwitterFeed:
 
     def entry_from_tweet(self, tweet):
         new_entry = Entry()
-        new_entry['title'] = tweet.text
-        urls = re.findall(r'(https?://\S+)', tweet.text)
-        new_entry['urls'] = urls
+        new_entry["title"] = tweet.text
+        urls = re.findall(r"(https?://\S+)", tweet.text)
+        new_entry["urls"] = urls
         if urls:
-            new_entry['url'] = urls[0]
+            new_entry["url"] = urls[0]
         return new_entry
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(TwitterFeed, 'twitterfeed', api_ver=2)
+    plugin.register(TwitterFeed, "twitterfeed", api_ver=2)

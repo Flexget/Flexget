@@ -5,7 +5,7 @@ from loguru import logger
 from flexget import plugin
 from flexget.event import event
 
-logger = logger.bind(name='path_by_ext')
+logger = logger.bind(name="path_by_ext")
 
 
 class PluginPathByExt:
@@ -18,35 +18,35 @@ class PluginPathByExt:
 
     """
 
-    schema = {'type': 'object'}
+    schema = {"type": "object"}
 
     def on_task_modify(self, task, config):
         self.ext(task, config, self.set_path)
 
     def set_path(self, entry, path):
-        logger.debug('Setting {} path to {}', entry['title'], path)
-        entry['path'] = path
+        logger.debug("Setting {} path to {}", entry["title"], path)
+        entry["path"] = path
 
     def ext(self, task, config, callback):
         for entry in task.entries:
-            if 'mime-type' in entry:
+            if "mime-type" in entry:
                 # check if configuration has mimetype that entry has
-                if entry['mime-type'] in config:
-                    callback(entry, config[entry['mime-type']])
+                if entry["mime-type"] in config:
+                    callback(entry, config[entry["mime-type"]])
                 # check if entry mimetype extension matches in config
-                ext = mimetypes.types_map.get(entry['mime-type'])
+                ext = mimetypes.types_map.get(entry["mime-type"])
                 path = config.get(ext) or config.get(ext[1:])
                 if path:
                     callback(entry, path)
                 else:
-                    logger.debug('Unknown mimetype {}', entry['mime-type'])
+                    logger.debug("Unknown mimetype {}", entry["mime-type"])
             else:
                 # try to find from url
                 for ext, path in config.items():
-                    if entry['url'].endswith('.' + ext):
+                    if entry["url"].endswith("." + ext):
                         callback(entry, path)
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(PluginPathByExt, 'path_by_ext', api_ver=2)
+    plugin.register(PluginPathByExt, "path_by_ext", api_ver=2)

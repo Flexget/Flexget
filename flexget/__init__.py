@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from collections.abc import Sequence
 
 
-def main(args: Optional['Sequence[str]'] = None):
+def main(args: Optional["Sequence[str]"] = None):
     """Execute as the main entry point for Command Line Interface."""
     if args is None:
         args = sys.argv[1:]
@@ -29,7 +29,7 @@ def main(args: Optional['Sequence[str]'] = None):
 
                 traceback.print_exc()
             else:
-                print(f'Could not instantiate manager: {e}', file=sys.stderr)
+                print(f"Could not instantiate manager: {e}", file=sys.stderr)
             sys.exit(1)
         else:
             log.start(
@@ -46,7 +46,7 @@ def main(args: Optional['Sequence[str]'] = None):
                 except ImportError:
                     import profile
                 profile.runctx(
-                    'manager.start()',
+                    "manager.start()",
                     globals(),
                     locals(),
                     str(manager.config_base / manager.options.profile),
@@ -59,7 +59,7 @@ def main(args: Optional['Sequence[str]'] = None):
 
                 traceback.print_exc()
             else:
-                print(f'Could not start manager: {e}', file=sys.stderr)
+                print(f"Could not start manager: {e}", file=sys.stderr)
 
             sys.exit(1)
     except KeyboardInterrupt:
@@ -68,12 +68,12 @@ def main(args: Optional['Sequence[str]'] = None):
 
             traceback.print_exc()
 
-        print('Killed with keyboard interrupt.', file=sys.stderr)
+        print("Killed with keyboard interrupt.", file=sys.stderr)
         sys.exit(1)
 
 
 def _is_debug() -> bool:
     return any(
-        arg in ['debug', '--debug', '--loglevel=trace', '--loglevel=debug']
+        arg in ["debug", "--debug", "--loglevel=trace", "--loglevel=debug"]
         for arg in [a.lower() for a in sys.argv]
     )

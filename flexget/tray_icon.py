@@ -8,7 +8,7 @@ from loguru import logger
 
 from flexget import __version__
 
-logger = logger.bind(name='tray_icon')
+logger = logger.bind(name="tray_icon")
 
 try:
     # If we are running outside of a graphical environment, these imports will fail
@@ -17,7 +17,7 @@ try:
 
     _import_success = True
 except Exception as e:
-    logger.debug('Could not load tray icon: {}', e)
+    logger.debug("Could not load tray icon: {}", e)
     _import_success = False
 
 
@@ -31,14 +31,14 @@ def check_if_tray_is_active(f):
     return wrapped
 
 
-image_path = Path(__file__).parent / 'resources' / 'flexget.png'
+image_path = Path(__file__).parent / "resources" / "flexget.png"
 
 
 class TrayIcon:
     def __init__(self, path_to_image: Path = image_path):
         # Silence PIL noisy logging
-        logging.getLogger('PIL.PngImagePlugin').setLevel(logging.INFO)
-        logging.getLogger('PIL.Image').setLevel(logging.INFO)
+        logging.getLogger("PIL.PngImagePlugin").setLevel(logging.INFO)
+        logging.getLogger("PIL.Image").setLevel(logging.INFO)
 
         self.path_to_image: Path = path_to_image
         self.icon: Optional[Icon] = None
@@ -55,7 +55,7 @@ class TrayIcon:
         self,
         text: Optional[str] = None,
         action: Optional[Callable] = None,
-        menu_item: 'MenuItem' = None,
+        menu_item: "MenuItem" = None,
         index: Optional[int] = None,
         **kwargs,
     ):
@@ -75,13 +75,13 @@ class TrayIcon:
 
     def add_core_menu_items(self):
         open_web = partial(webbrowser.open)
-        self.add_menu_item(text=f'Flexget {__version__}', enabled=False)
+        self.add_menu_item(text=f"Flexget {__version__}", enabled=False)
         self.add_menu_separator()
-        self.add_menu_item(text='Homepage', action=partial(open_web, 'https://flexget.com/'))
-        self.add_menu_item(text='Forum', action=partial(open_web, 'https://discuss.flexget.com/'))
+        self.add_menu_item(text="Homepage", action=partial(open_web, "https://flexget.com/"))
+        self.add_menu_item(text="Forum", action=partial(open_web, "https://discuss.flexget.com/"))
 
     @property
-    def menu(self) -> 'Menu':
+    def menu(self) -> "Menu":
         # This is lazy loaded since we'd like to delay the menu build until the tray is requested to run
         if not self._menu:
             self._menu = Menu(*self.menu_items)
@@ -91,12 +91,12 @@ class TrayIcon:
     def run(self):
         """Run the tray icon. Must be run from the main thread and is blocking."""
         try:
-            logger.verbose('Starting tray icon')
-            self.icon = Icon('Flexget', Image.open(self.path_to_image), menu=self.menu)
+            logger.verbose("Starting tray icon")
+            self.icon = Icon("Flexget", Image.open(self.path_to_image), menu=self.menu)
             self.running = True
             self.icon.run()
         except Exception as e:
-            logger.warning('Could not run tray icon: {}', e)
+            logger.warning("Could not run tray icon: {}", e)
             self.running = False
 
     @check_if_tray_is_active
@@ -104,7 +104,7 @@ class TrayIcon:
         if not self.running:
             return
 
-        logger.verbose('Stopping tray icon')
+        logger.verbose("Stopping tray icon")
         self.icon.stop()
         self.running = False
 

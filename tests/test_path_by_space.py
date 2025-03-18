@@ -7,7 +7,7 @@ from flexget.config_schema import parse_size
 
 
 def mock_os_disk_stats(folder):
-    used, total = os.path.basename(folder).split(',')
+    used, total = os.path.basename(folder).split(",")
 
     used_bytes = parse_size(used)
     total_bytes = parse_size(total)
@@ -16,7 +16,7 @@ def mock_os_disk_stats(folder):
     return free_bytes, total_bytes
 
 
-@mock.patch('flexget.plugins.modify.path_by_space.os_disk_stats', side_effect=mock_os_disk_stats)
+@mock.patch("flexget.plugins.modify.path_by_space.os_disk_stats", side_effect=mock_os_disk_stats)
 class TestPathSelect:
     config = """
         tasks:
@@ -99,50 +99,50 @@ class TestPathSelect:
     def no_path_validation(self, monkeypatch):
         from flexget.config_schema import format_checker
 
-        monkeypatch.delitem(format_checker.checkers, 'path')
+        monkeypatch.delitem(format_checker.checkers, "path")
 
     def test_most_free(self, disk_static_fun, no_path_validation, execute_task):
-        task = execute_task('test_most_free')
-        assert task.entries[0].get('path') == "/data/1GB,100GB"
+        task = execute_task("test_most_free")
+        assert task.entries[0].get("path") == "/data/1GB,100GB"
 
     def test_most_free_within(self, disk_static_func, no_path_validation, execute_task):
         for _ in range(3):
-            task = execute_task('test_most_free_within')
-            assert task.entries[0].get('path') in [
+            task = execute_task("test_most_free_within")
+            assert task.entries[0].get("path") in [
                 "/data/49.5GB,100GB",
                 "/data/50.5GB,100GB",
                 "/data/50GB,100GB",
-            ], "path {} not in list".format(task.entries[0].get('path'))
+            ], "path {} not in list".format(task.entries[0].get("path"))
 
     def test_most_free_percent(self, disk_static_func, no_path_validation, execute_task):
         for _ in range(2):
-            task = execute_task('test_most_free_percent')
-            assert task.entries[0].get('path') in [
-                '/data/50.5GB,100GB',
-                '/data/50GB,100GB',
-            ], "path {} not in list".format(task.entries[0].get('path'))
+            task = execute_task("test_most_free_percent")
+            assert task.entries[0].get("path") in [
+                "/data/50.5GB,100GB",
+                "/data/50GB,100GB",
+            ], "path {} not in list".format(task.entries[0].get("path"))
 
     def test_most_free_percent_within(self, disk_static_func, no_path_validation, execute_task):
         for _ in range(2):
-            task = execute_task('test_most_free_percent_within')
-            assert task.entries[0].get('path') in [
-                '/data/50GB,100GB',
-                '/data/50.5GB,100GB',
-                '/data/52GB,100GB',
-            ], "path {} not in list".format(task.entries[0].get('path'))
+            task = execute_task("test_most_free_percent_within")
+            assert task.entries[0].get("path") in [
+                "/data/50GB,100GB",
+                "/data/50.5GB,100GB",
+                "/data/52GB,100GB",
+            ], "path {} not in list".format(task.entries[0].get("path"))
 
     def test_most_used_percent(self, disk_static_func, no_path_validation, execute_task):
         for _ in range(2):
-            task = execute_task('test_most_used_percent')
-            assert task.entries[0].get('path') in [
-                '/data/99GB,100GB',
-                '/data/49GB,50GB',
-            ], "path {} not in list".format(task.entries[0].get('path'))
+            task = execute_task("test_most_used_percent")
+            assert task.entries[0].get("path") in [
+                "/data/99GB,100GB",
+                "/data/49GB,50GB",
+            ], "path {} not in list".format(task.entries[0].get("path"))
 
     def test_most_used(self, disk_static_func, no_path_validation, execute_task):
         for _ in range(2):
-            task = execute_task('test_most_used')
-            assert task.entries[0].get('path') in [
-                '/data/90GB,100GB',
-                '/data/90.5GB,100GB',
-            ], "path {} not in list".format(task.entries[0].get('path'))
+            task = execute_task("test_most_used")
+            assert task.entries[0].get("path") in [
+                "/data/90GB,100GB",
+                "/data/90.5GB,100GB",
+            ], "path {} not in list".format(task.entries[0].get("path"))

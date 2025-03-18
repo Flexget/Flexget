@@ -7,15 +7,15 @@ from . import db
 
 
 def do_cli(manager, options):
-    if options.action == 'clear':
+    if options.action == "clear":
         num = db.clear_entries(options.task, all=True)
-        console(f'{num} entries cleared from backlog.')
+        console(f"{num} entries cleared from backlog.")
     else:
-        header = ['Title', 'Task', 'Expires']
+        header = ["Title", "Task", "Expires"]
         with Session() as session:
             entries = db.get_entries(options.task, session=session)
             table_data = [
-                [entry.title, entry.task, entry.expire.strftime('%Y-%m-%d %H:%M')]
+                [entry.title, entry.task, entry.expire.strftime("%Y-%m-%d %H:%M")]
                 for entry in entries
             ]
         table = TerminalTable(*header, table_type=options.table_type)
@@ -24,14 +24,14 @@ def do_cli(manager, options):
         console(table)
 
 
-@event('options.register')
+@event("options.register")
 def register_options():
     parser = options.register_command(
-        'backlog', do_cli, help='View or clear entries from backlog plugin', parents=[table_parser]
+        "backlog", do_cli, help="View or clear entries from backlog plugin", parents=[table_parser]
     )
     parser.add_argument(
-        'action',
-        choices=['list', 'clear'],
-        help='Choose to show items in backlog, or clear all of them',
+        "action",
+        choices=["list", "clear"],
+        help="Choose to show items in backlog, or clear all of them",
     )
-    parser.add_argument('task', nargs='?', help='Limit to specific task (if supplied)')
+    parser.add_argument("task", nargs="?", help="Limit to specific task (if supplied)")

@@ -9,25 +9,25 @@ from flexget import plugin
 from flexget.event import event
 from flexget.plugin import PluginError
 
-logger = logger.bind(name='wordpress_auth')
+logger = logger.bind(name="wordpress_auth")
 
 
-def construct_request(url, username='', password='', redirect='/wp-admin/'):
+def construct_request(url, username="", password="", redirect="/wp-admin/"):
     headers = {
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) '
-        'Chrome/50.0.2661.102 Safari/537.36',
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'DNT': '1',
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/50.0.2661.102 Safari/537.36",
+        "Content-Type": "application/x-www-form-urlencoded",
+        "DNT": "1",
     }
     data = {
-        'log': username,
-        'pwd': password,
-        'wp-submit': 'Log In',
-        'testcookie': '1',
-        'redirect_to': redirect,
+        "log": username,
+        "pwd": password,
+        "wp-submit": "Log In",
+        "testcookie": "1",
+        "redirect_to": redirect,
     }
     return Request(
-        method='POST', url=url, headers=headers, data=urlencode(data).encode('UTF-8')
+        method="POST", url=url, headers=headers, data=urlencode(data).encode("UTF-8")
     ).prepare()
 
 
@@ -40,7 +40,7 @@ def collect_cookies(response):
 
 def get_valid_cookies(cookies):
     def is_wp_cookie(key):
-        return re.match(r'(wordpress|wp)(?!_*test)[A-z0-9]*', key, re.IGNORECASE)
+        return re.match(r"(wordpress|wp)(?!_*test)[A-z0-9]*", key, re.IGNORECASE)
 
     valid_cookies = {key: value for key, value in cookies.items() if is_wp_cookie(key)}
     return cookiejar_from_dict(valid_cookies)
@@ -58,40 +58,40 @@ class PluginWordPress:
     """
 
     schema = {
-        'type': 'object',
-        'properties': {
-            'url': {'type': 'string', 'oneOf': [{'format': 'url'}]},
-            'username': {'type': 'string', 'default': ''},
-            'password': {'type': 'string', 'default': ''},
+        "type": "object",
+        "properties": {
+            "url": {"type": "string", "oneOf": [{"format": "url"}]},
+            "username": {"type": "string", "default": ""},
+            "password": {"type": "string", "default": ""},
         },
-        'required': ['url'],
-        'additionalProperties': False,
+        "required": ["url"],
+        "additionalProperties": False,
     }
 
     @plugin.priority(135)
     def on_task_start(self, task, config):
-        url = config['url']
-        username = config['username']
-        password = config['password']
+        url = config["url"]
+        username = config["username"]
+        password = config["password"]
         try:
             response = task.requests.send(
                 construct_request(url, username=username, password=password)
             )
         except RequestException as err:
             logger.error(err)
-            raise PluginError(f'WordPress Authentication at {url} failed')
+            raise PluginError(f"WordPress Authentication at {url} failed")
         if not response.ok:
             logger.error(str(response))
-            raise PluginError(f'WordPress Authentication at {url} failed')
+            raise PluginError(f"WordPress Authentication at {url} failed")
         cookies = collect_cookies(response)
         if len(get_valid_cookies(cookies)) < 1:
             logger.error(
-                'No recognized WordPress cookies found. Perhaps username/password is invalid?'
+                "No recognized WordPress cookies found. Perhaps username/password is invalid?"
             )
-            raise PluginError(f'WordPress Authentication at {url} failed')
+            raise PluginError(f"WordPress Authentication at {url} failed")
         task.requests.add_cookiejar(cookies)
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(PluginWordPress, 'wordpress_auth', api_ver=2)
+    plugin.register(PluginWordPress, "wordpress_auth", api_ver=2)

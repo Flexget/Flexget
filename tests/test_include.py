@@ -13,10 +13,10 @@ class TestInclude:
 
     @pytest.fixture
     def config(self, tmp_path):
-        test_dir = tmp_path / 'include'
+        test_dir = tmp_path / "include"
         test_dir.mkdir()
-        file_1 = test_dir / 'foo.yml'
-        file_2 = test_dir / 'baz.yml'
+        file_1 = test_dir / "foo.yml"
+        file_2 = test_dir / "baz.yml"
         file_1.write_text(
             """
             mock:
@@ -29,13 +29,13 @@ class TestInclude:
             - title: baz
         """
         )
-        return Template(self._config).render({'tmpfile_1': file_1, 'tmpfile_2': file_2})
+        return Template(self._config).render({"tmpfile_1": file_1, "tmpfile_2": file_2})
 
     def test_include(self, execute_task):
-        task = execute_task('include_test')
+        task = execute_task("include_test")
         assert len(task.all_entries) == 2
-        assert task.find_entry(title='foo')
-        assert task.find_entry(title='baz')
+        assert task.find_entry(title="foo")
+        assert task.find_entry(title="baz")
 
 
 class TestIncludeChange:
@@ -48,43 +48,43 @@ class TestIncludeChange:
 
     @pytest.fixture
     def config(self, tmp_path):
-        test_dir = tmp_path / 'include'
+        test_dir = tmp_path / "include"
         test_dir.mkdir()
-        file_1 = test_dir / 'foo.yml'
+        file_1 = test_dir / "foo.yml"
         file_1.write_text(
             """
             mock:
             - title: foo
         """
         )
-        return Template(self._config).render({'tmpfile_1': file_1})
+        return Template(self._config).render({"tmpfile_1": file_1})
 
     def test_include_update(self, execute_task, manager, tmp_path):
-        task = execute_task('include_test')
+        task = execute_task("include_test")
         assert len(task.all_entries) == 1
-        assert task.find_entry(title='foo')
+        assert task.find_entry(title="foo")
 
         # Run without change. verify task hasn't changed
-        task = execute_task('include_test')
+        task = execute_task("include_test")
         assert not task.config_modified
 
         # Change file name
-        test_dir = tmp_path / 'include_changed'
+        test_dir = tmp_path / "include_changed"
         test_dir.mkdir()
-        file_1 = test_dir / 'foo.yml'
+        file_1 = test_dir / "foo.yml"
         file_1.write_text(
             """
             mock:
             - title: foo_change_1
         """
         )
-        new_file = Template('{{ tmpfile_1 }}').render({'tmpfile_1': file_1})
-        manager.config['tasks']['include_test']['include'].pop()
-        manager.config['tasks']['include_test']['include'].append(new_file)
+        new_file = Template("{{ tmpfile_1 }}").render({"tmpfile_1": file_1})
+        manager.config["tasks"]["include_test"]["include"].pop()
+        manager.config["tasks"]["include_test"]["include"].append(new_file)
 
-        task = execute_task('include_test')
+        task = execute_task("include_test")
         assert len(task.all_entries) == 1
-        assert task.find_entry(title='foo_change_1')
+        assert task.find_entry(title="foo_change_1")
         assert task.config_modified
 
         # Change file contents
@@ -94,7 +94,7 @@ class TestIncludeChange:
             - title: foo_change_2
         """
         )
-        task = execute_task('include_test')
+        task = execute_task("include_test")
         assert len(task.all_entries) == 1
-        assert task.find_entry(title='foo_change_2')
+        assert task.find_entry(title="foo_change_2")
         assert task.config_modified

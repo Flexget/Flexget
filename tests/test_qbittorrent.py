@@ -20,9 +20,9 @@ class TestQbittorrent:
         """
 
     def test_default(self, execute_task):
-        task = execute_task('default')
+        task = execute_task("default")
         assert task.accepted
 
     def test_ratio_limit(self, execute_task):
-        task = execute_task('ratio_limit')
+        task = execute_task("ratio_limit")
         assert task.accepted

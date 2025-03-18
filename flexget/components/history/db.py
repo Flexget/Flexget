@@ -6,14 +6,14 @@ from sqlalchemy import Column, DateTime, Integer, String, Unicode
 from flexget.event import event
 from flexget.manager import Base
 
-logger = logger.bind(name='history.db')
+logger = logger.bind(name="history.db")
 
 
 class History(Base):
-    __tablename__ = 'history'
+    __tablename__ = "history"
 
     id = Column(Integer, primary_key=True)
-    task = Column('feed', String)
+    task = Column("feed", String)
     filename = Column(String)
     url = Column(String)
     title = Column(Unicode)
@@ -24,25 +24,25 @@ class History(Base):
         self.time = datetime.now()
 
     def __str__(self):
-        return f'<History(filename={self.filename},task={self.task})>'
+        return f"<History(filename={self.filename},task={self.task})>"
 
     def to_dict(self):
         return {
-            'id': self.id,
-            'task': self.task,
-            'filename': self.filename,
-            'url': self.url,
-            'title': self.title,
-            'time': self.time.isoformat(),
-            'details': self.details,
+            "id": self.id,
+            "task": self.task,
+            "filename": self.filename,
+            "url": self.url,
+            "title": self.title,
+            "time": self.time.isoformat(),
+            "details": self.details,
         }
 
 
-@event('manager.db_cleanup')
+@event("manager.db_cleanup")
 def db_cleanup(manager, session):
     # Purge task executions older than 1 year
     result = (
         session.query(History).filter(History.time < datetime.now() - timedelta(days=365)).delete()
     )
     if result:
-        logger.verbose('Removed {} accepted entries from history older than 1 year', result)
+        logger.verbose("Removed {} accepted entries from history older than 1 year", result)

@@ -13,9 +13,9 @@ class TestTheTVDBList:
     """
 
     tvdb_config = {
-        'username': 'flexget2',
-        'account_id': 'D3405F10B200C4DB',
-        'api_key': '4D297D8CFDE0E105',
+        "username": "flexget2",
+        "account_id": "D3405F10B200C4DB",
+        "api_key": "4D297D8CFDE0E105",
     }
 
     def test_thetvdb_list_add(self, manager):
@@ -24,7 +24,7 @@ class TestTheTVDBList:
         # Clearing existing list
         tvdb_set.clear()
 
-        entry = Entry(title='Marvels Daredevil', tvdb_id='281662')
+        entry = Entry(title="Marvels Daredevil", tvdb_id="281662")
 
         assert entry not in tvdb_set
         tvdb_set.add(entry)

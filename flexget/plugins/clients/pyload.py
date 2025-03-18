@@ -9,7 +9,7 @@ from flexget.event import event
 from flexget.utils import json
 from flexget.utils.template import RenderError
 
-logger = logger.bind(name='pyload')
+logger = logger.bind(name="pyload")
 
 
 class PyloadApi:
@@ -19,14 +19,14 @@ class PyloadApi:
 
     def get_session(self, config):
         # Login
-        data = {'username': config['username'], 'password': config['password']}
-        result = self.post('login', data=data)
+        data = {"username": config["username"], "password": config["password"]}
+        result = self.post("login", data=data)
         response = result.json()
         if not response:
-            raise plugin.PluginError('Login failed', logger)
+            raise plugin.PluginError("Login failed", logger)
 
         if isinstance(response, str):
-            return response.replace('"', '')
+            return response.replace('"', "")
         return response
 
     def get(self, method):
@@ -34,7 +34,7 @@ class PyloadApi:
             return self.requests.get(self.url.rstrip("/") + "/" + method.strip("/"))
         except RequestException as e:
             if e.response and e.response.status_code == 500:
-                raise plugin.PluginError(f'Internal API Error: <{method}> <{self.url}>', logger)
+                raise plugin.PluginError(f"Internal API Error: <{method}> <{self.url}>", logger)
             raise
 
     def post(self, method, data):
@@ -43,7 +43,7 @@ class PyloadApi:
         except RequestException as e:
             if e.response and e.response.status_code == 500:
                 raise plugin.PluginError(
-                    f'Internal API Error: <{method}> <{self.url}> <{data}>', logger
+                    f"Internal API Error: <{method}> <{self.url}> <{data}>", logger
                 )
             raise
 
@@ -78,12 +78,12 @@ class PluginPyLoad:
           enabled: yes
     """
 
-    __author__ = 'http://pyload.org'
-    __version__ = '0.5'
+    __author__ = "http://pyload.org"
+    __version__ = "0.5"
 
-    DEFAULT_API = 'http://localhost:8000/api'
+    DEFAULT_API = "http://localhost:8000/api"
     DEFAULT_QUEUE = False
-    DEFAULT_FOLDER = ''
+    DEFAULT_FOLDER = ""
     DEFAULT_HOSTER = []
     DEFAULT_PARSE_URL = False
     DEFAULT_MULTIPLE_HOSTER = True
@@ -91,28 +91,28 @@ class PluginPyLoad:
     DEFAULT_HANDLE_NO_URL_AS_FAILURE = False
 
     schema = {
-        'type': 'object',
-        'properties': {
-            'api': {'type': 'string'},
-            'username': {'type': 'string'},
-            'password': {'type': 'string'},
-            'folder': {'type': 'string'},
-            'package': {'type': 'string'},
-            'package_password': {'type': 'string'},
-            'queue': {'type': 'boolean'},
-            'parse_url': {'type': 'boolean'},
-            'multiple_hoster': {'type': 'boolean'},
-            'hoster': one_or_more({'type': 'string'}),
-            'preferred_hoster_only': {'type': 'boolean'},
-            'handle_no_url_as_failure': {'type': 'boolean'},
-            'enabled': {'type': 'boolean'},
+        "type": "object",
+        "properties": {
+            "api": {"type": "string"},
+            "username": {"type": "string"},
+            "password": {"type": "string"},
+            "folder": {"type": "string"},
+            "package": {"type": "string"},
+            "package_password": {"type": "string"},
+            "queue": {"type": "boolean"},
+            "parse_url": {"type": "boolean"},
+            "multiple_hoster": {"type": "boolean"},
+            "hoster": one_or_more({"type": "string"}),
+            "preferred_hoster_only": {"type": "boolean"},
+            "handle_no_url_as_failure": {"type": "boolean"},
+            "enabled": {"type": "boolean"},
         },
-        'required': ['username', 'password'],
-        'additionalProperties': False,
+        "required": ["username", "password"],
+        "additionalProperties": False,
     }
 
     def on_task_output(self, task, config):
-        if not config.get('enabled', True):
+        if not config.get("enabled", True):
             return
         if not task.accepted:
             return
@@ -121,157 +121,157 @@ class PluginPyLoad:
 
     def add_entries(self, task, config):
         """Add accepted entries."""
-        apiurl = config.get('api', self.DEFAULT_API)
+        apiurl = config.get("api", self.DEFAULT_API)
         api = PyloadApi(task.requests, apiurl)
 
         try:
             session = api.get_session(config)
         except OSError:
-            raise plugin.PluginError('pyLoad not reachable', logger)
+            raise plugin.PluginError("pyLoad not reachable", logger)
         except plugin.PluginError:
             raise
         except Exception as e:
-            raise plugin.PluginError(f'Unknown error: {e!s}', logger)
+            raise plugin.PluginError(f"Unknown error: {e!s}", logger)
 
         # old pyload (stable)
         is_pyload_ng = False
-        parse_urls_command = 'parseURLs'
-        add_package_command = 'addPackage'
-        set_package_data_command = 'setPackageData'
-        package_id_parameter = 'pid'
-        folder_key = 'folder'
+        parse_urls_command = "parseURLs"
+        add_package_command = "addPackage"
+        set_package_data_command = "setPackageData"
+        package_id_parameter = "pid"
+        folder_key = "folder"
 
         # pyload-ng is returning dict instead of session string on login
         if isinstance(session, dict):
             is_pyload_ng = True
-            parse_urls_command = 'parse_urls'
-            add_package_command = 'add_package'
-            set_package_data_command = 'set_package_data'
-            package_id_parameter = 'package_id'
-            folder_key = '_folder'
+            parse_urls_command = "parse_urls"
+            add_package_command = "add_package"
+            set_package_data_command = "set_package_data"
+            package_id_parameter = "package_id"
+            folder_key = "_folder"
 
-        hoster = config.get('hoster', self.DEFAULT_HOSTER)
+        hoster = config.get("hoster", self.DEFAULT_HOSTER)
 
         for entry in task.accepted:
             # bunch of urls now going to check
             contents = []
-            description = entry.get('description')
+            description = entry.get("description")
             if description is not None:
                 contents.append(description)
-            contents.append(quote(entry['url']))
+            contents.append(quote(entry["url"]))
             content = " ".join(contents)
 
             content = repr(content)
 
             if is_pyload_ng:
-                url = repr(entry['url'] if config.get('parse_url', self.DEFAULT_PARSE_URL) else '')
+                url = repr(entry["url"] if config.get("parse_url", self.DEFAULT_PARSE_URL) else "")
             else:
                 url = (
-                    json.dumps(entry['url'])
-                    if config.get('parse_url', self.DEFAULT_PARSE_URL)
+                    json.dumps(entry["url"])
+                    if config.get("parse_url", self.DEFAULT_PARSE_URL)
                     else "''"
                 )
 
-            logger.debug('Parsing url {}', url)
+            logger.debug("Parsing url {}", url)
 
-            data = {'html': content, 'url': url}
+            data = {"html": content, "url": url}
             if not is_pyload_ng:
-                data['session'] = session
+                data["session"] = session
             result = api.post(parse_urls_command, data=data)
 
             parsed = result.json()
 
-            urls = entry.get('urls', [])
+            urls = entry.get("urls", [])
 
             # check for preferred hoster
             for name in hoster:
                 if name in parsed:
                     urls.extend(parsed[name])
-                    if not config.get('multiple_hoster', self.DEFAULT_MULTIPLE_HOSTER):
+                    if not config.get("multiple_hoster", self.DEFAULT_MULTIPLE_HOSTER):
                         break
 
             # no preferred hoster and not preferred hoster only - add all recognized plugins
             if not urls and not config.get(
-                'preferred_hoster_only', self.DEFAULT_PREFERRED_HOSTER_ONLY
+                "preferred_hoster_only", self.DEFAULT_PREFERRED_HOSTER_ONLY
             ):
                 for name, purls in parsed.items():
-                    if name != 'BasePlugin':
+                    if name != "BasePlugin":
                         urls.extend(purls)
 
             if task.options.test:
-                logger.info('Would add `{}` to pyload', urls)
+                logger.info("Would add `{}` to pyload", urls)
                 continue
 
             # no urls found
             if not urls:
-                if config.get('handle_no_url_as_failure', self.DEFAULT_HANDLE_NO_URL_AS_FAILURE):
-                    entry.fail('No suited urls in entry {}'.format(entry['title']))
+                if config.get("handle_no_url_as_failure", self.DEFAULT_HANDLE_NO_URL_AS_FAILURE):
+                    entry.fail("No suited urls in entry {}".format(entry["title"]))
                 else:
-                    logger.info('No suited urls in entry {}', entry['title'])
+                    logger.info("No suited urls in entry {}", entry["title"])
                 continue
 
-            logger.debug('Add {} urls to pyLoad', len(urls))
+            logger.debug("Add {} urls to pyLoad", len(urls))
 
             try:
-                dest = 1 if config.get('queue', self.DEFAULT_QUEUE) else 0  # Destination.Queue = 1
+                dest = 1 if config.get("queue", self.DEFAULT_QUEUE) else 0  # Destination.Queue = 1
 
                 # Use the title of the entry, if no naming schema for the package is defined.
-                name = config.get('package', entry['title'])
+                name = config.get("package", entry["title"])
 
                 # If name has jinja template, render it
                 try:
                     name = entry.render(name)
                 except RenderError as e:
-                    name = entry['title']
-                    logger.error('Error rendering jinja event: {}', e)
+                    name = entry["title"]
+                    logger.error("Error rendering jinja event: {}", e)
 
                 if is_pyload_ng:
                     data = {
-                        'name': repr(name.encode('ascii', 'ignore').decode()),
-                        'links': repr(urls),
-                        'dest': dest,
+                        "name": repr(name.encode("ascii", "ignore").decode()),
+                        "links": repr(urls),
+                        "dest": dest,
                     }
                 else:
                     data = {
-                        'name': json.dumps(name.encode('ascii', 'ignore').decode()),
-                        'links': json.dumps(urls),
-                        'dest': json.dumps(dest),
-                        'session': session,
+                        "name": json.dumps(name.encode("ascii", "ignore").decode()),
+                        "links": json.dumps(urls),
+                        "dest": json.dumps(dest),
+                        "session": session,
                     }
 
                 pid = api.post(add_package_command, data=data).text
-                logger.debug('added package pid: {}', pid)
+                logger.debug("added package pid: {}", pid)
 
                 # Set Folder
-                folder = config.get('folder', self.DEFAULT_FOLDER)
-                folder = entry.get('path', folder)
+                folder = config.get("folder", self.DEFAULT_FOLDER)
+                folder = entry.get("path", folder)
                 if folder:
                     # If folder has jinja template, render it
                     try:
                         folder = entry.render(folder)
                     except RenderError as e:
                         folder = self.DEFAULT_FOLDER
-                        logger.error('Error rendering jinja event: {}', e)
+                        logger.error("Error rendering jinja event: {}", e)
                     # set folder with api
                     data = json.dumps({folder_key: folder})
-                    post_data = {package_id_parameter: pid, 'data': data}
+                    post_data = {package_id_parameter: pid, "data": data}
                     if not is_pyload_ng:
-                        post_data['session'] = session
+                        post_data["session"] = session
                     api.post(set_package_data_command, data=post_data)
 
                 # Set Package Password
-                package_password = config.get('package_password')
+                package_password = config.get("package_password")
                 if package_password:
-                    data = json.dumps({'password': package_password})
-                    post_data = {package_id_parameter: pid, 'data': data}
+                    data = json.dumps({"password": package_password})
+                    post_data = {package_id_parameter: pid, "data": data}
                     if not is_pyload_ng:
-                        post_data['session'] = session
+                        post_data["session"] = session
                     api.post(set_package_data_command, data=post_data)
 
             except Exception as e:
                 entry.fail(str(e))
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(PluginPyLoad, 'pyload', api_ver=2)
+    plugin.register(PluginPyLoad, "pyload", api_ver=2)

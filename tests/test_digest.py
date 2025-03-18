@@ -56,40 +56,40 @@ class TestDigest:
         """
 
     def test_multiple_task_merging(self, execute_task):
-        execute_task('digest 1')
-        execute_task('digest 2')
-        task = execute_task('emit digest')
+        execute_task("digest 1")
+        execute_task("digest 2")
+        task = execute_task("emit digest")
         assert len(task.all_entries) == 2
 
     def test_same_task_merging(self, execute_task):
-        execute_task('digest multi run')
-        execute_task('digest multi run')
-        task = execute_task('emit digest')
+        execute_task("digest multi run")
+        execute_task("digest multi run")
+        task = execute_task("emit digest")
         assert len(task.all_entries) == 2
 
     def test_expire(self, execute_task):
-        execute_task('digest 1')
-        task = execute_task('emit digest')
+        execute_task("digest 1")
+        task = execute_task("emit digest")
         assert len(task.all_entries) == 1
-        task = execute_task('emit digest')
+        task = execute_task("emit digest")
         assert len(task.all_entries) == 0
 
     def test_limit(self, execute_task):
-        execute_task('many entries')
-        task = execute_task('emit limit')
+        execute_task("many entries")
+        task = execute_task("emit limit")
         assert len(task.all_entries) == 3
 
     def test_different_states(self, execute_task):
-        execute_task('different states')
-        task = execute_task('emit digest')
+        execute_task("different states")
+        task = execute_task("emit digest")
         assert len(task.all_entries) == 2
         for entry in task.all_entries:
-            assert entry.undecided, 'Should have been emitted in undecided state'
+            assert entry.undecided, "Should have been emitted in undecided state"
 
     def test_restore_state(self, execute_task):
-        execute_task('different states')
-        task = execute_task('emit state')
+        execute_task("different states")
+        task = execute_task("emit state")
         for entry in task.all_entries:
-            assert str(entry.state) == entry['title'], (
-                'Should have been emitted in same state as when digested'
+            assert str(entry.state) == entry["title"], (
+                "Should have been emitted in same state as when digested"
             )

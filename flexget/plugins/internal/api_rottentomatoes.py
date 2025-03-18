@@ -16,45 +16,45 @@ from flexget.utils import requests
 from flexget.utils.database import text_date_synonym, with_session
 from flexget.utils.sqlalchemy_utils import table_add_column, table_schema
 
-logger = logger.bind(name='api_rottentomatoes')
-Base: type[db_schema.VersionedBaseMeta] = db_schema.versioned_base('api_rottentomatoes', 2)
+logger = logger.bind(name="api_rottentomatoes")
+Base: type[db_schema.VersionedBaseMeta] = db_schema.versioned_base("api_rottentomatoes", 2)
 session = requests.Session()
 # There is a 5 call per second rate limit per api key with multiple users on the same api key, this can be problematic
-session.add_domain_limiter(requests.TimedLimiter('api.rottentomatoes.com', '0.4 seconds'))
+session.add_domain_limiter(requests.TimedLimiter("api.rottentomatoes.com", "0.4 seconds"))
 
 # This is developer Atlanta800's API key
-API_KEY = 'rh8chjzp8vu6gnpwj88736uv'
-API_VER = 'v1.0'
-SERVER = 'http://api.rottentomatoes.com/api/public'
+API_KEY = "rh8chjzp8vu6gnpwj88736uv"
+API_VER = "v1.0"
+SERVER = "http://api.rottentomatoes.com/api/public"
 
 MIN_MATCH = 0.5
 MIN_DIFF = 0.01
 
 
-@db_schema.upgrade('api_rottentomatoes')
+@db_schema.upgrade("api_rottentomatoes")
 def upgrade(ver: int, session: Session) -> int:
     if ver == 0:
         table_names = [
-            'rottentomatoes_actors',
-            'rottentomatoes_alternate_ids',
-            'rottentomatoes_directors',
-            'rottentomatoes_genres',
-            'rottentomatoes_links',
-            'rottentomatoes_movie_actors',
-            'rottentomatoes_movie_directors',
-            'rottentomatoes_movie_genres',
-            'rottentomatoes_movies',
-            'rottentomatoes_posters',
-            'rottentomatoes_releasedates',
-            'rottentomatoes_search_results',
+            "rottentomatoes_actors",
+            "rottentomatoes_alternate_ids",
+            "rottentomatoes_directors",
+            "rottentomatoes_genres",
+            "rottentomatoes_links",
+            "rottentomatoes_movie_actors",
+            "rottentomatoes_movie_directors",
+            "rottentomatoes_movie_genres",
+            "rottentomatoes_movies",
+            "rottentomatoes_posters",
+            "rottentomatoes_releasedates",
+            "rottentomatoes_search_results",
         ]
         tables = [table_schema(name, session) for name in table_names]
         for table in tables:
             session.execute(table.delete())
-        table_add_column('rottentomatoes_actors', 'rt_id', String, session)
+        table_add_column("rottentomatoes_actors", "rt_id", String, session)
         ver = 1
     if ver == 1:
-        table = table_schema('rottentomatoes_search_results', session)
+        table = table_schema("rottentomatoes_search_results", session)
         session.execute(sql.delete(table, table.c.movie_id.is_(None)))
         ver = 2
     return ver
@@ -62,29 +62,29 @@ def upgrade(ver: int, session: Session) -> int:
 
 # association tables
 genres_table = Table(
-    'rottentomatoes_movie_genres',
+    "rottentomatoes_movie_genres",
     Base.metadata,
-    Column('movie_id', Integer, ForeignKey('rottentomatoes_movies.id')),
-    Column('genre_id', Integer, ForeignKey('rottentomatoes_genres.id')),
-    Index('ix_rottentomatoes_movie_genres', 'movie_id', 'genre_id'),
+    Column("movie_id", Integer, ForeignKey("rottentomatoes_movies.id")),
+    Column("genre_id", Integer, ForeignKey("rottentomatoes_genres.id")),
+    Index("ix_rottentomatoes_movie_genres", "movie_id", "genre_id"),
 )
 Base.register_table(genres_table)
 
 actors_table = Table(
-    'rottentomatoes_movie_actors',
+    "rottentomatoes_movie_actors",
     Base.metadata,
-    Column('movie_id', Integer, ForeignKey('rottentomatoes_movies.id')),
-    Column('actor_id', Integer, ForeignKey('rottentomatoes_actors.id')),
-    Index('ix_rottentomatoes_movie_actors', 'movie_id', 'actor_id'),
+    Column("movie_id", Integer, ForeignKey("rottentomatoes_movies.id")),
+    Column("actor_id", Integer, ForeignKey("rottentomatoes_actors.id")),
+    Index("ix_rottentomatoes_movie_actors", "movie_id", "actor_id"),
 )
 Base.register_table(actors_table)
 
 directors_table = Table(
-    'rottentomatoes_movie_directors',
+    "rottentomatoes_movie_directors",
     Base.metadata,
-    Column('movie_id', Integer, ForeignKey('rottentomatoes_movies.id')),
-    Column('director_id', Integer, ForeignKey('rottentomatoes_directors.id')),
-    Index('ix_rottentomatoes_movie_directors', 'movie_id', 'director_id'),
+    Column("movie_id", Integer, ForeignKey("rottentomatoes_movies.id")),
+    Column("director_id", Integer, ForeignKey("rottentomatoes_directors.id")),
+    Index("ix_rottentomatoes_movie_directors", "movie_id", "director_id"),
 )
 Base.register_table(directors_table)
 
@@ -105,17 +105,17 @@ class RottenTomatoesContainer:
 
 
 class RottenTomatoesMovie(RottenTomatoesContainer, Base):
-    __tablename__ = 'rottentomatoes_movies'
+    __tablename__ = "rottentomatoes_movies"
 
     id = Column(Integer, primary_key=True, autoincrement=False, nullable=False)
     title = Column(String)
     year = Column(Integer)
-    genres = relationship('RottenTomatoesGenre', secondary=genres_table, backref='movies')
+    genres = relationship("RottenTomatoesGenre", secondary=genres_table, backref="movies")
     mpaa_rating = Column(String)
     runtime = Column(Integer)
     critics_consensus = Column(String)
     release_dates = relationship(
-        'ReleaseDate', backref='movie', cascade='all, delete, delete-orphan'
+        "ReleaseDate", backref="movie", cascade="all, delete, delete-orphan"
     )
     critics_rating = Column(String)
     critics_score = Column(Integer)
@@ -123,17 +123,17 @@ class RottenTomatoesMovie(RottenTomatoesContainer, Base):
     audience_score = Column(Integer)
     synopsis = Column(String)
     posters = relationship(
-        'RottenTomatoesPoster', backref='movie', cascade='all, delete, delete-orphan'
+        "RottenTomatoesPoster", backref="movie", cascade="all, delete, delete-orphan"
     )
-    cast = relationship('RottenTomatoesActor', secondary=actors_table, backref='movies')
-    directors = relationship('RottenTomatoesDirector', secondary=directors_table, backref='movies')
+    cast = relationship("RottenTomatoesActor", secondary=actors_table, backref="movies")
+    directors = relationship("RottenTomatoesDirector", secondary=directors_table, backref="movies")
     studio = Column(String)
     # NOTE: alternate_ids is not anymore used, it used to store imdb_id
     alternate_ids = relationship(
-        'RottenTomatoesAlternateId', backref='movie', cascade='all, delete, delete-orphan'
+        "RottenTomatoesAlternateId", backref="movie", cascade="all, delete, delete-orphan"
     )
     links = relationship(
-        'RottenTomatoesLink', backref='movie', cascade='all, delete, delete-orphan'
+        "RottenTomatoesLink", backref="movie", cascade="all, delete, delete-orphan"
     )
 
     # updated time, so we can grab new rating counts after 48 hours
@@ -144,21 +144,21 @@ class RottenTomatoesMovie(RottenTomatoesContainer, Base):
     def expired(self) -> bool:
         """:return: True if movie details are considered to be expired, ie. need of update"""
         if self.updated is None:
-            logger.debug('updated is None: {}', self)
+            logger.debug("updated is None: {}", self)
             return True
         refresh_interval = 2
         if self.year:
             age = datetime.now().year - self.year
             refresh_interval += age * 5
-            logger.debug('movie `{}` age {} expires in {} days', self.title, age, refresh_interval)
+            logger.debug("movie `{}` age {} expires in {} days", self.title, age, refresh_interval)
         return self.updated < datetime.now() - timedelta(days=refresh_interval)
 
     def __repr__(self) -> str:
-        return f'<RottenTomatoesMovie(title={self.title},id={self.id},year={self.year})>'
+        return f"<RottenTomatoesMovie(title={self.title},id={self.id},year={self.year})>"
 
 
 class RottenTomatoesGenre(Base):
-    __tablename__ = 'rottentomatoes_genres'
+    __tablename__ = "rottentomatoes_genres"
 
     id = Column(Integer, primary_key=True)
     name = Column(String)
@@ -168,13 +168,13 @@ class RottenTomatoesGenre(Base):
 
 
 class ReleaseDate(Base):
-    __tablename__ = 'rottentomatoes_releasedates'
+    __tablename__ = "rottentomatoes_releasedates"
 
     db_id = Column(Integer, primary_key=True)
-    movie_id = Column(Integer, ForeignKey('rottentomatoes_movies.id'))
+    movie_id = Column(Integer, ForeignKey("rottentomatoes_movies.id"))
     name = Column(String)
-    date = text_date_synonym('_date')
-    _date = Column('date', DateTime)
+    date = text_date_synonym("_date")
+    _date = Column("date", DateTime)
 
     def __init__(self, name: str, date: datetime) -> None:
         self.name = name
@@ -182,10 +182,10 @@ class ReleaseDate(Base):
 
 
 class RottenTomatoesPoster(Base):
-    __tablename__ = 'rottentomatoes_posters'
+    __tablename__ = "rottentomatoes_posters"
 
     db_id = Column(Integer, primary_key=True)
-    movie_id = Column(Integer, ForeignKey('rottentomatoes_movies.id'))
+    movie_id = Column(Integer, ForeignKey("rottentomatoes_movies.id"))
     name = Column(String)
     url = Column(String)
 
@@ -195,7 +195,7 @@ class RottenTomatoesPoster(Base):
 
 
 class RottenTomatoesActor(Base):
-    __tablename__ = 'rottentomatoes_actors'
+    __tablename__ = "rottentomatoes_actors"
 
     id = Column(Integer, primary_key=True)
     rt_id = Column(String)
@@ -207,7 +207,7 @@ class RottenTomatoesActor(Base):
 
 
 class RottenTomatoesDirector(Base):
-    __tablename__ = 'rottentomatoes_directors'
+    __tablename__ = "rottentomatoes_directors"
 
     id = Column(Integer, primary_key=True)
     name = Column(String)
@@ -217,10 +217,10 @@ class RottenTomatoesDirector(Base):
 
 
 class RottenTomatoesAlternateId(Base):
-    __tablename__ = 'rottentomatoes_alternate_ids'
+    __tablename__ = "rottentomatoes_alternate_ids"
 
     db_id = Column(Integer, primary_key=True)
-    movie_id = Column(Integer, ForeignKey('rottentomatoes_movies.id'))
+    movie_id = Column(Integer, ForeignKey("rottentomatoes_movies.id"))
     name = Column(String)
     id = Column(String)
 
@@ -230,10 +230,10 @@ class RottenTomatoesAlternateId(Base):
 
 
 class RottenTomatoesLink(Base):
-    __tablename__ = 'rottentomatoes_links'
+    __tablename__ = "rottentomatoes_links"
 
     db_id = Column(Integer, primary_key=True)
-    movie_id = Column(Integer, ForeignKey('rottentomatoes_movies.id'))
+    movie_id = Column(Integer, ForeignKey("rottentomatoes_movies.id"))
     name = Column(String)
     url = Column(String)
 
@@ -243,15 +243,15 @@ class RottenTomatoesLink(Base):
 
 
 class RottenTomatoesSearchResult(Base):
-    __tablename__ = 'rottentomatoes_search_results'
+    __tablename__ = "rottentomatoes_search_results"
 
     id = Column(Integer, primary_key=True)
     search = Column(String, nullable=False)
-    movie_id = Column(Integer, ForeignKey('rottentomatoes_movies.id'), nullable=False)
-    movie = relationship(RottenTomatoesMovie, backref='search_strings')
+    movie_id = Column(Integer, ForeignKey("rottentomatoes_movies.id"), nullable=False)
+    movie = relationship(RottenTomatoesMovie, backref="search_strings")
 
     def __repr__(self) -> str:
-        return f'<RottenTomatoesSearchResult(search={self.search},movie_id={self.movie_id},movie={self.movie})>'
+        return f"<RottenTomatoesSearchResult(search={self.search},movie_id={self.movie_id},movie={self.movie})>"
 
 
 @internet(logger)
@@ -281,24 +281,24 @@ def lookup_movie(
     """
     if smart_match:
         # If smart_match was specified, and we don't have more specific criteria, parse it into a title and year
-        title_parser = plugin.get('parsing', 'api_rottentomatoes').parse_movie(smart_match)
+        title_parser = plugin.get("parsing", "api_rottentomatoes").parse_movie(smart_match)
         title = title_parser.name
         year = title_parser.year
-        if title == '' and not (rottentomatoes_id or title):
-            raise PluginError(f'Failed to parse name from {smart_match}')
+        if title == "" and not (rottentomatoes_id or title):
+            raise PluginError(f"Failed to parse name from {smart_match}")
 
     search_string = ""
     if title:
         search_string = title.lower()
         if year:
-            search_string = f'{search_string} {year}'
+            search_string = f"{search_string} {year}"
     elif not rottentomatoes_id:
-        raise PluginError('No criteria specified for rotten tomatoes lookup')
+        raise PluginError("No criteria specified for rotten tomatoes lookup")
 
     def id_str() -> str:
-        return f'<title={title},year={year},rottentomatoes_id={rottentomatoes_id}>'
+        return f"<title={title},year={year},rottentomatoes_id={rottentomatoes_id}>"
 
-    logger.debug('Looking up rotten tomatoes information for {}', id_str())
+    logger.debug("Looking up rotten tomatoes information for {}", id_str())
 
     movie = None
 
@@ -317,20 +317,20 @@ def lookup_movie(
             movie_filter = movie_filter.filter(RottenTomatoesMovie.year == year)
         movie = movie_filter.first()
         if not movie:
-            logger.debug('No matches in movie cache found, checking search cache.')
+            logger.debug("No matches in movie cache found, checking search cache.")
             found = (
                 session.query(RottenTomatoesSearchResult)
                 .filter(func.lower(RottenTomatoesSearchResult.search) == search_string)
                 .first()
             )
             if found and found.movie:
-                logger.debug('Movie found in search cache.')
+                logger.debug("Movie found in search cache.")
                 movie = found.movie
     if movie:
         # Movie found in cache, check if cache has expired.
         if movie.expired and not only_cached:
             logger.debug(
-                'Cache has expired for {}, attempting to refresh from Rotten Tomatoes.', id_str()
+                "Cache has expired for {}, attempting to refresh from Rotten Tomatoes.", id_str()
             )
             try:
                 result = movies_info(movie.id, api_key)
@@ -338,15 +338,15 @@ def lookup_movie(
                 session.merge(movie)
             except URLError:
                 logger.error(
-                    'Error refreshing movie details from Rotten Tomatoes, cached info being used.'
+                    "Error refreshing movie details from Rotten Tomatoes, cached info being used."
                 )
         else:
-            logger.debug('Movie {} information restored from cache.', id_str())
+            logger.debug("Movie {} information restored from cache.", id_str())
     else:
         if only_cached:
-            raise PluginError(f'Movie {id_str()} not found from cache')
+            raise PluginError(f"Movie {id_str()} not found from cache")
         # There was no movie found in the cache, do a lookup from Rotten Tomatoes
-        logger.debug('Movie {} not found in cache, looking up from rotten tomatoes.', id_str())
+        logger.debug("Movie {} not found in cache, looking up from rotten tomatoes.", id_str())
         try:
             if not movie and rottentomatoes_id:
                 result = movies_info(rottentomatoes_id, api_key)
@@ -357,83 +357,83 @@ def lookup_movie(
 
             if not movie and title:
                 # TODO: Extract to method
-                logger.verbose('Searching from rt `{}`', search_string)
+                logger.verbose("Searching from rt `{}`", search_string)
                 results = movies_search(search_string, api_key=api_key)
                 if results:
-                    results = results.get('movies')
+                    results = results.get("movies")
                     if results:
                         for movie_res in results:
                             seq = difflib.SequenceMatcher(
-                                lambda x: x == ' ', movie_res['title'].lower(), title.lower()
+                                lambda x: x == " ", movie_res["title"].lower(), title.lower()
                             )
-                            movie_res['match'] = seq.ratio()
-                        results.sort(key=lambda x: x['match'], reverse=True)
+                            movie_res["match"] = seq.ratio()
+                        results.sort(key=lambda x: x["match"], reverse=True)
 
                         # Remove all movies below MIN_MATCH, and different year
                         for movie_res in results[:]:
-                            if year and movie_res.get('year'):
-                                movie_res['year'] = int(movie_res['year'])
-                                if movie_res['year'] != year:
+                            if year and movie_res.get("year"):
+                                movie_res["year"] = int(movie_res["year"])
+                                if movie_res["year"] != year:
                                     release_year = False
-                                    if movie_res.get('release_dates', {}).get('theater'):
-                                        logger.debug('Checking year against theater release date')
+                                    if movie_res.get("release_dates", {}).get("theater"):
+                                        logger.debug("Checking year against theater release date")
                                         release_year = time.strptime(
-                                            movie_res['release_dates'].get('theater'), '%Y-%m-%d'
+                                            movie_res["release_dates"].get("theater"), "%Y-%m-%d"
                                         ).tm_year
-                                    elif movie_res.get('release_dates', {}).get('dvd'):
-                                        logger.debug('Checking year against dvd release date')
+                                    elif movie_res.get("release_dates", {}).get("dvd"):
+                                        logger.debug("Checking year against dvd release date")
                                         release_year = time.strptime(
-                                            movie_res['release_dates'].get('dvd'), '%Y-%m-%d'
+                                            movie_res["release_dates"].get("dvd"), "%Y-%m-%d"
                                         ).tm_year
                                     if not (release_year and release_year == year):
                                         logger.debug(
-                                            'removing {} - {} (wrong year: {})',
-                                            movie_res['title'],
-                                            movie_res['id'],
-                                            str(release_year or movie_res['year']),
+                                            "removing {} - {} (wrong year: {})",
+                                            movie_res["title"],
+                                            movie_res["id"],
+                                            str(release_year or movie_res["year"]),
                                         )
                                         results.remove(movie_res)
                                         continue
-                            if movie_res['match'] < MIN_MATCH:
-                                logger.debug('removing {} (min_match)', movie_res['title'])
+                            if movie_res["match"] < MIN_MATCH:
+                                logger.debug("removing {} (min_match)", movie_res["title"])
                                 results.remove(movie_res)
                                 continue
 
                         if not results:
-                            raise PluginError('no appropiate results')
+                            raise PluginError("no appropiate results")
 
                         if len(results) == 1:
-                            logger.debug('SUCCESS: only one movie remains')
+                            logger.debug("SUCCESS: only one movie remains")
                         else:
                             # Check min difference between best two hits
-                            diff = results[0]['match'] - results[1]['match']
+                            diff = results[0]["match"] - results[1]["match"]
                             if diff < MIN_DIFF:
                                 logger.debug(
-                                    'unable to determine correct movie, min_diff too small(`{} ({}) - {}` <-?-> `{} ({}) - {}`)',
-                                    results[0]['title'],
-                                    results[0]['year'],
-                                    results[0]['id'],
-                                    results[1]['title'],
-                                    results[1]['year'],
-                                    results[1]['id'],
+                                    "unable to determine correct movie, min_diff too small(`{} ({}) - {}` <-?-> `{} ({}) - {}`)",
+                                    results[0]["title"],
+                                    results[0]["year"],
+                                    results[0]["id"],
+                                    results[1]["title"],
+                                    results[1]["year"],
+                                    results[1]["id"],
                                 )
                                 for r in results:
                                     logger.debug(
-                                        'remain: {} (match: {}) {}',
-                                        r['title'],
-                                        r['match'],
-                                        r['id'],
+                                        "remain: {} (match: {}) {}",
+                                        r["title"],
+                                        r["match"],
+                                        r["id"],
                                     )
-                                raise PluginError('min_diff')
+                                raise PluginError("min_diff")
 
-                        result = movies_info(results[0].get('id'), api_key)
+                        result = movies_info(results[0].get("id"), api_key)
 
                         if not result:
                             result = results[0]
 
                         movie = (
                             session.query(RottenTomatoesMovie)
-                            .filter(RottenTomatoesMovie.id == result['id'])
+                            .filter(RottenTomatoesMovie.id == result["id"])
                             .first()
                         )
 
@@ -449,19 +449,19 @@ def lookup_movie(
                                 RottenTomatoesSearchResult(search=search_string, movie=movie)
                             )
         except URLError:
-            raise PluginError('Error looking up movie from RottenTomatoes')
+            raise PluginError("Error looking up movie from RottenTomatoes")
 
     if not movie:
-        raise PluginError(f'No results found from rotten tomatoes for {id_str()}')
+        raise PluginError(f"No results found from rotten tomatoes for {id_str()}")
     # Access attributes to force the relationships to eager load before we detach from session
     for attr in [
-        'alternate_ids',
-        'cast',
-        'directors',
-        'genres',
-        'links',
-        'posters',
-        'release_dates',
+        "alternate_ids",
+        "cast",
+        "directors",
+        "genres",
+        "links",
+        "posters",
+        "release_dates",
     ]:
         getattr(movie, attr)
     session.commit()
@@ -484,7 +484,7 @@ def _set_movie_details(
     """
     if not movie_data:
         if not movie.id:
-            raise PluginError('Cannot get rotten tomatoes details without rotten tomatoes id')
+            raise PluginError("Cannot get rotten tomatoes details without rotten tomatoes id")
         movie_data = movies_info(movie.id, api_key)
     if movie_data:
         if movie.id:
@@ -496,8 +496,8 @@ def _set_movie_details(
             del movie.alternate_ids[:]
             del movie.links[:]
         movie.update_from_dict(movie_data)
-        movie.update_from_dict(movie_data.get('ratings'))
-        genres = movie_data.get('genres')
+        movie.update_from_dict(movie_data.get("ratings"))
+        genres = movie_data.get("genres")
         if genres:
             for name in genres:
                 genre = (
@@ -508,49 +508,49 @@ def _set_movie_details(
                 if not genre:
                     genre = RottenTomatoesGenre(name)
                 movie.genres.append(genre)
-        release_dates = movie_data.get('release_dates')
+        release_dates = movie_data.get("release_dates")
         if release_dates:
             for name, date in list(release_dates.items()):
                 movie.release_dates.append(ReleaseDate(name, date))
-        posters = movie_data.get('posters')
+        posters = movie_data.get("posters")
         if posters:
             for name, url in list(posters.items()):
                 movie.posters.append(RottenTomatoesPoster(name, url))
-        cast = movie_data.get('abridged_cast')
+        cast = movie_data.get("abridged_cast")
         if cast:
             for res_actor in cast:
                 actor = (
                     session.query(RottenTomatoesActor)
-                    .filter(func.lower(RottenTomatoesActor.rt_id) == res_actor['id'])
+                    .filter(func.lower(RottenTomatoesActor.rt_id) == res_actor["id"])
                     .first()
                 )
                 if not actor:
-                    actor = RottenTomatoesActor(res_actor['name'], res_actor['id'])
+                    actor = RottenTomatoesActor(res_actor["name"], res_actor["id"])
                 movie.cast.append(actor)
-        directors = movie_data.get('abridged_directors')
+        directors = movie_data.get("abridged_directors")
         if directors:
             for res_director in directors:
                 director = (
                     session.query(RottenTomatoesDirector)
                     .filter(
-                        func.lower(RottenTomatoesDirector.name) == res_director['name'].lower()
+                        func.lower(RottenTomatoesDirector.name) == res_director["name"].lower()
                     )
                     .first()
                 )
                 if not director:
-                    director = RottenTomatoesDirector(res_director['name'])
+                    director = RottenTomatoesDirector(res_director["name"])
                 movie.directors.append(director)
-        alternate_ids = movie_data.get('alternate_ids')
+        alternate_ids = movie_data.get("alternate_ids")
         if alternate_ids:
             for name, id in list(alternate_ids.items()):
                 movie.alternate_ids.append(RottenTomatoesAlternateId(name, id))
-        links = movie_data.get('links')
+        links = movie_data.get("links")
         if links:
             for name, url in list(links.items()):
                 movie.links.append(RottenTomatoesLink(name, url))
         movie.updated = datetime.now()
     else:
-        raise PluginError(f'No movie_data for rottentomatoes_id {movie.id}')
+        raise PluginError(f"No movie_data for rottentomatoes_id {movie.id}")
 
     return movie
 
@@ -558,9 +558,9 @@ def _set_movie_details(
 def movies_info(id, api_key: Optional[str] = None):
     if not api_key:
         api_key = API_KEY
-    url = f'{SERVER}/{API_VER}/movies/{id}.json?apikey={api_key}'
+    url = f"{SERVER}/{API_VER}/movies/{id}.json?apikey={api_key}"
     result = get_json(url)
-    if isinstance(result, dict) and result.get('id'):
+    if isinstance(result, dict) and result.get("id"):
         return result
     return None
 
@@ -574,23 +574,23 @@ def lists(
     api_key=None,
 ):
     if isinstance(list_type, str):
-        list_type = list_type.replace(' ', '_')
+        list_type = list_type.replace(" ", "_")
     if isinstance(list_name, str):
-        list_name = list_name.replace(' ', '_')
+        list_name = list_name.replace(" ", "_")
 
     if not api_key:
         api_key = API_KEY
 
-    url = f'{SERVER}/{API_VER}/lists/{list_type}/{list_name}.json?apikey={api_key}'
+    url = f"{SERVER}/{API_VER}/lists/{list_type}/{list_name}.json?apikey={api_key}"
     if limit:
-        url += f'&limit={limit}'
+        url += f"&limit={limit}"
     if page_limit:
-        url += f'&page_limit={page_limit}'
+        url += f"&page_limit={page_limit}"
     if page:
-        url += f'&page={page}'
+        url += f"&page={page}"
 
     results = get_json(url)
-    if isinstance(results, dict) and len(results.get('movies')):
+    if isinstance(results, dict) and len(results.get("movies")):
         return results
     return None
 
@@ -599,31 +599,31 @@ def movies_search(
     q, page_limit: Optional[int] = None, page: Optional[int] = None, api_key: Optional[str] = None
 ):
     if isinstance(q, str):
-        q = quote_plus(q.encode('latin-1', errors='ignore'))
+        q = quote_plus(q.encode("latin-1", errors="ignore"))
 
     if not api_key:
         api_key = API_KEY
 
-    url = f'{SERVER}/{API_VER}/movies.json?q={q}&apikey={api_key}'
+    url = f"{SERVER}/{API_VER}/movies.json?q={q}&apikey={api_key}"
     if page_limit:
-        url += f'&page_limit={page_limit}'
+        url += f"&page_limit={page_limit}"
     if page:
-        url += f'&page={page}'
+        url += f"&page={page}"
 
     results = get_json(url)
-    if isinstance(results, dict) and results.get('total') and results.get('movies'):
+    if isinstance(results, dict) and results.get("total") and results.get("movies"):
         return results
     return None
 
 
 def get_json(url: str) -> Optional[dict[str, Any]]:
     try:
-        logger.debug('fetching json at {}', url)
+        logger.debug("fetching json at {}", url)
         data = session.get(url)
         return data.json()
     except requests.RequestException as e:
-        logger.warning('Request failed {}: {}', url, e)
+        logger.warning("Request failed {}: {}", url, e)
         return None
     except ValueError:
-        logger.warning('Rotten Tomatoes returned invalid json at: {}', url)
+        logger.warning("Rotten Tomatoes returned invalid json at: {}", url)
         return None

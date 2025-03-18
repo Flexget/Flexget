@@ -47,10 +47,10 @@ class TestListInterface:
     """
 
     def test_list_add(self, execute_task):
-        task = execute_task('pending_list_add')
+        task = execute_task("pending_list_add")
         assert len(task.entries) == 2
 
-        task = execute_task('list_get')
+        task = execute_task("list_get")
         assert len(task.entries) == 0
 
         with Session() as session:
@@ -59,14 +59,14 @@ class TestListInterface:
             for entry in list.entries:
                 entry.approved = True
 
-        task = execute_task('list_get')
+        task = execute_task("list_get")
         assert len(task.entries) == 2
 
     def test_list_match(self, execute_task):
-        task = execute_task('pending_list_add')
+        task = execute_task("pending_list_add")
         assert len(task.entries) == 2
 
-        task = execute_task('pending_list_match')
+        task = execute_task("pending_list_match")
         assert len(task.accepted) == 0
 
         with Session() as session:
@@ -75,28 +75,28 @@ class TestListInterface:
             for entry in list.entries:
                 entry.approved = True
 
-        task = execute_task('list_get')
+        task = execute_task("list_get")
         assert len(task.entries) == 2
 
-        task = execute_task('pending_list_match')
+        task = execute_task("pending_list_match")
         assert len(task.accepted) == 2
 
-        task = execute_task('list_get')
+        task = execute_task("list_get")
         assert len(task.entries) == 0
 
     def test_list_get_include(self, execute_task):
-        task = execute_task('pending_list_add')
+        task = execute_task("pending_list_add")
         assert len(task.entries) == 2
 
         with Session() as session:
             entry = session.query(PendingListList).first().entries.first()
             entry.approved = True
 
-        task = execute_task('list_get_all')
+        task = execute_task("list_get_all")
         assert len(task.entries) == 2
 
-        task = execute_task('list_get_pending')
+        task = execute_task("list_get_pending")
         assert len(task.entries) == 1
 
-        task = execute_task('list_get_approved')
+        task = execute_task("list_get_approved")
         assert len(task.entries) == 1

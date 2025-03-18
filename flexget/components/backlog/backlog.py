@@ -10,7 +10,7 @@ from flexget.utils.database import with_session
 from flexget.utils.serialization import serialize
 from flexget.utils.tools import parse_timedelta
 
-logger = logger.bind(name='backlog')
+logger = logger.bind(name="backlog")
 
 
 class InputBacklog:
@@ -23,7 +23,7 @@ class InputBacklog:
     Rarely useful for end users, mainly used by other plugins.
     """
 
-    schema = {'type': 'string', 'format': 'interval'}
+    schema = {"type": "string", "format": "interval"}
 
     @plugin.priority(plugin.PRIORITY_LAST)
     def on_task_input(self, task, config):
@@ -39,50 +39,50 @@ class InputBacklog:
     def on_task_metainfo(self, task, config):
         # Take a snapshot of any new entries' states before metainfo event in case we have to store them to backlog
         for entry in task.entries:
-            entry['_backlog_snapshot'] = serialize(entry)
+            entry["_backlog_snapshot"] = serialize(entry)
 
     def on_task_abort(self, task, config):
         """Remember all entries until next execution when task gets aborted."""
         if task.entries:
-            logger.debug('Remembering all entries to backlog because of task abort.')
+            logger.debug("Remembering all entries to backlog because of task abort.")
             self.learn_backlog(task)
 
     @with_session
-    def add_backlog(self, task, entry, amount='', session=None):
+    def add_backlog(self, task, entry, amount="", session=None):
         """Add single entry to task backlog.
 
         If :amount: is not specified, entry will only be injected on next execution.
         """
-        snapshot = entry.get('_backlog_snapshot')
+        snapshot = entry.get("_backlog_snapshot")
         if not snapshot:
-            if task.current_phase != 'input':
+            if task.current_phase != "input":
                 # Not having a snapshot is normal during input phase, don't display a warning
                 logger.warning(
-                    'No input snapshot available for `{}`, using current state', entry['title']
+                    "No input snapshot available for `{}`, using current state", entry["title"]
                 )
             snapshot = serialize(entry)
         expire_time = datetime.now() + parse_timedelta(amount)
         backlog_entry = (
             session.query(BacklogEntry)
-            .filter(BacklogEntry.title == entry['title'])
+            .filter(BacklogEntry.title == entry["title"])
             .filter(BacklogEntry.task == task.name)
             .first()
         )
         if backlog_entry:
             # If there is already a backlog entry for this, update the expiry time if necessary.
             if backlog_entry.expire < expire_time:
-                logger.debug('Updating expiry time for {}', entry['title'])
+                logger.debug("Updating expiry time for {}", entry["title"])
                 backlog_entry.expire = expire_time
         else:
-            logger.debug('Saving {}', entry['title'])
+            logger.debug("Saving {}", entry["title"])
             backlog_entry = BacklogEntry()
-            backlog_entry.title = entry['title']
+            backlog_entry.title = entry["title"]
             backlog_entry.entry = snapshot
             backlog_entry.task = task.name
             backlog_entry.expire = expire_time
             session.add(backlog_entry)
 
-    def learn_backlog(self, task, amount=''):
+    def learn_backlog(self, task, amount=""):
         """Learn current entries into backlog. All task inputs must have been executed."""
         with Session() as session:
             for entry in task.entries:
@@ -96,20 +96,20 @@ class InputBacklog:
             entry = backlog_entry.entry
 
             # this is already in the task
-            if task.find_entry(title=entry['title'], url=entry['url']):
+            if task.find_entry(title=entry["title"], url=entry["url"]):
                 continue
-            logger.debug('Restoring {}', entry['title'])
+            logger.debug("Restoring {}", entry["title"])
             entries.append(entry)
         if entries:
-            logger.verbose('Added {} entries from backlog', len(entries))
+            logger.verbose("Added {} entries from backlog", len(entries))
 
         # purge expired
         purged = clear_entries(task=task.name, all=False, session=session)
-        logger.debug('{} entries purged from backlog', purged)
+        logger.debug("{} entries purged from backlog", purged)
 
         return entries
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(InputBacklog, 'backlog', builtin=True, api_ver=2)
+    plugin.register(InputBacklog, "backlog", builtin=True, api_ver=2)

@@ -6,11 +6,11 @@ class OneEntryInput:
     """Fake input plugin, fails if second entry is grabbed."""
 
     def on_task_input(self, task, config):
-        yield Entry(title='Test', url='http://test.com')
-        raise RuntimeError('Should not have tried to get second entry.')
+        yield Entry(title="Test", url="http://test.com")
+        raise RuntimeError("Should not have tried to get second entry.")
 
 
-plugin.register(OneEntryInput, 'one_entry_input', api_ver=2)
+plugin.register(OneEntryInput, "one_entry_input", api_ver=2)
 
 
 class TestLimit:
@@ -32,9 +32,9 @@ class TestLimit:
     """
 
     def test_limit(self, execute_task):
-        task = execute_task('test_limit')
+        task = execute_task("test_limit")
         assert len(task.all_entries) == 2
 
     def test_limit_generator(self, execute_task):
-        task = execute_task('test_limit_generator')
+        task = execute_task("test_limit_generator")
         assert len(task.all_entries) == 1

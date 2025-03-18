@@ -3,7 +3,7 @@ from loguru import logger
 from flexget import plugin
 from flexget.event import event
 
-logger = logger.bind(name='nzbget')
+logger = logger.bind(name="nzbget")
 
 
 class OutputNzbget:
@@ -19,15 +19,15 @@ class OutputNzbget:
     """
 
     schema = {
-        'type': 'object',
-        'properties': {
-            'url': {'type': 'string'},
-            'category': {'type': 'string', 'default': ''},
-            'priority': {'type': 'integer', 'default': 0},
-            'top': {'type': 'boolean', 'default': False},
+        "type": "object",
+        "properties": {
+            "url": {"type": "string"},
+            "category": {"type": "string", "default": ""},
+            "priority": {"type": "integer", "default": 0},
+            "top": {"type": "boolean", "default": False},
         },
-        'required': ['url'],
-        'additionalProperties': False,
+        "required": ["url"],
+        "additionalProperties": False,
     }
 
     def on_task_output(self, task, config):
@@ -39,27 +39,27 @@ class OutputNzbget:
 
         for entry in task.accepted:
             if task.options.test:
-                logger.info('Would add into nzbget: {}', entry['title'])
+                logger.info("Would add into nzbget: {}", entry["title"])
                 continue
 
             # allow overriding the category
-            if 'category' in entry:
-                params['category'] = entry['category']
+            if "category" in entry:
+                params["category"] = entry["category"]
 
             try:
                 server.appendurl(
-                    entry['title'] + '.nzb',
-                    params['category'],
-                    params['priority'],
-                    params['top'],
-                    entry['url'],
+                    entry["title"] + ".nzb",
+                    params["category"],
+                    params["priority"],
+                    params["top"],
+                    entry["url"],
                 )
-                logger.info('Added `{}` to nzbget', entry['title'])
+                logger.info("Added `{}` to nzbget", entry["title"])
             except Exception as e:
-                logger.critical('rpc call to nzbget failed: {}', e)
-                entry.fail('could not call appendurl via RPC')
+                logger.critical("rpc call to nzbget failed: {}", e)
+                entry.fail("could not call appendurl via RPC")
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(OutputNzbget, 'nzbget', api_ver=2)
+    plugin.register(OutputNzbget, "nzbget", api_ver=2)

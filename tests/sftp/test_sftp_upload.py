@@ -86,13 +86,13 @@ class TestSftpDownload:
 
     @pytest.fixture
     def to_upload_path(self, tmp_path: Path):
-        to_upload_path = tmp_path / 'to_upload'
+        to_upload_path = tmp_path / "to_upload"
         to_upload_path.mkdir()
         return to_upload_path
 
     @pytest.fixture
     def config(self, to_upload_path: Path):
-        return Template(self._config).render({'to_upload_path': str(to_upload_path)})
+        return Template(self._config).render({"to_upload_path": str(to_upload_path)})
 
     @pytest.fixture
     def sftp_fs(self, sftp: TestSFTPServerController) -> TestSFTPFileSystem:
@@ -100,40 +100,40 @@ class TestSftpDownload:
 
     @pytest.fixture
     def remote(self, sftp_fs: TestSFTPFileSystem):
-        return sftp_fs.home() / 'uploaded'
+        return sftp_fs.home() / "uploaded"
 
     def test_sftp_upload_file(self, execute_task, to_upload_path: Path, remote: Path):
-        local_file: Path = TestSftpDownload.create_file(to_upload_path, 'file.mkv', 100)
+        local_file: Path = TestSftpDownload.create_file(to_upload_path, "file.mkv", 100)
 
-        execute_task('sftp_upload_file')
-        assert filecmp.cmp(local_file, remote / 'file.mkv')
+        execute_task("sftp_upload_file")
+        assert filecmp.cmp(local_file, remote / "file.mkv")
 
     def test_sftp_upload_dir(self, execute_task, to_upload_path: Path, remote: Path):
-        local_dir: Path = TestSftpDownload.create_dir(to_upload_path, 'dir')
-        TestSftpDownload.create_file(to_upload_path, 'dir/file1.mkv', 100)
-        TestSftpDownload.create_file(to_upload_path, 'dir/nested/file2.mkv', 100)
+        local_dir: Path = TestSftpDownload.create_dir(to_upload_path, "dir")
+        TestSftpDownload.create_file(to_upload_path, "dir/file1.mkv", 100)
+        TestSftpDownload.create_file(to_upload_path, "dir/nested/file2.mkv", 100)
 
-        execute_task('sftp_upload_dir')
+        execute_task("sftp_upload_dir")
 
-        assert filecmp.dircmp(local_dir, remote / 'dir')
+        assert filecmp.dircmp(local_dir, remote / "dir")
 
     def test_sftp_upload_file_delete_origin(
         self, execute_task, to_upload_path: Path, remote: Path
     ):
-        local_file: Path = TestSftpDownload.create_file(to_upload_path, 'file.mkv', 100)
+        local_file: Path = TestSftpDownload.create_file(to_upload_path, "file.mkv", 100)
 
-        execute_task('sftp_upload_file_delete_origin')
+        execute_task("sftp_upload_file_delete_origin")
         assert not local_file.exists()
 
     @pytest.mark.skip(
-        reason='No attempt is made by the sftp_upload plugin to remove the local dir)'
+        reason="No attempt is made by the sftp_upload plugin to remove the local dir)"
     )
     def test_sftp_upload_dir_delete_origin(self, execute_task, to_upload_path: Path, remote: Path):
-        local_dir: Path = TestSftpDownload.create_dir(to_upload_path, 'dir')
-        TestSftpDownload.create_file(to_upload_path, 'dir/file1.mkv', 100)
-        TestSftpDownload.create_file(to_upload_path, 'dir/nested/file2.mkv', 100)
+        local_dir: Path = TestSftpDownload.create_dir(to_upload_path, "dir")
+        TestSftpDownload.create_file(to_upload_path, "dir/file1.mkv", 100)
+        TestSftpDownload.create_file(to_upload_path, "dir/nested/file2.mkv", 100)
 
-        execute_task('sftp_upload_dir_delete_origin')
+        execute_task("sftp_upload_dir_delete_origin")
 
         assert not local_dir.exists()
 
@@ -141,18 +141,18 @@ class TestSftpDownload:
         self, execute_task, to_upload_path: Path, sftp: TestSFTPServerController
     ):
         sftp_fs = sftp.start(key_only=True)
-        remote = sftp_fs.home() / 'uploaded'
-        local_file: Path = TestSftpDownload.create_file(to_upload_path, 'file.mkv', 100)
+        remote = sftp_fs.home() / "uploaded"
+        local_file: Path = TestSftpDownload.create_file(to_upload_path, "file.mkv", 100)
 
-        execute_task('sftp_upload_key_only')
-        assert filecmp.cmp(local_file, remote / 'file.mkv')
+        execute_task("sftp_upload_key_only")
+        assert filecmp.cmp(local_file, remote / "file.mkv")
 
     @staticmethod
     def create_file(root: Path, path: str, size: int = 0) -> Path:
         file_path = root / path
         file_path.parent.mkdir(parents=True, exist_ok=True)
-        with file_path.open('wb') as file:
-            file.write(b'\0' * size)
+        with file_path.open("wb") as file:
+            file.write(b"\0" * size)
         return file_path
 
     @staticmethod

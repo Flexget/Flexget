@@ -18,12 +18,12 @@ from flexget import __version__ as version
 from flexget.utils.tools import TimedDict, parse_timedelta
 
 # If we use just 'requests' here, we'll get the logger created by requests, rather than our own
-logger = logger.bind(name='utils.requests')
+logger = logger.bind(name="utils.requests")
 
 # Don't emit info level urllib3 log messages or below
-logging.getLogger('requests.packages.urllib3').setLevel(logging.WARNING)
+logging.getLogger("requests.packages.urllib3").setLevel(logging.WARNING)
 # same as above, but for systems where urllib3 isn't part of the requests pacakge (i.e., Ubuntu)
-logging.getLogger('urllib3').setLevel(logging.WARNING)
+logging.getLogger("urllib3").setLevel(logging.WARNING)
 
 # Time to wait before trying an unresponsive site again
 WAIT_TIME = timedelta(seconds=60)
@@ -79,7 +79,7 @@ class TokenBucketLimiter(DomainLimiter):
 
     # This is just an in memory cache right now, it works for the daemon, and across tasks in a single execution
     # but not for multiple executions via cron. Do we need to store this to db?
-    state_cache: dict[str, 'StateCacheDict'] = {}
+    state_cache: dict[str, "StateCacheDict"] = {}
 
     def __init__(
         self,
@@ -100,24 +100,24 @@ class TokenBucketLimiter(DomainLimiter):
         self.wait = wait
         # Restore previous state for this domain, or establish new state cache
         self.state = self.state_cache.setdefault(
-            domain, {'tokens': self.max_tokens, 'last_update': datetime.now()}
+            domain, {"tokens": self.max_tokens, "last_update": datetime.now()}
         )
 
     @property
     def tokens(self) -> Union[float, int]:
-        return min(self.max_tokens, self.state['tokens'])
+        return min(self.max_tokens, self.state["tokens"])
 
     @tokens.setter
     def tokens(self, value: float) -> None:
-        self.state['tokens'] = value
+        self.state["tokens"] = value
 
     @property
     def last_update(self) -> datetime:
-        return self.state['last_update']
+        return self.state["last_update"]
 
     @last_update.setter
     def last_update(self, value: datetime) -> None:
-        self.state['last_update'] = value
+        self.state["last_update"] = value
 
     def __call__(self) -> None:
         if self.tokens < self.max_tokens:
@@ -126,11 +126,11 @@ class TokenBucketLimiter(DomainLimiter):
         self.last_update = datetime.now()
         if self.tokens < 1:
             if not self.wait:
-                raise RequestException(f'Requests to {self.domain} have exceeded their limit.')
+                raise RequestException(f"Requests to {self.domain} have exceeded their limit.")
             wait = self.rate.total_seconds() * (1 - self.tokens)
             # Don't spam console if wait is low
-            level = 'DEBUG' if wait < 4 else 'VERBOSE'
-            logger.log(level, 'Waiting {:.2f} seconds until next request to {}', wait, self.domain)
+            level = "DEBUG" if wait < 4 else "VERBOSE"
+            logger.log(level, "Waiting {:.2f} seconds until next request to {}", wait, self.domain)
             # Sleep until it is time for the next request
             time.sleep(wait)
         self.tokens -= 1
@@ -153,7 +153,7 @@ def _wrap_urlopen(url: str, timeout: Optional[int] = None) -> requests.Response:
     try:
         raw = urlopen(url, timeout=timeout)
     except OSError as e:
-        msg = f'Error getting {url}: {e}'
+        msg = f"Error getting {url}: {e}"
         logger.error(msg)
         raise RequestException(msg)
     resp = requests.Response()
@@ -177,14 +177,14 @@ def limit_domains(url: str, limit_dict: dict[str, DomainLimiter]) -> None:
             break
 
 
-def parse_header(header: str) -> tuple[str, 'Mapping']:
+def parse_header(header: str) -> tuple[str, "Mapping"]:
     """Parse a MIME header (such as Content-Type) into a main value and a dictionary of parameters.
 
     Replaces function in the deprecated cgi stdlib module.
     """
     msg = EmailMessage()
-    msg['content-type'] = header
-    return msg.get_content_type(), msg['content-type'].params
+    msg["content-type"] = header
+    return msg.get_content_type(), msg["content-type"].params
 
 
 class Session(requests.Session):
@@ -194,10 +194,10 @@ class Session(requests.Session):
         """Set some defaults for our session if not explicitly defined."""
         super().__init__()
         self.timeout = timeout
-        self.adapters['http://'].max_retries = max_retries
+        self.adapters["http://"].max_retries = max_retries
         # Stores min intervals between requests for certain sites
         self.domain_limiters: dict[str, DomainLimiter] = {}
-        self.headers.update({'User-Agent': f'FlexGet/{version} (www.flexget.com)'})
+        self.headers.update({"User-Agent": f"FlexGet/{version} (www.flexget.com)"})
 
     def add_cookiejar(self, cookiejar):
         """Merge cookies from `cookiejar` into cookiejar for this session.
@@ -216,7 +216,7 @@ class Session(requests.Session):
         :param delay: The amount of time between requests, can be a timedelta or string like '3 seconds'
         """
         warnings.warn(
-            'set_domain_delay is deprecated, use add_domain_limiter',
+            "set_domain_delay is deprecated, use add_domain_limiter",
             DeprecationWarning,
             stacklevel=2,
         )
@@ -244,25 +244,25 @@ class Session(requests.Session):
         # Raise Timeout right away if site is known to timeout
         if is_unresponsive(url):
             raise requests.Timeout(
-                f'Requests to this site ({urlparse(url).hostname}) have timed out recently. '
-                'Waiting before trying again.'
+                f"Requests to this site ({urlparse(url).hostname}) have timed out recently. "
+                "Waiting before trying again."
             )
 
         # Run domain limiters for this url
-        if not kwargs.pop('disable_limiters', False):
+        if not kwargs.pop("disable_limiters", False):
             limit_domains(url, self.domain_limiters)
 
-        kwargs.setdefault('timeout', self.timeout)
-        raise_status = kwargs.pop('raise_status', True)
+        kwargs.setdefault("timeout", self.timeout)
+        raise_status = kwargs.pop("raise_status", True)
 
         # If we do not have an adapter for this url, pass it off to urllib
         if not any(url.startswith(adapter) for adapter in self.adapters):
-            logger.debug('No adaptor, passing off to urllib')
-            return _wrap_urlopen(url, timeout=kwargs['timeout'])
+            logger.debug("No adaptor, passing off to urllib")
+            return _wrap_urlopen(url, timeout=kwargs["timeout"])
 
         try:
             logger.debug(
-                '{}ing URL {} with args {} and kwargs {}', method.upper(), url, args, kwargs
+                "{}ing URL {} with args {} and kwargs {}", method.upper(), url, args, kwargs
             )
             result = super().request(method, url, *args, **kwargs)
         except requests.Timeout:
@@ -278,7 +278,7 @@ class Session(requests.Session):
 
 # Define some module level functions that use our Session, so this module can be used like main requests module
 def request(method: str, url: str, **kwargs) -> requests.Response:
-    s = kwargs.pop('session', Session())
+    s = kwargs.pop("session", Session())
     return s.request(method=method, url=url, **kwargs)
 
 
@@ -288,8 +288,8 @@ def head(url: str, **kwargs) -> requests.Response:
     :param url: URL for the new :class:`Request` object.
     :param kwargs: Optional arguments that ``request`` takes.
     """
-    kwargs.setdefault('allow_redirects', True)
-    return request('head', url, **kwargs)
+    kwargs.setdefault("allow_redirects", True)
+    return request("head", url, **kwargs)
 
 
 def get(url: str, **kwargs) -> requests.Response:
@@ -298,8 +298,8 @@ def get(url: str, **kwargs) -> requests.Response:
     :param url: URL for the new :class:`Request` object.
     :param kwargs: Optional arguments that ``request`` takes.
     """
-    kwargs.setdefault('allow_redirects', True)
-    return request('get', url, **kwargs)
+    kwargs.setdefault("allow_redirects", True)
+    return request("get", url, **kwargs)
 
 
 def post(url: str, data=None, **kwargs) -> requests.Response:
@@ -309,4 +309,4 @@ def post(url: str, data=None, **kwargs) -> requests.Response:
     :param data: (optional) Dictionary or bytes to send in the body of the :class:`Request`.
     :param kwargs: Optional arguments that ``request`` takes.
     """
-    return request('post', url, data=data, **kwargs)
+    return request("post", url, data=data, **kwargs)

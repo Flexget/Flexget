@@ -18,10 +18,10 @@ class TestTemplate:
     """
 
     def test_config_template_hash_check(self, manager, execute_task):
-        task = execute_task('test')
-        assert len(task.entries) == 1, 'Should have emitted House S01E01'
+        task = execute_task("test")
+        assert len(task.entries) == 1, "Should have emitted House S01E01"
 
-        manager.config['templates']['test_series']['series']['test'].append('Hawaii Five-O')
+        manager.config["templates"]["test_series"]["series"]["test"].append("Hawaii Five-O")
 
-        task = execute_task('test')
-        assert len(task.entries) == 2, 'Should have emitted House S01E02 and Hawaii Five-O S01E01'
+        task = execute_task("test")
+        assert len(task.entries) == 2, "Should have emitted House S01E02 and Hawaii Five-O S01E01"

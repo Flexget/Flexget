@@ -7,11 +7,11 @@ from loguru import logger
 
 from flexget.utils import json
 
-DATE_FMT = '%Y-%m-%d'
-DATETIME_FMT = '%Y-%m-%dT%H:%M:%SZ'
+DATE_FMT = "%Y-%m-%d"
+DATETIME_FMT = "%Y-%m-%dT%H:%M:%SZ"
 
 
-logger = logger.bind(name='utils.serialization')
+logger = logger.bind(name="utils.serialization")
 
 
 def serialize(value: Any) -> Any:
@@ -23,9 +23,9 @@ def serialize(value: Any) -> Any:
     s = _serializer_for(value)
     if s:
         return {
-            'serializer': s.serializer_name(),
-            'version': s.serializer_version(),
-            'value': s.serialize(value),
+            "serializer": s.serializer_name(),
+            "version": s.serializer_version(),
+            "value": s.serialize(value),
         }
     if isinstance(value, list):
         return [serialize(v) for v in value]
@@ -33,7 +33,7 @@ def serialize(value: Any) -> Any:
         return {k: serialize(v) for k, v in value.items()}
     if isinstance(value, (str, int, float, type(None))):
         return value
-    raise TypeError(f'`{value!r}` of type {type(value)!r} is not serializable')
+    raise TypeError(f"`{value!r}` of type {type(value)!r} is not serializable")
 
 
 def deserialize(value: Any) -> Any:
@@ -43,9 +43,9 @@ def deserialize(value: Any) -> Any:
     :return: Deserialized object.
     """
     if isinstance(value, dict):
-        if all(key in value for key in ('serializer', 'version', 'value')):
-            return _deserializer_for(value['serializer']).deserialize(
-                value['value'], value['version']
+        if all(key in value for key in ("serializer", "version", "value")):
+            return _deserializer_for(value["serializer"]).deserialize(
+                value["value"], value["version"]
             )
         return {k: deserialize(v) for k, v in value.items()}
     if isinstance(value, list):
@@ -59,7 +59,7 @@ def dumps(value: Any) -> str:
     try:
         return json.dumps(serialized)
     except TypeError as exc:
-        raise TypeError(f'Error during dumping {exc}. Instance: {serialized!r}') from exc
+        raise TypeError(f"Error during dumping {exc}. Instance: {serialized!r}") from exc
 
 
 def loads(value: str) -> Any:
@@ -70,7 +70,7 @@ def loads(value: str) -> Any:
 def yaml_dump(data, *args, **kwargs):
     """Dump an object to YAML text using the serialization system."""
     data = serialize(data)
-    kwargs['Dumper'] = FGDumper
+    kwargs["Dumper"] = FGDumper
     return yaml.dump(data, *args, **kwargs)
 
 
@@ -134,9 +134,9 @@ class DateTimeSerializer(Serializer):
     def serialize(cls, value: datetime.datetime):
         result = value.strftime(DATETIME_FMT)
         # See note above
-        year, rest = result.split('-', maxsplit=1)
+        year, rest = result.split("-", maxsplit=1)
         if len(year) != 4:
-            result = f'{value.year:04}-{rest}'
+            result = f"{value.year:04}-{rest}"
         return result
 
     @classmethod
@@ -144,7 +144,7 @@ class DateTimeSerializer(Serializer):
         try:
             return datetime.datetime.strptime(data, DATETIME_FMT)
         except ValueError:
-            logger.error('Error deserializing datetime `{}`', data)
+            logger.error("Error deserializing datetime `{}`", data)
             return datetime.datetime.min
 
 
@@ -157,9 +157,9 @@ class DateSerializer(Serializer):
     def serialize(cls, value: datetime.date):
         result = value.strftime(DATE_FMT)
         # See note above
-        year, rest = result.split('-', maxsplit=1)
+        year, rest = result.split("-", maxsplit=1)
         if len(year) != 4:
-            result = f'{value.year:04}-{rest}'
+            result = f"{value.year:04}-{rest}"
         return result
 
     @classmethod
@@ -167,7 +167,7 @@ class DateSerializer(Serializer):
         try:
             return datetime.datetime.strptime(data, DATE_FMT).date()
         except ValueError:
-            logger.error('Error deserializing date `{}`', data)
+            logger.error("Error deserializing date `{}`", data)
             return datetime.date.min
 
 
@@ -210,27 +210,27 @@ def _deserializer_for(serializer_name: str) -> type[Serializer]:
     for s in Serializer.__subclasses__():
         if serializer_name == s.serializer_name():
             return s
-    raise ValueError(f'No deserializer for {serializer_name}')
+    raise ValueError(f"No deserializer for {serializer_name}")
 
 
 def _yaml_representer(dumper, data):
-    if isinstance(data, dict) and all(k in data for k in ('value', 'serializer', 'version')):
+    if isinstance(data, dict) and all(k in data for k in ("value", "serializer", "version")):
         tag = f"!{data['serializer']}.v{data['version']}"
-        if isinstance(data['value'], dict):
-            return dumper.represent_mapping(tag, data['value'])
-        if isinstance(data['value'], list):
-            return dumper.represent_sequence(tag, data['value'])
-        return dumper.represent_scalar(tag, data['value'])
+        if isinstance(data["value"], dict):
+            return dumper.represent_mapping(tag, data["value"])
+        if isinstance(data["value"], list):
+            return dumper.represent_sequence(tag, data["value"])
+        return dumper.represent_scalar(tag, data["value"])
     return dumper.represent_dict(data)
 
 
 def _yaml_constructor(loader, node):
-    serializer, version = node.tag.split('.v')
-    serializer = serializer.lstrip('!')
+    serializer, version = node.tag.split(".v")
+    serializer = serializer.lstrip("!")
     version = int(version)
-    if node.id == 'mapping':
+    if node.id == "mapping":
         value = loader.construct_mapping(node, deep=True)
-    elif node.id == 'sequence':
+    elif node.id == "sequence":
         value = loader.construct_sequence(node, deep=True)
     else:
         value = loader.construct_scalar(node)

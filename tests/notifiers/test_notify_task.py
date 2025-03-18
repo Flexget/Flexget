@@ -33,17 +33,17 @@ class TestNotifyTask:
     """
 
     def test_notify_accepted(self, execute_task, debug_notifications):
-        execute_task('test_accepted')
+        execute_task("test_accepted")
 
         assert len(debug_notifications) == 1
 
     def test_no_notification(self, execute_task, debug_notifications):
         # With no accepted entries, nothing should have been sent
-        execute_task('test_nothing')
+        execute_task("test_nothing")
         assert len(debug_notifications) == 0
 
     def test_jinja(self, execute_task, debug_notifications):
-        execute_task('test_jinja')
+        execute_task("test_jinja")
         assert len(debug_notifications) == 1
-        assert debug_notifications[0][0] == 'test_jinja aoeu'
-        assert debug_notifications[0][2]['setting'] == '1test_jinja'
+        assert debug_notifications[0][0] == "test_jinja aoeu"
+        assert debug_notifications[0][2]["setting"] == "1test_jinja"

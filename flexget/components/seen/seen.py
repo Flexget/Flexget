@@ -5,7 +5,7 @@ from flexget.event import event
 
 from . import db
 
-logger = logger.bind(name='seen')
+logger = logger.bind(name="seen")
 
 
 class FilterSeen:
@@ -18,16 +18,16 @@ class FilterSeen:
     """
 
     schema = {
-        'oneOf': [
-            {'type': 'boolean'},
-            {'type': 'string', 'enum': ['global', 'local']},
+        "oneOf": [
+            {"type": "boolean"},
+            {"type": "string", "enum": ["global", "local"]},
             {
-                'type': 'object',
-                'properties': {
-                    'local': {'type': 'boolean'},
-                    'fields': {
-                        'type': 'array',
-                        'items': {'type': 'string'},
+                "type": "object",
+                "properties": {
+                    "local": {"type": "boolean"},
+                    "fields": {
+                        "type": "array",
+                        "items": {"type": "string"},
                         "minItems": 1,
                         "uniqueItems": True,
                     },
@@ -38,8 +38,8 @@ class FilterSeen:
 
     def __init__(self):
         # remember and filter by these fields
-        self.fields = ['title', 'url', 'original_url']
-        self.keyword = 'seen'
+        self.fields = ["title", "url", "original_url"]
+        self.keyword = "seen"
 
     def prepare_config(self, config):
         if config is None:
@@ -47,12 +47,12 @@ class FilterSeen:
         elif isinstance(config, bool):
             if config is False:
                 return config
-            config = {'local': False}
+            config = {"local": False}
         elif isinstance(config, str):
-            config = {'local': config == 'local'}
+            config = {"local": config == "local"}
 
-        config.setdefault('local', False)
-        config.setdefault('fields', self.fields)
+        config.setdefault("local", False)
+        config.setdefault("fields", self.fields)
         return config
 
     @plugin.priority(plugin.PRIORITY_FIRST)
@@ -60,11 +60,11 @@ class FilterSeen:
         """Filter entries already accepted on previous runs."""
         config = self.prepare_config(config)
         if config is False:
-            logger.debug('{} is disabled', self.keyword)
+            logger.debug("{} is disabled", self.keyword)
             return
 
-        fields = config.get('fields')
-        local = config.get('local')
+        fields = config.get("fields")
+        local = config.get("local")
 
         for entry in task.entries:
             # construct list of values looked
@@ -75,7 +75,7 @@ class FilterSeen:
                 if entry[field] not in values and entry[field]:
                     values.append(str(entry[field]))
             if values:
-                logger.trace('querying for: {}', ', '.join(values))
+                logger.trace("querying for: {}", ", ".join(values))
                 # check if SeenField.value is any of the values
                 found = db.search_by_field_values(
                     field_value_list=values, task_name=task.name, local=local, session=task.session
@@ -83,8 +83,8 @@ class FilterSeen:
                 if found:
                     logger.debug(
                         "Rejecting '{}' '{}' because of seen '{}'",
-                        entry['url'],
-                        entry['title'],
+                        entry["url"],
+                        entry["title"],
                         found.value,
                     )
                     se = (
@@ -93,8 +93,8 @@ class FilterSeen:
                         .one()
                     )
                     entry.reject(
-                        'Entry with {} `{}` is already marked seen in the task {} at {}'.format(
-                            found.field, found.value, se.task, se.added.strftime('%Y-%m-%d %H:%M')
+                        "Entry with {} `{}` is already marked seen in the task {} at {}".format(
+                            found.field, found.value, se.task, se.added.strftime("%Y-%m-%d %H:%M")
                         ),
                         remember=remember_rejected,
                     )
@@ -103,11 +103,11 @@ class FilterSeen:
         """Remember succeeded entries."""
         config = self.prepare_config(config)
         if config is False:
-            logger.debug('disabled')
+            logger.debug("disabled")
             return
 
-        fields = config.get('fields')
-        local = config.get('local')
+        fields = config.get("fields")
+        local = config.get("local")
 
         if isinstance(config, list):
             fields.extend(config)
@@ -116,14 +116,14 @@ class FilterSeen:
             self.learn(task, entry, fields=fields, local=local)
             # verbose if in learning mode
             if task.options.learn:
-                logger.info("Learned '{}' (will skip this in the future)", entry['title'])
+                logger.info("Learned '{}' (will skip this in the future)", entry["title"])
 
     def learn(self, task, entry, fields=None, reason=None, local=False):
         """Mark entry as seen."""
         # no explicit fields given, use default
         if not fields:
             fields = self.fields
-        se = db.SeenEntry(entry['title'], str(task.name), reason, local)
+        se = db.SeenEntry(entry["title"], str(task.name), reason, local)
         remembered = []
         for field in fields:
             if field not in entry:
@@ -149,6 +149,6 @@ class FilterSeen:
         return None
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(FilterSeen, 'seen', builtin=True, api_ver=2)
+    plugin.register(FilterSeen, "seen", builtin=True, api_ver=2)

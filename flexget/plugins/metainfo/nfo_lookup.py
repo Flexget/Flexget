@@ -10,10 +10,10 @@ try:
     # NOTE: Importing other plugins is discouraged!
     from flexget.components.imdb.utils import is_valid_imdb_title_id
 except ImportError:
-    raise plugin.DependencyError(issued_by=__name__, missing='imdb')
+    raise plugin.DependencyError(issued_by=__name__, missing="imdb")
 
 
-logger = logger.bind(name='nfo_lookup')
+logger = logger.bind(name="nfo_lookup")
 
 
 class NfoLookup:
@@ -37,8 +37,8 @@ class NfoLookup:
 
     """
 
-    schema = {'type': 'boolean'}
-    nfo_file_extension = '.nfo'
+    schema = {"type": "boolean"}
+    nfo_file_extension = ".nfo"
 
     # This priority makes sure this plugin runs before the imdb_lookup plugin, if it is also used. That way setting
     # imdb_id here will help imdb_lookup find the correct movie.
@@ -52,21 +52,21 @@ class NfoLookup:
         for entry in task.entries:
             # If this entry was obtained from the filesystem plugin it should have a filename field. If it does not have
             # one then there is nothing we can do in this plugin.
-            filename = entry.get('filename')
-            location = entry.get('location')
+            filename = entry.get("filename")
+            location = entry.get("location")
 
             # If there is no 'filename' field there is also no nfo file
             if filename is None or location is None:
                 logger.warning(
-                    "Entry {} didn't come from the filesystem plugin", entry.get('title')
+                    "Entry {} didn't come from the filesystem plugin", entry.get("title")
                 )
                 continue
             # This will be None if there is no nfo file
             nfo_filename = self.get_nfo_filename(entry)
             if nfo_filename is None:
                 logger.warning(
-                    'Entry {} has no corresponding {} file',
-                    entry.get('title'),
+                    "Entry {} has no corresponding {} file",
+                    entry.get("title"),
                     self.nfo_file_extension,
                 )
                 continue
@@ -77,10 +77,10 @@ class NfoLookup:
 
     def lookup(self, entry, nfo_filename):
         # If there is already data from a previous parse then we don't need to do anything
-        if entry.get('nfo_id') is not None:
+        if entry.get("nfo_id") is not None:
             logger.warning(
-                'Entry {} was already parsed by nfo_lookup and it will be skipped. ',
-                entry.get('title'),
+                "Entry {} was already parsed by nfo_lookup and it will be skipped. ",
+                entry.get("title"),
             )
             return
 
@@ -93,20 +93,20 @@ class NfoLookup:
             nfo_reader = NfoReader(nfo_filename)
             fields = nfo_reader.get_fields_from_nfo_file()
         except BadXmlFile:
-            logger.warning("Invalid '.nfo' file for entry {}", entry.get('title'))
+            logger.warning("Invalid '.nfo' file for entry {}", entry.get("title"))
             return
 
         entry.update(fields)
 
         # If a valid IMDB id was found in the nfo file, set the imdb_id field of the entry. This will help the
         # imdb_lookup plugin to get the correct data if it is also used.
-        if 'nfo_id' in fields:
-            if is_valid_imdb_title_id(entry.get('nfo_id', '')):
-                entry.update({'imdb_id': fields['nfo_id']})
+        if "nfo_id" in fields:
+            if is_valid_imdb_title_id(entry.get("nfo_id", "")):
+                entry.update({"imdb_id": fields["nfo_id"]})
             else:
                 logger.warning(
                     "ID found in nfo file for entry '{}', but it was not a valid IMDB ID",
-                    entry.get('title'),
+                    entry.get("title"),
                 )
 
     def get_nfo_filename(self, entry):
@@ -118,14 +118,14 @@ class NfoLookup:
             The file name of the 'nfo' file, or None it there is no 'nfo' file.
 
         """
-        location = entry.get('location')
+        location = entry.get("location")
         nfo_full_filename = os.path.splitext(location)[0] + self.nfo_file_extension
 
         if os.path.isfile(nfo_full_filename):
             return nfo_full_filename
 
         movie_nfo_filename = os.path.join(
-            os.path.dirname(location), 'movie' + self.nfo_file_extension
+            os.path.dirname(location), "movie" + self.nfo_file_extension
         )
         if os.path.isfile(movie_nfo_filename):
             return movie_nfo_filename
@@ -222,14 +222,14 @@ class NfoReader:
             return d
 
         # TODO: Right now it only works for movies
-        if self._root.tag != 'movie':
+        if self._root.tag != "movie":
             return d
 
         for name, values in self._fields.items():
             multiple_bool = values[0]
             getter_func = values[1]
 
-            nfo_field_name = f'nfo_{name}'
+            nfo_field_name = f"nfo_{name}"
 
             if multiple_bool:
                 v = self._extract_multiple_field(name, getter_func)
@@ -242,6 +242,6 @@ class NfoReader:
         return d
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(NfoLookup, 'nfo_lookup', api_ver=2)
+    plugin.register(NfoLookup, "nfo_lookup", api_ver=2)

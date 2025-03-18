@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.schema import MetaData, Table
 from sqlalchemy.types import TypeEngine
 
-logger = logger.bind(name='sql_utils')
+logger = logger.bind(name="sql_utils")
 
 
 def table_exists(name: str, session: Session) -> bool:
@@ -109,7 +109,7 @@ def table_add_column(
         # If we got a type class instead of an instance of one, instantiate it
         col_type = col_type()
     type_string = session.bind.engine.dialect.type_compiler.process(col_type)
-    statement = f'ALTER TABLE {table.name} ADD {name} {type_string}'
+    statement = f"ALTER TABLE {table.name} ADD {name} {type_string}"
     session.execute(text(statement))
     session.commit()
     # Update the table with the default value if given
@@ -153,13 +153,13 @@ def create_index(table_name: str, session: Session, *column_names: str) -> None:
     :param session: Session object which should be used
     :param column_names: The names of the columns that should belong to this index.
     """
-    index_name = '_'.join(['ix', table_name, *list(column_names)])
+    index_name = "_".join(["ix", table_name, *list(column_names)])
     table = table_schema(table_name, session)
     columns = [getattr(table.c, column) for column in column_names]
     try:
         Index(index_name, *columns).create(bind=session.bind)
     except OperationalError:
-        logger.opt(exception=True).debug('Error creating index.')
+        logger.opt(exception=True).debug("Error creating index.")
 
 
 class ContextSession(Session):
@@ -168,7 +168,7 @@ class ContextSession(Session):
     # TODO: This auto-committing might be a bad idea and need to be removed
     # might be hard to figure out where exactly code needs to be updated to compensate though.
 
-    def __enter__(self) -> 'ContextSession':
+    def __enter__(self) -> "ContextSession":
         return super().__enter__()
 
     def __exit__(self, exc_type, exc_val, exc_tb):

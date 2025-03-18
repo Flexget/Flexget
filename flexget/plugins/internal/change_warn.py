@@ -6,7 +6,7 @@ from loguru import logger
 from flexget import plugin
 from flexget.event import event
 
-logger = logger.bind(name='change')
+logger = logger.bind(name="change")
 found_deprecated = False
 
 
@@ -21,25 +21,25 @@ class ChangeWarn:
     def on_task_start(self, task, config):
         global found_deprecated
 
-        if 'torrent_size' in task.config:
-            logger.critical('Plugin torrent_size is deprecated, use content_size instead')
+        if "torrent_size" in task.config:
+            logger.critical("Plugin torrent_size is deprecated, use content_size instead")
             found_deprecated = True
 
-        if 'nzb_size' in task.config:
-            logger.critical('Plugin nzb_size is deprecated, use content_size instead')
+        if "nzb_size" in task.config:
+            logger.critical("Plugin nzb_size is deprecated, use content_size instead")
             found_deprecated = True
 
         if found_deprecated:
             task.manager.shutdown(finish_queue=False)
-            task.abort('Deprecated config.')
+            task.abort("Deprecated config.")
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(ChangeWarn, 'change_warn', builtin=True, api_ver=2)
+    plugin.register(ChangeWarn, "change_warn", builtin=True, api_ver=2)
 
 
-@event('manager.startup')
+@event("manager.startup")
 def startup_warnings(manager):
     if sys.version_info < (3, 10) and date.today() > date(year=2025, month=10, day=1):
         logger.warning(
@@ -53,61 +53,61 @@ try:
     import os.path
 
     plugin_dirs = (
-        os.path.normpath(sys.path[0] + '/../flexget/plugins/'),
-        os.path.normpath(sys.path[0] + '/../flexget/plugins/input/'),
+        os.path.normpath(sys.path[0] + "/../flexget/plugins/"),
+        os.path.normpath(sys.path[0] + "/../flexget/plugins/input/"),
     )
     for plugin_dir in plugin_dirs:
         for name in os.listdir(plugin_dir):
             require_clean = False
 
-            if name.startswith('module'):
+            if name.startswith("module"):
                 require_clean = True
 
-            if name == 'csv.pyc':
+            if name == "csv.pyc":
                 require_clean = True
 
-            if 'resolver' in name:
+            if "resolver" in name:
                 require_clean = True
 
-            if 'filter_torrent_size' in name:
+            if "filter_torrent_size" in name:
                 require_clean = True
 
-            if 'filter_nzb_size' in name:
+            if "filter_nzb_size" in name:
                 require_clean = True
 
-            if 'module_priority' in name:
+            if "module_priority" in name:
                 require_clean = True
 
-            if 'ignore_feed' in name:
+            if "ignore_feed" in name:
                 require_clean = True
 
-            if 'module_manual' in name:
+            if "module_manual" in name:
                 require_clean = True
 
-            if 'output_exec' in name:
+            if "output_exec" in name:
                 require_clean = True
 
-            if 'plugin_adv_exec' in name:
+            if "plugin_adv_exec" in name:
                 require_clean = True
 
-            if 'output_transmissionrpc' in name:
+            if "output_transmissionrpc" in name:
                 require_clean = True
 
             if require_clean:
-                logger.critical('-' * 79)
-                logger.critical('IMPORTANT: Your installation has some files from older FlexGet!')
-                logger.critical('')
+                logger.critical("-" * 79)
+                logger.critical("IMPORTANT: Your installation has some files from older FlexGet!")
+                logger.critical("")
                 logger.critical(
-                    ' Please remove all pre-compiled .pyc and .pyo files from {}', plugin_dir
+                    " Please remove all pre-compiled .pyc and .pyo files from {}", plugin_dir
                 )
-                logger.critical(' Offending file: {}', name)
-                logger.critical('')
+                logger.critical(" Offending file: {}", name)
+                logger.critical("")
                 logger.critical(
-                    '           After getting rid of these FlexGet should run again normally'
+                    "           After getting rid of these FlexGet should run again normally"
                 )
 
-                logger.critical('')
-                logger.critical('-' * 79)
+                logger.critical("")
+                logger.critical("-" * 79)
                 found_deprecated = True
                 break
 

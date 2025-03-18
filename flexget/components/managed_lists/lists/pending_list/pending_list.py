@@ -11,7 +11,7 @@ from flexget.manager import Session
 
 from . import db
 
-plugin_name = 'pending_list'
+plugin_name = "pending_list"
 logger = logger.bind(name=plugin_name)
 
 
@@ -25,13 +25,13 @@ class PendingListSet(MutableSet):
 
     def __init__(self, config):
         if not isinstance(config, dict):
-            config = {'list_name': config}
-        self.list_name = config.get('list_name')
+            config = {"list_name": config}
+        self.list_name = config.get("list_name")
 
         self.filter_approved = True
-        if config.get('include') == "pending":
+        if config.get("include") == "pending":
             self.filter_approved = False
-        if config.get('include') == "all":
+        if config.get("include") == "all":
             self.filter_approved = None
 
         with Session() as session:
@@ -44,10 +44,10 @@ class PendingListSet(MutableSet):
             .filter(db.PendingListEntry.list_id == self._db_list(session).id)
             .filter(
                 or_(
-                    db.PendingListEntry.title == entry['title'],
+                    db.PendingListEntry.title == entry["title"],
                     and_(
                         db.PendingListEntry.original_url,
-                        db.PendingListEntry.original_url == entry['original_url'],
+                        db.PendingListEntry.original_url == entry["original_url"],
                     ),
                 )
             )
@@ -64,7 +64,7 @@ class PendingListSet(MutableSet):
             if self.filter_approved is not None:
                 query = query.filter(db.PendingListEntry.approved == self.filter_approved)
             for e in query.all():
-                logger.debug('returning {}', e.entry)
+                logger.debug("returning {}", e.entry)
                 yield e.entry
 
     def __contains__(self, entry):
@@ -79,7 +79,7 @@ class PendingListSet(MutableSet):
         with Session() as session:
             db_entry = self._entry_query(session=session, entry=entry)
             if db_entry:
-                logger.debug('deleting entry {}', db_entry)
+                logger.debug("deleting entry {}", db_entry)
                 session.delete(db_entry)
 
     def add(self, entry):
@@ -87,10 +87,10 @@ class PendingListSet(MutableSet):
             stored_entry = self._entry_query(session, entry)
             if stored_entry:
                 # Refresh all the fields if we already have this entry
-                logger.debug('refreshing entry {}', entry)
+                logger.debug("refreshing entry {}", entry)
                 stored_entry.entry = entry
             else:
-                logger.debug('adding entry {} to list {}', entry, self._db_list(session).name)
+                logger.debug("adding entry {} to list {}", entry, self._db_list(session).name)
                 stored_entry = db.PendingListEntry(
                     entry=entry, pending_list_id=self._db_list(session).id
                 )
@@ -119,20 +119,20 @@ class PendingListSet(MutableSet):
 
 class PendingList:
     schema = {
-        'oneOf': [
-            {'type': 'string'},
+        "oneOf": [
+            {"type": "string"},
             {
-                'type': 'object',
-                'properties': {
-                    'list_name': {'type': 'string'},
-                    'include': {
-                        'type': 'string',
-                        'enum': ['pending', 'approved', 'all'],
-                        'default': 'approved',
+                "type": "object",
+                "properties": {
+                    "list_name": {"type": "string"},
+                    "include": {
+                        "type": "string",
+                        "enum": ["pending", "approved", "all"],
+                        "default": "approved",
                     },
                 },
-                'required': ['list_name'],
-                'additionalProperties': False,
+                "required": ["list_name"],
+                "additionalProperties": False,
             },
         ]
     }
@@ -145,6 +145,6 @@ class PendingList:
         return list(PendingListSet(config))
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(PendingList, plugin_name, api_ver=2, interfaces=['task', 'list'])
+    plugin.register(PendingList, plugin_name, api_ver=2, interfaces=["task", "list"])

@@ -4,12 +4,12 @@ from flexget.event import event
 
 
 class ExternalPlugin:
-    schema = {'type': 'boolean'}
+    schema = {"type": "boolean"}
 
     def on_task_input(self, task, config):
-        return [Entry('test entry', 'fake url')]
+        return [Entry("test entry", "fake url")]
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(ExternalPlugin, 'external_plugin', api_ver=2)
+    plugin.register(ExternalPlugin, "external_plugin", api_ver=2)

@@ -6,8 +6,8 @@ from loguru import logger
 from flexget import plugin
 from flexget.event import event
 
-logger = logger.bind(name='rtorrent_magnet')
-pat = re.compile('xt=urn:btih:([^&/]+)')
+logger = logger.bind(name="rtorrent_magnet")
+pat = re.compile("xt=urn:btih:([^&/]+)")
 
 
 class PluginRtorrentMagnet:
@@ -30,39 +30,39 @@ class PluginRtorrentMagnet:
 
     """
 
-    schema = {'type': 'string', 'format': 'path'}
+    schema = {"type": "string", "format": "path"}
 
     def write_torrent_file(self, task, entry, path):
-        path = os.path.join(path, 'meta-{}.torrent'.format(entry['title']))
+        path = os.path.join(path, "meta-{}.torrent".format(entry["title"]))
         path = os.path.expanduser(path)
 
         if task.options.test:
-            logger.info('Would write: {}', path)
+            logger.info("Would write: {}", path)
         else:
-            logger.info('Writing rTorrent Magnet File: {}', path)
-            with open(path, 'w') as f:
-                f.write('d10:magnet-uri{}:{}e'.format(len(entry['url']), entry['url']))
-        entry['output'] = path
+            logger.info("Writing rTorrent Magnet File: {}", path)
+            with open(path, "w") as f:
+                f.write("d10:magnet-uri{}:{}e".format(len(entry["url"]), entry["url"]))
+        entry["output"] = path
 
     # Run after download plugin to only pick up entries it did not already handle
     @plugin.priority(0)
     def on_task_output(self, task, config):
         for entry in task.accepted:
-            if 'output' in entry:
+            if "output" in entry:
                 logger.debug(
-                    'Ignoring, {} already has an output file: {}', entry['title'], entry['output']
+                    "Ignoring, {} already has an output file: {}", entry["title"], entry["output"]
                 )
                 continue
 
-            for url in entry.get('urls', [entry['url']]):
-                if url.startswith('magnet:'):
-                    logger.debug('Magnet URI detected for url {} ({})', url, entry['title'])
+            for url in entry.get("urls", [entry["url"]]):
+                if url.startswith("magnet:"):
+                    logger.debug("Magnet URI detected for url {} ({})", url, entry["title"])
                     if pat.search(url):
-                        self.write_torrent_file(task, entry, entry.get('path', config))
+                        self.write_torrent_file(task, entry, entry.get("path", config))
                         break
-                    logger.warning('Unrecognized Magnet URI Format: {}', url)
+                    logger.warning("Unrecognized Magnet URI Format: {}", url)
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(PluginRtorrentMagnet, 'rtorrent_magnet', api_ver=2)
+    plugin.register(PluginRtorrentMagnet, "rtorrent_magnet", api_ver=2)

@@ -8,7 +8,7 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.cached_input import cached
 
-logger = logger.bind(name='csv')
+logger = logger.bind(name="csv")
 
 
 class InputCSV:
@@ -37,42 +37,42 @@ class InputCSV:
     """
 
     schema = {
-        'type': 'object',
-        'properties': {
-            'url': {'type': 'string', 'format': 'url'},
-            'values': {
-                'type': 'object',
-                'additionalProperties': {'type': 'integer'},
-                'required': ['title', 'url'],
+        "type": "object",
+        "properties": {
+            "url": {"type": "string", "format": "url"},
+            "values": {
+                "type": "object",
+                "additionalProperties": {"type": "integer"},
+                "required": ["title", "url"],
             },
         },
-        'required': ['url', 'values'],
-        'additionalProperties': False,
+        "required": ["url", "values"],
+        "additionalProperties": False,
     }
 
-    @cached('csv')
+    @cached("csv")
     def on_task_input(self, task, config):
         entries = []
         try:
-            r = task.requests.get(config['url'])
+            r = task.requests.get(config["url"])
         except RequestException as e:
-            raise plugin.PluginError('Error fetching `{}`: {}'.format(config['url'], e))
+            raise plugin.PluginError("Error fetching `{}`: {}".format(config["url"], e))
 
         page = r.text.splitlines()
         for row in csv.reader(page):
             if not row:
                 continue
             entry = Entry()
-            for name, index in list(config.get('values', {}).items()):
+            for name, index in list(config.get("values", {}).items()):
                 try:
                     entry[name] = row[index - 1].strip()
                 except IndexError:
-                    raise plugin.PluginError(f'Field `{name}` index is out of range')
+                    raise plugin.PluginError(f"Field `{name}` index is out of range")
 
             entries.append(entry)
         return entries
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(InputCSV, 'csv', api_ver=2)
+    plugin.register(InputCSV, "csv", api_ver=2)

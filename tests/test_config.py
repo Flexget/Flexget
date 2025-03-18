@@ -4,11 +4,11 @@ import pytest
 
 from flexget.manager import Manager
 
-config_utf8 = Path(__file__).parent / 'config_utf8.yml'
+config_utf8 = Path(__file__).parent / "config_utf8.yml"
 
 
 class TestConfig:
-    config = 'tasks: {}'
+    config = "tasks: {}"
 
     @pytest.fixture
     def manager(self, manager):
@@ -23,4 +23,4 @@ class TestConfig:
         manager.config = {}
         manager._init_config()
         manager.load_config()
-        assert manager.config, 'Config didn\'t load'
+        assert manager.config, "Config didn't load"

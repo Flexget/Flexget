@@ -3,8 +3,8 @@ from loguru import logger
 from flexget import plugin
 from flexget.event import event
 
-logger = logger.bind(name='parsing')
-PARSER_TYPES = ['movie', 'series']
+logger = logger.bind(name="parsing")
+PARSER_TYPES = ["movie", "series"]
 
 # Mapping of parser type to (mapping of parser name to plugin instance)
 parsers = {}
@@ -14,21 +14,21 @@ selected_parsers = []
 
 
 # We need to wait until manager startup to access other plugin instances, to make sure they have all been loaded
-@event('manager.startup')
+@event("manager.startup")
 def init_parsers(manager):
     """Prepare our list of parsing plugins and default parsers."""
     for parser_type in PARSER_TYPES:
         parsers[parser_type] = {}
-        for p in plugin.get_plugins(interface=parser_type + '_parser'):
-            parsers[parser_type][p.name.replace('parser_', '')] = p.instance
+        for p in plugin.get_plugins(interface=parser_type + "_parser"):
+            parsers[parser_type][p.name.replace("parser_", "")] = p.instance
         # Select default parsers based on priority
-        func_name = 'parse_' + parser_type
+        func_name = "parse_" + parser_type
         default_parsers[parser_type] = max(
             iter(parsers[parser_type].items()),
-            key=lambda p: getattr(getattr(p[1], func_name), 'priority', 0),
+            key=lambda p: getattr(getattr(p[1], func_name), "priority", 0),
         )[0]
         logger.debug(
-            'setting default {} parser to {}. (options: {})',
+            "setting default {} parser to {}. (options: {})",
             parser_type,
             default_parsers[parser_type],
             parsers[parser_type],
@@ -44,11 +44,11 @@ class PluginParsing:
         properties = {}
         for parser_type in PARSER_TYPES:
             parser_names = [
-                p.name.replace('parser_', '')
-                for p in plugin.get_plugins(interface=parser_type + '_parser')
+                p.name.replace("parser_", "")
+                for p in plugin.get_plugins(interface=parser_type + "_parser")
             ]
-            properties[parser_type] = {'type': 'string', 'enum': parser_names}
-        return {'type': 'object', 'properties': properties, 'additionalProperties': False}
+            properties[parser_type] = {"type": "string", "enum": parser_names}
+        return {"type": "object", "properties": properties, "additionalProperties": False}
 
     def on_task_start(self, task, config):
         # Set up user selected parsers from config for this task run
@@ -80,7 +80,7 @@ class PluginParsing:
 
         :returns: An object containing the parsed information. The `valid` attribute will be set depending on success.
         """
-        parser = parsers['series'][self.selected.get('series', default_parsers.get('series'))]
+        parser = parsers["series"][self.selected.get("series", default_parsers.get("series"))]
         return parser.parse_series(data, name=name, **kwargs)
 
     def parse_movie(self, data, **kwargs):
@@ -90,10 +90,10 @@ class PluginParsing:
 
         :returns: An object containing the parsed information. The `valid` attribute will be set depending on success.
         """
-        parser = parsers['movie'][self.selected.get('movie') or default_parsers['movie']]
+        parser = parsers["movie"][self.selected.get("movie") or default_parsers["movie"]]
         return parser.parse_movie(data, **kwargs)
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(PluginParsing, 'parsing', api_ver=2)
+    plugin.register(PluginParsing, "parsing", api_ver=2)

@@ -11,15 +11,15 @@ from flexget.utils.requests import RequestException
 from flexget.utils.soup import get_soup
 from flexget.utils.tools import parse_filesize
 
-logger = logger.bind(name='limetorrents')
+logger = logger.bind(name="limetorrents")
 
 
 def clean_symbols(text):
     """Replace common symbols with spaces. Also normalize unicode strings in decomposed form."""
     result = text
     if isinstance(result, str):
-        result = normalize('NFKD', result)
-    result = re.sub(r'[ \(\)\-_\[\]\.]+', ' ', result).lower()
+        result = normalize("NFKD", result)
+    result = re.sub(r"[ \(\)\-_\[\]\.]+", " ", result).lower()
 
     # Leftovers
     return re.sub(r"[^a-zA-Z0-9 ]", "", result)
@@ -29,106 +29,106 @@ class Limetorrents:
     """Limetorrents search plugin."""
 
     schema = {
-        'oneOf': [
-            {'type': 'boolean'},
+        "oneOf": [
+            {"type": "boolean"},
             {
-                'type': 'object',
-                'properties': {
-                    'category': {
-                        'type': 'string',
-                        'enum': [
-                            'all',
-                            'anime',
-                            'applications',
-                            'games',
-                            'movies',
-                            'music',
-                            'tv',
-                            'other',
+                "type": "object",
+                "properties": {
+                    "category": {
+                        "type": "string",
+                        "enum": [
+                            "all",
+                            "anime",
+                            "applications",
+                            "games",
+                            "movies",
+                            "music",
+                            "tv",
+                            "other",
                         ],
-                        'default': 'all',
+                        "default": "all",
                     },
-                    'order_by': {'type': 'string', 'enum': ['date', 'seeds'], 'default': 'date'},
+                    "order_by": {"type": "string", "enum": ["date", "seeds"], "default": "date"},
                 },
-                'additionalProperties': False,
+                "additionalProperties": False,
             },
         ]
     }
 
-    base_url = 'https://www.limetorrents.cc/'
+    base_url = "https://www.limetorrents.cc/"
     errors = False
 
     @plugin.internet(logger)
     def search(self, task, entry, config):
         """Search for entries on Limetorrents."""
         if not isinstance(config, dict):
-            config = {'category': config}
+            config = {"category": config}
 
-        order_by = ''
-        if isinstance(config.get('order_by'), str) and config['order_by'] != 'date':
-            order_by = '{}/1'.format(config['order_by'])
+        order_by = ""
+        if isinstance(config.get("order_by"), str) and config["order_by"] != "date":
+            order_by = "{}/1".format(config["order_by"])
 
-        category = 'all'
-        if isinstance(config.get('category'), str):
-            category = '{}'.format(config['category'])
+        category = "all"
+        if isinstance(config.get("category"), str):
+            category = "{}".format(config["category"])
 
         entries = set()
 
-        for search_string in entry.get('search_strings', [entry['title']]):
+        for search_string in entry.get("search_strings", [entry["title"]]):
             # No special characters - use dashes instead of %20
-            cleaned_search_string = clean_symbols(search_string).replace(' ', '-')
+            cleaned_search_string = clean_symbols(search_string).replace(" ", "-")
 
-            query = 'search/{}/{}/{}'.format(
-                category, cleaned_search_string.encode('utf8'), order_by
+            query = "search/{}/{}/{}".format(
+                category, cleaned_search_string.encode("utf8"), order_by
             )
             logger.debug(
-                'Using search: {}; category: {}; ordering: {}',
+                "Using search: {}; category: {}; ordering: {}",
                 cleaned_search_string,
                 category,
-                order_by or 'default',
+                order_by or "default",
             )
             try:
                 page = task.requests.get(self.base_url + query)
-                logger.debug('requesting: {}', page.url)
+                logger.debug("requesting: {}", page.url)
             except RequestException as e:
-                logger.error('Limetorrents request failed: {}', e)
+                logger.error("Limetorrents request failed: {}", e)
                 continue
 
             soup = get_soup(page.content)
-            if soup.find('a', attrs={'class': 'csprite_dl14'}) is not None:
-                for link in soup.findAll('a', attrs={'class': 'csprite_dl14'}):
-                    row = link.find_parent('tr')
-                    info_url = str(link.get('href'))
+            if soup.find("a", attrs={"class": "csprite_dl14"}) is not None:
+                for link in soup.findAll("a", attrs={"class": "csprite_dl14"}):
+                    row = link.find_parent("tr")
+                    info_url = str(link.get("href"))
 
                     # Get the title from the URL as it's complete versus the actual Title text which gets cut off
-                    title = str(link.next_sibling.get('href'))
-                    title = title[: title.rfind('-torrent')].replace('-', ' ')
+                    title = str(link.next_sibling.get("href"))
+                    title = title[: title.rfind("-torrent")].replace("-", " ")
                     title = title[1:]
 
-                    data = row.findAll('td', attrs={'class': 'tdnormal'})
-                    size = str(data[1].text).replace(',', '')
+                    data = row.findAll("td", attrs={"class": "tdnormal"})
+                    size = str(data[1].text).replace(",", "")
 
-                    seeds = int(row.find('td', attrs={'class': 'tdseed'}).text.replace(',', ''))
-                    leeches = int(row.find('td', attrs={'class': 'tdleech'}).text.replace(',', ''))
+                    seeds = int(row.find("td", attrs={"class": "tdseed"}).text.replace(",", ""))
+                    leeches = int(row.find("td", attrs={"class": "tdleech"}).text.replace(",", ""))
 
                     size = parse_filesize(size)
 
                     e = Entry()
 
-                    e['url'] = info_url
-                    e['title'] = title
-                    e['torrent_seeds'] = seeds
-                    e['torrent_leeches'] = leeches
-                    e['torrent_availability'] = torrent_availability(
-                        e['torrent_seeds'], e['torrent_leeches']
+                    e["url"] = info_url
+                    e["title"] = title
+                    e["torrent_seeds"] = seeds
+                    e["torrent_leeches"] = leeches
+                    e["torrent_availability"] = torrent_availability(
+                        e["torrent_seeds"], e["torrent_leeches"]
                     )
-                    e['content_size'] = size
+                    e["content_size"] = size
 
                     entries.add(e)
 
         return entries
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(Limetorrents, 'limetorrents', interfaces=['search'], api_ver=2)
+    plugin.register(Limetorrents, "limetorrents", interfaces=["search"], api_ver=2)

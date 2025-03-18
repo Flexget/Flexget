@@ -7,7 +7,7 @@ from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 
-logger = logger.bind(name='gen_series')
+logger = logger.bind(name="gen_series")
 
 PER_RUN = 50
 
@@ -28,23 +28,23 @@ class GenSeries:
     def __init__(self):
         self.entries = []
 
-    schema = {'type': 'object', 'minProperties': 1}
+    schema = {"type": "object", "minProperties": 1}
 
     @plugin.priority(200)
     def on_task_start(self, task, config):
-        logger.info('Generating test data ...')
+        logger.info("Generating test data ...")
         series = []
-        for num in range(config['series']):
-            series.append(f'series {num} name')
-            for season in range(int(config['seasons'])):
-                for episode in range(int(config['episodes'])):
-                    for quality in config['qualities']:
+        for num in range(config["series"]):
+            series.append(f"series {num} name")
+            for season in range(int(config["seasons"])):
+                for episode in range(int(config["episodes"])):
+                    for quality in config["qualities"]:
                         entry = Entry()
-                        entry['title'] = (
-                            f'series {num} name - S{season + 1:02d}E{episode + 1:02d} - {quality}'
+                        entry["title"] = (
+                            f"series {num} name - S{season + 1:02d}E{episode + 1:02d} - {quality}"
                         )
-                        entry['url'] = 'http://localhost/mock/{}'.format(
-                            ''.join(
+                        entry["url"] = "http://localhost/mock/{}".format(
+                            "".join(
                                 [
                                     random.choice(string.ascii_letters + string.digits)
                                     for x in range(1, 30)
@@ -52,10 +52,10 @@ class GenSeries:
                             )
                         )
                         self.entries.append(entry)
-        logger.info('Generated {} entries', len(self.entries))
+        logger.info("Generated {} entries", len(self.entries))
 
         # configure series plugin, bad way but this is debug shit
-        task.config['series'] = series
+        task.config["series"] = series
 
     def on_task_input(self, task, config):
         entries = []
@@ -68,12 +68,12 @@ class GenSeries:
 
     def on_task_exit(self, task, config):
         if self.entries:
-            logger.info('There are still {} left to be processed!', len(self.entries))
+            logger.info("There are still {} left to be processed!", len(self.entries))
             # rerun ad infinitum, also commits session between them
             task._rerun = True
             task._rerun_count = 0
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(GenSeries, 'gen_series_data', api_ver=2, debug=True)
+    plugin.register(GenSeries, "gen_series_data", api_ver=2, debug=True)

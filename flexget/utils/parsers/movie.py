@@ -7,7 +7,7 @@ from flexget.utils import qualities
 from flexget.utils.parsers.parser import TitleParser
 from flexget.utils.tools import str_to_int
 
-logger = logger.bind(name='movieparser')
+logger = logger.bind(name="movieparser")
 
 
 def diff_pos(string1, string2):
@@ -46,14 +46,14 @@ class MovieParser(TitleParser):
             data = self.data
 
         # Move anything in leading brackets to the end
-        data = re.sub(r'^\[(.*?)\](.*)', r'\2 \1', data)
+        data = re.sub(r"^\[(.*?)\](.*)", r"\2 \1", data)
 
-        for char in '[]()_,.':
-            data = data.replace(char, ' ')
+        for char in "[]()_,.":
+            data = data.replace(char, " ")
 
         # if there are no spaces
-        if data.find(' ') == -1:
-            data = data.replace('-', ' ')
+        if data.find(" ") == -1:
+            data = data.replace("-", " ")
 
         # remove unwanted words (imax, ..)
         self.remove_words(data, self.remove)
@@ -61,7 +61,7 @@ class MovieParser(TitleParser):
         data = self.strip_spaces(data)
 
         # split to parts
-        parts = data.split(' ')
+        parts = data.split(" ")
         cut_part = 256
         all_caps = True
         for part_pos, part in enumerate(parts):
@@ -90,7 +90,7 @@ class MovieParser(TitleParser):
                 cut = True
             # check for propers, 'real' and 'final' are too common in movie parsers, only cut if it comes after year
             if (
-                part.lower() in self.propers and part.lower() not in ['real', 'final']
+                part.lower() in self.propers and part.lower() not in ["real", "final"]
             ) or self.year:
                 self.proper_count += 1
                 cut = True
@@ -99,13 +99,13 @@ class MovieParser(TitleParser):
                 cut_part = part_pos
 
         if cut_part != 256:
-            logger.debug('parts: {}, cut is: {}', parts, parts[cut_part])
+            logger.debug("parts: {}, cut is: {}", parts, parts[cut_part])
 
         # calculate cut positon from cut_part
-        abs_cut = len(' '.join(parts[:cut_part]))
+        abs_cut = len(" ".join(parts[:cut_part]))
 
         logger.debug(
-            'after parts check, cut data would be: `{}` abs_cut: {}', data[:abs_cut], abs_cut
+            "after parts check, cut data would be: `{}` abs_cut: {}", data[:abs_cut], abs_cut
         )
 
         # parse quality
@@ -117,14 +117,14 @@ class MovieParser(TitleParser):
             # quality bit, anything after that has no relevance to the movie name
             dp = diff_pos(data, quality.clean_text)
             if dp is not None:
-                logger.debug('quality start: {}', dp)
+                logger.debug("quality start: {}", dp)
                 if dp < abs_cut:
-                    logger.debug('quality cut is even shorter')
+                    logger.debug("quality cut is even shorter")
                     abs_cut = dp
 
         # make cut
         data = data[:abs_cut].strip()
-        logger.debug('data cut to `{}` - this will be the name', data)
+        logger.debug("data cut to `{}` - this will be the name", data)
 
         # save results
         self.name = data

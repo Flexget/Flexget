@@ -12,7 +12,7 @@ def _mock_session_response(mock_, monkeypatch):
     def mocked_send(*args, **kwargs):
         return mock_
 
-    monkeypatch.setattr('requests.Session.send', mocked_send)
+    monkeypatch.setattr("requests.Session.send", mocked_send)
 
 
 class TestWordPress:
@@ -28,32 +28,32 @@ class TestWordPress:
     def test_task_aborts_for_status_not_ok(self, execute_task, monkeypatch):
         _mock_session_response(mock.Mock(ok=False), monkeypatch)
         with pytest.raises(TaskAbort):
-            execute_task('test')
+            execute_task("test")
 
     def test_task_aborts_for_requests_exception(self, execute_task, monkeypatch):
-        monkeypatch.setattr('requests.Session.send', mock.Mock(side_effect=RequestException))
+        monkeypatch.setattr("requests.Session.send", mock.Mock(side_effect=RequestException))
         with pytest.raises(TaskAbort):
-            execute_task('test')
+            execute_task("test")
 
     def test_task_aborts_when_response_has_no_valid_cookies(self, execute_task, monkeypatch):
         invalid_cookies = {
-            '__cfduid': '16a85284e4ee53f4933760b08b2bc82c',
-            'wordpress_test_cookie': 'test+cookie',
+            "__cfduid": "16a85284e4ee53f4933760b08b2bc82c",
+            "wordpress_test_cookie": "test+cookie",
         }
         _mock_session_response(
             mock.Mock(cookies=cookiejar_from_dict(invalid_cookies), history=[]), monkeypatch
         )
         with pytest.raises(TaskAbort):
-            execute_task('test')
+            execute_task("test")
 
     def test_cookies_collected_across_redirects(self, execute_task, monkeypatch):
         valid_cookies = {
-            'wordpress_logged_in_a32b6': '16a85284e4ee53f4933760b08b2bc82c',
-            'wordpress_sec': 'test_value',
+            "wordpress_logged_in_a32b6": "16a85284e4ee53f4933760b08b2bc82c",
+            "wordpress_sec": "test_value",
         }
         mock_history = [mock.Mock(cookies=cookiejar_from_dict(valid_cookies))]
         _mock_session_response(
             mock.Mock(cookies=RequestsCookieJar(), history=mock_history), monkeypatch
         )
-        task = execute_task('test')
-        assert len(task.requests.cookies) > 0, 'No cookies found within response'
+        task = execute_task("test")
+        assert len(task.requests.cookies) > 0, "No cookies found within response"

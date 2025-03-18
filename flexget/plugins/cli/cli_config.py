@@ -24,7 +24,7 @@ from loguru import logger
 from flexget import options
 from flexget.event import event
 
-logger = logger.bind(name='cli_config')
+logger = logger.bind(name="cli_config")
 
 
 def replace_in_item(replaces, item):
@@ -32,7 +32,7 @@ def replace_in_item(replaces, item):
     if isinstance(item, str):
         # Do replacement in text objects
         for key, val in replaces.items():
-            item = item.replace(f'${key}', val)
+            item = item.replace(f"${key}", val)
         return item
     if isinstance(item, list):
         # Make a new list with replacements done on each item
@@ -44,7 +44,7 @@ def replace_in_item(replaces, item):
     return item
 
 
-@event('manager.before_config_validate')
+@event("manager.before_config_validate")
 def substitute_cli_variables(config, manager):
     if not manager.options.execute.cli_config:
         return None
@@ -52,17 +52,17 @@ def substitute_cli_variables(config, manager):
 
 
 def key_value_pair(text):
-    if '=' not in text:
-        raise argparse.ArgumentTypeError('arguments must be in VARIABLE=VALUE form')
-    return text.split('=', 1)
+    if "=" not in text:
+        raise argparse.ArgumentTypeError("arguments must be in VARIABLE=VALUE form")
+    return text.split("=", 1)
 
 
-@event('options.register')
+@event("options.register")
 def register_parser_arguments():
-    options.get_parser('execute').add_argument(
-        '--cli-config',
-        nargs='+',
+    options.get_parser("execute").add_argument(
+        "--cli-config",
+        nargs="+",
         type=key_value_pair,
-        metavar='VARIABLE=VALUE',
-        help='configuration parameters through commandline',
+        metavar="VARIABLE=VALUE",
+        help="configuration parameters through commandline",
     )

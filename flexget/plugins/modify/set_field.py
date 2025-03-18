@@ -7,10 +7,10 @@ from flexget.entry import register_lazy_lookup
 from flexget.event import event
 from flexget.utils.template import RenderError
 
-logger = logger.bind(name='set')
+logger = logger.bind(name="set")
 
 # Use a string for this sentinel, so it survives serialization
-UNSET = '__unset__'
+UNSET = "__unset__"
 
 
 class ModifySet:
@@ -22,7 +22,7 @@ class ModifySet:
 
     """
 
-    schema = {'type': 'object', "minProperties": 1}
+    schema = {"type": "object", "minProperties": 1}
 
     def on_task_metainfo(self, task, config):
         """Add the set dict to all accepted entries."""
@@ -33,7 +33,7 @@ class ModifySet:
         """Can be called from a plugin to add set values to an entry."""
         for field in config:
             # If this doesn't appear to be a jinja template, just set it right away.
-            if not isinstance(config[field], str) or '{' not in config[field]:
+            if not isinstance(config[field], str) or "{" not in config[field]:
                 entry[field] = config[field]
             # Store original values before overwriting with a lazy field, so that set directives can reference
             # themselves.
@@ -45,24 +45,24 @@ class ModifySet:
                     self.lazy_set,
                     [field],
                     kwargs={
-                        'config': config,
-                        'field': field,
-                        'orig_field_value': orig_value,
-                        'errors': errors,
+                        "config": config,
+                        "field": field,
+                        "orig_field_value": orig_value,
+                        "errors": errors,
                     },
                 )
 
-    @register_lazy_lookup('set_field')
+    @register_lazy_lookup("set_field")
     def lazy_set(self, entry, config, field, orig_field_value, errors=True):
-        level = 'ERROR' if errors else 'DEBUG'
+        level = "ERROR" if errors else "DEBUG"
         if orig_field_value is not UNSET:
             entry[field] = orig_field_value
         try:
             entry[field] = entry.render(config[field], native=True)
         except RenderError as e:
-            logger.log(level, 'Could not set {} for {}: {}', field, entry['title'], e)
+            logger.log(level, "Could not set {} for {}: {}", field, entry["title"], e)
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(ModifySet, 'set', api_ver=2)
+    plugin.register(ModifySet, "set", api_ver=2)

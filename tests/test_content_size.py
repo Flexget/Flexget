@@ -34,33 +34,33 @@ class TestTorrentSize:
               min: 2000
     """
 
-    @pytest.mark.filecopy('test.torrent', '__tmp__/test.torrent')
+    @pytest.mark.filecopy("test.torrent", "__tmp__/test.torrent")
     def test_min(self, execute_task):
         """Content Size: torrent with min size."""
-        task = execute_task('test_min')
-        assert task.find_entry('rejected', title='test'), 'should have rejected, minimum size'
+        task = execute_task("test_min")
+        assert task.find_entry("rejected", title="test"), "should have rejected, minimum size"
 
-    @pytest.mark.filecopy('test.torrent', '__tmp__/test.torrent')
+    @pytest.mark.filecopy("test.torrent", "__tmp__/test.torrent")
     def test_max(self, execute_task):
         """Content Size: torrent with max size."""
-        task = execute_task('test_max')
-        assert task.find_entry('rejected', title='test'), 'should have rejected, maximum size'
+        task = execute_task("test_max")
+        assert task.find_entry("rejected", title="test"), "should have rejected, maximum size"
 
-    @pytest.mark.filecopy('test.torrent', '__tmp__/test.torrent')
+    @pytest.mark.filecopy("test.torrent", "__tmp__/test.torrent")
     def test_strict(self, execute_task):
         """Content Size: strict enabled."""
-        task = execute_task('test_strict')
-        assert task.find_entry('rejected', title='test'), 'should have rejected non torrent'
+        task = execute_task("test_strict")
+        assert task.find_entry("rejected", title="test"), "should have rejected non torrent"
 
     def test_cache(self, execute_task):
         """Content Size: caching."""
-        task = execute_task('test_cache')
-        assert task.find_entry('rejected', title='test'), 'should have rejected, too small'
+        task = execute_task("test_cache")
+        assert task.find_entry("rejected", title="test"), "should have rejected, too small"
 
         # Make sure remember_rejected rejects on the second execution
-        task = execute_task('test_cache')
-        assert task.find_entry('rejected', title='test', rejected_by='remember_rejected'), (
-            'should have rejected, size present from the cache'
+        task = execute_task("test_cache")
+        assert task.find_entry("rejected", title="test", rejected_by="remember_rejected"), (
+            "should have rejected, size present from the cache"
         )
 
 
@@ -92,25 +92,25 @@ class TestFileSize:
               - {title: 'test', location: 'test.torrent'}
     """
 
-    @pytest.mark.filecopy('test.torrent', '__tmp__/test.file')
+    @pytest.mark.filecopy("test.torrent", "__tmp__/test.file")
     def test_min(self, execute_task):
         """Content Size: torrent with min size."""
-        task = execute_task('test_min')
-        entry = task.find_entry('rejected', title='test')
-        assert entry, 'should have rejected, minimum size'
-        assert entry['content_size'] == 28047, 'content_size was not detected'
+        task = execute_task("test_min")
+        entry = task.find_entry("rejected", title="test")
+        assert entry, "should have rejected, minimum size"
+        assert entry["content_size"] == 28047, "content_size was not detected"
 
-    @pytest.mark.filecopy('test.torrent', '__tmp__/test.file')
+    @pytest.mark.filecopy("test.torrent", "__tmp__/test.file")
     def test_max(self, execute_task):
         """Content Size: torrent with max size."""
-        task = execute_task('test_max')
-        entry = task.find_entry('accepted', title='test')
-        assert entry, 'should have been accepted, it is below maximum size'
-        assert entry['content_size'] == 28047, 'content_size was not detected'
+        task = execute_task("test_max")
+        entry = task.find_entry("accepted", title="test")
+        assert entry, "should have been accepted, it is below maximum size"
+        assert entry["content_size"] == 28047, "content_size was not detected"
 
     def test_torrent(self, execute_task):
-        task = execute_task('test_torrent')
-        entry = task.find_entry('entries', title='test')
-        assert 'content_size' not in entry, (
-            'size of .torrent file should not be read as content_size'
+        task = execute_task("test_torrent")
+        entry = task.find_entry("entries", title="test")
+        assert "content_size" not in entry, (
+            "size of .torrent file should not be read as content_size"
         )

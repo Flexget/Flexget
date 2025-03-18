@@ -6,7 +6,7 @@ from flexget.components.emby.emby_util import SCHEMA_SERVER_TAG, SORT_FIELDS
 from flexget.config_schema import one_or_more
 from flexget.event import event
 
-logger = logger.bind(name='from_emby')
+logger = logger.bind(name="from_emby")
 
 
 class EmbyInput:
@@ -27,37 +27,37 @@ class EmbyInput:
     auth = None
 
     schema = {
-        'type': 'object',
-        'properties': {
+        "type": "object",
+        "properties": {
             **SCHEMA_SERVER_TAG,
-            'list': {'type': 'string'},
-            'types': one_or_more(
-                {'type': 'string', 'enum': ['movie', 'series', 'season', 'episode']}
+            "list": {"type": "string"},
+            "types": one_or_more(
+                {"type": "string", "enum": ["movie", "series", "season", "episode"]}
             ),
-            'watched': {'type': 'boolean'},
-            'favorite': {'type': 'boolean'},
-            'sort': {
-                'oneOf': [
+            "watched": {"type": "boolean"},
+            "favorite": {"type": "boolean"},
+            "sort": {
+                "oneOf": [
                     {
-                        'type': 'string',
-                        'enum': SORT_FIELDS,
+                        "type": "string",
+                        "enum": SORT_FIELDS,
                     },
                     {
-                        'type': 'object',
-                        'properties': {
-                            'field': {
-                                'type': 'string',
-                                'enum': SORT_FIELDS,
+                        "type": "object",
+                        "properties": {
+                            "field": {
+                                "type": "string",
+                                "enum": SORT_FIELDS,
                             },
-                            'order': {'type': 'string', 'enum': ['ascending', 'descending']},
+                            "order": {"type": "string", "enum": ["ascending", "descending"]},
                         },
-                        'required': ['field', 'order'],
+                        "required": ["field", "order"],
                     },
                 ]
             },
         },
-        'required': ['server'],
-        'additionalProperties': False,
+        "required": ["server"],
+        "additionalProperties": False,
     }
 
     def login(self, config):
@@ -91,21 +91,21 @@ class EmbyInput:
 
         entries_obj = {}
 
-        for search_string in entry.get('search_strings', [entry['title']]):
-            entry['search_string'] = search_string
+        for search_string in entry.get("search_strings", [entry["title"]]):
+            entry["search_string"] = search_string
             media = s_list.get(entry)
             if not media:
                 continue
 
             new_entry = media.to_entry()
-            if 'emby_id' not in new_entry:
+            if "emby_id" not in new_entry:
                 continue
 
-            entries_obj[new_entry['emby_id']] = new_entry
+            entries_obj[new_entry["emby_id"]] = new_entry
 
         return list(entries_obj.values())
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(EmbyInput, 'from_emby', interfaces=['search', 'task'], api_ver=2)
+    plugin.register(EmbyInput, "from_emby", interfaces=["search", "task"], api_ver=2)

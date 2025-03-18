@@ -15,53 +15,53 @@ from flexget.api.app import (
 
 from . import db
 
-logger = logger.bind(name='rejected')
+logger = logger.bind(name="rejected")
 
-rejected_api = api.namespace('rejected', description='View and manage remembered rejected entries')
+rejected_api = api.namespace("rejected", description="View and manage remembered rejected entries")
 
 
 def rejected_entry_to_dict(entry):
     return {
-        'id': entry.id,
-        'added': entry.added,
-        'expires': entry.expires,
-        'title': entry.title,
-        'url': entry.url,
-        'rejected_by': entry.rejected_by,
-        'reason': entry.reason,
+        "id": entry.id,
+        "added": entry.added,
+        "expires": entry.expires,
+        "title": entry.title,
+        "url": entry.url,
+        "rejected_by": entry.rejected_by,
+        "reason": entry.reason,
     }
 
 
 class ObjectsContainer:
     rejected_entry_object = {
-        'type': 'object',
-        'properties': {
-            'id': {'type': 'integer'},
-            'title': {'type': 'string'},
-            'url': {'type': 'string'},
-            'added': {'type': 'string', 'format': 'date-time'},
-            'reason': {'type': 'string'},
-            'expires': {'type': 'string', 'format': 'date-time'},
-            'rejected_by': {'type': 'string'},
+        "type": "object",
+        "properties": {
+            "id": {"type": "integer"},
+            "title": {"type": "string"},
+            "url": {"type": "string"},
+            "added": {"type": "string", "format": "date-time"},
+            "reason": {"type": "string"},
+            "expires": {"type": "string", "format": "date-time"},
+            "rejected_by": {"type": "string"},
         },
-        'required': ['id', 'title', 'url', 'added', 'reason', 'expires', 'rejected_by'],
-        'additionalProperties': False,
+        "required": ["id", "title", "url", "added", "reason", "expires", "rejected_by"],
+        "additionalProperties": False,
     }
-    rejected_entries_list_object = {'type': 'array', 'items': rejected_entry_object}
+    rejected_entries_list_object = {"type": "array", "items": rejected_entry_object}
 
 
 rejected_entry_schema = api.schema_model(
-    'rejected_failed_entry_schema', ObjectsContainer.rejected_entry_object
+    "rejected_failed_entry_schema", ObjectsContainer.rejected_entry_object
 )
 rejected_entries_list_schema = api.schema_model(
-    'rejected_entries_list_schema', ObjectsContainer.rejected_entries_list_object
+    "rejected_entries_list_schema", ObjectsContainer.rejected_entries_list_object
 )
 
-sort_choices = ('added', 'id', 'title', 'url', 'expires', 'rejected_by', 'reason')
+sort_choices = ("added", "id", "title", "url", "expires", "rejected_by", "reason")
 rejected_parser = api.pagination_parser(sort_choices=sort_choices)
 
 
-@rejected_api.route('/')
+@rejected_api.route("/")
 class Rejected(APIResource):
     @etag
     @api.response(NotFoundError)
@@ -72,15 +72,15 @@ class Rejected(APIResource):
         args = rejected_parser.parse_args()
 
         # Pagination and sorting params
-        page = args['page']
-        per_page = args['per_page']
-        sort_by = args['sort_by']
-        sort_order = args['order']
+        page = args["page"]
+        per_page = args["per_page"]
+        sort_by = args["sort_by"]
+        sort_order = args["order"]
 
         # Handle max size limit
         per_page = min(per_page, 100)
 
-        descending = sort_order == 'desc'
+        descending = sort_order == "desc"
 
         # Handle max size limit
         per_page = min(per_page, 100)
@@ -89,11 +89,11 @@ class Rejected(APIResource):
         stop = start + per_page
 
         kwargs = {
-            'start': start,
-            'stop': stop,
-            'descending': descending,
-            'sort_by': sort_by,
-            'session': session,
+            "start": start,
+            "stop": stop,
+            "descending": descending,
+            "sort_by": sort_by,
+            "session": session,
         }
 
         total_items = db.get_rejected(session, count=True)
@@ -106,7 +106,7 @@ class Rejected(APIResource):
         total_pages = int(ceil(total_items / float(per_page)))
 
         if page > total_pages:
-            raise NotFoundError(f'page {page} does not exist')
+            raise NotFoundError(f"page {page} does not exist")
 
         # Actual results in page
         actual_size = min(per_page, len(failed_entries))
@@ -129,10 +129,10 @@ class Rejected(APIResource):
         if entries:
             session.commit()
             self.manager.config_changed()
-        return success_response(f'successfully deleted {entries} rejected entries')
+        return success_response(f"successfully deleted {entries} rejected entries")
 
 
-@rejected_api.route('/<int:rejected_entry_id>/')
+@rejected_api.route("/<int:rejected_entry_id>/")
 @api.response(NotFoundError)
 class RejectedEntry(APIResource):
     @etag
@@ -146,7 +146,7 @@ class RejectedEntry(APIResource):
                 .one()
             )
         except NoResultFound:
-            raise NotFoundError(f'rejected entry ID {rejected_entry_id} not found')
+            raise NotFoundError(f"rejected entry ID {rejected_entry_id} not found")
         return jsonify(rejected_entry_to_dict(entry))
 
     @api.response(200, model=base_message_schema)
@@ -159,6 +159,6 @@ class RejectedEntry(APIResource):
                 .one()
             )
         except NoResultFound:
-            raise NotFoundError(f'rejected entry ID {rejected_entry_id} not found')
+            raise NotFoundError(f"rejected entry ID {rejected_entry_id} not found")
         session.delete(entry)
-        return success_response(f'successfully deleted rejected entry {rejected_entry_id}')
+        return success_response(f"successfully deleted rejected entry {rejected_entry_id}")

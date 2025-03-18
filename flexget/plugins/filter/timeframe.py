@@ -11,48 +11,48 @@ from flexget.utils import qualities
 from flexget.utils.database import quality_property
 from flexget.utils.tools import group_entries, parse_timedelta
 
-logger = logger.bind(name='timeframe')
+logger = logger.bind(name="timeframe")
 
-Base = db_schema.versioned_base('upgrade', 0)
+Base = db_schema.versioned_base("upgrade", 0)
 
-entry_actions = {'accept': Entry.accept, 'reject': Entry.reject}
+entry_actions = {"accept": Entry.accept, "reject": Entry.reject}
 
 
 class EntryTimeFrame(Base):
-    __tablename__ = 'timeframe'
+    __tablename__ = "timeframe"
 
     id = Column(Unicode, primary_key=True, index=True)
     status = Column(Unicode)
     title = Column(Unicode)
-    _quality = Column('quality', String)
-    quality = quality_property('_quality')
+    _quality = Column("quality", String)
+    quality = quality_property("_quality")
     first_seen = Column(DateTime, default=datetime.now())
     proper_count = Column(Integer, default=0)
 
     def __str__(self):
-        return f'<Timeframe(id={self.id},added={self.added},quality={self.quality})>'
+        return f"<Timeframe(id={self.id},added={self.added},quality={self.quality})>"
 
 
 class FilterTimeFrame:
     schema = {
-        'type': 'object',
-        'properties': {
-            'identified_by': {'type': 'string', 'default': 'auto'},
-            'target': {'type': 'string', 'format': 'quality_requirements'},
-            'wait': {'type': 'string', 'format': 'interval'},
-            'on_waiting': {
-                'type': 'string',
-                'enum': ['accept', 'reject', 'do_nothing'],
-                'default': 'reject',
+        "type": "object",
+        "properties": {
+            "identified_by": {"type": "string", "default": "auto"},
+            "target": {"type": "string", "format": "quality_requirements"},
+            "wait": {"type": "string", "format": "interval"},
+            "on_waiting": {
+                "type": "string",
+                "enum": ["accept", "reject", "do_nothing"],
+                "default": "reject",
             },
-            'on_reached': {
-                'type': 'string',
-                'enum': ['accept', 'reject', 'do_nothing'],
-                'default': 'do_nothing',
+            "on_reached": {
+                "type": "string",
+                "enum": ["accept", "reject", "do_nothing"],
+                "default": "do_nothing",
             },
         },
-        'required': ['target', 'wait'],
-        'additionalProperties': False,
+        "required": ["target", "wait"],
+        "additionalProperties": False,
     }
 
     # Run last so we work on only accepted entries
@@ -62,7 +62,7 @@ class FilterTimeFrame:
             return
 
         identified_by = (
-            '{{ media_id }}' if config['identified_by'] == 'auto' else config['identified_by']
+            "{{ media_id }}" if config["identified_by"] == "auto" else config["identified_by"]
         )
 
         grouped_entries = group_entries(task.accepted, identified_by)
@@ -70,10 +70,10 @@ class FilterTimeFrame:
             return
 
         action_on_waiting = (
-            entry_actions[config['on_waiting']] if config['on_waiting'] != 'do_nothing' else None
+            entry_actions[config["on_waiting"]] if config["on_waiting"] != "do_nothing" else None
         )
         action_on_reached = (
-            entry_actions[config['on_reached']] if config['on_reached'] != 'do_nothing' else None
+            entry_actions[config["on_reached"]] if config["on_reached"] != "do_nothing" else None
         )
 
         with Session() as session:
@@ -93,80 +93,80 @@ class FilterTimeFrame:
                 if not id_timeframe:
                     id_timeframe = EntryTimeFrame()
                     id_timeframe.id = identifier
-                    id_timeframe.status = 'waiting'
+                    id_timeframe.status = "waiting"
                     id_timeframe.first_seen = datetime.now()
                     session.add(id_timeframe)
 
-                if id_timeframe.status == 'accepted':
+                if id_timeframe.status == "accepted":
                     logger.debug(
-                        'Previously accepted {} with {} skipping', identifier, id_timeframe.title
+                        "Previously accepted {} with {} skipping", identifier, id_timeframe.title
                     )
                     continue
 
                 # Sort entities in order of quality and best proper
-                entries.sort(key=lambda e: (e['quality'], e.get('proper_count', 0)), reverse=True)
+                entries.sort(key=lambda e: (e["quality"], e.get("proper_count", 0)), reverse=True)
                 best_entry = entries[0]
 
                 logger.debug(
-                    'Current best for identifier {} is {}', identifier, best_entry['title']
+                    "Current best for identifier {} is {}", identifier, best_entry["title"]
                 )
 
-                id_timeframe.title = best_entry['title']
-                id_timeframe.quality = best_entry['quality']
-                id_timeframe.proper_count = best_entry.get('proper_count', 0)
+                id_timeframe.title = best_entry["title"]
+                id_timeframe.quality = best_entry["quality"]
+                id_timeframe.proper_count = best_entry.get("proper_count", 0)
 
                 # Check we hit target or better
-                target_requirement = qualities.Requirements(config['target'])
-                target_quality = qualities.Quality(config['target'])
+                target_requirement = qualities.Requirements(config["target"])
+                target_quality = qualities.Quality(config["target"])
                 if (
-                    target_requirement.allows(best_entry['quality'])
-                    or best_entry['quality'] >= target_quality
+                    target_requirement.allows(best_entry["quality"])
+                    or best_entry["quality"] >= target_quality
                 ):
                     logger.debug(
-                        'timeframe reach target quality {} or higher for {}',
+                        "timeframe reach target quality {} or higher for {}",
                         target_quality,
                         identifier,
                     )
                     if action_on_reached:
-                        action_on_reached(best_entry, 'timeframe reached target quality or higher')
+                        action_on_reached(best_entry, "timeframe reached target quality or higher")
                     continue
 
                 # Check if passed wait time
-                expires = id_timeframe.first_seen + parse_timedelta(config['wait'])
+                expires = id_timeframe.first_seen + parse_timedelta(config["wait"])
                 if expires <= datetime.now():
                     logger.debug(
-                        'timeframe expired, releasing quality restriction for {}', identifier
+                        "timeframe expired, releasing quality restriction for {}", identifier
                     )
                     if action_on_reached:
-                        action_on_reached(best_entry, 'timeframe wait expired')
+                        action_on_reached(best_entry, "timeframe wait expired")
                     continue
 
                 # Verbose waiting, add to backlog
                 if action_on_waiting:
                     for entry in entries:
-                        action_on_waiting(entry, 'timeframe waiting')
+                        action_on_waiting(entry, "timeframe waiting")
                 diff = expires - datetime.now()
                 hours, remainder = divmod(diff.seconds, 3600)
                 hours += diff.days * 24
                 minutes, _ = divmod(remainder, 60)
 
                 logger.info(
-                    '`{}`: timeframe waiting for {:02d}h:{:02d}min. Currently best is `{}`.',
+                    "`{}`: timeframe waiting for {:02d}h:{:02d}min. Currently best is `{}`.",
                     identifier,
                     hours,
                     minutes,
-                    best_entry['title'],
+                    best_entry["title"],
                 )
 
                 # add best entry to backlog (backlog is able to handle duplicate adds)
-                plugin.get('backlog', self).add_backlog(task, best_entry, session=session)
+                plugin.get("backlog", self).add_backlog(task, best_entry, session=session)
 
     def on_task_learn(self, task, config):
         if not config:
             return
 
         identified_by = (
-            '{{ media_id }}' if config['identified_by'] == 'auto' else config['identified_by']
+            "{{ media_id }}" if config["identified_by"] == "auto" else config["identified_by"]
         )
 
         grouped_entries = group_entries(task.accepted, identified_by)
@@ -192,17 +192,17 @@ class FilterTimeFrame:
                     continue
 
                 # Sort entities in order of quality
-                entries.sort(key=lambda e: e['quality'], reverse=True)
+                entries.sort(key=lambda e: e["quality"], reverse=True)
 
                 # First entry will be the best quality
                 best_entry = entries[0]
 
-                id_timeframe.quality = best_entry['quality']
-                id_timeframe.title = best_entry['title']
-                id_timeframe.proper_count = best_entry.get('proper_count', 0)
-                id_timeframe.status = 'accepted'
+                id_timeframe.quality = best_entry["quality"]
+                id_timeframe.title = best_entry["title"]
+                id_timeframe.proper_count = best_entry.get("proper_count", 0)
+                id_timeframe.status = "accepted"
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(FilterTimeFrame, 'timeframe', api_ver=2)
+    plugin.register(FilterTimeFrame, "timeframe", api_ver=2)

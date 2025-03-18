@@ -24,8 +24,8 @@ class TestAbortIfExists:
 
     def test_abort(self, execute_task):
         with pytest.raises(TaskAbort):
-            execute_task('test_abort')
+            execute_task("test_abort")
 
     def test_not_abort(self, execute_task):
-        task = execute_task('test_not_abort')
-        assert not task.aborted, 'Task should have aborted'
+        task = execute_task("test_not_abort")
+        assert not task.aborted, "Task should have aborted"

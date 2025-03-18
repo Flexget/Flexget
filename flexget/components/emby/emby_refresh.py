@@ -6,7 +6,7 @@ from flexget.components.emby.emby_util import SCHEMA_SERVER_TAG
 from flexget.config_schema import one_or_more
 from flexget.event import event
 
-logger = logger.bind(name='emby_reload')
+logger = logger.bind(name="emby_reload")
 
 
 class EmbyRefreshLibrary:
@@ -26,18 +26,18 @@ class EmbyRefreshLibrary:
     auth = None
 
     schema = {
-        'type': 'object',
-        'properties': {
+        "type": "object",
+        "properties": {
             **SCHEMA_SERVER_TAG,
-            'when': one_or_more(
+            "when": one_or_more(
                 {
-                    'type': 'string',
-                    'enum': ['accepted', 'rejected', 'failed', 'no_entries', 'aborted', 'always'],
+                    "type": "string",
+                    "enum": ["accepted", "rejected", "failed", "no_entries", "aborted", "always"],
                 }
             ),
         },
-        'required': ['server'],
-        'additionalProperties': False,
+        "required": ["server"],
+        "additionalProperties": False,
     }
 
     def login(self, config):
@@ -51,11 +51,11 @@ class EmbyRefreshLibrary:
         self.auth.login(True)
 
     def prepare_config(self, config):
-        config.setdefault('when', ['always'])
+        config.setdefault("when", ["always"])
 
-        when = config['when']
+        when = config["when"]
         if when and not isinstance(when, list):
-            config['when'] = [when]
+            config["when"] = [when]
 
     def library_refresh(self):
         EmbyApiLibrary.library_refresh(self.auth)
@@ -69,11 +69,11 @@ class EmbyRefreshLibrary:
         self.prepare_config(config)
 
         conditions = [
-            task.accepted and 'accepted' in config['when'],
-            task.rejected and 'rejected' in config['when'],
-            task.failed and 'failed' in config['when'],
-            not task.all_entries and 'no_entries' in config['when'],
-            'always' in config['when'],
+            task.accepted and "accepted" in config["when"],
+            task.rejected and "rejected" in config["when"],
+            task.failed and "failed" in config["when"],
+            not task.all_entries and "no_entries" in config["when"],
+            "always" in config["when"],
         ]
 
         if any(conditions):
@@ -82,10 +82,10 @@ class EmbyRefreshLibrary:
     def on_task_abort(self, task, config):
         self.prepare_config(config)
 
-        if 'aborted' in config['when']:
+        if "aborted" in config["when"]:
             self.library_refresh()
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(EmbyRefreshLibrary, 'emby_refresh', api_ver=2)
+    plugin.register(EmbyRefreshLibrary, "emby_refresh", api_ver=2)

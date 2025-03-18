@@ -9,7 +9,7 @@ from flexget.components.sites.utils import normalize_unicode
 from flexget.event import event
 from flexget.utils.soup import get_soup
 
-logger = logger.bind(name='rlsbb')
+logger = logger.bind(name="rlsbb")
 
 
 class UrlRewriteRlsbb:
@@ -51,24 +51,24 @@ class UrlRewriteRlsbb:
       - echo "text={{urls}}" >> "/path/to/jd2/folderwatch/{{title}}.crawljob"
     """
 
-    DEFAULT_DOWNLOAD_TEXT = ['UPLOADGiG', 'NiTROFLARE', 'RAPiDGATOR']
+    DEFAULT_DOWNLOAD_TEXT = ["UPLOADGiG", "NiTROFLARE", "RAPiDGATOR"]
 
     schema = {
-        'type': 'object',
-        'properties': {
-            'filehosters_re': {'type': 'array', 'items': {'format': 'regexp'}, 'default': []},
-            'link_text_re': {
-                'type': 'array',
-                'items': {'format': 'regexp'},
-                'default': DEFAULT_DOWNLOAD_TEXT,
+        "type": "object",
+        "properties": {
+            "filehosters_re": {"type": "array", "items": {"format": "regexp"}, "default": []},
+            "link_text_re": {
+                "type": "array",
+                "items": {"format": "regexp"},
+                "default": DEFAULT_DOWNLOAD_TEXT,
             },
-            'parse_comments': {'type': 'boolean', 'default': False},
+            "parse_comments": {"type": "boolean", "default": False},
         },
-        'additionalProperties': False,
+        "additionalProperties": False,
     }
 
     # Since the urlrewriter relies on a config, we need to create a default one
-    config = {'filehosters_re': [], 'link_text_re': DEFAULT_DOWNLOAD_TEXT, 'parse_comments': False}
+    config = {"filehosters_re": [], "link_text_re": DEFAULT_DOWNLOAD_TEXT, "parse_comments": False}
 
     # grab config
     def on_task_start(self, task, config):
@@ -76,8 +76,8 @@ class UrlRewriteRlsbb:
 
     # urlrewriter API
     def url_rewritable(self, task, entry):
-        url = entry['url']
-        rewritable_regex = r'^https?:\/\/(www.)?rlsbb\.(ru|com)\/.*'
+        url = entry["url"]
+        rewritable_regex = r"^https?:\/\/(www.)?rlsbb\.(ru|com)\/.*"
         return re.match(rewritable_regex, url) is not None
 
     def _get_soup(self, task, url):
@@ -94,52 +94,52 @@ class UrlRewriteRlsbb:
     # which we parse here
     def _grab_multilinks(self, task, url):
         soup = self._get_soup(task, url)
-        link_list = soup.find('ol')
-        link_divs = link_list.find_all('div')
+        link_list = soup.find("ol")
+        link_divs = link_list.find_all("div")
         return [link.string() for link in link_divs]
 
     @plugin.internet(logger)
     # urlrewriter API
     def url_rewrite(self, task, entry):
-        soup = self._get_soup(task, entry['url'])
+        soup = self._get_soup(task, entry["url"])
 
         # grab links from the main post:
         link_elements = []
         logger.debug(
-            'Searching {} for a tags where the text matches one of: {}',
-            entry['url'],
-            str(self.config.get('link_text_re')),
+            "Searching {} for a tags where the text matches one of: {}",
+            entry["url"],
+            str(self.config.get("link_text_re")),
         )
-        for regexp in self.config.get('link_text_re'):
-            link_elements.extend(soup.find_all('a', string=re.compile(regexp)))
-        logger.debug('Original urls: {}', str(entry['urls']))
-        if 'urls' in entry:
-            urls = list(entry['urls'])
-            logger.debug('Original urls: {}', str(entry['urls']))
+        for regexp in self.config.get("link_text_re"):
+            link_elements.extend(soup.find_all("a", string=re.compile(regexp)))
+        logger.debug("Original urls: {}", str(entry["urls"]))
+        if "urls" in entry:
+            urls = list(entry["urls"])
+            logger.debug("Original urls: {}", str(entry["urls"]))
         else:
             urls = []
-        logger.debug('Found link elements: {}', str(link_elements))
+        logger.debug("Found link elements: {}", str(link_elements))
         for element in link_elements:
-            if re.search('nfo1.rlsbb.(ru|com)', element['href']):
+            if re.search("nfo1.rlsbb.(ru|com)", element["href"]):
                 # grab multipart links
-                urls.extend(self.grab_multilinks(task, element['href']))
+                urls.extend(self.grab_multilinks(task, element["href"]))
             else:
-                urls.append(element['href'])
+                urls.append(element["href"])
 
         # grab links from comments
-        regexps = self.config.get('filehosters_re', [])
-        if self.config.get('parse_comments'):
-            comments = soup.find_all('div', id=re.compile("commentbody"))
-            logger.debug('Comment parsing enabled: found {} comments.', len(comments))
+        regexps = self.config.get("filehosters_re", [])
+        if self.config.get("parse_comments"):
+            comments = soup.find_all("div", id=re.compile("commentbody"))
+            logger.debug("Comment parsing enabled: found {} comments.", len(comments))
             if comments and not regexps:
                 logger.warning(
-                    'You have enabled comment parsing but you did not define any filehoster_re filter. '
-                    'You may get a lot of unwanted and potentially dangerous links from the comments.'
+                    "You have enabled comment parsing but you did not define any filehoster_re filter. "
+                    "You may get a lot of unwanted and potentially dangerous links from the comments."
                 )
             for comment in comments:
-                links = comment.find_all('a')
+                links = comment.find_all("a")
                 for link in links:
-                    urls.append(link['href'])
+                    urls.append(link["href"])
 
         # filter urls:
         filtered_urls = []
@@ -158,19 +158,19 @@ class UrlRewriteRlsbb:
                         str(regexps),
                     )
         if regexps:
-            logger.debug('Using filehosters_re filters: {}', str(regexps))
+            logger.debug("Using filehosters_re filters: {}", str(regexps))
             urls = filtered_urls
         else:
-            logger.debug('No filehoster filters configured, using all found links.')
+            logger.debug("No filehoster filters configured, using all found links.")
         num_links = len(urls)
-        logger.verbose('Found {} links at {}.', num_links, entry['url'])
+        logger.verbose("Found {} links at {}.", num_links, entry["url"])
         if num_links:
-            entry['urls'] = urls
-            entry['url'] = urls[0]
+            entry["urls"] = urls
+            entry["url"] = urls[0]
         else:
-            raise UrlRewritingError('No useable links found at {}'.format(entry['url']))
+            raise UrlRewritingError("No useable links found at {}".format(entry["url"]))
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(UrlRewriteRlsbb, 'rlsbb', interfaces=['urlrewriter', 'task'], api_ver=2)
+    plugin.register(UrlRewriteRlsbb, "rlsbb", interfaces=["urlrewriter", "task"], api_ver=2)

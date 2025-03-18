@@ -4,7 +4,7 @@ from flexget import plugin
 from flexget.event import event
 from flexget.utils.log import log_once
 
-logger = logger.bind(name='thetvdb')
+logger = logger.bind(name="thetvdb")
 
 
 class FilterTvdb:
@@ -82,26 +82,26 @@ class FilterTvdb:
     """
 
     schema = {
-        'type': 'object',
-        'properties': {
-            'min_series_rating': {'type': 'number'},
-            'min_episode_rating': {'type': 'number'},
-            'min_episode_air_year': {'type': 'integer'},
-            'max_episode_air_year': {'type': 'integer'},
-            'min_episode_runtime': {'type': 'number'},
-            'max_episode_runtime': {'type': 'number'},
-            'reject_content_rating': {'type': 'array', 'items': {'type': 'string'}},
-            'accept_content_rating': {'type': 'array', 'items': {'type': 'string'}},
-            'accept_network': {'type': 'array', 'items': {'type': 'string'}},
-            'reject_network': {'type': 'array', 'items': {'type': 'string'}},
-            'reject_genres': {'type': 'array', 'items': {'type': 'string'}},
-            'reject_status': {'type': 'array', 'items': {'type': 'string'}},
-            'accept_actors': {'type': 'array', 'items': {'type': 'string'}},
-            'reject_actors': {'type': 'array', 'items': {'type': 'string'}},
-            'accept_directors': {'type': 'array', 'items': {'type': 'string'}},
-            'reject_directors': {'type': 'array', 'items': {'type': 'string'}},
+        "type": "object",
+        "properties": {
+            "min_series_rating": {"type": "number"},
+            "min_episode_rating": {"type": "number"},
+            "min_episode_air_year": {"type": "integer"},
+            "max_episode_air_year": {"type": "integer"},
+            "min_episode_runtime": {"type": "number"},
+            "max_episode_runtime": {"type": "number"},
+            "reject_content_rating": {"type": "array", "items": {"type": "string"}},
+            "accept_content_rating": {"type": "array", "items": {"type": "string"}},
+            "accept_network": {"type": "array", "items": {"type": "string"}},
+            "reject_network": {"type": "array", "items": {"type": "string"}},
+            "reject_genres": {"type": "array", "items": {"type": "string"}},
+            "reject_status": {"type": "array", "items": {"type": "string"}},
+            "accept_actors": {"type": "array", "items": {"type": "string"}},
+            "reject_actors": {"type": "array", "items": {"type": "string"}},
+            "accept_directors": {"type": "array", "items": {"type": "string"}},
+            "reject_directors": {"type": "array", "items": {"type": "string"}},
         },
-        'additionalProperties': False,
+        "additionalProperties": False,
     }
 
     def is_in_set(self, config, configkey, entryitem):
@@ -120,7 +120,7 @@ class FilterTvdb:
 
     @plugin.priority(126)
     def on_task_filter(self, task, config):
-        lookup = plugin.get('thetvdb_lookup', self).lookup
+        lookup = plugin.get("thetvdb_lookup", self).lookup
 
         for entry in task.entries:
             force_accept = False
@@ -128,100 +128,100 @@ class FilterTvdb:
             try:
                 lookup(task, entry)
             except plugin.PluginError as e:
-                logger.error('Skipping {} because of an error: {}', entry['title'], e.value)
+                logger.error("Skipping {} because of an error: {}", entry["title"], e.value)
                 continue
 
             # Check defined conditions
             reasons = []
             if (
-                'min_series_rating' in config
-                and entry['tvdb_rating'] < config['min_series_rating']
+                "min_series_rating" in config
+                and entry["tvdb_rating"] < config["min_series_rating"]
             ):
                 reasons.append(
-                    'series_rating ({} < {})'.format(
-                        entry['tvdb_rating'], config['min_series_rating']
+                    "series_rating ({} < {})".format(
+                        entry["tvdb_rating"], config["min_series_rating"]
                     )
                 )
             if (
-                'min_episode_rating' in config
-                and entry['tvdb_ep_rating'] < config['min_episode_rating']
+                "min_episode_rating" in config
+                and entry["tvdb_ep_rating"] < config["min_episode_rating"]
             ):
                 reasons.append(
-                    'tvdb_ep_rating ({} < {})'.format(
-                        entry['tvdb_ep_rating'], config['min_episode_rating']
+                    "tvdb_ep_rating ({} < {})".format(
+                        entry["tvdb_ep_rating"], config["min_episode_rating"]
                     )
                 )
             if (
-                'min_episode_air_year' in config
-                and entry['tvdb_ep_air_date'].strftime("%Y") < config['min_episode_air_year']
+                "min_episode_air_year" in config
+                and entry["tvdb_ep_air_date"].strftime("%Y") < config["min_episode_air_year"]
             ):
                 reasons.append(
-                    'tvdb_ep_air_date ({} < {})'.format(
-                        entry['tvdb_ep_air_date'].strftime("%Y"),
-                        config['min_episode_air_year'],
+                    "tvdb_ep_air_date ({} < {})".format(
+                        entry["tvdb_ep_air_date"].strftime("%Y"),
+                        config["min_episode_air_year"],
                     )
                 )
             if (
-                'max_episode_air_year' in config
-                and entry['tvdb_ep_air_date'].strftime("%Y") > config['max_episode_air_year']
+                "max_episode_air_year" in config
+                and entry["tvdb_ep_air_date"].strftime("%Y") > config["max_episode_air_year"]
             ):
                 reasons.append(
-                    'tvdb_ep_air_date ({} < {})'.format(
-                        entry['tvdb_ep_air_date'].strftime("%Y"),
-                        config['max_episode_air_year'],
+                    "tvdb_ep_air_date ({} < {})".format(
+                        entry["tvdb_ep_air_date"].strftime("%Y"),
+                        config["max_episode_air_year"],
                     )
                 )
 
-            if self.is_in_set(config, 'reject_content_rating', entry['tvdb_content_rating']):
-                reasons.append('reject_content_rating')
+            if self.is_in_set(config, "reject_content_rating", entry["tvdb_content_rating"]):
+                reasons.append("reject_content_rating")
 
-            if not self.is_in_set(config, 'accept_content_rating', entry['tvdb_content_rating']):
-                reasons.append('accept_content_rating')
+            if not self.is_in_set(config, "accept_content_rating", entry["tvdb_content_rating"]):
+                reasons.append("accept_content_rating")
 
-            if self.is_in_set(config, 'reject_network', entry['tvdb_network']):
-                reasons.append('reject_network')
+            if self.is_in_set(config, "reject_network", entry["tvdb_network"]):
+                reasons.append("reject_network")
 
-            if not self.is_in_set(config, 'accept_network', entry['tvdb_network']):
-                reasons.append('accept_network')
+            if not self.is_in_set(config, "accept_network", entry["tvdb_network"]):
+                reasons.append("accept_network")
 
-            if self.is_in_set(config, 'reject_genres', entry['tvdb_genres']):
-                reasons.append('reject_genres')
+            if self.is_in_set(config, "reject_genres", entry["tvdb_genres"]):
+                reasons.append("reject_genres")
 
-            if self.is_in_set(config, 'reject_status', entry['tvdb_status']):
-                reasons.append('reject_status')
+            if self.is_in_set(config, "reject_status", entry["tvdb_status"]):
+                reasons.append("reject_status")
 
             # Accept if actors contains an accepted actor, but don't reject otherwise
             if self.is_in_set(
-                config, 'accept_actors', entry['tvdb_actors'] + entry['tvdb_ep_guest_stars']
+                config, "accept_actors", entry["tvdb_actors"] + entry["tvdb_ep_guest_stars"]
             ):
                 force_accept = True
 
             if self.is_in_set(
-                config, 'reject_actors', entry['tvdb_actors'] + entry['tvdb_ep_guest_stars']
+                config, "reject_actors", entry["tvdb_actors"] + entry["tvdb_ep_guest_stars"]
             ):
-                reasons.append('reject_genres')
+                reasons.append("reject_genres")
 
             # Accept if director is an accepted director, but don't reject otherwise
-            if self.is_in_set(config, 'accept_directors', entry['tvdb_ep_director']):
+            if self.is_in_set(config, "accept_directors", entry["tvdb_ep_director"]):
                 force_accept = True
 
-            if self.is_in_set(config, 'reject_directors', entry['tvdb_ep_director']):
-                reasons.append('reject_directors')
+            if self.is_in_set(config, "reject_directors", entry["tvdb_ep_director"]):
+                reasons.append("reject_directors")
 
             if reasons and not force_accept:
-                msg = 'Skipping {} because of rule(s) {}'.format(
-                    entry.get('series_name_thetvdb', None) or entry['title'],
-                    ', '.join(reasons),
+                msg = "Skipping {} because of rule(s) {}".format(
+                    entry.get("series_name_thetvdb", None) or entry["title"],
+                    ", ".join(reasons),
                 )
                 if task.options.debug:
                     logger.debug(msg)
                 else:
                     log_once(msg, logger)
             else:
-                logger.debug('Accepting {}', entry)
+                logger.debug("Accepting {}", entry)
                 entry.accept()
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(FilterTvdb, 'thetvdb', api_ver=2)
+    plugin.register(FilterTvdb, "thetvdb", api_ver=2)

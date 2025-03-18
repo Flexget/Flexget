@@ -16,27 +16,27 @@ from flexget.utils.template import CoercingDateTime, FlexGetTemplate, render_fro
 if TYPE_CHECKING:
     from collections.abc import Iterable, Mapping, Sequence
 
-logger = logger.bind(name='entry')
+logger = logger.bind(name="entry")
 
 
 class EntryState(Enum):
-    ACCEPTED = 'accepted'
-    REJECTED = 'rejected'
-    FAILED = 'failed'
-    UNDECIDED = 'undecided'
+    ACCEPTED = "accepted"
+    REJECTED = "rejected"
+    FAILED = "failed"
+    UNDECIDED = "undecided"
 
     @property
     def color(self) -> str:
         return {
-            EntryState.ACCEPTED: 'green',
-            EntryState.REJECTED: 'red',
-            EntryState.FAILED: 'RED',
-            EntryState.UNDECIDED: 'dim',
+            EntryState.ACCEPTED: "green",
+            EntryState.REJECTED: "red",
+            EntryState.FAILED: "RED",
+            EntryState.UNDECIDED: "dim",
         }[self]
 
     @property
     def log_markup(self) -> str:
-        return f'<{self.color}>{self.value.upper()}</>'
+        return f"<{self.color}>{self.value.upper()}</>"
 
     # __str__, __eq__, and __hash__ are make these states almost interchangeable with the old plain string states
     def __str__(self) -> str:
@@ -59,7 +59,7 @@ class EntryUnicodeError(Exception):
         self.value = value
 
     def __str__(self):
-        return f'Entry strings must be unicode: {self.key} ({self.value!r})'
+        return f"Entry strings must be unicode: {self.key} ({self.value!r})"
 
 
 class Entry(LazyDict, Serializer):
@@ -79,13 +79,13 @@ class Entry(LazyDict, Serializer):
         super().__init__()
         self.traces = []
         self._state = EntryState.UNDECIDED
-        self._hooks = {'accept': [], 'reject': [], 'fail': [], 'complete': []}
+        self._hooks = {"accept": [], "reject": [], "fail": [], "complete": []}
         self.task = None
         self.lazy_lookups = []
 
         if len(args) == 2:
-            kwargs['title'] = args[0]
-            kwargs['url'] = args[1]
+            kwargs["title"] = args[0]
+            kwargs["url"] = args[1]
             args = []
 
         # Make sure constructor does not escape our __setitem__ enforcement
@@ -105,8 +105,8 @@ class Entry(LazyDict, Serializer):
         :param string operation: None, reject, accept or fail
         :param plugin: Uses task.current_plugin by default, pass value to override
         """
-        if operation not in (None, 'accept', 'reject', 'fail'):
-            raise ValueError(f'Unknown operation {operation}')
+        if operation not in (None, "accept", "reject", "fail"):
+            raise ValueError(f"Unknown operation {operation}")
         item = (plugin, operation, message)
         if item not in self.traces:
             self.traces.append(item)
@@ -131,7 +131,7 @@ class Entry(LazyDict, Serializer):
         try:
             self._hooks[action].append(functools.partial(func, **kwargs))
         except KeyError:
-            raise ValueError(f'`{action}` is not a valid entry action')
+            raise ValueError(f"`{action}` is not a valid entry action")
 
     def on_accept(self, func: Callable, **kwargs) -> None:
         """Register a function to be called when this entry is accepted.
@@ -139,7 +139,7 @@ class Entry(LazyDict, Serializer):
         :param func: The function to call
         :param kwargs: Keyword arguments that should be passed to the registered function
         """
-        self.add_hook('accept', func, **kwargs)
+        self.add_hook("accept", func, **kwargs)
 
     def on_reject(self, func: Callable, **kwargs) -> None:
         """Register a function to be called when this entry is rejected.
@@ -147,7 +147,7 @@ class Entry(LazyDict, Serializer):
         :param func: The function to call
         :param kwargs: Keyword arguments that should be passed to the registered function
         """
-        self.add_hook('reject', func, **kwargs)
+        self.add_hook("reject", func, **kwargs)
 
     def on_fail(self, func: Callable, **kwargs) -> None:
         """Register a function to be called when this entry is failed.
@@ -155,7 +155,7 @@ class Entry(LazyDict, Serializer):
         :param func: The function to call
         :param kwargs: Keyword arguments that should be passed to the registered function
         """
-        self.add_hook('fail', func, **kwargs)
+        self.add_hook("fail", func, **kwargs)
 
     def on_complete(self, func: Callable, **kwargs) -> None:
         """Register a function to be called when a :class:`Task` has finished processing this entry.
@@ -163,42 +163,42 @@ class Entry(LazyDict, Serializer):
         :param func: The function to call
         :param kwargs: Keyword arguments that should be passed to the registered function
         """
-        self.add_hook('complete', func, **kwargs)
+        self.add_hook("complete", func, **kwargs)
 
     def accept(self, reason: Optional[str] = None, **kwargs) -> None:
         if self.rejected:
-            logger.debug('tried to accept rejected {!r}', self)
+            logger.debug("tried to accept rejected {!r}", self)
         elif not self.accepted:
             self._state = EntryState.ACCEPTED
-            self.trace(reason, operation='accept')
+            self.trace(reason, operation="accept")
             # Run entry on_accept hooks
-            self.run_hooks('accept', reason=reason, **kwargs)
+            self.run_hooks("accept", reason=reason, **kwargs)
 
     def reject(self, reason: Optional[str] = None, **kwargs) -> None:
         # ignore rejections on immortal entries
-        if self.get('immortal'):
-            reason_str = f'({reason})' if reason else ''
-            logger.info('Tried to reject immortal {} {}', self['title'], reason_str)
-            self.trace(f'Tried to reject immortal {reason_str}')
+        if self.get("immortal"):
+            reason_str = f"({reason})" if reason else ""
+            logger.info("Tried to reject immortal {} {}", self["title"], reason_str)
+            self.trace(f"Tried to reject immortal {reason_str}")
             return
         if not self.rejected:
             self._state = EntryState.REJECTED
-            self.trace(reason, operation='reject')
+            self.trace(reason, operation="reject")
             # Run entry on_reject hooks
-            self.run_hooks('reject', reason=reason, **kwargs)
+            self.run_hooks("reject", reason=reason, **kwargs)
 
     def fail(self, reason: Optional[str] = None, **kwargs):
-        logger.debug("Marking entry '{}' as failed", self['title'])
+        logger.debug("Marking entry '{}' as failed", self["title"])
         if not self.failed:
             self._state = EntryState.FAILED
-            self.trace(reason, operation='fail')
-            logger.error('Failed {} ({})', self['title'], reason)
+            self.trace(reason, operation="fail")
+            logger.error("Failed {} ({})", self["title"], reason)
             # Run entry on_fail hooks
-            self.run_hooks('fail', reason=reason, **kwargs)
+            self.run_hooks("fail", reason=reason, **kwargs)
 
     def complete(self, **kwargs):
         # Run entry on_complete hooks
-        self.run_hooks('complete', **kwargs)
+        self.run_hooks("complete", **kwargs)
 
     @property
     def state(self) -> EntryState:
@@ -240,28 +240,28 @@ class Entry(LazyDict, Serializer):
             value = pendulum.instance(value)
 
         # url and original_url handling
-        if key == 'url':
+        if key == "url":
             if not isinstance(value, (str, LazyLookup)):
                 raise plugin.PluginError(
-                    'Tried to set {!r} url to {!r}'.format(self.get('title'), value)
+                    "Tried to set {!r} url to {!r}".format(self.get("title"), value)
                 )
-            self.setdefault('original_url', value)
+            self.setdefault("original_url", value)
 
         # title handling
-        if key == 'title':
+        if key == "title":
             if not isinstance(value, (str, LazyLookup)):
-                raise plugin.PluginError(f'Tried to set title to {value!r}')
-            self.setdefault('original_title', value)
+                raise plugin.PluginError(f"Tried to set title to {value!r}")
+            self.setdefault("original_title", value)
 
         try:
-            logger.trace('ENTRY SET: {} = {!r}', key, value)
+            logger.trace("ENTRY SET: {} = {!r}", key, value)
         except Exception as e:
-            logger.debug('trying to debug key `{}` value threw exception: {}', key, e)
+            logger.debug("trying to debug key `{}` value threw exception: {}", key, e)
 
         super().__setitem__(key, value)
 
     def safe_str(self) -> str:
-        return f'{self["title"]} | {self["url"]}'
+        return f"{self['title']} | {self['url']}"
 
     # TODO: this is too manual, maybe we should somehow check this internally and throw some exception if
     # application is trying to operate on invalid entry
@@ -270,13 +270,13 @@ class Entry(LazyDict, Serializer):
 
         :rtype: bool
         """
-        if 'title' not in self:
+        if "title" not in self:
             return False
-        if 'url' not in self:
+        if "url" not in self:
             return False
-        if not isinstance(self['url'], str):
+        if not isinstance(self["url"], str):
             return False
-        return isinstance(self['title'], str)
+        return isinstance(self["title"], str)
 
     def update_using_map(
         self, field_map: dict, source_item: Union[dict, object], ignore_none: bool = False
@@ -295,7 +295,7 @@ class Entry(LazyDict, Serializer):
         func = dict.get if isinstance(source_item, dict) else getattr
         for field, value in field_map.items():
             if isinstance(value, str):
-                v = functools.reduce(func, value.split('.'), source_item)
+                v = functools.reduce(func, value.split("."), source_item)
             else:
                 v = value(source_item)
             if ignore_none and v is None:
@@ -313,46 +313,46 @@ class Entry(LazyDict, Serializer):
         """
         if not isinstance(template, (str, FlexGetTemplate)):
             raise TypeError(
-                f'Trying to render non string template or unrecognized template format, got {template!r}'
+                f"Trying to render non string template or unrecognized template format, got {template!r}"
             )
-        logger.trace('rendering: {}', template)
+        logger.trace("rendering: {}", template)
         return render_from_entry(template, self, native=native)
 
     @classmethod
-    def serialize(cls, entry: 'Entry') -> dict:
+    def serialize(cls, entry: "Entry") -> dict:
         fields = {}
         for key in entry:
-            if key.startswith('_') or entry.is_lazy(key):
+            if key.startswith("_") or entry.is_lazy(key):
                 continue
             try:
                 fields[key] = serialize(entry[key])
             except TypeError as exc:
-                logger.debug('field {} was not serializable. {}', key, exc)
+                logger.debug("field {} was not serializable. {}", key, exc)
         lazy_lookups = []
         for ll in entry.lazy_lookups:
             try:
                 lazy_lookups.append(serialize(ll))
             except TypeError:
                 logger.exception(
-                    'BUG: Lazy lookup was not compatible with serialization. Please file a bug report'
+                    "BUG: Lazy lookup was not compatible with serialization. Please file a bug report"
                 )
-        return {'fields': fields, 'lazy_lookups': lazy_lookups}
+        return {"fields": fields, "lazy_lookups": lazy_lookups}
 
     @classmethod
-    def deserialize(cls, data, version) -> 'Entry':
+    def deserialize(cls, data, version) -> "Entry":
         result = cls()
-        for key, value in data['fields'].items():
+        for key, value in data["fields"].items():
             result[key] = deserialize(value)
-        for lazy_lookup in deserialize(data['lazy_lookups']):
+        for lazy_lookup in deserialize(data["lazy_lookups"]):
             result.add_lazy_fields(*lazy_lookup)
         return result
 
     def add_lazy_fields(
         self,
-        lazy_func: Union[Callable[['Entry'], None], str],
-        fields: 'Iterable[str]',
-        args: Optional['Sequence'] = None,
-        kwargs: Optional['Mapping'] = None,
+        lazy_func: Union[Callable[["Entry"], None], str],
+        fields: "Iterable[str]",
+        args: Optional["Sequence"] = None,
+        kwargs: Optional["Mapping"] = None,
     ):
         """Add lazy fields to an entry.
 
@@ -363,10 +363,10 @@ class Entry(LazyDict, Serializer):
         :param kwargs: Keyword arguments which will be passed to the lazy lookup function when called.
         """
         if not isinstance(lazy_func, str):
-            lazy_func = getattr(lazy_func, 'lazy_func_id', None)
+            lazy_func = getattr(lazy_func, "lazy_func_id", None)
         if lazy_func not in lazy_func_registry:
             raise ValueError(
-                'Lazy lookup functions/methods must be registered with the `register_lazy_lookup` decorator'
+                "Lazy lookup functions/methods must be registered with the `register_lazy_lookup` decorator"
             )
         # Make sure fields is a plain list. If it is a dict, (or some other iterable) we may try to serialize
         # extra/unserializable stuff.
@@ -381,23 +381,23 @@ class Entry(LazyDict, Serializer):
         Use `add_lazy_fields` instead.
         """
         warnings.warn(
-            '`register_lazy_func` is deprecated. `add_lazy_fields` should be used instead. '
-            'This plugin should be updated to work with the latest versions of FlexGet',
+            "`register_lazy_func` is deprecated. `add_lazy_fields` should be used instead. "
+            "This plugin should be updated to work with the latest versions of FlexGet",
             DeprecationWarning,
             stacklevel=2,
         )
         super().register_lazy_func(func, keys, [], {})
 
     def __eq__(self, other):
-        return self.get('original_title') == other.get('original_title') and self.get(
-            'original_url'
-        ) == other.get('original_url')
+        return self.get("original_title") == other.get("original_title") and self.get(
+            "original_url"
+        ) == other.get("original_url")
 
     def __hash__(self):
-        return hash(self.get('original_title', '') + self.get('original_url', ''))
+        return hash(self.get("original_title", "") + self.get("original_url", ""))
 
     def __repr__(self):
-        return '<Entry(title={},state={})>'.format(self['title'], self._state)
+        return "<Entry(title={},state={})>".format(self["title"], self._state)
 
 
 lazy_func_registry = {}
@@ -411,7 +411,7 @@ class LazyFunc:
     def __call__(self, func: Callable) -> Callable:
         if self.name in lazy_func_registry:
             raise RuntimeError(
-                f'The name {self.name} is already registered to another lazy function.'
+                f"The name {self.name} is already registered to another lazy function."
             )
         func.lazy_func_id = self.name
         self._func = func
@@ -420,14 +420,14 @@ class LazyFunc:
 
     @property
     def function(self) -> Callable:
-        if '.' in self._func.__qualname__:
+        if "." in self._func.__qualname__:
             # This is a method of a plugin class, bind the function to the plugin instance
-            plugin_class_name = self._func.__qualname__.split('.')[0]
+            plugin_class_name = self._func.__qualname__.split(".")[0]
             for p in plugin.plugins.values():
                 if p.plugin_class.__name__ == plugin_class_name:
                     return types.MethodType(self._func, p.instance)
             raise TypeError(
-                f'lazy lookups must be functions, or methods of a registered plugin class. {self._func!r} is not'
+                f"lazy lookups must be functions, or methods of a registered plugin class. {self._func!r} is not"
             )
         return self._func
 

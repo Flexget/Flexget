@@ -16,9 +16,9 @@ try:
     # NOTE: Importing other plugins is discouraged!
     from flexget.components.parsing.parsers import parser_common as plugin_parser_common
 except ImportError:
-    raise plugin.DependencyError(issued_by=__name__, missing='parser_common')
+    raise plugin.DependencyError(issued_by=__name__, missing="parser_common")
 
-logger = logger.bind(name='movie_list')
+logger = logger.bind(name="movie_list")
 
 
 class MovieListBase:
@@ -28,7 +28,7 @@ class MovieListBase:
     def supported_ids(self):
         # Return a list of supported series identifier as registered via their plugins
         return [
-            p.instance.movie_identifier for p in plugin.get_plugins(interface='movie_metainfo')
+            p.instance.movie_identifier for p in plugin.get_plugins(interface="movie_metainfo")
         ]
 
 
@@ -45,10 +45,10 @@ class MovieList(MutableSet):
     @with_session
     def __init__(self, config, session=None):
         if not isinstance(config, dict):
-            config = {'list_name': config}
-        config.setdefault('strip_year', False)
-        self.list_name = config.get('list_name')
-        self.strip_year = config.get('strip_year')
+            config = {"list_name": config}
+        config.setdefault("strip_year", False)
+        self.list_name = config.get("list_name")
+        self.strip_year = config.get("strip_year")
 
         db_list = self._db_list(session)
         if not db_list:
@@ -73,14 +73,14 @@ class MovieList(MutableSet):
             if db_movie:
                 session.delete(db_movie)
             db_movie = db.MovieListMovie()
-            if 'movie_name' in entry:
-                db_movie.title, db_movie.year = entry['movie_name'], entry.get('movie_year')
+            if "movie_name" in entry:
+                db_movie.title, db_movie.year = entry["movie_name"], entry.get("movie_year")
             else:
-                db_movie.title, db_movie.year = split_title_year(entry['title'])
+                db_movie.title, db_movie.year = split_title_year(entry["title"])
             for id_name in MovieListBase().supported_ids:
                 if id_name in entry:
                     db_movie.ids.append(db.MovieListID(id_name=id_name, id_value=entry[id_name]))
-            logger.debug('adding entry {}', entry)
+            logger.debug("adding entry {}", entry)
             db_list.movies.append(db_movie)
             session.commit()
             return db_movie.to_entry()
@@ -89,7 +89,7 @@ class MovieList(MutableSet):
         with Session() as session:
             db_movie = self._find_entry(entry, session=session)
             if db_movie:
-                logger.debug('deleting movie {}', db_movie)
+                logger.debug("deleting movie {}", db_movie)
                 session.delete(db_movie)
 
     def __contains__(self, entry):
@@ -101,7 +101,7 @@ class MovieList(MutableSet):
         # Match by supported IDs
         for id_name in MovieListBase().supported_ids:
             if entry.get(id_name):
-                logger.debug('trying to match movie based off id {}: {}', id_name, entry[id_name])
+                logger.debug("trying to match movie based off id {}: {}", id_name, entry[id_name])
                 res = (
                     self._db_list(session)
                     .movies.join(db.MovieListMovie.ids)
@@ -114,18 +114,18 @@ class MovieList(MutableSet):
                     .first()
                 )
                 if res:
-                    logger.debug('found movie {}', res)
+                    logger.debug("found movie {}", res)
                     return res
         # Fall back to title/year match
-        if not entry.get('movie_name'):
+        if not entry.get("movie_name"):
             self._parse_title(entry)
-        if entry.get('movie_name'):
-            name = entry['movie_name']
-            year = entry.get('movie_year') if entry.get('movie_year') else None
+        if entry.get("movie_name"):
+            name = entry["movie_name"]
+            year = entry.get("movie_year") if entry.get("movie_year") else None
         else:
-            logger.warning('Could not get a movie name, skipping')
+            logger.warning("Could not get a movie name, skipping")
             return None
-        logger.debug('trying to match movie based of name: {} and year: {}', name, year)
+        logger.debug("trying to match movie based of name: {} and year: {}", name, year)
         res = (
             self._db_list(session)
             .movies.filter(func.lower(db.MovieListMovie.title) == name.lower())
@@ -133,12 +133,12 @@ class MovieList(MutableSet):
             .first()
         )
         if res:
-            logger.debug('found movie {}', res)
+            logger.debug("found movie {}", res)
         return res
 
     @staticmethod
     def _parse_title(entry):
-        parser = plugin.get('parsing', 'movie_list').parse_movie(data=entry['title'])
+        parser = plugin.get("parsing", "movie_list").parse_movie(data=entry["title"])
         if parser and parser.valid:
             parser.name = plugin_parser_common.normalize_name(
                 plugin_parser_common.remove_dirt(parser.name)
@@ -164,13 +164,13 @@ class PluginMovieList:
     """Remove all accepted elements from your trakt.tv watchlist/library/seen or custom list."""
 
     schema = {
-        'oneOf': [
-            {'type': 'string'},
+        "oneOf": [
+            {"type": "string"},
             {
-                'type': 'object',
-                'properties': {'list_name': {'type': 'string'}, 'strip_year': {'type': 'boolean'}},
-                'required': ['list_name'],
-                'additionalProperties': False,
+                "type": "object",
+                "properties": {"list_name": {"type": "string"}, "strip_year": {"type": "boolean"}},
+                "required": ["list_name"],
+                "additionalProperties": False,
             },
         ]
     }
@@ -183,6 +183,6 @@ class PluginMovieList:
         return list(MovieList(config))
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(PluginMovieList, 'movie_list', api_ver=2, interfaces=['task', 'list'])
+    plugin.register(PluginMovieList, "movie_list", api_ver=2, interfaces=["task", "list"])

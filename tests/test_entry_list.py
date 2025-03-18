@@ -30,38 +30,38 @@ class TestEntryListSearch:
 
     def test_entry_list_search(self, execute_task):
         entry = Entry()
-        entry['title'] = 'test title'
-        entry['url'] = ''
+        entry["title"] = "test title"
+        entry["url"] = ""
 
         with Session() as session:
             entry_list = EntryListList()
-            entry_list.name = 'Test list'
+            entry_list.name = "Test list"
             session.add(entry_list)
             session.commit()
 
             db_entry = EntryListEntry(entry, entry_list.id)
             entry_list.entries.append(db_entry)
 
-        task = execute_task('entry_list_discover')
+        task = execute_task("entry_list_discover")
         assert len(task.entries) > 0
-        assert task.find_entry(title='test title')
+        assert task.find_entry(title="test title")
 
     def test_entry_list_with_next_series_episodes(self, execute_task):
         entry = Entry()
-        entry['title'] = 'foo.s01e01.720p.hdtv-flexget'
-        entry['url'] = ''
+        entry["title"] = "foo.s01e01.720p.hdtv-flexget"
+        entry["url"] = ""
 
         with Session() as session:
             entry_list = EntryListList()
-            entry_list.name = 'series list'
+            entry_list.name = "series list"
             session.add(entry_list)
             session.commit()
 
             db_entry = EntryListEntry(entry, entry_list.id)
             entry_list.entries.append(db_entry)
 
-        task = execute_task('entry_list_with_series')
-        assert task.find_entry('accepted', title='foo.s01e01.720p.hdtv-flexget')
+        task = execute_task("entry_list_with_series")
+        assert task.find_entry("accepted", title="foo.s01e01.720p.hdtv-flexget")
 
 
 class TestEntryListQuality:
@@ -82,7 +82,7 @@ class TestEntryListQuality:
     """
 
     def test_quality_in_entry_list(self, execute_task):
-        execute_task('verify_quality_1')
-        task = execute_task('verify_quality_2')
-        entry = task.find_entry(title='foo.bar.720p.hdtv-Flexget')
-        assert entry['quality'] == '720p hdtv'
+        execute_task("verify_quality_1")
+        task = execute_task("verify_quality_2")
+        entry = task.find_entry(title="foo.bar.720p.hdtv-Flexget")
+        assert entry["quality"] == "720p hdtv"

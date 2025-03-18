@@ -19,7 +19,7 @@ from flexget.utils.database import entry_synonym
 from flexget.utils.sqlalchemy_utils import table_add_column, table_schema
 from flexget.utils.tools import TimedDict, get_config_hash, parse_timedelta
 
-logger = logger.bind(name='input_cache')
+logger = logger.bind(name="input_cache")
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -28,41 +28,41 @@ if TYPE_CHECKING:
         def __init__(self, *args, **kwargs) -> None: ...
 
 else:
-    Base = db_schema.versioned_base('input_cache', 2)
+    Base = db_schema.versioned_base("input_cache", 2)
 
 
-@db_schema.upgrade('input_cache')
+@db_schema.upgrade("input_cache")
 def upgrade(ver: int, session: DBSession) -> int:
     if ver == 0:
-        table = table_schema('input_cache_entry', session)
-        table_add_column(table, 'json', Unicode, session)
+        table = table_schema("input_cache_entry", session)
+        table_add_column(table, "json", Unicode, session)
         # Make sure we get the new schema with the added column
-        table = table_schema('input_cache_entry', session)
+        table = table_schema("input_cache_entry", session)
         for row in session.execute(select(table.c.id, table.c.entry)):
             try:
-                p = pickle.loads(row['entry'])
+                p = pickle.loads(row["entry"])
                 session.execute(
                     table.update()
-                    .where(table.c.id == row['id'])
+                    .where(table.c.id == row["id"])
                     .values(json=json.dumps(p, encode_datetime=True))
                 )
             except KeyError as ex:
-                logger.error('Unable error upgrading input_cache pickle object due to {}', ex)
+                logger.error("Unable error upgrading input_cache pickle object due to {}", ex)
         ver = 1
     if ver == 1:
-        table = table_schema('input_cache_entry', session)
+        table = table_schema("input_cache_entry", session)
         for row in session.execute(select(table.c.id, table.c.json)):
-            if not row['json']:
+            if not row["json"]:
                 # Seems there could be invalid data somehow. See #2590
                 continue
-            data = json.loads(row['json'], decode_datetime=True)
+            data = json.loads(row["json"], decode_datetime=True)
             # If title looked like a date, make sure it's a string
             # Had a weird case of an entry without a title: https://github.com/Flexget/Flexget/issues/2636
-            title = data.pop('title', None)
+            title = data.pop("title", None)
             entry = partial(Entry, **data)
             e = entry(title=str(title)) if title else entry()
             session.execute(
-                table.update().where(table.c.id == row['id']).values(json=serialization.dumps(e))
+                table.update().where(table.c.id == row["id"]).values(json=serialization.dumps(e))
             )
 
         ver = 2
@@ -70,7 +70,7 @@ def upgrade(ver: int, session: DBSession) -> int:
 
 
 class InputCache(Base):
-    __tablename__ = 'input_cache'
+    __tablename__ = "input_cache"
 
     id = Column(Integer, primary_key=True)
     name = Column(Unicode)
@@ -78,21 +78,21 @@ class InputCache(Base):
     added = Column(DateTime, default=datetime.now)
 
     entries = relationship(
-        'InputCacheEntry', backref='cache', cascade='all, delete, delete-orphan'
+        "InputCacheEntry", backref="cache", cascade="all, delete, delete-orphan"
     )
 
 
 class InputCacheEntry(Base):
-    __tablename__ = 'input_cache_entry'
+    __tablename__ = "input_cache_entry"
 
     id = Column(Integer, primary_key=True)
-    _json = Column('json', Unicode)
-    entry = entry_synonym('_json')
+    _json = Column("json", Unicode)
+    entry = entry_synonym("_json")
 
-    cache_id = Column(Integer, ForeignKey('input_cache.id'), nullable=False)
+    cache_id = Column(Integer, ForeignKey("input_cache.id"), nullable=False)
 
 
-@event('manager.db_cleanup')
+@event("manager.db_cleanup")
 def db_cleanup(manager, session: DBSession) -> None:
     """Remove old input caches from plugins that are no longer configured."""
     result = (
@@ -101,7 +101,7 @@ def db_cleanup(manager, session: DBSession) -> None:
         .delete()
     )
     if result:
-        logger.verbose('Removed {} old input caches.', result)
+        logger.verbose("Removed {} old input caches.", result)
 
 
 class cached:  # noqa: N801 It acts like a function in usage
@@ -116,7 +116,7 @@ class cached:  # noqa: N801 It acts like a function in usage
     .. note:: Configuration assumptions may make this unusable in some (future) inputs
     """
 
-    cache = TimedDict(cache_time='5 minutes')
+    cache = TimedDict(cache_time="5 minutes")
 
     def __init__(self, name: str, persist: Optional[str] = None) -> None:
         # Cast name to unicode to prevent sqlalchemy warnings when filtering
@@ -133,19 +133,19 @@ class cached:  # noqa: N801 It acts like a function in usage
             task = args[1]
             self.config_hash = get_config_hash(args[2])
 
-            logger.trace('self.name: {}', self.name)
-            logger.trace('hash: {}', self.config_hash)
+            logger.trace("self.name: {}", self.name)
+            logger.trace("hash: {}", self.config_hash)
 
-            self.cache_name = self.name + '_' + self.config_hash
+            self.cache_name = self.name + "_" + self.config_hash
             logger.debug(
-                'cache name: {} (has: {})', self.cache_name, ', '.join(list(self.cache.keys()))
+                "cache name: {} (has: {})", self.cache_name, ", ".join(list(self.cache.keys()))
             )
 
             if not task.options.nocache:
                 cache_value = self.cache.get(self.cache_name, None)
                 if cache_value:
                     # return from the cache
-                    logger.verbose('Restored entries from cache')
+                    logger.verbose("Restored entries from cache")
                     return cache_value
 
                 if self.persist:
@@ -155,7 +155,7 @@ class cached:  # noqa: N801 It acts like a function in usage
                         return db_cache
 
             # Nothing was restored from db or memory cache, run the function
-            logger.trace('cache miss')
+            logger.trace("cache miss")
             # call input event
             try:
                 response = func(*args, **kwargs) or []
@@ -165,7 +165,7 @@ class cached:  # noqa: N801 It acts like a function in usage
                     cache = self.load_from_db(load_expired=True)
                     if cache is not None:
                         logger.error(
-                            'There was an error during {} input ({}), using cache instead.',
+                            "There was an error during {} input ({}), using cache instead.",
                             self.name,
                             e,
                         )
@@ -173,7 +173,7 @@ class cached:  # noqa: N801 It acts like a function in usage
                 # If there was nothing in the db cache, re-raise the error.
                 raise
             # store results to cache
-            logger.debug('storing entries to cache {} ', self.cache_name)
+            logger.debug("storing entries to cache {} ", self.cache_name)
             cache = IterableCache(response, self.store_to_db if self.persist else None)
             self.cache[self.cache_name] = cache
             return cache
@@ -182,7 +182,7 @@ class cached:  # noqa: N801 It acts like a function in usage
 
     def store_to_db(self, entries: list[str]):
         # Store to database
-        logger.debug('Storing cache {} to database.', self.cache_name)
+        logger.debug("Storing cache {} to database.", self.cache_name)
         with Session() as session:
             db_cache = (
                 session.query(InputCache)
@@ -208,7 +208,7 @@ class cached:  # noqa: N801 It acts like a function in usage
             db_cache = db_cache.first()
             if db_cache:
                 entries = [ent.entry for ent in db_cache.entries]
-                logger.verbose(f'Restored {len(entries)} entries from db cache for {self.name}')
+                logger.verbose(f"Restored {len(entries)} entries from db cache for {self.name}")
                 # Store to in memory cache
                 self.cache[self.cache_name] = copy.deepcopy(entries)
                 return entries
@@ -222,7 +222,7 @@ class IterableCache:
     """
 
     def __init__(
-        self, iterable: 'Iterable', finished_hook: Optional[Callable[[list], None]] = None
+        self, iterable: "Iterable", finished_hook: Optional[Callable[[list], None]] = None
     ):
         self.iterable = iter(iterable)
         self.cache: list = []

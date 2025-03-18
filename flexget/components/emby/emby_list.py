@@ -5,7 +5,7 @@ from flexget.components.emby.api_emby import EmbyApi, EmbyApiList, EmbyAuth
 from flexget.components.emby.emby_util import SCHEMA_SERVER_TAG
 from flexget.event import event
 
-logger = logger.bind(name='emby_list')
+logger = logger.bind(name="emby_list")
 
 
 class PluginEmbyList:
@@ -25,13 +25,13 @@ class PluginEmbyList:
     auth = None
 
     schema = {
-        'type': 'object',
-        'properties': {
+        "type": "object",
+        "properties": {
             **SCHEMA_SERVER_TAG,
-            'list': {'type': 'string'},
+            "list": {"type": "string"},
         },
-        'required': ['server', 'list'],
-        'additionalProperties': False,
+        "required": ["server", "list"],
+        "additionalProperties": False,
     }
 
     def login(self, config):
@@ -62,6 +62,6 @@ class PluginEmbyList:
             yield entry
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(PluginEmbyList, 'emby_list', api_ver=2, interfaces=['task', 'list'])
+    plugin.register(PluginEmbyList, "emby_list", api_ver=2, interfaces=["task", "list"])

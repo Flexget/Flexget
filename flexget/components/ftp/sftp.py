@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from flexget.entry import Entry
     from flexget.task import Task
 
-logger = logger.bind(name='sftp')
+logger = logger.bind(name="sftp")
 
 # Constants
 DEFAULT_SFTP_PORT: int = 22
@@ -69,57 +69,57 @@ class SftpList:
     """
 
     schema = {
-        'type': 'object',
-        'properties': {
-            'host': {'type': 'string'},
-            'username': {'type': 'string'},
-            'password': {'type': 'string'},
-            'port': {'type': 'integer', 'default': DEFAULT_SFTP_PORT},
-            'files_only': {'type': 'boolean', 'default': True},
-            'dirs_only': {'type': 'boolean', 'default': False},
-            'recursive': {'type': 'boolean', 'default': False},
-            'get_size': {'type': 'boolean', 'default': True},
-            'private_key': {'type': 'string'},
-            'private_key_pass': {'type': 'string'},
-            'dirs': one_or_more({'type': 'string'}),
-            'socket_timeout_sec': {'type': 'integer', 'default': DEFAULT_SOCKET_TIMEOUT_SEC},
-            'connection_tries': {'type': 'integer', 'default': DEFAULT_CONNECT_TRIES},
-            'host_key': {
-                'type': 'object',
-                'properties': {
-                    'key_type': {'type': 'string', 'enum': list(HOST_KEY_TYPES.keys())},
-                    'public_key': {'type': 'string'},
+        "type": "object",
+        "properties": {
+            "host": {"type": "string"},
+            "username": {"type": "string"},
+            "password": {"type": "string"},
+            "port": {"type": "integer", "default": DEFAULT_SFTP_PORT},
+            "files_only": {"type": "boolean", "default": True},
+            "dirs_only": {"type": "boolean", "default": False},
+            "recursive": {"type": "boolean", "default": False},
+            "get_size": {"type": "boolean", "default": True},
+            "private_key": {"type": "string"},
+            "private_key_pass": {"type": "string"},
+            "dirs": one_or_more({"type": "string"}),
+            "socket_timeout_sec": {"type": "integer", "default": DEFAULT_SOCKET_TIMEOUT_SEC},
+            "connection_tries": {"type": "integer", "default": DEFAULT_CONNECT_TRIES},
+            "host_key": {
+                "type": "object",
+                "properties": {
+                    "key_type": {"type": "string", "enum": list(HOST_KEY_TYPES.keys())},
+                    "public_key": {"type": "string"},
                 },
-                'required': ['key_type', 'public_key'],
-                'additionalProperties': False,
+                "required": ["key_type", "public_key"],
+                "additionalProperties": False,
             },
         },
-        'additionalProperties': False,
-        'required': ['host', 'username'],
+        "additionalProperties": False,
+        "required": ["host", "username"],
     }
 
     @staticmethod
     def prepare_config(config: dict) -> dict:
         """Set defaults for the provided configuration."""
-        config.setdefault('password', None)
-        config.setdefault('private_key', None)
-        config.setdefault('private_key_pass', None)
-        config.setdefault('host_key', None)
-        config.setdefault('dirs', ['.'])
+        config.setdefault("password", None)
+        config.setdefault("private_key", None)
+        config.setdefault("private_key_pass", None)
+        config.setdefault("host_key", None)
+        config.setdefault("dirs", ["."])
 
         return config
 
     @classmethod
-    def on_task_input(cls, task: 'Task', config: dict) -> list['Entry']:
+    def on_task_input(cls, task: "Task", config: dict) -> list["Entry"]:
         """Input task handler."""
         config = cls.prepare_config(config)
 
-        files_only: bool = config['files_only']
-        dirs_only: bool = config['dirs_only']
-        recursive: bool = config['recursive']
-        get_size: bool = config['get_size']
-        socket_timeout_sec: int = config['socket_timeout_sec']
-        connection_tries: int = config['connection_tries']
+        files_only: bool = config["files_only"]
+        dirs_only: bool = config["dirs_only"]
+        recursive: bool = config["recursive"]
+        get_size: bool = config["get_size"]
+        socket_timeout_sec: int = config["socket_timeout_sec"]
+        connection_tries: int = config["connection_tries"]
         directories: list[str] = []
 
         if files_only and dirs_only:
@@ -127,10 +127,10 @@ class SftpList:
                 "Both files_only and dirs_only are set.  This will result in no entries being discovered."
             )
 
-        if isinstance(config['dirs'], list):
-            directories.extend(config['dirs'])
+        if isinstance(config["dirs"], list):
+            directories.extend(config["dirs"])
         else:
-            directories.append(config['dirs'])
+            directories.append(config["dirs"])
 
         sftp_config: SftpConfig = task_config_to_sftp_config(config)
         sftp: SftpClient = sftp_connect(sftp_config, socket_timeout_sec, connection_tries)
@@ -166,30 +166,30 @@ class SftpDownload:
     """
 
     schema = {
-        'type': 'object',
-        'properties': {
-            'to': {'type': 'string', 'format': 'path'},
-            'recursive': {'type': 'boolean', 'default': True},
-            'delete_origin': {'type': 'boolean', 'default': False},
-            'socket_timeout_sec': {'type': 'integer', 'default': DEFAULT_SOCKET_TIMEOUT_SEC},
-            'connection_tries': {'type': 'integer', 'default': DEFAULT_CONNECT_TRIES},
+        "type": "object",
+        "properties": {
+            "to": {"type": "string", "format": "path"},
+            "recursive": {"type": "boolean", "default": True},
+            "delete_origin": {"type": "boolean", "default": False},
+            "socket_timeout_sec": {"type": "integer", "default": DEFAULT_SOCKET_TIMEOUT_SEC},
+            "connection_tries": {"type": "integer", "default": DEFAULT_CONNECT_TRIES},
         },
-        'required': ['to'],
-        'additionalProperties': False,
+        "required": ["to"],
+        "additionalProperties": False,
     }
 
     @classmethod
-    def download_entry(cls, entry: 'Entry', config: dict, sftp: SftpClient) -> None:
+    def download_entry(cls, entry: "Entry", config: dict, sftp: SftpClient) -> None:
         """Download the file(s) described in entry."""
-        path: str = unquote(urlparse(entry['url']).path) or '.'
-        delete_origin: bool = config['delete_origin']
-        recursive: bool = config['recursive']
-        to: str = config['to']
+        path: str = unquote(urlparse(entry["url"]).path) or "."
+        delete_origin: bool = config["delete_origin"]
+        recursive: bool = config["recursive"]
+        to: str = config["to"]
 
         try:
             to = render_from_entry(to, entry)
         except RenderError as e:
-            logger.error('Could not render path: {}', to)
+            logger.error("Could not render path: {}", to)
             entry.fail(str(e))
             return
 
@@ -199,14 +199,14 @@ class SftpDownload:
             entry.fail(e)
 
     @classmethod
-    def on_task_output(cls, task: 'Task', config: dict) -> None:
+    def on_task_output(cls, task: "Task", config: dict) -> None:
         """Register this as an output plugin."""
 
     @classmethod
-    def on_task_download(cls, task: 'Task', config: dict) -> None:
+    def on_task_download(cls, task: "Task", config: dict) -> None:
         """Task handler for sftp_download plugin."""
-        socket_timeout_sec: int = config['socket_timeout_sec']
-        connection_tries: int = config['connection_tries']
+        socket_timeout_sec: int = config["socket_timeout_sec"]
+        connection_tries: int = config["connection_tries"]
 
         # Download entries by host so we can reuse the connection
         for sftp_config, entries in groupby(task.accepted, cls._get_sftp_config):
@@ -218,7 +218,7 @@ class SftpDownload:
             try:
                 sftp = sftp_connect(sftp_config, socket_timeout_sec, connection_tries)
             except Exception as e:
-                error_message = f'Failed to connect to {sftp_config.host} ({e})'
+                error_message = f"Failed to connect to {sftp_config.host} ({e})"
 
             for entry in entries:
                 if sftp:
@@ -229,34 +229,34 @@ class SftpDownload:
                 sftp.close()
 
     @classmethod
-    def _get_sftp_config(cls, entry: 'Entry'):
+    def _get_sftp_config(cls, entry: "Entry"):
         """Parse a url and return a hashable config, source path, and destination path."""
         # parse url
-        parsed = urlparse(entry['url'])
+        parsed = urlparse(entry["url"])
         host: str = parsed.hostname
         username: str = parsed.username
         password: str = parsed.password
         port: int = parsed.port or DEFAULT_SFTP_PORT
 
         # get private key info if it exists
-        private_key: str = entry.get('private_key')
-        private_key_pass: str = entry.get('private_key_pass')
+        private_key: str = entry.get("private_key")
+        private_key_pass: str = entry.get("private_key_pass")
 
-        entry_host_key_config: dict = entry.get('host_key')
+        entry_host_key_config: dict = entry.get("host_key")
         host_key: Optional[HostKey] = None
         if entry_host_key_config:
             host_key = HostKey(
-                entry_host_key_config['key_type'], entry_host_key_config['public_key']
+                entry_host_key_config["key_type"], entry_host_key_config["public_key"]
             )
 
         config: Optional[SftpConfig] = None
 
-        if parsed.scheme == 'sftp':
+        if parsed.scheme == "sftp":
             config = SftpConfig(
                 host, port, username, password, private_key, private_key_pass, host_key
             )
         else:
-            logger.warning('Scheme does not match SFTP: {}', entry['url'])
+            logger.warning("Scheme does not match SFTP: {}", entry["url"])
 
         return config
 
@@ -290,53 +290,53 @@ class SftpUpload:
     """
 
     schema = {
-        'type': 'object',
-        'properties': {
-            'host': {'type': 'string'},
-            'username': {'type': 'string'},
-            'password': {'type': 'string'},
-            'port': {'type': 'integer', 'default': DEFAULT_SFTP_PORT},
-            'private_key': {'type': 'string'},
-            'private_key_pass': {'type': 'string'},
-            'to': {'type': 'string'},
-            'delete_origin': {'type': 'boolean', 'default': False},
-            'host_key': {
-                'type': 'object',
-                'properties': {
-                    'key_type': {'type': 'string', 'enum': list(HOST_KEY_TYPES.keys())},
-                    'public_key': {'type': 'string'},
+        "type": "object",
+        "properties": {
+            "host": {"type": "string"},
+            "username": {"type": "string"},
+            "password": {"type": "string"},
+            "port": {"type": "integer", "default": DEFAULT_SFTP_PORT},
+            "private_key": {"type": "string"},
+            "private_key_pass": {"type": "string"},
+            "to": {"type": "string"},
+            "delete_origin": {"type": "boolean", "default": False},
+            "host_key": {
+                "type": "object",
+                "properties": {
+                    "key_type": {"type": "string", "enum": list(HOST_KEY_TYPES.keys())},
+                    "public_key": {"type": "string"},
                 },
-                'required': ['key_type', 'public_key'],
-                'additionalProperties': False,
+                "required": ["key_type", "public_key"],
+                "additionalProperties": False,
             },
-            'socket_timeout_sec': {'type': 'integer', 'default': DEFAULT_SOCKET_TIMEOUT_SEC},
-            'connection_tries': {'type': 'integer', 'default': DEFAULT_CONNECT_TRIES},
+            "socket_timeout_sec": {"type": "integer", "default": DEFAULT_SOCKET_TIMEOUT_SEC},
+            "connection_tries": {"type": "integer", "default": DEFAULT_CONNECT_TRIES},
         },
-        'additionalProperties': False,
-        'required': ['host', 'username'],
+        "additionalProperties": False,
+        "required": ["host", "username"],
     }
 
     @staticmethod
     def prepare_config(config: dict) -> dict:
         """Set defaults for the provided configuration."""
-        config.setdefault('password', None)
-        config.setdefault('private_key', None)
-        config.setdefault('private_key_pass', None)
-        config.setdefault('to', None)
+        config.setdefault("password", None)
+        config.setdefault("private_key", None)
+        config.setdefault("private_key_pass", None)
+        config.setdefault("to", None)
 
         return config
 
     @classmethod
-    def handle_entry(cls, entry: 'Entry', sftp: SftpClient, config: dict):
-        to: str = config['to']
-        location: str = entry['location']
-        delete_origin: bool = config['delete_origin']
+    def handle_entry(cls, entry: "Entry", sftp: SftpClient, config: dict):
+        to: str = config["to"]
+        location: str = entry["location"]
+        delete_origin: bool = config["delete_origin"]
 
         if to:
             try:
                 to = render_from_entry(to, entry)
             except RenderError as e:
-                logger.error('Could not render path: {}', to)
+                logger.error("Could not render path: {}", to)
                 entry.fail(str(e))
                 return
 
@@ -350,39 +350,39 @@ class SftpUpload:
             try:
                 Path(location).unlink()
             except Exception as e:
-                logger.warning('Failed to delete file {} ({})', location, e)
+                logger.warning("Failed to delete file {} ({})", location, e)
 
     @classmethod
-    def on_task_output(cls, task: 'Task', config: dict) -> None:
+    def on_task_output(cls, task: "Task", config: dict) -> None:
         """Upload accepted entries to the specified SFTP server."""
         config = cls.prepare_config(config)
 
-        socket_timeout_sec: int = config['socket_timeout_sec']
-        connection_tries: int = config['connection_tries']
+        socket_timeout_sec: int = config["socket_timeout_sec"]
+        connection_tries: int = config["connection_tries"]
 
         sftp_config: SftpConfig = task_config_to_sftp_config(config)
         sftp = sftp_connect(sftp_config, socket_timeout_sec, connection_tries)
 
         for entry in task.accepted:
             if sftp:
-                logger.debug('Uploading file: {}', entry['location'])
+                logger.debug("Uploading file: {}", entry["location"])
                 cls.handle_entry(entry, sftp, config)
             else:
-                entry.fail('SFTP connection failed.')
+                entry.fail("SFTP connection failed.")
 
 
 def task_config_to_sftp_config(config: dict) -> SftpConfig:
     """Create an SFTP connection from a Flexget config object."""
-    host: int = config['host']
-    port: int = config['port']
-    username: str = config['username']
-    password: str = config['password']
-    private_key: str = config['private_key']
-    private_key_pass: str = config['private_key_pass']
+    host: int = config["host"]
+    port: int = config["port"]
+    username: str = config["username"]
+    password: str = config["password"]
+    private_key: str = config["private_key"]
+    private_key_pass: str = config["private_key_pass"]
 
     host_key: Optional[HostKey] = None
-    if config.get('host_key') is not None:
-        host_key = HostKey(config['host_key']['key_type'], config['host_key']['public_key'])
+    if config.get("host_key") is not None:
+        host_key = HostKey(config["host_key"]["key_type"], config["host_key"]["public_key"])
 
     return SftpConfig(host, port, username, password, private_key, private_key_pass, host_key)
 
@@ -405,8 +405,8 @@ def sftp_connect(
     return sftp_client
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin() -> None:
-    plugin.register(SftpList, 'sftp_list', api_ver=2)
-    plugin.register(SftpDownload, 'sftp_download', api_ver=2)
-    plugin.register(SftpUpload, 'sftp_upload', api_ver=2)
+    plugin.register(SftpList, "sftp_list", api_ver=2)
+    plugin.register(SftpDownload, "sftp_download", api_ver=2)
+    plugin.register(SftpUpload, "sftp_upload", api_ver=2)

@@ -19,14 +19,14 @@ from flexget.utils import json
 from flexget.utils.database import json_synonym
 from flexget.utils.sqlalchemy_utils import create_index, table_add_column, table_schema
 
-logger = logger.bind(name='util.simple_persistence')
-Base = db_schema.versioned_base('simple_persistence', 4)
+logger = logger.bind(name="util.simple_persistence")
+Base = db_schema.versioned_base("simple_persistence", 4)
 
 # Used to signify that a given key should be deleted from simple persistence on flush
 DELETE = object()
 
 
-@db_schema.upgrade('simple_persistence')
+@db_schema.upgrade("simple_persistence")
 def upgrade(ver, session):
     if ver is None:
         # Upgrade to version 0 was a failed attempt at cleaning bad entries from our table, better attempt in ver 1
@@ -34,17 +34,17 @@ def upgrade(ver, session):
     if ver == 0:
         try:
             # Remove any values that are not loadable.
-            table = table_schema('simple_persistence', session)
+            table = table_schema("simple_persistence", session)
             for row in session.execute(
                 select(table.c.id, table.c.plugin, table.c.key, table.c.value)
             ):
                 try:
-                    pickle.loads(row['value'])
+                    pickle.loads(row["value"])
                 except Exception as e:
                     logger.warning(
-                        "Couldn't load {}:{} removing from db: {}", row['plugin'], row['key'], e
+                        "Couldn't load {}:{} removing from db: {}", row["plugin"], row["key"], e
                     )
-                    session.execute(table.delete().where(table.c.id == row['id']))
+                    session.execute(table.delete().where(table.c.id == row["id"]))
         except Exception as e:
             logger.warning(
                 "Couldn't upgrade the simple_persistence table. Commencing nuke. Error: {}", e
@@ -52,35 +52,35 @@ def upgrade(ver, session):
             raise db_schema.UpgradeImpossible
         ver = 1
     if ver == 1:
-        logger.info('Creating index on simple_persistence table.')
-        create_index('simple_persistence', session, 'feed', 'plugin', 'key')
+        logger.info("Creating index on simple_persistence table.")
+        create_index("simple_persistence", session, "feed", "plugin", "key")
         ver = 2
     if ver in (2, 3):
-        table = table_schema('simple_persistence', session)
-        table_add_column(table, 'json', Unicode, session)
+        table = table_schema("simple_persistence", session)
+        table_add_column(table, "json", Unicode, session)
         # Make sure we get the new schema with the added column
-        table = table_schema('simple_persistence', session)
+        table = table_schema("simple_persistence", session)
         failures = 0
         for row in session.execute(select(table.c.id, table.c.value)):
             try:
-                p = pickle.loads(row['value'])
+                p = pickle.loads(row["value"])
                 session.execute(
                     table.update()
-                    .where(table.c.id == row['id'])
+                    .where(table.c.id == row["id"])
                     .values(json=json.dumps(p, encode_datetime=True))
                 )
             except Exception:
                 failures += 1
         if failures > 0:
             logger.error(
-                'Error upgrading {} simple_persistence pickle objects. Some information has been lost.',
+                "Error upgrading {} simple_persistence pickle objects. Some information has been lost.",
                 failures,
             )
         ver = 4
     return ver
 
 
-@event('manager.db_cleanup')
+@event("manager.db_cleanup")
 def db_cleanup(manager, session):
     """Clean up values in the db from tasks which no longer exist."""
     # SKVs not associated with any task use None as task tame
@@ -91,14 +91,14 @@ def db_cleanup(manager, session):
 
 
 class SimpleKeyValue(Base):
-    __tablename__ = 'simple_persistence'
+    __tablename__ = "simple_persistence"
 
     id = Column(Integer, primary_key=True)
-    task = Column('feed', String)
+    task = Column("feed", String)
     plugin = Column(String)
     key = Column(String)
-    _json = Column('json', Unicode)
-    value = json_synonym('_json')
+    _json = Column("json", Unicode)
+    value = json_synonym("_json")
     added = Column(DateTime, default=datetime.now())
 
     def __init__(self, task, plugin, key, value):
@@ -112,7 +112,7 @@ class SimpleKeyValue(Base):
 
 
 Index(
-    'ix_simple_persistence_feed_plugin_key',
+    "ix_simple_persistence_feed_plugin_key",
     SimpleKeyValue.task,
     SimpleKeyValue.plugin,
     SimpleKeyValue.key,
@@ -138,12 +138,12 @@ class SimplePersistence(MutableMapping):
         return self.class_store[self.taskname][self.plugin]
 
     def __setitem__(self, key, value):
-        logger.debug('setting key {} value {}', key, repr(value))
+        logger.debug("setting key {} value {}", key, repr(value))
         self.store[key] = value
 
     def __getitem__(self, key):
         if key not in self.store or self.store[key] == DELETE:
-            raise KeyError(f'{key} is not contained in the simple_persistence table.')
+            raise KeyError(f"{key} is not contained in the simple_persistence table.")
         return self.store[key]
 
     def __delitem__(self, key):
@@ -164,7 +164,7 @@ class SimplePersistence(MutableMapping):
                     cls.class_store[task][skv.plugin][skv.key] = skv.value
                 except TypeError as e:
                     logger.warning(
-                        'Value stored in simple_persistence cannot be decoded. It will be removed. Error: {}',
+                        "Value stored in simple_persistence cannot be decoded. It will be removed. Error: {}",
                         str(e),
                     )
                     cls.class_store[task][skv.plugin][skv.key] = DELETE
@@ -172,7 +172,7 @@ class SimplePersistence(MutableMapping):
     @classmethod
     def flush(cls, task=None):
         """Flush all in memory key/values to database."""
-        logger.debug('Flushing simple persistence for task {} to db.', task)
+        logger.debug("Flushing simple persistence for task {} to db.", task)
         with Session() as session:
             for pluginname in cls.class_store[task]:
                 for key, value in cls.class_store[task][pluginname].items():
@@ -186,7 +186,7 @@ class SimplePersistence(MutableMapping):
                         query.delete()
                     else:
                         updated = query.update(
-                            {'value': json.dumps(value, encode_datetime=True)},
+                            {"value": json.dumps(value, encode_datetime=True)},
                             synchronize_session=False,
                         )
                         if not updated:
@@ -203,25 +203,25 @@ class SimpleTaskPersistence(SimplePersistence):
         return self.task.current_plugin
 
 
-@event('manager.startup')
+@event("manager.startup")
 def load_taskless(manager):
     """Load all key/value pairs into memory which aren't associated with a specific task."""
     SimplePersistence.load()
 
 
-@event('manager.shutdown')
+@event("manager.shutdown")
 def flush_taskless(manager):
     SimplePersistence.flush()
 
 
-@event('task.execute.started')
+@event("task.execute.started")
 def load_task(task):
     """Load all key/value pairs into memory before a task starts."""
     if not SimplePersistence.class_store[task.name]:
         SimplePersistence.load(task.name)
 
 
-@event('task.execute.completed')
+@event("task.execute.completed")
 def flush_task(task):
     """Store all in memory key/value pairs to database when a task has completed."""
     SimplePersistence.flush(task.name)

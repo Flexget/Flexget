@@ -13,7 +13,7 @@ from unicodedata import normalize
 def normalize_unicode(text):
     if isinstance(text, str):
         # Convert to combined form for better search results
-        return normalize('NFC', text)
+        return normalize("NFC", text)
     return text
 
 
@@ -28,8 +28,8 @@ def normalize_scene(text):
     #     ABCDEFGHIJKLMNOPQRSTUVWXYZ
     #     abcdefghijklmnopqrstuvwxyz
     #     0123456789-._()
-    text = normalize('NFKD', text).encode('ASCII', 'ignore').decode()
-    return re.sub(r'[^a-zA-Z0-9 \-._()]', '', text.replace('...', ''))
+    text = normalize("NFKD", text).encode("ASCII", "ignore").decode()
+    return re.sub(r"[^a-zA-Z0-9 \-._()]", "", text.replace("...", ""))
 
 
 def torrent_availability(seeds, leeches):

@@ -6,10 +6,10 @@ from flexget import plugin
 from flexget.event import event
 from flexget.utils.tools import format_filesize
 
-logger = logger.bind(name='nzb_size')
+logger = logger.bind(name="nzb_size")
 
 # a bit hacky, add nzb as a known mimetype
-mimetypes.add_type('application/x-nzb', '.nzb')
+mimetypes.add_type("application/x-nzb", ".nzb")
 
 
 class NzbSize:
@@ -26,26 +26,26 @@ class NzbSize:
         except ImportError:
             # TODO: remove builtin status so this won't get repeated on every task execution
             # TODO: this will get loaded even without any need for nzb
-            raise plugin.DependencyError(issued_by='nzb_size', missing='lib pynzb')
+            raise plugin.DependencyError(issued_by="nzb_size", missing="lib pynzb")
 
         for entry in task.accepted:
-            if entry.get('mime-type') in ['text/nzb', 'application/x-nzb'] or (
-                entry.get('filename') and entry['filename'].endswith('.nzb')
+            if entry.get("mime-type") in ["text/nzb", "application/x-nzb"] or (
+                entry.get("filename") and entry["filename"].endswith(".nzb")
             ):
-                if 'file' not in entry:
+                if "file" not in entry:
                     logger.warning(
-                        '`{}` does not have a `file` that could be used to get size information',
-                        entry['title'],
+                        "`{}` does not have a `file` that could be used to get size information",
+                        entry["title"],
                     )
                     continue
 
-                filename = entry['file']
-                logger.debug('reading {}', filename)
+                filename = entry["file"]
+                logger.debug("reading {}", filename)
                 with open(filename).read() as xmldata:
                     try:
                         nzbfiles = nzb_parser.parse(xmldata)
                     except Exception:
-                        logger.debug('{} is not a valid nzb', entry['title'])
+                        logger.debug("{} is not a valid nzb", entry["title"])
                         continue
 
                 size = 0
@@ -53,12 +53,12 @@ class NzbSize:
                     for segment in nzbfile.segments:
                         size += segment.bytes
 
-                logger.debug('{} content size: {}', entry['title'], format_filesize(size))
-                entry['content_size'] = size
+                logger.debug("{} content size: {}", entry["title"], format_filesize(size))
+                entry["content_size"] = size
             else:
-                logger.trace('{} does not seem to be nzb', entry['title'])
+                logger.trace("{} does not seem to be nzb", entry["title"])
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(NzbSize, 'nzb_size', api_ver=2, builtin=True)
+    plugin.register(NzbSize, "nzb_size", api_ver=2, builtin=True)

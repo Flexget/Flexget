@@ -10,13 +10,13 @@ from flexget.utils.requests import TokenBucketLimiter
 from flexget.utils.soup import get_soup
 from flexget.utils.tools import parse_filesize
 
-logger = logger.bind(name='nCore')
+logger = logger.bind(name="nCore")
 
-URL = 'https://ncore.pro'
+URL = "https://ncore.pro"
 
-HEADERS = {'Content-type': 'application/x-www-form-urlencoded'}
+HEADERS = {"Content-type": "application/x-www-form-urlencoded"}
 
-PASSKEY = ''
+PASSKEY = ""
 
 CATEGORIES = {
     "all",
@@ -37,12 +37,12 @@ CATEGORIES = {
 }
 
 SORT = {
-    'default': 'fid',
-    'date': 'fid',
-    'size': 'size',
-    'seeds': 'seeders',
-    'leechers': 'leechers',
-    'downloads': 'times_completed',
+    "default": "fid",
+    "date": "fid",
+    "size": "size",
+    "seeds": "seeders",
+    "leechers": "leechers",
+    "downloads": "times_completed",
 }
 
 
@@ -50,23 +50,23 @@ class UrlRewriteNcore:
     """nCore urlrewriter."""
 
     schema = {
-        'type': 'object',
-        'properties': {
-            'username': {'type': 'string'},
-            'password': {'type': 'string'},
-            'category': {
-                'type': 'array',
-                'items': {'type': 'string', 'enum': list(CATEGORIES)},
-                'default': [],
+        "type": "object",
+        "properties": {
+            "username": {"type": "string"},
+            "password": {"type": "string"},
+            "category": {
+                "type": "array",
+                "items": {"type": "string", "enum": list(CATEGORIES)},
+                "default": [],
             },
-            'sort_by': {'type': 'string', 'default': 'default', 'enum': list(SORT)},
-            'sort_reverse': {'type': 'boolean', 'default': False},
+            "sort_by": {"type": "string", "default": "default", "enum": list(SORT)},
+            "sort_reverse": {"type": "boolean", "default": False},
         },
-        'required': ['username', 'password'],
-        'additionalProperties': False,
+        "required": ["username", "password"],
+        "additionalProperties": False,
     }
 
-    request_limiter = TokenBucketLimiter('ncore.pro/', 100, '5 seconds')
+    request_limiter = TokenBucketLimiter("ncore.pro/", 100, "5 seconds")
 
     @plugin.internet(logger)
     def search(self, task, entry, config):
@@ -81,51 +81,51 @@ class UrlRewriteNcore:
 
         page = task.requests.post(URL + "/login.php", data=data, headers=HEADERS)
         soup = get_soup(page.content)
-        passkey_line = str(soup.find('link', href=re.compile(r'rss\.php\?key=')))
+        passkey_line = str(soup.find("link", href=re.compile(r"rss\.php\?key=")))
         passkey = passkey_line[passkey_line.find("key=") : passkey_line.find('"', 20, 90)]
 
-        for search_string in entry.get('search_strings', [entry['title']]):
+        for search_string in entry.get("search_strings", [entry["title"]]):
             data = {
                 "mire": search_string,
                 "miben": "name",
-                "miszerint": SORT[config.get('sort_by')],
+                "miszerint": SORT[config.get("sort_by")],
             }
 
-            if config.get('category'):
-                data["kivalasztott_tipus[]"] = config.get('category')
+            if config.get("category"):
+                data["kivalasztott_tipus[]"] = config.get("category")
                 data["tipus"] = "kivalasztottak_kozott"
             else:
                 data["tipus"] = "all_own"
 
-            if config.get('sort_reverse'):
+            if config.get("sort_reverse"):
                 data["hogyan"] = "DESC"
 
             page = task.requests.post(URL + "/torrents.php", data=data, headers=HEADERS)
             soup = get_soup(page.content)
-            for a in soup.findAll('a', title=re.compile(".+")):
-                if 'details' in a.get('href'):
+            for a in soup.findAll("a", title=re.compile(".+")):
+                if "details" in a.get("href"):
                     e = Entry()
 
-                    href = a.get('href')
+                    href = a.get("href")
                     id = href[href.find("id=") + 3 :]
 
-                    e['title'] = a.get('title')
-                    e['url'] = URL + f'/torrents.php?action=download&id={id}&' + passkey
+                    e["title"] = a.get("title")
+                    e["url"] = URL + f"/torrents.php?action=download&id={id}&" + passkey
 
                     parent = a.parent.parent.parent.parent
 
-                    e['torrent_seeds'] = int(parent.find('div', class_='box_s2').string)
-                    e['torrent_leeches'] = int(parent.find('div', class_='box_l2').string)
-                    e['content_size'] = parse_filesize(
-                        parent.find('div', class_='box_meret2').string
+                    e["torrent_seeds"] = int(parent.find("div", class_="box_s2").string)
+                    e["torrent_leeches"] = int(parent.find("div", class_="box_l2").string)
+                    e["content_size"] = parse_filesize(
+                        parent.find("div", class_="box_meret2").string
                     )
-                    e['torrent_availability'] = torrent_availability(
-                        e['torrent_seeds'], e['torrent_leeches']
+                    e["torrent_availability"] = torrent_availability(
+                        e["torrent_seeds"], e["torrent_leeches"]
                     )
 
                     yield e
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(UrlRewriteNcore, 'ncore', interfaces=['search'], api_ver=2)
+    plugin.register(UrlRewriteNcore, "ncore", interfaces=["search"], api_ver=2)

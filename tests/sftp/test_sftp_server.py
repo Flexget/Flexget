@@ -27,7 +27,7 @@ except ImportError:
 else:
     logger = logging.getLogger("StubSFTP")
 
-    ADDRESS = '127.0.0.1'
+    ADDRESS = "127.0.0.1"
     PORT = 40022
 
     class TestSFTPServerController:
@@ -41,8 +41,8 @@ else:
 
         def start(
             self,
-            username: str = 'test_user',
-            password: str = 'test_pass',
+            username: str = "test_user",
+            password: str = "test_pass",
             key_only: bool = False,
             log_level: int = logging.DEBUG,
         ) -> TestSFTPFileSystem:
@@ -74,14 +74,14 @@ else:
             return self.__fs
 
         def __run_server(self):
-            logger.debug('Starting sftp server 127.0.0.1:40022 with root fs at %s', self.__root)
+            logger.debug("Starting sftp server 127.0.0.1:40022 with root fs at %s", self.__root)
             try:
                 conn, addr = self.__server_socket.accept()
 
-                host_key = RSAKey.from_private_key_file('test_sftp_server.key')
+                host_key = RSAKey.from_private_key_file("test_sftp_server.key")
                 transport = Transport(conn)
                 transport.add_server_key(host_key)
-                transport.set_subsystem_handler('sftp', SFTPServer, TestSFTPServer, self.__fs)
+                transport.set_subsystem_handler("sftp", SFTPServer, TestSFTPServer, self.__fs)
 
                 server = TestServer(
                     username=self.__username, password=self.__password, key_only=self.__key_only
@@ -112,7 +112,7 @@ else:
         def __init__(self, root: Path, username: str) -> None:
             self.__root = root
             self.__cwd = None
-            self.__home = self.create_dir(f'/home/{username}')
+            self.__home = self.create_dir(f"/home/{username}")
 
         def create_file(self, path: str, size: int = 0) -> Path:
             """Create a file on the :class: `StubSFTPServer` instance.
@@ -127,8 +127,8 @@ else:
             """
             canonicalized: Path = self.canonicalize(path)
             canonicalized.parent.mkdir(parents=True, exist_ok=True)
-            with canonicalized.open('wb') as file:
-                file.write(b'\0' * size)
+            with canonicalized.open("wb") as file:
+                file.write(b"\0" * size)
             return canonicalized
 
         def create_dir(self, path: str) -> Path:
@@ -179,7 +179,7 @@ else:
 
             if self.__root == canonicalized or self.__root in canonicalized.parents:
                 return canonicalized.resolve() if resolve else canonicalized
-            raise ValueError(f'Unable to canoicalize {path}')
+            raise ValueError(f"Unable to canoicalize {path}")
 
         def root(self) -> Path:
             return self.__root
@@ -213,8 +213,8 @@ else:
 
         def get_allowed_auths(self, username: str) -> str:
             if self.__key_only:
-                return 'publickey'
-            return 'password, publickey'
+                return "publickey"
+            return "password, publickey"
 
     class TestSFTPHandle(SFTPHandle):
         __test__ = False
@@ -228,14 +228,14 @@ else:
             self.writefile = write_file
 
         def stat(self):
-            logger.debug('stat() on %s', self.filename)
+            logger.debug("stat() on %s", self.filename)
             try:
                 return SFTPAttributes.from_stat(os.fstat(self.readfile.fileno()))
             except OSError as e:
                 return TestSFTPHandle.log_and_return_error_code(e)
 
         def chattr(self, attr):
-            logger.debug('chattr(%s) on %s', attr, self.filename)
+            logger.debug("chattr(%s) on %s", attr, self.filename)
             # python doesn't have equivalents to fchown or fchmod, so we have to
             # use the stored filename
             try:
@@ -259,18 +259,18 @@ else:
             self.__fs = fs
 
         def session_started(self):
-            logger.debug('session_started')
+            logger.debug("session_started")
 
         def session_ended(self):
-            logger.debug('session_ended')
+            logger.debug("session_ended")
 
         def open(self, path: str, flags: int, attr: SFTPAttributes) -> SFTPHandle | int:
-            logger.debug('open(%s, %s, %s)', path, flags, attr)
+            logger.debug("open(%s, %s, %s)", path, flags, attr)
 
             canonicalized_path: Path = self.__fs.canonicalize(path)
             try:
                 # Ensure Binary mode.
-                flags |= getattr(os, 'O_BINARY', 0)
+                flags |= getattr(os, "O_BINARY", 0)
                 mode = attr.st_mode if attr.st_mode else 0o666  # rw-rw-rw-
                 fd = os.open(canonicalized_path, flags, mode)
             except OSError as e:
@@ -286,7 +286,7 @@ else:
                 file_mode = "a+b" if flags & os.O_APPEND else "r+b"
             else:
                 # O_RDONLY
-                file_mode = 'rb'
+                file_mode = "rb"
             try:
                 file = os.fdopen(fd, file_mode)
             except OSError as e:
@@ -294,7 +294,7 @@ else:
             return TestSFTPHandle(path, file, file, flags)
 
         def list_folder(self, path: str):
-            logger.debug('list_folder(%s)', path)
+            logger.debug("list_folder(%s)", path)
 
             canonicalized_path: Path = self.__fs.canonicalize(path)
             try:
@@ -308,7 +308,7 @@ else:
             return out
 
         def stat(self, path: str) -> SFTPAttributes | int:
-            logger.debug('stat(%s)', path)
+            logger.debug("stat(%s)", path)
 
             try:
                 return SFTPAttributes.from_stat(self.__fs.canonicalize(path).stat())
@@ -316,7 +316,7 @@ else:
                 return TestSFTPServer.log_and_return_error_code(e)
 
         def lstat(self, path: str) -> SFTPAttributes | int:
-            logger.debug('lstat(%s)', path)
+            logger.debug("lstat(%s)", path)
             try:
                 return SFTPAttributes.from_stat(
                     os.lstat(self.__fs.canonicalize(path, resolve=False))
@@ -325,7 +325,7 @@ else:
                 return TestSFTPServer.log_and_return_error_code(e)
 
         def remove(self, path: str) -> int:
-            logger.debug('remove(%s)', path)
+            logger.debug("remove(%s)", path)
             try:
                 self.__fs.canonicalize(path, resolve=False).unlink()
             except OSError as e:
@@ -333,7 +333,7 @@ else:
             return SFTP_OK
 
         def rename(self, oldpath: str, newpath: str) -> int:
-            logger.debug('rename(%s, %s)', oldpath, newpath)
+            logger.debug("rename(%s, %s)", oldpath, newpath)
             """
             Rename (or move) a file.  The SFTP specification implies that this
             method can be used to move an existing file into a different folder,
@@ -355,7 +355,7 @@ else:
             return SFTP_OP_UNSUPPORTED
 
         def posix_rename(self, oldpath: str, newpath: str) -> int:
-            logger.debug('posix_rename(%s, %s)', oldpath, newpath)
+            logger.debug("posix_rename(%s, %s)", oldpath, newpath)
             """
             Rename (or move) a file, following posix conventions. If newpath
             already exists, it will be overwritten.
@@ -368,7 +368,7 @@ else:
             return SFTP_OP_UNSUPPORTED
 
         def mkdir(self, path: str, attr: SFTPAttributes) -> int:
-            logger.debug('mkdir(%s, %s)', path, attr)
+            logger.debug("mkdir(%s, %s)", path, attr)
             """
             Create a new directory with the given attributes.  The ``attr``
             object may be considered a "hint" and ignored.
@@ -388,7 +388,7 @@ else:
             return SFTP_OK
 
         def rmdir(self, path: str) -> int:
-            logger.debug('rmdir(%s)', path)
+            logger.debug("rmdir(%s)", path)
             """
             Remove a directory if it exists.  The ``path`` should refer to an
             existing, empty folder -- otherwise this method should return an
@@ -404,7 +404,7 @@ else:
             return SFTP_OK
 
         def chattr(self, path: str, attr: SFTPAttributes) -> int:
-            logger.debug('chattr(%s, %s)', path, attr)
+            logger.debug("chattr(%s, %s)", path, attr)
             """
             Change the attributes of a file.  The ``attr`` object will contain
             only those fields provided by the client in its request, so you
@@ -419,7 +419,7 @@ else:
             return SFTP_OP_UNSUPPORTED
 
         def readlink(self, path: str) -> str | int:
-            logger.debug('readlink(%s)', path)
+            logger.debug("readlink(%s)", path)
             """
             Return the target of a symbolic link (or shortcut) on the server.
             If the specified path doesn't refer to a symbolic link, an error
@@ -432,7 +432,7 @@ else:
             return SFTP_OP_UNSUPPORTED
 
         def symlink(self, target_path: str, path: str) -> int:
-            logger.debug('symlink(%s, %s)', target_path, path)
+            logger.debug("symlink(%s, %s)", target_path, path)
             """
             Create a symbolic link on the server, as new pathname ``path``,
             with ``target_path`` as the target of the link.
@@ -446,9 +446,9 @@ else:
             return SFTP_OP_UNSUPPORTED
 
         def canonicalize(self, path: str) -> str:
-            logger.debug('canonicalize(%s)', path)
+            logger.debug("canonicalize(%s)", path)
             return (
-                '/'
+                "/"
                 + self.__fs.canonicalize(path).resolve().relative_to(self.__fs.root()).as_posix()
             )
 

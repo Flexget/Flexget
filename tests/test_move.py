@@ -14,9 +14,9 @@ class TestMove:
               to: __tmp__/{{ 'newdir' }}/
     """
 
-    @pytest.mark.filecopy('movie.mkv', '__tmp__/movie.mkv')
+    @pytest.mark.filecopy("movie.mkv", "__tmp__/movie.mkv")
     def test_move(self, execute_task, tmp_path):
-        assert (tmp_path / 'movie.mkv').exists()
-        execute_task('test_move')
-        assert not (tmp_path / 'movie.mkv').exists()
-        assert (tmp_path / 'newdir/movie.mkv').exists()
+        assert (tmp_path / "movie.mkv").exists()
+        execute_task("test_move")
+        assert not (tmp_path / "movie.mkv").exists()
+        assert (tmp_path / "newdir/movie.mkv").exists()

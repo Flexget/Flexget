@@ -25,23 +25,23 @@ class TestInfoHash:
 
     def test_infohash(self, execute_task):
         """Torrent: infohash parsing."""
-        task = execute_task('test')
-        info_hash = task.entries[0].get('torrent_info_hash')
-        assert info_hash == '14FFE5DD23188FD5CB53A1D47F1289DB70ABF31E', (
-            f'InfoHash does not match (got {info_hash})'
+        task = execute_task("test")
+        info_hash = task.entries[0].get("torrent_info_hash")
+        assert info_hash == "14FFE5DD23188FD5CB53A1D47F1289DB70ABF31E", (
+            f"InfoHash does not match (got {info_hash})"
         )
 
     def test_magnet_infohash(self, execute_task):
         """Test metainfo/magnet_btih plugin."""
-        task = execute_task('test_magnet')
+        task = execute_task("test_magnet")
         assert (
-            task.all_entries[0]['torrent_info_hash'] == '2A8959BED2BE495BB0E3EA96F497D873D5FAED05'
+            task.all_entries[0]["torrent_info_hash"] == "2A8959BED2BE495BB0E3EA96F497D873D5FAED05"
         )
         assert (
-            task.all_entries[1]['torrent_info_hash'] == '2B3959BED2BE445BB0E3EA96F497D873D5FAED05'
+            task.all_entries[1]["torrent_info_hash"] == "2B3959BED2BE445BB0E3EA96F497D873D5FAED05"
         )
         assert (
-            task.all_entries[2]['torrent_info_hash'] == 'B45BFCCFCD5301E94AF8500B1A1863415346A91A'
+            task.all_entries[2]["torrent_info_hash"] == "B45BFCCFCD5301E94AF8500B1A1863415346A91A"
         )
 
 
@@ -63,23 +63,23 @@ class TestSeenInfoHash:
             accept_all: yes
     """
 
-    @pytest.mark.filecopy('test.torrent', '__tmp__/test.torrent')
+    @pytest.mark.filecopy("test.torrent", "__tmp__/test.torrent")
     def test_seen_info_hash(self, execute_task):
-        task = execute_task('test')
-        assert task.find_entry('accepted', title='test'), (
-            'torrent should have been accepted on first run'
+        task = execute_task("test")
+        assert task.find_entry("accepted", title="test"), (
+            "torrent should have been accepted on first run"
         )
-        task = execute_task('test2')
-        assert task.find_entry('rejected', title='test2'), (
-            'torrent should have been rejected on second run'
+        task = execute_task("test2")
+        assert task.find_entry("rejected", title="test2"), (
+            "torrent should have been rejected on second run"
         )
 
     def test_same_run(self, execute_task):
         # Test that 2 entries with the same info hash don't get accepted on the same run.
         # Also tests that the plugin compares info hash case insensitively.
-        task = execute_task('test_same_run')
+        task = execute_task("test_same_run")
         assert len(task.accepted) == 1, (
-            'Should not have accepted both entries with the same info hash'
+            "Should not have accepted both entries with the same info hash"
         )
 
 
@@ -117,40 +117,40 @@ class TestModifyTrackers:
     """
 
     def load_torrent(self, file: Path):
-        with file.open('rb') as f:
+        with file.open("rb") as f:
             data = f.read()
         return Torrent(data)
 
-    @pytest.mark.filecopy('test.torrent', '__tmp__/test.torrent')
+    @pytest.mark.filecopy("test.torrent", "__tmp__/test.torrent")
     def test_add_trackers(self, execute_task, tmp_path):
-        task = execute_task('test_add_trackers')
-        torrent = self.load_torrent(tmp_path / 'test.torrent')
-        assert 'udp://thetracker.com/announce' in torrent.trackers, (
-            'udp://thetracker.com/announce should have been added to trackers'
+        task = execute_task("test_add_trackers")
+        torrent = self.load_torrent(tmp_path / "test.torrent")
+        assert "udp://thetracker.com/announce" in torrent.trackers, (
+            "udp://thetracker.com/announce should have been added to trackers"
         )
         # Check magnet url
-        assert 'tr=udp://thetracker.com/announce' in task.find_entry(title='test_magnet')['url']
+        assert "tr=udp://thetracker.com/announce" in task.find_entry(title="test_magnet")["url"]
 
-    @pytest.mark.filecopy('test.torrent', '__tmp__/test.torrent')
+    @pytest.mark.filecopy("test.torrent", "__tmp__/test.torrent")
     def test_remove_trackers(self, execute_task, tmp_path):
-        task = execute_task('test_remove_trackers')
-        torrent = self.load_torrent(tmp_path / 'test.torrent')
-        assert 'http://ipv6.torrent.ubuntu.com:6969/announce' not in torrent.trackers, (
-            'ipv6 tracker should have been removed'
+        task = execute_task("test_remove_trackers")
+        torrent = self.load_torrent(tmp_path / "test.torrent")
+        assert "http://ipv6.torrent.ubuntu.com:6969/announce" not in torrent.trackers, (
+            "ipv6 tracker should have been removed"
         )
 
         # Check magnet url
         assert (
-            'tr=http://ipv6.torrent.ubuntu.com:6969/announce'
-            not in task.find_entry(title='test_magnet')['url']
+            "tr=http://ipv6.torrent.ubuntu.com:6969/announce"
+            not in task.find_entry(title="test_magnet")["url"]
         )
 
-    @pytest.mark.filecopy('test.torrent', '__tmp__/test.torrent')
+    @pytest.mark.filecopy("test.torrent", "__tmp__/test.torrent")
     def test_modify_trackers(self, execute_task, tmp_path):
-        execute_task('test_modify_trackers')
-        torrent = self.load_torrent(tmp_path / 'test.torrent')
-        assert 'http://torrent.replaced.com:6969/announce' in torrent.trackers, (
-            'ubuntu tracker should have been added'
+        execute_task("test_modify_trackers")
+        torrent = self.load_torrent(tmp_path / "test.torrent")
+        assert "http://torrent.replaced.com:6969/announce" in torrent.trackers, (
+            "ubuntu tracker should have been added"
         )
 
 
@@ -166,9 +166,9 @@ class TestPrivateTorrents:
     """
 
     def test_private_torrents(self, execute_task):
-        task = execute_task('test')
-        assert task.find_entry('rejected', title='test_private'), 'did not reject private torrent'
-        assert task.find_entry('accepted', title='test_public'), 'did not pass public torrent'
+        task = execute_task("test")
+        assert task.find_entry("rejected", title="test_private"), "did not reject private torrent"
+        assert task.find_entry("accepted", title="test_public"), "did not pass public torrent"
 
 
 class TestTorrentScrub:
@@ -200,16 +200,16 @@ class TestTorrentScrub:
     """
 
     test_cases = (
-        (True, Path('test.torrent')),
-        (False, Path('LICENSE.torrent')),
-        (False, Path('LICENSE-resume.torrent')),
+        (True, Path("test.torrent")),
+        (False, Path("LICENSE.torrent")),
+        (False, Path("LICENSE-resume.torrent")),
     )
     test_files = [i[1] for i in test_cases]
 
-    @pytest.mark.filecopy(test_files, '__tmp__')
+    @pytest.mark.filecopy(test_files, "__tmp__")
     def test_torrent_scrub(self, execute_task, tmp_path):
         # Run task
-        task = execute_task('test_all')
+        task = execute_task("test_all")
 
         for clean, file in self.test_cases:
             original = Torrent.from_file(file)
@@ -217,23 +217,23 @@ class TestTorrentScrub:
 
             modified = task.find_entry(title=title)
             assert modified, f"{title} cannot be found in {task}"
-            modified = modified.get('torrent')
+            modified = modified.get("torrent")
             assert modified, f"No 'torrent' key in {title}"
 
             osize = file.stat().st_size
             msize = (tmp_path / file).stat().st_size
 
             # Make sure essentials survived
-            assert 'announce' in modified.content
-            assert 'info' in modified.content
-            assert 'name' in modified.content['info']
-            assert 'piece length' in modified.content['info']
-            assert 'pieces' in modified.content['info']
+            assert "announce" in modified.content
+            assert "info" in modified.content
+            assert "name" in modified.content["info"]
+            assert "piece length" in modified.content["info"]
+            assert "pieces" in modified.content["info"]
 
             # Check that hashes have changed accordingly
             if clean:
                 assert osize == msize, "Filesizes aren't supposed to differ!"
-                assert original.info_hash == modified.info_hash, 'info dict changed in ' + str(
+                assert original.info_hash == modified.info_hash, "info dict changed in " + str(
                     file
                 )
             else:
@@ -241,30 +241,30 @@ class TestTorrentScrub:
                 assert original.info_hash != modified.info_hash, str(file) + " wasn't scrubbed!"
 
             # Check essential keys were scrubbed
-            if file == 'LICENSE.torrent':
-                assert 'x_cross_seed' in original.content['info']
-                assert 'x_cross_seed' not in modified.content['info']
+            if file == "LICENSE.torrent":
+                assert "x_cross_seed" in original.content["info"]
+                assert "x_cross_seed" not in modified.content["info"]
 
-            if file == 'LICENSE-resume.torrent':
-                assert 'libtorrent_resume' in original.content
-                assert 'libtorrent_resume' not in modified.content
+            if file == "LICENSE-resume.torrent":
+                assert "libtorrent_resume" in original.content
+                assert "libtorrent_resume" not in modified.content
 
-    @pytest.mark.filecopy(test_files, '__tmp__')
+    @pytest.mark.filecopy(test_files, "__tmp__")
     def test_torrent_scrub_fields(self, execute_task):
-        task = execute_task('test_fields')
-        title = 'fields.LICENSE'
+        task = execute_task("test_fields")
+        title = "fields.LICENSE"
         torrent = task.find_entry(title=title)
         assert torrent, f"{title!r} cannot be found in {task!r}"
-        torrent = torrent.get('torrent')
+        torrent = torrent.get("torrent")
         assert torrent, f"No 'torrent' key in {title!r}"
 
-        assert 'name' in torrent.content['info'], "'info.name' was lost"
-        assert 'comment' not in torrent.content, "'comment' not scrubbed"
-        assert 'x_cross_seed' not in torrent.content['info'], "'info.x_cross_seed' not scrubbed"
+        assert "name" in torrent.content["info"], "'info.name' was lost"
+        assert "comment" not in torrent.content, "'comment' not scrubbed"
+        assert "x_cross_seed" not in torrent.content["info"], "'info.x_cross_seed' not scrubbed"
 
-    @pytest.mark.filecopy(test_files, '__tmp__')
+    @pytest.mark.filecopy(test_files, "__tmp__")
     def test_torrent_scrub_off(self, execute_task, tmp_path):
-        execute_task('test_off')
+        execute_task("test_off")
 
         for filename in self.test_files:
             osize = filename.stat().st_size
@@ -290,36 +290,36 @@ class TestTorrentAlive:
             torrent_alive: 0
     """
 
-    @pytest.mark.filecopy('test.torrent', '__tmp__/test.torrent')
-    @mock.patch('flexget.utils.requests.get')
+    @pytest.mark.filecopy("test.torrent", "__tmp__/test.torrent")
+    @mock.patch("flexget.utils.requests.get")
     def test_torrent_alive_fail(self, mocked_request, execute_task):
-        task = execute_task('test_torrent_alive_fail')
-        assert not task.accepted, 'Torrent should not have met seed requirement.'
+        task = execute_task("test_torrent_alive_fail")
+        assert not task.accepted, "Torrent should not have met seed requirement."
         assert task._rerun_count == 1, (
-            f'Task should have been rerun 1 time. Was rerun {task._rerun_count} times.'
+            f"Task should have been rerun 1 time. Was rerun {task._rerun_count} times."
         )
 
         # Run it again to make sure remember_rejected prevents a rerun from occurring
-        task = execute_task('test_torrent_alive_fail')
-        assert not task.accepted, 'Torrent should have been rejected by remember_rejected.'
-        assert task._rerun_count == 0, 'Task should not have been rerun.'
+        task = execute_task("test_torrent_alive_fail")
+        assert not task.accepted, "Torrent should have been rejected by remember_rejected."
+        assert task._rerun_count == 0, "Task should not have been rerun."
 
-    @pytest.mark.filecopy('test.torrent', '__tmp__/test.torrent')
+    @pytest.mark.filecopy("test.torrent", "__tmp__/test.torrent")
     def test_torrent_alive_pass(self, execute_task):
-        task = execute_task('test_torrent_alive_pass')
+        task = execute_task("test_torrent_alive_pass")
         assert task.accepted
-        assert task._rerun_count == 0, 'Torrent should have been accepted without rerun.'
+        assert task._rerun_count == 0, "Torrent should have been accepted without rerun."
 
     def test_torrent_alive_udp_invalid_port(self):
         from flexget.components.bittorrent.torrent_alive import get_udp_seeds
 
-        assert get_udp_seeds('udp://[2001::1]/announce', 'HASH') == 0
-        assert get_udp_seeds('udp://[::1]/announce', 'HASH') == 0
-        assert get_udp_seeds('udp://["2100::1"]:-1/announce', 'HASH') == 0
-        assert get_udp_seeds('udp://127.0.0.1/announce', 'HASH') == 0
-        assert get_udp_seeds('udp://127.0.0.1:-1/announce', 'HASH') == 0
-        assert get_udp_seeds('udp://127.0.0.1:PORT/announce', 'HASH') == 0
-        assert get_udp_seeds('udp://127.0.0.1:65536/announce', 'HASH') == 0
+        assert get_udp_seeds("udp://[2001::1]/announce", "HASH") == 0
+        assert get_udp_seeds("udp://[::1]/announce", "HASH") == 0
+        assert get_udp_seeds('udp://["2100::1"]:-1/announce', "HASH") == 0
+        assert get_udp_seeds("udp://127.0.0.1/announce", "HASH") == 0
+        assert get_udp_seeds("udp://127.0.0.1:-1/announce", "HASH") == 0
+        assert get_udp_seeds("udp://127.0.0.1:PORT/announce", "HASH") == 0
+        assert get_udp_seeds("udp://127.0.0.1:65536/announce", "HASH") == 0
 
 
 class TestRtorrentMagnet:
@@ -335,10 +335,10 @@ class TestRtorrentMagnet:
     """
 
     def test_rtorrent_magnet(self, execute_task, tmp_path):
-        execute_task('test')
-        fullpath = tmp_path / 'meta-test.torrent'
+        execute_task("test")
+        fullpath = tmp_path / "meta-test.torrent"
         assert fullpath.is_file()
         assert (
             fullpath.read_text()
-            == 'd10:magnet-uri76:magnet:?xt=urn:btih:HASH&dn=title&tr=http://torrent.ubuntu.com:6969/announcee'
+            == "d10:magnet-uri76:magnet:?xt=urn:btih:HASH&dn=title&tr=http://torrent.ubuntu.com:6969/announcee"
         )

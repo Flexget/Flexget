@@ -21,8 +21,8 @@ if TYPE_CHECKING:
     from collections.abc import AsyncGenerator
 
 try:
-    if Version(version("python-telegram-bot")) < Version('21.9'):
-        raise plugin.PluginWarning('obsolete python-telegram-bot pkg')
+    if Version(version("python-telegram-bot")) < Version("21.9"):
+        raise plugin.PluginWarning("obsolete python-telegram-bot pkg")
 except PackageNotFoundError:
     pass
 else:
@@ -35,30 +35,30 @@ try:
 except ImportError:
     Image = None
 
-_PLUGIN_NAME = 'telegram'
+_PLUGIN_NAME = "telegram"
 _TEXT_LIMIT = 4096
-_PARSERS = {'html': 'HTML', 'markdown': 'MarkdownV2', 'markdown_legacy': 'Markdown'}
+_PARSERS = {"html": "HTML", "markdown": "MarkdownV2", "markdown_legacy": "Markdown"}
 
-_DISABLE_PREVIEWS_ATTR = 'disable_previews'
-_TOKEN_ATTR = 'bot_token'
-_PARSE_ATTR = 'parse_mode'
-_RCPTS_ATTR = 'recipients'
-_CHATID_ATTR = 'chat_id'
-_USERNAME_ATTR = 'username'
-_FULLNAME_ATTR = 'fullname'
-_FIRSTNAME_ATTR = 'first'
-_SURNAME_ATTR = 'sur'
-_GROUP_ATTR = 'group'
-_SOCKSPROXY_ATTR = 'socks_proxy'
-_IMAGES_ATTR = 'images'
+_DISABLE_PREVIEWS_ATTR = "disable_previews"
+_TOKEN_ATTR = "bot_token"
+_PARSE_ATTR = "parse_mode"
+_RCPTS_ATTR = "recipients"
+_CHATID_ATTR = "chat_id"
+_USERNAME_ATTR = "username"
+_FULLNAME_ATTR = "fullname"
+_FIRSTNAME_ATTR = "first"
+_SURNAME_ATTR = "sur"
+_GROUP_ATTR = "group"
+_SOCKSPROXY_ATTR = "socks_proxy"
+_IMAGES_ATTR = "images"
 
-ChatIdsBase = db_schema.versioned_base('telegram_chat_ids', 0)
+ChatIdsBase = db_schema.versioned_base("telegram_chat_ids", 0)
 
 logger = logger.bind(name=_PLUGIN_NAME)
 
 
 class ChatIdEntry(ChatIdsBase):
-    __tablename__ = 'telegram_chat_ids'
+    __tablename__ = "telegram_chat_ids"
 
     id = Column(Integer, primary_key=True)
     username = Column(String, index=True, nullable=True)
@@ -67,16 +67,16 @@ class ChatIdEntry(ChatIdsBase):
     group = Column(String, index=True, nullable=True)
 
     def __str__(self):
-        x = [f'id={self.id}']
+        x = [f"id={self.id}"]
         if self.username:
-            x.append(f'username={self.username}')
+            x.append(f"username={self.username}")
         if self.firstname:
-            x.append(f'firstname={self.firstname}')
+            x.append(f"firstname={self.firstname}")
         if self.surname:
-            x.append(f'surname={self.surname}')
+            x.append(f"surname={self.surname}")
         if self.group:
-            x.append(f'group={self.group}')
-        return ' '.join(x)
+            x.append(f"group={self.group}")
+        return " ".join(x)
 
 
 class TelegramNotifier:
@@ -145,58 +145,58 @@ class TelegramNotifier:
     _bot = None
 
     schema = {
-        'type': 'object',
-        'properties': {
-            _TOKEN_ATTR: {'type': 'string'},
-            _PARSE_ATTR: {'type': 'string', 'enum': list(_PARSERS.keys())},
-            _DISABLE_PREVIEWS_ATTR: {'type': 'boolean', 'default': False},
+        "type": "object",
+        "properties": {
+            _TOKEN_ATTR: {"type": "string"},
+            _PARSE_ATTR: {"type": "string", "enum": list(_PARSERS.keys())},
+            _DISABLE_PREVIEWS_ATTR: {"type": "boolean", "default": False},
             _RCPTS_ATTR: {
-                'type': 'array',
-                'minItems': 1,
-                'items': {
-                    'oneOf': [
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                    "oneOf": [
                         {
-                            'type': 'object',
-                            'properties': {_CHATID_ATTR: {'type': 'integer'}},
-                            'required': [_CHATID_ATTR],
-                            'additionalProperties': False,
+                            "type": "object",
+                            "properties": {_CHATID_ATTR: {"type": "integer"}},
+                            "required": [_CHATID_ATTR],
+                            "additionalProperties": False,
                         },
                         {
-                            'type': 'object',
-                            'properties': {_USERNAME_ATTR: {'type': 'string'}},
-                            'required': [_USERNAME_ATTR],
-                            'additionalProperties': False,
+                            "type": "object",
+                            "properties": {_USERNAME_ATTR: {"type": "string"}},
+                            "required": [_USERNAME_ATTR],
+                            "additionalProperties": False,
                         },
                         {
-                            'type': 'object',
-                            'properties': {
+                            "type": "object",
+                            "properties": {
                                 _FULLNAME_ATTR: {
-                                    'type': 'object',
-                                    'properties': {
-                                        _FIRSTNAME_ATTR: {'type': 'string'},
-                                        _SURNAME_ATTR: {'type': 'string'},
+                                    "type": "object",
+                                    "properties": {
+                                        _FIRSTNAME_ATTR: {"type": "string"},
+                                        _SURNAME_ATTR: {"type": "string"},
                                     },
-                                    'required': [_FIRSTNAME_ATTR, _SURNAME_ATTR],
-                                    'additionalProperties': False,
+                                    "required": [_FIRSTNAME_ATTR, _SURNAME_ATTR],
+                                    "additionalProperties": False,
                                 }
                             },
-                            'required': [_FULLNAME_ATTR],
-                            'additionalProperties': False,
+                            "required": [_FULLNAME_ATTR],
+                            "additionalProperties": False,
                         },
                         {
-                            'type': 'object',
-                            'properties': {_GROUP_ATTR: {'type': 'string'}},
-                            'required': [_GROUP_ATTR],
-                            'additionalProperties': False,
+                            "type": "object",
+                            "properties": {_GROUP_ATTR: {"type": "string"}},
+                            "required": [_GROUP_ATTR],
+                            "additionalProperties": False,
                         },
                     ]
                 },
             },
-            _SOCKSPROXY_ATTR: {'type': 'string'},
-            _IMAGES_ATTR: {'type': 'array', 'items': {'type': 'string'}},
+            _SOCKSPROXY_ATTR: {"type": "string"},
+            _IMAGES_ATTR: {"type": "array", "items": {"type": "string"}},
         },
-        'required': [_TOKEN_ATTR, _RCPTS_ATTR],
-        'additionalProperties': False,
+        "required": [_TOKEN_ATTR, _RCPTS_ATTR],
+        "additionalProperties": False,
     }
 
     def notify(self, title: str, message: str, config: dict) -> None:
@@ -238,7 +238,7 @@ class TelegramNotifier:
         self.socks_proxy = config.get(_SOCKSPROXY_ATTR)
         self._images = config.get(_IMAGES_ATTR)
         logger.debug(
-            'token={}, parse_mode={}, disable_previews={}, usernames={}, fullnames={}, groups={}, images={}',
+            "token={}, parse_mode={}, disable_previews={}, usernames={}, fullnames={}, groups={}, images={}",
             self._token,
             self._parse_mode,
             self._disable_previews,
@@ -252,11 +252,11 @@ class TelegramNotifier:
         try:
             await self._bot.get_me()
         except UnicodeDecodeError as e:
-            logger.trace(f'bot.get_me() raised: {e!r}')
-            raise plugin.PluginWarning('invalid bot token')
+            logger.trace(f"bot.get_me() raised: {e!r}")
+            raise plugin.PluginWarning("invalid bot token")
         except (NetworkError, TelegramError) as e:
             logger.error(
-                'Could not connect Telegram servers at this time, please try again later: {}',
+                "Could not connect Telegram servers at this time, please try again later: {}",
                 e.message,
             )
 
@@ -278,25 +278,25 @@ class TelegramNotifier:
     ) -> None:
         kwargs = {}
         if self._parse_mode:
-            kwargs['parse_mode'] = _PARSERS[self._parse_mode]
-        kwargs['disable_web_page_preview'] = self._disable_previews
+            kwargs["parse_mode"] = _PARSERS[self._parse_mode]
+        kwargs["disable_web_page_preview"] = self._disable_previews
         for chat_id in chat_ids:
             for paragraph in wrap(msg, _TEXT_LIMIT, replace_whitespace=False):
                 try:
-                    logger.debug('sending paragraph to telegram servers: {}', paragraph)
+                    logger.debug("sending paragraph to telegram servers: {}", paragraph)
                     await self._bot.send_message(chat_id=chat_id, text=paragraph, **kwargs)
                 except ChatMigrated as e:
                     logger.debug("Chat migrated to id {}", e.new_chat_id)
                     await self._bot.send_message(chat_id=e.new_chat_id, text=paragraph, **kwargs)
                     await self._replace_chat_id(chat_id, e.new_chat_id, session)
                 except TelegramError as e:
-                    if kwargs.get('parse_mode'):
+                    if kwargs.get("parse_mode"):
                         logger.warning(
-                            'Failed to render message using parse mode {}. Falling back to basic parsing: {}',
-                            kwargs['parse_mode'],
+                            "Failed to render message using parse mode {}. Falling back to basic parsing: {}",
+                            kwargs["parse_mode"],
                             e.message,
                         )
-                        del kwargs['parse_mode']
+                        del kwargs["parse_mode"]
                         await self._bot.send_message(chat_id=chat_id, text=paragraph, **kwargs)
                     else:
                         raise
@@ -329,7 +329,7 @@ class TelegramNotifier:
         chat_id_entries, has_new_chat_ids = await self._get_chat_id_entries(
             session, usernames, fullnames, groups
         )
-        logger.debug('chat_id_entries={}', chat_id_entries)
+        logger.debug("chat_id_entries={}", chat_id_entries)
 
         # TODO: The situation where the new chat_id from `ChatMigrated` exception needs to be written to the
         #  database if the chat_id specified directly in the configuration file is migrated is not considered.
@@ -338,15 +338,15 @@ class TelegramNotifier:
         chat_ids = {x.id for x in chat_id_entries} | self._chat_ids_from_config
         if not chat_ids:
             raise PluginError(
-                'no chat id found, try manually sending the bot any message to initialize the chat'
+                "no chat id found, try manually sending the bot any message to initialize the chat"
             )
         if chat_id_entries:
             if usernames:
-                logger.warning('no chat id found for usernames: {}', usernames)
+                logger.warning("no chat id found for usernames: {}", usernames)
             if fullnames:
-                logger.warning('no chat id found for fullnames: {}', fullnames)
+                logger.warning("no chat id found for fullnames: {}", fullnames)
             if groups:
-                logger.warning('no chat id found for groups: {}', groups)
+                logger.warning("no chat id found for groups: {}", groups)
             if has_new_chat_ids:
                 self._update_db(session, chat_id_entries)
         return chat_ids
@@ -362,20 +362,20 @@ class TelegramNotifier:
 
         Entries with a matching chat ids will be removed from the input lists.
         """
-        logger.debug('loading cached chat ids')
+        logger.debug("loading cached chat ids")
         chat_id_entries = self._get_cached_chat_id_entries(session, usernames, fullnames, groups)
         logger.debug(
-            'found {} cached chat_ids: {}', len(chat_id_entries), [f'{x}' for x in chat_id_entries]
+            "found {} cached chat_ids: {}", len(chat_id_entries), [f"{x}" for x in chat_id_entries]
         )
         if not (usernames or fullnames or groups):
-            logger.debug('all chat ids found in cache')
+            logger.debug("all chat ids found in cache")
             return chat_id_entries, False
-        logger.debug('loading new chat ids')
+        logger.debug("loading new chat ids")
         new_chat_ids = [
             e async for e in self._get_new_chat_id_entries(usernames, fullnames, groups)
         ]
         logger.debug(
-            'found {} new chat_ids: {}', len(new_chat_ids), [f'{x}' for x in new_chat_ids]
+            "found {} new chat_ids: {}", len(new_chat_ids), [f"{x}" for x in new_chat_ids]
         )
         chat_id_entries += new_chat_ids
         return chat_id_entries, bool(new_chat_ids)
@@ -495,15 +495,15 @@ class TelegramNotifier:
             elif update.channel_post:
                 chat = update.channel_post.chat
             else:
-                logger.warning('Unknown update type encountered: {}', update)
+                logger.warning("Unknown update type encountered: {}", update)
                 continue
-            if chat.type == 'private':
+            if chat.type == "private":
                 usernames[chat.username] = chat
                 fullnames[(chat.first_name, chat.last_name)] = chat
-            elif chat.type in ('group', 'supergroup', 'channel'):
+            elif chat.type in ("group", "supergroup", "channel"):
                 groups[chat.title] = chat
             else:
-                logger.warning('unknown chat type: {}}}', type(chat))
+                logger.warning("unknown chat type: {}}}", type(chat))
 
         return usernames, fullnames, groups
 
@@ -511,7 +511,7 @@ class TelegramNotifier:
         self, session: sqlalchemy.orm.Session, chat_id_entries: list[ChatIdEntry]
     ) -> None:
         """Update the DB with found `chat_ids`."""
-        logger.info('saving updated chat_ids to db')
+        logger.info("saving updated chat_ids to db")
 
         # avoid duplicate chat_ids. (this is possible if configuration specified both username & fullname
         chat_id_mappings = {x.id: x for x in chat_id_entries}
@@ -520,6 +520,6 @@ class TelegramNotifier:
         session.commit()
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(TelegramNotifier, _PLUGIN_NAME, api_ver=2, interfaces=['notifiers'])
+    plugin.register(TelegramNotifier, _PLUGIN_NAME, api_ver=2, interfaces=["notifiers"])

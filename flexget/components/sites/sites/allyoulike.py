@@ -12,13 +12,13 @@ try:
     from flexget.components.sites.urlrewriting import UrlRewritingError
 except ImportError:
     raise plugin.DependencyError(
-        issued_by='allyoulike',
-        missing='urlrewriting',
-        message='Plugin allyoulike is missing plugin dependency urlrewriting',
+        issued_by="allyoulike",
+        missing="urlrewriting",
+        message="Plugin allyoulike is missing plugin dependency urlrewriting",
     )
 
 
-logger = logger.bind(name='allyoulike')
+logger = logger.bind(name="allyoulike")
 
 
 class UrlRewriteAllyoulike:
@@ -59,8 +59,8 @@ class UrlRewriteAllyoulike:
 
     # urlrewriter API
     def url_rewritable(self, task, entry):
-        url = entry['url']
-        rewritable_regex = r'^https?:\/\/(www.)?allyoulike\.com\/.*'
+        url = entry["url"]
+        rewritable_regex = r"^https?:\/\/(www.)?allyoulike\.com\/.*"
         return re.match(rewritable_regex, url) is not None
 
     def _get_soup(self, task, url):
@@ -76,35 +76,35 @@ class UrlRewriteAllyoulike:
     @plugin.internet(logger)
     # urlrewriter API
     def url_rewrite(self, task, entry):
-        soup = self._get_soup(task, entry['url'])
+        soup = self._get_soup(task, entry["url"])
 
-        link_re = re.compile(r'rarefile\.net.*\.rar$')
+        link_re = re.compile(r"rarefile\.net.*\.rar$")
 
         # grab links from the main entry:
-        blog_entry = soup.find('div', class_="entry-content")
+        blog_entry = soup.find("div", class_="entry-content")
         num_links = 0
         link_list = None
-        for paragraph in blog_entry.find_all('p'):
-            links = paragraph.find_all('a', href=link_re)
+        for paragraph in blog_entry.find_all("p"):
+            links = paragraph.find_all("a", href=link_re)
             if len(links) > num_links:
                 link_list = links
                 num_links = len(links)
-        urls = list(entry['urls']) if 'urls' in entry else []
+        urls = list(entry["urls"]) if "urls" in entry else []
         if link_list is not None:
             for link in link_list:
-                urls.append(normalize_unicode(link['href']))
+                urls.append(normalize_unicode(link["href"]))
         else:
-            raise UrlRewritingError('No useable links found at {}'.format(entry['url']))
+            raise UrlRewritingError("No useable links found at {}".format(entry["url"]))
 
         num_links = len(urls)
-        logger.verbose('Found {} links at {}.', num_links, entry['url'])
+        logger.verbose("Found {} links at {}.", num_links, entry["url"])
         if num_links:
-            entry['urls'] = urls
-            entry['url'] = urls[0]
+            entry["urls"] = urls
+            entry["url"] = urls[0]
         else:
-            raise UrlRewritingError('No useable links found at {}'.format(entry['url']))
+            raise UrlRewritingError("No useable links found at {}".format(entry["url"]))
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(UrlRewriteAllyoulike, 'allyoulike', interfaces=['urlrewriter'], api_ver=2)
+    plugin.register(UrlRewriteAllyoulike, "allyoulike", interfaces=["urlrewriter"], api_ver=2)

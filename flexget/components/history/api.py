@@ -9,40 +9,40 @@ from flexget.api.app import BadRequest, NotFoundError, etag, pagination_headers
 
 from . import db
 
-logger = logger.bind(name='history')
+logger = logger.bind(name="history")
 
-history_api = api.namespace('history', description='Entry History')
+history_api = api.namespace("history", description="Entry History")
 
 
 class ObjectsContainer:
     base_history_object = {
-        'type': 'object',
-        'properties': {
-            'details': {'type': 'string'},
-            'filename': {'type': 'string'},
-            'id': {'type': 'integer'},
-            'task': {'type': 'string'},
-            'time': {'type': 'string', 'format': 'date-time'},
-            'title': {'type': 'string'},
-            'url': {'type': 'string'},
+        "type": "object",
+        "properties": {
+            "details": {"type": "string"},
+            "filename": {"type": "string"},
+            "id": {"type": "integer"},
+            "task": {"type": "string"},
+            "time": {"type": "string", "format": "date-time"},
+            "title": {"type": "string"},
+            "url": {"type": "string"},
         },
-        'required': ['details', 'filename', 'id', 'task', 'time', 'title', 'url'],
-        'additionalProperties': False,
+        "required": ["details", "filename", "id", "task", "time", "title", "url"],
+        "additionalProperties": False,
     }
 
-    history_list_object = {'type': 'array', 'items': base_history_object}
+    history_list_object = {"type": "array", "items": base_history_object}
 
 
-history_list_schema = api.schema_model('history.list', ObjectsContainer.history_list_object)
+history_list_schema = api.schema_model("history.list", ObjectsContainer.history_list_object)
 
-sort_choices = ('id', 'task', 'filename', 'url', 'title', 'time', 'details')
+sort_choices = ("id", "task", "filename", "url", "title", "time", "details")
 
 # Create pagination parser
-history_parser = api.pagination_parser(sort_choices=sort_choices, default='time')
-history_parser.add_argument('task', help='Filter by task name')
+history_parser = api.pagination_parser(sort_choices=sort_choices, default="time")
+history_parser.add_argument("task", help="Filter by task name")
 
 
-@history_api.route('/')
+@history_api.route("/")
 @api.doc(expect=[history_parser])
 class HistoryAPI(APIResource):
     @etag
@@ -53,16 +53,16 @@ class HistoryAPI(APIResource):
         args = history_parser.parse_args()
 
         # Pagination and sorting params
-        page = args['page']
-        per_page = args['per_page']
-        sort_by = args['sort_by']
-        sort_order = args['order']
+        page = args["page"]
+        per_page = args["per_page"]
+        sort_by = args["sort_by"]
+        sort_order = args["order"]
 
         # Hard limit results per page to 100
         per_page = min(per_page, 100)
 
         # Filter param
-        task = args['task']
+        task = args["task"]
 
         # Build query
         query = session.query(db.History)
@@ -80,13 +80,13 @@ class HistoryAPI(APIResource):
         total_pages = int(ceil(total_items / float(per_page)))
 
         if page > total_pages:
-            raise NotFoundError(f'page {page} does not exist')
+            raise NotFoundError(f"page {page} does not exist")
 
         start = (page - 1) * per_page
         finish = start + per_page
 
         # Choose sorting order
-        order = desc if sort_order == 'desc' else asc
+        order = desc if sort_order == "desc" else asc
 
         # Get items
         try:

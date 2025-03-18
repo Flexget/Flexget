@@ -10,17 +10,17 @@ from flexget.utils.tools import multiply_timedelta
 
 from . import db
 
-logger = logger.bind(name='est_series_internal')
+logger = logger.bind(name="est_series_internal")
 
 
 class EstimatesSeriesInternal:
     @plugin.priority(0)  # Should always be last priority
     def estimate(self, entry):
-        if not all(field in entry for field in ['series_name', 'series_season', 'series_episode']):
+        if not all(field in entry for field in ["series_name", "series_season", "series_episode"]):
             return None
         with Session() as session:
             series = (
-                session.query(db.Series).filter(db.Series.name == entry['series_name']).first()
+                session.query(db.Series).filter(db.Series.name == entry["series_name"]).first()
             )
             if not series:
                 return None
@@ -50,15 +50,15 @@ class EstimatesSeriesInternal:
             if last_diff < timedelta(days=2) or last_diff > timedelta(days=10):
                 return None
             # Estimate next season somewhat more than a normal episode break
-            if entry['series_season'] > episodes[0].season:
+            if entry["series_season"] > episodes[0].season:
                 # TODO: How big should this be?
                 return episodes[0].first_seen + multiply_timedelta(last_diff, 2)
             # Estimate next episode comes out about same length as last ep span, with a little leeway
             return episodes[0].first_seen + multiply_timedelta(last_diff, 0.9)
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
     plugin.register(
-        EstimatesSeriesInternal, 'est_series_internal', interfaces=['estimate_release'], api_ver=2
+        EstimatesSeriesInternal, "est_series_internal", interfaces=["estimate_release"], api_ver=2
     )

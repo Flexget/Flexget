@@ -9,7 +9,7 @@ from flexget.components.archives import utils as archiveutil
 from flexget.event import event
 from flexget.utils.template import RenderError, render_from_entry
 
-logger = logger.bind(name='decompress')
+logger = logger.bind(name="decompress")
 
 
 def fail_entry_with_error(entry, error):
@@ -23,21 +23,21 @@ def open_archive_entry(entry):
 
     Convenience function for opening archives from entries.
     """
-    archive_path = entry.get('location', '')
+    archive_path = entry.get("location", "")
     if not archive_path:
-        logger.error('Entry does not appear to represent a local file.')
+        logger.error("Entry does not appear to represent a local file.")
         return None
     if not Path(archive_path).exists():
-        logger.error('File no longer exists: {}', entry['location'])
+        logger.error("File no longer exists: {}", entry["location"])
         return None
     try:
         archive = archiveutil.open_archive(archive_path)
     except archiveutil.BadArchive as error:
-        fail_entry_with_error(entry, f'Bad archive: {archive_path} ({error})')
+        fail_entry_with_error(entry, f"Bad archive: {archive_path} ({error})")
     except archiveutil.NeedFirstVolume:
-        logger.error('Not the first volume: {}', archive_path)
+        logger.error("Not the first volume: {}", archive_path)
     except archiveutil.ArchiveError as error:
-        fail_entry_with_error(entry, f'Failed to open Archive: {archive_path} ({error})')
+        fail_entry_with_error(entry, f"Failed to open Archive: {archive_path} ({error})")
     else:
         return archive
 
@@ -47,9 +47,9 @@ def get_output_path(to: str, entry) -> Path:
     try:
         if to:
             return Path(render_from_entry(to, entry))
-        return Path(entry.get('location')).parent
+        return Path(entry.get("location")).parent
     except RenderError:
-        raise plugin.PluginError(f'Could not render path: {to}')
+        raise plugin.PluginError(f"Could not render path: {to}")
 
 
 def extract_info(info, archive, to: Path, keep_dirs, test=False):
@@ -57,17 +57,17 @@ def extract_info(info, archive, to: Path, keep_dirs, test=False):
     destination = get_destination_path(info, to, keep_dirs)
 
     if test:
-        logger.info('Would extract: {} to {}', info.filename, destination)
+        logger.info("Would extract: {} to {}", info.filename, destination)
         return
-    logger.debug('Attempting to extract: {} to {}', info.filename, destination)
+    logger.debug("Attempting to extract: {} to {}", info.filename, destination)
     try:
         info.extract(archive, destination)
     except archiveutil.FSError as error:
-        logger.error('OS error while creating file: {} ({})', destination, error)
+        logger.error("OS error while creating file: {} ({})", destination, error)
     except archiveutil.FileAlreadyExists:
-        logger.warning('File already exists: {}', destination)
+        logger.warning("File already exists: {}", destination)
     except archiveutil.ArchiveError as error:
-        logger.error('Failed to extract file: {} from {} ({})', info.filename, archive.path, error)
+        logger.error("Failed to extract file: {} from {} ({})", info.filename, archive.path, error)
 
 
 def get_destination_path(info, to: Path, keep_dirs) -> Path:
@@ -82,9 +82,9 @@ def is_match(info, pattern):
     is_match = bool(match(info.filename))
 
     if is_match:
-        logger.debug('Found matching file: {}', info.filename)
+        logger.debug("Found matching file: {}", info.filename)
     else:
-        logger.debug('File did not match regexp: {}', info.filename)
+        logger.debug("File did not match regexp: {}", info.filename)
 
     return is_match
 
@@ -123,19 +123,19 @@ class Decompress:
     """
 
     schema = {
-        'anyOf': [
-            {'type': 'boolean'},
+        "anyOf": [
+            {"type": "boolean"},
             {
-                'type': 'object',
-                'properties': {
-                    'to': {'type': 'string'},
-                    'keep_dirs': {'type': 'boolean'},
-                    'mask': {'type': 'string'},
-                    'regexp': {'type': 'string', 'format': 'regex'},
-                    'unrar_tool': {'type': 'string'},
-                    'delete_archive': {'type': 'boolean'},
+                "type": "object",
+                "properties": {
+                    "to": {"type": "string"},
+                    "keep_dirs": {"type": "boolean"},
+                    "mask": {"type": "string"},
+                    "regexp": {"type": "string", "format": "regex"},
+                    "unrar_tool": {"type": "string"},
+                    "delete_archive": {"type": "boolean"},
                 },
-                'additionalProperties': False,
+                "additionalProperties": False,
             },
         ]
     }
@@ -148,17 +148,17 @@ class Decompress:
         if not isinstance(config, dict):
             config = {}
 
-        config.setdefault('to', '')
-        config.setdefault('keep_dirs', True)
-        config.setdefault('unrar_tool', '')
-        config.setdefault('delete_archive', False)
+        config.setdefault("to", "")
+        config.setdefault("keep_dirs", True)
+        config.setdefault("unrar_tool", "")
+        config.setdefault("delete_archive", False)
 
         # If mask was specified, turn it in to a regexp
-        if 'mask' in config:
-            config['regexp'] = translate(config['mask'])
+        if "mask" in config:
+            config["regexp"] = translate(config["mask"])
         # If no mask or regexp specified, accept all files
-        if 'regexp' not in config:
-            config['regexp'] = '.'
+        if "regexp" not in config:
+            config["regexp"] = "."
 
         return config
 
@@ -173,17 +173,17 @@ class Decompress:
         if not archive:
             return
 
-        to = get_output_path(config['to'], entry)
+        to = get_output_path(config["to"], entry)
 
         for info in archive.infolist():
-            if is_match(info, config['regexp']):
-                extract_info(info, archive, to, config['keep_dirs'], test=test)
+            if is_match(info, config["regexp"]):
+                extract_info(info, archive, to, config["keep_dirs"], test=test)
 
-        if config['delete_archive']:
+        if config["delete_archive"]:
             if not test:
                 archive.delete()
             else:
-                logger.info('Would delete archive {}', archive.path)
+                logger.info("Would delete archive {}", archive.path)
                 archive.close()
         else:
             archive.close()
@@ -210,6 +210,6 @@ class Decompress:
             self.handle_entry(entry, config, test=task.options.test)
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(Decompress, 'decompress', api_ver=2)
+    plugin.register(Decompress, "decompress", api_ver=2)

@@ -11,7 +11,7 @@ from flexget.utils.parsers.series import SeriesParser
 
 from .parser_common import MovieParseResult, SeriesParseResult
 
-logger = logger.bind(name='parser_internal')
+logger = logger.bind(name="parser_internal")
 
 
 try:
@@ -25,7 +25,7 @@ class ParserInternal:
 
     @plugin.priority(1)
     def parse_movie(self, data, **kwargs):
-        logger.debug('Parsing movie: `{}` kwargs: {}', data, kwargs)
+        logger.debug("Parsing movie: `{}` kwargs: {}", data, kwargs)
         start = preferred_clock()
         parser = MovieParser()
         try:
@@ -40,13 +40,13 @@ class ParserInternal:
             proper_count=parser.proper_count,
             valid=bool(parser.name),
         )
-        logger.debug('Parsing result: {} (in {} ms)', parser, (preferred_clock() - start) * 1000)
+        logger.debug("Parsing result: {} (in {} ms)", parser, (preferred_clock() - start) * 1000)
         return result
 
     # series_parser API
     @plugin.priority(1)
     def parse_series(self, data, **kwargs):
-        logger.debug('Parsing series: `{}` kwargs: {}', data, kwargs)
+        logger.debug("Parsing series: `{}` kwargs: {}", data, kwargs)
         start = preferred_clock()
         parser = SeriesParser(**kwargs)
         try:
@@ -70,12 +70,12 @@ class ParserInternal:
             strict_name=parser.strict_name,
             identified_by=parser.identified_by,
         )
-        logger.debug('Parsing result: {} (in {} ms)', parser, (preferred_clock() - start) * 1000)
+        logger.debug("Parsing result: {} (in {} ms)", parser, (preferred_clock() - start) * 1000)
         return result
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
     plugin.register(
-        ParserInternal, 'parser_internal', interfaces=['movie_parser', 'series_parser'], api_ver=2
+        ParserInternal, "parser_internal", interfaces=["movie_parser", "series_parser"], api_ver=2
     )

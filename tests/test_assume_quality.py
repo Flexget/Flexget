@@ -81,62 +81,62 @@ class TestAssumeQuality:
                 qualities: [720p hdtv]
     """
 
-    @pytest.fixture(scope='class', params=['internal', 'guessit'], ids=['internal', 'guessit'])
+    @pytest.fixture(scope="class", params=["internal", "guessit"], ids=["internal", "guessit"])
     def config(self, request):
         """Override and parametrize default config fixture."""
-        return Template(self._config).render({'parser': request.param})
+        return Template(self._config).render({"parser": request.param})
 
     def test_matching(self, execute_task):
-        task = execute_task('test_matching')
-        entry = task.find_entry('entries', title='Testfile.HDTV')
-        assert entry.get('quality') == qualities.Quality('720p HDTV')
+        task = execute_task("test_matching")
+        entry = task.find_entry("entries", title="Testfile.HDTV")
+        assert entry.get("quality") == qualities.Quality("720p HDTV")
 
     def test_negative_matching(self, execute_task):
-        task = execute_task('test_negative_matching')
-        entry = task.find_entry('entries', title='Testfile.HDTV')
-        assert entry.get('quality') == qualities.Quality('1080p HDTV')
+        task = execute_task("test_negative_matching")
+        entry = task.find_entry("entries", title="Testfile.HDTV")
+        assert entry.get("quality") == qualities.Quality("1080p HDTV")
 
-        entry = task.find_entry('entries', title='Testfile.xvid.mp3')
-        assert entry.get('quality') == qualities.Quality('xvid mp3')
+        entry = task.find_entry("entries", title="Testfile.xvid.mp3")
+        assert entry.get("quality") == qualities.Quality("xvid mp3")
 
     def test_no_clobber(self, execute_task):
-        task = execute_task('test_no_clobber')
-        entry = task.find_entry('entries', title='Testfile[h264-720p]')
-        assert entry.get('quality') != qualities.Quality('720p xvid')
-        assert entry.get('quality') == qualities.Quality('720p h264')
+        task = execute_task("test_no_clobber")
+        entry = task.find_entry("entries", title="Testfile[h264-720p]")
+        assert entry.get("quality") != qualities.Quality("720p xvid")
+        assert entry.get("quality") == qualities.Quality("720p h264")
 
     def test_default(self, execute_task):
-        task = execute_task('test_default')
-        entry = task.find_entry('entries', title='Testfile.noquality')
-        assert entry.get('quality') == qualities.Quality('720p h264'), (
-            'Testfile.noquality quality not \'720p h264\''
+        task = execute_task("test_default")
+        entry = task.find_entry("entries", title="Testfile.noquality")
+        assert entry.get("quality") == qualities.Quality("720p h264"), (
+            "Testfile.noquality quality not '720p h264'"
         )
 
     def test_simple(self, execute_task):
-        task = execute_task('test_simple')
-        entry = task.find_entry('entries', title='Testfile.noquality')
-        assert entry.get('quality') == qualities.Quality('720p h264'), (
-            'Testfile.noquality quality not \'720p h264\''
+        task = execute_task("test_simple")
+        entry = task.find_entry("entries", title="Testfile.noquality")
+        assert entry.get("quality") == qualities.Quality("720p h264"), (
+            "Testfile.noquality quality not '720p h264'"
         )
 
     def test_priority(self, execute_task):
-        task = execute_task('test_priority')
-        entry = task.find_entry('entries', title='Testfile[h264-720p]')
-        assert entry.get('quality') != qualities.Quality('720p h264 mp3')
-        assert entry.get('quality') == qualities.Quality('720p h264 flac')
+        task = execute_task("test_priority")
+        entry = task.find_entry("entries", title="Testfile[h264-720p]")
+        assert entry.get("quality") != qualities.Quality("720p h264 mp3")
+        assert entry.get("quality") == qualities.Quality("720p h264 flac")
 
     def test_invalid_target(self, execute_task):
         with pytest.raises(TaskAbort):
-            execute_task('test_invalid_target')
+            execute_task("test_invalid_target")
 
     def test_with_series(self, execute_task):
-        task = execute_task('test_with_series')
-        assert task.accepted, 'series plugin should have used assumed quality'
+        task = execute_task("test_with_series")
+        assert task.accepted, "series plugin should have used assumed quality"
 
     def test_with_series_target(self, execute_task):
-        task = execute_task('test_with_series_target')
-        assert task.accepted, 'series plugin should have used assumed quality'
+        task = execute_task("test_with_series_target")
+        assert task.accepted, "series plugin should have used assumed quality"
 
     def test_with_series_qualities(self, execute_task):
-        task = execute_task('test_with_series_qualities')
-        assert task.accepted, 'series plugin should have used assumed quality'
+        task = execute_task("test_with_series_qualities")
+        assert task.accepted, "series plugin should have used assumed quality"

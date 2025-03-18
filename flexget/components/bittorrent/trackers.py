@@ -5,7 +5,7 @@ from loguru import logger
 from flexget import plugin
 from flexget.event import event
 
-logger = logger.bind(name='modify_torrents')
+logger = logger.bind(name="modify_torrents")
 
 
 class AddTrackers:
@@ -19,18 +19,18 @@ class AddTrackers:
     This will add all tracker URL uri://tracker_address:port/.
     """
 
-    schema = {'type': 'array', 'items': {'type': 'string', 'format': 'url'}}
+    schema = {"type": "array", "items": {"type": "string", "format": "url"}}
 
     @plugin.priority(127)
     def on_task_modify(self, task, config):
         for entry in task.entries:
-            if 'torrent' in entry:
+            if "torrent" in entry:
                 for url in config:
-                    if url not in entry['torrent'].trackers:
-                        entry['torrent'].add_multitracker(url)
-                        logger.info('Added {} tracker to {}', url, entry['title'])
-            if entry['url'].startswith('magnet:'):
-                entry['url'] += ''.join(['&tr=' + url for url in config])
+                    if url not in entry["torrent"].trackers:
+                        entry["torrent"].add_multitracker(url)
+                        logger.info("Added {} tracker to {}", url, entry["title"])
+            if entry["url"].startswith("magnet:"):
+                entry["url"] += "".join(["&tr=" + url for url in config])
 
 
 class RemoveTrackers:
@@ -44,26 +44,26 @@ class RemoveTrackers:
     This will remove all trackers that contain text moviex in their url.
     """
 
-    schema = {'type': 'array', 'items': {'type': 'string', 'format': 'regex'}}
+    schema = {"type": "array", "items": {"type": "string", "format": "regex"}}
 
     @plugin.priority(127)
     def on_task_modify(self, task, config):
         for entry in task.entries:
-            if 'torrent' in entry:
-                for tracker in entry['torrent'].trackers:
+            if "torrent" in entry:
+                for tracker in entry["torrent"].trackers:
                     for regexp in config or []:
                         if re.search(regexp, tracker, re.IGNORECASE):
                             logger.debug(
-                                'remove_trackers removing {} because of {}', tracker, regexp
+                                "remove_trackers removing {} because of {}", tracker, regexp
                             )
                             # remove tracker
-                            entry['torrent'].remove_multitracker(tracker)
-                            logger.info('Removed {}', tracker)
-            if entry['url'].startswith('magnet:'):
+                            entry["torrent"].remove_multitracker(tracker)
+                            logger.info("Removed {}", tracker)
+            if entry["url"].startswith("magnet:"):
                 for regexp in config:
                     # Replace any tracker strings that match the regexp with nothing
-                    tr_search = rf'&tr=([^&]*{regexp}[^&]*)'
-                    entry['url'] = re.sub(tr_search, '', entry['url'], flags=re.IGNORECASE)
+                    tr_search = rf"&tr=([^&]*{regexp}[^&]*)"
+                    entry["url"] = re.sub(tr_search, "", entry["url"], flags=re.IGNORECASE)
 
 
 class ModifyTrackers:
@@ -79,38 +79,38 @@ class ModifyTrackers:
     """
 
     schema = {
-        'type': 'array',
-        'items': {
-            'type': 'object',
-            'additionalProperties': {
-                'type': 'object',
-                'properties': {'from': {'type': 'string'}, 'to': {'type': 'string'}},
-                'additionalProperties': False,
+        "type": "array",
+        "items": {
+            "type": "object",
+            "additionalProperties": {
+                "type": "object",
+                "properties": {"from": {"type": "string"}, "to": {"type": "string"}},
+                "additionalProperties": False,
             },
-            'maxProperties': 1,
+            "maxProperties": 1,
         },
     }
 
     @plugin.priority(127)
     def on_task_modify(self, task, config):
         for entry in task.entries:
-            if 'torrent' in entry:
-                torrent = entry['torrent']
+            if "torrent" in entry:
+                torrent = entry["torrent"]
                 trackers = torrent.trackers
                 for item in config:
                     for replace in item.values():
                         for tracker in trackers:
-                            if replace.get('from') in tracker:
+                            if replace.get("from") in tracker:
                                 torrent.remove_multitracker(tracker)
                                 trackernew = tracker.replace(
-                                    replace.get('from'), replace.get('to')
+                                    replace.get("from"), replace.get("to")
                                 )
                                 torrent.add_multitracker(trackernew)
-                                logger.info('Modify {} in {}', tracker, trackernew)
+                                logger.info("Modify {} in {}", tracker, trackernew)
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(AddTrackers, 'add_trackers', api_ver=2)
-    plugin.register(RemoveTrackers, 'remove_trackers', api_ver=2)
-    plugin.register(ModifyTrackers, 'modify_trackers', api_ver=2)
+    plugin.register(AddTrackers, "add_trackers", api_ver=2)
+    plugin.register(RemoveTrackers, "remove_trackers", api_ver=2)
+    plugin.register(ModifyTrackers, "modify_trackers", api_ver=2)

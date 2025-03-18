@@ -14,55 +14,55 @@ from flexget.utils.requests import Session as RequestSession
 from flexget.utils.soup import get_soup
 from flexget.utils.tools import parse_filesize
 
-logger = logger.bind(name='filelist')
-Base = db_schema.versioned_base('filelist', 0)
+logger = logger.bind(name="filelist")
+Base = db_schema.versioned_base("filelist", 0)
 
 requests = RequestSession()
-requests.add_domain_limiter(TimedLimiter('filelist.ro', '2 seconds'))
+requests.add_domain_limiter(TimedLimiter("filelist.ro", "2 seconds"))
 
-BASE_URL = 'https://filelist.ro/'
+BASE_URL = "https://filelist.ro/"
 
 CATEGORIES = {
-    'all': 0,
-    'anime': 24,
-    'audio': 11,
-    'cartoons': 15,
-    'docs': 16,
-    'games console': 10,
-    'games pc': 9,
-    'linux': 17,
-    'misc': 18,
-    'mobile': 22,
-    'movies 3d': 25,
-    'movies 4k': 6,
-    'movies 4k blueray': 26,
-    'movies bluray': 20,
-    'movies dvd': 2,
-    'movies dvd-ro': 3,
-    'movies hd': 4,
-    'movies hd-ro': 19,
-    'movies sd': 1,
-    'series 4k': 27,
-    'series hd': 21,
-    'series sd': 23,
-    'software': 8,
-    'sport': 13,
-    'tv': 14,
-    'videoclip': 12,
-    'xxx': 7,
+    "all": 0,
+    "anime": 24,
+    "audio": 11,
+    "cartoons": 15,
+    "docs": 16,
+    "games console": 10,
+    "games pc": 9,
+    "linux": 17,
+    "misc": 18,
+    "mobile": 22,
+    "movies 3d": 25,
+    "movies 4k": 6,
+    "movies 4k blueray": 26,
+    "movies bluray": 20,
+    "movies dvd": 2,
+    "movies dvd-ro": 3,
+    "movies hd": 4,
+    "movies hd-ro": 19,
+    "movies sd": 1,
+    "series 4k": 27,
+    "series hd": 21,
+    "series sd": 23,
+    "software": 8,
+    "sport": 13,
+    "tv": 14,
+    "videoclip": 12,
+    "xxx": 7,
 }
 
-SORTING = {'hybrid': 0, 'relevance': 1, 'date': 2, 'size': 3, 'snatches': 4, 'peers': 5}
+SORTING = {"hybrid": 0, "relevance": 1, "date": 2, "size": 3, "snatches": 4, "peers": 5}
 
-SEARCH_IN = {'both': 0, 'title': 1, 'description': 2}
+SEARCH_IN = {"both": 0, "title": 1, "description": 2}
 
 
 class FileListCookie(Base):
-    __tablename__ = 'filelist_cookie'
+    __tablename__ = "filelist_cookie"
 
     username = Column(Unicode, primary_key=True)
-    _cookie = Column('cookie', Unicode)
-    cookie = json_synonym('_cookie')
+    _cookie = Column("cookie", Unicode)
+    cookie = json_synonym("_cookie")
     expires = Column(DateTime)
 
 
@@ -70,21 +70,21 @@ class SearchFileList:
     """FileList.ro search plugin."""
 
     schema = {
-        'type': 'object',
-        'deprecated': True,
-        'deprecationMessage': 'plugin filelist is deprecated, please consider using plugin filelist_api',
-        'properties': {
-            'username': {'type': 'string'},
-            'password': {'type': 'string'},
-            'passkey': {'type': 'string'},
-            'category': {'type': 'string', 'enum': list(CATEGORIES.keys()), 'default': 'all'},
-            'order_by': {'type': 'string', 'enum': list(SORTING.keys()), 'default': 'hybrid'},
-            'order_ascending': {'type': 'boolean', 'default': False},
-            'search_in': {'type': 'string', 'enum': list(SEARCH_IN.keys()), 'default': 'both'},
-            'include_dead': {'type': 'boolean', 'default': False},
+        "type": "object",
+        "deprecated": True,
+        "deprecationMessage": "plugin filelist is deprecated, please consider using plugin filelist_api",
+        "properties": {
+            "username": {"type": "string"},
+            "password": {"type": "string"},
+            "passkey": {"type": "string"},
+            "category": {"type": "string", "enum": list(CATEGORIES.keys()), "default": "all"},
+            "order_by": {"type": "string", "enum": list(SORTING.keys()), "default": "hybrid"},
+            "order_ascending": {"type": "boolean", "default": False},
+            "search_in": {"type": "string", "enum": list(SEARCH_IN.keys()), "default": "both"},
+            "include_dead": {"type": "boolean", "default": False},
         },
-        'required': ['username', 'password', 'passkey'],
-        'additionalProperties': False,
+        "required": ["username", "password", "passkey"],
+        "additionalProperties": False,
     }
 
     errors = False
@@ -103,10 +103,10 @@ class SearchFileList:
 
         response = requests.get(url, params=params, cookies=cookies)
 
-        if 'login.php' in response.url:
+        if "login.php" in response.url:
             if self.errors:
                 raise plugin.PluginError(
-                    'FileList.ro login cookie is invalid. Login page received?'
+                    "FileList.ro login cookie is invalid. Login page received?"
                 )
             self.errors = True
             # try again
@@ -136,49 +136,49 @@ class SearchFileList:
                     and saved_cookie.expires
                     and saved_cookie.expires >= datetime.datetime.now()
                 ):
-                    logger.debug('Found valid login cookie')
+                    logger.debug("Found valid login cookie")
                     return saved_cookie.cookie
 
-        url = BASE_URL + 'takelogin.php'
+        url = BASE_URL + "takelogin.php"
         try:
             # get validator token
-            response = requests.get(BASE_URL + 'login.php')
+            response = requests.get(BASE_URL + "login.php")
             soup = get_soup(response.content)
 
             login_validator = soup.find("input", {"name": "validator"})
 
             if not login_validator:
-                raise plugin.PluginError('FileList.ro could not get login validator')
-            logger.debug('Login Validator: {}', login_validator.get('value'))
-            logger.debug('Attempting to retrieve FileList.ro cookie')
+                raise plugin.PluginError("FileList.ro could not get login validator")
+            logger.debug("Login Validator: {}", login_validator.get("value"))
+            logger.debug("Attempting to retrieve FileList.ro cookie")
 
             response = requests.post(
                 url,
                 data={
-                    'username': username,
-                    'password': password,
-                    'validator': login_validator.get('value'),
-                    'login': 'Log in',
-                    'unlock': '1',
+                    "username": username,
+                    "password": password,
+                    "validator": login_validator.get("value"),
+                    "login": "Log in",
+                    "unlock": "1",
                 },
                 timeout=30,
             )
         except RequestException as e:
-            raise plugin.PluginError(f'FileList.ro login failed: {e}')
+            raise plugin.PluginError(f"FileList.ro login failed: {e}")
 
-        if response.url != 'https://filelist.ro/my.php':
+        if response.url != "https://filelist.ro/my.php":
             raise plugin.PluginError(
-                'FileList.ro login failed: Your username or password was incorrect.'
+                "FileList.ro login failed: Your username or password was incorrect."
             )
 
         with Session() as session:
             expires = None
             for c in requests.cookies:
-                if c.name == 'pass':
+                if c.name == "pass":
                     expires = c.expires
             if expires:
                 expires = datetime.datetime.fromtimestamp(expires)
-            logger.debug('Saving or updating FileList.ro cookie in db')
+            logger.debug("Saving or updating FileList.ro cookie in db")
             cookie = FileListCookie(
                 username=username.lower(), cookie=dict(requests.cookies), expires=expires
             )
@@ -191,86 +191,86 @@ class SearchFileList:
         entries = []
 
         params = {
-            'cat': CATEGORIES[config['category']],
-            'incldead': int(config['include_dead']),
-            'order_by': SORTING[config['order_by']],
-            'searchin': SEARCH_IN[config['search_in']],
-            'asc': int(config['order_ascending']),
+            "cat": CATEGORIES[config["category"]],
+            "incldead": int(config["include_dead"]),
+            "order_by": SORTING[config["order_by"]],
+            "searchin": SEARCH_IN[config["search_in"]],
+            "asc": int(config["order_ascending"]),
         }
 
-        for search_string in entry.get('search_strings', [entry['title']]):
-            params['search'] = search_string
-            logger.debug('Using search params: {}', params)
+        for search_string in entry.get("search_strings", [entry["title"]]):
+            params["search"] = search_string
+            logger.debug("Using search params: {}", params)
             try:
                 page = self.get(
-                    BASE_URL + 'browse.php', params, config['username'], config['password']
+                    BASE_URL + "browse.php", params, config["username"], config["password"]
                 )
-                logger.debug('requesting: {}', page.url)
+                logger.debug("requesting: {}", page.url)
             except RequestException as e:
-                logger.error('FileList.ro request failed: {}', e)
+                logger.error("FileList.ro request failed: {}", e)
                 continue
 
             soup = get_soup(page.content)
-            for result in soup.findAll('div', attrs={'class': 'torrentrow'}):
+            for result in soup.findAll("div", attrs={"class": "torrentrow"}):
                 e = Entry()
 
-                torrent_info = result.findAll('div', attrs={'class': 'torrenttable'})
+                torrent_info = result.findAll("div", attrs={"class": "torrenttable"})
 
                 # genres
-                genres = torrent_info[1].find('font')
+                genres = torrent_info[1].find("font")
                 if genres:
-                    genres = genres.text.lstrip('[').rstrip(']').replace(' ', '')
-                    genres = genres.split('|')
+                    genres = genres.text.lstrip("[").rstrip("]").replace(" ", "")
+                    genres = genres.split("|")
 
-                tags = torrent_info[1].findAll('img')
+                tags = torrent_info[1].findAll("img")
                 freeleech = False
                 internal = False
                 for tag in tags:
-                    if tag.get('alt', '').lower() == 'freeleech':
+                    if tag.get("alt", "").lower() == "freeleech":
                         freeleech = True
-                    if tag.get('alt', '').lower() == 'internal':
+                    if tag.get("alt", "").lower() == "internal":
                         internal = True
 
-                title = torrent_info[1].find('a').get('title')
+                title = torrent_info[1].find("a").get("title")
                 # this is a dirty fix to get the full title since their developer is a moron
                 if re.match(r"\<img src=\'.*\'\>", title):
-                    title = torrent_info[1].find('b').text
+                    title = torrent_info[1].find("b").text
                     # if the title is shortened, then do a request to get the full one :(
-                    if title.endswith('...'):
-                        url = BASE_URL + torrent_info[1].find('a')['href']
+                    if title.endswith("..."):
+                        url = BASE_URL + torrent_info[1].find("a")["href"]
                         try:
-                            request = self.get(url, {}, config['username'], config['password'])
+                            request = self.get(url, {}, config["username"], config["password"])
                         except RequestException as e:
-                            logger.error('FileList.ro request failed: {}', e)
+                            logger.error("FileList.ro request failed: {}", e)
                             continue
                         title_soup = get_soup(request.content)
-                        title = title_soup.find('div', attrs={'class': 'cblock-header'}).text
+                        title = title_soup.find("div", attrs={"class": "cblock-header"}).text
 
-                e['title'] = title
-                e['url'] = (
-                    BASE_URL + torrent_info[3].find('a')['href'] + '&passkey=' + config['passkey']
+                e["title"] = title
+                e["url"] = (
+                    BASE_URL + torrent_info[3].find("a")["href"] + "&passkey=" + config["passkey"]
                 )
-                e['content_size'] = parse_filesize(torrent_info[6].find('font').text)
+                e["content_size"] = parse_filesize(torrent_info[6].find("font").text)
 
-                e['torrent_snatches'] = int(
+                e["torrent_snatches"] = int(
                     torrent_info[7]
-                    .find('font')
-                    .text.replace(' ', '')
-                    .replace('times', '')
-                    .replace(',', '')
+                    .find("font")
+                    .text.replace(" ", "")
+                    .replace("times", "")
+                    .replace(",", "")
                 )
-                e['torrent_seeds'] = int(torrent_info[8].find('span').text)
-                e['torrent_leeches'] = int(torrent_info[9].find('span').text)
-                e['torrent_internal'] = internal
-                e['torrent_freeleech'] = freeleech
+                e["torrent_seeds"] = int(torrent_info[8].find("span").text)
+                e["torrent_leeches"] = int(torrent_info[9].find("span").text)
+                e["torrent_internal"] = internal
+                e["torrent_freeleech"] = freeleech
                 if genres:
-                    e['torrent_genres'] = genres
+                    e["torrent_genres"] = genres
 
                 entries.append(e)
 
         return entries
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(SearchFileList, 'filelist', interfaces=['search'], api_ver=2)
+    plugin.register(SearchFileList, "filelist", interfaces=["search"], api_ver=2)

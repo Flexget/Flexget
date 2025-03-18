@@ -14,7 +14,7 @@ from flexget.components.managed_lists.lists.subtitle_list import (
 from flexget.manager import Session
 
 
-@pytest.mark.filecopy(['movie.mkv', 'series.mkv'], '__tmp__')
+@pytest.mark.filecopy(["movie.mkv", "series.mkv"], "__tmp__")
 @pytest.mark.xdist_group(name="subtitle_list")
 class TestSubtitleList:
     config = """
@@ -227,16 +227,16 @@ class TestSubtitleList:
     """
 
     def test_subtitle_list_del(self, execute_task):
-        execute_task('subtitle_add')
-        task = execute_task('subtitle_emit')
+        execute_task("subtitle_add")
+        task = execute_task("subtitle_emit")
         assert len(task.entries) == 2
 
-        execute_task('subtitle_remove')
-        task = execute_task('subtitle_emit')
+        execute_task("subtitle_remove")
+        task = execute_task("subtitle_emit")
         assert len(task.entries) == 0
 
     def test_subtitle_list_unique_lang(self, execute_task):
-        execute_task('subtitle_add_with_languages')
+        execute_task("subtitle_add_with_languages")
 
         with Session() as session:
             s = session.query(SubtitleListLanguage).all()
@@ -249,119 +249,119 @@ class TestSubtitleList:
             )
 
     def test_subtitle_list_old(self, execute_task):
-        execute_task('subtitle_test_expiration_add')
+        execute_task("subtitle_test_expiration_add")
 
         with Session() as session:
             s = session.query(SubtitleListFile).first()
             s.added = datetime.datetime.now() + datetime.timedelta(-8)
 
-        task = execute_task('subtitle_emit')
-        assert len(task.entries) == 0, 'File should have expired.'
+        task = execute_task("subtitle_emit")
+        assert len(task.entries) == 0, "File should have expired."
 
     @pytest.mark.require_optional_deps
     @pytest.mark.online
     @pytest.mark.skipif(
-        platform.system() == 'Darwin',
-        reason='This test fails intermittently on macOS',
+        platform.system() == "Darwin",
+        reason="This test fails intermittently on macOS",
     )
     def test_subtitle_list_subliminal_fail(self, execute_task):
-        task = execute_task('subtitle_add_with_languages')
+        task = execute_task("subtitle_add_with_languages")
 
-        assert len(task.entries) == 2, 'Task should have two entries.'
+        assert len(task.entries) == 2, "Task should have two entries."
 
-        task = execute_task('subtitle_fail')
-        assert len(task.rejected) == 2, 'Entries should be rejected since the files are not valid.'
+        task = execute_task("subtitle_fail")
+        assert len(task.rejected) == 2, "Entries should be rejected since the files are not valid."
 
     @pytest.mark.skip
     @pytest.mark.online
     def test_subtitle_list_subliminal_semi_fail(self, execute_task):
-        task = execute_task('subtitle_add_local_file')
+        task = execute_task("subtitle_add_local_file")
 
-        assert len(task.entries) == 1, 'Task should have accepted walking dead local file'
+        assert len(task.entries) == 1, "Task should have accepted walking dead local file"
 
-        task = execute_task('subtitle_fail')
+        task = execute_task("subtitle_fail")
 
         # cleanup
         with contextlib.suppress(OSError):
-            Path('subtitle_list_test_dir/The.Walking.Dead.S06E08-FlexGet.en.srt').unlink()
+            Path("subtitle_list_test_dir/The.Walking.Dead.S06E08-FlexGet.en.srt").unlink()
 
         assert len(task.failed) == 1, (
-            'Only one language should have been downloaded which results in failure'
+            "Only one language should have been downloaded which results in failure"
         )
 
     @pytest.mark.require_optional_deps
     def test_subtitle_list_subliminal_success(self, execute_task):
-        task = execute_task('subtitle_add_local_file')
-        assert len(task.entries) == 1, 'Task should have accepted walking dead local file'
+        task = execute_task("subtitle_add_local_file")
+        assert len(task.entries) == 1, "Task should have accepted walking dead local file"
 
-        task = execute_task('subtitle_add_another_local_file')
-        assert len(task.entries) == 1, 'Task should have accepted jessica jones file'
+        task = execute_task("subtitle_add_another_local_file")
+        assert len(task.entries) == 1, "Task should have accepted jessica jones file"
 
-        with Path('subtitle_list_test_dir/The.Walking.Dead.S06E08-FlexGet.en.srt').open('a'):
-            os.utime('subtitle_list_test_dir/The.Walking.Dead.S06E08-FlexGet.en.srt', None)
+        with Path("subtitle_list_test_dir/The.Walking.Dead.S06E08-FlexGet.en.srt").open("a"):
+            os.utime("subtitle_list_test_dir/The.Walking.Dead.S06E08-FlexGet.en.srt", None)
 
-        with Path('subtitle_list_test_dir/The.Walking.Dead.S06E08-FlexGet.ja.srt').open('a'):
-            os.utime('subtitle_list_test_dir/The.Walking.Dead.S06E08-FlexGet.ja.srt', None)
+        with Path("subtitle_list_test_dir/The.Walking.Dead.S06E08-FlexGet.ja.srt").open("a"):
+            os.utime("subtitle_list_test_dir/The.Walking.Dead.S06E08-FlexGet.ja.srt", None)
 
-        with Path('subtitle_list_test_dir/Marvels.Jessica.Jones.S01E02-FlexGet.en.srt').open('a'):
-            os.utime('subtitle_list_test_dir/Marvels.Jessica.Jones.S01E02-FlexGet.en.srt', None)
+        with Path("subtitle_list_test_dir/Marvels.Jessica.Jones.S01E02-FlexGet.en.srt").open("a"):
+            os.utime("subtitle_list_test_dir/Marvels.Jessica.Jones.S01E02-FlexGet.en.srt", None)
 
-        task = execute_task('subtitle_simulate_success')
+        task = execute_task("subtitle_simulate_success")
         assert len(task.rejected) == 1, (
-            'Should have found both languages for walking dead but not for jessica jones'
+            "Should have found both languages for walking dead but not for jessica jones"
         )
 
-        task = execute_task('subtitle_emit')
-        assert len(task.entries) == 1, 'Walking Dead should have been removed from the list'
+        task = execute_task("subtitle_emit")
+        assert len(task.entries) == 1, "Walking Dead should have been removed from the list"
         with contextlib.suppress(OSError):
-            Path('subtitle_list_test_dir/The.Walking.Dead.S06E08-FlexGet.en.srt').unlink()
+            Path("subtitle_list_test_dir/The.Walking.Dead.S06E08-FlexGet.en.srt").unlink()
         with contextlib.suppress(OSError):
-            Path('subtitle_list_test_dir/The.Walking.Dead.S06E08-FlexGet.ja.srt').unlink()
+            Path("subtitle_list_test_dir/The.Walking.Dead.S06E08-FlexGet.ja.srt").unlink()
         with contextlib.suppress(OSError):
-            Path('subtitle_list_test_dir/Marvels.Jessica.Jones.S01E02-FlexGet.en.srt').unlink()
+            Path("subtitle_list_test_dir/Marvels.Jessica.Jones.S01E02-FlexGet.en.srt").unlink()
 
     @pytest.mark.require_optional_deps
     def test_subtitle_list_local_subtitles(self, execute_task):
-        execute_task('subtitle_add_local_file')
-        execute_task('subtitle_add_another_local_file')
-        execute_task('subtitle_add_a_third_local_file')
+        execute_task("subtitle_add_local_file")
+        execute_task("subtitle_add_another_local_file")
+        execute_task("subtitle_add_a_third_local_file")
 
-        task = execute_task('subtitle_emit')
+        task = execute_task("subtitle_emit")
         assert len(task.entries) == 2, (
-            'Big Bang Theory already has a local subtitle and should have been removed.'
+            "Big Bang Theory already has a local subtitle and should have been removed."
         )
 
     def test_subtitle_list_local_dir(self, execute_task):
-        execute_task('subtitle_add_local_dir')
+        execute_task("subtitle_add_local_dir")
 
         with Session() as session:
             s = session.query(SubtitleListFile).first()
-            assert s.title == 'My Videos', (
+            assert s.title == "My Videos", (
                 'Should have added the dir with title "My Videos" to the list'
             )
 
-        task = execute_task('subtitle_emit_dir')
+        task = execute_task("subtitle_emit_dir")
 
         assert len(task.entries) == 3, (
-            'Should have found 3 video files and the containing dir should not be included.'
+            "Should have found 3 video files and the containing dir should not be included."
         )
 
     @pytest.mark.require_optional_deps
     def test_subtitle_list_subliminal_dir_success(self, execute_task):
-        execute_task('subtitle_add_local_dir')
+        execute_task("subtitle_add_local_dir")
 
-        with Path('subtitle_list_test_dir/The.Walking.Dead.S06E08-FlexGet.ja.srt').open('a'):
-            os.utime('subtitle_list_test_dir/The.Walking.Dead.S06E08-FlexGet.ja.srt', None)
+        with Path("subtitle_list_test_dir/The.Walking.Dead.S06E08-FlexGet.ja.srt").open("a"):
+            os.utime("subtitle_list_test_dir/The.Walking.Dead.S06E08-FlexGet.ja.srt", None)
 
-        with Path('subtitle_list_test_dir/Marvels.Jessica.Jones.S01E02-FlexGet.ja.srt').open('a'):
-            os.utime('subtitle_list_test_dir/Marvels.Jessica.Jones.S01E02-FlexGet.ja.srt', None)
+        with Path("subtitle_list_test_dir/Marvels.Jessica.Jones.S01E02-FlexGet.ja.srt").open("a"):
+            os.utime("subtitle_list_test_dir/Marvels.Jessica.Jones.S01E02-FlexGet.ja.srt", None)
 
-        with Path('subtitle_list_test_dir/The.Big.Bang.Theory.S09E09-FlexGet.ja.srt').open('a'):
-            os.utime('subtitle_list_test_dir/The.Big.Bang.Theory.S09E09-FlexGet.ja.srt', None)
+        with Path("subtitle_list_test_dir/The.Big.Bang.Theory.S09E09-FlexGet.ja.srt").open("a"):
+            os.utime("subtitle_list_test_dir/The.Big.Bang.Theory.S09E09-FlexGet.ja.srt", None)
 
-        task = execute_task('subtitle_simulate_success_no_check')
+        task = execute_task("subtitle_simulate_success_no_check")
         assert len(task.all_entries) == 3, '"My Videos" should have been deleted'
-        assert len(task.accepted) == 3, 'All files have all subtitles'
+        assert len(task.accepted) == 3, "All files have all subtitles"
 
         with Session() as session:
             s = session.query(SubtitleListFile).first()
@@ -370,81 +370,81 @@ class TestSubtitleList:
             )
 
         with contextlib.suppress(OSError):
-            Path('subtitle_list_test_dir/The.Walking.Dead.S06E08-FlexGet.ja.srt').unlink()
+            Path("subtitle_list_test_dir/The.Walking.Dead.S06E08-FlexGet.ja.srt").unlink()
         with contextlib.suppress(OSError):
-            Path('subtitle_list_test_dir/Marvels.Jessica.Jones.S01E02-FlexGet.ja.srt').unlink()
+            Path("subtitle_list_test_dir/Marvels.Jessica.Jones.S01E02-FlexGet.ja.srt").unlink()
         with contextlib.suppress(OSError):
-            Path('subtitle_list_test_dir/The.Big.Bang.Theory.S09E09-FlexGet.ja.srt').unlink()
+            Path("subtitle_list_test_dir/The.Big.Bang.Theory.S09E09-FlexGet.ja.srt").unlink()
 
     def test_subtitle_list_force_file_existence_no(self, execute_task):
-        task = execute_task('subtitle_add_force_file_no')
+        task = execute_task("subtitle_add_force_file_no")
 
-        assert not Path(task.entries[0]['location']).exists(), 'File should not exist.'
+        assert not Path(task.entries[0]["location"]).exists(), "File should not exist."
 
         with Session() as session:
             s = session.query(SubtitleListFile).first()
-            assert s, 'The file should have been added to the list even though it does not exist'
+            assert s, "The file should have been added to the list even though it does not exist"
 
-        task = execute_task('subtitle_emit_force_no')
+        task = execute_task("subtitle_emit_force_no")
 
         assert len(task.entries) == 0, (
-            'List should not be empty, but since file does not exist it isn\' returned'
+            "List should not be empty, but since file does not exist it isn' returned"
         )
 
         with Session() as session:
             s = session.query(SubtitleListFile).first()
-            assert s, 'The file should still be in the list'
+            assert s, "The file should still be in the list"
 
     def test_subtitle_list_force_file_existence_yes(self, execute_task):
-        task = execute_task('subtitle_add_force_file')
+        task = execute_task("subtitle_add_force_file")
 
-        assert not Path(task.entries[0]['location']).exists(), 'File should not exist.'
+        assert not Path(task.entries[0]["location"]).exists(), "File should not exist."
 
         with Session() as session:
             s = session.query(SubtitleListFile).first()
             assert s is None, (
-                'The file should not have been added to the list as it does not exist'
+                "The file should not have been added to the list as it does not exist"
             )
 
-        task = execute_task('subtitle_emit')
+        task = execute_task("subtitle_emit")
 
-        assert len(task.entries) == 0, 'List should be empty'
+        assert len(task.entries) == 0, "List should be empty"
 
     def test_subtitle_list_force_file_existence_yes_input(self, execute_task):
-        task = execute_task('subtitle_add_force_file_no')
+        task = execute_task("subtitle_add_force_file_no")
 
-        assert not Path(task.entries[0]['location']).exists(), 'File should not exist.'
+        assert not Path(task.entries[0]["location"]).exists(), "File should not exist."
 
         with Session() as session:
             s = session.query(SubtitleListFile).first()
-            assert s, 'The file should have been added to the list even though it does not exist'
+            assert s, "The file should have been added to the list even though it does not exist"
 
-        task = execute_task('subtitle_emit')
+        task = execute_task("subtitle_emit")
 
-        assert len(task.entries) == 0, 'No input should be returned as the file does not exist'
+        assert len(task.entries) == 0, "No input should be returned as the file does not exist"
 
         with Session() as session:
             s = session.query(SubtitleListFile).first()
             assert s is None, (
-                'The file should have been removed from the list since it does not exist'
+                "The file should have been removed from the list since it does not exist"
             )
 
     def test_subtitle_list_path(self, execute_task):
-        execute_task('subtitle_path')
+        execute_task("subtitle_path")
 
         with Session() as session:
             s = session.query(SubtitleListFile).first()
-            assert s, 'The file should have been added to the list'
+            assert s, "The file should have been added to the list"
             assert s.location == normalize_path(
-                'subtitle_list_test_dir/The.Walking.Dead.S06E08-FlexGet.mp4'
-            ), 'location should be what the output field was set to'
+                "subtitle_list_test_dir/The.Walking.Dead.S06E08-FlexGet.mp4"
+            ), "location should be what the output field was set to"
 
     def test_subtitle_list_relative_path(self, execute_task):
-        execute_task('subtitle_path_relative')
+        execute_task("subtitle_path_relative")
 
         with Session() as session:
             s = session.query(SubtitleListFile).first()
-            assert s, 'The file should have been added to the list'
+            assert s, "The file should have been added to the list"
             assert s.location == normalize_path(
-                'subtitle_list_test_dir/The.Walking.Dead.S06E08-FlexGet.mp4'
-            ), 'location should be what the output field was set to'
+                "subtitle_list_test_dir/The.Walking.Dead.S06E08-FlexGet.mp4"
+            ), "location should be what the output field was set to"

@@ -9,7 +9,7 @@ from flexget import plugin
 from flexget.config_schema import one_or_more, parse_percent, parse_size
 from flexget.event import event
 
-logger = logger.bind(name='path_by_space')
+logger = logger.bind(name="path_by_space")
 
 
 class DiskStats(NamedTuple):
@@ -23,7 +23,7 @@ class DiskStats(NamedTuple):
 
 def os_disk_stats(folder):
     """Return drive free, used and total bytes."""
-    if os.name == 'nt':
+    if os.name == "nt":
         free_bytes = ctypes.c_ulonglong(0)
         total_bytes = ctypes.c_ulonglong(0)
         ctypes.windll.kernel32.GetDiskFreeSpaceExW(
@@ -66,26 +66,26 @@ def _path_selector(paths, within, stat_attr):
 
 
 def select_most_free(paths, within):
-    return _path_selector(paths, within, 'free_bytes')
+    return _path_selector(paths, within, "free_bytes")
 
 
 def select_most_used(paths, within):
-    return _path_selector(paths, within, 'used_bytes')
+    return _path_selector(paths, within, "used_bytes")
 
 
 def select_most_free_percent(paths, within):
-    return _path_selector(paths, within, 'free_percent')
+    return _path_selector(paths, within, "free_percent")
 
 
 def select_most_used_percent(paths, within):
-    return _path_selector(paths, within, 'used_percent')
+    return _path_selector(paths, within, "used_percent")
 
 
 selector_map = {
-    'most_free': select_most_free,
-    'most_used': select_most_used,
-    'most_free_percent': select_most_free_percent,
-    'most_used_percent': select_most_used_percent,
+    "most_free": select_most_free,
+    "most_used": select_most_used,
+    "most_free_percent": select_most_free_percent,
+    "most_used_percent": select_most_used_percent,
 }
 
 
@@ -106,45 +106,45 @@ class PluginPathBySpace:
     """
 
     schema = {
-        'type': 'object',
-        'properties': {
-            'select': {'type': 'string', 'enum': list(selector_map.keys())},
-            'to_field': {'type': 'string', 'default': 'path'},
-            'paths': one_or_more({'type': 'string', 'format': 'path'}),
-            'within': {
-                'oneOf': [
-                    {'type': 'string', 'format': 'size'},
-                    {'type': 'string', 'format': 'percent'},
+        "type": "object",
+        "properties": {
+            "select": {"type": "string", "enum": list(selector_map.keys())},
+            "to_field": {"type": "string", "default": "path"},
+            "paths": one_or_more({"type": "string", "format": "path"}),
+            "within": {
+                "oneOf": [
+                    {"type": "string", "format": "size"},
+                    {"type": "string", "format": "percent"},
                 ]
             },
         },
-        'required': ['paths', 'select'],
-        'additionalProperties': False,
+        "required": ["paths", "select"],
+        "additionalProperties": False,
     }
 
     @plugin.priority(250)  # run before other plugins
     def on_task_metainfo(self, task, config):
-        selector = selector_map[config['select']]
+        selector = selector_map[config["select"]]
 
         # Convert within to bytes (int) or percent (float)
-        within = config.get('within')
-        if isinstance(within, str) and '%' in within:
+        within = config.get("within")
+        if isinstance(within, str) and "%" in within:
             within = parse_percent(within)
         else:
             within = parse_size(within)
 
-        path = selector(config['paths'], within=within)
+        path = selector(config["paths"], within=within)
 
         if path:
-            logger.debug('Path {} selected due to ({})', path, config['select'])
+            logger.debug("Path {} selected due to ({})", path, config["select"])
 
             for entry in task.all_entries:
-                entry[config['to_field']] = path
+                entry[config["to_field"]] = path
         else:
-            task.abort('Unable to select a path based on {}'.format(config['select']))
+            task.abort("Unable to select a path based on {}".format(config["select"]))
             return
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(PluginPathBySpace, 'path_by_space', api_ver=2)
+    plugin.register(PluginPathBySpace, "path_by_space", api_ver=2)

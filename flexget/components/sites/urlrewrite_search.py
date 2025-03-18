@@ -5,7 +5,7 @@ from loguru import logger
 from flexget import plugin
 from flexget.event import event
 
-logger = logger.bind(name='urlrewrite_search')
+logger = logger.bind(name="urlrewrite_search")
 
 
 class PluginSearch:
@@ -27,11 +27,11 @@ class PluginSearch:
     """
 
     schema = {
-        'type': 'array',
-        'items': {
-            'allOf': [
-                {'$ref': '/schema/plugins?interface=search'},
-                {'maxProperties': 1, 'minProperties': 1},
+        "type": "array",
+        "items": {
+            "allOf": [
+                {"$ref": "/schema/plugins?interface=search"},
+                {"maxProperties": 1, "minProperties": 1},
             ]
         },
     }
@@ -44,7 +44,7 @@ class PluginSearch:
             return
 
         plugins = {}
-        for p in plugin.get_plugins(interface='search'):
+        for p in plugin.get_plugins(interface="search"):
             plugins[p.name] = p.instance
 
         # search accepted
@@ -55,7 +55,7 @@ class PluginSearch:
                 if isinstance(name, dict):
                     # the name is the first/only key in the dict.
                     name, search_config = next(iter(name.items()))
-                logger.verbose('Searching `{}` from {}', entry['title'], name)
+                logger.verbose("Searching `{}` from {}", entry["title"], name)
                 try:
                     try:
                         results = plugins[name].search(
@@ -64,31 +64,31 @@ class PluginSearch:
                     except TypeError:
                         # Old search api did not take task argument
                         logger.warning(
-                            'Search plugin {} does not support latest search api.', name
+                            "Search plugin {} does not support latest search api.", name
                         )
                         results = plugins[name].search(entry, search_config)
-                    matcher = SequenceMatcher(a=entry['title'])
+                    matcher = SequenceMatcher(a=entry["title"])
                     for result in results:
-                        matcher.set_seq2(result['title'])
+                        matcher.set_seq2(result["title"])
                         if matcher.ratio() > 0.9:
-                            logger.debug('Found url: {}', result['url'])
-                            entry['url'] = result['url']
+                            logger.debug("Found url: {}", result["url"])
+                            entry["url"] = result["url"]
                             break
-                        logger.debug('Match {} is not close enough', result['title'])
+                        logger.debug("Match {} is not close enough", result["title"])
                     else:
                         continue
                     break
                 except (plugin.PluginError, plugin.PluginWarning) as pw:
-                    logger.verbose('Failed: {}', pw.value)
+                    logger.verbose("Failed: {}", pw.value)
                     continue
 
             # Search failed
             else:
                 # If I don't have a URL, doesn't matter if I'm immortal...
-                entry['immortal'] = False
-                entry.reject('search failed')
+                entry["immortal"] = False
+                entry.reject("search failed")
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(PluginSearch, 'urlrewrite_search', api_ver=2)
+    plugin.register(PluginSearch, "urlrewrite_search", api_ver=2)

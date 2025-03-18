@@ -9,14 +9,14 @@ from flexget.plugin import PluginWarning
 from flexget.utils.requests import Session as RequestSession
 from flexget.utils.requests import TimedLimiter
 
-plugin_name = 'sms_ru'
+plugin_name = "sms_ru"
 logger = logger.bind(name=plugin_name)
 
-SMS_SEND_URL = 'http://sms.ru/sms/send'
-SMS_TOKEN_URL = 'http://sms.ru/auth/get_token'
+SMS_SEND_URL = "http://sms.ru/sms/send"
+SMS_TOKEN_URL = "http://sms.ru/auth/get_token"
 
 requests = RequestSession(max_retries=3)
-requests.add_domain_limiter(TimedLimiter('sms.ru', '5 seconds'))
+requests.add_domain_limiter(TimedLimiter("sms.ru", "5 seconds"))
 
 
 class SMSRuNotifier:
@@ -35,10 +35,10 @@ class SMSRuNotifier:
     """
 
     schema = {
-        'type': 'object',
-        'properties': {'phone_number': {'type': 'string'}, 'password': {'type': 'string'}},
-        'additionalProperties': False,
-        'required': ['phone_number', 'password'],
+        "type": "object",
+        "properties": {"phone_number": {"type": "string"}, "password": {"type": "string"}},
+        "additionalProperties": False,
+        "required": ["phone_number", "password"],
     }
 
     def notify(self, title, message, config):
@@ -46,17 +46,17 @@ class SMSRuNotifier:
         try:
             token_response = requests.get(SMS_TOKEN_URL)
         except RequestException as e:
-            raise PluginWarning(f'Could not get auth token: {e!r}')
+            raise PluginWarning(f"Could not get auth token: {e!r}")
 
-        sha512 = hashlib.sha512(config['password'] + token_response.text).hexdigest()
+        sha512 = hashlib.sha512(config["password"] + token_response.text).hexdigest()
 
         # Build request params
         notification = {
-            'login': config['phone_number'],
-            'sha512': sha512,
-            'token': token_response.text,
-            'to': config['phone_number'],
-            'text': message,
+            "login": config["phone_number"],
+            "sha512": sha512,
+            "token": token_response.text,
+            "to": config["phone_number"],
+            "text": message,
         }
 
         try:
@@ -64,10 +64,10 @@ class SMSRuNotifier:
         except RequestException as e:
             raise PluginWarning(e.args[0])
         else:
-            if not response.text.find('100') == 0:
+            if not response.text.find("100") == 0:
                 raise PluginWarning(response.text)
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(SMSRuNotifier, plugin_name, api_ver=2, interfaces=['notifiers'])
+    plugin.register(SMSRuNotifier, plugin_name, api_ver=2, interfaces=["notifiers"])

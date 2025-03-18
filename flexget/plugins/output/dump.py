@@ -10,7 +10,7 @@ from flexget.event import event
 from flexget.terminal import TerminalTable, console
 from flexget.utils.tools import format_filesize
 
-logger = logger.bind(name='dump')
+logger = logger.bind(name="dump")
 
 
 def dump(entries, debug=False, eval_lazy=False, trace=False, title_only=False):
@@ -25,11 +25,11 @@ def dump(entries, debug=False, eval_lazy=False, trace=False, title_only=False):
 
     def sort_key(field):
         # Sort certain fields above the rest
-        if field == 'title':
+        if field == "title":
             return (0,)
-        if field == 'url':
+        if field == "url":
             return (1,)
-        if field == 'original_url':
+        if field == "original_url":
             return (2,)
         return 3, field
 
@@ -37,9 +37,9 @@ def dump(entries, debug=False, eval_lazy=False, trace=False, title_only=False):
 
     for entry in entries:
         entry_table = TerminalTable(
-            'field',
-            ':',
-            'value',
+            "field",
+            ":",
+            "value",
             show_header=False,
             show_edge=False,
             pad_edge=False,
@@ -48,69 +48,69 @@ def dump(entries, debug=False, eval_lazy=False, trace=False, title_only=False):
             padding=0,
         )
         for field in sorted(entry, key=sort_key):
-            if field.startswith('_') and not debug:
+            if field.startswith("_") and not debug:
                 continue
-            if title_only and field != 'title':
+            if title_only and field != "title":
                 continue
             if entry.is_lazy(field) and not eval_lazy:
                 renderable = (
-                    '[italic]<LazyField - value will be determined when it is accessed>[/italic]'
+                    "[italic]<LazyField - value will be determined when it is accessed>[/italic]"
                 )
             else:
                 try:
                     value = entry[field]
                 except KeyError:
-                    renderable = '[italic]<LazyField - lazy lookup failed>[/italic]'
+                    renderable = "[italic]<LazyField - lazy lookup failed>[/italic]"
                 else:
                     if value is None:
                         # Make sure we don't try to do anything fancy if the value is None
                         renderable = highlighter(str(value))
-                    elif field.rsplit('_', maxsplit=1)[-1] == 'url':
+                    elif field.rsplit("_", maxsplit=1)[-1] == "url":
                         url = quote(value, safe=":/")
-                        renderable = f'[link={url}][repr.url]{escape(value)}[/repr.url][/link]'
-                    elif field == 'content_size':
-                        renderable = highlighter(str(value)) + f' ({format_filesize(value)})'
+                        renderable = f"[link={url}][repr.url]{escape(value)}[/repr.url][/link]"
+                    elif field == "content_size":
+                        renderable = highlighter(str(value)) + f" ({format_filesize(value)})"
                     elif isinstance(value, str):
-                        renderable = escape(value.replace('\r', '').replace('\n', ''))
+                        renderable = escape(value.replace("\r", "").replace("\n", ""))
                     elif is_expandable(value):
                         renderable = Pretty(value)
                     else:
                         try:
                             renderable = highlighter(str(value))
                         except Exception:
-                            renderable = f'[[i]not printable[/i]] ({value!r})'
-            entry_table.add_row(f'{field}', ': ', renderable)
+                            renderable = f"[[i]not printable[/i]] ({value!r})"
+            entry_table.add_row(f"{field}", ": ", renderable)
         console(entry_table)
         if trace:
-            console('── Processing trace:', style='italic')
+            console("── Processing trace:", style="italic")
             trace_table = TerminalTable(
-                'Plugin',
-                'Operation',
-                'Message',
+                "Plugin",
+                "Operation",
+                "Message",
                 show_edge=False,
                 pad_edge=False,
             )
             for item in entry.traces:
-                trace_table.add_row(item[0], '' if item[1] is None else item[1], item[2])
+                trace_table.add_row(item[0], "" if item[1] is None else item[1], item[2])
             console(trace_table)
         if not title_only:
-            console('')
+            console("")
 
 
 class OutputDump:
     """Outputs all entries to console."""
 
-    schema = {'type': 'boolean'}
+    schema = {"type": "boolean"}
 
     @plugin.priority(0)
     def on_task_output(self, task, config):
         if not config and task.options.dump_entries is None:
             return
 
-        eval_lazy = 'eval' in task.options.dump_entries
-        trace = 'trace' in task.options.dump_entries
-        title = 'title' in task.options.dump_entries
-        states = {'accepted': 'green', 'rejected': 'red', 'failed': 'yellow', 'undecided': 'none'}
+        eval_lazy = "eval" in task.options.dump_entries
+        trace = "trace" in task.options.dump_entries
+        title = "title" in task.options.dump_entries
+        states = {"accepted": "green", "rejected": "red", "failed": "yellow", "undecided": "none"}
         dumpstates = [s for s in states if getattr(task, s)]
         specificstates = [s for s in states if s in task.options.dump_entries]
         if specificstates:
@@ -120,26 +120,26 @@ class OutputDump:
             if getattr(task, state):
                 dump(getattr(task, state), task.options.debug, eval_lazy, trace, title)
             else:
-                console(f'No {state} entries', style='italic')
+                console(f"No {state} entries", style="italic")
         if not dumpstates:
-            console('No entries were produced', style='italic')
+            console("No entries were produced", style="italic")
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(OutputDump, 'dump', builtin=True, api_ver=2)
+    plugin.register(OutputDump, "dump", builtin=True, api_ver=2)
 
 
-@event('options.register')
+@event("options.register")
 def register_parser_arguments():
-    options.get_parser('execute').add_argument(
-        '--dump',
-        nargs='*',
-        choices=['eval', 'trace', 'accepted', 'rejected', 'undecided', 'failed', 'title'],
-        dest='dump_entries',
+    options.get_parser("execute").add_argument(
+        "--dump",
+        nargs="*",
+        choices=["eval", "trace", "accepted", "rejected", "undecided", "failed", "title"],
+        dest="dump_entries",
         help=(
-            'display all entries in task with fields they contain, '
-            'use `--dump eval` to evaluate all lazy fields. Specify an entry '
-            'state/states to only dump matching entries.'
+            "display all entries in task with fields they contain, "
+            "use `--dump eval` to evaluate all lazy fields. Specify an entry "
+            "state/states to only dump matching entries."
         ),
     )

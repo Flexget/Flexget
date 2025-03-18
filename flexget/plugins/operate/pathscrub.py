@@ -13,7 +13,7 @@ class PathScrub:
       pathscrub: windows
     """
 
-    schema = {'type': 'string', 'enum': ['windows', 'linux', 'mac']}
+    schema = {"type": "string", "enum": ["windows", "linux", "mac"]}
 
     def on_task_start(self, task, config):
         # Change path scrub os mode
@@ -26,6 +26,6 @@ class PathScrub:
     on_task_abort = on_task_exit
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(PathScrub, 'pathscrub', api_ver=2)
+    plugin.register(PathScrub, "pathscrub", api_ver=2)

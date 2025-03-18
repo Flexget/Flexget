@@ -11,25 +11,25 @@ from flexget.utils.sqlalchemy_utils import table_add_column
 SCHEMA_VER = 3
 FAIL_LIMIT = 100
 
-logger = logger.bind(name='failed.db')
-Base = db_schema.versioned_base('failed', SCHEMA_VER)
+logger = logger.bind(name="failed.db")
+Base = db_schema.versioned_base("failed", SCHEMA_VER)
 
 
-@db_schema.upgrade('failed')
+@db_schema.upgrade("failed")
 def upgrade(ver, session):
     if ver is None or ver < 1:
         raise db_schema.UpgradeImpossible
     if ver == 1:
-        table_add_column('failed', 'reason', Unicode, session)
+        table_add_column("failed", "reason", Unicode, session)
         ver = 2
     if ver == 2:
-        table_add_column('failed', 'retry_time', DateTime, session)
+        table_add_column("failed", "retry_time", DateTime, session)
         ver = 3
     return ver
 
 
 class FailedEntry(Base):
-    __tablename__ = 'failed'
+    __tablename__ = "failed"
 
     id = Column(Integer, primary_key=True)
     title = Column(Unicode)
@@ -46,26 +46,26 @@ class FailedEntry(Base):
         self.tof = datetime.now()
 
     def __str__(self):
-        return f'<Failed(title={self.title})>'
+        return f"<Failed(title={self.title})>"
 
     def to_dict(self):
         return {
-            'id': self.id,
-            'title': self.title,
-            'url': self.url,
-            'added_at': self.tof,
-            'reason': self.reason,
-            'count': self.count,
-            'retry_time': self.retry_time,
+            "id": self.id,
+            "title": self.title,
+            "url": self.url,
+            "added_at": self.tof,
+            "reason": self.reason,
+            "count": self.count,
+            "retry_time": self.retry_time,
         }
 
 
 # create indexes, used when creating tables
-columns = Base.metadata.tables['failed'].c
-Index('failed_title_url', columns.title, columns.url, columns.count)
+columns = Base.metadata.tables["failed"].c
+Index("failed_title_url", columns.title, columns.url, columns.count)
 
 
-@event('manager.db_cleanup')
+@event("manager.db_cleanup")
 def db_cleanup(manager, session):
     # Delete everything older than 30 days
     session.query(FailedEntry).filter(

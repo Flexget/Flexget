@@ -5,21 +5,21 @@ from loguru import logger
 from flexget import plugin
 from flexget.event import event
 
-logger = logger.bind(name='proxy')
+logger = logger.bind(name="proxy")
 
-PROTOCOLS = ['http', 'https']
+PROTOCOLS = ["http", "https"]
 
 
 class Proxy:
     """Adds a proxy to the requests session."""
 
     schema = {
-        'oneOf': [
-            {'type': 'string', 'format': 'url'},
+        "oneOf": [
+            {"type": "string", "format": "url"},
             {
-                'type': 'object',
-                'properties': {prot: {'type': 'string', 'format': 'url'} for prot in PROTOCOLS},
-                'additionalProperties': False,
+                "type": "object",
+                "properties": {prot: {"type": "string", "format": "url"} for prot in PROTOCOLS},
+                "additionalProperties": False,
             },
         ]
     }
@@ -30,8 +30,8 @@ class Proxy:
             # If no configuration is provided, see if there are any proxy env variables
             proxies = {}
             for prot in PROTOCOLS:
-                if os.environ.get(prot + '_proxy'):
-                    proxies[prot] = os.environ[prot + '_proxy']
+                if os.environ.get(prot + "_proxy"):
+                    proxies[prot] = os.environ[prot + "_proxy"]
             if not proxies:
                 # If there were no environment variables set, do nothing
                 return
@@ -40,10 +40,10 @@ class Proxy:
         else:
             # Map all protocols to the configured proxy
             proxies = {prot: config for prot in PROTOCOLS}
-        logger.verbose('Setting proxy to {}', proxies)
+        logger.verbose("Setting proxy to {}", proxies)
         task.requests.proxies = proxies
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(Proxy, 'proxy', builtin=True, api_ver=2)
+    plugin.register(Proxy, "proxy", builtin=True, api_ver=2)

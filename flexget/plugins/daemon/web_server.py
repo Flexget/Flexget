@@ -9,33 +9,33 @@ from flexget.utils.tools import get_config_hash
 from flexget.webserver import get_secret, register_app, setup_server
 
 logger = logger.bind(name="web_server_daemon")
-config_hash = ''
+config_hash = ""
 web_server = None
 
 web_config_schema = {
-    'oneOf': [
-        {'type': 'boolean'},
-        {'type': 'integer', 'minimum': 0, 'maximum': 65536},
+    "oneOf": [
+        {"type": "boolean"},
+        {"type": "integer", "minimum": 0, "maximum": 65536},
         {
-            'type': 'object',
-            'properties': {
-                'bind': {'type': 'string', 'format': 'ipv4'},
-                'port': {'type': 'integer', 'minimum': 0, 'maximum': 65536},
-                'ssl_certificate': {'type': 'string'},
-                'ssl_private_key': {'type': 'string'},
-                'web_ui': {'type': 'boolean'},
-                'base_url': {'type': 'string'},
-                'run_v2': {
-                    'type': 'boolean',
-                    'deprecated': True,
-                    'deprecationMessage': 'v2 is registered by default if web_ui: true so `run_v2` is now redundant. To run v1 alongside, use the `run_v1`.',
+            "type": "object",
+            "properties": {
+                "bind": {"type": "string", "format": "ipv4"},
+                "port": {"type": "integer", "minimum": 0, "maximum": 65536},
+                "ssl_certificate": {"type": "string"},
+                "ssl_private_key": {"type": "string"},
+                "web_ui": {"type": "boolean"},
+                "base_url": {"type": "string"},
+                "run_v2": {
+                    "type": "boolean",
+                    "deprecated": True,
+                    "deprecationMessage": "v2 is registered by default if web_ui: true so `run_v2` is now redundant. To run v1 alongside, use the `run_v1`.",
                 },
-                'run_v1': {'type': 'boolean'},
+                "run_v1": {"type": "boolean"},
             },
-            'additionalProperties': False,
-            'dependentRequired': {
-                'ssl_certificate': ['ssl_private_key'],
-                'ssl_private_key': ['ssl_certificate'],
+            "additionalProperties": False,
+            "dependentRequired": {
+                "ssl_certificate": ["ssl_private_key"],
+                "ssl_private_key": ["ssl_certificate"],
             },
         },
     ]
@@ -48,30 +48,30 @@ def prepare_config(config):
     if isinstance(config, bool):
         config = {}
     if isinstance(config, int):
-        config = {'port': config}
-    config.setdefault('bind', '0.0.0.0')
-    config.setdefault('port', 5050)
-    config.setdefault('ssl_certificate', None)
-    config.setdefault('ssl_private_key', None)
-    config.setdefault('web_ui', True)
-    config.setdefault('base_url', '')
-    config.setdefault('run_v2', False)
-    config.setdefault('run_v1', False)
-    if config['base_url']:
-        if not config['base_url'].startswith('/'):
-            config['base_url'] = '/' + config['base_url']
-        config['base_url'] = config['base_url'].removesuffix('/')
+        config = {"port": config}
+    config.setdefault("bind", "0.0.0.0")
+    config.setdefault("port", 5050)
+    config.setdefault("ssl_certificate", None)
+    config.setdefault("ssl_private_key", None)
+    config.setdefault("web_ui", True)
+    config.setdefault("base_url", "")
+    config.setdefault("run_v2", False)
+    config.setdefault("run_v1", False)
+    if config["base_url"]:
+        if not config["base_url"].startswith("/"):
+            config["base_url"] = "/" + config["base_url"]
+        config["base_url"] = config["base_url"].removesuffix("/")
 
     return config
 
 
-@event('config.register')
+@event("config.register")
 def register_config():
-    register_config_key('web_server', web_config_schema)
+    register_config_key("web_server", web_config_schema)
 
 
-@event('manager.config_updated')
-@event('manager.daemon.started')
+@event("manager.config_updated")
+@event("manager.daemon.started")
 def register_web_server(manager):
     """Register Web Server and load API (always) and WebUi via config."""
     global web_server, config_hash
@@ -79,9 +79,9 @@ def register_web_server(manager):
     if not manager.is_daemon:
         return
 
-    config = manager.config.get('web_server')
+    config = manager.config.get("web_server")
     if get_config_hash(config) == config_hash:
-        logger.debug('web server config has\'nt changed')
+        logger.debug("web server config has'nt changed")
         return
 
     config_hash = get_config_hash(config)
@@ -94,27 +94,27 @@ def register_web_server(manager):
         return
 
     logger.info(
-        'Running web server at IP {}:{}', web_server_config['bind'], web_server_config['port']
+        "Running web server at IP {}:{}", web_server_config["bind"], web_server_config["port"]
     )
     # Register API
     api_app.secret_key = get_secret()
 
     logger.info("Initiating API")
-    register_app('/api', api_app, 'API')
+    register_app("/api", api_app, "API")
 
     # Register WebUI
-    if web_server_config.get('web_ui'):
-        if web_server_config.get('run_v1'):
-            logger.info('Registering WebUI v1')
+    if web_server_config.get("web_ui"):
+        if web_server_config.get("run_v1"):
+            logger.info("Registering WebUI v1")
             register_web_ui_v1(manager)
 
-        logger.info('Registering WebUI v2')
+        logger.info("Registering WebUI v2")
         register_web_ui_v2(web_server_config)
 
     web_server = setup_server(web_server_config)
 
 
-@event('manager.shutdown')
+@event("manager.shutdown")
 def stop_server(manager):
     """Set up and start/restart the webui."""
     global web_server

@@ -208,6 +208,3 @@ quote-annotations = true
 
 [tool.ruff.lint.isort]
 known-first-party = ['flexget']
-
-[tool.ruff.format]
-quote-style = "preserve"

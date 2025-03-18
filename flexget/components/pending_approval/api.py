@@ -16,52 +16,52 @@ from flexget.api.app import (
 
 from . import db
 
-pending_api = api.namespace('pending', description='View and manage pending entries')
+pending_api = api.namespace("pending", description="View and manage pending entries")
 
 
 class ObjectsContainer:
     pending_entry_object = {
-        'type': 'object',
-        'properties': {
-            'id': {'type': 'integer'},
-            'task_name': {'type': 'string'},
-            'title': {'type': 'string'},
-            'url': {'type': 'string'},
-            'approved': {'type': 'boolean'},
-            'added': {'type': 'string', 'format': 'date-time'},
+        "type": "object",
+        "properties": {
+            "id": {"type": "integer"},
+            "task_name": {"type": "string"},
+            "title": {"type": "string"},
+            "url": {"type": "string"},
+            "approved": {"type": "boolean"},
+            "added": {"type": "string", "format": "date-time"},
         },
     }
 
-    pending_entry_list = {'type': 'array', 'items': pending_entry_object}
+    pending_entry_list = {"type": "array", "items": pending_entry_object}
 
     operation_object = {
-        'type': 'object',
-        'properties': {'operation': {'type': 'string', 'enum': ['approve', 'reject']}},
-        'required': ['operation'],
-        'additionalProperties': False,
+        "type": "object",
+        "properties": {"operation": {"type": "string", "enum": ["approve", "reject"]}},
+        "required": ["operation"],
+        "additionalProperties": False,
     }
 
 
-pending_entry_schema = api.schema_model('pending.entry', ObjectsContainer.pending_entry_object)
+pending_entry_schema = api.schema_model("pending.entry", ObjectsContainer.pending_entry_object)
 pending_entry_list_schema = api.schema_model(
-    'pending.entry_list', ObjectsContainer.pending_entry_list
+    "pending.entry_list", ObjectsContainer.pending_entry_list
 )
-operation_schema = api.schema_model('pending.operation', ObjectsContainer.operation_object)
+operation_schema = api.schema_model("pending.operation", ObjectsContainer.operation_object)
 
 filter_parser = api.parser()
-filter_parser.add_argument('task_name', help='Filter by task name')
-filter_parser.add_argument('approved', type=inputs.boolean, help='Filter by approval status')
+filter_parser.add_argument("task_name", help="Filter by task name")
+filter_parser.add_argument("approved", type=inputs.boolean, help="Filter by approval status")
 
-sort_choices = ('added', 'task_name', 'title', 'url', 'approved')
+sort_choices = ("added", "task_name", "title", "url", "approved")
 pending_parser = api.pagination_parser(parser=filter_parser, sort_choices=sort_choices)
 
 just_task_parser = filter_parser.copy()
-just_task_parser.remove_argument('approved')
+just_task_parser.remove_argument("approved")
 
-description = 'Either \'approve\' or \'reject\''
+description = "Either 'approve' or 'reject'"
 
 
-@pending_api.route('/')
+@pending_api.route("/")
 class PendingEntriesAPI(APIResource):
     @etag
     @api.response(NotFoundError)
@@ -72,19 +72,19 @@ class PendingEntriesAPI(APIResource):
         args = pending_parser.parse_args()
 
         # Filter params
-        task_name = args.get('task_name')
-        approved = args.get('approved')
+        task_name = args.get("task_name")
+        approved = args.get("approved")
 
         # Pagination and sorting params
-        page = args['page']
-        per_page = args['per_page']
-        sort_by = args['sort_by']
-        sort_order = args['order']
+        page = args["page"]
+        per_page = args["per_page"]
+        sort_by = args["sort_by"]
+        sort_order = args["order"]
 
         # Handle max size limit
         per_page = min(per_page, 100)
 
-        descending = sort_order == 'desc'
+        descending = sort_order == "desc"
 
         # Handle max size limit
         per_page = min(per_page, 100)
@@ -93,13 +93,13 @@ class PendingEntriesAPI(APIResource):
         stop = start + per_page
 
         kwargs = {
-            'task_name': task_name,
-            'approved': approved,
-            'start': start,
-            'stop': stop,
-            'descending': descending,
-            'sort_by': sort_by,
-            'session': session,
+            "task_name": task_name,
+            "approved": approved,
+            "start": start,
+            "stop": stop,
+            "descending": descending,
+            "sort_by": sort_by,
+            "session": session,
         }
 
         total_items = session.query(db.PendingEntry).count()
@@ -112,7 +112,7 @@ class PendingEntriesAPI(APIResource):
         total_pages = int(ceil(total_items / float(per_page)))
 
         if page > total_pages:
-            raise NotFoundError(f'page {page} does not exist')
+            raise NotFoundError(f"page {page} does not exist")
 
         # Actual results in page
         actual_size = min(per_page, len(pending_entries))
@@ -130,15 +130,15 @@ class PendingEntriesAPI(APIResource):
 
     @api.validate(operation_schema, description=description)
     @api.response(201, model=pending_entry_list_schema)
-    @api.response(204, 'No entries modified')
+    @api.response(204, "No entries modified")
     @api.doc(expect=[just_task_parser])
     def put(self, session=None):
         """Approve/Reject the status of pending entries."""
         args = filter_parser.parse_args()
 
         data = request.json
-        approved = data['operation'] == 'approve'
-        task_name = args.get('task_name')
+        approved = data["operation"] == "approve"
+        task_name = args.get("task_name")
 
         pending_entries = []
         for entry in db.list_pending_entries(session, task_name=task_name):
@@ -157,8 +157,8 @@ class PendingEntriesAPI(APIResource):
         args = filter_parser.parse_args()
 
         # Filter params
-        task_name = args.get('task_name')
-        approved = args.get('approved')
+        task_name = args.get("task_name")
+        approved = args.get("approved")
 
         deleted = session.query(db.PendingEntry)
         if task_name:
@@ -167,11 +167,11 @@ class PendingEntriesAPI(APIResource):
             deleted = deleted.filter(db.PendingEntry.approved == approved)
         deleted = deleted.delete()
 
-        return success_response(f'deleted {deleted} pending entries')
+        return success_response(f"deleted {deleted} pending entries")
 
 
-@pending_api.route('/<int:entry_id>/')
-@api.doc(params={'entry_id': 'ID of the entry'})
+@pending_api.route("/<int:entry_id>/")
+@api.doc(params={"entry_id": "ID of the entry"})
 @api.response(NotFoundError)
 class PendingEntryAPI(APIResource):
     @etag
@@ -181,7 +181,7 @@ class PendingEntryAPI(APIResource):
         try:
             entry = db.get_entry_by_id(session, entry_id)
         except NoResultFound:
-            raise NotFoundError(f'No pending entry with ID {entry_id}')
+            raise NotFoundError(f"No pending entry with ID {entry_id}")
         return jsonify(entry.to_dict())
 
     @api.response(201, model=pending_entry_schema)
@@ -192,13 +192,13 @@ class PendingEntryAPI(APIResource):
         try:
             entry = db.get_entry_by_id(session, entry_id)
         except NoResultFound:
-            raise NotFoundError(f'No pending entry with ID {entry_id}')
+            raise NotFoundError(f"No pending entry with ID {entry_id}")
 
         data = request.json
-        approved = data['operation'] == 'approve'
-        operation_text = 'approved' if approved else 'pending'
+        approved = data["operation"] == "approve"
+        operation_text = "approved" if approved else "pending"
         if entry.approved is approved:
-            raise BadRequest(f'Entry with id {entry_id} is already {operation_text}')
+            raise BadRequest(f"Entry with id {entry_id} is already {operation_text}")
 
         entry.approved = approved
         session.commit()
@@ -212,6 +212,6 @@ class PendingEntryAPI(APIResource):
         try:
             entry = db.get_entry_by_id(session, entry_id)
         except NoResultFound:
-            raise NotFoundError(f'No pending entry with ID {entry_id}')
+            raise NotFoundError(f"No pending entry with ID {entry_id}")
         session.delete(entry)
-        return success_response(f'successfully deleted entry with ID {entry_id}')
+        return success_response(f"successfully deleted entry with ID {entry_id}")

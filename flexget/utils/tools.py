@@ -34,16 +34,16 @@ if TYPE_CHECKING:
     from flexget.entry import Entry
     from flexget.task import Task
 
-logger = logger.bind(name='utils')
+logger = logger.bind(name="utils")
 
 
 def str_to_boolean(string: str) -> bool:
-    return string.lower() in ['true', '1', 't', 'y', 'yes']
+    return string.lower() in ["true", "1", "t", "y", "yes"]
 
 
 def str_to_int(string: str) -> Optional[int]:
     try:
-        return int(string.replace(',', ''))
+        return int(string.replace(",", ""))
     except ValueError:
         return None
 
@@ -61,15 +61,15 @@ def strip_html(text: str) -> str:
     from bs4 import BeautifulSoup
 
     try:
-        text = ' '.join(BeautifulSoup(text).find_all(text=True))
-        return ' '.join(text.split())
+        text = " ".join(BeautifulSoup(text).find_all(text=True))
+        return " ".join(text.split())
     except Exception:
         return text
 
 
 # This pattern matches a character entity reference (a decimal numeric
 # references, a hexadecimal numeric reference, or a named reference).
-charrefpat = re.compile(r'&(#(\d+|x[\da-fA-F]+)|[\w.:-]+);?')
+charrefpat = re.compile(r"&(#(\d+|x[\da-fA-F]+)|[\w.:-]+);?")
 
 
 def _htmldecode(text: str) -> str:
@@ -84,9 +84,9 @@ def _htmldecode(text: str) -> str:
 
     def entitydecode(match, uchr=uchr):
         entity = match.group(1)
-        if entity.startswith('#x'):
+        if entity.startswith("#x"):
             return uchr(int(entity[2:], 16))
-        if entity.startswith('#'):
+        if entity.startswith("#"):
             return uchr(int(entity[1:]))
         if entity in name2codepoint:
             return uchr(name2codepoint[entity])
@@ -103,9 +103,9 @@ def decode_html(value: str) -> str:
     return _htmldecode(value)
 
 
-def encode_html(unicode_data: str, encoding: str = 'ascii') -> bytes:
+def encode_html(unicode_data: str, encoding: str = "ascii") -> bytes:
     """Encode unicode_data for use as XML or HTML, with characters outside of the encoding converted to XML numeric character references."""
-    return unicode_data.encode(encoding, 'xmlcharrefreplace')
+    return unicode_data.encode(encoding, "xmlcharrefreplace")
 
 
 def merge_dict_from_to(d1: dict, d2: dict) -> None:
@@ -120,7 +120,7 @@ def merge_dict_from_to(d1: dict, d2: dict) -> None:
                 elif isinstance(v, (str, bool, int, float, type(None))):
                     pass
                 else:
-                    raise TypeError(f'Unknown type: {type(v)} value: {v!r} in dictionary')
+                    raise TypeError(f"Unknown type: {type(v)} value: {v!r} in dictionary")
             elif isinstance(v, (str, bool, int, float, list, type(None))) and isinstance(
                 d2[k], (str, bool, int, float, list, type(None))
             ):
@@ -128,7 +128,7 @@ def merge_dict_from_to(d1: dict, d2: dict) -> None:
                 pass
             else:
                 raise MergeException(
-                    f'Merging key {k} failed, conflicting datatypes {type(v).__name__!r} vs. {type(d2[k]).__name__!r}.'
+                    f"Merging key {k} failed, conflicting datatypes {type(v).__name__!r} vs. {type(d2[k]).__name__!r}."
                 )
         else:
             d2[k] = copy.deepcopy(v)
@@ -147,8 +147,8 @@ class ReList(list):
 
     def __init__(self, *args, **kwargs) -> None:
         """Compile with optional :flags: keyword argument with regexp flags."""
-        if 'flags' in kwargs:
-            self.flags = kwargs.pop('flags')
+        if "flags" in kwargs:
+            self.flags = kwargs.pop("flags")
         list.__init__(self, *args, **kwargs)
 
     def __getitem__(self, k) -> Pattern:
@@ -165,22 +165,22 @@ class ReList(list):
 
 
 # Determine the encoding for io
-io_encoding = ''
-if hasattr(sys.stdout, 'encoding'):
+io_encoding = ""
+if hasattr(sys.stdout, "encoding"):
     io_encoding = sys.stdout.encoding
 if not io_encoding:
     with contextlib.suppress(Exception):
         io_encoding = locale.getpreferredencoding()
 if not io_encoding:
     # Default to utf8 if nothing can be determined
-    io_encoding = 'utf8'
+    io_encoding = "utf8"
 else:
     # Normalize the encoding
     io_encoding = io_encoding.lower()
-    if io_encoding == 'cp65001':
-        io_encoding = 'utf8'
-    elif io_encoding in ['us-ascii', '646', 'ansi_x3.4-1968']:
-        io_encoding = 'ascii'
+    if io_encoding == "cp65001":
+        io_encoding = "utf8"
+    elif io_encoding in ["us-ascii", "646", "ansi_x3.4-1968"]:
+        io_encoding = "ascii"
 
 
 def parse_timedelta(value: Union[timedelta, str, None]) -> timedelta:
@@ -191,10 +191,10 @@ def parse_timedelta(value: Union[timedelta, str, None]) -> timedelta:
     if not value:
         # If no time is given, default to 0
         return timedelta()
-    amount, unit = value.lower().split(' ')
+    amount, unit = value.lower().split(" ")
     # Make sure unit name is plural.
-    if not unit.endswith('s'):
-        unit += 's'
+    if not unit.endswith("s"):
+        unit += "s"
     params = {unit: float(amount)}
     try:
         return timedelta(**params)
@@ -226,9 +226,9 @@ _bin_ops = {
 class TimedDict(MutableMapping):
     """Acts like a normal dict, but keys will only remain in the dictionary for a specified time span."""
 
-    _instances: dict[int, 'TimedDict'] = weakref.WeakValueDictionary()
+    _instances: dict[int, "TimedDict"] = weakref.WeakValueDictionary()
 
-    def __init__(self, cache_time: Union[timedelta, str] = '5 minutes'):
+    def __init__(self, cache_time: Union[timedelta, str] = "5 minutes"):
         self.cache_time = parse_timedelta(cache_time)
         self._store: dict = {}
         self._last_prune = datetime.now()
@@ -246,7 +246,7 @@ class TimedDict(MutableMapping):
         # Prune data and raise KeyError if expired
         if add_time < datetime.now() - self.cache_time:
             del self._store[key]
-            raise KeyError(key, 'cache time expired')
+            raise KeyError(key, "cache time expired")
         return value
 
     def __setitem__(self, key, value):
@@ -266,7 +266,7 @@ class TimedDict(MutableMapping):
         return len(list(self.__iter__()))
 
     def __repr__(self):
-        return f'{self.__class__.__name__}({dict(list(zip(self._store, (v[1] for v in list(self._store.values())))))!r})'
+        return f"{self.__class__.__name__}({dict(list(zip(self._store, (v[1] for v in list(self._store.values())))))!r})"
 
     @classmethod
     def clear_all(cls):
@@ -296,11 +296,11 @@ class TitleYear(NamedTuple):
 def split_title_year(title: str) -> TitleYear:
     """Split title containing a year into a title, year pair."""
     if not title:
-        return TitleYear('', None)
-    if not re.search(r'\d{4}', title):
+        return TitleYear("", None)
+    if not re.search(r"\d{4}", title):
         return TitleYear(title, None)
     # We only recognize years from the 2nd and 3rd millennium, FlexGetters from the year 3000 be damned!
-    match = re.search(r'(.*?)\(?([12]\d{3})?\)?$', title)
+    match = re.search(r"(.*?)\(?([12]\d{3})?\)?$", title)
 
     if not match:
         return TitleYear(title, None)
@@ -321,8 +321,8 @@ def split_title_year(title: str) -> TitleYear:
 def get_latest_flexget_version_number() -> Optional[str]:
     """Return latest Flexget version from https://pypi.python.org/pypi/FlexGet/json."""
     try:
-        data = requests.get('https://pypi.python.org/pypi/FlexGet/json').json()
-        return data.get('info', {}).get('version')
+        data = requests.get("https://pypi.python.org/pypi/FlexGet/json").json()
+        return data.get("info", {}).get("version")
     except requests.RequestException:
         return None
 
@@ -344,24 +344,24 @@ def parse_filesize(
 
     :returns: an int with the data size in bytes
     """
-    prefix_order = {'': 0, 'k': 1, 'm': 2, 'g': 3, 't': 4, 'p': 5}
+    prefix_order = {"": 0, "k": 1, "m": 2, "g": 3, "t": 4, "p": 5}
 
-    match_re = match_re or r'\b(\d+(?:[.,\s]\d+)*)\s*((?:[ptgmk]i?)?b)\b'
+    match_re = match_re or r"\b(\d+(?:[.,\s]\d+)*)\s*((?:[ptgmk]i?)?b)\b"
     parsed_size = re.search(match_re, text_size.lower())
     if not parsed_size:
-        raise ValueError(f'{text_size} does not look like a file size')
+        raise ValueError(f"{text_size} does not look like a file size")
     amount_str = parsed_size.group(1)
     unit = parsed_size.group(2)
-    if not unit.endswith('b'):
-        raise ValueError(f'{text_size} does not look like a file size')
-    unit = unit.rstrip('b')
-    if unit.endswith('i'):
+    if not unit.endswith("b"):
+        raise ValueError(f"{text_size} does not look like a file size")
+    unit = unit.rstrip("b")
+    if unit.endswith("i"):
         si = False
-        unit = unit.rstrip('i')
+        unit = unit.rstrip("i")
     if unit not in prefix_order:
-        raise ValueError(f'{text_size} does not look like a file size')
+        raise ValueError(f"{text_size} does not look like a file size")
     order = prefix_order[unit]
-    amount = float(amount_str.replace(',', '').replace(' ', ''))
+    amount = float(amount_str.replace(",", "").replace(" ", ""))
     base = 1000 if si else 1024
     return int(amount * (base**order))
 
@@ -374,22 +374,22 @@ def format_filesize(num_bytes: float, si: bool = False, unit: Optional[str] = No
         an appropriate unit will be picked automatically based on size.
     """
     if unit:
-        all_units = [f'{p}b' for p in 'kmgtp'] + [f'{p}ib' for p in 'kmgtp'] + ['b']
+        all_units = [f"{p}b" for p in "kmgtp"] + [f"{p}ib" for p in "kmgtp"] + ["b"]
         if unit.lower() not in all_units:
-            raise ValueError(f'{unit} is not a recognized filesize unit')
-        si = 'i' not in unit.lower()
+            raise ValueError(f"{unit} is not a recognized filesize unit")
+        si = "i" not in unit.lower()
     base = 1000 if si else 1024
     amount = float(num_bytes)
     unit_prefixes = [
         # For some reason the convention is to use lowercase k for si kilobytes
-        'k' if si else 'K',
-        'M',
-        'G',
-        'T',
-        'P',
+        "k" if si else "K",
+        "M",
+        "G",
+        "T",
+        "P",
     ]
 
-    out_unit = 'B'
+    out_unit = "B"
     round_digits = 2
     for p in unit_prefixes:
         if not unit and amount < base:
@@ -397,11 +397,11 @@ def format_filesize(num_bytes: float, si: bool = False, unit: Optional[str] = No
         if unit and out_unit.lower() == unit.lower():
             break
         amount /= base
-        out_unit = f'{p}{"" if si else "i"}B'
+        out_unit = f"{p}{'' if si else 'i'}B"
         # If user specified a unit that's too big, allow a few more fractional digits
         if amount < 1:
             round_digits += 1
-    return f'{round(amount, round_digits)} {out_unit}'
+    return f"{round(amount, round_digits)} {out_unit}"
 
 
 def get_config_hash(config: Any) -> str:
@@ -411,8 +411,8 @@ def get_config_hash(config: Any) -> str:
     """
     if isinstance(config, (dict, list)):
         # this does in fact support nested dicts, they're sorted too!
-        return hashlib.md5(pformat(config).encode('utf-8')).hexdigest()
-    return hashlib.md5(str(config).encode('utf-8')).hexdigest()
+        return hashlib.md5(pformat(config).encode("utf-8")).hexdigest()
+    return hashlib.md5(str(config).encode("utf-8")).hexdigest()
 
 
 def get_config_as_array(config: dict, key: str) -> list:
@@ -438,34 +438,34 @@ def parse_episode_identifier(
     :raises ValueError: If ep_id does not match any valid types
     """
     error = None
-    identified_by = ''
-    entity_type = 'episode'
+    identified_by = ""
+    entity_type = "episode"
     if isinstance(ep_id, int):
         if ep_id <= 0:
-            error = 'sequence type episode must be higher than 0'
-        identified_by = 'sequence'
-    elif re.match(r'(?i)^S\d{1,4}E\d{1,3}$', ep_id):
-        identified_by = 'ep'
-    elif re.match(r'(?i)^S\d{1,4}$', ep_id) and identify_season:
-        identified_by = 'ep'
-        entity_type = 'season'
-    elif re.match(r'\d{4}-\d{2}-\d{2}', ep_id):
-        identified_by = 'date'
+            error = "sequence type episode must be higher than 0"
+        identified_by = "sequence"
+    elif re.match(r"(?i)^S\d{1,4}E\d{1,3}$", ep_id):
+        identified_by = "ep"
+    elif re.match(r"(?i)^S\d{1,4}$", ep_id) and identify_season:
+        identified_by = "ep"
+        entity_type = "season"
+    elif re.match(r"\d{4}-\d{2}-\d{2}", ep_id):
+        identified_by = "date"
     else:
         # Check if a sequence identifier was passed as a string
         try:
             ep_id = int(ep_id)
             if ep_id <= 0:
-                error = 'sequence type episode must be higher than 0'
-            identified_by = 'sequence'
+                error = "sequence type episode must be higher than 0"
+            identified_by = "sequence"
         except ValueError:
-            error = f'`{ep_id}` is not a valid episode identifier.'
+            error = f"`{ep_id}` is not a valid episode identifier."
     if error:
         raise ValueError(error)
     return identified_by, entity_type
 
 
-def group_entries(entries: Iterable['Entry'], identifier: str) -> dict[str, list['Entry']]:
+def group_entries(entries: Iterable["Entry"], identifier: str) -> dict[str, list["Entry"]]:
     from flexget.utils.template import RenderError
 
     grouped_entries = defaultdict(list)
@@ -483,7 +483,7 @@ def group_entries(entries: Iterable['Entry'], identifier: str) -> dict[str, list
     return grouped_entries
 
 
-def aggregate_inputs(task: 'Task', inputs: list[dict]) -> list['Entry']:
+def aggregate_inputs(task: "Task", inputs: list[dict]) -> list["Entry"]:
     from flexget import plugin
 
     entries = []
@@ -493,41 +493,41 @@ def aggregate_inputs(task: 'Task', inputs: list[dict]) -> list['Entry']:
     for item in inputs:
         for input_name, input_config in item.items():
             input = plugin.get_plugin_by_name(input_name)
-            method = input.phase_handlers['input']
+            method = input.phase_handlers["input"]
             try:
                 result = method(task, input_config)
             except plugin.PluginError as e:
-                logger.warning('Error during input plugin {}: {}', input_name, e)
+                logger.warning("Error during input plugin {}: {}", input_name, e)
                 continue
 
             if not result:
-                logger.warning('Input {} did not return anything', input_name)
+                logger.warning("Input {} did not return anything", input_name)
                 continue
 
             for entry in result:
-                urls = ([entry['url']] if entry.get('url') else []) + entry.get('urls', [])
+                urls = ([entry["url"]] if entry.get("url") else []) + entry.get("urls", [])
 
                 if any(url in entry_urls for url in urls):
-                    logger.debug('URL for `{}` already in entry list, skipping.', entry['title'])
+                    logger.debug("URL for `{}` already in entry list, skipping.", entry["title"])
                     continue
 
-                if entry['title'] in entry_titles:
+                if entry["title"] in entry_titles:
                     logger.debug(
-                        'Ignored duplicate title `{}`', entry['title']
+                        "Ignored duplicate title `{}`", entry["title"]
                     )  # TODO: should combine?
                     continue
 
-                if entry.get('location') and entry['location'] in entry_locations:
+                if entry.get("location") and entry["location"] in entry_locations:
                     logger.debug(
-                        'Ignored duplicate location `{}`', entry['location']
+                        "Ignored duplicate location `{}`", entry["location"]
                     )  # TODO: should combine?
                     continue
 
                 entries.append(entry)
-                entry_titles.add(entry['title'])
+                entry_titles.add(entry["title"])
                 entry_urls.update(urls)
-                if entry.get('location'):
-                    entry_locations.add(entry['location'])
+                if entry.get("location"):
+                    entry_locations.add(entry["location"])
 
     return entries
 

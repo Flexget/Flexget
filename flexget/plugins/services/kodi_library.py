@@ -6,73 +6,73 @@ from flexget import plugin
 from flexget.event import event
 from flexget.utils.requests import RequestException
 
-logger = logger.bind(name='kodi_library')
+logger = logger.bind(name="kodi_library")
 
-JSON_URI = '/jsonrpc'
+JSON_URI = "/jsonrpc"
 
 
 class KodiLibrary:
     schema = {
-        'type': 'object',
-        'properties': {
-            'action': {'type': 'string', 'enum': ['clean', 'scan']},
-            'category': {'type': 'string', 'enum': ['audio', 'video']},
-            'url': {'type': 'string', 'format': 'url'},
-            'port': {'type': 'integer', 'default': 8080},
-            'username': {'type': 'string'},
-            'password': {'type': 'string'},
-            'only_on_accepted': {'type': 'boolean', 'default': True},
+        "type": "object",
+        "properties": {
+            "action": {"type": "string", "enum": ["clean", "scan"]},
+            "category": {"type": "string", "enum": ["audio", "video"]},
+            "url": {"type": "string", "format": "url"},
+            "port": {"type": "integer", "default": 8080},
+            "username": {"type": "string"},
+            "password": {"type": "string"},
+            "only_on_accepted": {"type": "boolean", "default": True},
         },
-        'required': ['url', 'action', 'category'],
-        'additionalProperties': False,
+        "required": ["url", "action", "category"],
+        "additionalProperties": False,
     }
 
     @plugin.priority(plugin.PRIORITY_LAST)
     def on_task_exit(self, task, config):
-        if task.accepted or not config['only_on_accepted']:
+        if task.accepted or not config["only_on_accepted"]:
             # make the url without trailing slash
-            base_url = config['url'].removesuffix('/')
-            base_url += ':{}'.format(config['port'])
+            base_url = config["url"].removesuffix("/")
+            base_url += ":{}".format(config["port"])
 
             url = base_url + JSON_URI
             # create the params
             params = {
                 "id": 1,
                 "jsonrpc": "2.0",
-                'method': '{category}Library.{action}'.format(
-                    category=config['category'].title(), action=config['action'].title()
+                "method": "{category}Library.{action}".format(
+                    category=config["category"].title(), action=config["action"].title()
                 ),
             }
-            logger.debug('Sending request params {}', params)
+            logger.debug("Sending request params {}", params)
 
             try:
                 r = task.requests.post(
-                    url, json=params, auth=(config.get('username'), config.get('password'))
+                    url, json=params, auth=(config.get("username"), config.get("password"))
                 ).json()
-                if r.get('result') == 'OK':
+                if r.get("result") == "OK":
                     logger.info(
-                        'Successfully sent a {} request for the {} library',
-                        config['action'],
-                        config['category'],
+                        "Successfully sent a {} request for the {} library",
+                        config["action"],
+                        config["category"],
                     )
-                elif r.get('error'):
+                elif r.get("error"):
                     logger.error(
-                        'Kodi JSONRPC failed. Error {}: {}',
-                        r['error']['code'],
-                        r['error']['message'],
+                        "Kodi JSONRPC failed. Error {}: {}",
+                        r["error"]["code"],
+                        r["error"]["message"],
                     )
                 else:
                     # this should never happen as Kodi say they follow the JSON-RPC 2.0 spec
-                    logger.debug('Received error response {}', json.dumps(r))
+                    logger.debug("Received error response {}", json.dumps(r))
                     logger.error(
-                        'Kodi JSONRPC failed with unrecognized message: {}', json.dumps(r)
+                        "Kodi JSONRPC failed with unrecognized message: {}", json.dumps(r)
                     )
             except RequestException as e:
-                raise plugin.PluginError(f'Failed to send request to Kodi: {e.args[0]}')
+                raise plugin.PluginError(f"Failed to send request to Kodi: {e.args[0]}")
         else:
-            logger.info('No entries were accepted. No request is sent.')
+            logger.info("No entries were accepted. No request is sent.")
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(KodiLibrary, 'kodi_library', api_ver=2)
+    plugin.register(KodiLibrary, "kodi_library", api_ver=2)

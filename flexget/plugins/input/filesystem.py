@@ -10,7 +10,7 @@ from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
 
-logger = logger.bind(name='filesystem')
+logger = logger.bind(name="filesystem")
 
 
 class Filesystem:
@@ -60,27 +60,27 @@ class Filesystem:
 
     """
 
-    retrieval_options = ['files', 'dirs', 'symlinks']
-    paths = one_or_more({'type': 'string', 'format': 'path'}, unique_items=True)
+    retrieval_options = ["files", "dirs", "symlinks"]
+    paths = one_or_more({"type": "string", "format": "path"}, unique_items=True)
 
     schema = {
-        'oneOf': [
+        "oneOf": [
             paths,
             {
-                'type': 'object',
-                'properties': {
-                    'path': paths,
-                    'mask': {'type': 'string'},
-                    'regexp': {'type': 'string', 'format': 'regex'},
-                    'recursive': {
-                        'oneOf': [{'type': 'integer', 'minimum': 2}, {'type': 'boolean'}]
+                "type": "object",
+                "properties": {
+                    "path": paths,
+                    "mask": {"type": "string"},
+                    "regexp": {"type": "string", "format": "regex"},
+                    "recursive": {
+                        "oneOf": [{"type": "integer", "minimum": 2}, {"type": "boolean"}]
                     },
-                    'retrieve': one_or_more(
-                        {'type': 'string', 'enum': retrieval_options}, unique_items=True
+                    "retrieve": one_or_more(
+                        {"type": "string", "enum": retrieval_options}, unique_items=True
                     ),
                 },
-                'required': ['path'],
-                'additionalProperties': False,
+                "required": ["path"],
+                "additionalProperties": False,
             },
         ]
     }
@@ -90,18 +90,18 @@ class Filesystem:
 
         # Converts config to a dict with a list of paths
         if not isinstance(config, dict):
-            config = {'path': config}
-        if not isinstance(config['path'], list):
-            config['path'] = [config['path']]
+            config = {"path": config}
+        if not isinstance(config["path"], list):
+            config["path"] = [config["path"]]
 
-        config.setdefault('recursive', False)
+        config.setdefault("recursive", False)
         # If mask was specified, turn it in to a regexp
-        if config.get('mask'):
-            config['regexp'] = translate(config['mask'])
+        if config.get("mask"):
+            config["regexp"] = translate(config["mask"])
         # If no mask or regexp specified, accept all files
-        config.setdefault('regexp', '.')
+        config.setdefault("regexp", ".")
         # Sets the default retrieval option to files
-        config.setdefault('retrieve', self.retrieval_options)
+        config.setdefault("retrieve", self.retrieval_options)
 
         return config
 
@@ -109,44 +109,44 @@ class Filesystem:
         """Create a single entry using a filepath and a type (file/dir)."""
         filepath = filepath.absolute()
         entry = Entry()
-        entry['location'] = str(filepath)
-        entry['url'] = filepath.absolute().as_uri()
-        entry['filename'] = filepath.name
+        entry["location"] = str(filepath)
+        entry["url"] = filepath.absolute().as_uri()
+        entry["filename"] = filepath.name
         if filepath.is_file():
-            entry['title'] = filepath.stem
+            entry["title"] = filepath.stem
         else:
-            entry['title'] = filepath.name
+            entry["title"] = filepath.name
         file_stat = filepath.stat()
         try:
-            entry['timestamp'] = pendulum.from_timestamp(file_stat.st_mtime, tz='local')
+            entry["timestamp"] = pendulum.from_timestamp(file_stat.st_mtime, tz="local")
         except Exception as e:
-            logger.warning('Error setting timestamp for {}: {}', filepath, e)
-            entry['timestamp'] = None
-        entry['accessed'] = pendulum.from_timestamp(file_stat.st_atime, tz='local')
-        entry['modified'] = pendulum.from_timestamp(file_stat.st_mtime, tz='local')
-        entry['created'] = pendulum.from_timestamp(file_stat.st_ctime, tz='local')
+            logger.warning("Error setting timestamp for {}: {}", filepath, e)
+            entry["timestamp"] = None
+        entry["accessed"] = pendulum.from_timestamp(file_stat.st_atime, tz="local")
+        entry["modified"] = pendulum.from_timestamp(file_stat.st_mtime, tz="local")
+        entry["created"] = pendulum.from_timestamp(file_stat.st_ctime, tz="local")
         if entry.isvalid():
             if test_mode:
                 logger.info("Test mode. Entry includes:")
-                logger.info(' Title: {}', entry['title'])
-                logger.info(' URL: {}', entry['url'])
-                logger.info(' Filename: {}', entry['filename'])
-                logger.info(' Location: {}', entry['location'])
-                logger.info(' Timestamp: {}', entry['timestamp'])
+                logger.info(" Title: {}", entry["title"])
+                logger.info(" URL: {}", entry["url"])
+                logger.info(" Filename: {}", entry["filename"])
+                logger.info(" Location: {}", entry["location"])
+                logger.info(" Timestamp: {}", entry["timestamp"])
             return entry
-        logger.error('Non valid entry created: {} ', entry)
+        logger.error("Non valid entry created: {} ", entry)
         return None
 
     def get_max_depth(self, recursion, base_depth):
         if recursion is False:
             return base_depth + 1
         if recursion is True:
-            return float('inf')
+            return float("inf")
         return base_depth + recursion
 
     @staticmethod
     def get_folder_objects(folder: Path, recursion: bool):
-        return folder.rglob('*') if recursion else folder.iterdir()
+        return folder.rglob("*") if recursion else folder.iterdir()
 
     def get_entries_from_path(
         self, path_list, match, recursion, test_mode, get_files, get_dirs, get_symlinks
@@ -154,22 +154,22 @@ class Filesystem:
         entries = []
 
         for folder in path_list:
-            logger.verbose('Scanning folder {}. Recursion is set to {}.', folder, recursion)
+            logger.verbose("Scanning folder {}. Recursion is set to {}.", folder, recursion)
             folder = Path(folder).expanduser()
             if not folder.exists():
-                logger.error('{} does not exist (anymore.)', folder)
+                logger.error("{} does not exist (anymore.)", folder)
                 continue
-            logger.debug('Scanning {}', folder)
+            logger.debug("Scanning {}", folder)
             base_depth = len(folder.parts)
             max_depth = self.get_max_depth(recursion, base_depth)
             folder_objects = self.get_folder_objects(folder, recursion)
             for path_object in folder_objects:
-                logger.debug('Checking if {} qualifies to be added as an entry.', path_object)
+                logger.debug("Checking if {} qualifies to be added as an entry.", path_object)
                 try:
                     path_object.exists()
                 except UnicodeError:
                     logger.error(
-                        'File {} not decodable with filesystem encoding: {}',
+                        "File {} not decodable with filesystem encoding: {}",
                         path_object,
                         sys.getfilesystemencoding(),
                     )
@@ -196,20 +196,20 @@ class Filesystem:
     def on_task_input(self, task, config):
         config = self.prepare_config(config)
 
-        path_list = config['path']
+        path_list = config["path"]
         test_mode = task.options.test
-        match = re.compile(config['regexp'], re.IGNORECASE).match
-        recursive = config['recursive']
-        get_files = 'files' in config['retrieve']
-        get_dirs = 'dirs' in config['retrieve']
-        get_symlinks = 'symlinks' in config['retrieve']
+        match = re.compile(config["regexp"], re.IGNORECASE).match
+        recursive = config["recursive"]
+        get_files = "files" in config["retrieve"]
+        get_dirs = "dirs" in config["retrieve"]
+        get_symlinks = "symlinks" in config["retrieve"]
 
-        logger.verbose('Starting to scan folders.')
+        logger.verbose("Starting to scan folders.")
         return self.get_entries_from_path(
             path_list, match, recursive, test_mode, get_files, get_dirs, get_symlinks
         )
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(Filesystem, 'filesystem', api_ver=2)
+    plugin.register(Filesystem, "filesystem", api_ver=2)

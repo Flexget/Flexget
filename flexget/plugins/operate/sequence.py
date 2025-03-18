@@ -5,7 +5,7 @@ from loguru import logger
 from flexget import plugin
 from flexget.event import event
 
-logger = logger.bind(name='sequence')
+logger = logger.bind(name="sequence")
 
 
 class PluginSequence:
@@ -18,12 +18,12 @@ class PluginSequence:
 
     """
 
-    schema = {'type': 'array', 'items': {'$ref': '/schema/plugins'}}
+    schema = {"type": "array", "items": {"$ref": "/schema/plugins"}}
 
     def __getattr__(self, item):
         """Return a function for all on_task_* events, that runs all the configured plugins."""
         for phase, method in plugin.phase_methods.items():
-            if item == method and phase not in ['accept', 'reject', 'fail']:
+            if item == method and phase not in ["accept", "reject", "fail"]:
                 break
         else:
             raise AttributeError(item)
@@ -36,15 +36,15 @@ class PluginSequence:
                 for plugin_name, plugin_config in item.items():
                     if phase in plugin.get_phases_by_plugin(plugin_name):
                         method = plugin.get_plugin_by_name(plugin_name).phase_handlers[phase]
-                        logger.debug('Running plugin {}', plugin_name)
+                        logger.debug("Running plugin {}", plugin_name)
                         result = method(task, plugin_config)
-                        if phase == 'input' and result:
+                        if phase == "input" and result:
                             results.append(result)
             return itertools.chain(*results)
 
         return handle_phase
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(PluginSequence, 'sequence', api_ver=2, debug=True)
+    plugin.register(PluginSequence, "sequence", api_ver=2, debug=True)

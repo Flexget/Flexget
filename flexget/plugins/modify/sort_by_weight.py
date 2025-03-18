@@ -7,11 +7,11 @@ from flexget.event import event
 from flexget.utils.qualities import Quality
 from flexget.utils.tools import parse_timedelta
 
-__author__ = 'andy'
+__author__ = "andy"
 
-logger = logger.bind(name='sort_by_weight')
+logger = logger.bind(name="sort_by_weight")
 
-ENTRY_WEIGHT_FIELD_NAME = 'sort_by_weight_sum'
+ENTRY_WEIGHT_FIELD_NAME = "sort_by_weight_sum"
 DEFAULT_STRIDE = (
     10  # its a design choice to allow 'similar' values to-be grouped under the same slot/weight
 )
@@ -74,44 +74,44 @@ class PluginSortByWeight:
     """
 
     schema = {
-        'type': 'array',
-        'items': {
-            'type': 'object',
-            'properties': {
-                'field': {'type': 'string'},
-                'weight': {'type': 'integer', 'minimum': 5},
-                'inverse': {'type': 'boolean', 'default': False},
-                'upper_limit': {
-                    'oneOf': [
-                        {'type': 'integer', 'minimum': 1},
-                        {'type': 'string', 'format': 'interval'},
+        "type": "array",
+        "items": {
+            "type": "object",
+            "properties": {
+                "field": {"type": "string"},
+                "weight": {"type": "integer", "minimum": 5},
+                "inverse": {"type": "boolean", "default": False},
+                "upper_limit": {
+                    "oneOf": [
+                        {"type": "integer", "minimum": 1},
+                        {"type": "string", "format": "interval"},
                     ]
                 },
-                'delta_distance': {
-                    'oneOf': [
-                        {'type': 'integer', 'minimum': 1},
-                        {'type': 'string', 'format': 'interval'},
+                "delta_distance": {
+                    "oneOf": [
+                        {"type": "integer", "minimum": 1},
+                        {"type": "string", "format": "interval"},
                     ]
                 },
             },
-            'required': ['field', 'weight'],
-            'additionalProperties': False,
+            "required": ["field", "weight"],
+            "additionalProperties": False,
         },
-        'minItems': 2,
+        "minItems": 2,
     }
 
     def prepare_config(self, config):
         settings = {}
         for entry in config:
-            if isinstance(entry, dict) and entry.get('field') and not entry.get('field').isspace():
-                key = entry.get('field')
+            if isinstance(entry, dict) and entry.get("field") and not entry.get("field").isspace():
+                key = entry.get("field")
                 settings[key] = entry
-                delta = settings[key].get('delta_distance')
+                delta = settings[key].get("delta_distance")
                 if delta and isinstance(delta, str):
-                    settings[key]['delta_distance'] = parse_timedelta(delta)
-                limit = settings[key].get('upper_limit')
+                    settings[key]["delta_distance"] = parse_timedelta(delta)
+                limit = settings[key].get("upper_limit")
                 if limit and isinstance(limit, str):
-                    settings[key]['upper_limit'] = parse_timedelta(limit)
+                    settings[key]["upper_limit"] = parse_timedelta(limit)
         return settings
 
     @plugin.priority(127)  # run after default filters
@@ -121,7 +121,7 @@ class PluginSortByWeight:
             return
         config = self.prepare_config(config)
         logger.verbose(
-            'Calculating weights for undecided, accepted entries and sorting by result field: {}',
+            "Calculating weights for undecided, accepted entries and sorting by result field: {}",
             ENTRY_WEIGHT_FIELD_NAME,
         )
         self.calc_weights(entries, config)
@@ -145,11 +145,11 @@ class PluginSortByWeight:
 
     @staticmethod
     def _limit_value(key, value, config):
-        if config[key].get('upper_limit'):
-            limit = config[key]['upper_limit']
+        if config[key].get("upper_limit"):
+            limit = config[key]["upper_limit"]
             # auto handle datetime
             if isinstance(value, datetime) and isinstance(limit, timedelta):
-                if config[key]['inverse'] is True:
+                if config[key]["inverse"] is True:
                     value = max(value, datetime.now() - limit)
                 elif (datetime.now() + limit) < value:
                     value = datetime.now() + limit
@@ -170,12 +170,12 @@ class PluginSortByWeight:
         try:
             min_value = min(min_value, lower_default)  # try normalize to natural lower bound
         except Exception as ex:
-            logger.debug('Incompatible min_value op: {}', ex)
+            logger.debug("Incompatible min_value op: {}", ex)
 
         value_range = max_value - min_value
         if value_range:
-            if 'delta_distance' in config[key]:
-                delta = config[key]['delta_distance']
+            if "delta_distance" in config[key]:
+                delta = config[key]["delta_distance"]
                 stride = value_range / delta
                 if isinstance(stride, timedelta):
                     stride = stride.days
@@ -197,7 +197,7 @@ class PluginSortByWeight:
             except Exception as ex:
                 delta = None
                 logger.warning(
-                    'Could not calculate stride for key: {}, type: {}, using fallback sort. Error: {}',
+                    "Could not calculate stride for key: {}, type: {}, using fallback sort. Error: {}",
                     key,
                     type(entries[0][key]),
                     ex,
@@ -206,7 +206,7 @@ class PluginSortByWeight:
                 entries.sort(key=lambda e, k=key, d=lower_default: e.get(k, d), reverse=True)
             if not stride:
                 stride = DEFAULT_STRIDE
-            max_weight = config[key]['weight']
+            max_weight = config[key]["weight"]
             weight_step = max_weight / max(int(stride), 1)
             current_value = None
             weight = None
@@ -234,7 +234,7 @@ class PluginSortByWeight:
                             weight = (value_normalized / delta) * weight_step
                         except Exception as ex:
                             logger.warning(
-                                'Skipping entry: {}, could not calc weight for key: {}, error: {}',
+                                "Skipping entry: {}, could not calc weight for key: {}, error: {}",
                                 entry,
                                 key,
                                 ex,
@@ -244,7 +244,7 @@ class PluginSortByWeight:
                 elif value < current_value:
                     weight = weight - weight_step
                     current_value = value
-                if config[key]['inverse'] is True:
+                if config[key]["inverse"] is True:
                     weight = max_weight - weight
 
                 weight = int(max(weight, 0))
@@ -252,24 +252,24 @@ class PluginSortByWeight:
                 # self._add_debug_info(key, entry, weight, entry[key], value)  # debug only
 
     def _add_debug_info(self, key, entry, weight, *args):
-        if 'weights' not in entry:
-            entry['weights'] = {}
+        if "weights" not in entry:
+            entry["weights"] = {}
         short_args = []
         for arg in args:
             if isinstance(arg, timedelta):
                 short_args.append(arg.days)
             elif isinstance(arg, datetime):
                 date = arg.date()
-                short_args.append(f'{date.year}-{date.month}-{date.day}')
+                short_args.append(f"{date.year}-{date.month}-{date.day}")
             elif isinstance(arg, Quality):
-                quality_string = f'[ {arg.resolution} ]-{arg.source}-{arg.codec}, [ {arg.audio} ]'
+                quality_string = f"[ {arg.resolution} ]-{arg.source}-{arg.codec}, [ {arg.audio} ]"
                 if quality_string not in short_args:
                     short_args.append(quality_string)
             else:
                 short_args.append(arg)
-        entry['weights'][key] = f'{weight} = {short_args}'
+        entry["weights"][key] = f"{weight} = {short_args}"
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(PluginSortByWeight, 'sort_by_weight', api_ver=2)
+    plugin.register(PluginSortByWeight, "sort_by_weight", api_ver=2)

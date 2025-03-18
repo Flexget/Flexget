@@ -9,7 +9,7 @@ from flexget.event import event
 from flexget.utils.template import RenderError, render_from_entry, render_from_task
 from flexget.utils.tools import io_encoding
 
-logger = logger.bind(name='exec')
+logger = logger.bind(name="exec")
 
 
 class EscapingEntry(Entry):
@@ -46,40 +46,40 @@ class PluginExec:
     You can use all (available) entry fields in the command.
     """
 
-    NAME = 'exec'
-    HANDLED_PHASES = ['start', 'input', 'filter', 'output', 'exit']
+    NAME = "exec"
+    HANDLED_PHASES = ["start", "input", "filter", "output", "exit"]
 
     schema = {
-        'oneOf': [
-            one_or_more({'type': 'string'}),
+        "oneOf": [
+            one_or_more({"type": "string"}),
             {
-                'type': 'object',
-                'properties': {
-                    'on_start': {'$ref': '#/$defs/phaseSettings'},
-                    'on_input': {'$ref': '#/$defs/phaseSettings'},
-                    'on_filter': {'$ref': '#/$defs/phaseSettings'},
-                    'on_output': {'$ref': '#/$defs/phaseSettings'},
-                    'on_exit': {'$ref': '#/$defs/phaseSettings'},
-                    'fail_entries': {'type': 'boolean'},
-                    'auto_escape': {'type': 'boolean'},
-                    'encoding': {'type': 'string'},
-                    'allow_background': {'type': 'boolean'},
+                "type": "object",
+                "properties": {
+                    "on_start": {"$ref": "#/$defs/phaseSettings"},
+                    "on_input": {"$ref": "#/$defs/phaseSettings"},
+                    "on_filter": {"$ref": "#/$defs/phaseSettings"},
+                    "on_output": {"$ref": "#/$defs/phaseSettings"},
+                    "on_exit": {"$ref": "#/$defs/phaseSettings"},
+                    "fail_entries": {"type": "boolean"},
+                    "auto_escape": {"type": "boolean"},
+                    "encoding": {"type": "string"},
+                    "allow_background": {"type": "boolean"},
                 },
-                'additionalProperties': False,
+                "additionalProperties": False,
             },
         ],
-        '$defs': {
-            'phaseSettings': {
-                'type': 'object',
-                'properties': {
-                    'phase': one_or_more({'type': 'string'}),
-                    'for_entries': one_or_more({'type': 'string'}),
-                    'for_accepted': one_or_more({'type': 'string'}),
-                    'for_rejected': one_or_more({'type': 'string'}),
-                    'for_undecided': one_or_more({'type': 'string'}),
-                    'for_failed': one_or_more({'type': 'string'}),
+        "$defs": {
+            "phaseSettings": {
+                "type": "object",
+                "properties": {
+                    "phase": one_or_more({"type": "string"}),
+                    "for_entries": one_or_more({"type": "string"}),
+                    "for_accepted": one_or_more({"type": "string"}),
+                    "for_rejected": one_or_more({"type": "string"}),
+                    "for_undecided": one_or_more({"type": "string"}),
+                    "for_failed": one_or_more({"type": "string"}),
                 },
-                'additionalProperties': False,
+                "additionalProperties": False,
             }
         },
     }
@@ -88,11 +88,11 @@ class PluginExec:
         if isinstance(config, str):
             config = [config]
         if isinstance(config, list):
-            config = {'on_output': {'for_accepted': config}}
-        if not config.get('encoding'):
-            config['encoding'] = io_encoding
+            config = {"on_output": {"for_accepted": config}}
+        if not config.get("encoding"):
+            config["encoding"] = io_encoding
         for phase_name in config:
-            if phase_name.startswith('on_'):
+            if phase_name.startswith("on_"):
                 for items_name in config[phase_name]:
                     if isinstance(config[phase_name][items_name], str):
                         config[phase_name][items_name] = [config[phase_name][items_name]]
@@ -100,7 +100,7 @@ class PluginExec:
         return config
 
     def execute_cmd(self, cmd, allow_background, encoding):
-        logger.verbose('Executing: {}', cmd)
+        logger.verbose("Executing: {}", cmd)
         p = subprocess.Popen(
             cmd,
             shell=True,
@@ -115,30 +115,30 @@ class PluginExec:
             r.close()
             w.close()
             if response:
-                logger.info('Stdout: {}', response.rstrip())  # rstrip to get rid of newlines
+                logger.info("Stdout: {}", response.rstrip())  # rstrip to get rid of newlines
         return p.wait()
 
     def execute(self, task, phase_name, config):
         config = self.prepare_config(config)
         if phase_name not in config:
-            logger.debug('phase {} not configured', phase_name)
+            logger.debug("phase {} not configured", phase_name)
             return
 
         name_map = {
-            'for_entries': task.entries,
-            'for_accepted': task.accepted,
-            'for_rejected': task.rejected,
-            'for_undecided': task.undecided,
-            'for_failed': task.failed,
+            "for_entries": task.entries,
+            "for_accepted": task.accepted,
+            "for_rejected": task.rejected,
+            "for_undecided": task.undecided,
+            "for_failed": task.failed,
         }
 
-        allow_background = config.get('allow_background')
+        allow_background = config.get("allow_background")
         for operation, entries in name_map.items():
             if operation not in config[phase_name]:
                 continue
 
             logger.debug(
-                'running phase_name: {} operation: {} entries: {}',
+                "running phase_name: {} operation: {} entries: {}",
                 phase_name,
                 operation,
                 len(entries),
@@ -146,61 +146,61 @@ class PluginExec:
 
             for entry in entries:
                 for cmd in config[phase_name][operation]:
-                    entrydict = EscapingEntry(entry) if config.get('auto_escape') else entry
+                    entrydict = EscapingEntry(entry) if config.get("auto_escape") else entry
                     # Do string replacement from entry, but make sure quotes get escaped
                     try:
                         cmd = render_from_entry(cmd, entrydict)
                     except RenderError as e:
-                        logger.error('Could not set exec command for {}: {}', entry['title'], e)
+                        logger.error("Could not set exec command for {}: {}", entry["title"], e)
                         # fail the entry if configured to do so
-                        if config.get('fail_entries'):
+                        if config.get("fail_entries"):
                             entry.fail(
-                                'Entry `{}` does not have required fields for string replacement.'.format(
-                                    entry['title']
+                                "Entry `{}` does not have required fields for string replacement.".format(
+                                    entry["title"]
                                 )
                             )
                         continue
 
                     logger.debug(
-                        'phase_name: {} operation: {} cmd: {}', phase_name, operation, cmd
+                        "phase_name: {} operation: {} cmd: {}", phase_name, operation, cmd
                     )
                     if task.options.test:
-                        logger.info('Would execute: {}', cmd)
+                        logger.info("Would execute: {}", cmd)
                     else:
                         # Make sure the command can be encoded into appropriate encoding, don't actually encode yet,
                         # so logging continues to work.
                         try:
-                            cmd.encode(config['encoding'])
+                            cmd.encode(config["encoding"])
                         except UnicodeEncodeError:
                             logger.error(
-                                'Unable to encode cmd `{}` to {}', cmd, config['encoding']
+                                "Unable to encode cmd `{}` to {}", cmd, config["encoding"]
                             )
-                            if config.get('fail_entries'):
+                            if config.get("fail_entries"):
                                 entry.fail(
-                                    'cmd `{}` could not be encoded to {}.'.format(
-                                        cmd, config['encoding']
+                                    "cmd `{}` could not be encoded to {}.".format(
+                                        cmd, config["encoding"]
                                     )
                                 )
                             continue
                         # Run the command, fail entries with non-zero return code if configured to
                         if self.execute_cmd(
-                            cmd, allow_background, config['encoding']
-                        ) != 0 and config.get('fail_entries'):
-                            entry.fail('exec return code was non-zero')
+                            cmd, allow_background, config["encoding"]
+                        ) != 0 and config.get("fail_entries"):
+                            entry.fail("exec return code was non-zero")
 
         # phase keyword in this
-        if 'phase' in config[phase_name]:
-            for cmd in config[phase_name]['phase']:
+        if "phase" in config[phase_name]:
+            for cmd in config[phase_name]["phase"]:
                 try:
                     cmd = render_from_task(cmd, task)
                 except RenderError as e:
-                    logger.error('Error rendering `{}`: {}', cmd, e)
+                    logger.error("Error rendering `{}`: {}", cmd, e)
                 else:
-                    logger.debug('phase cmd: {}', cmd)
+                    logger.debug("phase cmd: {}", cmd)
                     if task.options.test:
-                        logger.info('Would execute: {}', cmd)
+                        logger.info("Would execute: {}", cmd)
                     else:
-                        self.execute_cmd(cmd, allow_background, config['encoding'])
+                        self.execute_cmd(cmd, allow_background, config["encoding"])
 
     def __getattr__(self, item):
         """Create methods to handle task phases."""
@@ -213,13 +213,13 @@ class PluginExec:
             raise AttributeError(item)
 
         def phase_handler(task, config):
-            self.execute(task, 'on_' + phase, config)
+            self.execute(task, "on_" + phase, config)
 
         # Make sure we run after other plugins so exec can use their output
         phase_handler.priority = 100
         return phase_handler
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(PluginExec, 'exec', api_ver=2)
+    plugin.register(PluginExec, "exec", api_ver=2)

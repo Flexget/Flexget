@@ -14,15 +14,15 @@ from flexget import terminal
 from flexget.log import capture_logs
 from flexget.options import get_parser
 
-logger = logger.bind(name='ipc')
+logger = logger.bind(name="ipc")
 
 # Allow some attributes from dict interface to be called over the wire
-rpyc.core.protocol.DEFAULT_CONFIG['safe_attrs'].update(['items'])
-rpyc.core.protocol.DEFAULT_CONFIG['allow_pickle'] = True
+rpyc.core.protocol.DEFAULT_CONFIG["safe_attrs"].update(["items"])
+rpyc.core.protocol.DEFAULT_CONFIG["allow_pickle"] = True
 
 IPC_VERSION = 4
-AUTH_ERROR = b'authentication error'
-AUTH_SUCCESS = b'authentication success'
+AUTH_ERROR = b"authentication error"
+AUTH_SUCCESS = b"authentication success"
 
 
 class RemoteStream:
@@ -34,24 +34,24 @@ class RemoteStream:
 
     def __init__(self, writer: Optional[Callable]):
         """:param writer: A function which writes a line of text to remote client."""
-        self.buffer = ''
+        self.buffer = ""
         self.writer = writer
 
     def write(self, text: str) -> None:
         self.buffer += text
-        if '\n' in self.buffer:
+        if "\n" in self.buffer:
             self.flush()
 
     def flush(self) -> None:
         if self.buffer is None or self.writer is None:
             return
         try:
-            self.writer(self.buffer, end='')
+            self.writer(self.buffer, end="")
         except EOFError:
             self.writer = None
-            logger.error('Client ended connection while still streaming output.')
+            logger.error("Client ended connection while still streaming output.")
         finally:
-            self.buffer = ''
+            self.buffer = ""
 
 
 class DaemonService(rpyc.Service):
@@ -67,14 +67,14 @@ class DaemonService(rpyc.Service):
 
     def exposed_handle_cli(self, args):
         args = rpyc.utils.classic.obtain(args)
-        logger.verbose('Running command `{}` for client.', ' '.join(args))
+        logger.verbose("Running command `{}` for client.", " ".join(args))
         parser = get_parser()
         try:
             options = parser.parse_args(args, file=self.client_out_stream)
         except SystemExit as e:
             if e.code:
                 # TODO: Not sure how to properly propagate the exit code back to client
-                logger.debug('Parsing cli args caused system exit with status {}.', e.code)
+                logger.debug("Parsing cli args caused system exit with status {}.", e.code)
             return
         context_managers = []
         # Don't capture any output when used with --cron
@@ -83,9 +83,9 @@ class DaemonService(rpyc.Service):
             # This means decisions about color formatting, and table sizes can be delayed and
             # decided based on the client terminal capabilities.
             context_managers.append(
-                unittest.mock.patch('flexget.terminal._patchable_console', self._conn.root.console)
+                unittest.mock.patch("flexget.terminal._patchable_console", self._conn.root.console)
             )
-            if options.loglevel != 'NONE':
+            if options.loglevel != "NONE":
                 context_managers.append(capture_logs(self.client_log_sink, level=options.loglevel))
         with contextlib.ExitStack() as stack:
             for cm in context_managers:
@@ -107,7 +107,7 @@ class ClientService(rpyc.Service):
         daemon_version = self._conn.root.version()
         if daemon_version != IPC_VERSION:
             self._conn.close()
-            raise ValueError('Daemon is different version than client.')
+            raise ValueError("Daemon is different version than client.")
         super().on_connect(conn)
 
     def exposed_version(self):
@@ -120,7 +120,7 @@ class ClientService(rpyc.Service):
     def exposed_log_sink(self, message):
         message = rpyc.classic.obtain(message)
         record = message.record
-        level, message = record['level'].name, record['message']
+        level, message = record["level"].name, record["message"]
         logger.patch(lambda r: r.update(record)).log(level, message)
 
 
@@ -128,9 +128,9 @@ class IPCServer:
     def __init__(self, manager, port=None):
         self.daemon = True
         self.manager = manager
-        self.host = '127.0.0.1'
+        self.host = "127.0.0.1"
         self.port = port or 0
-        self.password = ''.join(
+        self.password = "".join(
             random.choice(string.ascii_letters + string.digits) for x in range(15)
         )
         self.server = None
@@ -138,22 +138,22 @@ class IPCServer:
 
     def start(self):
         if not self._thread:
-            self._thread = threading.Thread(name='ipc_server', target=self.run)
+            self._thread = threading.Thread(name="ipc_server", target=self.run)
         self._thread.start()
 
     def authenticator(self, sock):
         channel = rpyc.Channel(rpyc.SocketStream(sock))
-        password = channel.recv().decode('utf-8')
+        password = channel.recv().decode("utf-8")
         if password != self.password:
             channel.send(AUTH_ERROR)
-            raise rpyc.utils.authenticators.AuthenticationError('Invalid password from client.')
+            raise rpyc.utils.authenticators.AuthenticationError("Invalid password from client.")
         channel.send(AUTH_SUCCESS)
         return sock, self.password
 
     def run(self):
         # Make the rpyc logger a bit quieter when we aren't in debugging.
-        rpyc_logger = logging.getLogger('ipc.rpyc')
-        if logger.level(self.manager.options.loglevel).no > logger.level('DEBUG').no:
+        rpyc_logger = logging.getLogger("ipc.rpyc")
+        if logger.level(self.manager.options.loglevel).no > logger.level("DEBUG").no:
             rpyc_logger.setLevel(logging.WARNING)
         DaemonService.manager = self.manager
         self.server = ThreadedServer(
@@ -163,11 +163,11 @@ class IPCServer:
             authenticator=self.authenticator,
             logger=rpyc_logger,
             # Timeout can happen when piping to 'less' and delaying scrolling to bottom. Make it a long timeout.
-            protocol_config={'sync_request_timeout': 3600},
+            protocol_config={"sync_request_timeout": 3600},
         )
         # If we just chose an open port, write save the chosen one
         self.port = self.server.listener.getsockname()[1]
-        self.manager.write_lock(ipc_info={'port': self.port, 'password': self.password})
+        self.manager.write_lock(ipc_info={"port": self.port, "password": self.password})
         self.server.start()
 
     def shutdown(self):
@@ -177,14 +177,14 @@ class IPCServer:
 
 class IPCClient:
     def __init__(self, port, password: str):
-        channel = rpyc.Channel(rpyc.SocketStream.connect('127.0.0.1', port))
-        channel.send(password.encode('utf-8'))
+        channel = rpyc.Channel(rpyc.SocketStream.connect("127.0.0.1", port))
+        channel.send(password.encode("utf-8"))
         response = channel.recv()
         if response == AUTH_ERROR:
             # TODO: What to raise here. I guess we create a custom error
-            raise ValueError('Invalid password for daemon')
+            raise ValueError("Invalid password for daemon")
         self.conn = rpyc.utils.factory.connect_channel(
-            channel, service=ClientService, config={'sync_request_timeout': None}
+            channel, service=ClientService, config={"sync_request_timeout": None}
         )
 
     def close(self):

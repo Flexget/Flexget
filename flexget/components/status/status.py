@@ -8,13 +8,13 @@ from flexget.manager import Session
 
 from . import db
 
-logger = logger.bind(name='status')
+logger = logger.bind(name="status")
 
 
 class Status:
     """Track health status of tasks."""
 
-    schema = {'type': 'boolean'}
+    schema = {"type": "boolean"}
 
     def __init__(self):
         self.execution = None
@@ -23,7 +23,7 @@ class Status:
         with Session() as session:
             st = session.query(db.StatusTask).filter(db.StatusTask.name == task.name).first()
             if not st:
-                logger.debug('Adding new task {}', task.name)
+                logger.debug("Adding new task {}", task.name)
                 st = db.StatusTask()
                 st.name = task.name
                 session.add(st)
@@ -55,6 +55,6 @@ class Status:
     on_task_abort = on_task_exit
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(Status, 'status', builtin=True, api_ver=2)
+    plugin.register(Status, "status", builtin=True, api_ver=2)

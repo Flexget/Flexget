@@ -9,7 +9,7 @@ from flexget import options
 from flexget.event import event
 from flexget.manager import Session
 
-logger = logger.bind(name='debug_db_sess')
+logger = logger.bind(name="debug_db_sess")
 
 open_transactions_lock = (
     Lock()
@@ -22,12 +22,12 @@ def find_caller(stack):
     for frame in stack:
         # We don't care about sqlalchemy internals
         module = inspect.getmodule(frame[0])
-        if not hasattr(module, '__name__'):
+        if not hasattr(module, "__name__"):
             continue
-        if module.__name__.startswith('sqlalchemy'):
+        if module.__name__.startswith("sqlalchemy"):
             continue
         return (module.__name__, *tuple(frame[2:4]), frame[4][0].strip())
-    logger.warning('Transaction from unknown origin')
+    logger.warning("Transaction from unknown origin")
     return None, None, None, None
 
 
@@ -36,20 +36,20 @@ def after_begin(session, transaction, connection):
     with open_transactions_lock:
         if any(info[1] is not connection.connection for info in open_transactions.values()):
             logger.warning(
-                'Sessions from 2 threads! Transaction 0x{:08X} opened {} Already open one(s): {}',
+                "Sessions from 2 threads! Transaction 0x{:08X} opened {} Already open one(s): {}",
                 id(transaction),
                 caller_info,
                 open_transactions,
             )
         elif open_transactions:
             logger.debug(
-                'Transaction 0x{:08X} opened {} Already open one(s): {}',
+                "Transaction 0x{:08X} opened {} Already open one(s): {}",
                 id(transaction),
                 caller_info,
                 open_transactions,
             )
         else:
-            logger.debug('Transaction 0x{:08X} opened {}', id(transaction), caller_info)
+            logger.debug("Transaction 0x{:08X} opened {}", id(transaction), caller_info)
         # Store information about this transaction
         open_transactions[transaction] = (time.time(), connection.connection, *caller_info)
 
@@ -67,7 +67,7 @@ def after_flush(session, flush_context):
 
             tid = next(id(t) for t in _iterate_parents() if t in open_transactions)
             logger.debug(
-                'Transaction 0x{:08X} writing {} new: {} deleted: {} dirty: {}',
+                "Transaction 0x{:08X} writing {} new: {} deleted: {} dirty: {}",
                 tid,
                 caller_info,
                 tuple(session.new),
@@ -83,7 +83,7 @@ def after_end(session, transaction):
             # Transaction was created but a connection was never opened for it
             return
         open_time = time.time() - open_transactions[transaction][0]
-        msg = f'Transaction 0x{id(transaction):08X} closed {caller_info} (open time {open_time})'
+        msg = f"Transaction 0x{id(transaction):08X} closed {caller_info} (open time {open_time})"
         if open_time > 2:
             logger.warning(msg)
         else:
@@ -91,18 +91,18 @@ def after_end(session, transaction):
         del open_transactions[transaction]
 
 
-@event('manager.startup')
+@event("manager.startup")
 def debug_warnings(manager):
     if manager.options.debug_db_sessions:
-        sqlalchemy.event.listen(Session, 'after_begin', after_begin)
-        sqlalchemy.event.listen(Session, 'after_flush', after_flush)
-        sqlalchemy.event.listen(Session, 'after_transaction_end', after_end)
+        sqlalchemy.event.listen(Session, "after_begin", after_begin)
+        sqlalchemy.event.listen(Session, "after_flush", after_flush)
+        sqlalchemy.event.listen(Session, "after_transaction_end", after_end)
 
 
-@event('options.register')
+@event("options.register")
 def register_parser_arguments():
     options.get_parser().add_argument(
-        '--debug-db-sessions',
-        action='store_true',
-        help='debug session starts and ends, for finding problems with db locks',
+        "--debug-db-sessions",
+        action="store_true",
+        help="debug session starts and ends, for finding problems with db locks",
     )

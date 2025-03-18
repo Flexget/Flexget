@@ -10,7 +10,7 @@ from flexget.utils.tools import parse_timedelta
 
 from . import db
 
-logger = logger.bind(name='remember_rej')
+logger = logger.bind(name="remember_rej")
 
 
 class FilterRememberRejected:
@@ -33,7 +33,7 @@ class FilterRememberRejected:
                 session.query(db.RememberTask).filter(db.RememberTask.name == task.name).first()
             )
             if not task.is_rerun and old_task and task.config_modified:
-                logger.debug('Task config has changed since last run, purging remembered entries.')
+                logger.debug("Task config has changed since last run, purging remembered entries.")
                 session.delete(old_task)
                 old_task = None
             if not old_task:
@@ -48,7 +48,7 @@ class FilterRememberRejected:
                     .delete()
                 )
                 if deleted:
-                    logger.debug('{} entries have expired from remember_rejected table.', deleted)
+                    logger.debug("{} entries have expired from remember_rejected table.", deleted)
                     task.config_changed()
 
     @plugin.priority(plugin.PRIORITY_LAST)
@@ -69,44 +69,44 @@ class FilterRememberRejected:
             if reject_entries.count():
                 # Reject all the remembered entries
                 for entry in task.entries:
-                    if not entry.get('url'):
+                    if not entry.get("url"):
                         # We don't record or reject any entries without url
                         continue
                     reject_entry = reject_entries.filter(
                         and_(
-                            db.RememberEntry.title == entry['title'],
-                            db.RememberEntry.url == entry['original_url'],
+                            db.RememberEntry.title == entry["title"],
+                            db.RememberEntry.url == entry["original_url"],
                         )
                     ).first()
                     if reject_entry:
                         entry.reject(
-                            f'Rejected on behalf of {reject_entry.rejected_by} plugin: {reject_entry.reason}'
+                            f"Rejected on behalf of {reject_entry.rejected_by} plugin: {reject_entry.reason}"
                         )
 
     def on_entry_reject(self, entry, remember=None, remember_time=None, **kwargs):
         # We only remember rejections that specify the remember keyword argument
         if not (remember or remember_time):
             return
-        if not entry.get('title') or not entry.get('original_url'):
-            logger.debug('Can\'t remember rejection for entry without title or url.')
+        if not entry.get("title") or not entry.get("original_url"):
+            logger.debug("Can't remember rejection for entry without title or url.")
             return
         if remember_time and isinstance(remember_time, str):
             remember_time = parse_timedelta(remember_time)
-        message = 'Remembering rejection of `{}`'.format(entry['title'])
+        message = "Remembering rejection of `{}`".format(entry["title"])
         if remember_time:
-            message += f' for {remember_time.seconds / 60} minutes'
+            message += f" for {remember_time.seconds / 60} minutes"
         logger.info(message)
-        entry['remember_rejected'] = remember_time or remember
+        entry["remember_rejected"] = remember_time or remember
 
     @plugin.priority(plugin.PRIORITY_LAST)
     def on_task_learn(self, task, config):
         with Session() as session:
             for entry in task.all_entries:
-                if not entry.get('remember_rejected'):
+                if not entry.get("remember_rejected"):
                     continue
                 expires = None
-                if isinstance(entry['remember_rejected'], timedelta):
-                    expires = datetime.now() + entry['remember_rejected']
+                if isinstance(entry["remember_rejected"], timedelta):
+                    expires = datetime.now() + entry["remember_rejected"]
 
                 (remember_task_id,) = (
                     session.query(db.RememberTask.id)
@@ -115,16 +115,16 @@ class FilterRememberRejected:
                 )
                 session.add(
                     db.RememberEntry(
-                        title=entry['title'],
-                        url=entry['original_url'],
+                        title=entry["title"],
+                        url=entry["original_url"],
                         task_id=remember_task_id,
-                        rejected_by=entry.get('rejected_by'),
-                        reason=entry.get('reason'),
+                        rejected_by=entry.get("rejected_by"),
+                        reason=entry.get("reason"),
                         expires=expires,
                     )
                 )
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(FilterRememberRejected, 'remember_rejected', builtin=True, api_ver=2)
+    plugin.register(FilterRememberRejected, "remember_rejected", builtin=True, api_ver=2)

@@ -31,9 +31,9 @@ class FilterSeriesPremiere(plugin_series.FilterSeriesBase):
     @property
     def schema(self):
         settings = self.settings_schema
-        settings['properties']['allow_seasonless'] = {'type': 'boolean'}
-        settings['properties']['allow_teasers'] = {'type': 'boolean'}
-        return {'anyOf': [{'type': 'boolean'}, settings]}
+        settings["properties"]["allow_seasonless"] = {"type": "boolean"}
+        settings["properties"]["allow_teasers"] = {"type": "boolean"}
+        return {"anyOf": [{"type": "boolean"}, settings]}
 
     # Run after series and metainfo series plugins
     @plugin.priority(115)
@@ -46,49 +46,49 @@ class FilterSeriesPremiere(plugin_series.FilterSeriesBase):
         allow_seasonless = False
         desired_eps = [0, 1]
         if isinstance(config, dict):
-            allow_seasonless = config.pop('allow_seasonless', False)
-            if not config.pop('allow_teasers', True):
+            allow_seasonless = config.pop("allow_seasonless", False)
+            if not config.pop("allow_teasers", True):
                 desired_eps = [1]
             group_settings = config
-        group_settings['identified_by'] = 'ep'
+        group_settings["identified_by"] = "ep"
         # Generate a list of unique series that have premieres
-        guess_entry = plugin.get('metainfo_series', self).guess_entry
+        guess_entry = plugin.get("metainfo_series", self).guess_entry
         # Make a set of unique series according to series name normalization rules
         guessed_series = {}
         for entry in task.entries:
             if guess_entry(entry, allow_seasonless=allow_seasonless, config=group_settings) and (
-                not entry['season_pack']
-                and entry['series_season'] == 1
-                and entry['series_episode'] in desired_eps
+                not entry["season_pack"]
+                and entry["series_season"] == 1
+                and entry["series_episode"] in desired_eps
             ):
-                normalized_name = plugin_series.normalize_series_name(entry['series_name'])
+                normalized_name = plugin_series.normalize_series_name(entry["series_name"])
                 db_series = (
                     task.session.query(db.Series).filter(db.Series.name == normalized_name).first()
                 )
                 if db_series and db_series.in_tasks:
                     continue
-                guessed_series.setdefault(normalized_name, entry['series_name'])
+                guessed_series.setdefault(normalized_name, entry["series_name"])
         # Reject any further episodes in those series
         for entry in task.entries:
             for series in guessed_series.values():
-                if entry.get('series_name') == series and (
-                    entry.get('season_pack')
+                if entry.get("series_name") == series and (
+                    entry.get("season_pack")
                     or not (
-                        entry.get('series_season') == 1
-                        and entry.get('series_episode') in desired_eps
+                        entry.get("series_season") == 1
+                        and entry.get("series_episode") in desired_eps
                     )
                 ):
-                    entry.reject('Non premiere episode or season pack in a premiere series')
+                    entry.reject("Non premiere episode or season pack in a premiere series")
 
         # Combine settings and series into series plugin config format
         allseries = {
-            'settings': {'series_premiere': group_settings},
-            'series_premiere': list(guessed_series.values()),
+            "settings": {"series_premiere": group_settings},
+            "series_premiere": list(guessed_series.values()),
         }
         # Merge the our config in to the main series config
         self.merge_config(task, allseries)
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(FilterSeriesPremiere, 'series_premiere', api_ver=2)
+    plugin.register(FilterSeriesPremiere, "series_premiere", api_ver=2)

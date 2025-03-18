@@ -14,9 +14,9 @@ class TestAsciifyFilter:
     """
 
     def test_asciify_me(self, execute_task):
-        task = execute_task('asscify_me')
+        task = execute_task("asscify_me")
 
         assert len(task.accepted) == 1
-        assert task.accepted[0]['title1'] == '[My](Title)-is still a\' me^ss'
-        assert task.accepted[0]['title2'] == 'My Tìtlê ìs still a mess'
-        assert task.accepted[0]['title3'] == 'My Title is not a mess'
+        assert task.accepted[0]["title1"] == "[My](Title)-is still a' me^ss"
+        assert task.accepted[0]["title2"] == "My Tìtlê ìs still a mess"
+        assert task.accepted[0]["title3"] == "My Title is not a mess"

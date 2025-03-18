@@ -4,7 +4,7 @@ from flexget import plugin
 from flexget.event import event
 from flexget.utils.log import log_once
 
-logger = logger.bind(name='imdb')
+logger = logger.bind(name="imdb")
 
 
 class FilterImdb:
@@ -78,33 +78,33 @@ class FilterImdb:
     """
 
     schema = {
-        'type': 'object',
-        'properties': {
-            'min_year': {'type': 'integer'},
-            'max_year': {'type': 'integer'},
-            'min_votes': {'type': 'integer'},
-            'min_meta_score': {'type': 'integer'},
-            'min_score': {'type': 'number'},
-            'accept_genres': {'type': 'array', 'items': {'type': 'string'}},
-            'reject_genres': {'type': 'array', 'items': {'type': 'string'}},
-            'reject_languages': {'type': 'array', 'items': {'type': 'string'}},
-            'accept_languages': {'type': 'array', 'items': {'type': 'string'}},
-            'reject_actors': {'type': 'array', 'items': {'type': 'string'}},
-            'accept_actors': {'type': 'array', 'items': {'type': 'string'}},
-            'reject_directors': {'type': 'array', 'items': {'type': 'string'}},
-            'accept_directors': {'type': 'array', 'items': {'type': 'string'}},
-            'reject_writers': {'type': 'array', 'items': {'type': 'string'}},
-            'accept_writers': {'type': 'array', 'items': {'type': 'string'}},
-            'reject_mpaa_ratings': {'type': 'array', 'items': {'type': 'string'}},
-            'accept_mpaa_ratings': {'type': 'array', 'items': {'type': 'string'}},
+        "type": "object",
+        "properties": {
+            "min_year": {"type": "integer"},
+            "max_year": {"type": "integer"},
+            "min_votes": {"type": "integer"},
+            "min_meta_score": {"type": "integer"},
+            "min_score": {"type": "number"},
+            "accept_genres": {"type": "array", "items": {"type": "string"}},
+            "reject_genres": {"type": "array", "items": {"type": "string"}},
+            "reject_languages": {"type": "array", "items": {"type": "string"}},
+            "accept_languages": {"type": "array", "items": {"type": "string"}},
+            "reject_actors": {"type": "array", "items": {"type": "string"}},
+            "accept_actors": {"type": "array", "items": {"type": "string"}},
+            "reject_directors": {"type": "array", "items": {"type": "string"}},
+            "accept_directors": {"type": "array", "items": {"type": "string"}},
+            "reject_writers": {"type": "array", "items": {"type": "string"}},
+            "accept_writers": {"type": "array", "items": {"type": "string"}},
+            "reject_mpaa_ratings": {"type": "array", "items": {"type": "string"}},
+            "accept_mpaa_ratings": {"type": "array", "items": {"type": "string"}},
         },
-        'additionalProperties': False,
+        "additionalProperties": False,
     }
 
     # Run later to avoid unnecessary lookups
     @plugin.priority(120)
     def on_task_filter(self, task, config):
-        lookup = plugin.get('imdb_lookup', self).lookup
+        lookup = plugin.get("imdb_lookup", self).lookup
 
         # since the plugin does not reject anything, no sense going trough accepted
         for entry in task.undecided:
@@ -115,7 +115,7 @@ class FilterImdb:
             except plugin.PluginError as e:
                 # logs skip message once trough log_once (info) and then only when ran from cmd line (w/o --cron)
                 log_once(
-                    'Skipping {} because of an error: {}'.format(entry['title'], e.value),
+                    "Skipping {} because of an error: {}".format(entry["title"], e.value),
                     logger=logger,
                 )
                 continue
@@ -125,131 +125,131 @@ class FilterImdb:
 
             # Check defined conditions, TODO: rewrite into functions?
             reasons = []
-            if 'min_score' in config and entry.get('imdb_score', 0) < config['min_score']:
+            if "min_score" in config and entry.get("imdb_score", 0) < config["min_score"]:
                 reasons.append(
-                    'min_score ({} < {})'.format(entry.get('imdb_score'), config['min_score'])
+                    "min_score ({} < {})".format(entry.get("imdb_score"), config["min_score"])
                 )
-            if 'min_votes' in config and entry.get('imdb_votes', 0) < config['min_votes']:
+            if "min_votes" in config and entry.get("imdb_votes", 0) < config["min_votes"]:
                 reasons.append(
-                    'min_votes ({} < {})'.format(entry.get('imdb_votes'), config['min_votes'])
+                    "min_votes ({} < {})".format(entry.get("imdb_votes"), config["min_votes"])
                 )
             if (
-                'min_meta_score' in config
-                and entry.get('imdb_meta_score', 0) < config['min_meta_score']
+                "min_meta_score" in config
+                and entry.get("imdb_meta_score", 0) < config["min_meta_score"]
             ):
                 reasons.append(
-                    'min_meta_score ({} < {})'.format(
-                        entry.get('imdb_meta_score'), config['min_meta_score']
+                    "min_meta_score ({} < {})".format(
+                        entry.get("imdb_meta_score"), config["min_meta_score"]
                     )
                 )
-            if 'min_year' in config and entry.get('imdb_year', 0) < config['min_year']:
+            if "min_year" in config and entry.get("imdb_year", 0) < config["min_year"]:
                 reasons.append(
-                    'min_year ({} < {})'.format(entry.get('imdb_year'), config['min_year'])
+                    "min_year ({} < {})".format(entry.get("imdb_year"), config["min_year"])
                 )
-            if 'max_year' in config and entry.get('imdb_year', 0) > config['max_year']:
+            if "max_year" in config and entry.get("imdb_year", 0) > config["max_year"]:
                 reasons.append(
-                    'max_year ({} > {})'.format(entry.get('imdb_year'), config['max_year'])
+                    "max_year ({} > {})".format(entry.get("imdb_year"), config["max_year"])
                 )
 
-            if 'accept_genres' in config:
-                accepted = config['accept_genres']
+            if "accept_genres" in config:
+                accepted = config["accept_genres"]
                 accept_genre = False
-                for genre in entry.get('imdb_genres', []):
+                for genre in entry.get("imdb_genres", []):
                     if genre in accepted:
                         accept_genre = True
                         break
                 if not accept_genre:
-                    reasons.append('accept_genres')
+                    reasons.append("accept_genres")
 
-            if 'reject_genres' in config:
-                rejected = config['reject_genres']
-                for genre in entry.get('imdb_genres', []):
+            if "reject_genres" in config:
+                rejected = config["reject_genres"]
+                for genre in entry.get("imdb_genres", []):
                     if genre in rejected:
-                        reasons.append('reject_genres')
+                        reasons.append("reject_genres")
                         break
 
-            if 'reject_languages' in config:
-                rejected = config['reject_languages']
-                for language in entry.get('imdb_languages', []):
+            if "reject_languages" in config:
+                rejected = config["reject_languages"]
+                for language in entry.get("imdb_languages", []):
                     if language in rejected:
-                        reasons.append('reject_languages')
+                        reasons.append("reject_languages")
                         break
 
-            if 'accept_languages' in config:
-                accepted = config['accept_languages']
-                if entry.get('imdb_languages') and entry['imdb_languages'][0] not in accepted:
+            if "accept_languages" in config:
+                accepted = config["accept_languages"]
+                if entry.get("imdb_languages") and entry["imdb_languages"][0] not in accepted:
                     # Reject if the first (primary) language is not among acceptable languages
-                    reasons.append('accept_languages')
+                    reasons.append("accept_languages")
 
-            if 'reject_actors' in config:
-                rejected = config['reject_actors']
-                for actor_id, actor_name in entry.get('imdb_actors', {}).items():
+            if "reject_actors" in config:
+                rejected = config["reject_actors"]
+                for actor_id, actor_name in entry.get("imdb_actors", {}).items():
                     if actor_id in rejected or actor_name in rejected:
-                        reasons.append(f'reject_actors {actor_name}' or actor_id)
+                        reasons.append(f"reject_actors {actor_name}" or actor_id)
                         break
 
             # Accept if actors contains an accepted actor, but don't reject otherwise
-            if 'accept_actors' in config:
-                accepted = config['accept_actors']
-                for actor_id, actor_name in entry.get('imdb_actors', {}).items():
+            if "accept_actors" in config:
+                accepted = config["accept_actors"]
+                for actor_id, actor_name in entry.get("imdb_actors", {}).items():
                     if actor_id in accepted or actor_name in accepted:
                         logger.debug(
-                            'Accepting because of accept_actors {}', actor_name or actor_id
+                            "Accepting because of accept_actors {}", actor_name or actor_id
                         )
                         force_accept = True
                         break
 
-            if 'reject_directors' in config:
-                rejected = config['reject_directors']
-                for director_id, director_name in entry.get('imdb_directors', {}).items():
+            if "reject_directors" in config:
+                rejected = config["reject_directors"]
+                for director_id, director_name in entry.get("imdb_directors", {}).items():
                     if director_id in rejected or director_name in rejected:
-                        reasons.append(f'reject_directors {director_name}' or director_id)
+                        reasons.append(f"reject_directors {director_name}" or director_id)
                         break
 
             # Accept if the director is in the accept list, but do not reject if the director is unknown
-            if 'accept_directors' in config:
-                accepted = config['accept_directors']
-                for director_id, director_name in entry.get('imdb_directors', {}).items():
+            if "accept_directors" in config:
+                accepted = config["accept_directors"]
+                for director_id, director_name in entry.get("imdb_directors", {}).items():
                     if director_id in accepted or director_name in accepted:
                         logger.debug(
-                            'Accepting because of accept_directors {}',
+                            "Accepting because of accept_directors {}",
                             director_name or director_id,
                         )
                         force_accept = True
                         break
 
-            if 'reject_writers' in config:
-                rejected = config['reject_writers']
-                for writer_id, writer_name in entry.get('imdb_writers', {}).items():
+            if "reject_writers" in config:
+                rejected = config["reject_writers"]
+                for writer_id, writer_name in entry.get("imdb_writers", {}).items():
                     if writer_id in rejected or writer_name in rejected:
-                        reasons.append(f'reject_writers {writer_name}' or writer_id)
+                        reasons.append(f"reject_writers {writer_name}" or writer_id)
                         break
 
             # Accept if the writer is in the accept list, but do not reject if the writer is unknown
-            if 'accept_writers' in config:
-                accepted = config['accept_writers']
-                for writer_id, writer_name in entry.get('imdb_writers', {}).items():
+            if "accept_writers" in config:
+                accepted = config["accept_writers"]
+                for writer_id, writer_name in entry.get("imdb_writers", {}).items():
                     if writer_id in accepted or writer_name in accepted:
                         logger.debug(
-                            'Accepting because of accept_writers {}', writer_name or writer_id
+                            "Accepting because of accept_writers {}", writer_name or writer_id
                         )
                         force_accept = True
                         break
 
-            if 'reject_mpaa_ratings' in config:
-                rejected = config['reject_mpaa_ratings']
-                if entry.get('imdb_mpaa_rating') in rejected:
-                    reasons.append('reject_mpaa_ratings {}'.format(entry['imdb_mpaa_rating']))
+            if "reject_mpaa_ratings" in config:
+                rejected = config["reject_mpaa_ratings"]
+                if entry.get("imdb_mpaa_rating") in rejected:
+                    reasons.append("reject_mpaa_ratings {}".format(entry["imdb_mpaa_rating"]))
 
-            if 'accept_mpaa_ratings' in config:
-                accepted = config['accept_mpaa_ratings']
-                if entry.get('imdb_mpaa_rating') not in accepted:
-                    reasons.append('accept_mpaa_ratings {}'.format(entry.get('imdb_mpaa_rating')))
+            if "accept_mpaa_ratings" in config:
+                accepted = config["accept_mpaa_ratings"]
+                if entry.get("imdb_mpaa_rating") not in accepted:
+                    reasons.append("accept_mpaa_ratings {}".format(entry.get("imdb_mpaa_rating")))
 
             if reasons and not force_accept:
-                msg = 'Didn\'t accept `{}` because of rule(s) {}'.format(
-                    entry.get('imdb_name', None) or entry['title'],
-                    ', '.join(reasons),
+                msg = "Didn't accept `{}` because of rule(s) {}".format(
+                    entry.get("imdb_name", None) or entry["title"],
+                    ", ".join(reasons),
                 )
                 if task.options.debug:
                     logger.debug(msg)
@@ -258,10 +258,10 @@ class FilterImdb:
                 else:
                     logger.info(msg)
             else:
-                logger.debug('Accepting {}', entry['title'])
+                logger.debug("Accepting {}", entry["title"])
                 entry.accept()
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(FilterImdb, 'imdb', api_ver=2)
+    plugin.register(FilterImdb, "imdb", api_ver=2)

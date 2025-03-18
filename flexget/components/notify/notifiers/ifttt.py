@@ -7,7 +7,7 @@ from flexget.event import event
 from flexget.plugin import PluginWarning
 from flexget.utils.requests import Session
 
-plugin_name = 'ifttt'
+plugin_name = "ifttt"
 logger = logger.bind(name=plugin_name)
 
 
@@ -36,13 +36,13 @@ class IFTTTNotifier:
 
     def __init__(self):
         self.session = Session()
-        self.url_template = 'https://maker.ifttt.com/trigger/{}/with/key/{}'
+        self.url_template = "https://maker.ifttt.com/trigger/{}/with/key/{}"
 
     schema = {
-        'type': 'object',
-        'properties': {'event': {'type': 'string'}, 'keys': one_or_more({'type': 'string'})},
-        'required': ['event', 'keys'],
-        'additionalProperties': False,
+        "type": "object",
+        "properties": {"event": {"type": "string"}, "keys": one_or_more({"type": "string"})},
+        "required": ["event", "keys"],
+        "additionalProperties": False,
     }
 
     def notify(self, title, message, config):
@@ -59,25 +59,25 @@ class IFTTTNotifier:
         :param dict config: plugin config
         """
         config = self.prepare_config(config)
-        notification_body = {'value1': title, 'value2': message}
+        notification_body = {"value1": title, "value2": message}
         errors = False
-        for key in config['keys']:
-            url = self.url_template.format(config['event'], key)
+        for key in config["keys"]:
+            url = self.url_template.format(config["event"], key)
             try:
                 self.session.post(url, json=notification_body)
-                logger.info('Sent notification to key: {}', key)
+                logger.info("Sent notification to key: {}", key)
             except RequestException as e:
-                logger.error('Error sending notification to key {}: {}', key, e)
+                logger.error("Error sending notification to key {}: {}", key, e)
                 errors = True
         if errors:
             raise PluginWarning("Failed to send notifications")
 
     def prepare_config(self, config):
-        if not isinstance(config['keys'], list):
-            config['keys'] = [config['keys']]
+        if not isinstance(config["keys"], list):
+            config["keys"] = [config["keys"]]
         return config
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(IFTTTNotifier, plugin_name, api_ver=2, interfaces=['notifiers'])
+    plugin.register(IFTTTNotifier, plugin_name, api_ver=2, interfaces=["notifiers"])

@@ -14,4 +14,4 @@ class TestAbort:
     """
 
     def test_abort(self, execute_task):
-        execute_task('test', abort=True)
+        execute_task("test", abort=True)

@@ -8,7 +8,7 @@ from flexget.utils.requests import Session as RequestSession
 
 requests = RequestSession(max_retries=3)
 
-plugin_name = 'bark'
+plugin_name = "bark"
 
 logger = logger.bind(name=plugin_name)
 
@@ -46,38 +46,38 @@ class BarkNotifier:
     """
 
     schema = {
-        'type': 'object',
-        'properties': {
-            'server': {'type': 'string'},
-            'device_key': {'type': 'string'},
-            'level': {'type': 'string', 'enum': ['active', 'timeSensitive', 'passive']},
-            'badge': {'type': 'integer'},
-            'automatically_copy': {'type': 'boolean'},
-            'copy': {'type': 'string'},
-            'sound': {'type': 'string'},
-            'icon': {'type': 'string'},
-            'group': {'type': 'string'},
-            'is_archive': {'type': 'boolean'},
-            'url': {'type': 'string'},
+        "type": "object",
+        "properties": {
+            "server": {"type": "string"},
+            "device_key": {"type": "string"},
+            "level": {"type": "string", "enum": ["active", "timeSensitive", "passive"]},
+            "badge": {"type": "integer"},
+            "automatically_copy": {"type": "boolean"},
+            "copy": {"type": "string"},
+            "sound": {"type": "string"},
+            "icon": {"type": "string"},
+            "group": {"type": "string"},
+            "is_archive": {"type": "boolean"},
+            "url": {"type": "string"},
         },
-        'required': ['server', 'device_key'],
-        'additionalProperties': False,
+        "required": ["server", "device_key"],
+        "additionalProperties": False,
     }
 
     def prepare_config(self, config):
         options = config.copy()
-        server = options.pop('server')
-        if options.pop('automatically_copy', False):
-            options['automaticallyCopy'] = '1'
-        if options.pop('is_archive', False):
-            options['isArchive'] = '1'
+        server = options.pop("server")
+        if options.pop("automatically_copy", False):
+            options["automaticallyCopy"] = "1"
+        if options.pop("is_archive", False):
+            options["isArchive"] = "1"
         return server, options
 
     def notify(self, title, message, config):
         """Send notification to Bark."""
         notification = {
-            'title': title,
-            'body': message,
+            "title": title,
+            "body": message,
         }
         server, options = self.prepare_config(config)
         notification.update(options)
@@ -87,6 +87,6 @@ class BarkNotifier:
             raise PluginWarning(e.args[0])
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(BarkNotifier, plugin_name, api_ver=2, interfaces=['notifiers'])
+    plugin.register(BarkNotifier, plugin_name, api_ver=2, interfaces=["notifiers"])

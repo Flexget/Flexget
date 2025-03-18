@@ -10,11 +10,11 @@ from flexget.manager import Session
 
 from . import db
 
-logger = logger.bind(name='regexp_list')
+logger = logger.bind(name="regexp_list")
 
 
 class RegexpList(MutableSet):
-    schema = {'type': 'string'}
+    schema = {"type": "string"}
 
     def _db_list(self, session):
         return (
@@ -49,7 +49,7 @@ class RegexpList(MutableSet):
             if db_regexp:
                 session.delete(db_regexp)
             db_regexp = db.RegexListRegexp()
-            db_regexp.regexp = entry.get('regexp', entry['title'])
+            db_regexp.regexp = entry.get("regexp", entry["title"])
             db_list.regexps.append(db_regexp)
             session.commit()
             return db_regexp.to_entry()
@@ -59,7 +59,7 @@ class RegexpList(MutableSet):
             for match_regexp in [False, True]:
                 db_regexp = self._find_entry(entry, match_regexp=match_regexp, session=session)
                 if db_regexp:
-                    logger.debug('deleting file {}', db_regexp)
+                    logger.debug("deleting file {}", db_regexp)
                     session.delete(db_regexp)
 
     def __contains__(self, entry):
@@ -71,12 +71,12 @@ class RegexpList(MutableSet):
         res = None
         if match_regexp:
             for regexp in self._db_list(session).regexps:
-                if re.search(regexp.regexp, entry['title'], re.IGNORECASE):
+                if re.search(regexp.regexp, entry["title"], re.IGNORECASE):
                     res = regexp
         else:
             res = (
                 self._db_list(session)
-                .regexps.filter(db.RegexListRegexp.regexp == entry.get('regexp', entry['title']))
+                .regexps.filter(db.RegexListRegexp.regexp == entry.get("regexp", entry["title"]))
                 .first()
             )
         return res
@@ -114,6 +114,6 @@ class PluginRegexpList:
         return list(regexp_list)
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(PluginRegexpList, 'regexp_list', api_ver=2, interfaces=['task', 'list'])
+    plugin.register(PluginRegexpList, "regexp_list", api_ver=2, interfaces=["task", "list"])

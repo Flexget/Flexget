@@ -14,7 +14,7 @@ from flexget.event import event
 from flexget.plugin import PluginError
 from flexget.utils import json
 
-PLUGIN_NAME = 'yaml_list'
+PLUGIN_NAME = "yaml_list"
 
 logger = logger.bind(name=PLUGIN_NAME)
 
@@ -32,7 +32,7 @@ class YamlManagedList(MutableSet):
                     # TODO: use the load from our serialization system if that goes in
                     entries = load_yaml(content)
                 except Exception as exc:
-                    raise PluginError(f'Error opening yaml file `{self.filename}`: {exc}')
+                    raise PluginError(f"Error opening yaml file `{self.filename}`: {exc}")
         except FileNotFoundError:
             entries = []
         if not entries:
@@ -42,12 +42,12 @@ class YamlManagedList(MutableSet):
                 if isinstance(entry, dict):
                     entry = Entry(**entry)
                 else:
-                    raise PluginError(f'Elements of `{self.filename}` must be dictionaries')
-                if not entry.get('url'):
-                    entry['url'] = f'mock://localhost/entry_list/{random.random()}'
+                    raise PluginError(f"Elements of `{self.filename}` must be dictionaries")
+                if not entry.get("url"):
+                    entry["url"] = f"mock://localhost/entry_list/{random.random()}"
                 self.entries.append(entry)
         else:
-            raise PluginError(f'List `{self.filename}` must be a yaml list')
+            raise PluginError(f"List `{self.filename}` must be a yaml list")
 
     def filter_keys(self, item: typing.Mapping) -> dict:
         """Get items with limited keys.
@@ -59,13 +59,13 @@ class YamlManagedList(MutableSet):
             dict: Item with limited keys
 
         """
-        required_fields = ['title']
+        required_fields = ["title"]
         if not self.fields:
-            return {k: item[k] for k in item if not k.startswith('_')}
+            return {k: item[k] for k in item if not k.startswith("_")}
         return {k: item[k] for k in item if k in self.fields or k in required_fields}
 
     def matches(self, entry1, entry2) -> bool:
-        return entry1['title'] == entry2['title']
+        return entry1["title"] == entry2["title"]
 
     def __iter__(self):
         return iter(self.entries)
@@ -83,12 +83,12 @@ class YamlManagedList(MutableSet):
             PluginError: Error
 
         """
-        top_fields = ['title', 'url']
+        top_fields = ["title", "url"]
 
         def sort_key(item: tuple[str, typing.Any]) -> tuple[int, str]:
             # Sort important fields first, then the rest of the fields alphabetically
             try:
-                return top_fields.index(item[0]), ''
+                return top_fields.index(item[0]), ""
             except ValueError:
                 return len(top_fields), item[0]
 
@@ -107,10 +107,10 @@ class YamlManagedList(MutableSet):
             out_bytes = dump_yaml(out, default_flow_style=False, encoding=self.encoding)
 
         try:
-            with open(self.filename, 'wb') as outfile:
+            with open(self.filename, "wb") as outfile:
                 outfile.write(out_bytes)
         except Exception as e:
-            raise PluginError(f'Error writhing data to `{self.filename}`: {e}')
+            raise PluginError(f"Error writhing data to `{self.filename}`: {e}")
 
     def get(self, item) -> Optional[Entry]:
         for entry in self.entries:
@@ -129,9 +129,9 @@ class YamlManagedList(MutableSet):
         self.save_yaml()
 
     def discard(self, item) -> None:
-        title = item.get('title', None)
+        title = item.get("title", None)
         if not title:
-            logger.error('Can\'t add entry, no `title` field')
+            logger.error("Can't add entry, no `title` field")
             return
 
         for i, entry in enumerate(self.entries):
@@ -154,26 +154,26 @@ class YamlManagedList(MutableSet):
 
 class YamlList:
     schema = {
-        'oneOf': [
-            {'type': 'string'},
+        "oneOf": [
+            {"type": "string"},
             {
-                'type': 'object',
-                'properties': {
-                    'path': {'type': 'string'},
-                    'fields': {'type': 'array', 'items': {'type': 'string'}},
-                    'encoding': {'type': 'string', 'default': 'utf-8'},
+                "type": "object",
+                "properties": {
+                    "path": {"type": "string"},
+                    "fields": {"type": "array", "items": {"type": "string"}},
+                    "encoding": {"type": "string", "default": "utf-8"},
                 },
-                'required': ['path'],
-                'additionalProperties': False,
+                "required": ["path"],
+                "additionalProperties": False,
             },
         ]
     }
 
     def process_config(self, config: dict) -> dict:
         if isinstance(config, str):
-            config = {'path': config}
-        config.setdefault('fields', [])
-        config.setdefault('encoding', 'utf-8')
+            config = {"path": config}
+        config.setdefault("fields", [])
+        config.setdefault("encoding", "utf-8")
         return config
 
     def get_list(self, config):
@@ -187,6 +187,6 @@ class YamlList:
         yield from yaml_list
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(YamlList, PLUGIN_NAME, api_ver=2, interfaces=['task', 'list'])
+    plugin.register(YamlList, PLUGIN_NAME, api_ver=2, interfaces=["task", "list"])

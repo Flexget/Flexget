@@ -24,78 +24,78 @@ except ImportError:
     irc_bot = None
     SimpleIRCBot = object
 
-logger = logger.bind(name='irc')
+logger = logger.bind(name="irc")
 
 MESSAGE_CLEAN = re.compile(r"\x0f|\x1f|\x02|\x03(?:[\d]{1,2}(?:,[\d]{1,2})?)?", re.MULTILINE)
-URL_MATCHER = re.compile(r'(https?://[\da-z\.-]+\.[a-z\.]{2,6}[/\w\.-\?&]*/?)', re.MULTILINE)
+URL_MATCHER = re.compile(r"(https?://[\da-z\.-]+\.[a-z\.]{2,6}[/\w\.-\?&]*/?)", re.MULTILINE)
 
 channel_pattern = {
-    'type': 'string',
-    'pattern': r'^([#&][^\x07\x2C\s]{0,200})',
-    'error_pattern': 'channel name must start with # or & and contain no commas and whitespace',
+    "type": "string",
+    "pattern": r"^([#&][^\x07\x2C\s]{0,200})",
+    "error_pattern": "channel name must start with # or & and contain no commas and whitespace",
 }
 schema = {
-    'oneOf': [
+    "oneOf": [
         {
-            'type': 'object',
-            'additionalProperties': {
-                'type': 'object',
-                'properties': {
-                    'tracker_file': {'type': 'string'},
-                    'server': {'type': 'string'},
-                    'port': {'type': 'integer'},
-                    'nickname': {'type': 'string'},
-                    'password': {'type': 'string'},
-                    'channels': one_or_more(channel_pattern),
-                    'nickserv_password': {'type': 'string'},
-                    'invite_nickname': {'type': 'string'},
-                    'invite_message': {'type': 'string'},
-                    'task': one_or_more({'type': 'string'}),
-                    'task_re': {
-                        'type': 'array',
-                        'items': {
-                            'type': 'object',
-                            'properties': {
-                                'task': {'type': 'string'},
-                                'patterns': {
-                                    'type': 'array',
-                                    'items': {
-                                        'type': 'object',
-                                        'properties': {
-                                            'regexp': {'type': 'string', 'format': 'regex'},
-                                            'field': {'type': 'string'},
+            "type": "object",
+            "additionalProperties": {
+                "type": "object",
+                "properties": {
+                    "tracker_file": {"type": "string"},
+                    "server": {"type": "string"},
+                    "port": {"type": "integer"},
+                    "nickname": {"type": "string"},
+                    "password": {"type": "string"},
+                    "channels": one_or_more(channel_pattern),
+                    "nickserv_password": {"type": "string"},
+                    "invite_nickname": {"type": "string"},
+                    "invite_message": {"type": "string"},
+                    "task": one_or_more({"type": "string"}),
+                    "task_re": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "task": {"type": "string"},
+                                "patterns": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "regexp": {"type": "string", "format": "regex"},
+                                            "field": {"type": "string"},
                                         },
-                                        'required': ['regexp', 'field'],
-                                        'additionalProperties': False,
+                                        "required": ["regexp", "field"],
+                                        "additionalProperties": False,
                                     },
                                 },
                             },
-                            'required': ['task', 'patterns'],
-                            'additionalProperties': False,
+                            "required": ["task", "patterns"],
+                            "additionalProperties": False,
                         },
                     },
-                    'queue_size': {'type': 'integer', 'default': 1},
-                    'use_ssl': {'type': 'boolean', 'default': False},
-                    'task_delay': {'type': 'integer'},
+                    "queue_size": {"type": "integer", "default": 1},
+                    "use_ssl": {"type": "boolean", "default": False},
+                    "task_delay": {"type": "integer"},
                 },
-                'allOf': [
+                "allOf": [
                     {
-                        'anyOf': [
-                            {'required': ['server', 'channels']},
-                            {'required': ['tracker_file']},
+                        "anyOf": [
+                            {"required": ["server", "channels"]},
+                            {"required": ["tracker_file"]},
                         ],
-                        'error': 'Must specify a tracker file or server and channel(s)',
+                        "error": "Must specify a tracker file or server and channel(s)",
                     },
                     {
-                        'anyOf': [{'required': ['task']}, {'required': ['task_re']}],
-                        'error': 'Must specify a task',
+                        "anyOf": [{"required": ["task"]}, {"required": ["task_re"]}],
+                        "error": "Must specify a task",
                     },
                 ],
-                'required': ['port'],
-                'additionalProperties': {'type': 'string'},
+                "required": ["port"],
+                "additionalProperties": {"type": "string"},
             },
         },
-        {'type': 'boolean', 'enum': [False]},
+        {"type": "boolean", "enum": [False]},
     ]
 }
 
@@ -125,7 +125,7 @@ def irc_prefix(var):
     :return: Prefixed variable
     """
     if isinstance(var, str):
-        return f'irc_{var.lower()}'
+        return f"irc_{var.lower()}"
     return None
 
 
@@ -163,88 +163,88 @@ class IRCConnection(SimpleIRCBot):
         self.message_regex = []
 
         # If we have a tracker config file, load it
-        tracker_config_file = config.get('tracker_file')
+        tracker_config_file = config.get("tracker_file")
         if tracker_config_file:
             self.tracker_config = self.retrieve_tracker_config(tracker_config_file)
 
         channel_list = []
         if self.tracker_config is not None:
             # Validate config with the settings in the torrent file
-            for param in self.tracker_config.find('settings'):
+            for param in self.tracker_config.find("settings"):
                 # Handle textbox entries
-                value_name = param.get('name') if param.tag == 'textbox' else param.tag
+                value_name = param.get("name") if param.tag == "textbox" else param.tag
 
                 # Strip the gazelle prefix
-                if value_name.startswith('gazelle_'):
-                    value_name = value_name.replace('gazelle_', '')
+                if value_name.startswith("gazelle_"):
+                    value_name = value_name.replace("gazelle_", "")
 
                 # Skip descriptions
-                if 'description' in value_name:
+                if "description" in value_name:
                     continue
 
                 if self.config.get(value_name) is None:
                     raise MissingConfigOption(
-                        f'missing configuration option on irc config {self.connection_name}: {value_name}'
+                        f"missing configuration option on irc config {self.connection_name}: {value_name}"
                     )
 
             # Get the tracker name, for use in the connection name
-            self.connection_name = self.tracker_config.get('longName', config_name)
+            self.connection_name = self.tracker_config.get("longName", config_name)
 
             # Extract the IRC server information
-            for server in self.tracker_config.find('servers'):
-                self.server_list.extend(server.get('serverNames').split(','))
-                channel_list.extend(server.get('channelNames').split(','))
-                self.announcer_list.extend(server.get('announcerNames').split(','))
+            for server in self.tracker_config.find("servers"):
+                self.server_list.extend(server.get("serverNames").split(","))
+                channel_list.extend(server.get("channelNames").split(","))
+                self.announcer_list.extend(server.get("announcerNames").split(","))
 
             # Process ignore lines
-            for regex_values in self.tracker_config.findall('parseinfo/ignore/regex'):
-                rx = re.compile(regex_values.get('value'), re.MULTILINE)
-                self.ignore_lines.append((rx, regex_values.get('expected') != 'false'))
+            for regex_values in self.tracker_config.findall("parseinfo/ignore/regex"):
+                rx = re.compile(regex_values.get("value"), re.MULTILINE)
+                self.ignore_lines.append((rx, regex_values.get("expected") != "false"))
 
             # Parse patterns
             self.multilinepatterns = self.parse_patterns(
-                list(self.tracker_config.findall('parseinfo/multilinepatterns/extract'))
+                list(self.tracker_config.findall("parseinfo/multilinepatterns/extract"))
             )
             self.linepatterns = self.parse_patterns(
-                list(self.tracker_config.findall('parseinfo/linepatterns/extract'))
+                list(self.tracker_config.findall("parseinfo/linepatterns/extract"))
             )
 
         # overwrite tracker config with flexget config
-        if self.config.get('server'):
-            self.server_list = [self.config['server']]
-            logger.debug('Using server specified from config')
-        channels = config.get('channels')
+        if self.config.get("server"):
+            self.server_list = [self.config["server"]]
+            logger.debug("Using server specified from config")
+        channels = config.get("channels")
         if channels:
             channel_list = channels if isinstance(channels, list) else [channels]
-            logger.debug('Using channel(s) specified from config')
+            logger.debug("Using channel(s) specified from config")
 
-        logger.debug('Servers: {}', self.server_list)
-        logger.debug('Channels: {}', channel_list)
-        logger.debug('Announcers: {}', self.announcer_list)
-        logger.debug('Ignore Lines: {}', len(self.ignore_lines))
-        logger.debug('Message Regexs: {}', len(self.multilinepatterns) + len(self.linepatterns))
+        logger.debug("Servers: {}", self.server_list)
+        logger.debug("Channels: {}", channel_list)
+        logger.debug("Announcers: {}", self.announcer_list)
+        logger.debug("Ignore Lines: {}", len(self.ignore_lines))
+        logger.debug("Message Regexs: {}", len(self.multilinepatterns) + len(self.linepatterns))
         for rx, vals, optional in self.multilinepatterns:
             msg = '    Multilinepattern "{}" extracts {}'
             if optional:
-                msg += ' (optional)'
+                msg += " (optional)"
             logger.debug(msg, rx.pattern, vals)
         for rx, vals, optional in self.linepatterns:
             msg = '    Linepattern "{}" extracts {}'
             if optional:
-                msg += ' (optional)'
+                msg += " (optional)"
             logger.debug(msg, rx.pattern, vals)
 
         # Init the IRC Bot
         ircbot_config = {
-            'servers': self.server_list,
-            'port': config['port'],
-            'channels': channel_list,
-            'nickname': config.get('nickname', f'Flexget-{uuid4()!s}'),
-            'password': config.get('password'),
-            'invite_nickname': config.get('invite_nickname'),
-            'invite_message': config.get('invite_message'),
-            'nickserv_password': config.get('nickserv_password'),
-            'use_ssl': config.get('use_ssl'),
+            "servers": self.server_list,
+            "port": config["port"],
+            "channels": channel_list,
+            "nickname": config.get("nickname", f"Flexget-{uuid4()!s}"),
+            "password": config.get("password"),
+            "invite_nickname": config.get("invite_nickname"),
+            "invite_message": config.get("invite_message"),
+            "nickserv_password": config.get("nickserv_password"),
+            "use_ssl": config.get("use_ssl"),
         }
         SimpleIRCBot.__init__(self, ircbot_config)
 
@@ -264,10 +264,10 @@ class IRCConnection(SimpleIRCBot):
         :return: the parsed XML
         """
         try:
-            with open(path, 'rb') as xml_file:
+            with open(path, "rb") as xml_file:
                 return parse(xml_file).getroot()
         except Exception as e:
-            raise TrackerFileParseError(f'Unable to parse tracker config file {path}: {e}')
+            raise TrackerFileParseError(f"Unable to parse tracker config file {path}: {e}")
 
     @classmethod
     def retrieve_tracker_config(cls, tracker_config_file):
@@ -277,28 +277,28 @@ class IRCConnection(SimpleIRCBot):
         :return: parsed XML
         """
         base_url = (
-            'https://raw.githubusercontent.com/autodl-community/autodl-trackers/master/trackers/'
+            "https://raw.githubusercontent.com/autodl-community/autodl-trackers/master/trackers/"
         )
         tracker_config_file = os.path.expanduser(tracker_config_file)
 
         # First we attempt to find the file locally as-is
         if os.path.exists(tracker_config_file):
-            logger.debug('Found tracker file: {}', tracker_config_file)
+            logger.debug("Found tracker file: {}", tracker_config_file)
             return cls.read_tracker_config(tracker_config_file)
 
-        if not tracker_config_file.endswith('.tracker'):
-            tracker_config_file += '.tracker'
+        if not tracker_config_file.endswith(".tracker"):
+            tracker_config_file += ".tracker"
 
             # Maybe the file is missing extension?
             if os.path.exists(tracker_config_file):
-                logger.debug('Found tracker file: {}', tracker_config_file)
-                return cls.read_tracker_config(tracker_config_file.rsplit('.tracker')[0])
+                logger.debug("Found tracker file: {}", tracker_config_file)
+                return cls.read_tracker_config(tracker_config_file.rsplit(".tracker")[0])
 
         # Check that containing dir exists, otherwise default to flexget_config_dir/trackers
         if os.path.exists(os.path.dirname(tracker_config_file)):
             base_dir = os.path.dirname(tracker_config_file)
         else:
-            base_dir = os.path.abspath(os.path.join(manager.config_base, 'trackers'))
+            base_dir = os.path.abspath(os.path.join(manager.config_base, "trackers"))
         # Find the filenames for easy use later
         tracker_name = os.path.basename(tracker_config_file)
         tracker_name_no_ext = os.path.splitext(tracker_name)[0]
@@ -308,7 +308,7 @@ class IRCConnection(SimpleIRCBot):
             for f in files:
                 if tracker_name_no_ext.lower() in f.lower():
                     found_path = os.path.join(base_dir, f)
-                    logger.debug('Found tracker file: {}', found_path)
+                    logger.debug("Found tracker file: {}", found_path)
                     return cls.read_tracker_config(found_path)
 
         # Download from Github instead
@@ -318,28 +318,28 @@ class IRCConnection(SimpleIRCBot):
             except OSError as e:
                 raise TrackerFileError(e)
         logger.info(
-            'Tracker file not found on disk. Attempting to fetch tracker config file from Github.'
+            "Tracker file not found on disk. Attempting to fetch tracker config file from Github."
         )
         tracker = None
         with contextlib.suppress(requests.RequestException, OSError):
             tracker = requests.get(base_url + tracker_config_file)
         if not tracker:
             try:
-                logger.debug('Trying to search list of tracker files on Github')
+                logger.debug("Trying to search list of tracker files on Github")
                 # Try to see if it's not found due to case sensitivity
                 trackers = (
                     requests.get(
-                        'https://api.github.com/repos/autodl-community/'
-                        'autodl-trackers/git/trees/master?recursive=1'
+                        "https://api.github.com/repos/autodl-community/"
+                        "autodl-trackers/git/trees/master?recursive=1"
                     )
                     .json()
-                    .get('tree', [])
+                    .get("tree", [])
                 )
                 for t in trackers:
-                    name = t.get('path', '')
+                    name = t.get("path", "")
                     if (
-                        not name.endswith('.tracker')
-                        or name.lower() != 'trackers/' + tracker_name.lower()
+                        not name.endswith(".tracker")
+                        or name.lower() != "trackers/" + tracker_name.lower()
                     ):
                         continue
                     tracker = requests.get(base_url + name)
@@ -349,12 +349,12 @@ class IRCConnection(SimpleIRCBot):
                 raise TrackerFileError(e)
         if not tracker:
             raise TrackerFileError(
-                f'Unable to find {tracker_config_file} on disk or Github. Did you spell it correctly?'
+                f"Unable to find {tracker_config_file} on disk or Github. Did you spell it correctly?"
             )
 
         # If we got this far, let's save our work :)
         save_path = os.path.join(base_dir, tracker_name)
-        with open(save_path, 'wb') as tracker_file:
+        with open(save_path, "wb") as tracker_file:
             for chunk in tracker.iter_content(8192):
                 tracker_file.write(chunk)
         return cls.read_tracker_config(save_path)
@@ -370,9 +370,9 @@ class IRCConnection(SimpleIRCBot):
         """
         result = []
         for pattern in patterns:
-            rx = re.compile(pattern.find('regex').get('value'), re.MULTILINE)
-            vals = [var.get('name') for idx, var in enumerate(pattern.find('vars'))]
-            optional = pattern.get('optional', 'false').lower() == 'true'
+            rx = re.compile(pattern.find("regex").get("value"), re.MULTILINE)
+            vals = [var.get("name") for idx, var in enumerate(pattern.find("vars"))]
+            optional = pattern.get("optional", "false").lower() == "true"
             result.append((rx, vals, optional))
         return result
 
@@ -390,21 +390,21 @@ class IRCConnection(SimpleIRCBot):
 
         :return:
         """
-        tasks = self.config.get('task')
-        tasks_re = self.config.get('task_re')
+        tasks = self.config.get("task")
+        tasks_re = self.config.get("task_re")
         if tasks:
             if isinstance(tasks, str):
                 tasks = [tasks]
             logger.debug(
-                'Injecting {} entries into tasks {}', len(self.entry_queue), ', '.join(tasks)
+                "Injecting {} entries into tasks {}", len(self.entry_queue), ", ".join(tasks)
             )
             options = {
-                'tasks': tasks,
-                'cron': True,
-                'inject': self.entry_queue,
-                'allow_manual': True,
+                "tasks": tasks,
+                "cron": True,
+                "inject": self.entry_queue,
+                "allow_manual": True,
             }
-            manager.execute(options=options, priority=5, suppress_warnings=['input'])
+            manager.execute(options=options, priority=5, suppress_warnings=["input"])
 
         if tasks_re:
             tasks_entry_map = {}
@@ -412,26 +412,26 @@ class IRCConnection(SimpleIRCBot):
                 matched = False
                 for task_config in tasks_re:
                     pattern_match = 0
-                    for pattern in task_config.get('patterns'):
+                    for pattern in task_config.get("patterns"):
                         if re.search(
-                            pattern['regexp'], entry.get(pattern['field'], ''), re.IGNORECASE
+                            pattern["regexp"], entry.get(pattern["field"], ""), re.IGNORECASE
                         ):
                             pattern_match += 1
 
                     # the entry is added to the task map if all of the defined regex matched
-                    if len(task_config.get('patterns')) == pattern_match:
+                    if len(task_config.get("patterns")) == pattern_match:
                         matched = True
-                        if not tasks_entry_map.get(task_config.get('task')):
-                            tasks_entry_map[task_config.get('task')] = []
-                        tasks_entry_map[task_config.get('task')].append(entry)
+                        if not tasks_entry_map.get(task_config.get("task")):
+                            tasks_entry_map[task_config.get("task")] = []
+                        tasks_entry_map[task_config.get("task")].append(entry)
 
                 if not matched:
-                    logger.debug('Entry "{}" did not match any task regexp.', entry['title'])
+                    logger.debug('Entry "{}" did not match any task regexp.', entry["title"])
 
             for task, entries in tasks_entry_map.items():
                 logger.debug('Injecting {} entries into task "{}"', len(entries), task)
-                options = {'tasks': [task], 'cron': True, 'inject': entries, 'allow_manual': True}
-                manager.execute(options=options, priority=5, suppress_warnings=['input'])
+                options = {"tasks": [task], "cron": True, "inject": entries, "allow_manual": True}
+                manager.execute(options=options, priority=5, suppress_warnings=["input"])
 
         self.entry_queue = []
 
@@ -442,11 +442,11 @@ class IRCConnection(SimpleIRCBot):
         :return:
         """
         self.entry_queue.append(entry)
-        logger.debug('Entry: {}', entry)
-        if len(self.entry_queue) >= self.config['queue_size']:
-            if self.config.get('task_delay'):
+        logger.debug("Entry: {}", entry)
+        if len(self.entry_queue) >= self.config["queue_size"]:
+            if self.config.get("task_delay"):
                 self.schedule.queue_command(
-                    self.config['task_delay'], self.run_tasks, unique=False
+                    self.config["task_delay"], self.run_tasks, unique=False
                 )
             else:
                 self.run_tasks()
@@ -461,15 +461,15 @@ class IRCConnection(SimpleIRCBot):
         """
         result = {}
         for rx, vals, _ in patterns:
-            logger.debug('Using pattern {} to parse message vars', rx.pattern)
+            logger.debug("Using pattern {} to parse message vars", rx.pattern)
             match = rx.search(msg)
             if match:
                 val_names = [irc_prefix(val.lower()) for val in vals]
-                val_values = [strip_whitespace(x) or '' for x in match.groups()]
+                val_values = [strip_whitespace(x) or "" for x in match.groups()]
                 result.update(dict(zip(val_names, val_values)))
-                logger.debug('Found: {}', dict(zip(val_names, val_values)))
+                logger.debug("Found: {}", dict(zip(val_names, val_values)))
                 break
-            logger.debug('No matches found for {} in {}', rx.pattern, msg)
+            logger.debug("No matches found for {} in {}", rx.pattern, msg)
         return result
 
     def process_tracker_config_rules(self, entry, rules=None):
@@ -482,49 +482,49 @@ class IRCConnection(SimpleIRCBot):
         ignore_optionals = []
 
         if rules is None:
-            rules = self.tracker_config.find('parseinfo/linematched')
+            rules = self.tracker_config.find("parseinfo/linematched")
 
         # Make sure all irc fields from entry are in `fields`
-        fields = {key: val for key, val in entry.items() if key.startswith('irc_')}
+        fields = {key: val for key, val in entry.items() if key.startswith("irc_")}
 
         for rule in rules:
-            logger.debug('Processing rule {}', rule.tag)
+            logger.debug("Processing rule {}", rule.tag)
 
             # Var - concat a var from other vars
-            if rule.tag == 'var':
-                result = ''
+            if rule.tag == "var":
+                result = ""
                 for element in rule:
-                    if element.tag == 'string':
-                        result += element.get('value')
-                    elif element.tag in ['var', 'varenc']:
-                        varname = element.get('name')
+                    if element.tag == "string":
+                        result += element.get("value")
+                    elif element.tag in ["var", "varenc"]:
+                        varname = element.get("name")
                         if irc_prefix(varname) in fields:
                             value = fields[irc_prefix(varname)]
                         elif self.config.get(varname):
                             value = self.config.get(varname)
                         else:
                             logger.error(
-                                'Missing variable {} from config, skipping rule',
+                                "Missing variable {} from config, skipping rule",
                                 irc_prefix(varname),
                             )
                             break
-                        if element.tag == 'varenc':
-                            value = quote(value.encode('utf-8'))
+                        if element.tag == "varenc":
+                            value = quote(value.encode("utf-8"))
                         result += value
                     else:
-                        logger.error('Unsupported var operation {}, skipping rule', element.tag)
+                        logger.error("Unsupported var operation {}, skipping rule", element.tag)
                         break
                 else:
                     # Only set the result if we processed all elements
-                    logger.debug('Result for rule {}: {}={}', rule.tag, rule.get('name'), result)
-                    fields[irc_prefix(rule.get('name'))] = result
+                    logger.debug("Result for rule {}: {}={}", rule.tag, rule.get("name"), result)
+                    fields[irc_prefix(rule.get("name"))] = result
 
             # Var Replace - replace text in a var
-            elif rule.tag == 'varreplace':
-                source_var = irc_prefix(rule.get('srcvar'))
-                target_var = irc_prefix(rule.get('name'))
-                regex = rule.get('regex')
-                replace = rule.get('replace')
+            elif rule.tag == "varreplace":
+                source_var = irc_prefix(rule.get("srcvar"))
+                target_var = irc_prefix(rule.get("name"))
+                regex = rule.get("regex")
+                replace = rule.get("replace")
                 if (
                     source_var
                     and target_var
@@ -533,48 +533,48 @@ class IRCConnection(SimpleIRCBot):
                     and source_var in fields
                 ):
                     fields[target_var] = re.sub(regex, replace, fields[source_var])
-                    logger.debug('varreplace: {}={}', target_var, fields[target_var])
+                    logger.debug("varreplace: {}={}", target_var, fields[target_var])
                 else:
-                    logger.error('Invalid varreplace options, skipping rule')
+                    logger.error("Invalid varreplace options, skipping rule")
 
             # Extract - create multiple vars from a single regex
-            elif rule.tag == 'extract':
-                source_var = irc_prefix(rule.get('srcvar'))
+            elif rule.tag == "extract":
+                source_var = irc_prefix(rule.get("srcvar"))
                 if source_var not in fields:
-                    if rule.get('optional', 'false') == 'false':
+                    if rule.get("optional", "false") == "false":
                         logger.error(
-                            'Error processing extract rule, non-optional value {} missing!',
+                            "Error processing extract rule, non-optional value {} missing!",
                             source_var,
                         )
                     ignore_optionals.append(source_var)
                     continue
-                if rule.find('regex') is not None:
-                    regex = rule.find('regex').get('value')
+                if rule.find("regex") is not None:
+                    regex = rule.find("regex").get("value")
                 else:
-                    logger.error('Regex option missing on extract rule, skipping rule')
+                    logger.error("Regex option missing on extract rule, skipping rule")
                     continue
                 group_names = [
-                    irc_prefix(x.get('name')) for x in rule.find('vars') if x.tag == 'var'
+                    irc_prefix(x.get("name")) for x in rule.find("vars") if x.tag == "var"
                 ]
                 match = re.search(regex, fields[source_var])
                 if match:
                     fields.update(dict(zip(group_names, match.groups())))
                 else:
-                    logger.debug('No match found for rule extract')
+                    logger.debug("No match found for rule extract")
 
             # Extract Tag - set a var if a regex matches a tag in a var
-            elif rule.tag == 'extracttags':
-                source_var = irc_prefix(rule.get('srcvar'))
-                split = rule.get('split')
+            elif rule.tag == "extracttags":
+                source_var = irc_prefix(rule.get("srcvar"))
+                split = rule.get("split")
                 if source_var in ignore_optionals:
                     continue
                 values = [strip_whitespace(x) for x in fields[source_var].split(split)]
                 for element in rule:
-                    if element.tag == 'setvarif':
-                        target_var = irc_prefix(element.get('varName'))
-                        regex = element.get('regex')
-                        value = element.get('value')
-                        new_value = element.get('newValue')
+                    if element.tag == "setvarif":
+                        target_var = irc_prefix(element.get("varName"))
+                        regex = element.get("regex")
+                        value = element.get("value")
+                        new_value = element.get("newValue")
                         if regex is not None:
                             found_match = False
                             for val in values:
@@ -583,67 +583,67 @@ class IRCConnection(SimpleIRCBot):
                                     fields[target_var] = val
                                     found_match = True
                             if not found_match:
-                                logger.debug('No matches found for regex {}', regex)
+                                logger.debug("No matches found for regex {}", regex)
                         elif value is not None and new_value is not None:
                             if value in values:
                                 fields[target_var] = new_value
                             else:
                                 logger.debug(
-                                    'No match found for value {} in {}', value, source_var
+                                    "No match found for value {} in {}", value, source_var
                                 )
                         else:
                             logger.error(
-                                'Missing regex/value/newValue for setvarif command, ignoring'
+                                "Missing regex/value/newValue for setvarif command, ignoring"
                             )
 
             # Extract One - extract one var from a list of regexes
-            elif rule.tag == 'extractone':
+            elif rule.tag == "extractone":
                 for element in rule:
-                    if element.tag == 'extract':
-                        source_var = irc_prefix(element.get('srcvar'))
-                        if element.find('regex') is not None:
-                            regex = element.find('regex').get('value')
+                    if element.tag == "extract":
+                        source_var = irc_prefix(element.get("srcvar"))
+                        if element.find("regex") is not None:
+                            regex = element.find("regex").get("value")
                         else:
-                            logger.error('Regex option missing on extract rule, skipping.')
+                            logger.error("Regex option missing on extract rule, skipping.")
                             continue
-                        if element.find('vars') is not None:
-                            vars = [irc_prefix(var.get('name')) for var in element.find('vars')]
+                        if element.find("vars") is not None:
+                            vars = [irc_prefix(var.get("name")) for var in element.find("vars")]
                         else:
-                            logger.error('No variable bindings found in extract rule, skipping.')
+                            logger.error("No variable bindings found in extract rule, skipping.")
                             continue
-                        match = re.match(regex, fields.get(source_var, ''))
+                        match = re.match(regex, fields.get(source_var, ""))
                         if match:
                             fields.update(dict(zip(vars, match.groups())))
                         else:
-                            logger.debug('No match for extract with regex: {}', regex)
+                            logger.debug("No match for extract with regex: {}", regex)
                     else:
-                        logger.error('Unsupported extractone tag: {}', element.tag)
+                        logger.error("Unsupported extractone tag: {}", element.tag)
 
             # Set Regex - set a var if a regex matches
-            elif rule.tag == 'setregex':
-                source_var = irc_prefix(rule.get('srcvar'))
-                regex = rule.get('regex')
-                target_var = irc_prefix(rule.get('varName'))
-                target_val = rule.get('newValue')
+            elif rule.tag == "setregex":
+                source_var = irc_prefix(rule.get("srcvar"))
+                regex = rule.get("regex")
+                target_var = irc_prefix(rule.get("varName"))
+                target_val = rule.get("newValue")
                 if source_var and regex and target_var and target_val:
                     if source_var in fields and re.search(regex, fields[source_var]):
                         fields[target_var] = target_val
                 else:
-                    logger.error('Option missing on setregex, skipping rule')
+                    logger.error("Option missing on setregex, skipping rule")
 
             # If statement
-            elif rule.tag == 'if':
-                source_var = irc_prefix(rule.get('srcvar'))
-                regex = rule.get('regex')
+            elif rule.tag == "if":
+                source_var = irc_prefix(rule.get("srcvar"))
+                regex = rule.get("regex")
 
                 if source_var and regex:
                     if source_var in fields and re.match(regex, fields[source_var]):
                         fields.update(self.process_tracker_config_rules(fields, rule))
                 else:
-                    logger.error('Option missing for if statement, skipping rule')
+                    logger.error("Option missing for if statement, skipping rule")
 
             else:
-                logger.warning('Unsupported linematched tag: {}', rule.tag)
+                logger.warning("Unsupported linematched tag: {}", rule.tag)
 
         return fields
 
@@ -657,7 +657,7 @@ class IRCConnection(SimpleIRCBot):
         nickname = msg.from_nick
         channel = msg.arguments[0]
         if not irc_bot.is_channel(channel):
-            logger.debug('Received msg is not a channel msg: {}', msg)
+            logger.debug("Received msg is not a channel msg: {}", msg)
             return
         # set some defaults
         self.line_cache.setdefault(channel, {})
@@ -678,14 +678,14 @@ class IRCConnection(SimpleIRCBot):
         """
         # If we have announcers defined, ignore any messages not from them
         if self.announcer_list and nickname not in self.announcer_list:
-            logger.debug('Ignoring message: from non-announcer {}', nickname)
+            logger.debug("Ignoring message: from non-announcer {}", nickname)
             self.processing_message = False
             return
 
         # Clean up the messages
-        lines = [MESSAGE_CLEAN.sub('', line) for line in self.line_cache[channel][nickname]]
+        lines = [MESSAGE_CLEAN.sub("", line) for line in self.line_cache[channel][nickname]]
 
-        logger.debug('Received line(s): {}', '\n'.join(lines))
+        logger.debug("Received line(s): {}", "\n".join(lines))
 
         # Generate some entries
         if self.linepatterns:
@@ -700,28 +700,28 @@ class IRCConnection(SimpleIRCBot):
             if self.tracker_config is not None and entry:
                 entry.update(self.process_tracker_config_rules(entry))
             elif self.tracker_config is not None:
-                logger.error('Failed to parse message(s).')
+                logger.error("Failed to parse message(s).")
                 self.processing_message = False
                 return
 
-            entry['title'] = entry.get('irc_torrentname')
+            entry["title"] = entry.get("irc_torrentname")
 
-            entry['url'] = entry.get('irc_torrenturl')
+            entry["url"] = entry.get("irc_torrenturl")
 
-            logger.debug('Entry after processing: {}', dict(entry))
-            if not entry['url'] or not entry['title']:
+            logger.debug("Entry after processing: {}", dict(entry))
+            if not entry["url"] or not entry["title"]:
                 logger.error(
-                    'Parsing message failed. Title={}, url={}.', entry['title'], entry['url']
+                    "Parsing message failed. Title={}, url={}.", entry["title"], entry["url"]
                 )
                 continue
 
-            logger.verbose('IRC message in {} generated an entry: {}', channel, entry)
+            logger.verbose("IRC message in {} generated an entry: {}", channel, entry)
             self.queue_entry(entry)
 
         # reset the line cache
         if self.multilinepatterns and lines:
             self.line_cache[channel][nickname] = lines
-            logger.debug('Left over lines: {}', '\n'.join(lines))
+            logger.debug("Left over lines: {}", "\n".join(lines))
         else:
             self.line_cache[channel][nickname] = []
 
@@ -738,7 +738,7 @@ class IRCConnection(SimpleIRCBot):
             ignore = False
             for rx, expected in self.ignore_lines:
                 if rx.match(line) and expected:
-                    logger.debug('Ignoring message: matched ignore line')
+                    logger.debug("Ignoring message: matched ignore line")
                     ignore = True
                     break
             if ignore:
@@ -750,7 +750,7 @@ class IRCConnection(SimpleIRCBot):
 
             # Generate the entry and process it through the linematched rules
             if not match:
-                logger.error('Failed to parse message. Skipping: {}', line)
+                logger.error("Failed to parse message. Skipping: {}", line)
                 continue
 
             entry.update(match)
@@ -768,48 +768,48 @@ class IRCConnection(SimpleIRCBot):
         rest = []  # contains the rest of the lines
         while len(lines) > 0:
             entry = Entry()
-            raw_message = ''
+            raw_message = ""
             matched_lines = []
             for idx, (rx, vals, optional) in enumerate(self.multilinepatterns):
-                logger.debug('Using pattern {} to parse message vars', rx.pattern)
+                logger.debug("Using pattern {} to parse message vars", rx.pattern)
                 # find the next candidate line
-                line = ''
+                line = ""
                 for candidate in list(lines):
                     # skip ignored lines
                     for ignore_rx, expected in self.ignore_lines:
                         if ignore_rx.match(candidate) and expected:
-                            logger.debug('Ignoring message: matched ignore line')
+                            logger.debug("Ignoring message: matched ignore line")
                             lines.remove(candidate)
                             break
                     else:
                         line = candidate
                         break
 
-                raw_message += '\n' + line
+                raw_message += "\n" + line
                 match = self.match_message_patterns([(rx, vals, optional)], line)
                 if match:
                     entry.update(match)
                     matched_lines.append(line)
                     lines.remove(line)
                 elif optional:
-                    logger.debug('No match for optional extract pattern found.')
+                    logger.debug("No match for optional extract pattern found.")
                 elif not line:
                     rest = matched_lines + lines
                     break
                 elif (
                     idx == 0
                 ):  # if it's the first regex that fails, then it's probably just garbage
-                    logger.error('No matches found for pattern {}', rx.pattern)
+                    logger.error("No matches found for pattern {}", rx.pattern)
                     lines.remove(line)
                     rest = lines
                     break
                 else:
-                    logger.error('No matches found for pattern {}', rx.pattern)
+                    logger.error("No matches found for pattern {}", rx.pattern)
                     rest = lines
                     break
 
             else:
-                entry['irc_raw_message'] = raw_message
+                entry["irc_raw_message"] = raw_message
 
                 entries.append(entry)
                 continue
@@ -826,7 +826,7 @@ class IRCConnection(SimpleIRCBot):
             entry = Entry(irc_raw_message=line)
 
             # Use the message as title
-            entry['title'] = line
+            entry["title"] = line
 
             # find a url...
             url_match = URL_MATCHER.findall(line)
@@ -834,10 +834,10 @@ class IRCConnection(SimpleIRCBot):
                 # We have a URL(s)!, generate an entry
                 urls = list(url_match)
                 url = urls[-1]
-                entry.update({'urls': urls, 'url': url})
+                entry.update({"urls": urls, "url": url})
 
-            if not entry.get('url'):
-                logger.error('Parsing message failed. No url found.')
+            if not entry.get("url"):
+                logger.error("Parsing message failed. No url found.")
                 continue
 
             entries.append(entry)
@@ -859,7 +859,7 @@ class IRCConnectionManager:
         self.shutdown_event = threading.Event()
         self.wait = False
         self.delay = 30
-        self.thread = create_thread('irc_manager', self)
+        self.thread = create_thread("irc_manager", self)
         self.thread.start()
 
     def is_alive(self):
@@ -899,7 +899,7 @@ class IRCConnectionManager:
                     # is it time yet?
                     if schedule[conn_name] <= now:
                         logger.error(
-                            'IRC connection for {} has died unexpectedly. Restarting it.',
+                            "IRC connection for {} has died unexpectedly. Restarting it.",
                             conn_name,
                         )
                         try:
@@ -937,10 +937,10 @@ class IRCConnectionManager:
         # First we validate the config for all connections including their .tracker files
         for conn_name, config in self.config.items():
             try:
-                logger.info('Starting IRC connection for {}', conn_name)
+                logger.info("Starting IRC connection for {}", conn_name)
                 conn = IRCConnection(config, conn_name)
                 irc_connections[conn_name] = conn
-                config_hash['names'][conn_name] = get_config_hash(config)
+                config_hash["names"][conn_name] = get_config_hash(config)
             except (MissingConfigOption, TrackerFileParseError, TrackerFileError, OSError) as e:
                 logger.error(e)
                 if conn_name in irc_connections:
@@ -969,7 +969,7 @@ class IRCConnectionManager:
     def status(self, name=None):
         if name:
             if name not in irc_connections:
-                raise ValueError(f'{name} is not a valid irc connection')
+                raise ValueError(f"{name} is not a valid irc connection")
             status = [self.status_dict(name)]
         else:
             status = [self.status_dict(n) for n in irc_connections]
@@ -978,11 +978,11 @@ class IRCConnectionManager:
     def status_dict(self, name):
         status = {name: {}}
         connection = irc_connections[name]
-        status[name]['alive'] = connection.is_alive()
-        status[name]['channels'] = [{key: value} for key, value in connection.channels.items()]
-        status[name]['connected_channels'] = connection.connected_channels
-        status[name]['server'] = connection.servers[0]
-        status[name]['port'] = connection.port
+        status[name]["alive"] = connection.is_alive()
+        status[name]["channels"] = [{key: value} for key, value in connection.channels.items()]
+        status[name]["connected_channels"] = connection.connected_channels
+        status[name]["server"] = connection.servers[0]
+        status[name]["port"] = connection.port
 
         return status
 
@@ -991,13 +991,13 @@ class IRCConnectionManager:
         removed_connections = set(self.config.keys()) - set(config.keys())
         for name, conf in config.items():
             hash = get_config_hash(conf)
-            if name in self.config and config_hash['names'].get(name) == hash:
+            if name in self.config and config_hash["names"].get(name) == hash:
                 continue
             try:
                 new_irc_connections[name] = IRCConnection(conf, name)
-                config_hash['names'][name] = hash
+                config_hash["names"][name] = hash
             except (MissingConfigOption, TrackerFileParseError, TrackerFileError, OSError) as e:
-                logger.error('Failed to update config. Error when updating {}: {}', name, e)
+                logger.error("Failed to update config. Error when updating {}: {}", name, e)
                 return
 
         # stop connections that have been removed from config
@@ -1015,12 +1015,12 @@ class IRCConnectionManager:
         self.config = config
 
 
-@event('manager.daemon.started')
+@event("manager.daemon.started")
 def irc_start(manager):
     irc_update_config(manager)
 
 
-@event('manager.config_updated')
+@event("manager.config_updated")
 def irc_update_config(manager):
     global irc_manager
 
@@ -1028,28 +1028,28 @@ def irc_update_config(manager):
     if not manager.is_daemon:
         return
 
-    config = manager.config.get('irc')
+    config = manager.config.get("irc")
     # No config, no connections
     if not config:
-        logger.debug('No irc connections defined in the config')
+        logger.debug("No irc connections defined in the config")
         stop_irc(manager)
         return
 
     if irc_bot is None:
         logger.error(
-            'ImportError: irc_bot module not found or version is too old. Shutting down daemon.'
+            "ImportError: irc_bot module not found or version is too old. Shutting down daemon."
         )
         stop_irc(manager)
         manager.shutdown(finish_queue=False)
         return
 
-    config_hash.setdefault('names', {})
+    config_hash.setdefault("names", {})
     new_config_hash = get_config_hash(config)
 
-    if config_hash.get('config') == new_config_hash:
-        logger.verbose('IRC config has not been changed. Not reloading any connections.')
+    if config_hash.get("config") == new_config_hash:
+        logger.verbose("IRC config has not been changed. Not reloading any connections.")
         return
-    config_hash['manager'] = new_config_hash
+    config_hash["manager"] = new_config_hash
 
     if irc_manager is not None and irc_manager.is_alive():
         irc_manager.update_config(config)
@@ -1057,15 +1057,15 @@ def irc_update_config(manager):
         irc_manager = IRCConnectionManager(config)
 
 
-@event('manager.shutdown_requested')
+@event("manager.shutdown_requested")
 def shutdown_requested(manager):
     stop_irc(manager, wait=True)
 
 
-@event('manager.shutdown')
+@event("manager.shutdown")
 def stop_irc(manager, wait=False):
     if irc_manager is not None and irc_manager.is_alive():
-        logger.info('Shutting down IRC.')
+        logger.info("Shutting down IRC.")
         irc_manager.stop(wait)
         # this check is necessary for when the irc manager is the one shutting down the daemon
         # a thread can't join itself
@@ -1074,6 +1074,6 @@ def stop_irc(manager, wait=False):
             irc_manager.thread.join(len(irc_connections.keys()) * 11)
 
 
-@event('config.register')
+@event("config.register")
 def register_plugin():
-    register_config_key('irc', schema)
+    register_config_key("irc", schema)

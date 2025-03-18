@@ -17,10 +17,10 @@ class TestNotifyEntry:
 
     def test_basic_notify(self, debug_notifications, execute_task):
         expected = [
-            ('foo', 'http://bla.com', {'api_key': 'apikey'}),
-            ('bar', 'http://bla2.com', {'api_key': 'apikey'}),
+            ("foo", "http://bla.com", {"api_key": "apikey"}),
+            ("bar", "http://bla2.com", {"api_key": "apikey"}),
         ]
-        task = execute_task('test_basic_notify')
+        task = execute_task("test_basic_notify")
 
         assert len(task.accepted) == 2
         assert debug_notifications == expected

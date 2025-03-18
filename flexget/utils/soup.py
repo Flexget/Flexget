@@ -7,8 +7,8 @@ from typing import IO, Union
 from bs4 import BeautifulSoup
 from html5lib.constants import DataLossWarning
 
-warnings.simplefilter('ignore', DataLossWarning)
+warnings.simplefilter("ignore", DataLossWarning)
 
 
-def get_soup(obj: Union[str, IO, bytes], parser: str = 'html5lib') -> BeautifulSoup:
+def get_soup(obj: Union[str, IO, bytes], parser: str = "html5lib") -> BeautifulSoup:
     return BeautifulSoup(obj, parser)

@@ -14,6 +14,6 @@ class TestCrossmatch:
     """
 
     def test_reject_title(self, execute_task):
-        task = execute_task('test_title')
-        assert task.find_entry('rejected', title='entry 2')
+        task = execute_task("test_title")
+        assert task.find_entry("rejected", title="entry 2")
         assert len(task.rejected) == 1

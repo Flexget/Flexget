@@ -23,7 +23,7 @@ local_context = threading.local()
 class _Console(rich.console.Console):
     def __init__(self, *args, **kwargs):
         if "PYCHARM_HOSTED" in os.environ:
-            kwargs.setdefault('color_system', 'truecolor')
+            kwargs.setdefault("color_system", "truecolor")
         kwargs.setdefault("markup", True)
         super().__init__(*args, **kwargs)
 
@@ -60,11 +60,11 @@ class _Console(rich.console.Console):
             if not isinstance(rule.title, rich.text.Text):
                 rule.title = self.render_str(rule.title, style="rule.text")
             text = rich.text.Text()
-            if rule.align == 'left':
-                text = text.append(rule.characters * indent + ' ', style=rule.style)
+            if rule.align == "left":
+                text = text.append(rule.characters * indent + " ", style=rule.style)
             text.append(rule.title)
-            if rule.align == 'right':
-                text = text.append(' ' + rule.characters * indent, style=rule.style)
+            if rule.align == "right":
+                text = text.append(" " + rule.characters * indent, style=rule.style)
             rule.title = text
         self.print(rule)
 
@@ -138,18 +138,18 @@ class TerminalTable(rich.table.Table):
 
     # TODO: Add other new types
     TABLE_TYPES = {
-        'plain': {'box': rich.box.ASCII},
-        'porcelain': {
-            'box': PORCELAIN_BOX,
-            'show_edge': False,
-            'pad_edge': False,
-            'title': None,
-            'padding': 0,
+        "plain": {"box": rich.box.ASCII},
+        "porcelain": {
+            "box": PORCELAIN_BOX,
+            "show_edge": False,
+            "pad_edge": False,
+            "title": None,
+            "padding": 0,
         },
-        'single': {'box': rich.box.SQUARE},
-        'double': {'box': rich.box.DOUBLE},
-        'github': {'box': GITHUB_BOX},
-        'heavy-head': {'box': rich.box.HEAVY_HEAD},
+        "single": {"box": rich.box.SQUARE},
+        "double": {"box": rich.box.DOUBLE},
+        "github": {"box": GITHUB_BOX},
+        "heavy-head": {"box": rich.box.HEAVY_HEAD},
     }
 
     def __init__(self, *args, table_type: Optional[str] = None, **kwargs) -> None:
@@ -160,7 +160,7 @@ class TerminalTable(rich.table.Table):
 
     def __rich_console__(self, console, options):
         segments = super().__rich_console__(console, options)
-        if self.table_type not in ['porcelain', 'github']:
+        if self.table_type not in ["porcelain", "github"]:
             yield from segments
             return
         # Strips out blank lines from our custom types
@@ -173,17 +173,17 @@ class TerminalTable(rich.table.Table):
 
 table_parser = ArgumentParser(add_help=False)
 table_parser.add_argument(
-    '--table-type',
+    "--table-type",
     choices=list(TerminalTable.TABLE_TYPES),
-    default='heavy-head',
-    help='Select output table style',
+    default="heavy-head",
+    help="Select output table style",
 )
 table_parser.add_argument(
-    '--porcelain',
-    dest='table_type',
-    action='store_const',
-    const='porcelain',
-    help='Make the output parseable. Similar to using `--table-type porcelain`',
+    "--porcelain",
+    dest="table_type",
+    action="store_const",
+    const="porcelain",
+    help="Make the output parseable. Similar to using `--table-type porcelain`",
 )
 
 
@@ -195,7 +195,7 @@ def word_wrap(text: str, max_length: int) -> str:
     :return: Wrapped text or original text
     """
     if len(text) >= max_length:
-        return '\n'.join(wrap(text, max_length))
+        return "\n".join(wrap(text, max_length))
     return text
 
 
@@ -209,7 +209,7 @@ def colorize(color: str, text: str) -> str:
 
     :return: Colored text or text
     """
-    return f'[{color}]{text}[/]'
+    return f"[{color}]{text}[/]"
 
 
 def disable_colors():
@@ -228,7 +228,7 @@ def capture_console(filelike: TextIO) -> "Iterator":
 
 
 def get_console_output() -> Optional[TextIO]:
-    return getattr(local_context, 'output', None)
+    return getattr(local_context, "output", None)
 
 
 def _patchable_console(*args, **kwargs):

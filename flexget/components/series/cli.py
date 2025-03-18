@@ -11,38 +11,38 @@ from flexget.terminal import TerminalTable, colorize, console, table_parser
 from . import db
 
 # Environment variables to set defaults for `series list` and `series show`
-ENV_SHOW_SORTBY_FIELD = 'FLEXGET_SERIES_SHOW_SORTBY_FIELD'
-ENV_SHOW_SORTBY_ORDER = 'FLEXGET_SERIES_SHOW_SORTBY_ORDER'
-ENV_LIST_CONFIGURED = 'FLEXGET_SERIES_LIST_CONFIGURED'
-ENV_LIST_PREMIERES = 'FLEXGET_SERIES_LIST_PREMIERES'
-ENV_LIST_SORTBY_FIELD = 'FLEXGET_SERIES_LIST_SORTBY_FIELD'
-ENV_LIST_SORTBY_ORDER = 'FLEXGET_SERIES_LIST_SORTBY_ORDER'
-ENV_ADD_QUALITY = 'FLEXGET_SERIES_ADD_QUALITY'
+ENV_SHOW_SORTBY_FIELD = "FLEXGET_SERIES_SHOW_SORTBY_FIELD"
+ENV_SHOW_SORTBY_ORDER = "FLEXGET_SERIES_SHOW_SORTBY_ORDER"
+ENV_LIST_CONFIGURED = "FLEXGET_SERIES_LIST_CONFIGURED"
+ENV_LIST_PREMIERES = "FLEXGET_SERIES_LIST_PREMIERES"
+ENV_LIST_SORTBY_FIELD = "FLEXGET_SERIES_LIST_SORTBY_FIELD"
+ENV_LIST_SORTBY_ORDER = "FLEXGET_SERIES_LIST_SORTBY_ORDER"
+ENV_ADD_QUALITY = "FLEXGET_SERIES_ADD_QUALITY"
 # Colors for console output
-SORT_COLUMN_COLOR = 'yellow'
-NEW_EP_COLOR = 'green'
-FRESH_EP_COLOR = 'yellow'
-OLD_EP_COLOR = 'default'
-BEHIND_EP_COLOR = 'red'
-UNDOWNLOADED_RELEASE_COLOR = 'default'
-DOWNLOADED_RELEASE_COLOR = 'green'
-ERROR_COLOR = 'red'
+SORT_COLUMN_COLOR = "yellow"
+NEW_EP_COLOR = "green"
+FRESH_EP_COLOR = "yellow"
+OLD_EP_COLOR = "default"
+BEHIND_EP_COLOR = "red"
+UNDOWNLOADED_RELEASE_COLOR = "default"
+DOWNLOADED_RELEASE_COLOR = "green"
+ERROR_COLOR = "red"
 
 
 def do_cli(manager, options):
-    if hasattr(options, 'table_type') and options.table_type == 'porcelain':
+    if hasattr(options, "table_type") and options.table_type == "porcelain":
         flexget.terminal.disable_colors()
-    if options.series_action == 'list':
+    if options.series_action == "list":
         display_summary(options)
-    elif options.series_action == 'show':
+    elif options.series_action == "show":
         display_details(options)
-    elif options.series_action == 'remove':
+    elif options.series_action == "remove":
         remove(manager, options)
-    elif options.series_action == 'forget':
+    elif options.series_action == "forget":
         remove(manager, options, forget=True)
-    elif options.series_action == 'begin':
+    elif options.series_action == "begin":
         begin(manager, options)
-    elif options.series_action == 'add':
+    elif options.series_action == "add":
         add(manager, options)
 
 
@@ -51,29 +51,29 @@ def display_summary(options):
 
     :param options: argparse options from the CLI
     """
-    porcelain = options.table_type == 'porcelain'
-    configured = options.configured or os.environ.get(ENV_LIST_CONFIGURED, 'configured')
-    premieres = bool(os.environ.get(ENV_LIST_PREMIERES) == 'yes' or options.premieres)
-    sort_by = options.sort_by or os.environ.get(ENV_LIST_SORTBY_FIELD, 'name')
+    porcelain = options.table_type == "porcelain"
+    configured = options.configured or os.environ.get(ENV_LIST_CONFIGURED, "configured")
+    premieres = bool(os.environ.get(ENV_LIST_PREMIERES) == "yes" or options.premieres)
+    sort_by = options.sort_by or os.environ.get(ENV_LIST_SORTBY_FIELD, "name")
     if options.order is not None:
-        descending = options.order == 'desc'
+        descending = options.order == "desc"
     else:
-        descending = os.environ.get(ENV_LIST_SORTBY_ORDER) == 'desc'
+        descending = os.environ.get(ENV_LIST_SORTBY_ORDER) == "desc"
     with Session() as session:
         kwargs = {
-            'configured': configured,
-            'premieres': premieres,
-            'session': session,
-            'sort_by': sort_by,
-            'descending': descending,
+            "configured": configured,
+            "premieres": premieres,
+            "session": session,
+            "sort_by": sort_by,
+            "descending": descending,
         }
-        if sort_by == 'name':
-            kwargs['sort_by'] = 'show_name'
+        if sort_by == "name":
+            kwargs["sort_by"] = "show_name"
         else:
-            kwargs['sort_by'] = 'last_download_date'
+            kwargs["sort_by"] = "last_download_date"
 
         query = db.get_series_summary(**kwargs)
-        header = ['Name', 'Begin', 'Last Encountered', 'Age', 'Downloaded', 'Identified By']
+        header = ["Name", "Begin", "Last Encountered", "Age", "Downloaded", "Identified By"]
         for index, value in enumerate(header):
             if value.lower() == options.sort_by:
                 header[index] = colorize(SORT_COLUMN_COLOR, value)
@@ -83,14 +83,14 @@ def display_summary(options):
             name_column = series.name
 
             behind = (0,)
-            begin = series.begin.identifier if series.begin else '-'
-            latest_release = '-'
-            age_col = '-'
-            episode_id = '-'
+            begin = series.begin.identifier if series.begin else "-"
+            latest_release = "-"
+            age_col = "-"
+            episode_id = "-"
             latest = db.get_latest_release(series)
             identifier_type = series.identified_by
-            if identifier_type == 'auto':
-                identifier_type = colorize('yellow', 'auto')
+            if identifier_type == "auto":
+                identifier_type = colorize("yellow", "auto")
             if latest:
                 behind = db.new_entities_after(latest)
                 latest_release = get_latest_status(latest)
@@ -105,36 +105,36 @@ def display_summary(options):
                         age_col = colorize(OLD_EP_COLOR, latest.age)
                 episode_id = latest.identifier
             if not porcelain and behind[0] > 0:
-                name_column += colorize(BEHIND_EP_COLOR, f' {behind[0]} {behind[1]} behind')
+                name_column += colorize(BEHIND_EP_COLOR, f" {behind[0]} {behind[1]} behind")
 
             table.add_row(name_column, begin, episode_id, age_col, latest_release, identifier_type)
     console(table)
     if not porcelain:
         if not query.count():
-            console('Use `flexget series list all` to view all known series.')
+            console("Use `flexget series list all` to view all known series.")
         else:
-            console('Use `flexget series show NAME` to get detailed information.')
+            console("Use `flexget series show NAME` to get detailed information.")
 
 
 def begin(manager, options):
     series_name = options.series_name
-    series_name = series_name.replace(r'\!', '!')
+    series_name = series_name.replace(r"\!", "!")
     normalized_name = flexget.components.series.utils.normalize_series_name(series_name)
     with Session() as session:
         series = db.shows_by_exact_name(normalized_name, session)
         if options.forget:
             if not series:
-                console(f'Series `{series_name}` was not found in the database.')
+                console(f"Series `{series_name}` was not found in the database.")
             else:
                 series = series[0]
                 series.begin = None
-                console(f'The begin episode for `{series.name}` has been forgotten.')
+                console(f"The begin episode for `{series.name}` has been forgotten.")
                 session.commit()
                 manager.config_changed()
         elif options.episode_id:
             ep_id = options.episode_id
             if not series:
-                console(f'Series not yet in database. Adding `{series_name}`.')
+                console(f"Series not yet in database. Adding `{series_name}`.")
                 series = db.Series()
                 series.name = series_name
                 session.add(series)
@@ -145,10 +145,10 @@ def begin(manager, options):
             except ValueError as e:
                 console(e)
             else:
-                if entity_type == 'season':
-                    console(f'`{ep_id}` was identified as a season.')
-                    ep_id += 'E01'
-                console(f'Releases for `{series.name}` will be accepted starting with `{ep_id}`.')
+                if entity_type == "season":
+                    console(f"`{ep_id}` was identified as a season.")
+                    ep_id += "E01"
+                console(f"Releases for `{series.name}` will be accepted starting with `{ep_id}`.")
                 session.commit()
             manager.config_changed()
 
@@ -163,7 +163,7 @@ def remove(manager, options, forget=False):
                 console(e.args[0])
             else:
                 console(
-                    f'Removed entities(s) matching `{identifier}` from series `{name.capitalize()}`.'
+                    f"Removed entities(s) matching `{identifier}` from series `{name.capitalize()}`."
                 )
     else:
         # remove whole series
@@ -172,7 +172,7 @@ def remove(manager, options, forget=False):
         except ValueError as e:
             console(e.args[0])
         else:
-            console(f'Removed series `{name.capitalize()}` from database.')
+            console(f"Removed series `{name.capitalize()}` from database.")
 
     manager.config_changed()
 
@@ -182,55 +182,55 @@ def get_latest_status(episode):
 
     :param episode: Instance of Episode
     """
-    status = ''
+    status = ""
     for release in sorted(episode.releases, key=lambda r: r.quality):
         if not release.downloaded:
             continue
         status += release.quality.name
         if release.proper_count > 0:
-            status += '-proper'
+            status += "-proper"
             if release.proper_count > 1:
                 status += str(release.proper_count)
-        status += ', '
-    return status.rstrip(', ') if status else None
+        status += ", "
+    return status.rstrip(", ") if status else None
 
 
 def display_details(options):
     """Display detailed series information, ie. series show NAME."""
     name = options.series_name
-    sort_by = options.sort_by or os.environ.get(ENV_SHOW_SORTBY_FIELD, 'age')
+    sort_by = options.sort_by or os.environ.get(ENV_SHOW_SORTBY_FIELD, "age")
     if options.order is not None:
-        reverse = options.order == 'desc'
+        reverse = options.order == "desc"
     else:
-        reverse = os.environ.get(ENV_SHOW_SORTBY_ORDER) == 'desc'
+        reverse = os.environ.get(ENV_SHOW_SORTBY_ORDER) == "desc"
     with Session() as session:
         name = flexget.components.series.utils.normalize_series_name(name)
         # Sort by length of name, so that partial matches always show shortest matching title
         matches = db.shows_by_name(name, session=session)
         if not matches:
-            console(colorize(ERROR_COLOR, f'ERROR: Unknown series `{name}`'))
+            console(colorize(ERROR_COLOR, f"ERROR: Unknown series `{name}`"))
             return
         # Pick the best matching series
         series = matches[0]
         table_title = series.name
         if len(matches) > 1:
             warning = (
-                colorize('red', ' WARNING: ')
-                + 'Multiple series match to `{}`.\n '
-                'Be more specific to see the results of other matches:\n\n'
-                ' {}'.format(name, ', '.join(s.name for s in matches[1:]))
+                colorize("red", " WARNING: ")
+                + "Multiple series match to `{}`.\n "
+                "Be more specific to see the results of other matches:\n\n"
+                " {}".format(name, ", ".join(s.name for s in matches[1:]))
             )
-            if options.table_type != 'porcelain':
+            if options.table_type != "porcelain":
                 console(warning)
-        header = ['Identifier', 'Last seen', 'Release titles', 'Quality', 'Proper']
+        header = ["Identifier", "Last seen", "Release titles", "Quality", "Proper"]
         table_data = []
         entities = db.get_all_entities(series, session=session, sort_by=sort_by, reverse=reverse)
         for entity in entities:
             if not entity.releases:
                 continue
             if entity.identifier is None:
-                identifier = colorize(ERROR_COLOR, 'MISSING')
-                age = ''
+                identifier = colorize(ERROR_COLOR, "MISSING")
+                age = ""
             else:
                 identifier = entity.identifier
                 age = entity.age
@@ -244,35 +244,35 @@ def display_details(options):
                 if not release.downloaded:
                     title = colorize(UNDOWNLOADED_RELEASE_COLOR, title)
                 else:
-                    title += ' *'
+                    title += " *"
                     title = colorize(DOWNLOADED_RELEASE_COLOR, title)
                 release_titles.append(title)
                 release_qualities.append(quality)
-                release_propers.append('Yes' if release.proper_count > 0 else '')
-            entity_data.append('\n'.join(release_titles))
-            entity_data.append('\n'.join(release_qualities))
-            entity_data.append('\n'.join(release_propers))
+                release_propers.append("Yes" if release.proper_count > 0 else "")
+            entity_data.append("\n".join(release_titles))
+            entity_data.append("\n".join(release_qualities))
+            entity_data.append("\n".join(release_propers))
             table_data.append(entity_data)
-        footer = ' {} \n'.format(colorize(DOWNLOADED_RELEASE_COLOR, '* Downloaded'))
+        footer = " {} \n".format(colorize(DOWNLOADED_RELEASE_COLOR, "* Downloaded"))
         if not series.identified_by:
             footer += (
-                '\n Series plugin is still learning which episode numbering mode is \n'
-                ' correct for this series (identified_by: auto).\n'
-                ' Few duplicate downloads can happen with different numbering schemes\n'
-                ' during this time.'
+                "\n Series plugin is still learning which episode numbering mode is \n"
+                " correct for this series (identified_by: auto).\n"
+                " Few duplicate downloads can happen with different numbering schemes\n"
+                " during this time."
             )
         else:
-            footer += f'\n `{series.name}` uses `{series.identified_by}` mode to identify episode numbering.'
-        begin_text = 'option'
+            footer += f"\n `{series.name}` uses `{series.identified_by}` mode to identify episode numbering."
+        begin_text = "option"
         if series.begin:
-            footer += f' \n Begin for `{series.name}` is set to `{series.begin.identifier}`.'
-            begin_text = 'and `begin` options'
-        footer += f' \n See `identified_by` {begin_text} for more information.'
+            footer += f" \n Begin for `{series.name}` is set to `{series.begin.identifier}`."
+            begin_text = "and `begin` options"
+        footer += f" \n See `identified_by` {begin_text} for more information."
     table = TerminalTable(*header, table_type=options.table_type, title=table_title)
     for row in table_data:
         table.add_row(*row)
     console(table)
-    if options.table_type != 'porcelain':
+    if options.table_type != "porcelain":
         console(footer)
 
 
@@ -280,12 +280,12 @@ def add(manager, options):
     series_name = options.series_name
     entity_ids = options.entity_id
     quality = options.quality or os.environ.get(ENV_ADD_QUALITY, None)
-    series_name = series_name.replace(r'\!', '!')
+    series_name = series_name.replace(r"\!", "!")
     normalized_name = flexget.components.series.utils.normalize_series_name(series_name)
     with Session() as session:
         series = db.shows_by_exact_name(normalized_name, session)
         if not series:
-            console(f'Series not yet in database, adding `{series_name}`')
+            console(f"Series not yet in database, adding `{series_name}`")
             series = db.Series()
             series.name = series_name
             session.add(series)
@@ -297,132 +297,132 @@ def add(manager, options):
             except ValueError as e:
                 console(e.args[0])
             else:
-                console(f'Added entity `{ent_id}` to series `{series.name.title()}`.')
+                console(f"Added entity `{ent_id}` to series `{series.name.title()}`.")
         session.commit()
     manager.config_changed()
 
 
-@event('options.register')
+@event("options.register")
 def register_parser_arguments():
     # Register the command
     parser = options.register_command(
-        'series', do_cli, help='View and manipulate the series plugin database'
+        "series", do_cli, help="View and manipulate the series plugin database"
     )
 
     # Parent parser for subcommands that need a series name
     series_parser = argparse.ArgumentParser(add_help=False)
     series_parser.add_argument(
-        'series_name', help='The name of the series', metavar='<series name>'
+        "series_name", help="The name of the series", metavar="<series name>"
     )
 
     # Set up our subparsers
-    subparsers = parser.add_subparsers(title='actions', metavar='<action>', dest='series_action')
+    subparsers = parser.add_subparsers(title="actions", metavar="<action>", dest="series_action")
     list_parser = subparsers.add_parser(
-        'list', parents=[table_parser], help='List a summary of the different series being tracked'
+        "list", parents=[table_parser], help="List a summary of the different series being tracked"
     )
     list_parser.add_argument(
-        'configured',
-        nargs='?',
-        choices=['configured', 'unconfigured', 'all'],
-        help='Limit list to series that are currently in the config or not (default: %(default)s)',
+        "configured",
+        nargs="?",
+        choices=["configured", "unconfigured", "all"],
+        help="Limit list to series that are currently in the config or not (default: %(default)s)",
     )
     list_parser.add_argument(
-        '--premieres',
-        action='store_true',
-        help='limit list to series which only have episode 1 (and maybe also 2) downloaded',
+        "--premieres",
+        action="store_true",
+        help="limit list to series which only have episode 1 (and maybe also 2) downloaded",
     )
     list_parser.add_argument(
-        '--sort-by', choices=('name', 'age'), help='Choose list sort attribute'
+        "--sort-by", choices=("name", "age"), help="Choose list sort attribute"
     )
     order = list_parser.add_mutually_exclusive_group(required=False)
     order.add_argument(
-        '--descending',
-        dest='order',
-        action='store_const',
-        const='desc',
-        help='Sort in descending order',
+        "--descending",
+        dest="order",
+        action="store_const",
+        const="desc",
+        help="Sort in descending order",
     )
     order.add_argument(
-        '--ascending',
-        dest='order',
-        action='store_const',
-        const='asc',
-        help='Sort in ascending order',
+        "--ascending",
+        dest="order",
+        action="store_const",
+        const="asc",
+        help="Sort in ascending order",
     )
 
     show_parser = subparsers.add_parser(
-        'show',
+        "show",
         parents=[series_parser, table_parser],
-        help='Show the releases FlexGet has seen for a given series',
+        help="Show the releases FlexGet has seen for a given series",
     )
     show_parser.add_argument(
-        '--sort-by',
-        choices=('age', 'identifier'),
-        help='Choose releases list sort: age (default) or identifier',
+        "--sort-by",
+        choices=("age", "identifier"),
+        help="Choose releases list sort: age (default) or identifier",
     )
     show_order = show_parser.add_mutually_exclusive_group(required=False)
     show_order.add_argument(
-        '--descending',
-        dest='order',
-        action='store_const',
-        const='desc',
-        help='Sort in descending order',
+        "--descending",
+        dest="order",
+        action="store_const",
+        const="desc",
+        help="Sort in descending order",
     )
     show_order.add_argument(
-        '--ascending',
-        dest='order',
-        action='store_const',
-        const='asc',
-        help='Sort in ascending order',
+        "--ascending",
+        dest="order",
+        action="store_const",
+        const="asc",
+        help="Sort in ascending order",
     )
 
     begin_parser = subparsers.add_parser(
-        'begin', parents=[series_parser], help='set the episode to start getting a series from'
+        "begin", parents=[series_parser], help="set the episode to start getting a series from"
     )
     begin_opts = begin_parser.add_mutually_exclusive_group(required=True)
     begin_opts.add_argument(
-        '--forget', dest='forget', action='store_true', help='Forget begin episode', required=False
+        "--forget", dest="forget", action="store_true", help="Forget begin episode", required=False
     )
     begin_opts.add_argument(
-        'episode_id',
-        metavar='<episode ID>',
-        help='Episode ID to start getting the series from (e.g. S02E01, 2013-12-11, or 9, '
-        'depending on how the series is numbered). You can also enter a season ID such as '
-        ' S02.',
-        nargs='?',
-        default='',
+        "episode_id",
+        metavar="<episode ID>",
+        help="Episode ID to start getting the series from (e.g. S02E01, 2013-12-11, or 9, "
+        "depending on how the series is numbered). You can also enter a season ID such as "
+        " S02.",
+        nargs="?",
+        default="",
     )
 
     addshow_parser = subparsers.add_parser(
-        'add', parents=[series_parser], help='Add episode(s) and season(s) to series history'
+        "add", parents=[series_parser], help="Add episode(s) and season(s) to series history"
     )
     addshow_parser.add_argument(
-        'entity_id',
-        nargs='+',
+        "entity_id",
+        nargs="+",
         default=None,
-        metavar='<entity_id>',
-        help='Episode or season entity ID(s) to add',
+        metavar="<entity_id>",
+        help="Episode or season entity ID(s) to add",
     )
     addshow_parser.add_argument(
-        '--quality',
+        "--quality",
         default=None,
-        metavar='<quality>',
-        help='Quality string to be stored for all entity ID(s)',
+        metavar="<quality>",
+        help="Quality string to be stored for all entity ID(s)",
     )
 
     forget_parser = subparsers.add_parser(
-        'forget',
+        "forget",
         parents=[series_parser],
-        help='Removes episodes or whole series from the entire database (including seen plugin)',
+        help="Removes episodes or whole series from the entire database (including seen plugin)",
     )
     forget_parser.add_argument(
-        'episode_id', nargs='*', default=None, help='Entity ID(s) to forget (optional)'
+        "episode_id", nargs="*", default=None, help="Entity ID(s) to forget (optional)"
     )
     delete_parser = subparsers.add_parser(
-        'remove',
+        "remove",
         parents=[series_parser],
-        help='Removes episodes or whole series from the series database only',
+        help="Removes episodes or whole series from the series database only",
     )
     delete_parser.add_argument(
-        'episode_id', nargs='*', default=None, help='Episode ID to forget (optional)'
+        "episode_id", nargs="*", default=None, help="Episode ID to forget (optional)"
     )

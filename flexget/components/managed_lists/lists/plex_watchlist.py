@@ -8,8 +8,8 @@ from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 
-PLUGIN_NAME = 'plex_watchlist'
-SUPPORTED_IDS = ['imdb_id', 'tmdb_id', 'tvdb_id', 'plex_guid']
+PLUGIN_NAME = "plex_watchlist"
+SUPPORTED_IDS = ["imdb_id", "tmdb_id", "tvdb_id", "plex_guid"]
 
 logger = logger.bind(name=PLUGIN_NAME)
 
@@ -22,7 +22,7 @@ def import_plexaccount() -> "type[MyPlexAccount]":
     try:
         from plexapi.myplex import MyPlexAccount
     except ImportError:
-        raise plugin.DependencyError('plex_watchlist', 'plexapi', 'plexapi package required')
+        raise plugin.DependencyError("plex_watchlist", "plexapi", "plexapi package required")
     return MyPlexAccount
 
 
@@ -32,12 +32,12 @@ def to_entry(plex_item: "Union[Movie, Show]") -> Entry:
         url=plex_item.guid,
     )
 
-    if plex_item.TYPE == 'movie':
-        entry['movie_name'] = plex_item.title
-        entry['movie_year'] = plex_item.year
-    elif plex_item.TYPE == 'show':
-        entry['series_name'] = plex_item.title
-        entry['series_year'] = plex_item.year
+    if plex_item.TYPE == "movie":
+        entry["movie_name"] = plex_item.title
+        entry["movie_year"] = plex_item.year
+    elif plex_item.TYPE == "show":
+        entry["series_name"] = plex_item.title
+        entry["series_year"] = plex_item.year
 
     entry.update(get_supported_ids_from_plex_object(plex_item))
 
@@ -45,7 +45,7 @@ def to_entry(plex_item: "Union[Movie, Show]") -> Entry:
 
 
 def get_supported_ids_from_plex_object(plex_item):
-    ids = {'plex_guid': plex_item.guid}
+    ids = {"plex_guid": plex_item.guid}
     for guid in plex_item.guids:
         x = guid.id.split("://")
         try:
@@ -53,7 +53,7 @@ def get_supported_ids_from_plex_object(plex_item):
         except ValueError:
             value = x[1]
 
-        media_id = f'{x[0]}_id'
+        media_id = f"{x[0]}_id"
         if media_id in SUPPORTED_IDS:
             ids[media_id] = value
     return ids
@@ -67,8 +67,8 @@ class VideoStub:
 # plexapi objects are build fomr XML. So we create a simple stub that works for watchlist calls
 def to_plex_item(entry):
     item = VideoStub()
-    item.guid = entry['plex_guid']
-    item.title = entry['title']
+    item.guid = entry["plex_guid"]
+    item.title = entry["title"]
     return item
 
 
@@ -120,11 +120,11 @@ class PlexManagedWatchlist(MutableSet):
     def add(self, entry: Entry) -> None:
         item = None
 
-        if 'plex_guid' in entry:
+        if "plex_guid" in entry:
             item = to_plex_item(entry)
         else:
-            logger.debug('Searching for {} with discover', entry['title'])
-            results = self.account.searchDiscover(entry['title'], libtype=self.type)
+            logger.debug("Searching for {} with discover", entry["title"])
+            results = self.account.searchDiscover(entry["title"], libtype=self.type)
             matched_entry = self._match_entry(entry, [to_entry(result) for result in results])
             if matched_entry:
                 item = to_plex_item(matched_entry)
@@ -141,7 +141,7 @@ class PlexManagedWatchlist(MutableSet):
         entry = self._find_entry(entry)
         if entry:
             item = to_plex_item(entry)
-            logger.debug('Removing {} from watchlist', entry['title'])
+            logger.debug("Removing {} from watchlist", entry["title"])
             self.account.removeFromWatchlist(item)
 
     @property
@@ -161,29 +161,29 @@ class PlexManagedWatchlist(MutableSet):
             if any(entry.get(id) is not None and entry[id] == item[id] for id in SUPPORTED_IDS):
                 return item
 
-            name = entry.get('movie_name', None) or entry.get('series_name', None)
-            year = entry.get('movie_year', None) or entry.get('series_year', None)
-            _name = item.get('movie_name', None) or item.get('series_name', None)
-            _year = item.get('movie_year', None) or item.get('series_year', None)
+            name = entry.get("movie_name", None) or entry.get("series_name", None)
+            year = entry.get("movie_year", None) or entry.get("series_year", None)
+            _name = item.get("movie_name", None) or item.get("series_name", None)
+            _year = item.get("movie_year", None) or item.get("series_year", None)
             if (name and year) and (_name == name and _year == year):
                 return item
 
             # title matching sucks but lets try as last resort
-            if entry.get('title').lower() == item['title'].lower():
+            if entry.get("title").lower() == item["title"].lower():
                 return item
         return None
 
 
 class PlexWatchlist:
     schema = {
-        'properties': {
-            'username': {'type': 'string'},
-            'password': {'type': 'string'},
-            'token': {'type': 'string'},
-            'type': {'type': 'string', 'enum': ['movie', 'show']},
-            'filter': {'type': 'string', 'enum': ['available', 'released']},
+        "properties": {
+            "username": {"type": "string"},
+            "password": {"type": "string"},
+            "token": {"type": "string"},
+            "type": {"type": "string", "enum": ["movie", "show"]},
+            "filter": {"type": "string", "enum": ["available", "released"]},
         },
-        'anyOf': [{'required': ['token']}, {'required': ['username', 'password']}],
+        "anyOf": [{"required": ["token"]}, {"required": ["username", "password"]}],
     }
 
     @plugin.priority(plugin.PRIORITY_FIRST)
@@ -199,6 +199,6 @@ class PlexWatchlist:
         yield from yaml_list
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(PlexWatchlist, PLUGIN_NAME, api_ver=2, interfaces=['task', 'list'])
+    plugin.register(PlexWatchlist, PLUGIN_NAME, api_ver=2, interfaces=["task", "list"])

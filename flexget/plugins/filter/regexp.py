@@ -8,7 +8,7 @@ from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
 
-logger = logger.bind(name='regexp')
+logger = logger.bind(name="regexp")
 
 
 class FilterRegexp:
@@ -38,43 +38,43 @@ class FilterRegexp:
     """
 
     schema = {
-        'type': 'object',
-        'properties': {
-            'accept': {'$ref': '#/$defs/regex_list'},
-            'reject': {'$ref': '#/$defs/regex_list'},
-            'accept_excluding': {'$ref': '#/$defs/regex_list'},
-            'reject_excluding': {'$ref': '#/$defs/regex_list'},
-            'rest': {'type': 'string', 'enum': ['accept', 'reject']},
-            'from': one_or_more({'type': 'string'}),
+        "type": "object",
+        "properties": {
+            "accept": {"$ref": "#/$defs/regex_list"},
+            "reject": {"$ref": "#/$defs/regex_list"},
+            "accept_excluding": {"$ref": "#/$defs/regex_list"},
+            "reject_excluding": {"$ref": "#/$defs/regex_list"},
+            "rest": {"type": "string", "enum": ["accept", "reject"]},
+            "from": one_or_more({"type": "string"}),
         },
-        'additionalProperties': False,
-        '$defs': {
+        "additionalProperties": False,
+        "$defs": {
             # The validator for a list of regexps, each with or without settings
-            'regex_list': {
-                'type': 'array',
-                'items': {
-                    'oneOf': [
+            "regex_list": {
+                "type": "array",
+                "items": {
+                    "oneOf": [
                         # Plain regex string
-                        {'type': 'string', 'format': 'regex'},
+                        {"type": "string", "format": "regex"},
                         # Regex with options (regex is key, options are value)
                         {
-                            'type': 'object',
-                            'additionalProperties': {
-                                'oneOf': [
+                            "type": "object",
+                            "additionalProperties": {
+                                "oneOf": [
                                     # Simple options, just path
-                                    {'type': 'string', 'format': 'path'},
+                                    {"type": "string", "format": "path"},
                                     # Dict style options
                                     {
-                                        'type': 'object',
-                                        'properties': {
-                                            'path': {'type': 'string', 'format': 'path'},
-                                            'set': {'type': 'object'},
-                                            'not': one_or_more(
-                                                {'type': 'string', 'format': 'regex'}
+                                        "type": "object",
+                                        "properties": {
+                                            "path": {"type": "string", "format": "path"},
+                                            "set": {"type": "object"},
+                                            "not": one_or_more(
+                                                {"type": "string", "format": "regex"}
                                             ),
-                                            'from': one_or_more({'type': 'string'}),
+                                            "from": one_or_more({"type": "string"}),
                                         },
-                                        'additionalProperties': False,
+                                        "additionalProperties": False,
                                     },
                                 ]
                             },
@@ -98,11 +98,11 @@ class FilterRegexp:
         :return: New config dictionary
         """
         out_config = {}
-        if 'rest' in config:
-            out_config['rest'] = config['rest']
+        if "rest" in config:
+            out_config["rest"] = config["rest"]
         # Turn all our regexps into advanced form dicts and compile them
         for operation, regexps in config.items():
-            if operation in ['rest', 'from']:
+            if operation in ["rest", "from"]:
                 continue
             for regexp_item in regexps:
                 if not isinstance(regexp_item, dict):
@@ -110,19 +110,19 @@ class FilterRegexp:
                     regexp_item = {regexp: {}}
                 regexp, opts = next(iter(regexp_item.items()))
                 # Parse custom settings for this regexp, and we don't want to modify original config
-                opts = {'path': opts} if not isinstance(opts, dict) else opts.copy()
+                opts = {"path": opts} if not isinstance(opts, dict) else opts.copy()
                 # advanced configuration
-                if config.get('from'):
-                    opts.setdefault('from', config['from'])
+                if config.get("from"):
+                    opts.setdefault("from", config["from"])
                 # Put plain strings into list form for `from` and `not` options
-                if 'from' in opts and isinstance(opts['from'], str):
-                    opts['from'] = [opts['from']]
-                if 'not' in opts and isinstance(opts['not'], str):
-                    opts['not'] = [opts['not']]
+                if "from" in opts and isinstance(opts["from"], str):
+                    opts["from"] = [opts["from"]]
+                if "not" in opts and isinstance(opts["not"], str):
+                    opts["not"] = [opts["not"]]
 
                 # compile `not` option regexps
-                if 'not' in opts:
-                    opts['not'] = [re.compile(not_re, re.IGNORECASE) for not_re in opts['not']]
+                if "not" in opts:
+                    opts["not"] = [re.compile(not_re, re.IGNORECASE) for not_re in opts["not"]]
 
                 # compile regexp and make sure regexp is a string for series like '24'
                 try:
@@ -130,7 +130,7 @@ class FilterRegexp:
                 except re.error as e:
                     # Since validator can't validate dict keys (when an option is defined for the pattern) make sure we
                     # raise a proper error here.
-                    raise plugin.PluginError(f'Invalid regex `{regexp}`: {e}')
+                    raise plugin.PluginError(f"Invalid regex `{regexp}`: {e}")
                 out_config.setdefault(operation, []).append({regexp: opts})
         return out_config
 
@@ -141,17 +141,17 @@ class FilterRegexp:
         # Keep track of all entries which have not matched any regexp
         rest = set(task.entries)
         for operation, regexps in config.items():
-            if operation == 'rest':
+            if operation == "rest":
                 continue
             matched = self.filter(task.entries, operation, regexps)
             # Remove any entries from rest which matched this regexp
             rest -= matched
 
-        if 'rest' in config:
-            rest_method = Entry.accept if config['rest'] == 'accept' else Entry.reject
+        if "rest" in config:
+            rest_method = Entry.accept if config["rest"] == "accept" else Entry.reject
             for entry in rest:
-                logger.debug('Rest method {} for {}', config['rest'], entry['title'])
-                rest_method(entry, 'regexp `rest`')
+                logger.debug("Rest method {} for {}", config["rest"], entry["title"])
+                rest_method(entry, "regexp `rest`")
 
     def matches(self, entry, regexp, find_from=None, not_regexps=None):
         """Check if :entry: has any string fields or strings in a list field that match :regexp:.
@@ -162,8 +162,8 @@ class FilterRegexp:
         :param not_regexps: None or list of regexps that can NOT match
         :return: Field matching
         """
-        unquote_fields = ['url']
-        for field in find_from or ['title', 'description']:
+        unquote_fields = ["url"]
+        for field in find_from or ["title", "description"]:
             # Only evaluate lazy fields if find_from has been explicitly specified
             if not entry.get(field, eval_lazy=find_from):
                 continue
@@ -181,7 +181,7 @@ class FilterRegexp:
                     # Make sure the not_regexps do not match for this field
                     for not_regexp in not_regexps or []:
                         if self.matches(entry, not_regexp, find_from=[field]):
-                            entry.trace(f'Configured not_regexp {not_regexp} matched, ignored')
+                            entry.trace(f"Configured not_regexp {not_regexp} matched, ignored")
                             break
                     else:  # None of the not_regexps matched
                         return field
@@ -197,42 +197,42 @@ class FilterRegexp:
         :param regexps: list of {compiled_regexp: options} dictionaries
         """
         matched = set()
-        method = Entry.accept if 'accept' in operation else Entry.reject
-        match_mode = 'excluding' not in operation
+        method = Entry.accept if "accept" in operation else Entry.reject
+        match_mode = "excluding" not in operation
         for entry in entries:
-            logger.trace('testing {} regexps to {}', len(regexps), entry['title'])
+            logger.trace("testing {} regexps to {}", len(regexps), entry["title"])
             for regexp_opts in regexps:
                 regexp, opts = next(iter(regexp_opts.items()))
 
                 # check if entry matches given regexp configuration
-                field = self.matches(entry, regexp, opts.get('from'), opts.get('not'))
+                field = self.matches(entry, regexp, opts.get("from"), opts.get("not"))
 
                 # Run if we are in match mode and have a hit, or are in non-match mode and don't have a hit
                 if match_mode == bool(field):
                     # Creates the string with the reason for the hit
-                    matchtext = f'regexp \'{regexp.pattern}\' ' + (
-                        f'matched field \'{field}\'' if match_mode else 'didn\'t match'
+                    matchtext = f"regexp '{regexp.pattern}' " + (
+                        f"matched field '{field}'" if match_mode else "didn't match"
                     )
-                    logger.debug('{} for {}', matchtext, entry['title'])
+                    logger.debug("{} for {}", matchtext, entry["title"])
                     # apply settings to entry and run the method on it
-                    if opts.get('path'):
-                        entry['path'] = opts['path']
-                    if opts.get('set'):
+                    if opts.get("path"):
+                        entry["path"] = opts["path"]
+                    if opts.get("set"):
                         # invoke set plugin with given configuration
                         logger.debug(
-                            'adding set: info to entry:"{}" {}', entry['title'], opts['set']
+                            'adding set: info to entry:"{}" {}', entry["title"], opts["set"]
                         )
-                        plugin.get('set', self).modify(entry, opts['set'])
+                        plugin.get("set", self).modify(entry, opts["set"])
                     method(entry, matchtext)
                     matched.add(entry)
                     # We had a match so break out of the regexp loop.
                     break
             else:
                 # We didn't run method for any of the regexps, add this entry to rest
-                entry.trace(f'None of configured {operation} regexps matched')
+                entry.trace(f"None of configured {operation} regexps matched")
         return matched
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(FilterRegexp, 'regexp', api_ver=2)
+    plugin.register(FilterRegexp, "regexp", api_ver=2)

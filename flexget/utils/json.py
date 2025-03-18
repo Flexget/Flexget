@@ -22,18 +22,18 @@ except ImportError:
             # Google Appengine offers simplejson via django
             from django.utils import simplejson as json
         except ImportError:
-            raise DependencyError(missing='simplejson')
+            raise DependencyError(missing="simplejson")
 
-DATE_FMT = '%Y-%m-%d'
-ISO8601_FMT = '%Y-%m-%dT%H:%M:%SZ'
+DATE_FMT = "%Y-%m-%d"
+ISO8601_FMT = "%Y-%m-%dT%H:%M:%SZ"
 
 
 class DTDecoder(json.JSONDecoder):
     def decode(self, obj, **kwargs):
         # The built-in `json` library will `unicode` strings, except for empty strings. patch this for
         # consistency so that `unicode` is always returned.
-        if obj == b'':
-            return ''
+        if obj == b"":
+            return ""
 
         if isinstance(obj, str):
             dt_str = obj.strip('"')
@@ -58,8 +58,8 @@ def _datetime_decoder(dict_: dict) -> dict:
     for key, value in dict_.items():
         # The built-in `json` library will `unicode` strings, except for empty strings. patch this for
         # consistency so that `unicode` is always returned.
-        if value == b'':
-            dict_[key] = ''
+        if value == b"":
+            dict_[key] = ""
             continue
 
         try:
@@ -77,40 +77,40 @@ def _empty_unicode_decoder(dict_: dict) -> dict:
     for key, value in dict_.items():
         # The built-in `json` library will `unicode` strings, except for empty strings. patch this for
         # consistency so that `unicode` is always returned.
-        if value == b'':
-            dict_[key] = ''
+        if value == b"":
+            dict_[key] = ""
     return dict_
 
 
 def dumps(*args, **kwargs) -> str:
-    if kwargs.pop('encode_datetime', False):
-        kwargs['default'] = _datetime_encoder
+    if kwargs.pop("encode_datetime", False):
+        kwargs["default"] = _datetime_encoder
     return json.dumps(*args, **kwargs)
 
 
 def dump(*args, **kwargs) -> None:
-    if kwargs.pop('encode_datetime', False):
-        kwargs['default'] = _datetime_encoder
+    if kwargs.pop("encode_datetime", False):
+        kwargs["default"] = _datetime_encoder
     return json.dump(*args, **kwargs)
 
 
 def loads(*args, **kwargs) -> Any:
     """:param bool decode_datetime: If `True`, dates in ISO8601 format will be deserialized to :class:`datetime.datetime` objects."""
-    if kwargs.pop('decode_datetime', False):
-        kwargs['object_hook'] = _datetime_decoder
-        kwargs['cls'] = DTDecoder
+    if kwargs.pop("decode_datetime", False):
+        kwargs["object_hook"] = _datetime_decoder
+        kwargs["cls"] = DTDecoder
     else:
-        kwargs['object_hook'] = _empty_unicode_decoder
+        kwargs["object_hook"] = _empty_unicode_decoder
     return json.loads(*args, **kwargs)
 
 
 def load(*args, **kwargs) -> Any:
     """:param bool decode_datetime: If `True`, dates in ISO8601 format will be deserialized to :class:`datetime.datetime` objects."""
-    if kwargs.pop('decode_datetime', False):
-        kwargs['object_hook'] = _datetime_decoder
-        kwargs['cls'] = DTDecoder
+    if kwargs.pop("decode_datetime", False):
+        kwargs["object_hook"] = _datetime_decoder
+        kwargs["cls"] = DTDecoder
     else:
-        kwargs['object_hook'] = _empty_unicode_decoder
+        kwargs["object_hook"] = _empty_unicode_decoder
     return json.load(*args, **kwargs)
 
 
@@ -132,4 +132,4 @@ def coerce(obj) -> Union[str, int, float, bool, dict, list, None]:
     try:
         return str(obj)
     except Exception:
-        return 'NOT JSON SERIALIZABLE'
+        return "NOT JSON SERIALIZABLE"

@@ -21,12 +21,12 @@ if TYPE_CHECKING:
 # A level more detailed than INFO
 VERBOSE = 15
 # environment variables to modify rotating log parameters from defaults of 1 MB and 9 files
-ENV_MAXBYTES = 'FLEXGET_LOG_MAXBYTES'
-ENV_MAXCOUNT = 'FLEXGET_LOG_MAXCOUNT'
+ENV_MAXBYTES = "FLEXGET_LOG_MAXBYTES"
+ENV_MAXCOUNT = "FLEXGET_LOG_MAXCOUNT"
 
 LOG_FORMAT = (
-    '<green>{time:YYYY-MM-DD HH:mm:ss}</green> <level>{level: <8}</level> '
-    '<cyan>{name: <13}</cyan> <bold>{extra[task]: <15}</bold> {message}'
+    "<green>{time:YYYY-MM-DD HH:mm:ss}</green> <level>{level: <8}</level> "
+    "<cyan>{name: <13}</cyan> <bold>{extra[task]: <15}</bold> {message}"
 )
 
 # Stores current `session_id` to keep track of originating thread for log calls
@@ -34,21 +34,21 @@ local_context = threading.local()
 
 
 @contextlib.contextmanager
-def capture_logs(*args, **kwargs) -> 'Iterator':
+def capture_logs(*args, **kwargs) -> "Iterator":
     """Take the same arguments as `logger.add`, but this sync will only log messages contained in context."""
     old_id = get_log_session_id()
     session_id = local_context.session_id = old_id or str(uuid.uuid4())
-    existing_filter = kwargs.pop('filter', None)
-    kwargs.setdefault('format', LOG_FORMAT)
+    existing_filter = kwargs.pop("filter", None)
+    kwargs.setdefault("format", LOG_FORMAT)
 
     def filter_func(record):
-        if record['extra'].get('session_id') != session_id:
+        if record["extra"].get("session_id") != session_id:
             return False
         if existing_filter:
             return existing_filter(record)
         return True
 
-    kwargs['filter'] = filter_func
+    kwargs["filter"] = filter_func
 
     log_sink = logger.add(*args, **kwargs)
     try:
@@ -60,14 +60,14 @@ def capture_logs(*args, **kwargs) -> 'Iterator':
 
 
 def get_log_session_id() -> str:
-    return getattr(local_context, 'session_id', None)
+    return getattr(local_context, "session_id", None)
 
 
-def record_patcher(record: 'loguru.Record') -> None:
+def record_patcher(record: "loguru.Record") -> None:
     # If a custom name was bound to the logger, move it from extra directly into the record
-    name = record['extra'].pop('name', None)
+    name = record["extra"].pop("name", None)
     if name:
-        record['name'] = name
+        record["name"] = name
 
 
 class InterceptHandler(logging.Handler):
@@ -93,11 +93,11 @@ class InterceptHandler(logging.Handler):
 
 
 _logging_configured = False
-_startup_buffer: list['loguru.Record'] = []
+_startup_buffer: list["loguru.Record"] = []
 _startup_buffer_id: Optional[int] = None
 _logging_started = False
 # Stores the last 100 debug messages
-debug_buffer: deque['loguru.Message'] = deque(maxlen=100)
+debug_buffer: deque["loguru.Message"] = deque(maxlen=100)
 _log_filters = []  # Stores filter functions
 
 
@@ -106,12 +106,12 @@ def _log_filterer(record):
     return all(f(record) for f in _log_filters)
 
 
-def add_filter(func: Callable[['loguru.Record'], bool]):
+def add_filter(func: Callable[["loguru.Record"], bool]):
     """Add a filter function to the log handlers."""
     _log_filters.append(func)
 
 
-def remove_filter(func: Callable[['loguru.Record'], bool]):
+def remove_filter(func: Callable[["loguru.Record"], bool]):
     """Remove a filter function from the log handlers."""
     _log_filters.remove(func)
 
@@ -125,14 +125,14 @@ def initialize(unit_test: bool = False) -> None:
     if _logging_configured:
         return
 
-    if 'dev' in __version__:
-        warnings.filterwarnings('always', category=DeprecationWarning, module='flexget.*')
-    warnings.simplefilter('once', append=True)
+    if "dev" in __version__:
+        warnings.filterwarnings("always", category=DeprecationWarning, module="flexget.*")
+    warnings.simplefilter("once", append=True)
 
-    logger.level('VERBOSE', no=VERBOSE, color='<bold>', icon='👄')
+    logger.level("VERBOSE", no=VERBOSE, color="<bold>", icon="👄")
 
-    logger.__class__.verbose = functools.partialmethod(logger.__class__.log, 'VERBOSE')
-    logger.configure(extra={'task': '', 'session_id': None}, patcher=record_patcher)
+    logger.__class__.verbose = functools.partialmethod(logger.__class__.log, "VERBOSE")
+    logger.configure(extra={"task": "", "session_id": None}, patcher=record_patcher)
 
     _logging_configured = True
 
@@ -144,13 +144,13 @@ def initialize(unit_test: bool = False) -> None:
     # Store any log messages in a buffer until we `start` function is run
     global _startup_buffer_id
     _startup_buffer_id = logger.add(
-        lambda message: _startup_buffer.append(message.record), level='DEBUG', format=LOG_FORMAT
+        lambda message: _startup_buffer.append(message.record), level="DEBUG", format=LOG_FORMAT
     )
 
     # Add a handler that sores the last 100 debug lines to `debug_buffer` for use in crash reports
     logger.add(
         lambda message: debug_buffer.append(message),
-        level='DEBUG',
+        level="DEBUG",
         format=LOG_FORMAT,
         backtrace=True,
         diagnose=True,
@@ -162,7 +162,7 @@ def initialize(unit_test: bool = False) -> None:
 
 def start(
     filename: Optional[str] = None,
-    level: str = 'INFO',
+    level: str = "INFO",
     to_console: bool = True,
     to_file: bool = True,
 ) -> None:
@@ -174,7 +174,7 @@ def start(
     if _logging_started:
         return
 
-    if level == 'NONE':
+    if level == "NONE":
         return
 
     # Make sure stdlib logger is set so that dependency logging gets propagated
@@ -186,7 +186,7 @@ def start(
             level=level,
             rotation=int(os.environ.get(ENV_MAXBYTES, 1000 * 1024)),
             retention=int(os.environ.get(ENV_MAXCOUNT, 9)),
-            encoding='utf-8',
+            encoding="utf-8",
             format=LOG_FORMAT,
             filter=_log_filterer,
         )
@@ -197,7 +197,7 @@ def start(
             logger.debug("No sys.stdout, can't log to console.")
         else:
             # Make sure we don't send any characters that the current terminal doesn't support printing
-            sys.stdout.reconfigure(errors='replace')
+            sys.stdout.reconfigure(errors="replace")
             logger.add(sys.stdout, level=level, format=LOG_FORMAT, filter=_log_filterer)
 
     if _startup_buffer_id is not None:
@@ -207,7 +207,7 @@ def start(
     # flush what we have stored from the plugin initialization
     if _startup_buffer:
         for record in _startup_buffer:
-            level, message = record['level'].name, record['message']
+            level, message = record["level"].name, record["message"]
             logger.patch(lambda r, record=record: r.update(record)).log(level, message)
         _startup_buffer = []
     _logging_started = True

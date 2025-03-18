@@ -15,16 +15,16 @@ try:
     # NOTE: Importing other plugins is discouraged!
     from flexget.components.imdb.utils import extract_id
 except ImportError:
-    raise plugin.DependencyError(issued_by=__name__, missing='imdb')
+    raise plugin.DependencyError(issued_by=__name__, missing="imdb")
 
 
-logger = logger.bind(name='rlslog')
+logger = logger.bind(name="rlslog")
 
 
 class RlsLog:
     """Adds support for rlslog.net as a feed."""
 
-    schema = {'type': 'string', 'format': 'url'}
+    schema = {"type": "string", "format": "url"}
 
     def parse_rlslog(self, rlslog_url, task):
         """Return list of release dictionaries.
@@ -36,47 +36,47 @@ class RlsLog:
         soup = get_soup(task.requests.get(rlslog_url, timeout=25).content)
 
         releases = []
-        for entry in soup.find_all('div', attrs={'class': 'entry'}):
+        for entry in soup.find_all("div", attrs={"class": "entry"}):
             release = {}
-            h3 = entry.find('h3', attrs={'class': 'entrytitle'})
+            h3 = entry.find("h3", attrs={"class": "entrytitle"})
             if not h3:
-                logger.debug('FAIL: No h3 entrytitle')
+                logger.debug("FAIL: No h3 entrytitle")
                 continue
-            release['title'] = h3.a.contents[0].strip()
-            entrybody = entry.find('div', attrs={'class': 'entrybody'})
+            release["title"] = h3.a.contents[0].strip()
+            entrybody = entry.find("div", attrs={"class": "entrybody"})
             if not entrybody:
-                logger.debug('FAIL: No entrybody')
+                logger.debug("FAIL: No entrybody")
                 continue
 
-            logger.trace('Processing title {}', release['title'])
+            logger.trace("Processing title {}", release["title"])
 
             # find imdb url
-            link_imdb = entrybody.find('a', text=re.compile(r'imdb', re.IGNORECASE))
+            link_imdb = entrybody.find("a", text=re.compile(r"imdb", re.IGNORECASE))
             if link_imdb:
-                release['imdb_id'] = extract_id(link_imdb['href'])
-                release['imdb_url'] = link_imdb['href']
+                release["imdb_id"] = extract_id(link_imdb["href"])
+                release["imdb_url"] = link_imdb["href"]
 
             # find google search url
-            google = entrybody.find('a', href=re.compile(r'google', re.IGNORECASE))
+            google = entrybody.find("a", href=re.compile(r"google", re.IGNORECASE))
             if google:
-                release['url'] = google['href']
+                release["url"] = google["href"]
                 releases.append(release)
             else:
                 log_once(
-                    '{} skipped due to missing or unsupported download link'.format(
-                        release['title']
+                    "{} skipped due to missing or unsupported download link".format(
+                        release["title"]
                     ),
                     logger,
                 )
 
         return releases
 
-    @cached('rlslog')
+    @cached("rlslog")
     @plugin.internet(logger)
     def on_task_input(self, task, config):
         url = config
-        if url.endswith('feed/'):
-            raise plugin.PluginError('Invalid URL. Remove trailing feed/ from the url.')
+        if url.endswith("feed/"):
+            raise plugin.PluginError("Invalid URL. Remove trailing feed/ from the url.")
 
         releases = []
         entries = []
@@ -90,7 +90,7 @@ class RlsLog:
                 if number == 1:
                     raise
                 logger.verbose(
-                    'Error receiving content, retrying in 5s. Try [{} of 2]. Error: {}',
+                    "Error receiving content, retrying in 5s. Try [{} of 2]. Error: {}",
                     number + 1,
                     e,
                 )
@@ -106,7 +106,7 @@ class RlsLog:
                         return  # None values are not wanted!
                     d_to[f] = d_from[f]
 
-            for field in ('title', 'url', 'imdb_url'):
+            for field in ("title", "url", "imdb_url"):
                 apply_field(release, entry, field)
 
             entries.append(entry)
@@ -114,6 +114,6 @@ class RlsLog:
         return entries
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(RlsLog, 'rlslog', api_ver=2)
+    plugin.register(RlsLog, "rlslog", api_ver=2)

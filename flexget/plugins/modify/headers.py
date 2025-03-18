@@ -3,7 +3,7 @@ from loguru import logger
 from flexget import plugin
 from flexget.event import event
 
-logger = logger.bind(name='headers')
+logger = logger.bind(name="headers")
 
 
 class PluginHeaders:
@@ -15,19 +15,19 @@ class PluginHeaders:
 
     """
 
-    schema = {'type': 'object', 'additionalProperties': {'type': 'string'}}
+    schema = {"type": "object", "additionalProperties": {"type": "string"}}
 
     @plugin.priority(130)
     def on_task_start(self, task, config):
         """Task starting."""
         # Set the headers for this task's request session
-        logger.debug('headers to add: {}', config)
+        logger.debug("headers to add: {}", config)
         if task.requests.headers:
             task.requests.headers.update(config)
         else:
             task.requests.headers = config
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(PluginHeaders, 'headers', api_ver=2)
+    plugin.register(PluginHeaders, "headers", api_ver=2)

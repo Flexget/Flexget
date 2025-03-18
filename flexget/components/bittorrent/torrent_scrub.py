@@ -8,9 +8,9 @@ try:
     # NOTE: Importing other plugins is discouraged!
     from flexget.components.bittorrent import torrent as plugin_torrent
 except ImportError:
-    raise plugin.DependencyError(issued_by=__name__, missing='torrent')
+    raise plugin.DependencyError(issued_by=__name__, missing="torrent")
 
-logger = logger.bind(name='torrent_scrub')
+logger = logger.bind(name="torrent_scrub")
 
 
 class TorrentScrub:
@@ -33,10 +33,10 @@ class TorrentScrub:
     RT_KEYS = ("libtorrent_resume", "log_callback", "err_callback", "rtorrent")
 
     schema = {
-        'oneOf': [
-            {'type': 'boolean'},
-            {'type': 'string', 'enum': list(SCRUB_MODES)},
-            {'type': 'array', 'items': {'type': 'string'}},  # list of keys to scrub
+        "oneOf": [
+            {"type": "boolean"},
+            {"type": "string", "enum": list(SCRUB_MODES)},
+            {"type": "array", "items": {"type": "string"}},  # list of keys to scrub
         ]
     }
 
@@ -81,8 +81,8 @@ class TorrentScrub:
                     key = bittorrent.Torrent.KEY_TYPE(key)
                     field = metainfo
 
-                    while field and '.' in key:
-                        name, key = key.split('.', 1)
+                    while field and "." in key:
+                        name, key = key.split(".", 1)
                         try:
                             field = field[name]
                         except KeyError:
@@ -103,10 +103,10 @@ class TorrentScrub:
                 entry["torrent"].modified = True
                 logger.info(
                     "{} {} {} scrubbed from torrent '{}'!",
-                    'Key' if len(modified) == 1 else 'Keys',
-                    ', '.join(sorted(modified)),
-                    'was' if len(modified) == 1 else 'were',
-                    entry['title'],
+                    "Key" if len(modified) == 1 else "Keys",
+                    ", ".join(sorted(modified)),
+                    "was" if len(modified) == 1 else "were",
+                    entry["title"],
                 )
                 new_infohash = entry["torrent"].info_hash
                 if infohash != new_infohash:
@@ -114,10 +114,10 @@ class TorrentScrub:
                         "Info hash changed from #{} to #{} in '{}'",
                         infohash,
                         new_infohash,
-                        entry['filename'],
+                        entry["filename"],
                     )
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(TorrentScrub, interfaces=['task', 'torrent'], api_ver=2)
+    plugin.register(TorrentScrub, interfaces=["task", "torrent"], api_ver=2)

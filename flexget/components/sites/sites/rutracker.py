@@ -16,12 +16,12 @@ from flexget.event import event
 from flexget.manager import Session
 from flexget.plugin import PluginError
 
-__author__ = 'asm0dey'
+__author__ = "asm0dey"
 
-logger = logger.bind(name='rutracker_auth')
-Base = versioned_base('rutracker_auth', 0)
+logger = logger.bind(name="rutracker_auth")
+Base = versioned_base("rutracker_auth", 0)
 
-MIRRORS = ['https://rutracker.net', 'https://rutracker.org']
+MIRRORS = ["https://rutracker.net", "https://rutracker.org"]
 
 
 class JSONEncodedDict(TypeDecorator):
@@ -48,7 +48,7 @@ class JSONEncodedDict(TypeDecorator):
 
 
 class RutrackerAccount(Base):
-    __tablename__ = 'rutracker_accoounts'
+    __tablename__ = "rutracker_accoounts"
     id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
     login = Column(Unicode, index=True)
     cookies = Column(JSONEncodedDict)
@@ -70,26 +70,26 @@ class RutrackerAuth(AuthBase):
                     url = mirror
                     break
             except RequestException as err:
-                logger.debug('Connection error. {}', str(err))
+                logger.debug("Connection error. {}", str(err))
 
         if url:
             return url
-        raise PluginError('Host unreachable.')
+        raise PluginError("Host unreachable.")
 
     def try_authenticate(self, payload):
         for _ in range(5):
-            self.requests.post(f'{self.base_url}/forum/login.php', data=payload)
+            self.requests.post(f"{self.base_url}/forum/login.php", data=payload)
             if self.requests.cookies and len(self.requests.cookies) > 0:
                 return self.requests.cookies
             sleep(3)
-        raise PluginError('unable to obtain cookies from rutracker')
+        raise PluginError("unable to obtain cookies from rutracker")
 
     def __init__(self, requests, login, password, cookies=None, db_session=None):
         self.requests = requests
         self.base_url = self.update_base_url()
         if cookies is None:
-            logger.debug('rutracker cookie not found. Requesting new one')
-            payload_ = {'login_username': login, 'login_password': password, 'login': 'Вход'}
+            logger.debug("rutracker cookie not found. Requesting new one")
+            payload_ = {"login_username": login, "login_password": password, "login": "Вход"}
             self.cookies_ = self.try_authenticate(payload_)
             if db_session:
                 db_session.add(
@@ -101,25 +101,25 @@ class RutrackerAuth(AuthBase):
                 )
                 db_session.commit()
             else:
-                raise ValueError('db_session can not be None if cookies is None')
+                raise ValueError("db_session can not be None if cookies is None")
         else:
-            logger.debug('Using previously saved cookie')
+            logger.debug("Using previously saved cookie")
             self.cookies_ = cookies
 
     def __call__(self, r):
         url = r.url
-        t_id = re.findall(r'\d+', url)[0]
-        data = f't={t_id}'
+        t_id = re.findall(r"\d+", url)[0]
+        data = f"t={t_id}"
         headers = {
-            'referer': f'{self.base_url}/forum/viewtopic.php?t={t_id}',
-            'Content-Type': 'application/x-www-form-urlencoded',
-            't': t_id,
-            'Origin': self.base_url,
-            'Accept-Encoding': 'gzip,deflate,sdch',
+            "referer": f"{self.base_url}/forum/viewtopic.php?t={t_id}",
+            "Content-Type": "application/x-www-form-urlencoded",
+            "t": t_id,
+            "Origin": self.base_url,
+            "Accept-Encoding": "gzip,deflate,sdch",
         }
         r.prepare_body(data=data, files=None)
-        r.prepare_method('POST')
-        r.prepare_url(url=f'{self.base_url}/forum/dl.php?t={t_id}', params=None)
+        r.prepare_method("POST")
+        r.prepare_url(url=f"{self.base_url}/forum/dl.php?t={t_id}", params=None)
         r.prepare_headers(headers)
         r.prepare_cookies(self.cookies_)
         return r
@@ -136,28 +136,28 @@ class RutrackerUrlrewrite:
     """
 
     schema = {
-        'type': 'object',
-        'properties': {'username': {'type': 'string'}, 'password': {'type': 'string'}},
-        'additionalProperties': False,
+        "type": "object",
+        "properties": {"username": {"type": "string"}, "password": {"type": "string"}},
+        "additionalProperties": False,
     }
 
     auth_cache = {}
 
     @plugin.priority(127)
     def on_task_urlrewrite(self, task, config):
-        username = config['username']
+        username = config["username"]
         db_session = Session()
         cookies = self.try_find_cookie(db_session, username)
         if username not in self.auth_cache:
             auth_handler = RutrackerAuth(
-                task.requests, username, config['password'], cookies, db_session
+                task.requests, username, config["password"], cookies, db_session
             )
             self.auth_cache[username] = auth_handler
         else:
             auth_handler = self.auth_cache[username]
         for entry in task.accepted:
-            if re.match(r'https?:\/\/rutracker', entry['url']):
-                entry['download_auth'] = auth_handler
+            if re.match(r"https?:\/\/rutracker", entry["url"]):
+                entry["download_auth"] = auth_handler
 
     @staticmethod
     def try_find_cookie(db_session, username):
@@ -173,6 +173,6 @@ class RutrackerUrlrewrite:
         return None
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(RutrackerUrlrewrite, 'rutracker_auth', api_ver=2)
+    plugin.register(RutrackerUrlrewrite, "rutracker_auth", api_ver=2)

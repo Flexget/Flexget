@@ -3,7 +3,7 @@ from loguru import logger
 from flexget import plugin
 from flexget.event import event
 
-logger = logger.bind(name='priority')
+logger = logger.bind(name="priority")
 
 
 # TODO: 1.2 figure out replacement for this
@@ -13,12 +13,12 @@ logger = logger.bind(name='priority')
 class TaskPriority:
     """Set task priorities."""
 
-    schema = {'type': 'integer'}
+    schema = {"type": "integer"}
 
     def on_task_start(self, task, config):
         pass
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(TaskPriority, 'priority', api_ver=2)
+    plugin.register(TaskPriority, "priority", api_ver=2)

@@ -32,17 +32,17 @@ if TYPE_CHECKING:
 
     import flask
 
-logger = logger.bind(name='tests')
+logger = logger.bind(name="tests")
 
-VCR_CASSETTE_DIR = Path(__file__).parent / 'cassettes'
-VCR_RECORD_MODE = os.environ.get('VCR_RECORD_MODE', 'once')
+VCR_CASSETTE_DIR = Path(__file__).parent / "cassettes"
+VCR_RECORD_MODE = os.environ.get("VCR_RECORD_MODE", "once")
 
 vcr = VCR(
     cassette_library_dir=str(VCR_CASSETTE_DIR),
     record_mode=VCR_RECORD_MODE,
     custom_patches=(
-        (client, 'HTTPSConnection', VCRHTTPSConnection),
-        (client, 'HTTPConnection', VCRHTTPConnection),
+        (client, "HTTPSConnection", VCRHTTPSConnection),
+        (client, "HTTPConnection", VCRHTTPConnection),
     ),
 )
 
@@ -50,7 +50,7 @@ vcr = VCR(
 # --- These are the public fixtures tests can ask for ---
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture(scope="class")
 def config(request):
     """If used inside a test class, uses the `config` class attribute of the class.
 
@@ -64,9 +64,9 @@ def manager(
     request, config, caplog, monkeypatch, filecopy, tmp_path_factory
 ):  # enforce filecopy is run before manager
     """Create a :class:`MockManager` for this test based on `config` argument."""
-    config = config.replace('__tmp__', str(request.getfixturevalue('tmp_path')))
+    config = config.replace("__tmp__", str(request.getfixturevalue("tmp_path")))
     try:
-        mockmanager = MockManager(config, request.cls.__name__, tmp_path_factory.mktemp('manager'))
+        mockmanager = MockManager(config, request.cls.__name__, tmp_path_factory.mktemp("manager"))
     except Exception:
         # Since we haven't entered the test function yet, pytest won't print the logs on failure. Print them manually.
         print(caplog.text)
@@ -82,7 +82,7 @@ def execute_task(manager: Manager) -> Callable[..., Task]:
     def execute(
         task_name: str,
         abort: bool = False,
-        options: Optional[Union[dict, 'argparse.Namespace']] = None,
+        options: Optional[Union[dict, "argparse.Namespace"]] = None,
     ) -> Task:
         """Use to execute one test task from config.
 
@@ -90,8 +90,8 @@ def execute_task(manager: Manager) -> Callable[..., Task]:
         :param abort: If `True` expect (and require) this task to abort.
         :param options: Options for the execution.
         """
-        logger.info('********** Running task: {} ********** ', task_name)
-        config = manager.config['tasks'][task_name]
+        logger.info("********** Running task: {} ********** ", task_name)
+        config = manager.config["tasks"][task_name]
         task = Task(manager, task_name, config=config, options=options)
 
         try:
@@ -116,32 +116,32 @@ def use_vcr(request, monkeypatch):
 
     The record mode of VCR can be set using the VCR_RECORD_MODE environment variable when running tests.
     """
-    if VCR_RECORD_MODE == 'off':
+    if VCR_RECORD_MODE == "off":
         yield None
     else:
-        module = request.module.__name__.split('tests.')[-1]
+        module = request.module.__name__.split("tests.")[-1]
         class_name = request.cls.__name__
-        cassette_name = f'{module}.{class_name}.{request.function.__name__}'
+        cassette_name = f"{module}.{class_name}.{request.function.__name__}"
         cassette_path = VCR_CASSETTE_DIR / cassette_name
         online = True
-        if vcr.record_mode == 'none':
+        if vcr.record_mode == "none":
             online = False
-        elif vcr.record_mode == 'once':
+        elif vcr.record_mode == "once":
             online = not cassette_path.exists()
         # If we are not going online, disable domain limiting during test
         if not online:
-            logger.debug('Disabling domain limiters during VCR playback.')
-            monkeypatch.setattr('flexget.utils.requests.limit_domains', mock.Mock())
+            logger.debug("Disabling domain limiters during VCR playback.")
+            monkeypatch.setattr("flexget.utils.requests.limit_domains", mock.Mock())
         with vcr.use_cassette(path=str(cassette_path)) as cassette:
             yield cassette
 
 
 @pytest.fixture
-def api_client(manager) -> 'APIClient':
+def api_client(manager) -> "APIClient":
     with Session() as session:
         user = session.query(User).first()
         if not user:
-            user = User(name='flexget', password='flexget')
+            user = User(name="flexget", password="flexget")
             session.add(user)
             session.commit()
         return APIClient(user.token)
@@ -157,21 +157,21 @@ def schema_match(manager) -> Callable[[dict, Any], list[dict]]:
     def match(schema: dict, response: Any) -> list[dict]:
         validator = jsonschema.Draft202012Validator(schema)
         errors = list(validator.iter_errors(response))
-        return [{'value': list(e.path), 'message': e.message} for e in errors]
+        return [{"value": list(e.path), "message": e.message} for e in errors]
 
     return match
 
 
 @pytest.fixture
-def link_headers(manager) -> Callable[['flask.Response'], dict[str, dict]]:
+def link_headers(manager) -> Callable[["flask.Response"], dict[str, dict]]:
     """Parse link headers and return them in dict form."""
 
-    def headers(response: 'flask.Response') -> dict[str, dict]:
+    def headers(response: "flask.Response") -> dict[str, dict]:
         links = {}
-        for link in requests.utils.parse_header_links(response.headers.get('link')):
-            url = link['url']
-            page = int(re.search(r'(?<!per_)page=(\d)', url).group(1))
-            links[link['rel']] = {'url': url, 'page': page}
+        for link in requests.utils.parse_header_links(response.headers.get("link")):
+            url = link["url"]
+            page = int(re.search(r"(?<!per_)page=(\d)", url).group(1))
+            links[link["rel"]] = {"url": url, "page": page}
         return links
 
     return headers
@@ -181,11 +181,11 @@ def link_headers(manager) -> Callable[['flask.Response'], dict[str, dict]]:
 def caplog(pytestconfig, _caplog):  # noqa: F811
     """Override caplog so that we can send loguru messages to logging for compatibility."""
     # set logging level according to pytest verbosity
-    level = logger.level('DEBUG')
-    if pytestconfig.getoption('verbose') == 1:
-        level = logger.level('TRACE')
-    elif pytestconfig.getoption('quiet', None) == 1:
-        level = logger.level('INFO')
+    level = logger.level("DEBUG")
+    if pytestconfig.getoption("verbose") == 1:
+        level = logger.level("TRACE")
+    elif pytestconfig.getoption("quiet", None) == 1:
+        level = logger.level("INFO")
 
     class PropagateHandler(logging.Handler):
         def emit(self, record):
@@ -202,23 +202,23 @@ def caplog(pytestconfig, _caplog):  # noqa: F811
 
 def pytest_runtest_setup(item):
     # Add the filcopy fixture to any test marked with filecopy
-    if item.get_closest_marker('filecopy'):
-        item.fixturenames.append('filecopy')
+    if item.get_closest_marker("filecopy"):
+        item.fixturenames.append("filecopy")
     # Add the online marker to tests that will go online
-    if item.get_closest_marker('online'):
-        item.fixturenames.append('use_vcr')
+    if item.get_closest_marker("online"):
+        item.fixturenames.append("use_vcr")
     else:
-        item.fixturenames.append('no_requests')
+        item.fixturenames.append("no_requests")
 
 
 @pytest.fixture
 def filecopy(request):
     out_files: list[Path] = []
-    for marker in request.node.iter_markers('filecopy'):
+    for marker in request.node.iter_markers("filecopy"):
         sources, dst = marker.args
         if isinstance(sources, (str, Path)):
             sources = [sources]
-        dst = dst.replace('__tmp__', str(request.getfixturevalue('tmp_path')))
+        dst = dst.replace("__tmp__", str(request.getfixturevalue("tmp_path")))
         dst = Path(dst)
         paths: itertools.chain[Path] = itertools.chain(
             *(Path().glob(str(src)) for src in sources)
@@ -227,7 +227,7 @@ def filecopy(request):
             dest_path = dst
             if dest_path.is_dir():
                 dest_path = dest_path / f.name
-            logger.debug('copying {} to {}', f, dest_path)
+            logger.debug("copying {} to {}", f, dest_path)
             if not dest_path.parent.is_dir():
                 dest_path.parent.mkdir(parents=True)
             if f.is_dir():
@@ -249,33 +249,33 @@ def filecopy(request):
 
 @pytest.fixture
 def no_requests(monkeypatch):
-    online_funcs = ['requests.sessions.Session.request', 'http.client.HTTPConnection.request']
+    online_funcs = ["requests.sessions.Session.request", "http.client.HTTPConnection.request"]
 
     # Don't monkey patch HTTPSConnection if ssl not installed as it won't exist in backports
     try:
         import ssl  # noqa: F401
         from ssl import SSLContext  # noqa: F401
 
-        online_funcs.append('http.client.HTTPSConnection.request')
+        online_funcs.append("http.client.HTTPSConnection.request")
     except ImportError:
         pass
 
     online_funcs.extend(
-        ['http.client.HTTPConnection.request', 'http.client.HTTPSConnection.request']
+        ["http.client.HTTPConnection.request", "http.client.HTTPSConnection.request"]
     )
 
     for func in online_funcs:
         monkeypatch.setattr(
-            func, mock.Mock(side_effect=Exception('Online tests should use @pytest.mark.online'))
+            func, mock.Mock(side_effect=Exception("Online tests should use @pytest.mark.online"))
         )
 
 
-@pytest.fixture(scope='session', autouse=True)
+@pytest.fixture(scope="session", autouse=True)
 def setup_once(pytestconfig, request, tmp_path_factory):
     #    os.chdir(os.path.join(pytestconfig.rootdir.strpath, 'flexget', 'tests'))
     flexget.log.initialize(True)
     m = MockManager(
-        'tasks: {}', 'init', tmp_path_factory.mktemp('manager')
+        "tasks: {}", "init", tmp_path_factory.mktemp("manager")
     )  # This makes sure our template environment is set up before any tests are run
     m.shutdown()
     logging.getLogger().setLevel(logging.DEBUG)
@@ -288,7 +288,7 @@ def chdir(pytestconfig, request):
 
     Task configuration can then assume this being location for relative paths
     """
-    if 'chdir' in request.fixturenames:
+    if "chdir" in request.fixturenames:
         os.chdir(Path(request.module.__file__).parent)
 
 
@@ -315,10 +315,10 @@ class MockManager(Manager):
         self._config_name = config_name
         self._tmp_path = tmp_path
         self.config_text = config_text
-        self._db_uri = db_uri or 'sqlite:///:memory:'
-        super().__init__(['execute'])
+        self._db_uri = db_uri or "sqlite:///:memory:"
+        super().__init__(["execute"])
         self.database_uri = self._db_uri
-        logger.debug('database_uri: {}', self.database_uri)
+        logger.debug("database_uri: {}", self.database_uri)
         self.initialize()
 
     def _init_config(self, *args, **kwargs):
@@ -345,9 +345,9 @@ class MockManager(Manager):
 
     def crash_report(self):
         # We don't want to silently swallow crash reports during unit tests
-        logger.opt(exception=True).error('Crash Report Traceback:')
+        logger.opt(exception=True).error("Crash Report Traceback:")
         raise CrashReport(
-            'Crash report created during unit test, check log for traceback.',
+            "Crash report created during unit test, check log for traceback.",
             flexget.log.debug_buffer,
         )
 
@@ -362,23 +362,23 @@ class MockManager(Manager):
 class DoublePhaseChecker:
     @staticmethod
     def on_phase(task, phase):
-        if getattr(task, f'did_{phase}', None):
-            raise RuntimeError(f'{phase} phase should not run twice')
-        setattr(task, f'did_{phase}', True)
+        if getattr(task, f"did_{phase}", None):
+            raise RuntimeError(f"{phase} phase should not run twice")
+        setattr(task, f"did_{phase}", True)
 
     def on_task_start(self, task, config):
-        self.on_phase(task, 'start')
+        self.on_phase(task, "start")
 
     def on_task_prepare(self, task, config):
-        self.on_phase(task, 'prepare')
+        self.on_phase(task, "prepare")
 
     def on_task_exit(self, task, config):
-        self.on_phase(task, 'exit')
+        self.on_phase(task, "exit")
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(DoublePhaseChecker, 'test_dobule_phase', api_ver=2, debug=True, builtin=True)
+    plugin.register(DoublePhaseChecker, "test_dobule_phase", api_ver=2, debug=True, builtin=True)
 
 
 class APIClient:
@@ -387,49 +387,49 @@ class APIClient:
         self.client = api_app.test_client()
 
     def _append_header(self, key, value, kwargs):
-        if 'headers' not in kwargs:
-            kwargs['headers'] = {}
+        if "headers" not in kwargs:
+            kwargs["headers"] = {}
 
-        kwargs['headers'][key] = value
+        kwargs["headers"][key] = value
 
-    def json_post(self, *args, **kwargs) -> 'flask.Response':
-        self._append_header('Content-Type', 'application/json', kwargs)
-        if kwargs.get('auth', True):
-            self._append_header('Authorization', f'Token {self.api_key}', kwargs)
+    def json_post(self, *args, **kwargs) -> "flask.Response":
+        self._append_header("Content-Type", "application/json", kwargs)
+        if kwargs.get("auth", True):
+            self._append_header("Authorization", f"Token {self.api_key}", kwargs)
         return self.client.post(*args, **kwargs)
 
-    def json_put(self, *args, **kwargs) -> 'flask.Response':
-        self._append_header('Content-Type', 'application/json', kwargs)
-        if kwargs.get('auth', True):
-            self._append_header('Authorization', f'Token {self.api_key}', kwargs)
+    def json_put(self, *args, **kwargs) -> "flask.Response":
+        self._append_header("Content-Type", "application/json", kwargs)
+        if kwargs.get("auth", True):
+            self._append_header("Authorization", f"Token {self.api_key}", kwargs)
         return self.client.put(*args, **kwargs)
 
-    def json_patch(self, *args, **kwargs) -> 'flask.Response':
-        self._append_header('Content-Type', 'application/json', kwargs)
-        if kwargs.get('auth', True):
-            self._append_header('Authorization', f'Token {self.api_key}', kwargs)
+    def json_patch(self, *args, **kwargs) -> "flask.Response":
+        self._append_header("Content-Type", "application/json", kwargs)
+        if kwargs.get("auth", True):
+            self._append_header("Authorization", f"Token {self.api_key}", kwargs)
         return self.client.patch(*args, **kwargs)
 
-    def get(self, *args, **kwargs) -> 'flask.Response':
-        if kwargs.get('auth', True):
-            self._append_header('Authorization', f'Token {self.api_key}', kwargs)
+    def get(self, *args, **kwargs) -> "flask.Response":
+        if kwargs.get("auth", True):
+            self._append_header("Authorization", f"Token {self.api_key}", kwargs)
 
         return self.client.get(*args, **kwargs)
 
-    def delete(self, *args, **kwargs) -> 'flask.Response':
-        if kwargs.get('auth', True):
-            self._append_header('Authorization', f'Token {self.api_key}', kwargs)
+    def delete(self, *args, **kwargs) -> "flask.Response":
+        if kwargs.get("auth", True):
+            self._append_header("Authorization", f"Token {self.api_key}", kwargs)
 
         return self.client.delete(*args, **kwargs)
 
-    def json_delete(self, *args, **kwargs) -> 'flask.Response':
-        self._append_header('Content-Type', 'application/json', kwargs)
-        if kwargs.get('auth', True):
-            self._append_header('Authorization', f'Token {self.api_key}', kwargs)
+    def json_delete(self, *args, **kwargs) -> "flask.Response":
+        self._append_header("Content-Type", "application/json", kwargs)
+        if kwargs.get("auth", True):
+            self._append_header("Authorization", f"Token {self.api_key}", kwargs)
         return self.client.delete(*args, **kwargs)
 
-    def head(self, *args, **kwargs) -> 'flask.Response':
-        if kwargs.get('auth', True):
-            self._append_header('Authorization', f'Token {self.api_key}', kwargs)
+    def head(self, *args, **kwargs) -> "flask.Response":
+        if kwargs.get("auth", True):
+            self._append_header("Authorization", f"Token {self.api_key}", kwargs)
 
         return self.client.head(*args, **kwargs)

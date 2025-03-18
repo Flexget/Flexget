@@ -8,9 +8,9 @@ try:
     from guppy import hpy
 except ImportError:
     # this will leave the plugin unloaded
-    raise plugin.DependencyError(issued_by='memusage', missing='guppy3', silent=True)
+    raise plugin.DependencyError(issued_by="memusage", missing="guppy3", silent=True)
 
-logger = logger.bind(name='mem_usage')
+logger = logger.bind(name="mem_usage")
 
 """
 http://blog.mfabrik.com/2008/03/07/debugging-django-memory-leak-with-trackrefs-and-guppy/
@@ -33,7 +33,7 @@ def update()
 heapy = None
 
 
-@event('manager.startup')
+@event("manager.startup")
 def on_manager_startup(manager):
     if not manager.options.mem_usage:
         return
@@ -41,7 +41,7 @@ def on_manager_startup(manager):
     heapy = hpy()
 
 
-@event('manager.shutdown')
+@event("manager.shutdown")
 def on_manager_shutdown(manager):
     if not manager.options.mem_usage:
         return
@@ -50,26 +50,26 @@ def on_manager_shutdown(manager):
         import resource
 
         console(
-            f'Resource Module memory usage: {resource.getrusage(resource.RUSAGE_SELF).ru_maxrss} (kb)'
+            f"Resource Module memory usage: {resource.getrusage(resource.RUSAGE_SELF).ru_maxrss} (kb)"
         )
     except ImportError:
-        console('Resource Module memory usage:')
+        console("Resource Module memory usage:")
 
     global heapy
-    console('Heapy module calculating memory usage:')
+    console("Heapy module calculating memory usage:")
     console(heapy.heap())
-    console('-' * 79)
-    console('Heapy module calculating report (this may take a while):')
+    console("-" * 79)
+    console("Heapy module calculating report (this may take a while):")
     console(heapy.heap().get_rp(40))
     heapy = None
 
 
-@event('options.register')
+@event("options.register")
 def register_parser_arguments():
     options.get_parser().add_argument(
-        '--mem-usage',
-        action='store_true',
-        dest='mem_usage',
+        "--mem-usage",
+        action="store_true",
+        dest="mem_usage",
         default=False,
-        help='display memory usage debug information',
+        help="display memory usage debug information",
     )

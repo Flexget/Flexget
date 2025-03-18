@@ -7,7 +7,7 @@ from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.event import event
 
-logger = logger.bind(name='exists')
+logger = logger.bind(name="exists")
 
 
 class FilterExists:
@@ -18,7 +18,7 @@ class FilterExists:
       exists: /storage/movies/
     """
 
-    schema = one_or_more({'type': 'string', 'format': 'path'})
+    schema = one_or_more({"type": "string", "format": "path"})
 
     def prepare_config(self, config):
         # If only a single path is passed turn it into a 1 element list
@@ -29,32 +29,32 @@ class FilterExists:
     @plugin.priority(-1)
     def on_task_filter(self, task, config):
         if not task.accepted:
-            logger.debug('No accepted entries, not scanning for existing.')
+            logger.debug("No accepted entries, not scanning for existing.")
             return
-        logger.verbose('Scanning path(s) for existing files.')
+        logger.verbose("Scanning path(s) for existing files.")
         config = self.prepare_config(config)
         filenames = {}
         for folder in config:
             folder = Path(folder).expanduser()
             if not folder.exists():
-                raise plugin.PluginWarning(f'Path {folder} does not exist', logger)
-            for p in folder.rglob('*'):
+                raise plugin.PluginWarning(f"Path {folder} does not exist", logger)
+            for p in folder.rglob("*"):
                 if p.is_file():
                     key = p.name
                     # windows file system is not case sensitive
-                    if platform.system() == 'Windows':
+                    if platform.system() == "Windows":
                         key = key.lower()
                     filenames[key] = p
         for entry in task.accepted:
             # priority is: filename, location (filename only), title
-            name = Path(entry.get('filename', entry.get('location', entry['title']))).name
-            if platform.system() == 'Windows':
+            name = Path(entry.get("filename", entry.get("location", entry["title"]))).name
+            if platform.system() == "Windows":
                 name = name.lower()
             if name in filenames:
-                logger.debug('Found {} in {}', name, filenames[name])
-                entry.reject(f'exists in {filenames[name]}')
+                logger.debug("Found {} in {}", name, filenames[name])
+                entry.reject(f"exists in {filenames[name]}")
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(FilterExists, 'exists', api_ver=2)
+    plugin.register(FilterExists, "exists", api_ver=2)

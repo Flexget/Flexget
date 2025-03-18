@@ -32,15 +32,15 @@ class TestRegexpList:
     """
 
     def test_regexp_list_simple_match(self, execute_task):
-        task = execute_task('regexp_list_add')
+        task = execute_task("regexp_list_add")
         assert len(task.accepted) == 1
 
-        task = execute_task('regexp_list_match')
+        task = execute_task("regexp_list_match")
         assert len(task.accepted) == 1
 
     def test_regexp_list_advanced_match(self, execute_task):
-        task = execute_task('regexp_list_add_advanced')
+        task = execute_task("regexp_list_add_advanced")
         assert len(task.accepted) == 1
 
-        task = execute_task('regexp_list_match')
+        task = execute_task("regexp_list_match")
         assert len(task.accepted) == 1

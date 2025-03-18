@@ -7,9 +7,9 @@ from flexget.components.managed_lists.lists.imdb_list import ImdbEntrySet
 @pytest.mark.online
 class TestIMDBListTypes:
     imdb_config = {
-        'login': 'siysbijz@sharklasers.com',
-        'password': 'flexget16',
-        'list': 'watchlist',
+        "login": "siysbijz@sharklasers.com",
+        "password": "flexget16",
+        "list": "watchlist",
     }
 
     config = """
@@ -51,17 +51,17 @@ class TestIMDBListTypes:
         # Clearing existing list
         imdb_set.clear()
 
-        task = execute_task('imdb_list_add')
+        task = execute_task("imdb_list_add")
         assert len(task.accepted) == 3
 
-        task = execute_task('imdb_list_get')
+        task = execute_task("imdb_list_get")
         assert len(task.accepted) == 3
-        assert task.find_entry(movie_name='The Matrix', movie_year=1999)
-        assert task.find_entry(series_name='Black Mirror', series_year=2011)
-        assert task.find_entry(movie_name='Blackfish', movie_year=2013)
+        assert task.find_entry(movie_name="The Matrix", movie_year=1999)
+        assert task.find_entry(series_name="Black Mirror", series_year=2011)
+        assert task.find_entry(movie_name="Blackfish", movie_year=2013)
 
-        task = execute_task('imdb_list_remove')
+        task = execute_task("imdb_list_remove")
         assert len(task.all_entries) == 3
 
-        task = execute_task('imdb_list_get')
+        task = execute_task("imdb_list_get")
         assert len(task.accepted) == 0

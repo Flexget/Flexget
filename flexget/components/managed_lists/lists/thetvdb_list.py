@@ -13,23 +13,23 @@ try:
     # NOTE: Importing other plugins is discouraged!
     from flexget.components.thetvdb import api_tvdb as plugin_api_tvdb
 except ImportError:
-    raise plugin.DependencyError(issued_by=__name__, missing='api_tvdb')
+    raise plugin.DependencyError(issued_by=__name__, missing="api_tvdb")
 
-logger = logger.bind(name='thetvdb_list')
+logger = logger.bind(name="thetvdb_list")
 
 
 class TheTVDBSet(MutableSet):
     schema = {
-        'type': 'object',
-        'properties': {
-            'username': {'type': 'string'},
-            'account_id': {'type': 'string'},
-            'api_key': {'type': 'string'},
-            'strip_dates': {'type': 'boolean'},
-            'language': {'type': 'string'},
+        "type": "object",
+        "properties": {
+            "username": {"type": "string"},
+            "account_id": {"type": "string"},
+            "api_key": {"type": "string"},
+            "strip_dates": {"type": "boolean"},
+            "language": {"type": "string"},
         },
-        'required': ['username', 'account_id', 'api_key'],
-        'additionalProperties': False,
+        "required": ["username", "account_id", "api_key"],
+        "additionalProperties": False,
     }
 
     @property
@@ -60,31 +60,31 @@ class TheTVDBSet(MutableSet):
         if self._items is None:
             try:
                 req = plugin_api_tvdb.TVDBRequest(
-                    username=self.config['username'],
-                    account_id=self.config['account_id'],
-                    api_key=self.config['api_key'],
-                ).get('user/favorites')
-                series_ids = [int(f_id) for f_id in req['favorites'] if f_id != '']
+                    username=self.config["username"],
+                    account_id=self.config["account_id"],
+                    api_key=self.config["api_key"],
+                ).get("user/favorites")
+                series_ids = [int(f_id) for f_id in req["favorites"] if f_id != ""]
             except RequestException as e:
-                raise PluginError(f'Error retrieving favorites from thetvdb: {e!s}')
+                raise PluginError(f"Error retrieving favorites from thetvdb: {e!s}")
             self._items = []
             for series_id in series_ids:
                 # Lookup the series name from the id
                 try:
                     series = plugin_api_tvdb.lookup_series(
-                        tvdb_id=series_id, language=self.config.get('language')
+                        tvdb_id=series_id, language=self.config.get("language")
                     )
                 except LookupError as e:
-                    logger.error('Error looking up {} from thetvdb: {}', series_id, e.args[0])
+                    logger.error("Error looking up {} from thetvdb: {}", series_id, e.args[0])
                 else:
                     series_name = series.name
-                    if self.config.get('strip_dates'):
+                    if self.config.get("strip_dates"):
                         # Remove year from end of series name if present
                         series_name, _ = split_title_year(series_name)
                     entry = Entry()
-                    entry['title'] = entry['series_name'] = series_name
-                    entry['url'] = f'http://thetvdb.com/index.php?tab=series&id={series.id!s}'
-                    entry['tvdb_id'] = str(series.id)
+                    entry["title"] = entry["series_name"] = series_name
+                    entry["url"] = f"http://thetvdb.com/index.php?tab=series&id={series.id!s}"
+                    entry["tvdb_id"] = str(series.id)
                     self._items.append(entry)
         return self._items
 
@@ -92,43 +92,43 @@ class TheTVDBSet(MutableSet):
         self._items = None
 
     def add(self, entry):
-        if not entry.get('tvdb_id'):
+        if not entry.get("tvdb_id"):
             logger.verbose(
-                'entry does not have `tvdb_id`, cannot add to list. Consider using a lookup plugin`'
+                "entry does not have `tvdb_id`, cannot add to list. Consider using a lookup plugin`"
             )
             return
         try:
             plugin_api_tvdb.TVDBRequest(
-                username=self.config['username'],
-                account_id=self.config['account_id'],
-                api_key=self.config['api_key'],
-            ).put('user/favorites/{}'.format(entry['tvdb_id']))
+                username=self.config["username"],
+                account_id=self.config["account_id"],
+                api_key=self.config["api_key"],
+            ).put("user/favorites/{}".format(entry["tvdb_id"]))
         except RequestException as e:
-            logger.error('Could not add tvdb_id {} to favourites list: {}', entry['tvdb_id'], e)
+            logger.error("Could not add tvdb_id {} to favourites list: {}", entry["tvdb_id"], e)
         self.invalidate_cache()
 
     def discard(self, entry):
-        if not entry.get('tvdb_id'):
+        if not entry.get("tvdb_id"):
             logger.verbose(
-                'entry does not have `tvdb_id`, cannot remove from list. Consider using a lookup plugin`'
+                "entry does not have `tvdb_id`, cannot remove from list. Consider using a lookup plugin`"
             )
             return
         try:
             plugin_api_tvdb.TVDBRequest(
-                username=self.config['username'],
-                account_id=self.config['account_id'],
-                api_key=self.config['api_key'],
-            ).delete('user/favorites/{}'.format(entry['tvdb_id']))
+                username=self.config["username"],
+                account_id=self.config["account_id"],
+                api_key=self.config["api_key"],
+            ).delete("user/favorites/{}".format(entry["tvdb_id"]))
         except RequestException as e:
-            logger.error('Could not add tvdb_id {} to favourites list: {}', entry['tvdb_id'], e)
+            logger.error("Could not add tvdb_id {} to favourites list: {}", entry["tvdb_id"], e)
         self.invalidate_cache()
 
     def _find_entry(self, entry):
-        if not entry.get('tvdb_id'):
-            logger.debug('entry does not have `tvdb_id`, skipping: {}', entry)
+        if not entry.get("tvdb_id"):
+            logger.debug("entry does not have `tvdb_id`, skipping: {}", entry)
             return None
         for item in self.items:
-            if item['tvdb_id'] == entry['tvdb_id']:
+            if item["tvdb_id"] == entry["tvdb_id"]:
                 return item
         return None
 
@@ -151,6 +151,6 @@ class TheTVDBList:
         return list(TheTVDBSet(config))
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(TheTVDBList, 'thetvdb_list', api_ver=2, interfaces=['task', 'list'])
+    plugin.register(TheTVDBList, "thetvdb_list", api_ver=2, interfaces=["task", "list"])

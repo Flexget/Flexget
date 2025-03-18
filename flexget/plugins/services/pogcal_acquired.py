@@ -11,23 +11,23 @@ from flexget.utils import requests
 from flexget.utils.parsers.generic import name_to_re
 from flexget.utils.soup import get_soup
 
-logger = logger.bind(name='pogcal_acquired')
-Base = versioned_base('pogcal_acquired', 0)
+logger = logger.bind(name="pogcal_acquired")
+Base = versioned_base("pogcal_acquired", 0)
 session = requests.Session(max_retries=3)
 
 
 class PogcalShow(Base):
-    __tablename__ = 'pogcal_shows'
+    __tablename__ = "pogcal_shows"
     id = Column(Integer, primary_key=True, autoincrement=False, nullable=False)
     name = Column(Unicode)
 
 
 class PogcalAcquired:
     schema = {
-        'type': 'object',
-        'properties': {'username': {'type': 'string'}, 'password': {'type': 'string'}},
-        'required': ['username', 'password'],
-        'additionalProperties': False,
+        "type": "object",
+        "properties": {"username": {"type": "string"}, "password": {"type": "string"}},
+        "required": ["username", "password"],
+        "additionalProperties": False,
     }
 
     @plugin.priority(plugin.PRIORITY_LAST)
@@ -36,57 +36,57 @@ class PogcalAcquired:
             return
         try:
             result = session.post(
-                'http://www.pogdesign.co.uk/cat/login',
+                "http://www.pogdesign.co.uk/cat/login",
                 data={
-                    'username': config['username'],
-                    'password': config['password'],
-                    'sub_login': 'Account Login',
+                    "username": config["username"],
+                    "password": config["password"],
+                    "sub_login": "Account Login",
                 },
             )
         except requests.RequestException as e:
-            logger.error('Error logging in to pog calendar: {}', e)
+            logger.error("Error logging in to pog calendar: {}", e)
             return
-        if 'logout' not in result.text:
-            logger.error('Username/password for pogdesign calendar appear to be incorrect.')
+        if "logout" not in result.text:
+            logger.error("Username/password for pogdesign calendar appear to be incorrect.")
             return
         if task.options.test:
-            logger.verbose('Successfully logged in to pogdesign calendar.')
+            logger.verbose("Successfully logged in to pogdesign calendar.")
         for entry in task.accepted:
-            if not entry.get('series_name') or entry.get('series_id_type') != 'ep':
+            if not entry.get("series_name") or entry.get("series_id_type") != "ep":
                 continue
-            show_id = self.find_show_id(entry['series_name'], task.session)
+            show_id = self.find_show_id(entry["series_name"], task.session)
             if not show_id:
-                logger.debug('Could not find pogdesign calendar id for `{}`', entry['series_name'])
+                logger.debug("Could not find pogdesign calendar id for `{}`", entry["series_name"])
                 continue
             if task.options.test:
                 logger.verbose(
-                    'Would mark {} {} in pogdesign calenadar.',
-                    entry['series_name'],
-                    entry['series_id'],
+                    "Would mark {} {} in pogdesign calenadar.",
+                    entry["series_name"],
+                    entry["series_id"],
                 )
                 continue
             logger.verbose(
-                'Marking {} {} in pogdesign calenadar.',
-                entry['series_name'],
-                entry['series_id'],
+                "Marking {} {} in pogdesign calenadar.",
+                entry["series_name"],
+                entry["series_id"],
             )
-            shid = '{}-{}-{}/{}-{}'.format(
+            shid = "{}-{}-{}/{}-{}".format(
                 show_id,
-                entry['series_season'],
-                entry['series_episode'],
+                entry["series_season"],
+                entry["series_episode"],
                 datetime.now().month,
                 datetime.now().year,
             )
             try:
                 session.post(
-                    'http://www.pogdesign.co.uk/cat/watchhandle',
-                    data={'watched': 'adding', 'shid': shid},
+                    "http://www.pogdesign.co.uk/cat/watchhandle",
+                    data={"watched": "adding", "shid": shid},
                 )
             except requests.RequestException as e:
                 logger.error(
-                    'Error marking {} {} in pogdesign calendar: {}',
-                    entry['series_name'],
-                    entry['series_id'],
+                    "Error marking {} {} in pogdesign calendar: {}",
+                    entry["series_name"],
+                    entry["series_id"],
                     e,
                 )
 
@@ -97,9 +97,9 @@ class PogcalAcquired:
         if db_show:
             return db_show.id
         try:
-            page = session.get('http://www.pogdesign.co.uk/cat/showselect.php')
+            page = session.get("http://www.pogdesign.co.uk/cat/showselect.php")
         except requests.RequestException as e:
-            logger.error('Error looking up show show list from pogdesign calendar: {}', e)
+            logger.error("Error looking up show show list from pogdesign calendar: {}", e)
             return None
         # Try to find the show id from pogdesign show list
         show_re = name_to_re(show_name)
@@ -107,13 +107,13 @@ class PogcalAcquired:
         search = re.compile(show_re, flags=re.IGNORECASE)
         show = soup.find(text=search)
         if show:
-            id = int(show.find_previous('input')['value'])
+            id = int(show.find_previous("input")["value"])
             db_sess.add(PogcalShow(id=id, name=show_name))
             return id
-        logger.verbose('Could not find pogdesign calendar id for show `{}`', show_re)
+        logger.verbose("Could not find pogdesign calendar id for show `{}`", show_re)
         return None
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(PogcalAcquired, 'pogcal_acquired', api_ver=2)
+    plugin.register(PogcalAcquired, "pogcal_acquired", api_ver=2)

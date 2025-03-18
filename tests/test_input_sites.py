@@ -22,15 +22,15 @@ class TestInputSites:
 
     """
 
-    @pytest.mark.skip(reason='Missing a usable urlrewriter for uploadgig?')
+    @pytest.mark.skip(reason="Missing a usable urlrewriter for uploadgig?")
     def test_sceper(self, execute_task):
-        task = execute_task('test_sceper')
-        assert task.entries, 'no entries created / site may be down'
+        task = execute_task("test_sceper")
+        assert task.entries, "no entries created / site may be down"
 
     def test_apple_trailers(self, execute_task, use_vcr):
-        task = execute_task('test_apple_trailers')
-        assert task.entries, 'no entries created / site may be down'
+        task = execute_task("test_apple_trailers")
+        assert task.entries, "no entries created / site may be down"
 
     def test_apple_trailers_simple(self, execute_task):
-        task = execute_task('test_apple_trailers_simple')
-        assert task.entries, 'no entries created / site may be down'
+        task = execute_task("test_apple_trailers_simple")
+        assert task.entries, "no entries created / site may be down"

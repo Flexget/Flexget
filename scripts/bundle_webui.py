@@ -58,9 +58,9 @@ def bundle_webui(ui_version: Optional[str] = None):
         z = zipfile.ZipFile(io.BytesIO(r.content))
         z.extractall(dest_path)
 
-    if not ui_version or ui_version == 'v1':
+    if not ui_version or ui_version == "v1":
         # WebUI V1
-        print('Bundling WebUI v1...')
+        print("Bundling WebUI v1...")
         try:
             # Remove existing
             app_path = ui_path / "v1" / "app"
@@ -70,37 +70,37 @@ def bundle_webui(ui_version: Optional[str] = None):
             # It doesn't get updated anymore,
             # we should probably stop bundling it with releases soon.
             download_extract(
-                'https://github.com/Flexget/Flexget/releases/download/v3.0.6/webui_v1.zip',
+                "https://github.com/Flexget/Flexget/releases/download/v3.0.6/webui_v1.zip",
                 ui_path / "v1",
             )
         except OSError as e:
-            raise RuntimeError(f'Unable to download and extract WebUI v1 due to {e!s}')
+            raise RuntimeError(f"Unable to download and extract WebUI v1 due to {e!s}")
 
-    if not ui_version or ui_version == 'v2':
+    if not ui_version or ui_version == "v2":
         # WebUI V2
         try:
-            print('Bundling WebUI v2...')
+            print("Bundling WebUI v2...")
             # Remove existing
             app_path = ui_path / "v2" / "dist"
             if app_path.exists():
                 shutil.rmtree(app_path)
 
             release = requests.get(
-                'https://api.github.com/repos/Flexget/webui/releases/latest'
+                "https://api.github.com/repos/Flexget/webui/releases/latest"
             ).json()
 
             v2_package = None
-            for asset in release['assets']:
-                if asset['name'] == 'dist.zip':
-                    v2_package = asset['browser_download_url']
+            for asset in release["assets"]:
+                if asset["name"] == "dist.zip":
+                    v2_package = asset["browser_download_url"]
                     break
 
             if not v2_package:
-                raise RuntimeError('Unable to find dist.zip in assets')
+                raise RuntimeError("Unable to find dist.zip in assets")
             download_extract(v2_package, ui_path / "v2")
         except (OSError, ValueError) as e:
-            raise RuntimeError(f'Unable to download and extract WebUI v2 due to {e!s}')
+            raise RuntimeError(f"Unable to download and extract WebUI v2 due to {e!s}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     bundle_webui()

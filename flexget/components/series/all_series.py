@@ -21,7 +21,7 @@ class FilterAllSeries(plugin_series.FilterSeriesBase):
 
     @property
     def schema(self):
-        return {'oneOf': [{'type': 'boolean'}, self.settings_schema]}
+        return {"oneOf": [{"type": "boolean"}, self.settings_schema]}
 
     # Run after series and metainfo series plugins
     @plugin.priority(115)
@@ -36,24 +36,24 @@ class FilterAllSeries(plugin_series.FilterSeriesBase):
         group_settings = {}
         if isinstance(config, dict):
             group_settings = config
-        group_settings.setdefault('identified_by', 'auto')
+        group_settings.setdefault("identified_by", "auto")
         # Generate a list of unique series that metainfo_series can parse for this task
-        guess_entry = plugin.get('metainfo_series', 'all_series').guess_entry
+        guess_entry = plugin.get("metainfo_series", "all_series").guess_entry
         guessed_series = {}
         for entry in task.entries:
             if guess_entry(entry, config=group_settings):
                 guessed_series.setdefault(
-                    plugin_series.normalize_series_name(entry['series_name']), entry['series_name']
+                    plugin_series.normalize_series_name(entry["series_name"]), entry["series_name"]
                 )
         # Combine settings and series into series plugin config format
         all_series = {
-            'settings': {'all_series': group_settings},
-            'all_series': list(guessed_series.values()),
+            "settings": {"all_series": group_settings},
+            "all_series": list(guessed_series.values()),
         }
         # Merge our config in to the main series config
         self.merge_config(task, all_series)
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(FilterAllSeries, 'all_series', api_ver=2)
+    plugin.register(FilterAllSeries, "all_series", api_ver=2)

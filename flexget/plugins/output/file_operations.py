@@ -50,13 +50,13 @@ class BaseFileOps:
     # Defined by subclasses
     logger = None
     along = {
-        'type': 'object',
-        'properties': {
-            'extensions': one_or_more({'type': 'string'}),
-            'subdirs': one_or_more({'type': 'string'}),
+        "type": "object",
+        "properties": {
+            "extensions": one_or_more({"type": "string"}),
+            "subdirs": one_or_more({"type": "string"}),
         },
-        'additionalProperties': False,
-        'required': ['extensions'],
+        "additionalProperties": False,
+        "required": ["extensions"],
     }
 
     def prepare_config(self, config):
@@ -65,16 +65,16 @@ class BaseFileOps:
         if config is False:
             return None
 
-        if 'along' not in config:
+        if "along" not in config:
             return config
 
-        extensions = config['along'].get('extensions')
-        subdirs = config['along'].get('subdirs')
+        extensions = config["along"].get("extensions")
+        subdirs = config["along"].get("subdirs")
 
         if extensions and not isinstance(extensions, list):
-            config['along']['extensions'] = [extensions]
+            config["along"]["extensions"] = [extensions]
         if subdirs and not isinstance(subdirs, list):
-            config['along']['subdirs'] = [subdirs]
+            config["along"]["subdirs"] = [subdirs]
 
         return config
 
@@ -83,36 +83,36 @@ class BaseFileOps:
         if config is None:
             return
         for entry in task.accepted:
-            if 'location' not in entry:
+            if "location" not in entry:
                 self.logger.verbose(
-                    'Cannot handle {} because it does not have the field location.', entry['title']
+                    "Cannot handle {} because it does not have the field location.", entry["title"]
                 )
                 continue
-            src = entry['location']
+            src = entry["location"]
             src_isdir = os.path.isdir(src)
             try:
                 # check location
                 if not os.path.exists(src):
-                    self.logger.warning('location `{}` does not exists (anymore).', src)
+                    self.logger.warning("location `{}` does not exists (anymore).", src)
                     continue
                 if src_isdir:
-                    if not config.get('allow_dir'):
-                        self.logger.warning('location `{}` is a directory.', src)
+                    if not config.get("allow_dir"):
+                        self.logger.warning("location `{}` is a directory.", src)
                         continue
                 elif not os.path.isfile(src):
-                    self.logger.warning('location `{}` is not a file.', src)
+                    self.logger.warning("location `{}` is not a file.", src)
                     continue
                 # search for namesakes
                 siblings = {}  # dict of (path=ext) pairs
-                if not src_isdir and 'along' in config:
+                if not src_isdir and "along" in config:
                     parent = os.path.dirname(src)
                     filename_no_ext, filename_ext = os.path.splitext(os.path.basename(src))
-                    for ext in config['along']['extensions']:
+                    for ext in config["along"]["extensions"]:
                         siblings.update(get_siblings(ext, filename_no_ext, filename_ext, parent))
 
                     files = os.listdir(parent)
                     files_lower = list(map(str.lower, files))
-                    for subdir in config['along'].get('subdirs', []):
+                    for subdir in config["along"].get("subdirs", []):
                         try:
                             idx = files_lower.index(subdir)
                         except ValueError:
@@ -120,7 +120,7 @@ class BaseFileOps:
                         subdir_path = os.path.join(parent, files[idx])
                         if not os.path.isdir(subdir_path):
                             continue
-                        for ext in config['along']['extensions']:
+                        for ext in config["along"]["extensions"]:
                             siblings.update(
                                 get_siblings(ext, filename_no_ext, filename_ext, subdir_path)
                             )
@@ -131,35 +131,35 @@ class BaseFileOps:
                 continue
 
     def clean_source(self, task, config, entry):
-        min_size = entry.get('clean_source', config.get('clean_source', -1))
+        min_size = entry.get("clean_source", config.get("clean_source", -1))
         if min_size < 0:
             return
-        base_path = os.path.split(entry.get('old_location', entry['location']))[0]
+        base_path = os.path.split(entry.get("old_location", entry["location"]))[0]
         # everything here happens after a successful execution of the main action: the entry has been moved in a
         # different location, or it does not exists anymore. so from here we can just log warnings and move on.
         if not os.path.isdir(base_path):
             self.logger.warning(
-                'Cannot delete path `{}` because it does not exists (anymore).', base_path
+                "Cannot delete path `{}` because it does not exists (anymore).", base_path
             )
             return
         dir_size = get_directory_size(base_path) / 1024 / 1024
         if dir_size >= min_size:
             self.logger.info(
-                'Path `{}` left because it exceeds safety value set in clean_source option.',
+                "Path `{}` left because it exceeds safety value set in clean_source option.",
                 base_path,
             )
             return
         if task.options.test:
-            self.logger.info('Would delete `{}` and everything under it.', base_path)
+            self.logger.info("Would delete `{}` and everything under it.", base_path)
             return
         try:
             shutil.rmtree(base_path)
             self.logger.info(
-                'Path `{}` has been deleted because was less than clean_source safe value.',
+                "Path `{}` has been deleted because was less than clean_source safe value.",
                 base_path,
             )
         except Exception as err:
-            self.logger.warning('Unable to delete path `{}`: {}', base_path, err)
+            self.logger.warning("Unable to delete path `{}`: {}", base_path, err)
 
     def handle_entry(self, task, config, entry, siblings):
         raise NotImplementedError
@@ -169,45 +169,45 @@ class DeleteFiles(BaseFileOps):
     """Delete all accepted files."""
 
     schema = {
-        'oneOf': [
-            {'type': 'boolean'},
+        "oneOf": [
+            {"type": "boolean"},
             {
-                'type': 'object',
-                'properties': {
-                    'allow_dir': {'type': 'boolean'},
-                    'along': BaseFileOps.along,
-                    'clean_source': {'type': 'number'},
+                "type": "object",
+                "properties": {
+                    "allow_dir": {"type": "boolean"},
+                    "along": BaseFileOps.along,
+                    "clean_source": {"type": "number"},
                 },
-                'additionalProperties': False,
+                "additionalProperties": False,
             },
         ]
     }
 
-    logger = logger.bind(name='delete')
+    logger = logger.bind(name="delete")
 
     def handle_entry(self, task, config, entry, siblings):
-        src = entry['location']
+        src = entry["location"]
         src_isdir = os.path.isdir(src)
         if task.options.test:
             if src_isdir:
-                self.logger.info('Would delete `{}` and all its content.', src)
+                self.logger.info("Would delete `{}` and all its content.", src)
             else:
-                self.logger.info('Would delete `{}`', src)
+                self.logger.info("Would delete `{}`", src)
                 for s in siblings:
-                    self.logger.info('Would also delete `{}`', s)
+                    self.logger.info("Would also delete `{}`", s)
             return
         # IO errors will have the entry mark failed in the base class
         if src_isdir:
             shutil.rmtree(src)
-            self.logger.info('`{}` and all its content has been deleted.', src)
+            self.logger.info("`{}` and all its content has been deleted.", src)
         else:
             os.remove(src)
-            self.logger.info('`{}` has been deleted.', src)
+            self.logger.info("`{}` has been deleted.", src)
         # further errors will not have any effect (the entry does not exists anymore)
         for s in siblings:
             try:
                 os.remove(s)
-                self.logger.info('`{}` has been deleted as well.', s)
+                self.logger.info("`{}` has been deleted as well.", s)
             except Exception as err:
                 self.logger.warning(str(err))
         if not src_isdir:
@@ -234,30 +234,30 @@ class TransformingOps(BaseFileOps):
                 raise
 
     def handle_entry(self, task, config, entry, siblings):
-        src = entry['location']
+        src = entry["location"]
         src_isdir = os.path.isdir(src)
         src_path, src_name = os.path.split(src)
 
         # get the proper path and name in order of: entry, config, above split
-        dst_path = entry.get(self.destination_field, config.get('to', src_path))
-        if config.get('rename'):
-            dst_name = config['rename']
-        elif entry.get('filename') and entry['filename'] != src_name:
+        dst_path = entry.get(self.destination_field, config.get("to", src_path))
+        if config.get("rename"):
+            dst_name = config["rename"]
+        elif entry.get("filename") and entry["filename"] != src_name:
             # entry specifies different filename than what was split from the path
             # since some inputs fill in filename it must be different in order to be used
-            dst_name = entry['filename']
+            dst_name = entry["filename"]
         else:
             dst_name = src_name
 
         try:
             dst_path = entry.render(dst_path)
         except RenderError as err:
-            entry.fail(f'Path value replacement `{dst_path}` failed: {err.args[0]}')
+            entry.fail(f"Path value replacement `{dst_path}` failed: {err.args[0]}")
             return
         try:
             dst_name = entry.render(dst_name)
         except RenderError as err:
-            entry.fail(f'Filename value replacement `{dst_name}` failed: {err.args[0]}')
+            entry.fail(f"Filename value replacement `{dst_name}` failed: {err.args[0]}")
             return
 
         # Clean invalid characters with pathscrub plugin
@@ -266,25 +266,25 @@ class TransformingOps(BaseFileOps):
 
         # Join path and filename
         dst = os.path.join(dst_path, dst_name)
-        if dst == entry['location']:
-            raise plugin.PluginWarning('source and destination are the same.')
+        if dst == entry["location"]:
+            raise plugin.PluginWarning("source and destination are the same.")
 
         if not os.path.exists(dst_path):
             if task.options.test:
-                self.logger.info('Would create `{}`', dst_path)
+                self.logger.info("Would create `{}`", dst_path)
             else:
-                self.logger.info('Creating destination directory `{}`', dst_path)
+                self.logger.info("Creating destination directory `{}`", dst_path)
                 os.makedirs(dst_path)
         if not os.path.isdir(dst_path) and not task.options.test:
-            raise plugin.PluginWarning(f'destination `{dst_path}` is not a directory.')
+            raise plugin.PluginWarning(f"destination `{dst_path}` is not a directory.")
 
         # unpack_safety
-        if config.get('unpack_safety', entry.get('unpack_safety', True)):
+        if config.get("unpack_safety", entry.get("unpack_safety", True)):
             count = 0
             while True:
                 if count > 60 * 30:
                     raise plugin.PluginWarning(
-                        'The task has been waiting unpacking for 30 minutes'
+                        "The task has been waiting unpacking for 30 minutes"
                     )
                 size = os.path.getsize(src)
                 time.sleep(1)
@@ -292,7 +292,7 @@ class TransformingOps(BaseFileOps):
                 if size != new_size:
                     if not count % 10:
                         self.logger.verbose(
-                            'File `{}` is possibly being unpacked, waiting ...', src_name
+                            "File `{}` is possibly being unpacked, waiting ...", src_name
                         )
                 else:
                     break
@@ -303,23 +303,23 @@ class TransformingOps(BaseFileOps):
 
         # Check dst contains src_ext
         if (
-            config.get('keep_extension', entry.get('keep_extension', True))
+            config.get("keep_extension", entry.get("keep_extension", True))
             and not src_isdir
             and dst_ext != src_ext
         ):
-            self.logger.verbose('Adding extension `{}` to dst `{}`', src_ext, dst)
+            self.logger.verbose("Adding extension `{}` to dst `{}`", src_ext, dst)
             dst += src_ext
             dst_file += dst_ext  # this is used for sibling files. dst_ext turns out not to be an extension!
 
-        funct_name = 'move' if self.move else 'copy'
-        funct_done = 'moved' if self.move else 'copied'
+        funct_name = "move" if self.move else "copy"
+        funct_done = "moved" if self.move else "copied"
 
         if task.options.test:
-            self.logger.info('Would {} `{}` to `{}`', funct_name, src, dst)
+            self.logger.info("Would {} `{}` to `{}`", funct_name, src, dst)
             for s, ext in siblings.items():
                 # we cannot rely on splitext for extensions here (subtitles may have the language code)
                 d = dst_file + ext
-                self.logger.info('Would also {} `{}` to `{}`', funct_name, s, d)
+                self.logger.info("Would also {} `{}` to `{}`", funct_name, s, d)
         else:
             # IO errors will have the entry mark failed in the base class
             if self.move:
@@ -328,7 +328,7 @@ class TransformingOps(BaseFileOps):
                 shutil.copytree(src, dst, copy_function=self.copy_permissive)
             else:
                 self.copy_permissive(src, dst)
-            self.logger.info('`{}` has been {} to `{}`', src, funct_done, dst)
+            self.logger.info("`{}` has been {} to `{}`", src, funct_done, dst)
             # further errors will not have any effect (the entry has been successfully moved or copied out)
             for s, ext in siblings.items():
                 # we cannot rely on splitext for extensions here (subtitles may have the language code)
@@ -338,11 +338,11 @@ class TransformingOps(BaseFileOps):
                         shutil.move(s, d)
                     else:
                         shutil.copy(s, d)
-                    self.logger.info('`{}` has been {} to `{}` as well.', s, funct_done, d)
+                    self.logger.info("`{}` has been {} to `{}` as well.", s, funct_done, d)
                 except Exception as err:
                     self.logger.warning(str(err))
-        entry['old_location'] = entry['location']
-        entry['location'] = dst
+        entry["old_location"] = entry["location"]
+        entry["location"] = dst
         if self.move and not src_isdir:
             self.clean_source(task, config, entry)
 
@@ -351,57 +351,57 @@ class CopyFiles(TransformingOps):
     """Copy all accepted files."""
 
     schema = {
-        'oneOf': [
-            {'type': 'boolean'},
+        "oneOf": [
+            {"type": "boolean"},
             {
-                'type': 'object',
-                'properties': {
-                    'to': {'type': 'string', 'format': 'path'},
-                    'rename': {'type': 'string'},
-                    'allow_dir': {'type': 'boolean'},
-                    'unpack_safety': {'type': 'boolean'},
-                    'keep_extension': {'type': 'boolean'},
-                    'along': TransformingOps.along,
+                "type": "object",
+                "properties": {
+                    "to": {"type": "string", "format": "path"},
+                    "rename": {"type": "string"},
+                    "allow_dir": {"type": "boolean"},
+                    "unpack_safety": {"type": "boolean"},
+                    "keep_extension": {"type": "boolean"},
+                    "along": TransformingOps.along,
                 },
-                'additionalProperties': False,
+                "additionalProperties": False,
             },
         ]
     }
 
     move = False
-    destination_field = 'copy_to'
-    logger = logger.bind(name='copy')
+    destination_field = "copy_to"
+    logger = logger.bind(name="copy")
 
 
 class MoveFiles(TransformingOps):
     """Move all accepted files."""
 
     schema = {
-        'oneOf': [
-            {'type': 'boolean'},
+        "oneOf": [
+            {"type": "boolean"},
             {
-                'type': 'object',
-                'properties': {
-                    'to': {'type': 'string', 'format': 'path'},
-                    'rename': {'type': 'string'},
-                    'allow_dir': {'type': 'boolean'},
-                    'unpack_safety': {'type': 'boolean'},
-                    'keep_extension': {'type': 'boolean'},
-                    'along': TransformingOps.along,
-                    'clean_source': {'type': 'number'},
+                "type": "object",
+                "properties": {
+                    "to": {"type": "string", "format": "path"},
+                    "rename": {"type": "string"},
+                    "allow_dir": {"type": "boolean"},
+                    "unpack_safety": {"type": "boolean"},
+                    "keep_extension": {"type": "boolean"},
+                    "along": TransformingOps.along,
+                    "clean_source": {"type": "number"},
                 },
-                'additionalProperties': False,
+                "additionalProperties": False,
             },
         ]
     }
 
     move = True
-    destination_field = 'move_to'
-    logger = logger.bind(name='move')
+    destination_field = "move_to"
+    logger = logger.bind(name="move")
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(DeleteFiles, 'delete', api_ver=2)
-    plugin.register(CopyFiles, 'copy', api_ver=2)
-    plugin.register(MoveFiles, 'move', api_ver=2)
+    plugin.register(DeleteFiles, "delete", api_ver=2)
+    plugin.register(CopyFiles, "copy", api_ver=2)
+    plugin.register(MoveFiles, "move", api_ver=2)

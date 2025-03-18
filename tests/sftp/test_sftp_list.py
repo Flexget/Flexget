@@ -88,111 +88,111 @@ class TestSftpList:
     def test_sftp_list_bad_login(
         self, execute_task: Callable[..., Task], sftp: TestSFTPServerController
     ):
-        sftp.start(username='foo', password='bar')
+        sftp.start(username="foo", password="bar")
 
         with pytest.raises(TaskAbort) as ex:
-            execute_task('sftp_list_bad_login')
+            execute_task("sftp_list_bad_login")
 
-        assert ex.value.reason == 'Failed to connect to 127.0.0.1'
+        assert ex.value.reason == "Failed to connect to 127.0.0.1"
 
     def test_sftp_list_files(self, execute_task: Callable[..., Task], sftp_fs: TestSFTPFileSystem):
-        sftp_fs.create_file('file.mkv')
+        sftp_fs.create_file("file.mkv")
 
         assert_entries(
-            execute_task('sftp_list'),
+            execute_task("sftp_list"),
             {
-                'title': 'file.mkv',
-                'url': 'sftp://test_user:test_pass@127.0.0.1:40022/home/test_user/file.mkv',
+                "title": "file.mkv",
+                "url": "sftp://test_user:test_pass@127.0.0.1:40022/home/test_user/file.mkv",
             },
         )
 
     def test_sftp_list_files_recursive_false(
         self, execute_task: Callable[..., Task], sftp_fs: TestSFTPFileSystem
     ):
-        sftp_fs.create_file('dir/file.mkv')
+        sftp_fs.create_file("dir/file.mkv")
 
-        assert_no_entries(execute_task('sftp_list'))
+        assert_no_entries(execute_task("sftp_list"))
 
     def test_sftp_list_files_recursive_true(
         self, execute_task: Callable[..., Task], sftp_fs: TestSFTPFileSystem
     ):
-        sftp_fs.create_file('dir/file.mkv')
+        sftp_fs.create_file("dir/file.mkv")
 
         assert_entries(
-            execute_task('sftp_list_recursive_true'),
+            execute_task("sftp_list_recursive_true"),
             {
-                'title': 'file.mkv',
-                'url': 'sftp://test_user:test_pass@127.0.0.1:40022/home/test_user/dir/file.mkv',
+                "title": "file.mkv",
+                "url": "sftp://test_user:test_pass@127.0.0.1:40022/home/test_user/dir/file.mkv",
             },
         )
 
     def test_sftp_list_dirs(self, execute_task: Callable[..., Task], sftp_fs: TestSFTPFileSystem):
-        sftp_fs.create_dir('dir')
+        sftp_fs.create_dir("dir")
 
         assert_entries(
-            execute_task('sftp_list_files_only_false'),
+            execute_task("sftp_list_files_only_false"),
             {
-                'title': 'dir',
-                'url': 'sftp://test_user:test_pass@127.0.0.1:40022/home/test_user/dir',
+                "title": "dir",
+                "url": "sftp://test_user:test_pass@127.0.0.1:40022/home/test_user/dir",
             },
         )
 
     def test_sftp_list_dirs_recursive_false(
         self, execute_task: Callable[..., Task], sftp_fs: TestSFTPFileSystem
     ):
-        sftp_fs.create_dir('dir/nested')
+        sftp_fs.create_dir("dir/nested")
 
         assert_entries(
-            execute_task('sftp_list_files_only_false'),
+            execute_task("sftp_list_files_only_false"),
             {
-                'title': 'dir',
-                'url': 'sftp://test_user:test_pass@127.0.0.1:40022/home/test_user/dir',
+                "title": "dir",
+                "url": "sftp://test_user:test_pass@127.0.0.1:40022/home/test_user/dir",
             },
         )
 
     def test_sftp_list_dirs_recursive_true(
         self, execute_task: Callable[..., Task], sftp_fs: TestSFTPFileSystem
     ):
-        sftp_fs.create_dir('dir/nested')
+        sftp_fs.create_dir("dir/nested")
 
         assert_entries(
-            execute_task('sftp_list_files_only_false_recursive_true'),
+            execute_task("sftp_list_files_only_false_recursive_true"),
             {
-                'title': 'dir',
-                'url': 'sftp://test_user:test_pass@127.0.0.1:40022/home/test_user/dir',
+                "title": "dir",
+                "url": "sftp://test_user:test_pass@127.0.0.1:40022/home/test_user/dir",
             },
             {
-                'title': 'nested',
-                'url': 'sftp://test_user:test_pass@127.0.0.1:40022/home/test_user/dir/nested',
+                "title": "nested",
+                "url": "sftp://test_user:test_pass@127.0.0.1:40022/home/test_user/dir/nested",
             },
         )
 
     def test_sftp_list_file_size(
         self, execute_task: Callable[..., Task], sftp_fs: TestSFTPFileSystem
     ):
-        sftp_fs.create_file('file.mkv', 24)
+        sftp_fs.create_file("file.mkv", 24)
 
         assert_entries(
-            execute_task('sftp_list_get_size_true_files_only_false_recursive_true'),
+            execute_task("sftp_list_get_size_true_files_only_false_recursive_true"),
             {
-                'title': 'file.mkv',
-                'url': 'sftp://test_user:test_pass@127.0.0.1:40022/home/test_user/file.mkv',
-                'content_size': 24,
+                "title": "file.mkv",
+                "url": "sftp://test_user:test_pass@127.0.0.1:40022/home/test_user/file.mkv",
+                "content_size": 24,
             },
         )
 
     def test_sftp_list_dir_size(
         self, execute_task: Callable[..., Task], sftp_fs: TestSFTPFileSystem
     ):
-        sftp_fs.create_file('dir/file1.mkv', 40)
-        sftp_fs.create_file('dir/file2.mkv', 60)
+        sftp_fs.create_file("dir/file1.mkv", 40)
+        sftp_fs.create_file("dir/file2.mkv", 60)
 
         assert_entries(
-            execute_task('sftp_list_get_size_true_files_only_false_recursive_true'),
+            execute_task("sftp_list_get_size_true_files_only_false_recursive_true"),
             {
-                'title': 'dir',
-                'url': 'sftp://test_user:test_pass@127.0.0.1:40022/home/test_user/dir',
-                'content_size': 100,
+                "title": "dir",
+                "url": "sftp://test_user:test_pass@127.0.0.1:40022/home/test_user/dir",
+                "content_size": 100,
             },
             allow_unexpected_entires=True,
         )
@@ -200,27 +200,27 @@ class TestSftpList:
     def test_sftp_list_symlink_file(
         self, execute_task: Callable[..., Task], sftp_fs: TestSFTPFileSystem
     ):
-        sftp_fs.create_symlink('file.mkv', sftp_fs.create_file('/target.mkv', 100))
+        sftp_fs.create_symlink("file.mkv", sftp_fs.create_file("/target.mkv", 100))
 
         assert_entries(
-            execute_task('sftp_list'),
+            execute_task("sftp_list"),
             {
-                'title': 'file.mkv',
-                'url': 'sftp://test_user:test_pass@127.0.0.1:40022/home/test_user/file.mkv',
+                "title": "file.mkv",
+                "url": "sftp://test_user:test_pass@127.0.0.1:40022/home/test_user/file.mkv",
             },
         )
 
     def test_sftp_list_symlink_dir(
         self, execute_task: Callable[..., Task], sftp_fs: TestSFTPFileSystem
     ):
-        sftp_fs.create_symlink('dir', sftp_fs.create_dir('/target_dir'))
-        sftp_fs.create_file('/target_dir/file.mkv')
+        sftp_fs.create_symlink("dir", sftp_fs.create_dir("/target_dir"))
+        sftp_fs.create_file("/target_dir/file.mkv")
 
         assert_entries(
-            execute_task('sftp_list_recursive_true'),
+            execute_task("sftp_list_recursive_true"),
             {
-                'title': 'file.mkv',
-                'url': 'sftp://test_user:test_pass@127.0.0.1:40022/home/test_user/dir/file.mkv',
+                "title": "file.mkv",
+                "url": "sftp://test_user:test_pass@127.0.0.1:40022/home/test_user/dir/file.mkv",
             },
         )
 
@@ -228,42 +228,42 @@ class TestSftpList:
         self, execute_task: Callable[..., Task], sftp: TestSFTPServerController
     ):
         sftp_fs: TestSFTPFileSystem = sftp.start(key_only=True)
-        sftp_fs.create_file('file.mkv')
+        sftp_fs.create_file("file.mkv")
 
-        execute_task('sftp_list_private_key')
+        execute_task("sftp_list_private_key")
 
     def test_sftp_list_private_key_set_on_entry(
         self, execute_task: Callable[..., Task], sftp_fs: TestSFTPFileSystem
     ):
-        sftp_fs.create_file('file.mkv')
+        sftp_fs.create_file("file.mkv")
 
         assert_entries(
-            execute_task('sftp_list_private_key'),
-            {'title': 'file.mkv', 'private_key': 'test_sftp_user_key'},
+            execute_task("sftp_list_private_key"),
+            {"title": "file.mkv", "private_key": "test_sftp_user_key"},
         )
 
     def test_sftp_list_private_key_pass_set_on_entry(
         self, execute_task: Callable[..., Task], sftp_fs: TestSFTPFileSystem
     ):
-        sftp_fs.create_file('file.mkv')
+        sftp_fs.create_file("file.mkv")
 
         assert_entries(
-            execute_task('sftp_list_private_key'),
-            {'title': 'file.mkv', 'private_key_pass': 'password'},
+            execute_task("sftp_list_private_key"),
+            {"title": "file.mkv", "private_key_pass": "password"},
         )
 
     def test_sftp_list_host_key_set_on_entry(
         self, execute_task: Callable[..., Task], sftp_fs: TestSFTPFileSystem
     ):
-        sftp_fs.create_file('file.mkv')
+        sftp_fs.create_file("file.mkv")
 
         assert_entries(
-            execute_task('sftp_list'),
+            execute_task("sftp_list"),
             {
-                'title': 'file.mkv',
-                'host_key': {
-                    'key_type': 'ssh-rsa',
-                    'public_key': 'AAAAB3NzaC1yc2EAAAADAQABAAABAQC7Hn9BizDY6wI1oNYUBoVHAVioXzOJkZDPB+QsUHDBOqVIcdL/glfMtgIO1E5khoBYql8DSSI+EyrxaC+mfeJ7Ax5qZnimOFvZsJvwvO5h7LI4W1KkoJrYUfMLFfHkDy5EbPIuXeAQGdF/JzOXoIqMcCmKQDS56WRDnga91CGQeXAuzINiviZ63R55b8ynN2JFqKW5V6WZiYZBSmTia68s2ZefkFMiv7E6gmD4WYj6hitz8FGPUoyFAGIR+NVqZ5i9l/8CDuNcZ8E8G7AmNFQhChAeQdEOPO0f2vdH6aRb8Cn0EAy6zpBllxQO8EuLjiEfH01n4/VlGeQEiXlyCLqj',
+                "title": "file.mkv",
+                "host_key": {
+                    "key_type": "ssh-rsa",
+                    "public_key": "AAAAB3NzaC1yc2EAAAADAQABAAABAQC7Hn9BizDY6wI1oNYUBoVHAVioXzOJkZDPB+QsUHDBOqVIcdL/glfMtgIO1E5khoBYql8DSSI+EyrxaC+mfeJ7Ax5qZnimOFvZsJvwvO5h7LI4W1KkoJrYUfMLFfHkDy5EbPIuXeAQGdF/JzOXoIqMcCmKQDS56WRDnga91CGQeXAuzINiviZ63R55b8ynN2JFqKW5V6WZiYZBSmTia68s2ZefkFMiv7E6gmD4WYj6hitz8FGPUoyFAGIR+NVqZ5i9l/8CDuNcZ8E8G7AmNFQhChAeQdEOPO0f2vdH6aRb8Cn0EAy6zpBllxQO8EuLjiEfH01n4/VlGeQEiXlyCLqj",
                 },
             },
         )
@@ -285,17 +285,17 @@ def assert_entries(
     :param allow_unexpected_entires: bool to assert if there are any additional entries generated
                                      that matchers arn't specified for.
     """
-    expected = [m['title'] for m in [entry_matcher, *argv]]
-    found = [m['title'] for m in task.all_entries]
+    expected = [m["title"] for m in [entry_matcher, *argv]]
+    found = [m["title"] for m in task.all_entries]
     if not allow_unexpected_entires:
         unexpected: list[str] = [title for title in found if title not in expected]
-        assert not unexpected, f'Found unexpected entries {unexpected}'
+        assert not unexpected, f"Found unexpected entries {unexpected}"
 
     not_found: list[str] = [title for title in expected if title not in found]
-    assert not not_found, f'Entires not found {not_found} in {found}'
+    assert not not_found, f"Entires not found {not_found} in {found}"
 
     for matcher in [entry_matcher, *argv]:
-        entry = task.find_entry(title=matcher['title'])
+        entry = task.find_entry(title=matcher["title"])
         assert entry, f"Expected entry with title {matcher['title']}, but found none"
         for k, v in matcher.items():
             assert k in entry.store, f"Expected entry {matcher['title']} to have attribute {k}"

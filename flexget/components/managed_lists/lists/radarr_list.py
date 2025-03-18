@@ -11,7 +11,7 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.qualities import Requirements
 
-logger = logger.bind(name='radarr')
+logger = logger.bind(name="radarr")
 
 
 class RadarrRequestError(Exception):
@@ -80,7 +80,7 @@ def request_post_json(url, headers, data):
                 error_message = json_response[0]["errorMessage"]
         except ValueError:
             # Raised by response.json() if JSON couln't be decoded
-            logger.error('Radarr returned non-JSON error result: {}', response.content)
+            logger.error("Radarr returned non-JSON error result: {}", response.content)
 
         raise RadarrRequestError(
             f"Invalid response received from Radarr: {response.content}",
@@ -271,7 +271,7 @@ def radarr_quality_to_flexget_quality_req(radarr_quality):
         return Requirements(flexget_quality_req_string)
     except ValueError:
         logger.error(
-            'Failed to convert {} into a valid quality requirement', flexget_quality_req_string
+            "Failed to convert {} into a valid quality requirement", flexget_quality_req_string
         )
 
 
@@ -326,7 +326,7 @@ class RadarrSet(MutableSet):
                 # Handle tags by id
                 if tag not in self._tags.values():
                     logger.error(
-                        'Unable to add tag with id {} to entry {} as the tag does not exist in radarr',
+                        "Unable to add tag with id {} to entry {} as the tag does not exist in radarr",
                         entry,
                         tag,
                     )
@@ -337,7 +337,7 @@ class RadarrSet(MutableSet):
                 tag = entry.render(tag).lower()
                 found = self._tags.get(tag)
                 if not found:
-                    logger.verbose('Adding missing tag {} to Radarr', tag)
+                    logger.verbose("Adding missing tag {} to Radarr", tag)
                     found = self.service.add_tag(tag)["id"]
                     self._tags[tag] = found
                 tags_ids.append(found)
@@ -351,11 +351,11 @@ class RadarrSet(MutableSet):
         if matching_entry:
             movie_id = matching_entry["radarr_id"]
             self.service.delete_movie(movie_id)
-            logger.verbose('Removed movie {} from Radarr', matching_entry['title'])
+            logger.verbose("Removed movie {} from Radarr", matching_entry["title"])
             # Clear the cache
             self._movie_entries = None
         else:
-            logger.debug('Could not find any matching movie to remove for entry {}', entry)
+            logger.debug("Could not find any matching movie to remove for entry {}", entry)
 
     def __ior__(self, other):
         for entry in other:
@@ -389,20 +389,20 @@ class RadarrSet(MutableSet):
                     result["images"],
                     result["tmdbId"],
                     root_folder_path,
-                    monitored=self.config.get('monitored', False),
+                    monitored=self.config.get("monitored", False),
                     tags=self.get_tag_ids(entry),
                 )
-                logger.verbose('Added movie {} to Radarr list', result['title'])
+                logger.verbose("Added movie {} to Radarr list", result["title"])
             except RadarrMovieAlreadyExistsError:
                 logger.warning(
-                    'Could not add movie {} because it already exists on Radarr', result['title']
+                    "Could not add movie {} because it already exists on Radarr", result["title"]
                 )
             except RadarrRequestError as ex:
-                msg = f'The movie add command raised exception: {ex}'
+                msg = f"The movie add command raised exception: {ex}"
                 logger.error(msg)
                 entry.fail(msg)
         else:
-            msg = f'The lookup for entry {entry} did not return any results.Can not add the movie in Radarr.'
+            msg = f"The lookup for entry {entry} did not return any results.Can not add the movie in Radarr."
             logger.verbose(msg)
             entry.fail(msg)
 
@@ -436,7 +436,7 @@ class RadarrSet(MutableSet):
                 tag = tag.lower()
                 found = existing.get(tag)
                 if not found:
-                    logger.verbose('Adding missing tag {}} to Radarr', tag)
+                    logger.verbose("Adding missing tag {}} to Radarr", tag)
                     found = self.service.add_tag(tag)["id"]
                 tags_ids.append(found)
             self._tags = tags_ids
@@ -547,7 +547,7 @@ class RadarrSet(MutableSet):
                 if result:
                     return result
             except RadarrRequestError as ex:
-                logger.error('Radarr IMDB lookup failed: {}', ex)
+                logger.error("Radarr IMDB lookup failed: {}", ex)
 
         # If the entry has a TMDB id, use that for lookup
         if tmdb_id:
@@ -557,7 +557,7 @@ class RadarrSet(MutableSet):
                 if result:
                     return result
             except RadarrRequestError as ex:
-                logger.error('Radarr TMDB lookup failed: {}', ex)
+                logger.error("Radarr TMDB lookup failed: {}", ex)
 
         # Could not lookup by id. Try to use the title.
         # However, we can only accept any results if it's
@@ -570,11 +570,11 @@ class RadarrSet(MutableSet):
                         "Radarr lookup for '{}' returned {:d} results. Using the first result '{}'.",
                         title,
                         len(results),
-                        results[0]['title'],
+                        results[0]["title"],
                     )
                     return results[0]
             except RadarrRequestError as ex:
-                logger.error('Radarr search term lookup failed: {}', ex)
+                logger.error("Radarr search term lookup failed: {}", ex)
         return None
 
 
@@ -592,7 +592,7 @@ class RadarrList:
             "only_use_cutoff_quality": {"type": "boolean", "default": False},
             "monitored": {"type": "boolean", "default": True},
             "profile_id": {"type": "integer", "default": 1},
-            "tags": {"type": "array", "items": {'type': ['integer', 'string']}},
+            "tags": {"type": "array", "items": {"type": ["integer", "string"]}},
         },
         "required": ["api_key", "base_url"],
         "additionalProperties": False,

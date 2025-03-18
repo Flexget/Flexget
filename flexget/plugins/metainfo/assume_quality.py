@@ -9,7 +9,7 @@ from flexget.utils import qualities
 if TYPE_CHECKING:
     from flexget.utils.qualities import Quality, Requirements
 
-logger = logger.bind(name='assume_quality')
+logger = logger.bind(name="assume_quality")
 
 
 class AssumeQuality:
@@ -31,13 +31,13 @@ class AssumeQuality:
     """
 
     schema = {
-        'oneOf': [
-            {'title': 'simple config', 'type': 'string', 'format': 'quality'},
+        "oneOf": [
+            {"title": "simple config", "type": "string", "format": "quality"},
             {
-                'title': 'advanced config',
-                'type': 'object',
+                "title": "advanced config",
+                "type": "object",
                 # Can't validate dict keys, so allow any
-                'additionalProperties': {'type': 'string', 'format': 'quality'},
+                "additionalProperties": {"type": "string", "format": "quality"},
             },
         ]
     }
@@ -58,44 +58,44 @@ class AssumeQuality:
 
     def assume(self, entry, quality):
         newquality = qualities.Quality()
-        logger.debug('Current qualities: {}', entry.get('quality'))
-        for component in entry.get('quality').components:
+        logger.debug("Current qualities: {}", entry.get("quality"))
+        for component in entry.get("quality").components:
             qualitycomponent = getattr(quality, component.type)
-            logger.debug('\t{}: {} vs {}', component.type, component.name, qualitycomponent.name)
-            if component.name != 'unknown':
-                logger.debug('\t{}: keeping {}', component.type, component.name)
+            logger.debug("\t{}: {} vs {}", component.type, component.name, qualitycomponent.name)
+            if component.name != "unknown":
+                logger.debug("\t{}: keeping {}", component.type, component.name)
                 setattr(newquality, component.type, component)
-            elif qualitycomponent.name != 'unknown':
-                logger.debug('\t{}: assuming {}', component.type, qualitycomponent.name)
+            elif qualitycomponent.name != "unknown":
+                logger.debug("\t{}: assuming {}", component.type, qualitycomponent.name)
                 setattr(newquality, component.type, qualitycomponent)
-                entry['assumed_quality'] = True
-            elif component.name == 'unknown' and qualitycomponent.name == 'unknown':
-                logger.debug('\t{}: got nothing', component.type)
-        entry['quality'] = newquality
-        logger.debug('Quality updated: {}', entry.get('quality'))
+                entry["assumed_quality"] = True
+            elif component.name == "unknown" and qualitycomponent.name == "unknown":
+                logger.debug("\t{}: got nothing", component.type)
+        entry["quality"] = newquality
+        logger.debug("Quality updated: {}", entry.get("quality"))
 
     def on_task_start(self, task, config):
         if isinstance(config, str):
-            config = {'any': config}
+            config = {"any": config}
 
         class Assume(NamedTuple):
-            target: 'Requirements'
-            quality: 'Quality'
+            target: "Requirements"
+            quality: "Quality"
 
         self.assumptions = []
         for target, quality in list(config.items()):
-            logger.verbose('New assumption: {} is {}', target, quality)
+            logger.verbose("New assumption: {} is {}", target, quality)
             try:
                 target = qualities.Requirements(target)
             except ValueError:
                 raise plugin.PluginError(
-                    f'{target} is not a valid quality. Forgetting assumption.'
+                    f"{target} is not a valid quality. Forgetting assumption."
                 )
             try:
                 quality = qualities.get(quality)
             except ValueError:
                 raise plugin.PluginError(
-                    f'{quality} is not a valid quality. Forgetting assumption.'
+                    f"{quality} is not a valid quality. Forgetting assumption."
                 )
             self.assumptions.append(Assume(target, quality))
         self.assumptions.sort(
@@ -103,21 +103,21 @@ class AssumeQuality:
         )
         for assumption in self.assumptions:
             logger.debug(
-                'Target {} - Priority {}', assumption.target, self.precision(assumption.target)
+                "Target {} - Priority {}", assumption.target, self.precision(assumption.target)
             )
 
     @plugin.priority(100)  # run after other plugins which fill quality (series, quality)
     def on_task_metainfo(self, task, config):
         for entry in task.entries:
-            logger.verbose(entry.get('title'))
+            logger.verbose(entry.get("title"))
             for assumption in self.assumptions:
-                logger.debug('Trying {} - {}', assumption.target, assumption.quality)
-                if assumption.target.allows(entry.get('quality')):
-                    logger.debug('Match: {}', assumption.target)
+                logger.debug("Trying {} - {}", assumption.target, assumption.quality)
+                if assumption.target.allows(entry.get("quality")):
+                    logger.debug("Match: {}", assumption.target)
                     self.assume(entry, assumption.quality)
-            logger.verbose('New quality: {}', entry.get('quality'))
+            logger.verbose("New quality: {}", entry.get("quality"))
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(AssumeQuality, 'assume_quality', api_ver=2)
+    plugin.register(AssumeQuality, "assume_quality", api_ver=2)

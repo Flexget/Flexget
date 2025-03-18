@@ -18,7 +18,7 @@ from flexget.utils.requests import parse_header
 from flexget.utils.template import RenderError
 from flexget.utils.tools import decode_html
 
-logger = logger.bind(name='download')
+logger = logger.bind(name="download")
 tmpdir = tempfile.gettempdir()
 
 
@@ -50,45 +50,45 @@ class PluginDownload:
     """
 
     schema = {
-        'oneOf': [
+        "oneOf": [
             {
-                'title': 'specify options',
-                'type': 'object',
-                'properties': {
-                    'path': {'type': 'string', 'format': 'path'},
-                    'fail_html': {'type': 'boolean', 'default': True},
-                    'overwrite': {'type': 'boolean', 'default': False},
-                    'temp': {'type': 'string', 'format': 'path'},
-                    'filename': {'type': 'string'},
+                "title": "specify options",
+                "type": "object",
+                "properties": {
+                    "path": {"type": "string", "format": "path"},
+                    "fail_html": {"type": "boolean", "default": True},
+                    "overwrite": {"type": "boolean", "default": False},
+                    "temp": {"type": "string", "format": "path"},
+                    "filename": {"type": "string"},
                 },
-                'additionalProperties': False,
+                "additionalProperties": False,
             },
-            {'title': 'specify path', 'type': 'string', 'format': 'path'},
-            {'title': 'no options', 'type': 'boolean', 'enum': [True]},
+            {"title": "specify path", "type": "string", "format": "path"},
+            {"title": "no options", "type": "boolean", "enum": [True]},
         ]
     }
 
     def process_config(self, config):
         """Return plugin configuration in advanced form."""
         if isinstance(config, str):
-            config = {'path': config}
+            config = {"path": config}
         if not isinstance(config, dict):
             config = {}
-        if not config.get('path'):
-            config['require_path'] = True
-        config.setdefault('fail_html', True)
+        if not config.get("path"):
+            config["require_path"] = True
+        config.setdefault("fail_html", True)
         return config
 
     def on_task_download(self, task, config):
         config = self.process_config(config)
 
         # set temporary download path based on user's config setting or use fallback
-        tmp = config.get('temp', os.path.join(task.manager.config_base, 'temp'))
+        tmp = config.get("temp", os.path.join(task.manager.config_base, "temp"))
 
         self.get_temp_files(
             task,
-            require_path=config.get('require_path', False),
-            fail_html=config['fail_html'],
+            require_path=config.get("require_path", False),
+            fail_html=config["fail_html"],
             tmp_path=tmp,
         )
 
@@ -115,57 +115,57 @@ class PluginDownload:
         :param tmp_path:
           path to use for temporary files while downloading
         """
-        urls = entry.get('urls') if entry.get('urls') else [entry['url']]
+        urls = entry.get("urls") if entry.get("urls") else [entry["url"]]
         errors = []
         for url in urls:
-            if url.startswith('magnet:'):
+            if url.startswith("magnet:"):
                 if handle_magnets:
                     # Set magnet link as main url, so a torrent client plugin can grab it
-                    logger.debug('Accepting magnet url for {}', entry['title'])
-                    entry['url'] = url
+                    logger.debug("Accepting magnet url for {}", entry["title"])
+                    entry["url"] = url
                     break
-                logger.warning('Can\'t download magnet url')
-                errors.append('Magnet URL')
+                logger.warning("Can't download magnet url")
+                errors.append("Magnet URL")
                 continue
-            if require_path and 'path' not in entry:
+            if require_path and "path" not in entry:
                 # Don't fail here, there might be a magnet later in the list of urls
-                logger.debug('Skipping url {} because there is no path for download', url)
+                logger.debug("Skipping url {} because there is no path for download", url)
                 continue
             error = self.process_entry(task, entry, url, tmp_path)
 
             # disallow html content
-            html_mimes = ['html', 'text/html']
-            if entry.get('mime-type') in html_mimes and fail_html:
-                error = 'Unexpected html content received from `{}` - maybe a login page?'.format(
-                    entry['url']
+            html_mimes = ["html", "text/html"]
+            if entry.get("mime-type") in html_mimes and fail_html:
+                error = "Unexpected html content received from `{}` - maybe a login page?".format(
+                    entry["url"]
                 )
                 self.cleanup_temp_file(entry)
 
             if not error:
                 # Set the main url, so we know where this file actually came from
-                logger.debug('Successfully retrieved {} from {}', entry['title'], url)
-                entry['url'] = url
+                logger.debug("Successfully retrieved {} from {}", entry["title"], url)
+                entry["url"] = url
                 break
             errors.append(error)
         else:
             # check if entry must have a path (download: yes)
-            if require_path and 'path' not in entry:
-                logger.error("{} can't be downloaded, no path specified for entry", entry['title'])
-                entry.fail('no path specified for entry')
+            if require_path and "path" not in entry:
+                logger.error("{} can't be downloaded, no path specified for entry", entry["title"])
+                entry.fail("no path specified for entry")
             else:
-                entry.fail(', '.join(errors))
+                entry.fail(", ".join(errors))
 
     def save_error_page(self, entry, task, page):
-        received = os.path.join(task.manager.config_base, 'received', task.name)
+        received = os.path.join(task.manager.config_base, "received", task.name)
         if not os.path.isdir(received):
             os.makedirs(received)
         filename = os.path.join(
-            received, pathscrub('{}.error'.format(entry['title']), filename=True)
+            received, pathscrub("{}.error".format(entry["title"]), filename=True)
         )
         logger.error(
-            'Error retrieving {}, the error page has been saved to {}', entry['title'], filename
+            "Error retrieving {}, the error page has been saved to {}", entry["title"], filename
         )
-        with open(filename, 'wb') as outfile:
+        with open(filename, "wb") as outfile:
             outfile.write(page)
 
     def get_temp_files(
@@ -205,27 +205,27 @@ class PluginDownload:
         """
         try:
             if task.options.test:
-                logger.info('Would download: {}', entry['title'])
+                logger.info("Would download: {}", entry["title"])
             else:
                 if not task.manager.unit_test:
-                    logger.info('Downloading: {}', entry['title'])
+                    logger.info("Downloading: {}", entry["title"])
                 self.download_entry(task, entry, url, tmp_path)
         except RequestException as e:
-            logger.warning('RequestException {}, while downloading {}', e, url)
-            return f'Network error during request: {e}'
+            logger.warning("RequestException {}, while downloading {}", e, url)
+            return f"Network error during request: {e}"
         except BadStatusLine as e:
-            logger.warning('Failed to reach server. Reason: {}', getattr(e, 'message', 'N/A'))
-            return 'BadStatusLine'
+            logger.warning("Failed to reach server. Reason: {}", getattr(e, "message", "N/A"))
+            return "BadStatusLine"
         except OSError as e:
-            if hasattr(e, 'reason'):
-                logger.warning('Failed to reach server. Reason: {}', e.reason)
-            elif hasattr(e, 'code'):
+            if hasattr(e, "reason"):
+                logger.warning("Failed to reach server. Reason: {}", e.reason)
+            elif hasattr(e, "code"):
                 logger.warning("The server couldn't fulfill the request. Error code: {}", e.code)
-            logger.opt(exception=True).debug('OSError')
-            return 'OSError'
+            logger.opt(exception=True).debug("OSError")
+            return "OSError"
         except ValueError as e:
             # Probably unknown url type
-            msg = f'ValueError {e}'
+            msg = f"ValueError {e}"
             logger.warning(msg)
             logger.opt(exception=True).debug(msg)
             return msg
@@ -240,19 +240,19 @@ class PluginDownload:
 
         # get content
         auth = None
-        if 'download_auth' in entry:
-            auth = entry['download_auth']
+        if "download_auth" in entry:
+            auth = entry["download_auth"]
             logger.debug(
-                'Custom auth enabled for {} download: {}', entry['title'], entry['download_auth']
+                "Custom auth enabled for {} download: {}", entry["title"], entry["download_auth"]
             )
 
         headers = task.requests.headers
-        if 'download_headers' in entry:
-            headers.update(entry['download_headers'])
+        if "download_headers" in entry:
+            headers.update(entry["download_headers"])
             logger.debug(
-                'Custom headers enabled for {} download: {}',
-                entry['title'],
-                entry['download_headers'],
+                "Custom headers enabled for {} download: {}",
+                entry["title"],
+                entry["download_headers"],
             )
 
         # expand ~ in temp path
@@ -260,7 +260,7 @@ class PluginDownload:
         try:
             tmp_path = os.path.expanduser(tmp_path)
         except RenderError as e:
-            entry.fail(f'Could not set temp path. Error during string replacement: {e}')
+            entry.fail(f"Could not set temp path. Error during string replacement: {e}")
             return
 
         # Clean illegal characters from temp path name
@@ -268,16 +268,16 @@ class PluginDownload:
 
         # create if missing
         if not os.path.isdir(tmp_path):
-            logger.debug('creating tmp_path {}', tmp_path)
+            logger.debug("creating tmp_path {}", tmp_path)
             os.mkdir(tmp_path)
 
         # check for write-access
         if not os.access(tmp_path, os.W_OK):
-            raise plugin.PluginError(f'Not allowed to write to temp directory `{tmp_path}`')
+            raise plugin.PluginError(f"Not allowed to write to temp directory `{tmp_path}`")
 
         # download and write data into a temp file
         tmp_dir = tempfile.mkdtemp(dir=tmp_path)
-        fname = hashlib.md5(url.encode('utf-8', 'replace')).hexdigest()
+        fname = hashlib.md5(url.encode("utf-8", "replace")).hexdigest()
         datafile = os.path.join(tmp_dir, fname)
 
         with task.requests.get(
@@ -285,7 +285,7 @@ class PluginDownload:
         ) as response:
             if response.status_code != 200:
                 logger.debug(
-                    'Got {} response from server. Saving error page.', response.status_code
+                    "Got {} response from server. Saving error page.", response.status_code
                 )
                 # Save the error page
                 if response.content:
@@ -295,90 +295,90 @@ class PluginDownload:
                 return
 
             try:
-                with open(datafile, 'wb') as outfile:
+                with open(datafile, "wb") as outfile:
                     for chunk in response.iter_content(
                         chunk_size=150 * 1024, decode_unicode=False
                     ):
                         outfile.write(chunk)
             except Exception as e:
                 # don't leave futile files behind
-                logger.debug('Download interrupted, removing datafile')
+                logger.debug("Download interrupted, removing datafile")
                 os.remove(datafile)
                 if isinstance(e, socket.timeout):
-                    logger.error('Timeout while downloading file')
+                    logger.error("Timeout while downloading file")
                 else:
                     raise
             else:
                 # Do a sanity check on downloaded file
                 if os.path.getsize(datafile) == 0:
-                    entry.fail(f'File {datafile} is 0 bytes in size')
+                    entry.fail(f"File {datafile} is 0 bytes in size")
                     os.remove(datafile)
                     return
                 # store temp filename into entry so other plugins may read and modify content
                 # temp file is moved into final destination at self.output
-                entry['file'] = datafile
-                logger.debug('{} field file set to: {}', entry['title'], entry['file'])
+                entry["file"] = datafile
+                logger.debug("{} field file set to: {}", entry["title"], entry["file"])
 
-        if 'content-type' in response.headers:
-            entry['mime-type'] = str(parse_header(response.headers['content-type'])[0])
+        if "content-type" in response.headers:
+            entry["mime-type"] = str(parse_header(response.headers["content-type"])[0])
         else:
-            entry['mime-type'] = "unknown/unknown"
+            entry["mime-type"] = "unknown/unknown"
 
-        content_encoding = response.headers.get('content-encoding', '')
-        decompress = 'gzip' in content_encoding or 'deflate' in content_encoding
-        if 'content-length' in response.headers and not decompress:
-            entry['content-length'] = int(response.headers['content-length'])
+        content_encoding = response.headers.get("content-encoding", "")
+        decompress = "gzip" in content_encoding or "deflate" in content_encoding
+        if "content-length" in response.headers and not decompress:
+            entry["content-length"] = int(response.headers["content-length"])
 
         # prefer content-disposition naming, note: content-disposition can be disabled completely
         # by setting entry field `content-disposition` to False
-        if entry.get('content-disposition', True):
+        if entry.get("content-disposition", True):
             self.filename_from_headers(entry, response)
         else:
-            logger.info('Content-disposition disabled for {}', entry['title'])
+            logger.info("Content-disposition disabled for {}", entry["title"])
         self.filename_ext_from_mime(entry)
 
-        if not entry.get('filename'):
-            filename = unquote(url.rsplit('/', 1)[1])
-            logger.debug('No filename - setting from url: {}', filename)
-            entry['filename'] = filename
-        logger.debug('Finishing download_entry() with filename {}', entry.get('filename'))
+        if not entry.get("filename"):
+            filename = unquote(url.rsplit("/", 1)[1])
+            logger.debug("No filename - setting from url: {}", filename)
+            entry["filename"] = filename
+        logger.debug("Finishing download_entry() with filename {}", entry.get("filename"))
 
     def filename_from_headers(self, entry, response):
         """Check entry filename if it's found from content-disposition."""
-        if not response.headers.get('content-disposition'):
+        if not response.headers.get("content-disposition"):
             # No content disposition header, nothing we can do
             return
-        filename = parse_header(response.headers['content-disposition'])[1].get('filename')
+        filename = parse_header(response.headers["content-disposition"])[1].get("filename")
 
         if filename:
             filename = decode_html(filename)
-            logger.debug('Found filename from headers: {}', filename)
-            if 'filename' in entry:
+            logger.debug("Found filename from headers: {}", filename)
+            if "filename" in entry:
                 logger.debug(
-                    'Overriding filename {} with {} from content-disposition',
-                    entry['filename'],
+                    "Overriding filename {} with {} from content-disposition",
+                    entry["filename"],
                     filename,
                 )
-            entry['filename'] = filename
+            entry["filename"] = filename
 
     def filename_ext_from_mime(self, entry):
         """Try to set filename extension from mime-type."""
-        extensions = mimetypes.guess_all_extensions(entry['mime-type'], strict=False)
+        extensions = mimetypes.guess_all_extensions(entry["mime-type"], strict=False)
         if extensions:
-            logger.debug('Mimetype guess for {} is {} ', entry['mime-type'], extensions)
-            if entry.get('filename'):
-                if any(entry['filename'].endswith(extension) for extension in extensions):
-                    logger.debug('Filename {} extension matches to mime-type', entry['filename'])
+            logger.debug("Mimetype guess for {} is {} ", entry["mime-type"], extensions)
+            if entry.get("filename"):
+                if any(entry["filename"].endswith(extension) for extension in extensions):
+                    logger.debug("Filename {} extension matches to mime-type", entry["filename"])
                 else:
                     # mimetypes library has no concept of a 'prefered' extension when there are multiple possibilites
                     # this causes the first to be used which is not always desirable, e.g. 'ksh' for 'text/plain'
-                    extension = mimetypes.guess_extension(entry['mime-type'], strict=False)
+                    extension = mimetypes.guess_extension(entry["mime-type"], strict=False)
                     logger.debug(
-                        'Adding mime-type extension {} to {}', extension, entry['filename']
+                        "Adding mime-type extension {} to {}", extension, entry["filename"]
                     )
-                    entry['filename'] = entry['filename'] + extension
+                    entry["filename"] = entry["filename"] + extension
         else:
-            logger.debug("Python doesn't know extension for mime-type: {}", entry['mime-type'])
+            logger.debug("Python doesn't know extension for mime-type: {}", entry["mime-type"])
 
     def on_task_output(self, task, config):
         """Move downloaded content from temp folder to final destination."""
@@ -388,10 +388,10 @@ class PluginDownload:
                 self.output(task, entry, config)
             except plugin.PluginWarning as e:
                 entry.fail()
-                logger.error('Plugin error while writing: {}', e)
+                logger.error("Plugin error while writing: {}", e)
             except Exception:
                 entry.fail()
-                logger.exception('Exception while writing')
+                logger.exception("Exception while writing")
 
     def output(self, task, entry, config):
         """Move temp-file into final destination.
@@ -400,17 +400,17 @@ class PluginDownload:
             PluginError if operation fails
 
         """
-        if 'file' not in entry and not task.options.test:
-            logger.debug('file missing, entry: {}', entry)
+        if "file" not in entry and not task.options.test:
+            logger.debug("file missing, entry: {}", entry)
             raise plugin.PluginError(
-                'Entry `{}` has no temp file associated with'.format(entry['title']), logger
+                "Entry `{}` has no temp file associated with".format(entry["title"]), logger
             )
 
         try:
             # use path from entry if has one, otherwise use from download definition parameter
-            path = entry.get('path', config.get('path'))
+            path = entry.get("path", config.get("path"))
             if not isinstance(path, str):
-                raise plugin.PluginError('Invalid `path` in entry `{}`'.format(entry['title']))
+                raise plugin.PluginError("Invalid `path` in entry `{}`".format(entry["title"]))
 
             # override path from command line parameter
             if task.options.dl_path:
@@ -420,7 +420,7 @@ class PluginDownload:
             try:
                 path = os.path.expanduser(entry.render(path))
             except RenderError as e:
-                entry.fail(f'Could not set path. Error during string replacement: {e}')
+                entry.fail(f"Could not set path. Error during string replacement: {e}")
                 return
 
             # Clean illegal characters from path name
@@ -428,91 +428,91 @@ class PluginDownload:
 
             # If we are in test mode, report and return
             if task.options.test:
-                logger.info('Would write `{}` to `{}`', entry['title'], path)
+                logger.info("Would write `{}` to `{}`", entry["title"], path)
                 # Set a fake location, so the exec plugin can do string replacement during --test #1015
-                entry['location'] = os.path.join(path, 'TEST_MODE_NO_OUTPUT')
+                entry["location"] = os.path.join(path, "TEST_MODE_NO_OUTPUT")
                 return
 
             # make path
             if not os.path.isdir(path):
-                logger.debug('Creating directory {}', path)
+                logger.debug("Creating directory {}", path)
                 try:
                     os.makedirs(path)
                 except Exception:
-                    raise plugin.PluginError(f'Cannot create path {path}', logger)
+                    raise plugin.PluginError(f"Cannot create path {path}", logger)
 
             # check that temp file is present
-            if not os.path.exists(entry['file']):
-                logger.debug('entry: {}', entry)
+            if not os.path.exists(entry["file"]):
+                logger.debug("entry: {}", entry)
                 raise plugin.PluginWarning(
-                    'Downloaded temp file `{}` doesn\'t exist!?'.format(entry['file'])
+                    "Downloaded temp file `{}` doesn't exist!?".format(entry["file"])
                 )
 
-            if config.get('filename'):
+            if config.get("filename"):
                 try:
-                    entry['filename'] = entry.render(config['filename'])
-                    logger.debug('set filename from config {}', entry['filename'])
+                    entry["filename"] = entry.render(config["filename"])
+                    logger.debug("set filename from config {}", entry["filename"])
                 except RenderError as e:
-                    entry.fail(f'Could not set filename. Error during string replacement: {e}')
+                    entry.fail(f"Could not set filename. Error during string replacement: {e}")
                     return
             # if we still don't have a filename, try making one from title (last resort)
-            elif not entry.get('filename'):
-                entry['filename'] = entry['title']
-                logger.debug('set filename from title {}', entry['filename'])
-                if 'mime-type' not in entry:
+            elif not entry.get("filename"):
+                entry["filename"] = entry["title"]
+                logger.debug("set filename from title {}", entry["filename"])
+                if "mime-type" not in entry:
                     logger.warning(
-                        'Unable to figure proper filename for {}. Using title.', entry['title']
+                        "Unable to figure proper filename for {}. Using title.", entry["title"]
                     )
                 else:
-                    guess = mimetypes.guess_extension(entry['mime-type'])
+                    guess = mimetypes.guess_extension(entry["mime-type"])
                     if not guess:
-                        logger.warning('Unable to guess extension with mime-type {}', guess)
+                        logger.warning("Unable to guess extension with mime-type {}", guess)
                     else:
                         self.filename_ext_from_mime(entry)
 
-            name = entry.get('filename', entry['title'])
+            name = entry.get("filename", entry["title"])
             # Remove illegal characters from filename #325, #353
             name = pathscrub(name)
             # Remove directory separators from filename #208
-            name = name.replace('/', ' ')
-            if sys.platform.startswith('win'):
-                name = name.replace('\\', ' ')
+            name = name.replace("/", " ")
+            if sys.platform.startswith("win"):
+                name = name.replace("\\", " ")
             # remove duplicate spaces
-            name = ' '.join(name.split())
+            name = " ".join(name.split())
             # combine to full path + filename
             destfile = os.path.join(path, name)
-            logger.debug('destfile: {}', destfile)
+            logger.debug("destfile: {}", destfile)
 
             if os.path.exists(destfile):
                 import filecmp
 
-                if filecmp.cmp(entry['file'], destfile):
+                if filecmp.cmp(entry["file"], destfile):
                     logger.debug("Identical destination file '{}' already exists", destfile)
-                elif config.get('overwrite'):
-                    logger.debug('Overwriting already existing file {}', destfile)
+                elif config.get("overwrite"):
+                    logger.debug("Overwriting already existing file {}", destfile)
                 else:
                     logger.info(
-                        'File `{}` already exists and is not identical, download failed.', destfile
+                        "File `{}` already exists and is not identical, download failed.", destfile
                     )
-                    entry.fail(f'File `{destfile}` already exists and is not identical.')
+                    entry.fail(f"File `{destfile}` already exists and is not identical.")
                     return
             else:
                 # move temp file
-                logger.debug('moving {} to {}', entry['file'], destfile)
+                logger.debug("moving {} to {}", entry["file"], destfile)
 
                 try:
-                    shutil.move(entry['file'], destfile)
+                    shutil.move(entry["file"], destfile)
                 except OSError as err:
                     # ignore permission errors, see ticket #555
                     import errno
 
                     if not os.path.exists(destfile):
-                        raise plugin.PluginError(f'Unable to write {destfile}: {err}')
+                        raise plugin.PluginError(f"Unable to write {destfile}: {err}")
                     if err.errno not in (errno.EPERM, errno.EACCES):
                         raise
 
             # store final destination as output key
-            entry['location'] = destfile
+            entry["location"] = destfile
 
         finally:
             self.cleanup_temp_file(entry)
@@ -526,13 +526,13 @@ class PluginDownload:
         self.cleanup_temp_files(task)
 
     def cleanup_temp_file(self, entry):
-        if 'file' in entry:
-            if os.path.exists(entry['file']):
-                logger.debug('removing temp file {} from {}', entry['file'], entry['title'])
-                os.remove(entry['file'])
-            if os.path.exists(os.path.dirname(entry['file'])):
-                shutil.rmtree(os.path.dirname(entry['file']))
-            del entry['file']
+        if "file" in entry:
+            if os.path.exists(entry["file"]):
+                logger.debug("removing temp file {} from {}", entry["file"], entry["title"])
+                os.remove(entry["file"])
+            if os.path.exists(os.path.dirname(entry["file"])):
+                shutil.rmtree(os.path.dirname(entry["file"]))
+            del entry["file"]
 
     def cleanup_temp_files(self, task):
         """Check all entries for leftover temp files and deletes them."""
@@ -540,17 +540,17 @@ class PluginDownload:
             self.cleanup_temp_file(entry)
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(PluginDownload, 'download', api_ver=2)
+    plugin.register(PluginDownload, "download", api_ver=2)
 
 
-@event('options.register')
+@event("options.register")
 def register_parser_arguments():
-    options.get_parser('execute').add_argument(
-        '--dl-path',
-        dest='dl_path',
+    options.get_parser("execute").add_argument(
+        "--dl-path",
+        dest="dl_path",
         default=False,
-        metavar='PATH',
-        help='override path for download plugin, applies to all executed tasks',
+        metavar="PATH",
+        help="override path for download plugin, applies to all executed tasks",
     )

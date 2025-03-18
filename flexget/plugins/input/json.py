@@ -10,7 +10,7 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils import json
 
-logger = logger.bind(name='json')
+logger = logger.bind(name="json")
 
 
 class Json:
@@ -37,14 +37,14 @@ class Json:
     """
 
     schema = {
-        'type': 'object',
-        'properties': {
-            'file': {'type': 'string', 'format': 'file'},
-            'encoding': {'type': 'string'},
-            'field_map': {'type': 'object', 'additionalProperties': {'type': 'string'}},
+        "type": "object",
+        "properties": {
+            "file": {"type": "string", "format": "file"},
+            "encoding": {"type": "string"},
+            "field_map": {"type": "object", "additionalProperties": {"type": "string"}},
         },
-        'required': ['file'],
-        'additionalProperties': False,
+        "required": ["file"],
+        "additionalProperties": False,
     }
 
     @staticmethod
@@ -55,11 +55,11 @@ class Json:
             return val
 
     def on_task_input(self, task, config):
-        file = Path(config['file'])
-        field_map = config.get('field_map', {})
+        file = Path(config["file"])
+        field_map = config.get("field_map", {})
         # Switch the field map to map from json to flexget fields
         field_map = {v: k for k, v in field_map.items()}
-        with file.open(encoding=config.get('encoding', 'utf-8')) as data:
+        with file.open(encoding=config.get("encoding", "utf-8")) as data:
             contents = json.load(data)
             for item in contents:
                 entry = Entry()
@@ -70,11 +70,11 @@ class Json:
                         entry[field] = self.ds_dt(value)
                 if not entry.isvalid():
                     logger.error(
-                        'No title and url defined for entry, you may need to use field_map to map them.'
+                        "No title and url defined for entry, you may need to use field_map to map them."
                     )
                 yield Entry(item)
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(Json, 'json', api_ver=2)
+    plugin.register(Json, "json", api_ver=2)

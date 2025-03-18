@@ -3,17 +3,17 @@ from loguru import logger
 from flexget import plugin
 from flexget.event import event
 
-logger = logger.bind(name='manual')
+logger = logger.bind(name="manual")
 
 
 class ManualTask:
     """Only execute task when specified with --tasks."""
 
     schema = {
-        'type': 'boolean',
-        'title': 'manual',
-        'description': 'Prevents this task from running unless it is explicitly specified with --tasks, '
-        'or in a schedule',
+        "type": "boolean",
+        "title": "manual",
+        "description": "Prevents this task from running unless it is explicitly specified with --tasks, "
+        "or in a schedule",
     }
 
     @plugin.priority(plugin.PRIORITY_FIRST)
@@ -29,11 +29,11 @@ class ManualTask:
             or not task.options.allow_manual
         ):
             logger.debug(
-                'Disabling task {}, task can only run in manual mode (via API/CLI)', task.name
+                "Disabling task {}, task can only run in manual mode (via API/CLI)", task.name
             )
-            task.abort('manual task not specified in --tasks', silent=True)
+            task.abort("manual task not specified in --tasks", silent=True)
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(ManualTask, 'manual', api_ver=2)
+    plugin.register(ManualTask, "manual", api_ver=2)

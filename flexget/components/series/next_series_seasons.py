@@ -9,7 +9,7 @@ from flexget.manager import Session
 
 from . import db
 
-plugin_name = 'next_series_seasons'
+plugin_name = "next_series_seasons"
 logger = logger.bind(name=plugin_name)
 
 MAX_SEASON_DIFF_WITHOUT_BEGIN = 15
@@ -23,16 +23,16 @@ class NextSeriesSeasons:
     """
 
     schema = {
-        'oneOf': [
-            {'type': 'boolean'},
+        "oneOf": [
+            {"type": "boolean"},
             {
-                'type': 'object',
-                'properties': {
-                    'from_start': {'type': 'boolean', 'default': False},
-                    'backfill': {'type': 'boolean', 'default': False},
-                    'threshold': {'type': 'integer', 'minimum': 0},
+                "type": "object",
+                "properties": {
+                    "from_start": {"type": "boolean", "default": False},
+                    "backfill": {"type": "boolean", "default": False},
+                    "threshold": {"type": "integer", "minimum": 0},
                 },
-                'additionalProperties': False,
+                "additionalProperties": False,
             },
         ]
     }
@@ -41,22 +41,22 @@ class NextSeriesSeasons:
         self.rerun_entries = []
 
     def season_identifiers(self, season):
-        return [f'S{season:02d}']
+        return [f"S{season:02d}"]
 
     def search_entry(self, series, season, task, rerun=True):
         # Extract the alternate names for the series
         alts = [alt.alt_name for alt in series.alternate_names]
         # Also consider series name without parenthetical (year, country) an alternate name
-        paren_match = re.match(r'(.+?)( \(.+\))?$', series.name)
+        paren_match = re.match(r"(.+?)( \(.+\))?$", series.name)
         if paren_match.group(2):
             alts.append(paren_match.group(1))
-        search_strings = [f'{series.name} {id}' for id in self.season_identifiers(season)]
-        series_id = f'S{season:02d}'
+        search_strings = [f"{series.name} {id}" for id in self.season_identifiers(season)]
+        series_id = f"S{season:02d}"
         for alt in alts:
-            search_strings.extend([f'{alt} {id}' for id in self.season_identifiers(season)])
+            search_strings.extend([f"{alt} {id}" for id in self.season_identifiers(season)])
         entry = Entry(
             title=search_strings[0],
-            url='',
+            url="",
             search_strings=search_strings,
             series_name=series.name,
             series_alternate_names=alts,  # Not sure if this field is useful down the road.
@@ -84,7 +84,7 @@ class NextSeriesSeasons:
             return entries
         self.rerun_entries = []
 
-        threshold = config.get('threshold')
+        threshold = config.get("threshold")
 
         entries = []
         impossible = {}
@@ -93,16 +93,16 @@ class NextSeriesSeasons:
                 session.query(db.SeriesTask).filter(db.SeriesTask.name == task.name).all()
             ):
                 series = seriestask.series
-                logger.trace('evaluating {}', series.name)
+                logger.trace("evaluating {}", series.name)
                 if not series:
                     # TODO: How can this happen?
-                    logger.debug('Found SeriesTask item without series specified. Cleaning up.')
+                    logger.debug("Found SeriesTask item without series specified. Cleaning up.")
                     session.delete(seriestask)
                     continue
 
-                if series.identified_by not in ['ep']:
-                    logger.trace('unsupported identified_by scheme')
-                    reason = series.identified_by or 'auto'
+                if series.identified_by not in ["ep"]:
+                    logger.trace("unsupported identified_by scheme")
+                    reason = series.identified_by or "auto"
                     impossible.setdefault(reason, []).append(series.name)
                     continue
 
@@ -112,7 +112,7 @@ class NextSeriesSeasons:
                     low_season = max(series.begin.season - 1, 0)
 
                 new_season = None
-                check_downloaded = not config.get('backfill')
+                check_downloaded = not config.get("backfill")
                 latest_season = db.get_latest_release(series, downloaded=check_downloaded)
                 if latest_season:
                     if latest_season.season <= low_season:
@@ -132,10 +132,10 @@ class NextSeriesSeasons:
                 ):
                     if series.begin:
                         logger.error(
-                            'Series `{}` has a begin episode set (`{}`), but the season currently being processed '
-                            '({}) is {} seasons later than it. To prevent emitting incorrect seasons, '
-                            'this series will not emit unless the begin episode is adjusted to a season that is less '
-                            'than {} seasons from season {}.',
+                            "Series `{}` has a begin episode set (`{}`), but the season currently being processed "
+                            "({}) is {} seasons later than it. To prevent emitting incorrect seasons, "
+                            "this series will not emit unless the begin episode is adjusted to a season that is less "
+                            "than {} seasons from season {}.",
                             series.name,
                             series.begin.identifier,
                             latest_season,
@@ -145,9 +145,9 @@ class NextSeriesSeasons:
                         )
                     else:
                         logger.error(
-                            'Series `{}` does not have a begin episode set and continuing this task would result in '
-                            'more than {} seasons being emitted. To prevent emitting incorrect seasons, '
-                            'this series will not emit unless the begin episode is set in your series config or by '
+                            "Series `{}` does not have a begin episode set and continuing this task would result in "
+                            "more than {} seasons being emitted. To prevent emitting incorrect seasons, "
+                            "this series will not emit unless the begin episode is set in your series config or by "
                             'using the CLI subcommand `series begin "{}" <SxxExx>`.',
                             series.name,
                             MAX_SEASON_DIFF_WITHOUT_BEGIN,
@@ -156,16 +156,16 @@ class NextSeriesSeasons:
                     continue
                 for season in range(latest_season, low_season, -1):
                     if season in series.completed_seasons:
-                        logger.debug('season {} is marked as completed, skipping', season)
+                        logger.debug("season {} is marked as completed, skipping", season)
                         continue
                     if threshold is not None and series.episodes_for_season(season) > threshold:
                         logger.debug(
-                            'season {} has met threshold of threshold of {}, skipping',
+                            "season {} has met threshold of threshold of {}, skipping",
                             season,
                             threshold,
                         )
                         continue
-                    logger.trace('Evaluating season {} for series `{}`', season, series.name)
+                    logger.trace("Evaluating season {} for series `{}`", season, series.name)
                     latest = db.get_latest_release(
                         series, season=season, downloaded=check_downloaded
                     )
@@ -184,28 +184,28 @@ class NextSeriesSeasons:
                     # First iteration of a new season with no show begin and show has downloads
                     elif (
                         (new_season and season == new_season)
-                        or config.get('from_start')
-                        or config.get('backfill')
+                        or config.get("from_start")
+                        or config.get("backfill")
                     ):
                         entries.append(self.search_entry(series, season, task))
                     else:
                         logger.verbose(
-                            'Series `{}` has no history. Set the begin option in your config, '
+                            "Series `{}` has no history. Set the begin option in your config, "
                             'or use the CLI subcommand `series begin "{}" <SxxExx>` '
-                            'to set the first episode to emit',
+                            "to set the first episode to emit",
                             series.name,
                             series.name,
                         )
                         break
                     # Skip older seasons if we are not in backfill mode
-                    if not config.get('backfill'):
-                        logger.debug('backfill is not enabled; skipping older seasons')
+                    if not config.get("backfill"):
+                        logger.debug("backfill is not enabled; skipping older seasons")
                         break
 
         for reason, series in impossible.items():
             logger.verbose(
-                'Series `{}` with identified_by value `{}` are not supported.',
-                ', '.join(sorted(series)),
+                "Series `{}` with identified_by value `{}` are not supported.",
+                ", ".join(sorted(series)),
                 reason,
             )
 
@@ -215,36 +215,36 @@ class NextSeriesSeasons:
         """Decides whether we should look for next season based on whether we found/accepted any seasons."""
         with Session() as session:
             series = (
-                session.query(db.Series).filter(db.Series.name == entry['series_name']).first()
+                session.query(db.Series).filter(db.Series.name == entry["series_name"]).first()
             )
             latest = db.get_latest_season_pack_release(series)
-            latest_ep = db.get_latest_episode_release(series, season=entry['series_season'])
+            latest_ep = db.get_latest_episode_release(series, season=entry["series_season"])
 
             if entry.accepted:
                 if not latest and latest_ep:
                     logger.debug(
-                        'season lookup produced an episode result; assuming no season match, no need to rerun'
+                        "season lookup produced an episode result; assuming no season match, no need to rerun"
                     )
                     return
                 logger.debug(
-                    '{} {} was accepted, rerunning to look for next season.',
-                    entry['series_name'],
-                    entry['series_id'],
+                    "{} {} was accepted, rerunning to look for next season.",
+                    entry["series_name"],
+                    entry["series_id"],
                 )
                 if not any(
-                    e.get('series_season') == latest.season + 1 for e in self.rerun_entries
+                    e.get("series_season") == latest.season + 1 for e in self.rerun_entries
                 ):
                     self.rerun_entries.append(self.search_entry(series, latest.season + 1, task))
                 # Increase rerun limit by one if we have matches, this way
                 # we keep searching as long as matches are found!
                 # TODO: this should ideally be in discover so it would be more generic
                 task.max_reruns += 1
-                task.rerun(plugin=plugin_name, reason='Look for next season')
+                task.rerun(plugin=plugin_name, reason="Look for next season")
             elif latest and not latest.completed:
                 # There are known releases of this season, but none were accepted
                 return
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
     plugin.register(NextSeriesSeasons, plugin_name, api_ver=2)

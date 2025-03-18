@@ -25,16 +25,16 @@ class TestDuplicates:
     """
 
     def test_duplicates_accept(self, execute_task):
-        task = execute_task('duplicates_accept')
+        task = execute_task("duplicates_accept")
         assert len(task.accepted) == 2
         assert len(task.rejected) == 0
 
     def test_duplicates_reject(self, execute_task):
-        task = execute_task('duplicates_reject')
+        task = execute_task("duplicates_reject")
         assert len(task.accepted) == 0
         assert len(task.rejected) == 1
 
     def test_duplicates_missing_field(self, execute_task):
-        task = execute_task('duplicates_missing_field')
+        task = execute_task("duplicates_missing_field")
         assert len(task.accepted) == 0
         assert len(task.rejected) == 0

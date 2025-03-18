@@ -5,18 +5,18 @@ from flexget.event import event
 from flexget.manager import Session
 from flexget.terminal import console
 
-logger = logger.bind(name='perftests')
+logger = logger.bind(name="perftests")
 
-TESTS = ['imdb_query']
+TESTS = ["imdb_query"]
 
 
 def cli_perf_test(manager, options):
     if options.test_name not in TESTS:
-        console(f'Unknown performance test {options.test_name}')
+        console(f"Unknown performance test {options.test_name}")
         return
     session = Session()
     try:
-        if options.test_name == 'imdb_query':
+        if options.test_name == "imdb_query":
             imdb_query(session)
     finally:
         session.close()
@@ -35,20 +35,20 @@ def imdb_query(session):
 
     imdb_urls = []
 
-    logger.info('Getting imdb_urls ...')
+    logger.info("Getting imdb_urls ...")
     # query so that we avoid loading whole object (maybe cached?)
     for _, url in session.execute(select(Movie.id, Movie.url)):
         imdb_urls.append(url)
-    logger.info('Got {} urls from database', len(imdb_urls))
+    logger.info("Got {} urls from database", len(imdb_urls))
     if not imdb_urls:
-        logger.info('so .. aborting')
+        logger.info("so .. aborting")
         return
 
     # commence testing
 
-    log_query_count('test')
+    log_query_count("test")
     start_time = time.time()
-    for url in track(imdb_urls, description='Benchmarking...'):
+    for url in track(imdb_urls, description="Benchmarking..."):
         # movie = session.query(Movie).filter(Movie.url == url).first()
         # movie = session.query(Movie).options(subqueryload(Movie.genres)).filter(Movie.url == url).one()
 
@@ -70,12 +70,12 @@ def imdb_query(session):
         [x.name for x in movie.actors]
         [x.language for x in movie.languages]
 
-    log_query_count('test')
+    log_query_count("test")
     took = time.time() - start_time
-    logger.debug('Took {:.2f} seconds to query {} movies', took, len(imdb_urls))
+    logger.debug("Took {:.2f} seconds to query {} movies", took, len(imdb_urls))
 
 
-@event('options.register')
+@event("options.register")
 def register_parser_arguments():
-    perf_parser = options.register_command('perf-test', cli_perf_test)
-    perf_parser.add_argument('test_name', metavar='<test name>', choices=TESTS)
+    perf_parser = options.register_command("perf-test", cli_perf_test)
+    perf_parser.add_argument("test_name", metavar="<test name>", choices=TESTS)

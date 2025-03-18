@@ -12,9 +12,9 @@ class RejectRememberPlugin:
                 entry.reject(remember=True)
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(RejectRememberPlugin, 'test_remember_reject', api_ver=2, debug=True)
+    plugin.register(RejectRememberPlugin, "test_remember_reject", api_ver=2, debug=True)
 
 
 class TestRememberRejected:
@@ -27,9 +27,9 @@ class TestRememberRejected:
     """
 
     def test_remember_rejected(self, execute_task):
-        task = execute_task('test')
-        assert task.find_entry('rejected', title='title 1', rejected_by='test_remember_reject')
-        task = execute_task('test')
-        assert task.find_entry('rejected', title='title 1', rejected_by='remember_rejected'), (
-            'remember_rejected should have rejected'
+        task = execute_task("test")
+        assert task.find_entry("rejected", title="title 1", rejected_by="test_remember_reject")
+        task = execute_task("test")
+        assert task.find_entry("rejected", title="title 1", rejected_by="remember_rejected"), (
+            "remember_rejected should have rejected"
         )

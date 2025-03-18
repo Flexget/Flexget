@@ -7,9 +7,9 @@ from flexget.config_schema import one_or_more
 from flexget.event import event
 from flexget.utils.template import evaluate_expression
 
-logger = logger.bind(name='sort_by')
+logger = logger.bind(name="sort_by")
 
-RE_ARTICLES = r'^(the|a|an)\s'
+RE_ARTICLES = r"^(the|a|an)\s"
 
 
 class PluginSortBy:
@@ -33,18 +33,18 @@ class PluginSortBy:
 
     schema = one_or_more(
         {
-            'oneOf': [
-                {'type': 'string'},
+            "oneOf": [
+                {"type": "string"},
                 {
-                    'type': 'object',
-                    'properties': {
-                        'field': {'type': 'string'},
-                        'reverse': {'type': 'boolean'},
-                        'ignore_articles': {
-                            'oneOf': [{'type': 'boolean'}, {'type': 'string', 'format': 'regex'}]
+                    "type": "object",
+                    "properties": {
+                        "field": {"type": "string"},
+                        "reverse": {"type": "boolean"},
+                        "ignore_articles": {
+                            "oneOf": [{"type": "boolean"}, {"type": "string", "format": "regex"}]
                         },
                     },
-                    'additionalProperties': False,
+                    "additionalProperties": False,
                 },
             ]
         }
@@ -61,11 +61,11 @@ class PluginSortBy:
                 reverse = False
                 ignore_articles = False
             else:
-                field = item.get('field', None)
-                reverse = item.get('reverse', False)
-                ignore_articles = item.get('ignore_articles', False)
+                field = item.get("field", None)
+                reverse = item.get("reverse", False)
+                ignore_articles = item.get("ignore_articles", False)
 
-            logger.debug('sorting entries by: {}', item)
+            logger.debug("sorting entries by: {}", item)
 
             if not field:
                 if reverse:
@@ -77,13 +77,13 @@ class PluginSortBy:
             def sort_key(entry, field=field, re_articles=re_articles, reverse=reverse):
                 val = evaluate_expression(field, entry)
                 if isinstance(val, str) and re_articles:
-                    val = re.sub(re_articles, '', val, flags=re.IGNORECASE)
+                    val = re.sub(re_articles, "", val, flags=re.IGNORECASE)
                 # Sort None values last no matter whether reversed or not
                 return (val is not None) == reverse, val
 
             task.all_entries.sort(key=sort_key, reverse=reverse)
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(PluginSortBy, 'sort_by', api_ver=2)
+    plugin.register(PluginSortBy, "sort_by", api_ver=2)

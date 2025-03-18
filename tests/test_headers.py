@@ -16,5 +16,5 @@ class TestHeaders:
     """
 
     def test_headers(self, execute_task):
-        task = execute_task('test_headers', options={'nocache': True})
-        assert task.find_entry(title='blah', url='other'), 'Entry should have been created.'
+        task = execute_task("test_headers", options={"nocache": True})
+        assert task.find_entry(title="blah", url="other"), "Entry should have been created."

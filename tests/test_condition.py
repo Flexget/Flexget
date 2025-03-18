@@ -43,28 +43,28 @@ class TestCondition:
     """
 
     def test_reject(self, execute_task):
-        task = execute_task('test_condition_reject')
+        task = execute_task("test_condition_reject")
         count = len(task.rejected)
         assert count == 1
 
     def test_accept(self, execute_task):
-        task = execute_task('test_condition_accept')
+        task = execute_task("test_condition_accept")
         count = len(task.accepted)
         assert count == 2
 
     def test_implicit_and(self, execute_task):
         for i in "12":
-            task = execute_task('test_condition_and' + i)
+            task = execute_task("test_condition_and" + i)
             count = len(task.accepted)
             assert count == int(i)
 
     def test_has_field(self, execute_task):
-        task = execute_task('test_has_field')
+        task = execute_task("test_has_field")
         assert len(task.accepted) == 2
 
     def test_sub_plugin(self, execute_task):
-        task = execute_task('test_sub_plugin')
-        entry = task.find_entry('accepted', title='test', some_field='some value')
+        task = execute_task("test_sub_plugin")
+        entry = task.find_entry("accepted", title="test", some_field="some value")
         assert entry
         assert len(task.accepted) == 1
 
@@ -94,7 +94,7 @@ class TestQualityCondition:
     """
 
     def test_quality(self, manager, execute_task):
-        for taskname in manager.config['tasks']:
+        for taskname in manager.config["tasks"]:
             task = execute_task(taskname)
             count = len(task.rejected)
             expected = int(taskname[-1])
@@ -116,21 +116,21 @@ class TestDateCondition:
     """
 
     def test_naive(self, execute_task):
-        entry = Entry(title='1960', url='', dt_field=DateTime.create(1960, 1, 1, tz=None))
-        task = execute_task('test_now', options={'inject': [entry]})
+        entry = Entry(title="1960", url="", dt_field=DateTime.create(1960, 1, 1, tz=None))
+        task = execute_task("test_now", options={"inject": [entry]})
         assert len(task.accepted) == 1
-        entry = Entry(title='future', url='', dt_field=DateTime.now().add(days=1).naive())
-        task = execute_task('test_now', options={'inject': [entry]})
+        entry = Entry(title="future", url="", dt_field=DateTime.now().add(days=1).naive())
+        task = execute_task("test_now", options={"inject": [entry]})
         assert len(task.accepted) == 0
 
     def test_tz(self, execute_task):
         # This would end up being false if a naive comparison was done, but with timezones dt1 < dt2
         dt1 = DateTime.create(2023, 1, 1, 2, tz="America/New_York")
         dt2 = DateTime.create(2023, 1, 1, 1, tz="America/Los_Angeles")
-        entry = Entry(title='entry', url='', dt_field1=dt1, dt_field2=dt2)
-        task = execute_task('test_compare', options={'inject': [entry]})
+        entry = Entry(title="entry", url="", dt_field1=dt1, dt_field2=dt2)
+        task = execute_task("test_compare", options={"inject": [entry]})
         assert len(task.accepted) == 1
         # Sanity check that when we reverse the comparison it's not true
-        entry = Entry(title='entry', url='', dt_field1=dt2, dt_field2=dt1)
-        task = execute_task('test_compare', options={'inject': [entry]})
+        entry = Entry(title="entry", url="", dt_field1=dt2, dt_field2=dt1)
+        task = execute_task("test_compare", options={"inject": [entry]})
         assert len(task.accepted) == 0

@@ -4,7 +4,7 @@ from typing import Any, Callable
 
 from loguru import logger
 
-logger = logger.bind(name='event')
+logger = logger.bind(name="event")
 
 
 class Event:
@@ -28,7 +28,7 @@ class Event:
         return self.priority > other.priority
 
     def __str__(self):
-        return f'<Event(name={self.name},func={self.func.__name__},priority={self.priority})>'
+        return f"<Event(name={self.name},func={self.func.__name__},priority={self.priority})>"
 
     __repr__ = __str__
 
@@ -55,7 +55,7 @@ def get_events(name: str) -> list[Event]:
     :param String name: event name
     """
     if name not in _events:
-        raise KeyError(f'No such event {name}')
+        raise KeyError(f"No such event {name}")
     _events[name].sort(reverse=True)
     return _events[name]
 
@@ -74,9 +74,9 @@ def add_event_handler(name: str, func: Callable, priority: int = 128) -> Event:
     for event in events:
         if event.func == func:
             raise ValueError(
-                f'{func.__name__} has already been registered as event listener under name {name}'
+                f"{func.__name__} has already been registered as event listener under name {name}"
             )
-    logger.trace('registered function {} to event {}', func.__name__, name)
+    logger.trace("registered function {} to event {}", func.__name__, name)
     event = Event(name, func, priority)
     events.append(event)
     return event

@@ -11,9 +11,9 @@ class AbortPlugin:
     """
 
     def on_task_output(self, task, config):
-        task.abort('abort plugin')
+        task.abort("abort plugin")
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register():
-    plugin.register(AbortPlugin, 'abort', debug=True, api_ver=2)
+    plugin.register(AbortPlugin, "abort", debug=True, api_ver=2)

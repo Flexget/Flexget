@@ -8,7 +8,7 @@ from flexget.utils.requests import Session as RequestSession
 
 requests = RequestSession(max_retries=3)
 
-plugin_name = 'matrix'
+plugin_name = "matrix"
 
 logger = logger.bind(name=plugin_name)
 
@@ -18,7 +18,7 @@ def urljoin(*args):
 
     Trailing but not leading slashes are stripped for each argument.
     """
-    return "/".join(str(x).rstrip('/') for x in args)
+    return "/".join(str(x).rstrip("/") for x in args)
 
 
 class MatrixNotifier:
@@ -45,26 +45,26 @@ class MatrixNotifier:
     """
 
     schema = {
-        'type': 'object',
-        'properties': {
-            'server': {'type': 'string'},
-            'token': {'type': 'string'},
-            'room_id': {'type': 'string'},
+        "type": "object",
+        "properties": {
+            "server": {"type": "string"},
+            "token": {"type": "string"},
+            "room_id": {"type": "string"},
         },
-        'required': ['server', 'token', 'room_id'],
-        'additionalProperties': False,
+        "required": ["server", "token", "room_id"],
+        "additionalProperties": False,
     }
 
-    __version__ = '0.3'
+    __version__ = "0.3"
 
     def notify(self, title, message, config):
         """Send notification to Matrix Room."""
-        notification = {'body': message, 'msgtype': "m.text"}
+        notification = {"body": message, "msgtype": "m.text"}
         room = urljoin(
-            config['server'],
+            config["server"],
             "_matrix/client/r0/rooms",
-            config['room_id'],
-            "send/m.room.message?access_token=" + config['token'],
+            config["room_id"],
+            "send/m.room.message?access_token=" + config["token"],
         )
         try:
             requests.post(room, json=notification)
@@ -72,6 +72,6 @@ class MatrixNotifier:
             raise PluginWarning(e.args[0]) from e
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(MatrixNotifier, plugin_name, api_ver=2, interfaces=['notifiers'])
+    plugin.register(MatrixNotifier, plugin_name, api_ver=2, interfaces=["notifiers"])

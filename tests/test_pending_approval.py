@@ -12,7 +12,7 @@ class TestPendingApproval:
     """
 
     def test_pending_approval(self, execute_task, manager):
-        task = execute_task('test')
+        task = execute_task("test")
         assert len(task.all_entries) == 1
         assert len(task.rejected) == 1
         assert len(task.accepted) == 0
@@ -22,14 +22,14 @@ class TestPendingApproval:
             pnd_entry = session.query(PendingEntry).first()
             pnd_entry.approved = True
 
-        task = execute_task('test')
+        task = execute_task("test")
         assert len(task.all_entries) == 2
         assert len(task.rejected) == 0
         assert len(task.accepted) == 1
 
-        assert task.find_entry(other_attribute='bla')
+        assert task.find_entry(other_attribute="bla")
 
-        task = execute_task('test')
+        task = execute_task("test")
         assert len(task.all_entries) == 1
         assert len(task.rejected) == 1
         assert len(task.accepted) == 0

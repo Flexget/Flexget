@@ -8,7 +8,7 @@ from flexget.utils.requests import Session as RequestSession
 
 requests = RequestSession(max_retries=3)
 
-plugin_name = 'slack'
+plugin_name = "slack"
 
 logger = logger.bind(name=plugin_name)
 
@@ -31,96 +31,96 @@ class SlackNotifier:
     """
 
     schema = {
-        'type': 'object',
-        'properties': {
-            'web_hook_url': {'type': 'string', 'format': 'uri'},
-            'username': {'type': 'string', 'default': 'Flexget'},
-            'icon_url': {'type': 'string', 'format': 'uri'},
-            'icon_emoji': {'type': 'string'},
-            'channel': {'type': 'string'},
-            'unfurl_links': {'type': 'boolean'},
-            'message': {'type': 'string'},
-            'attachments': {
-                'type': 'array',
-                'items': {
-                    'type': 'object',
-                    'properties': {
-                        'title': {'type': 'string'},
-                        'author_name': {'type': 'string'},
-                        'author_link': {'type': 'string'},
-                        'author_icon': {'type': 'string'},
-                        'title_link': {'type': 'string'},
-                        'image_url': {'type': 'string'},
-                        'thumb_url': {'type': 'string'},
-                        'footer': {'type': 'string'},
-                        'footer_icon': {'type': 'string'},
-                        'ts': {'type': 'number'},
-                        'fallback': {'type': 'string'},
-                        'text': {'type': 'string'},
-                        'pretext': {'type': 'string'},
-                        'color': {'type': 'string'},
-                        'fields': {
-                            'type': 'array',
-                            'minItems': 1,
-                            'items': {
-                                'type': 'object',
-                                'properties': {
-                                    'title': {'type': 'string'},
-                                    'value': {'type': 'string'},
-                                    'short': {'type': 'boolean'},
+        "type": "object",
+        "properties": {
+            "web_hook_url": {"type": "string", "format": "uri"},
+            "username": {"type": "string", "default": "Flexget"},
+            "icon_url": {"type": "string", "format": "uri"},
+            "icon_emoji": {"type": "string"},
+            "channel": {"type": "string"},
+            "unfurl_links": {"type": "boolean"},
+            "message": {"type": "string"},
+            "attachments": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "title": {"type": "string"},
+                        "author_name": {"type": "string"},
+                        "author_link": {"type": "string"},
+                        "author_icon": {"type": "string"},
+                        "title_link": {"type": "string"},
+                        "image_url": {"type": "string"},
+                        "thumb_url": {"type": "string"},
+                        "footer": {"type": "string"},
+                        "footer_icon": {"type": "string"},
+                        "ts": {"type": "number"},
+                        "fallback": {"type": "string"},
+                        "text": {"type": "string"},
+                        "pretext": {"type": "string"},
+                        "color": {"type": "string"},
+                        "fields": {
+                            "type": "array",
+                            "minItems": 1,
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "title": {"type": "string"},
+                                    "value": {"type": "string"},
+                                    "short": {"type": "boolean"},
                                 },
-                                'required': ['title'],
-                                'additionalProperties': False,
+                                "required": ["title"],
+                                "additionalProperties": False,
                             },
                         },
-                        'actions': {
-                            'type': 'array',
-                            'minItems': 1,
-                            'items': {
-                                'type': 'object',
-                                'properties': {
-                                    'name': {'type': 'string'},
-                                    'text': {'type': 'string'},
-                                    'type': {'type': 'string'},
-                                    'value': {'type': 'string'},
+                        "actions": {
+                            "type": "array",
+                            "minItems": 1,
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {"type": "string"},
+                                    "text": {"type": "string"},
+                                    "type": {"type": "string"},
+                                    "value": {"type": "string"},
                                 },
-                                'required': ['name', 'text', 'type', 'value'],
-                                'additionalProperties': False,
+                                "required": ["name", "text", "type", "value"],
+                                "additionalProperties": False,
                             },
                         },
-                        'callback_id': {'type': 'string'},
+                        "callback_id": {"type": "string"},
                     },
-                    'required': ['fallback'],
-                    'dependentRequired': {'actions': ['callback_id']},
-                    'additionalProperties': False,
+                    "required": ["fallback"],
+                    "dependentRequired": {"actions": ["callback_id"]},
+                    "additionalProperties": False,
                 },
             },
         },
-        'not': {'required': ['icon_emoji', 'icon_url']},
-        'error_not': 'Can only use one of \'icon_emoji\' or \'icon_url\'',
-        'required': ['web_hook_url'],
-        'additionalProperties': False,
+        "not": {"required": ["icon_emoji", "icon_url"]},
+        "error_not": "Can only use one of 'icon_emoji' or 'icon_url'",
+        "required": ["web_hook_url"],
+        "additionalProperties": False,
     }
 
     def notify(self, title, message, config):
         """Send a Slack notification."""
         notification = {
-            'text': message,
-            'username': config.get('username'),
-            'channel': config.get('channel'),
-            'attachments': config.get('attachments'),
+            "text": message,
+            "username": config.get("username"),
+            "channel": config.get("channel"),
+            "attachments": config.get("attachments"),
         }
-        if config.get('icon_emoji'):
-            notification['icon_emoji'] = ':{}:'.format(config['icon_emoji'].strip(':'))
-        if config.get('icon_url'):
-            notification['icon_url'] = config['icon_url']
+        if config.get("icon_emoji"):
+            notification["icon_emoji"] = ":{}:".format(config["icon_emoji"].strip(":"))
+        if config.get("icon_url"):
+            notification["icon_url"] = config["icon_url"]
 
         try:
-            requests.post(config['web_hook_url'], json=notification)
+            requests.post(config["web_hook_url"], json=notification)
         except RequestException as e:
             raise PluginWarning(e.args[0])
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(SlackNotifier, plugin_name, api_ver=2, interfaces=['notifiers'])
+    plugin.register(SlackNotifier, plugin_name, api_ver=2, interfaces=["notifiers"])

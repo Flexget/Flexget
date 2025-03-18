@@ -11,84 +11,84 @@ from scripts.dev_tools import bump_version, cli_bundle_webui, get_changelog, ver
 
 class TestDevTools:
     def test_version(self, tmp_path):
-        (tmp_path / 'flexget').mkdir(parents=True, exist_ok=True)
+        (tmp_path / "flexget").mkdir(parents=True, exist_ok=True)
         shutil.copy(
-            Path(__file__).parent / 'dev_tools' / 'dev_version.py',
-            tmp_path / 'flexget' / '_version.py',
+            Path(__file__).parent / "dev_tools" / "dev_version.py",
+            tmp_path / "flexget" / "_version.py",
         )
         os.chdir(tmp_path)
         runner = CliRunner()
         result = runner.invoke(version)
         assert result.exit_code == 0
-        assert result.output == '3.13.19.dev\n'
+        assert result.output == "3.13.19.dev\n"
 
     @pytest.mark.parametrize(
-        ('bump_from', 'bump_to', 'version'),
+        ("bump_from", "bump_to", "version"),
         [
             (
-                'dev',
-                'release',
-                '3.13.19',
+                "dev",
+                "release",
+                "3.13.19",
             ),
             (
-                'release',
-                'dev',
-                '3.13.20.dev',
+                "release",
+                "dev",
+                "3.13.20.dev",
             ),
         ],
     )
     def test_bump_version(self, tmp_path, bump_from, bump_to, version):
-        (tmp_path / 'flexget').mkdir(parents=True, exist_ok=True)
+        (tmp_path / "flexget").mkdir(parents=True, exist_ok=True)
         shutil.copy(
-            Path(__file__).parent / 'dev_tools' / f'{bump_from}_version.py',
-            tmp_path / 'flexget' / '_version.py',
+            Path(__file__).parent / "dev_tools" / f"{bump_from}_version.py",
+            tmp_path / "flexget" / "_version.py",
         )
         os.chdir(tmp_path)
         runner = CliRunner()
         result = runner.invoke(bump_version, [bump_to])
         assert result.exit_code == 0
-        with (tmp_path / 'flexget' / '_version.py').open() as f:
+        with (tmp_path / "flexget" / "_version.py").open() as f:
             assert f"__version__ = '{version}'\n" in f
 
     @pytest.mark.skipif(
-        platform.system() == 'Windows',
-        reason='The cassette generated on the Windows platform is different from the ones generated on Linux/macOS.'
-        'To make the cassette generated on Linux/macOS work on the Windows platform,'
-        'you need to install the zstandard dependency.',
+        platform.system() == "Windows",
+        reason="The cassette generated on the Windows platform is different from the ones generated on Linux/macOS."
+        "To make the cassette generated on Linux/macOS work on the Windows platform,"
+        "you need to install the zstandard dependency.",
     )
     @pytest.mark.parametrize(
-        'args', [[], ['--version', 'v2'], ['--version', 'v1'], ['--version', '']]
+        "args", [[], ["--version", "v2"], ["--version", "v1"], ["--version", ""]]
     )
     def test_cli_bundle_webui(self, args, online):
-        os.environ['BUNDLE_WEBUI'] = 'true'
-        v1_path = Path(__file__).parents[2] / 'flexget' / 'ui' / 'v1' / 'app'
-        v2_path = Path(__file__).parents[2] / 'flexget' / 'ui' / 'v2' / 'dist'
+        os.environ["BUNDLE_WEBUI"] = "true"
+        v1_path = Path(__file__).parents[2] / "flexget" / "ui" / "v1" / "app"
+        v2_path = Path(__file__).parents[2] / "flexget" / "ui" / "v2" / "dist"
         shutil.rmtree(v1_path, ignore_errors=True)
         shutil.rmtree(v2_path, ignore_errors=True)
         runner = CliRunner()
         result = runner.invoke(cli_bundle_webui, args)
         assert result.exit_code == 0
-        if 'v1' in args:
+        if "v1" in args:
             assert v1_path.is_dir()
-        elif 'v2' in args:
+        elif "v2" in args:
             assert v2_path.is_dir()
         else:
             assert v1_path.is_dir()
             assert v2_path.is_dir()
 
     @pytest.mark.skipif(
-        platform.system() == 'Windows',
-        reason='The cassette generated on the Windows platform is different from the ones generated on Linux/macOS.'
-        'To make the cassette generated on Linux/macOS work on the Windows platform,'
-        'you need to install the zstandard dependency.',
+        platform.system() == "Windows",
+        reason="The cassette generated on the Windows platform is different from the ones generated on Linux/macOS."
+        "To make the cassette generated on Linux/macOS work on the Windows platform,"
+        "you need to install the zstandard dependency.",
     )
     def test_get_changelog(self, online):
         runner = CliRunner()
-        result = runner.invoke(get_changelog, ['v3.13.6'])
+        result = runner.invoke(get_changelog, ["v3.13.6"])
         assert result.exit_code == 0
         assert result.output == (
-            '[all commits](https://github.com/Flexget/Flexget/compare/v3.13.5...v3.13.6)\n'
-            '### Changed\n'
-            '- Strictly ignore 19xx-20xx from episode parsing\n'
-            '- Strictly ignore 19xx-20xx from episode parsing\n'
+            "[all commits](https://github.com/Flexget/Flexget/compare/v3.13.5...v3.13.6)\n"
+            "### Changed\n"
+            "- Strictly ignore 19xx-20xx from episode parsing\n"
+            "- Strictly ignore 19xx-20xx from episode parsing\n"
         )

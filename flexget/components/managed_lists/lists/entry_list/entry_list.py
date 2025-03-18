@@ -11,7 +11,7 @@ logger = logger.bind(name=__name__)
 
 
 class EntryList:
-    schema = {'type': 'string'}
+    schema = {"type": "string"}
 
     @staticmethod
     def get_list(config):
@@ -29,20 +29,20 @@ class EntryList:
                 logger.warning("Entry list with name '{}' does not exist", config)
                 return entries
             else:
-                for search_string in entry.get('search_strings', [entry['title']]):
+                for search_string in entry.get("search_strings", [entry["title"]]):
                     logger.debug(
-                        'searching for entry that matches {} in entry_list {}',
+                        "searching for entry that matches {} in entry_list {}",
                         search_string,
                         config,
                     )
-                    search_string = search_string.replace(' ', '%').replace('.', '%')
+                    search_string = search_string.replace(" ", "%").replace(".", "%")
                     query = entry_list.entries.filter(
-                        db.EntryListEntry.title.like('%' + search_string + '%')
+                        db.EntryListEntry.title.like("%" + search_string + "%")
                     )
                     entries += [e.entry for e in query.all()]
                 return entries
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(EntryList, 'entry_list', api_ver=2, interfaces=['task', 'list', 'search'])
+    plugin.register(EntryList, "entry_list", api_ver=2, interfaces=["task", "list", "search"])

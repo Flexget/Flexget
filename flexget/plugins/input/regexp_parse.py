@@ -9,7 +9,7 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.cached_input import cached
 
-logger = logger.bind(name='regexp_parse')
+logger = logger.bind(name="regexp_parse")
 
 
 class RegexpParse:
@@ -65,68 +65,68 @@ class RegexpParse:
 
     # dict used to convert string values of regexp flags to int
     FLAG_VALUES = {
-        'DEBUG': re.DEBUG,
-        'I': re.IGNORECASE,
-        'IGNORECASE': re.IGNORECASE,
-        'L': re.LOCALE,
-        'LOCALE': re.LOCALE,
-        'M': re.MULTILINE,
-        'MULTILINE': re.MULTILINE,
-        'S': re.DOTALL,
-        'DOTALL': re.DOTALL,
-        'U': re.UNICODE,
-        'UNICODE': re.UNICODE,
-        'X': re.VERBOSE,
-        'VERBOSE': re.VERBOSE,
+        "DEBUG": re.DEBUG,
+        "I": re.IGNORECASE,
+        "IGNORECASE": re.IGNORECASE,
+        "L": re.LOCALE,
+        "LOCALE": re.LOCALE,
+        "M": re.MULTILINE,
+        "MULTILINE": re.MULTILINE,
+        "S": re.DOTALL,
+        "DOTALL": re.DOTALL,
+        "U": re.UNICODE,
+        "UNICODE": re.UNICODE,
+        "X": re.VERBOSE,
+        "VERBOSE": re.VERBOSE,
     }
 
-    FLAG_REGEX = r'^(\s?({})\s?(,|$))+$'.format('|'.join(FLAG_VALUES))
+    FLAG_REGEX = r"^(\s?({})\s?(,|$))+$".format("|".join(FLAG_VALUES))
 
     schema = {
-        '$defs': {
-            'regex_list': {
-                'type': 'array',
-                'items': {
-                    'type': 'object',
-                    'properties': {
-                        'regexp': {'type': 'string', 'format': 'regex'},
-                        'flags': {
-                            'type': 'string',
-                            'pattern': FLAG_REGEX,
-                            'error_pattern': 'Must be a comma separated list of flags. See python regex docs.',
+        "$defs": {
+            "regex_list": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "regexp": {"type": "string", "format": "regex"},
+                        "flags": {
+                            "type": "string",
+                            "pattern": FLAG_REGEX,
+                            "error_pattern": "Must be a comma separated list of flags. See python regex docs.",
                         },
                     },
-                    'required': ['regexp'],
-                    'additionalProperties': False,
+                    "required": ["regexp"],
+                    "additionalProperties": False,
                 },
             }
         },
-        'type': 'object',
-        'properties': {
-            'source': {
-                'anyOf': [
-                    {'type': 'string', 'format': 'url'},
-                    {'type': 'string', 'format': 'file'},
+        "type": "object",
+        "properties": {
+            "source": {
+                "anyOf": [
+                    {"type": "string", "format": "url"},
+                    {"type": "string", "format": "file"},
                 ]
             },
-            'encoding': {'type': 'string'},
-            'sections': {'$ref': '#/$defs/regex_list'},
-            'keys': {
-                'type': 'object',
-                'additionalProperties': {
-                    'type': 'object',
-                    'properties': {
-                        'required': {'type': 'boolean'},
-                        'regexps': {'$ref': '#/$defs/regex_list'},
+            "encoding": {"type": "string"},
+            "sections": {"$ref": "#/$defs/regex_list"},
+            "keys": {
+                "type": "object",
+                "additionalProperties": {
+                    "type": "object",
+                    "properties": {
+                        "required": {"type": "boolean"},
+                        "regexps": {"$ref": "#/$defs/regex_list"},
                     },
-                    'required': ['regexps'],
-                    'additionalProperties': False,
+                    "required": ["regexps"],
+                    "additionalProperties": False,
                 },
-                'required': ['title', 'url'],
+                "required": ["title", "url"],
             },
         },
-        'required': ['source', 'keys'],
-        'additionalProperties': False,
+        "required": ["source", "keys"],
+        "additionalProperties": False,
     }
 
     def __init__(self):
@@ -135,7 +135,7 @@ class RegexpParse:
     def flagstr_to_flags(self, flag_str):
         """Turn a comma seperated list of flags into the int value."""
         combind_flags = 0
-        split_flags = flag_str.split(',')
+        split_flags = flag_str.split(",")
         for flag in split_flags:
             combind_flags = combind_flags | RegexpParse.FLAG_VALUES[flag.strip()]
         return combind_flags
@@ -145,9 +145,9 @@ class RegexpParse:
         compiled_regexps = []
         for dic in re_list:
             flags = 0
-            if 'flags' in dic:
-                flags = self.flagstr_to_flags(dic['flags'])
-            compiled_regexps.append(re.compile(dic['regexp'], flags))
+            if "flags" in dic:
+                flags = self.flagstr_to_flags(dic["flags"])
+            compiled_regexps.append(re.compile(dic["regexp"], flags))
         return compiled_regexps
 
     def isvalid(self, entry):
@@ -157,15 +157,15 @@ class RegexpParse:
                 return False
         return entry.isvalid()
 
-    @cached('regexp_parse')
+    @cached("regexp_parse")
     @plugin.internet(logger)
     def on_task_input(self, task, config):
-        url = config['source']
-        encoding = config.get('encoding')
+        url = config["source"]
+        encoding = config.get("encoding")
 
         # if it's a file open it and read into content (assume utf-8 encoding)
         if os.path.isfile(os.path.expanduser(url)):
-            with codecs.open(url, 'r', encoding=encoding or 'utf-8') as u:
+            with codecs.open(url, "r", encoding=encoding or "utf-8") as u:
                 content = u.read()
         # else use requests to get the data
         else:
@@ -175,13 +175,13 @@ class RegexpParse:
             content = resp.text
 
         sections = []
-        seperators = config.get('sections')
+        seperators = config.get("sections")
         if seperators:
             for sep in seperators:
                 flags = 0
-                if 'flags' in sep:
-                    flags = self.flagstr_to_flags(sep['flags'])
-                sections.extend(re.findall(sep['regexp'], content, flags))
+                if "flags" in sep:
+                    flags = self.flagstr_to_flags(sep["flags"])
+                sections.extend(re.findall(sep["regexp"], content, flags))
 
         # no seperators just do work on the whole content
         else:
@@ -191,9 +191,9 @@ class RegexpParse:
         key_to_regexps = {}
 
         # put every key in keys into the rey_to_regexps list
-        for key, value in config['keys'].items():
-            key_to_regexps[key] = self.compile_regexp_dict_list(value['regexps'])
-            if value.get('required'):
+        for key, value in config["keys"].items():
+            key_to_regexps[key] = self.compile_regexp_dict_list(value["regexps"])
+            if value.get("required"):
                 self.required.append(key)
 
         entries = []
@@ -211,6 +211,6 @@ class RegexpParse:
         return entries
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(RegexpParse, 'regexp_parse', api_ver=2)
+    plugin.register(RegexpParse, "regexp_parse", api_ver=2)

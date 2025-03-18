@@ -10,12 +10,12 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.manager import Session
 
-logger = logger.bind(name='tail')
-Base = versioned_base('tail', 0)
+logger = logger.bind(name="tail")
+Base = versioned_base("tail", 0)
 
 
 class TailPosition(Base):
-    __tablename__ = 'tail'
+    __tablename__ = "tail"
     id = Column(Integer, primary_key=True)
     task = Column(Unicode)
     filename = Column(Unicode)
@@ -50,22 +50,22 @@ class InputTail:
     """
 
     schema = {
-        'type': 'object',
-        'properties': {
-            'file': {'type': 'string', 'format': 'file'},
-            'encoding': {'type': 'string'},
-            'entry': {
-                'type': 'object',
-                'properties': {
-                    'url': {'type': 'string', 'format': 'regex'},
-                    'title': {'type': 'string', 'format': 'regex'},
+        "type": "object",
+        "properties": {
+            "file": {"type": "string", "format": "file"},
+            "encoding": {"type": "string"},
+            "entry": {
+                "type": "object",
+                "properties": {
+                    "url": {"type": "string", "format": "regex"},
+                    "title": {"type": "string", "format": "regex"},
                 },
-                'required': ['url', 'title'],
+                "required": ["url", "title"],
             },
-            'format': {'type': 'object', 'additionalProperties': {'type': 'string'}},
+            "format": {"type": "object", "additionalProperties": {"type": "string"}},
         },
-        'required': ['file', 'entry'],
-        'additionalProperties': False,
+        "required": ["file", "entry"],
+        "additionalProperties": False,
     }
 
     def format_entry(self, entry, d):
@@ -76,8 +76,8 @@ class InputTail:
         # Let details plugin know that it is ok if this task doesn't produce any entries
         task.no_entries_ok = True
 
-        filename = os.path.expanduser(config['file'])
-        encoding = config.get('encoding', 'utf-8')
+        filename = os.path.expanduser(config["file"])
+        encoding = config.get("encoding", "utf-8")
         with Session() as session:
             db_pos = (
                 session.query(TailPosition)
@@ -87,28 +87,28 @@ class InputTail:
             )
             last_pos = db_pos.position if db_pos else 0
 
-            with open(filename, encoding=encoding, errors='replace') as file:
+            with open(filename, encoding=encoding, errors="replace") as file:
                 if task.options.tail_reset in (filename, task.name):
                     if last_pos == 0:
-                        logger.info('Task {} tail position is already zero', task.name)
+                        logger.info("Task {} tail position is already zero", task.name)
                     else:
                         logger.info(
-                            'Task {} tail position ({}) reset to zero', task.name, last_pos
+                            "Task {} tail position ({}) reset to zero", task.name, last_pos
                         )
                         last_pos = 0
 
                 if os.path.getsize(filename) < last_pos:
                     logger.info(
-                        'File size is smaller than in previous execution, resetting to beginning of the file'
+                        "File size is smaller than in previous execution, resetting to beginning of the file"
                     )
                     last_pos = 0
 
                 file.seek(last_pos)
 
-                logger.debug('continuing from last position {}', last_pos)
+                logger.debug("continuing from last position {}", last_pos)
 
-                entry_config = config.get('entry')
-                format_config = config.get('format', {})
+                entry_config = config.get("entry")
+                format_config = config.get("format", {})
 
                 # keep track what fields have been found
                 used = {}
@@ -129,14 +129,14 @@ class InputTail:
                             if field in used:
                                 if entry.isvalid():
                                     logger.info(
-                                        'Found field {} again before entry was completed. Adding current incomplete, but valid entry and moving to next.',
+                                        "Found field {} again before entry was completed. Adding current incomplete, but valid entry and moving to next.",
                                         field,
                                     )
                                     self.format_entry(entry, format_config)
                                     entries.append(entry)
                                 else:
                                     logger.info(
-                                        'Invalid data, entry field {} is already found once. Ignoring entry.',
+                                        "Invalid data, entry field {} is already found once. Ignoring entry.",
                                         field,
                                     )
                                 # start new entry
@@ -146,19 +146,19 @@ class InputTail:
                             # add field to entry
                             entry[field] = match.group(1)
                             used[field] = True
-                            logger.debug('found field: {} value: {}', field, entry[field])
+                            logger.debug("found field: {} value: {}", field, entry[field])
 
                         # if all fields have been found
                         if len(used) == len(entry_config):
                             # check that entry has at least title and url
                             if not entry.isvalid():
                                 logger.info(
-                                    'Invalid data, constructed entry is missing mandatory fields (title or url)'
+                                    "Invalid data, constructed entry is missing mandatory fields (title or url)"
                                 )
                             else:
                                 self.format_entry(entry, format_config)
                                 entries.append(entry)
-                                logger.debug('Added entry {}', entry)
+                                logger.debug("Added entry {}", entry)
                                 # start new entry
                                 entry = Entry()
                                 used = {}
@@ -170,18 +170,18 @@ class InputTail:
         return entries
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(InputTail, 'tail', api_ver=2)
+    plugin.register(InputTail, "tail", api_ver=2)
 
 
-@event('options.register')
+@event("options.register")
 def register_parser_arguments():
-    options.get_parser('execute').add_argument(
-        '--tail-reset',
-        action='store',
-        dest='tail_reset',
+    options.get_parser("execute").add_argument(
+        "--tail-reset",
+        action="store",
+        dest="tail_reset",
         default=False,
-        metavar='FILE|TASK',
-        help='reset tail position for a file',
+        metavar="FILE|TASK",
+        help="reset tail position for a file",
     )

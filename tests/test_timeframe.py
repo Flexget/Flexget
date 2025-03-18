@@ -7,7 +7,7 @@ from flexget.plugins.filter.timeframe import EntryTimeFrame
 def age_timeframe(**kwargs):
     with Session() as session:
         session.query(EntryTimeFrame).update(
-            {'first_seen': datetime.datetime.now() - datetime.timedelta(**kwargs)}
+            {"first_seen": datetime.datetime.now() - datetime.timedelta(**kwargs)}
         )
 
 
@@ -50,40 +50,40 @@ class TestTimeFrame:
     """
 
     def test_wait(self, execute_task):
-        task = execute_task('wait')
+        task = execute_task("wait")
         with Session() as session:
             query = session.query(EntryTimeFrame).all()
-            assert len(query) == 1, 'There should be one tracked entity present.'
-            assert query[0].id == 'movie', 'Should have tracked name `Movie`.'
+            assert len(query) == 1, "There should be one tracked entity present."
+            assert query[0].id == "movie", "Should have tracked name `Movie`."
 
-        entry = task.find_entry('rejected', title='Movie.BRRip.x264.720p')
-        assert entry, 'Movie.BRRip.x264.720p should be rejected'
-        entry = task.find_entry('rejected', title='Movie.720p WEB-DL X264 AC3')
-        assert entry, 'Movie.720p WEB-DL X264 AC3 should be rejected'
+        entry = task.find_entry("rejected", title="Movie.BRRip.x264.720p")
+        assert entry, "Movie.BRRip.x264.720p should be rejected"
+        entry = task.find_entry("rejected", title="Movie.720p WEB-DL X264 AC3")
+        assert entry, "Movie.720p WEB-DL X264 AC3 should be rejected"
 
     def test_reached_and_backlog(self, manager, execute_task):
-        execute_task('reached_and_backlog')
+        execute_task("reached_and_backlog")
         age_timeframe(hours=1)
 
         # simulate movie going away from the task/feed
-        del manager.config['tasks']['reached_and_backlog']['mock']
+        del manager.config["tasks"]["reached_and_backlog"]["mock"]
 
-        task = execute_task('reached_and_backlog')
-        entry = task.find_entry('accepted', title='Movie.BRRip.x264.720p')
-        assert entry, 'Movie.BRRip.x264.720p should be accepted, backlog not injecting'
+        task = execute_task("reached_and_backlog")
+        entry = task.find_entry("accepted", title="Movie.BRRip.x264.720p")
+        assert entry, "Movie.BRRip.x264.720p should be accepted, backlog not injecting"
 
     def test_target(self, execute_task):
-        execute_task('target1')
-        task = execute_task('target2')
-        entry = task.find_entry('accepted', title='Movie.1080p WEB-DL X264 AC3')
-        assert entry, 'Movie.1080p WEB-DL X264 AC3 should be undecided'
+        execute_task("target1")
+        task = execute_task("target2")
+        entry = task.find_entry("accepted", title="Movie.1080p WEB-DL X264 AC3")
+        assert entry, "Movie.1080p WEB-DL X264 AC3 should be undecided"
 
     def test_learn(self, execute_task):
-        execute_task('target2')
+        execute_task("target2")
         with Session() as session:
             query = session.query(EntryTimeFrame).all()
-            assert len(query) == 1, 'There should be one tracked entity present.'
-            assert query[0].status == 'accepted', 'Should be accepted.'
+            assert len(query) == 1, "There should be one tracked entity present."
+            assert query[0].status == "accepted", "Should be accepted."
 
 
 class TestTimeFrameActions:
@@ -111,15 +111,15 @@ class TestTimeFrameActions:
     """
 
     def test_on_reject(self, execute_task):
-        task = execute_task('wait_reject')
-        entry = task.find_entry('rejected', title='Movie.BRRip.x264.720p')
-        assert entry, 'Movie.BRRip.x264.720p should be rejected'
-        entry = task.find_entry('rejected', title='Movie.720p WEB-DL X264 AC3')
-        assert entry, 'Movie.720p WEB-DL X264 AC3 should be rejected'
+        task = execute_task("wait_reject")
+        entry = task.find_entry("rejected", title="Movie.BRRip.x264.720p")
+        assert entry, "Movie.BRRip.x264.720p should be rejected"
+        entry = task.find_entry("rejected", title="Movie.720p WEB-DL X264 AC3")
+        assert entry, "Movie.720p WEB-DL X264 AC3 should be rejected"
 
     def test_on_reached(self, manager, execute_task):
-        execute_task('reached_accept')
+        execute_task("reached_accept")
         age_timeframe(hours=1)
-        task = execute_task('reached_accept')
-        entry = task.find_entry('accepted', title='Movie.BRRip.x264.720p')
-        assert entry, 'Movie.BRRip.x264.720p should be undecided, backlog not injecting'
+        task = execute_task("reached_accept")
+        entry = task.find_entry("accepted", title="Movie.BRRip.x264.720p")
+        assert entry, "Movie.BRRip.x264.720p should be undecided, backlog not injecting"

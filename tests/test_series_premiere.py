@@ -2,10 +2,10 @@ import pytest
 from jinja2 import Template
 
 
-@pytest.fixture(scope='class', params=['internal', 'guessit'], ids=['internal', 'guessit'])
+@pytest.fixture(scope="class", params=["internal", "guessit"], ids=["internal", "guessit"])
 def config(request):
     """Override and parametrize default config fixture for all series tests."""
-    return Template(request.cls.config).render({'parser': request.param})
+    return Template(request.cls.config).render({"parser": request.param})
 
 
 class TestSeriesPremiere:
@@ -87,51 +87,51 @@ class TestSeriesPremiere:
     """
 
     def test_only_one(self, execute_task):
-        task = execute_task('test_only_one')
-        assert len(task.accepted) == 1, 'should only have accepted one'
+        task = execute_task("test_only_one")
+        assert len(task.accepted) == 1, "should only have accepted one"
         assert not task.find_entry(
-            'accepted', title='Foos and Bars 2009 S01E02 HDTV Xvid-2HD[AOEU]'
-        ), 'Non premiere accepted'
+            "accepted", title="Foos and Bars 2009 S01E02 HDTV Xvid-2HD[AOEU]"
+        ), "Non premiere accepted"
 
     def test_dupes_across_tasks(self, execute_task):
-        task = execute_task('test_dupes_across_tasks_1')
-        assert len(task.accepted) == 1, 'didn\'t accept first premiere'
-        task = execute_task('test_dupes_across_tasks_2')
-        assert len(task.accepted) == 0, 'accepted duplicate premiere'
+        task = execute_task("test_dupes_across_tasks_1")
+        assert len(task.accepted) == 1, "didn't accept first premiere"
+        task = execute_task("test_dupes_across_tasks_2")
+        assert len(task.accepted) == 0, "accepted duplicate premiere"
 
     def test_path_set(self, execute_task):
-        task = execute_task('test_path_set')
-        assert task.find_entry(title='foo bar s01e01 hdtv', path='.')
+        task = execute_task("test_path_set")
+        assert task.find_entry(title="foo bar s01e01 hdtv", path=".")
 
     def test_pilot_and_premiere(self, execute_task):
-        task = execute_task('test_pilot_and_premiere')
-        assert len(task.accepted) == 2, 'should have accepted pilot and premiere'
+        task = execute_task("test_pilot_and_premiere")
+        assert len(task.accepted) == 2, "should have accepted pilot and premiere"
 
     def test_no_teasers(self, execute_task):
-        task = execute_task('test_no_teasers')
-        assert len(task.accepted) == 1, 'should have accepted only premiere'
-        assert not task.find_entry('accepted', title='foo bar s01e00 hdtv')
+        task = execute_task("test_no_teasers")
+        assert len(task.accepted) == 1, "should have accepted only premiere"
+        assert not task.find_entry("accepted", title="foo bar s01e00 hdtv")
 
     def test_multi_episode(self, execute_task):
-        task = execute_task('test_multi_episode')
-        assert len(task.accepted) == 1, 'should have accepted multi-episode premiere'
+        task = execute_task("test_multi_episode")
+        assert len(task.accepted) == 1, "should have accepted multi-episode premiere"
 
     def test_rerun(self, execute_task):
-        task = execute_task('test_rerun')
-        assert not task.find_entry('accepted', title='theshow s01e02'), 'accepted non-premiere'
+        task = execute_task("test_rerun")
+        assert not task.find_entry("accepted", title="theshow s01e02"), "accepted non-premiere"
 
     def test_no_rerun_with_series(self, execute_task):
-        task = execute_task('test_no_rerun_with_series')
-        assert task.find_entry('accepted', title='theshow s01e02'), 'should be accepted by series'
+        task = execute_task("test_no_rerun_with_series")
+        assert task.find_entry("accepted", title="theshow s01e02"), "should be accepted by series"
 
     def test_no_rerun(self, execute_task):
-        task = execute_task('test_no_rerun')
-        assert not task.find_entry('accepted', title='theshow s01e02'), 'accepted non-premiere'
+        task = execute_task("test_no_rerun")
+        assert not task.find_entry("accepted", title="theshow s01e02"), "accepted non-premiere"
 
     def test_no_configured_shows(self, execute_task):
-        task = execute_task('test_no_configured_1')
-        task = execute_task('test_no_configured_2')
-        entry = task.find_entry(title='explicit show s01e01')
+        task = execute_task("test_no_configured_1")
+        task = execute_task("test_no_configured_2")
+        entry = task.find_entry(title="explicit show s01e01")
         assert not entry.accepted
-        entry = task.find_entry(title='other show s01e01')
+        entry = task.find_entry(title="other show s01e01")
         assert entry.accepted

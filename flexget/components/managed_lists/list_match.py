@@ -4,49 +4,49 @@ from flexget import plugin
 from flexget.event import event
 from flexget.plugin import PluginError
 
-logger = logger.bind(name='list_match')
+logger = logger.bind(name="list_match")
 
 
 class ListMatch:
     schema = {
-        'type': 'object',
-        'properties': {
-            'from': {
-                'type': 'array',
-                'items': {
-                    'allOf': [
-                        {'$ref': '/schema/plugins?interface=list'},
+        "type": "object",
+        "properties": {
+            "from": {
+                "type": "array",
+                "items": {
+                    "allOf": [
+                        {"$ref": "/schema/plugins?interface=list"},
                         {
-                            'maxProperties': 1,
-                            'error_maxProperties': 'Plugin options within list_match plugin must be indented '
-                            '2 more spaces than the first letter of the plugin name.',
-                            'minProperties': 1,
+                            "maxProperties": 1,
+                            "error_maxProperties": "Plugin options within list_match plugin must be indented "
+                            "2 more spaces than the first letter of the plugin name.",
+                            "minProperties": 1,
                         },
                     ]
                 },
             },
-            'action': {'type': 'string', 'enum': ['accept', 'reject'], 'default': 'accept'},
-            'remove_on_match': {'type': 'boolean', 'default': True},
-            'single_match': {'type': 'boolean', 'default': True},
+            "action": {"type": "string", "enum": ["accept", "reject"], "default": "accept"},
+            "remove_on_match": {"type": "boolean", "default": True},
+            "single_match": {"type": "boolean", "default": True},
         },
-        'additionalProperties': False,
+        "additionalProperties": False,
     }
 
     @plugin.priority(0)
     def on_task_filter(self, task, config):
-        for item in config['from']:
+        for item in config["from"]:
             for plugin_name, plugin_config in item.items():
                 try:
                     thelist = plugin.get(plugin_name, self).get_list(plugin_config)
                 except AttributeError:
-                    raise PluginError(f'Plugin {plugin_name} does not support list interface')
+                    raise PluginError(f"Plugin {plugin_name} does not support list interface")
                 already_accepted = []
                 for entry in task.entries:
                     result = thelist.get(entry)
                     if not result:
                         continue
-                    if config['action'] == 'accept':
-                        if config['single_match']:
+                    if config["action"] == "accept":
+                        if config["single_match"]:
                             if result not in already_accepted:
                                 already_accepted.append(result)
                                 # Add all new result data to entry
@@ -56,30 +56,30 @@ class ListMatch:
                                 entry.accept()
                         else:
                             entry.accept()
-                    elif config['action'] == 'reject':
+                    elif config["action"] == "reject":
                         entry.reject()
 
     def on_task_learn(self, task, config):
-        if not config['remove_on_match'] or not len(task.accepted) > 0:
+        if not config["remove_on_match"] or not len(task.accepted) > 0:
             return
-        for item in config['from']:
+        for item in config["from"]:
             for plugin_name, plugin_config in item.items():
                 try:
                     thelist = plugin.get(plugin_name, self).get_list(plugin_config)
                 except AttributeError:
-                    raise PluginError(f'Plugin {plugin_name} does not support list interface')
+                    raise PluginError(f"Plugin {plugin_name} does not support list interface")
                 if task.manager.options.test and thelist.online:
                     logger.info(
-                        '`{}` is marked as online, would remove accepted items outside of --test mode.',
+                        "`{}` is marked as online, would remove accepted items outside of --test mode.",
                         plugin_name,
                     )
                     continue
                 logger.verbose(
-                    'removing accepted entries from {} - {}', plugin_name, plugin_config
+                    "removing accepted entries from {} - {}", plugin_name, plugin_config
                 )
                 thelist -= task.accepted
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(ListMatch, 'list_match', api_ver=2)
+    plugin.register(ListMatch, "list_match", api_ver=2)

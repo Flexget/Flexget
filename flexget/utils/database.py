@@ -22,10 +22,10 @@ def with_session(*args, **kwargs):
 
     def decorator(func):
         def wrapper(*args, **kwargs):
-            if kwargs.get('session'):
+            if kwargs.get("session"):
                 return func(*args, **kwargs)
             with _Session() as session:
-                kwargs['session'] = session
+                kwargs["session"] = session
                 return func(*args, **kwargs)
 
         return wrapper
@@ -46,14 +46,14 @@ def pipe_list_synonym(name: str) -> SynonymProperty:
     def getter(self) -> Optional[list[str]]:
         attr = getattr(self, name)
         if attr:
-            return attr.strip('|').split('|')
+            return attr.strip("|").split("|")
         return None
 
     def setter(self, value: Union[str, list[str]]) -> None:
         if isinstance(value, str):
             setattr(self, name, value)
         else:
-            setattr(self, name, '|'.join(value))
+            setattr(self, name, "|".join(value))
 
     return synonym(name, descriptor=property(getter, setter))
 
@@ -67,7 +67,7 @@ def text_date_synonym(name: str) -> SynonymProperty:
     def setter(self, value: Union[str, datetime]) -> None:
         if isinstance(value, str):
             try:
-                setattr(self, name, datetime.strptime(value, '%Y-%m-%d'))
+                setattr(self, name, datetime.strptime(value, "%Y-%m-%d"))
             except ValueError:
                 # Invalid date string given, set to None
                 setattr(self, name, None)
@@ -85,7 +85,7 @@ def entry_synonym(name: str) -> SynonymProperty:
 
     def setter(self, entry: Union[dict, Entry]) -> None:
         if isinstance(entry, dict):
-            if entry.get('serializer') == 'Entry' and 'version' in entry and 'value' in entry:
+            if entry.get("serializer") == "Entry" and "version" in entry and "value" in entry:
                 # This is already a serialized form of entry
                 setattr(self, name, json.dumps(entry))
                 return
@@ -93,7 +93,7 @@ def entry_synonym(name: str) -> SynonymProperty:
         if isinstance(entry, Entry):
             setattr(self, name, serialization.dumps(entry))
         else:
-            raise TypeError(f'{type(entry)!r} is not type Entry or dict.')
+            raise TypeError(f"{type(entry)!r} is not type Entry or dict.")
 
     return synonym(name, descriptor=property(getter, setter))
 
@@ -113,7 +113,7 @@ def json_synonym(name: str) -> SynonymProperty:
 class CaseInsensitiveWord(Comparator):
     """Hybrid value representing a string that compares case insensitively."""
 
-    def __init__(self, word: Union[str, 'CaseInsensitiveWord']):
+    def __init__(self, word: Union[str, "CaseInsensitiveWord"]):
         if isinstance(word, CaseInsensitiveWord):
             self.word: str = word.word
         else:
@@ -192,6 +192,6 @@ def year_property(date_attr):
         return date and date.year
 
     def expr(cls):
-        return extract('year', getattr(cls, date_attr))
+        return extract("year", getattr(cls, date_attr))
 
     return hybrid_property(getter, expr=expr)

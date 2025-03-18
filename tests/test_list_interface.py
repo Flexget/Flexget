@@ -163,163 +163,163 @@ class TestListInterface:
     """
 
     def test_list_add(self, execute_task):
-        task = execute_task('test_list_add')
+        task = execute_task("test_list_add")
         assert len(task.entries) == 2
 
-        task = execute_task('list_get')
+        task = execute_task("list_get")
         assert len(task.entries) == 2
 
     def test_multiple_list_add(self, execute_task):
-        task = execute_task('test_multiple_list_add')
+        task = execute_task("test_multiple_list_add")
         assert len(task.entries) == 2
 
-        task = execute_task('list_1_get')
+        task = execute_task("list_1_get")
         assert len(task.entries) == 2
 
-        task = execute_task('list_2_get')
+        task = execute_task("list_2_get")
         assert len(task.entries) == 2
 
     def test_list_accept_with_remove(self, execute_task):
-        task = execute_task('test_list_add')
+        task = execute_task("test_list_add")
         assert len(task.entries) == 2
 
-        task = execute_task('list_get')
+        task = execute_task("list_get")
         assert len(task.entries) == 2
 
-        task = execute_task('test_list_accept_with_remove')
+        task = execute_task("test_list_accept_with_remove")
         assert len(task.all_entries) == 3
         assert len(task.accepted) == 2
 
-        task = execute_task('list_get')
+        task = execute_task("list_get")
         assert len(task.entries) == 0
 
     def test_list_accept_without_remove(self, execute_task):
-        task = execute_task('test_list_add')
+        task = execute_task("test_list_add")
         assert len(task.entries) == 2
 
-        task = execute_task('list_get')
+        task = execute_task("list_get")
         assert len(task.entries) == 2
 
-        task = execute_task('test_list_accept_without_remove')
+        task = execute_task("test_list_accept_without_remove")
         assert len(task.all_entries) == 3
         assert len(task.accepted) == 2
 
-        task = execute_task('list_get')
+        task = execute_task("list_get")
         assert len(task.entries) == 2
 
     def test_multiple_list_accept_with_remove(self, execute_task):
-        task = execute_task('list_1_add')
+        task = execute_task("list_1_add")
         assert len(task.entries) == 2
 
-        task = execute_task('list_2_add')
+        task = execute_task("list_2_add")
         assert len(task.entries) == 1
 
-        task = execute_task('list_1_get')
+        task = execute_task("list_1_get")
         assert len(task.entries) == 2
 
-        task = execute_task('list_2_get')
+        task = execute_task("list_2_get")
         assert len(task.entries) == 1
 
-        task = execute_task('test_multiple_list_accept_with_remove')
+        task = execute_task("test_multiple_list_accept_with_remove")
         assert len(task.accepted) == 3
 
-        task = execute_task('list_1_get')
+        task = execute_task("list_1_get")
         assert len(task.entries) == 0
 
-        task = execute_task('list_2_get')
+        task = execute_task("list_2_get")
         assert len(task.entries) == 0
 
     def test_multiple_list_accept_without_remove(self, execute_task):
-        task = execute_task('list_1_add')
+        task = execute_task("list_1_add")
         assert len(task.entries) == 2
 
-        task = execute_task('list_2_add')
+        task = execute_task("list_2_add")
         assert len(task.entries) == 1
 
-        task = execute_task('list_1_get')
+        task = execute_task("list_1_get")
         assert len(task.entries) == 2
 
-        task = execute_task('list_2_get')
+        task = execute_task("list_2_get")
         assert len(task.entries) == 1
 
-        task = execute_task('test_multiple_list_accept_without_remove')
+        task = execute_task("test_multiple_list_accept_without_remove")
         assert len(task.accepted) == 3
 
-        task = execute_task('list_1_get')
+        task = execute_task("list_1_get")
         assert len(task.entries) == 2
 
-        task = execute_task('list_2_get')
+        task = execute_task("list_2_get")
         assert len(task.entries) == 1
 
     def test_list_remove(self, execute_task):
-        task = execute_task('test_list_add')
+        task = execute_task("test_list_add")
         assert len(task.entries) == 2
 
-        task = execute_task('list_get')
+        task = execute_task("list_get")
         assert len(task.entries) == 2
 
-        task = execute_task('test_list_remove')
+        task = execute_task("test_list_remove")
         assert len(task.accepted) == 1
 
-        task = execute_task('list_get')
+        task = execute_task("list_get")
         assert len(task.entries) == 1
 
     def test_list_reject(self, execute_task):
-        task = execute_task('test_list_add')
+        task = execute_task("test_list_add")
         assert len(task.entries) == 2
 
-        task = execute_task('list_get')
+        task = execute_task("list_get")
         assert len(task.entries) == 2
 
-        task = execute_task('test_list_reject')
+        task = execute_task("test_list_reject")
         assert len(task.rejected) == 1
 
     def test_list_queue(self, execute_task):
         # List queue test is based off movie_list and not entry_list since it entry_list matching is a
         # lot more strict so it doesn't make sense to use it with it
-        task = execute_task('add_for_list_queue')
+        task = execute_task("add_for_list_queue")
         assert len(task.entries) == 2
 
-        task = execute_task('test_list_queue')
+        task = execute_task("test_list_queue")
         assert len(task.accepted) == 1
 
         assert task.find_entry(title="Drumline 2002 1080p BluRay DTS-HD MA 5 1 x264-FuzerHD")
 
-        task = execute_task('get_for_list_queue')
+        task = execute_task("get_for_list_queue")
         assert len(task.entries) == 1
 
     def test_list_clear_start(self, execute_task):
-        task = execute_task('test_list_add')
+        task = execute_task("test_list_add")
         assert len(task.entries) == 2
 
-        task = execute_task('test_list_clear_start')
+        task = execute_task("test_list_clear_start")
         assert len(task.entries) == 0
 
     def test_list_clear_exit(self, execute_task):
-        task = execute_task('test_list_add')
+        task = execute_task("test_list_add")
         assert len(task.entries) == 2
 
-        task = execute_task('test_list_clear_exit')
+        task = execute_task("test_list_clear_exit")
         assert len(task.entries) == 2
 
-        task = execute_task('list_get')
+        task = execute_task("list_get")
         assert len(task.entries) == 0
 
     def test_list_clear_input(self, execute_task):
-        task = execute_task('test_list_add')
+        task = execute_task("test_list_add")
         assert len(task.entries) == 2
 
-        task = execute_task('test_list_clear_input')
+        task = execute_task("test_list_clear_input")
         assert len(task.entries) == 0
 
     def test_entries_attributes_merge(self, execute_task):
-        task = execute_task('test_list_add_with_attribute')
+        task = execute_task("test_list_add_with_attribute")
         assert len(task.entries) == 1
 
-        task = execute_task('test_entries_attributes_merge')
+        task = execute_task("test_entries_attributes_merge")
         assert len(task.all_entries) == 1
         assert len(task.accepted) == 1
 
         entry = task.find_entry(title="title 1")
         assert entry
-        assert entry['attribute_name'] == 'some data'
+        assert entry["attribute_name"] == "some data"

@@ -32,7 +32,7 @@ from flexget.utils.simple_persistence import SimpleTaskPersistence
 from flexget.utils.template import FlexGetTemplate, render_from_task
 from flexget.utils.tools import MergeException, get_config_hash, merge_dict_from_to
 
-logger = logger.bind(name='task')
+logger = logger.bind(name="task")
 
 if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator
@@ -42,24 +42,24 @@ if TYPE_CHECKING:
 
     Base = VersionedBaseMeta
 else:
-    Base = db_schema.versioned_base('feed', 0)
+    Base = db_schema.versioned_base("feed", 0)
 
 
 class TaskConfigHash(Base):
     """Stores the config hash for tasks so that we can tell if the config has changed since last run."""
 
-    __tablename__ = 'feed_config_hash'
+    __tablename__ = "feed_config_hash"
 
     id = Column(Integer, primary_key=True)
-    task = Column('name', Unicode, index=True, nullable=False)
-    hash = Column('hash', String)
+    task = Column("name", Unicode, index=True, nullable=False)
+    hash = Column("hash", String)
 
     def __repr__(self) -> str:
-        return f'<TaskConfigHash(task={self.task},hash={self.hash})>'
+        return f"<TaskConfigHash(task={self.task},hash={self.hash})>"
 
 
 @with_session
-def config_changed(task: Optional[str] = None, session: 'ContextSession' = None) -> None:
+def config_changed(task: Optional[str] = None, session: "ContextSession" = None) -> None:
     """Force config_modified flag to come out true on next run of `task`.
 
     Used when the db changes, and all entries need to be reprocessed.
@@ -69,7 +69,7 @@ def config_changed(task: Optional[str] = None, session: 'ContextSession' = None)
     :param task: Name of the task. If `None`, will be set for all tasks.
     :param session: sqlalchemy Session instance
     """
-    logger.debug('Marking config for {} as changed.', (task or 'all tasks'))
+    logger.debug("Marking config for {} as changed.", (task or "all tasks"))
     task_hash = session.query(TaskConfigHash)
     if task:
         task_hash = task_hash.filter(TaskConfigHash.task == task)
@@ -95,13 +95,13 @@ def use_task_logging(func):
 class EntryIterator:
     """An iterator over a subset of entries to emulate old task.accepted/rejected/failed/entries properties."""
 
-    def __init__(self, entries: list[Entry], states: Union[EntryState, 'Iterable[EntryState]']):
+    def __init__(self, entries: list[Entry], states: Union[EntryState, "Iterable[EntryState]"]):
         self.all_entries = entries
         if isinstance(states, EntryState):
             states = [states]
         self.filter = lambda e: e._state in states
 
-    def __iter__(self) -> 'Iterator[Entry]':
+    def __iter__(self) -> "Iterator[Entry]":
         return filter(self.filter, self.all_entries)
 
     def __bool__(self):
@@ -116,15 +116,15 @@ class EntryIterator:
     def __radd__(self, other):
         return itertools.chain(other, self)
 
-    def __getitem__(self, item) -> Union[Entry, 'Iterable[Entry]']:
+    def __getitem__(self, item) -> Union[Entry, "Iterable[Entry]"]:
         if isinstance(item, slice):
             return list(itertools.islice(self, item.start, item.stop))
         if not isinstance(item, int):
-            raise TypeError('Index must be integer.')
+            raise TypeError("Index must be integer.")
         for index, entry in enumerate(self):
             if index == item:
                 return entry
-        raise IndexError(f'{item} is out of bounds')
+        raise IndexError(f"{item} is out of bounds")
 
     def reverse(self):
         self.all_entries.sort(reverse=True)
@@ -157,7 +157,7 @@ class EntryContainer(list):
     undecided: EntryIterator = property(lambda self: self._undecided)
 
     def __repr__(self) -> str:
-        return f'<EntryContainer({list.__repr__(self)})>'
+        return f"<EntryContainer({list.__repr__(self)})>"
 
 
 class TaskAbort(Exception):
@@ -166,7 +166,7 @@ class TaskAbort(Exception):
         self.silent = silent
 
     def __repr__(self):
-        return f'TaskAbort(reason={self.reason}, silent={self.silent})'
+        return f"TaskAbort(reason={self.reason}, silent={self.silent})"
 
 
 @total_ordering
@@ -231,10 +231,10 @@ class Task:
 
         """
         self.name = str(name)
-        self.id = ''.join(random.choice(string.digits) for _ in range(6))
+        self.id = "".join(random.choice(string.digits) for _ in range(6))
         self.manager = manager
         if config is None:
-            config = manager.config['tasks'].get(name, {})
+            config = manager.config["tasks"].get(name, {})
         self.config = copy.deepcopy(config)
         self.prepared_config = None
         if options is None:
@@ -244,7 +244,7 @@ class Task:
             options_namespace.__dict__.update(options)
             options = options_namespace
         # If execution hasn't specifically set the `allow_manual` flag, set it to False by default
-        if not hasattr(options, 'allow_manual'):
+        if not hasattr(options, "allow_manual"):
             options.allow_manual = False
         self.options = options
         self.output = output
@@ -268,7 +268,7 @@ class Task:
 
         self.config_modified = None
 
-        self.enabled = not self.name.startswith('_')
+        self.enabled = not self.name.startswith("_")
 
         # These are just to query what happened in task. Call task.abort to set.
         self.aborted = False
@@ -302,16 +302,16 @@ class Task:
         if not self._reruns_locked:
             self._max_reruns = value
         else:
-            logger.debug('max_reruns is locked, {} tried to modify it', self.current_plugin)
+            logger.debug("max_reruns is locked, {} tried to modify it", self.current_plugin)
 
     def lock_reruns(self):
         """Prevent modification of max_reruns property."""
-        logger.debug('Enabling rerun lock')
+        logger.debug("Enabling rerun lock")
         self._reruns_locked = True
 
     def unlock_reruns(self):
         """Allow modification of max_reruns property."""
-        logger.debug('Releasing rerun lock')
+        logger.debug("Releasing rerun lock")
         self._reruns_locked = False
 
     @property
@@ -376,7 +376,7 @@ class Task:
         return (self.priority, self._count) == (other.priority, other._count)
 
     def __str__(self):
-        return f'<Task(name={self.name},aborted={self.aborted})>'
+        return f"<Task(name={self.name},aborted={self.aborted})>"
 
     def disable_phase(self, phase):
         """Disable ``phase`` from execution.
@@ -385,9 +385,9 @@ class Task:
         :raises ValueError: *phase* could not be found.
         """
         if phase not in task_phases:
-            raise ValueError(f'{phase} is not a valid phase')
+            raise ValueError(f"{phase} is not a valid phase")
         if phase not in self.disabled_phases:
-            logger.debug('Disabling {} phase', phase)
+            logger.debug("Disabling {} phase", phase)
             self.disabled_phases.append(phase)
 
     def disable_plugin(self, plugin):
@@ -397,22 +397,22 @@ class Task:
         :raises ValueError: *plugin* could not be found.
         """
         if plugin not in all_plugins:
-            raise ValueError(f'`{plugin}` is not a valid plugin.')
+            raise ValueError(f"`{plugin}` is not a valid plugin.")
         self.disabled_plugins.append(plugin)
 
-    def abort(self, reason='Unknown', silent=False, traceback: Optional[str] = None):
+    def abort(self, reason="Unknown", silent=False, traceback: Optional[str] = None):
         """Abort this task execution, no more plugins will be executed except the abort handling ones."""
         self.aborted = True
         self.abort_reason = reason
         self.silent_abort = silent
         self.traceback = traceback
         if not self.silent_abort:
-            logger.warning('Aborting task (plugin: {})', self.current_plugin)
+            logger.warning("Aborting task (plugin: {})", self.current_plugin)
         else:
-            logger.debug('Aborting task (plugin: {})', self.current_plugin)
+            logger.debug("Aborting task (plugin: {})", self.current_plugin)
         raise TaskAbort(reason, silent=silent)
 
-    def find_entry(self, category='entries', **values):
+    def find_entry(self, category="entries", **values):
         """Find and return :class:`~flexget.entry.Entry` with given attributes from task or None.
 
         :param string category: entries, accepted, rejected or failed. Defaults to entries.
@@ -421,7 +421,7 @@ class Task:
         """
         cat = getattr(self, category)
         if not isinstance(cat, EntryIterator):
-            raise TypeError('category must be a EntryIterator')
+            raise TypeError("category must be a EntryIterator")
         for entry in cat:
             for k, v in values.items():
                 if not (k in entry and entry[k] == v):
@@ -457,23 +457,23 @@ class Task:
         :param string phase: Name of the phase
         """
         if phase not in phase_methods:
-            raise ValueError(f'{phase} is not a valid task phase')
+            raise ValueError(f"{phase} is not a valid task phase")
         # warn if no inputs, filters or outputs in the task
-        if phase in ['input', 'filter', 'output'] and not self.manager.unit_test:
+        if phase in ["input", "filter", "output"] and not self.manager.unit_test:
             # Check that there is at least one manually configured plugin for these phases
             for p in self.plugins(phase):
                 if not p.builtin:
                     break
             else:
                 if phase not in self.suppress_warnings:
-                    if phase == 'filter':
+                    if phase == "filter":
                         logger.warning(
-                            'Task does not have any filter plugins to accept entries. '
-                            'You need at least one to accept the entries you want.'
+                            "Task does not have any filter plugins to accept entries. "
+                            "You need at least one to accept the entries you want."
                         )
                     else:
                         logger.warning(
-                            'Task doesn\'t have any {} plugins, you should add (at least) one!',
+                            "Task doesn't have any {} plugins, you should add (at least) one!",
                             phase,
                         )
 
@@ -499,18 +499,18 @@ class Task:
             with Session() as session:
                 self.session = session
                 try:
-                    fire_event('task.execute.before_plugin', self, plugin.name)
+                    fire_event("task.execute.before_plugin", self, plugin.name)
                     response = self.__run_plugin(plugin, phase, args)
-                    if phase == 'input' and response:
+                    if phase == "input" and response:
                         # add entries returned by input to self.all_entries
                         for e in response:
                             e.task = self
                             self.all_entries.append(e)
                 finally:
-                    fire_event('task.execute.after_plugin', self, plugin.name)
+                    fire_event("task.execute.after_plugin", self, plugin.name)
                 self.session = None
         # check config hash for changes at the end of 'prepare' phase
-        if phase == 'prepare':
+        if phase == "prepare":
             self.check_config_hash()
 
     def __run_plugin(self, plugin, phase, args=None, kwargs=None):
@@ -541,30 +541,30 @@ class Task:
             raise
         except PluginWarning as warn:
             # check if this warning should be logged only once (may keep repeating)
-            if warn.kwargs.get('log_once', False):
+            if warn.kwargs.get("log_once", False):
                 from flexget.utils.log import log_once
 
                 log_once(warn.value, warn.logger)
             else:
                 warn.logger.warning(warn)
         except EntryUnicodeError as eue:
-            msg = f'Plugin {keyword} tried to create non-unicode compatible entry (key: {eue.key}, value: {eue.value!r})'
+            msg = f"Plugin {keyword} tried to create non-unicode compatible entry (key: {eue.key}, value: {eue.value!r})"
             logger.critical(msg)
             self.abort(msg)
         except PluginError as err:
             err.logger.critical(err.value)
             self.abort(err.value)
         except DependencyError as e:
-            msg = f'Plugin `{keyword}` cannot be used because dependency `{e.missing}` is missing.'
+            msg = f"Plugin `{keyword}` cannot be used because dependency `{e.missing}` is missing."
             logger.critical(e.message)
             self.abort(msg)
         except Warning as e:
             # If warnings have been elevated to errors
-            msg = f'Warning during plugin {keyword}: {e}'
+            msg = f"Warning during plugin {keyword}: {e}"
             logger.exception(msg)
             self.abort(msg)
         except Exception as e:
-            msg = f'BUG: Unhandled error in plugin {keyword}: {e}'
+            msg = f"BUG: Unhandled error in plugin {keyword}: {e}"
             logger.opt(exception=True).critical(msg)
             traceback = self.manager.crash_report()
             self.abort(msg, traceback=traceback)
@@ -577,9 +577,9 @@ class Task:
         :param str plugin: Plugin name
         :param str reason: Why the rerun is done
         """
-        msg = f'Plugin {self.current_plugin if plugin is None else plugin} has requested task to be ran again after execution has completed.'
+        msg = f"Plugin {self.current_plugin if plugin is None else plugin} has requested task to be ran again after execution has completed."
         if reason:
-            msg += f' Reason: {reason}'
+            msg += f" Reason: {reason}"
         # Only print the first request for a rerun to the info log
         if self._rerun:
             logger.debug(msg)
@@ -598,7 +598,7 @@ class Task:
         try:
             merge_dict_from_to(new_config, self.config)
         except MergeException as e:
-            raise PluginError(f'Failed to merge configs for task {self.name}: {e}')
+            raise PluginError(f"Failed to merge configs for task {self.name}: {e}")
 
     def check_config_hash(self):
         """Check the task's config hash and update the hash if necessary."""
@@ -609,7 +609,7 @@ class Task:
             if self.prepared_config:
                 self.config = copy.deepcopy(self.prepared_config)
             else:
-                logger.error('BUG: No prepared_config on rerun, please report.')
+                logger.error("BUG: No prepared_config on rerun, please report.")
         with Session() as session:
             last_hash = (
                 session.query(TaskConfigHash).filter(TaskConfigHash.task == self.name).first()
@@ -624,21 +624,21 @@ class Task:
     def _execute(self):
         """Execute the task without rerunning."""
         if not self.enabled:
-            logger.debug('Not running disabled task {}', self.name)
+            logger.debug("Not running disabled task {}", self.name)
             return
 
-        logger.debug('executing {}', self.name)
+        logger.debug("executing {}", self.name)
 
         # Handle keyword args
         if self.options.learn:
-            logger.info('Disabling download and output phases because of --learn')
-            self.disable_phase('download')
-            self.disable_phase('output')
+            logger.info("Disabling download and output phases because of --learn")
+            self.disable_phase("download")
+            self.disable_phase("output")
         if self.options.disable_phases:
             list(map(self.disable_phase, self.options.disable_phases))
         if self.options.inject:
             # If entries are passed for this execution (eg. rerun), disable the input phase
-            self.disable_phase('input')
+            self.disable_phase("input")
             self.all_entries.extend(copy.deepcopy(self.options.inject))
 
         # run phases
@@ -650,33 +650,33 @@ class Task:
                         for plugin in self.plugins(phase):
                             if plugin.name in self.config:
                                 logger.info(
-                                    'Plugin {} is not executed in {} phase because the phase is disabled '
-                                    '(e.g. --test, --inject)',
+                                    "Plugin {} is not executed in {} phase because the phase is disabled "
+                                    "(e.g. --test, --inject)",
                                     plugin.name,
                                     phase,
                                 )
                     continue
-                if phase in ('start', 'prepare') and self.is_rerun:
-                    logger.debug('skipping phase {} during rerun', phase)
+                if phase in ("start", "prepare") and self.is_rerun:
+                    logger.debug("skipping phase {} during rerun", phase)
                     continue
-                if phase == 'exit':
+                if phase == "exit":
                     # Make sure we run the entry complete hook before exit phase. These hooks may call for a rerun,
                     # which would mean we should skip the exit phase during this run.
                     for entry in self.all_entries:
                         entry.complete()
                     if self._rerun and self._rerun_count < self.max_reruns:
-                        logger.debug('not running task_exit yet because task will rerun')
+                        logger.debug("not running task_exit yet because task will rerun")
                         continue
                 # run all plugins with this phase
                 self.__run_task_phase(phase)
-                if phase == 'start':
+                if phase == "start":
                     # Store a copy of the config state after start phase to restore for reruns
                     self.prepared_config = copy.deepcopy(self.config)
         except TaskAbort:
             try:
-                self.__run_task_phase('abort')
+                self.__run_task_phase("abort")
             except TaskAbort:
-                logger.exception('abort handlers aborted')
+                logger.exception("abort handlers aborted")
             raise
 
     @use_task_logging
@@ -695,7 +695,7 @@ class Task:
         try:
             if self.options.cron:
                 self.manager.db_cleanup()
-            fire_event('task.execute.started', self)
+            fire_event("task.execute.started", self)
             while True:
                 self._execute()
                 # rerun task
@@ -704,27 +704,27 @@ class Task:
                     and self._rerun_count < self.max_reruns
                     and self._rerun_count < Task.RERUN_MAX
                 ):
-                    logger.info('Rerunning the task in case better resolution can be achieved.')
+                    logger.info("Rerunning the task in case better resolution can be achieved.")
                     self._rerun_count += 1
                     self._all_entries = EntryContainer()
                     self._rerun = False
                     continue
                 if self._rerun:
                     logger.info(
-                        'Task has been re-run {} times already, stopping for now',
+                        "Task has been re-run {} times already, stopping for now",
                         self._rerun_count,
                     )
                 break
-            fire_event('task.execute.completed', self)
+            fire_event("task.execute.completed", self)
         finally:
             self.finished_event.set()
             self.requests.close()
 
     @staticmethod
     def validate_config(config):
-        schema = plugin_schemas(interface='task')
+        schema = plugin_schemas(interface="task")
         # Don't validate commented out plugins
-        schema['patternProperties'] = {'^_': {}}
+        schema["patternProperties"] = {"^_": {}}
         return config_schema.process_config(config, schema)
 
     def __copy__(self):
@@ -748,22 +748,22 @@ class Task:
         """
         if not isinstance(template, (str, FlexGetTemplate)):
             raise TypeError(
-                f'Trying to render non string template or unrecognized template format, got {template!r}'
+                f"Trying to render non string template or unrecognized template format, got {template!r}"
             )
-        logger.trace('rendering: {}', template)
+        logger.trace("rendering: {}", template)
         return render_from_task(template, self)
 
 
-@event('config.register')
+@event("config.register")
 def register_config_key():
     task_config_schema = {
-        'type': 'object',
-        'title': 'tasks',
-        'description': 'All tasks which can be run by FlexGet are defined in this section',
-        'additionalProperties': {
-            '$ref': '/schema/plugins?interface=task',
-            'description': 'The name of the task',
+        "type": "object",
+        "title": "tasks",
+        "description": "All tasks which can be run by FlexGet are defined in this section",
+        "additionalProperties": {
+            "$ref": "/schema/plugins?interface=task",
+            "description": "The name of the task",
         },
     }
 
-    config_schema.register_config_key('tasks', task_config_schema, required=True)
+    config_schema.register_config_key("tasks", task_config_schema, required=True)

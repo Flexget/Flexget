@@ -3,7 +3,7 @@ from loguru import logger
 from flexget import plugin
 from flexget.event import event
 
-logger = logger.bind(name='limit_new')
+logger = logger.bind(name="limit_new")
 
 
 class FilterLimitNew:
@@ -20,28 +20,28 @@ class FilterLimitNew:
     FlexGet is executed.
     """
 
-    schema = {'type': 'integer', 'minimum': 1}
+    schema = {"type": "integer", "minimum": 1}
 
     @plugin.priority(plugin.PRIORITY_LAST)
     def on_task_filter(self, task, config):
         if task.options.learn:
-            logger.info('Plugin limit_new is disabled with --learn')
+            logger.info("Plugin limit_new is disabled with --learn")
             return
 
         amount = config
         for index, entry in enumerate(task.accepted):
             if index < amount:
-                logger.verbose('Allowed {} ({})', entry['title'], entry['url'])
+                logger.verbose("Allowed {} ({})", entry["title"], entry["url"])
             else:
-                entry.reject('limit exceeded')
+                entry.reject("limit exceeded")
                 # Also save this in backlog so that it can be accepted next time.
-                plugin.get('backlog', self).add_backlog(task, entry)
+                plugin.get("backlog", self).add_backlog(task, entry)
 
         logger.debug(
-            'Rejected: {} Allowed: {}', len(task.accepted[amount:]), len(task.accepted[:amount])
+            "Rejected: {} Allowed: {}", len(task.accepted[amount:]), len(task.accepted[:amount])
         )
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(FilterLimitNew, 'limit_new', api_ver=2)
+    plugin.register(FilterLimitNew, "limit_new", api_ver=2)

@@ -26,24 +26,24 @@ from flexget.event import event
 from flexget.plugin import PluginWarning
 from flexget.utils.template import RenderError
 
-logger = logger.bind(name='notify')
+logger = logger.bind(name="notify")
 
 NOTIFY_VIA_SCHEMA = {
-    'type': 'array',
-    'items': {
-        'allOf': [
-            {'$ref': '/schema/plugins?interface=notifiers'},
+    "type": "array",
+    "items": {
+        "allOf": [
+            {"$ref": "/schema/plugins?interface=notifiers"},
             {
-                'minProperties': 1,
-                'maxProperties': 1,
-                'error_maxProperties': 'Plugin options indented 2 more spaces than the first letter of the plugin name.',
+                "minProperties": 1,
+                "maxProperties": 1,
+                "error_maxProperties": "Plugin options indented 2 more spaces than the first letter of the plugin name.",
             },
         ]
     },
 }
 
 
-def render_config(config, template_renderer, notifier_name, _path=''):
+def render_config(config, template_renderer, notifier_name, _path=""):
     """Recurse through config data structures attempting to render any string fields against a given context.
 
     :param config: Any simple data structure as retrieved from the FlexGet config.
@@ -57,20 +57,20 @@ def render_config(config, template_renderer, notifier_name, _path=''):
             return template_renderer(config)
         except Exception as e:
             logger.error(
-                'Error rendering {} plugin config field `{}`: {}', notifier_name, config, e
+                "Error rendering {} plugin config field `{}`: {}", notifier_name, config, e
             )
-            logger.debug('{} notifier config location of error: {}', notifier_name, _path)
+            logger.debug("{} notifier config location of error: {}", notifier_name, _path)
             return config
     elif isinstance(config, list):
         if _path:
-            _path += '/'
+            _path += "/"
         return [
             render_config(v, template_renderer, notifier_name, _path=_path + str(i))
             for i, v in enumerate(config)
         ]
     elif isinstance(config, dict):
         if _path:
-            _path += '/'
+            _path += "/"
         return {
             k: render_config(v, template_renderer, notifier_name, _path=_path + k)
             for k, v in config.items()
@@ -96,11 +96,11 @@ class NotificationFramework:
             try:
                 title = template_renderer(title)
             except RenderError as e:
-                logger.error('Error rendering notification title: {}', e)
+                logger.error("Error rendering notification title: {}", e)
             try:
                 message = template_renderer(message)
             except RenderError as e:
-                logger.error('Error rendering notification body: {}', e)
+                logger.error("Error rendering notification body: {}", e)
         for notifier in notifiers:
             for notifier_name, notifier_config in notifier.items():
                 notifier_plugin = plugin.get(notifier_name, self)
@@ -113,19 +113,19 @@ class NotificationFramework:
                         notifier_config, template_renderer, notifier_name
                     )
 
-                logger.debug('Sending a notification to `{}`', notifier_name)
+                logger.debug("Sending a notification to `{}`", notifier_name)
                 try:
                     notifier_plugin.notify(
                         title, message, rendered_config
                     )  # TODO: Update notifiers for new api
                 except PluginWarning as e:
                     logger.warning(
-                        'Error while sending notification to `{}`: {}', notifier_name, e.value
+                        "Error while sending notification to `{}`: {}", notifier_name, e.value
                     )
                 else:
-                    logger.verbose('Successfully sent a notification to `{}`', notifier_name)
+                    logger.verbose("Successfully sent a notification to `{}`", notifier_name)
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(NotificationFramework, 'notification_framework', api_ver=2, interfaces=[])
+    plugin.register(NotificationFramework, "notification_framework", api_ver=2, interfaces=[])

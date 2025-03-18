@@ -6,7 +6,7 @@ from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 
-logger = logger.bind(name='mock')
+logger = logger.bind(name="mock")
 
 
 class Mock:
@@ -23,14 +23,14 @@ class Mock:
     """
 
     schema = {
-        'type': 'array',
-        'items': {
-            'oneOf': [
-                {'type': 'string'},
+        "type": "array",
+        "items": {
+            "oneOf": [
+                {"type": "string"},
                 {
-                    'type': 'object',
-                    'properties': {'title': {'type': 'string'}, 'url': {'type': 'string'}},
-                    'required': ['title'],
+                    "type": "object",
+                    "properties": {"title": {"type": "string"}, "url": {"type": "string"}},
+                    "required": ["title"],
                 },
             ],
         },
@@ -41,12 +41,12 @@ class Mock:
         for line in config:
             entry = Entry(line) if isinstance(line, dict) else Entry(title=line)
             # no url specified, add random one based on title (ie. test)
-            if 'url' not in entry:
-                entry['url'] = 'mock://localhost/mock/{}'.format(hash(entry['title']))
+            if "url" not in entry:
+                entry["url"] = "mock://localhost/mock/{}".format(hash(entry["title"]))
             entries.append(entry)
         return entries
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(Mock, 'mock', api_ver=2)
+    plugin.register(Mock, "mock", api_ver=2)

@@ -34,25 +34,25 @@ class TestTemplate:
     """
 
     def test_preset1(self, execute_task):
-        task = execute_task('test1')
-        assert task.find_entry(title='global'), 'test1, preset global not applied'
-        assert task.find_entry(title='movies'), 'test1, preset movies not applied'
+        task = execute_task("test1")
+        assert task.find_entry(title="global"), "test1, preset global not applied"
+        assert task.find_entry(title="movies"), "test1, preset movies not applied"
 
     def test_preset2(self, execute_task):
-        task = execute_task('test2')
-        assert not task.find_entry(title='global'), 'test2, preset global applied'
-        assert not task.find_entry(title='movies'), 'test2, preset movies applied'
+        task = execute_task("test2")
+        assert not task.find_entry(title="global"), "test2, preset global applied"
+        assert not task.find_entry(title="movies"), "test2, preset movies applied"
 
     def test_preset3(self, execute_task):
-        task = execute_task('test3')
-        assert not task.find_entry(title='global'), 'test3, preset global applied'
-        assert task.find_entry(title='movies'), 'test3, preset movies not applied'
+        task = execute_task("test3")
+        assert not task.find_entry(title="global"), "test3, preset global applied"
+        assert task.find_entry(title="movies"), "test3, preset movies not applied"
 
     def test_nested(self, execute_task):
-        task = execute_task('test_nested')
-        assert task.find_entry(title='a'), 'Entry from preset a was not created'
-        assert task.find_entry(title='b'), 'Entry from preset b was not created'
-        assert len(task.entries) == 2, 'Should only have been 2 entries created'
+        task = execute_task("test_nested")
+        assert task.find_entry(title="a"), "Entry from preset a was not created"
+        assert task.find_entry(title="b"), "Entry from preset b was not created"
+        assert len(task.entries) == 2, "Should only have been 2 entries created"
 
 
 class TestTemplateMerge:
@@ -80,9 +80,9 @@ class TestTemplateMerge:
     """
 
     def test_merge(self, execute_task):
-        task = execute_task('test')
-        assert task.config['imdb']['min_score'] == 6.5, 'float merge failed'
-        assert 'comedy' in task.config['imdb']['reject_genres'], 'list merge failed'
+        task = execute_task("test")
+        assert task.config["imdb"]["min_score"] == 6.5, "float merge failed"
+        assert "comedy" in task.config["imdb"]["reject_genres"], "list merge failed"
 
 
 class TestTemplateRerun:
@@ -98,8 +98,8 @@ class TestTemplateRerun:
     """
 
     def test_rerun(self, execute_task):
-        task = execute_task('test_rerun')
-        assert len(task.config['series']) == 1
+        task = execute_task("test_rerun")
+        assert len(task.config["series"]) == 1
 
 
 class TestTemplateChange:
@@ -116,10 +116,10 @@ class TestTemplateChange:
     """
 
     def test_template_change_trigger_config_change(self, execute_task, manager):
-        task = execute_task('test_config_change')
+        task = execute_task("test_config_change")
         assert len(task.all_entries) == 2
 
-        manager.config['templates']['a']['mock'].append({'title': 'baz}'})
-        task = execute_task('test_config_change')
+        manager.config["templates"]["a"]["mock"].append({"title": "baz}"})
+        task = execute_task("test_config_change")
         assert task.config_modified
         assert len(task.all_entries) == 3

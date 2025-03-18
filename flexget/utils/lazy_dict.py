@@ -3,7 +3,7 @@ from typing import Any, Callable, NamedTuple
 
 from loguru import logger
 
-logger = logger.bind(name='lazy_lookup')
+logger = logger.bind(name="lazy_lookup")
 
 
 class LazyCallee(NamedTuple):
@@ -20,7 +20,7 @@ class LazyLookup:
     There should be one instance of this class per LazyDict.
     """
 
-    def __init__(self, store: 'LazyDict') -> None:
+    def __init__(self, store: "LazyDict") -> None:
         self.store = store
         self.callee_list: list[LazyCallee] = []
 
@@ -43,17 +43,17 @@ class LazyLookup:
             except PluginError as e:
                 e.logger.info(e)
             except Exception as e:
-                logger.error('Unhandled error in lazy lookup plugin: {}', e)
+                logger.error("Unhandled error in lazy lookup plugin: {}", e)
                 from flexget.manager import manager
 
                 if manager:
                     manager.crash_report()
                 else:
-                    logger.opt(exception=True).debug('Traceback')
+                    logger.opt(exception=True).debug("Traceback")
         return self.store[key]
 
     def __repr__(self):
-        return f'<LazyLookup({self.callee_list!r})>'
+        return f"<LazyLookup({self.callee_list!r})>"
 
 
 class LazyDict(MutableMapping):

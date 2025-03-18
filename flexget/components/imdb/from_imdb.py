@@ -8,7 +8,7 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.cached_input import cached
 
-logger = logger.bind(name='from_imdb')
+logger = logger.bind(name="from_imdb")
 
 
 class FromIMDB:
@@ -44,84 +44,84 @@ class FromIMDB:
     """
 
     job_types = [
-        'actor',
-        'actress',
-        'director',
-        'producer',
-        'writer',
-        'self',
-        'editor',
-        'miscellaneous',
-        'editorial department',
-        'cinematographer',
-        'visual effects',
-        'thanks',
-        'music department',
-        'in development',
-        'archive footage',
-        'soundtrack',
+        "actor",
+        "actress",
+        "director",
+        "producer",
+        "writer",
+        "self",
+        "editor",
+        "miscellaneous",
+        "editorial department",
+        "cinematographer",
+        "visual effects",
+        "thanks",
+        "music department",
+        "in development",
+        "archive footage",
+        "soundtrack",
     ]
 
     content_types = [
-        'movie',
-        'tv series',
-        'tv mini series',
-        'video game',
-        'video movie',
-        'tv movie',
-        'episode',
+        "movie",
+        "tv series",
+        "tv mini series",
+        "video game",
+        "video movie",
+        "tv movie",
+        "episode",
     ]
 
     content_type_conversion = {
-        'movie': 'movie',
-        'tv series': 'tv',
-        'tv mini series': 'tv',
-        'tv movie': 'tv',
-        'episode': 'tv',
-        'video movie': 'video',
-        'video game': 'video game',
+        "movie": "movie",
+        "tv series": "tv",
+        "tv mini series": "tv",
+        "tv movie": "tv",
+        "episode": "tv",
+        "video movie": "video",
+        "video game": "video game",
     }
 
     character_content_type_conversion = {
-        'movie': 'feature',
-        'tv series': 'tv',
-        'tv mini series': 'tv',
-        'tv movie': 'tv',
-        'episode': 'tv',
-        'video movie': 'video',
-        'video game': 'video-game',
+        "movie": "feature",
+        "tv series": "tv",
+        "tv mini series": "tv",
+        "tv movie": "tv",
+        "episode": "tv",
+        "video movie": "video",
+        "video game": "video-game",
     }
 
-    jobs_without_content_type = ['actor', 'actress', 'self', 'in development', 'archive footage']
+    jobs_without_content_type = ["actor", "actress", "self", "in development", "archive footage"]
 
     imdb_pattern = one_or_more(
         {
-            'type': 'string',
-            'pattern': r'(nm|co|ch)\d{7,8}',
-            'error_pattern': 'Get the id from the url of the person/company you want to use,'
-            ' e.g. http://imdb.com/text/<id here>/blah',
+            "type": "string",
+            "pattern": r"(nm|co|ch)\d{7,8}",
+            "error_pattern": "Get the id from the url of the person/company you want to use,"
+            " e.g. http://imdb.com/text/<id here>/blah",
         },
         unique_items=True,
     )
 
     schema = {
-        'oneOf': [
+        "oneOf": [
             imdb_pattern,
             {
-                'type': 'object',
-                'properties': {
-                    'id': imdb_pattern,
-                    'job_types': one_or_more(
-                        {'type': 'string', 'enum': job_types}, unique_items=True
+                "type": "object",
+                "properties": {
+                    "id": imdb_pattern,
+                    "job_types": one_or_more(
+                        {"type": "string", "enum": job_types}, unique_items=True
                     ),
-                    'content_types': one_or_more(
-                        {'type': 'string', 'enum': content_types}, unique_items=True
+                    "content_types": one_or_more(
+                        {"type": "string", "enum": content_types}, unique_items=True
                     ),
-                    'max_entries': {'type': 'integer'},
-                    'match_type': {'type': 'string', 'enum': ['strict', 'loose']},
+                    "max_entries": {"type": "integer"},
+                    "match_type": {"type": "string", "enum": ["strict", "loose"]},
                 },
-                'required': ['id'],
-                'additionalProperties': False,
+                "required": ["id"],
+                "additionalProperties": False,
             },
         ]
     }
@@ -129,39 +129,39 @@ class FromIMDB:
     def prepare_config(self, config):
         """Convert config to dict form and sets defaults if needed."""
         if isinstance(config, str):
-            config = {'id': [config]}
+            config = {"id": [config]}
         elif isinstance(config, list):
-            config = {'id': config}
-        if isinstance(config, dict) and not isinstance(config['id'], list):
-            config['id'] = [config['id']]
+            config = {"id": config}
+        if isinstance(config, dict) and not isinstance(config["id"], list):
+            config["id"] = [config["id"]]
 
-        config.setdefault('content_types', [self.content_types[0]])
-        config.setdefault('job_types', [self.job_types[0]])
-        config.setdefault('max_entries', 200)
-        config.setdefault('match_type', 'strict')
+        config.setdefault("content_types", [self.content_types[0]])
+        config.setdefault("job_types", [self.job_types[0]])
+        config.setdefault("max_entries", 200)
+        config.setdefault("match_type", "strict")
 
-        if isinstance(config.get('content_types'), str):
-            logger.debug('Converted content type from string to list.')
-            config['content_types'] = [config['content_types']]
+        if isinstance(config.get("content_types"), str):
+            logger.debug("Converted content type from string to list.")
+            config["content_types"] = [config["content_types"]]
 
-        if isinstance(config['job_types'], str):
-            logger.debug('Converted job type from string to list.')
-            config['job_types'] = [config['job_types']]
+        if isinstance(config["job_types"], str):
+            logger.debug("Converted job type from string to list.")
+            config["job_types"] = [config["job_types"]]
         # Special case in case user meant to add actress instead of actor (different job types in IMDB)
-        if 'actor' in config['job_types'] and 'actress' not in config['job_types']:
-            config['job_types'].append('actress')
+        if "actor" in config["job_types"] and "actress" not in config["job_types"]:
+            config["job_types"].append("actress")
 
         return config
 
     def get_items(self, config):
         items = []
-        for id in config['id']:
+        for id in config["id"]:
             try:
                 entity_type, entity_object = self.get_entity_type_and_object(id)
             except Exception as e:
                 logger.error(
-                    'Could not resolve entity via ID: {}. '
-                    'Either error in config or unsupported entity. Error:{}',
+                    "Could not resolve entity via ID: {}. "
+                    "Either error in config or unsupported entity. Error:{}",
                     id,
                     e,
                 )
@@ -169,9 +169,9 @@ class FromIMDB:
             items += self.get_items_by_entity(
                 entity_type,
                 entity_object,
-                config.get('content_types'),
-                config.get('job_types'),
-                config.get('match_type'),
+                config.get("content_types"),
+                config.get("job_types"),
+                config.get("match_type"),
             )
         return set(items)
 
@@ -181,31 +181,31 @@ class FromIMDB:
         :param imdb_id: string which contains IMDB id
         :return: entity type, entity object (person, company, etc.)
         """
-        if imdb_id.startswith('nm'):
+        if imdb_id.startswith("nm"):
             person = self.ia.get_person(imdb_id[2:])
-            logger.info('Starting to retrieve items for person: {}', person)
-            return 'Person', person
-        if imdb_id.startswith('co'):
+            logger.info("Starting to retrieve items for person: {}", person)
+            return "Person", person
+        if imdb_id.startswith("co"):
             company = self.ia.get_company(imdb_id[2:])
-            logger.info('Starting to retrieve items for company: {}', company)
-            return 'Company', company
-        if imdb_id.startswith('ch'):
+            logger.info("Starting to retrieve items for company: {}", company)
+            return "Company", company
+        if imdb_id.startswith("ch"):
             character = self.ia.get_character(imdb_id[2:])
-            logger.info('Starting to retrieve items for Character: {}', character)
-            return 'Character', character
+            logger.info("Starting to retrieve items for Character: {}", character)
+            return "Character", character
         return None
 
     def get_items_by_entity(
         self, entity_type, entity_object, content_types, job_types, match_type
     ):
         """Get entity object and return movie list using relevant method."""
-        if entity_type == 'Company':
+        if entity_type == "Company":
             return self.items_by_company(entity_object)
 
-        if entity_type == 'Character':
+        if entity_type == "Character":
             return self.items_by_character(entity_object, content_types, match_type)
 
-        if entity_type == 'Person':
+        if entity_type == "Person":
             return self.items_by_person(entity_object, job_types, content_types, match_type)
         return None
 
@@ -227,20 +227,20 @@ class FromIMDB:
         items = []
         unfiltered_items = set(unfiltered_items)
         for item in sorted(unfiltered_items):
-            if match_type == 'strict':
+            if match_type == "strict":
                 logger.debug(
-                    'Match type is strict, verifying item type to requested content types'
+                    "Match type is strict, verifying item type to requested content types"
                 )
                 self.ia.update(item)
-                if item['kind'] in content_types:
+                if item["kind"] in content_types:
                     logger.verbose(
-                        'Adding item "{}" to list. Item kind is "{}"', item, item['kind']
+                        'Adding item "{}" to list. Item kind is "{}"', item, item["kind"]
                     )
                     items.append(item)
                 else:
-                    logger.verbose('Rejecting item "{}". Item kind is "{}', item, item['kind'])
+                    logger.verbose('Rejecting item "{}". Item kind is "{}', item, item["kind"])
             else:
-                logger.debug('Match type is loose, all items are being added')
+                logger.debug("Match type is loose, all items are being added")
                 items.append(item)
         return items
 
@@ -256,7 +256,7 @@ class FromIMDB:
     def items_by_content_type(self, person, job_type, content_type):
         return [
             _f
-            for _f in (person.get(job_type + ' ' + self.content_type_conversion[content_type], []))
+            for _f in (person.get(job_type + " " + self.content_type_conversion[content_type], []))
             if _f
         ]
 
@@ -266,10 +266,10 @@ class FromIMDB:
             if job_type in self.jobs_without_content_type
             else [
                 (
-                    person.get(job_type + ' ' + 'documentary', [])
-                    and person.get(job_type + ' ' + 'short', [])
+                    person.get(job_type + " " + "documentary", [])
+                    and person.get(job_type + " " + "short", [])
                     and self.items_by_content_type(person, job_type, content_type)
-                    if content_type == 'movie'
+                    if content_type == "movie"
                     else self.items_by_content_type(person, job_type, content_type)
                 )
                 for content_type in content_types
@@ -300,9 +300,9 @@ class FromIMDB:
         :param company: company object
         :return: company items list
         """
-        return company.get('production companies')
+        return company.get("production companies")
 
-    @cached('from_imdb', persist='2 hours')
+    @cached("from_imdb", persist="2 hours")
     def on_task_input(self, task, config):
         try:
             from imdb import IMDb
@@ -318,13 +318,13 @@ class FromIMDB:
         config = self.prepare_config(config)
         items = self.get_items(config)
         if not items:
-            logger.error('Could not get IMDB item list, check your configuration.')
+            logger.error("Could not get IMDB item list, check your configuration.")
             return None
         for item in items:
             entry = Entry(
-                title=item['title'],
-                imdb_id='tt' + self.ia.get_imdbID(item),
-                url='',
+                title=item["title"],
+                imdb_id="tt" + self.ia.get_imdbID(item),
+                url="",
                 imdb_url=self.ia.get_imdbURL(item),
             )
 
@@ -334,20 +334,20 @@ class FromIMDB:
                     if entry and task.options.test:
                         logger.info("Test mode. Entry includes:")
                         for key, value in list(entry.items()):
-                            logger.info('     {}: {}', key.capitalize(), value)
+                            logger.info("     {}: {}", key.capitalize(), value)
             else:
-                logger.error('Invalid entry created? {}', entry)
-        if len(entries) <= config.get('max_entries'):
+                logger.error("Invalid entry created? {}", entry)
+        if len(entries) <= config.get("max_entries"):
             return entries
         logger.warning(
-            'Number of entries ({}) exceeds maximum allowed value {}. '
+            "Number of entries ({}) exceeds maximum allowed value {}. "
             'Edit your filters or raise the maximum value by entering a higher "max_entries"',
             len(entries),
-            config.get('max_entries'),
+            config.get("max_entries"),
         )
         return None
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(FromIMDB, 'from_imdb', api_ver=2)
+    plugin.register(FromIMDB, "from_imdb", api_ver=2)

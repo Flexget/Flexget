@@ -4,7 +4,7 @@ from flexget import plugin
 from flexget.components.archives import utils
 from flexget.event import event
 
-logger = logger.bind(name='archives')
+logger = logger.bind(name="archives")
 
 
 class FilterArchives:
@@ -20,12 +20,12 @@ class FilterArchives:
     """
 
     schema = {
-        'anyOf': [
-            {'type': 'boolean'},
+        "anyOf": [
+            {"type": "boolean"},
             {
-                'type': 'object',
-                'properties': {'unrar_tool': {'type': 'string'}},
-                'additionalProperties': False,
+                "type": "object",
+                "properties": {"unrar_tool": {"type": "string"}},
+                "additionalProperties": False,
             },
         ]
     }
@@ -34,7 +34,7 @@ class FilterArchives:
         """Prepare config for processing."""
         if not isinstance(config, dict):
             config = {}
-        config.setdefault('unrar_tool', '')
+        config.setdefault("unrar_tool", "")
         return config
 
     @plugin.priority(200)
@@ -47,10 +47,10 @@ class FilterArchives:
         utils.rarfile_set_tool_path(config)
 
         for entry in task.entries:
-            archive_path = entry.get('location', '')
+            archive_path = entry.get("location", "")
             entry.accept() if utils.is_archive(archive_path) else entry.reject()
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(FilterArchives, 'archives', api_ver=2)
+    plugin.register(FilterArchives, "archives", api_ver=2)

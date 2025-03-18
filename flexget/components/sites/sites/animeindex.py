@@ -5,7 +5,7 @@ from loguru import logger
 from flexget import plugin
 from flexget.event import event
 
-logger = logger.bind(name='animeindex')
+logger = logger.bind(name="animeindex")
 
 
 # http://tracker.anime-index.org/index.php?page=torrent-details&id=b8327fdf9003e87446c8b3601951a9a65526abb2
@@ -16,15 +16,15 @@ class UrlRewriteAnimeIndex:
     """AnimeIndex urlrewriter."""
 
     def url_rewritable(self, task, entry):
-        return entry['url'].startswith(
-            'http://tracker.anime-index.org/index.php?page=torrent-details&id='
+        return entry["url"].startswith(
+            "http://tracker.anime-index.org/index.php?page=torrent-details&id="
         )
 
     def url_rewrite(self, task, entry):
-        entry['url'] = entry['url'].replace('index.php?page=torrent-details&', 'download.php?')
-        entry['url'] += '&f={}.torrent'.format(quote(entry['title'], safe=''))
+        entry["url"] = entry["url"].replace("index.php?page=torrent-details&", "download.php?")
+        entry["url"] += "&f={}.torrent".format(quote(entry["title"], safe=""))
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(UrlRewriteAnimeIndex, 'animeindex', interfaces=['urlrewriter'], api_ver=2)
+    plugin.register(UrlRewriteAnimeIndex, "animeindex", interfaces=["urlrewriter"], api_ver=2)

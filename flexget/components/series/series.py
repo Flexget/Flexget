@@ -26,9 +26,9 @@ try:
     # NOTE: Importing other plugins is discouraged!
     from flexget.components.parsing.parsers import parser_common as plugin_parser_common
 except ImportError:
-    raise plugin.DependencyError(issued_by=__name__, missing='parsers')
+    raise plugin.DependencyError(issued_by=__name__, missing="parsers")
 
-logger = logger.bind(name='series')
+logger = logger.bind(name="series")
 
 try:
     preferred_clock = time.process_time
@@ -36,29 +36,29 @@ except AttributeError:
     preferred_clock = time.clock
 
 
-@event('manager.lock_acquired')
+@event("manager.lock_acquired")
 def repair(manager):
     # Perform database repairing and upgrading at startup.
-    if not manager.persist.get('series_repaired', False):
+    if not manager.persist.get("series_repaired", False):
         session = Session()
         try:
             # For some reason at least I have some releases in database which don't belong to any episode.
             for release in (
                 session.query(db.EpisodeRelease).filter(db.EpisodeRelease.episode.is_(None)).all()
             ):
-                logger.info('Purging orphan release {} from database', release.title)
+                logger.info("Purging orphan release {} from database", release.title)
                 session.delete(release)
             session.commit()
         finally:
             session.close()
-        manager.persist['series_repaired'] = True
+        manager.persist["series_repaired"] = True
 
     # Run clean_series the first time we get a database lock, since we won't have had one the first time the config
     # got loaded.
     clean_series(manager)
 
 
-@event('manager.config_updated')
+@event("manager.config_updated")
 def clean_series(manager):
     # Unmark series from tasks which have been deleted.
     if not manager.has_lock:
@@ -78,50 +78,50 @@ def populate_entry_fields(entry, parser, config):
     :param parser: A valid result from a series parser used to populate the fields.
     :config dict: If supplied, will use 'path' and 'set' options to populate specified fields.
     """
-    entry['series_parser'] = copy(parser)
+    entry["series_parser"] = copy(parser)
 
     # add series, season and episode to entry
-    entry['series_name'] = parser.name
-    if 'quality' in entry and entry['quality'] != parser.quality:
+    entry["series_name"] = parser.name
+    if "quality" in entry and entry["quality"] != parser.quality:
         logger.verbose(
-            'Found different quality for `{}`. Was `{}`, overriding with `{}`.',
-            entry['title'],
-            entry['quality'],
+            "Found different quality for `{}`. Was `{}`, overriding with `{}`.",
+            entry["title"],
+            entry["quality"],
             parser.quality,
         )
-    entry['quality'] = parser.quality
-    entry['proper'] = parser.proper
-    entry['proper_count'] = parser.proper_count
-    entry['release_group'] = parser.group
-    entry['season_pack'] = parser.season_pack
-    if parser.id_type == 'ep':
-        entry['series_season'] = parser.season
+    entry["quality"] = parser.quality
+    entry["proper"] = parser.proper
+    entry["proper_count"] = parser.proper_count
+    entry["release_group"] = parser.group
+    entry["season_pack"] = parser.season_pack
+    if parser.id_type == "ep":
+        entry["series_season"] = parser.season
         if not parser.season_pack:
-            entry['series_episode'] = parser.episode
-    elif parser.id_type == 'date':
-        entry['series_date'] = parser.id
-        entry['series_season'] = parser.id.year
+            entry["series_episode"] = parser.episode
+    elif parser.id_type == "date":
+        entry["series_date"] = parser.id
+        entry["series_season"] = parser.id.year
     else:
-        entry['series_season'] = time.gmtime().tm_year
-    entry['series_episodes'] = parser.episodes
-    entry['series_id'] = parser.pack_identifier
-    entry['series_id_type'] = parser.id_type
-    entry['series_identified_by'] = parser.identified_by
-    entry['series_exact'] = parser.strict_name
+        entry["series_season"] = time.gmtime().tm_year
+    entry["series_episodes"] = parser.episodes
+    entry["series_id"] = parser.pack_identifier
+    entry["series_id_type"] = parser.id_type
+    entry["series_identified_by"] = parser.identified_by
+    entry["series_exact"] = parser.strict_name
 
     # If a config is passed in, also look for 'path' and 'set' options to set more fields
     if config:
         # set custom download path
-        if 'path' in config:
+        if "path" in config:
             logger.debug(
-                'setting custom path for `{}` to `{}`', entry['title'], config.get('path')
+                "setting custom path for `{}` to `{}`", entry["title"], config.get("path")
             )
             # Just add this to the 'set' dictionary, so that string replacement is done cleanly
-            config.setdefault('set', {}).update(path=config['path'])
+            config.setdefault("set", {}).update(path=config["path"])
 
         # accept info from set: and place into the entry
-        if 'set' in config:
-            plugin.get('set', 'series').modify(entry, config.get('set'))
+        if "set" in config:
+            plugin.get("set", "series").modify(entry, config.get("set"))
 
 
 class FilterSeriesBase:
@@ -130,99 +130,99 @@ class FilterSeriesBase:
     @property
     def settings_schema(self):
         return {
-            'title': 'series options',
-            'type': 'object',
-            'properties': {
-                'path': {'type': 'string'},
-                'set': {'type': 'object'},
-                'alternate_name': one_or_more({'type': 'string'}),
+            "title": "series options",
+            "type": "object",
+            "properties": {
+                "path": {"type": "string"},
+                "set": {"type": "object"},
+                "alternate_name": one_or_more({"type": "string"}),
                 # Custom regexp options
-                'name_regexp': one_or_more({'type': 'string', 'format': 'regex'}),
-                'ep_regexp': one_or_more({'type': 'string', 'format': 'regex'}),
-                'date_regexp': one_or_more({'type': 'string', 'format': 'regex'}),
-                'sequence_regexp': one_or_more({'type': 'string', 'format': 'regex'}),
-                'id_regexp': one_or_more({'type': 'string', 'format': 'regex'}),
+                "name_regexp": one_or_more({"type": "string", "format": "regex"}),
+                "ep_regexp": one_or_more({"type": "string", "format": "regex"}),
+                "date_regexp": one_or_more({"type": "string", "format": "regex"}),
+                "sequence_regexp": one_or_more({"type": "string", "format": "regex"}),
+                "id_regexp": one_or_more({"type": "string", "format": "regex"}),
                 # Date parsing options
-                'date_yearfirst': {'type': 'boolean'},
-                'date_dayfirst': {'type': 'boolean'},
+                "date_yearfirst": {"type": "boolean"},
+                "date_dayfirst": {"type": "boolean"},
                 # Quality options
-                'quality': {'type': 'string', 'format': 'quality_requirements'},
-                'qualities': {
-                    'type': 'array',
-                    'items': {'type': 'string', 'format': 'quality_requirements'},
+                "quality": {"type": "string", "format": "quality_requirements"},
+                "qualities": {
+                    "type": "array",
+                    "items": {"type": "string", "format": "quality_requirements"},
                 },
-                'timeframe': {'type': 'string', 'format': 'interval'},
-                'upgrade': {'type': 'boolean'},
-                'target': {'type': 'string', 'format': 'quality_requirements'},
+                "timeframe": {"type": "string", "format": "interval"},
+                "upgrade": {"type": "boolean"},
+                "target": {"type": "string", "format": "quality_requirements"},
                 # Specials
-                'specials': {'type': 'boolean'},
+                "specials": {"type": "boolean"},
                 # Propers (can be boolean, or an interval string)
-                'propers': {'type': ['boolean', 'string'], 'format': 'interval'},
+                "propers": {"type": ["boolean", "string"], "format": "interval"},
                 # Identified by
-                'identified_by': {
-                    'type': 'string',
-                    'enum': ['ep', 'date', 'sequence', 'id', 'auto'],
+                "identified_by": {
+                    "type": "string",
+                    "enum": ["ep", "date", "sequence", "id", "auto"],
                 },
                 # Strict naming
-                'exact': {'type': 'boolean'},
+                "exact": {"type": "boolean"},
                 # Begin takes an ep, sequence or date identifier
-                'begin': {'type': ['string', 'integer'], 'format': 'episode_or_season_id'},
-                'from_group': one_or_more({'type': 'string'}),
-                'parse_only': {'type': 'boolean'},
-                'special_ids': one_or_more({'type': 'string'}),
-                'prefer_specials': {'type': 'boolean'},
-                'assume_special': {'type': 'boolean'},
+                "begin": {"type": ["string", "integer"], "format": "episode_or_season_id"},
+                "from_group": one_or_more({"type": "string"}),
+                "parse_only": {"type": "boolean"},
+                "special_ids": one_or_more({"type": "string"}),
+                "prefer_specials": {"type": "boolean"},
+                "assume_special": {"type": "boolean"},
                 # Season pack
-                'season_packs': {
-                    'oneOf': [
-                        {'type': 'boolean'},
-                        {'type': 'integer'},
-                        {'type': 'string', 'enum': ['always', 'only']},
+                "season_packs": {
+                    "oneOf": [
+                        {"type": "boolean"},
+                        {"type": "integer"},
+                        {"type": "string", "enum": ["always", "only"]},
                         {
-                            'type': 'object',
-                            'properties': {
-                                'threshold': {'type': 'integer', 'minimum': 0},
-                                'reject_eps': {'type': 'boolean'},
+                            "type": "object",
+                            "properties": {
+                                "threshold": {"type": "integer", "minimum": 0},
+                                "reject_eps": {"type": "boolean"},
                             },
-                            'required': ['threshold', 'reject_eps'],
-                            'additionalProperties': False,
+                            "required": ["threshold", "reject_eps"],
+                            "additionalProperties": False,
                         },
                     ]
                 },
             },
-            'dependentSchemas': {
-                'timeframe': {
-                    'oneOf': [{'required': ['target']}, {'required': ['qualities']}],
-                    'error': 'A `target` should be specified along with a timeframe.',
+            "dependentSchemas": {
+                "timeframe": {
+                    "oneOf": [{"required": ["target"]}, {"required": ["qualities"]}],
+                    "error": "A `target` should be specified along with a timeframe.",
                 }
             },
-            'additionalProperties': False,
+            "additionalProperties": False,
         }
 
     def make_grouped_config(self, config):
         """Turn a simple series list into grouped format with a empty settings dict."""
         if not isinstance(config, dict):
             # convert simplest configuration internally grouped format
-            config = {'simple': config, 'settings': {}}
+            config = {"simple": config, "settings": {}}
         else:
             # already in grouped format, just make sure there's settings
-            config.setdefault('settings', {})
+            config.setdefault("settings", {})
         return config
 
     def season_pack_opts(self, season_packs):
         """Parse the user's `season_packs` option, and turn it in to a more useful form."""
         if season_packs in [False, None]:
             return False
-        opts = {'threshold': 0, 'reject_eps': False}
+        opts = {"threshold": 0, "reject_eps": False}
         if season_packs is True:
             return opts
         if isinstance(season_packs, int):
-            opts['threshold'] = season_packs
+            opts["threshold"] = season_packs
         elif isinstance(season_packs, str):
-            if season_packs == 'always':
-                opts['threshold'] = sys.maxsize
+            if season_packs == "always":
+                opts["threshold"] = sys.maxsize
             else:  # 'only'
-                opts['reject_eps'] = True
+                opts["reject_eps"] = True
         elif isinstance(season_packs, dict):
             opts = season_packs
         return opts
@@ -232,18 +232,18 @@ class FilterSeriesBase:
         # Make sure config is in grouped format first
         config = self.make_grouped_config(config)
         for group_name in config:
-            if group_name == 'settings':
+            if group_name == "settings":
                 continue
             group_series = []
             if isinstance(group_name, str):
                 # if group name is known quality, convenience create settings with that quality
                 try:
                     qualities.Requirements(group_name)
-                    config['settings'].setdefault(group_name, {}).setdefault('target', group_name)
+                    config["settings"].setdefault(group_name, {}).setdefault("target", group_name)
                 except ValueError:
                     # If group name is not a valid quality requirement string, do nothing.
                     pass
-            group_settings = config['settings'].get(group_name, {})
+            group_settings = config["settings"].get(group_name, {})
             for series in config[group_name]:
                 # convert into dict-form if necessary
                 series_settings = {}
@@ -251,31 +251,31 @@ class FilterSeriesBase:
                     series, series_settings = next(iter(series.items()))
                 # Make sure this isn't a series with no name
                 if not series:
-                    logger.warning('Series config contains a series with no name!')
+                    logger.warning("Series config contains a series with no name!")
                     continue
                 # make sure series name is a string to accommodate for "24"
                 if not isinstance(series, str):
                     series = str(series)
                 # if series have given path instead of dict, convert it into a dict
                 if isinstance(series_settings, str):
-                    series_settings = {'path': series_settings}
+                    series_settings = {"path": series_settings}
                 # merge group settings into this series settings
                 merge_dict_from_to(group_settings, series_settings)
                 # Convert to dict if watched is in SXXEXX format
-                if isinstance(series_settings.get('watched'), str):
-                    season, episode = series_settings['watched'].upper().split('E')
-                    season = season.lstrip('S')
-                    series_settings['watched'] = {'season': int(season), 'episode': int(episode)}
+                if isinstance(series_settings.get("watched"), str):
+                    season, episode = series_settings["watched"].upper().split("E")
+                    season = season.lstrip("S")
+                    series_settings["watched"] = {"season": int(season), "episode": int(episode)}
                 # Convert enough to target for backwards compatibility
-                if 'enough' in series_settings:
+                if "enough" in series_settings:
                     logger.warning(
-                        'Series setting `enough` has been renamed to `target`. Please update your config.'
+                        "Series setting `enough` has been renamed to `target`. Please update your config."
                     )
-                    series_settings.setdefault('target', series_settings['enough'])
+                    series_settings.setdefault("target", series_settings["enough"])
 
                 group_series.append({series: series_settings})
             config[group_name] = group_series
-        del config['settings']
+        del config["settings"]
         return config
 
     def prepare_config(self, config):
@@ -300,13 +300,13 @@ class FilterSeriesBase:
                 if series not in unique_series:
                     unique_series[series] = series_settings
                 else:
-                    if kwargs.get('log_once'):
+                    if kwargs.get("log_once"):
                         log_once(
-                            f'Series `{series}` is already configured in series plugin', logger
+                            f"Series `{series}` is already configured in series plugin", logger
                         )
                     else:
                         logger.warning(
-                            'Series `{}` is configured multiple times in series plugin.', series
+                            "Series `{}` is configured multiple times in series plugin.", series
                         )
                     # Combine the config dicts for both instances of the show
                     merge_dict_from_to(series_settings, unique_series[series])
@@ -317,12 +317,12 @@ class FilterSeriesBase:
     def merge_config(self, task, config):
         """Merge another series config dict in with the current one."""
         # Make sure we start with both configs as a list of complex series
-        native_series = self.prepare_config(task.config.get('series', {}))
+        native_series = self.prepare_config(task.config.get("series", {}))
         merging_series = self.prepare_config(config)
-        task.config['series'] = self.combine_series_lists(
+        task.config["series"] = self.combine_series_lists(
             native_series, merging_series, log_once=True
         )
-        return task.config['series']
+        return task.config["series"]
 
 
 class FilterSeries(FilterSeriesBase):
@@ -334,27 +334,27 @@ class FilterSeries(FilterSeriesBase):
     @property
     def schema(self):
         return {
-            'type': ['array', 'object'],
+            "type": ["array", "object"],
             # simple format:
             #   - series
             #   - another series
-            'items': {
-                'type': ['string', 'number', 'object'],
-                'additionalProperties': self.settings_schema,
+            "items": {
+                "type": ["string", "number", "object"],
+                "additionalProperties": self.settings_schema,
             },
             # advanced format:
             #   settings:
             #     group: {...}
             #   group:
             #     {...}
-            'properties': {
-                'settings': {'type': 'object', 'additionalProperties': self.settings_schema}
+            "properties": {
+                "settings": {"type": "object", "additionalProperties": self.settings_schema}
             },
-            'additionalProperties': {
-                'type': 'array',
-                'items': {
-                    'type': ['string', 'number', 'object'],
-                    'additionalProperties': self.settings_schema,
+            "additionalProperties": {
+                "type": "array",
+                "items": {
+                    "type": ["string", "number", "object"],
+                    "additionalProperties": self.settings_schema,
                 },
             },
         }
@@ -373,14 +373,14 @@ class FilterSeries(FilterSeriesBase):
                 if (
                     (name.lower().startswith(series_name.lower()))
                     and (name.lower() != series_name.lower())
-                    and 'exact' not in series_config
+                    and "exact" not in series_config
                 ):
                     logger.verbose(
-                        'Auto enabling exact matching for series `{}` (reason: `{}`)',
+                        "Auto enabling exact matching for series `{}` (reason: `{}`)",
                         series_name,
                         name,
                     )
-                    series_config['exact'] = True
+                    series_config["exact"] = True
 
     # Run after metainfo_quality and before metainfo_series
     @plugin.priority(125)
@@ -388,7 +388,7 @@ class FilterSeries(FilterSeriesBase):
         config = self.prepare_config(config)
         self.auto_exact(config)
 
-        parser = plugin.get('parsing', self)
+        parser = plugin.get("parsing", self)
 
         start_time = preferred_clock()
 
@@ -396,12 +396,12 @@ class FilterSeries(FilterSeriesBase):
         # Only process series if both the entry title and series title first letter match
         entries_map = defaultdict(list)
         for entry in task.entries:
-            parsed = parser.parse_series(entry['title'])
+            parsed = parser.parse_series(entry["title"])
             if parsed.name:
                 entries_map[parsed.name[:1].lower()].append(entry)
             else:
                 # If parsing failed, use first char of each word in the entry title
-                for word in entry['title'].replace(' ', '.').split('.'):
+                for word in entry["title"].replace(" ", ".").split("."):
                     entries_map[word[:1].lower()].append(entry)
 
         with Session() as session:
@@ -429,7 +429,7 @@ class FilterSeries(FilterSeriesBase):
 
             for series_item in config:
                 series_name, series_config = next(iter(series_item.items()))
-                alt_names = get_config_as_array(series_config, 'alternate_name')
+                alt_names = get_config_as_array(series_config, "alternate_name")
                 db_series = existing_db_series.get(normalize_series_name(series_name))
                 db_identified_by = db_series.identified_by if db_series else None
                 letters = set(
@@ -441,7 +441,7 @@ class FilterSeries(FilterSeriesBase):
                 if entries:
                     self.parse_series(entries, series_name, series_config, db_identified_by)
 
-        logger.debug('series on_task_metainfo took {} to parse', preferred_clock() - start_time)
+        logger.debug("series on_task_metainfo took {} to parse", preferred_clock() - start_time)
 
     def on_task_filter(self, task, config):
         """Filter series."""
@@ -453,11 +453,11 @@ class FilterSeries(FilterSeriesBase):
         found_series = {}
         for entry in task.entries:
             if (
-                entry.get('series_name')
-                and entry.get('series_id') is not None
-                and entry.get('series_parser')
+                entry.get("series_name")
+                and entry.get("series_id") is not None
+                and entry.get("series_parser")
             ):
-                found_series.setdefault(entry['series_name'], []).append(entry)
+                found_series.setdefault(entry["series_name"], []).append(entry)
 
         # Prefetch series
         with Session() as session:
@@ -478,9 +478,9 @@ class FilterSeries(FilterSeriesBase):
             with Session() as session:
                 series_name, series_config = next(iter(series_item.items()))
 
-                if series_config.get('parse_only'):
+                if series_config.get("parse_only"):
                     logger.debug(
-                        'Skipping filtering of series `{}` because of parse_only', series_name
+                        "Skipping filtering of series `{}` because of parse_only", series_name
                     )
                     continue
 
@@ -488,14 +488,14 @@ class FilterSeries(FilterSeriesBase):
                 series_name = str(series_name)
                 db_series = existing_series_map.get(normalize_series_name(series_name))
                 if not db_series:
-                    logger.debug('adding series `{}` into db', series_name)
+                    logger.debug("adding series `{}` into db", series_name)
                     db_series = db.Series()
                     db_series.name = series_name
-                    db_series.identified_by = series_config.get('identified_by', 'auto')
+                    db_series.identified_by = series_config.get("identified_by", "auto")
                     session.add(db_series)
-                    logger.debug('-> added `{}`', db_series)
+                    logger.debug("-> added `{}`", db_series)
                     session.flush()  # Flush to get an id on series before adding alternate names.
-                    alts = series_config.get('alternate_name', [])
+                    alts = series_config.get("alternate_name", [])
                     if not isinstance(alts, list):
                         alts = [alts]
                     for alt in alts:
@@ -514,12 +514,12 @@ class FilterSeries(FilterSeriesBase):
                     # store found episodes into database and save reference for later use
                     releases = db.store_parser(
                         session,
-                        entry['series_parser'],
+                        entry["series_parser"],
                         series=db_series,
-                        quality=entry.get('quality'),
+                        quality=entry.get("quality"),
                     )
-                    entry['series_releases'] = [r.id for r in releases]
-                    if hasattr(releases[0], 'episode'):
+                    entry["series_releases"] = [r.id for r in releases]
+                    if hasattr(releases[0], "episode"):
                         entity = releases[0].episode
                     else:
                         entity = releases[0].season
@@ -527,32 +527,32 @@ class FilterSeries(FilterSeriesBase):
 
                 # If we didn't find any episodes for this series, continue
                 if not series_entries:
-                    logger.trace('No entries found for `{}` this run.', series_name)
+                    logger.trace("No entries found for `{}` this run.", series_name)
                     continue
 
                 # configuration always overrides everything
-                if series_config.get('identified_by', 'auto') != 'auto':
-                    db_series.identified_by = series_config['identified_by']
+                if series_config.get("identified_by", "auto") != "auto":
+                    db_series.identified_by = series_config["identified_by"]
 
                 # if series doesn't have identified_by flag already set, calculate one now that new eps are added to db
                 auto_begin = False
-                if not db_series.identified_by or db_series.identified_by == 'auto':
+                if not db_series.identified_by or db_series.identified_by == "auto":
                     db_series.identified_by = db.auto_identified_by(db_series)
                     logger.debug(
-                        'identified_by set to `{}` based on series history',
+                        "identified_by set to `{}` based on series history",
                         db_series.identified_by,
                     )
                     # Update begin only if locked into ep or seq mode
-                    if db_series.identified_by in ['ep', 'seq']:
+                    if db_series.identified_by in ["ep", "seq"]:
                         auto_begin = True
 
                 # Remove begin episode if identified_by has now been set to a different type than begin ep
                 if db_series.begin and db_series.identified_by not in (
-                    'auto',
+                    "auto",
                     db_series.begin.identified_by,
                 ):
                     logger.warning(
-                        'Removing begin episode for {} ({}) because it does not match the identified_by type for series ({})',
+                        "Removing begin episode for {} ({}) because it does not match the identified_by type for series ({})",
                         series_name,
                         db_series.begin.identifier,
                         db_series.identified_by,
@@ -565,7 +565,7 @@ class FilterSeries(FilterSeriesBase):
                     latest: db.Episode = db.get_latest_release(entity.series)
                     ep_id = None
                     if latest:
-                        if db_series.identified_by == 'ep':
+                        if db_series.identified_by == "ep":
                             ep_id = f"S{latest.season}E01"
                         else:
                             ep_id = latest.identifier
@@ -573,10 +573,10 @@ class FilterSeries(FilterSeriesBase):
                             f"Defaulting series `{series_name}` begin to start of current season `{ep_id}`"
                         )
                     else:
-                        if db_series.identified_by == 'ep':
-                            ep_id = 'S01E01'
-                        elif db_series.identified_by == 'sequence':
-                            ep_id = '01'
+                        if db_series.identified_by == "ep":
+                            ep_id = "S01E01"
+                        elif db_series.identified_by == "sequence":
+                            ep_id = "01"
                         if ep_id is not None:
                             logger.verbose(
                                 f"Defaulting series `{series_name}` begin to best guess `{ep_id}`"
@@ -587,7 +587,7 @@ class FilterSeries(FilterSeriesBase):
 
                 self.process_series(task, series_entries, series_config)
 
-        logger.debug('processing series took {}', preferred_clock() - start_time)
+        logger.debug("processing series took {}", preferred_clock() - start_time)
 
     def parse_series(self, entries, series_name, config, db_identified_by=None):
         """Search for `series_name` and populate all `series_*` fields in entries when successfully parsed.
@@ -598,44 +598,44 @@ class FilterSeries(FilterSeriesBase):
         :param db_identified_by: Series config being processed
         """
         # set parser flags flags based on config / database
-        identified_by = config.get('identified_by', 'auto')
-        if identified_by == 'auto':
+        identified_by = config.get("identified_by", "auto")
+        if identified_by == "auto":
             # set flag from database
-            identified_by = db_identified_by or 'auto'
+            identified_by = db_identified_by or "auto"
 
         params = {
-            'identified_by': identified_by,
-            'alternate_names': get_config_as_array(config, 'alternate_name'),
-            'name_regexps': get_config_as_array(config, 'name_regexp'),
-            'strict_name': config.get('exact', False),
-            'allow_groups': get_config_as_array(config, 'from_group'),
-            'date_yearfirst': config.get('date_yearfirst'),
-            'date_dayfirst': config.get('date_dayfirst'),
-            'special_ids': get_config_as_array(config, 'special_ids'),
-            'prefer_specials': config.get('prefer_specials'),
-            'assume_special': config.get('assume_special'),
+            "identified_by": identified_by,
+            "alternate_names": get_config_as_array(config, "alternate_name"),
+            "name_regexps": get_config_as_array(config, "name_regexp"),
+            "strict_name": config.get("exact", False),
+            "allow_groups": get_config_as_array(config, "from_group"),
+            "date_yearfirst": config.get("date_yearfirst"),
+            "date_dayfirst": config.get("date_dayfirst"),
+            "special_ids": get_config_as_array(config, "special_ids"),
+            "prefer_specials": config.get("prefer_specials"),
+            "assume_special": config.get("assume_special"),
         }
         for id_type in plugin_parser_common.SERIES_ID_TYPES:
-            params[id_type + '_regexps'] = get_config_as_array(config, id_type + '_regexp')
+            params[id_type + "_regexps"] = get_config_as_array(config, id_type + "_regexp")
 
-        parser = plugin.get('parsing', self)
+        parser = plugin.get("parsing", self)
         for entry in entries:
             # skip processed entries
             if (
-                entry.get('series_parser')
-                and entry['series_parser'].valid
-                and entry['series_parser'].name.lower() != series_name.lower()
+                entry.get("series_parser")
+                and entry["series_parser"].valid
+                and entry["series_parser"].name.lower() != series_name.lower()
             ):
                 continue
 
             # Quality field may have been manipulated by e.g. assume_quality. Use quality field from entry if available.
-            parsed = parser.parse_series(entry['title'], name=series_name, **params)
+            parsed = parser.parse_series(entry["title"], name=series_name, **params)
             if not parsed.valid:
                 continue
-            parsed.field = 'title'
+            parsed.field = "title"
 
             logger.debug(
-                '`{}` detected as `{}`, field: `{}`', entry['title'], parsed, parsed.field
+                "`{}` detected as `{}`, field: `{}`", entry["title"], parsed, parsed.field
             )
             populate_entry_fields(entry, parsed, config)
 
@@ -658,7 +658,7 @@ class FilterSeries(FilterSeriesBase):
             # can't wait for task learn phase
             if series_entity.is_season:
                 logger.debug(
-                    'adding season number `{}` to accepted seasons for this task',
+                    "adding season number `{}` to accepted seasons for this task",
                     series_entity.season,
                 )
                 accepted_seasons_list.append(series_entity.season)
@@ -674,7 +674,7 @@ class FilterSeries(FilterSeriesBase):
             # Add season exclude hook to all entries so it will get added to list in all code paths of entry acceptance
             for entry in entries:
                 entry.add_hook(
-                    action='accept',
+                    action="accept",
                     func=_exclude_season_on_accept,
                     series_entity=entity,
                     accepted_seasons_list=accepted_seasons,
@@ -682,29 +682,29 @@ class FilterSeries(FilterSeriesBase):
 
             reason = None
 
-            logger.debug('start with entities: {}', [e['title'] for e in entries])
+            logger.debug("start with entities: {}", [e["title"] for e in entries])
 
-            season_packs = self.season_pack_opts(config.get('season_packs', False))
+            season_packs = self.season_pack_opts(config.get("season_packs", False))
             # reject season packs unless specified
             if entity.is_season and not season_packs:
                 for entry in entries:
-                    entry.reject('season pack support is turned off')
+                    entry.reject("season pack support is turned off")
                 continue
 
             # reject episodes if season pack is set to 'only'
-            if not entity.is_season and season_packs and season_packs['reject_eps']:
+            if not entity.is_season and season_packs and season_packs["reject_eps"]:
                 for entry in entries:
-                    entry.reject('season pack only mode')
+                    entry.reject("season pack only mode")
                 continue
 
             # Determine episode threshold for season pack
-            ep_threshold = season_packs['threshold'] if season_packs else 0
+            ep_threshold = season_packs["threshold"] if season_packs else 0
 
             # check that a season pack for this season wasn't already accepted in this task run
             if entity.season in accepted_seasons:
                 for entry in entries:
                     entry.reject(
-                        f'already accepted season pack for season `{entity.season}` in this task'
+                        f"already accepted season pack for season `{entity.season}` in this task"
                     )
                 continue
 
@@ -712,30 +712,30 @@ class FilterSeries(FilterSeriesBase):
             if entity.series.begin and entity < entity.series.begin:
                 for entry in entries:
                     entry.reject(
-                        f'Entity `{entity.identifier}` is before begin value of `{entity.series.begin.identifier}`'
+                        f"Entity `{entity.identifier}` is before begin value of `{entity.series.begin.identifier}`"
                     )
                 continue
 
             # skip special episodes if special handling has been turned off
-            if not config.get('specials', True) and entity.identified_by == 'special':
-                logger.debug('Skipping special episode as support is turned off.')
+            if not config.get("specials", True) and entity.identified_by == "special":
+                logger.debug("Skipping special episode as support is turned off.")
                 continue
 
-            logger.debug('current entities: {}', [e['title'] for e in entries])
+            logger.debug("current entities: {}", [e["title"] for e in entries])
 
             # quality filtering
-            if 'quality' in config:
+            if "quality" in config:
                 entries = self.process_quality(config, entries)
                 if not entries:
                     continue
-                reason = 'matches quality'
+                reason = "matches quality"
 
             # Many of the following functions need to know this info. Only look it up once.
             downloaded = entity.downloaded_releases
             downloaded_qualities = [rls.quality for rls in downloaded]
 
             # proper handling
-            logger.debug('{} process_propers -->', '-' * 20)
+            logger.debug("{} process_propers -->", "-" * 20)
             entries = self.process_propers(config, entity, entries)
             if not entries:
                 continue
@@ -744,48 +744,48 @@ class FilterSeries(FilterSeriesBase):
             for entry in reversed(
                 entries
             ):  # Iterate in reverse so we can safely remove from the list while iterating
-                if entry['quality'] in downloaded_qualities:
-                    entry.reject('quality already downloaded')
+                if entry["quality"] in downloaded_qualities:
+                    entry.reject("quality already downloaded")
                     entries.remove(entry)
             if not entries:
                 continue
 
             # Figure out if we need an additional quality for this ep
             if downloaded:
-                if config.get('upgrade'):
+                if config.get("upgrade"):
                     # Remove all the qualities lower than what we have
                     for entry in reversed(entries):
-                        if entry['quality'] < max(downloaded_qualities):
-                            entry.reject('worse quality than already downloaded.')
+                        if entry["quality"] < max(downloaded_qualities):
+                            entry.reject("worse quality than already downloaded.")
                             entries.remove(entry)
                 if not entries:
                     continue
 
-                if 'target' in config and config.get('upgrade'):
+                if "target" in config and config.get("upgrade"):
                     # If we haven't grabbed the target yet, allow upgrade to it
                     self.process_timeframe_target(config, entries, downloaded)
                     continue
-                if 'qualities' in config:
+                if "qualities" in config:
                     # Grab any additional wanted qualities
-                    logger.debug('{} process_qualities -->', '-' * 20)
+                    logger.debug("{} process_qualities -->", "-" * 20)
                     self.process_qualities(config, entries, downloaded)
                     continue
-                if config.get('upgrade'):
-                    entries[0].accept('is an upgrade to existing quality')
+                if config.get("upgrade"):
+                    entries[0].accept("is an upgrade to existing quality")
                     continue
 
                 # Reject entity because we have them
                 for entry in entries:
-                    entry.reject('entity has already been downloaded')
+                    entry.reject("entity has already been downloaded")
                 continue
 
             best = entries[0]
-            logger.debug('continuing w. entities: {}', [e['title'] for e in entries])
-            logger.debug('best entity is: `{}`', best['title'])
+            logger.debug("continuing w. entities: {}", [e["title"] for e in entries])
+            logger.debug("best entity is: `{}`", best["title"])
 
             # episode tracking. used only with season and sequence based series
-            if entity.identified_by in ['ep', 'sequence']:
-                logger.debug('{} tracking -->', '-' * 20)
+            if entity.identified_by in ["ep", "sequence"]:
+                logger.debug("{} tracking -->", "-" * 20)
                 if self.process_entity_tracking(
                     entity,
                     entries,
@@ -794,25 +794,25 @@ class FilterSeries(FilterSeriesBase):
                     continue
 
             # quality
-            if 'target' in config or 'qualities' in config:
-                if 'target' in config:
+            if "target" in config or "qualities" in config:
+                if "target" in config:
                     if self.process_timeframe_target(config, entries, downloaded):
                         continue
-                elif 'qualities' in config and self.process_qualities(config, entries, downloaded):
+                elif "qualities" in config and self.process_qualities(config, entries, downloaded):
                     continue
 
                 # We didn't make a quality target match, check timeframe to see
                 # if we should get something anyway
-                if 'timeframe' in config:
+                if "timeframe" in config:
                     if self.process_timeframe(task, config, entity, entries):
                         continue
-                    reason = 'Timeframe expired, choosing best available'
+                    reason = "Timeframe expired, choosing best available"
                 else:
                     # If target or qualities is configured without timeframe, don't accept anything now
                     continue
 
             # Just pick the best ep if we get here
-            reason = reason or 'choosing first acceptable match'
+            reason = reason or "choosing first acceptable match"
             best.accept(reason)
 
     def process_propers(self, config, episode, entries):
@@ -823,47 +823,47 @@ class FilterSeries(FilterSeriesBase):
         pass_filter = []
         # First find the best available proper for each quality without modifying incoming entry order
         sorted_entries = sorted(
-            entries, key=lambda e: (e['quality'], e['proper_count']), reverse=True
+            entries, key=lambda e: (e["quality"], e["proper_count"]), reverse=True
         )
         best_propers = {
-            q: next(e) for q, e in itertools.groupby(sorted_entries, key=lambda e: e['quality'])
+            q: next(e) for q, e in itertools.groupby(sorted_entries, key=lambda e: e["quality"])
         }
         for entry in entries:
-            if entry['proper_count'] < best_propers[entry['quality']]['proper_count']:
+            if entry["proper_count"] < best_propers[entry["quality"]]["proper_count"]:
                 # nuke qualities which there is a better proper available
-                entry.reject('nuked')
+                entry.reject("nuked")
             else:
                 pass_filter.append(entry)
 
         # If propers support is turned off, or proper timeframe has expired just return the filtered eps list
-        if isinstance(config.get('propers', True), bool):
-            if not config.get('propers', True):
+        if isinstance(config.get("propers", True), bool):
+            if not config.get("propers", True):
                 return pass_filter
         else:
             # propers with timeframe
-            logger.debug('proper timeframe: {}', config['propers'])
-            timeframe = parse_timedelta(config['propers'])
+            logger.debug("proper timeframe: {}", config["propers"])
+            timeframe = parse_timedelta(config["propers"])
 
             first_seen = episode.first_seen
             expires = first_seen + timeframe
-            logger.debug('propers timeframe: {}', timeframe)
-            logger.debug('first_seen: {}', first_seen)
-            logger.debug('propers ignore after: {}', expires)
+            logger.debug("propers timeframe: {}", timeframe)
+            logger.debug("first_seen: {}", first_seen)
+            logger.debug("propers ignore after: {}", expires)
 
             if datetime.now() > expires:
-                logger.debug('propers timeframe expired')
+                logger.debug("propers timeframe expired")
                 return pass_filter
 
         downloaded_qualities = {d.quality: d.proper_count for d in episode.downloaded_releases}
-        logger.debug('propers - downloaded qualities: {}', downloaded_qualities)
+        logger.debug("propers - downloaded qualities: {}", downloaded_qualities)
 
         # Accept propers we actually need, and remove them from the list of entries to continue processing
         for quality, entry in best_propers.items():
             if (
                 quality in downloaded_qualities
-                and entry['proper_count'] > downloaded_qualities[quality]
+                and entry["proper_count"] > downloaded_qualities[quality]
             ):
-                entry.accept('proper')
+                entry.accept("proper")
                 pass_filter.remove(entry)
 
         return pass_filter
@@ -873,17 +873,17 @@ class FilterSeries(FilterSeriesBase):
 
         :return: True if accepted something
         """
-        req = qualities.Requirements(config['target'])
+        req = qualities.Requirements(config["target"])
         if downloaded and any(req.allows(release.quality) for release in downloaded):
-            logger.debug('Target quality already achieved.')
+            logger.debug("Target quality already achieved.")
             return True
         # scan for quality
         for entry in entries:
-            if req.allows(entry['quality']):
+            if req.allows(entry["quality"]):
                 logger.debug(
-                    'Accepted by series. `{}` meets quality requirement `{}`.', entry['title'], req
+                    "Accepted by series. `{}` meets quality requirement `{}`.", entry["title"], req
                 )
-                entry.accept('target quality')
+                entry.accept("target quality")
                 return True
         return None
 
@@ -892,19 +892,19 @@ class FilterSeries(FilterSeriesBase):
 
         :returns: A list of eps that are in the acceptable range
         """
-        reqs = qualities.Requirements(config['quality'])
-        logger.debug('quality req: {}', reqs)
+        reqs = qualities.Requirements(config["quality"])
+        logger.debug("quality req: {}", reqs)
         result = []
         # see if any of the eps match accepted qualities
         for entry in entries:
-            if reqs.allows(entry['quality']):
+            if reqs.allows(entry["quality"]):
                 result.append(entry)
             else:
                 logger.verbose(
-                    'Ignored `{}`. Does not meet quality requirement `{}`.', entry['title'], reqs
+                    "Ignored `{}`. Does not meet quality requirement `{}`.", entry["title"], reqs
                 )
         if not result:
-            logger.debug('no quality meets requirements')
+            logger.debug("no quality meets requirements")
         return result
 
     def process_entity_tracking(self, entity, entries, threshold):
@@ -927,34 +927,34 @@ class FilterSeries(FilterSeriesBase):
             begin = db.Episode()
             begin.identified_by = latest.identified_by
             begin.number = 1
-            if begin.identified_by == 'ep':
+            if begin.identified_by == "ep":
                 begin.season = 1
                 begin.identifier = "S01E01"
                 logger.verbose("Series begin is unknown, defaulting to ep S01E01")
-            elif begin.identified_by == 'sequence':
+            elif begin.identified_by == "sequence":
                 begin.season = 0
                 begin.identifier = "1"
                 logger.verbose("Series begin is unknown, defaulting to sequence 1")
             else:
                 logger.debug("Unable to set default begin (identified_by is date, auto)")
 
-        logger.debug('latest download: {}', latest)
-        logger.debug('current: {}', entity)
-        logger.debug('begin: {}', begin)
+        logger.debug("latest download: {}", latest)
+        logger.debug("current: {}", entity)
+        logger.debug("begin: {}", begin)
 
         # reject any entity if a season pack for this season was already downloaded
         if entity.season in entity.series.completed_seasons:
-            logger.debug('season `{}` already completed for this series', entity.season)
+            logger.debug("season `{}` already completed for this series", entity.season)
             for entry in entries:
-                entry.reject(f'Season `{entity.season}` is already completed')
+                entry.reject(f"Season `{entity.season}` is already completed")
             return True
 
         # Test if episode threshold has been met
         if entity.is_season and entity.series.episodes_for_season(entity.season) > threshold:
-            logger.debug('threshold of {} has been met, skipping season pack', threshold)
+            logger.debug("threshold of {} has been met, skipping season pack", threshold)
             for entry in entries:
                 entry.reject(
-                    'The configured number of episodes for this season has already been downloaded'
+                    "The configured number of episodes for this season has already been downloaded"
                 )
             return True
 
@@ -968,13 +968,13 @@ class FilterSeries(FilterSeriesBase):
             and entity < begin
         ):
             logger.debug(
-                'episode {} before begin {}! rejecting all occurrences',
+                "episode {} before begin {}! rejecting all occurrences",
                 entity.identifier,
                 begin.identifier,
             )
             for entry in entries:
                 entry.reject(
-                    f'Episode `{{entity.identifier}}` is from before series begin value `{begin.identifier}`. '
+                    f"Episode `{{entity.identifier}}` is from before series begin value `{begin.identifier}`. "
                 )
             return True
 
@@ -982,7 +982,7 @@ class FilterSeries(FilterSeriesBase):
         if entity.series.identified_by not in (entity.identified_by, "auto"):
             for entry in entries:
                 entry.reject(
-                    f'Episode `{{entity.identifier}}` doesn\'t match series format `{entity.series.identified_by}`. '
+                    f"Episode `{{entity.identifier}}` doesn't match series format `{entity.series.identified_by}`. "
                 )
             return None
         return None
@@ -995,41 +995,41 @@ class FilterSeries(FilterSeriesBase):
         :returns: True - if we should keep the quality (or qualities) restriction
                   False - if the quality restriction should be released, due to timeframe expiring
         """
-        if 'timeframe' not in config:
+        if "timeframe" not in config:
             return True
 
         best = entries[0]
 
         # parse options
-        logger.debug('timeframe: {}', config['timeframe'])
-        timeframe = parse_timedelta(config['timeframe'])
+        logger.debug("timeframe: {}", config["timeframe"])
+        timeframe = parse_timedelta(config["timeframe"])
 
-        if config.get('quality'):
-            req = qualities.Requirements(config['quality'])
+        if config.get("quality"):
+            req = qualities.Requirements(config["quality"])
             seen_times = [rls.first_seen for rls in episode.releases if req.allows(rls.quality)]
         else:
             seen_times = [rls.first_seen for rls in episode.releases]
         # Somehow we can get here without having qualifying releases (#2779) make sure min doesn't crash
         first_seen = min(seen_times) if seen_times else datetime.now()
-        expires = pendulum.instance(first_seen, tz='local') + timeframe
-        logger.debug('timeframe: {}, first_seen: {}, expires: {}', timeframe, first_seen, expires)
+        expires = pendulum.instance(first_seen, tz="local") + timeframe
+        logger.debug("timeframe: {}, first_seen: {}, expires: {}", timeframe, first_seen, expires)
 
         stop = normalize_series_name(task.options.stop_waiting) == episode.series._name_normalized
         if expires <= pendulum.now() or stop:
             # Expire timeframe, accept anything
-            logger.info('Timeframe expired, releasing quality restriction.')
+            logger.info("Timeframe expired, releasing quality restriction.")
             return False
         # verbose waiting, add to backlog
         logger.info(
-            '`{}`: Timeframe will expire {}. Waiting for target `{}`, current best is `{}`.',
+            "`{}`: Timeframe will expire {}. Waiting for target `{}`, current best is `{}`.",
             episode.series.name,
             expires.diff_for_humans(),
-            config.get('target', ' or '.join(config.get('qualities', []))),
-            best['title'],
+            config.get("target", " or ".join(config.get("qualities", []))),
+            best["title"],
         )
 
         # add best entry to backlog (backlog is able to handle duplicate adds)
-        plugin.get('backlog', self).add_backlog(task, best, session=object_session(episode))
+        plugin.get("backlog", self).add_backlog(task, best, session=object_session(episode))
 
         return True
 
@@ -1041,42 +1041,42 @@ class FilterSeries(FilterSeriesBase):
         """
         # Get list of already downloaded qualities
         downloaded_qualities = [r.quality for r in downloaded]
-        logger.debug('downloaded_qualities: {}', downloaded_qualities)
+        logger.debug("downloaded_qualities: {}", downloaded_qualities)
 
         # If qualities key is configured, we only want qualities defined in it.
-        wanted_qualities = {qualities.Requirements(name) for name in config.get('qualities', [])}
+        wanted_qualities = {qualities.Requirements(name) for name in config.get("qualities", [])}
         # Compute the requirements from our set that have not yet been fulfilled
         still_needed = [
             req
             for req in wanted_qualities
             if not any(req.allows(qual) for qual in downloaded_qualities)
         ]
-        logger.debug('wanted qualities: {}', wanted_qualities)
+        logger.debug("wanted qualities: {}", wanted_qualities)
 
         def wanted(quality):
             """Return True if we want this quality based on the config options."""
             wanted_q = not wanted_qualities or any(req.allows(quality) for req in wanted_qualities)
-            if config.get('upgrade'):
+            if config.get("upgrade"):
                 wanted_q = wanted_q and quality > max(
                     downloaded_qualities or [qualities.Quality()]
                 )
             return wanted_q
 
         for entry in entries:
-            quality = entry['quality']
-            logger.debug('ep: `{}`, quality: `{}`', entry['title'], quality)
+            quality = entry["quality"]
+            logger.debug("ep: `{}`, quality: `{}`", entry["title"], quality)
             if not wanted(quality):
-                logger.debug('`{}` is an unwanted quality', quality)
+                logger.debug("`{}` is an unwanted quality", quality)
                 continue
             if any(req.allows(quality) for req in still_needed):
                 # Don't get worse qualities in upgrade mode
                 if (
-                    config.get('upgrade')
+                    config.get("upgrade")
                     and downloaded_qualities
                     and quality < max(downloaded_qualities)
                 ):
                     continue
-                entry.accept('quality wanted')
+                entry.accept("quality wanted")
                 downloaded_qualities.append(quality)
                 downloaded.append(entry)
                 # Re-calculate what is still needed
@@ -1085,32 +1085,32 @@ class FilterSeries(FilterSeriesBase):
 
     def on_task_learn(self, task, config):
         """Learn succeeded episodes."""
-        logger.debug('on_task_learn')
+        logger.debug("on_task_learn")
         for entry in task.accepted:
-            if 'series_releases' in entry:
+            if "series_releases" in entry:
                 with Session() as session:
                     season_num = ep_num = 0
-                    if entry['season_pack']:
+                    if entry["season_pack"]:
                         season_num = (
                             session.query(db.SeasonRelease)
-                            .filter(db.SeasonRelease.id.in_(entry['series_releases']))
-                            .update({'downloaded': True}, synchronize_session=False)
+                            .filter(db.SeasonRelease.id.in_(entry["series_releases"]))
+                            .update({"downloaded": True}, synchronize_session=False)
                         )
                     else:
                         ep_num = (
                             session.query(db.EpisodeRelease)
-                            .filter(db.EpisodeRelease.id.in_(entry['series_releases']))
-                            .update({'downloaded': True}, synchronize_session=False)
+                            .filter(db.EpisodeRelease.id.in_(entry["series_releases"]))
+                            .update({"downloaded": True}, synchronize_session=False)
                         )
 
                 logger.debug(
-                    'marking {} episode releases and {} season releases as downloaded for `{}`',
+                    "marking {} episode releases and {} season releases as downloaded for `{}`",
                     ep_num,
                     season_num,
                     entry,
                 )
             else:
-                logger.debug('`{}` is not a series', entry['title'])
+                logger.debug("`{}` is not a series", entry["title"])
 
 
 class SeriesDBManager(FilterSeriesBase):
@@ -1127,9 +1127,9 @@ class SeriesDBManager(FilterSeriesBase):
             add_series_tasks = {}
 
             session.query(db.SeriesTask).filter(db.SeriesTask.name == task.name).delete()
-            if not task.config.get('series'):
+            if not task.config.get("series"):
                 return
-            config = self.prepare_config(task.config['series'])
+            config = self.prepare_config(task.config["series"])
 
             # Prefetch series
             names = [str(next(iter(series.keys()))) for series in config]
@@ -1146,7 +1146,7 @@ class SeriesDBManager(FilterSeriesBase):
                 # Make sure number shows (e.g. 24) are turned into strings
                 series_name = str(series_name)
                 db_series = existing_series_map.get(normalize_series_name(series_name))
-                alts = series_config.get('alternate_name', [])
+                alts = series_config.get("alternate_name", [])
                 if not isinstance(alts, list):
                     alts = [alts]
                 if db_series:
@@ -1159,21 +1159,21 @@ class SeriesDBManager(FilterSeriesBase):
                     # Add/update the possibly new alternate names
                 else:
                     logger.debug(
-                        'adding series `{}` `{}` into db (on_task_start)',
+                        "adding series `{}` `{}` into db (on_task_start)",
                         series_name,
                         normalize_series_name(series_name),
                     )
-                    logger.debug('adding series `{}` into db (on_task_start)', series_name)
+                    logger.debug("adding series `{}` into db (on_task_start)", series_name)
                     db_series = db.Series()
                     db_series.name = series_name
                     session.add(db_series)
                     session.flush()  # flush to get id on series before creating alternate names
                     existing_series_map[db_series.name_normalized] = db_series
-                    logger.debug('-> added `{}`', db_series)
+                    logger.debug("-> added `{}`", db_series)
                 for alt in alts:
                     db._add_alt_name(alt, db_series, series_name, session)
 
-                logger.debug('connecting series `{}` to task `{}`', db_series.name, task.name)
+                logger.debug("connecting series `{}` to task `{}`", db_series.name, task.name)
 
                 # Add in bulk at the end
                 if db_series.id not in add_series_tasks:
@@ -1181,12 +1181,12 @@ class SeriesDBManager(FilterSeriesBase):
                     series_task.series_id = db_series.id
                     add_series_tasks[db_series.id] = series_task
 
-                if series_config.get('identified_by', 'auto') != 'auto':
-                    db_series.identified_by = series_config['identified_by']
+                if series_config.get("identified_by", "auto") != "auto":
+                    db_series.identified_by = series_config["identified_by"]
                 # Set the begin episode
-                if series_config.get('begin'):
+                if series_config.get("begin"):
                     try:
-                        db.set_series_begin(db_series, series_config['begin'])
+                        db.set_series_begin(db_series, series_config["begin"])
                     except ValueError as e:
                         raise plugin.PluginError(e)
 
@@ -1194,21 +1194,21 @@ class SeriesDBManager(FilterSeriesBase):
                 session.bulk_save_objects(add_series_tasks.values())
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(FilterSeries, 'series', api_ver=2)
+    plugin.register(FilterSeries, "series", api_ver=2)
     # This is a builtin so that it can update the database for tasks that may have had series plugin removed
-    plugin.register(SeriesDBManager, 'series_db', builtin=True, api_ver=2)
+    plugin.register(SeriesDBManager, "series_db", builtin=True, api_ver=2)
 
 
-@event('options.register')
+@event("options.register")
 def register_parser_arguments():
-    exec_parser = options.get_parser('execute')
+    exec_parser = options.get_parser("execute")
     exec_parser.add_argument(
-        '--stop-waiting',
-        action='store',
-        dest='stop_waiting',
-        default='',
-        metavar='NAME',
-        help='stop timeframe for a given series',
+        "--stop-waiting",
+        action="store",
+        dest="stop_waiting",
+        default="",
+        metavar="NAME",
+        help="stop timeframe for a given series",
     )

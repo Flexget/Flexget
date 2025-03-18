@@ -1,7 +1,7 @@
 import pytest
 
-PLEX_USERNAME = 'flexget_flexget'
-PLEX_PASSWORD = 'flexget_flexget'
+PLEX_USERNAME = "flexget_flexget"
+PLEX_PASSWORD = "flexget_flexget"
 
 
 @pytest.mark.require_optional_deps
@@ -55,15 +55,15 @@ class TestPlex:
     """
 
     def test_list_add(self, execute_task):
-        task = execute_task('test_list_add')
-        task = execute_task('plex_watchlist')
+        task = execute_task("test_list_add")
+        task = execute_task("plex_watchlist")
         assert len(task.entries) == 3
 
     def test_list_match(self, execute_task):
-        task = execute_task('test_list_match')
+        task = execute_task("test_list_match")
         assert len(task.accepted) == 3
 
     def test_list_remove(self, execute_task):
-        task = execute_task('test_list_remove')
-        task = execute_task('plex_watchlist')
+        task = execute_task("test_list_remove")
+        task = execute_task("plex_watchlist")
         assert len(task.entries) == 1

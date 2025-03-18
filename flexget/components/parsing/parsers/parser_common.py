@@ -9,21 +9,21 @@ from flexget.utils.qualities import Quality
 if TYPE_CHECKING:
     import datetime
 
-logger = logger.bind(name='parser')
+logger = logger.bind(name="parser")
 
-SERIES_ID_TYPES = ['ep', 'date', 'sequence', 'id']
+SERIES_ID_TYPES = ["ep", "date", "sequence", "id"]
 
 
 def clean_value(name: str) -> str:
-    for char in '[]()_,.':
-        name = name.replace(char, ' ')
+    for char in "[]()_,.":
+        name = name.replace(char, " ")
 
     # if there are no spaces
-    if name.find(' ') == -1:
-        name = name.replace('-', ' ')
+    if name.find(" ") == -1:
+        name = name.replace("-", " ")
 
     # MovieParser.strip_spaces
-    return ' '.join(name.split())
+    return " ".join(name.split())
 
 
 def old_assume_quality(guessed_quality: Quality, assumed_quality: Quality) -> Quality:
@@ -42,7 +42,7 @@ def old_assume_quality(guessed_quality: Quality, assumed_quality: Quality) -> Qu
 
 
 def remove_dirt(name: str) -> str:
-    return re.sub(r'[_.,\[\]\(\): ]+', ' ', name).strip().lower() if name else name
+    return re.sub(r"[_.,\[\]\(\): ]+", " ", name).strip().lower() if name else name
 
 
 def normalize_name(name: str) -> str:
@@ -71,7 +71,7 @@ class MovieParseResult:
     @property
     def identifier(self) -> str:
         if self.name:
-            return (f'{self.name} {self.year}').strip().lower() if self.year else self.name.lower()
+            return (f"{self.name} {self.year}").strip().lower() if self.year else self.name.lower()
         return None
 
     @property
@@ -82,21 +82,21 @@ class MovieParseResult:
     def fields(self) -> dict:
         """Return a dict of all parser fields."""
         return {
-            'id': self.identifier,
-            'movie_parser': self,
-            'movie_name': self.name,
-            'movie_year': self.year,
-            'proper': self.proper,
-            'proper_count': self.proper_count,
-            'release_group': self.release_group,
+            "id": self.identifier,
+            "movie_parser": self,
+            "movie_name": self.name,
+            "movie_year": self.year,
+            "proper": self.proper,
+            "proper_count": self.proper_count,
+            "release_group": self.release_group,
         }
 
     def __str__(self) -> str:
-        valid = 'OK' if self.valid else 'INVALID'
+        valid = "OK" if self.valid else "INVALID"
         return (
-            f'<MovieParseResult(data={self.data},name={self.name},year={self.year},'
-            f'id={self.identifier},quality={self.quality},proper={self.proper_count},'
-            f'release_group={self.release_group},status={valid})>'
+            f"<MovieParseResult(data={self.data},name={self.name},year={self.year},"
+            f"id={self.identifier},quality={self.quality},proper={self.proper_count},"
+            f"release_group={self.release_group},status={valid})>"
         )
 
 
@@ -107,7 +107,7 @@ class SeriesParseResult:
         name: Optional[str] = None,
         identified_by: Optional[str] = None,
         id_type: Optional[str] = None,
-        id: Optional[Union[tuple[int, int], str, int, 'datetime.date']] = None,
+        id: Optional[Union[tuple[int, int], str, int, "datetime.date"]] = None,
         episodes: int = 1,
         season_pack: bool = False,
         strict_name: bool = False,
@@ -138,19 +138,19 @@ class SeriesParseResult:
     @property
     def season(self) -> Optional[int]:
         # TODO: Use match-case statement after Python 3.9 is dropped
-        if self.id_type == 'ep':
+        if self.id_type == "ep":
             return self.id[0]
-        if self.id_type == 'date':
+        if self.id_type == "date":
             return self.id.year
-        if self.id_type == 'sequence':
+        if self.id_type == "sequence":
             return 0
         return None
 
     @property
     def episode(self) -> Optional[int]:
-        if self.id_type == 'ep':
+        if self.id_type == "ep":
             return self.id[1]
-        if self.id_type == 'sequence':
+        if self.id_type == "sequence":
             return self.id
         return None
 
@@ -159,17 +159,17 @@ class SeriesParseResult:
         """Return all identifiers this parser represents. (for packs)."""
         # Currently 'ep' is the only id type that supports packs
         if not self.valid:
-            raise RuntimeError('Series flagged invalid')
-        if self.id_type == 'ep':
+            raise RuntimeError("Series flagged invalid")
+        if self.id_type == "ep":
             return (
-                [f'S{self.season:02d}']
+                [f"S{self.season:02d}"]
                 if self.season_pack
-                else [f'S{self.season:02d}E{self.episode + x:02d}' for x in range(self.episodes)]
+                else [f"S{self.season:02d}E{self.episode + x:02d}" for x in range(self.episodes)]
             )
-        if self.id_type == 'date':
-            return [self.id.strftime('%Y-%m-%d')]
+        if self.id_type == "date":
+            return [self.id.strftime("%Y-%m-%d")]
         if self.id is None:
-            raise RuntimeError('Series is missing identifier')
+            raise RuntimeError("Series is missing identifier")
         return [self.id]
 
     @property
@@ -185,15 +185,15 @@ class SeriesParseResult:
         """Return a combined identifier for the whole pack if this has more than one episode."""
         # Currently only supports ep mode
         return (
-            f'S{self.season:02d}E{self.episode:02d}-E{self.episode + self.episodes - 1:02d}'
-            if self.id_type == 'ep' and self.episodes > 1
+            f"S{self.season:02d}E{self.episode:02d}-E{self.episode + self.episodes - 1:02d}"
+            if self.id_type == "ep" and self.episodes > 1
             else self.identifier
         )
 
     def __str__(self) -> str:
-        valid = 'OK' if self.valid else 'INVALID'
+        valid = "OK" if self.valid else "INVALID"
         return (
-            f'<SeriesParseResult(data={self.data},name={self.name},id={self.id!s},season={self.season},'
-            f'season_pack={self.season_pack},episode={self.episode},quality={self.quality},'
-            f'proper={self.proper_count},special={self.special},status={valid})>'
+            f"<SeriesParseResult(data={self.data},name={self.name},id={self.id!s},season={self.season},"
+            f"season_pack={self.season_pack},episode={self.episode},quality={self.quality},"
+            f"proper={self.proper_count},special={self.special},status={valid})>"
         )

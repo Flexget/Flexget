@@ -24,16 +24,16 @@ class TestVariablesFromFile:
             accept_all: yes
     """
 
-    @pytest.mark.filecopy('variables.yml', '__tmp__/variables.yml')
+    @pytest.mark.filecopy("variables.yml", "__tmp__/variables.yml")
     def test_variable_from_file(self, execute_task, manager):
-        task = execute_task('test_variable_from_file')
+        task = execute_task("test_variable_from_file")
         assert len(task.accepted) == 1
 
-    @pytest.mark.filecopy('variables.yml', '__tmp__/variables.yml')
+    @pytest.mark.filecopy("variables.yml", "__tmp__/variables.yml")
     def test_variables_alongside_jinja(self, execute_task):
-        task = execute_task('test_variables_alongside_jinja')
+        task = execute_task("test_variables_alongside_jinja")
         assert len(task.accepted) == 1
-        assert task.accepted[0]['a_field'] == 'first bar then foo end'
+        assert task.accepted[0]["a_field"] == "first bar then foo end"
 
 
 class TestVariablesFromConfig:
@@ -56,12 +56,12 @@ class TestVariablesFromConfig:
     """
 
     def test_complex_var(self, execute_task):
-        task = execute_task('test_var_mock')
+        task = execute_task("test_var_mock")
         assert len(task.all_entries) == 2
-        assert task.all_entries[1]['title'] == 'b'
+        assert task.all_entries[1]["title"] == "b"
 
     def test_int_var(self, execute_task):
-        task = execute_task('test_int_var')
+        task = execute_task("test_int_var")
         assert len(task.all_entries) == 3
         assert len(task.accepted) == 2
 
@@ -80,10 +80,10 @@ class TestVariablesFromDB:
 
     def test_variable_from_db(self, execute_task, manager):
         with Session() as session:
-            s = Variables(variables={'test_variable_db': True})
+            s = Variables(variables={"test_variable_db": True})
             session.add(s)
 
-        fire_event('manager.before_config_validate', manager.config, manager)
+        fire_event("manager.before_config_validate", manager.config, manager)
 
-        task = execute_task('test_variable_from_db')
+        task = execute_task("test_variable_from_db")
         assert len(task.accepted) == 1

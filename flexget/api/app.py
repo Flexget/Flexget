@@ -23,9 +23,9 @@ from flexget.webserver import User
 
 from . import __path__
 
-__version__ = '1.8.0'
+__version__ = "1.8.0"
 
-logger = logger.bind(name='api')
+logger = logger.bind(name="api")
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -43,7 +43,7 @@ if TYPE_CHECKING:
         required: list[str]
 
     PaginationHeaders = TypedDict(
-        'PaginationHeaders', {'Link': str, 'Total-Count': int, 'Count': int}
+        "PaginationHeaders", {"Link": str, "Total-Count": int, "Count": int}
     )
 
 
@@ -56,20 +56,20 @@ class APIClient:
     def __init__(self) -> None:
         self.app = api_app.test_client()
 
-    def __getattr__(self, item: str) -> 'APIEndpoint':
-        return APIEndpoint('/api/' + item, self.get_endpoint)
+    def __getattr__(self, item: str) -> "APIEndpoint":
+        return APIEndpoint("/api/" + item, self.get_endpoint)
 
     def get_endpoint(self, url: str, data=None, method: Optional[str] = None):
         if method is None:
-            method = 'POST' if data is not None else 'GET'
-        auth_header = {'Authorization': f'Token {api_key()}'}
+            method = "POST" if data is not None else "GET"
+        auth_header = {"Authorization": f"Token {api_key()}"}
         response = self.app.open(
             url, data=data, follow_redirects=True, method=method, headers=auth_header
         )
         result = json.loads(response.get_data(as_text=True))
         # TODO: Proper exceptions
         if 200 > response.status_code >= 300:
-            raise HTTPError(result['error'])
+            raise HTTPError(result["error"])
         return result
 
 
@@ -79,7 +79,7 @@ class APIEndpoint:
         self.caller = caller
 
     def __getattr__(self, item):
-        return self.__class__(self.endpoint + '/' + item, self.caller)
+        return self.__class__(self.endpoint + "/" + item, self.caller)
 
     __getitem__ = __getattr__
 
@@ -93,7 +93,7 @@ def api_version(f: Callable[..., Response]):
     @wraps(f)
     def wrapped(*args, **kwargs):
         rv = f(*args, **kwargs)
-        rv.headers['API-Version'] = __version__
+        rv.headers["API-Version"] = __version__
         return rv
 
     return wrapped
@@ -149,7 +149,7 @@ class API(RestxAPI):
 
         return decorator
 
-    def response(self, code_or_apierror, description: str = 'Success', model=None, **kwargs):
+    def response(self, code_or_apierror, description: str = "Success", model=None, **kwargs):
         """Extend :meth:`flask_restx.Api.response` to allow passing an :class:`ApiError` class instead of response code.
 
         If an `ApiError` is used, the response code, and expected response model, is automatically
@@ -171,11 +171,11 @@ class API(RestxAPI):
 
     def pagination_parser(
         self,
-        parser: 'RequestParser' = None,
+        parser: "RequestParser" = None,
         sort_choices: Optional[list[str]] = None,
         default: Optional[str] = None,
         add_sort: Optional[bool] = None,
-    ) -> 'RequestParser':
+    ) -> "RequestParser":
         """Return a standardized pagination parser, to be used for any endpoint that has pagination.
 
         :param RequestParser parser: Can extend a given parser or create a new one
@@ -186,58 +186,58 @@ class API(RestxAPI):
         :return: An api.parser() instance with pagination and sorting arguments.
         """
         pagination = parser.copy() if parser else self.parser()
-        pagination.add_argument('page', type=int, default=1, help='Page number')
-        pagination.add_argument('per_page', type=int, default=50, help='Results per page')
+        pagination.add_argument("page", type=int, default=1, help="Page number")
+        pagination.add_argument("per_page", type=int, default=50, help="Results per page")
         if sort_choices or add_sort:
             pagination.add_argument(
-                'order', choices=('desc', 'asc'), default='desc', help='Sorting order'
+                "order", choices=("desc", "asc"), default="desc", help="Sorting order"
             )
         if sort_choices:
             pagination.add_argument(
-                'sort_by',
+                "sort_by",
                 choices=sort_choices,
                 default=default or sort_choices[0],
-                help='Sort by attribute',
+                help="Sort by attribute",
             )
 
         return pagination
 
 
-api_app = Flask(__name__, template_folder=Path(__path__[0]) / 'templates')
-api_app.config['REMEMBER_COOKIE_NAME'] = 'flexget.token'
-api_app.config['DEBUG'] = True
-api_app.config['RESTX_ERROR_404_HELP'] = False
+api_app = Flask(__name__, template_folder=Path(__path__[0]) / "templates")
+api_app.config["REMEMBER_COOKIE_NAME"] = "flexget.token"
+api_app.config["DEBUG"] = True
+api_app.config["RESTX_ERROR_404_HELP"] = False
 api_app.url_map.strict_slashes = False
 
-CORS(api_app, expose_headers='Link, Total-Count, Count, ETag')
+CORS(api_app, expose_headers="Link, Total-Count, Count, ETag")
 Compress(api_app)
 
 api = API(
     api_app,
-    title=f'Flexget API v{__version__}',
+    title=f"Flexget API v{__version__}",
     version=__version__,
-    description='View and manage flexget core operations and plugins. Open each endpoint view for usage information.'
-    ' Navigate to http://flexget.com/API for more details.',
+    description="View and manage flexget core operations and plugins. Open each endpoint view for usage information."
+    " Navigate to http://flexget.com/API for more details.",
     format_checker=format_checker,
 )
 
 base_message: "MessageDict" = {
-    'type': 'object',
-    'properties': {
-        'status_code': {'type': 'integer'},
-        'message': {'type': 'string'},
-        'status': {'type': 'string'},
+    "type": "object",
+    "properties": {
+        "status_code": {"type": "integer"},
+        "message": {"type": "string"},
+        "status": {"type": "string"},
     },
-    'required': ['status_code', 'message', 'status'],
+    "required": ["status_code", "message", "status"],
 }
 
-base_message_schema = api.schema_model('base_message', base_message)
+base_message_schema = api.schema_model("base_message", base_message)
 
 
 class APIError(Exception):
-    description = 'Server error'
+    description = "Server error"
     status_code = 500
-    status = 'Error'
+    status = "Error"
     response_model = base_message_schema
 
     def __init__(self, message: Optional[str] = None, payload=None) -> None:
@@ -256,89 +256,89 @@ class APIError(Exception):
 
 class NotFoundError(APIError):
     status_code = 404
-    description = 'Not found'
+    description = "Not found"
 
 
 class Unauthorized(APIError):
     status_code = 401
-    description = 'Unauthorized'
+    description = "Unauthorized"
 
 
 class BadRequest(APIError):
     status_code = 400
-    description = 'Bad request'
+    description = "Bad request"
 
 
 class Conflict(APIError):
     status_code = 409
-    description = 'Conflict'
+    description = "Conflict"
 
 
 class PreconditionFailed(APIError):
     status_code = 412
-    description = 'Precondition failed'
+    description = "Precondition failed"
 
 
 class NotModified(APIError):
     status_code = 304
-    description = 'not modified'
+    description = "not modified"
 
 
 class ValidationError(APIError):
     status_code = 422
-    description = 'Validation error'
+    description = "Validation error"
 
     response_model = api.schema_model(
-        'validation_error',
+        "validation_error",
         {
-            'type': 'object',
-            'properties': {
-                'validation_errors': {
-                    'type': 'array',
-                    'items': {
-                        'type': 'object',
-                        'properties': {
-                            'message': {
-                                'type': 'string',
-                                'description': 'A human readable message explaining the error.',
+            "type": "object",
+            "properties": {
+                "validation_errors": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "message": {
+                                "type": "string",
+                                "description": "A human readable message explaining the error.",
                             },
-                            'validator': {
-                                'type': 'string',
-                                'description': 'The name of the failed validator.',
+                            "validator": {
+                                "type": "string",
+                                "description": "The name of the failed validator.",
                             },
-                            'validator_value': {
-                                'type': 'string',
-                                'description': 'The value for the failed validator in the schema.',
+                            "validator_value": {
+                                "type": "string",
+                                "description": "The value for the failed validator in the schema.",
                             },
-                            'path': {'type': 'string'},
-                            'schema_path': {'type': 'string'},
+                            "path": {"type": "string"},
+                            "schema_path": {"type": "string"},
                         },
                     },
                 }
             },
-            'required': ['validation_errors'],
+            "required": ["validation_errors"],
         },
     )
 
     verror_attrs = (
-        'message',
-        'cause',
-        'validator',
-        'validator_value',
-        'path',
-        'schema_path',
-        'parent',
+        "message",
+        "cause",
+        "validator",
+        "validator_value",
+        "path",
+        "schema_path",
+        "parent",
     )
 
     def __init__(
-        self, validation_errors: list['SchemaValidationError'], message: str = 'validation error'
+        self, validation_errors: list["SchemaValidationError"], message: str = "validation error"
     ) -> None:
         payload = {
-            'validation_errors': [self._verror_to_dict(error) for error in validation_errors]
+            "validation_errors": [self._verror_to_dict(error) for error in validation_errors]
         }
         super().__init__(message, payload=payload)
 
-    def _verror_to_dict(self, error: 'SchemaValidationError') -> 'Mapping[str, Union[str, list]]':
+    def _verror_to_dict(self, error: "SchemaValidationError") -> "Mapping[str, Union[str, list]]":
         error_dict: dict[str, Union[str, list]] = {}
         for attr in self.verror_attrs:
             if isinstance(getattr(error, attr), deque):
@@ -348,11 +348,11 @@ class ValidationError(APIError):
         return error_dict
 
 
-empty_response = api.schema_model('empty', {'type': 'object'})
+empty_response = api.schema_model("empty", {"type": "object"})
 
 
-def success_response(message: str, status_code: int = 200, status: str = 'success') -> Response:
-    rsp_dict = {'message': message, 'status_code': status_code, 'status': status}
+def success_response(message: str, status_code: int = 200, status: str = "success") -> Response:
+    rsp_dict = {"message": message, "status_code": status_code, "status": status}
     rsp = jsonify(rsp_dict)
     rsp.status_code = status_code
     return rsp
@@ -371,8 +371,8 @@ def api_errors(error: APIError) -> tuple[dict, int]:
 
 
 @with_session
-def api_key(session: 'Session' = None) -> str:
-    logger.debug('fetching token for internal lookup')
+def api_key(session: "Session" = None) -> str:
+    logger.debug("fetching token for internal lookup")
     return session.query(User).first().token
 
 
@@ -392,30 +392,30 @@ def etag(method: Optional[Callable] = None, cache_age: int = 0):
     @wraps(method)
     def wrapped(*args, **kwargs):
         # Identify if this is a GET or HEAD in order to proceed
-        assert request.method in ['HEAD', 'GET'], '@etag is only supported for GET requests'
+        assert request.method in ["HEAD", "GET"], "@etag is only supported for GET requests"
         rv = method(*args, **kwargs)
         rv = make_response(rv)
 
         # Some headers can change without data change for specific page
         content_headers = (
-            rv.headers.get('link', '')
-            + rv.headers.get('count', '')
-            + rv.headers.get('total-count', '')
+            rv.headers.get("link", "")
+            + rv.headers.get("count", "")
+            + rv.headers.get("total-count", "")
         )
         data = (rv.get_data().decode() + content_headers).encode()
         etag = generate_etag(data)
-        rv.headers['Cache-Control'] = f'max-age={cache_age}'
-        rv.headers['ETag'] = etag
-        if_match = request.headers.get('If-Match')
-        if_none_match = request.headers.get('If-None-Match')
+        rv.headers["Cache-Control"] = f"max-age={cache_age}"
+        rv.headers["ETag"] = etag
+        if_match = request.headers.get("If-Match")
+        if_none_match = request.headers.get("If-None-Match")
 
         if if_match:
-            etag_list = [tag.strip() for tag in if_match.split(',')]
-            if etag not in etag_list and '*' not in etag_list:
-                raise PreconditionFailed('etag does not match')
+            etag_list = [tag.strip() for tag in if_match.split(",")]
+            if etag not in etag_list and "*" not in etag_list:
+                raise PreconditionFailed("etag does not match")
         elif if_none_match:
-            etag_list = [tag.strip() for tag in if_none_match.split(',')]
-            if etag in etag_list or '*' in etag_list:
+            etag_list = [tag.strip() for tag in if_none_match.split(",")]
+            if etag in etag_list or "*" in etag_list:
                 raise NotModified
 
         return rv
@@ -425,7 +425,7 @@ def etag(method: Optional[Callable] = None, cache_age: int = 0):
 
 def pagination_headers(
     total_pages: int, total_items: int, page_count: int, request: Request
-) -> 'PaginationHeaders':
+) -> "PaginationHeaders":
     """Create the `Link`. 'Count' and  'Total-Count' headers, to be used for pagination traversing.
 
     :param total_pages: Total number of pages
@@ -435,22 +435,22 @@ def pagination_headers(
     :return:
     """
     # Build constant variables from request data
-    url = request.url_root + request.path.lstrip('/')
-    per_page = request.args.get('per_page', 50)
-    page = int(request.args.get('page', 1))
+    url = request.url_root + request.path.lstrip("/")
+    per_page = request.args.get("per_page", 50)
+    page = int(request.args.get("page", 1))
 
     # Build the base template
-    link_with_params = f'<{url}?per_page={per_page}&'
+    link_with_params = f"<{url}?per_page={per_page}&"
 
     # Removed page and per_page from query string
-    query_string = re.sub(rb'per_page=\d+', b'', request.query_string)
-    query_string = re.sub(rb'page=\d+', b'', query_string)
-    query_string = re.sub(b'&{2,}', b'&', query_string)
+    query_string = re.sub(rb"per_page=\d+", b"", request.query_string)
+    query_string = re.sub(rb"page=\d+", b"", query_string)
+    query_string = re.sub(b"&{2,}", b"&", query_string)
 
     # Add all original query params
-    link_with_params += query_string.decode().lstrip('&')
+    link_with_params += query_string.decode().lstrip("&")
 
-    link_string = ''
+    link_string = ""
 
     if page > 1:
         link_string += f'{link_with_params}&page={page - 1}>; rel="prev", '
@@ -458,4 +458,4 @@ def pagination_headers(
         link_string += f'{link_with_params}&page={page + 1}>; rel="next", '
     link_string += f'{link_with_params}&page={total_pages}>; rel="last"'
 
-    return {'Link': link_string, 'Total-Count': total_items, 'Count': page_count}
+    return {"Link": link_string, "Total-Count": total_items, "Count": page_count}

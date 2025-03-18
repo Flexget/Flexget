@@ -18,8 +18,8 @@ class TestParameterize:
     """
 
     def test_parameterize(self, manager, execute_task):
-        task = execute_task('test')
-        assert len(task.entries) == 2, 'Should have created entries'
-        e1 = task.find_entry(title='entry 1')
+        task = execute_task("test")
+        assert len(task.entries) == 2, "Should have created entries"
+        e1 = task.find_entry(title="entry 1")
         assert e1
-        assert e1['other_field'] == 'field 1'
+        assert e1["other_field"] == "field 1"

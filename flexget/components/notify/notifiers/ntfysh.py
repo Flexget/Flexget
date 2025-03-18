@@ -9,7 +9,7 @@ from flexget.event import event
 from flexget.plugin import PluginWarning
 from flexget.utils.requests import Session as RequestSession
 
-plugin_name = 'ntfysh'
+plugin_name = "ntfysh"
 
 requests = RequestSession(max_retries=3)
 
@@ -29,46 +29,46 @@ class NtfyshNotifier:
     """
 
     schema = {
-        'type': 'object',
-        'properties': {
-            'url': {'format': 'url', 'default': 'https://ntfy.sh/'},
-            'topic': {'type': 'string'},
-            'priority': {'type': 'integer', 'default': 3},
-            'delay': {'type': 'string'},
-            'tags': {'type': 'string'},
-            'username': {'type': 'string'},
-            'password': {'type': 'string'},
+        "type": "object",
+        "properties": {
+            "url": {"format": "url", "default": "https://ntfy.sh/"},
+            "topic": {"type": "string"},
+            "priority": {"type": "integer", "default": 3},
+            "delay": {"type": "string"},
+            "tags": {"type": "string"},
+            "username": {"type": "string"},
+            "password": {"type": "string"},
         },
-        'required': ['topic', 'url'],
-        'additionalProperties': False,
+        "required": ["topic", "url"],
+        "additionalProperties": False,
     }
 
     def notify(self, title, message, config):
         """Send a Ntfy.sh notification."""
-        base_url = config['url']
-        topic = config['topic']
+        base_url = config["url"]
+        topic = config["topic"]
         url = urljoin(base_url, topic)
 
         req = {
-            'url': url,
-            'data': message,
-            'params': {'title': title, 'priority': config['priority']},
+            "url": url,
+            "data": message,
+            "params": {"title": title, "priority": config["priority"]},
         }
 
-        if 'username' in config or 'password' in config:
-            req['auth'] = HTTPBasicAuth(config.get('username', ''), config.get('password', ''))
+        if "username" in config or "password" in config:
+            req["auth"] = HTTPBasicAuth(config.get("username", ""), config.get("password", ""))
 
-        if 'delay' in config:
-            req['params']['delay'] = config['delay']
-        if 'tags' in config:
-            req['params']['tags'] = config['tags']
+        if "delay" in config:
+            req["params"]["delay"] = config["delay"]
+        if "tags" in config:
+            req["params"]["tags"] = config["tags"]
 
         try:
             requests.post(**req)
         except RequestException as e:
             if e.response is not None:
                 if e.response.status_code in (HTTPStatus.UNAUTHORIZED, HTTPStatus.FORBIDDEN):
-                    message = 'Invalid username and password'
+                    message = "Invalid username and password"
                 else:
                     message = e.response.text()
             else:
@@ -76,6 +76,6 @@ class NtfyshNotifier:
             raise PluginWarning(message)
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(NtfyshNotifier, plugin_name, api_ver=2, interfaces=['notifiers'])
+    plugin.register(NtfyshNotifier, plugin_name, api_ver=2, interfaces=["notifiers"])

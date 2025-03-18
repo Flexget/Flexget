@@ -9,9 +9,9 @@ try:
     # NOTE: Importing other plugins is discouraged!
     from flexget.plugins.internal import api_rottentomatoes as plugin_api_rottentomatoes
 except ImportError:
-    raise plugin.DependencyError(issued_by=__name__, missing='api_rottentomatoes')
+    raise plugin.DependencyError(issued_by=__name__, missing="api_rottentomatoes")
 
-logger = logger.bind(name='rottentomatoes_list')
+logger = logger.bind(name="rottentomatoes_list")
 
 
 class RottenTomatoesList:
@@ -32,25 +32,25 @@ class RottenTomatoesList:
     """
 
     schema = {
-        'type': 'object',
-        'properties': {
-            'dvds': {
-                'type': 'array',
-                'items': {'enum': ['top_rentals', 'current_releases', 'new_releases', 'upcoming']},
+        "type": "object",
+        "properties": {
+            "dvds": {
+                "type": "array",
+                "items": {"enum": ["top_rentals", "current_releases", "new_releases", "upcoming"]},
             },
-            'movies': {
-                'type': 'array',
-                'items': {'enum': ['box_office', 'in_theaters', 'opening', 'upcoming']},
+            "movies": {
+                "type": "array",
+                "items": {"enum": ["box_office", "in_theaters", "opening", "upcoming"]},
             },
-            'api_key': {'type': 'string'},
+            "api_key": {"type": "string"},
         },
-        'additionalProperties': False,
+        "additionalProperties": False,
     }
 
-    @cached('rottentomatoes_list', persist='2 hours')
+    @cached("rottentomatoes_list", persist="2 hours")
     def on_task_input(self, task, config):
         entries = []
-        api_key = config.get('api_key', None)
+        api_key = config.get("api_key", None)
         for l_type, l_names in list(config.items()):
             if not isinstance(l_names, list):
                 continue
@@ -60,19 +60,19 @@ class RottenTomatoesList:
                     list_type=l_type, list_name=l_name, api_key=api_key
                 )
                 if results:
-                    for movie in results['movies']:
-                        if [entry for entry in entries if movie['title'] == entry.get('title')]:
+                    for movie in results["movies"]:
+                        if [entry for entry in entries if movie["title"] == entry.get("title")]:
                             continue
-                        imdb_id = movie.get('alternate_ids', {}).get('imdb')
+                        imdb_id = movie.get("alternate_ids", {}).get("imdb")
                         if imdb_id:
-                            imdb_id = 'tt' + str(imdb_id)
+                            imdb_id = "tt" + str(imdb_id)
                         entries.append(
                             Entry(
-                                title=movie['title'],
-                                rt_id=movie['id'],
+                                title=movie["title"],
+                                rt_id=movie["id"],
                                 imdb_id=imdb_id,
-                                rt_name=movie['title'],
-                                url=movie['links']['alternate'],
+                                rt_name=movie["title"],
+                                url=movie["links"]["alternate"],
                             )
                         )
                 else:
@@ -84,6 +84,6 @@ class RottenTomatoesList:
         return entries
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(RottenTomatoesList, 'rottentomatoes_list', api_ver=2, interfaces=['task'])
+    plugin.register(RottenTomatoesList, "rottentomatoes_list", api_ver=2, interfaces=["task"])

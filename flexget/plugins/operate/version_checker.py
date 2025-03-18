@@ -8,12 +8,12 @@ from flexget.event import event
 from flexget.manager import Session
 from flexget.utils.tools import get_current_flexget_version, get_latest_flexget_version_number
 
-logger = logger.bind(name='version_checker')
-Base = db_schema.versioned_base('version_checker', 0)
+logger = logger.bind(name="version_checker")
+Base = db_schema.versioned_base("version_checker", 0)
 
 
 class LastVersionCheck(Base):
-    __tablename__ = 'last_version_check'
+    __tablename__ = "last_version_check"
 
     last_check_time = Column(DateTime, primary_key=True)
 
@@ -25,17 +25,17 @@ class LastVersionCheck(Base):
 
 
 schema = {
-    'oneOf': [
-        {'type': 'boolean'},
-        {'type': 'string', 'enum': ['always', 'by_interval']},
+    "oneOf": [
+        {"type": "boolean"},
+        {"type": "string", "enum": ["always", "by_interval"]},
         {
-            'type': 'object',
-            'properties': {
-                'lookup': {'type': 'string', 'enum': ['always', 'by_interval']},
-                'check_for_dev_version': {'type': 'boolean'},
-                'interval': {'type': 'integer'},
+            "type": "object",
+            "properties": {
+                "lookup": {"type": "string", "enum": ["always", "by_interval"]},
+                "check_for_dev_version": {"type": "boolean"},
+                "interval": {"type": "integer"},
             },
-            'additionalProperties': False,
+            "additionalProperties": False,
         },
     ]
 }
@@ -53,13 +53,13 @@ class VersionChecker:
 
     def prepare_config(self, config):
         if isinstance(config, bool) and config is True:
-            config = {'lookup': 'by_interval'}
+            config = {"lookup": "by_interval"}
         elif isinstance(config, str):
-            config = {'lookup': config}
+            config = {"lookup": config}
 
-        config.setdefault('lookup', 'by_interval')
-        config.setdefault('interval', 1)
-        config.setdefault('check_for_dev_version', False)
+        config.setdefault("lookup", "by_interval")
+        config.setdefault("interval", 1)
+        config.setdefault("check_for_dev_version", False)
 
         return config
 
@@ -70,12 +70,12 @@ class VersionChecker:
         config = self.prepare_config(config)
         current_version = get_current_flexget_version()
 
-        if config.get('check_for_dev_version') is False and current_version.endswith('dev'):
-            logger.debug('dev version detected, skipping check')
+        if config.get("check_for_dev_version") is False and current_version.endswith("dev"):
+            logger.debug("dev version detected, skipping check")
             return
 
-        always_check = bool(config.get('lookup') == 'always')
-        interval = config.get('interval')
+        always_check = bool(config.get("lookup") == "always")
+        interval = config.get("interval")
 
         session = Session()
         last_check = session.query(LastVersionCheck).first()
@@ -87,28 +87,28 @@ class VersionChecker:
                 should_poll = True
 
             if not should_poll:
-                logger.debug('version check interval not met, skipping check')
+                logger.debug("version check interval not met, skipping check")
                 return
 
         latest_version = get_latest_flexget_version_number()
         if not latest_version:
-            logger.warning('Could not get latest version of flexget')
+            logger.warning("Could not get latest version of flexget")
             return
         if latest_version != current_version:
             logger.warning(
-                'You are not running latest Flexget Version. Current is {} and latest is {}',
+                "You are not running latest Flexget Version. Current is {} and latest is {}",
                 current_version,
                 latest_version,
             )
         if last_check:
-            logger.debug('updating last check time')
+            logger.debug("updating last check time")
             last_check.update()
         else:
             last_check = LastVersionCheck()
-            logger.debug('creating instance of last version check in DB')
+            logger.debug("creating instance of last version check in DB")
             session.add(last_check)
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(VersionChecker, 'version_checker', api_ver=2)
+    plugin.register(VersionChecker, "version_checker", api_ver=2)

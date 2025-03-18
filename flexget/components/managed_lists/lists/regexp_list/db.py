@@ -7,59 +7,59 @@ from sqlalchemy.orm import relationship
 from flexget.db_schema import versioned_base, with_session
 from flexget.entry import Entry
 
-logger = logger.bind(name='regexp_list')
-Base = versioned_base('regexp_list', 1)
+logger = logger.bind(name="regexp_list")
+Base = versioned_base("regexp_list", 1)
 
 
 class RegexpListList(Base):
-    __tablename__ = 'regexp_list_lists'
+    __tablename__ = "regexp_list_lists"
     id = Column(Integer, primary_key=True)
     name = Column(Unicode, unique=True)
     added = Column(DateTime, default=datetime.now)
     regexps = relationship(
-        'RegexListRegexp', backref='list', cascade='all, delete, delete-orphan', lazy='dynamic'
+        "RegexListRegexp", backref="list", cascade="all, delete, delete-orphan", lazy="dynamic"
     )
 
     def __repr__(self):
-        return f'<RegexpListList name={self.name},id={self.id}>'
+        return f"<RegexpListList name={self.name},id={self.id}>"
 
     def to_dict(self):
-        return {'id': self.id, 'name': self.name, 'added_on': self.added}
+        return {"id": self.id, "name": self.name, "added_on": self.added}
 
 
 class RegexListRegexp(Base):
-    __tablename__ = 'regexp_list_regexps'
+    __tablename__ = "regexp_list_regexps"
     id = Column(Integer, primary_key=True)
     added = Column(DateTime, default=datetime.now)
     regexp = Column(Unicode)
     list_id = Column(Integer, ForeignKey(RegexpListList.id), nullable=False)
 
     def __repr__(self):
-        return f'<RegexListRegexp regexp={self.regexp},list_name={self.list.name}>'
+        return f"<RegexListRegexp regexp={self.regexp},list_name={self.list.name}>"
 
     def to_entry(self):
         entry = Entry()
-        entry['title'] = entry['regexp'] = self.regexp
-        entry['url'] = f'mock://localhost/regexp_list/{self.id}'
+        entry["title"] = entry["regexp"] = self.regexp
+        entry["url"] = f"mock://localhost/regexp_list/{self.id}"
         return entry
 
     def to_dict(self):
-        return {'id': self.id, 'added_on': self.added, 'regexp': self.regexp}
+        return {"id": self.id, "added_on": self.added, "regexp": self.regexp}
 
 
 @with_session
 def get_regexp_lists(name=None, session=None):
-    logger.debug('retrieving regexp lists')
+    logger.debug("retrieving regexp lists")
     query = session.query(RegexpListList)
     if name:
-        logger.debug('filtering by name {}', name)
+        logger.debug("filtering by name {}", name)
         query = query.filter(RegexpListList.name.contains(name))
     return query.all()
 
 
 @with_session
 def get_list_by_exact_name(name, session=None):
-    logger.debug('returning list with name {}', name)
+    logger.debug("returning list with name {}", name)
     return (
         session.query(RegexpListList)
         .filter(func.lower(RegexpListList.name) == name.lower())
@@ -69,7 +69,7 @@ def get_list_by_exact_name(name, session=None):
 
 @with_session
 def get_regexps_by_list_id(
-    list_id, count=False, start=None, stop=None, order_by='added', descending=False, session=None
+    list_id, count=False, start=None, stop=None, order_by="added", descending=False, session=None
 ):
     query = session.query(RegexListRegexp).filter(RegexListRegexp.list_id == list_id)
     if count:
@@ -84,7 +84,7 @@ def get_regexps_by_list_id(
 
 @with_session
 def get_list_by_id(list_id, session=None):
-    logger.debug('fetching list with id {}', list_id)
+    logger.debug("fetching list with id {}", list_id)
     return session.query(RegexpListList).filter(RegexpListList.id == list_id).one_or_none()
 
 
@@ -92,7 +92,7 @@ def get_list_by_id(list_id, session=None):
 def get_regexp(list_id, regexp, session=None):
     regexp_list = get_list_by_id(list_id=list_id, session=session)
     if regexp_list:
-        logger.debug('searching for regexp {} in list {}', regexp, list_id)
+        logger.debug("searching for regexp {} in list {}", regexp, list_id)
         return (
             session.query(RegexListRegexp)
             .filter(

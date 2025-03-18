@@ -3,7 +3,7 @@ from loguru import logger
 from flexget import plugin
 from flexget.event import event
 
-logger = logger.bind(name='rerun')
+logger = logger.bind(name="rerun")
 
 
 class Rerun:
@@ -13,10 +13,10 @@ class Rerun:
     that prevents other plugins modifying it.
     """
 
-    schema = {'type': ['integer']}
+    schema = {"type": ["integer"]}
 
     def on_task_start(self, task, config):
-        logger.debug('Setting max_reruns from {} -> {}', task.max_reruns, config)
+        logger.debug("Setting max_reruns from {} -> {}", task.max_reruns, config)
         task.max_reruns = int(config)
         task.lock_reruns()
 
@@ -24,6 +24,6 @@ class Rerun:
         task.rerun()
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(Rerun, 'rerun', api_ver=2, debug=True)
+    plugin.register(Rerun, "rerun", api_ver=2, debug=True)

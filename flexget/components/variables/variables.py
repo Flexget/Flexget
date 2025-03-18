@@ -17,30 +17,30 @@ from flexget.plugin import PluginError
 from flexget.utils.database import json_synonym
 from flexget.utils.template import get_filters
 
-logger = logger.bind(name='variables')
+logger = logger.bind(name="variables")
 
 DB_VERSION = 0
-Base = db_schema.versioned_base('variables', DB_VERSION)
+Base = db_schema.versioned_base("variables", DB_VERSION)
 
 
 class Variables(Base):
-    __tablename__ = 'variables'
+    __tablename__ = "variables"
 
     id = Column(Integer, primary_key=True)
-    _variables = Column('variables', Unicode)
-    variables = json_synonym('_variables')
+    _variables = Column("variables", Unicode)
+    variables = json_synonym("_variables")
     added = Column(DateTime, default=datetime.now)
 
 
 def variables_from_file(config_base, filename):
     variables_file = os.path.join(config_base, filename)
     if not os.path.exists(variables_file):
-        raise PluginError(f'File {variables_file} does not exist!')
+        raise PluginError(f"File {variables_file} does not exist!")
     try:
-        with codecs.open(variables_file, 'rb', 'utf-8') as f:
+        with codecs.open(variables_file, "rb", "utf-8") as f:
             variables_dict = yaml.safe_load(f.read())
     except yaml.YAMLError as e:
-        raise PluginError(f'Invalid variables file: {e}')
+        raise PluginError(f"Invalid variables file: {e}")
     return variables_dict or {}
 
 
@@ -61,29 +61,29 @@ def variables_to_db(variables_dict):
         session.merge(variables)
 
 
-@event('manager.before_config_validate')
+@event("manager.before_config_validate")
 def process_variables(config, manager):
     """Render all string elements of the config against defined variables."""
     env_params = {
-        'block_start_string': '^^disabled^^',
-        'block_end_string': '^^disabled^^',
-        'variable_start_string': '{?',
-        'variable_end_string': '?}',
+        "block_start_string": "^^disabled^^",
+        "block_end_string": "^^disabled^^",
+        "variable_start_string": "{?",
+        "variable_end_string": "?}",
     }
-    if 'variables' not in config or config.get('variables') is False:
+    if "variables" not in config or config.get("variables") is False:
         return None
     env = NativeEnvironment(**env_params)
     env.filters.update(get_filters())
-    if isinstance(config['variables'], bool):
-        logger.debug('trying to load variables from DB')
+    if isinstance(config["variables"], bool):
+        logger.debug("trying to load variables from DB")
         variables = variables_from_db()
-    elif isinstance(config['variables'], dict):
-        logger.debug('loading variables from config')
-        variables = config['variables']
+    elif isinstance(config["variables"], dict):
+        logger.debug("loading variables from config")
+        variables = config["variables"]
     else:
-        logger.debug('trying to load variables from file')
-        variables = variables_from_file(manager.config_base, config['variables'])
-        logger.debug('updating DB with variable file contents')
+        logger.debug("trying to load variables from file")
+        variables = variables_from_file(manager.config_base, config["variables"])
+        logger.debug("updating DB with variable file contents")
         variables_to_db(variables)
     env.globals = variables
     _process(config, env)
@@ -107,7 +107,7 @@ def _process(element, environment):
             if val:
                 element[i] = val
         return None
-    if isinstance(element, str) and '{?' in element:
+    if isinstance(element, str) and "{?" in element:
         try:
             template = environment.from_string(element)
             return template.render()
@@ -116,9 +116,9 @@ def _process(element, environment):
     return None
 
 
-variables_config_schema = {'type': ['string', 'boolean', 'object']}
+variables_config_schema = {"type": ["string", "boolean", "object"]}
 
 
-@event('config.register')
+@event("config.register")
 def register_config():
-    register_config_key('variables', variables_config_schema)
+    register_config_key("variables", variables_config_schema)

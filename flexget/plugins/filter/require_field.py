@@ -4,7 +4,7 @@ from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.event import event
 
-logger = logger.bind(name='require_field')
+logger = logger.bind(name="require_field")
 
 
 class FilterRequireField:
@@ -15,7 +15,7 @@ class FilterRequireField:
       require_field: imdb_url
     """
 
-    schema = one_or_more({'type': 'string'})
+    schema = one_or_more({"type": "string"})
 
     @plugin.priority(32)
     def on_task_filter(self, task, config):
@@ -24,13 +24,13 @@ class FilterRequireField:
         for entry in task.entries:
             for field in config:
                 if field not in entry:
-                    entry.reject(f'Required field {field} is not present')
+                    entry.reject(f"Required field {field} is not present")
                     break
                 if entry[field] is None:
-                    entry.reject(f'Required field {field} is `None`')
+                    entry.reject(f"Required field {field} is `None`")
                     break
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(FilterRequireField, 'require_field', api_ver=2)
+    plugin.register(FilterRequireField, "require_field", api_ver=2)

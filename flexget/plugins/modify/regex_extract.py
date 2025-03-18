@@ -7,7 +7,7 @@ from flexget.config_schema import one_or_more
 from flexget.event import event
 from flexget.utils.tools import ReList
 
-logger = logger.bind(name='regex_extract')
+logger = logger.bind(name="regex_extract")
 
 
 class RegexExtract:
@@ -32,16 +32,16 @@ class RegexExtract:
     """
 
     schema = {
-        'type': 'object',
-        'properties': {
-            'prefix': {'type': 'string'},
-            'field': {'type': 'string'},
-            'regex': one_or_more({'type': 'string', 'format': 'regex'}),
+        "type": "object",
+        "properties": {
+            "prefix": {"type": "string"},
+            "field": {"type": "string"},
+            "regex": one_or_more({"type": "string", "format": "regex"}),
         },
     }
 
     def on_task_start(self, task, config):
-        regex = config.get('regex')
+        regex = config.get("regex")
         if isinstance(regex, str):
             regex = [regex]
         self.regex_list = ReList(regex)
@@ -51,34 +51,34 @@ class RegexExtract:
             for _ in self.regex_list:
                 pass
         except re.error as e:
-            raise plugin.PluginError(f'Error compiling regex: {e!s}')
+            raise plugin.PluginError(f"Error compiling regex: {e!s}")
 
     def on_task_modify(self, task, config):
-        prefix = config.get('prefix')
+        prefix = config.get("prefix")
         modified = 0
 
         for entry in task.entries:
             for rx in self.regex_list:
-                entry_field = entry.get('title')
-                logger.debug('Matching {} with regex: {}', entry_field, rx)
+                entry_field = entry.get("title")
+                logger.debug("Matching {} with regex: {}", entry_field, rx)
                 try:
                     match = rx.match(entry_field)
                 except re.error as e:
-                    raise plugin.PluginError(f'Error encountered processing regex: {e!s}')
+                    raise plugin.PluginError(f"Error encountered processing regex: {e!s}")
                 if match:
-                    logger.debug('Successfully matched {}', entry_field)
+                    logger.debug("Successfully matched {}", entry_field)
                     data = match.groupdict()
                     if prefix:
                         for key in list(data.keys()):
                             data[prefix + key] = data[key]
                             del data[key]
-                    logger.debug('Values added to entry: {}', data)
+                    logger.debug("Values added to entry: {}", data)
                     entry.update(data)
                     modified += 1
 
-        logger.info('{} entries matched and modified', modified)
+        logger.info("{} entries matched and modified", modified)
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(RegexExtract, 'regex_extract', api_ver=2)
+    plugin.register(RegexExtract, "regex_extract", api_ver=2)

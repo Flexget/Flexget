@@ -11,9 +11,9 @@ from flexget.components.sites.utils import torrent_availability
 from flexget.entry import Entry
 from flexget.event import event
 
-logger = logger.bind(name='solidtorrents')
+logger = logger.bind(name="solidtorrents")
 
-URL = 'https://solidtorrents.net/'
+URL = "https://solidtorrents.net/"
 
 CATEGORIES = (
     "all",
@@ -38,18 +38,18 @@ class UrlRewriteSolidTorrents:
     """SolidTorrents urlrewriter."""
 
     schema = {
-        'oneOf': [
-            {'type': 'boolean'},
+        "oneOf": [
+            {"type": "boolean"},
             {
-                'type': 'object',
-                'properties': {
-                    'url': {'type': 'string', 'default': URL, 'format': 'url'},
-                    'category': {'type': 'string', 'enum': list(CATEGORIES)},
-                    'sort_by': {'type': 'string', 'enum': list(SORT)},
-                    'reverse': {'type': 'boolean'},
-                    'remove_potentially_unsafe': {'type': 'boolean'},
+                "type": "object",
+                "properties": {
+                    "url": {"type": "string", "default": URL, "format": "url"},
+                    "category": {"type": "string", "enum": list(CATEGORIES)},
+                    "sort_by": {"type": "string", "enum": list(SORT)},
+                    "reverse": {"type": "boolean"},
+                    "remove_potentially_unsafe": {"type": "boolean"},
                 },
-                'additionalProperties': False,
+                "additionalProperties": False,
             },
         ]
     }
@@ -62,71 +62,71 @@ class UrlRewriteSolidTorrents:
     def on_task_start(self, task, config=None):
         if not isinstance(config, dict):
             config = {}
-        self.set_urls(config.get('url', URL))
+        self.set_urls(config.get("url", URL))
 
     def set_urls(self, url):
-        url = url.rstrip('/')
+        url = url.rstrip("/")
         if self.url != url:
             self.url = url
             parsed_url = urlparse(url)
             escaped_url_scheme = re.escape(parsed_url.scheme)
             escaped_url_netloc = re.escape(parsed_url.netloc)
             self.url_match = re.compile(
-                rf'^{escaped_url_scheme}://{escaped_url_netloc}/view/[^/]+/([a-zA-Z0-9]{24})$'
+                rf"^{escaped_url_scheme}://{escaped_url_netloc}/view/[^/]+/([a-zA-Z0-9]{24})$"
             )
             self.url_search = re.compile(
-                rf'^{escaped_url_scheme}://{escaped_url_netloc}/search\?q=.*$'
+                rf"^{escaped_url_scheme}://{escaped_url_netloc}/search\?q=.*$"
             )
 
     # urlrewriter API
     def url_rewritable(self, task, entry):
-        url = entry['url']
-        if url.endswith('.torrent'):
+        url = entry["url"]
+        if url.endswith(".torrent"):
             return False
         return bool(self.url_match.match(url))
 
     # urlrewriter API
     def url_rewrite(self, task, entry):
-        if 'url' not in entry:
+        if "url" not in entry:
             logger.error("Didn't actually get a URL...")
         else:
-            logger.debug('Got the URL: {}', entry['url'])
-        if self.url_search.match(entry['url']):
+            logger.debug("Got the URL: {}", entry["url"])
+        if self.url_search.match(entry["url"]):
             # use search
             results = self.search(task, entry)
             if not results:
                 raise UrlRewritingError("No search results found")
             # TODO: Close matching was taken out of search methods, this may need to be fixed to be more picky
-            entry['url'] = results[0]['url']
+            entry["url"] = results[0]["url"]
         else:
-            torrent_id = self.url_match(entry['url']).group(1)
+            torrent_id = self.url_match(entry["url"]).group(1)
             url = f"{self.url}/api/v1/torrents/{torrent_id}"
-            logger.debug('Getting info for torrent ID {}', torrent_id)
+            logger.debug("Getting info for torrent ID {}", torrent_id)
             json_result = task.requests.get(url).json()
             # if json_result['error'] == '404':
-            if 'result' not in json_result:
+            if "result" not in json_result:
                 raise UrlRewritingError(f"Torrent with ID {torrent_id} does not exist.")
-            entry['url'] = json_result['result']['rating']['magnet']
+            entry["url"] = json_result["result"]["rating"]["magnet"]
 
     @plugin.internet(logger)
     def search(self, task, entry, config=None):
         """Search for name from solidtorrents."""
         if not isinstance(config, dict):
             config = {}
-        self.set_urls(config.get('url', URL))
-        sort = config.get('sort_by', 'seeders')
-        reverse = bool(config.get('reverse', 'False'))
-        remove_potentially_unsafe = bool(config.get('remove_potentially_unsafe', 'True'))
-        category = config.get('category', 'all')
+        self.set_urls(config.get("url", URL))
+        sort = config.get("sort_by", "seeders")
+        reverse = bool(config.get("reverse", "False"))
+        remove_potentially_unsafe = bool(config.get("remove_potentially_unsafe", "True"))
+        category = config.get("category", "all")
 
         entries = []
-        for search_string in entry.get('search_strings', [entry['title']]):
+        for search_string in entry.get("search_strings", [entry["title"]]):
             # query = normalize_unicode(search_string)
             params = {
-                'q': search_string,
-                'cat': category,
-                'sort': sort,
-                'fuv': remove_potentially_unsafe,
+                "q": search_string,
+                "cat": category,
+                "sort": sort,
+                "fuv": remove_potentially_unsafe,
             }
             url = f"{self.url}/api/v1/search"
             json_results = task.requests.get(url, params=params).json()
@@ -134,12 +134,12 @@ class UrlRewriteSolidTorrents:
                 raise plugin.PluginError(
                     "Error while searching solidtorrents for %s.", search_string
                 )
-            if 'results' not in json_results:
+            if "results" not in json_results:
                 logger.info(
                     "No result founds while searching solidtorrents for %s.", search_string
                 )
                 continue
-            for result in json_results['results']:
+            for result in json_results["results"]:
                 entry = self.json_to_entry(result)
                 entries.append(entry)
 
@@ -148,28 +148,28 @@ class UrlRewriteSolidTorrents:
     # convert a single json result to an Entry
     def json_to_entry(self, json_result: dict) -> Entry:
         entry = Entry()
-        entry['title'] = json_result['title']
-        entry['torrent_seeds'] = int(json_result['swarm']['seeders'])
-        entry['torrent_leeches'] = int(json_result['swarm']['leechers'])
-        entry['torrent_timestamp'] = int(
+        entry["title"] = json_result["title"]
+        entry["torrent_seeds"] = int(json_result["swarm"]["seeders"])
+        entry["torrent_leeches"] = int(json_result["swarm"]["leechers"])
+        entry["torrent_timestamp"] = int(
             time.mktime(
-                datetime.strptime(json_result['imported'], '%Y-%m-%dT%H:%M:%S.%fZ').timetuple()
+                datetime.strptime(json_result["imported"], "%Y-%m-%dT%H:%M:%S.%fZ").timetuple()
             )
         )
-        entry['torrent_availability'] = torrent_availability(
-            entry['torrent_seeds'], entry['torrent_leeches']
+        entry["torrent_availability"] = torrent_availability(
+            entry["torrent_seeds"], entry["torrent_leeches"]
         )
-        entry['content_size'] = int(json_result['size'])  # content_size is in bytes
-        entry['torrent_info_hash'] = json_result['infohash']
-        entry['url'] = json_result['magnet']
+        entry["content_size"] = int(json_result["size"])  # content_size is in bytes
+        entry["torrent_info_hash"] = json_result["infohash"]
+        entry["url"] = json_result["magnet"]
         return entry
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
     plugin.register(
         UrlRewriteSolidTorrents,
-        'solidtorrents',
-        interfaces=['urlrewriter', 'search', 'task'],
+        "solidtorrents",
+        interfaces=["urlrewriter", "search", "task"],
         api_ver=2,
     )

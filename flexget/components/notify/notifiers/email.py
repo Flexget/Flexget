@@ -13,7 +13,7 @@ from flexget.config_schema import one_or_more
 from flexget.event import event
 from flexget.plugin import PluginWarning
 
-plugin_name = 'email'
+plugin_name = "email"
 logger = logger.bind(name=plugin_name)
 
 
@@ -100,14 +100,14 @@ class EmailNotifier:
         self.tls = None
 
     def connect_to_smtp_server(self, config):
-        self.host = config['smtp_host']
-        self.port = config['smtp_port']
-        self.ssl = config['smtp_ssl']
-        self.tls = config['smtp_tls']
-        self.username = config.get('smtp_username')
-        self.password = config.get('smtp_password')
+        self.host = config["smtp_host"]
+        self.port = config["smtp_port"]
+        self.ssl = config["smtp_ssl"]
+        self.tls = config["smtp_tls"]
+        self.username = config.get("smtp_username")
+        self.password = config.get("smtp_password")
         try:
-            logger.debug('connecting to smtp server {}:{}', self.host, self.port)
+            logger.debug("connecting to smtp server {}:{}", self.host, self.port)
             self.mail_server = smtplib.SMTP_SSL if self.ssl else smtplib.SMTP
             self.mail_server = self.mail_server(self.host, self.port)
             if self.tls:
@@ -120,36 +120,36 @@ class EmailNotifier:
         try:
             if self.username:
                 # Forcing to use `str` type
-                logger.debug('logging in to smtp server using username: {}', self.username)
+                logger.debug("logging in to smtp server using username: {}", self.username)
                 self.mail_server.login(self.username, self.password)
         except (OSError, SMTPAuthenticationError) as e:
             raise PluginWarning(str(e))
 
     schema = {
-        'type': 'object',
-        'properties': {
-            'to': one_or_more({'type': 'string', 'format': 'email'}),
-            'from': {
-                'type': 'string',
-                'default': 'flexget_notifer@flexget.com',
-                'format': 'email',
+        "type": "object",
+        "properties": {
+            "to": one_or_more({"type": "string", "format": "email"}),
+            "from": {
+                "type": "string",
+                "default": "flexget_notifer@flexget.com",
+                "format": "email",
             },
-            'autofrom': {'type': 'boolean', 'default': False},
-            'smtp_host': {'type': 'string', 'default': 'localhost'},
-            'smtp_port': {'type': 'integer', 'default': 25},
-            'smtp_username': {'type': 'string'},
-            'smtp_password': {'type': 'string'},
-            'smtp_tls': {'type': 'boolean', 'default': False},
-            'smtp_ssl': {'type': 'boolean', 'default': False},
-            'html': {'type': 'boolean', 'default': False},
+            "autofrom": {"type": "boolean", "default": False},
+            "smtp_host": {"type": "string", "default": "localhost"},
+            "smtp_port": {"type": "integer", "default": 25},
+            "smtp_username": {"type": "string"},
+            "smtp_password": {"type": "string"},
+            "smtp_tls": {"type": "boolean", "default": False},
+            "smtp_ssl": {"type": "boolean", "default": False},
+            "html": {"type": "boolean", "default": False},
         },
-        'required': ['to'],
-        'dependentRequired': {
-            'smtp_username': ['smtp_password'],
-            'smtp_password': ['smtp_username'],
-            'smtp_ssl': ['smtp_tls'],
+        "required": ["to"],
+        "dependentRequired": {
+            "smtp_username": ["smtp_password"],
+            "smtp_password": ["smtp_username"],
+            "smtp_ssl": ["smtp_tls"],
         },
-        'additionalProperties': False,
+        "additionalProperties": False,
     }
 
     def notify(self, title, message, config):
@@ -159,39 +159,39 @@ class EmailNotifier:
         :param str title: message subject
         :param dict config: email plugin config
         """
-        if not isinstance(config['to'], list):
-            config['to'] = [config['to']]
+        if not isinstance(config["to"], list):
+            config["to"] = [config["to"]]
 
-        email = MIMEMultipart('alternative')
-        email['To'] = ','.join(config['to'])
-        email['From'] = (
-            getpass.getuser() + '@' + socket.getfqdn() if config['autofrom'] else config['from']
+        email = MIMEMultipart("alternative")
+        email["To"] = ",".join(config["to"])
+        email["From"] = (
+            getpass.getuser() + "@" + socket.getfqdn() if config["autofrom"] else config["from"]
         )
-        email['Subject'] = title
-        email['Date'] = formatdate(localtime=True)
-        content_type = 'html' if config['html'] else 'plain'
-        email.attach(MIMEText(message.encode('utf-8'), content_type, _charset='utf-8'))
+        email["Subject"] = title
+        email["Date"] = formatdate(localtime=True)
+        content_type = "html" if config["html"] else "plain"
+        email.attach(MIMEText(message.encode("utf-8"), content_type, _charset="utf-8"))
 
         # Making sure mail server connection will remain open per host or username
         # (in case several mail servers are used in the same task)
         if not self.mail_server or not (
-            self.host == config['smtp_host'] and self.username == config.get('smtp_username')
+            self.host == config["smtp_host"] and self.username == config.get("smtp_username")
         ):
             self.connect_to_smtp_server(config)
 
         connection_error = None
         while True:
             try:
-                self.mail_server.sendmail(email['From'], config['to'], email.as_string())
+                self.mail_server.sendmail(email["From"], config["to"], email.as_string())
                 break
             except (SMTPServerDisconnected, SMTPSenderRefused) as e:
                 if not connection_error:
                     self.connect_to_smtp_server(config)
                     connection_error = e
                 else:
-                    raise PluginWarning(f'Could not connect to SMTP server: {e!s}')
+                    raise PluginWarning(f"Could not connect to SMTP server: {e!s}")
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(EmailNotifier, plugin_name, api_ver=2, interfaces=['notifiers'])
+    plugin.register(EmailNotifier, plugin_name, api_ver=2, interfaces=["notifiers"])

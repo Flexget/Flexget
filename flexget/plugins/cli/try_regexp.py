@@ -6,7 +6,7 @@ from flexget import options, plugin
 from flexget.event import event
 from flexget.terminal import console
 
-logger = logger.bind(name='try_regexp')
+logger = logger.bind(name="try_regexp")
 
 
 class PluginTryRegexp:
@@ -30,20 +30,20 @@ class PluginTryRegexp:
         if self.abort:
             return
 
-        console('-' * 79)
-        console('Hi there, welcome to try regexps in realtime!')
+        console("-" * 79)
+        console("Hi there, welcome to try regexps in realtime!")
         console(
-            'Press ^D or type \'exit\' to continue. Type \'continue\' to continue non-interactive execution.'
+            "Press ^D or type 'exit' to continue. Type 'continue' to continue non-interactive execution."
         )
         console(
-            f'Task \'{task.name}\' has {len(task.entries)} entries, enter regexp to see what matches it.'
+            f"Task '{task.name}' has {len(task.entries)} entries, enter regexp to see what matches it."
         )
         while True:
             try:
-                s = input('--> ')
-                if s == 'exit':
+                s = input("--> ")
+                if s == "exit":
                     break
-                if s in ('abort', 'continue'):
+                if s in ("abort", "continue"):
                     self.abort = True
                     break
             except EOFError:
@@ -55,31 +55,31 @@ class PluginTryRegexp:
                     match, field = self.matches(entry, s)
                     if match:
                         console(
-                            'Title: {:40s} URL: {:30s} From: {}'.format(
-                                entry['title'], entry['url'], field
+                            "Title: {:40s} URL: {:30s} From: {}".format(
+                                entry["title"], entry["url"], field
                             )
                         )
                         count += 1
                 except re.error:
-                    console('Invalid regular expression')
+                    console("Invalid regular expression")
                     break
-            console(f'{count} of {len(task.entries)} entries matched')
-        console('Bye!')
+            console(f"{count} of {len(task.entries)} entries matched")
+        console("Bye!")
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
     # This plugin runs on task phases, but should not be allowed in the config, so we do not declare the 'task'
     # interface. This may break if we start checking for the task interface for more than just config schemas.
-    plugin.register(PluginTryRegexp, '--try-regexp', builtin=True, interfaces=[], api_ver=2)
+    plugin.register(PluginTryRegexp, "--try-regexp", builtin=True, interfaces=[], api_ver=2)
 
 
-@event('options.register')
+@event("options.register")
 def register_parser_arguments():
-    options.get_parser('execute').add_argument(
-        '--try-regexp',
-        action='store_true',
-        dest='try_regexp',
+    options.get_parser("execute").add_argument(
+        "--try-regexp",
+        action="store_true",
+        dest="try_regexp",
         default=False,
-        help='try regular expressions interactively',
+        help="try regular expressions interactively",
     )

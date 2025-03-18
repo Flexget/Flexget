@@ -6,7 +6,7 @@ from flexget.components.emby.emby_util import SCHEMA_SERVER, get_field_map
 from flexget.entry import register_lazy_lookup
 from flexget.event import event
 
-logger = logger.bind(name='emby_lookup')
+logger = logger.bind(name="emby_lookup")
 
 
 class EmbyLookup:
@@ -34,9 +34,9 @@ class EmbyLookup:
         try:
             self.auth.login(False)
         except plugin.PluginError as e:
-            logger.error('Not possible to login to emby: {}', e)
+            logger.error("Not possible to login to emby: {}", e)
 
-    @register_lazy_lookup('emby_lookup')
+    @register_lazy_lookup("emby_lookup")
     def lazy_loader(self, entry, auth):
         if not auth:
             return
@@ -61,11 +61,11 @@ class EmbyLookup:
     def add_lazy(self, entry, media_type):
         lazy_fields = get_field_map(media_type=media_type)
 
-        entry.add_lazy_fields(self.lazy_loader, lazy_fields, kwargs={'auth': self.auth})
+        entry.add_lazy_fields(self.lazy_loader, lazy_fields, kwargs={"auth": self.auth})
 
-        entry['emby_server_id'] = self.auth.server_id
-        entry['emby_username'] = self.auth.username
-        entry['emby_user_id'] = self.auth.uid
+        entry["emby_server_id"] = self.auth.server_id
+        entry["emby_username"] = self.auth.username
+        entry["emby_user_id"] = self.auth.uid
 
     # Run after series and metainfo series and imdb
     @plugin.priority(110)
@@ -79,19 +79,19 @@ class EmbyLookup:
     @property
     def movie_identifier(self):
         """Returns the plugin main identifier type."""
-        return 'emby_movie_id'
+        return "emby_movie_id"
 
     @property
     def series_identifier(self):
         """Returns the plugin main identifier type."""
-        return 'emby_serie_id'
+        return "emby_serie_id"
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
     plugin.register(
         EmbyLookup,
-        'emby_lookup',
+        "emby_lookup",
         api_ver=2,
-        interfaces=['task', 'series_metainfo', 'movie_metainfo'],
+        interfaces=["task", "series_metainfo", "movie_metainfo"],
     )

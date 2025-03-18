@@ -24,18 +24,18 @@ class TestServerAPI:
         """
 
     def test_pid(self, api_client, schema_match):
-        rsp = api_client.get('/server/pid/', headers={})
+        rsp = api_client.get("/server/pid/", headers={})
         assert rsp.status_code == 200
         data = json.loads(rsp.get_data(as_text=True))
 
         errors = schema_match(OC.pid_object, data)
         assert not errors
-        assert data['pid'] == os.getpid()
+        assert data["pid"] == os.getpid()
 
     def test_reload(self, api_client, schema_match):
-        with patch.object(MockManager, 'load_config') as mocked_load_config:
-            payload = {'operation': 'reload'}
-            rsp = api_client.json_post('/server/manage/', data=json.dumps(payload))
+        with patch.object(MockManager, "load_config") as mocked_load_config:
+            payload = {"operation": "reload"}
+            rsp = api_client.json_post("/server/manage/", data=json.dumps(payload))
             assert rsp.status_code == 200
             data = json.loads(rsp.get_data(as_text=True))
 
@@ -44,9 +44,9 @@ class TestServerAPI:
             assert mocked_load_config.called
 
     def test_shutdown(self, api_client, schema_match):
-        with patch.object(MockManager, 'shutdown') as mocked_shutdown:
-            payload = {'operation': 'shutdown'}
-            rsp = api_client.json_post('/server/manage/', data=json.dumps(payload))
+        with patch.object(MockManager, "shutdown") as mocked_shutdown:
+            payload = {"operation": "shutdown"}
+            rsp = api_client.json_post("/server/manage/", data=json.dumps(payload))
             assert rsp.status_code == 200
             data = json.loads(rsp.get_data(as_text=True))
 
@@ -55,32 +55,32 @@ class TestServerAPI:
             assert mocked_shutdown.called
 
     def test_get_config(self, api_client, schema_match):
-        rsp = api_client.get('/server/config/')
+        rsp = api_client.get("/server/config/")
         assert rsp.status_code == 200
         data = json.loads(rsp.get_data(as_text=True))
 
-        errors = schema_match({'type': 'object'}, data)
+        errors = schema_match({"type": "object"}, data)
         assert not errors
         assert data == {
-            'tasks': {
-                'test': {
-                    'mock': [{'title': 'entry 1'}],
-                    'rss': {
-                        'url': 'http://test/rss',
-                        'group_links': False,
-                        'ascii': False,
-                        'escape': False,
-                        'silent': False,
-                        'all_entries': True,
+            "tasks": {
+                "test": {
+                    "mock": [{"title": "entry 1"}],
+                    "rss": {
+                        "url": "http://test/rss",
+                        "group_links": False,
+                        "ascii": False,
+                        "escape": False,
+                        "silent": False,
+                        "all_entries": True,
                     },
                 }
             }
         }
 
     def test_get_raw_config(self, manager, api_client, schema_match):
-        manager._config_path = Path(__file__).parent / 'raw_config.yml'
+        manager._config_path = Path(__file__).parent / "raw_config.yml"
 
-        rsp = api_client.get('/server/raw_config/')
+        rsp = api_client.get("/server/raw_config/")
         assert rsp.status_code == 200
         data = json.loads(rsp.get_data(as_text=True))
 
@@ -88,29 +88,29 @@ class TestServerAPI:
         assert not errors
 
         assert (
-            data['raw_config']
-            == 'dGFza3M6CiAgdGVzdDoKICAgIHJzczoKICAgICAgdXJsOiBodHRwOi8vdGVzdC9yc3MKICAgIG1'
-            'vY2s6CiAgICAgIC0gdGl0bGU6IGVudHJ5IDE='
+            data["raw_config"]
+            == "dGFza3M6CiAgdGVzdDoKICAgIHJzczoKICAgICAgdXJsOiBodHRwOi8vdGVzdC9yc3MKICAgIG1"
+            "vY2s6CiAgICAgIC0gdGl0bGU6IGVudHJ5IDE="
         )
 
     @pytest.mark.online
     def test_version(self, api_client, schema_match):
         latest = get_latest_flexget_version_number()
 
-        rsp = api_client.get('/server/version/')
+        rsp = api_client.get("/server/version/")
         assert rsp.status_code == 200
         data = json.loads(rsp.get_data(as_text=True))
 
         errors = schema_match(OC.version_object, data)
         assert not errors
         assert data == {
-            'flexget_version': __version__,
-            'api_version': __api_version__,
-            'latest_version': latest,
+            "flexget_version": __version__,
+            "api_version": __api_version__,
+            "latest_version": latest,
         }
 
     def test_crash_logs_without_crash_log(self, api_client, schema_match):
-        rsp = api_client.get('/server/crash_logs')
+        rsp = api_client.get("/server/crash_logs")
         assert rsp.status_code == 200
         data = json.loads(rsp.get_data(as_text=True))
 
@@ -120,8 +120,8 @@ class TestServerAPI:
         assert not data
 
     def test_crash_logs_with_crashes(self, api_client, schema_match, manager):
-        manager._config_path = Path(__file__).parent / 'fakeconfig.yml'
-        rsp = api_client.get('/server/crash_logs')
+        manager._config_path = Path(__file__).parent / "fakeconfig.yml"
+        rsp = api_client.get("/server/crash_logs")
         assert rsp.status_code == 200
         data = json.loads(rsp.get_data(as_text=True))
 

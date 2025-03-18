@@ -20,6 +20,6 @@ if __name__ == "__main__":
         print(f"output dir {sys.argv[1]} does not exist")
         sys.exit(1)
 
-    with (out_dir / filename).open('w') as outfile:
+    with (out_dir / filename).open("w") as outfile:
         for arg in sys.argv[3:]:
-            outfile.write(arg + '\n')
+            outfile.write(arg + "\n")

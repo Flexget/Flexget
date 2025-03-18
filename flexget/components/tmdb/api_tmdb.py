@@ -25,29 +25,29 @@ from flexget.manager import Session
 from flexget.utils import requests
 from flexget.utils.database import json_synonym, with_session, year_property
 
-logger = logger.bind(name='api_tmdb')
-Base = db_schema.versioned_base('api_tmdb', 6)
+logger = logger.bind(name="api_tmdb")
+Base = db_schema.versioned_base("api_tmdb", 6)
 
 # This is a FlexGet API key
-API_KEY = 'bdfc018dbdb7c243dc7cb1454ff74b95'
-BASE_URL = 'https://api.themoviedb.org/3/'
+API_KEY = "bdfc018dbdb7c243dc7cb1454ff74b95"
+BASE_URL = "https://api.themoviedb.org/3/"
 
 _tmdb_config = None
 
 
 class TMDBConfig(Base):
-    __tablename__ = 'tmdb_configuration'
+    __tablename__ = "tmdb_configuration"
 
     id = Column(Integer, primary_key=True)
-    _configuration = Column('configuration', Unicode)
-    configuration = json_synonym('_configuration')
+    _configuration = Column("configuration", Unicode)
+    configuration = json_synonym("_configuration")
     updated = Column(DateTime, default=datetime.now, nullable=False)
 
     def __init__(self):
         try:
-            configuration = tmdb_request('configuration')
+            configuration = tmdb_request("configuration")
         except requests.RequestException as e:
-            raise LookupError(f'Error updating data from tmdb: {e}')
+            raise LookupError(f"Error updating data from tmdb: {e}")
         self.configuration = configuration
 
     @property
@@ -59,23 +59,23 @@ def get_tmdb_config():
     """Load TMDB config and cache it in DB and memory."""
     global _tmdb_config
     if _tmdb_config is None:
-        logger.debug('no tmdb configuration in memory, checking cache')
+        logger.debug("no tmdb configuration in memory, checking cache")
         with Session() as session:
             config = session.query(TMDBConfig).first()
             if not config or config.expired:
-                logger.debug('no config cached or config expired, refreshing')
+                logger.debug("no config cached or config expired, refreshing")
                 config = session.merge(TMDBConfig())
             _tmdb_config = config.configuration
     return _tmdb_config
 
 
 def tmdb_request(endpoint, **params):
-    params.setdefault('api_key', API_KEY)
+    params.setdefault("api_key", API_KEY)
     full_url = BASE_URL + endpoint
     return requests.get(full_url, params=params).json()
 
 
-@db_schema.upgrade('api_tmdb')
+@db_schema.upgrade("api_tmdb")
 def upgrade(ver, session):
     if ver is None or ver <= 5:
         raise db_schema.UpgradeImpossible
@@ -84,16 +84,16 @@ def upgrade(ver, session):
 
 # association tables
 genres_table = Table(
-    'tmdb_movie_genres',
+    "tmdb_movie_genres",
     Base.metadata,
-    Column('movie_id', Integer, ForeignKey('tmdb_movies.id')),
-    Column('genre_id', Integer, ForeignKey('tmdb_genres.id')),
+    Column("movie_id", Integer, ForeignKey("tmdb_movies.id")),
+    Column("genre_id", Integer, ForeignKey("tmdb_genres.id")),
 )
 Base.register_table(genres_table)
 
 
 class TMDBMovie(Base):
-    __tablename__ = 'tmdb_movies'
+    __tablename__ = "tmdb_movies"
 
     id = Column(Integer, primary_key=True, autoincrement=False, nullable=False)
     imdb_id = Column(Unicode)
@@ -102,7 +102,7 @@ class TMDBMovie(Base):
     original_name = Column(Unicode)
     alternative_name = Column(Unicode)
     released = Column(Date)
-    year = year_property('released')
+    year = year_property("released")
     runtime = Column(Integer)
     language = Column(Unicode)
     overview = Column(Unicode)
@@ -115,12 +115,12 @@ class TMDBMovie(Base):
     revenue = Column(Integer)
     homepage = Column(Unicode)
     lookup_language = Column(String)
-    _posters = relationship('TMDBPoster', backref='movie', cascade='all, delete, delete-orphan')
+    _posters = relationship("TMDBPoster", backref="movie", cascade="all, delete, delete-orphan")
     _backdrops = relationship(
-        'TMDBBackdrop', backref='movie', cascade='all, delete, delete-orphan'
+        "TMDBBackdrop", backref="movie", cascade="all, delete, delete-orphan"
     )
-    _genres = relationship('TMDBGenre', secondary=genres_table, backref='movies')
-    genres = association_proxy('_genres', 'name')
+    _genres = relationship("TMDBGenre", secondary=genres_table, backref="movies")
+    genres = association_proxy("_genres", "name")
     updated = Column(DateTime, default=datetime.now, nullable=False)
 
     def __init__(self, id, language):
@@ -131,46 +131,46 @@ class TMDBMovie(Base):
         self.id = id
         try:
             movie = tmdb_request(
-                f'movie/{self.id}',
-                append_to_response='alternative_titles',
+                f"movie/{self.id}",
+                append_to_response="alternative_titles",
                 language=language,
             )
         except requests.RequestException as e:
-            raise LookupError(f'Error updating data from tmdb: {e}')
-        self.imdb_id = movie['imdb_id']
-        self.name = movie['title']
-        self.original_name = movie['original_title']
-        if movie.get('release_date'):
-            self.released = dateutil_parse(movie['release_date']).date()
-        self.runtime = movie['runtime']
-        self.language = movie['original_language']
-        self.overview = movie['overview']
-        self.tagline = movie['tagline']
-        self.rating = movie['vote_average']
-        self.votes = movie['vote_count']
-        self.popularity = movie['popularity']
-        self.adult = movie['adult']
-        self.budget = movie['budget']
-        self.revenue = movie['revenue']
-        self.homepage = movie['homepage']
+            raise LookupError(f"Error updating data from tmdb: {e}")
+        self.imdb_id = movie["imdb_id"]
+        self.name = movie["title"]
+        self.original_name = movie["original_title"]
+        if movie.get("release_date"):
+            self.released = dateutil_parse(movie["release_date"]).date()
+        self.runtime = movie["runtime"]
+        self.language = movie["original_language"]
+        self.overview = movie["overview"]
+        self.tagline = movie["tagline"]
+        self.rating = movie["vote_average"]
+        self.votes = movie["vote_count"]
+        self.popularity = movie["popularity"]
+        self.adult = movie["adult"]
+        self.budget = movie["budget"]
+        self.revenue = movie["revenue"]
+        self.homepage = movie["homepage"]
         self.lookup_language = language
         try:
-            self.alternative_name = movie['alternative_titles']['titles'][0]['title']
+            self.alternative_name = movie["alternative_titles"]["titles"][0]["title"]
         except (KeyError, IndexError):
             # No alternate titles
             self.alternative_name = None
-        self._genres = [TMDBGenre(**g) for g in movie['genres']]
+        self._genres = [TMDBGenre(**g) for g in movie["genres"]]
         self.updated = datetime.now()
 
     def get_images(self):
-        logger.debug('images for movie {} not found in DB, fetching from TMDB', self.name)
+        logger.debug("images for movie {} not found in DB, fetching from TMDB", self.name)
         try:
-            images = tmdb_request(f'movie/{self.id}/images')
+            images = tmdb_request(f"movie/{self.id}/images")
         except requests.RequestException as e:
-            raise LookupError(f'Error updating data from tmdb: {e}')
+            raise LookupError(f"Error updating data from tmdb: {e}")
 
-        self._posters = [TMDBPoster(movie_id=self.id, **p) for p in images['posters']]
-        self._backdrops = [TMDBBackdrop(movie_id=self.id, **b) for b in images['backdrops']]
+        self._posters = [TMDBPoster(movie_id=self.id, **p) for p in images["posters"]]
+        self._backdrops = [TMDBBackdrop(movie_id=self.id, **b) for b in images["backdrops"]]
 
     @property
     def posters(self):
@@ -186,41 +186,41 @@ class TMDBMovie(Base):
 
     def to_dict(self):
         return {
-            'id': self.id,
-            'imdb_id': self.imdb_id,
-            'name': self.name,
-            'original_name': self.original_name,
-            'alternative_name': self.alternative_name,
-            'year': self.year,
-            'runtime': self.runtime,
-            'language': self.language,
-            'overview': self.overview,
-            'tagline': self.tagline,
-            'rating': self.rating,
-            'votes': self.votes,
-            'popularity': self.popularity,
-            'adult': self.adult,
-            'budget': self.budget,
-            'revenue': self.revenue,
-            'homepage': self.homepage,
-            'genres': list(self.genres),
-            'updated': self.updated,
-            'lookup_language': self.lookup_language,
+            "id": self.id,
+            "imdb_id": self.imdb_id,
+            "name": self.name,
+            "original_name": self.original_name,
+            "alternative_name": self.alternative_name,
+            "year": self.year,
+            "runtime": self.runtime,
+            "language": self.language,
+            "overview": self.overview,
+            "tagline": self.tagline,
+            "rating": self.rating,
+            "votes": self.votes,
+            "popularity": self.popularity,
+            "adult": self.adult,
+            "budget": self.budget,
+            "revenue": self.revenue,
+            "homepage": self.homepage,
+            "genres": list(self.genres),
+            "updated": self.updated,
+            "lookup_language": self.lookup_language,
         }
 
 
 class TMDBGenre(Base):
-    __tablename__ = 'tmdb_genres'
+    __tablename__ = "tmdb_genres"
 
     id = Column(Integer, primary_key=True, autoincrement=False)
     name = Column(Unicode, nullable=False)
 
 
 class TMDBImage(Base):
-    __tablename__ = 'tmdb_images'
+    __tablename__ = "tmdb_images"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    movie_id = Column(Integer, ForeignKey('tmdb_movies.id'))
+    movie_id = Column(Integer, ForeignKey("tmdb_movies.id"))
     file_path = Column(Unicode)
     width = Column(Integer)
     height = Column(Integer)
@@ -229,41 +229,41 @@ class TMDBImage(Base):
     vote_count = Column(Integer)
     iso_639_1 = Column(Unicode)
     type = Column(Unicode)
-    __mapper_args__ = {'polymorphic_on': type}
+    __mapper_args__ = {"polymorphic_on": type}
 
     def url(self, size):
-        return get_tmdb_config()['images']['base_url'] + size + self.file_path
+        return get_tmdb_config()["images"]["base_url"] + size + self.file_path
 
     def to_dict(self):
         return {
-            'id': self.id,
-            'urls': {
-                size: self.url(size) for size in get_tmdb_config()['images'][self.type + '_sizes']
+            "id": self.id,
+            "urls": {
+                size: self.url(size) for size in get_tmdb_config()["images"][self.type + "_sizes"]
             },
-            'movie_id': self.movie_id,
-            'file_path': self.file_path,
-            'width': self.width,
-            'height': self.height,
-            'aspect_ratio': self.aspect_ratio,
-            'vote_average': self.vote_average,
-            'vote_count': self.vote_count,
-            'language_code': self.iso_639_1,
+            "movie_id": self.movie_id,
+            "file_path": self.file_path,
+            "width": self.width,
+            "height": self.height,
+            "aspect_ratio": self.aspect_ratio,
+            "vote_average": self.vote_average,
+            "vote_count": self.vote_count,
+            "language_code": self.iso_639_1,
         }
 
 
 class TMDBPoster(TMDBImage):
-    __mapper_args__ = {'polymorphic_identity': 'poster'}
+    __mapper_args__ = {"polymorphic_identity": "poster"}
 
 
 class TMDBBackdrop(TMDBImage):
-    __mapper_args__ = {'polymorphic_identity': 'backdrop'}
+    __mapper_args__ = {"polymorphic_identity": "backdrop"}
 
 
 class TMDBSearchResult(Base):
-    __tablename__ = 'tmdb_search_results'
+    __tablename__ = "tmdb_search_results"
 
     search = Column(Unicode, primary_key=True)
-    movie_id = Column(Integer, ForeignKey('tmdb_movies.id'), nullable=True)
+    movie_id = Column(Integer, ForeignKey("tmdb_movies.id"), nullable=True)
     movie = relationship(TMDBMovie)
 
     def __init__(self, search, movie_id=None, movie=None):
@@ -287,7 +287,7 @@ class ApiTmdb:
         smart_match=None,
         only_cached=False,
         session=None,
-        language='en',
+        language="en",
     ):
         """Do a lookup from TMDb for the movie matching the passed arguments.
 
@@ -313,14 +313,14 @@ class ApiTmdb:
 
         if smart_match and not (title or tmdb_id or imdb_id):
             # If smart_match was specified, parse it into a title and year
-            title_parser = plugin.get('parsing', 'api_tmdb').parse_movie(smart_match)
+            title_parser = plugin.get("parsing", "api_tmdb").parse_movie(smart_match)
             title = title_parser.name
             year = title_parser.year
         if not (title or tmdb_id or imdb_id):
-            raise LookupError('No criteria specified for TMDb lookup')
-        id_str = f'<title={title}, year={year}, tmdb_id={tmdb_id}, imdb_id={imdb_id}>'
+            raise LookupError("No criteria specified for TMDb lookup")
+        id_str = f"<title={title}, year={year}, tmdb_id={tmdb_id}, imdb_id={imdb_id}>"
 
-        logger.debug('Looking up TMDb information for {}', id_str)
+        logger.debug("Looking up TMDb information for {}", id_str)
         movie = None
         if imdb_id or tmdb_id:
             ors = []
@@ -337,7 +337,7 @@ class ApiTmdb:
                 movie_filter = movie_filter.filter(TMDBMovie.year == year)
             movie = movie_filter.first()
             if not movie:
-                search_string = title + f' ({year})' if year else title
+                search_string = title + f" ({year})" if year else title
                 found = (
                     session.query(TMDBSearchResult)
                     .filter(TMDBSearchResult.search == search_string.lower())
@@ -357,52 +357,52 @@ class ApiTmdb:
                     refresh_time += timedelta(days=age_in_years * 5)
             if movie.updated < datetime.now() - refresh_time and not only_cached:
                 logger.debug(
-                    'Cache has expired for {}, attempting to refresh from TMDb.', movie.name
+                    "Cache has expired for {}, attempting to refresh from TMDb.", movie.name
                 )
                 try:
                     updated_movie = TMDBMovie(id=movie.id, language=language)
                 except LookupError:
                     logger.error(
-                        'Error refreshing movie details from TMDb, cached info being used.'
+                        "Error refreshing movie details from TMDb, cached info being used."
                     )
                 else:
                     movie = session.merge(updated_movie)
             else:
-                logger.debug('Movie {} information restored from cache.', movie.name)
+                logger.debug("Movie {} information restored from cache.", movie.name)
         else:
             if only_cached:
-                raise LookupError(f'Movie {id_str} not found from cache')
+                raise LookupError(f"Movie {id_str} not found from cache")
             # There was no movie found in the cache, do a lookup from tmdb
-            logger.verbose('Searching from TMDb {}', id_str)
+            logger.verbose("Searching from TMDb {}", id_str)
             if imdb_id and not tmdb_id:
                 try:
-                    result = tmdb_request(f'find/{imdb_id}', external_source='imdb_id')
+                    result = tmdb_request(f"find/{imdb_id}", external_source="imdb_id")
                 except requests.RequestException as e:
-                    raise LookupError(f'Error searching imdb id on tmdb: {e}')
-                if result['movie_results']:
-                    tmdb_id = result['movie_results'][0]['id']
+                    raise LookupError(f"Error searching imdb id on tmdb: {e}")
+                if result["movie_results"]:
+                    tmdb_id = result["movie_results"][0]["id"]
             if not tmdb_id:
-                search_string = title + f' ({year})' if year else title
-                search_params = {'query': title, 'language': language}
+                search_string = title + f" ({year})" if year else title
+                search_params = {"query": title, "language": language}
                 if year:
-                    search_params['year'] = year
+                    search_params["year"] = year
                 try:
-                    results = tmdb_request('search/movie', **search_params)
+                    results = tmdb_request("search/movie", **search_params)
                 except requests.RequestException as e:
-                    raise LookupError(f'Error searching for tmdb item {search_string}: {e}')
-                if not results['results']:
-                    raise LookupError(f'No results for {search_string} from tmdb')
-                tmdb_id = results['results'][0]['id']
+                    raise LookupError(f"Error searching for tmdb item {search_string}: {e}")
+                if not results["results"]:
+                    raise LookupError(f"No results for {search_string} from tmdb")
+                tmdb_id = results["results"][0]["id"]
                 session.add(TMDBSearchResult(search=search_string, movie_id=tmdb_id))
             if tmdb_id:
                 movie = TMDBMovie(id=tmdb_id, language=language)
                 movie = session.merge(movie)
             else:
-                raise LookupError(f'Unable to find movie on tmdb: {id_str}')
+                raise LookupError(f"Unable to find movie on tmdb: {id_str}")
 
         return movie
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(ApiTmdb, 'api_tmdb', api_ver=2, interfaces=[])
+    plugin.register(ApiTmdb, "api_tmdb", api_ver=2, interfaces=[])

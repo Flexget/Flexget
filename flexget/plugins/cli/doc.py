@@ -7,12 +7,12 @@ from flexget.event import event
 from flexget.plugin import plugins
 from flexget.terminal import console
 
-logger = logger.bind(name='doc')
+logger = logger.bind(name="doc")
 
 
 def trim(docstring):
     if not docstring:
-        return ''
+        return ""
     # Convert tabs to spaces (following the normal Python rules)
     # and split into a list of lines:
     lines = docstring.expandtabs().splitlines()
@@ -32,7 +32,7 @@ def trim(docstring):
     while trimmed and not trimmed[0]:
         trimmed.pop(0)
     # Return a single string:
-    return '\n'.join(trimmed)
+    return "\n".join(trimmed)
 
 
 def print_doc(manager, options):
@@ -40,16 +40,16 @@ def print_doc(manager, options):
     plugin = plugins.get(plugin_name, None)
     if plugin:
         if not plugin.instance.__doc__:
-            console(f'Plugin {plugin_name} does not have documentation')
+            console(f"Plugin {plugin_name} does not have documentation")
         else:
-            console('')
+            console("")
             console(trim(plugin.instance.__doc__))
-            console('')
+            console("")
     else:
-        console(f'Could not find plugin {plugin_name}')
+        console(f"Could not find plugin {plugin_name}")
 
 
-@event('options.register')
+@event("options.register")
 def register_parser_arguments():
-    parser = options.register_command('doc', print_doc, help='display plugin documentation')
-    parser.add_argument('doc', metavar='<plugin name>', help='name of plugin to show docs for')
+    parser = options.register_command("doc", print_doc, help="display plugin documentation")
+    parser.add_argument("doc", metavar="<plugin name>", help="name of plugin to show docs for")

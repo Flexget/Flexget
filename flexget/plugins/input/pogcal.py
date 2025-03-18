@@ -6,67 +6,67 @@ from flexget.event import event
 from flexget.utils import requests
 from flexget.utils.soup import get_soup
 
-logger = logger.bind(name='pogcal')
+logger = logger.bind(name="pogcal")
 
 
 class InputPogDesign:
     schema = {
-        'type': 'object',
-        'properties': {'username': {'type': 'string'}, 'password': {'type': 'string'}},
-        'required': ['username', 'password'],
-        'additionalProperties': False,
+        "type": "object",
+        "properties": {"username": {"type": "string"}, "password": {"type": "string"}},
+        "required": ["username", "password"],
+        "additionalProperties": False,
     }
 
     name_map = {
-        'The Tonight Show [Leno]': 'The Tonight Show With Jay Leno',
-        'Late Show [Letterman]': 'David Letterman',
+        "The Tonight Show [Leno]": "The Tonight Show With Jay Leno",
+        "Late Show [Letterman]": "David Letterman",
     }
 
     def on_task_input(self, task, config):
         session = requests.Session()
         data = {
-            'username': config['username'],
-            'password': config['password'],
-            'sub_login': 'Account Login',
+            "username": config["username"],
+            "password": config["password"],
+            "sub_login": "Account Login",
         }
         try:
-            r = session.post('https://www.pogdesign.co.uk/cat/login', data=data)
-            if 'Login to Your Account' in r.text:
-                raise plugin.PluginError('Invalid username/password for pogdesign.')
-            page = session.get('https://www.pogdesign.co.uk/cat/show-select')
+            r = session.post("https://www.pogdesign.co.uk/cat/login", data=data)
+            if "Login to Your Account" in r.text:
+                raise plugin.PluginError("Invalid username/password for pogdesign.")
+            page = session.get("https://www.pogdesign.co.uk/cat/show-select")
         except requests.RequestException as e:
-            raise plugin.PluginError(f'Error retrieving source: {e}')
+            raise plugin.PluginError(f"Error retrieving source: {e}")
         soup = get_soup(page.text)
         entries = []
-        for row in soup.find_all('li', {'class': 'selectgrp checked'}):
+        for row in soup.find_all("li", {"class": "selectgrp checked"}):
             # Get name
-            t = row.find('strong')
+            t = row.find("strong")
 
             # Remove <span> tags
-            spantags = t.find_all('span')
+            spantags = t.find_all("span")
             for s in spantags:
                 s.extract()
             t = row.text
             # remove newlines and whitepsace
-            t = t.replace('\n', '').strip()
+            t = t.replace("\n", "").strip()
 
-            if t.endswith('[The]'):
-                t = 'The ' + t[:-6]
+            if t.endswith("[The]"):
+                t = "The " + t[:-6]
 
             # Make certain names friendlier
             if t in self.name_map:
                 t = self.name_map[t]
 
             e = Entry()
-            e['title'] = t
-            e['url'] = 'https://www.pogdesign.co.uk/{}'.format(
-                row.find_next('a')['href'].lstrip('/')
+            e["title"] = t
+            e["url"] = "https://www.pogdesign.co.uk/{}".format(
+                row.find_next("a")["href"].lstrip("/")
             )
             entries.append(e)
 
         return entries
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(InputPogDesign, 'pogcal', api_ver=2)
+    plugin.register(InputPogDesign, "pogcal", api_ver=2)

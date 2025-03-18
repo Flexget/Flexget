@@ -8,28 +8,28 @@ from flexget.event import event
 from flexget.utils import requests
 from flexget.utils.soup import get_soup
 
-logger = logger.bind(name='serienjunkies')
+logger = logger.bind(name="serienjunkies")
 
-regex_single_ep = re.compile(r'(S\d+E\d\d+)(?!-E)', re.IGNORECASE)
+regex_single_ep = re.compile(r"(S\d+E\d\d+)(?!-E)", re.IGNORECASE)
 regex_multi_ep = re.compile(
-    r'(?P<season>S\d\d)E(?P<startep>\d\d+)-E?(?P<stopep>\d\d+)', re.IGNORECASE
+    r"(?P<season>S\d\d)E(?P<startep>\d\d+)-E?(?P<stopep>\d\d+)", re.IGNORECASE
 )
-regex_season = re.compile(r'(?<=\.|\-)S\d\d(?:[-\.]S\d\d)*(?!E\d\d+)', re.IGNORECASE)
+regex_season = re.compile(r"(?<=\.|\-)S\d\d(?:[-\.]S\d\d)*(?!E\d\d+)", re.IGNORECASE)
 
-regex_language_container = re.compile(r'Sprache')
+regex_language_container = re.compile(r"Sprache")
 
-regex_is_german = re.compile(r'german|deutsch', re.IGNORECASE)
+regex_is_german = re.compile(r"german|deutsch", re.IGNORECASE)
 regex_is_foreign = re.compile(
-    r'englisc?h|französisch|japanisch|dänisch|norwegisch|niederländisch|ungarisch|italienisch|portugiesisch',
+    r"englisc?h|französisch|japanisch|dänisch|norwegisch|niederländisch|ungarisch|italienisch|portugiesisch",
     re.IGNORECASE,
 )
-regex_is_subtitle = re.compile(r'Untertitel|Subs?|UT', re.IGNORECASE)
+regex_is_subtitle = re.compile(r"Untertitel|Subs?|UT", re.IGNORECASE)
 
-LANGUAGE = ['german', 'foreign', 'subtitle', 'dual']
-HOSTER = ['ul', 'cz', 'so', 'all']
+LANGUAGE = ["german", "foreign", "subtitle", "dual"]
+HOSTER = ["ul", "cz", "so", "all"]
 
-DEFAULT_LANGUAGE = 'dual'
-DEFAULT_HOSTER = 'ul'
+DEFAULT_LANGUAGE = "dual"
+DEFAULT_HOSTER = "ul"
 
 
 class UrlRewriteSerienjunkies:
@@ -46,41 +46,41 @@ class UrlRewriteSerienjunkies:
     """
 
     schema = {
-        'type': 'object',
-        'properties': {
-            'language': {'type': 'string', 'enum': LANGUAGE},
-            'hoster': {'type': 'string', 'enum': HOSTER},
+        "type": "object",
+        "properties": {
+            "language": {"type": "string", "enum": LANGUAGE},
+            "hoster": {"type": "string", "enum": HOSTER},
         },
-        'additionalProperties': False,
+        "additionalProperties": False,
     }
 
     # Since the urlrewriter relies on a config, we need to create a default one
-    config = {'hoster': DEFAULT_HOSTER, 'language': DEFAULT_LANGUAGE}
+    config = {"hoster": DEFAULT_HOSTER, "language": DEFAULT_LANGUAGE}
 
     def on_task_start(self, task, config):
         self.config = config
 
     # urlrewriter API
     def url_rewritable(self, task, entry):
-        url = entry['url']
-        return bool(url.startswith(('http://www.serienjunkies.org/', 'http://serienjunkies.org/')))
+        url = entry["url"]
+        return bool(url.startswith(("http://www.serienjunkies.org/", "http://serienjunkies.org/")))
 
     # urlrewriter API
     def url_rewrite(self, task, entry):
-        series_url = entry['url']
-        search_title = re.sub(r'\[.*\] ', '', entry['title'])
+        series_url = entry["url"]
+        search_title = re.sub(r"\[.*\] ", "", entry["title"])
 
         download_urls = self.parse_downloads(series_url, search_title)
         if not download_urls:
-            entry.reject('No Episode found')
+            entry.reject("No Episode found")
         else:
-            entry['url'] = download_urls[-1]
-            entry['description'] = ", ".join(download_urls)
+            entry["url"] = download_urls[-1]
+            entry["description"] = ", ".join(download_urls)
 
         # Debug Information
-        logger.debug('TV Show URL: {}', series_url)
-        logger.debug('Episode: {}', search_title)
-        logger.debug('Download URL: {}', download_urls)
+        logger.debug("TV Show URL: {}", series_url)
+        logger.debug("Episode: {}", search_title)
+        logger.debug("Download URL: {}", download_urls)
 
     @plugin.internet(logger)
     def parse_downloads(self, series_url, search_title):
@@ -94,11 +94,11 @@ class UrlRewriteSerienjunkies:
         # find all titles
         episode_titles = self.find_all_titles(search_title)
         if not episode_titles:
-            raise UrlRewritingError('Unable to find episode')
+            raise UrlRewritingError("Unable to find episode")
 
         for ep_title in episode_titles:
             # find matching download
-            episode_title = soup.find('strong', text=re.compile(ep_title, re.IGNORECASE))
+            episode_title = soup.find("strong", text=re.compile(ep_title, re.IGNORECASE))
             if not episode_title:
                 continue
 
@@ -108,34 +108,34 @@ class UrlRewriteSerienjunkies:
                 continue
 
             # find episode language
-            episode_lang = episode.find_previous('strong', text=re.compile('Sprache')).next_sibling
+            episode_lang = episode.find_previous("strong", text=re.compile("Sprache")).next_sibling
             if not episode_lang:
-                logger.warning('No language found for: {}', series_url)
+                logger.warning("No language found for: {}", series_url)
                 continue
 
             # filter language
             if not self.check_language(episode_lang):
                 logger.warning(
-                    'languages not matching: {} <> {}', self.config['language'], episode_lang
+                    "languages not matching: {} <> {}", self.config["language"], episode_lang
                 )
                 continue
 
             # find download links
-            links = episode.find_all('a')
+            links = episode.find_all("a")
             if not links:
-                logger.warning('No links found for: {}', series_url)
+                logger.warning("No links found for: {}", series_url)
                 continue
 
             for link in links:
-                if not link.has_attr('href'):
+                if not link.has_attr("href"):
                     continue
 
-                url = link['href']
-                pattern = r'http:\/\/download\.serienjunkies\.org.*{}_.*\.html'.format(
-                    self.config['hoster']
+                url = link["href"]
+                pattern = r"http:\/\/download\.serienjunkies\.org.*{}_.*\.html".format(
+                    self.config["hoster"]
                 )
 
-                if re.match(pattern, url) or self.config['hoster'] == 'all':
+                if re.match(pattern, url) or self.config["hoster"] == "all":
                     urls.append(url)
                 else:
                     continue
@@ -145,62 +145,62 @@ class UrlRewriteSerienjunkies:
         search_titles = []
         # Check type
         if regex_multi_ep.search(search_title):
-            logger.debug('Title seems to describe multiple episodes')
-            first_ep = int(regex_multi_ep.search(search_title).group('startep'))
-            last_ep = int(regex_multi_ep.search(search_title).group('stopep'))
-            season = regex_multi_ep.search(search_title).group('season') + 'E'
+            logger.debug("Title seems to describe multiple episodes")
+            first_ep = int(regex_multi_ep.search(search_title).group("startep"))
+            last_ep = int(regex_multi_ep.search(search_title).group("stopep"))
+            season = regex_multi_ep.search(search_title).group("season") + "E"
             # TODO: Umlaute , Mehrzeilig etc.
             search_titles.extend(
                 [
                     regex_multi_ep.sub(
-                        season + str(i).zfill(2) + '[\\\\w\\\\.\\\\(\\\\)]*', search_title
+                        season + str(i).zfill(2) + "[\\\\w\\\\.\\\\(\\\\)]*", search_title
                     )
                     for i in range(first_ep, last_ep + 1)
                 ]
             )
         elif regex_season.search(search_title):
-            logger.debug('Title seems to describe one or more season')
+            logger.debug("Title seems to describe one or more season")
             search_string = regex_season.search(search_title).group(0)
             search_titles.extend(
                 [
-                    regex_season.sub(s + '[\\\\w\\\\.]*', search_title)
-                    for s in re.findall(r'(?<!\-)S\d\d(?!\-)', search_string)
+                    regex_season.sub(s + "[\\\\w\\\\.]*", search_title)
+                    for s in re.findall(r"(?<!\-)S\d\d(?!\-)", search_string)
                 ]
             )
-            for s in re.finditer(r'(?<!\-)S(\d\d)-S(\d\d)(?!\-)', search_string):
+            for s in re.finditer(r"(?<!\-)S(\d\d)-S(\d\d)(?!\-)", search_string):
                 season_start = int(s.group(1))
                 season_end = int(s.group(2))
                 search_titles.extend(
                     [
-                        regex_season.sub('S' + str(i).zfill(2) + '[\\\\w\\\\.]*', search_title)
+                        regex_season.sub("S" + str(i).zfill(2) + "[\\\\w\\\\.]*", search_title)
                         for i in range(season_start, season_end + 1)
                     ]
                 )
         else:
-            logger.debug('Title seems to describe a single episode')
+            logger.debug("Title seems to describe a single episode")
             search_titles.append(re.escape(search_title))
         return search_titles
 
     def check_language(self, languages):
         # Cut additional Subtitles
-        languages = languages.split('|', 1)[0]
+        languages = languages.split("|", 1)[0]
 
-        language_list = re.split(r'[,&]', languages)
+        language_list = re.split(r"[,&]", languages)
 
         try:
-            if self.config['language'] == 'german':
+            if self.config["language"] == "german":
                 if regex_is_german.search(language_list[0]):
                     return True
-            elif self.config['language'] == 'foreign':
+            elif self.config["language"] == "foreign":
                 if (regex_is_foreign.search(language_list[0]) and len(language_list) == 1) or (
                     len(language_list) > 1 and not regex_is_subtitle.search(language_list[1])
                 ):
                     return True
-            elif self.config['language'] == 'subtitle':
+            elif self.config["language"] == "subtitle":
                 if len(language_list) > 1 and regex_is_subtitle.search(language_list[1]):
                     return True
             elif (
-                self.config['language'] == 'dual'
+                self.config["language"] == "dual"
                 and len(language_list) > 1
                 and not regex_is_subtitle.search(language_list[1])
             ):
@@ -211,8 +211,8 @@ class UrlRewriteSerienjunkies:
         return False
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
     plugin.register(
-        UrlRewriteSerienjunkies, 'serienjunkies', interfaces=['urlrewriter', 'task'], api_ver=2
+        UrlRewriteSerienjunkies, "serienjunkies", interfaces=["urlrewriter", "task"], api_ver=2
     )

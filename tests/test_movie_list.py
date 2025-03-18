@@ -124,134 +124,134 @@ class TestListInterface:
     """
 
     def test_list_add(self, execute_task):
-        task = execute_task('test_list_add')
+        task = execute_task("test_list_add")
         assert len(task.entries) == 2
 
-        task = execute_task('list_get')
+        task = execute_task("list_get")
         assert len(task.entries) == 2
 
     def test_allowed_identifiers(self, execute_task):
-        task = execute_task('test_allowed_identifiers')
+        task = execute_task("test_allowed_identifiers")
         assert len(task.entries) == 1
 
-        task = execute_task('list_get')
+        task = execute_task("list_get")
         assert len(task.entries) == 1
 
-        assert task.find_entry(imdb_id='tt1234567')
-        assert task.find_entry(trakt_movie_id='12345')
-        assert task.find_entry(tmdb_id='3456')
-        assert not task.find_entry(fake_id_name='123abc')
+        assert task.find_entry(imdb_id="tt1234567")
+        assert task.find_entry(trakt_movie_id="12345")
+        assert task.find_entry(tmdb_id="3456")
+        assert not task.find_entry(fake_id_name="123abc")
 
     def test_multiple_list_add(self, execute_task):
-        task = execute_task('test_multiple_list_add')
+        task = execute_task("test_multiple_list_add")
         assert len(task.entries) == 2
 
-        task = execute_task('list_1_get')
+        task = execute_task("list_1_get")
         assert len(task.entries) == 2
 
-        task = execute_task('list_2_get')
+        task = execute_task("list_2_get")
         assert len(task.entries) == 2
 
     def test_list_accept_with_remove(self, execute_task):
-        task = execute_task('test_list_add')
+        task = execute_task("test_list_add")
         assert len(task.entries) == 2
 
-        task = execute_task('list_get')
+        task = execute_task("list_get")
         assert len(task.entries) == 2
 
-        task = execute_task('test_list_accept_with_remove')
+        task = execute_task("test_list_accept_with_remove")
         assert len(task.all_entries) == 3
         assert len(task.accepted) == 2
 
-        task = execute_task('list_get')
+        task = execute_task("list_get")
         assert len(task.entries) == 0
 
     def test_list_accept_without_remove(self, execute_task):
-        task = execute_task('test_list_add')
+        task = execute_task("test_list_add")
         assert len(task.entries) == 2
 
-        task = execute_task('list_get')
+        task = execute_task("list_get")
         assert len(task.entries) == 2
 
-        task = execute_task('test_list_accept_without_remove')
+        task = execute_task("test_list_accept_without_remove")
         assert len(task.all_entries) == 3
         assert len(task.accepted) == 2
 
-        task = execute_task('list_get')
+        task = execute_task("list_get")
         assert len(task.entries) == 2
 
     def test_multiple_list_accept_with_remove(self, execute_task):
-        task = execute_task('list_1_add')
+        task = execute_task("list_1_add")
         assert len(task.entries) == 2
 
-        task = execute_task('list_2_add')
+        task = execute_task("list_2_add")
         assert len(task.entries) == 1
 
-        task = execute_task('list_1_get')
+        task = execute_task("list_1_get")
         assert len(task.entries) == 2
 
-        task = execute_task('list_2_get')
+        task = execute_task("list_2_get")
         assert len(task.entries) == 1
 
-        task = execute_task('test_multiple_list_accept_with_remove')
+        task = execute_task("test_multiple_list_accept_with_remove")
         assert len(task.accepted) == 3
 
-        task = execute_task('list_1_get')
+        task = execute_task("list_1_get")
         assert len(task.entries) == 0
 
-        task = execute_task('list_2_get')
+        task = execute_task("list_2_get")
         assert len(task.entries) == 0
 
     def test_multiple_list_accept_without_remove(self, execute_task):
-        task = execute_task('list_1_add')
+        task = execute_task("list_1_add")
         assert len(task.entries) == 2
 
-        task = execute_task('list_2_add')
+        task = execute_task("list_2_add")
         assert len(task.entries) == 1
 
-        task = execute_task('list_1_get')
+        task = execute_task("list_1_get")
         assert len(task.entries) == 2
 
-        task = execute_task('list_2_get')
+        task = execute_task("list_2_get")
         assert len(task.entries) == 1
 
-        task = execute_task('test_multiple_list_accept_without_remove')
+        task = execute_task("test_multiple_list_accept_without_remove")
         assert len(task.accepted) == 3
 
-        task = execute_task('list_1_get')
+        task = execute_task("list_1_get")
         assert len(task.entries) == 2
 
-        task = execute_task('list_2_get')
+        task = execute_task("list_2_get")
         assert len(task.entries) == 1
 
     def test_list_remove(self, execute_task):
-        task = execute_task('test_list_add')
+        task = execute_task("test_list_add")
         assert len(task.entries) == 2
 
-        task = execute_task('list_get')
+        task = execute_task("list_get")
         assert len(task.entries) == 2
 
-        task = execute_task('test_list_remove')
+        task = execute_task("test_list_remove")
         assert len(task.accepted) == 1
 
-        task = execute_task('list_get')
+        task = execute_task("list_get")
         assert len(task.entries) == 1
 
     def test_list_reject(self, execute_task):
-        task = execute_task('test_list_add')
+        task = execute_task("test_list_add")
         assert len(task.entries) == 2
 
-        task = execute_task('list_get')
+        task = execute_task("list_get")
         assert len(task.entries) == 2
 
-        task = execute_task('test_list_reject')
+        task = execute_task("test_list_reject")
         assert len(task.rejected) == 1
 
     def test_list_accept_for_real_title(self, execute_task):
-        task = execute_task('test_list_add')
+        task = execute_task("test_list_add")
         assert len(task.entries) == 2
 
-        task = execute_task('test_list_accept_for_real_title')
+        task = execute_task("test_list_accept_for_real_title")
         assert len(task.accepted) == 1
 
 
@@ -288,33 +288,33 @@ class TestMovieListStripYearInterface:
     """
 
     def test_strip_year_regression_test(self, execute_task):
-        task = execute_task('test_list_add')
+        task = execute_task("test_list_add")
         assert len(task.entries) == 1
 
-        task = execute_task('test_list_get_simple')
+        task = execute_task("test_list_get_simple")
         assert len(task.entries) == 1
-        assert task.find_entry(title='The Matrix (1999)')
+        assert task.find_entry(title="The Matrix (1999)")
 
     def test_strip_year_just_list_name(self, execute_task):
-        task = execute_task('test_list_add')
+        task = execute_task("test_list_add")
         assert len(task.entries) == 1
 
-        task = execute_task('test_list_get_list_name')
+        task = execute_task("test_list_get_list_name")
         assert len(task.entries) == 1
-        assert task.find_entry(title='The Matrix (1999)')
+        assert task.find_entry(title="The Matrix (1999)")
 
     def test_strip_year_positive(self, execute_task):
-        task = execute_task('test_list_add')
+        task = execute_task("test_list_add")
         assert len(task.entries) == 1
 
-        task = execute_task('test_list_get_strip_year')
+        task = execute_task("test_list_get_strip_year")
         assert len(task.entries) == 1
-        assert task.find_entry(title='The Matrix')
+        assert task.find_entry(title="The Matrix")
 
     def test_strip_year_negative(self, execute_task):
-        task = execute_task('test_list_add')
+        task = execute_task("test_list_add")
         assert len(task.entries) == 1
 
-        task = execute_task('test_list_get_strip_year_negative')
+        task = execute_task("test_list_get_strip_year_negative")
         assert len(task.entries) == 1
-        assert task.find_entry(title='The Matrix (1999)')
+        assert task.find_entry(title="The Matrix (1999)")

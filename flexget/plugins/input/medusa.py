@@ -6,22 +6,22 @@ from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 
-logger = logger.bind(name='medusa')
+logger = logger.bind(name="medusa")
 
 
 class Medusa:
     schema = {
-        'type': 'object',
-        'properties': {
-            'base_url': {'type': 'string', 'format': 'uri'},
-            'port': {'type': 'number', 'default': 8081},
-            'username': {'type': 'string'},
-            'password': {'type': 'string'},
-            'only_monitored': {'type': 'boolean', 'default': False},
-            'include_ended': {'type': 'boolean', 'default': False},
+        "type": "object",
+        "properties": {
+            "base_url": {"type": "string", "format": "uri"},
+            "port": {"type": "number", "default": 8081},
+            "username": {"type": "string"},
+            "password": {"type": "string"},
+            "only_monitored": {"type": "boolean", "default": False},
+            "include_ended": {"type": "boolean", "default": False},
         },
-        'required': ['username', 'password', 'base_url'],
-        'additionalProperties': False,
+        "required": ["username", "password", "base_url"],
+        "additionalProperties": False,
     }
 
     def on_task_input(self, task, config):
@@ -63,39 +63,39 @@ class Medusa:
         depending on your usage.
 
         """
-        parsed_url = urlparse(config.get('base_url'))
-        base_url = '{scheme}://{url}:{port}/api/v2'.format(
-            scheme=parsed_url.scheme, url=parsed_url.netloc, port=config.get('port')
+        parsed_url = urlparse(config.get("base_url"))
+        base_url = "{scheme}://{url}:{port}/api/v2".format(
+            scheme=parsed_url.scheme, url=parsed_url.netloc, port=config.get("port")
         )
 
-        body_auth = {'username': config.get('username'), 'password': config.get('password')}
+        body_auth = {"username": config.get("username"), "password": config.get("password")}
 
-        api_key = task.requests.post(f'{base_url}/authenticate', json=body_auth).json()['token']
+        api_key = task.requests.post(f"{base_url}/authenticate", json=body_auth).json()["token"]
 
-        headers = {'x-auth': 'Bearer ' + api_key}
+        headers = {"x-auth": "Bearer " + api_key}
 
-        params = {'limit': 1000}
+        params = {"limit": 1000}
 
-        series = task.requests.get(f'{base_url}/series', params=params, headers=headers).json()
+        series = task.requests.get(f"{base_url}/series", params=params, headers=headers).json()
 
         entries = []
         for show in series:
-            logger.debug('processing show: {}', show)
-            if (show['config']['paused'] and config.get('only_monitored')) or (
-                show['status'] == 'Ended' and not config.get('include_ended')
+            logger.debug("processing show: {}", show)
+            if (show["config"]["paused"] and config.get("only_monitored")) or (
+                show["status"] == "Ended" and not config.get("include_ended")
             ):
-                logger.debug('discarted show: {}', show)
+                logger.debug("discarted show: {}", show)
 
-            entry = Entry(title=show['title'], url='', series_name=show['title'])
+            entry = Entry(title=show["title"], url="", series_name=show["title"])
 
             if entry.isvalid():
                 entries.append(entry)
             else:
-                logger.error('Invalid entry created? {}', entry)
+                logger.error("Invalid entry created? {}", entry)
 
         return entries
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(Medusa, 'medusa', api_ver=2)
+    plugin.register(Medusa, "medusa", api_ver=2)

@@ -4,7 +4,7 @@ from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.event import event
 
-logger = logger.bind(name='disable')
+logger = logger.bind(name="disable")
 
 
 def all_builtins():
@@ -35,7 +35,7 @@ class DisablePlugin:
       # Task nzbs uses all other configuration from template movies but removes the download plugin
     """
 
-    schema = one_or_more({'type': 'string'})
+    schema = one_or_more({"type": "string"})
     disabled_builtins = None
 
     @plugin.priority(254)
@@ -47,24 +47,24 @@ class DisablePlugin:
 
         # Disable plugins explicitly included in config.
         for p in config:
-            if p == 'builtins':
+            if p == "builtins":
                 continue
             try:
                 task.disable_plugin(p)
             except ValueError:
-                logger.error('Unknown plugin `{}`', p)
+                logger.error("Unknown plugin `{}`", p)
             else:
                 disabled.add(p)
 
         # Disable all builtins mode.
-        if 'builtins' in config:
+        if "builtins" in config:
             for p in all_builtins():
                 task.disable_plugin(p.name)
                 disabled.add(p.name)
 
-        logger.debug('Disabled plugins: {}', ', '.join(disabled))
+        logger.debug("Disabled plugins: {}", ", ".join(disabled))
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(DisablePlugin, 'disable', api_ver=2)
+    plugin.register(DisablePlugin, "disable", api_ver=2)

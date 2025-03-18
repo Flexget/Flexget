@@ -15,10 +15,10 @@ from flexget.event import event
 from flexget.utils import requests
 from flexget.utils.requests import RequestException
 
-log = logger.bind(name='ombi_list')
+log = logger.bind(name="ombi_list")
 
 # This should probably be a list of enum but the Type hinting is worse than Literal
-SUPPORTED_IDS: list[Literal['ombi_id', 'tmdb_id', 'imdb_id']] = ['ombi_id', 'tmdb_id', 'imdb_id']
+SUPPORTED_IDS: list[Literal["ombi_id", "tmdb_id", "imdb_id"]] = ["ombi_id", "tmdb_id", "imdb_id"]
 
 
 class ApiError(Exception):
@@ -26,7 +26,7 @@ class ApiError(Exception):
 
     def __init__(self, response: dict[str, Any]) -> None:
         self.response = response
-        super().__init__(self.response.get('errorMessage'))
+        super().__init__(self.response.get("errorMessage"))
 
 
 class Config(TypedDict):
@@ -36,17 +36,17 @@ class Config(TypedDict):
     api_key: NotRequired[str]
     username: NotRequired[str]
     password: NotRequired[str]
-    type: Literal['shows', 'seasons', 'episodes', 'movies']
-    status: Literal['approved', 'requested', 'denied', 'all']
+    type: Literal["shows", "seasons", "episodes", "movies"]
+    status: Literal["approved", "requested", "denied", "all"]
     hide_available: bool
-    on_remove: NotRequired[Literal['unavailable', 'denied', 'deleted']]
+    on_remove: NotRequired[Literal["unavailable", "denied", "deleted"]]
     include_year: bool
     include_ep_title: bool
 
 
 class OmbiRequest:
     def __init__(self, config: Config) -> None:
-        self.base_url = config['url']
+        self.base_url = config["url"]
         # We dont really need the whole config, just the auth part
         # but I'm saving it for now, in case we need to configure
         # token refresh or something
@@ -55,34 +55,34 @@ class OmbiRequest:
 
     def _create_auth_header(self):
         if "api_key" in self.config:
-            log.debug('Authenticating via api_key')
-            api_key = self.config['api_key']
-            return {'ApiKey': api_key}
+            log.debug("Authenticating via api_key")
+            api_key = self.config["api_key"]
+            return {"ApiKey": api_key}
 
-        if self.config.get('username') and self.config.get('password'):
-            log.debug('Authenticating via username: %s', self.config.get('username'))
+        if self.config.get("username") and self.config.get("password"):
+            log.debug("Authenticating via username: %s", self.config.get("username"))
             access_token = self._get_access_token()
             return {"Authorization": f"Bearer {access_token}"}
 
-        raise plugin.PluginError('Error: an api_key or username and password must be configured')
+        raise plugin.PluginError("Error: an api_key or username and password must be configured")
 
     def _get_access_token(self):
         endpoint = "/api/v1/Token"
-        data = {'username': self.config.get('username'), 'password': self.config.get('password')}
+        data = {"username": self.config.get("username"), "password": self.config.get("password")}
         headers = self.create_json_headers()
         try:
-            return self._request('post', endpoint, data=data, headers=headers).get('access_token')
+            return self._request("post", endpoint, data=data, headers=headers).get("access_token")
         except (HTTPError, RequestException, ValueError) as e:
-            raise plugin.PluginError('Ombi username and password login failed') from e
+            raise plugin.PluginError("Ombi username and password login failed") from e
 
     def _request(self, method, endpoint, **params):
-        if not endpoint.startswith('/'):
-            endpoint = '/' + endpoint
+        if not endpoint.startswith("/"):
+            endpoint = "/" + endpoint
 
         url = self.base_url + endpoint
 
-        headers: dict[str, str] = params.pop('headers', {})
-        data = params.pop('data', None)
+        headers: dict[str, str] = params.pop("headers", {})
+        data = params.pop("data", None)
 
         # add auth header
         headers.update(self.auth_header.copy())
@@ -95,40 +95,40 @@ class OmbiRequest:
 
         # I did this instead of a try/catch of the JSONDecodeError,
         # I only had issues with doing a "delete" request
-        if 'application/json' in response.headers.get('Content-Type', ''):
+        if "application/json" in response.headers.get("Content-Type", ""):
             result = response.json()
 
         try:
             response.raise_for_status()
         except HTTPError as e:
             log.debug(e)
-            if result.get('errors'):
-                log.debug(result.get('title'))
-                log.debug(result.get('errors'))
+            if result.get("errors"):
+                log.debug(result.get("title"))
+                log.debug(result.get("errors"))
 
             raise
 
-        if isinstance(result, dict) and result.get('isError'):
+        if isinstance(result, dict) and result.get("isError"):
             log.debug(result)
             raise ApiError(result)
 
         return result
 
     def get(self, endpoint, **params):
-        return self._request('get', endpoint, **params)
+        return self._request("get", endpoint, **params)
 
     def post(self, endpoint, **params):
-        return self._request('post', endpoint, **params)
+        return self._request("post", endpoint, **params)
 
     def put(self, endpoint, **params):
-        return self._request('put', endpoint, **params)
+        return self._request("put", endpoint, **params)
 
     def delete(self, endpoint, **params):
-        return self._request('delete', endpoint, **params)
+        return self._request("delete", endpoint, **params)
 
     @classmethod
     def create_json_headers(cls):
-        return {'Content-Type': 'application/json', 'Accept': 'application/json'}
+        return {"Content-Type": "application/json", "Accept": "application/json"}
 
 
 class OmbiEntry:
@@ -143,26 +143,26 @@ class OmbiEntry:
         self._request = request
         self.entry_type = entry_type
         self.data = data
-        self.ombi_title: str = data['title']
+        self.ombi_title: str = data["title"]
 
-        if data.get('tmdb_season'):
-            self.ombi_title = self.ombi_title + ' S' + str(data['tmdb_season']).zfill(2)
+        if data.get("tmdb_season"):
+            self.ombi_title = self.ombi_title + " S" + str(data["tmdb_season"]).zfill(2)
 
-        if data.get('tmdb_episode'):
-            self.ombi_title = self.ombi_title + ' E' + str(data['tmdb_episode']).zfill(2)
+        if data.get("tmdb_episode"):
+            self.ombi_title = self.ombi_title + " E" + str(data["tmdb_episode"]).zfill(2)
 
     @property
     def request_id(self) -> str:
         if "requestId" in self.data:
-            return self.data['requestId']
+            return self.data["requestId"]
 
         new_data = self._request.get(f"/api/v2/Search/{self.entry_type}/{self.data['id']}")
         self.data = new_data
-        return self.data['requestId']
+        return self.data["requestId"]
 
     @request_id.setter
     def request_id(self, value: str):
-        self.data['requestId'] = value
+        self.data["requestId"] = value
 
     def already_requested(self) -> tuple[bool, str]:
         """Check if an entry in Ombi has already been requested.
@@ -171,19 +171,19 @@ class OmbiEntry:
             tuple[bool, str]: A tuple containing a boolean indicating if the entry has already been requested and a string indicating the status of the entry.
 
         """
-        if self.data['requested']:
-            return True, 'requested'
+        if self.data["requested"]:
+            return True, "requested"
 
-        if self.data['available']:
-            return True, 'available'
+        if self.data["available"]:
+            return True, "available"
 
-        if self.data.get('approved'):
-            return True, 'approved'
+        if self.data.get("approved"):
+            return True, "approved"
 
-        if self.data.get('denied'):
-            return True, 'denied'
+        if self.data.get("denied"):
+            return True, "denied"
 
-        return False, 'unrequested'
+        return False, "unrequested"
 
     def mark_requested(self, endpoint: str, data: dict[str, Any]):
         """Mark an entry in Ombi as being requested."""
@@ -196,19 +196,19 @@ class OmbiEntry:
                 endpoint=endpoint, data=data, headers=headers
             )
 
-            self.request_id = response['requestId']
+            self.request_id = response["requestId"]
 
             log.info("{} was requested in Ombi.", self.ombi_title)
 
         except (HTTPError, ApiError) as error:
             if isinstance(error, ApiError):
-                if error.response.get('errrorCode') == 'AlreadyRequested':
+                if error.response.get("errrorCode") == "AlreadyRequested":
                     log.verbose(f"{self.ombi_title} already requested in Ombi.")
                     return True
 
-                error_msg = error.response.get('errorMessage')
+                error_msg = error.response.get("errorMessage")
 
-                if 'already' in error_msg and 'requested' in error_msg:
+                if "already" in error_msg and "requested" in error_msg:
                     log.verbose(f"{self.ombi_title} already requested in Ombi.")
                     return True
 
@@ -219,7 +219,7 @@ class OmbiEntry:
 
     def mark_available(self):
         """Mark an entry in Ombi as avaliable."""
-        if self.data['available']:
+        if self.data["available"]:
             log.verbose(f"{self.ombi_title} already available in Ombi.")
             return
 
@@ -241,7 +241,7 @@ class OmbiEntry:
 
     def mark_deleted(self):
         """Mark an entry in Ombi as deleted."""
-        if not self.data['requested']:
+        if not self.data["requested"]:
             log.verbose(f"{self.ombi_title} is not requested in Ombi, unable to delete it.")
             return
 
@@ -261,11 +261,11 @@ class OmbiEntry:
 
     def mark_unavailable(self):
         """Mark an entry in Ombi as unavaliable."""
-        if not self.data['available']:
+        if not self.data["available"]:
             log.verbose(f"{self.ombi_title} already unavailable in Ombi.")
             return
 
-        if not self.data['requested']:
+        if not self.data["requested"]:
             log.verbose(f"{self.ombi_title} is not requested in Ombi, unable to mark unavailable.")
             return
 
@@ -287,7 +287,7 @@ class OmbiEntry:
 
     def mark_denied(self):
         """Mark an entry in Ombi as denied."""
-        if self.data.get('denied'):
+        if self.data.get("denied"):
             log.verbose(f"{self.ombi_title} already denied in Ombi.")
             return
 
@@ -310,7 +310,7 @@ class OmbiEntry:
 
     def mark_approved(self):
         """Mark an entry in Ombi as approved."""
-        if self.data.get('approved'):
+        if self.data.get("approved"):
             log.verbose(f"{self.ombi_title} already approved in Ombi.")
             return
 
@@ -335,7 +335,7 @@ class OmbiEntry:
 class OmbiMovie(OmbiEntry):
     """Manage a Movie entry in Ombi."""
 
-    entry_type = 'movie'
+    entry_type = "movie"
 
     def __init__(self, request: OmbiRequest, data: dict[str, Any]) -> None:
         super().__init__(request, self.entry_type, data)
@@ -398,11 +398,11 @@ class OmbiMovie(OmbiEntry):
     @classmethod
     def from_id(cls, request: OmbiRequest, entry: Entry):
         """Create a Ombi Entry from an OMBI ID."""
-        if entry.get('tmdb_id'):
-            return cls.from_tmdb_id(request, entry['tmdb_id'])
+        if entry.get("tmdb_id"):
+            return cls.from_tmdb_id(request, entry["tmdb_id"])
 
-        if entry.get('imdb_id'):
-            return cls.from_imdb_id(request, entry['imdb_id'])
+        if entry.get("imdb_id"):
+            return cls.from_imdb_id(request, entry["imdb_id"])
 
         raise plugin.PluginError(
             f"Error: Unable to find required ID to lookup Ombi {cls.entry_type}."
@@ -412,13 +412,13 @@ class OmbiMovie(OmbiEntry):
 class OmbiTv(OmbiEntry):
     """Manage a TV entry in Ombi."""
 
-    entry_type = 'tv'
+    entry_type = "tv"
 
     def __init__(
         self,
         request: OmbiRequest,
         data: dict[str, Any],
-        sub_type: Literal['show', 'season', 'episode'],
+        sub_type: Literal["show", "season", "episode"],
     ) -> None:
         super().__init__(request, self.entry_type, data)
 
@@ -431,19 +431,19 @@ class OmbiTv(OmbiEntry):
 
         payload = {"theMovieDbId": self.data["id"]}
 
-        if self.sub_type == 'shows':
-            payload['requestAll'] = True
-        if self.sub_type == 'seasons':
-            payload['seasons'] = [
+        if self.sub_type == "shows":
+            payload["requestAll"] = True
+        if self.sub_type == "seasons":
+            payload["seasons"] = [
                 season
-                for season in self.data['seasonRequests']
-                if season['seasonNumber'] == self.data['tmdb_season']
+                for season in self.data["seasonRequests"]
+                if season["seasonNumber"] == self.data["tmdb_season"]
             ]
-        if self.sub_type == 'episodes':
-            payload['seasons'] = [
+        if self.sub_type == "episodes":
+            payload["seasons"] = [
                 {
-                    "seasonNumber": self.data['tmdb_season'],
-                    "episodes": [{"episodeNumber": self.data['tmdb_episode']}],
+                    "seasonNumber": self.data["tmdb_season"],
+                    "episodes": [{"episodeNumber": self.data["tmdb_episode"]}],
                 }
             ]
 
@@ -451,15 +451,15 @@ class OmbiTv(OmbiEntry):
 
     @classmethod
     def from_tmdb_id(
-        cls, request: OmbiRequest, entry: Entry, sub_type: Literal['show', 'season', 'episode']
+        cls, request: OmbiRequest, entry: Entry, sub_type: Literal["show", "season", "episode"]
     ):
         """Create a Ombi Entry from an TVDB ID."""
         headers = request.create_json_headers()
 
-        if not entry.get('tmdb_id'):
+        if not entry.get("tmdb_id"):
             return None
 
-        tmdb_id = entry['tmdb_id']
+        tmdb_id = entry["tmdb_id"]
 
         endpoint = f"/api/v2/Search/{cls.entry_type}/moviedb/{tmdb_id}"
 
@@ -481,30 +481,30 @@ class OmbiSet(MutableSet):
 
     supported_ids = SUPPORTED_IDS
     schema = {
-        'type': 'object',
-        'properties': {
-            'url': {'type': 'string'},
-            'api_key': {'type': 'string'},
-            'username': {'type': 'string'},
-            'password': {'type': 'string'},
-            'type': {'type': 'string', 'enum': ['shows', 'seasons', 'episodes', 'movies']},
-            'status': {
-                'type': 'string',
-                'enum': ['approved', 'requested', 'denied', 'all'],
-                'default': 'approved',
+        "type": "object",
+        "properties": {
+            "url": {"type": "string"},
+            "api_key": {"type": "string"},
+            "username": {"type": "string"},
+            "password": {"type": "string"},
+            "type": {"type": "string", "enum": ["shows", "seasons", "episodes", "movies"]},
+            "status": {
+                "type": "string",
+                "enum": ["approved", "requested", "denied", "all"],
+                "default": "approved",
             },
-            'hide_available': {'type': 'boolean', 'default': True},
-            'on_remove': {
-                'type': 'string',
-                'enum': ['unavailable', 'denied', 'deleted'],
-                'default': 'deleted',
+            "hide_available": {"type": "boolean", "default": True},
+            "on_remove": {
+                "type": "string",
+                "enum": ["unavailable", "denied", "deleted"],
+                "default": "deleted",
             },
-            'include_year': {'type': 'boolean', 'default': False},
-            'include_ep_title': {'type': 'boolean', 'default': False},
+            "include_year": {"type": "boolean", "default": False},
+            "include_ep_title": {"type": "boolean", "default": False},
         },
-        'oneOf': [{'required': ['username', 'password']}, {'required': ['api_key']}],
-        'required': ['url', 'type'],
-        'additionalProperties': False,
+        "oneOf": [{"required": ["username", "password"]}, {"required": ["api_key"]}],
+        "required": ["url", "type"],
+        "additionalProperties": False,
     }
 
     @property
@@ -522,14 +522,14 @@ class OmbiSet(MutableSet):
         return len(self.items)
 
     def add(self, entry: Entry):
-        log.info("Adding {} to Ombi as {}.", entry['title'], self.config['status'])
+        log.info("Adding {} to Ombi as {}.", entry["title"], self.config["status"])
 
-        log.debug("Getting OMBI entry for {}.", entry['title'])
+        log.debug("Getting OMBI entry for {}.", entry["title"])
 
         ombi_entry = self._get_ombi_entry(entry)
 
         if not ombi_entry:
-            log.error("Failed to find OMBI entry for {}.", entry['title'])
+            log.error("Failed to find OMBI entry for {}.", entry["title"])
             return
 
         # To set a status like approved or denied, we need to mark the entry as requested first
@@ -544,7 +544,7 @@ class OmbiSet(MutableSet):
         # mark_requested  {'result': False, 'message': None, 'isError': True, 'errorMessage': 'Request does not exist', 'errorCode': None, 'requestId': 0}
         # mark_requested  Failed to mark Top Gun as approved in Ombi.
 
-        if self.config['status'] == 'requested':
+        if self.config["status"] == "requested":
             self.invalidate_cache()
             return
 
@@ -554,8 +554,8 @@ class OmbiSet(MutableSet):
         if not mark_status:
             log.error(
                 "Failed to find correct method to mark {} as {}.",
-                entry['title'],
-                self.config['status'],
+                entry["title"],
+                self.config["status"],
             )
             return
 
@@ -578,14 +578,14 @@ class OmbiSet(MutableSet):
         # I'm wondering if we should be checking if the entry is already
         # in the list of _items first.
 
-        log.info("Removing {} from ombi_list.", entry['title'])
+        log.info("Removing {} from ombi_list.", entry["title"])
 
-        log.debug("Getting OMBI entry for {}.", entry['title'])
+        log.debug("Getting OMBI entry for {}.", entry["title"])
 
         ombi_entry = self._get_ombi_entry(entry)
 
         if not ombi_entry:
-            log.error("Failed to find OMBI entry for {}.", entry['title'])
+            log.error("Failed to find OMBI entry for {}.", entry["title"])
             return
 
         unmark_status = getattr(ombi_entry, f"mark_{self.config['on_remove']}", None)
@@ -593,8 +593,8 @@ class OmbiSet(MutableSet):
         if not unmark_status:
             log.error(
                 "Failed to find correct method to mark {} as {}.",
-                entry['title'],
-                self.config['on_remove'],
+                entry["title"],
+                self.config["on_remove"],
             )
             return
 
@@ -615,7 +615,7 @@ class OmbiSet(MutableSet):
 
         if not find_method:
             raise plugin.PluginError(
-                'Error: Unknown list type {}.'.format(self.config.get('type'))
+                "Error: Unknown list type {}.".format(self.config.get("type"))
             )
 
         return find_method(entry)
@@ -641,9 +641,9 @@ class OmbiSet(MutableSet):
         # _items can be set to None to invalidate the cache
         self._items = []
 
-        list_type = self.config['type']
+        list_type = self.config["type"]
 
-        if list_type == 'movies':
+        if list_type == "movies":
             # The Ombi API allows a mix of statuses to be returned,
             # so we have to be careful when we filter them.
             # For example a requested movie can be both approved and denied
@@ -655,31 +655,31 @@ class OmbiSet(MutableSet):
 
             return self._items
 
-        if list_type == 'shows':
+        if list_type == "shows":
             shows = [self.generate_tv_entry(show) for show in requested_items]
             # Shows dont have approvals or available flags so include them all
             self._items = shows
             return self._items
 
-        if list_type == 'seasons':
+        if list_type == "seasons":
             seasons = [
                 self.generate_tv_entry(show, request, season)
                 for show in requested_items
-                for request in show['childRequests']
-                for season in request['seasonRequests']
+                for request in show["childRequests"]
+                for season in request["seasonRequests"]
             ]
             # Seasons dont have approvals or available flags so include them all
             self._items = seasons
             return self._items
 
-        if list_type == 'episodes':
+        if list_type == "episodes":
             # Generate a list of tuples (show, request, season, episode)
             episode_data = [
                 (show, request, season, episode)
                 for show in requested_items
-                for request in show['childRequests']
-                for season in request['seasonRequests']
-                for episode in season['episodes']
+                for request in show["childRequests"]
+                for season in request["seasonRequests"]
+                for episode in season["episodes"]
             ]
 
             # Generate a list of episodes
@@ -699,7 +699,7 @@ class OmbiSet(MutableSet):
             return self._items
 
         # We should never get here, but just in case...
-        raise plugin.PluginError('Error: Unknown list type {}.'.format(self.config.get('type')))
+        raise plugin.PluginError("Error: Unknown list type {}.".format(self.config.get("type")))
 
     @property
     def online(self):
@@ -743,8 +743,8 @@ class OmbiSet(MutableSet):
             for id in SUPPORTED_IDS:
                 # First find the correct show, then find the correct season
                 if entry.get(id, False) == item.get(id, True) and entry.get(
-                    'tmdb_season', False
-                ) == item.get('tmdb_season', True):
+                    "tmdb_season", False
+                ) == item.get("tmdb_season", True):
                     return item
 
         return None
@@ -758,51 +758,51 @@ class OmbiSet(MutableSet):
                 # First find the correct show, then find the correct season and the correct episode
                 if (
                     entry.get(id, False) == item.get(id, True)
-                    and entry.get('tmdb_season', False) == item.get('tmdb_season', True)
-                    and entry.get('tmdb_episode', False) == item.get('tmdb_episode', True)
+                    and entry.get("tmdb_season", False) == item.get("tmdb_season", True)
+                    and entry.get("tmdb_episode", False) == item.get("tmdb_episode", True)
                 ):
                     return item
 
         return None
 
     def _get_ombi_entry(self, entry: Entry) -> OmbiMovie | OmbiTv | None:
-        entry_type: str = self.config['type']
+        entry_type: str = self.config["type"]
 
         request = OmbiRequest(self.config)
 
-        if entry_type == 'movies':
+        if entry_type == "movies":
             return OmbiMovie.from_id(request, entry)
 
         return OmbiTv.from_tmdb_id(request, entry, entry_type)
 
     def generate_series_id(self, season, episode=None):
-        tempid = 'S' + str(season.get('seasonNumber')).zfill(2)
+        tempid = "S" + str(season.get("seasonNumber")).zfill(2)
         if episode:
-            tempid = tempid + 'E' + str(episode.get('episodeNumber')).zfill(2)
+            tempid = tempid + "E" + str(episode.get("episodeNumber")).zfill(2)
 
         return tempid
 
     def generate_title(self, item, season=None, episode=None):
-        temptitle = item.get('title')
+        temptitle = item.get("title")
 
-        if item.get('releaseDate') and self.config.get('include_year'):
-            temptitle = temptitle + ' (' + str(item.get('releaseDate')[0:4]) + ')'
+        if item.get("releaseDate") and self.config.get("include_year"):
+            temptitle = temptitle + " (" + str(item.get("releaseDate")[0:4]) + ")"
 
         if season or episode:
-            temptitle = temptitle + ' ' + self.generate_series_id(season, episode)
-            if episode and episode.get('title') and self.config.get('include_ep_title'):
-                temptitle = temptitle + ' ' + episode.get('title')
+            temptitle = temptitle + " " + self.generate_series_id(season, episode)
+            if episode and episode.get("title") and self.config.get("include_ep_title"):
+                temptitle = temptitle + " " + episode.get("title")
 
         return temptitle
 
     def get_access_token(self):
         url = f"{self.config.get('url')}/api/v1/Token"
-        data = {'username': self.config.get('username'), 'password': self.config.get('password')}
-        headers = {'Content-Type': 'application/json', 'Accept': 'application/json'}
+        data = {"username": self.config.get("username"), "password": self.config.get("password")}
+        headers = {"Content-Type": "application/json", "Accept": "application/json"}
         try:
-            return requests.post(url, json=data, headers=headers).json().get('access_token')
+            return requests.post(url, json=data, headers=headers).json().get("access_token")
         except (RequestException, ValueError) as e:
-            raise plugin.PluginError(f'Ombi username and password login failed: {e}')
+            raise plugin.PluginError(f"Ombi username and password login failed: {e}")
 
     def ombi_auth(self) -> dict[str, str]:
         """Return a dictionary that contains authrization headers for the OMBI API.
@@ -815,16 +815,16 @@ class OmbiSet(MutableSet):
 
         """
         if "api_key" in self.config:
-            log.debug('Authenticating via api_key')
-            api_key = self.config['api_key']
-            return {'ApiKey': api_key}
+            log.debug("Authenticating via api_key")
+            api_key = self.config["api_key"]
+            return {"ApiKey": api_key}
 
-        if self.config.get('username') and self.config.get('password'):
-            log.debug('Authenticating via username: %s', self.config.get('username'))
+        if self.config.get("username") and self.config.get("password"):
+            log.debug("Authenticating via username: %s", self.config.get("username"))
             access_token = self.get_access_token()
             return {"Authorization": f"Bearer {access_token}"}
 
-        raise plugin.PluginError('Error: an api_key or username and password must be configured')
+        raise plugin.PluginError("Error: an api_key or username and password must be configured")
 
     def get_requested_items(self) -> list[OmbiEntry]:
         """Get a list of all the items that have been requested in Ombi.
@@ -839,119 +839,119 @@ class OmbiSet(MutableSet):
         request = OmbiRequest(self.config)
 
         endpoint = (
-            "/api/v1/Request/movie" if self.config['type'] == 'movies' else "/api/v1/Request/tv"
+            "/api/v1/Request/movie" if self.config["type"] == "movies" else "/api/v1/Request/tv"
         )
 
-        log.debug("Connecting to Ombi to retrieve list of {} requests.", self.config['type'])
+        log.debug("Connecting to Ombi to retrieve list of {} requests.", self.config["type"])
 
         try:
             headers = request.create_json_headers()
             return request.get(endpoint, headers=headers)
         except (HTTPError, ApiError) as error:
             raise plugin.PluginError(
-                'Error retrieving list of %s requests', self.config.get('type')
+                "Error retrieving list of %s requests", self.config.get("type")
             ) from error
 
     def generate_movie_entry(self, parent_request):
-        log.debug('Found: %s', parent_request.get('title'))
+        log.debug("Found: %s", parent_request.get("title"))
 
         # If we dont have an imdb id, maybe we should get it from the title?
-        if not parent_request.get('imdbId'):
-            simdburl = ''
+        if not parent_request.get("imdbId"):
+            simdburl = ""
         else:
-            simdburl = 'http://www.imdb.com/title/' + parent_request.get('imdbId') + '/'
+            simdburl = "http://www.imdb.com/title/" + parent_request.get("imdbId") + "/"
         return Entry(
             title=self.generate_title(parent_request),
             url=simdburl,
-            imdb_id=parent_request.get('imdbId'),
-            tmdb_id=parent_request.get('theMovieDbId'),
-            ombi_id=parent_request.get('theMovieDbId'),
-            movie_name=parent_request.get('title'),
-            movie_year=int(parent_request.get('releaseDate')[0:4]),
-            ombi_request_id=parent_request.get('id'),
-            ombi_released=parent_request.get('released'),
-            ombi_status=parent_request.get('requestStatus'),
-            ombi_approved=parent_request.get('approved'),
-            ombi_available=parent_request.get('available'),
-            ombi_denied=parent_request.get('denied'),
+            imdb_id=parent_request.get("imdbId"),
+            tmdb_id=parent_request.get("theMovieDbId"),
+            ombi_id=parent_request.get("theMovieDbId"),
+            movie_name=parent_request.get("title"),
+            movie_year=int(parent_request.get("releaseDate")[0:4]),
+            ombi_request_id=parent_request.get("id"),
+            ombi_released=parent_request.get("released"),
+            ombi_status=parent_request.get("requestStatus"),
+            ombi_approved=parent_request.get("approved"),
+            ombi_available=parent_request.get("available"),
+            ombi_denied=parent_request.get("denied"),
         )
 
     def generate_tv_entry(self, parent_request, child_request=None, season=None, episode=None):
-        if self.config.get('type') == 'shows':
-            log.debug('Found: %s', parent_request.get('title'))
-            if not parent_request.get('imdbId'):
-                simdburl = ''
+        if self.config.get("type") == "shows":
+            log.debug("Found: %s", parent_request.get("title"))
+            if not parent_request.get("imdbId"):
+                simdburl = ""
             else:
-                simdburl = 'http://www.imdb.com/title/' + parent_request.get('imdbId') + '/'
+                simdburl = "http://www.imdb.com/title/" + parent_request.get("imdbId") + "/"
             return Entry(
                 title=self.generate_title(parent_request),
                 url=simdburl,
                 series_name=self.generate_title(parent_request),
-                tvdb_id=parent_request.get('tvDbId'),
-                imdb_id=parent_request.get('imdbId'),
-                tmdb_id=parent_request.get('externalProviderId'),
-                ombi_id=parent_request.get('externalProviderId'),
-                ombi_status=parent_request.get('status'),
-                ombi_request_id=parent_request.get('id'),
+                tvdb_id=parent_request.get("tvDbId"),
+                imdb_id=parent_request.get("imdbId"),
+                tmdb_id=parent_request.get("externalProviderId"),
+                ombi_id=parent_request.get("externalProviderId"),
+                ombi_status=parent_request.get("status"),
+                ombi_request_id=parent_request.get("id"),
             )
-        if self.config.get('type') == 'seasons':
-            log.debug('Found: %s S%s', parent_request.get('title'), season.get('seasonNumber'))
-            if not parent_request.get('imdbId'):
-                simdburl = ''
+        if self.config.get("type") == "seasons":
+            log.debug("Found: %s S%s", parent_request.get("title"), season.get("seasonNumber"))
+            if not parent_request.get("imdbId"):
+                simdburl = ""
             else:
-                simdburl = 'http://www.imdb.com/title/' + parent_request.get('imdbId') + '/'
+                simdburl = "http://www.imdb.com/title/" + parent_request.get("imdbId") + "/"
             return Entry(
                 title=self.generate_title(parent_request, season),
                 url=simdburl,
                 series_name=self.generate_title(parent_request),
-                series_season=season.get('seasonNumber'),
+                series_season=season.get("seasonNumber"),
                 series_id=self.generate_series_id(season),
-                tvdb_id=parent_request.get('tvDbId'),
-                imdb_id=parent_request.get('imdbId'),
-                tmdb_id=parent_request.get('externalProviderId'),
-                tmdb_season=season.get('seasonNumber'),
-                ombi_id=parent_request.get('externalProviderId'),
-                ombi_childrequest_id=child_request.get('id'),
-                ombi_season_id=season.get('id'),
-                ombi_season=season.get('seasonNumber'),
-                ombi_status=parent_request.get('status'),
-                ombi_request_id=parent_request.get('id'),
+                tvdb_id=parent_request.get("tvDbId"),
+                imdb_id=parent_request.get("imdbId"),
+                tmdb_id=parent_request.get("externalProviderId"),
+                tmdb_season=season.get("seasonNumber"),
+                ombi_id=parent_request.get("externalProviderId"),
+                ombi_childrequest_id=child_request.get("id"),
+                ombi_season_id=season.get("id"),
+                ombi_season=season.get("seasonNumber"),
+                ombi_status=parent_request.get("status"),
+                ombi_request_id=parent_request.get("id"),
             )
-        if self.config.get('type') == 'episodes':
+        if self.config.get("type") == "episodes":
             log.debug(
-                'Found: %s S%sE%s',
-                parent_request.get('title'),
-                season.get('seasonNumber'),
-                episode.get('episodeNumber'),
+                "Found: %s S%sE%s",
+                parent_request.get("title"),
+                season.get("seasonNumber"),
+                episode.get("episodeNumber"),
             )
-            if not parent_request.get('imdbId'):
-                simdburl = ''
+            if not parent_request.get("imdbId"):
+                simdburl = ""
             else:
-                simdburl = 'http://www.imdb.com/title/' + parent_request.get('imdbId') + '/'
+                simdburl = "http://www.imdb.com/title/" + parent_request.get("imdbId") + "/"
             return Entry(
                 title=self.generate_title(parent_request, season, episode),
                 url=simdburl,
                 series_name=self.generate_title(parent_request),
-                series_season=season.get('seasonNumber'),
-                series_episode=episode.get('episodeNumber'),
+                series_season=season.get("seasonNumber"),
+                series_episode=episode.get("episodeNumber"),
                 series_id=self.generate_series_id(season, episode),
-                tvdb_id=parent_request.get('tvDbId'),
-                imdb_id=parent_request.get('imdbId'),
-                tmdb_id=parent_request.get('externalProviderId'),
-                tmdb_season=season.get('seasonNumber'),
-                tmdb_episode=episode.get('episodeNumber'),
-                ombi_id=parent_request.get('externalProviderId'),
-                ombi_request_id=parent_request.get('id'),
-                ombi_childrequest_id=child_request.get('id'),
-                ombi_season_id=season.get('id'),
-                ombi_season=season.get('seasonNumber'),
-                ombi_episode_id=episode.get('id'),
-                ombi_episode=episode.get('episodeNumber'),
-                ombi_approved=episode.get('approved'),
-                ombi_available=episode.get('available'),
-                ombi_requested=episode.get('requested'),
+                tvdb_id=parent_request.get("tvDbId"),
+                imdb_id=parent_request.get("imdbId"),
+                tmdb_id=parent_request.get("externalProviderId"),
+                tmdb_season=season.get("seasonNumber"),
+                tmdb_episode=episode.get("episodeNumber"),
+                ombi_id=parent_request.get("externalProviderId"),
+                ombi_request_id=parent_request.get("id"),
+                ombi_childrequest_id=child_request.get("id"),
+                ombi_season_id=season.get("id"),
+                ombi_season=season.get("seasonNumber"),
+                ombi_episode_id=episode.get("id"),
+                ombi_episode=episode.get("episodeNumber"),
+                ombi_approved=episode.get("approved"),
+                ombi_available=episode.get("available"),
+                ombi_requested=episode.get("requested"),
             )
-        raise plugin.PluginError('Error: Unknown list type {}.'.format(self.config.get('type')))
+        raise plugin.PluginError("Error: Unknown list type {}.".format(self.config.get("type")))
 
 
 class OmbiList:
@@ -964,9 +964,9 @@ class OmbiList:
         return list(OmbiSet(config))
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(OmbiList, 'ombi_list', api_ver=2, interfaces=['task', 'list'])
+    plugin.register(OmbiList, "ombi_list", api_ver=2, interfaces=["task", "list"])
 
 
 def filter_ombi_items(items: list[dict[str, Any]], config: Config) -> list[dict[str, Any]]:
@@ -985,22 +985,22 @@ def filter_ombi_items(items: list[dict[str, Any]], config: Config) -> list[dict[
     """
     filtered_items = items
 
-    if config['hide_available']:
-        filtered_items = [item for item in filtered_items if not item.get('available')]
+    if config["hide_available"]:
+        filtered_items = [item for item in filtered_items if not item.get("available")]
 
-    if config['status'] == 'all':
+    if config["status"] == "all":
         return filtered_items
 
-    if config['status'] == 'approved':
-        return [item for item in filtered_items if item.get('approved') and not item.get('denied')]
+    if config["status"] == "approved":
+        return [item for item in filtered_items if item.get("approved") and not item.get("denied")]
 
-    if config['status'] == 'denied':
-        return [item for item in filtered_items if item.get('denied')]
+    if config["status"] == "denied":
+        return [item for item in filtered_items if item.get("denied")]
 
-    if config['status'] == 'requested':
+    if config["status"] == "requested":
         return [
-            item for item in filtered_items if not item.get('approved') and not item.get('denied')
+            item for item in filtered_items if not item.get("approved") and not item.get("denied")
         ]
 
     # We shouldn't get here, but just in case...
-    raise plugin.PluginError('Error: Unknown status {}.'.format(config.get('status')))
+    raise plugin.PluginError("Error: Unknown status {}.".format(config.get("status")))

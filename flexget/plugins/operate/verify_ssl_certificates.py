@@ -4,7 +4,7 @@ from requests.packages import urllib3
 from flexget import plugin
 from flexget.event import event
 
-logger = logger.bind(name='verify_ssl')
+logger = logger.bind(name="verify_ssl")
 
 
 class VerifySSLCertificates:
@@ -14,7 +14,7 @@ class VerifySSLCertificates:
       verify_ssl_certificates: no
     """
 
-    schema = {'type': 'boolean'}
+    schema = {"type": "boolean"}
 
     @plugin.priority(253)
     def on_task_start(self, task, config):
@@ -32,6 +32,6 @@ class VerifySSLCertificates:
             urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(VerifySSLCertificates, 'verify_ssl_certificates', api_ver=2)
+    plugin.register(VerifySSLCertificates, "verify_ssl_certificates", api_ver=2)

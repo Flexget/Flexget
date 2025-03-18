@@ -3,7 +3,7 @@ from loguru import logger
 from flexget import plugin
 from flexget.event import event
 
-logger = logger.bind(name='duplicates')
+logger = logger.bind(name="duplicates")
 
 
 class Duplicates:
@@ -17,29 +17,29 @@ class Duplicates:
     """
 
     schema = {
-        'type': 'object',
-        'properties': {'field': {'type': 'string'}, 'action': {'enum': ['accept', 'reject']}},
-        'required': ['field', 'action'],
-        'additionalProperties': False,
+        "type": "object",
+        "properties": {"field": {"type": "string"}, "action": {"enum": ["accept", "reject"]}},
+        "required": ["field", "action"],
+        "additionalProperties": False,
     }
 
     def on_task_filter(self, task, config):
-        field = config['field']
-        action = config['action']
+        field = config["field"]
+        action = config["action"]
         for entry in task.entries:
             for prospect in task.entries:
                 if entry == prospect:
                     continue
                 if entry.get(field) is not None and entry[field] == prospect.get(field):
-                    msg = 'Field {} value {} equals on {} and {}'.format(
-                        field, entry[field], entry['title'], prospect['title']
+                    msg = "Field {} value {} equals on {} and {}".format(
+                        field, entry[field], entry["title"], prospect["title"]
                     )
-                    if action == 'accept':
+                    if action == "accept":
                         entry.accept(msg)
                     else:
                         entry.reject(msg)
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(Duplicates, 'duplicates', api_ver=2)
+    plugin.register(Duplicates, "duplicates", api_ver=2)

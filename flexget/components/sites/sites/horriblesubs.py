@@ -9,13 +9,13 @@ from flexget.utils.cached_input import cached
 from flexget.utils.requests import RequestException
 from flexget.utils.soup import get_soup
 
-logger = logger.bind(name='horriblesubs')
+logger = logger.bind(name="horriblesubs")
 
 
 class HorribleSubs:
     """Give latest horriblesubs releases."""
 
-    schema = {'type': 'boolean'}
+    schema = {"type": "boolean"}
 
     @staticmethod
     def horrible_get_downloads(requests, title, page_url):
@@ -24,23 +24,23 @@ class HorribleSubs:
         try:
             soup = get_soup(requests.get(page_url).content)
         except RequestException as e:
-            logger.error('HorribleSubs request failed: {}', e)
+            logger.error("HorribleSubs request failed: {}", e)
             return entries
-        for div in soup.findAll('div', attrs={'class': 'rls-link'}):
-            ttitle = '{} [{}]'.format(title, re.sub(r'.*-', '', div['id']))
+        for div in soup.findAll("div", attrs={"class": "rls-link"}):
+            ttitle = "{} [{}]".format(title, re.sub(r".*-", "", div["id"]))
             urls = []
-            for url in div.findAll('a'):
+            for url in div.findAll("a"):
                 # skip non torrent based links
                 if (
-                    'hs-ddl-link' in url.parent.attrs['class']
-                    or 'hs-xdcc-link' in url.parent.attrs['class']
+                    "hs-ddl-link" in url.parent.attrs["class"]
+                    or "hs-xdcc-link" in url.parent.attrs["class"]
                 ):
                     continue
-                logger.debug('Found url `{}`', url)
-                urls.append(url.attrs['href'])
+                logger.debug("Found url `{}`", url)
+                urls.append(url.attrs["href"])
             # move magnets to last, a bit hacky
             for url in urls[:]:
-                if url.startswith('magnet'):
+                if url.startswith("magnet"):
                     urls.remove(url)
                     urls.append(url)
             entries.append(Entry(title=ttitle, url=urls[0], urls=urls))
@@ -53,36 +53,36 @@ class HorribleSubs:
         try:
             soup = get_soup(requests.get(page_url).content)
         except RequestException as e:
-            logger.error('HorribleSubs request failed: {}', e)
+            logger.error("HorribleSubs request failed: {}", e)
             return entries
 
-        for li_label in soup.findAll('li'):
-            title = '[HorribleSubs] {}{}'.format(
-                str(li_label.find('span').next_sibling), str(li_label.find('strong').text)
+        for li_label in soup.findAll("li"):
+            title = "[HorribleSubs] {}{}".format(
+                str(li_label.find("span").next_sibling), str(li_label.find("strong").text)
             )
-            logger.debug('Found title `{}`', title)
-            url = li_label.find('a')['href']
-            episode = re.sub(r'.*#', '', url)
+            logger.debug("Found title `{}`", title)
+            url = li_label.find("a")["href"]
+            episode = re.sub(r".*#", "", url)
             # Get show ID
             try:
-                soup = get_soup(requests.get(f'https://horriblesubs.info/{url}').content)
+                soup = get_soup(requests.get(f"https://horriblesubs.info/{url}").content)
             except RequestException as e:
-                logger.error('HorribleSubs request failed: {}', e)
+                logger.error("HorribleSubs request failed: {}", e)
                 return entries
-            show_id = re.sub(r'[^0-9]', '', soup(text=re.compile('hs_showid'))[0])
+            show_id = re.sub(r"[^0-9]", "", soup(text=re.compile("hs_showid"))[0])
             entries = HorribleSubs.horrible_get_downloads(
                 requests,
                 title,
-                f'https://horriblesubs.info/api.php?method=getshows&type=show&mode=filter&showid={show_id}&value={episode}',
+                f"https://horriblesubs.info/api.php?method=getshows&type=show&mode=filter&showid={show_id}&value={episode}",
             )
         return entries
 
-    @cached('horriblesubs')
+    @cached("horriblesubs")
     def on_task_input(self, task, config):
         if not config:
             return None
         return HorribleSubs.horrible_entries(
-            task.requests, 'https://horriblesubs.info/api.php?method=getlatest'
+            task.requests, "https://horriblesubs.info/api.php?method=getlatest"
         )
 
     # Search API method
@@ -90,16 +90,16 @@ class HorribleSubs:
         if not config:
             return None
         entries = []
-        for search_string in entry.get('search_strings', [entry['title']]):
-            logger.debug('Searching `{}`', search_string)
+        for search_string in entry.get("search_strings", [entry["title"]]):
+            logger.debug("Searching `{}`", search_string)
             results = HorribleSubs.horrible_entries(
                 task.requests,
-                f'https://horriblesubs.info/api.php?method=search&value={search_string}',
+                f"https://horriblesubs.info/api.php?method=search&value={search_string}",
             )
             entries.extend(results)
         return entries
 
 
-@event('plugin.register')
+@event("plugin.register")
 def register_plugin():
-    plugin.register(HorribleSubs, 'horriblesubs', interfaces=['task', 'search'], api_ver=2)
+    plugin.register(HorribleSubs, "horriblesubs", interfaces=["task", "search"], api_ver=2)
