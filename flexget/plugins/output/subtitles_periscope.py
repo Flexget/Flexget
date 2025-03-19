@@ -90,7 +90,7 @@ class PluginPeriscope:
                 logger.warning('cannot overwrite existing subs for {}', entry['location'])
             else:
                 try:
-                    if psc.downloadSubtitle(entry['location'].encode("utf8"), langs):
+                    if psc.downloadSubtitle(entry['location'].encode('utf8'), langs):
                         logger.info('Subtitles found for {}', entry['location'])
                     elif alts and psc.downloadSubtitle(entry['location'].encode('utf8'), alts):
                         entry.fail('subtitles found for a second-choice language.')

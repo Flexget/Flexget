@@ -129,7 +129,7 @@ class UrlRewriteRlsbb:
         # grab links from comments
         regexps = self.config.get('filehosters_re', [])
         if self.config.get('parse_comments'):
-            comments = soup.find_all('div', id=re.compile("commentbody"))
+            comments = soup.find_all('div', id=re.compile('commentbody'))
             logger.debug('Comment parsing enabled: found {} comments.', len(comments))
             if comments and not regexps:
                 logger.warning(

@@ -26,7 +26,7 @@ except ImportError:
 
 logger = logger.bind(name='irc')
 
-MESSAGE_CLEAN = re.compile(r"\x0f|\x1f|\x02|\x03(?:[\d]{1,2}(?:,[\d]{1,2})?)?", re.MULTILINE)
+MESSAGE_CLEAN = re.compile(r'\x0f|\x1f|\x02|\x03(?:[\d]{1,2}(?:,[\d]{1,2})?)?', re.MULTILINE)
 URL_MATCHER = re.compile(r'(https?://[\da-z\.-]+\.[a-z\.]{2,6}[/\w\.-\?&]*/?)', re.MULTILINE)
 
 channel_pattern = {

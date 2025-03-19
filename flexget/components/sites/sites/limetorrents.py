@@ -22,7 +22,7 @@ def clean_symbols(text):
     result = re.sub(r'[ \(\)\-_\[\]\.]+', ' ', result).lower()
 
     # Leftovers
-    return re.sub(r"[^a-zA-Z0-9 ]", "", result)
+    return re.sub(r'[^a-zA-Z0-9 ]', '', result)
 
 
 class Limetorrents:

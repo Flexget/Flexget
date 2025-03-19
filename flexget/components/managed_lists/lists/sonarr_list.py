@@ -45,7 +45,7 @@ class SonarrSet(MutableSet):
                 'enum': ['standard', 'daily', 'anime'],
                 'default': 'standard',
             },
-            "tags": {"type": "array", "items": {'type': 'string'}},
+            'tags': {'type': 'array', 'items': {'type': 'string'}},
         },
         'required': ['api_key'],
         'additionalProperties': False,
@@ -74,7 +74,7 @@ class SonarrSet(MutableSet):
             base_msg = 'Sonarr returned an error. {}'
             if e.response is not None:
                 error = e.response.json()[0]
-                error = '{}: {} \'{}\''.format(
+                error = "{}: {} '{}'".format(
                     error['errorMessage'], error['propertyName'], error['attemptedValue']
                 )
             else:
@@ -102,9 +102,9 @@ class SonarrSet(MutableSet):
         tags_ids = []
 
         if not self._tags:
-            self._tags = {t["label"].lower(): t["id"] for t in self._sonarr_request("tag")}
+            self._tags = {t['label'].lower(): t['id'] for t in self._sonarr_request('tag')}
 
-        for tag in self.config.get("tags", []):
+        for tag in self.config.get('tags', []):
             if isinstance(tag, int):
                 # Handle tags by id
                 if tag not in self._tags.values():
@@ -120,7 +120,7 @@ class SonarrSet(MutableSet):
                 found = self._tags.get(tag)
                 if not found:
                     logger.verbose('Adding missing tag {} to Sonarr', tag)
-                    found = self._sonarr_request("tag", method="post", data={"label": tag})["id"]
+                    found = self._sonarr_request('tag', method='post', data={'label': tag})['id']
                     self._tags[tag] = found
                 tags_ids.append(found)
         return tags_ids
@@ -190,7 +190,7 @@ class SonarrSet(MutableSet):
             logger.debug('got multiple results for Sonarr, using first one')
         show = lookup_results[0]
 
-        if show.get("id"):
+        if show.get('id'):
             logger.debug('entry {} already exists in Sonarr list as show {}', entry, show)
             return show
 
@@ -213,9 +213,9 @@ class SonarrSet(MutableSet):
         show['tags'] = self.get_tag_ids(entry)
         show['rootFolderPath'] = root_path
         show['addOptions'] = {
-            "ignoreEpisodesWithFiles": self.config.get('ignore_episodes_with_files'),
-            "ignoreEpisodesWithoutFiles": self.config.get('ignore_episodes_without_files'),
-            "searchForMissingEpisodes": self.config.get('search_missing_episodes'),
+            'ignoreEpisodesWithFiles': self.config.get('ignore_episodes_with_files'),
+            'ignoreEpisodesWithoutFiles': self.config.get('ignore_episodes_without_files'),
+            'searchForMissingEpisodes': self.config.get('search_missing_episodes'),
         }
 
         logger.debug('adding show {} to sonarr', show)

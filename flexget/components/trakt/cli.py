@@ -108,7 +108,7 @@ def register_parser_arguments():
 
     show_parser = subparsers.add_parser(
         'list',
-        help='List expiration date for Flexget authorization(s) (don\'t worry, '
+        help="List expiration date for Flexget authorization(s) (don't worry, "
         'they will automatically refresh when expired)',
         parents=[table_parser],
     )

@@ -15,7 +15,7 @@ from flexget.manager import Session
 
 
 @pytest.mark.filecopy(['movie.mkv', 'series.mkv'], '__tmp__')
-@pytest.mark.xdist_group(name="subtitle_list")
+@pytest.mark.xdist_group(name='subtitle_list')
 class TestSubtitleList:
     config = """
          templates:
@@ -388,7 +388,7 @@ class TestSubtitleList:
         task = execute_task('subtitle_emit_force_no')
 
         assert len(task.entries) == 0, (
-            'List should not be empty, but since file does not exist it isn\' returned'
+            "List should not be empty, but since file does not exist it isn' returned"
         )
 
         with Session() as session:

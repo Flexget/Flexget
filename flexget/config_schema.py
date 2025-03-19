@@ -116,7 +116,7 @@ def resolve_ref(uri: str) -> JsonSchema:
         if callable(schema):
             schema = schema(**dict(parse_qsl(parsed.query)))
         return {'$schema': BASE_SCHEMA_URI, **schema}
-    raise Unresolvable(f"{uri} could not be resolved")
+    raise Unresolvable(f'{uri} could not be resolved')
 
 
 def retrieve_resource(uri: str) -> Resource:
@@ -367,7 +367,7 @@ def set_error_message(error: jsonschema.ValidationError) -> None:
                 )
     else:
         # Remove u'' string representation from jsonschema error messages
-        error.message = re.sub('u\'(.*?)\'', '`\\1`', error.message)
+        error.message = re.sub("u'(.*?)'", '`\\1`', error.message)
 
     # Then update with any custom error message supplied from the schema
     custom_error = error.schema.get(f'error_{error.validator}', error.schema.get('error'))
@@ -423,21 +423,21 @@ def validate_properties_w_defaults(validator, properties, instance, schema):
     for key, subschema in properties.items():
         if 'default' in subschema:
             instance.setdefault(key, subschema['default'])
-    yield from BaseValidator.VALIDATORS["properties"](validator, properties, instance, schema)
+    yield from BaseValidator.VALIDATORS['properties'](validator, properties, instance, schema)
 
 
 def validate_any_of(validator, any_of, instance, schema):
-    errors = BaseValidator.VALIDATORS["anyOf"](validator, any_of, instance, schema)
+    errors = BaseValidator.VALIDATORS['anyOf'](validator, any_of, instance, schema)
     yield from select_child_errors(validator, errors)
 
 
 def validate_one_of(validator, one_of, instance, schema):
-    errors = BaseValidator.VALIDATORS["oneOf"](validator, one_of, instance, schema)
+    errors = BaseValidator.VALIDATORS['oneOf'](validator, one_of, instance, schema)
     yield from select_child_errors(validator, errors)
 
 
 def validate_deprecated(validator, deprecated, instance, schema):
-    if "deprecationMessage" not in schema and isinstance(deprecated, str):
+    if 'deprecationMessage' not in schema and isinstance(deprecated, str):
         logger.warning(deprecated)
 
 
@@ -488,9 +488,9 @@ def _rewrite_ref(identifier: str, definition_path: str, defs: dict) -> str:
             # We have to set this before we recurse to stop infinite recursion
             deep_set(path, defs, new_def)
             deep_set(path, defs, _inline_refs(new_def, path, defs))
-        return "#/$defs/" + path
+        return '#/$defs/' + path
     if identifier.startswith('#'):
-        return "#/$defs/" + definition_path + identifier[1:]
+        return '#/$defs/' + definition_path + identifier[1:]
     return identifier
 
 
@@ -507,7 +507,7 @@ def _inline_refs(schema: JsonSchema, definition_path: str, defs: dict) -> Union[
 def inline_refs(schema: JsonSchema) -> JsonSchema:
     """Include all $refs to subschemas in the $defs section of the schema, and rewrite the $refs to point to the right place."""
     definitions = {}
-    schema = _inline_refs(schema, "", definitions)
+    schema = _inline_refs(schema, '', definitions)
     schema.setdefault('$defs', {}).update(definitions)
     return schema
 

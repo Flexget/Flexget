@@ -566,11 +566,11 @@ class FilterSeries(FilterSeriesBase):
                     ep_id = None
                     if latest:
                         if db_series.identified_by == 'ep':
-                            ep_id = f"S{latest.season}E01"
+                            ep_id = f'S{latest.season}E01'
                         else:
                             ep_id = latest.identifier
                         logger.verbose(
-                            f"Defaulting series `{series_name}` begin to start of current season `{ep_id}`"
+                            f'Defaulting series `{series_name}` begin to start of current season `{ep_id}`'
                         )
                     else:
                         if db_series.identified_by == 'ep':
@@ -579,7 +579,7 @@ class FilterSeries(FilterSeriesBase):
                             ep_id = '01'
                         if ep_id is not None:
                             logger.verbose(
-                                f"Defaulting series `{series_name}` begin to best guess `{ep_id}`"
+                                f'Defaulting series `{series_name}` begin to best guess `{ep_id}`'
                             )
 
                     if ep_id is not None:
@@ -929,14 +929,14 @@ class FilterSeries(FilterSeriesBase):
             begin.number = 1
             if begin.identified_by == 'ep':
                 begin.season = 1
-                begin.identifier = "S01E01"
-                logger.verbose("Series begin is unknown, defaulting to ep S01E01")
+                begin.identifier = 'S01E01'
+                logger.verbose('Series begin is unknown, defaulting to ep S01E01')
             elif begin.identified_by == 'sequence':
                 begin.season = 0
-                begin.identifier = "1"
-                logger.verbose("Series begin is unknown, defaulting to sequence 1")
+                begin.identifier = '1'
+                logger.verbose('Series begin is unknown, defaulting to sequence 1')
             else:
-                logger.debug("Unable to set default begin (identified_by is date, auto)")
+                logger.debug('Unable to set default begin (identified_by is date, auto)')
 
         logger.debug('latest download: {}', latest)
         logger.debug('current: {}', entity)
@@ -962,8 +962,8 @@ class FilterSeries(FilterSeriesBase):
             latest.identified_by == entity.identified_by
             and latest.identified_by
             not in [
-                "date",
-                "auto",
+                'date',
+                'auto',
             ]
             and entity < begin
         ):
@@ -979,10 +979,10 @@ class FilterSeries(FilterSeriesBase):
             return True
 
         # TODO: should not be in tracking ?
-        if entity.series.identified_by not in (entity.identified_by, "auto"):
+        if entity.series.identified_by not in (entity.identified_by, 'auto'):
             for entry in entries:
                 entry.reject(
-                    f'Episode `{{entity.identifier}}` doesn\'t match series format `{entity.series.identified_by}`. '
+                    f"Episode `{{entity.identifier}}` doesn't match series format `{entity.series.identified_by}`. "
                 )
             return None
         return None

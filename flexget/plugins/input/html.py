@@ -283,7 +283,7 @@ class InputHtml:
 
             if title_exists(title):
                 # title link should be unique, add CRC32 to end if it's not
-                hash = zlib.crc32(url.encode("utf-8"))
+                hash = zlib.crc32(url.encode('utf-8'))
                 crc32 = '%08X' % (hash & 0xFFFFFFFF)
                 title = f'{title} [{crc32}]'
                 # truly duplicate, title + url crc already exists in queue

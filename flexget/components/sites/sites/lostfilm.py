@@ -130,7 +130,7 @@ class LostFilm:
                 if url.endswith('/'):
                     site_urls.append(url)
                 else:
-                    site_urls.append(url + "/")
+                    site_urls.append(url + '/')
             cfg['site_urls'] = site_urls
         return cfg
 
@@ -160,7 +160,7 @@ class LostFilm:
         rss = None
 
         while site_urls:
-            rss_url = site_urls[0] + "rss.xml"  # If RSS url changes, update it here
+            rss_url = site_urls[0] + 'rss.xml'  # If RSS url changes, update it here
             logger.trace('Trying to get and parse the RSS feed: {}', rss_url)
             try:
                 rss = feedparser.parse(
@@ -197,7 +197,7 @@ class LostFilm:
             perfect_match = False
 
             if item.get('title') is None:
-                logger.warning('RSS item doesn\'t have a title')
+                logger.warning("RSS item doesn't have a title")
             else:
                 logger.trace('Got RSS item title: {}', item['title'])
                 title_match = RSS_TITLE_REGEXP.fullmatch(item['title'])
@@ -249,12 +249,12 @@ class LostFilm:
                     )
 
             if item.get('description') is None:
-                logger.warning('RSS item doesn\'t have a description, skipping')
+                logger.warning("RSS item doesn't have a description, skipping")
                 continue
             lostfilm_id_match = RSS_LF_ID_REGEXP.search(item['description'])
             if lostfilm_id_match is None or lostfilm_id_match['id'] is None:
                 logger.warning(
-                    'RSS item doesn\'t have lostfilm id in the description: {}, skipping'.item[
+                    "RSS item doesn't have lostfilm id in the description: {}, skipping".item[
                         'description'
                     ]
                 )
@@ -263,7 +263,7 @@ class LostFilm:
 
             if not series_name_org or season_num is None or episode_num is None:
                 if item.get('link') is None:
-                    logger.warning('RSS item doesn\'t have a link, skipping')
+                    logger.warning("RSS item doesn't have a link, skipping")
                     continue
                 link_match = RSS_LINK_REGEXP.fullmatch(item['link'])
                 if link_match is None:
@@ -272,7 +272,7 @@ class LostFilm:
                 series_name_org = link_match['sr_org2'].replace('_', ' ')
                 season_num = int(link_match['season'])
                 episode_num = int(link_match['episode'])
-                logger.verbose('Using imprecise information from RSS item \'link\'')
+                logger.verbose("Using imprecise information from RSS item 'link'")
 
             logger.trace(
                 (
@@ -341,7 +341,7 @@ class LostFilm:
                 find_item = find_item.find('head', recursive=False)
                 if find_item is not None:
                     find_item = find_item.find(
-                        'meta', attrs={'http-equiv': "refresh"}, recursive=False
+                        'meta', attrs={'http-equiv': 'refresh'}, recursive=False
                     )
                     if (
                         find_item is not None

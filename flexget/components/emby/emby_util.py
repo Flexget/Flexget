@@ -6,21 +6,21 @@ SCHEMA_SERVER = {
         {
             'type': 'object',
             'properties': {
-                'host': {'type': 'string', "default": "http://localhost:8096"},
-                "username": {'type': 'string'},
-                "password": {'type': 'string'},
-                "return_host": {'type': 'string', 'enum': ['lan', 'wan']},
+                'host': {'type': 'string', 'default': 'http://localhost:8096'},
+                'username': {'type': 'string'},
+                'password': {'type': 'string'},
+                'return_host': {'type': 'string', 'enum': ['lan', 'wan']},
             },
-            'required': ['username', "password"],
+            'required': ['username', 'password'],
             'additionalProperties': False,
         },
         {
             'type': 'object',
             'properties': {
-                'host': {'type': 'string', "default": "http://localhost:8096"},
+                'host': {'type': 'string', 'default': 'http://localhost:8096'},
                 'username': {'type': 'string'},
-                "apikey": {'type': 'string'},
-                "return_host": {'type': 'string', 'enum': ['lan', 'wan']},
+                'apikey': {'type': 'string'},
+                'return_host': {'type': 'string', 'enum': ['lan', 'wan']},
             },
             'required': ['username', 'apikey'],
             'additionalProperties': False,
@@ -29,7 +29,7 @@ SCHEMA_SERVER = {
 }
 
 
-SCHEMA_SERVER_TAG = {"server": {**SCHEMA_SERVER}}
+SCHEMA_SERVER_TAG = {'server': {**SCHEMA_SERVER}}
 
 
 SORT_FIELDS = [
@@ -134,7 +134,7 @@ def simplify_text(text: str) -> str:
     # Symbols that should be converted to white space
     result = re.sub(r'[ \(\)\-_\[\]\.]+', ' ', result)
     # Leftovers
-    result = re.sub(r"[^a-zA-Z0-9 ]", "", result)
+    result = re.sub(r'[^a-zA-Z0-9 ]', '', result)
     # Replace multiple white spaces with one
     result = ' '.join(result.split())
     return None

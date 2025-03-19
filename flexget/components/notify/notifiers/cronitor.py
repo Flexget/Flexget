@@ -10,7 +10,7 @@ from flexget.utils.requests import Session as RequestSession
 
 requests = RequestSession(max_retries=3)
 
-plugin_name = "cronitor"
+plugin_name = 'cronitor'
 
 logger = logger.bind(name=plugin_name)
 
@@ -31,65 +31,65 @@ class Cronitor:
         auth_key: secret
     """
 
-    base_url = "https://cronitor.link/{monitor_code}/{status}"
+    base_url = 'https://cronitor.link/{monitor_code}/{status}'
 
     schema = {
-        "oneOf": [
+        'oneOf': [
             {
-                "type": "object",
-                "properties": {
-                    "monitor_code": {"type": "string"},
-                    "on_start": {"type": "boolean"},
-                    "on_abort": {"type": "boolean"},
-                    "message": {"type": "string"},
-                    "host": {"type": "string"},
-                    "auth_key": {"type": "string"},
+                'type': 'object',
+                'properties': {
+                    'monitor_code': {'type': 'string'},
+                    'on_start': {'type': 'boolean'},
+                    'on_abort': {'type': 'boolean'},
+                    'message': {'type': 'string'},
+                    'host': {'type': 'string'},
+                    'auth_key': {'type': 'string'},
                 },
-                "required": ["monitor_code"],
-                "additionalProperties": False,
+                'required': ['monitor_code'],
+                'additionalProperties': False,
             },
-            {"type": "string"},
+            {'type': 'string'},
         ]
     }
 
     @staticmethod
     def prepare_config(config):
         if isinstance(config, str):
-            config = {"monitor_code": config}
-        config.setdefault("on_start", True)
-        config.setdefault("on_abort", True)
-        config.setdefault("host", socket.gethostname())
+            config = {'monitor_code': config}
+        config.setdefault('on_start', True)
+        config.setdefault('on_abort', True)
+        config.setdefault('host', socket.gethostname())
         return config
 
     def _send_request(self, status, config, task_name):
-        url = self.base_url.format(monitor_code=config["monitor_code"], status=status)
-        message = config.get("message", f"{task_name} task {status}")
-        data = {"msg": message, "host": config["host"]}
-        if config.get("auth_key"):
-            data["auth_key"] = config["auth_key"]
+        url = self.base_url.format(monitor_code=config['monitor_code'], status=status)
+        message = config.get('message', f'{task_name} task {status}')
+        data = {'msg': message, 'host': config['host']}
+        if config.get('auth_key'):
+            data['auth_key'] = config['auth_key']
         try:
             rsp = requests.get(url, params=data)
             rsp.raise_for_status()
         except RequestException as e:
-            raise PluginWarning(f"Could not report to cronitor: {e}")
+            raise PluginWarning(f'Could not report to cronitor: {e}')
 
     def on_task_start(self, task, config):
         config = self.prepare_config(config)
-        if not config["on_start"]:
+        if not config['on_start']:
             return
-        self._send_request("run", config, task.name)
+        self._send_request('run', config, task.name)
 
     def on_task_abort(self, task, config):
         config = self.prepare_config(config)
-        if not config["on_abort"]:
+        if not config['on_abort']:
             return
-        self._send_request("fail", config, task.name)
+        self._send_request('fail', config, task.name)
 
     def on_task_exit(self, task, config):
         config = self.prepare_config(config)
-        self._send_request("complete", config, task.name)
+        self._send_request('complete', config, task.name)
 
 
-@event("plugin.register")
+@event('plugin.register')
 def register_plugin():
     plugin.register(Cronitor, plugin_name, api_ver=2)

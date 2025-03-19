@@ -171,11 +171,11 @@ class TestMetainfoSeries:
             media_id='show-a us s02e09',
         ), 'Failed to parse series info'
         assert task.find_entry(
-            series_name='Jack\'s Show',
+            series_name="Jack's Show",
             series_season=3,
             series_episode=1,
             quality='1080p',
-            media_id='jack\'s show s03e01',
+            media_id="jack's show s03e01",
         ), 'Failed to parse series info'
         # Test season pack
         assert task.find_entry(

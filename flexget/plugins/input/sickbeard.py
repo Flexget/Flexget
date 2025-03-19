@@ -142,7 +142,7 @@ class Sickbeard:
                 continue
             # Test mode logging
             if task.options.test:
-                logger.info("Test mode. Entry includes:")
+                logger.info('Test mode. Entry includes:')
                 for key, value in list(entry.items()):
                     logger.info('     {}: {}', key.capitalize(), value)
 

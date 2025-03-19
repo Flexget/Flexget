@@ -115,11 +115,11 @@ def pending_list_add(options):
         db_entry = db.get_entry_by_title(list_id=pending_list.id, title=title, session=session)
         if db_entry:
             console(
-                f"Entry with the title `{title}` already exist with list `{pending_list.name}`. Will replace identifiers if given"
+                f'Entry with the title `{title}` already exist with list `{pending_list.name}`. Will replace identifiers if given'
             )
             operation = 'updated'
         else:
-            console(f"Adding entry with title `{title}` to list `{pending_list.name}`")
+            console(f'Adding entry with title `{title}` to list `{pending_list.name}`')
             db_entry = db.PendingListEntry(entry=entry, pending_list_id=pending_list.id)
             if options.approved:
                 console('marking entry as approved')
@@ -205,8 +205,8 @@ def pending_list_purge(options):
 def register_parser_arguments():
     # Common option to be used in multiple subparsers
     entry_parser = ArgumentParser(add_help=False)
-    entry_parser.add_argument('entry_title', help="Title of the entry")
-    entry_parser.add_argument('url', help="URL of the entry")
+    entry_parser.add_argument('entry_title', help='Title of the entry')
+    entry_parser.add_argument('url', help='URL of the entry')
 
     global_entry_parser = ArgumentParser(add_help=False)
     global_entry_parser.add_argument('entry', help='Can be entry title or ID')
@@ -247,12 +247,12 @@ def register_parser_arguments():
     subparsers.add_parser(
         'approve',
         parents=[list_name_parser, global_entry_parser],
-        help="Mark a pending entry as approved",
+        help='Mark a pending entry as approved',
     )
     subparsers.add_parser(
         'reject',
         parents=[list_name_parser, global_entry_parser],
-        help="Mark a pending entry as rejected",
+        help='Mark a pending entry as rejected',
     )
     subparsers.add_parser(
         'del',

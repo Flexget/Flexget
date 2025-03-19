@@ -125,7 +125,7 @@ class MyEpisodes:
             or 'series_name' not in entry
         ):
             raise plugin.PluginWarning(
-                'Can\'t mark entry `{}` in myepisodes without series_season, series_episode and series_name '
+                "Can't mark entry `{}` in myepisodes without series_season, series_episode and series_name "
                 'fields'.format(entry['title']),
                 logger,
             )
@@ -251,14 +251,14 @@ class MyEpisodes:
             PluginWarning if operation fails
 
         """
-        url = "http://www.myepisodes.com/ajax/service.php?mode=eps_update"
+        url = 'http://www.myepisodes.com/ajax/service.php?mode=eps_update'
         myepisodes_id = entry['myepisodes_id']
         season = entry['series_season']
         episode = entry['series_episode']
 
-        super_secret_code = f"A{myepisodes_id!s}-{season!s}-{episode!s}"
+        super_secret_code = f'A{myepisodes_id!s}-{season!s}-{episode!s}'
 
-        payload = {super_secret_code: "true"}
+        payload = {super_secret_code: 'true'}
 
         if self.test_mode:
             logger.info(
@@ -289,7 +289,7 @@ class MyEpisodes:
             PluginError if http communication fails
 
         """
-        url = "https://www.myepisodes.com/login.php"
+        url = 'https://www.myepisodes.com/login.php'
         session = requests.Session()
 
         payload = {

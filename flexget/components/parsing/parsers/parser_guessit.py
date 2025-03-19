@@ -210,7 +210,7 @@ class ParserGuessit:
                 expected_titles.extend(kwargs['alternate_names'])
             # apostrophe support
             expected_titles = [
-                title.replace('\'', '(?:\'|\\\'|\\\\\'|-|)?') for title in expected_titles
+                title.replace("'", "(?:'|\\'|\\\\'|-|)?") for title in expected_titles
             ]
             guessit_options['expected_title'] = ['re:' + title for title in expected_titles]
         if kwargs.get('id_regexps'):

@@ -18,7 +18,7 @@ def urljoin(*args):
 
     Trailing but not leading slashes are stripped for each argument.
     """
-    return "/".join(str(x).rstrip('/') for x in args)
+    return '/'.join(str(x).rstrip('/') for x in args)
 
 
 class MatrixNotifier:
@@ -59,12 +59,12 @@ class MatrixNotifier:
 
     def notify(self, title, message, config):
         """Send notification to Matrix Room."""
-        notification = {'body': message, 'msgtype': "m.text"}
+        notification = {'body': message, 'msgtype': 'm.text'}
         room = urljoin(
             config['server'],
-            "_matrix/client/r0/rooms",
+            '_matrix/client/r0/rooms',
             config['room_id'],
-            "send/m.room.message?access_token=" + config['token'],
+            'send/m.room.message?access_token=' + config['token'],
         )
         try:
             requests.post(room, json=notification)

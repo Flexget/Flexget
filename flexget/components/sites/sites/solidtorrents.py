@@ -16,22 +16,22 @@ logger = logger.bind(name='solidtorrents')
 URL = 'https://solidtorrents.net/'
 
 CATEGORIES = (
-    "all",
-    "Audio",
-    "Video",
-    "Image",
-    "Document",
-    "eBook",
-    "Program",
-    "Android",
-    "Archive",
-    "Diskimage",
-    "Sourcecode",
-    "Database",
+    'all',
+    'Audio',
+    'Video',
+    'Image',
+    'Document',
+    'eBook',
+    'Program',
+    'Android',
+    'Archive',
+    'Diskimage',
+    'Sourcecode',
+    'Database',
 )
 
 
-SORT = ("seeders", "leechers", "downloads", "date", "size")
+SORT = ('seeders', 'leechers', 'downloads', 'date', 'size')
 
 
 class UrlRewriteSolidTorrents:
@@ -95,17 +95,17 @@ class UrlRewriteSolidTorrents:
             # use search
             results = self.search(task, entry)
             if not results:
-                raise UrlRewritingError("No search results found")
+                raise UrlRewritingError('No search results found')
             # TODO: Close matching was taken out of search methods, this may need to be fixed to be more picky
             entry['url'] = results[0]['url']
         else:
             torrent_id = self.url_match(entry['url']).group(1)
-            url = f"{self.url}/api/v1/torrents/{torrent_id}"
+            url = f'{self.url}/api/v1/torrents/{torrent_id}'
             logger.debug('Getting info for torrent ID {}', torrent_id)
             json_result = task.requests.get(url).json()
             # if json_result['error'] == '404':
             if 'result' not in json_result:
-                raise UrlRewritingError(f"Torrent with ID {torrent_id} does not exist.")
+                raise UrlRewritingError(f'Torrent with ID {torrent_id} does not exist.')
             entry['url'] = json_result['result']['rating']['magnet']
 
     @plugin.internet(logger)
@@ -128,15 +128,15 @@ class UrlRewriteSolidTorrents:
                 'sort': sort,
                 'fuv': remove_potentially_unsafe,
             }
-            url = f"{self.url}/api/v1/search"
+            url = f'{self.url}/api/v1/search'
             json_results = task.requests.get(url, params=params).json()
             if not json_results:
                 raise plugin.PluginError(
-                    "Error while searching solidtorrents for %s.", search_string
+                    'Error while searching solidtorrents for %s.', search_string
                 )
             if 'results' not in json_results:
                 logger.info(
-                    "No result founds while searching solidtorrents for %s.", search_string
+                    'No result founds while searching solidtorrents for %s.', search_string
                 )
                 continue
             for result in json_results['results']:

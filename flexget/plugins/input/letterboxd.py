@@ -71,7 +71,7 @@ class Letterboxd:
 
     def tmdb_lookup(self, search):
         if not search:
-            logger.warning('Can\'t search tmdb, no tmdb_id')
+            logger.warning("Can't search tmdb, no tmdb_id")
             return None
 
         try:
@@ -89,7 +89,7 @@ class Letterboxd:
         }
 
     def parse_film(self, film, config):
-        url = base_url + "/film/" + film.get(config['f_slug'])
+        url = base_url + '/film/' + film.get(config['f_slug'])
         soup = get_soup(requests.get(url).content)
         result = self.tmdb_lookup(soup.find(attrs={'data-tmdb-id': True}).get('data-tmdb-id'))
         if not result:

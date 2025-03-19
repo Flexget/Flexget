@@ -93,14 +93,14 @@ class MyAnimeList:
 
             for anime in list_json:
                 has_selected_status = (
-                    anime["status"] in selected_status or config['status'] == 'all'
+                    anime['status'] in selected_status or config['status'] == 'all'
                 )
                 has_selected_airing_status = (
-                    anime["anime_airing_status"] in selected_airing_status
+                    anime['anime_airing_status'] in selected_airing_status
                     or config['airing_status'] == 'all'
                 )
                 has_selected_type = (
-                    anime["anime_media_type_string"].lower() in selected_types
+                    anime['anime_media_type_string'].lower() in selected_types
                     or config['type'] == 'all'
                 )
                 if has_selected_status and has_selected_type and has_selected_airing_status:

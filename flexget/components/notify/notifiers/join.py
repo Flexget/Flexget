@@ -51,7 +51,7 @@ class JoinNotifier:
         },
         'required': ['api_key'],
         'not': {'required': ['device', 'group']},
-        'error_not': 'Cannot select both \'device\' and \'group\'',
+        'error_not': "Cannot select both 'device' and 'group'",
         'additionalProperties': False,
     }
 

@@ -3,7 +3,7 @@ from loguru import logger
 from flexget import plugin
 from flexget.event import event
 
-logger = logger.bind(name="archetorrent")
+logger = logger.bind(name='archetorrent')
 
 
 class UrlRewriteArchetorrent:

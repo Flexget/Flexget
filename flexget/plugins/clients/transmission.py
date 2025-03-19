@@ -94,14 +94,14 @@ class TransmissionBase:
             )
         except TransmissionAuthError:
             raise plugin.PluginError(
-                "Username/password for transmission is incorrect. Cannot connect."
+                'Username/password for transmission is incorrect. Cannot connect.'
             )
         except TransmissionTimeoutError:
-            raise plugin.PluginError("Cannot connect to transmission: Connection timed out.")
+            raise plugin.PluginError('Cannot connect to transmission: Connection timed out.')
         except TransmissionConnectError as e:
-            raise plugin.PluginError(f"Error connecting to transmission: {e.message}")
+            raise plugin.PluginError(f'Error connecting to transmission: {e.message}')
         except TransmissionError:
-            raise plugin.PluginError("Error connecting to transmission")
+            raise plugin.PluginError('Error connecting to transmission')
         return cli
 
     def torrent_info(self, torrent: 'Torrent', config):
@@ -453,7 +453,7 @@ class PluginTransmission(TransmissionBase):
             # Torrent already loaded in transmission
             elif options['add'].get('download_dir'):
                 logger.log(
-                    "VERBOSE",
+                    'VERBOSE',
                     'Moving {} to "{}"',
                     torrent_info.name,
                     options['add']['download_dir'],
@@ -759,7 +759,7 @@ class PluginTransmission(TransmissionBase):
                         'Unable to render label {!r} for {}: {}', label, entry['title'], e
                     )
             # Transmission doesn't allow commas in labels
-            labels = [re.sub(", ?", " ", label) for label in rendered_labels]
+            labels = [re.sub(', ?', ' ', label) for label in rendered_labels]
             labels = [label.strip() for label in labels]
             labels = [label for label in labels if label]
             if labels:
@@ -835,33 +835,33 @@ class PluginTransmissionClean(TransmissionBase):
     """
 
     schema = {
-        "deprecated": True,
-        "deprecationMessage": "The clean_transmission plugin is deprecated. Configure a new task using the "
-        "from_transmission plugin as well as the transmission plugin using the remove or purge "
-        "action.",
-        "anyOf": [
-            {"type": "boolean"},
+        'deprecated': True,
+        'deprecationMessage': 'The clean_transmission plugin is deprecated. Configure a new task using the '
+        'from_transmission plugin as well as the transmission plugin using the remove or purge '
+        'action.',
+        'anyOf': [
+            {'type': 'boolean'},
             {
-                "type": "object",
-                "properties": {
-                    "host": {"type": "string"},
-                    "port": {"type": "integer"},
-                    "netrc": {"type": "string", "format": "file"},
-                    "username": {"type": "string"},
-                    "password": {"type": "string"},
-                    "enabled": {"type": "boolean"},
-                    "min_ratio": {"type": "number"},
-                    "finished_for": {"type": "string", "format": "interval"},
-                    "transmission_seed_limits": {"type": "boolean"},
-                    "delete_files": {"type": "boolean"},
-                    "tracker": {"type": "string", "format": "regex"},
-                    "preserve_tracker": {"type": "string", "format": "regex"},
-                    "directories": {
-                        "type": "array",
-                        "items": {"type": "string", "format": "regex"},
+                'type': 'object',
+                'properties': {
+                    'host': {'type': 'string'},
+                    'port': {'type': 'integer'},
+                    'netrc': {'type': 'string', 'format': 'file'},
+                    'username': {'type': 'string'},
+                    'password': {'type': 'string'},
+                    'enabled': {'type': 'boolean'},
+                    'min_ratio': {'type': 'number'},
+                    'finished_for': {'type': 'string', 'format': 'interval'},
+                    'transmission_seed_limits': {'type': 'boolean'},
+                    'delete_files': {'type': 'boolean'},
+                    'tracker': {'type': 'string', 'format': 'regex'},
+                    'preserve_tracker': {'type': 'string', 'format': 'regex'},
+                    'directories': {
+                        'type': 'array',
+                        'items': {'type': 'string', 'format': 'regex'},
                     },
                 },
-                "additionalProperties": False,
+                'additionalProperties': False,
             },
         ],
     }
@@ -883,7 +883,7 @@ class PluginTransmissionClean(TransmissionBase):
         remove_ids = []
         for torrent in client.get_torrents():
             logger.log(
-                "VERBOSE",
+                'VERBOSE',
                 'Torrent "{}": status: "{}" - ratio: {} - date added: {}',
                 torrent.name,
                 torrent.status,

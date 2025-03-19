@@ -195,10 +195,10 @@ class TestTVMazeShowLookup:
                 'should have added Shameless and not Shameless (2011)'
             )
             # change the search query
-            session.query(TVMazeLookup).update({'search_name': "shameless.s01e03.hdtv-flexget"})
+            session.query(TVMazeLookup).update({'search_name': 'shameless.s01e03.hdtv-flexget'})
             session.commit()
 
-            lookupargs = {'title': "Shameless.S01E03.HDTV-FlexGet"}
+            lookupargs = {'title': 'Shameless.S01E03.HDTV-FlexGet'}
             series = APITVMaze.series_lookup(**lookupargs)
 
             assert series.tvdb_id == entry['tvdb_id'], (
@@ -302,7 +302,7 @@ class TestTVMazeShowLookup:
             # Verify series expiration flag is now True
             assert session.query(TVMazeSeries).first().expired, 'expired status should be True'
 
-            lookupargs = {'title': "Shameless"}
+            lookupargs = {'title': 'Shameless'}
             series = APITVMaze.series_lookup(**lookupargs)
 
             # Verify series data has been refreshed with actual values upon 2nd call, and series expiration flag
@@ -392,7 +392,7 @@ class TestTVMazeShowLookup:
     def test_episode_summary(self, execute_task):
         expected_summary = (
             "<p>The team's visitor, Jay Garrick, explains that he comes from a parallel world and "
-            "was a speedster there, but lost his powers transitioning over. Now he insists that Barry"
+            'was a speedster there, but lost his powers transitioning over. Now he insists that Barry'
             " needs his help fighting a new metahuman, Sand Demon, who came from Jay's world."
             " Meanwhile, Officer Patty Spivot tries to join Joe's Metahuman Taskforce.</p>"
         )

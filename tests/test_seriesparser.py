@@ -372,10 +372,10 @@ class TestSeriesParser:
         )
 
     @pytest.mark.parametrize(
-        "parse",
+        'parse',
         [(ParserGuessit)],
-        ids=["guessit"],
-        indirect=["parse"],
+        ids=['guessit'],
+        indirect=['parse'],
     )
     def test_ignore_multi_seasonpacks(self, parse, parse_valid, parse_invalid):
         """SeriesParser: ignore multi season and multi episode (only supported by guessit)."""
@@ -407,8 +407,8 @@ class TestSeriesParser:
     def test_idiotic_numbering(self, parse):
         """SeriesParser: idiotic 101, 102, 103, .. numbering."""
         s = parse('Test.706.720p-FlexGet', name='test', identified_by='ep')
-        assert s.season == 7, 'didn\'t pick up season'
-        assert s.episode == 6, 'didn\'t pick up episode'
+        assert s.season == 7, "didn't pick up season"
+        assert s.episode == 6, "didn't pick up episode"
 
     def test_idiotic_numbering_with_zero(self, parse):
         """SeriesParser: idiotic 0101, 0102, 0103, .. numbering."""
@@ -510,13 +510,13 @@ class TestSeriesParser:
 
                 s = parse(f'FooBar - {mock_ep1} {quality2.name}-FlexGet', name='FooBar')
                 assert s.episode == int(mock_ep1), (
-                    f"confused episode {mock_ep1} with quality {quality2.name}"
+                    f'confused episode {mock_ep1} with quality {quality2.name}'
                 )
 
                 # Also test with reversed relative order of episode and quality
                 s = parse(f'[{quality2.name}] FooBar - {mock_ep1} [FlexGet]', name='FooBar')
                 assert s.episode == int(mock_ep1), (
-                    f"confused episode {mock_ep1} with quality {quality2.name}"
+                    f'confused episode {mock_ep1} with quality {quality2.name}'
                 )
 
     def test_name_with_number(self, parse):
@@ -680,18 +680,18 @@ class TestSeriesParser:
         assert s.episode == 2
 
     def test_parentheticals(self, parse):
-        s = parse('The Show (US)', name="The Show (US)")
+        s = parse('The Show (US)', name='The Show (US)')
         # Make sure US is ok outside of parentheses
-        s = parse('The.Show.US.S01E01', name="The Show (US)")
+        s = parse('The.Show.US.S01E01', name='The Show (US)')
         assert s.valid
         # Make sure US is ok inside parentheses
-        s = parse('The Show (US) S01E01', name="The Show (US)")
+        s = parse('The Show (US) S01E01', name='The Show (US)')
         assert s.valid
         # Make sure it works without US
-        s = parse('The.Show.S01E01', name="The Show (US)")
+        s = parse('The.Show.S01E01', name='The Show (US)')
         assert s.valid
         # Make sure it doesn't work with a different country
-        s = parse('The Show (UK) S01E01', name="The Show (US)")
+        s = parse('The Show (UK) S01E01', name='The Show (US)')
         assert not s.valid
 
     def test_id_regexps(self, parse):
@@ -710,11 +710,11 @@ class TestSeriesParser:
     def test_apostrophe(self, parse):
         s = parse(name="FlexGet's show", data="FlexGet's show s01e01")
         assert s.valid
-        s = parse(name="FlexGet's show", data="FlexGets show s01e01")
+        s = parse(name="FlexGet's show", data='FlexGets show s01e01')
         assert s.valid
-        s = parse(name="FlexGet's show", data="FlexGet s show s01e01")
+        s = parse(name="FlexGet's show", data='FlexGet s show s01e01')
         assert s.valid
-        s = parse(name="FlexGet's show", data="FlexGet show s01e01")
+        s = parse(name="FlexGet's show", data='FlexGet show s01e01')
         assert not s.valid
         # bad data with leftover escaping
         s = parse(name="FlexGet's show", data="FlexGet\\'s show s01e01")

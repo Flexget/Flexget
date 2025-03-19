@@ -315,7 +315,7 @@ class PluginInfo(dict):
         self.instance = self.plugin_class()
         self.instance.plugin_info = self  # give plugin easy access to its own info
         self.instance.logger = logger.bind(
-            name=getattr(self.instance, "LOGGER_NAME", None) or self.name
+            name=getattr(self.instance, 'LOGGER_NAME', None) or self.name
         )
         if hasattr(self.instance, 'schema'):
             self.schema = self.instance.schema

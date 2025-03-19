@@ -35,9 +35,9 @@ class UrlRewriteFTDB:
             soup = get_soup(page.text)
         except Exception as e:
             raise UrlRewritingError(e)
-        tag_a = soup.find("a", {"class": "dl_link"})
+        tag_a = soup.find('a', {'class': 'dl_link'})
         if not tag_a:
-            if soup.findAll(text="Connexion ?"):
+            if soup.findAll(text='Connexion ?'):
                 raise UrlRewritingError(
                     'You are not logged in,\
                                          check if your cookie for\
@@ -48,7 +48,7 @@ class UrlRewriteFTDB:
                                     limit per 24hours, so I cannot\
                                     get the torrent'
             )
-        torrent_url = "http://www.frenchtorrentdb.com" + tag_a.get('href') + "&js=1"
+        torrent_url = 'http://www.frenchtorrentdb.com' + tag_a.get('href') + '&js=1'
         logger.debug('TORRENT URL is : {}', torrent_url)
         return torrent_url
 

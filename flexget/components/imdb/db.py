@@ -183,7 +183,7 @@ class Writer(Base):
 
 
 class PlotKeyword(Base):
-    __tablename__ = "imdb_plot_keywords"
+    __tablename__ = 'imdb_plot_keywords'
 
     id = Column(Integer, primary_key=True)
     name = Column(String)

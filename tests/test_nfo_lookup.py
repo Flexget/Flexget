@@ -3,7 +3,7 @@ import pytest
 
 @pytest.mark.online
 class TestNfoLookupWithMovies:
-    base = "nfo_lookup_test_dir/"
+    base = 'nfo_lookup_test_dir/'
     config = f"""
         tasks:
           test_1:  # Only ID
@@ -90,7 +90,7 @@ class TestNfoLookupWithMovies:
             # The imdb_lookup plugin was able to get the correct movie metadata even though there are many versions of
             # (Beauty and the Beast). That is because the nfo_lookup plugin sets the 'imdb_id' field in the entry.
             assert entry['imdb_name'] == 'Beauty and the Beast'
-            assert entry['imdb_original_name'] == "La belle et la bête"
+            assert entry['imdb_original_name'] == 'La belle et la bête'
             assert entry['imdb_year'] == 2014
             assert entry['imdb_genres'] == ['drama', 'family', 'fantasy', 'romance', 'thriller']
 
@@ -138,9 +138,9 @@ class TestNfoLookupWithMovies:
             assert entry['nfo_id'] == 'tt2316801'
             assert entry['nfo_title'] == 'A Bela e a Fera'
             assert entry['nfo_plot'] == (
-                "Um romance inesperado floresce depois que a filha mais nova de um mercador "
-                "em dificuldades se oferece para uma misteriosa besta com a qual seu pai "
-                "ficou endividado."
+                'Um romance inesperado floresce depois que a filha mais nova de um mercador '
+                'em dificuldades se oferece para uma misteriosa besta com a qual seu pai '
+                'ficou endividado.'
             )
             assert entry['imdb_id'] == 'tt2316801'
 
@@ -236,20 +236,20 @@ class TestNfoLookupWithMovies:
             assert entry['nfo_title'] == 'A Bela e a Fera'
 
             # Check the actors. They are in the same order from the nfo file
-            assert entry['nfo_actor'][0]['name'] == "Vincent Cassel"
-            assert entry['nfo_actor'][0]['role'] == "La bête"
+            assert entry['nfo_actor'][0]['name'] == 'Vincent Cassel'
+            assert entry['nfo_actor'][0]['role'] == 'La bête'
 
-            assert entry['nfo_actor'][1]['name'] == "Léa Seydoux"
-            assert entry['nfo_actor'][1]['role'] == "La belle"
+            assert entry['nfo_actor'][1]['name'] == 'Léa Seydoux'
+            assert entry['nfo_actor'][1]['role'] == 'La belle'
 
-            assert entry['nfo_actor'][2]['name'] == "André Dussollier"
+            assert entry['nfo_actor'][2]['name'] == 'André Dussollier'
             assert entry['nfo_actor'][2]['role'] == "Belle's father"
 
-            assert entry['nfo_actor'][3]['name'] == "Eduardo Noriega"
-            assert entry['nfo_actor'][3]['role'] == "Perducas"
+            assert entry['nfo_actor'][3]['name'] == 'Eduardo Noriega'
+            assert entry['nfo_actor'][3]['role'] == 'Perducas'
 
-            assert entry['nfo_actor'][4]['name'] == "Myriam Charleins"
-            assert entry['nfo_actor'][4]['role'] == "Astrid"
+            assert entry['nfo_actor'][4]['name'] == 'Myriam Charleins'
+            assert entry['nfo_actor'][4]['role'] == 'Astrid'
 
             # assert entry['nfo_genre'] == ['Fantasia', 'Romance']
             assert entry['imdb_id'] == 'tt2316801'
@@ -282,39 +282,39 @@ class TestNfoLookupWithMovies:
             assert entry['nfo_title'] == 'A Bela e a Fera'
 
             # Check the actors. They are in the same order from the nfo file
-            assert entry['nfo_actor'][0]['name'] == "Vincent Cassel"
-            assert entry['nfo_actor'][0]['role'] == "La bête"
+            assert entry['nfo_actor'][0]['name'] == 'Vincent Cassel'
+            assert entry['nfo_actor'][0]['role'] == 'La bête'
 
-            assert entry['nfo_actor'][1]['name'] == "Léa Seydoux"
-            assert entry['nfo_actor'][1]['role'] == "La belle"
+            assert entry['nfo_actor'][1]['name'] == 'Léa Seydoux'
+            assert entry['nfo_actor'][1]['role'] == 'La belle'
 
-            assert entry['nfo_actor'][2]['name'] == "André Dussollier"
+            assert entry['nfo_actor'][2]['name'] == 'André Dussollier'
             assert entry['nfo_actor'][2]['role'] == "Belle's father"
 
-            assert entry['nfo_actor'][3]['name'] == "Eduardo Noriega"
-            assert entry['nfo_actor'][3]['role'] == "Perducas"
+            assert entry['nfo_actor'][3]['name'] == 'Eduardo Noriega'
+            assert entry['nfo_actor'][3]['role'] == 'Perducas'
 
-            assert entry['nfo_actor'][4]['name'] == "Myriam Charleins"
-            assert entry['nfo_actor'][4]['role'] == "Astrid"
+            assert entry['nfo_actor'][4]['name'] == 'Myriam Charleins'
+            assert entry['nfo_actor'][4]['role'] == 'Astrid'
 
-            assert entry['nfo_country'] == ["France", "Germany"]
+            assert entry['nfo_country'] == ['France', 'Germany']
             # Single director, but still a list
-            assert entry['nfo_director'] == ["Christophe Gans"]
-            assert entry['nfo_genre'] == ["Fantasia", "Romance"]
-            assert entry['nfo_originaltitle'] == "La Belle et la Bête"
+            assert entry['nfo_director'] == ['Christophe Gans']
+            assert entry['nfo_genre'] == ['Fantasia', 'Romance']
+            assert entry['nfo_originaltitle'] == 'La Belle et la Bête'
             assert entry['nfo_plot'] == (
-                "Um romance inesperado floresce depois que a filha mais nova de um mercador "
-                "em dificuldades se oferece para uma misteriosa besta com a qual seu pai "
-                "ficou endividado."
+                'Um romance inesperado floresce depois que a filha mais nova de um mercador '
+                'em dificuldades se oferece para uma misteriosa besta com a qual seu pai '
+                'ficou endividado.'
             )
-            assert entry['nfo_rating'] == "6"
-            assert entry['nfo_runtime'] == "153"
-            assert entry['nfo_studio'] == ["Canal Plus", "Studio Babelsberg", "Eskwad"]
+            assert entry['nfo_rating'] == '6'
+            assert entry['nfo_runtime'] == '153'
+            assert entry['nfo_studio'] == ['Canal Plus', 'Studio Babelsberg', 'Eskwad']
 
             # There are 3 'thumb's in the nfo file
             assert len(entry['nfo_thumb']) == 3
 
-            assert entry['nfo_trailer'] == "http://www.youtube.com/watch?v=P-WF6ugqIY8"
+            assert entry['nfo_trailer'] == 'http://www.youtube.com/watch?v=P-WF6ugqIY8'
 
             assert entry['nfo_votes'] == '210'
             assert entry['nfo_year'] == '2014'

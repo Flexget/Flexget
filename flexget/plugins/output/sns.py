@@ -60,7 +60,7 @@ class SNSNotification:
         except ImportError as e:
             logger.debug('Error importing boto3: {}', e)
             raise plugin.DependencyError(
-                "sns", "boto3", f"Boto3 module required. ImportError: {e}"
+                'sns', 'boto3', f'Boto3 module required. ImportError: {e}'
             )
 
     # this has to run near the end of the plugin chain, because we

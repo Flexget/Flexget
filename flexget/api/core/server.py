@@ -197,7 +197,7 @@ class ServerRawConfigAPI(APIResource):
     def get(self, session: 'Session' = None) -> Response:
         """Get raw YAML config file."""
         with self.manager.config_path.open(encoding='utf-8') as f:
-            raw_config = base64.b64encode(f.read().encode("utf-8"))
+            raw_config = base64.b64encode(f.read().encode('utf-8'))
         return jsonify(raw_config=raw_config.decode('utf-8'))
 
     @api.validate(raw_config_schema)
@@ -470,7 +470,7 @@ class LogParser:
             )
 
             operator_parenthesis = (
-                Group(Suppress('(') + operator_or + Suppress(")")).setResultsName('parenthesis')
+                Group(Suppress('(') + operator_or + Suppress(')')).setResultsName('parenthesis')
                 | operator_quotes
             )
 

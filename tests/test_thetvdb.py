@@ -99,12 +99,12 @@ class TestTVDBLookup:
             == 'Dr. Gregory House is a maverick physician who is devoid of bedside manner. '
             'While his behavior can border on antisocial, Dr. House thrives on the challenge '
             'of solving the medical puzzles that other doctors give up on. Together with his '
-            'hand-picked team of young medical experts, he\'ll do whatever it takes in the '
+            "hand-picked team of young medical experts, he'll do whatever it takes in the "
             'race against the clock to solve the case.'
         )
 
         assert entry['tvdb_ep_air_date'] == datetime(2004, 11, 23, 0, 0)
-        assert entry['tvdb_ep_directors'] == 'Peter O\'Fallon'
+        assert entry['tvdb_ep_directors'] == "Peter O'Fallon"
         assert entry['tvdb_ep_id'] == 'S01E02'
         assert entry['tvdb_ep_image'] == 'http://thetvdb.com/banners/episodes/73255/110995.jpg'
         assert entry['tvdb_ep_name'] == 'Paternity'
@@ -112,10 +112,10 @@ class TestTVDBLookup:
             entry['tvdb_ep_overview']
             == 'When a teenage lacrosse player is stricken with an unidentifiable brain '
             'disease, Dr. House and the team hustle to give his parents answers. '
-            'Chase breaks the bad news, the kid has MS, but the boy\'s night-terror'
+            "Chase breaks the bad news, the kid has MS, but the boy's night-terror"
             ' hallucinations disprove the diagnosis and send House and his team back '
-            'to square one. As the boy\'s health deteriorates. House\'s side-bet on '
-            'the paternity of the patient infuriates Dr. Cuddy and the teenager\'s '
+            "to square one. As the boy's health deteriorates. House's side-bet on "
+            "the paternity of the patient infuriates Dr. Cuddy and the teenager's "
             'parents, but may just pay off in spades.'
         )
         assert entry['tvdb_ep_rating'] == 7.8
@@ -254,8 +254,8 @@ class TestTVDBExpire:
         persist['last_check'] = datetime.utcnow() - timedelta(hours=3)
 
         expired_data = [
-            {"id": 73255, "lastUpdated": 1458186055},
-            {"id": 295743, "lastUpdated": 1458186088},
+            {'id': 73255, 'lastUpdated': 1458186055},
+            {'id': 295743, 'lastUpdated': 1458186088},
         ]
 
         # Ensure series is marked as expired
@@ -445,7 +445,7 @@ class TestTheTVDBLanguages:
         assert entry['tvdb_genres'] == ['Documentary']
         assert (
             entry['tvdb_overview']
-            == 'Tegenlicht is de reeks informatieve programma\'s van VPRO Televisie, '
+            == "Tegenlicht is de reeks informatieve programma's van VPRO Televisie, "
             'waarin nieuwe ideeën en trends worden onderzocht binnen de wereld van'
             ' politiek, economie, maatschappij en wetenschap. \r\nTegenlicht beschouwt '
             'zichzelf nadrukkelijk als de eerste en enige future affairs-rubriek binnen '
@@ -455,7 +455,7 @@ class TestTheTVDBLanguages:
             'tegelijkertijd gedegen analyses wil Tegenlicht zijn kijk geven op de '
             'wereld; zowel op nationale als op internationale ontwikkelingen die'
             ' onze wereld in de 21ste eeuw vormgeven.\r\n\r\nTegenlicht is een programma'
-            ' zonder een vast \'format\'. Afhankelijk van het onderwerp wordt steeds '
+            " zonder een vast 'format'. Afhankelijk van het onderwerp wordt steeds "
             'een passende vorm gekozen, waardoor langere reportages uit binnen- en '
             'buitenland worden afgewisseld met debatten, en met uitzendingen waarbij '
             'één persoon alle ruimte krijgt zijn of haar visie op een onderwerp te geven.'

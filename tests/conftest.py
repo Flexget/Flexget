@@ -191,7 +191,7 @@ def caplog(pytestconfig, _caplog):  # noqa: F811
         def emit(self, record):
             logging.getLogger(record.name).handle(record)
 
-    handler_id = logger.add(PropagateHandler(), level=level.no, format="{message}", catch=False)
+    handler_id = logger.add(PropagateHandler(), level=level.no, format='{message}', catch=False)
     _caplog.set_level(level.no)
     yield _caplog
     logger.remove(handler_id)

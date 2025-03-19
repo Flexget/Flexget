@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
 
 @pytest.mark.require_optional_deps
-@pytest.mark.xdist_group(name="sftp")
+@pytest.mark.xdist_group(name='sftp')
 class TestSftpList:
     config = """
         templates:
@@ -296,11 +296,11 @@ def assert_entries(
 
     for matcher in [entry_matcher, *argv]:
         entry = task.find_entry(title=matcher['title'])
-        assert entry, f"Expected entry with title {matcher['title']}, but found none"
+        assert entry, f'Expected entry with title {matcher["title"]}, but found none'
         for k, v in matcher.items():
-            assert k in entry.store, f"Expected entry {matcher['title']} to have attribute {k}"
+            assert k in entry.store, f'Expected entry {matcher["title"]} to have attribute {k}'
             assert entry[k] == v, (
-                f"Expected entry {matcher['title']} to have value {v} for attribute {k}, but was {entry[k]}"
+                f'Expected entry {matcher["title"]} to have value {v} for attribute {k}, but was {entry[k]}'
             )
 
 
@@ -310,5 +310,5 @@ def assert_no_entries(task: Task):
     :param task: Task to assert no entires are generated for.
     """
     assert len(task.all_entries) == 0, (
-        f"Expected no entries, but found {[m['title'] for m in task.all_entries]}"
+        f'Expected no entries, but found {[m["title"] for m in task.all_entries]}'
     )

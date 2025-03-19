@@ -53,11 +53,11 @@ CATEGORIES = {
     'TV-Web-DL': 22,
 }
 
-DOMAIN = "iptorrents.com"
-BASE_URL = f"https://{DOMAIN}"
-SEARCH_URL = f"https://{DOMAIN}/t?"
-FREE_SEARCH_URL = f"https://{DOMAIN}/t?free=on"
-DELAY = "2 seconds"
+DOMAIN = 'iptorrents.com'
+BASE_URL = f'https://{DOMAIN}'
+SEARCH_URL = f'https://{DOMAIN}/t?'
+FREE_SEARCH_URL = f'https://{DOMAIN}/t?free=on'
+DELAY = '2 seconds'
 
 
 class UrlRewriteIPTorrents:
@@ -118,7 +118,7 @@ class UrlRewriteIPTorrents:
             # use search
             results = self.search(task, entry)
             if not results:
-                raise UrlRewritingError("No search results found")
+                raise UrlRewritingError('No search results found')
             # TODO: Search doesn't enforce close match to title, be more picky
             entry['url'] = results[0]['url']
 
@@ -161,7 +161,7 @@ class UrlRewriteIPTorrents:
             logger.debug('full search URL: {}', req.url)
 
             if '/u/' + str(config['uid']) not in req.text:
-                raise plugin.PluginError("Invalid cookies (user not logged in)...")
+                raise plugin.PluginError('Invalid cookies (user not logged in)...')
 
             soup = get_soup(req.content, parser='html5lib')
             torrents = soup.find('table', {'id': 'torrents'})
@@ -184,7 +184,7 @@ class UrlRewriteIPTorrents:
                     break
                 entry = Entry()
                 link = torrent.find('a', href=re.compile('download'))['href']
-                entry['url'] = f"{BASE_URL}{link}?torrent_pass={config.get('rss_key')}"
+                entry['url'] = f'{BASE_URL}{link}?torrent_pass={config.get("rss_key")}'
                 entry['title'] = torrent.find('a', href=re.compile('details|/t/[0-9]+$')).text
 
                 seeders = cols[seeders_idx].text

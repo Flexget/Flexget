@@ -22,9 +22,9 @@ local_context = threading.local()
 
 class _Console(rich.console.Console):
     def __init__(self, *args, **kwargs):
-        if "PYCHARM_HOSTED" in os.environ:
+        if 'PYCHARM_HOSTED' in os.environ:
             kwargs.setdefault('color_system', 'truecolor')
-        kwargs.setdefault("markup", True)
+        kwargs.setdefault('markup', True)
         super().__init__(*args, **kwargs)
 
     def __call__(self, text: Any, *args, **kwargs) -> None:
@@ -47,18 +47,18 @@ class _Console(rich.console.Console):
 
     def rule(
         self,
-        title: rich.text.TextType = "",
+        title: rich.text.TextType = '',
         *,
-        characters: str = "─",
-        style: Union[str, rich.console.Style] = "rule.line",
-        align: rich.text.AlignMethod = "left",
+        characters: str = '─',
+        style: Union[str, rich.console.Style] = 'rule.line',
+        align: rich.text.AlignMethod = 'left',
         # This is a custom FlexGet argument
         indent: int = 3,
     ) -> None:
         rule = rich.rule.Rule(title, characters=characters, style=style, align=align)
         if indent and title:
             if not isinstance(rule.title, rich.text.Text):
-                rule.title = self.render_str(rule.title, style="rule.text")
+                rule.title = self.render_str(rule.title, style='rule.text')
             text = rich.text.Text()
             if rule.align == 'left':
                 text = text.append(rule.characters * indent + ' ', style=rule.style)
@@ -218,7 +218,7 @@ def disable_colors():
 
 
 @contextlib.contextmanager
-def capture_console(filelike: TextIO) -> "Iterator":
+def capture_console(filelike: TextIO) -> 'Iterator':
     old_output = get_console_output()
     local_context.output = filelike
     try:

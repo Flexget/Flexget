@@ -218,7 +218,7 @@ def open_archive(archive_path):
     archive = None
 
     if not Path(archive_path).exists():
-        raise PathError('Path doesn\'t exist')
+        raise PathError("Path doesn't exist")
 
     if zipfile.is_zipfile(archive_path):
         archive = ZipArchive(archive_path)

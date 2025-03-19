@@ -34,13 +34,13 @@ class RadarrMovieAlreadyExistsError(Exception):
 def spec_exception_from_response_ex(radarr_request_ex):
     error_message = None
 
-    if "error_message" in radarr_request_ex.kwargs:
-        error_message = radarr_request_ex.kwargs["error_message"]
+    if 'error_message' in radarr_request_ex.kwargs:
+        error_message = radarr_request_ex.kwargs['error_message']
 
     if not error_message:
         return None
 
-    if error_message.lower() == "this movie has already been added":
+    if error_message.lower() == 'this movie has already been added':
         return RadarrMovieAlreadyExistsError()
     return None
 
@@ -51,9 +51,9 @@ def request_get_json(url, headers):
         response = requests.get(url, headers=headers, timeout=10)  # TODO: HANGS HERE
         if response.status_code == 200:
             return response.json()
-        raise RadarrRequestError(f"Invalid response received from Radarr: {response.content}")
+        raise RadarrRequestError(f'Invalid response received from Radarr: {response.content}')
     except RequestException as e:
-        raise RadarrRequestError(f"Unable to connect to Radarr at {url}. Error: {e}")
+        raise RadarrRequestError(f'Unable to connect to Radarr at {url}. Error: {e}')
 
 
 def request_delete_json(url, headers):
@@ -62,9 +62,9 @@ def request_delete_json(url, headers):
         response = requests.delete(url, headers=headers, timeout=10)
         if response.status_code == 200:
             return response.json()
-        raise RadarrRequestError(f"Invalid response received from Radarr: {response.content}")
+        raise RadarrRequestError(f'Invalid response received from Radarr: {response.content}')
     except RequestException as e:
-        raise RadarrRequestError(f"Unable to connect to Radarr at {url}. Error: {e}")
+        raise RadarrRequestError(f'Unable to connect to Radarr at {url}. Error: {e}')
 
 
 def request_post_json(url, headers, data):
@@ -76,21 +76,21 @@ def request_post_json(url, headers, data):
         error_message = None
         try:
             json_response = response.json()
-            if len(json_response) > 0 and "errorMessage" in json_response[0]:
-                error_message = json_response[0]["errorMessage"]
+            if len(json_response) > 0 and 'errorMessage' in json_response[0]:
+                error_message = json_response[0]['errorMessage']
         except ValueError:
             # Raised by response.json() if JSON couln't be decoded
             logger.error('Radarr returned non-JSON error result: {}', response.content)
 
         raise RadarrRequestError(
-            f"Invalid response received from Radarr: {response.content}",
+            f'Invalid response received from Radarr: {response.content}',
             logger,
             status_code=response.status_code,
             error_message=error_message,
         )
 
     except RequestException as e:
-        raise RadarrRequestError(f"Unable to connect to Radarr at {url}. Error: {e}")
+        raise RadarrRequestError(f'Unable to connect to Radarr at {url}. Error: {e}')
 
 
 def request_put_json(url, headers):
@@ -99,9 +99,9 @@ def request_put_json(url, headers):
         response = requests.put(url, headers=headers)
         if response.status_code == 200:
             return response.json()
-        raise RadarrRequestError(f"Invalid response received from Radarr: {response.content}")
+        raise RadarrRequestError(f'Invalid response received from Radarr: {response.content}')
     except RequestException as e:
-        raise RadarrRequestError(f"Unable to connect to Radarr at {url}. Error: {e}")
+        raise RadarrRequestError(f'Unable to connect to Radarr at {url}. Error: {e}')
 
 
 class RadarrAPIService:
@@ -114,63 +114,63 @@ class RadarrAPIService:
         if parsed_base_url.port:
             port = int(parsed_base_url.port)
 
-        self.api_url = f"{parsed_base_url.scheme}://{parsed_base_url.netloc}:{port}{parsed_base_url.path}/api/v3/"
+        self.api_url = f'{parsed_base_url.scheme}://{parsed_base_url.netloc}:{port}{parsed_base_url.path}/api/v3/'
 
     def get_profiles(self):
         """Get all profiles."""
-        request_url = self.api_url + "qualityProfile"
+        request_url = self.api_url + 'qualityProfile'
         headers = self._default_headers()
         return request_get_json(request_url, headers)
 
     def get_tags(self):
         """Get all tags."""
-        request_url = self.api_url + "tag"
+        request_url = self.api_url + 'tag'
         headers = self._default_headers()
         return request_get_json(request_url, headers)
 
     def add_tag(self, label):
         """Add a tag."""
-        request_url = self.api_url + "tag"
+        request_url = self.api_url + 'tag'
         headers = self._default_headers()
-        data = {"label": label}
+        data = {'label': label}
         return request_post_json(request_url, headers, data)
 
     def get_movies(self):
         """Get all movies."""
-        request_url = self.api_url + "movie"
+        request_url = self.api_url + 'movie'
         headers = self._default_headers()
         return request_get_json(request_url, headers)
 
     def get_root_folders(self):
         """Get the root folders."""
-        request_url = self.api_url + "rootfolder"
+        request_url = self.api_url + 'rootfolder'
         headers = self._default_headers()
         return request_get_json(request_url, headers)
 
     def delete_movie(self, movie_id):
         """Delete a movie provided by its id."""
-        request_url = self.api_url + "movie/" + str(movie_id)
+        request_url = self.api_url + 'movie/' + str(movie_id)
         headers = self._default_headers()
         return request_delete_json(request_url, headers)
 
     def lookup_by_term(self, term):
         """Return all movies that matches the search term."""
         term = quote(term)
-        request_url = self.api_url + "movie/lookup?term=" + term
+        request_url = self.api_url + 'movie/lookup?term=' + term
         headers = self._default_headers()
         return request_get_json(request_url, headers)
 
     def lookup_by_imdb(self, imdb_id):
         """Return all movies that matches the imdb id."""
         # TODO: make regexp check that imdb_id really is an IMDB_ID
-        request_url = self.api_url + "movie/lookup/imdb?imdbId=" + imdb_id
+        request_url = self.api_url + 'movie/lookup/imdb?imdbId=' + imdb_id
         headers = self._default_headers()
         return request_get_json(request_url, headers)
 
     def lookup_by_tmdb(self, tmdb_id):
         """Return all movies that matches the tmdb id."""
         tmdb_id = int(tmdb_id)
-        request_url = self.api_url + "movie/lookup/tmdb?tmdbId=" + str(tmdb_id)
+        request_url = self.api_url + 'movie/lookup/tmdb?tmdbId=' + str(tmdb_id)
         headers = self._default_headers()
         return request_get_json(request_url, headers)
 
@@ -188,22 +188,22 @@ class RadarrAPIService:
         tags=(),
     ):
         """Add a movie."""
-        request_url = self.api_url + "movie"
+        request_url = self.api_url + 'movie'
         headers = self._default_headers()
         data = {
-            "title": title,
-            "year": year,
-            "qualityProfileId": quality_profile_id,
-            "titleSlug": title_slug,
-            "images": images,
-            "tmdbId": tmdb_id,
-            "rootFolderPath": root_folder_path,
-            "monitored": monitored,
-            "tags": tags,
+            'title': title,
+            'year': year,
+            'qualityProfileId': quality_profile_id,
+            'titleSlug': title_slug,
+            'images': images,
+            'tmdbId': tmdb_id,
+            'rootFolderPath': root_folder_path,
+            'monitored': monitored,
+            'tags': tags,
         }
 
         if add_options:
-            data["addOptions"] = add_options
+            data['addOptions'] = add_options
 
         try:
             json_response = request_post_json(request_url, headers, data)
@@ -217,36 +217,36 @@ class RadarrAPIService:
 
     def _default_headers(self):
         """Return a dictionary with default headers."""
-        return {"X-Api-Key": self.api_key}
+        return {'X-Api-Key': self.api_key}
 
 
 # Maps (lowercase) Radarr qualities to flexget
 # quality reqirement strings
 QUALITIES_MAP = {
-    "workprint": "workprint",
-    "cam": "cam",
-    "telesync": "ts",
-    "telecine": "tc",
-    "dvdscr": "dvdscr",
-    "sdtv": "sdtv",
-    "dvd": "dvdrip",  # not completely correct
-    "dvd-r": "dvdrip",  # not completely correct
-    "webdl-480p": "webdl 480p",
-    "bluray-480p": "bluray 480p",
-    "bluray-576p": "bluray 576p",
-    "hdtv-720p": "hdtv 720p",
-    "webdl-720p": "webdl 720p",
-    "bluray-720p": "bluray 720p",
-    "hdtv-1080p": "hdtv 1080p",
-    "webdl-1080p": "webdl 1080p",
-    "bluray-1080p": "bluray 1080p",
-    "remux-1080p": "remux 1080p",
-    "hdtv-2160p": "hdtv 2160p",
-    "webdl-2160p": "webdl 2160p",
-    "bluray-2160p": "bluray 2160p",
-    "remux-2160p": "remux 2160p",
-    "br-disk": "remux",  # not completely correct
-    "raw-hd": "remux",  # not completely correct
+    'workprint': 'workprint',
+    'cam': 'cam',
+    'telesync': 'ts',
+    'telecine': 'tc',
+    'dvdscr': 'dvdscr',
+    'sdtv': 'sdtv',
+    'dvd': 'dvdrip',  # not completely correct
+    'dvd-r': 'dvdrip',  # not completely correct
+    'webdl-480p': 'webdl 480p',
+    'bluray-480p': 'bluray 480p',
+    'bluray-576p': 'bluray 576p',
+    'hdtv-720p': 'hdtv 720p',
+    'webdl-720p': 'webdl 720p',
+    'bluray-720p': 'bluray 720p',
+    'hdtv-1080p': 'hdtv 1080p',
+    'webdl-1080p': 'webdl 1080p',
+    'bluray-1080p': 'bluray 1080p',
+    'remux-1080p': 'remux 1080p',
+    'hdtv-2160p': 'hdtv 2160p',
+    'webdl-2160p': 'webdl 2160p',
+    'bluray-2160p': 'bluray 2160p',
+    'remux-2160p': 'remux 2160p',
+    'br-disk': 'remux',  # not completely correct
+    'raw-hd': 'remux',  # not completely correct
     # No idea of how to map these:
     # 'regional': 'UNKNOWN'
 }
@@ -278,14 +278,14 @@ def radarr_quality_to_flexget_quality_req(radarr_quality):
 def get_flexget_qualities(profile, cutoff_only=False):
     quality_requirements = []
     if cutoff_only:
-        name = profile["cutoff"]["name"]
+        name = profile['cutoff']['name']
         quality_req = radarr_quality_to_flexget_quality_req(name)
         if quality_req:
             quality_requirements.append(quality_req)
     else:
-        for quality in profile["items"]:
-            if quality["allowed"]:
-                name = quality["quality"]["name"]
+        for quality in profile['items']:
+            if quality['allowed']:
+                name = quality['quality']['name']
                 quality_req = radarr_quality_to_flexget_quality_req(name)
                 if quality_req:
                     quality_requirements.append(quality_req)
@@ -298,7 +298,7 @@ class RadarrSet(MutableSet):
 
     def __init__(self, config):
         self.config = config
-        self.service = RadarrAPIService(config["api_key"], config["base_url"], config["port"])
+        self.service = RadarrAPIService(config['api_key'], config['base_url'], config['port'])
 
         # cache tags
         self._tags = None
@@ -319,9 +319,9 @@ class RadarrSet(MutableSet):
         tags_ids = []
 
         if not self._tags:
-            self._tags = {t["label"].lower(): t["id"] for t in self.service.get_tags()}
+            self._tags = {t['label'].lower(): t['id'] for t in self.service.get_tags()}
 
-        for tag in self.config.get("tags", []):
+        for tag in self.config.get('tags', []):
             if isinstance(tag, int):
                 # Handle tags by id
                 if tag not in self._tags.values():
@@ -338,7 +338,7 @@ class RadarrSet(MutableSet):
                 found = self._tags.get(tag)
                 if not found:
                     logger.verbose('Adding missing tag {} to Radarr', tag)
-                    found = self.service.add_tag(tag)["id"]
+                    found = self.service.add_tag(tag)['id']
                     self._tags[tag] = found
                 tags_ids.append(found)
         return tags_ids
@@ -349,7 +349,7 @@ class RadarrSet(MutableSet):
 
         matching_entry = self._find_matching_entry(entry)
         if matching_entry:
-            movie_id = matching_entry["radarr_id"]
+            movie_id = matching_entry['radarr_id']
             self.service.delete_movie(movie_id)
             logger.verbose('Removed movie {} from Radarr', matching_entry['title'])
             # Clear the cache
@@ -374,20 +374,20 @@ class RadarrSet(MutableSet):
         # first use the lookup API. Using that we will get
         # a json response which gives us most of the input
         # we need for the POST request.
-        result = self._lookup_movie(entry.get("title"), entry.get("imdb_id"), entry.get("tmdb_id"))
+        result = self._lookup_movie(entry.get('title'), entry.get('imdb_id'), entry.get('tmdb_id'))
 
         if result:
             root_folders = self.service.get_root_folders()
-            root_folder_path = root_folders[0]["path"]
+            root_folder_path = root_folders[0]['path']
 
             try:
                 self.service.add_movie(
-                    result["title"],
-                    result["year"],
-                    self.config.get("profile_id"),
-                    result["titleSlug"],
-                    result["images"],
-                    result["tmdbId"],
+                    result['title'],
+                    result['year'],
+                    self.config.get('profile_id'),
+                    result['titleSlug'],
+                    result['images'],
+                    result['tmdbId'],
                     root_folder_path,
                     monitored=self.config.get('monitored', False),
                     tags=self.get_tag_ids(entry),
@@ -431,13 +431,13 @@ class RadarrSet(MutableSet):
         """Returns tag by id."""
         tags_ids = []
         if self._tags is None:
-            existing = {t["label"].lower(): t["id"] for t in self.service.get_tags()}
+            existing = {t['label'].lower(): t['id'] for t in self.service.get_tags()}
             for tag in self.config_tags:
                 tag = tag.lower()
                 found = existing.get(tag)
                 if not found:
                     logger.verbose('Adding missing tag {}} to Radarr', tag)
-                    found = self.service.add_tag(tag)["id"]
+                    found = self.service.add_tag(tag)['id']
                 tags_ids.append(found)
             self._tags = tags_ids
         return self._tags
@@ -459,7 +459,7 @@ class RadarrSet(MutableSet):
         """Find a movie by first checking against the ids of the  provided entry, and if none matches, check by title name."""
         for movie_entry in self.items:
             # First check if any of the id attributes match
-            for id_attribute in ["tmdb_id", "imdb_id", "radarr_id"]:
+            for id_attribute in ['tmdb_id', 'imdb_id', 'radarr_id']:
                 if (
                     id_attribute in entry
                     and id_attribute in movie_entry
@@ -469,19 +469,19 @@ class RadarrSet(MutableSet):
                     return movie_entry
 
             # Then we check if the title matches
-            movie_name = entry.get("movie_name")
-            movie_year = entry.get("movie_year")
-            if movie_name and movie_name.lower() == movie_entry["movie_name"].lower():
+            movie_name = entry.get('movie_name')
+            movie_year = entry.get('movie_year')
+            if movie_name and movie_name.lower() == movie_entry['movie_name'].lower():
                 # The name matches. If we also have a year lets check that as well.
-                if movie_year == movie_entry.get("movie_year", object()):
+                if movie_year == movie_entry.get('movie_year', object()):
                     # Movie name and year matches
                     return movie_entry
                 # The movie had no year present
                 return movie_entry
 
             # Last resort is just to compare the title straight off
-            title = entry.get("title").lower()
-            if title == movie_entry["title"].lower():
+            title = entry.get('title').lower()
+            if title == movie_entry['title'].lower():
                 return movie_entry
         return None
 
@@ -493,44 +493,44 @@ class RadarrSet(MutableSet):
         profile_to_requirement_cache = {}
         entries = []
         for movie in movies:
-            if self.config.get("only_monitored") and not movie["monitored"]:
+            if self.config.get('only_monitored') and not movie['monitored']:
                 continue
 
             quality_requirements = []
 
             # Check if we should add quality requirement
-            if self.config.get("include_data"):
-                movie_profile_id = movie["qualityProfileId"]
+            if self.config.get('include_data'):
+                movie_profile_id = movie['qualityProfileId']
                 for profile in profiles:
-                    profile_id = profile["id"]
+                    profile_id = profile['id']
                     if profile_id == movie_profile_id:
                         if profile_id not in profile_to_requirement_cache:
                             profile_to_requirement_cache[profile_id] = get_flexget_qualities(
-                                profile, self.config["only_use_cutoff_quality"]
+                                profile, self.config['only_use_cutoff_quality']
                             )
 
                         quality_requirements = profile_to_requirement_cache[profile_id]
                         break
 
             entry = Entry(
-                title=movie["title"],
-                url="",
-                radarr_id=movie["id"],
-                movie_name=movie["title"],
-                movie_year=movie["year"],
+                title=movie['title'],
+                url='',
+                radarr_id=movie['id'],
+                movie_name=movie['title'],
+                movie_year=movie['year'],
             )
 
             # There seem to be a bug in the Radarr API because sometimes
             # the imdbId is omitted in the response. So we can't be sure
             # it's there
-            if "imdbId" in movie:
-                entry["imdb_id"] = movie["imdbId"]
+            if 'imdbId' in movie:
+                entry['imdb_id'] = movie['imdbId']
 
-            if "tmdbId" in movie:
-                entry["tmdb_id"] = movie["tmdbId"]
+            if 'tmdbId' in movie:
+                entry['tmdb_id'] = movie['tmdbId']
 
             if len(quality_requirements) > 0:
-                entry["quality_req"] = [str(quality_req) for quality_req in quality_requirements]
+                entry['quality_req'] = [str(quality_req) for quality_req in quality_requirements]
 
             entries.append(entry)
 
@@ -582,20 +582,20 @@ class RadarrList:
     """List plugin for Radarr that also works as an input plugin."""
 
     schema = {
-        "type": "object",
-        "properties": {
-            "base_url": {"type": "string"},
-            "port": {"type": "number", "default": 80},
-            "api_key": {"type": "string"},
-            "only_monitored": {"type": "boolean", "default": True},
-            "include_data": {"type": "boolean", "default": False},
-            "only_use_cutoff_quality": {"type": "boolean", "default": False},
-            "monitored": {"type": "boolean", "default": True},
-            "profile_id": {"type": "integer", "default": 1},
-            "tags": {"type": "array", "items": {'type': ['integer', 'string']}},
+        'type': 'object',
+        'properties': {
+            'base_url': {'type': 'string'},
+            'port': {'type': 'number', 'default': 80},
+            'api_key': {'type': 'string'},
+            'only_monitored': {'type': 'boolean', 'default': True},
+            'include_data': {'type': 'boolean', 'default': False},
+            'only_use_cutoff_quality': {'type': 'boolean', 'default': False},
+            'monitored': {'type': 'boolean', 'default': True},
+            'profile_id': {'type': 'integer', 'default': 1},
+            'tags': {'type': 'array', 'items': {'type': ['integer', 'string']}},
         },
-        "required": ["api_key", "base_url"],
-        "additionalProperties": False,
+        'required': ['api_key', 'base_url'],
+        'additionalProperties': False,
     }
 
     @staticmethod
@@ -608,6 +608,6 @@ class RadarrList:
         return list(RadarrSet(config))
 
 
-@event("plugin.register")
+@event('plugin.register')
 def register_plugin():
-    plugin.register(RadarrList, "radarr_list", api_ver=2, interfaces=["task", "list"])
+    plugin.register(RadarrList, 'radarr_list', api_ver=2, interfaces=['task', 'list'])

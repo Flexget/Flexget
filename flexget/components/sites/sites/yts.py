@@ -51,7 +51,7 @@ class UrlRewriteYTS:
                             entry['year'] = item['year']
                             entry['url'] = torrent['url']
                             entry['content_size'] = parse_filesize(
-                                str(torrent['size_bytes']) + "b"
+                                str(torrent['size_bytes']) + 'b'
                             )
                             entry['torrent_seeds'] = torrent['seeds']
                             entry['torrent_leeches'] = torrent['peers']
@@ -59,7 +59,7 @@ class UrlRewriteYTS:
                             entry['torrent_availability'] = torrent_availability(
                                 entry['torrent_seeds'], entry['torrent_leeches']
                             )
-                            entry['quality'] = Quality(f"{torrent['quality']} {torrent['type']}")
+                            entry['quality'] = Quality(f'{torrent["quality"]} {torrent["type"]}')
                             entry['movie_name'] = item['title']
                             entry['movie_year'] = item['year']
                             entry['imdb_id'] = item['imdb_code']

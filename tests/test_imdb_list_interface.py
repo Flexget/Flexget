@@ -3,7 +3,7 @@ import pytest
 from flexget.components.managed_lists.lists.imdb_list import ImdbEntrySet
 
 
-@pytest.mark.skip(reason="It rarely works")
+@pytest.mark.skip(reason='It rarely works')
 @pytest.mark.online
 class TestIMDBListTypes:
     imdb_config = {

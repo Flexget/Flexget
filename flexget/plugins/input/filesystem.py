@@ -127,7 +127,7 @@ class Filesystem:
         entry['created'] = pendulum.from_timestamp(file_stat.st_ctime, tz='local')
         if entry.isvalid():
             if test_mode:
-                logger.info("Test mode. Entry includes:")
+                logger.info('Test mode. Entry includes:')
                 logger.info(' Title: {}', entry['title'])
                 logger.info(' URL: {}', entry['url'])
                 logger.info(' Filename: {}', entry['filename'])

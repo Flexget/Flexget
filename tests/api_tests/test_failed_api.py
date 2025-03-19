@@ -19,19 +19,19 @@ class TestRetryFailedAPI:
         assert not errors
 
         failed_entry_dict_1 = {
-            "title": 'Failed title1',
-            "url": 'http://123.com',
-            "reason": 'Test reason1',
+            'title': 'Failed title1',
+            'url': 'http://123.com',
+            'reason': 'Test reason1',
         }
         failed_entry_dict_2 = {
-            "title": 'Failed title2',
-            "url": 'http://124.com',
-            "reason": 'Test reason2',
+            'title': 'Failed title2',
+            'url': 'http://124.com',
+            'reason': 'Test reason2',
         }
         failed_entry_dict_3 = {
-            "title": 'Failed title3',
-            "url": 'http://125.com',
-            "reason": 'Test reason3',
+            'title': 'Failed title3',
+            'url': 'http://125.com',
+            'reason': 'Test reason3',
         }
         failed_entries = sorted(
             [failed_entry_dict_1, failed_entry_dict_2, failed_entry_dict_3],
@@ -79,9 +79,9 @@ class TestRetryFailedAPI:
         assert not errors
 
         failed_entry_dict_1 = {
-            "title": 'Failed title1',
-            "url": 'http://123.com',
-            "reason": 'Test reason1',
+            'title': 'Failed title1',
+            'url': 'http://123.com',
+            'reason': 'Test reason1',
         }
 
         with Session() as session:
@@ -125,9 +125,9 @@ class TestFailedPaginationAPI:
 
     def add_failed_entries(self):
         base_failed_entry = {
-            "title": 'Failed title_',
-            "url": 'http://123.com/',
-            "reason": 'Test reason_',
+            'title': 'Failed title_',
+            'url': 'http://123.com/',
+            'reason': 'Test reason_',
         }
         num_of_entries = 200
 
@@ -183,19 +183,19 @@ class TestFailedPaginationAPI:
 
     def test_failed_sorting(self, api_client):
         failed_entry_dict_1 = {
-            "title": 'Failed title_1',
-            "url": 'http://jhb.com',
-            "reason": 'Test reason_3',
+            'title': 'Failed title_1',
+            'url': 'http://jhb.com',
+            'reason': 'Test reason_3',
         }
         failed_entry_dict_2 = {
-            "title": 'Failed title_2',
-            "url": 'http://def.com',
-            "reason": 'Test reason_1',
+            'title': 'Failed title_2',
+            'url': 'http://def.com',
+            'reason': 'Test reason_1',
         }
         failed_entry_dict_3 = {
-            "title": 'Failed title_3',
-            "url": 'http://abc.com',
-            "reason": 'Test reason_2',
+            'title': 'Failed title_3',
+            'url': 'http://abc.com',
+            'reason': 'Test reason_2',
         }
 
         with Session() as session:

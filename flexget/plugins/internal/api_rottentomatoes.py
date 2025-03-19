@@ -287,7 +287,7 @@ def lookup_movie(
         if title == '' and not (rottentomatoes_id or title):
             raise PluginError(f'Failed to parse name from {smart_match}')
 
-    search_string = ""
+    search_string = ''
     if title:
         search_string = title.lower()
         if year:
@@ -489,7 +489,7 @@ def _set_movie_details(
     if movie_data:
         if movie.id:
             logger.debug(
-                "Updating movie info (actually just deleting the old info and adding the new)"
+                'Updating movie info (actually just deleting the old info and adding the new)'
             )
             del movie.release_dates[:]
             del movie.posters[:]

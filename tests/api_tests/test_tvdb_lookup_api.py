@@ -170,7 +170,7 @@ class TestTVDSearchNameLookupAPI:
         errors = schema_match(OC.search_results_object, data)
         assert not errors
 
-        values = {'series_name': "Supernatural", 'tvdb_id': 78901}
+        values = {'series_name': 'Supernatural', 'tvdb_id': 78901}
 
         for field, value in values.items():
             assert data[0].get(field) == value
@@ -188,7 +188,7 @@ class TestTVDSearchIMDBLookupAPI:
         errors = schema_match(OC.search_results_object, data)
         assert not errors
 
-        values = {'series_name': "Game of Thrones", 'tvdb_id': 121361}
+        values = {'series_name': 'Game of Thrones', 'tvdb_id': 121361}
 
         for field, value in values.items():
             assert data[0].get(field) == value
@@ -206,7 +206,7 @@ class TestTVDSearchZAP2ITLookupAPI:
         errors = schema_match(OC.search_results_object, data)
         assert not errors
 
-        values = {'series_name': "The Flash (2014)", 'tvdb_id': 279121}
+        values = {'series_name': 'The Flash (2014)', 'tvdb_id': 279121}
 
         for field, value in values.items():
             assert data[0].get(field) == value
@@ -284,7 +284,7 @@ class TestTVDBLanguages:
         errors = schema_match(OC.search_results_object, data)
         assert not errors
 
-        values = {'series_name': "Tegenlicht", 'tvdb_id': 252712}
+        values = {'series_name': 'Tegenlicht', 'tvdb_id': 252712}
 
         for field, value in values.items():
             assert data[0].get(field) == value

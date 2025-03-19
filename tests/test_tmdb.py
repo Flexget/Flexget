@@ -19,10 +19,10 @@ class TestTmdbLookup:
         task = execute_task('test')
         # check that these were created
         assert task.find_entry(tmdb_name='Taken', tmdb_year=2008), (
-            'Didn\'t populate tmdb info for Taken'
+            "Didn't populate tmdb info for Taken"
         )
         assert task.find_entry(tmdb_name='The Matrix', tmdb_year=1999), (
-            'Didn\'t populate tmdb info for The Matrix'
+            "Didn't populate tmdb info for The Matrix"
         )
 
 

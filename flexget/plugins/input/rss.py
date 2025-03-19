@@ -20,8 +20,8 @@ from flexget.utils.tools import decode_html
 
 logger = logger.bind(name='rss')
 feedparser.registerDateHandler(
-    lambda date_string: pendulum.parse(date_string, tz="UTC", strict=False)
-    .in_tz("UTC")
+    lambda date_string: pendulum.parse(date_string, tz='UTC', strict=False)
+    .in_tz('UTC')
     .timetuple()
 )
 
@@ -279,7 +279,7 @@ class InputRSS:
             status = response.status_code
             if status == 304:
                 logger.verbose(
-                    '{} hasn\'t changed since last run. Not creating entries.', config['url']
+                    "{} hasn't changed since last run. Not creating entries.", config['url']
                 )
                 # Let details plugin know that it is ok if this feed doesn't produce any entries
                 task.no_entries_ok = True
@@ -327,7 +327,7 @@ class InputRSS:
             logger.error('No data recieved for rss feed.')
             return []
         if config.get('escape'):
-            logger.debug("Trying to escape unescaped in RSS")
+            logger.debug('Trying to escape unescaped in RSS')
             content = self.escape_content(content)
         try:
             rss = feedparser.parse(content)
@@ -486,7 +486,7 @@ class InputRSS:
                             )
                 # Also grab pubdate if available
                 if hasattr(entry, 'published_parsed') and entry.published_parsed:
-                    ea['rss_pubdate'] = pendulum.parse(entry.published, tz="UTC", strict=False)
+                    ea['rss_pubdate'] = pendulum.parse(entry.published, tz='UTC', strict=False)
                 # store basic auth info
                 if 'username' in config and 'password' in config:
                     ea['download_auth'] = (config['username'], config['password'])

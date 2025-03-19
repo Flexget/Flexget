@@ -6,7 +6,7 @@ from flexget.plugin import PluginWarning
 
 @pytest.mark.online
 class TestPushoverNotifier:
-    config = "{tasks:{}}"
+    config = '{tasks:{}}'
 
     def test_minimal_pushover_config(self, execute_task):
         """Test pushover account set using `hirabecicr@throwam.com`, password: `flexget`.

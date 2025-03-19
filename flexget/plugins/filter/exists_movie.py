@@ -148,7 +148,7 @@ class FilterExistsMovie:
                 else:
                     movie_id = movie.name
                     if movie.name is not None and movie.year is not None:
-                        movie_id = f"{movie.name} {movie.year}"
+                        movie_id = f'{movie.name} {movie.year}'
                 if movie_id is not None:
                     path_qualities.setdefault(movie_id, set()).add(movie.quality)
                     logger.trace('adding: {}', movie_id)
@@ -179,7 +179,7 @@ class FilterExistsMovie:
                     entry['movie_year'] = movie.year
 
                 if entry.get('movie_year', eval_lazy=False):
-                    movie_id = f"{entry['movie_name']} {entry['movie_year']}"
+                    movie_id = f'{entry["movie_name"]} {entry["movie_year"]}'
                 else:
                     movie_id = entry['movie_name']
 

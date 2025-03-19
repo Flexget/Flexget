@@ -31,7 +31,7 @@ class _Method:
         self.__name = name
 
     def __getattr__(self, name):
-        return _Method(self.__send, f"{self.__name}.{name}")
+        return _Method(self.__send, f'{self.__name}.{name}')
 
     def __call__(self, *args):
         return self.__send(self.__name, args)
@@ -398,7 +398,7 @@ class RTorrent:
             logger.verbose('Creating destination directory `{}`', dst_path)
             self._server.execute.throw('', 'mkdir', '-p', dst_path)
         except xmlrpc_client.Error:
-            raise xmlrpc_client.Error(f"unable to create folder {dst_path}")
+            raise xmlrpc_client.Error(f'unable to create folder {dst_path}')
 
         self._server.execute.throw('', 'mv', '-u', torrent['base_path'], dst_path)
         self._server.d.set_directory(info_hash, dst_path)
@@ -535,7 +535,7 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
                     try:
                         options = self._build_options(config, entry)
                     except RenderError as e:
-                        entry.fail(f"failed to render properties {e!s}")
+                        entry.fail(f'failed to render properties {e!s}')
                         continue
 
                     # fast_resume is not really an rtorrent option so it's not in _build_options
@@ -621,7 +621,7 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
         try:
             options = self._build_options(config, entry, entry_first=False)
         except RenderError as e:
-            entry.fail(f"failed to render properties {e!s}")
+            entry.fail(f'failed to render properties {e!s}')
             return
 
         # Check if changing to another directory which requires a move

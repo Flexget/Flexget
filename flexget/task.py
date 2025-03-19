@@ -473,7 +473,7 @@ class Task:
                         )
                     else:
                         logger.warning(
-                            'Task doesn\'t have any {} plugins, you should add (at least) one!',
+                            "Task doesn't have any {} plugins, you should add (at least) one!",
                             phase,
                         )
 

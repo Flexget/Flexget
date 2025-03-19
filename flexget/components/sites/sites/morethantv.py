@@ -264,7 +264,7 @@ class SearchMoreThanTV:
         )
 
         for search_string in entry.get('search_strings', [entry['title']]):
-            params['searchstr'] = search_string.replace("'", "")
+            params['searchstr'] = search_string.replace("'", '')
             logger.debug('Using search params: {}', params)
             try:
                 page = self.get(

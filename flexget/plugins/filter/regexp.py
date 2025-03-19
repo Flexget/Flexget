@@ -210,8 +210,8 @@ class FilterRegexp:
                 # Run if we are in match mode and have a hit, or are in non-match mode and don't have a hit
                 if match_mode == bool(field):
                     # Creates the string with the reason for the hit
-                    matchtext = f'regexp \'{regexp.pattern}\' ' + (
-                        f'matched field \'{field}\'' if match_mode else 'didn\'t match'
+                    matchtext = f"regexp '{regexp.pattern}' " + (
+                        f"matched field '{field}'" if match_mode else "didn't match"
                     )
                     logger.debug('{} for {}', matchtext, entry['title'])
                     # apply settings to entry and run the method on it

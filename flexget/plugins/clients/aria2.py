@@ -75,8 +75,8 @@ class JsonRpcClient(RpcClient):
     ):
         resp = requests.post(self.url, data=json.dumps(self._get_req_params(method, params)))
         result = resp.json()
-        if "error" in result:
-            return on_fail(result["error"]["code"], result["error"]["message"])
+        if 'error' in result:
+            return on_fail(result['error']['code'], result['error']['message'])
         return on_success(resp)
 
     def add_uri(self, uris, options):
@@ -243,7 +243,7 @@ class OutputAria2:
             path = entry.get('path', config.get('path', None))
             options['dir'] = os.path.expanduser(entry.render(path).rstrip('/'))
         except RenderError as e:
-            entry.fail(f'failed to render \'path\': {e}')
+            entry.fail(f"failed to render 'path': {e}")
             return None
 
         filename = entry.get('content_filename', config.get('filename', None))
@@ -298,7 +298,7 @@ class OutputAria2:
             try:
                 options['out'] = os.path.expanduser(entry.render(filename))
             except RenderError as e:
-                entry.fail(f'failed to render \'filename\': {e}')
+                entry.fail(f"failed to render 'filename': {e}")
                 return None
 
         # handle torrent files

@@ -95,7 +95,7 @@ class TestSeriesPremiere:
 
     def test_dupes_across_tasks(self, execute_task):
         task = execute_task('test_dupes_across_tasks_1')
-        assert len(task.accepted) == 1, 'didn\'t accept first premiere'
+        assert len(task.accepted) == 1, "didn't accept first premiere"
         task = execute_task('test_dupes_across_tasks_2')
         assert len(task.accepted) == 0, 'accepted duplicate premiere'
 

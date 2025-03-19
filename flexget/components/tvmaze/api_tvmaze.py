@@ -31,11 +31,11 @@ Base = db_schema.versioned_base('tvmaze', DB_VERSION)
 UPDATE_INTERVAL = 7  # Used for expiration, number is in days
 BASE_URL = 'https://api.tvmaze.com'
 
-TVMAZE_SHOW_PATH = "/shows/{}"
-TVMAZE_LOOKUP_PATH = "/lookup/shows"
-TVMAZE_SEARCH_PATH = "/singlesearch/shows"
-TVMAZE_EPISODES_BY_DATE_PATH = "/shows/{}/episodesbydate"
-TVMAZE_EPISODES_BY_NUMBER_PATH = "/shows/{}/episodebynumber"
+TVMAZE_SHOW_PATH = '/shows/{}'
+TVMAZE_LOOKUP_PATH = '/lookup/shows'
+TVMAZE_SEARCH_PATH = '/singlesearch/shows'
+TVMAZE_EPISODES_BY_DATE_PATH = '/shows/{}/episodesbydate'
+TVMAZE_EPISODES_BY_NUMBER_PATH = '/shows/{}/episodebynumber'
 TVMAZE_SEASONS = '/shows/{}/seasons'
 
 

@@ -221,7 +221,7 @@ api = API(
     format_checker=format_checker,
 )
 
-base_message: "MessageDict" = {
+base_message: 'MessageDict' = {
     'type': 'object',
     'properties': {
         'status_code': {'type': 'integer'},

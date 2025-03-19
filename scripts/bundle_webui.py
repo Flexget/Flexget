@@ -20,28 +20,28 @@ except ImportError:
 else:
 
     class CustomBuildHook(BuildHookInterface):
-        PLUGIN_NAME = "bundle-webui"
+        PLUGIN_NAME = 'bundle-webui'
 
         def dependencies(self) -> list[str]:
-            if os.environ.get("BUNDLE_WEBUI") not in ["1", "true"]:
+            if os.environ.get('BUNDLE_WEBUI') not in ['1', 'true']:
                 return []
-            return ["requests"]
+            return ['requests']
 
         def clean(self, versions: list[str]) -> None:
             p = Path(__file__).resolve().parents[1]
-            v1_path = p / "flexget" / "ui" / "v1" / "app"
-            v2_path = p / "flexget" / "ui" / "v2" / "dist"
+            v1_path = p / 'flexget' / 'ui' / 'v1' / 'app'
+            v2_path = p / 'flexget' / 'ui' / 'v2' / 'dist'
             if v1_path.exists():
                 shutil.rmtree(v1_path)
             if v2_path.exists():
                 shutil.rmtree(v2_path)
 
         def initialize(self, version: str, build_data: dict[str, Any]) -> None:
-            if os.environ.get("BUNDLE_WEBUI") not in ["1", "true"]:
+            if os.environ.get('BUNDLE_WEBUI') not in ['1', 'true']:
                 return
             bundle_webui()
-            build_data["force_include"]["flexget/ui/v1/app"] = "/flexget/ui/v1/app"
-            build_data["force_include"]["flexget/ui/v2/dist"] = "/flexget/ui/v2/dist"
+            build_data['force_include']['flexget/ui/v1/app'] = '/flexget/ui/v1/app'
+            build_data['force_include']['flexget/ui/v2/dist'] = '/flexget/ui/v2/dist'
 
 
 def bundle_webui(ui_version: Optional[str] = None):
@@ -50,7 +50,7 @@ def bundle_webui(ui_version: Optional[str] = None):
     # once it is registered it can install the dep automatically during the build process.
     import requests
 
-    ui_path = Path(__file__).resolve().parents[1] / "flexget" / "ui"
+    ui_path = Path(__file__).resolve().parents[1] / 'flexget' / 'ui'
 
     def download_extract(url, dest_path):
         print(dest_path)
@@ -63,7 +63,7 @@ def bundle_webui(ui_version: Optional[str] = None):
         print('Bundling WebUI v1...')
         try:
             # Remove existing
-            app_path = ui_path / "v1" / "app"
+            app_path = ui_path / 'v1' / 'app'
             if app_path.exists():
                 shutil.rmtree(app_path)
             # Just stashed the old webui zip on a random github release for easy hosting.
@@ -71,7 +71,7 @@ def bundle_webui(ui_version: Optional[str] = None):
             # we should probably stop bundling it with releases soon.
             download_extract(
                 'https://github.com/Flexget/Flexget/releases/download/v3.0.6/webui_v1.zip',
-                ui_path / "v1",
+                ui_path / 'v1',
             )
         except OSError as e:
             raise RuntimeError(f'Unable to download and extract WebUI v1 due to {e!s}')
@@ -81,7 +81,7 @@ def bundle_webui(ui_version: Optional[str] = None):
         try:
             print('Bundling WebUI v2...')
             # Remove existing
-            app_path = ui_path / "v2" / "dist"
+            app_path = ui_path / 'v2' / 'dist'
             if app_path.exists():
                 shutil.rmtree(app_path)
 
@@ -97,7 +97,7 @@ def bundle_webui(ui_version: Optional[str] = None):
 
             if not v2_package:
                 raise RuntimeError('Unable to find dist.zip in assets')
-            download_extract(v2_package, ui_path / "v2")
+            download_extract(v2_package, ui_path / 'v2')
         except (OSError, ValueError) as e:
             raise RuntimeError(f'Unable to download and extract WebUI v2 due to {e!s}')
 

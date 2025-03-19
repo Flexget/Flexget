@@ -23,4 +23,4 @@ class TestConfig:
         manager.config = {}
         manager._init_config()
         manager.load_config()
-        assert manager.config, 'Config didn\'t load'
+        assert manager.config, "Config didn't load"

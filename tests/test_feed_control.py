@@ -14,15 +14,15 @@ class TestOnlyTask:
               - {title: 'nodownload', url: 'http://localhost/nodownload'}
     """
 
-    @pytest.mark.skip(reason="1.2 we need to test this with execute command")
+    @pytest.mark.skip(reason='1.2 we need to test this with execute command')
     def test_manual_with_onlytask(self, execute_task):
         # TODO: 1.2 we need to test this with execute command
         # Pretend we have been run with --task test
         # This task should run normally, as we specified it as onlytask
-        task = execute_task('test', options={"tasks": ['test']})
+        task = execute_task('test', options={'tasks': ['test']})
         assert task.find_entry(title='download'), 'task failed to download with --task'
         # This task should be disabled, as it wasn't specified with onlytask
-        task = execute_task('test2', options={"tasks": ['test']}, abort_ok=True)
+        task = execute_task('test2', options={'tasks': ['test']}, abort_ok=True)
         assert task.aborted
         assert not task.find_entry(title='nodownload'), 'task should not have been executed'
 
@@ -63,5 +63,5 @@ class TestManualOnlytask:
 
     def test_manual_with_onlytask(self, execute_task):
         # Pretend we have been run with --task test2
-        task = execute_task('test2', options={"tasks": ['test2'], "allow_manual": True})
+        task = execute_task('test2', options={'tasks': ['test2'], 'allow_manual': True})
         assert task.find_entry(title='download'), 'Manual tasks failed to download on manual run'

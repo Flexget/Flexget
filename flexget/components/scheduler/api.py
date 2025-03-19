@@ -45,9 +45,9 @@ def _schedule_by_id(schedule_id, schedules):
 
 
 schedule_desc = (
-    "Schedule ID changes upon daemon restart. The schedules object supports either interval or schedule"
-    " (cron) objects, see the model definition for details. Tasks also support string or list "
-    "(Not displayed as Swagger does yet not support anyOf or oneOf."
+    'Schedule ID changes upon daemon restart. The schedules object supports either interval or schedule'
+    ' (cron) objects, see the model definition for details. Tasks also support string or list '
+    '(Not displayed as Swagger does yet not support anyOf or oneOf.'
 )
 
 

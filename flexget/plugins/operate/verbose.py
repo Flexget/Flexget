@@ -24,10 +24,10 @@ class Verbose:
 
     @staticmethod
     def verbose_details(entry, task=None, act: EntryState = None, reason=None, **kwargs):
-        msg = f"`{entry['title']}` by {task.current_plugin} plugin"
+        msg = f'`{entry["title"]}` by {task.current_plugin} plugin'
         if reason:
             msg = f'{msg} because {reason[0].lower() + reason[1:]}'
-        task_logger.opt(colors=True).verbose(f"{act.log_markup}: {{}}", msg)
+        task_logger.opt(colors=True).verbose(f'{act.log_markup}: {{}}', msg)
 
     def on_task_exit(self, task, config):
         if task.options.silent:
@@ -70,5 +70,5 @@ def register_parser_arguments():
         action='store_true',
         dest='silent',
         default=False,
-        help='don\'t verbose any actions (accept, reject, fail)',
+        help="don't verbose any actions (accept, reject, fail)",
     )

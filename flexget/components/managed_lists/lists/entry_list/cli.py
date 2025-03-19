@@ -117,11 +117,11 @@ def entry_list_add(options):
         db_entry = db.get_entry_by_title(list_id=entry_list.id, title=title, session=session)
         if db_entry:
             console(
-                f"Entry with the title `{title}` already exist with list `{entry_list.name}`. Will replace identifiers if given"
+                f'Entry with the title `{title}` already exist with list `{entry_list.name}`. Will replace identifiers if given'
             )
             output = f'Successfully updated entry `{title}` to entry list `{entry_list.name}` '
         else:
-            console(f"Adding entry with title `{title}` to list `{entry_list.name}`")
+            console(f'Adding entry with title `{title}` to list `{entry_list.name}`')
             db_entry = db.EntryListEntry(entry=entry, entry_list_id=entry_list.id)
             session.add(db_entry)
             output = f'Successfully added entry `{title}` to entry list `{entry_list.name}` '
@@ -173,8 +173,8 @@ def entry_list_purge(options):
 def register_parser_arguments():
     # Common option to be used in multiple subparsers
     entry_parser = ArgumentParser(add_help=False)
-    entry_parser.add_argument('entry_title', help="Title of the entry")
-    entry_parser.add_argument('url', help="URL of the entry")
+    entry_parser.add_argument('entry_title', help='Title of the entry')
+    entry_parser.add_argument('url', help='URL of the entry')
 
     global_entry_parser = ArgumentParser(add_help=False)
     global_entry_parser.add_argument('entry', help='Can be entry title or ID')

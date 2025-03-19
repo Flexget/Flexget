@@ -41,7 +41,7 @@ def is_imdb_url(url):
 def is_valid_imdb_title_id(value):
     """Return True if `value` is a valid IMDB ID for titles (movies, series, etc)."""
     if not isinstance(value, str):
-        raise TypeError(f"is_valid_imdb_title_id expects a string but got {type(value)}")
+        raise TypeError(f'is_valid_imdb_title_id expects a string but got {type(value)}')
     # IMDB IDs for titles have 'tt' followed by 7 or 8 digits
     return re.match(r'tt\d{7,8}', value) is not None
 
@@ -49,7 +49,7 @@ def is_valid_imdb_title_id(value):
 def is_valid_imdb_person_id(value):
     """Return True if `value` is a valid IMDB ID for a person."""
     if not isinstance(value, str):
-        raise TypeError(f"is_valid_imdb_person_id expects a string but got {type(value)}")
+        raise TypeError(f'is_valid_imdb_person_id expects a string but got {type(value)}')
     # An IMDB ID for a person is formed by 'nm' followed by 7 digits
     return re.match(r'nm\d{7,8}', value) is not None
 
@@ -164,7 +164,7 @@ class ImdbSearch:
         # Adding the year to the search normally improves the results, except in the case that the
         # title of the movie is a number e.g. 1917 (2009)
         if year and not name.isdigit():
-            search += f" {year}"
+            search += f' {year}'
         url = f'https://v3.sg.media-imdb.com/suggestion/titles/x/{quote(search, safe="")}.json'
         params = {'includeVideos': 0}
 

@@ -337,7 +337,7 @@ class EmbyAuth(EmbyApiBase):
 
         if self.host_name:
             self.host = self.host_name
-            self._host_name = ""
+            self._host_name = ''
 
         if 'token_data' in persist:
             persist['token_data']['token'] = None
@@ -563,14 +563,14 @@ class EmbyApiListBase(EmbyApiBase):
         """Add a item to list."""
         item = EmbyApiMedia.cast(auth=self.auth, **entry)
         if not item:
-            logger.warning('Not possible to match \'{}\' in emby', item.fullname)
+            logger.warning("Not possible to match '{}' in emby", item.fullname)
             return
 
         if self.contains(item):
-            logger.warning('\'{}\' already in {}', item.fullname, self.fullname)
+            logger.warning("'{}' already in {}", item.fullname, self.fullname)
             return
 
-        logger.debug('Adding \'{}\' to {}', item.fullname, self.fullname)
+        logger.debug("Adding '{}' to {}", item.fullname, self.fullname)
         self._add(item)
 
     @abstractmethod
@@ -581,14 +581,14 @@ class EmbyApiListBase(EmbyApiBase):
         """Remove a item from list."""
         item = EmbyApiMedia.cast(auth=self.auth, **entry)
         if not item:
-            logger.warning('Not possible to match \'{}\' in emby', item.fullname)
+            logger.warning("Not possible to match '{}' in emby", item.fullname)
             return
 
         if not self.contains(item):
-            logger.warning('\'{}\' not in {}', item.fullname, self.fullname)
+            logger.warning("'{}' not in {}", item.fullname, self.fullname)
             return
 
-        logger.debug('Removing \'{}\' from {}', item.fullname, self.fullname)
+        logger.debug("Removing '{}' from {}", item.fullname, self.fullname)
         self._remove(item)
 
     @abstractmethod
@@ -673,7 +673,7 @@ class EmbyApiList(EmbyApiBase, MutableSet):
 
         self._list = self.get_api_list(**kwargs)
         if not self._list:
-            raise PluginError(f'List \'{self.name}\' does not exist')
+            raise PluginError(f"List '{self.name}' does not exist")
 
         self._items = self._list.get_items()
 
@@ -855,7 +855,7 @@ class EmbyApiLibrary(EmbyApiListBase):
 
     @property
     def fullname(self):
-        return f'Library \'{self.name}\''
+        return f"Library '{self.name}'"
 
     @property
     def created(self):
@@ -934,14 +934,14 @@ class EmbyApiWatchedList(EmbyApiListBase):
         endpoint = EMBY_ENDPOINT_WATCHED.format(userid=self.auth.uid, itemid=item.id)
         additem = EmbyApi.resquest_emby(endpoint, self.auth, 'POST', **args)
         if not additem:
-            logger.warning('Not possible to add item \'{}\' to watched list', item.fullname)
+            logger.warning("Not possible to add item '{}' to watched list", item.fullname)
 
     def _remove(self, item: 'EmbyApiMedia'):
         args = {}
         endpoint = EMBY_ENDPOINT_WATCHED.format(userid=self.auth.uid, itemid=item.id)
         additem = EmbyApi.resquest_emby(endpoint, self.auth, 'DELETE', **args)
         if not additem:
-            logger.warning('Not possible to remove item \'{}\' from watched list', item.fullname)
+            logger.warning("Not possible to remove item '{}' from watched list", item.fullname)
 
     def get(self, item):
         item_g = EmbyApiListBase.get(self, item)
@@ -1007,14 +1007,14 @@ class EmbyApiFavoriteList(EmbyApiListBase):
         endpoint = EMBY_ENDPOINT_FAVORITE.format(userid=self.auth.uid, itemid=item.id)
         additem = EmbyApi.resquest_emby(endpoint, self.auth, 'POST', **args)
         if not additem:
-            logger.warning('Not possible to add item \'{}\' to favorite list', item.fullname)
+            logger.warning("Not possible to add item '{}' to favorite list", item.fullname)
 
     def _remove(self, item: 'EmbyApiMedia'):
         args = {}
         endpoint = EMBY_ENDPOINT_FAVORITE.format(userid=self.auth.uid, itemid=item.id)
         additem = EmbyApi.resquest_emby(endpoint, self.auth, 'DELETE', **args)
         if not additem:
-            logger.warning('Not possible to remove item \'{}\' from favorite list', item.fullname)
+            logger.warning("Not possible to remove item '{}' from favorite list", item.fullname)
 
     def get(self, item):
         item_g = EmbyApiListBase.get(self, item)
@@ -1097,7 +1097,7 @@ class EmbyApiPlayList(EmbyApiListBase):
         additem = EmbyApi.resquest_emby(endpoint, self.auth, 'POST', **args)
         if not additem:
             logger.warning(
-                'Not possible to add item \'{}\' to Playlist \'{}\'', item.fullname, self.name
+                "Not possible to add item '{}' to Playlist '{}'", item.fullname, self.name
             )
             return
 
@@ -1111,7 +1111,7 @@ class EmbyApiPlayList(EmbyApiListBase):
             return
 
         if item.id not in self.playlist_bind:
-            logger.warning('Can\'t find entry of \'{}\' in {}', item.fullname, self.fullname)
+            logger.warning("Can't find entry of '{}' in {}", item.fullname, self.fullname)
             return
 
         args = {}
@@ -1121,7 +1121,7 @@ class EmbyApiPlayList(EmbyApiListBase):
         additem = EmbyApi.resquest_emby(endpoint, self.auth, 'DELETE', **args)
         if not additem:
             logger.warning(
-                'Not possible to remove item \'{}\' from Playlist \'{}\'', item.fullname, self.name
+                "Not possible to remove item '{}' from Playlist '{}'", item.fullname, self.name
             )
             return
 
@@ -1224,27 +1224,27 @@ class EmbyApiPlayList(EmbyApiListBase):
         args = {}
         args['Name'] = list_name
         args['Ids'] = item.id
-        logger.debug('Creating playlist \'{}\'', list_name)
+        logger.debug("Creating playlist '{}'", list_name)
 
         items = EmbyApi.resquest_emby(EMBY_ENDPOINT_NEW_PLAYLIST, auth, 'POST', **args)
         if not items:
-            logger.warning('Not possible to create playlist \'{}\'', list_name)
+            logger.warning("Not possible to create playlist '{}'", list_name)
             return None
 
-        logger.debug('Returning information of new playlist \'{}\'', items)
+        logger.debug("Returning information of new playlist '{}'", items)
 
         new_playlist = EmbyApiPlayList(auth=auth, **items)
         if not new_playlist.created:
-            logger.warning('Not possible to create playlist \'{}\'', list_name)
+            logger.warning("Not possible to create playlist '{}'", list_name)
             return None
 
-        logger.debug('Created playlist \'{}\' with id {}', new_playlist.name, new_playlist.id)
+        logger.debug("Created playlist '{}' with id {}", new_playlist.name, new_playlist.id)
 
         return new_playlist
 
     @property
     def fullname(self):
-        return f'Playlist \'{self.name}\''
+        return f"Playlist '{self.name}'"
 
 
 class EmbyApiMedia(EmbyApiBase):
@@ -1551,7 +1551,7 @@ class EmbyApiMedia(EmbyApiBase):
         return f'{self.host}{endpoint}?{qstr}'
 
     @classmethod
-    def get_from_child(cls, child: "EmbyApiMedia") -> "EmbyApiMedia":
+    def get_from_child(cls, child: 'EmbyApiMedia') -> 'EmbyApiMedia':
         parents = cls._get_parents(child)
         if not parents:
             return None
@@ -1638,7 +1638,7 @@ class EmbyApiMedia(EmbyApiBase):
 
         if media_api.mtype and media_api.mtype != EmbyApiMedia.TYPE:
             return EmbyApi.search(auth=auth, **media_api.to_dict())
-        logger.debug('Found media \'{}\' in emby server', media_api.fullname)
+        logger.debug("Found media '{}' in emby server", media_api.fullname)
 
         return media_api
 
@@ -1822,7 +1822,7 @@ class EmbyApiSerie(EmbyApiMedia):
 
         serie_api = EmbyApiSerie(auth=auth, **serie)
         if serie_api:
-            logger.debug('Found serie \'{}\' in emby server', serie_api.fullname)
+            logger.debug("Found serie '{}' in emby server", serie_api.fullname)
             return serie_api
         return None
 
@@ -2059,7 +2059,7 @@ class EmbyApiSeason(EmbyApiMedia):
 
         season_api = EmbyApiSeason(auth=auth, api_serie=season_serie, **season)
         if season_api:
-            logger.debug('Found season \'{}\' in emby server', season_api.fullname)
+            logger.debug("Found season '{}' in emby server", season_api.fullname)
             return season_api
         return None
 
@@ -2281,7 +2281,7 @@ class EmbyApiEpisode(EmbyApiMedia):
         episode = list(filter(lambda e: e.get('IndexNumber') == target_episode, episodes))
 
         if len(episode) > 1:
-            logger.warning("More than one episode found")
+            logger.warning('More than one episode found')
             return None
         if len(episode) == 0:
             logger.warning(
@@ -2299,7 +2299,7 @@ class EmbyApiEpisode(EmbyApiMedia):
         )
 
         if episode_api:
-            logger.debug('Found episode \'{}\' in emby server', episode_api.fullname)
+            logger.debug("Found episode '{}' in emby server", episode_api.fullname)
             return episode_api
         return None
 
@@ -2500,7 +2500,7 @@ class EmbyApiMovie(EmbyApiMedia):
             if len(movie_filter) == 1:
                 movie = movie_filter[0]
             else:
-                logger.warning("More than one movie found")
+                logger.warning('More than one movie found')
                 return None
 
         movie_api = EmbyApiMovie(auth=auth, **movie)
@@ -2606,19 +2606,19 @@ class EmbyApi(EmbyApiBase):
             kwargs['auth'] = EmbyApi.get_auth(**kwargs)
 
         if EmbyApiEpisode.is_type(**kwargs):
-            logger.debug("API search episode")
+            logger.debug('API search episode')
             search_result = EmbyApiEpisode.search(**kwargs)
         elif EmbyApiSeason.is_type(**kwargs):
-            logger.debug("API search season")
+            logger.debug('API search season')
             search_result = EmbyApiSeason.search(**kwargs)
         elif EmbyApiSerie.is_type(**kwargs):
-            logger.debug("API search serie")
+            logger.debug('API search serie')
             search_result = EmbyApiSerie.search(**kwargs)
         elif EmbyApiMovie.is_type(**kwargs):
-            logger.debug("API search movie")
+            logger.debug('API search movie')
             search_result = EmbyApiMovie.search(**kwargs)
         elif 'executed' not in kwargs:
-            logger.debug("API search unknown media")
+            logger.debug('API search unknown media')
             search_result = EmbyApiMedia.search(**kwargs)
 
         if not search_result:
@@ -2639,7 +2639,7 @@ class EmbyApi(EmbyApiBase):
 
         list_object = EmbyApiList.get_api_list(**kwargs)
         if not list_object:
-            raise PluginError(f'List \'{mlist}\' does not exist')
+            raise PluginError(f"List '{mlist}' does not exist")
 
         mlist = list_object.get_items()
 

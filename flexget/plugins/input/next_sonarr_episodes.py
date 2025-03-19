@@ -123,7 +123,7 @@ class NextSonarrEpisodes:
                     )
                     # Test mode logging
                     if entry and task.options.test:
-                        logger.verbose("Test mode. Entry includes:")
+                        logger.verbose('Test mode. Entry includes:')
                         for key, value in list(entry.items()):
                             logger.verbose('     {}: {}', key.capitalize(), value)
                     if entry.isvalid():

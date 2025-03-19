@@ -68,7 +68,7 @@ class XMPPNotifier:
                 sleekxmpp.ClientXMPP.__init__(self, jid, password)
                 self.recipients = recipients
                 self.msg = message
-                self.add_event_handler("session_start", self.start, threaded=True)
+                self.add_event_handler('session_start', self.start, threaded=True)
                 self.register_plugin('xep_0030')  # Service Discovery
                 self.register_plugin('xep_0199')  # XMPP Ping
 

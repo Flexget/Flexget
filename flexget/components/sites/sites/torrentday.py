@@ -92,7 +92,7 @@ class UrlRewriteTorrentday:
     # urlrewriter API
     def url_rewrite(self, task, entry):
         if 'url' not in entry:
-            logger.error('Didn\'t actually get a URL...')
+            logger.error("Didn't actually get a URL...")
         else:
             logger.debug('Got the URL: {}', entry['url'])
         if entry['url'].startswith('https://www.torrentday.com/browse'):

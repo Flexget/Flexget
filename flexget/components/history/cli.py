@@ -25,13 +25,13 @@ def do_cli(manager, options):
                 table.add_row('Task', item.task)
                 table.add_row('Title', item.title)
                 table.add_row('URL', item.url)
-                table.add_row('Time', item.time.strftime("%c"))
+                table.add_row('Time', item.time.strftime('%c'))
                 table.add_row('Details', item.details)
                 if item.filename:
                     table.add_row('Stored', item.filename)
                 table.rows[-1].end_section = True
             else:
-                table.add_row(item.time.strftime("%c"), item.title)
+                table.add_row(item.time.strftime('%c'), item.title)
     if not table.row_count:
         console('No history to display')
         return

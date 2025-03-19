@@ -133,11 +133,11 @@ class TestTraktShowLookup:
             )
             # change the search query
             session.query(TraktShowSearchResult).update(
-                {'search': "shameless.s01e03.hdtv-flexget"}
+                {'search': 'shameless.s01e03.hdtv-flexget'}
             )
             session.commit()
 
-            lookupargs = {'title': "Shameless.S01E03.HDTV-FlexGet"}
+            lookupargs = {'title': 'Shameless.S01E03.HDTV-FlexGet'}
             series = ApiTrakt.lookup_series(session=session, **lookupargs)
 
             assert series.tvdb_id == entry['tvdb_id'], (
@@ -166,7 +166,7 @@ class TestTraktShowLookup:
                 'We support trakt episode lookup by date now? Great! Change this test.'
             )
         assert entry.get('trakt_episode_id') is None, (
-            'false positive for episode match, we don\'t support lookup by date'
+            "false positive for episode match, we don't support lookup by date"
         )
 
     def test_absolute(self, execute_task):
@@ -180,7 +180,7 @@ class TestTraktShowLookup:
                 'We support trakt episode lookup by absolute number now? Great! Change this test.'
             )
         assert entry.get('trakt_episode_id') is None, (
-            'false positive for episode match, we don\'t support lookup by absolute number'
+            "false positive for episode match, we don't support lookup by absolute number"
         )
 
     def test_lookup_actors(self, execute_task):
@@ -448,9 +448,9 @@ class TestTraktMovieLookup:
     def test_search_results(self, execute_task):
         task = execute_task('test_search_results')
         entry = task.entries[0]
-        assert (
-            entry['movie_name'].lower() == 'Harry Potter and The Philosopher\'s Stone'.lower()
-        ), 'lookup failed'
+        assert entry['movie_name'].lower() == "Harry Potter and The Philosopher's Stone".lower(), (
+            'lookup failed'
+        )
         with Session() as session:
             assert len(session.query(TraktMovieSearchResult).all()) == 1, (
                 'should have added one movie to search result'
@@ -498,7 +498,7 @@ class TestTraktMovieLookup:
             'Janaya Pender',
             'Adryn White',
             'Natalie Tjen',
-            'David O\'Connor',
+            "David O'Connor",
             'Jeremy Ball',
             'Fiona Johnson',
             'Harry Lawrence',

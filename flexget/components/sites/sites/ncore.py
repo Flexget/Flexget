@@ -19,21 +19,21 @@ HEADERS = {'Content-type': 'application/x-www-form-urlencoded'}
 PASSKEY = ''
 
 CATEGORIES = {
-    "all",
-    "xvid_hun",
-    "xvid",
-    "dvd_hun",
-    "dvd",
-    "dvd9_hun",
-    "dvd9",
-    "hd_hun",
-    "hd",
-    "xvidser_hun",
-    "xvidser",
-    "dvdser_hun",
-    "dvdser",
-    "hdser_hun",
-    "hdser",
+    'all',
+    'xvid_hun',
+    'xvid',
+    'dvd_hun',
+    'dvd',
+    'dvd9_hun',
+    'dvd9',
+    'hd_hun',
+    'hd',
+    'xvidser_hun',
+    'xvidser',
+    'dvdser_hun',
+    'dvdser',
+    'hdser_hun',
+    'hdser',
 }
 
 SORT = {
@@ -72,42 +72,42 @@ class UrlRewriteNcore:
     def search(self, task, entry, config):
         """Search for name from ncore."""
         data = {
-            "set_lang": "hu",
-            "submitted": "1",
-            "nev": config.get("username"),
-            "pass": config.get("password"),
-            "ne_leptessen_ki": 0,
+            'set_lang': 'hu',
+            'submitted': '1',
+            'nev': config.get('username'),
+            'pass': config.get('password'),
+            'ne_leptessen_ki': 0,
         }
 
-        page = task.requests.post(URL + "/login.php", data=data, headers=HEADERS)
+        page = task.requests.post(URL + '/login.php', data=data, headers=HEADERS)
         soup = get_soup(page.content)
         passkey_line = str(soup.find('link', href=re.compile(r'rss\.php\?key=')))
-        passkey = passkey_line[passkey_line.find("key=") : passkey_line.find('"', 20, 90)]
+        passkey = passkey_line[passkey_line.find('key=') : passkey_line.find('"', 20, 90)]
 
         for search_string in entry.get('search_strings', [entry['title']]):
             data = {
-                "mire": search_string,
-                "miben": "name",
-                "miszerint": SORT[config.get('sort_by')],
+                'mire': search_string,
+                'miben': 'name',
+                'miszerint': SORT[config.get('sort_by')],
             }
 
             if config.get('category'):
-                data["kivalasztott_tipus[]"] = config.get('category')
-                data["tipus"] = "kivalasztottak_kozott"
+                data['kivalasztott_tipus[]'] = config.get('category')
+                data['tipus'] = 'kivalasztottak_kozott'
             else:
-                data["tipus"] = "all_own"
+                data['tipus'] = 'all_own'
 
             if config.get('sort_reverse'):
-                data["hogyan"] = "DESC"
+                data['hogyan'] = 'DESC'
 
-            page = task.requests.post(URL + "/torrents.php", data=data, headers=HEADERS)
+            page = task.requests.post(URL + '/torrents.php', data=data, headers=HEADERS)
             soup = get_soup(page.content)
-            for a in soup.findAll('a', title=re.compile(".+")):
+            for a in soup.findAll('a', title=re.compile('.+')):
                 if 'details' in a.get('href'):
                     e = Entry()
 
                     href = a.get('href')
-                    id = href[href.find("id=") + 3 :]
+                    id = href[href.find('id=') + 3 :]
 
                     e['title'] = a.get('title')
                     e['url'] = URL + f'/torrents.php?action=download&id={id}&' + passkey

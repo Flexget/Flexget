@@ -1,5 +1,5 @@
 TRANSLATE_MAP = {ord('&'): ' and '}
-for char in '\'\\':
+for char in "'\\":
     TRANSLATE_MAP[ord(char)] = ''
 for char in '_./-,[]():':
     TRANSLATE_MAP[ord(char)] = ' '

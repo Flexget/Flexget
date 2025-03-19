@@ -58,7 +58,7 @@ pending_parser = api.pagination_parser(parser=filter_parser, sort_choices=sort_c
 just_task_parser = filter_parser.copy()
 just_task_parser.remove_argument('approved')
 
-description = 'Either \'approve\' or \'reject\''
+description = "Either 'approve' or 'reject'"
 
 
 @pending_api.route('/')

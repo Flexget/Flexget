@@ -124,7 +124,7 @@ class PluginDownload:
                     logger.debug('Accepting magnet url for {}', entry['title'])
                     entry['url'] = url
                     break
-                logger.warning('Can\'t download magnet url')
+                logger.warning("Can't download magnet url")
                 errors.append('Magnet URL')
                 continue
             if require_path and 'path' not in entry:
@@ -322,7 +322,7 @@ class PluginDownload:
         if 'content-type' in response.headers:
             entry['mime-type'] = str(parse_header(response.headers['content-type'])[0])
         else:
-            entry['mime-type'] = "unknown/unknown"
+            entry['mime-type'] = 'unknown/unknown'
 
         content_encoding = response.headers.get('content-encoding', '')
         decompress = 'gzip' in content_encoding or 'deflate' in content_encoding
@@ -445,7 +445,7 @@ class PluginDownload:
             if not os.path.exists(entry['file']):
                 logger.debug('entry: {}', entry)
                 raise plugin.PluginWarning(
-                    'Downloaded temp file `{}` doesn\'t exist!?'.format(entry['file'])
+                    "Downloaded temp file `{}` doesn't exist!?".format(entry['file'])
                 )
 
             if config.get('filename'):

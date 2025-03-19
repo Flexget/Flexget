@@ -215,7 +215,7 @@ def _deserializer_for(serializer_name: str) -> type[Serializer]:
 
 def _yaml_representer(dumper, data):
     if isinstance(data, dict) and all(k in data for k in ('value', 'serializer', 'version')):
-        tag = f"!{data['serializer']}.v{data['version']}"
+        tag = f'!{data["serializer"]}.v{data["version"]}'
         if isinstance(data['value'], dict):
             return dumper.represent_mapping(tag, data['value'])
         if isinstance(data['value'], list):
@@ -249,5 +249,5 @@ class FGLoader(yaml.SafeLoader):
         for s in Serializer.__subclasses__():
             name = s.serializer_name()
             for v in range(1, s.serializer_version() + 1):
-                self.add_constructor(f"!{name}.v{v}", _yaml_constructor)
+                self.add_constructor(f'!{name}.v{v}', _yaml_constructor)
         super().__init__(stream)

@@ -83,7 +83,7 @@ class UrlRewriteTorrentleech:
             # use search
             results = self.search(task, entry)
             if not results:
-                raise UrlRewritingError("No search results found")
+                raise UrlRewritingError('No search results found')
             # TODO: Search doesn't enforce close match to title, be more picky
             entry['url'] = results[0]['url']
 
@@ -123,7 +123,7 @@ class UrlRewriteTorrentleech:
         filter_url = '/categories/{}'.format(','.join(str(c) for c in categories))
         entries = set()
         for search_string in entry.get('search_strings', [entry['title']]):
-            query = normalize_unicode(search_string).replace(":", "")
+            query = normalize_unicode(search_string).replace(':', '')
             # urllib.quote will crash if the unicode string has non ascii characters,
             # so encode in utf-8 beforehand
 

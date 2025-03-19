@@ -30,7 +30,7 @@ class UrlRewriteKoreus:
             soup = get_soup(page.text)
         except Exception as e:
             raise UrlRewritingError(e)
-        down_link = soup.find('a', attrs={'href': re.compile(".+mp4")})
+        down_link = soup.find('a', attrs={'href': re.compile('.+mp4')})
         if not down_link:
             raise UrlRewritingError(f'Unable to locate download link from url {url}')
         return down_link.get('href')

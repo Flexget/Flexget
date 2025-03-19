@@ -29,9 +29,9 @@ class PendingListSet(MutableSet):
         self.list_name = config.get('list_name')
 
         self.filter_approved = True
-        if config.get('include') == "pending":
+        if config.get('include') == 'pending':
             self.filter_approved = False
-        if config.get('include') == "all":
+        if config.get('include') == 'all':
             self.filter_approved = None
 
         with Session() as session:

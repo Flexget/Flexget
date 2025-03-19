@@ -86,7 +86,7 @@ class UrlRewriteFuzer:
             return []
 
         entries = []
-        for tr in table.find_all("tr"):
+        for tr in table.find_all('tr'):
             if not tr.get('class') or 'colhead_dark' in tr.get('class'):
                 continue
             name = tr.find('div', {'class': 'main_title'}).find('a').text

@@ -8,7 +8,7 @@ from flexget.ui.v2 import register_web_ui as register_web_ui_v2
 from flexget.utils.tools import get_config_hash
 from flexget.webserver import get_secret, register_app, setup_server
 
-logger = logger.bind(name="web_server_daemon")
+logger = logger.bind(name='web_server_daemon')
 config_hash = ''
 web_server = None
 
@@ -81,7 +81,7 @@ def register_web_server(manager):
 
     config = manager.config.get('web_server')
     if get_config_hash(config) == config_hash:
-        logger.debug('web server config has\'nt changed')
+        logger.debug("web server config has'nt changed")
         return
 
     config_hash = get_config_hash(config)
@@ -99,7 +99,7 @@ def register_web_server(manager):
     # Register API
     api_app.secret_key = get_secret()
 
-    logger.info("Initiating API")
+    logger.info('Initiating API')
     register_app('/api', api_app, 'API')
 
     # Register WebUI
