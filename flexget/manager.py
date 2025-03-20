@@ -201,7 +201,7 @@ class Manager:
                 options = manager_parser.parse_known_args(args, do_help=False)[0]
             except ParserError:
                 manager_parser.print_help()
-                print(f'\nError: {exc.message}')
+                logger.critical('Error: {}', exc.message)
                 sys.exit(1)
         return options
 
@@ -638,44 +638,44 @@ class Manager:
             msg = ' '.join(msg.split())
             logger.critical(msg)
             if output_to_console:
-                print()
-                print('-' * 79)
-                print(' Malformed configuration file (check messages above). Common reasons:')
-                print('-' * 79)
-                print()
-                print(' o Indentation error')
-                print(' o Missing : from end of the line')
-                print(' o Non ASCII characters (use UTF8)')
-                print(
-                    ' o If text contains any of :[]{}% characters it must be single-quoted '
-                    "(eg. value{1} should be 'value{1}')\n"
+                logger.critical(
+                    'Malformed configuration file (check messages above). Common reasons:\n'
+                    '(1) Indentation error\n'
+                    '(2) Missing : from end of the line\n'
+                    '(3) Non ASCII characters (use UTF8)\n'
+                    '(4) If text contains any of :[]{}% characters it must be single-quoted '
+                    "(eg. value{1} should be 'value{1}')"
                 )
-
                 # Not very good practice but we get several kind of exceptions here, I'm not even sure all of them
                 # At least: ReaderError, YmlScannerError (or something like that)
                 if isinstance(e, yaml.MarkedYAMLError):
                     lines = 0
                     if e.problem is not None:
-                        print(f' Reason: {e.problem}\n')
+                        logger.critical('Reason: {}', e.problem)
                         if e.problem == 'mapping values are not allowed here':
-                            print(' ----> MOST LIKELY REASON: Missing : from end of the line!')
-                            print()
+                            logger.critical(
+                                ' ----> MOST LIKELY REASON: Missing : from end of the line!'
+                            )
                     if e.context_mark is not None:
-                        print(
-                            f' Check configuration near line {e.context_mark.line}, column {e.context_mark.column}'
+                        logger.critical(
+                            'Check configuration near line {}, column {}',
+                            e.context_mark.line,
+                            e.context_mark.column,
                         )
                         lines += 1
                     if e.problem_mark is not None:
-                        print(
-                            f' Check configuration near line {e.problem_mark.line}, column {e.problem_mark.column}'
+                        logger.critical(
+                            'Check configuration near line {}, column {}',
+                            e.problem_mark.line,
+                            e.problem_mark.column,
                         )
                         lines += 1
-                    if lines:
-                        print()
                     if lines == 1:
-                        print(' Fault is almost always in this or previous line\n')
+                        logger.critical('Fault is almost always in this or previous line')
                     if lines == 2:
-                        print(' Fault is almost always in one of these lines or previous ones\n')
+                        logger.critical(
+                            'Fault is almost always in one of these lines or previous ones'
+                        )
 
             # When --debug escalate to full stacktrace
             if self.options.debug or not output_to_console:
@@ -765,9 +765,8 @@ class Manager:
         """Initialize SQLAlchemy."""
         try:
             if [int(part) for part in sqlalchemy.__version__.split('.')] < [0, 7, 0]:
-                print(
-                    'FATAL: SQLAlchemy 0.7.0 or newer required. Please upgrade your SQLAlchemy.',
-                    file=sys.stderr,
+                logger.critical(
+                    'FATAL: SQLAlchemy 0.7.0 or newer required. Please upgrade your SQLAlchemy.'
                 )
                 sys.exit(1)
         except ValueError:
@@ -790,15 +789,14 @@ class Manager:
                 echo=self.options.debug_sql,
                 connect_args={'check_same_thread': False, 'timeout': 10},
             )
-        except ImportError as e:
-            print(
-                'FATAL: Unable to use SQLite. Are you running Python 2.7, 3.3 or newer ?\n'
+        except ImportError:
+            logger.opt(exception=True).critical(
+                'FATAL: Unable to use SQLite. Are you running Python 3.9 or newer ?\n'
                 'Python should normally have SQLite support built in.\n'
                 "If you're running correct version of Python then it is not equipped with SQLite.\n"
-                'You can try installing `pysqlite`. If you have compiled python yourself, '
-                'recompile it with SQLite support.\n'
-                f'Error: {e}',
-                file=sys.stderr,
+                'You can try installing `pysqlite`.\n'
+                'If you have compiled python yourself, recompile it with SQLite support.\n'
+                'Error:'
             )
             sys.exit(1)
         Session.configure(bind=self.engine)
@@ -807,14 +805,16 @@ class Manager:
             Base.metadata.create_all(bind=self.engine)
         except OperationalError as e:
             if os.path.exists(self.db_filename):
-                print(
-                    f'{e.message} - make sure you have write permissions to file {self.db_filename}',
-                    file=sys.stderr,
+                logger.critical(
+                    '{} - make sure you have write permissions to file {}',
+                    e.message,
+                    self.db_filename,
                 )
             else:
-                print(
-                    f'{e.message} - make sure you have write permissions to directory {self.config_base}',
-                    file=sys.stderr,
+                logger.critical(
+                    '{} - make sure you have write permissions to directory {}',
+                    e.message,
+                    self.config_base,
                 )
             raise
 
@@ -870,13 +870,12 @@ class Manager:
                 if self.check_lock():
                     with open(self.lockfile, encoding='utf-8') as f:
                         pid = f.read()
-                    print(
-                        'Another process ({}) is running, will exit.'.format(pid.split('\n')[0]),
-                        file=sys.stderr,
+                    logger.critical(
+                        'Another process ({}) is running, will exit.', pid.split('\n')[0]
                     )
-                    print(
-                        f"If you're sure there is no other instance running, delete {self.lockfile}",
-                        file=sys.stderr,
+                    logger.critical(
+                        "If you're sure there is no other instance running, delete {}",
+                        self.lockfile,
                     )
                     sys.exit(1)
 
