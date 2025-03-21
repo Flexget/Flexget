@@ -14,7 +14,7 @@ URL = 'https://apibay.org'
 LISTS = ['top', 'top48h', 'recent']
 
 # from lowest to highest, selecting a rank automatically accept higher ranks
-RANKS = ['all', 'user', 'trusted', 'vip', 'helper', 'moderator', 'supermod']
+RANKS = ['all', 'user', 'member', 'trusted', 'vip', 'helper', 'moderator', 'supermod']
 
 CATEGORIES = {
     'All': 0,
@@ -91,7 +91,7 @@ class FromPirateBay:
       url: <piratebay api mirror, for example: https://apibay.org or http://piratebayztemzmv.onion>
       category: <str|int>. Accept a category name or ID.
       list: <top|top48h|recent>
-      rank: <any|member|vip|trusted> Minimum rank of torrent uploader
+      rank: <all|user|member|trusted|vip|helper|moderator|supermod> Minimum rank of torrent uploader
 
 
     Example::
