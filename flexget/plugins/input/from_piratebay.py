@@ -118,6 +118,7 @@ class FromPirateBay:
                     {'type': 'integer'},
                 ]
             },
+            'query': {'type': ['string']},
             'list': {'type': 'string', 'enum': list(LISTS), 'default': 'top'},
             'rank': {'type': 'string', 'enum': list(RANKS), 'default': 'all'},
         },
@@ -134,7 +135,11 @@ class FromPirateBay:
         else:
             category = CATEGORIES.get(config.get('category', 'All'))
 
-        if list == 'top':
+        params = {}
+        if 'query' in config:
+            list_url = f'{url}/q.php'
+            params = {'q': config['query']}
+        elif list == 'top':
             if category:
                 list_url = f'{url}/precompiled/data_top100_{category}.json'
             else:
@@ -145,13 +150,14 @@ class FromPirateBay:
             else:
                 list_url = f'{url}/precompiled/data_top100_48h.json'
         elif category:
-            list_url = f'{url}/q.php?q=category:{category}'
+            list_url = f'{url}/q.php'
+            params = {'q': f'category:{category}'}
         else:
             # top100_recent has multiple pages, starting at data_top100_recent.json, then data_top100_recent_1.json
             # to 30, and appears not filtered by categories
             list_url = f'{url}/precompiled/data_top100_recent.json'
 
-        json_results = task.requests.get(list_url).json()
+        json_results = task.requests.get(list_url, params=params).json()
 
         for result in json_results:
             if result['id'] == '0':
