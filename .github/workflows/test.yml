@@ -37,7 +37,7 @@ jobs:
         run: uv run pytest -m 'not require_optional_deps' -n logical --dist loadgroup --junit-xml test-results.xml
       - name: Run tests requiring optional dependencies
         if: ${{!cancelled() && steps.core-tests.outcome != 'skipped'}}
-        run: uv run --group plugin-test pytest -m 'require_optional_deps' -n logical --dist loadgroup --junit-xml test-results.xml
+        run: uv run --group all pytest -m 'require_optional_deps' -n logical --dist loadgroup --junit-xml test-results.xml
       - name: Upload Test Results
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
