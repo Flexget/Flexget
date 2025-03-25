@@ -180,6 +180,7 @@ def get_session(account=None, token=None):
     """Create a requests session ready to talk to trakt API with FlexGet's api key.
 
     Can also add user level authentication if `account` parameter is given.
+
     :param account: An account authorized via `flexget trakt auth` CLI command. If given, returned session will be
         authenticated for that account.
     """

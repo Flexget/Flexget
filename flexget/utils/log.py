@@ -83,7 +83,7 @@ def log_once(
         return None
 
     digest = hashlib.md5()
-    digest.update(message.encode('latin1', 'replace'))  # ticket:250
+    digest.update(message.encode('latin1', 'replace'))
     md5sum = digest.hexdigest()
 
     # abort if this has already been logged

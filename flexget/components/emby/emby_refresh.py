@@ -12,7 +12,8 @@ logger = logger.bind(name='emby_reload')
 class EmbyRefreshLibrary:
     """Refresh Emby Library.
 
-    Example:
+    Example::
+
         emby_refresh:
             server:
                 host: http://localhost:8096
@@ -20,7 +21,6 @@ class EmbyRefreshLibrary:
                 apikey: <apikey>
                 return_host: wan
             when: accepted
-
     """
 
     auth = None

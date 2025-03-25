@@ -19,41 +19,42 @@ class PluginThetvdbLookup:
 
     Use series_name, series_season, series_episode from series plugin.
 
-    Example:
-    thetvdb_lookup: yes
+    Example::
+
+        thetvdb_lookup: yes
 
     Primarily used for passing thetvdb information to other plugins.
     Among these is the IMDB url for the series.
 
-    This information is provided (via entry):
-    series info:
-      tvdb_series_name
-      tvdb_rating
-      tvdb_status (Continuing or Ended)
-      tvdb_runtime (show runtime in minutes)
-      tvdb_first_air_date
-      tvdb_air_time
-      tvdb_content_rating
-      tvdb_genres
-      tvdb_network
-      tvdb_overview
-      tvdb_banner
-      tvdb_posters
-      tvdb_airs_day_of_week
-      tvdb_actors
-      tvdb_language (en, fr, etc.)
-      imdb_url (if available)
-      zap2it_id (if available)
-    episode info: (if episode is found)
-      tvdb_ep_name
-      tvdb_ep_overview
-      tvdb_ep_directors
-      tvdb_ep_writers
-      tvdb_ep_air_date
-      tvdb_ep_rating
-      tvdb_ep_guest_stars
-      tvdb_ep_image
+    This information is provided (via entry)::
 
+        series info:
+          tvdb_series_name
+          tvdb_rating
+          tvdb_status (Continuing or Ended)
+          tvdb_runtime (show runtime in minutes)
+          tvdb_first_air_date
+          tvdb_air_time
+          tvdb_content_rating
+          tvdb_genres
+          tvdb_network
+          tvdb_overview
+          tvdb_banner
+          tvdb_posters
+          tvdb_airs_day_of_week
+          tvdb_actors
+          tvdb_language (en, fr, etc.)
+          imdb_url (if available)
+          zap2it_id (if available)
+        episode info: (if episode is found)
+          tvdb_ep_name
+          tvdb_ep_overview
+          tvdb_ep_directors
+          tvdb_ep_writers
+          tvdb_ep_air_date
+          tvdb_ep_rating
+          tvdb_ep_guest_stars
+          tvdb_ep_image
     """
 
     # Series info

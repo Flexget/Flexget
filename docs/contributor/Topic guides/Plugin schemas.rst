@@ -1,4 +1,4 @@
-Plugin Schemas
+Plugin schemas
 ==============
 
 Plugins define their desired form of their config using draft 4 of the
@@ -113,7 +113,7 @@ The following schema will allow either a boolean or an integer::
 
 The format keyword is used to make sure a string follows a specific format.
 Here are the format validators included with FlexGet, along with what they
-validate::
+validate.
 
 email
     email addresses
@@ -126,8 +126,8 @@ quality_requirements
 
 interval
     A text representation of a time interval, e.g. ``3 hours``, ``10 minutes``
-    Intervals in this format can be parsed to a :class:`datetime.timedelta` object using the utility function
-    :func:`flexget.utils.tools.parse_timedelta`
+    Intervals in this format can be parsed to a :class:`datetime.timedelta` object using the
+    utility function :func:`flexget.utils.tools.parse_timedelta`
 
 regex
     valid regular expression
@@ -206,8 +206,8 @@ to the plugin.
 ``not``
 ^^^^^^^
 
-The ``not`` keyword will allow you to negate a specific schema. This is especially useful when wanting to create
-mutually exclusive properties or groups::
+The ``not`` keyword will allow you to negate a specific schema. This is especially useful when
+wanting to create mutually exclusive properties or groups::
 
     {
         "type": "object",
@@ -243,8 +243,8 @@ Another more complex example::
 ``dependencies``
 ^^^^^^^^^^^^^^^^
 
-``dependencies`` are used to link a property to one or more other property, raising a validation error if not all
-dependencies have been met::
+``dependencies`` are used to link a property to one or more other property, raising a validation
+error if not all dependencies have been met::
 
      {
         "type": "object",

@@ -14,12 +14,12 @@ UNSET = '__unset__'
 
 
 class ModifySet:
-    """Allows adding information to a task entry for use later.
+    """Allow adding information to a task entry for use later.
 
-    Example:
-    set:
-      path: ~/download/path/
+    Example::
 
+        set:
+          path: ~/download/path/
     """
 
     schema = {'type': 'object', 'minProperties': 1}

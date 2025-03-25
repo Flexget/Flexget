@@ -24,14 +24,14 @@ class SMSRuNotifier:
 
     Phone number is a login assigned to sms.ru account.
 
-    Example:
+    Example::
+
       notify:
         entries:
           via:
             - sms_ru:
                 phone_number: <PHONE_NUMBER> (accepted format example: '79997776655')
                 password: <PASSWORD>
-
     """
 
     schema = {

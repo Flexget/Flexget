@@ -567,7 +567,6 @@ def get_plugins(
     :param string name: Name of the plugin.
     :param int min_api: Minimum api version.
     :return: List of PluginInfo instances.
-    :rtype: list
     """
 
     def matches(plugin):

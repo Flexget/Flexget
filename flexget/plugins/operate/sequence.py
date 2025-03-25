@@ -9,13 +9,13 @@ logger = logger.bind(name='sequence')
 
 
 class PluginSequence:
-    """Allows the same plugin to be configured multiple times in a task.
+    """Allow the same plugin to be configured multiple times in a task.
 
-    Example:
-    sequence:
-      - rss: http://feeda.com
-      - rss: http://feedb.com
+    Example::
 
+        sequence:
+          - rss: http://feeda.com
+          - rss: http://feedb.com
     """
 
     schema = {'type': 'array', 'items': {'$ref': '/schema/plugins'}}

@@ -1,34 +1,33 @@
-List Interface
+List interface
 ==============
 
-List interface is a unique type of plugin that enables manipulation of its content using flexget normal task operation.
-Different phases and interaction with the plugin enable using it as an input, filter or removing entries from it.
-It's especially useful for watchlist type list, but not limited to those. Any list that can return entries can be used
-as a list interface plugin.
+List interface is a unique type of plugin that enables manipulation of its content using flexget
+normal task operation. Different phases and interaction with the plugin enable using it as an
+input, filter or removing entries from it. It's especially useful for watchlist type list, but not
+limited to those. Any list that can return entries can be used as a list interface plugin.
 
-The class of the plugin is based on python's `MutableSet`_ with overrides of its methods where needed.
-
-.. _MutableSet: https://docs.python.org/2/library/collections.html#collections.MutableSet
+The class of the plugin is based on python's :class:`~collections.abc.MutableSet` with overrides
+of its methods where needed.
 
 Usage
 -----
 
-As various plugins have different meaning, the specific of the implementation can change. However a few specific override
-methods will always be needed, in addition to a few custom ones required by flexget.
+As various plugins have different meaning, the specific of the implementation can change. However
+a few specific override methods will always be needed, in addition to a few custom ones required
+by flexget.
 
 Init
 ~~~~
 
-.. code-block:: python
+::
 
     class ListInterfaceClass(MutableSet):
         def __init__(self, config):
             self.config = config
 
-The init method should pass the config to a class variable, that will be used by other class methods. Also, any other
-global data that is need for the class operation to work should be retrieved. For example, from ``trakt_list``:
-
-.. code-block:: python
+The init method should pass the config to a class variable, that will be used by other class
+methods. Also, any other global data that is need for the class operation to work should be
+retrieved. For example, from ``trakt_list``::
 
     def __init__(self, config):
         self.config = config
@@ -39,11 +38,9 @@ global data that is need for the class operation to work should be retrieved. Fo
         self.session.add_domain_limiter(TimedLimiter('trakt.tv', '2 seconds'))
         self._items = None
 
-Note the usage of ``self._items``. In case of an online list, the data should be fetch as little as possible, so a local
-cache that can be invalidated should be created. Then a property method that call on that data should be used throughout
-the class:
-
-.. code-block:: python
+Note the usage of ``self._items``. In case of an online list, the data should be fetch as little
+as possible, so a local cache that can be invalidated should be created. Then a property method
+that call on that data should be used throughout the class::
 
     @property
     def items(self):
@@ -52,9 +49,7 @@ the class:
             self._items = entries
          return self._items
 
-The cache could be invalidated when need by simply resetting the local cache:
-
-.. code-block:: python
+The cache could be invalidated when need by simply resetting the local cache::
 
     self._items = None
 
@@ -66,7 +61,7 @@ Below are code examples of overridden method taken from ``trakt_list`` and ``ent
 ``__iter__``
 ~~~~~~~~~~~~
 
-.. code-block:: python
+::
 
     def __iter__(self):
         return iter(self.items)
@@ -74,7 +69,7 @@ Below are code examples of overridden method taken from ``trakt_list`` and ``ent
 ``__len__``
 ~~~~~~~~~~~
 
-.. code-block:: python
+::
 
     def __len__(self):
         return len(self.items)
@@ -83,7 +78,7 @@ Below are code examples of overridden method taken from ``trakt_list`` and ``ent
 ``__discard__``
 ~~~~~~~~~~~~~~~
 
-.. code-block:: python
+::
 
     def discard(self, entry, session=None):
         db_entry = self._entry_query(session=session, entry=entry)
@@ -94,7 +89,7 @@ Below are code examples of overridden method taken from ``trakt_list`` and ``ent
 ``__ior__``
 ~~~~~~~~~~~
 
-.. code-block:: python
+::
 
     def __ior__(self, other):
         # Optimization to only open one session when adding multiple items
@@ -109,7 +104,7 @@ Below are code examples of overridden method taken from ``trakt_list`` and ``ent
 ``__contains__``
 ~~~~~~~~~~~~~~~~
 
-.. code-block:: python
+::
 
     @with_session
     def __contains__(self, entry, session=None):
@@ -118,7 +113,7 @@ Below are code examples of overridden method taken from ``trakt_list`` and ``ent
 ``__add__``
 ~~~~~~~~~~~
 
-.. code-block:: python
+::
 
     def add(self, entry):
         self.submit([entry])
@@ -126,7 +121,7 @@ Below are code examples of overridden method taken from ``trakt_list`` and ``ent
 ``___from_iterable__``
 ~~~~~~~~~~~~~~~~~~~~~~
 
-.. code-block:: python
+::
 
     def _from_iterable(self, it):
         return set(it)
@@ -141,7 +136,7 @@ These are custom methods that all list type plugin need to implement to work wit
 
 Used to specify if some elements of the list plugins are immutable.
 
-.. code-block:: python
+::
 
     IMMUTABLE_LISTS = ['ratings', 'checkins']
 
@@ -153,10 +148,10 @@ Used to specify if some elements of the list plugins are immutable.
 ``online``
 ~~~~~~~~~~
 
-Used to determine whether this plugin is an online one and change functionality accordingly in certain situations,
-like test mode.
+Used to determine whether this plugin is an online one and change functionality accordingly in
+certain situations, like test mode.
 
-.. code-block:: python
+::
 
     @property
     def online(self):
@@ -168,10 +163,10 @@ like test mode.
 ``get``
 ~~~~~~~
 
-Used to return entry match from internal used. ``list_queue`` plugin calls it in order to create a cached list of entries
-and avoid acceptance duplication during filter phase.
+Used to return entry match from internal used. ``list_queue`` plugin calls it in order to create a
+cached list of entries and avoid acceptance duplication during filter phase.
 
-.. code-block:: python
+::
 
     @with_session
     def get(self, entry, session):
@@ -184,7 +179,7 @@ Plugin format
 
 After creating the base class, the plugin class itself need to be created.
 
-.. code-block:: python
+::
 
     class EntryList:
         schema = {'type': 'string'}
@@ -201,5 +196,6 @@ After creating the base class, the plugin class itself need to be created.
     def register_plugin():
         plugin.register(EntryList, 'entry_list', api_ver=2, interfaces=['list', 'task'])
 
-All list plugins must declare the `list` interface, and implement the ``get_list(config)`` method. Declaring the `task`
-interface and the ``on_task_input`` method will allow the plugin to be used as an input plugin.
+All list plugins must declare the `list` interface, and implement the ``get_list(config)`` method.
+Declaring the `task` interface and the ``on_task_input`` method will allow the plugin to be used
+as an input plugin.

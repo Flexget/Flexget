@@ -19,19 +19,20 @@ ANIME_TYPE = ['all', 'tv', 'ova', 'movie', 'special', 'ona', 'music', 'unknown']
 class MyAnimeList:
     """Create entries for series and movies from MyAnimeList list.
 
-    Syntax:
-    my_anime_list:
-      username: <value>
-      status:
-        - <watching|completed|on_hold|dropped|plan_to_watch>
-        - <watching|completed|on_hold|dropped|plan_to_watch>
-        ...
-      airing_status:
-        - <airing|finished|planned>
-        - <airing|finished|planned>
-        ...
-      type:
-        - <series|ova...>
+    Syntax::
+
+        my_anime_list:
+          username: <value>
+          status:
+            - <watching|completed|on_hold|dropped|plan_to_watch>
+            - <watching|completed|on_hold|dropped|plan_to_watch>
+            ...
+          airing_status:
+            - <airing|finished|planned>
+            - <airing|finished|planned>
+            ...
+          type:
+            - <series|ova...>
     """
 
     schema = {

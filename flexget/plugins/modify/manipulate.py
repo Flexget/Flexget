@@ -11,7 +11,7 @@ logger = logger.bind(name='manipulate')
 class Manipulate:
     r"""The manipulate plugin.
 
-    Usage:
+    Usage::
 
       manipulate:
         - <destination field>:
@@ -25,11 +25,10 @@ class Manipulate:
               format: <regexp>
             [remove]: <boolean>
 
-    Example:
+    Example::
       manipulate:
         - title:
             extract: \[\d\d\d\d\](.*)
-
     """
 
     schema = {

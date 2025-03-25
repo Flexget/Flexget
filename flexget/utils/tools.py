@@ -203,7 +203,7 @@ def parse_timedelta(value: Union[timedelta, str, None]) -> timedelta:
 
 
 def multiply_timedelta(interval: timedelta, number: float) -> timedelta:
-    """`timedelta`s can not normally be multiplied by floating points. This does that."""
+    """`timedelta` cannot normally be multiplied by floating points. This does that."""
     return timedelta(seconds=interval.total_seconds() * number)
 
 

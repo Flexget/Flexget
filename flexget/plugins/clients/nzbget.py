@@ -11,11 +11,11 @@ class OutputNzbget:
 
     Example::
 
-    nzbget:
-      url: http://nzbget:12345@localhost:6789/xmlrpc
-      category: movies
-      priority: 0
-      top: False
+        nzbget:
+          url: http://nzbget:12345@localhost:6789/xmlrpc
+          category: movies
+          priority: 0
+          top: False
     """
 
     schema = {

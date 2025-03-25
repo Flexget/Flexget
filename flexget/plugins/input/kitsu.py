@@ -13,19 +13,19 @@ logger = logger.bind(name='kitsu')
 class KitsuAnime:
     """Creates an entry for each item in your kitsu.io list.
 
-    Syntax:
+    Syntax::
 
-    kitsu:
-      username: <value>
-      user_id: <value>
-      lists:
-        - <current|planned|completed|on_hold|dropped>
-        - <current|planned|completed|on_hold|dropped>
-      type:
-        - <ona|ova|tv|movie|music|special>
-        - <ona|ova|tv|movie|music|special>
-      status: <airing|finished>
-      latest: <yes|no>
+        kitsu:
+          username: <value>
+          user_id: <value>
+          lists:
+            - <current|planned|completed|on_hold|dropped>
+            - <current|planned|completed|on_hold|dropped>
+          type:
+            - <ona|ova|tv|movie|music|special>
+            - <ona|ova|tv|movie|music|special>
+          status: <airing|finished>
+          latest: <yes|no>
     """
 
     schema = {
