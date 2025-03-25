@@ -17,47 +17,47 @@ class NextSonarrEpisodes:
     This can be used with the discover plugin or set_series_begin plugin to
     get the relevant data from Sonarr.
 
-    Syntax:
+    Syntax::
 
-    next_sonarr_episodes:
-      base_url=<value> (Required)
-      port=<value> (Default is 80)
-      api_key=<value> (Required)
-      include_ended=<yes|no> (Default is yes)
-      only_monitored=<yes|no> (Default is yes)
-      page_size=<value> (Default is 50)
+        next_sonarr_episodes:
+          base_url=<value> (Required)
+          port=<value> (Default is 80)
+          api_key=<value> (Required)
+          include_ended=<yes|no> (Default is yes)
+          only_monitored=<yes|no> (Default is yes)
+          page_size=<value> (Default is 50)
 
     Page size determines the amount of results per each API call.
     Higher value means a bigger response. Lower value means more calls.
     Should be changed if there are performance issues.
 
 
-    Usage: (Example with discover)
+    Usage (Example with discover)::
 
-    discover_from_sonarr_task:
-      discover:
-        what:
-          - next_sonarr_episodes:
-              base_url: '{? credentials.sonarr.url ?}'
-              port: 8989
-              api_key: '{? credentials.sonarr.api_key ?}'
-              include_ended: false
-        from:
-          - kat:
-              verified: yes
-      all_series: yes
-      download: c:\bla\
+        discover_from_sonarr_task:
+          discover:
+            what:
+              - next_sonarr_episodes:
+                  base_url: '{? credentials.sonarr.url ?}'
+                  port: 8989
+                  api_key: '{? credentials.sonarr.api_key ?}'
+                  include_ended: false
+            from:
+              - kat:
+                  verified: yes
+          all_series: yes
+          download: c:\bla\
 
-    Usage: (Example with set_series_begin)
+    Usage (Example with set_series_begin)::
 
-    set-series-begin-from-sonarr:
-      next_sonarr_episodes:
-        base_url: '{{ secrets.credentials.sonarr.url }}'
-        port: 8989
-        api_key: '{{ secrets.credentials.sonarr.api_key }}'
-        include_ended: false
-      accept_all: yes
-      set_series_begin: yes
+        set-series-begin-from-sonarr:
+          next_sonarr_episodes:
+            base_url: '{{ secrets.credentials.sonarr.url }}'
+            port: 8989
+            api_key: '{{ secrets.credentials.sonarr.api_key }}'
+            include_ended: false
+          accept_all: yes
+          set_series_begin: yes
     """
 
     schema = {

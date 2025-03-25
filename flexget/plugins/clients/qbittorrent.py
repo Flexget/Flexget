@@ -17,23 +17,23 @@ logger = logger.bind(name='qbittorrent')
 class OutputQBitTorrent:
     """The QBitTorrent plugin.
 
-    Example:
-    qbittorrent:
-      username: <USERNAME> (default: (none))
-      password: <PASSWORD> (default: (none))
-      host: <HOSTNAME> (default: localhost)
-      port: <PORT> (default: 8080)
-      use_ssl: <SSL> (default: False)
-      verify_cert: <VERIFY> (default: True)
-      path: <OUTPUT_DIR> (default: (none))
-      label: <LABEL> (default: (none))
-      tags: <TAGS> (default: (none))
-      maxupspeed: <torrent upload speed limit> (default: 0)
-      maxdownspeed: <torrent download speed limit> (default: 0)
-      add_paused: <ADD_PAUSED> (default: False)
-      ratio_limit: <RATIO_LIMIT> (default: -2)
-      seeding_time_limit: <SEEDING_TIME_LIMIT> (default: -1)
+    Example::
 
+        qbittorrent:
+          username: <USERNAME> (default: (none))
+          password: <PASSWORD> (default: (none))
+          host: <HOSTNAME> (default: localhost)
+          port: <PORT> (default: 8080)
+          use_ssl: <SSL> (default: False)
+          verify_cert: <VERIFY> (default: True)
+          path: <OUTPUT_DIR> (default: (none))
+          label: <LABEL> (default: (none))
+          tags: <TAGS> (default: (none))
+          maxupspeed: <torrent upload speed limit> (default: 0)
+          maxdownspeed: <torrent download speed limit> (default: 0)
+          add_paused: <ADD_PAUSED> (default: False)
+          ratio_limit: <RATIO_LIMIT> (default: -2)
+          seeding_time_limit: <SEEDING_TIME_LIMIT> (default: -1)
     """
 
     schema = {

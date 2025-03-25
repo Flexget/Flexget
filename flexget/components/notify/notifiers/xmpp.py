@@ -16,7 +16,7 @@ class XMPPNotifier:
     """Send messages via XMPP.
 
     The sleekxmpp library is required to be installed.
-    Install it with: `pip install sleekxmpp`
+    Install it with: ``pip install sleekxmpp``
 
     All fields are required.
 

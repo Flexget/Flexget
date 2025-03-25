@@ -94,18 +94,19 @@ class PluginSubliminal:
         """Register this as an output plugin.
 
         Configuration::
-        subliminal:
-            languages: List of languages (as IETF codes) in order of preference. At least one is required.
-            alternatives: List of second-choice languages; subs will be downloaded but entries rejected.
-            exact_match: Use file hash only to search for subs, otherwise Subliminal will try to guess by filename.
-            providers: List of providers from where to download subtitles.
-            single: Download subtitles in single mode (no language code added to subtitle filename).
-            directory: Path to directory where to save the subtitles, default is next to the video.
-            hearing_impaired: Prefer subtitles for the hearing impaired when available
-            authentication: >
-              Dictionary of configuration options for different providers.
-              Keys correspond to provider names, and values are dictionaries, usually specifying `username` and
-              `password`.
+
+            subliminal:
+                languages: List of languages (as IETF codes) in order of preference. At least one is required.
+                alternatives: List of second-choice languages; subs will be downloaded but entries rejected.
+                exact_match: Use file hash only to search for subs, otherwise Subliminal will try to guess by filename.
+                providers: List of providers from where to download subtitles.
+                single: Download subtitles in single mode (no language code added to subtitle filename).
+                directory: Path to directory where to save the subtitles, default is next to the video.
+                hearing_impaired: Prefer subtitles for the hearing impaired when available
+                authentication: >
+                  Dictionary of configuration options for different providers.
+                  Keys correspond to provider names, and values are dictionaries, usually specifying `username` and
+                  `password`.
         """
         if not task.accepted:
             logger.debug('nothing accepted, aborting')

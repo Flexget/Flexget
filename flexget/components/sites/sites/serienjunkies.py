@@ -40,9 +40,10 @@ class UrlRewriteSerienjunkies:
     Language setting works like a whitelist, the selected is needed,
     but others are still possible.
 
-    Configuration
-    language: [german|foreign|subtitle|dual] default "foreign"
-    hoster: [ul|cz|so|all] default "ul"
+    Configuration::
+
+        language: [german|foreign|subtitle|dual] default "foreign"
+        hoster: [ul|cz|so|all] default "ul"
     """
 
     schema = {

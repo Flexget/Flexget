@@ -19,11 +19,11 @@ class NtfyshNotifier:
 
     Example::
 
-    notify:
-      entries:
-        via:
-          - ntfysh:
-              topic: <NTFY_TOPIC>
+        notify:
+          entries:
+            via:
+              - ntfysh:
+                  topic: <NTFY_TOPIC>
 
     Configuration parameters are also supported from entries (eg. through set).
     """

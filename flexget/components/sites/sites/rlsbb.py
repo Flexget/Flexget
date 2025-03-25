@@ -17,24 +17,27 @@ class UrlRewriteRlsbb:
 
     Version 0.1
 
-    Configuration
+    Configuration ::
 
-    rlsbb:
-      filehosters_re:
-        - domain\.com
-        - domain2\.org
-      link_text_re:
-        - UPLOADGiG
-        - NiTROFLARE
-        - RAPiDGATOR
-      parse_comments: no
+        rlsbb:
+          filehosters_re:
+            - domain\.com
+            - domain2\.org
+          link_text_re:
+            - UPLOADGiG
+            - NiTROFLARE
+            - RAPiDGATOR
+          parse_comments: no
 
-    filehosters_re: Only add links that match any of the regular expressions
+    filehosters_re
+      Only add links that match any of the regular expressions
       listed under filehosters_re.
-    link_text_re: search for <a> tags where the text (not the url) matches
+    link_text_re
+      search for <a> tags where the text (not the url) matches
       one of the given regular expressions. The href property of these <a> tags
       will be used as the url (or urls).
-    parse_comments: whether the plugin should also parse the comments or only
+    parse_comments
+      whether the plugin should also parse the comments or only
       the main post. Note that it is highly recommended to use filehosters_re
       if you enable parse_comments. Otherwise, the plugin may return too
       many and even some potentially dangerous links.
@@ -46,9 +49,10 @@ class UrlRewriteRlsbb:
     Therefore, it is recommended, that you configure your output to use the
     'urls' field instead of the 'url' field.
 
-    For example, to use jdownloader 2 as output, you would use the exec plugin:
-    exec:
-      - echo "text={{urls}}" >> "/path/to/jd2/folderwatch/{{title}}.crawljob"
+    For example, to use jdownloader 2 as output, you would use the exec plugin::
+
+        exec:
+          - echo "text={{urls}}" >> "/path/to/jd2/folderwatch/{{title}}.crawljob"
     """
 
     DEFAULT_DOWNLOAD_TEXT = ['UPLOADGiG', 'NiTROFLARE', 'RAPiDGATOR']

@@ -95,7 +95,6 @@ class TestSeriesParser:
         assert s.season == 1, 'failed to parse 1 x 2'
         assert s.episode == 2, 'failed to parse 1 x 2'
 
-        # Ticket #732
         s = parse(name='Something', data='Something - This is the Subtitle 14x9 [Group-Name]')
         assert s.season == 14, f'failed to parse {s.data}'
         assert s.episode == 9, f'failed to parse {s.data}'
@@ -733,7 +732,7 @@ class TestSeriesParser:
         assert not s.valid
 
     def test_long_season(self, parse):
-        """SeriesParser: long season ID Ticket #2197."""
+        """SeriesParser: long season ID."""
         s = parse(
             name='FlexGet', data='FlexGet.US.S2013E14.Title.Here.720p.HDTV.AAC5.1.x264-NOGRP'
         )

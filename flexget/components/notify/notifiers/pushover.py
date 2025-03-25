@@ -24,21 +24,21 @@ class PushoverNotifier:
 
     Example::
 
-    notify:
-      entries:
-        via:
-          - pushover:
-              user_key: <USER_KEY> (can also be a list of userkeys)
-              token: <TOKEN>
-              [device: <DEVICE_STRING>]
-              [priority: <PRIORITY>]
-              [url: <URL>]
-              [url_title: <URL_TITLE>]
-              [sound: <SOUND>]
-              [retry]: <RETRY>]
-              [expire]: <EXPIRE>]
-              [callback]: <CALLBACK>]
-              [html]: <HTML>]
+        notify:
+          entries:
+            via:
+              - pushover:
+                  user_key: <USER_KEY> (can also be a list of userkeys)
+                  token: <TOKEN>
+                  [device: <DEVICE_STRING>]
+                  [priority: <PRIORITY>]
+                  [url: <URL>]
+                  [url_title: <URL_TITLE>]
+                  [sound: <SOUND>]
+                  [retry]: <RETRY>]
+                  [expire]: <EXPIRE>]
+                  [callback]: <CALLBACK>]
+                  [html]: <HTML>]
     """
 
     schema = {

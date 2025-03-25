@@ -1,0 +1,11 @@
+.navbar-brand.logo {
+  height: 55px;
+}
+
+.sd-card .sd-card-img-top {
+  height: 60px;
+  width: 60px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 10px;
+}

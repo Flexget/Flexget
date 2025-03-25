@@ -1,4 +1,4 @@
-Plugin Schemas
+Plugin schemas
 ==============
 
 Plugins define their desired form of their config using draft 4 of the
@@ -10,7 +10,7 @@ for several things including:
 * Set defaults in the config that user did not provide
 * Generating a form for the webui config editor
 
-You can run the `test_config_schema.py` test in the suite to test the validity
+You can run the ``test_config_schema.py`` test in the suite to test the validity
 of your plugin's schema. The error messages it produces may help you fix your
 schema if you are having trouble. Note that this doesn't check the schema
 validates what you want, just that it is a valid json schema.
@@ -19,9 +19,9 @@ The following list of keywords is not exhaustive, just a general primer, as
 well as some FlexGet specific notes. The JSON schema spec should be referred to
 for more details, or if a keyword is not covered here. Take not that our
 schemas will be defined as python objects equivalent to parsed JSON. The full
-list of valid keywords can be found in section 5 of the `validaton spec`_.
+list of valid keywords can be found in the `validaton spec`_.
 
-.. _validaton spec: http://json-schema.org/latest/json-schema-validation.html
+.. _validaton spec: https://json-schema.org/latest/json-schema-validation
 
 Keywords
 --------
@@ -113,7 +113,7 @@ The following schema will allow either a boolean or an integer::
 
 The format keyword is used to make sure a string follows a specific format.
 Here are the format validators included with FlexGet, along with what they
-validate::
+validate.
 
 email
     email addresses
@@ -126,8 +126,8 @@ quality_requirements
 
 interval
     A text representation of a time interval, e.g. ``3 hours``, ``10 minutes``
-    Intervals in this format can be parsed to a :class:`datetime.timedelta` object using the utility function
-    :func:`flexget.utils.tools.parse_timedelta`
+    Intervals in this format can be parsed to a :class:`datetime.timedelta` object using the
+    utility function :func:`flexget.utils.tools.parse_timedelta`
 
 regex
     valid regular expression
@@ -206,8 +206,8 @@ to the plugin.
 ``not``
 ^^^^^^^
 
-The ``not`` keyword will allow you to negate a specific schema. This is especially useful when wanting to create
-mutually exclusive properties or groups::
+The ``not`` keyword will allow you to negate a specific schema. This is especially useful when
+wanting to create mutually exclusive properties or groups::
 
     {
         "type": "object",
@@ -243,8 +243,8 @@ Another more complex example::
 ``dependencies``
 ^^^^^^^^^^^^^^^^
 
-``dependencies`` are used to link a property to one or more other property, raising a validation error if not all
-dependencies have been met::
+``dependencies`` are used to link a property to one or more other property, raising a validation
+error if not all dependencies have been met::
 
      {
         "type": "object",
