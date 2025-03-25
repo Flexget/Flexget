@@ -71,12 +71,14 @@ plugin-test = [
     { include-group = "all" }
 ]
 deluge = ['deluge-client~=1.10']
+ftp = ['ftputil~=5.1']
 qbittorrent = ['qbittorrent-api~=2025.2']
 telegram = ['python-telegram-bot[http2,socks]~=21.9']
 transmission = ['transmission-rpc~=7.0']
 # This is all our optional deps installable via extras. Not actually 'all'
 all = [
     { include-group = "deluge" },
+    { include-group = 'ftp' },
     { include-group = "qbittorrent" },
     { include-group = "telegram" },
     { include-group = "transmission" }
@@ -100,7 +102,7 @@ build-backend = "hatchling.build"
 [tool.hatch.metadata.hooks.custom]
 # Extras with locked dependencies will be generated if BUILD_LOCKED env variable is specified
 path = "scripts/build_locked_extras.py"
-locked-groups = ["deluge", "qbittorrent", "telegram", "transmission", "all"]
+locked-groups = ["deluge", 'ftp', "qbittorrent", "telegram", "transmission", "all"]
 
 [tool.hatch.version]
 path = "flexget/_version.py"

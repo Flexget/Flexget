@@ -810,6 +810,7 @@ dependencies = [
 [package.dev-dependencies]
 all = [
     { name = "deluge-client" },
+    { name = "ftputil" },
     { name = "python-telegram-bot", extra = ["http2", "socks"] },
     { name = "qbittorrent-api" },
     { name = "transmission-rpc" },
@@ -824,9 +825,13 @@ dev = [
     { name = "ruff" },
     { name = "vcrpy" },
 ]
+ftp = [
+    { name = "ftputil" },
+]
 plugin-test = [
     { name = "boto3" },
     { name = "deluge-client" },
+    { name = "ftputil" },
     { name = "pillow" },
     { name = "plexapi" },
     { name = "pysftp" },
@@ -885,6 +890,7 @@ requires-dist = [
 [package.metadata.requires-dev]
 all = [
     { name = "deluge-client", specifier = "~=1.10" },
+    { name = "ftputil", specifier = "~=5.1" },
     { name = "python-telegram-bot", extras = ["http2", "socks"], specifier = "~=21.9" },
     { name = "qbittorrent-api", specifier = "~=2025.2" },
     { name = "transmission-rpc", specifier = "~=7.0" },
@@ -897,9 +903,11 @@ dev = [
     { name = "ruff", specifier = "~=0.9.0" },
     { name = "vcrpy", specifier = "~=7.0" },
 ]
+ftp = [{ name = "ftputil", specifier = "~=5.1" }]
 plugin-test = [
     { name = "boto3", specifier = "~=1.35" },
     { name = "deluge-client", specifier = "~=1.10" },
+    { name = "ftputil", specifier = "~=5.1" },
     { name = "pillow", specifier = "~=11.0" },
     { name = "plexapi", specifier = "~=4.16" },
     { name = "pysftp", specifier = "~=0.2.9" },
@@ -912,6 +920,12 @@ plugin-test = [
 qbittorrent = [{ name = "qbittorrent-api", specifier = "~=2025.2" }]
 telegram = [{ name = "python-telegram-bot", extras = ["http2", "socks"], specifier = "~=21.9" }]
 transmission = [{ name = "transmission-rpc", specifier = "~=7.0" }]
+
+[[package]]
+name = "ftputil"
+version = "5.1.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/73/dc/83f3fa78a9c8a8fe119a70d040df67799094821d3cad511ee0987d544a10/ftputil-5.1.0.tar.gz", hash = "sha256:e9e62d3fd307ef9c52e43b33fd92759fc94c04d8b5178f85f641b183906d4353", size = 86403 }
 
 [[package]]
 name = "greenlet"
