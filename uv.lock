@@ -2,10 +2,10 @@ version = 1
 revision = 3
 requires-python = ">=3.10"
 resolution-markers = [
-    "python_full_version >= '3.11' and platform_python_implementation != 'PyPy'",
-    "python_full_version < '3.11' and platform_python_implementation != 'PyPy'",
     "python_full_version >= '3.11' and platform_python_implementation == 'PyPy'",
     "python_full_version < '3.11' and platform_python_implementation == 'PyPy'",
+    "python_full_version >= '3.11' and platform_python_implementation != 'PyPy'",
+    "python_full_version < '3.11' and platform_python_implementation != 'PyPy'",
 ]
 
 [[package]]
@@ -294,7 +294,7 @@ name = "brotlicffi"
 version = "1.1.0.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "cffi" },
+    { name = "cffi", marker = "platform_python_implementation == 'PyPy'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/95/9d/70caa61192f570fcf0352766331b735afa931b4c6bc9a348a0925cc13288/brotlicffi-1.1.0.0.tar.gz", hash = "sha256:b77827a689905143f87915310b93b273ab17888fd43ef350d4832c4a71083c13", size = 465192, upload-time = "2023-09-14T14:22:40.707Z" }
 wheels = [
@@ -722,7 +722,7 @@ name = "exceptiongroup"
 version = "1.3.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
+    { name = "typing-extensions", marker = "python_full_version < '3.11'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/0b/9f/a65090624ecf468cdca03533906e7c69ed7588582240cfe7cc9e770b50eb/exceptiongroup-1.3.0.tar.gz", hash = "sha256:b241f5885f560bc56a59ee63ca4c6a8bfa46ae4ad651af316d4e81817bb9fd88", size = 29749, upload-time = "2025-05-10T17:42:51.123Z" }
 wheels = [
@@ -871,10 +871,21 @@ dependencies = [
 
 [package.dev-dependencies]
 all = [
+    { name = "boto3" },
     { name = "deluge-client" },
+    { name = "ftputil" },
+    { name = "paramiko" },
+    { name = "pillow" },
+    { name = "plexapi" },
+    { name = "pysftp" },
     { name = "python-telegram-bot", extra = ["http2", "socks"] },
     { name = "qbittorrent-api" },
+    { name = "rarfile" },
+    { name = "subliminal" },
     { name = "transmission-rpc" },
+]
+boto3 = [
+    { name = "boto3" },
 ]
 deluge = [
     { name = "deluge-client" },
@@ -894,23 +905,27 @@ docs = [
     { name = "sphinx-copybutton" },
     { name = "sphinx-design" },
 ]
-plugin-test = [
-    { name = "boto3" },
-    { name = "deluge-client" },
-    { name = "paramiko" },
-    { name = "pillow" },
+ftp = [
+    { name = "ftputil" },
+]
+plexapi = [
     { name = "plexapi" },
-    { name = "pysftp" },
-    { name = "python-telegram-bot", extra = ["http2", "socks"] },
-    { name = "qbittorrent-api" },
-    { name = "rarfile" },
-    { name = "subliminal" },
-    { name = "transmission-rpc" },
 ]
 qbittorrent = [
     { name = "qbittorrent-api" },
 ]
+rarfile = [
+    { name = "rarfile" },
+]
+sftp = [
+    { name = "paramiko" },
+    { name = "pysftp" },
+]
+subliminal = [
+    { name = "subliminal" },
+]
 telegram = [
+    { name = "pillow" },
     { name = "python-telegram-bot", extra = ["http2", "socks"] },
 ]
 transmission = [
@@ -952,11 +967,20 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 all = [
+    { name = "boto3", specifier = "~=1.35" },
     { name = "deluge-client", specifier = "~=1.10" },
+    { name = "ftputil", specifier = "~=5.1" },
+    { name = "paramiko", specifier = "~=3.5" },
+    { name = "pillow", specifier = "~=11.0" },
+    { name = "plexapi", specifier = "~=4.16" },
+    { name = "pysftp", specifier = "~=0.2.9" },
     { name = "python-telegram-bot", extras = ["http2", "socks"], specifier = "~=22.0" },
     { name = "qbittorrent-api", specifier = "~=2025.2" },
+    { name = "rarfile", specifier = "~=4.0" },
+    { name = "subliminal", specifier = "==2.2.1" },
     { name = "transmission-rpc", specifier = "~=7.0" },
 ]
+boto3 = [{ name = "boto3", specifier = "~=1.35" }]
 deluge = [{ name = "deluge-client", specifier = "~=1.10" }]
 dev = [
     { name = "pre-commit", specifier = "~=4.0" },
@@ -972,22 +996,26 @@ docs = [
     { name = "sphinx-copybutton", specifier = "~=0.5" },
     { name = "sphinx-design", specifier = "~=0.6" },
 ]
-plugin-test = [
-    { name = "boto3", specifier = "~=1.35" },
-    { name = "deluge-client", specifier = "~=1.10" },
-    { name = "paramiko", specifier = "~=3.5" },
-    { name = "pillow", specifier = "~=11.0" },
-    { name = "plexapi", specifier = "~=4.16" },
-    { name = "pysftp", specifier = "~=0.2.9" },
-    { name = "python-telegram-bot", extras = ["http2", "socks"], specifier = "~=22.0" },
-    { name = "qbittorrent-api", specifier = "~=2025.2" },
-    { name = "rarfile", specifier = "~=4.0" },
-    { name = "subliminal", specifier = "==2.2.1" },
-    { name = "transmission-rpc", specifier = "~=7.0" },
-]
+ftp = [{ name = "ftputil", specifier = "~=5.1" }]
+plexapi = [{ name = "plexapi", specifier = "~=4.16" }]
 qbittorrent = [{ name = "qbittorrent-api", specifier = "~=2025.2" }]
-telegram = [{ name = "python-telegram-bot", extras = ["http2", "socks"], specifier = "~=22.0" }]
+rarfile = [{ name = "rarfile", specifier = "~=4.0" }]
+sftp = [
+    { name = "paramiko", specifier = "~=3.5" },
+    { name = "pysftp", specifier = "~=0.2.9" },
+]
+subliminal = [{ name = "subliminal", specifier = "==2.2.1" }]
+telegram = [
+    { name = "pillow", specifier = "~=11.0" },
+    { name = "python-telegram-bot", extras = ["http2", "socks"], specifier = "~=22.0" },
+]
 transmission = [{ name = "transmission-rpc", specifier = "~=7.0" }]
+
+[[package]]
+name = "ftputil"
+version = "5.1.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/73/dc/83f3fa78a9c8a8fe119a70d040df67799094821d3cad511ee0987d544a10/ftputil-5.1.0.tar.gz", hash = "sha256:e9e62d3fd307ef9c52e43b33fd92759fc94c04d8b5178f85f641b183906d4353", size = 86403, upload-time = "2024-01-06T17:22:14.243Z" }
 
 [[package]]
 name = "greenlet"
@@ -2546,8 +2574,8 @@ name = "sphinx"
 version = "8.1.3"
 source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
-    "python_full_version < '3.11' and platform_python_implementation != 'PyPy'",
     "python_full_version < '3.11' and platform_python_implementation == 'PyPy'",
+    "python_full_version < '3.11' and platform_python_implementation != 'PyPy'",
 ]
 dependencies = [
     { name = "alabaster", marker = "python_full_version < '3.11'" },
@@ -2578,8 +2606,8 @@ name = "sphinx"
 version = "8.2.3"
 source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
-    "python_full_version >= '3.11' and platform_python_implementation != 'PyPy'",
     "python_full_version >= '3.11' and platform_python_implementation == 'PyPy'",
+    "python_full_version >= '3.11' and platform_python_implementation != 'PyPy'",
 ]
 dependencies = [
     { name = "alabaster", marker = "python_full_version >= '3.11'" },
