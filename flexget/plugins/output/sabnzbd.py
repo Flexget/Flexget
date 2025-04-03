@@ -84,7 +84,7 @@ class OutputSabnzbd:
             # check whether file is local or remote
             if entry['url'].startswith('file://'):
                 params['mode'] = 'addlocalfile'
-                params['name'] = entry['location']
+                params['name'] = str(entry['location'])
             else:
                 params['mode'] = 'addurl'
 

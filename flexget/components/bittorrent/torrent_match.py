@@ -46,7 +46,7 @@ class TorrentMatch:
         result = []
         for entry in entries:
             location = entry.get('location')
-            if not location or not Path(location).exists():
+            if not location or not location.exists():
                 logger.warning('{} is not a local file. Skipping.', entry['title'])
                 entry.reject('not a local file')
                 continue
@@ -54,8 +54,8 @@ class TorrentMatch:
             result.append(entry)
             entry['files'] = []
 
-            if Path(location).is_file():
-                entry['files'].append(TorrentMatchFile(location, Path(location).stat().st_size))
+            if location.is_file():
+                entry['files'].append(TorrentMatchFile(location, location.stat().st_size))
             else:
                 # change working dir to make things simpler
                 os.chdir(location)
@@ -65,7 +65,7 @@ class TorrentMatch:
                     for f in files:
                         file_path = Path(root) / f
                         # We need normpath to strip out the dot
-                        abs_file_path = os.path.normpath(Path(location) / file_path)
+                        abs_file_path = os.path.normpath(location / file_path)
                         entry['files'].append(
                             TorrentMatchFile(abs_file_path, file_path.stat().st_size)
                         )
@@ -133,8 +133,8 @@ class TorrentMatch:
                             and torrent_file.size == local_file.size
                         ):
                             # if the filename with ext is contained in 'location', we must grab its parent as path
-                            if os.path.basename(torrent_file.path) in str(local_entry['location']):
-                                entry['path'] = Path(local_entry['location']).parent
+                            if torrent_file.path.name in str(local_entry['location']):
+                                entry['path'] = local_entry['location'].parent
                             else:
                                 entry['path'] = local_entry['location']
                             logger.debug('Path for {} set to {}', entry['title'], entry['path'])

@@ -23,11 +23,11 @@ def open_archive_entry(entry):
 
     Convenience function for opening archives from entries.
     """
-    archive_path = entry.get('location', '')
+    archive_path = entry.get('location')
     if not archive_path:
         logger.error('Entry does not appear to represent a local file.')
         return None
-    if not Path(archive_path).exists():
+    if not archive_path.exists():
         logger.error('File no longer exists: {}', entry['location'])
         return None
     try:
@@ -47,7 +47,7 @@ def get_output_path(to: str, entry) -> Path:
     try:
         if to:
             return Path(render_from_entry(to, entry))
-        return Path(entry.get('location')).parent
+        return entry.get('location').parent
     except RenderError:
         raise plugin.PluginError(f'Could not render path: {to}')
 

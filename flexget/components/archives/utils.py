@@ -217,7 +217,7 @@ def open_archive(archive_path):
     """Return the appropriate archive object."""
     archive = None
 
-    if not Path(archive_path).exists():
+    if not archive_path.exists():
         raise PathError("Path doesn't exist")
 
     if zipfile.is_zipfile(archive_path):

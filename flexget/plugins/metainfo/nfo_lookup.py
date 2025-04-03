@@ -119,7 +119,7 @@ class NfoLookup:
 
         """
         location = entry.get('location')
-        nfo_full_filename = os.path.splitext(location)[0] + self.nfo_file_extension
+        nfo_full_filename = str(location.parent / location.stem) + self.nfo_file_extension
 
         if os.path.isfile(nfo_full_filename):
             return nfo_full_filename

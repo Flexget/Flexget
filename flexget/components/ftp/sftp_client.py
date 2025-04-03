@@ -4,7 +4,7 @@ import time
 from base64 import b64decode
 from dataclasses import dataclass
 from functools import partial
-from pathlib import Path, PurePath, PurePosixPath
+from pathlib import Path, PurePosixPath
 from stat import S_ISLNK
 from typing import Callable, Optional
 from urllib.parse import quote, urljoin
@@ -205,13 +205,13 @@ class SftpClient:
         else:
             logger.warning('Skipping unknown file: {}', source)
 
-    def upload(self, source: str, to: str) -> None:
+    def upload(self, source: Path, to: str) -> None:
         """Upload files or directories to an SFTP server.
 
         :param source: file or directory to upload
         :param to: destination
         """
-        if Path(source).is_dir():
+        if source.is_dir():
             logger.verbose('Skipping directory {}', source)
         else:
             self._upload_file(source, to)
@@ -342,8 +342,8 @@ class SftpClient:
         cnopts.hostkeys.add(self.host, self.host_key.key_type, key)
         return cnopts
 
-    def _upload_file(self, source: str, to: str) -> None:
-        if not Path(source).exists():
+    def _upload_file(self, source: Path, to: str) -> None:
+        if not source.exists():
             logger.warning('File no longer exists:', source)
             return
 
@@ -393,8 +393,8 @@ class SftpClient:
         if delete_origin:
             self.remove_file(source)
 
-    def _put_file(self, source: str, destination: str) -> None:
-        return self._sftp.put(source, destination)
+    def _put_file(self, source: Path, destination: str) -> None:
+        return self._sftp.put(str(source), destination)
 
     def _get_prefix(self) -> str:
         """Generate SFTP URL prefix."""
@@ -422,8 +422,8 @@ class SftpClient:
         return str(PurePosixPath(destination) / path)
 
     @staticmethod
-    def _get_upload_path(source: str, to: str):
-        basename: str = PurePath(source).name
+    def _get_upload_path(source: Path, to: str):
+        basename: str = source.name
         return str(PurePosixPath(to, basename))
 
 
