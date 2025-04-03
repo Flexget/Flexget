@@ -668,7 +668,7 @@ class OutputDeluge(DelugePlugin):
                     if opts.get('hide_sparse_files'):
                         # hide the other sparse files that are not supposed to download but are created anyway
                         # http://dev.deluge-torrent.org/ticket/1827
-                        # Made sparse files behave better with deluge http://flexget.com/ticket/2881
+                        # Made sparse files behave better with deluge
                         sparse_files = [
                             f
                             for f in status['files']

@@ -29,7 +29,8 @@ plugins for sites that do not provide any kind of useful feeds.
 Example
 =======
 Flexget uses a `YAML`_ based configuration file.
-The following example will look in the RSS feed in the link, will match any item that match the series names and download it::
+The following example will look in the RSS feed in the link, will match any
+item that match the series names and download it::
 
     tasks:
       tv:
@@ -44,7 +45,8 @@ and more are being added continuously.
 
 FlexGet is extremely useful in conjunction with applications which have watch
 directory support or provide interface for external utilities like FlexGet.
-To get a sense of the many things that can be done with FlexGet you can take a look in our `cookbook`_.
+To get a sense of the many things that can be done with FlexGet you can take
+a look in our `cookbook`_.
 
 .. _FlexGet: https://flexget.com
 
@@ -61,6 +63,8 @@ To get a sense of the many things that can be done with FlexGet you can take a l
 
 **Bugs:** https://github.com/Flexget/Flexget/issues
 
+**API reference** https://flexget.readthedocs.io/en/latest/api/flexget.html
+
 Install
 -------
 
@@ -72,12 +76,10 @@ For more detailed instructions see the `installation guide`_.
 
 .. _installation guide: https://flexget.com/Install
 
-How to use GIT checkout
+How to contribute
 -----------------------
 
-Refer to `development guide`_.
-
-.. _development guide: https://flexget.readthedocs.io/en/latest/develop/index.html#how-do-i-get-started
+Refer to `contributor guide <https://flexget.readthedocs.io/en/latest/contributor/index.html>`__.
 
 If you don't want to use virtualenv there's ``flexget_vanilla.py`` file which
 can be used to run FlexGet without virtualenv, note that you will need to

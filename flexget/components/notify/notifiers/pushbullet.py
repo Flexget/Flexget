@@ -25,14 +25,14 @@ class PushbulletNotifier:
 
     Example::
 
-    notify:
-      entries:
-        via:
-          pushbullet:
-            apikey: <API_KEY>
-            [device: <DEVICE_IDEN> (can also be a list of device ids, or don't specify any ids to send to all devices)]
-            [email: <EMAIL_ADDRESS> (can also be a list of user email addresses)]
-            [channel: <CHANNEL_TAG> (you can only specify device / email or channel tag, cannot use both)]
+        notify:
+          entries:
+            via:
+              pushbullet:
+                apikey: <API_KEY>
+                [device: <DEVICE_IDEN> (can also be a list of device ids, or don't specify any ids to send to all devices)]
+                [email: <EMAIL_ADDRESS> (can also be a list of user email addresses)]
+                [channel: <CHANNEL_TAG> (you can only specify device / email or channel tag, cannot use both)]
 
     Configuration parameters are also supported from entries (eg. through set).
     """

@@ -13,7 +13,7 @@ logger = logger.bind(name='regex_extract')
 class RegexExtract:
     r"""Updates an entry with the values of regex matched named groups.
 
-    Usage:
+    Usage::
 
       regex_extract:
         field: <string>
@@ -22,13 +22,13 @@ class RegexExtract:
         [prefix]: <string>
 
 
-    Example:
+    Example::
+
       regex_extract:
         prefix: f1_
         field: title
         regex:
           - Formula\.?1.(?P<location>*?)
-
     """
 
     schema = {

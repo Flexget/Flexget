@@ -22,15 +22,15 @@ class DiscordNotifier:
 
     Example::
 
-    notify:
-      entries:
-        via:
-          - discord:
-              web_hook_url: <string>
-              [silent: <boolean>] (suppress notification)
-              [username: <string>] (override the default username of the webhook)
-              [avatar_url: <string>] (override the default avatar of the webhook)
-              [embeds: <arrays>[<object>]] (override embeds)
+        notify:
+          entries:
+            via:
+              - discord:
+                  web_hook_url: <string>
+                  [silent: <boolean>] (suppress notification)
+                  [username: <string>] (override the default username of the webhook)
+                  [avatar_url: <string>] (override the default avatar of the webhook)
+                  [embeds: <arrays>[<object>]] (override embeds)
     """
 
     schema = {

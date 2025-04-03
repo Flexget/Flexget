@@ -12,23 +12,21 @@ except ImportError:
 
 logger = logger.bind(name='mem_usage')
 
-"""
-http://blog.mfabrik.com/2008/03/07/debugging-django-memory-leak-with-trackrefs-and-guppy/
-
-# Print memory statistics
-def update():
-    print heapy.heap()
-
-# Print relative memory consumption since last sycle
-def update():
-    print heapy.heap()
-    heapy.setref()
-
-# Print relative memory consumption w/heap traversing
-def update()
-    print heapy.heap().get_rp(40)
-    heapy.setref()
-"""
+# http://blog.mfabrik.com/2008/03/07/debugging-django-memory-leak-with-trackrefs-and-guppy/
+#
+# # Print memory statistics
+# def update():
+#     print heapy.heap()
+#
+# # Print relative memory consumption since last sycle
+# def update():
+#     print heapy.heap()
+#     heapy.setref()
+#
+# # Print relative memory consumption w/heap traversing
+# def update()
+#     print heapy.heap().get_rp(40)
+#     heapy.setref()
 
 heapy = None
 

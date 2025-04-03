@@ -22,18 +22,18 @@ class PushalotNotifier:
 
     Example::
 
-    notify:
-      entries:
-        via:
-          - pushalot:
-              token: <string> Authorization token (can also be a list of tokens) - Required
-              link: <string> (default: '{{imdb_url}}')
-              linktitle: <string> (default: (none))
-              important: <boolean> (default is False)
-              silent: <boolean< (default is False)
-              image: <string> (default: (none))
-              source: <string> (default is 'FlexGet')
-              timetolive: <integer>
+        notify:
+          entries:
+            via:
+              - pushalot:
+                  token: <string> Authorization token (can also be a list of tokens) - Required
+                  link: <string> (default: '{{imdb_url}}')
+                  linktitle: <string> (default: (none))
+                  important: <boolean> (default is False)
+                  silent: <boolean< (default is False)
+                  image: <string> (default: (none))
+                  source: <string> (default is 'FlexGet')
+                  timetolive: <integer>
     """
 
     schema = {

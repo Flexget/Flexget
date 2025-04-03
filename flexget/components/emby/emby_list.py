@@ -9,9 +9,10 @@ logger = logger.bind(name='emby_list')
 
 
 class PluginEmbyList:
-    """Returns Emby Lists.
+    """Return Emby Lists.
 
-    Example:
+    Example::
+
         emby_list:
             server:
                 host: http://localhost:8096
@@ -19,7 +20,6 @@ class PluginEmbyList:
                 apikey: <apikey>
                 return_host: wan
             list: watched
-
     """
 
     auth = None

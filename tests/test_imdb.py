@@ -284,7 +284,6 @@ class TestImdb:
             '22 Bullets should have been rejected'
         )
         rockstar = task.find_entry(imdb_name='Rockstar')['imdb_languages']
-        # http://flexget.com/ticket/1399
         assert rockstar == ['hindi'], 'Did not find only primary language'
         host_langs = task.find_entry(imdb_name='The Host')['imdb_languages']
         # switched to panjabi since that's what I got ...

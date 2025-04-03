@@ -21,16 +21,16 @@
         "^\\.github/workflows/[^/]+\\.ya?ml$"
       ],
       "matchStrings": [
-        "\\s*[A-Z_]+?_VERSION:\\s*[\"']?(?<currentValue>.+?)[\"']?\\s*# renovate: datasource=(?<datasource>.+?) depName=(?<depName>.+?)(?: versioning=(?<versioning>.+?))?\\s"
+        "\\s*[A-Z_]+?_VERSION:\\s*[\"']?(?<currentValue>.+?)[\"']?\\s*# renovate: datasource=(?<datasource>.+?) depName=(?<depName>.+?)\\s"
       ]
     },
     {
       "customType": "regex",
       "fileMatch": [
-        "^\\.readthedocs\\.ya?ml$"
+        "^\\.readthedocs\\.yaml$"
       ],
       "matchStrings": [
-        ":\\s*[\"']?(?:ubuntu-)?(?<currentValue>[^:]+?)[\"']?\\s*# renovate: datasource=(?<datasource>.+?) depName=(?<depName>.+?)(?: versioning=(?<versioning>.+?))?\\s"
+        "python:\\s*[\"']?(?<currentValue>.+?)[\"']?\\s*# renovate: datasource=(?<datasource>.+?) depName=(?<depName>.+?)\\s"
       ]
     }
   ],
@@ -48,17 +48,6 @@
     "enabled": false
   },
   "packageRules": [
-    {
-      "extends": [
-        ":pinDigestsDisabled"
-      ],
-      "matchManagers": [
-        "custom.regex"
-      ],
-      "matchDatasources": [
-        "docker"
-      ]
-    },
     {
       "description": "This pre-commit env takes a long time to rebuild. Limit updates to monthly.",
       "matchPackageNames": [
