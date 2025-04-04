@@ -26,6 +26,7 @@ class FTPList:
         self.password = None
         self.host = None
         self.port = None
+        self.encoding = None
         self.FTP = None
 
     schema = {
@@ -36,6 +37,7 @@ class FTPList:
             'host': {'type': 'string'},
             'port': {'type': 'integer'},
             'ssl': {'type': 'boolean'},
+            'encoding': {'type': 'string'},
             'dirs': one_or_more({'type': 'string'}),
             'recursion': {'type': 'boolean'},
             'recursion_depth': {'type': 'integer'},
@@ -52,6 +54,7 @@ class FTPList:
         config.setdefault('ssl', False)
         config.setdefault('dirs', [''])
         config.setdefault('port', 21)
+        config.setdefault('encoding', 'utf-8')
         config.setdefault('recursion', False)
         if not isinstance(config['dirs'], list):
             config['dirs'] = [config['dirs']]
@@ -135,6 +138,7 @@ class FTPList:
         self.password = config.get('password')
         self.host = config.get('host')
         self.port = config.get('port')
+        self.encoding = config.get('encoding')
 
         directories = config.get('dirs')
         recursion = config.get('recursion')
@@ -142,7 +146,9 @@ class FTPList:
         recursion_depth = -1 if recursion else 0
 
         base_class = ftplib.FTP_TLS if config.get('ssl') else ftplib.FTP
-        session_factory = ftputil.session.session_factory(port=self.port, base_class=base_class)
+        session_factory = ftputil.session.session_factory(
+            base_class=base_class, port=self.port, encoding=self.encoding
+        )
         try:
             logger.verbose(
                 'trying to establish connection to FTP: {}:<HIDDEN>@{}:{}',
