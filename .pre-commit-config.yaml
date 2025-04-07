@@ -9,7 +9,7 @@ repos:
         args: [ --fix ]
       - id: ruff-format
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.6.6
+    rev: 0.6.12
     hooks:
       - id: uv-lock
       - id: uv-export
