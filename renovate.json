@@ -6,6 +6,8 @@
     ":automergePatch",
     ":enablePreCommit",
     ":maintainLockFilesWeekly",
+    ":prConcurrentLimitNone",
+    ":prHourlyLimitNone",
     ":preserveSemverRanges",
     ":rebaseStalePrs",
     "schedule:weekly"
