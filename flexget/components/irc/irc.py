@@ -119,7 +119,7 @@ def create_thread(name, conn):
 
 
 def irc_prefix(var):
-    """Prefix a string with the irc_.
+    """Prefix a string with ``irc_``.
 
     :param var: Variable to prefix
     :return: Prefixed variable

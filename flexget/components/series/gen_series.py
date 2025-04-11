@@ -15,12 +15,14 @@ PER_RUN = 50
 class GenSeries:
     """Purely for debugging purposes. Not great quality :).
 
-    gen_series_data:
-        series: NUM
-        seasons: NUM
-        episodes: NUM
-        qualities:
-          - LIST
+    ::
+
+        gen_series_data:
+            series: NUM
+            seasons: NUM
+            episodes: NUM
+            qualities:
+              - LIST
 
     This will also auto configure series plugin for testing
     """

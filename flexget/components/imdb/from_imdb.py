@@ -17,20 +17,25 @@ class FromIMDB:
     It's based on IMDBpy which is required (pip install imdbpy). The basic config required just an IMDB ID of the
     required entity.
 
-    For example:
+    For example::
 
         from_imdb: ch0001354
 
     Schema description:
     Other than ID, all other properties are meant to filter the full list that the entity generates.
 
-    id: string that relates to a supported entity type. For example: 'nm0000375'. Required.
-    job_types: a string or list with job types from job_types. Default is 'actor'.
-    content_types: A string or list with content types from content_types. Default is 'movie'.
-    max_entries: The maximum number of entries that can return. This value's purpose is basically flood protection
-        against unruly configurations that will return too many results. Default is 200.
+    ==============   ==============================================================================================
+    Option           Description
+    ==============   ==============================================================================================
+    id               string that relates to a supported entity type. For example: 'nm0000375'. Required.
+    job_types        a string or list with job types from job_types. Default is 'actor'.
+    content_types    A string or list with content types from content_types. Default is 'movie'.
+    max_entries      The maximum number of entries that can return. This value's purpose is basically flood
+                     protection against unruly configurations that will return too many results. Default is 200.
+    ==============   ==============================================================================================
 
-    Advanced config example:
+    Advanced config example::
+
         dynamic_movie_queue:
             from_imdb:
               id: co0051941
@@ -40,7 +45,6 @@ class FromIMDB:
               content_types: tv series
             accept_all: yes
             movie_queue: add
-
     """
 
     job_types = [

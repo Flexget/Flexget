@@ -32,7 +32,7 @@ Please don't just say "it doesn't crash" or "it works". Explain what the expecte
 
 #### Config:
 ```yaml
-Paste FULL config and remove any personal info if config is too long, attach the file to the ticket.
+Paste FULL config and remove any personal info if config is too long, attach the file to the issue.
 If issue is with a single task, you can get get resulting configuration by running:
   flexget execute --task <NAME> --dump-config
 Make sure to redact any personal information (passwords, api keys, etc) !

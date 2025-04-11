@@ -17,20 +17,20 @@ class Filesystem:
     """Use local path content as an input. Can use recursion if configured.
 
     Recursion is False by default. Can be configured to true or get integer that will specify max depth in relation to
-        base folder.
-    All files/dir/symlinks are retrieved by default. Can be changed by using the 'retrieve' property.
+    base folder.
+    All files/dir/symlinks are retrieved by default. Can be changed by using the ``retrieve`` property.
 
-    Example 1:: Single path
+    Example 1—Single path::
 
       filesystem: /storage/movies/
 
-    Example 2:: List of paths
+    Example 2—List of paths::
 
       filesystem:
          - /storage/movies/
          - /storage/tv/
 
-    Example 3:: Object with list of paths
+    Example 3—Object with list of paths::
 
       filesystem:
         path:

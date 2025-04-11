@@ -27,25 +27,26 @@ TRAILER_SOURCE = {
 class AniList:
     """Creates entries for series and movies from your AniList list.
 
-    Syntax:
-    anilist:
-      username: <string>
-      status:
-        - <current|planning|completed|dropped|paused|repeating>
-        - <current|planning|completed|dropped|paused|repeating>
-        ...
-      release_status:
-        - <all|finished|releasing|not_yet_released|cancelled>
-        - <finished|releasing|not_yet_released|cancelled>
-        ...
-      format:
-        - <all|tv|tv_short|movie|special|ova|ona>
-        - <tv|tv_short|movie|special|ova|ona>
-        ...
-      list:
-        - <string>
-        - <string>
-        ...
+    Syntax::
+
+      anilist:
+        username: <string>
+        status:
+          - <current|planning|completed|dropped|paused|repeating>
+          - <current|planning|completed|dropped|paused|repeating>
+          ...
+        release_status:
+          - <all|finished|releasing|not_yet_released|cancelled>
+          - <finished|releasing|not_yet_released|cancelled>
+          ...
+        format:
+          - <all|tv|tv_short|movie|special|ova|ona>
+          - <tv|tv_short|movie|special|ova|ona>
+          ...
+        list:
+          - <string>
+          - <string>
+          ...
     """
 
     schema = {

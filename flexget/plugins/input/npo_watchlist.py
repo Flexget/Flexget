@@ -31,7 +31,8 @@ class NPOWatchlist:
     If 'download_premium' is set to 'yes', the plugin will also download entries that are marked as exclusive
         content for NPO Plus subscribers.
 
-    For example:
+    For example::
+
         npo_watchlist:
           email: aaaa@bbb.nl
           password: xxx

@@ -9,10 +9,10 @@ logger = logger.bind(name='headers')
 class PluginHeaders:
     """Allow setting up any headers in all requests (which use urllib2).
 
-    Example:
-    headers:
-      cookie: uid=<YOUR UID>; pass=<YOUR PASS>
+    Example::
 
+        headers:
+          cookie: uid=<YOUR UID>; pass=<YOUR PASS>
     """
 
     schema = {'type': 'object', 'additionalProperties': {'type': 'string'}}

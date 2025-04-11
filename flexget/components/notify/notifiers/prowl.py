@@ -33,7 +33,6 @@ class ProwlNotifier:
                 [event: event title, default New Release]
                 [priority: -2 - 2 (2 = highest), default 0]
                 [description: notification to send]
-
     """
 
     schema = {

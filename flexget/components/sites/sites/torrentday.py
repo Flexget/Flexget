@@ -48,23 +48,28 @@ CATEGORIES = {
 class UrlRewriteTorrentday:
     """Torrentday urlrewriter and search plugin.
 
-    torrentday:
-      uid: xxxxxxxxxxxxx  (required)    NOT YOUR LOGIN. find this in your browser's cookies
-      passkey: xxxxxxxxx  (required)    NOT YOUR PASSWORD. see previous
-      cfduid: xxxxxxxxxx  (required)    AGAIN IN THE COOKIES
-      rss_key: xxxxxxxxx  (required)    get this from your profile page
-      category: xxxxxxxx
+    ::
 
-      Category can be one of
-        ID from browsing site OR 'name'
-        movies:
-          mov4k, mov480p, movHD, movBD, movDVD,
-          movMP4, movNonEnglish, movPACKS,
-          movSDx264, movX265, movXVID
-        tv:
-          tv480p, tvBRD, tvDVD, tvDVDrip,
-          tvMOBILE, tvNonEnglish, tvPACKS,
-          tvSDx264, tvHDx264, tvX265, tvXVID
+        torrentday:
+            uid: xxxxxxxxxxxxx  (required)    NOT YOUR LOGIN. find this in your browser's cookies
+            passkey: xxxxxxxxx  (required)    NOT YOUR PASSWORD. see previous
+            cfduid: xxxxxxxxxx  (required)    AGAIN IN THE COOKIES
+            rss_key: xxxxxxxxx  (required)    get this from your profile page
+            category: xxxxxxxx
+
+    Category can be one of
+
+    * ID from browsing site
+    * ``name``
+
+    movies:
+        mov4k, mov480p, movHD, movBD, movDVD,
+        movMP4, movNonEnglish, movPACKS,
+        movSDx264, movX265, movXVID
+    tv:
+        tv480p, tvBRD, tvDVD, tvDVDrip,
+        tvMOBILE, tvNonEnglish, tvPACKS,
+        tvSDx264, tvHDx264, tvX265, tvXVID
     """
 
     schema = {
