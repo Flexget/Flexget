@@ -9,7 +9,6 @@ import pytest
 from flexget.components.managed_lists.lists.subtitle_list import (
     SubtitleListFile,
     SubtitleListLanguage,
-    normalize_path,
 )
 from flexget.manager import Session
 
@@ -435,8 +434,9 @@ class TestSubtitleList:
         with Session() as session:
             s = session.query(SubtitleListFile).first()
             assert s, 'The file should have been added to the list'
-            assert s.location == normalize_path(
-                'subtitle_list_test_dir/The.Walking.Dead.S06E08-FlexGet.mp4'
+            assert (
+                Path(s.location)
+                == Path('subtitle_list_test_dir/The.Walking.Dead.S06E08-FlexGet.mp4').resolve()
             ), 'location should be what the output field was set to'
 
     def test_subtitle_list_relative_path(self, execute_task):
@@ -445,6 +445,7 @@ class TestSubtitleList:
         with Session() as session:
             s = session.query(SubtitleListFile).first()
             assert s, 'The file should have been added to the list'
-            assert s.location == normalize_path(
-                'subtitle_list_test_dir/The.Walking.Dead.S06E08-FlexGet.mp4'
+            assert (
+                Path(s.location)
+                == Path('subtitle_list_test_dir/The.Walking.Dead.S06E08-FlexGet.mp4').resolve()
             ), 'location should be what the output field was set to'

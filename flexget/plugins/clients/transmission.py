@@ -1,11 +1,11 @@
 import importlib.metadata
 import os
-import pathlib
 import re
 from datetime import datetime, timedelta
 from fnmatch import fnmatch
 from functools import partial
 from netrc import NetrcParseError, netrc
+from pathlib import Path
 from time import sleep
 from typing import TYPE_CHECKING
 from urllib.parse import urlparse
@@ -221,8 +221,8 @@ class PluginTransmissionInput(TransmissionBase):
             )
             # Location of torrent is only valid if transmission is on same machine as flexget
             if config['host'] in ('localhost', '127.0.0.1'):
-                entry['location'] = torrent.torrent_file
-                entry['url'] = pathlib.Path(torrent.torrent_file).as_uri()
+                entry['location'] = Path(torrent.torrent_file)
+                entry['url'] = Path(torrent.torrent_file).as_uri()
             for attr, field in {
                 'id': 'id',
                 'activityDate': 'activity_date',

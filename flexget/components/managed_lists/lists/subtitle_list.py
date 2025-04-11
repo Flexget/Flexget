@@ -1,6 +1,7 @@
 import os
 from collections.abc import MutableSet
 from datetime import datetime
+from pathlib import Path
 
 from babelfish import Language
 from loguru import logger
@@ -106,10 +107,6 @@ def normalize_language(language):
     return str(Language.fromietf(language))
 
 
-def normalize_path(path):
-    return os.path.normpath(os.path.abspath(path)) if path else None
-
-
 class SubtitleListList(Base):
     __tablename__ = 'subtitle_list_lists'
     id = Column(Integer, primary_key=True)
@@ -145,7 +142,7 @@ class SubtitleListFile(Base):
         entry = Entry()
         entry['title'] = self.title
         entry['url'] = f'mock://localhost/subtitle_list/{self.id}'
-        entry['location'] = self.location
+        entry['location'] = Path(self.location)
         entry['remove_after'] = self.remove_after
         entry['added'] = self.added
         entry['subtitle_languages'] = []
@@ -221,12 +218,12 @@ class SubtitleList(MutableSet):
         path = ''
         if isinstance(self.config.get('path'), str):
             try:
-                path = entry.render(self.config['path'])
+                path = Path(entry.render(self.config['path']))
             except RenderError as e:
                 logger.error(e)
         else:
             path = entry.get('location')
-        return normalize_path(path)
+        return path.resolve()
 
     def add(self, entry):
         with Session() as session:
@@ -236,11 +233,11 @@ class SubtitleList(MutableSet):
                 logger.error('Entry {} does not represent a local file/dir.', entry['title'])
                 return None
 
-            path_exists = os.path.exists(path)
+            path_exists = path.exists()
             if self.config['force_file_existence'] and not path_exists:
                 logger.error('Path {} does not exist. Not adding to list.', path)
                 return None
-            if path_exists and not self.config.get('allow_dir') and os.path.isdir(path):
+            if path_exists and not self.config.get('allow_dir') and path.is_dir():
                 logger.error(
                     'Path {} is a directory and "allow_dir"={}.', path, self.config['allow_dir']
                 )
@@ -254,7 +251,7 @@ class SubtitleList(MutableSet):
                 session.delete(db_file)
             db_file = SubtitleListFile()
             db_file.title = entry['title']
-            db_file.location = path
+            db_file.location = str(path)
             db_file.languages = []
             db_file.remove_after = self.config.get('remove_after')
             db_file.languages = []
@@ -284,10 +281,12 @@ class SubtitleList(MutableSet):
     def _find_entry(self, entry, match_file_to_dir=False, session=None):
         """Find `SubtitleListFile` corresponding to this entry, if it exists."""
         path = self._extract_path(entry)
-        res = self._db_list(session).files.filter(SubtitleListFile.location == path).first()
+        res = self._db_list(session).files.filter(SubtitleListFile.location == str(path)).first()
         if not res and match_file_to_dir:
-            path = os.path.dirname(path)
-            res = self._db_list(session).files.filter(SubtitleListFile.location == path).first()
+            path = path.parent
+            res = (
+                self._db_list(session).files.filter(SubtitleListFile.location == str(path)).first()
+            )
         return res
 
     @with_session
@@ -349,11 +348,11 @@ class PluginSubtitleList:
         # A hack to not output certain files without deleting them from the list
         temp_discarded_items = set()
         for item in subtitle_list:
-            if not config['force_file_existence'] and not os.path.exists(item['location']):
+            if not config['force_file_existence'] and not item['location'].exists():
                 logger.error('File {} does not exist. Skipping.', item['location'])
                 temp_discarded_items.add(item)
                 continue
-            if not os.path.exists(item['location']):
+            if not item['location'].exists():
                 logger.error('File {} does not exist. Removing from list.', item['location'])
                 subtitle_list.discard(item)
                 continue
@@ -369,29 +368,27 @@ class PluginSubtitleList:
             languages = set(item['subtitle_languages']) or set(config.get('languages', []))
             num_potential_files = 0
             num_added_files = 0
-            if os.path.isdir(item['location']):
+            if item['location'].is_dir():
                 # recursion depth 1 is no recursion
-                max_depth = (
-                    len(normalize_path(item['location']).split(os.sep)) + recursion_depth - 1
-                )
+                max_depth = len(item['location'].resolve().parts) + recursion_depth - 1
                 for root_dir, _, files in os.walk(item['location']):
-                    current_depth = len(root_dir.split(os.sep))
+                    current_depth = len(Path(root_dir).parts)
                     if current_depth > max_depth:
                         break
                     for file in files:
-                        if os.path.splitext(file)[1] not in VIDEO_EXTENSIONS:
+                        if Path(file).suffix not in VIDEO_EXTENSIONS:
                             logger.debug('File {} is not a video file. Skipping', file)
                             continue
                         num_potential_files += 1
-                        file_path = normalize_path(os.path.join(root_dir, file))
+                        file_path = (Path(root_dir) / file).resolve()
                         if not config['check_subtitles'] or not self.all_subtitles_exist(
                             file_path, languages
                         ):
                             subtitle_list.config['languages'] = languages
                             subtitle_list.add(
                                 Entry(
-                                    title=os.path.splitext(os.path.basename(file_path))[0],
-                                    url='file://' + file_path,
+                                    title=file_path.stem,
+                                    url=f'file://{file_path}',
                                     location=file_path,
                                 )
                             )

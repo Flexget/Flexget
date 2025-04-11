@@ -1,5 +1,7 @@
 """Plugin for mocking task data."""
 
+from pathlib import Path
+
 from loguru import logger
 
 from flexget import plugin
@@ -39,6 +41,8 @@ class Mock:
     def on_task_input(self, task, config):
         entries = []
         for line in config:
+            if 'location' in line:
+                line['location'] = Path(line['location']) if line['location'] else None
             entry = Entry(line) if isinstance(line, dict) else Entry(title=line)
             # no url specified, add random one based on title (ie. test)
             if 'url' not in entry:

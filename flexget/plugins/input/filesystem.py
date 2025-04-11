@@ -109,8 +109,8 @@ class Filesystem:
         """Create a single entry using a filepath and a type (file/dir)."""
         filepath = filepath.absolute()
         entry = Entry()
-        entry['location'] = str(filepath)
-        entry['url'] = filepath.absolute().as_uri()
+        entry['location'] = filepath
+        entry['url'] = filepath.as_uri()
         entry['filename'] = filepath.name
         if filepath.is_file():
             entry['title'] = filepath.stem

@@ -57,8 +57,8 @@ class MetainfoSubs:
         if (
             entry.get('subtitles', eval_lazy=False)
             or 'location' not in entry
-            or ('$RECYCLE.BIN' in entry['location'])
-            or not os.path.exists(entry['location'])
+            or ('$RECYCLE.BIN' in str(entry['location']))
+            or not entry['location'].exists()
         ):
             return
         from subliminal import scan_video
