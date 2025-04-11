@@ -20,6 +20,21 @@ except ImportError:
 logger = logger.bind(name='ftp_list')
 
 
+class ReuseTLSSessionFTP(ftplib.FTP_TLS):
+    """Explicit FTPS, with shared TLS session.
+
+    This is a workaround for https://github.com/python/cpython/issues/63699.
+    """
+
+    def ntransfercmd(self, cmd, rest=None):
+        conn, size = ftplib.FTP.ntransfercmd(self, cmd, rest)
+        if self._prot_p:
+            conn = self.context.wrap_socket(
+                conn, server_hostname=self.host, session=self.sock.session
+            )
+        return conn, size
+
+
 class FTPList:
     def __init__(self):
         self.username = None
@@ -145,22 +160,23 @@ class FTPList:
         content_types = config.get('retrieve')
         recursion_depth = -1 if recursion else 0
 
-        base_class = ftplib.FTP_TLS if config.get('ssl') else ftplib.FTP
+        base_class = ReuseTLSSessionFTP if config.get('ssl') else ftplib.FTP
         session_factory = ftputil.session.session_factory(
             base_class=base_class, port=self.port, encoding=self.encoding
         )
+        logger.verbose(
+            'trying to establish connection to FTP: {}:{}@{}:{}',
+            self.username,
+            self.password,
+            self.host,
+            self.port,
+        )
         try:
-            logger.verbose(
-                'trying to establish connection to FTP: {}:<HIDDEN>@{}:{}',
-                self.username,
-                self.host,
-                self.port,
-            )
             self.FTP = ftputil.FTPHost(
                 self.host, self.username, self.password, session_factory=session_factory
             )
         except FTPOSError as e:
-            raise PluginError(f'Could not connect to FTP: {e.args[0]}')
+            raise PluginError(f'Could not connect to FTP: {e}')
 
         return [
             self._to_entry(content)
