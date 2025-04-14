@@ -157,7 +157,7 @@ referencing==0.36.2
     #   jsonschema-specifications
 requests==2.32.3
     # via flexget
-rich==13.9.4
+rich==14.0.0
     # via flexget
 rpds-py==0.23.1
     # via
