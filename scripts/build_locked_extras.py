@@ -44,7 +44,7 @@ def update_metadata_with_locked(
         except (subprocess.TimeoutExpired, subprocess.CalledProcessError) as exc:
             print(f'Failed to export locked dependencies for `{group}`: {exc.stderr}')
             sys.exit(1)
-        requirements = [line for line in export.splitlines() if not line.startswith('#')]
+        requirements = [line for line in export.splitlines() if not line.lstrip().startswith('#')]
         if not requirements:
             # TODO: We can remove this if uv starts checking the existence of groups itself.
             # https://github.com/astral-sh/uv/issues/10882
