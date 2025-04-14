@@ -4,7 +4,7 @@ aniso8601==10.0.0
     # via flask-restx
 apscheduler==3.11.0
     # via flexget
-attrs==25.1.0
+attrs==25.3.0
     # via
     #   jsonschema
     #   referencing
@@ -128,7 +128,7 @@ pygments==2.19.1
     # via rich
 pynzb==0.1.0
     # via flexget
-pyparsing==3.2.1
+pyparsing==3.2.3
     # via flexget
 pyrss2gen==1.1
     # via flexget
@@ -139,9 +139,9 @@ python-dateutil==2.9.0.post0
     #   pendulum
     #   tempora
     #   time-machine
-pytz==2025.1
+pytz==2025.2
     # via flask-restx
-pywin32==309 ; (python_full_version < '3.10' and implementation_name == 'cpython' and sys_platform == 'win32') or (platform_python_implementation != 'PyPy' and sys_platform == 'win32')
+pywin32==310 ; (python_full_version < '3.10' and implementation_name == 'cpython' and sys_platform == 'win32') or (platform_python_implementation != 'PyPy' and sys_platform == 'win32')
     # via
     #   cherrypy
     #   plumbum
@@ -159,13 +159,13 @@ requests==2.32.3
     # via flexget
 rich==14.0.0
     # via flexget
-rpds-py==0.23.1
+rpds-py==0.24.0
     # via
     #   jsonschema
     #   referencing
 rpyc==6.0.1
     # via flexget
-setuptools==76.0.0
+setuptools==78.1.0
     # via
     #   pynzb
     #   zc-lockfile
@@ -177,19 +177,19 @@ six==1.17.0
     #   python-dateutil
 soupsieve==2.6
     # via beautifulsoup4
-sqlalchemy==2.0.38
+sqlalchemy==2.0.40
     # via flexget
 tempora==5.8.0
     # via portend
 time-machine==2.16.0 ; implementation_name != 'pypy'
     # via pendulum
-typing-extensions==4.12.2
+typing-extensions==4.13.2
     # via
     #   beautifulsoup4
     #   referencing
     #   rich
     #   sqlalchemy
-tzdata==2025.1
+tzdata==2025.2
     # via
     #   pendulum
     #   tzlocal
