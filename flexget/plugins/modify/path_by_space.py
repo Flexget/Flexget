@@ -94,15 +94,15 @@ class PluginPathBySpace:
 
     Path will be selected at random if multiple paths match the within
 
-    Example:
-    path_by_space:
-      select: most_free_percent # or most_free, most_used, most_used_percent, has_free
-      within: 9000 # within in MB or percent.
-      paths:
-        - /drive1/
-        - /drive2/
-        - /drive3/
+    Example::
 
+        path_by_space:
+          select: most_free_percent # or most_free, most_used, most_used_percent, has_free
+          within: 9000 # within in MB or percent.
+          paths:
+            - /drive1/
+            - /drive2/
+            - /drive3/
     """
 
     schema = {

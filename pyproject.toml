@@ -59,6 +59,12 @@ dev = [
     "ruff ~=0.9.0",
     "vcrpy ~=7.0",
 ]
+docs = [
+    'sphinx~=8.2; python_version>="3.11"',
+    'pydata-sphinx-theme~=0.16',
+    'sphinx-copybutton~=0.5',
+    'sphinx-design~=0.6'
+]
 plugin-test = [
     # These are optional dependencies for plugins that have tests in the test suite
     # Tests that need these must add the `require_optional_deps` pytest mark
@@ -96,6 +102,10 @@ flexget-headless = "flexget:main"  # This is useful on Windows to avoid a cmd po
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[tool.doc8]
+ignore = [ "D004" ]
+max_line_length = 99
 
 [tool.hatch.metadata.hooks.custom]
 # Extras with locked dependencies will be generated if BUILD_LOCKED env variable is specified

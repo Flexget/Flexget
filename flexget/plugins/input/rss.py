@@ -349,7 +349,6 @@ class InputRSS:
                 # see: http://www.feedparser.org/docs/character-encoding.html#advanced.encoding.nonxml
                 logger.debug('ignoring feedparser.NonXMLContentType')
             elif isinstance(ex, feedparser.CharacterEncodingOverride):
-                # see: ticket 88
                 logger.debug('ignoring feedparser.CharacterEncodingOverride')
             elif isinstance(ex, UnicodeEncodeError):
                 raise plugin.PluginError('Feed has UnicodeEncodeError while parsing...')

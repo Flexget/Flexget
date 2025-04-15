@@ -252,21 +252,21 @@ class ArgumentParser(ArgParser):
 
      There are a few distinctions, mostly to ease subparser usage:
 
-    - If `add_subparsers` is called with the `nested_namespaces` kwarg, all subcommand options will be stored in a
+    - If ``add_subparsers`` is called with the ``nested_namespaces`` kwarg, all subcommand options will be stored in a
       nested namespace based on the command name for the subparser
-    - Adds the `add_subparser` method. After `add_subparsers` has been called, the `add_subparser` method can be used
-      instead of the `add_parser` method of the object returned by the `add_subparsers` call.
-    - `add_subparser` takes takes the `parent_defaults` argument, which will set/change the defaults for the parent
+    - Adds the ``add_subparser`` method. After ``add_subparsers`` has been called, the ``add_subparser`` method can be used
+      instead of the ``add_parser`` method of the object returned by the ``add_subparsers`` call.
+    - ``add_subparser`` takes takes the ``parent_defaults`` argument, which will set/change the defaults for the parent
       parser when that subparser is selected.
-    - The `get_subparser` method will get the :class:`ArgumentParser` instance for an existing subparser on this parser
+    - The ``get_subparser`` method will get the :class:`ArgumentParser` instance for an existing subparser on this parser
     - For any arguments defined both in this parser and one of its subparsers, the selected subparser default will
       override the main one.
-    - Adds the `set_post_defaults` method. This works like the normal argparse `set_defaults` method, but all actions
+    - Adds the ``set_post_defaults`` method. This works like the normal argparse ``set_defaults`` method, but all actions
       and subparsers will be run before any of these defaults are set.
     - Command shortening: If the command for a subparser is abbreviated unambiguously, it will still be accepted.
-    - The add_argument `nargs` keyword argument supports a range of arguments, e.g. `"2-4"
-    - If the `raise_errors` keyword argument to `parse_args` is True, a `ParserError` will be raised instead of sys.exit
-    - If the `file` argument is given to `parse_args`, output will be printed there instead of sys.stdout or stderr
+    - The add_argument ``nargs`` keyword argument supports a range of arguments, e.g. ``2-4``
+    - If the ``raise_errors`` keyword argument to ``parse_args`` is True, a ``ParserError`` will be raised instead of ``sys.exit``
+    - If the ``file`` argument is given to ``parse_args``, output will be printed there instead of ``sys.stdout`` or ``stderr``
     """
 
     # These are created as a class attribute so that we can set it for parser and all subparsers at once
@@ -342,7 +342,7 @@ class ArgumentParser(ArgParser):
         raise_errors: bool = False,
         file: Optional[TextIO] = None,
     ):
-        """:param raise_errors: If this is true, errors will be raised as `ParserError`s instead of calling sys.exit"""
+        """:param raise_errors: If this is true, errors will be raised as ``ParserError`` instead of calling sys.exit"""
         ArgumentParser.file = file
         try:
             return super().parse_args(args, namespace)
@@ -382,7 +382,7 @@ class ArgumentParser(ArgParser):
         """Add a parser for a new subcommand and return it.
 
         :param nested_namespaces: If True, options from subparsers will appear in nested namespace under the subparser
-        name.
+          name.
         """
         # Set the parser class so subparsers don't end up being an instance of a subclass, like CoreArgumentParser
         kwargs.setdefault('parser_class', ArgumentParser)

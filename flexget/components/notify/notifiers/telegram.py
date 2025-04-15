@@ -82,57 +82,55 @@ class ChatIdEntry(ChatIdsBase):
 class TelegramNotifier:
     """Send a message to one or more Telegram users or groups upon accepting a download.
 
-    Preparations::
+    Preparations:
 
-    * Install 'python-telegram-bot' python pkg (i.e. `pip install python-telegram-bot`)
+    * Install 'python-telegram-bot' python pkg (i.e. ``pip install python-telegram-bot``)
     * Create a bot & obtain a token for it (see https://core.telegram.org/bots#botfather).
     * For direct messages (not to a group), start a conversation with the bot and click "START" in the Telegram app.
-    * For group messages, add the bot to the desired group and send a start message to the bot: "/start" (mind the
+    * For group messages, add the bot to the desired group and send a start message to the bot: "/start" (heed the
       leading '/').
 
 
     Configuration example::
 
-    my-task:
-      notify:
-        title: {{title}}
-        message: {{title}}
-        entries:
-          via:
-            telegram:
-              bot_token: token
-              use_markdown: no
-              disable_previews: yes
-              images:
-                - image1.png
-                - image2.jpg
-              recipients:
-                - chat_id: ask @raw_data_bot (most recommended)
-                - username: my-user-name
-                - group: my-group-name
-                - fullname:
-                    first: my-first-name
-                    sur: my-sur-name
-              socks_proxy: socks5://user:pass@host:port
+        my-task:
+          notify:
+            title: {{title}}
+            message: {{title}}
+            entries:
+              via:
+                telegram:
+                  bot_token: token
+                  use_markdown: no
+                  disable_previews: yes
+                  images:
+                    - image1.png
+                    - image2.jpg
+                  recipients:
+                    - chat_id: ask @raw_data_bot (most recommended)
+                    - username: my-user-name
+                    - group: my-group-name
+                    - fullname:
+                        first: my-first-name
+                        sur: my-sur-name
+                  socks_proxy: socks5://user:pass@host:port
 
+    Configuration notes
+        You may use any combination of recipients types (``username``, ``group`` or ``fullname``) - 0 or more of each
+        (but you need at least one total...).
 
-    Configuration notes::
+    ``parse_mode``
+        Optional. Whether the template uses ``markdown`` or ``html`` formatting.
 
-    You may use any combination of recipients types (`username`, `group` or `fullname`) - 0 or more of each (but you
-    need at least one total...).
+    Note:
+        The markdown parser will fall back to basic parsing if there is a parsing error. This can be cause due to
+        unclosed tags (watch out for wandering underscore when using markdown)
 
-    `parse_mode`::
-    Optional. Whether the template uses `markdown` or `html` formatting.
-
-    NOTE: The markdown parser will fall back to basic parsing if there is a parsing error. This can be cause due to
-    unclosed tags (watch out for wandering underscore when using markdown)
-
-    `chat_id` vs. `username` vs. `fullname`::
-
-    The `chat_id` approach is the most recommended, because with this approach, you don't have to send a message to get
-    the chat ID before the program runs. In addition, it is the most stable. Even if you change your name, the program
-    will still work properly. `chat_id` can be a user's or a group's (including private groups). If the chat is a group,
-    the chat id is negative. If it is a single person, then positive.
+    ``chat_id`` vs. ``username`` vs. ``fullname``
+        The ``chat_id`` approach is the most recommended, because with this approach, you don't have to send a message to get
+        the chat ID before the program runs. In addition, it is the most stable. Even if you change your name, the program
+        will still work properly. ``chat_id`` can be a user's or a group's (including private groups). If the chat is a group,
+        the chat id is negative. If it is a single person, then positive.
 
     """
 
@@ -331,7 +329,7 @@ class TelegramNotifier:
         )
         logger.debug('chat_id_entries={}', chat_id_entries)
 
-        # TODO: The situation where the new chat_id from `ChatMigrated` exception needs to be written to the
+        # TODO: The situation where the new chat_id from ``ChatMigrated`` exception needs to be written to the
         #  database if the chat_id specified directly in the configuration file is migrated is not considered.
         #  This will cause one more HTTP request to be sent each time the program runs. However, this situation
         #  only occurs when the chat_id directly specified in the configuration file is a group and it is migrated.
@@ -358,7 +356,7 @@ class TelegramNotifier:
         fullnames: list[tuple[str, str]],
         groups: list[str],
     ) -> tuple[list[ChatIdEntry], bool]:
-        """Get chat ids for `usernames`, `fullnames` & `groups`.
+        """Get chat ids for ``usernames``, ``fullnames`` & ``groups``.
 
         Entries with a matching chat ids will be removed from the input lists.
         """
@@ -387,7 +385,7 @@ class TelegramNotifier:
         fullnames: list[tuple[str, str]],
         groups: list[str],
     ) -> list[ChatIdEntry]:
-        """Get chat ids from the cache (DB). remove found entries from `usernames`, `fullnames` & `groups`."""
+        """Get chat ids from the cache (DB). remove found entries from ``usernames``, ``fullnames`` & ``groups``."""
         chat_id_entries = []
         cached_usernames = {
             x.username: x
@@ -428,7 +426,7 @@ class TelegramNotifier:
     async def _get_new_chat_id_entries(
         self, usernames: list[str], fullnames: list[tuple[str, str]], groups: list[str]
     ) -> AsyncGenerator[ChatIdEntry, None]:
-        """Get chat ids by querying the telegram `bot`."""
+        """Get chat ids by querying the telegram ``bot``."""
         upd_usernames, upd_fullnames, upd_groups = await self._get_bot_updates()
 
         len_ = len(usernames)
@@ -471,7 +469,7 @@ class TelegramNotifier:
         dict[str, telegram.Chat], dict[tuple[str, str], telegram.Chat], dict[str, telegram.Chat]
     ]:
         """Get updated chats info from telegram."""
-        # highly unlikely, but if there are more than `telegram.constants.PollingLimit.MAX_LIMIT`
+        # highly unlikely, but if there are more than ``telegram.constants.PollingLimit.MAX_LIMIT``
         # msgs waiting for the bot, we should not miss one
         total_updates = []
         last_update = 0
@@ -510,7 +508,7 @@ class TelegramNotifier:
     def _update_db(
         self, session: sqlalchemy.orm.Session, chat_id_entries: list[ChatIdEntry]
     ) -> None:
-        """Update the DB with found `chat_ids`."""
+        """Update the DB with found ``chat_ids``."""
         logger.info('saving updated chat_ids to db')
 
         # avoid duplicate chat_ids. (this is possible if configuration specified both username & fullname

@@ -1,0 +1,10 @@
+[
+  {
+    "version": "latest",
+    "url": "https://flexget.readthedocs.io/en/latest"
+  },
+  {
+    "version": "stable",
+    "url": "https://flexget.readthedocs.io/en/stable"
+  }
+]

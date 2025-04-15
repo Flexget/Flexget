@@ -18,39 +18,46 @@ logger = logger.bind(name='plex')
 
 
 class InputPlex:
-    """Uses a plex media server (www.plexapp.com) tv section as an input.
+    """Use a plex media server (www.plexapp.com) tv section as an input.
 
-    'section'           Required parameter, numerical (/library/sections/<num>) or section name.
-    'selection'         Can be set to different keys:
-        - all                   : Default
-        - unwatched             :
-        - recentlyAdded         :
-        - recentlyViewed        :
-        - recentlyViewedShows   : Series only.
-      'all' and 'recentlyViewedShows' will only produce a list of show names while the other three will produce
-      filename and download url.
-    'token'             Plex access token, used to connect to PMS
-    'username'          Myplex (http://my.plexapp.com) username, used to connect to shared PMS'.
-    'password'          Myplex (http://my.plexapp.com) password, used to connect to shared PMS'.
-    'server'            Host/IP of PMS to connect to.
-    'lowercase_title'   Convert filename (title) to lower case.
-    'strip_non_alpha'   Sanitize filename (title), stripping all non-alphanumeric letters.
+    =================   ===========================================================================================
+    Option              Description
+    =================   ===========================================================================================
+    section             Required parameter, numerical (/library/sections/<num>) or section name.
+    selection           Can be set to different keys:
+
+                        * ``all``                    Default
+                        * ``unwatched``
+                        * ``recentlyAdded``
+                        * ``recentlyViewed``
+                        * ``recentlyViewedShows``    Series only.
+
+                        ``all`` and ``recentlyViewedShows`` will only produce a list of show names while the other
+                        three will produce filename and download url.
+    token               Plex access token, used to connect to PMS
+    username            Myplex (http://my.plexapp.com) username, used to connect to shared PMS'.
+    password            Myplex (http://my.plexapp.com) password, used to connect to shared PMS'.
+    server              Host/IP of PMS to connect to.
+    lowercase_title     Convert filename (title) to lower case.
+    strip_non_alpha     Sanitize filename (title), stripping all non-alphanumeric letters.
                         Better to turn off in case of non-english titles.
-    'strip_year'        Remove year from title, ex: Show Name (2012) 01x01 => Show Name 01x01.
+    strip_year          Remove year from title, ex: Show Name (2012) 01x01 => Show Name 01x01.
                         Movies will have year added to their filename unless this is set.
-    'strip_parens'      Remove information in parens from title, ex: Show Name (UK)(2012) 01x01 => Show Name 01x01.
-    'original_filename' Use filename stored in PMS instead of transformed name. lowercase_title and strip_year
+    strip_parens        Remove information in parens from title, ex: Show Name (UK)(2012) 01x01 => Show Name 01x01.
+    original_filename   Use filename stored in PMS instead of transformed name. lowercase_title and strip_year
                         will be ignored.
-    'unwatched_only'    Request only unwatched media from PMS.
-    'fetch'             What to download, can be set to the following values:
-        - file          The file itself, default.
-        - art           Series or movie art as configured in PMS
-        - cover         Series cover for series, movie cover for movies.
-        - thumb         Episode thumbnail, series only.
-        - season_cover  Season cover, series only. If used in movies, movie cover will be set.
+    unwatched_only      Request only unwatched media from PMS.
+    fetch               What to download, can be set to the following values:
 
+                        * ``file``          The file itself, default.
+                        * ``art``           Series or movie art as configured in PMS
+                        * ``cover``         Series cover for series, movie cover for movies.
+                        * ``thumb``         Episode thumbnail, series only.
+                        * ``season_cover``  Season cover, series only. If used in movies, movie cover will be set.
+    =================   ===========================================================================================
 
-    Default parameters:
+    Default parameters::
+
       server           : localhost
       port             : 32400
       selection        : all
@@ -62,13 +69,13 @@ class InputPlex:
       unwatched_only   : no
       fetch            : file
 
-    Example:
+    Example::
+
       plex:
         server: 192.168.1.23
         section: 3
         selection: recentlyAdded
         fetch: series_art
-
     """
 
     schema = {

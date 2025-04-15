@@ -70,7 +70,7 @@ class CoercingDateTime(DateTime):
     - Avoids crashing when comparing tz aware and naive datetimes.
       When this happens, it will assume the naive datetime is in the same timezone as the dt aware one.
     - Allows comparisons with plain dates, where the date is assumed to be at midnight in the same timezone.
-    - Returns `Interval`s with a nicer string representation for our templates
+    - Returns ``Interval`` with a nicer string representation for our templates
 
     This allows us to introduce tz aware datetimes into entry fields without breaking old configs, or old plugins.
     """
@@ -431,7 +431,7 @@ def render_from_task(template: Union[FlexGetTemplate, str], task: 'Task') -> str
 
 
 def evaluate_expression(expression: str, context: 'Mapping') -> Any:
-    """Evaluate a jinja `expression` using a given `context` with support for `LazyDict`s (`Entry`s.).
+    """Evaluate a jinja ``expression`` using a given ``context`` with support for ``LazyDict`` (``Entry``).
 
     :param str expression:  A jinja expression to evaluate
     :param context: dictlike, supporting LazyDicts

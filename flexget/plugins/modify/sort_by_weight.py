@@ -25,27 +25,34 @@ class PluginSortByWeight:
     Basic Concept:
     For each field we calculate a weight based on given parameters and than sum the weights up and do a sort based on it.
 
-    field:          Name of the sort field
-    weight:         The sort weight used, values between 10-200 are good starts
+    =============== ==============================================================================================================
+    Option          Description
+    =============== ==============================================================================================================
+    field           Name of the sort field
+    weight          The sort weight used, values between 10-200 are good starts
     inverse: yes    Use inverse weighting for the field, example: date, age fields that range in the past
                     This means the lowest entry/value will get the highest weight
-    upper_limit:    The upper value limit or upper cutoff value, that will be used for weighting.
+    upper_limit     The upper value limit or upper cutoff value, that will be used for weighting.
                     This will change the slot distribution, which helps narrow down to more meaningfully weighting results.
 
-                    Example: Entry1 is 100 days old, Entry2 is 7 days old, Entry3 is 1000 days old
-                    Without a upper_limit the weights will be distributed between 0-1000 days, with a upper_limit: 100 days
-                    weights will be distributed between 0-100 days and any value larger than upper_limit, gets the highest score.
-                    So we can smoothly distribute the rest between 0-100 days.
+    Example:
+                      Entry1 is 100 days old, Entry2 is 7 days old, Entry3 is 1000 days old
+                      Without a upper_limit the weights will be distributed between 0-1000 days, with a upper_limit: 100 days
+                      weights will be distributed between 0-100 days and any value larger than upper_limit, gets the highest score.
+                      So we can smoothly distribute the rest between 0-100 days.
 
-    delta_distance: The distance, step until a new slot is used for weighting.
+    delta_distance  The distance, step until a new slot is used for weighting.
                     Think of this like: Any value that is within this distance will get the same weight for the step.
                     NOTE: If not given the delta_distance will be distributed over 10 distinct steps
 
-                    Example: Size1 = 4000 MB, Size2 = 3000 MB, Size3 = 700 MB
-                             With a weight: 50 and delta_distance: 1200
-                             Size1 and Size2 both get the maximum weight of 50, while Size3 gets the weight for the 0-1200 MB step.
+    Example:
+                      Size1 = 4000 MB, Size2 = 3000 MB, Size3 = 700 MB
+                      With a weight: 50 and delta_distance: 1200
+                      Size1 and Size2 both get the maximum weight of 50, while Size3 gets the weight for the 0-1200 MB step.
+    =============== ==============================================================================================================
 
     Example::
+
         simple:
         sort_by_weight:
             - field: quality
@@ -71,6 +78,7 @@ class PluginSortByWeight:
             upper_limit: 100        # anything over 100 grabs is fine and gets maximum weight
 
             In this example the best result can have a 'sort_by_weight_sum' of sum = 80 + 30 + 20
+
     """
 
     schema = {

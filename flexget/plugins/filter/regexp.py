@@ -14,25 +14,27 @@ logger = logger.bind(name='regexp')
 class FilterRegexp:
     """All possible forms.
 
-    regexp:
-      [operation]:           # operation to perform on matches
-        - [regexp]           # simple regexp
-        - [regexp]: <path>   # override path
-        - [regexp]:
-            [path]: <path>   # override path
-            [not]: <regexp>  # not match
-            [from]: <field>  # search from given entry field
-        - [regexp]:
-            [path]: <path>   # override path
-            [not]:           # list of not match regexps
-              - <regexp>
-            [from]:          # search only from these fields
-              - <field>
-      [operation]:
-        - <regexp>
-      [rest]: <operation>    # non matching entries are
-      [from]:                # search only from these fields for all regexps
-        - <field>
+    Configuration options::
+
+        regexp:
+          [operation]:           # operation to perform on matches
+            - [regexp]           # simple regexp
+            - [regexp]: <path>   # override path
+            - [regexp]:
+                [path]: <path>   # override path
+                [not]: <regexp>  # not match
+                [from]: <field>  # search from given entry field
+            - [regexp]:
+                [path]: <path>   # override path
+                [not]:           # list of not match regexps
+                  - <regexp>
+                [from]:          # search only from these fields
+                  - <field>
+          [operation]:
+            - <regexp>
+          [rest]: <operation>    # non matching entries are
+          [from]:                # search only from these fields for all regexps
+            - <field>
 
     Possible operations: accept, reject, accept_excluding, reject_excluding
     """
@@ -191,9 +193,9 @@ class FilterRegexp:
         """Return set of entries that matched regexps.
 
         :param entries: entries to filter
-        :param operation: one of 'accept' 'reject' 'accept_excluding' and 'reject_excluding'
+        :param operation: one of ``accept`` ``reject`` ``accept_excluding`` and ``reject_excluding``
                           accept and reject will be called on the entry if any of the regexps match
-                          *_excluding operations will be called if any of the regexps don't match
+                          ``*_excluding`` operations will be called if any of the regexps don't match
         :param regexps: list of {compiled_regexp: options} dictionaries
         """
         matched = set()

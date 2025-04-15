@@ -28,34 +28,35 @@ class Medusa:
         """Return ALL of the shows monitored by Medusa.
 
         This includes both ongoing and ended.
-        Syntax:
+        Syntax::
 
-        medusa:
-          base_url=<value>
-          port=<value>
-          username=<value>
-          password=<value>
+            medusa:
+              base_url=<value>
+              port=<value>
+              username=<value>
+              password=<value>
 
         Options base_url, username and password are required.
 
         Use with input plugin like discover and/or configure_series.
 
-        Example:
-        download-tv-task:
-          configure_series:
-            from:
-              medusa:
-                base_url: http://localhost
-                port: 8531
-                username: USERNAME
-                password: PASSWORD
-          discover:
-            what:
-              - next_series_episodes: yes
-            from:
-              torrentz: any
-          download:
-            /download/tv
+        Example::
+
+            download-tv-task:
+              configure_series:
+                from:
+                  medusa:
+                    base_url: http://localhost
+                    port: 8531
+                    username: USERNAME
+                    password: PASSWORD
+              discover:
+                what:
+                  - next_series_episodes: yes
+                from:
+                  torrentz: any
+              download:
+                /download/tv
 
         Note that when using the configure_series plugin with Medusa
         you are basically synced to it, so removing a show in Medusa will

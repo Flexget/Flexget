@@ -130,7 +130,7 @@ def process_config(
 
     If schema is not given, uses the root config schema.
 
-    :returns: A list with :class:`jsonschema.ValidationError`s if any
+    :returns: A list with :class:`jsonschema.ValidationError` if any
 
     """
     if schema is None:
@@ -378,7 +378,7 @@ def set_error_message(error: jsonschema.ValidationError) -> None:
 def select_child_errors(validator, errors):
     """Look through subschema errors.
 
-     If any subschema is determined to be the intended one,
+    If any subschema is determined to be the intended one,
     (based on 'type' keyword errors) error from its branch will be released instead of the parent error.
     """
     for error in errors:

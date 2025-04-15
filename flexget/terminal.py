@@ -38,7 +38,7 @@ class _Console(rich.console.Console):
         self.print(text, *args, **kwargs)
 
     def print(self, *args, **kwargs) -> None:
-        # Also capture calls directly to console.print
+        """Also capture calls directly to ``console.print``."""
         _patchable_console(*args, **kwargs)
 
     def _print(self, *args, **kwargs):

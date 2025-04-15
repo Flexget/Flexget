@@ -1,26 +1,19 @@
-# .readthedocs.yaml
-# Read the Docs configuration file
-# See https://docs.readthedocs.io/en/stable/config-file/v2.html for details
-
-# Required
 version: 2
 
-# Set the version of Python and other tools you might need
 build:
-  os: ubuntu-24.04 # renovate: datasource=docker depName=ubuntu versioning=ubuntu
+  os: ubuntu-lts-latest
   tools:
     python: '3.12' # renovate: datasource=python-version depName=python
+  jobs:
+    post_install:
+      - sphinx-apidoc -ePT --remove-old -o docs/api flexget
 
-# Build documentation in the docs/ directory with Sphinx
 sphinx:
   configuration: docs/conf.py
+  fail_on_warning: true
 
-# If using Sphinx, optionally build your docs in additional formats such as PDF
-# formats:
-#   - pdf
-
-# Optionally declare the Python requirements required to build your docs
 python:
   install:
-  - method: pip
-    path: .
+    - requirements: docs/requirements.txt
+    - method: pip
+      path: .

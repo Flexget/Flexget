@@ -18,14 +18,14 @@ class MsTeamsNotifier:
 
     Example::
 
-    notify:
-      entries:
-        via:
-          ms_teams:
-            web_hook_url: <string>
-            [message: <string>]
-            [title: <string>]
-            [theme_color: <string>]
+        notify:
+          entries:
+            via:
+              ms_teams:
+                web_hook_url: <string>
+                [message: <string>]
+                [title: <string>]
+                [theme_color: <string>]
     """
 
     schema = {

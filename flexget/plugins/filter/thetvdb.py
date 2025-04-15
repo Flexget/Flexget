@@ -17,68 +17,68 @@ class FilterTvdb:
 
     Configuration:
 
-    Note: All parameters are optional. Some are mutually exclusive.
+    Note: All parameters are optional. Some are mutually exclusive. ::
 
-    min_series_rating: <num>
-    min_episode_rating: <num>
-    min_episode_air_year: <num>
-    max_episode_air_year: <num>
-    min_episode_runtime: <num>
-    max_episode_runtime: <num>
+        min_series_rating: <num>
+        min_episode_rating: <num>
+        min_episode_air_year: <num>
+        max_episode_air_year: <num>
+        min_episode_runtime: <num>
+        max_episode_runtime: <num>
 
-    # reject if genre contains any of these
-    reject_content_rating:
-        - TV-MA
-    # accept only this content rating
-    accept_content_rating:
-        - TV-PG
+        # reject if genre contains any of these
+        reject_content_rating:
+            - TV-MA
+        # accept only this content rating
+        accept_content_rating:
+            - TV-PG
 
-    # accept only these networks
-    accept_network:
-        - NBC
-    # reject if this network
-    reject_network:
-        - ABC
+        # accept only these networks
+        accept_network:
+            - NBC
+        # reject if this network
+        reject_network:
+            - ABC
 
-    # reject if genre contains any of these
-    reject_genres:
-        - drama
-        - romance
+        # reject if genre contains any of these
+        reject_genres:
+            - drama
+            - romance
 
-    # reject if status contains any of these
-    reject_status:
-        - Ended
+        # reject if status contains any of these
+        reject_status:
+            - Ended
 
-    # reject if language contain any of these
-    reject_languages:
-        - fr
-    # accept only this language
-    accept_languages:
-        - en
+        # reject if language contain any of these
+        reject_languages:
+            - fr
+        # accept only this language
+        accept_languages:
+            - en
 
-    # Actors below take into account series actors, and guest stars
-    # accept episode with any of these actors
-    accept_actors:
-        - Heidi Klum
-        - Bruce Willis
-    # reject episode if it has any of these actors
-    reject_actors:
-        - Cher
-        - Tamala Jones
+        # Actors below take into account series actors, and guest stars
+        # accept episode with any of these actors
+        accept_actors:
+            - Heidi Klum
+            - Bruce Willis
+        # reject episode if it has any of these actors
+        reject_actors:
+            - Cher
+            - Tamala Jones
 
-    # accept all episodes by these writers
-    accept_writers:
-        - Andrew W. Marlowe
-    # reject episodes by these writers
-    reject_writers:
-        - Barry Schindel
+        # accept all episodes by these writers
+        accept_writers:
+            - Andrew W. Marlowe
+        # reject episodes by these writers
+        reject_writers:
+            - Barry Schindel
 
-    # accept all episodes by these directors
-    accept_directors:
-        - Rob Bowman
-    # reject movies by these directors
-    reject_directors:
-        - John Terlesky
+        # accept all episodes by these directors
+        accept_directors:
+            - Rob Bowman
+        # reject movies by these directors
+        reject_directors:
+            - John Terlesky
     """
 
     schema = {
