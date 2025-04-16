@@ -59,13 +59,13 @@ class LogFilter:
     """Prevent entries with specific text from being logged.
 
     Example::
+
       log_filter:
       - message: in a galaxy
       - message: far far away
       - message: whatever text
       - message: what the heck?
         plugin: series
-
     """
 
     schema = SCHEMA

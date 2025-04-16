@@ -17,12 +17,12 @@ class UrlRewriteRmz:
 
     Version 0.1
 
-    Configuration
+    Configuration ::
 
-    rmz:
-      filehosters_re:
-        - domain\.com
-        - domain2\.org
+        rmz:
+          filehosters_re:
+            - domain\.com
+            - domain2\.org
 
     Only add links that match any of the regular expressions listed under filehosters_re.
 
@@ -33,9 +33,10 @@ class UrlRewriteRmz:
     Therefore, it is recommended, that you configure your output to use the
     'urls' field instead of the 'url' field.
 
-    For example, to use jdownloader 2 as output, you would use the exec plugin:
-    exec:
-      - echo "text={{urls}}" >> "/path/to/jd2/folderwatch/{{title}}.crawljob"
+    For example, to use jdownloader 2 as output, you would use the exec plugin::
+
+        exec:
+          - echo "text={{urls}}" >> "/path/to/jd2/folderwatch/{{title}}.crawljob"
     """
 
     schema = {

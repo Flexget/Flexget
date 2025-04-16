@@ -22,27 +22,26 @@ class PushsaferNotifier:
 
     Example::
 
-    notify:
-      entries:
-        via:
-          - pushsafer:
-              private_key: <string> your private key (can also be a alias key) - Required
-              url: <string> (default: '{{imdb_url}}')
-              url_title: <string> (default: (none))
-              device: <string> ypur device or device group id (default: (none))
-              icon: <integer> (default is 1)
-              iconcolor: <string> (default is (none))
-              sound: <integer> (default is (none))
-              vibration: <integer> (default is 0)
-              timetolive: <integer> (default: (none))
-              priority: <integer> (default: 0))
-              retry: <integer> (default: (none)))
-              expire: <integer> (default: (none)))
-              confirm: <integer> (default: (none)))
-              answer: <integer> (default: 0))
-              answeroptions: <string> (default: (none)))
-              answerforce: <integer> (default: 0))
-
+        notify:
+          entries:
+            via:
+              - pushsafer:
+                  private_key: <string> your private key (can also be a alias key) - Required
+                  url: <string> (default: '{{imdb_url}}')
+                  url_title: <string> (default: (none))
+                  device: <string> ypur device or device group id (default: (none))
+                  icon: <integer> (default is 1)
+                  iconcolor: <string> (default is (none))
+                  sound: <integer> (default is (none))
+                  vibration: <integer> (default is 0)
+                  timetolive: <integer> (default: (none))
+                  priority: <integer> (default: 0))
+                  retry: <integer> (default: (none)))
+                  expire: <integer> (default: (none)))
+                  confirm: <integer> (default: (none)))
+                  answer: <integer> (default: 0))
+                  answeroptions: <string> (default: (none)))
+                  answerforce: <integer> (default: 0))
     """
 
     schema = {

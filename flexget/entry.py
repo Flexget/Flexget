@@ -266,10 +266,7 @@ class Entry(LazyDict, Serializer):
     # TODO: this is too manual, maybe we should somehow check this internally and throw some exception if
     # application is trying to operate on invalid entry
     def isvalid(self) -> bool:
-        """Return True if entry is valid. Return False if this cannot be used.
-
-        :rtype: bool
-        """
+        """Return True if entry is valid. Return False if this cannot be used."""
         if 'title' not in self:
             return False
         if 'url' not in self:
@@ -308,7 +305,6 @@ class Entry(LazyDict, Serializer):
         :param template: A template string or FlexGetTemplate that uses jinja2 or python string replacement format.
         :param native: If True, and the rendering result can be all native python types, not just strings.
         :return: The result of the rendering.
-        :rtype: string
         :raises RenderError: If there is a problem.
         """
         if not isinstance(template, (str, FlexGetTemplate)):

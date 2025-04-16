@@ -15,28 +15,29 @@ class MQTTNotifier:
     """Send messages via MQTT.
 
     Example::
-    notify:
-      entries:
-        via:
-          - mqtt:
-              broker_address: "iot.eclipse.org"
-              topic: "flexget/notifications"
-              [broker_port: 1883]
-              [broker_timeout: 30]
-              [broker_transport: ['tcp','websockets'] ]
-              [broker_protocol: ['MQTTv31', 'MQTTv311'] ]
-              [username: yourUsernameHere]
-              [password: yourPasswordHere]
-              [encrypted_communication: True/False]
-              [certificates:
-                  broker_ca_cert: /path/to/pem/encoded/broker_ca_certificate.crt
-                  client_cert: /path/to/pem/encoded/client_certificate.crt
-                  client_key: /path/to/pem/encoded/client_certificate.key
-                  validate_broker_cert: True/False
-                  tls_version: ['tlsv1.2', 'tlsv1.1', 'tlsv1']
-              ]
-              [qos: [0,1,2] ]
-              [retain: True/False]
+
+        notify:
+          entries:
+            via:
+              - mqtt:
+                  broker_address: "iot.eclipse.org"
+                  topic: "flexget/notifications"
+                  [broker_port: 1883]
+                  [broker_timeout: 30]
+                  [broker_transport: ['tcp','websockets'] ]
+                  [broker_protocol: ['MQTTv31', 'MQTTv311'] ]
+                  [username: yourUsernameHere]
+                  [password: yourPasswordHere]
+                  [encrypted_communication: True/False]
+                  [certificates:
+                      broker_ca_cert: /path/to/pem/encoded/broker_ca_certificate.crt
+                      client_cert: /path/to/pem/encoded/client_certificate.crt
+                      client_key: /path/to/pem/encoded/client_certificate.key
+                      validate_broker_cert: True/False
+                      tls_version: ['tlsv1.2', 'tlsv1.1', 'tlsv1']
+                  ]
+                  [qos: [0,1,2] ]
+                  [retain: True/False]
     """
 
     schema = {

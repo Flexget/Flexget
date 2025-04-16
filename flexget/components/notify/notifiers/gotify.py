@@ -18,13 +18,14 @@ class GotifyNotifier:
 
     Example::
 
-    notify:
-      entries:
-        via:
-          - gotify:
-              url: <GOTIFY_SERVER_URL>
-              token: <GOTIFY_TOKEN>
-              priority: <PRIORITY>
+        notify:
+          entries:
+            via:
+              - gotify:
+                  url: <GOTIFY_SERVER_URL>
+                  token: <GOTIFY_TOKEN>
+                  priority: <PRIORITY>
+
     Configuration parameters are also supported from entries (eg. through set).
     """
 

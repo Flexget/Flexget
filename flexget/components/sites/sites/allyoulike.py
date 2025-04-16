@@ -42,19 +42,20 @@ class UrlRewriteAllyoulike:
     Therefore, it is recommended, that you configure your output to use the
     'urls' field instead of the 'url' field.
 
-    For example, to use jdownloader 2 as output, you would use the exec plugin:
-    exec:
-      - echo "text={{urls}}" >> "/path/to/jd2/folderwatch/{{title}}.crawljob"
+    For example, to use jdownloader 2 as output, you would use the exec plugin::
+
+        exec:
+          - echo "text={{urls}}" >> "/path/to/jd2/folderwatch/{{title}}.crawljob"
 
     The plugin is intended to be used in conjunction with the html plugin.
 
-    Example configuration for the html plugin:
+    Example configuration for the html plugin::
 
-    html:
-      url: "http://www.allyoulike.com/category/movies/"
-      title_from: link
-      links_re:
-        - allyoulike.com/\d*/(?!renew-or-purchase|for-vip-members-only)[^/]*/$
+        html:
+          url: "http://www.allyoulike.com/category/movies/"
+          title_from: link
+          links_re:
+            - allyoulike.com/\d*/(?!renew-or-purchase|for-vip-members-only)[^/]*/$
     """
 
     # urlrewriter API

@@ -28,7 +28,7 @@ For help, see GitHub's guides on [forking a repo](https://help.github.com/articl
 When submitting pull requests:
 
 - Submit PRs against the [develop](https://github.com/Flexget/Flexget/tree/develop) branch.
-- Explain in your PR the bug you are fixing or feature you are adding. Reference ticket numbers if relevant.
+- Explain in your PR the bug you are fixing or feature you are adding. Reference issue numbers if relevant.
 - If config changes are needed, mention those as well. They will be needed for the
   [UpgradeActions](http://flexget.com/wiki/UpgradeActions) page upon merging anyway.
 - Make separate PRs for separate ideas. The smaller each PR is the easier it is to get it reviewed and merged.

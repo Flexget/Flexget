@@ -38,29 +38,29 @@ class RegexpParse:
       #TODO: consider a mode field that allows a growing list for a field instead of just setting to
             # first match
 
-    Example config
+    Example config ::
 
-    regexp_parse:
-      source: http://username:password@ezrss.it/feed/
-      encoding: "utf-8"
-      sections:
-        - {regexp: "(?<=<item>).*?(?=</item>)", flags: "DOTALL,IGNORECASE"}
+        regexp_parse:
+          source: http://username:password@ezrss.it/feed/
+          encoding: "utf-8"
+          sections:
+            - {regexp: "(?<=<item>).*?(?=</item>)", flags: "DOTALL,IGNORECASE"}
 
-      keys:
-        title:
-          regexps:
-            - {regexp: '(?<=<title><!\[CDATA\[).*?(?=\]\]></title>)'} #comment
-        url:
-          regexps:
-            - {regexp: "magnet:.*?(?=])"}
-        custom_field:
-          regexps:
-            - {regexp: "custom regexps", flags: "comma separated list of flags (see python regex docs)"}
-          required: False
-        custom_field2:
-          regexps:
-            - {regexp: 'first custom regexps'}
-            - {regexp: 'can't find first regexp so try this one'}
+          keys:
+            title:
+              regexps:
+                - {regexp: '(?<=<title><!\[CDATA\[).*?(?=\]\]></title>)'} #comment
+            url:
+              regexps:
+                - {regexp: "magnet:.*?(?=])"}
+            custom_field:
+              regexps:
+                - {regexp: "custom regexps", flags: "comma separated list of flags (see python regex docs)"}
+              required: False
+            custom_field2:
+              regexps:
+                - {regexp: 'first custom regexps'}
+                - {regexp: 'can't find first regexp so try this one'}
     """
 
     # dict used to convert string values of regexp flags to int

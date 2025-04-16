@@ -24,16 +24,16 @@ class RapidpushNotifier:
 
     Example::
 
-    notify:
-      entries:
-        via:
-          - rapidpush:
-              apikey: xxxxxxx (can also be a list of api keys)
-              [category: category, default FlexGet]
-              [group: device group, default no group]
-              [channel: the broadcast notif. channel; if provided it will be send to the channel subscribers instead of
-                  your devices, default no channel]
-              [priority: 0 - 6 (6 = highest), default 2 (normal)]
+        notify:
+          entries:
+            via:
+              - rapidpush:
+                  apikey: xxxxxxx (can also be a list of api keys)
+                  [category: category, default FlexGet]
+                  [group: device group, default no group]
+                  [channel: the broadcast notif. channel; if provided it will be send to the channel subscribers instead of
+                      your devices, default no channel]
+                  [priority: 0 - 6 (6 = highest), default 2 (normal)]
     """
 
     schema = {

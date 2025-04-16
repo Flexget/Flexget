@@ -27,6 +27,7 @@ class ReuseTLSSessionFTP(ftplib.FTP_TLS):
     """
 
     def ntransfercmd(self, cmd, rest=None):
+        """Initiate a transfer using shared TLS session over the data connection."""
         conn, size = ftplib.FTP.ntransfercmd(self, cmd, rest)
         if self._prot_p:
             conn = self.context.wrap_socket(

@@ -1,0 +1,15 @@
+.navbar-brand.logo {
+  height: 55px;
+}
+
+#ethical-ad-placement {
+  max-width: 180px;
+}
+
+.sd-card .sd-card-img-top {
+  height: 60px;
+  width: 60px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 10px;
+}

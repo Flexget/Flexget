@@ -76,14 +76,15 @@ class TextProcessingError(Exception):
 class LostFilm:
     """Grab new torrents from lostfilm RSS feed.
 
-    Example:
+    Example::
+
       lostfilm: yes
 
-    or
+    or ::
 
       lostfilm: <lf_session_cookie_value>
 
-    Advanced usage:
+    Advanced usage::
 
       lostfilm:
         lf_session: <lf_session_cookie_value>
@@ -91,7 +92,6 @@ class LostFilm:
         site_urls:
           - "http://www.example.com/"
           - "https://www.example.org/"
-
     """
 
     schema = {

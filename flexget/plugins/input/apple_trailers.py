@@ -14,33 +14,43 @@ logger = logger.bind(name='apple_trailers')
 
 
 class AppleTrailers:
-    """Adds support for Apple.com movie trailers.
+    """Add support for Apple.com movie trailers.
 
     Configuration:
-    quality: Set the desired resolution - 480p, 720p or 1080p. default '720p'
-    genres:  List of genres used to filter the entries. If set, the
-    trailer must match at least one listed genre to be accepted. Genres
-    that can be used: Action and Adventure, Comedy, Documentary, Drama,
-    Family, Fantasy, Foreign, Horror, Musical, Romance, Science Fiction,
-    Thriller. default '' (all)
 
-    apple_trailers:
-      quality: 720p
-      genres: ['Action and Adventure']
+    quality
+      Set the desired resolution - 480p, 720p or 1080p. default '720p'
+    genres
+      List of genres used to filter the entries. If set, the
+      trailer must match at least one listed genre to be accepted. Genres
+      that can be used: Action and Adventure, Comedy, Documentary, Drama,
+      Family, Fantasy, Foreign, Horror, Musical, Romance, Science Fiction,
+      Thriller. default '' (all)
+
+    Example::
+
+      apple_trailers:
+        quality: 720p
+        genres: ['Action and Adventure']
 
     Alternatively, a simpler configuration format can be used. This uses
-    the default genre filter, all:
+    the default genre filter, all::
 
-    apple_trailers: 720p
+      apple_trailers: 720p
 
-    This plugin adds the following fields to the entry:
-      movie_name, movie_year, genres, apple_trailers_name, movie_studio
-    movie_name: Name of the movie
-    movie_year: Year the movie was/will be released
-    genres: Comma-separated list of genres that apply to the movie
-    apple_trailers_name: Contains the Apple-supplied name of the clip,
-    such as 'Clip 2', 'Trailer', 'Winter Olympic Preview'
-    movie_studio: Name of the studio that makes the movie
+    This plugin adds the following fields to the entry: ``movie_name``, ``movie_year``, ``genres``, ``apple_trailers_name``, ``movie_studio``
+
+    movie_name
+      Name of the movie
+    movie_year
+      Year the movie was/will be released
+    genres
+      Comma-separated list of genres that apply to the movie
+    apple_trailers_name
+      Contains the Apple-supplied name of the clip,
+      such as 'Clip 2', 'Trailer', 'Winter Olympic Preview'
+    movie_studio
+      Name of the studio that makes the movie
     """
 
     movie_data_url = 'http://trailers.apple.com/trailers/feeds/data/'

@@ -36,25 +36,30 @@ class SftpConfig(NamedTuple):
 class SftpList:
     """Generate entries from SFTP. This plugin requires the pysftp Python module and its dependencies.
 
-    Configuration:
+    Configuration options
 
-    host:                 Host to connect to.
-    port:                 Port the remote SSH server is listening on (default 22).
-    username:             Username to log in as.
-    password:             The password to use. Optional if a private key is provided.
-    private_key:          Path to the private key (if any) to log into the SSH server.
-    private_key_pass:     Password for the private key (if needed).
-    recursive:            Indicates whether the listing should be recursive.
-    get_size:             Indicates whetern to calculate the size of the remote file/directory.
+    ==================    ========================================================================
+    Option                Description
+    ==================    ========================================================================
+    host                  Host to connect to.
+    port                  Port the remote SSH server is listening on (default 22).
+    username              Username to log in as.
+    password              The password to use. Optional if a private key is provided.
+    private_key           Path to the private key (if any) to log into the SSH server.
+    private_key_pass      Password for the private key (if needed).
+    recursive             Indicates whether the listing should be recursive.
+    get_size              Indicates whetern to calculate the size of the remote file/directory.
                           WARNING: This can be very slow when computing the size of directories!
-    files_only:           Indicates wheter to omit diredtories from the results.
-    dirs_only:            Indicates whether to omit files from the results.
-    dirs:                 List of directories to download.
-    socket_timeout_sec:   Socket timeout in seconds (default 15 seconds).
-    connection_tries:     Number of times to attempt to connect before failing (default 3).
-    host_key:             Specifies a host key not already in known_hosts
+    files_only            Indicates wheter to omit diredtories from the results.
+    dirs_only             Indicates whether to omit files from the results.
+    dirs                  List of directories to download.
+    socket_timeout_sec    Socket timeout in seconds (default 15 seconds).
+    connection_tries      Number of times to attempt to connect before failing (default 3).
+    host_key              Specifies a host key not already in known_hosts
+    ==================    ========================================================================
 
-    Example:
+    Example::
+
       sftp_list:
           host: example.com
           username: Username
@@ -65,7 +70,6 @@ class SftpList:
           dirs:
               - '/path/to/list/'
               - '/another/path/'
-
     """
 
     schema = {
@@ -148,17 +152,22 @@ class SftpDownload:
 
     This plugin requires the pysftp Python module and its dependencies.
 
-    Configuration:
+    Configuration options
 
-    to:                  Destination path; supports Jinja2 templating on the input entry. Fields such
+    ==================   =============================================================================
+    Option               Description
+    ==================   =============================================================================
+    to                   Destination path; supports Jinja2 templating on the input entry. Fields such
                          as series_name must be populated prior to input into this plugin using
                          metainfo_series or similar.
-    recursive:           Indicates whether to download directory contents recursively.
-    delete_origin:       Indicates whether to delete the remote files(s) once they've been downloaded.
-    socket_timeout_sec:  Socket timeout in seconds
-    connection_tries:    Number of times to attempt to connect before failing (default 3).
+    recursive            Indicates whether to download directory contents recursively.
+    delete_origin        Indicates whether to delete the remote files(s) once they've been downloaded.
+    socket_timeout_sec   Socket timeout in seconds
+    connection_tries     Number of times to attempt to connect before failing (default 3).
+    ==================   =============================================================================
 
-    Example:
+    Example::
+
       sftp_download:
           to: '/Volumes/External/Drobo/downloads'
           delete_origin: False
@@ -264,22 +273,27 @@ class SftpDownload:
 class SftpUpload:
     """Upload files to a SFTP server. This plugin requires the pysftp Python module and its dependencies.
 
-    host:                 Host to connect to
-    port:                 Port the remote SSH server is listening on. Defaults to port 22.
-    username:             Username to log in as
-    password:             The password to use. Optional if a private key is provided.
-    private_key:          Path to the private key (if any) to log into the SSH server
-    private_key_pass:     Password for the private key (if needed)
-    to:                   Path to upload the file to; supports Jinja2 templating on the input entry. Fields such
+    ==================    ======================================================================================
+    Option                Description
+    ==================    ======================================================================================
+    host                  Host to connect to
+    port                  Port the remote SSH server is listening on. Defaults to port 22.
+    username              Username to log in as
+    password              The password to use. Optional if a private key is provided.
+    private_key           Path to the private key (if any) to log into the SSH server
+    private_key_pass      Password for the private key (if needed)
+    to                    Path to upload the file to; supports Jinja2 templating on the input entry. Fields such
                           as series_name must be populated prior to input into this plugin using
                           metainfo_series or similar.
-    delete_origin:        Indicates whether to delete the original file after a successful
+    delete_origin         Indicates whether to delete the original file after a successful
                           upload.
-    socket_timeout_sec:   Socket timeout in seconds
-    connection_tries:     Number of times to attempt to connect before failing (default 3).
-    host_key:             Specifies a host key not already in known_hosts
+    socket_timeout_sec    Socket timeout in seconds
+    connection_tries      Number of times to attempt to connect before failing (default 3).
+    host_key              Specifies a host key not already in known_hosts
+    ==================    ======================================================================================
 
-    Example:
+    Example::
+
       sftp_list:
           host: example.com
           username: Username
