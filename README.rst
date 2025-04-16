@@ -79,7 +79,7 @@ For more detailed instructions see the `installation guide`_.
 How to contribute
 -----------------------
 
-Refer to `contributor guide <https://flexget.readthedocs.io/en/latest/contributor/index.html>`__.
+Refer to `the contributor guide <https://flexget.readthedocs.io/en/latest/contributor/index.html>`__.
 
 If you don't want to use virtualenv there's ``flexget_vanilla.py`` file which
 can be used to run FlexGet without virtualenv, note that you will need to
