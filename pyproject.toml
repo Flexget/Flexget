@@ -171,6 +171,7 @@ select = [
     "PIE",
     "PL",
     "PT",
+    'PTH',
     "PYI",
     "RET",
     "RSE",
@@ -221,6 +222,8 @@ quote-annotations = true
 known-first-party = ['flexget']
 
 [tool.ruff.lint.per-file-ignores]
+'docs/scripts/*'=['T20']
+"flexget/*"=["PTH"] # TODO
 'scripts/*' = ['T20']
 'tests/*' = ['T20']
 
