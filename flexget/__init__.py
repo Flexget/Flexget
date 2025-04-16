@@ -1,6 +1,8 @@
 import sys
 from typing import TYPE_CHECKING, Optional
 
+from loguru import logger
+
 # __version__ import need to be first in order to avoid circular import within logger
 from ._version import __version__  # noqa: F401
 
@@ -21,7 +23,7 @@ def main(args: Optional['Sequence[str]'] = None):
 
         try:
             manager = Manager(args)
-        except (OSError, ValueError) as e:
+        except (OSError, ValueError):
             options = Manager.parse_initial_options(args)
             log.start(level=options.loglevel, to_file=False)
             if _is_debug():
@@ -29,7 +31,7 @@ def main(args: Optional['Sequence[str]'] = None):
 
                 traceback.print_exc()
             else:
-                print(f'Could not instantiate manager: {e}', file=sys.stderr)
+                logger.opt(exception=True).critical('Could not instantiate manager:')
             sys.exit(1)
         else:
             log.start(
@@ -53,13 +55,13 @@ def main(args: Optional['Sequence[str]'] = None):
                 )
             else:
                 manager.start()
-        except (OSError, ValueError) as e:
+        except (OSError, ValueError):
             if _is_debug():
                 import traceback
 
                 traceback.print_exc()
             else:
-                print(f'Could not start manager: {e}', file=sys.stderr)
+                logger.opt(exception=True).critical('Could not start manager:')
 
             sys.exit(1)
     except KeyboardInterrupt:
@@ -68,7 +70,7 @@ def main(args: Optional['Sequence[str]'] = None):
 
             traceback.print_exc()
 
-        print('Killed with keyboard interrupt.', file=sys.stderr)
+        logger.critical('Killed with keyboard interrupt.')
         sys.exit(1)
 
 
