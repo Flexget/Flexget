@@ -78,7 +78,7 @@ plugin-test = [
 ]
 deluge = ['deluge-client~=1.10']
 qbittorrent = ['qbittorrent-api~=2025.2']
-telegram = ['python-telegram-bot[http2,socks]~=21.9']
+telegram = ['python-telegram-bot[http2,socks]~=22.0']
 transmission = ['transmission-rpc~=7.0']
 # This is all our optional deps installable via extras. Not actually 'all'
 all = [
