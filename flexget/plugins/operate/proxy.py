@@ -39,7 +39,7 @@ class Proxy:
             proxies = config
         else:
             # Map all protocols to the configured proxy
-            proxies = {prot: config for prot in PROTOCOLS}
+            proxies = dict.fromkeys(PROTOCOLS, config)
         logger.verbose('Setting proxy to {}', proxies)
         task.requests.proxies = proxies
 
