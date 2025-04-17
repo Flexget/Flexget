@@ -365,7 +365,7 @@ def get_template(template_name: str, scope: Optional[str] = 'task') -> FlexGetTe
     for location in locations:
         if environment is not None:
             with suppress(TemplateNotFound):
-                return cast(FlexGetTemplate, environment.get_template(location))
+                return cast('FlexGetTemplate', environment.get_template(location))
     err = f'Template not found in templates dir: {template_name}'
     if scope:
         err += f' ({scope})'
@@ -386,12 +386,12 @@ def render(template: Union[FlexGetTemplate, str], context: 'Mapping', native: bo
             template_class = FlexGetNativeTemplate
         try:
             template = cast(
-                FlexGetTemplate, environment.from_string(template, template_class=template_class)
+                'FlexGetTemplate', environment.from_string(template, template_class=template_class)
             )
         except TemplateSyntaxError as e:
             raise RenderError(f'Error in template syntax: {e.message}')
     try:
-        template = cast(FlexGetTemplate, template)
+        template = cast('FlexGetTemplate', template)
         result = template.render(context)
     except Exception as e:
         error = RenderError(f'({type(e).__name__}) {e}')

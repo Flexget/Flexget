@@ -749,7 +749,7 @@ class PluginTransmission(TransmissionBase):
                 obj_labels = obj.get('labels', [])
                 if not isinstance(obj_labels, list):
                     obj_labels = [obj_labels]
-                labels.update({obj_label: None for obj_label in obj_labels})
+                labels.update(dict.fromkeys(obj_labels))
             rendered_labels = []
             for label in labels:
                 try:
