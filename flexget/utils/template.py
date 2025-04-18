@@ -3,7 +3,7 @@ import re
 from contextlib import suppress
 from copy import copy
 from datetime import date, datetime, time
-from pathlib import Path, PurePosixPath, PureWindowsPath
+from pathlib import Path, PureWindowsPath
 from typing import TYPE_CHECKING, Any, AnyStr, Optional, Union, cast
 from unicodedata import normalize
 
