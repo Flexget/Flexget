@@ -7,12 +7,14 @@ on:
     tags:
       - v*.*.*
   pull_request:
+  merge_group:
 permissions: { }
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref || github.run_id }}
+  group: ${{ github.workflow }}-${{ github.event.number || github.ref || github.run_id }}
   cancel-in-progress: true
 jobs:
   build:
+    name: Docker build
     permissions:
       packages: write # to push to ghcr.io
     runs-on: ubuntu-latest
@@ -32,7 +34,7 @@ jobs:
           install: true
 
       - name: Log in to Docker Hub
-        if: github.event_name != 'pull_request'
+        if: github.event_name == 'push'
         uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772 # v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}

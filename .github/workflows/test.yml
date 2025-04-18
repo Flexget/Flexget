@@ -5,9 +5,10 @@ on:
     branches:
       - develop
   pull_request:
+  merge_group:
 permissions: { }
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref || github.run_id }}
+  group: ${{ github.workflow }}-${{ github.event.number || github.ref || github.run_id }}
   cancel-in-progress: true
 env:
   UV_VERSION: 0.6.14 # renovate: datasource=pypi depName=uv
@@ -113,3 +114,18 @@ jobs:
         uses: EnricoMi/publish-unit-test-result-action@afb2984f4d89672b2f9d9c13ae23d53779671984 # v2
         with:
           files: artifacts/**/*.xml
+
+  test-results:
+    name: Test results
+    needs:
+      - publish-test-results
+      - tests
+      - test-scripts
+      - zizmor
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Decide whether the needed jobs succeeded or failed
+        uses: re-actors/alls-green@05ac9388f0aebcb5727afa17fcccfecd6f8ec5fe # v1
+        with:
+          jobs: ${{ toJSON(needs) }}
