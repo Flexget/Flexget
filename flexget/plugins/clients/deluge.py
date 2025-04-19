@@ -178,7 +178,7 @@ class InputDeluge(DelugePlugin):
                 config_path = Path(config['config_path']).expanduser()
                 torrent_path = config_path / 'state' / f'{hash}.torrent'
                 if torrent_path.is_file():
-                    entry['location'] = str(torrent_path)
+                    entry['location'] = torrent_path
                     entry['url'] = torrent_path.as_uri()
                 else:
                     logger.warning('Did not find torrent file at {}', torrent_path)
