@@ -109,7 +109,7 @@ class PendingEntriesAPI(APIResource):
 
         pending_entries = [pending.to_dict() for pending in db.list_pending_entries(**kwargs)]
 
-        total_pages = int(ceil(total_items / float(per_page)))
+        total_pages = ceil(total_items / float(per_page))
 
         if page > total_pages:
             raise NotFoundError(f'page {page} does not exist')

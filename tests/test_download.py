@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 
 import pytest
 from jinja2 import Template
@@ -67,7 +67,7 @@ class TestDownload:
         assert not task.aborted, 'Task should not have aborted'
 
         temp_path = manager.config['tasks']['just_temp']['download']['temp']
-        assert not os.listdir(temp_path)
+        assert not any(Path(temp_path).iterdir())
         entry = task.find_entry(title='entry 4')
         assert not entry.get('file')
 

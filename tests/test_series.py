@@ -323,15 +323,14 @@ class TestFilterSeries:
             'Some.Series.S01E20.720p.XViD-FlexGet should have been accepted'
         )
 
-        # date formats
-        df = [
+        date_formats = [
             'Date.Series.10-11-2008.XViD',
             'Date.Series.10.12.2008.XViD',
             'Date Series 2010 11 17 XViD',
             'Date.Series.2008-10-13.XViD',
             'Date.Series.10.14.09.XViD',
         ]
-        for d in df:
+        for d in date_formats:
             entry = task.find_entry(title=d)
             assert entry, f'Date format did not match {d}'
             assert 'series_parser' in entry, f'series_parser missing from {d}'

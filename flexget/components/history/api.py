@@ -77,7 +77,7 @@ class HistoryAPI(APIResource):
             rsp.headers.extend(pagination)
             return rsp
 
-        total_pages = int(ceil(total_items / float(per_page)))
+        total_pages = ceil(total_items / float(per_page))
 
         if page > total_pages:
             raise NotFoundError(f'page {page} does not exist')

@@ -115,7 +115,7 @@ class SeenSearchAPI(APIResource):
         converted_seen_entry_list = [entry.to_dict() for entry in raw_seen_entries_list]
 
         # Total number of pages
-        total_pages = int(ceil(total_items / float(per_page)))
+        total_pages = ceil(total_items / float(per_page))
 
         # Actual results in page
         actual_size = min(len(converted_seen_entry_list), per_page)

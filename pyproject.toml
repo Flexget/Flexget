@@ -150,50 +150,34 @@ line-length = 99
 extend-exclude = ["flexget/ui"]
 
 [tool.ruff.lint]
-select = [
-    "ASYNC",
-    "B",
-    "C4",
-    "D",
-    "E",
-    "EXE",
-    "F",
-    "FLY",
-    "FURB",
-    "G",
-    "I",
-    "ICN",
-    "ISC",
-    "LOG",
-    "N",
-    "PERF",
-    "PGH",
-    "PIE",
-    "PL",
-    "PT",
-    'PTH',
-    "PYI",
-    "RET",
-    "RSE",
-    "RUF",
-    "SIM",
-    "SLOT",
-    "T10",
-    "T20",
-    "TC",
-    "TD",
-    "TID",
-    "TRY",
-    "UP",
-    "W",
-    "YTT",
-]
+select = ["ALL"]
 ignore = [
+    "A", # flake8-builtins
+    "ANN", # flake8-annotations
+    "ARG", # flake8-unused-arguments
     "B904", # TODO: enable this rule (requires a lot of manual work)
-    "D1", # Missing docstring
+    "BLE001", # blind-except
+    "C901", # complex-structure
+    "COM", # Ruff recommends against using this rule alongside the formatter.
+    "D100", # undocumented-public-module
+    "D101", # undocumented-public-class
+    "D102", # undocumented-public-method
+    "D103", # undocumented-public-function
+    "D104", # undocumented-public-package
+    "D105", # undocumented-magic-method
+    "D107", # undocumented-public-init
     "D203", # incorrect-blank-line-before-class
     "D213", # multi-line-summary-second-line
+    "D415", # duplicate of D400
+    "DTZ", # flake8-datetimez
     "E501", # TODO: enable this rule (requires a lot of manual work)
+    "EM", # flake8-errmsg
+    "ERA001", # commented-out-code
+    "FA100", # TODO: remove this after Python 3.9 is dropped
+    "FBT", # flake8-boolean-trap
+    "FIX002", # We use "TODO" comments as a form of documentation
+    "FIX004", # We use "HACK" comments as a form of documentation
+    "INP001", # implicit-namespace-package
     "N817", # camelcase-imported-as-acronym
     "N818", # error-suffix-on-exception-name
     "PERF203", # TODO: remove this after Python 3.10 is dropped
@@ -208,7 +192,10 @@ ignore = [
     "PLW0642", # self-or-cls-assignment
     "PLW2901", # redefined-loop-name
     "PTH119", # TODO
+    "Q", # Ruff recommends against using this rule alongside the formatter.
     "RUF012", # Maybe can re-enable after https://github.com/astral-sh/ruff/issues/5243
+    "S", # flake8-bandit
+    "SLF001", # private-member-access
     "TD002", # missing-todo-author
     "TD003", # missing-todo-link
     "TRY003", # raise-vanilla-args

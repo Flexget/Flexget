@@ -132,7 +132,7 @@ class PluginsAPI(APIResource):
         sliced_list = plugin_list[start:stop]
 
         # Total number of pages
-        total_pages = int(ceil(total_items / float(per_page)))
+        total_pages = ceil(total_items / float(per_page))
 
         if page > total_pages and total_pages != 0:
             raise NotFoundError(f'page {page} does not exist')

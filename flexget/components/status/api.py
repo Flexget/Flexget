@@ -110,7 +110,7 @@ class TasksStatusAPI(APIResource):
 
         db_status_tasks = db.get_status_tasks(**kwargs)
 
-        total_pages = int(ceil(total_items / float(per_page)))
+        total_pages = ceil(total_items / float(per_page))
 
         if page > total_pages:
             raise NotFoundError(f'page {page} does not exist')
@@ -253,7 +253,7 @@ class TaskStatusExecutionsAPI(APIResource):
 
         executions = [e.to_dict() for e in db.get_executions_by_task_id(**kwargs)]
 
-        total_pages = int(ceil(total_items / float(per_page)))
+        total_pages = ceil(total_items / float(per_page))
 
         if page > total_pages:
             raise NotFoundError(f'page {page} does not exist')
