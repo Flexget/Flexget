@@ -7,7 +7,7 @@ on:
   pull_request_target: # zizmor: ignore[dangerous-triggers]
 permissions: { }
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref || github.run_id }}
+  group: ${{ github.workflow }}-${{ github.event.number || github.ref || github.run_id }}
   cancel-in-progress: true
 env:
   PYTHON_VERSION: '3.13' # renovate: datasource=python-version depName=python
