@@ -10,7 +10,7 @@ babel==2.17.0
     # via
     #   pydata-sphinx-theme
     #   sphinx
-beautifulsoup4==4.13.3
+beautifulsoup4==4.13.4
     # via pydata-sphinx-theme
 certifi==2025.1.31
     # via requests
@@ -46,7 +46,7 @@ roman-numerals-py==3.1.0 ; python_full_version >= '3.11'
     # via sphinx
 snowballstemmer==2.2.0
     # via sphinx
-soupsieve==2.6
+soupsieve==2.7
     # via beautifulsoup4
 sphinx==7.4.7 ; python_full_version < '3.10'
     # via
