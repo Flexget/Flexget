@@ -112,7 +112,7 @@ more-itertools==10.6.0
     #   cherrypy
     #   jaraco-functools
     #   jaraco-text
-packaging==24.2
+packaging==25.0
     # via flexget
 pendulum==3.0.0
     # via flexget
