@@ -124,7 +124,7 @@ class Filesystem:
             entry['timestamp'] = None
         entry['accessed'] = pendulum.from_timestamp(file_stat.st_atime, tz='local')
         entry['modified'] = pendulum.from_timestamp(file_stat.st_mtime, tz='local')
-        entry['created'] = pendulum.from_timestamp(file_stat.st_ctime, tz='local')
+        entry['ctime'] = pendulum.from_timestamp(file_stat.st_ctime, tz='local')
         if entry.isvalid():
             if test_mode:
                 logger.info('Test mode. Entry includes:')
