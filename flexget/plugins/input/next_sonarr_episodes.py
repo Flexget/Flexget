@@ -98,8 +98,8 @@ class NextSonarrEpisodes:
 
     def on_task_input(self, task, config):
         json = self.get_page(task, config, 1)
-        pages = int(
-            math.ceil(json['totalRecords'] / config.get('page_size'))
+        pages = math.ceil(
+            json['totalRecords'] / config.get('page_size')
         )  # Sets number of requested pages
         current_series_id = 0  # Initializes current series parameter
         for page in range(1, pages + 1):

@@ -153,6 +153,8 @@ class TestEntryUnicodeError:
 
 class TestEntryCoercion:
     class MyStr(str):
+        """Helper class for :meth:`test_string_coercion`."""
+
         __slots__ = ()
 
     def test_string_coercion(self):

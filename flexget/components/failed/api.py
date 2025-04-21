@@ -94,7 +94,7 @@ class RetryFailed(APIResource):
 
         failed_entries = [failed.to_dict() for failed in db.get_failures(**kwargs)]
 
-        total_pages = int(ceil(total_items / float(per_page)))
+        total_pages = ceil(total_items / float(per_page))
 
         if page > total_pages:
             raise NotFoundError(f'page {page} does not exist')

@@ -103,7 +103,7 @@ class Rejected(APIResource):
 
         failed_entries = [rejected_entry_to_dict(reject) for reject in db.get_rejected(**kwargs)]
 
-        total_pages = int(ceil(total_items / float(per_page)))
+        total_pages = ceil(total_items / float(per_page))
 
         if page > total_pages:
             raise NotFoundError(f'page {page} does not exist')

@@ -299,9 +299,9 @@ else:
             canonicalized_path: Path = self.__fs.canonicalize(path)
             try:
                 out = []
-                for filename in os.listdir(canonicalized_path):
-                    attr = SFTPAttributes.from_stat((canonicalized_path / filename).stat())
-                    attr.filename = filename
+                for filepath in canonicalized_path.iterdir():
+                    attr = SFTPAttributes.from_stat((canonicalized_path / filepath).stat())
+                    attr.filename = str(filepath.name)
                     out.append(attr)
             except OSError as e:
                 return TestSFTPServer.log_and_return_error_code(e)

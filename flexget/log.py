@@ -184,8 +184,8 @@ def start(
         logger.add(
             filename,
             level=level,
-            rotation=int(os.environ.get(ENV_MAXBYTES, 1000 * 1024)),
-            retention=int(os.environ.get(ENV_MAXCOUNT, 9)),
+            rotation=int(os.environ.get(ENV_MAXBYTES, str(1000 * 1024))),
+            retention=int(os.environ.get(ENV_MAXCOUNT, str(9))),
             encoding='utf-8',
             format=LOG_FORMAT,
             filter=_log_filterer,

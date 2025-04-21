@@ -275,7 +275,7 @@ class SeriesAPI(APIResource):
             series_list.append(series_object)
 
         # Total number of pages
-        total_pages = int(ceil(total_items / float(per_page)))
+        total_pages = ceil(total_items / float(per_page))
 
         if total_pages < page and total_pages != 0:
             raise NotFoundError(f'page {page} does not exist')
@@ -477,7 +477,7 @@ class SeriesSeasonsAPI(APIResource):
 
         seasons = [season.to_dict() for season in db.show_seasons(show, **kwargs)]
 
-        total_pages = int(ceil(total_items / float(per_page)))
+        total_pages = ceil(total_items / float(per_page))
 
         if total_pages < page and total_pages != 0:
             raise NotFoundError(f'page {page} does not exist')
@@ -609,7 +609,7 @@ class SeriesEpisodesAPI(APIResource):
 
         episodes = [episode.to_dict() for episode in db.show_episodes(show, **kwargs)]
 
-        total_pages = int(ceil(total_items / float(per_page)))
+        total_pages = ceil(total_items / float(per_page))
 
         if total_pages < page and total_pages != 0:
             raise NotFoundError(f'page {page} does not exist')
@@ -782,7 +782,7 @@ class SeriesSeasonsReleasesAPI(APIResource):
         release_items = [release.to_dict() for release in db.get_season_releases(**kwargs)]
 
         # Total number of pages
-        total_pages = int(ceil(total_items / float(per_page)))
+        total_pages = ceil(total_items / float(per_page))
 
         if total_pages < page and total_pages != 0:
             raise NotFoundError(f'page {page} does not exist')
@@ -1035,7 +1035,7 @@ class SeriesEpisodeReleasesAPI(APIResource):
         release_items = [release.to_dict() for release in db.get_episode_releases(**kwargs)]
 
         # Total number of pages
-        total_pages = int(ceil(total_items / float(per_page)))
+        total_pages = ceil(total_items / float(per_page))
 
         if total_pages < page and total_pages != 0:
             raise NotFoundError(f'page {page} does not exist')

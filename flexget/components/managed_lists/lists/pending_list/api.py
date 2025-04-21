@@ -246,7 +246,7 @@ class PendingListEntriesAPI(APIResource):
         entries = [entry.to_dict() for entry in db.get_entries_by_list_id(**kwargs)]
 
         # Total number of pages
-        total_pages = int(ceil(total_items / float(per_page)))
+        total_pages = ceil(total_items / float(per_page))
 
         if page > total_pages:
             raise NotFoundError(f'page {page} does not exist')
