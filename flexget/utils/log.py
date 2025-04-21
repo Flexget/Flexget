@@ -93,7 +93,7 @@ def log_once(
 
     row = LogMessage(md5sum)
     session.add(row)
-    session.flush()
+    session.commit()
 
     logger.log(once_level, message)
     return True
