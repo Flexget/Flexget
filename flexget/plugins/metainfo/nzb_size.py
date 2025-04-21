@@ -41,9 +41,9 @@ class NzbSize:
 
                 filename = entry['file']
                 logger.debug('reading {}', filename)
-                with open(filename).read() as xmldata:
+                with open(filename) as file:
                     try:
-                        nzbfiles = nzb_parser.parse(xmldata)
+                        nzbfiles = nzb_parser.parse(file.read())
                     except Exception:
                         logger.debug('{} is not a valid nzb', entry['title'])
                         continue
