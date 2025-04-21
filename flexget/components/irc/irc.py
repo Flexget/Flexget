@@ -943,8 +943,7 @@ class IRCConnectionManager:
                 config_hash['names'][conn_name] = get_config_hash(config)
             except (MissingConfigOption, TrackerFileParseError, TrackerFileError, OSError) as e:
                 logger.error(e)
-                if conn_name in irc_connections:
-                    del irc_connections[conn_name]  # remove it from the list of connections
+                irc_connections.pop(conn_name, None)  # remove it from the list of connections
 
         # Now we can start
         for connection in irc_connections.values():
