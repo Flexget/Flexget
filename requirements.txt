@@ -30,7 +30,7 @@ cffi==1.17.1 ; platform_python_implementation == 'PyPy'
     # via
     #   brotlicffi
     #   zstandard
-charset-normalizer==3.4.1
+charset-normalizer==3.4.2
     # via requests
 cheroot==10.0.1
     # via cherrypy
@@ -164,7 +164,7 @@ rpds-py==0.24.0
     #   referencing
 rpyc==6.0.2
     # via flexget
-setuptools==80.0.0
+setuptools==80.3.1
     # via
     #   pynzb
     #   zc-lockfile
