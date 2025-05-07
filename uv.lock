@@ -955,7 +955,7 @@ requires-dist = [
 [package.metadata.requires-dev]
 all = [
     { name = "deluge-client", specifier = "~=1.10" },
-    { name = "python-telegram-bot", extras = ["http2", "socks"], specifier = "~=21.9" },
+    { name = "python-telegram-bot", extras = ["http2", "socks"], specifier = "~=22.0" },
     { name = "qbittorrent-api", specifier = "~=2025.2" },
     { name = "transmission-rpc", specifier = "~=7.0" },
 ]
@@ -979,14 +979,14 @@ plugin-test = [
     { name = "pillow", specifier = "~=11.0" },
     { name = "plexapi", specifier = "~=4.16" },
     { name = "pysftp", specifier = "~=0.2.9" },
-    { name = "python-telegram-bot", extras = ["http2", "socks"], specifier = "~=21.9" },
+    { name = "python-telegram-bot", extras = ["http2", "socks"], specifier = "~=22.0" },
     { name = "qbittorrent-api", specifier = "~=2025.2" },
     { name = "rarfile", specifier = "~=4.0" },
     { name = "subliminal", specifier = "~=2.1" },
     { name = "transmission-rpc", specifier = "~=7.0" },
 ]
 qbittorrent = [{ name = "qbittorrent-api", specifier = "~=2025.2" }]
-telegram = [{ name = "python-telegram-bot", extras = ["http2", "socks"], specifier = "~=21.9" }]
+telegram = [{ name = "python-telegram-bot", extras = ["http2", "socks"], specifier = "~=22.0" }]
 transmission = [{ name = "transmission-rpc", specifier = "~=7.0" }]
 
 [[package]]
@@ -1187,7 +1187,7 @@ name = "importlib-metadata"
 version = "8.7.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "zipp" },
+    { name = "zipp", marker = "python_full_version < '3.10'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/76/66/650a33bd90f786193e4de4b3ad86ea60b53c89b669a5c7be931fac31cdb0/importlib_metadata-8.7.0.tar.gz", hash = "sha256:d13b81ad223b890aa16c5471f2ac3056cf76c5f10f82d6f9292f0b415f389000", size = 56641, upload-time = "2025-04-27T15:29:01.736Z" }
 wheels = [
@@ -2098,14 +2098,14 @@ wheels = [
 
 [[package]]
 name = "python-telegram-bot"
-version = "21.11.1"
+version = "22.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "httpx" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/4c/74/3ebdc3ee2c323b4577fcc57542f71aa064ac9dac154af0c2f5805e1b9fbd/python_telegram_bot-21.11.1.tar.gz", hash = "sha256:2abda5202f27a838f35e8140e5292af0f4f8fad6c2e5123b2defadd5f4e8ca02", size = 442624, upload-time = "2025-03-01T11:46:54.735Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/61/8c/0bd0d5c6de549ee0ebc2ddf4d49618eec1ece6d25084f3b4ef72bba6590c/python_telegram_bot-22.0.tar.gz", hash = "sha256:acf86f28d86d81cab736177d2988e5bcb27f2248137efd62e02c46e9ba1fe44c", size = 440017, upload-time = "2025-03-15T08:57:43.752Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/27/3b/8f6372e580ba4514335873f64924eb80b80c3d3f8359c2bb2e07bb6d01b9/python_telegram_bot-21.11.1-py3-none-any.whl", hash = "sha256:17f933a7a0569f519d9b672e06d71c29ab3688f1ec575ba59a3ca37922481113", size = 676058, upload-time = "2025-03-01T11:46:52.001Z" },
+    { url = "https://files.pythonhosted.org/packages/15/9f/b8c116f606074c19ec2600a7edc222f158c307ca949de568d67fe2b9d364/python_telegram_bot-22.0-py3-none-any.whl", hash = "sha256:23237f778655e634f08cfebbada96ed3692c2bdd3c20c122e90a6d606d6a4516", size = 673473, upload-time = "2025-03-15T08:57:41.637Z" },
 ]
 
 [package.optional-dependencies]
