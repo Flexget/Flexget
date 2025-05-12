@@ -81,7 +81,7 @@ jobs:
       - name: Extract the uv version in the merge commit
         if: github.event_name == 'pull_request_target'
         id: merge-commit-uv-version
-        uses: mikefarah/yq@c59fa8de59f1f5a16fdbfd1e2a6e97a1b42a64b9 # v4
+        uses: mikefarah/yq@b534aa9ee5d38001fba3cd8fe254a037e4847b37 # v4
         with:
           cmd: yq .env.UV_VERSION merge/.github/workflows/autofix.yml
       - name: Install uv and Python
