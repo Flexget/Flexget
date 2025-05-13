@@ -3,7 +3,7 @@ version: 2
 build:
   os: ubuntu-lts-latest
   tools:
-    python: '3.12' # renovate: datasource=python-version depName=python
+    python: '3.13' # renovate: datasource=python-version depName=python
   jobs:
     post_install:
       - sphinx-apidoc -ePT --remove-old -o docs/api flexget
