@@ -1,6 +1,4 @@
-import os.path
 import re
-from pathlib import Path
 
 from loguru import logger
 
@@ -47,13 +45,11 @@ class MetainfoContentSize:
             if entry.get('location'):
                 # If it is a .torrent or .nzb, don't bother getting the size as it will not be the content's size
                 location = entry['location']
-                if isinstance(location, str):
-                    location = Path(location)
                 if location.suffix in ('.nzb', '.torrent'):
                     continue
                 try:
                     if location.is_file():
-                        amount = os.path.getsize(entry['location'])
+                        amount = entry['location'].stat().st_size
                         logger.trace('setting content size to {}', format_filesize(amount))
                         entry['content_size'] = amount
                         continue
