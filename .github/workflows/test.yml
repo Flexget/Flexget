@@ -34,16 +34,22 @@ jobs:
           version: ${{ env.UV_VERSION }}
       - name: Run tests not requiring optional dependencies
         id: core-tests
-        run: uv run pytest -m 'not require_optional_deps' -n logical --dist loadgroup --junit-xml test-results.xml
+        run: uv run pytest -m 'not require_optional_deps' -n logical --cov --cov-branch --cov-report=xml --dist loadgroup --junit-xml core_test_results.xml
       - name: Run tests requiring optional dependencies
         if: ${{!cancelled() && steps.core-tests.outcome != 'skipped'}}
-        run: uv run --group plugin-test pytest -m 'require_optional_deps' -n logical --dist loadgroup --junit-xml test-results.xml
-      - name: Upload Test Results
-        if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        run: uv run --group plugin-test pytest -m 'require_optional_deps' -n logical --cov --cov-append --cov-branch --cov-report=xml --dist loadgroup --junit-xml optional_test_results.xml
+      - name: Upload test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/test-results-action@f2dba722c67b86c6caa034178c6e4d35335f6706 # v1
         with:
-          name: Test Results (Python ${{ matrix.python-version }} ${{ matrix.operating-system }})
-          path: test-results.xml
+          files: core_test_results.xml,optional_test_results.xml
+          token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@ad3126e916f78f00edff4ed0317cf185271ccc2d  # v5
+        with:
+          fail_ci_if_error: true
+          name: ${{ matrix.operating-system }}-${{ matrix.python-version }}
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   test-scripts:
     name: Test scripts
@@ -95,30 +101,9 @@ jobs:
           sarif_file: results.sarif
           category: zizmor
 
-  publish-test-results:
-    name: Publish Tests Results
-    needs: tests
-    runs-on: ubuntu-latest
-    permissions:
-      checks: write
-      pull-requests: write # needed unless run with comment_mode: off
-    if: always()
-
-    steps:
-      - name: Download Artifacts
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
-        with:
-          path: artifacts
-
-      - name: Publish Test Results
-        uses: EnricoMi/publish-unit-test-result-action@afb2984f4d89672b2f9d9c13ae23d53779671984 # v2
-        with:
-          files: artifacts/**/*.xml
-
   test-results:
     name: Test results
     needs:
-      - publish-test-results
       - tests
       - test-scripts
       - zizmor

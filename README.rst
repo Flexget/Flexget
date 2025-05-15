@@ -6,14 +6,13 @@ FlexGet
 .. image:: https://img.shields.io/pypi/v/Flexget.svg
     :target: https://pypi.python.org/pypi/Flexget
 
+.. image:: https://codecov.io/gh/Flexget/Flexget/graph/badge.svg
+   :target: https://codecov.io/gh/Flexget/Flexget
+
 ..
     Commenting these out for now, as they seem to be broken.
     .. image:: https://api.codacy.com/project/badge/Grade/86bb847efe984c12948bdeccabcbccad
         :target: https://www.codacy.com/app/Flexget/Flexget?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Flexget/Flexget&amp;utm_campaign=Badge_Grade
-
-    .. image:: https://api.codacy.com/project/badge/Coverage/86bb847efe984c12948bdeccabcbccad
-        :target: https://www.codacy.com/app/Flexget/Flexget?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Flexget/Flexget&amp;utm_campaign=Badge_Coverage
-
 
 .. image:: https://img.shields.io/discord/536690097056120833?label=discord
     :target: https://discord.gg/W6CQrJx

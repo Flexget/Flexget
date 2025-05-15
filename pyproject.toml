@@ -55,6 +55,7 @@ dependencies = [
 dev = [
     "pre-commit ~=4.0",
     "pytest ~=8.3",
+    'pytest-cov~=6.1',
     "pytest-xdist ~=3.6",
     "ruff ~=0.11.6",
     "vcrpy ~=7.0",
@@ -102,6 +103,11 @@ flexget-headless = "flexget:main"  # This is useful on Windows to avoid a cmd po
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[tool.coverage.report]
+exclude_also = [
+    "if TYPE_CHECKING"
+]
 
 [tool.doc8]
 ignore = [ "D004" ]
