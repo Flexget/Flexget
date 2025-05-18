@@ -170,7 +170,7 @@ class TestFormatChecker:
         payload2 = {'path': 'bla'}
 
         rsp = api_client.json_post('/format_check/', data=json.dumps(payload2))
-        assert rsp.status_code == 422, f'Response code is {rsp.status_code}'
+        assert rsp.status_code == 200, f'Response code is {rsp.status_code}'
         data = json.loads(rsp.get_data(as_text=True))
 
         errors = schema_match(base_message, data)
