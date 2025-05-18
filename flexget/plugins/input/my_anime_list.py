@@ -1,3 +1,4 @@
+from dateutil.parser import parse as parsedate
 from loguru import logger
 
 from flexget import plugin
@@ -105,15 +106,35 @@ class MyAnimeList:
                     or config['type'] == 'all'
                 )
                 if has_selected_status and has_selected_type and has_selected_airing_status:
-                    # MAL sometimes returns title as an integer
-                    anime['anime_title'] = str(anime['anime_title'])
                     entry = Entry()
-                    entry['title'] = anime['anime_title']
+                    # MAL sometimes returns title as an integer
+                    entry['title'] = str(anime['anime_title'])
                     entry['url'] = f'https://myanimelist.net{anime["anime_url"]}'
-                    entry['mal_name'] = anime['anime_title']
+                    entry['mal_id'] = anime['anime_id']
                     entry['mal_poster'] = anime['anime_image_path']
                     entry['mal_type'] = anime['anime_media_type_string']
                     entry['mal_tags'] = anime['tags']
+                    entry['mal_genres'] = [genre['name'] for genre in anime['genres']]
+                    entry['mal_demographics'] = [demo['name'] for demo in anime['demographics']]
+                    entry['mal_name'] = entry['title']
+                    entry['mal_episodes'] = anime['anime_num_episodes']
+                    entry['mal_airing_status'] = [
+                        k for k, v in AIRING_STATUS.items() if v == anime['anime_airing_status']
+                    ].pop().title() or 'Unknown'
+                    if anime.get('anime_title_eng'):
+                        entry['mal_name_eng'] = str(anime['anime_title_eng'])
+                    if anime.get('anime_start_date_string'):
+                        entry['mal_start_date'] = parsedate(
+                            # Handle undefined Day/Month on unreleased entries
+                            anime['anime_start_date_string'].replace('00', '01'),
+                            dayfirst=False,
+                        )
+                    if anime.get('anime_end_date_string'):
+                        entry['mal_end_date'] = parsedate(
+                            # Handle undefined Day/Month on ongoing/unreleased entries
+                            anime['anime_end_date_string'].replace('00', '01'),
+                            dayfirst=False,
+                        )
                     if entry.isvalid():
                         yield entry
 
