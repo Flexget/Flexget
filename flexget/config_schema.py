@@ -2,13 +2,15 @@ import datetime
 import functools
 import os
 import re
-import string
 from collections import defaultdict
 from json import JSONDecodeError
 from json import loads as json_loads
 from re import Match, Pattern
-from typing import Any, Callable, Optional, Union
+from typing import TYPE_CHECKING, Any, Callable, Optional, Union
 from urllib.parse import parse_qsl, urlparse
+
+if TYPE_CHECKING:
+    import string
 
 import jsonschema
 from jsonschema import ValidationError
