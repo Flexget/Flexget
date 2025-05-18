@@ -3,6 +3,7 @@ import re
 from contextlib import suppress
 from copy import copy
 from datetime import date, datetime, time
+from pathlib import Path, PurePosixPath, PureWindowsPath
 from typing import TYPE_CHECKING, Any, AnyStr, Optional, Union, cast
 from unicodedata import normalize
 
@@ -30,7 +31,6 @@ from flexget.utils.tools import format_filesize, parse_filesize, split_title_yea
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
-    from pathlib import Path
 
     from flexget.entry import Entry
     from flexget.manager import Manager
@@ -135,23 +135,31 @@ class CoercingDateTime(DateTime):
         return Interval(self, dt, absolute=abs)
 
 
-def filter_pathbase(val: 'Path') -> str:
+def filter_pathbase(val: Union[Path, str] = '') -> str:
     """Return base name of a path."""
+    if isinstance(val, str):
+        val = PureWindowsPath(val)
     return val.name
 
 
-def filter_pathname(val: 'Path') -> str:
+def filter_pathname(val: Union[Path, str] = '') -> str:
     """Return base name of a path, without its extension."""
+    if isinstance(val, str):
+        val = PureWindowsPath(val)
     return val.stem
 
 
-def filter_pathext(val: 'Path') -> str:
+def filter_pathext(val: Union[Path, str] = '') -> str:
     """Extension of a path (including the '.')."""
+    if isinstance(val, str):
+        val = PureWindowsPath(val)
     return val.suffix
 
 
-def filter_pathdir(val: 'Path') -> 'Path':
+def filter_pathdir(val: Union[Path, str] = '') -> Union[PureWindowsPath, PurePosixPath, Path]:
     """Directory containing the given path."""
+    if isinstance(val, str):
+        val = PureWindowsPath(val) if '\\' in val and val[1] == ':' else PurePosixPath(val)
     return val.parent
 
 
@@ -280,19 +288,19 @@ def filter_format_size(size: float, si=False, unit=None):
     return format_filesize(size, si=si, unit=unit)
 
 
-def is_fs_file(pathname: 'Path') -> bool:
+def is_fs_file(pathname: Union[Path, str]) -> bool:
     """Test whether item is existing file in filesystem."""
-    return pathname.is_file()
+    return Path(pathname).is_file()
 
 
-def is_fs_dir(pathname: 'Path') -> bool:
+def is_fs_dir(pathname: Union[Path, str]) -> bool:
     """Test whether item is existing directory in filesystem."""
-    return pathname.is_dir()
+    return Path(pathname).is_dir()
 
 
-def is_fs_link(pathname: 'Path') -> bool:
+def is_fs_link(pathname: Union[Path, str]) -> bool:
     """Test whether item is existing link in filesystem."""
-    return pathname.is_symlink()
+    return Path(pathname).is_symlink()
 
 
 class FlexGetTemplate(Template):
