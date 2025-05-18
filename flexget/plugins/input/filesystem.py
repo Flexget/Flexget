@@ -117,14 +117,9 @@ class Filesystem:
         else:
             entry['title'] = filepath.name
         file_stat = filepath.stat()
-        try:
-            entry['timestamp'] = pendulum.from_timestamp(file_stat.st_mtime, tz='local')
-        except Exception as e:
-            logger.warning('Error setting timestamp for {}: {}', filepath, e)
-            entry['timestamp'] = None
-        entry['accessed'] = pendulum.from_timestamp(file_stat.st_atime, tz='local')
-        entry['modified'] = pendulum.from_timestamp(file_stat.st_mtime, tz='local')
-        entry['created'] = pendulum.from_timestamp(file_stat.st_ctime, tz='local')
+        entry['atime'] = pendulum.from_timestamp(file_stat.st_atime, tz='local')
+        entry['mtime'] = pendulum.from_timestamp(file_stat.st_mtime, tz='local')
+        entry['ctime'] = pendulum.from_timestamp(file_stat.st_ctime, tz='local')
         if entry.isvalid():
             if test_mode:
                 logger.info('Test mode. Entry includes:')
