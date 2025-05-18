@@ -274,11 +274,10 @@ def is_path(instance) -> bool:
     result = pat.search(instance)
     if result:
         instance = os.path.dirname(instance[0 : result.start()])
-    if os.path.isdir(os.path.expanduser(instance)):
-        return True
-    error: str = f'`{instance}` does not exist'
-    logger.warning(error)
-    return False
+    if not os.path.isdir(os.path.expanduser(instance)):
+        error: str = f'`{instance}` does not exist'
+        logger.warning(error)
+    return True
 
 
 # TODO: jsonschema has a format checker for uri if rfc3987 is installed, perhaps we should use that
