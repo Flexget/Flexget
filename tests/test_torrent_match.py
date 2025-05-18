@@ -86,7 +86,7 @@ class TestTorrentMatch:
         task = execute_task('test_multi_torrent_empty_name')
 
         assert len(task.accepted) == 1, 'Should have accepted torrent1.mkv'
-        assert task.accepted[0]['path'] == 'torrent_match_test_dir/torrent1'
+        assert task.accepted[0]['path'] == Path('torrent_match_test_dir/torrent1')
 
     @pytest.mark.skipif(
         platform.system() == 'Windows',

@@ -6,6 +6,7 @@ import socket
 import sys
 import tempfile
 from http.client import BadStatusLine
+from pathlib import Path
 from urllib.parse import unquote
 
 from loguru import logger
@@ -418,26 +419,23 @@ class PluginDownload:
 
             # expand variables in path
             try:
-                path = os.path.expanduser(entry.render(path))
+                path = Path(entry.render(path)).expanduser()
             except RenderError as e:
                 entry.fail(f'Could not set path. Error during string replacement: {e}')
                 return
-
-            # Clean illegal characters from path name
-            path = pathscrub(path)
 
             # If we are in test mode, report and return
             if task.options.test:
                 logger.info('Would write `{}` to `{}`', entry['title'], path)
                 # Set a fake location, so the exec plugin can do string replacement during --test #1015
-                entry['location'] = os.path.join(path, 'TEST_MODE_NO_OUTPUT')
+                entry['location'] = path / 'TEST_MODE_NO_OUTPUT'
                 return
 
             # make path
-            if not os.path.isdir(path):
+            if not path.is_dir():
                 logger.debug('Creating directory {}', path)
                 try:
-                    os.makedirs(path)
+                    path.mkdir(parents=True)
                 except Exception:
                     raise plugin.PluginError(f'Cannot create path {path}', logger)
 
@@ -480,10 +478,10 @@ class PluginDownload:
             # remove duplicate spaces
             name = ' '.join(name.split())
             # combine to full path + filename
-            destfile = os.path.join(path, name)
+            destfile = path / name
             logger.debug('destfile: {}', destfile)
 
-            if os.path.exists(destfile):
+            if destfile.exists():
                 import filecmp
 
                 if filecmp.cmp(entry['file'], destfile):
@@ -506,7 +504,7 @@ class PluginDownload:
                     # ignore permission errors
                     import errno
 
-                    if not os.path.exists(destfile):
+                    if not destfile.exists():
                         raise plugin.PluginError(f'Unable to write {destfile}: {err}')
                     if err.errno not in (errno.EPERM, errno.EACCES):
                         raise

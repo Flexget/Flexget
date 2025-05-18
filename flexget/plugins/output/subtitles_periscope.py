@@ -83,17 +83,19 @@ class PluginPeriscope:
         for entry in task.accepted:
             if 'location' not in entry:
                 logger.warning('Cannot act on entries that do not represent a local file.')
-            elif not os.path.exists(entry['location']):
+            elif not entry['location'].exists():
                 entry.fail('file not found: {}'.format(entry['location']))
-            elif '$RECYCLE.BIN' in entry['location']:
+            elif '$RECYCLE.BIN' in str(entry['location']):
                 continue  # ignore deleted files in Windows shares
             elif not config['overwrite'] and self.subbed(entry['location']):
                 logger.warning('cannot overwrite existing subs for {}', entry['location'])
             else:
                 try:
-                    if psc.downloadSubtitle(entry['location'].encode('utf8'), langs):
+                    if psc.downloadSubtitle(str(entry['location']).encode('utf8'), langs):
                         logger.info('Subtitles found for {}', entry['location'])
-                    elif alts and psc.downloadSubtitle(entry['location'].encode('utf8'), alts):
+                    elif alts and psc.downloadSubtitle(
+                        str(entry['location']).encode('utf8'), alts
+                    ):
                         entry.fail('subtitles found for a second-choice language.')
                     else:
                         entry.fail('cannot find any subtitles for now.')

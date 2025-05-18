@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import jinja2
 import pytest
 
@@ -32,6 +34,16 @@ class TestJinjaFilters:
             set:
               size: "{{title|parse_size}}"
               size_si: "{{title|parse_size(si=True)}}"
+          path:
+            mock:
+              - {"title":"path", "location": "/a/b/c.d"}
+            accept_all: yes
+            set:
+              pathdir: "{{location|pathdir}}"
+              pathbase: "{{location|pathbase}}"
+              pathbase2: "{{location|pathdir|pathbase}}"
+              pathname: "{{location|pathname}}"
+              pathext: "{{location|pathext}}"
     """
 
     custom_filters = [
@@ -98,6 +110,14 @@ class TestJinjaFilters:
 
         assert task.accepted[4]['size'] == int(task.accepted[4]['actual'] * 1024**3)
         assert task.accepted[4]['size_si'] == int(task.accepted[4]['actual'] * 1000**3)
+
+    def test_path(self, execute_task):
+        task = execute_task('path')
+        assert Path(task.accepted[0]['pathdir']) == Path('/a/b')
+        assert task.accepted[0]['pathbase'] == 'c.d'
+        assert task.accepted[0]['pathbase2'] == 'b'
+        assert task.accepted[0]['pathname'] == 'c'
+        assert task.accepted[0]['pathext'] == '.d'
 
     @pytest.mark.parametrize('test_filter', custom_filters)
     def test_undefined_preserved(self, test_filter):

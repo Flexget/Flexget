@@ -3,6 +3,7 @@ import types
 import warnings
 from datetime import date, datetime
 from enum import Enum
+from pathlib import Path
 from typing import TYPE_CHECKING, Callable, Optional, Union
 
 import pendulum
@@ -252,6 +253,10 @@ class Entry(LazyDict, Serializer):
             if not isinstance(value, (str, LazyLookup)):
                 raise plugin.PluginError(f'Tried to set title to {value!r}')
             self.setdefault('original_title', value)
+
+        # location handling
+        if key == 'location' and isinstance(value, str) and value != '':
+            value = Path(value)
 
         try:
             logger.trace('ENTRY SET: {} = {!r}', key, value)

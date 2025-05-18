@@ -167,18 +167,22 @@ class PluginSubliminal:
                 if 'location' not in entry:
                     logger.warning('Cannot act on entries that do not represent a local file.')
                     continue
-                if not os.path.exists(entry['location']):
+                if not entry['location'].exists():
                     entry.fail('file not found: {}'.format(entry['location']))
                     continue
-                if '$RECYCLE.BIN' in entry['location']:  # ignore deleted files in Windows shares
+                if '$RECYCLE.BIN' in str(
+                    entry['location']
+                ):  # ignore deleted files in Windows shares
                     continue
 
                 try:
                     entry_languages = set(entry.get('subtitle_languages', [])) or languages
 
-                    if entry['location'].endswith(VIDEO_EXTENSIONS):
-                        video = scan_video(entry['location'])
-                    elif entry['location'].endswith(ARCHIVE_EXTENSIONS):
+                    if entry['location'].suffix in VIDEO_EXTENSIONS:
+                        video = scan_video(
+                            str(entry['location'])
+                        )  # TODO: remove str() type conversion after Python 3.9 support is dropped
+                    elif entry['location'].suffix in ARCHIVE_EXTENSIONS:
                         video = scan_archive(entry['location'])
                     else:
                         entry.reject(
