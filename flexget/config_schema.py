@@ -2,6 +2,7 @@ import datetime
 import functools
 import os
 import re
+import string
 from collections import defaultdict
 from json import JSONDecodeError
 from json import loads as json_loads
@@ -276,7 +277,8 @@ def is_path(instance) -> bool:
         instance = os.path.dirname(instance[0 : result.start()])
     if os.path.isdir(os.path.expanduser(instance)):
         return True
-    logger.warning(f'`{instance}` does not exist')
+    error: string = f'`{instance}` does not exist'
+    logger.warning(error)
     return False
 
 
