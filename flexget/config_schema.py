@@ -9,9 +9,6 @@ from re import Match, Pattern
 from typing import TYPE_CHECKING, Any, Callable, Optional, Union
 from urllib.parse import parse_qsl, urlparse
 
-if TYPE_CHECKING:
-    import string
-
 import jsonschema
 from jsonschema import ValidationError
 from loguru import logger
@@ -279,7 +276,7 @@ def is_path(instance) -> bool:
         instance = os.path.dirname(instance[0 : result.start()])
     if os.path.isdir(os.path.expanduser(instance)):
         return True
-    error: string = f'`{instance}` does not exist'
+    error: str = f'`{instance}` does not exist'
     logger.warning(error)
     return False
 
