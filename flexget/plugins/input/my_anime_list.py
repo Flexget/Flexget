@@ -118,9 +118,15 @@ class MyAnimeList:
                     entry['mal_demographics'] = [demo['name'] for demo in anime['demographics']]
                     entry['mal_name'] = entry['title']
                     entry['mal_episodes'] = anime['anime_num_episodes']
-                    entry['mal_airing_status'] = [
-                        k for k, v in AIRING_STATUS.items() if v == anime['anime_airing_status']
-                    ].pop().title() or 'Unknown'
+                    entry['mal_airing_status'] = (
+                        'Unknown'
+                        if anime['anime_airing_status'] not in AIRING_STATUS.values()
+                        else [
+                            k
+                            for k, v in AIRING_STATUS.items()
+                            if v == anime['anime_airing_status']
+                        ].pop().title()
+                    )
                     if anime.get('anime_title_eng'):
                         entry['mal_name_eng'] = str(anime['anime_title_eng'])
                     if anime.get('anime_start_date_string'):
