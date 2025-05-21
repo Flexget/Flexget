@@ -10,7 +10,10 @@
     ':prHourlyLimitNone',
     ':preserveSemverRanges',
     ':rebaseStalePrs',
-    'schedule:weekly',
+  ],
+  "schedule": [
+    "* 16-23 * * 0",
+    "* 0-12 * * 1"
   ],
   gitIgnoredAuthors: [
     'github-actions[bot]@users.noreply.github.com',
