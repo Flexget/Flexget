@@ -53,7 +53,7 @@ flask==3.1.0
     #   flexget
 flask-compress==1.17
     # via flexget
-flask-cors==5.0.1
+flask-cors==6.0.0
     # via flexget
 flask-login==0.6.3
     # via flexget
