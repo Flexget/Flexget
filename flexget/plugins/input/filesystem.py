@@ -127,7 +127,9 @@ class Filesystem:
                 logger.info(' URL: {}', entry['url'])
                 logger.info(' Filename: {}', entry['filename'])
                 logger.info(' Location: {}', entry['location'])
-                logger.info(' Timestamp: {}', entry['timestamp'])
+                logger.info(' atime: {}', entry['atime'])
+                logger.info(' ctime: {}', entry['ctime'])
+                logger.info(' mtime: {}', entry['mtime'])
             return entry
         logger.error('Non valid entry created: {} ', entry)
         return None
