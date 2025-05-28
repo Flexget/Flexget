@@ -3,7 +3,7 @@ ci:
   skip: [ renovate-config-validator,uv-lock ]
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.11.9
+    rev: v0.11.11
     hooks:
       - id: ruff
         args: [ --fix ]
@@ -13,7 +13,7 @@ repos:
     hooks:
       - id: doc8
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.7.3
+    rev: 0.7.8
     hooks:
       - id: uv-lock
       - id: uv-export
