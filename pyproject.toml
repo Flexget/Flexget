@@ -74,7 +74,7 @@ plugin-test = [
     "plexapi ~=4.16",
     "pysftp ~=0.2.9",
     'rarfile~=4.0',
-    "subliminal ~= 2.1",
+    'subliminal<2.3', # TODO: Update subliminal after https://github.com/Diaoul/subliminal/issues/1302 is resolved.
     { include-group = "all" }
 ]
 deluge = ['deluge-client~=1.10']
