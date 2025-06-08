@@ -288,6 +288,7 @@ class TestSubtitleList:
             'Only one language should have been downloaded which results in failure'
         )
 
+    @pytest.mark.online
     @pytest.mark.require_optional_deps
     def test_subtitle_list_subliminal_success(self, execute_task):
         task = execute_task('subtitle_add_local_file')

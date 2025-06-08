@@ -97,7 +97,7 @@ class TestFilesystem:
         task_name = 'string'
         should_exist = 'dir1', 'dir2', 'file1.mkv', 'file2.txt'
         should_not_exist = [item for item in self.item_list if item not in should_exist]
-        task = execute_task(task_name)
+        task = execute_task(task_name, options={'test': True})
 
         self.assert_check(task, task_name, 'positive', should_exist)
         self.assert_check(task, task_name, 'negative', should_not_exist)
