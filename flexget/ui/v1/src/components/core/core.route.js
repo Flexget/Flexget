@@ -1,24 +1,22 @@
 /* global angular */
 (function () {
-    'use strict';
+  'use strict';
 
-    angular
-        .module('components.core')
-        .config(coreConfig);
+  angular.module('components.core').config(coreConfig);
 
-    function coreConfig(routerHelperProvider) {
-        routerHelperProvider.configureStates(getStates());
-    }
+  function coreConfig(routerHelperProvider) {
+    routerHelperProvider.configureStates(getStates());
+  }
 
-    function getStates() {
-        return [
-            {
-                state: 'flexget',
-                config: {
-                    abstract: true,
-                    templateUrl: 'layout.tmpl.html'
-                }
-            }
-        ];
-    }
-}());
+  function getStates() {
+    return [
+      {
+        state: 'flexget',
+        config: {
+          abstract: true,
+          templateUrl: 'layout.tmpl.html',
+        },
+      },
+    ];
+  }
+})();

@@ -1,13 +1,12 @@
 /* global angular, registerPlugin */
 (function () {
-    'use strict';
+  'use strict';
 
-    angular
-        .module('plugins.seen', [
-            'blocks.pagination',
-            'blocks.exception',
-            'blocks.router'
-        ]);
+  angular.module('plugins.seen', [
+    'blocks.pagination',
+    'blocks.exception',
+    'blocks.router',
+  ]);
 
-    registerPlugin('plugins.seen');
-}());
+  registerPlugin('plugins.seen');
+})();

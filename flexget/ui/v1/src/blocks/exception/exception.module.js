@@ -1,9 +1,6 @@
 /* global angular */
 (function () {
-    'use strict';
+  'use strict';
 
-    angular
-        .module('blocks.exception', [
-            'blocks.error'
-        ]);
-}());
+  angular.module('blocks.exception', ['blocks.error']);
+})();

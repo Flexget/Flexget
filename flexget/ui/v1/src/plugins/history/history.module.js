@@ -1,15 +1,14 @@
 /* global angular, registerPlugin */
 (function () {
-    'use strict';
+  'use strict';
 
-    angular
-        .module('plugins.history', [
-            'angular.filter',
+  angular.module('plugins.history', [
+    'angular.filter',
 
-            'blocks.pagination',
-            'blocks.exception',
-            'blocks.router'
-        ]);
+    'blocks.pagination',
+    'blocks.exception',
+    'blocks.router',
+  ]);
 
-    registerPlugin('plugins.history');
-}());
+  registerPlugin('plugins.history');
+})();

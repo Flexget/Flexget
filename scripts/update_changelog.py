@@ -21,11 +21,11 @@ class MDChangeSet:
     """Represents a markdown change-set for a single version."""
 
     CATEGORIES = [
-        ('### Added\n', ['add', 'added', 'feature']),
-        ('### Changed\n', ['change', 'changed', 'update']),
-        ('### Fixed\n', ['fix', 'fixed']),
-        ('### Deprecated\n', ['deprecate', 'deprecated']),
-        ('### Removed\n', ['remove', 'removed']),
+        ('Added', ['add', 'added', 'feature']),
+        ('Changed', ['change', 'changed', 'update']),
+        ('Fixed', ['fix', 'fixed']),
+        ('Deprecated', ['deprecate', 'deprecated']),
+        ('Removed', ['remove', 'removed']),
     ]
 
     def __init__(self) -> None:
@@ -44,7 +44,10 @@ class MDChangeSet:
             instance.version_header = version_header
         instance.post_header, section, tail = isplit('### ', tail)
         while section:
-            instance.sections[section], section, tail = isplit('### ', tail)
+            instance.sections[section], new_section, tail = isplit('### ', tail)
+            while instance.sections[section] and instance.sections[section][-1] == '\n':
+                instance.sections[section].pop()
+            section = new_section
         return instance
 
     def parse_message(self, message: str) -> bool:
@@ -58,7 +61,7 @@ class MDChangeSet:
             item = re.sub(
                 r'#(\d{3,4})', r'[#\1](https://github.com/Flexget/Flexget/issues/\1)', item
             )
-            item = f'- {item}\n'
+            item = f'- {item}'
             self.sections.setdefault(cat, ['\n']).insert(0, item)
         return found
 
@@ -75,7 +78,7 @@ class MDChangeSet:
         """Return an official category for `cat` tag text."""
         for cat_item in self.CATEGORIES:
             if cat.lower() in cat_item[1]:
-                return cat_item[0]
+                return f'### {cat_item[0]}\n\n'
         return None
 
     def to_md_lines(self) -> 'Generator[str, None, None]':
@@ -83,7 +86,11 @@ class MDChangeSet:
         yield from self.pre_header
         yield self.version_header
         yield from self.post_header
+        is_first = True
         for section, items in self.sections.items():
+            if not is_first:
+                yield '\n'
+            is_first = False
             yield section
             yield from items
         yield from self.footer
@@ -134,7 +141,7 @@ def update_changelog(file: Path) -> None:
                     diffstartref = tags[oldestref].name
                 cur_ver.post_header.insert(
                     0,
-                    '[all commits]'
+                    '\n[all commits]'
                     f'(https://github.com/Flexget/Flexget/compare/{diffstartref}...{tag_name})\n',
                 )
                 released_vers.insert(0, cur_ver)
@@ -155,7 +162,7 @@ def update_changelog(file: Path) -> None:
             logfile.writelines(pre_lines)
             logfile.write(f'<!---{commit.hexsha}--->\n')
             logfile.writelines(cur_ver.to_md_lines())
-            logfile.write(f'<!---{oldestref}--->\n')
+            logfile.write(f'\n<!---{oldestref}--->\n')
             for ver in released_vers:
                 logfile.writelines(ver.to_md_lines())
             logfile.writelines(post_lines)

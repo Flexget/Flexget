@@ -2,10 +2,18 @@
   position: relative;
   min-width: 190px !important;
   max-width: 190px !important;
-  -webkit-transition: min-width 0.5s ease, max-width 0.5s ease;
-  -moz-transition: min-width 0.5s ease, max-width 0.5s ease;
-  -o-transition: min-width 0.5s ease, max-width 0.5s ease;
-  transition: min-width 0.5s ease, max-width 0.5s ease;
+  -webkit-transition:
+    min-width 0.5s ease,
+    max-width 0.5s ease;
+  -moz-transition:
+    min-width 0.5s ease,
+    max-width 0.5s ease;
+  -o-transition:
+    min-width 0.5s ease,
+    max-width 0.5s ease;
+  transition:
+    min-width 0.5s ease,
+    max-width 0.5s ease;
 
   md-content {
     background-color: #222d32 !important;
@@ -57,7 +65,6 @@
   .nav-menu md-list-item span:hover {
     display: block;
   }
-
 }
 
 .version-info {

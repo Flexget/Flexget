@@ -5,7 +5,7 @@ on:
     branches:
       - develop
   pull_request_target: # zizmor: ignore[dangerous-triggers]
-permissions: { }
+permissions: {}
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.number || github.ref || github.run_id }}
   cancel-in-progress: true

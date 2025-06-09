@@ -7,13 +7,13 @@ env:
   DAYS_BEFORE_ISSUE_CLOSE: 30
   DAYS_BEFORE_PR_STALE: 150
   DAYS_BEFORE_PR_CLOSE: 60
-permissions: { }
+permissions: {}
 
 jobs:
   stale:
     permissions:
-      issues: write  # for actions/stale to close stale issues
-      pull-requests: write  # for actions/stale to close stale PRs
+      issues: write # for actions/stale to close stale issues
+      pull-requests: write # for actions/stale to close stale PRs
     runs-on: ubuntu-latest
     steps:
       - name: Close stale issues and PRs

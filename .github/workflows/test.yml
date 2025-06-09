@@ -6,7 +6,7 @@ on:
       - develop
   pull_request:
   merge_group:
-permissions: { }
+permissions: {}
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.number || github.ref || github.run_id }}
   cancel-in-progress: true
@@ -18,8 +18,8 @@ jobs:
     runs-on: ${{ matrix.operating-system }}
     strategy:
       matrix:
-        python-version: [ '3.9', '3.10', '3.11', '3.12', '3.13' ]
-        operating-system: [ windows-latest, macos-latest, ubuntu-latest ]
+        python-version: ['3.9', '3.10', '3.11', '3.12', '3.13']
+        operating-system: [windows-latest, macos-latest, ubuntu-latest]
       fail-fast: false
     steps:
       - name: Checkout
@@ -45,7 +45,7 @@ jobs:
           files: core_test_results.xml,optional_test_results.xml
           token: ${{ secrets.CODECOV_TOKEN }}
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@18283e04ce6e62d37312384ff67231eb8fd56d24  # v5
+        uses: codecov/codecov-action@18283e04ce6e62d37312384ff67231eb8fd56d24 # v5
         with:
           fail_ci_if_error: true
           name: ${{ matrix.operating-system }}-${{ matrix.python-version }}

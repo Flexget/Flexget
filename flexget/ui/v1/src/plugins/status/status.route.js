@@ -1,29 +1,27 @@
 /* global angular */
 (function () {
-    'use strict';
+  'use strict';
 
-    angular
-        .module('plugins.status')
-        .config(statusConfig);
+  angular.module('plugins.status').config(statusConfig);
 
-    function statusConfig(routerHelperProvider) {
-        routerHelperProvider.configureStates(getStates());
-    }
+  function statusConfig(routerHelperProvider) {
+    routerHelperProvider.configureStates(getStates());
+  }
 
-    function getStates() {
-        return [
-            {
-                state: 'status',
-                config: {
-                    url: '/status',
-                    component: 'status-view',
-                    settings: {
-                        weight: 7,
-                        icon: 'heartbeat',
-                        caption: 'Status'
-                    }
-                }
-            }
-        ];
-    }
-}());
+  function getStates() {
+    return [
+      {
+        state: 'status',
+        config: {
+          url: '/status',
+          component: 'status-view',
+          settings: {
+            weight: 7,
+            icon: 'heartbeat',
+            caption: 'Status',
+          },
+        },
+      },
+    ];
+  }
+})();

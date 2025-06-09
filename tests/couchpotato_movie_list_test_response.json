@@ -4,15 +4,9 @@
       "status": "active",
       "info": {
         "rating": {
-          "imdb": [
-            6.3,
-            11840
-          ]
+          "imdb": [6.3, 11840]
         },
-        "genres": [
-          "Comedy",
-          "Action"
-        ],
+        "genres": ["Comedy", "Action"],
         "tmdb_id": 261392,
         "plot": "A stoner and his girlfriend's sleepy, small-town existence is disrupted when his past comes back to haunt him in the form of a government operation set to wipe him out.",
         "tagline": "Everyone's getting smoked",
@@ -73,12 +67,8 @@
         "via_imdb": true,
         "mpaa": "R",
         "via_tmdb": true,
-        "directors": [
-          "Nima Nourizadeh"
-        ],
-        "titles": [
-          "American Ultra"
-        ],
+        "directors": ["Nima Nourizadeh"],
+        "titles": ["American Ultra"],
         "imdb": "tt3316948",
         "year": 2015,
         "images": {
@@ -136,9 +126,7 @@
           "Topher Grace",
           "Connie Britton"
         ],
-        "writers": [
-          "Max Landis"
-        ],
+        "writers": ["Max Landis"],
         "runtime": 96,
         "type": "movie",
         "released": "2015-08-21"
@@ -164,10 +152,7 @@
       "status": "active",
       "info": {
         "rating": {
-          "imdb": [
-            7.8,
-            268
-          ]
+          "imdb": [7.8, 268]
         },
         "actor_roles": {
           "Jennifer Jason Leigh": "Lisa",
@@ -183,12 +168,7 @@
           "bluray": false
         },
         "original_title": "Anomalisa",
-        "genres": [
-          "Fantasy",
-          "Animation",
-          "Comedy",
-          "Drama"
-        ],
+        "genres": ["Fantasy", "Animation", "Comedy", "Drama"],
         "via_imdb": true,
         "mpaa": "R",
         "images": {
@@ -216,24 +196,13 @@
           ],
           "extra_fanart": []
         },
-        "directors": [
-          "Duke Johnson",
-          "Charlie Kaufman"
-        ],
-        "titles": [
-          "Anomalisa"
-        ],
+        "directors": ["Duke Johnson", "Charlie Kaufman"],
+        "titles": ["Anomalisa"],
         "imdb": "tt2401878",
         "year": 2015,
         "via_tmdb": true,
-        "actors": [
-          "Jennifer Jason Leigh",
-          "David Thewlis",
-          "Tom Noonan"
-        ],
-        "writers": [
-          "Charlie Kaufman"
-        ],
+        "actors": ["Jennifer Jason Leigh", "David Thewlis", "Tom Noonan"],
+        "writers": ["Charlie Kaufman"],
         "runtime": 90,
         "type": "movie",
         "released": "2015-09-02"
@@ -259,10 +228,7 @@
       "status": "active",
       "info": {
         "rating": {
-          "imdb": [
-            7.7,
-            117804
-          ]
+          "imdb": [7.7, 117804]
         },
         "actor_roles": {
           "Tom Kenny": "Hideous Rabbit (voice)",
@@ -344,12 +310,7 @@
           "bluray": true
         },
         "original_title": "Ant-Man",
-        "genres": [
-          "Action",
-          "Adventure",
-          "Science Fiction",
-          "Sci-Fi"
-        ],
+        "genres": ["Action", "Adventure", "Science Fiction", "Sci-Fi"],
         "via_imdb": true,
         "mpaa": "PG-13",
         "images": {
@@ -412,9 +373,7 @@
           ],
           "extra_fanart": []
         },
-        "directors": [
-          "Peyton Reed"
-        ],
+        "directors": ["Peyton Reed"],
         "titles": [
           "Ant-Man",
           "Homem-Formiga",
@@ -468,9 +427,7 @@
       "status": "active",
       "info": {
         "plot": "The plot is not yet known.",
-        "genres": [
-          "Comedy"
-        ],
+        "genres": ["Comedy"],
         "tmdb_id": 335980,
         "tagline": "",
         "release_date": {
@@ -484,37 +441,25 @@
         "via_imdb": true,
         "mpaa": null,
         "via_tmdb": true,
-        "titles": [
-          "Austin Powers 4"
-        ],
+        "titles": ["Austin Powers 4"],
         "imdb": "tt1218992",
         "year": 1999,
         "images": {
           "disc_art": [],
-          "poster": [
-            "https://image.tmdb.org/t/p/w154None"
-          ],
+          "poster": ["https://image.tmdb.org/t/p/w154None"],
           "extra_thumbs": [],
-          "poster_original": [
-            "https://image.tmdb.org/t/p/originalNone"
-          ],
+          "poster_original": ["https://image.tmdb.org/t/p/originalNone"],
           "landscape": [],
           "actors": {},
-          "backdrop_original": [
-            "https://image.tmdb.org/t/p/originalNone"
-          ],
+          "backdrop_original": ["https://image.tmdb.org/t/p/originalNone"],
           "clear_art": [],
           "logo": [],
           "banner": [],
           "backdrop": [],
           "extra_fanart": []
         },
-        "actors": [
-          "Mike Myers"
-        ],
-        "writers": [
-          "Mike Myers"
-        ],
+        "actors": ["Mike Myers"],
+        "writers": ["Mike Myers"],
         "runtime": 0,
         "type": "movie"
       },
@@ -537,16 +482,9 @@
       "status": "active",
       "info": {
         "rating": {
-          "imdb": [
-            8,
-            7183
-          ]
+          "imdb": [8, 7183]
         },
-        "genres": [
-          "Crime",
-          "Drama",
-          "Biography"
-        ],
+        "genres": ["Crime", "Drama", "Biography"],
         "tmdb_id": 261023,
         "plot": "The true story of Whitey Bulger, the brother of a state senator and the most infamous violent criminal in the history of South Boston, who became an FBI informant to take down a Mafia family invading his turf.",
         "tagline": "Keep your enemies close.",
@@ -595,13 +533,8 @@
         "via_imdb": true,
         "mpaa": "R",
         "via_tmdb": true,
-        "directors": [
-          "Scott Cooper"
-        ],
-        "titles": [
-          "Black Mass",
-          "Strictly Criminal"
-        ],
+        "directors": ["Scott Cooper"],
+        "titles": ["Black Mass", "Strictly Criminal"],
         "imdb": "tt1355683",
         "year": 2015,
         "images": {
@@ -689,15 +622,9 @@
       "status": "active",
       "info": {
         "rating": {
-          "imdb": [
-            8.8,
-            406
-          ]
+          "imdb": [8.8, 406]
         },
-        "genres": [
-          "Thriller",
-          "Drama"
-        ],
+        "genres": ["Thriller", "Drama"],
         "tmdb_id": 296098,
         "plot": "An American lawyer is recruited by the CIA during the Cold War to help rescue a pilot detained in the Soviet Union.",
         "tagline": "In the shadow of war, one man showed the world what we stood for.",
@@ -758,9 +685,7 @@
           "landscape": [],
           "extra_fanart": []
         },
-        "directors": [
-          "Steven Spielberg"
-        ],
+        "directors": ["Steven Spielberg"],
         "titles": [
           "Bridge of Spies",
           "Untitled Cold War Spy Thriller",
@@ -770,17 +695,8 @@
         "imdb": "tt3682448",
         "year": 2015,
         "via_tmdb": true,
-        "actors": [
-          "Tom Hanks",
-          "Alan Alda",
-          "Amy Ryan",
-          "Eve Hewson"
-        ],
-        "writers": [
-          "Matt Charman",
-          "Ethan Coen",
-          "Joel Coen"
-        ],
+        "actors": ["Tom Hanks", "Alan Alda", "Amy Ryan", "Eve Hewson"],
+        "writers": ["Matt Charman", "Ethan Coen", "Joel Coen"],
         "runtime": 135,
         "type": "movie",
         "released": "2015-10-16"
@@ -806,15 +722,9 @@
       "status": "active",
       "info": {
         "rating": {
-          "imdb": [
-            7.1,
-            15
-          ]
+          "imdb": [7.1, 15]
         },
-        "genres": [
-          "Comedy",
-          "Documentary"
-        ],
+        "genres": ["Comedy", "Documentary"],
         "tmdb_id": 347528,
         "plot": "In response to Morgan Spurlock's COMIC-CON: A FAN'S HOPE, comedian Doug Benson (SUPER HIGH ME) stars in this doc that looks at San Diego Comic-Con from his hazy perspective. Featuring fellow pot and film fanatics Kevin Smith, Brian Posehn, Joe Rogan and even Spurlock himself, it's a fun look at a rapidly growing cultural event.",
         "tagline": "",
@@ -837,12 +747,8 @@
         "via_imdb": true,
         "mpaa": null,
         "via_tmdb": true,
-        "directors": [
-          "Sharon Everitt Polito"
-        ],
-        "titles": [
-          "Chronic-Con, Episode 420: A New Dope"
-        ],
+        "directors": ["Sharon Everitt Polito"],
+        "titles": ["Chronic-Con, Episode 420: A New Dope"],
         "imdb": "tt3271220",
         "year": 2015,
         "images": {
@@ -865,21 +771,14 @@
             "Brian Posehn": "https://image.tmdb.org/t/p/w185/AfxSZidOeClXdBDz5yAY3vUiaQU.jpg",
             "Kevin Smith": "https://image.tmdb.org/t/p/w185/3XXThSMqHQgQFjM4bMJ25U1EJTj.jpg"
           },
-          "backdrop_original": [
-            "https://image.tmdb.org/t/p/originalNone"
-          ],
+          "backdrop_original": ["https://image.tmdb.org/t/p/originalNone"],
           "clear_art": [],
           "logo": [],
           "banner": [],
           "backdrop": [],
           "extra_fanart": []
         },
-        "actors": [
-          "Kevin Smith",
-          "Patton Oswalt",
-          "Brian Posehn",
-          "Joe Rogan"
-        ],
+        "actors": ["Kevin Smith", "Patton Oswalt", "Brian Posehn", "Joe Rogan"],
         "runtime": 84,
         "type": "movie",
         "released": "2015-07-03"
@@ -905,14 +804,9 @@
       "status": "active",
       "info": {
         "rating": {
-          "imdb": [
-            8.1,
-            25701
-          ]
+          "imdb": [8.1, 25701]
         },
-        "genres": [
-          "Documentary"
-        ],
+        "genres": ["Documentary"],
         "tmdb_id": 293310,
         "plot": "In June 2013, Laura Poitras and reporter Glenn Greenwald flew to Hong Kong for the first of many meetings with Edward Snowden. She brought her camera with her. The film that resulted from this series of tense encounters is absolutely sui generis in the history of cinema:  a 100% real-life thriller unfolding minute by minute before our eyes. Poitras is a great and brave filmmaker, but she is also a masterful storyteller: she compresses the many days of questioning, waiting, confirming, watching the world’s reaction and agonizing over the next move, into both a great character study of Snowden and a narrative that will leave you on the edge of your seat as it inexorably moves toward its conclusion.",
         "tagline": "",
@@ -966,13 +860,8 @@
           "landscape": [],
           "extra_fanart": []
         },
-        "directors": [
-          "Laura Poitras"
-        ],
-        "titles": [
-          "Citizenfour",
-          "Citizen four"
-        ],
+        "directors": ["Laura Poitras"],
+        "titles": ["Citizenfour", "Citizen four"],
         "imdb": "tt4044364",
         "mpaa": "R",
         "via_tmdb": true,
@@ -1007,10 +896,7 @@
       "status": "active",
       "info": {
         "rating": {
-          "imdb": [
-            0.0,
-            0
-          ]
+          "imdb": [0.0, 0]
         },
         "genres": [
           "Horror",
@@ -1071,12 +957,8 @@
           "landscape": [],
           "extra_fanart": []
         },
-        "directors": [
-          "Guillermo del Toro"
-        ],
-        "titles": [
-          "Crimson Peak"
-        ],
+        "directors": ["Guillermo del Toro"],
+        "titles": ["Crimson Peak"],
         "imdb": "tt2554274",
         "year": 2015,
         "via_tmdb": true,
@@ -1086,10 +968,7 @@
           "Tom Hiddleston",
           "Mia Wasikowska"
         ],
-        "writers": [
-          "Guillermo del Toro",
-          "Matthew Robbins"
-        ],
+        "writers": ["Guillermo del Toro", "Matthew Robbins"],
         "runtime": 0,
         "type": "movie",
         "released": "2015-10-16"
@@ -1115,10 +994,7 @@
       "status": "active",
       "info": {
         "rating": {
-          "imdb": [
-            0.0,
-            0
-          ]
+          "imdb": [0.0, 0]
         },
         "actor_roles": {
           "Gina Carano": "Angel Dust",
@@ -1147,12 +1023,8 @@
         "via_imdb": true,
         "mpaa": null,
         "via_tmdb": true,
-        "directors": [
-          "Tim Miller"
-        ],
-        "titles": [
-          "Deadpool"
-        ],
+        "directors": ["Tim Miller"],
+        "titles": ["Deadpool"],
         "imdb": "tt1431045",
         "year": 2016,
         "images": {
@@ -1190,10 +1062,7 @@
           "T.J. Miller",
           "Gina Carano"
         ],
-        "writers": [
-          "Rhett Reese (screenplay)",
-          "Paul Wernick (screenplay)"
-        ],
+        "writers": ["Rhett Reese (screenplay)", "Paul Wernick (screenplay)"],
         "runtime": 0,
         "type": "movie",
         "released": "2016-02-12"
@@ -1219,15 +1088,9 @@
       "status": "active",
       "info": {
         "rating": {
-          "imdb": [
-            5.9,
-            166
-          ]
+          "imdb": [5.9, 166]
         },
-        "genres": [
-          "TV Movie",
-          "Comedy"
-        ],
+        "genres": ["TV Movie", "Comedy"],
         "tmdb_id": 301304,
         "plot": "Doug Benson brings his weed laced comedy to Seattle's Neptune Theater for his first ever hour long comedy special.",
         "tagline": "",
@@ -1244,10 +1107,7 @@
         "via_imdb": true,
         "mpaa": null,
         "via_tmdb": true,
-        "titles": [
-          "Doug Benson: Doug Dynasty",
-          "Doug Dynasty"
-        ],
+        "titles": ["Doug Benson: Doug Dynasty", "Doug Dynasty"],
         "imdb": "tt3983738",
         "year": 2014,
         "images": {
@@ -1265,21 +1125,15 @@
           "actors": {
             "Doug Benson": "https://image.tmdb.org/t/p/w185/5P8TfwVryr6fyGMz6FJWAYpYTAm.jpg"
           },
-          "backdrop_original": [
-            "https://image.tmdb.org/t/p/originalNone"
-          ],
+          "backdrop_original": ["https://image.tmdb.org/t/p/originalNone"],
           "clear_art": [],
           "logo": [],
           "banner": [],
           "backdrop": [],
           "extra_fanart": []
         },
-        "actors": [
-          "Doug Benson"
-        ],
-        "writers": [
-          "Doug Benson"
-        ],
+        "actors": ["Doug Benson"],
+        "writers": ["Doug Benson"],
         "runtime": 60,
         "type": "movie",
         "released": "2014-11-06"
@@ -1305,18 +1159,9 @@
       "status": "active",
       "info": {
         "rating": {
-          "imdb": [
-            0.0,
-            0
-          ]
+          "imdb": [0.0, 0]
         },
-        "genres": [
-          "Horror",
-          "Action",
-          "Comedy",
-          "Science Fiction",
-          "Sci-Fi"
-        ],
+        "genres": ["Horror", "Action", "Comedy", "Science Fiction", "Sci-Fi"],
         "tmdb_id": 43074,
         "plot": "The plot is unknown at this time.",
         "tagline": "",
@@ -1336,9 +1181,7 @@
         "via_imdb": true,
         "mpaa": null,
         "via_tmdb": true,
-        "directors": [
-          "Paul Feig"
-        ],
+        "directors": ["Paul Feig"],
         "titles": [
           "Ghostbusters",
           "Ghostbusters 3",
@@ -1368,9 +1211,7 @@
             "Kristen Wiig": "https://image.tmdb.org/t/p/w185/x5avlvpHlBGGLhzbzuSfmOsMGlw.jpg",
             "Kate McKinnon": "https://image.tmdb.org/t/p/w185/9zB5AND00Zw9LmcBIlHGumrC0cb.jpg"
           },
-          "backdrop_original": [
-            "https://image.tmdb.org/t/p/originalNone"
-          ],
+          "backdrop_original": ["https://image.tmdb.org/t/p/originalNone"],
           "clear_art": [],
           "logo": [],
           "banner": [],
@@ -1414,10 +1255,7 @@
       "status": "active",
       "info": {
         "rating": {
-          "imdb": [
-            7.4,
-            18109
-          ]
+          "imdb": [7.4, 18109]
         },
         "actor_roles": {
           "Beth Crudele": "Nurse",
@@ -1446,17 +1284,11 @@
           "bluray": true
         },
         "original_title": "The Gift",
-        "genres": [
-          "Thriller",
-          "Drama",
-          "Mystery"
-        ],
+        "genres": ["Thriller", "Drama", "Mystery"],
         "via_imdb": true,
         "mpaa": "R",
         "via_tmdb": true,
-        "directors": [
-          "Joel Edgerton"
-        ],
+        "directors": ["Joel Edgerton"],
         "titles": [
           "The Gift",
           "Untitled Blumhouse Thriller",
@@ -1506,9 +1338,7 @@
           "Joel Edgerton",
           "Allison Tolman"
         ],
-        "writers": [
-          "Joel Edgerton"
-        ],
+        "writers": ["Joel Edgerton"],
         "runtime": 108,
         "type": "movie",
         "released": "2015-08-07"
@@ -1534,17 +1364,9 @@
       "status": "active",
       "info": {
         "rating": {
-          "imdb": [
-            0.0,
-            0
-          ]
+          "imdb": [0.0, 0]
         },
-        "genres": [
-          "Comedy",
-          "Music",
-          "Drama",
-          "Musical"
-        ],
+        "genres": ["Comedy", "Music", "Drama", "Musical"],
         "tmdb_id": 270487,
         "plot": "Hail, Caesar! follows Baird Whitlock, a fixer working for Hollywood studios in the 1950s, trying to discover what happened to a cast member who vanishes during filming.",
         "tagline": "",
@@ -1583,13 +1405,8 @@
           "landscape": [],
           "extra_fanart": []
         },
-        "directors": [
-          "Ethan Coen",
-          "Joel Coen"
-        ],
-        "titles": [
-          "Hail, Caesar!"
-        ],
+        "directors": ["Ethan Coen", "Joel Coen"],
+        "titles": ["Hail, Caesar!"],
         "imdb": "tt0475290",
         "year": 2016,
         "via_tmdb": true,
@@ -1599,10 +1416,7 @@
           "Josh Brolin",
           "Tilda Swinton"
         ],
-        "writers": [
-          "Ethan Coen",
-          "Joel Coen"
-        ],
+        "writers": ["Ethan Coen", "Joel Coen"],
         "runtime": 0,
         "type": "movie",
         "released": "2016-02-05"
@@ -1628,10 +1442,7 @@
       "status": "active",
       "info": {
         "rating": {
-          "imdb": [
-            7.6,
-            1423
-          ]
+          "imdb": [7.6, 1423]
         },
         "actor_roles": {
           "David Spade": "Himself",
@@ -1673,10 +1484,7 @@
           "bluray": false
         },
         "original_title": "I Am Chris Farley",
-        "genres": [
-          "Documentary",
-          "Biography"
-        ],
+        "genres": ["Documentary", "Biography"],
         "via_imdb": true,
         "mpaa": "PG",
         "images": {
@@ -1722,13 +1530,8 @@
           ],
           "extra_fanart": []
         },
-        "directors": [
-          "Brent Hodge",
-          "Derik Murray"
-        ],
-        "titles": [
-          "I Am Chris Farley"
-        ],
+        "directors": ["Brent Hodge", "Derik Murray"],
+        "titles": ["I Am Chris Farley"],
         "imdb": "tt3910602",
         "year": 2015,
         "via_tmdb": true,
@@ -1738,10 +1541,7 @@
           "Mike Myers",
           "Dan Aykroyd"
         ],
-        "writers": [
-          "Steve Burgess",
-          "Brent Hodge"
-        ],
+        "writers": ["Steve Burgess", "Brent Hodge"],
         "runtime": 96,
         "type": "movie",
         "released": "2015-07-27"
@@ -1767,10 +1567,7 @@
       "status": "active",
       "info": {
         "rating": {
-          "imdb": [
-            8.5,
-            122309
-          ]
+          "imdb": [8.5, 122309]
         },
         "genres": [
           "Comedy",
@@ -1846,10 +1643,7 @@
           "landscape": [],
           "extra_fanart": []
         },
-        "directors": [
-          "Pete Docter",
-          "Ronaldo Del Carmen"
-        ],
+        "directors": ["Pete Docter", "Ronaldo Del Carmen"],
         "titles": [
           "Inside Out",
           "The Untitled Pixar Movie That Takes You Inside the Mind",
@@ -1907,16 +1701,9 @@
       "status": "active",
       "info": {
         "rating": {
-          "imdb": [
-            0.0,
-            0
-          ]
+          "imdb": [0.0, 0]
         },
-        "genres": [
-          "Fantasy",
-          "Action",
-          "Adventure"
-        ],
+        "genres": ["Fantasy", "Action", "Adventure"],
         "tmdb_id": 274854,
         "plot": "The last witch hunter is all that stands between humanity and the combined forces of the most horrifying witches in history.",
         "tagline": "",
@@ -1947,12 +1734,8 @@
         "via_imdb": true,
         "mpaa": null,
         "via_tmdb": true,
-        "directors": [
-          "Breck Eisner"
-        ],
-        "titles": [
-          "The Last Witch Hunter"
-        ],
+        "directors": ["Breck Eisner"],
+        "titles": ["The Last Witch Hunter"],
         "imdb": "tt1618442",
         "year": 2015,
         "images": {
@@ -2027,10 +1810,7 @@
       "status": "active",
       "info": {
         "rating": {
-          "imdb": [
-            7.5,
-            8932
-          ]
+          "imdb": [7.5, 8932]
         },
         "actor_roles": {
           "Lorraine Stanley": "Blind Beggar Barmaid",
@@ -2071,11 +1851,7 @@
           "bluray": true
         },
         "original_title": "Legend",
-        "genres": [
-          "Crime",
-          "Thriller",
-          "Biography"
-        ],
+        "genres": ["Crime", "Thriller", "Biography"],
         "via_imdb": true,
         "mpaa": "R",
         "images": {
@@ -2120,12 +1896,8 @@
           ],
           "extra_fanart": []
         },
-        "directors": [
-          "Brian Helgeland"
-        ],
-        "titles": [
-          "Legend"
-        ],
+        "directors": ["Brian Helgeland"],
+        "titles": ["Legend"],
         "imdb": "tt3569230",
         "year": 2015,
         "via_tmdb": true,
@@ -2135,10 +1907,7 @@
           "Taron Egerton",
           "Paul Bettany"
         ],
-        "writers": [
-          "Brian Helgeland",
-          "John Pearson (book)"
-        ],
+        "writers": ["Brian Helgeland", "John Pearson (book)"],
         "runtime": 131,
         "type": "movie",
         "released": "2015-09-09"
@@ -2164,10 +1933,7 @@
       "status": "active",
       "info": {
         "rating": {
-          "imdb": [
-            0.0,
-            0
-          ]
+          "imdb": [0.0, 0]
         },
         "actor_roles": {
           "Matt Damon": "Mark Watney",
@@ -2196,12 +1962,7 @@
           "bluray": true
         },
         "original_title": "The Martian",
-        "genres": [
-          "Action",
-          "Adventure",
-          "Science Fiction",
-          "Sci-Fi"
-        ],
+        "genres": ["Action", "Adventure", "Science Fiction", "Sci-Fi"],
         "via_imdb": true,
         "mpaa": null,
         "images": {
@@ -2244,13 +2005,8 @@
           ],
           "extra_fanart": []
         },
-        "directors": [
-          "Ridley Scott"
-        ],
-        "titles": [
-          "The Martian",
-          "Filming Dates: autumn 2014"
-        ],
+        "directors": ["Ridley Scott"],
+        "titles": ["The Martian", "Filming Dates: autumn 2014"],
         "imdb": "tt3659388",
         "year": 2015,
         "via_tmdb": true,
@@ -2260,10 +2016,7 @@
           "Kristen Wiig",
           "Jessica Chastain"
         ],
-        "writers": [
-          "Drew Goddard (screenplay)",
-          "Andy Weir (book)"
-        ],
+        "writers": ["Drew Goddard (screenplay)", "Andy Weir (book)"],
         "runtime": 0,
         "type": "movie",
         "released": "2015-11-25"
@@ -2289,10 +2042,7 @@
       "status": "active",
       "info": {
         "rating": {
-          "imdb": [
-            6.9,
-            22446
-          ]
+          "imdb": [6.9, 22446]
         },
         "actor_roles": {
           "Geoffrey Rush": "Narrator",
@@ -2319,19 +2069,11 @@
           "bluray": true
         },
         "original_title": "Minions",
-        "genres": [
-          "Family",
-          "Animation",
-          "Adventure",
-          "Comedy"
-        ],
+        "genres": ["Family", "Animation", "Adventure", "Comedy"],
         "via_imdb": true,
         "mpaa": "PG",
         "via_tmdb": true,
-        "directors": [
-          "Kyle Balda",
-          "Pierre Coffin"
-        ],
+        "directors": ["Kyle Balda", "Pierre Coffin"],
         "titles": [
           "Minions",
           "גנוב על הירח 3",
@@ -2384,9 +2126,7 @@
           "Jon Hamm",
           "Michael Keaton"
         ],
-        "writers": [
-          "Brian Lynch"
-        ],
+        "writers": ["Brian Lynch"],
         "runtime": 91,
         "type": "movie",
         "released": "2015-07-10"
@@ -2413,17 +2153,9 @@
       "info": {
         "via_tmdb": true,
         "rating": {
-          "imdb": [
-            7.1,
-            19568
-          ]
+          "imdb": [7.1, 19568]
         },
-        "genres": [
-          "Action",
-          "Crime",
-          "Drama",
-          "Thriller"
-        ],
+        "genres": ["Action", "Crime", "Drama", "Thriller"],
         "tmdb_id": 241239,
         "plot": "A thriller set in New York City during the winter of 1981, statistically one of the most violent years in the city's history, and centered on a the lives of an immigrant and his family trying to expand their business and capitalize on opportunities as the rampant violence, decay, and corruption of the day drag them in and threaten to destroy all they have built.",
         "tagline": "The result is never in question. Just the path you take to get there.",
@@ -2460,13 +2192,8 @@
         "via_imdb": true,
         "mpaa": "R",
         "released": "2014-12-31",
-        "directors": [
-          "J.C. Chandor"
-        ],
-        "titles": [
-          "A Most Violent Year",
-          "Um Ano Muito Violento"
-        ],
+        "directors": ["J.C. Chandor"],
+        "titles": ["A Most Violent Year", "Um Ano Muito Violento"],
         "imdb": "tt2937898",
         "year": 2014,
         "images": {
@@ -2516,9 +2243,7 @@
           "David Oyelowo",
           "Alessandro Nivola"
         ],
-        "writers": [
-          "J.C. Chandor"
-        ],
+        "writers": ["J.C. Chandor"],
         "runtime": 125,
         "type": "movie"
       },
@@ -2543,16 +2268,9 @@
       "status": "active",
       "info": {
         "rating": {
-          "imdb": [
-            7.6,
-            3282
-          ]
+          "imdb": [7.6, 3282]
         },
-        "genres": [
-          "Mystery",
-          "Crime",
-          "Drama"
-        ],
+        "genres": ["Mystery", "Crime", "Drama"],
         "tmdb_id": 280996,
         "plot": "The story is set in 1947, following a long-retired Holmes living in a Sussex village with his housekeeper and rising detective son. But then he finds himself haunted by an unsolved 50-year old case. Holmes' memory isn't what it used to be, so he only remembers fragments of the case: a confrontation with an angry husband, a secret bond with his beautiful but unstable wife.",
         "tagline": "The man behind the myth",
@@ -2578,13 +2296,8 @@
         "via_imdb": true,
         "mpaa": "PG",
         "via_tmdb": true,
-        "directors": [
-          "Bill Condon"
-        ],
-        "titles": [
-          "Mr. Holmes",
-          "A Slight Trick of the Mind"
-        ],
+        "directors": ["Bill Condon"],
+        "titles": ["Mr. Holmes", "A Slight Trick of the Mind"],
         "imdb": "tt3168230",
         "year": 2015,
         "images": {
@@ -2656,15 +2369,9 @@
       "status": "active",
       "info": {
         "rating": {
-          "imdb": [
-            0.0,
-            0
-          ]
+          "imdb": [0.0, 0]
         },
-        "genres": [
-          "Comedy",
-          "Adventure"
-        ],
+        "genres": ["Comedy", "Adventure"],
         "tmdb_id": 347689,
         "plot": "Beloved 80's TV character Pee-wee Herman (played by comedian Paul Reubens) returns in this made-for-TV movie starring Paul Reubens,  Joe Manganiello, Alia Shawkat and Laurence Fishburne.",
         "tagline": "",
@@ -2682,32 +2389,22 @@
         "via_imdb": true,
         "images": {
           "disc_art": [],
-          "poster": [
-            "https://image.tmdb.org/t/p/w154None"
-          ],
+          "poster": ["https://image.tmdb.org/t/p/w154None"],
           "backdrop": [],
           "extra_thumbs": [],
-          "poster_original": [
-            "https://image.tmdb.org/t/p/originalNone"
-          ],
+          "poster_original": ["https://image.tmdb.org/t/p/originalNone"],
           "actors": {
             "Alia Shawkat": "https://image.tmdb.org/t/p/w185/3A9fLNoFLkbMlSpzoOCWlVIdKKw.jpg"
           },
-          "backdrop_original": [
-            "https://image.tmdb.org/t/p/originalNone"
-          ],
+          "backdrop_original": ["https://image.tmdb.org/t/p/originalNone"],
           "clear_art": [],
           "logo": [],
           "banner": [],
           "landscape": [],
           "extra_fanart": []
         },
-        "directors": [
-          "John Lee"
-        ],
-        "titles": [
-          "Pee-wee's Big Holiday"
-        ],
+        "directors": ["John Lee"],
+        "titles": ["Pee-wee's Big Holiday"],
         "imdb": "tt0837156",
         "mpaa": null,
         "via_tmdb": true,
@@ -2717,10 +2414,7 @@
           "Janina Gavankar",
           "Laurence Fishburne"
         ],
-        "writers": [
-          "Paul Reubens (screenplay)",
-          "Paul Rust (screenplay)"
-        ],
+        "writers": ["Paul Reubens (screenplay)", "Paul Rust (screenplay)"],
         "runtime": 0,
         "type": "movie"
       },
@@ -2743,18 +2437,9 @@
       "status": "active",
       "info": {
         "rating": {
-          "imdb": [
-            7.9,
-            1633
-          ]
+          "imdb": [7.9, 1633]
         },
-        "genres": [
-          "Mystery",
-          "Crime",
-          "Drama",
-          "Action",
-          "Thriller"
-        ],
+        "genres": ["Mystery", "Crime", "Drama", "Action", "Thriller"],
         "tmdb_id": 273481,
         "plot": "An idealistic FBI agent is enlisted by an elected government task force to aid in the escalating war against drugs at the border area between the U.S. and Mexico.",
         "tagline": "The deeper you go, the darker it gets.",
@@ -2784,13 +2469,8 @@
         "via_imdb": true,
         "mpaa": "R",
         "via_tmdb": true,
-        "directors": [
-          "Denis Villeneuve"
-        ],
-        "titles": [
-          "Sicario",
-          "סיקריו"
-        ],
+        "directors": ["Denis Villeneuve"],
+        "titles": ["Sicario", "סיקריו"],
         "imdb": "tt3397884",
         "year": 2015,
         "images": {
@@ -2833,9 +2513,7 @@
           "Josh Brolin",
           "Benicio Del Toro"
         ],
-        "writers": [
-          "Taylor Sheridan"
-        ],
+        "writers": ["Taylor Sheridan"],
         "runtime": 121,
         "type": "movie",
         "released": "2015-09-18"
@@ -2861,12 +2539,7 @@
       "status": "active",
       "info": {
         "plot": "A cryptic message from Bond’s past sends him on a trail to uncover a sinister organization. While M battles political forces to keep the secret service alive, Bond peels back the layers of deceit to reveal the terrible truth behind SPECTRE.",
-        "genres": [
-          "Action",
-          "Adventure",
-          "Crime",
-          "Thriller"
-        ],
+        "genres": ["Action", "Adventure", "Crime", "Thriller"],
         "tmdb_id": 206647,
         "tagline": "",
         "release_date": {
@@ -2896,9 +2569,7 @@
         "via_imdb": true,
         "mpaa": null,
         "released": "2015-10-26",
-        "directors": [
-          "Sam Mendes"
-        ],
+        "directors": ["Sam Mendes"],
         "titles": [
           "SPECTRE",
           "Bond 24",
@@ -2984,16 +2655,9 @@
       "status": "active",
       "info": {
         "rating": {
-          "imdb": [
-            8.3,
-            29020
-          ]
+          "imdb": [8.3, 29020]
         },
-        "genres": [
-          "Drama",
-          "Music",
-          "Biography"
-        ],
+        "genres": ["Drama", "Music", "Biography"],
         "tmdb_id": 277216,
         "plot": "In 1987, five young men, using brutally honest rhymes and hardcore beats, put their frustration and anger about life in the most dangerous place in America into the most powerful weapon they had: their music. Taking us back to where it all began, Straight Outta Compton tells the true story of how these cultural rebels-armed only with their lyrics, swagger, bravado and raw talent-stood up to the authorities that meant to keep them down and formed the world's most dangerous group, N.W.A. And as they spoke the truth that no one had before and exposed life in the hood, their voice ignited a social revolution that is still reverberating today. Straight Outta Compton stars O’Shea Jackson Jr., Corey Hawkins and Jason Mitchell as Ice Cube, Dr. Dre and Eazy-E, and is directed by F. Gary Gray.",
         "tagline": "The Story of N.W.A.",
@@ -3066,13 +2730,8 @@
         "via_imdb": true,
         "mpaa": "R",
         "via_tmdb": true,
-        "directors": [
-          "F. Gary Gray"
-        ],
-        "titles": [
-          "Straight Outta Compton",
-          "再别康城"
-        ],
+        "directors": ["F. Gary Gray"],
+        "titles": ["Straight Outta Compton", "再别康城"],
         "imdb": "tt1398426",
         "year": 2015,
         "images": {
@@ -3158,10 +2817,7 @@
       "status": "active",
       "info": {
         "rating": {
-          "imdb": [
-            6.7,
-            33677
-          ]
+          "imdb": [6.7, 33677]
         },
         "actor_roles": {
           "Jessica Barth": "Tami-Lynn McCafferty",
@@ -3195,20 +2851,12 @@
           "bluray": true
         },
         "original_title": "Ted 2",
-        "genres": [
-          "Comedy"
-        ],
+        "genres": ["Comedy"],
         "via_imdb": true,
         "mpaa": "R",
         "via_tmdb": true,
-        "directors": [
-          "Seth MacFarlane"
-        ],
-        "titles": [
-          "Ted 2",
-          "19곰 테드2",
-          "Tedis 2"
-        ],
+        "directors": ["Seth MacFarlane"],
+        "titles": ["Ted 2", "19곰 테드2", "Tedis 2"],
         "imdb": "tt2637276",
         "year": 2015,
         "images": {
@@ -3261,11 +2909,7 @@
           "Amanda Seyfried",
           "Jessica Barth"
         ],
-        "writers": [
-          "Seth MacFarlane",
-          "Alec Sulkin",
-          "Wellesley Wild"
-        ],
+        "writers": ["Seth MacFarlane", "Alec Sulkin", "Wellesley Wild"],
         "runtime": 115,
         "type": "movie",
         "released": "2015-06-26"
@@ -3291,10 +2935,7 @@
       "status": "active",
       "info": {
         "rating": {
-          "imdb": [
-            6.6,
-            44917
-          ]
+          "imdb": [6.6, 44917]
         },
         "actor_roles": {
           "Hugh Laurie": "David Nix",
@@ -3369,9 +3010,7 @@
         "via_imdb": true,
         "mpaa": "PG",
         "via_tmdb": true,
-        "directors": [
-          "Brad Bird"
-        ],
+        "directors": ["Brad Bird"],
         "titles": [
           "Tomorrowland",
           "Tomorroland: A World Beyond",
@@ -3465,10 +3104,7 @@
       "status": "active",
       "info": {
         "rating": {
-          "imdb": [
-            6.7,
-            28475
-          ]
+          "imdb": [6.7, 28475]
         },
         "actor_roles": {
           "Dave Attell": "Noam",
@@ -3507,20 +3143,12 @@
           "bluray": true
         },
         "original_title": "Trainwreck",
-        "genres": [
-          "Romance",
-          "Comedy"
-        ],
+        "genres": ["Romance", "Comedy"],
         "via_imdb": true,
         "mpaa": "R",
         "via_tmdb": true,
-        "directors": [
-          "Judd Apatow"
-        ],
-        "titles": [
-          "Trainwreck",
-          "Be stabdžių"
-        ],
+        "directors": ["Judd Apatow"],
+        "titles": ["Trainwreck", "Be stabdžių"],
         "imdb": "tt3152624",
         "year": 2015,
         "images": {
@@ -3566,15 +3194,8 @@
           "landscape": [],
           "extra_fanart": []
         },
-        "actors": [
-          "Colin Quinn",
-          "Devin Fabry",
-          "Carla Oudin",
-          "Amy Schumer"
-        ],
-        "writers": [
-          "Amy Schumer"
-        ],
+        "actors": ["Colin Quinn", "Devin Fabry", "Carla Oudin", "Amy Schumer"],
+        "writers": ["Amy Schumer"],
         "runtime": 125,
         "type": "movie",
         "released": "2015-07-17"
@@ -3600,10 +3221,7 @@
       "status": "active",
       "info": {
         "rating": {
-          "imdb": [
-            6.7,
-            2600
-          ]
+          "imdb": [6.7, 2600]
         },
         "actor_roles": {
           "Byron Jennings": "Judge Odenkirk",
@@ -3650,20 +3268,12 @@
           "bluray": false
         },
         "original_title": "True Story",
-        "genres": [
-          "Thriller",
-          "Drama",
-          "Mystery"
-        ],
+        "genres": ["Thriller", "Drama", "Mystery"],
         "via_imdb": true,
         "mpaa": "R",
         "via_tmdb": true,
-        "directors": [
-          "Rupert Goold"
-        ],
-        "titles": [
-          "True Story"
-        ],
+        "directors": ["Rupert Goold"],
+        "titles": ["True Story"],
         "imdb": "tt2273657",
         "year": 2015,
         "images": {
@@ -3755,14 +3365,9 @@
       "status": "active",
       "info": {
         "rating": {
-          "imdb": [
-            0.0,
-            0
-          ]
+          "imdb": [0.0, 0]
         },
-        "genres": [
-          "Action"
-        ],
+        "genres": ["Action"],
         "tmdb_id": 324668,
         "plot": "The fifth film in the Bourne franchise, and the first featuring Jason Bourne since The Bourne Ultimatum.",
         "tagline": "",
@@ -3780,9 +3385,7 @@
         "via_imdb": true,
         "mpaa": null,
         "via_tmdb": true,
-        "directors": [
-          "Paul Greengrass"
-        ],
+        "directors": ["Paul Greengrass"],
         "titles": [
           "Untitled Next Bourne Chapter",
           "Bourne 5",

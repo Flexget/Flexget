@@ -1,9 +1,6 @@
 /* global angular */
 (function () {
-    'use strict';
+  'use strict';
 
-    angular
-        .module('components.home', [
-            'blocks.router'
-        ]);
-}());
+  angular.module('components.home', ['blocks.router']);
+})();

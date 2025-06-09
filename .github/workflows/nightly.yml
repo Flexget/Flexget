@@ -3,9 +3,9 @@ name: Trigger Deploy
 on:
   schedule:
     - cron: 0 15 * * *
-  workflow_dispatch: { }
+  workflow_dispatch: {}
 
-permissions: { }
+permissions: {}
 
 jobs:
   deploy:

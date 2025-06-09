@@ -1,12 +1,8 @@
 /* global angular, registerPlugin */
 (function () {
-    'use strict';
+  'use strict';
 
-    angular
-        .module('plugins.pending', [
-            'blocks.exception',
-            'blocks.router'
-        ]);
+  angular.module('plugins.pending', ['blocks.exception', 'blocks.router']);
 
-    registerPlugin('plugins.pending');
-}());
+  registerPlugin('plugins.pending');
+})();

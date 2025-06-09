@@ -1,6 +1,6 @@
 name: Build and release to PyPI
-on: [ deployment ]
-permissions: { }
+on: [deployment]
+permissions: {}
 jobs:
   release:
     permissions:

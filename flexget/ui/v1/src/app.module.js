@@ -1,36 +1,35 @@
 /* global angular */
 (function () {
-    'use strict';
+  'use strict';
 
-    angular
-        .module('flexget', [
-            'ngCookies',
-            'ngMaterial',
-            'ngMessages',
-            'ngSanitize',
+  angular.module('flexget', [
+    'ngCookies',
+    'ngMaterial',
+    'ngMessages',
+    'ngSanitize',
 
-            'angular-loading-bar',
-            'http-etag',
-            
-            'blocks.error',
-            'blocks.exception',
-            'blocks.router',
-            'blocks.urlInterceptor',
+    'angular-loading-bar',
+    'http-etag',
 
-            'flexget.components',
-            'flexget.directives',
-            'flexget.plugins',
+    'blocks.error',
+    'blocks.exception',
+    'blocks.router',
+    'blocks.urlInterceptor',
 
-            'ui.router'
-        ]);
+    'flexget.components',
+    'flexget.directives',
+    'flexget.plugins',
 
-    function bootstrapApplication() {
-        /* Bootstrap app after page has loaded which allows plugins to register */
-        angular.element(document).ready(function () {
-            angular.bootstrap(document, ['flexget']);
-        });
-        window.loadingScreen.finish();
-    }
+    'ui.router',
+  ]);
 
-    bootstrapApplication();
-}());
+  function bootstrapApplication() {
+    /* Bootstrap app after page has loaded which allows plugins to register */
+    angular.element(document).ready(function () {
+      angular.bootstrap(document, ['flexget']);
+    });
+    window.loadingScreen.finish();
+  }
+
+  bootstrapApplication();
+})();

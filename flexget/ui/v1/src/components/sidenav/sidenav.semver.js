@@ -1,8 +1,9 @@
-(function(angular) {
+(function (angular) {
   angular.module('components.sidenav').factory('semver', [
-    function() {
-      var temp = function() { /* global define */
-        (function(root, factory) {
+    function () {
+      var temp = function () {
+        /* global define */
+        (function (root, factory) {
           /* istanbul ignore next */
           if (typeof define === 'function' && define.amd) {
             define([], factory);
@@ -11,9 +12,9 @@
           } else {
             root.compareVersions = factory();
           }
-        }(this, function() {
-
-          var semver = /^v?(?:0|[1-9]\d*)(\.(?:[x*]|0|[1-9]\d*)(\.(?:[x*]|0|[1-9]\d*)(?:[.-][\da-z\-]+(?:\.[\da-z\-]+)*)?(?:\+[\da-z\-]+(?:\.[\da-z\-]+)*)?)?)?$/i;
+        })(this, function () {
+          var semver =
+            /^v?(?:0|[1-9]\d*)(\.(?:[x*]|0|[1-9]\d*)(\.(?:[x*]|0|[1-9]\d*)(?:[.-][\da-z\-]+(?:\.[\da-z\-]+)*)?(?:\+[\da-z\-]+(?:\.[\da-z\-]+)*)?)?)?$/i;
           var patch = /-([0-9A-Za-z-.]+)/;
 
           function split(v) {
@@ -55,8 +56,16 @@
               var p2 = patch.exec(s2[2])[1].split('.').map(tryParse);
 
               for (i = 0; i < Math.max(p1.length, p2.length); i++) {
-                if (p1[i] === undefined || typeof p2[i] === 'string' && typeof p1[i] === 'number') return -1;
-                if (p2[i] === undefined || typeof p1[i] === 'string' && typeof p2[i] === 'number') return 1;
+                if (
+                  p1[i] === undefined ||
+                  (typeof p2[i] === 'string' && typeof p1[i] === 'number')
+                )
+                  return -1;
+                if (
+                  p2[i] === undefined ||
+                  (typeof p1[i] === 'string' && typeof p2[i] === 'number')
+                )
+                  return 1;
 
                 if (p1[i] > p2[i]) return 1;
                 if (p2[i] > p1[i]) return -1;
@@ -67,14 +76,13 @@
 
             return 0;
           };
-
-        }));
+        });
       };
       var context = {};
       var injected = {};
       temp.call(context);
       var propsAddedByTargetLib = [];
-      angular.forEach(context, function(val, prop) {
+      angular.forEach(context, function (val, prop) {
         if (angular.isUndefined(injected[prop])) {
           propsAddedByTargetLib.push(val);
         }
@@ -84,6 +92,6 @@
       } else {
         return context;
       }
-    }
+    },
   ]);
 })(window.angular);

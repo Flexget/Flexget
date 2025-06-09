@@ -1,19 +1,18 @@
 /* global angular, registerPlugin */
 (function () {
-    'use strict';
+  'use strict';
 
-    angular
-        .module('plugins.config', [
-            'ngMaterial',
+  angular.module('plugins.config', [
+    'ngMaterial',
 
-            'ab-base64',
+    'ab-base64',
 
-            'blocks.exception',
-            'blocks.router',
-            'components.toolbar',
+    'blocks.exception',
+    'blocks.router',
+    'components.toolbar',
 
-            'ui.ace'
-        ]);
+    'ui.ace',
+  ]);
 
-    registerPlugin('plugins.config');
-}());
+  registerPlugin('plugins.config');
+})();

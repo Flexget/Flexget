@@ -1,21 +1,19 @@
 /* global angular */
 (function () {
-    'use strict';
+  'use strict';
 
-    angular
-        .module('plugins.schedule')
-        .component('scheduleView', {
-            templateUrl: 'plugins/schedule/schedule.tmpl.html',
-            controllerAs: 'vm',
-            controller: scheduleController
-        });
+  angular.module('plugins.schedule').component('scheduleView', {
+    templateUrl: 'plugins/schedule/schedule.tmpl.html',
+    controllerAs: 'vm',
+    controller: scheduleController,
+  });
 
-    function scheduleController(schedulesService) {
-        var vm = this;
+  function scheduleController(schedulesService) {
+    var vm = this;
 
-        vm.$onInit = activate;
+    vm.$onInit = activate;
 
-        /*vm.form = [
+    /*vm.form = [
             '*',
             {
                 type: 'submit',
@@ -34,22 +32,20 @@
             }
         };*/
 
-        /*schema.get('config/schedules').then(function (schema) {
+    /*schema.get('config/schedules').then(function (schema) {
             vm.schema = { type: 'object', 'properties': { 'schedules': schema }, required: ['schedules'] };
         });*/
 
-        function activate() {
-            getSchedules();
-        }
-
-        function getSchedules() {
-            schedulesService.getSchedules()
-                .then(setSchedule)
-                .cached(setSchedule);
-        }
-        
-        function setSchedule(response) {
-            vm.models = response.data;
-        }
+    function activate() {
+      getSchedules();
     }
-}());
+
+    function getSchedules() {
+      schedulesService.getSchedules().then(setSchedule).cached(setSchedule);
+    }
+
+    function setSchedule(response) {
+      vm.models = response.data;
+    }
+  }
+})();

@@ -1,15 +1,14 @@
 /* global angular, registerPlugin */
 (function () {
-    'use strict';
+  'use strict';
 
-    angular
-        .module('plugins.series', [
-            'ngMaterial',
+  angular.module('plugins.series', [
+    'ngMaterial',
 
-            'blocks.pagination',            
-            'blocks.exception',
-            'blocks.router'
-        ]);
+    'blocks.pagination',
+    'blocks.exception',
+    'blocks.router',
+  ]);
 
-    registerPlugin('plugins.series');
-}());
+  registerPlugin('plugins.series');
+})();

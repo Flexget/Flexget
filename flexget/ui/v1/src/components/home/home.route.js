@@ -1,29 +1,23 @@
 /* global angular */
 (function () {
-    'use strict';
+  'use strict';
 
-    angular
-        .module('components.home')
-        .config(homeConfig);
+  angular.module('components.home').config(homeConfig);
 
-    function homeConfig(routerHelperProvider) {
-        routerHelperProvider.configureStates(getStates());
-    }
+  function homeConfig(routerHelperProvider) {
+    routerHelperProvider.configureStates(getStates());
+  }
 
-    function getStates() {
-        return [
-            {
-                state: 'home',
-                config: {
-                    url: '/',
-                    component: 'home'
-                },
-                when: [
-                    '',
-                    '/',
-                    '/home'
-                ]
-            }
-        ];
-    }
-}());
+  function getStates() {
+    return [
+      {
+        state: 'home',
+        config: {
+          url: '/',
+          component: 'home',
+        },
+        when: ['', '/', '/home'],
+      },
+    ];
+  }
+})();
