@@ -8,7 +8,7 @@ Also allows date and datetime objects to be encoded/decoded.
 import datetime
 from collections.abc import Iterable, Mapping
 from contextlib import suppress
-from typing import Any, Union
+from typing import Any
 
 from flexget.plugin import DependencyError
 
@@ -46,7 +46,7 @@ class DTDecoder(json.JSONDecoder):
         return super().decode(obj, **kwargs)
 
 
-def _datetime_encoder(obj: Union[datetime.datetime, datetime.date]) -> str:
+def _datetime_encoder(obj: datetime.datetime | datetime.date) -> str:
     if isinstance(obj, datetime.datetime):
         return obj.strftime(ISO8601_FMT)
     if isinstance(obj, datetime.date):
@@ -114,7 +114,7 @@ def load(*args, **kwargs) -> Any:
     return json.load(*args, **kwargs)
 
 
-def coerce(obj) -> Union[str, int, float, bool, dict, list, None]:
+def coerce(obj) -> str | int | float | bool | dict | list | None:
     """Coerce a data structure to a JSON serializable form.
 
     Will recursively go through data structure, and attempt to turn anything not JSON serializable into a string.

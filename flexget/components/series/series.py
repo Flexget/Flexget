@@ -4,7 +4,6 @@ import time
 from collections import defaultdict
 from copy import copy
 from datetime import datetime
-from typing import Union
 
 import pendulum
 from loguru import logger
@@ -650,7 +649,7 @@ class FilterSeries(FilterSeriesBase):
 
         def _exclude_season_on_accept(
             *args,
-            series_entity: Union[db.Season, db.Episode],
+            series_entity: db.Season | db.Episode,
             accepted_seasons_list: list[int],
             **kwargs,
         ) -> None:

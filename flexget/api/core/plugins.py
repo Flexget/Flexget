@@ -1,5 +1,5 @@
 from math import ceil
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from flask import Response, jsonify, request
 from flask_restx import inputs
@@ -74,11 +74,11 @@ if TYPE_CHECKING:
         name: str
         api_ver: int
         builtin: bool
-        category: Optional[str]
+        category: str | None
         debug: bool
-        interfaces: Optional[list[str]]
+        interfaces: list[str] | None
         phase_handlers: list[_PhaseHandler]
-        schema: Optional[JsonSchema]
+        schema: JsonSchema | None
 
 
 def plugin_to_dict(plugin) -> 'PluginDict':

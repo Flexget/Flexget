@@ -4,19 +4,13 @@ import time
 from functools import total_ordering
 from http.client import BadStatusLine
 from importlib import import_module
+from importlib.metadata import entry_points
 from pathlib import Path
-from typing import TYPE_CHECKING, Callable, Optional, Union
+from typing import TYPE_CHECKING
 from urllib.error import HTTPError, URLError
 
 import loguru
 from requests import RequestException
-
-try:
-    # This is in our requirements for python versions older than 3.10 to get the new style selectable entry points
-    from importlib_metadata import entry_points
-except ImportError:
-    # Python 3.10 and higher has the new functionality
-    from importlib.metadata import entry_points
 
 from flexget import components as components_pkg
 from flexget import config_schema
@@ -25,7 +19,7 @@ from flexget.event import Event, event, fire_event, remove_event_handlers
 from flexget.event import add_event_handler as add_phase_handler
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable
+    from collections.abc import Callable, Iterable
 
 logger = loguru.logger.bind(name='plugin')
 
@@ -48,9 +42,9 @@ class DependencyError(Exception):
 
     def __init__(
         self,
-        issued_by: Optional[str] = None,
-        missing: Optional[str] = None,
-        message: Optional[str] = None,
+        issued_by: str | None = None,
+        missing: str | None = None,
+        message: str | None = None,
         silent: bool = False,
     ):
         super().__init__()
@@ -124,7 +118,7 @@ class internet:  # noqa: N801 It acts like a function in usage
         else:
             self.logger = logger.bind(name='@internet')
 
-    def __call__(self, func: Callable) -> Callable:
+    def __call__(self, func: 'Callable') -> 'Callable':
         def wrapped_func(*args, **kwargs):
             try:
                 return func(*args, **kwargs)
@@ -160,10 +154,10 @@ class internet:  # noqa: N801 It acts like a function in usage
         return wrapped_func
 
 
-def priority(value: int) -> Callable[[Callable], Callable]:
+def priority(value: int) -> 'Callable[[Callable], Callable]':
     """Priority decorator for phase methods."""
 
-    def decorator(target: Callable) -> Callable:
+    def decorator(target: 'Callable') -> 'Callable':
         target.priority = value
         return target
 
@@ -200,10 +194,10 @@ plugins_loaded = False
 
 _loaded_plugins = {}
 _plugin_options = []
-_new_phase_queue: dict[str, list[Optional[str]]] = {}
+_new_phase_queue: dict[str, list[str | None]] = {}
 
 
-def register_task_phase(name: str, before: Optional[str] = None, after: Optional[str] = None):
+def register_task_phase(name: str, before: str | None = None, after: str | None = None):
     """Add a new task phase to the available phases."""
     if before and after:
         raise RegisterException('You can only give either before or after for a phase.')
@@ -212,7 +206,7 @@ def register_task_phase(name: str, before: Optional[str] = None, after: Optional
     if name in task_phases or name in _new_phase_queue:
         raise RegisterException(f'Phase {name} already exists.')
 
-    def add_phase(phase_name: str, before: Optional[str], after: Optional[str]):
+    def add_phase(phase_name: str, before: str | None, after: str | None):
         if before is not None and before not in task_phases:
             return False
         if after is not None and after not in task_phases:
@@ -248,12 +242,12 @@ class PluginInfo(dict):
     def __init__(
         self,
         plugin_class: type,
-        name: Optional[str] = None,
-        interfaces: Optional[list[str]] = None,
+        name: str | None = None,
+        interfaces: list[str] | None = None,
         builtin: bool = False,
         debug: bool = False,
         api_ver: int = 1,
-        category: Optional[str] = None,
+        category: str | None = None,
     ) -> None:
         """Register a plugin.
 
@@ -293,7 +287,7 @@ class PluginInfo(dict):
         self.category = category
         self.phase_handlers: dict[str, Event] = {}
         self.schema: config_schema.JsonSchema = {}
-        self.schema_id: Optional[str] = None
+        self.schema_id: str | None = None
 
         self.plugin_class: type = plugin_class
         self.instance: object = None
@@ -410,7 +404,7 @@ def _check_phase_queue() -> None:
             )
 
 
-def _import_plugin(module_name: str, plugin_path: Union[str, Path]) -> None:
+def _import_plugin(module_name: str, plugin_path: str | Path) -> None:
     try:
         import_module(module_name)
     except DependencyError as e:
@@ -515,7 +509,7 @@ def _load_plugins_from_packages() -> None:
 
 
 def load_plugins(
-    extra_plugins: Optional[list[Path]] = None, extra_components: Optional[list[Path]] = None
+    extra_plugins: list[Path] | None = None, extra_components: list[Path] | None = None
 ) -> None:
     """Load plugins from the standard plugin and component paths.
 
@@ -553,11 +547,11 @@ def load_plugins(
 
 
 def get_plugins(
-    phase: Optional[str] = None,
-    interface: Optional[str] = None,
-    category: Optional[str] = None,
-    name: Optional[str] = None,
-    min_api: Optional[int] = None,
+    phase: str | None = None,
+    interface: str | None = None,
+    category: str | None = None,
+    name: str | None = None,
+    min_api: int | None = None,
 ) -> 'Iterable[PluginInfo]':
     """Query other plugins characteristics.
 
@@ -628,7 +622,7 @@ def get_plugin_by_name(name: str, issued_by: str = '???') -> PluginInfo:
     return plugins[name]
 
 
-def get(name: str, requested_by: Union[str, object]) -> object:
+def get(name: str, requested_by: str | object) -> object:
     """Return instance of Plugin class.
 
     :param str name: Name of the requested plugin

@@ -4,7 +4,7 @@ import warnings
 from datetime import date, datetime
 from enum import Enum
 from pathlib import Path
-from typing import TYPE_CHECKING, Callable, Optional, Union
+from typing import TYPE_CHECKING, Optional
 
 import pendulum
 from loguru import logger
@@ -15,7 +15,7 @@ from flexget.utils.serialization import Serializer, deserialize, serialize
 from flexget.utils.template import CoercingDateTime, FlexGetTemplate, render_from_entry
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable, Mapping, Sequence
+    from collections.abc import Callable, Iterable, Mapping, Sequence
 
 logger = logger.bind(name='entry')
 
@@ -94,9 +94,9 @@ class Entry(LazyDict, Serializer):
 
     def trace(
         self,
-        message: Optional[str],
-        operation: Optional[str] = None,
-        plugin: Optional[str] = None,
+        message: str | None,
+        operation: str | None = None,
+        plugin: str | None = None,
     ) -> None:
         """Add trace message to the entry which should contain useful information about why plugin did not operate on entry.
 
@@ -121,7 +121,7 @@ class Entry(LazyDict, Serializer):
         for func in self._hooks[action]:
             func(self, **kwargs)
 
-    def add_hook(self, action: str, func: Callable, **kwargs) -> None:
+    def add_hook(self, action: str, func: 'Callable', **kwargs) -> None:
         """Add a hook for ``action`` to this entry.
 
         :param string action: One of: 'accept', 'reject', 'fail', 'complete'
@@ -134,7 +134,7 @@ class Entry(LazyDict, Serializer):
         except KeyError:
             raise ValueError(f'`{action}` is not a valid entry action')
 
-    def on_accept(self, func: Callable, **kwargs) -> None:
+    def on_accept(self, func: 'Callable', **kwargs) -> None:
         """Register a function to be called when this entry is accepted.
 
         :param func: The function to call
@@ -142,7 +142,7 @@ class Entry(LazyDict, Serializer):
         """
         self.add_hook('accept', func, **kwargs)
 
-    def on_reject(self, func: Callable, **kwargs) -> None:
+    def on_reject(self, func: 'Callable', **kwargs) -> None:
         """Register a function to be called when this entry is rejected.
 
         :param func: The function to call
@@ -150,7 +150,7 @@ class Entry(LazyDict, Serializer):
         """
         self.add_hook('reject', func, **kwargs)
 
-    def on_fail(self, func: Callable, **kwargs) -> None:
+    def on_fail(self, func: 'Callable', **kwargs) -> None:
         """Register a function to be called when this entry is failed.
 
         :param func: The function to call
@@ -158,7 +158,7 @@ class Entry(LazyDict, Serializer):
         """
         self.add_hook('fail', func, **kwargs)
 
-    def on_complete(self, func: Callable, **kwargs) -> None:
+    def on_complete(self, func: 'Callable', **kwargs) -> None:
         """Register a function to be called when a :class:`Task` has finished processing this entry.
 
         :param func: The function to call
@@ -166,7 +166,7 @@ class Entry(LazyDict, Serializer):
         """
         self.add_hook('complete', func, **kwargs)
 
-    def accept(self, reason: Optional[str] = None, **kwargs) -> None:
+    def accept(self, reason: str | None = None, **kwargs) -> None:
         if self.rejected:
             logger.debug('tried to accept rejected {!r}', self)
         elif not self.accepted:
@@ -175,7 +175,7 @@ class Entry(LazyDict, Serializer):
             # Run entry on_accept hooks
             self.run_hooks('accept', reason=reason, **kwargs)
 
-    def reject(self, reason: Optional[str] = None, **kwargs) -> None:
+    def reject(self, reason: str | None = None, **kwargs) -> None:
         # ignore rejections on immortal entries
         if self.get('immortal'):
             reason_str = f'({reason})' if reason else ''
@@ -188,7 +188,7 @@ class Entry(LazyDict, Serializer):
             # Run entry on_reject hooks
             self.run_hooks('reject', reason=reason, **kwargs)
 
-    def fail(self, reason: Optional[str] = None, **kwargs):
+    def fail(self, reason: str | None = None, **kwargs):
         logger.debug("Marking entry '{}' as failed", self['title'])
         if not self.failed:
             self._state = EntryState.FAILED
@@ -281,7 +281,7 @@ class Entry(LazyDict, Serializer):
         return isinstance(self['title'], str)
 
     def update_using_map(
-        self, field_map: dict, source_item: Union[dict, object], ignore_none: bool = False
+        self, field_map: dict, source_item: dict | object, ignore_none: bool = False
     ):
         """Populate entry fields from a source object using a dictionary that maps from entry field names to attributes (or keys) in the source object.
 
@@ -304,7 +304,7 @@ class Entry(LazyDict, Serializer):
                 continue
             self[field] = v
 
-    def render(self, template: Union[str, FlexGetTemplate], native: bool = False) -> str:
+    def render(self, template: str | FlexGetTemplate, native: bool = False) -> str:
         """Render a template string based on fields in the entry.
 
         :param template: A template string or FlexGetTemplate that uses jinja2 or python string replacement format.
@@ -350,7 +350,7 @@ class Entry(LazyDict, Serializer):
 
     def add_lazy_fields(
         self,
-        lazy_func: Union[Callable[['Entry'], None], str],
+        lazy_func: 'Callable[[Entry], None] | str',
         fields: 'Iterable[str]',
         args: Optional['Sequence'] = None,
         kwargs: Optional['Mapping'] = None,
@@ -409,7 +409,7 @@ class LazyFunc:
         self.name = lazy_func_name
         self._func = None
 
-    def __call__(self, func: Callable) -> Callable:
+    def __call__(self, func: 'Callable') -> 'Callable':
         if self.name in lazy_func_registry:
             raise RuntimeError(
                 f'The name {self.name} is already registered to another lazy function.'
@@ -420,7 +420,7 @@ class LazyFunc:
         return func
 
     @property
-    def function(self) -> Callable:
+    def function(self) -> 'Callable':
         if '.' in self._func.__qualname__:
             # This is a method of a plugin class, bind the function to the plugin instance
             plugin_class_name = self._func.__qualname__.split('.')[0]
