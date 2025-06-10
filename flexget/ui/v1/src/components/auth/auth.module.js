@@ -1,11 +1,10 @@
 /* global angular */
 (function () {
-    'use strict';
+  'use strict';
 
-    angular
-        .module('components.auth', [
-            'blocks.exception',
-            'blocks.router',
-            'components.toolbar'
-        ]);
-}());
+  angular.module('components.auth', [
+    'blocks.exception',
+    'blocks.router',
+    'components.toolbar',
+  ]);
+})();

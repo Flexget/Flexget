@@ -1,7 +1,6 @@
 /* global angular */
 (function () {
-    'use strict';
+  'use strict';
 
-    angular
-        .module('blocks.urlInterceptor', []);
-}());
+  angular.module('blocks.urlInterceptor', []);
+})();

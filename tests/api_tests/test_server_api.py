@@ -90,7 +90,7 @@ class TestServerAPI:
         assert (
             data['raw_config']
             == 'dGFza3M6CiAgdGVzdDoKICAgIHJzczoKICAgICAgdXJsOiBodHRwOi8vdGVzdC9yc3MKICAgIG1'
-            'vY2s6CiAgICAgIC0gdGl0bGU6IGVudHJ5IDE='
+            'vY2s6CiAgICAgIC0gdGl0bGU6IGVudHJ5IDEK'
         )
 
     @pytest.mark.online

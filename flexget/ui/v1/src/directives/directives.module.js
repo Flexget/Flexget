@@ -1,8 +1,6 @@
 /* global angular */
 (function () {
-    'use strict';
+  'use strict';
 
-    angular
-        .module('flexget.directives', [
-        ]);
-}());
+  angular.module('flexget.directives', []);
+})();

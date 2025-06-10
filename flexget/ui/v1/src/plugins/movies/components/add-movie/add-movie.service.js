@@ -1,27 +1,25 @@
 /* global angular */
 (function () {
-    'use strict';
+  'use strict';
 
-    angular
-        .module('plugins.movies')
-        .factory('addMovieService', addMovieService);
+  angular.module('plugins.movies').factory('addMovieService', addMovieService);
 
-    function addMovieService() {
-        var searchWatch;
+  function addMovieService() {
+    var searchWatch;
 
-        return {
-            setWatcher: setWatcher,
-            clearWatcher: clearWatcher
-        };
+    return {
+      setWatcher: setWatcher,
+      clearWatcher: clearWatcher,
+    };
 
-        function setWatcher(watch) {
-            searchWatch = watch;
-        }
-
-        function clearWatcher() {
-            if (searchWatch) {
-                searchWatch();
-            }    
-        }
+    function setWatcher(watch) {
+      searchWatch = watch;
     }
+
+    function clearWatcher() {
+      if (searchWatch) {
+        searchWatch();
+      }
+    }
+  }
 })();

@@ -38,10 +38,7 @@
       "ignore": true
     },
     "font-awesome": {
-      "main": [
-        "css/font-awesome.css",
-        "fonts/*"
-      ]
+      "main": ["css/font-awesome.css", "fonts/*"]
     },
     "ace-builds": {
       "main": [
@@ -53,9 +50,7 @@
       ]
     },
     "angular-link-header-parser": {
-      "main": [
-        "release/angular-link-header-parser.js"
-      ]
+      "main": ["release/angular-link-header-parser.js"]
     }
   },
   "resolutions": {

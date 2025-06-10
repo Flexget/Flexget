@@ -5,7 +5,7 @@ on:
     branches:
       - master
 
-permissions: { }
+permissions: {}
 
 jobs:
   fail:

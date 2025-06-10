@@ -16,13 +16,14 @@
   }
 
   #log-grid {
-      font-size: 70%;
+    font-size: 70%;
 
     .ui-grid-row .ui-grid-cell {
       background-color: inherit !important;
     }
 
-    .error, .critical {
+    .error,
+    .critical {
       background-color: #f2dede;
     }
 
@@ -31,7 +32,7 @@
     }
 
     .debug {
-      color: #B8B8B8;
+      color: #b8b8b8;
     }
 
     .verbose {
@@ -45,7 +46,5 @@
     .summary {
       background-color: #d9edf7;
     }
-
   }
 }
-

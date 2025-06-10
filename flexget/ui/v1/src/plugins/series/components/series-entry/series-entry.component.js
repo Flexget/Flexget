@@ -1,63 +1,63 @@
 /* global angular */
 (function () {
-    'use strict';
+  'use strict';
 
-    angular
-        .module('plugins.series')
-        .component('seriesEntry', {
-            templateUrl: 'plugins/series/components/series-entry/series-entry.tmpl.html',
-            controllerAs: 'vm',
-            controller: seriesEntryController,
-            bindings: {
-                show: '<',
-                forgetShow: '&',
-                toggleEpisodes: '&'
-            },
-            transclude: true
-        });
+  angular.module('plugins.series').component('seriesEntry', {
+    templateUrl:
+      'plugins/series/components/series-entry/series-entry.tmpl.html',
+    controllerAs: 'vm',
+    controller: seriesEntryController,
+    bindings: {
+      show: '<',
+      forgetShow: '&',
+      toggleEpisodes: '&',
+    },
+    transclude: true,
+  });
 
-    function seriesEntryController($mdDialog, seriesService) {
-        var vm = this;
+  function seriesEntryController($mdDialog, seriesService) {
+    var vm = this;
 
-        vm.$onInit = activate;
-        vm.setBegin = setBegin;
+    vm.$onInit = activate;
+    vm.setBegin = setBegin;
 
-        var dialog = {
-            template: '<series-begin-dialog begin=\'vm.begin\' show=\'vm.show\'></series-begin>',
-            bindToController: true,
-            controllerAs: 'vm',
-            controller: function () { }
-        };
+    var dialog = {
+      template:
+        "<series-begin-dialog begin='vm.begin' show='vm.show'></series-begin>",
+      bindToController: true,
+      controllerAs: 'vm',
+      controller: function () {},
+    };
 
-        function activate() {
-            loadMetadata();
+    function activate() {
+      loadMetadata();
+    }
+
+    function loadMetadata() {
+      seriesService
+        .getShowMetadata(vm.show)
+        .then(setMetadata)
+        .cached(setMetadata);
+    }
+
+    function setMetadata(response) {
+      vm.show.metadata = response.data;
+    }
+
+    function setBegin() {
+      dialog.locals = {
+        show: vm.show,
+      };
+
+      $mdDialog.show(dialog).then(function (begin) {
+        if (begin) {
+          vm.show['begin_episode']['identifier'] = begin;
         }
+      });
+    }
 
-        function loadMetadata() {
-            seriesService.getShowMetadata(vm.show)
-                .then(setMetadata)
-                .cached(setMetadata);
-        }
-
-        function setMetadata(response) {
-            vm.show.metadata = response.data;
-        }
-
-        function setBegin() {
-            dialog.locals = {
-                show: vm.show
-            };
-
-            $mdDialog.show(dialog).then(function (begin) {
-                if (begin) {
-                    vm.show['begin_episode']['identifier'] = begin;
-                }
-            });
-        }
-
-
-        //Dialog for the update possibilities, such as begin and alternate names
-       /* function showDialog(params) {
+    //Dialog for the update possibilities, such as begin and alternate names
+    /* function showDialog(params) {
             return $mdDialog.show({
                 controller: 'seriesUpdateController',
                 controllerAs: 'vm',
@@ -69,9 +69,7 @@
             });
         }*/
 
-
-
-        /*//Call from the page, to open a dialog with alternate names
+    /*//Call from the page, to open a dialog with alternate names
         vm.alternateName = function (ev) {
             var params = {
                 alternate_names: vm.show.alternate_names
@@ -83,5 +81,5 @@
                 console.log(err);
             });
         }*/
-    }
-}());
+  }
+})();

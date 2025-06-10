@@ -1,9 +1,6 @@
 /* global angular */
 (function () {
-    'use strict';
+  'use strict';
 
-    angular
-        .module('components.404', [
-            'blocks.router'
-        ]);
-}());
+  angular.module('components.404', ['blocks.router']);
+})();

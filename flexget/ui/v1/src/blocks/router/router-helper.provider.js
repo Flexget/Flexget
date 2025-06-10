@@ -1,59 +1,67 @@
 /* global angular */
 (function () {
-    'use strict';
+  'use strict';
 
-    angular
-        .module('blocks.router')
-        .provider('routerHelper', routerHelperProvider);
+  angular
+    .module('blocks.router')
+    .provider('routerHelper', routerHelperProvider);
 
-    function routerHelperProvider($stateProvider, $urlRouterProvider, $windowProvider) {
-        var $window = $windowProvider.$get();
-        if (!($window.history && $window.history.pushState)) {
-            $window.location.hash = '/';
+  function routerHelperProvider(
+    $stateProvider,
+    $urlRouterProvider,
+    $windowProvider,
+  ) {
+    var $window = $windowProvider.$get();
+    if (!($window.history && $window.history.pushState)) {
+      $window.location.hash = '/';
+    }
+
+    //TODO: Figure out if htlm5Mode is possible
+    //$locationProvider.html5Mode(true);
+
+    this.configureStates = configureStates;
+    this.$get = RouterHelper;
+
+    var hasOtherwise = false;
+
+    function configureStates(states, otherwisePath) {
+      angular.forEach(states, function (state) {
+        if (!state.config.root && !state.config.abstract) {
+          state.state = 'flexget.' + state.state;
+          state.config.template =
+            '<' +
+            state.config.component +
+            ' flex layout="row"></' +
+            state.config.component +
+            '>';
+          delete state.config.component;
         }
+        $stateProvider.state(state.state, state.config);
 
-        //TODO: Figure out if htlm5Mode is possible
-        //$locationProvider.html5Mode(true);
-
-        this.configureStates = configureStates;
-        this.$get = RouterHelper;
-
-        var hasOtherwise = false;
-
-        function configureStates(states, otherwisePath) {
-            angular.forEach(states, function (state) {
-                if (!state.config.root && !state.config.abstract) {
-                    state.state = 'flexget.' + state.state;
-                    state.config.template = '<' + state.config.component + ' flex layout="row"></' + state.config.component + '>';
-                    delete state.config.component;
-                }
-                $stateProvider.state(state.state, state.config);
-
-                if (state.when) {
-                    for (var i = 0; i < state.when.length; i++) {
-                        $urlRouterProvider.when(state.when[i], state.config.url);
-                    }
-                }
-            });
-
-            if (otherwisePath && !hasOtherwise) {
-                hasOtherwise = true;
-                $urlRouterProvider.otherwise(otherwisePath);
-            }
+        if (state.when) {
+          for (var i = 0; i < state.when.length; i++) {
+            $urlRouterProvider.when(state.when[i], state.config.url);
+          }
         }
+      });
 
-        function RouterHelper($location, $log, $rootScope, $state) {
-            //var handlingStateChangeError = false;
-            
-            return {
-                //configureStates: function () { },
-                getStates: getStates
-            };
+      if (otherwisePath && !hasOtherwise) {
+        hasOtherwise = true;
+        $urlRouterProvider.otherwise(otherwisePath);
+      }
+    }
 
+    function RouterHelper($location, $log, $rootScope, $state) {
+      //var handlingStateChangeError = false;
 
-            //init()
+      return {
+        //configureStates: function () { },
+        getStates: getStates,
+      };
 
-            /*function handleRoutingErrors() {
+      //init()
+
+      /*function handleRoutingErrors() {
                 //TODO: Convert to UI-router v1 (using transition.start etc.)
                 $rootScope.$on('$stateChangeError', function (event, toState, toParams, fromState, fromParams, error) {
                     if (handlingStateChangeError) {
@@ -78,14 +86,14 @@
                 });
             }*/
 
-            //TODO: Check if needed to be re-enabled
-            /*function init() {
+      //TODO: Check if needed to be re-enabled
+      /*function init() {
                 handleRoutingErrors();
             }*/
 
-            function getStates() {
-                return $state.get();
-            }
-        }
+      function getStates() {
+        return $state.get();
+      }
     }
-}());
+  }
+})();

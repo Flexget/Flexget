@@ -1,24 +1,21 @@
 /* global angular */
 (function () {
-    'use strict';
+  'use strict';
 
-    angular
-        .module('components.toolbar')
-        .component('toolBar', {
-            templateUrl: 'components/toolbar/toolbar.tmpl.html',
-            controllerAs: 'vm',
-            controller: toolbarController
-        });
+  angular.module('components.toolbar').component('toolBar', {
+    templateUrl: 'components/toolbar/toolbar.tmpl.html',
+    controllerAs: 'vm',
+    controller: toolbarController,
+  });
 
-    function toolbarController(sideNavService, toolbarHelper) {
-        var vm = this;
+  function toolbarController(sideNavService, toolbarHelper) {
+    var vm = this;
 
-        vm.$onInit = activate;
-        vm.toggle = sideNavService.toggle;
+    vm.$onInit = activate;
+    vm.toggle = sideNavService.toggle;
 
-        function activate() {
-            vm.toolBarItems = toolbarHelper.items;
-        }
+    function activate() {
+      vm.toolBarItems = toolbarHelper.items;
     }
-
-}());
+  }
+})();

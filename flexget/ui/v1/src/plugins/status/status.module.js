@@ -1,13 +1,12 @@
 /* global angular, registerPlugin */
 (function () {
-    'use strict';
+  'use strict';
 
-    angular
-        .module('plugins.status', [
-            'blocks.exception',
-            'blocks.router',
-            'mdDataTable'
-        ]);
+  angular.module('plugins.status', [
+    'blocks.exception',
+    'blocks.router',
+    'mdDataTable',
+  ]);
 
-    registerPlugin('plugins.status');
-}());
+  registerPlugin('plugins.status');
+})();
