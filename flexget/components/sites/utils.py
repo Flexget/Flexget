@@ -20,7 +20,7 @@ def normalize_unicode(text):
 def normalize_scene(text):
     """Normalize string according to scene standard.
 
-    Mainly, it replace accented chars by their 'normal' couterparts
+    Mainly, it replace accented chars by their 'normal' counterparts
     and removes special chars.
     https://en.wikipedia.org/wiki/Standard_(warez)#Naming for more information
     """

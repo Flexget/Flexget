@@ -324,7 +324,7 @@ class InputRSS:
                 content = content.decode('utf-8', 'ignore').encode('ascii', 'ignore')
 
         if not content:
-            logger.error('No data recieved for rss feed.')
+            logger.error('No data received for rss feed.')
             return []
         if config.get('escape'):
             logger.debug('Trying to escape unescaped in RSS')

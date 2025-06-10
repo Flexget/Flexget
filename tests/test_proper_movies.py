@@ -37,7 +37,7 @@ class TestProperMovies:
         return Template(self._config).render({'parser': request.param})
 
     def test_proper_movies(self, execute_task):
-        # first occurence
+        # first occurrence
         task = execute_task('test1')
         assert task.find_entry('accepted', title='Movie.Name.2011.720p-FlexGet')
 
