@@ -147,7 +147,7 @@ class TestExistsSeries:
         task = execute_task('test_propers')
         assert task.find_entry('accepted', title='Mock.S01E01.Proper'), 'new proper not accepted'
         assert task.find_entry('rejected', title='Test.S01E01'), (
-            'pre-existin proper should have caused reject'
+            'pre-existing proper should have caused reject'
         )
 
     def test_invalid(self, execute_task):
