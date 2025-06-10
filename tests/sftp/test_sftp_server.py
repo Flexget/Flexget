@@ -121,7 +121,7 @@ else:
         def create_file(self, path: str, size: int = 0) -> Path:
             """Create a file on the :class: `StubSFTPServer` instance.
 
-            If the path is relative it will be created realative to the users home directory
+            If the path is relative it will be created relative to the users home directory
 
             :param path: The path of the file to create absolute or relative
             :param size: The size in bytes of the file to create, defaults to 0
@@ -170,8 +170,8 @@ else:
             """Canonicalizes the given SFTP path to the local file system either from the cwd, or the user home if none is set.
 
             :param path: The path to canonicalize.
-            :param resolve: If symlinks shoul be resovled.
-            :raises ValueError: If the path or taget is relative and would take return a directory outside the SFTP filesytem.
+            :param resolve: If symlinks should be resolved.
+            :raises ValueError: If the path or target is relative and would take return a directory outside the SFTP filesystem.
             :return: An :class:`pathlib.Path` of the canonicalized path.
             """
             canonicalized: Path
@@ -225,7 +225,7 @@ else:
 
         def __init__(self, filename: str, read_file, write_file, flags: int = 0) -> None:
             super().__init__(flags)
-            # Note these names are used in the default SFTPHandle, hense no __ to
+            # Note these names are used in the default SFTPHandle, hence no __ to
             # indicate private
             self.filename = filename
             self.readfile = read_file
@@ -257,9 +257,9 @@ else:
         __test__ = False
 
         def __init__(
-            self, server: ServerInterface, fs: TestSFTPFileSystem, *larg, **kwarg
+            self, server: ServerInterface, fs: TestSFTPFileSystem, *args, **kwargs
         ) -> None:
-            super().__init__(server, *larg, **kwarg)
+            super().__init__(server, *args, **kwargs)
             self.__fs = fs
 
         def session_started(self):
@@ -346,7 +346,7 @@ else:
             files that cross disk partition boundaries, if at all possible.
             .. note:: You should return an error if a file with the same name as
                 ``newpath`` already exists.  (The rename operation should be
-                non-desctructive.)
+                non-destructive.)
             .. note::
                 This method implements 'standard' SFTP ``RENAME`` behavior; those
                 seeking the OpenSSH "POSIX rename" extension behavior should use

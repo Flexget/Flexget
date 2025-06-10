@@ -43,7 +43,7 @@ describe('Plugin: Log.component', function () {
 
       controller.$onDestroy();
 
-      expect(controller.stop).to.have.been.calleOnce;
+      expect(controller.stop).to.have.been.calledOnce;
     });
   });
 

@@ -17,13 +17,14 @@ try:
     PROVIDERS = provider_manager.names()
 except ImportError:
     PROVIDERS = [
-        'argenteam',
-        'legendastv',
+        'addic7ed',
+        'gestdown',
+        'napiprojekt',
         'opensubtitles',
+        'opensubtitlescom',
+        'opensubtitlescomvip',
         'opensubtitlesvip',
         'podnapisi',
-        'shooter',
-        'thesubdb',
         'tvsubtitles',
     ]
 
@@ -48,14 +49,14 @@ class PluginSubliminal:
           alternatives:
             - eng
           exact_match: no
-          providers: legendastv, opensubtitles
+          providers: gestdown, opensubtitles
           single: no
           directory: /disk/subtitles
           hearing_impaired: yes
           authentication:
-            legendastv:
+            opensubtitles:
               username: myuser
-              passsword: mypassword
+              password: mypassword
     """
 
     schema = {

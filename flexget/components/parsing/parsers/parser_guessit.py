@@ -298,18 +298,18 @@ class ParserGuessit:
 
         if country:
             try:
-                serie_result = guessit_api.guessit(name)
-                serie_country = str(serie_result.get('country', ''))
+                series_result = guessit_api.guessit(name)
+                series_country = str(series_result.get('country', ''))
                 allowed_countries = guessit_options.get('allowed_countries', [])
 
-                if country != serie_country or (
-                    not serie_country
+                if country != series_country or (
+                    not series_country
                     and allowed_countries
                     and country.lower() not in allowed_countries
                 ):
                     valid = False
             except GuessitException:
-                logger.warning('Parsing {} serie with guessit failed.', name)
+                logger.warning('Parsing {} series with guessit failed.', name)
 
         # Check the full list of 'episode_details' for special,
         # since things like 'pilot' and 'unaired' can also show up there

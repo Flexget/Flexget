@@ -220,7 +220,7 @@ class RadarrAPIService:
 
 
 # Maps (lowercase) Radarr qualities to flexget
-# quality reqirement strings
+# quality requirement strings
 QUALITIES_MAP = {
     'workprint': 'workprint',
     'cam': 'cam',

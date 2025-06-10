@@ -83,7 +83,7 @@ class TestNpoWatchlistPremium:
         task = execute_task('test')
         entry = task.find_entry(
             url='https://www.npostart.nl/hollands-hoop/08-02-2020/BV_101396963'
-        )  # a premium serie
+        )  # a premium series
         assert entry['npo_id'] == 'BV_101396963'
         assert entry['npo_url'] == 'https://www.npostart.nl/hollands-hoop/BV_101385153'
         assert entry['npo_name'] == 'Hollands Hoop'

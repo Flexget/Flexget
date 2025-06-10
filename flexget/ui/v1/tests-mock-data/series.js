@@ -142,7 +142,7 @@ var mockSeriesData = (function () {
       last_updated: '2016-06-09 11:14:09',
       network: 'The CW',
       overview:
-        "Olivia “Liv” Moore was a rosy-cheeked, disciplined, over-achieving medical resident who had her life path completely mapped out…until the night she attended a party that unexpectedly turned into a zombie feeding frenzy. Now a med sudent-turned-zombie, she takes a job in the coroner's office to gain acces to the brains she must reluctantly eat to maintain her humanity, but with each brain she consumes, she inherits the corpse's memories. With the help of her medical examiner boss and a police detective, she solves homicide cases in order to quiet the disturbing voices in her head. ",
+        "Olivia “Liv” Moore was a rosy-cheeked, disciplined, over-achieving medical resident who had her life path completely mapped out…until the night she attended a party that unexpectedly turned into a zombie feeding frenzy. Now a med student-turned-zombie, she takes a job in the coroner's office to gain access to the brains she must reluctantly eat to maintain her humanity, but with each brain she consumes, she inherits the corpse's memories. With the help of her medical examiner boss and a police detective, she solves homicide cases in order to quiet the disturbing voices in her head. ",
       posters: [
         'http://thetvdb.com/banners/posters/281470-2.jpg',
         'http://thetvdb.com/banners/posters/281470-1.jpg',

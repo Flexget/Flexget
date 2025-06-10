@@ -16,7 +16,7 @@
       $window.location.hash = '/';
     }
 
-    //TODO: Figure out if htlm5Mode is possible
+    //TODO: Figure out if html5Mode is possible
     //$locationProvider.html5Mode(true);
 
     this.configureStates = configureStates;

@@ -237,3 +237,29 @@ branch = true
 [tool.doc8]
 ignore = [ "D004" ]
 max_line_length = 99
+
+[tool.typos.default]
+extend-ignore-re = [
+  "idel",
+  "parametros",
+  'Programe',
+  'searchin',
+  'SerieS',
+  '23BA98',
+]
+
+[tool.typos.default.extend-words]
+nd = 'nd'
+sur = 'sur'
+hime = 'hime'
+
+[tool.typos.default.extend-identifiers]
+McClory = 'McClory'
+
+[tool.typos.files]
+extend-exclude = [
+  "**/cassettes/*",
+  'tests/couchpotato_movie_list_test_response.json',
+  'tests/couchpotato_quality_profile_test_response.json',
+  'tests/test_thetvdb.py',
+]

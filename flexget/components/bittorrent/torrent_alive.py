@@ -104,7 +104,7 @@ def get_udp_seeds(url, info_hash):
 
         # set 16 bytes ["QLL" = 16 bytes] for the fmq for unpack
         res = clisocket.recv(16)
-        # check recieved packet for response
+        # check received packet for response
         action, transaction_id, connection_id = struct.unpack(b'>LLQ', res)
 
         # build packet hash out of decoded info_hash
@@ -114,7 +114,7 @@ def get_udp_seeds(url, info_hash):
         packet = struct.pack(b'>QLL', connection_id, 2, transaction_id) + packet_hash
 
         clisocket.send(packet)
-        # set recieve size of 8 + 12 bytes
+        # set receive size of 8 + 12 bytes
         res = clisocket.recv(20)
 
     except OSError as e:

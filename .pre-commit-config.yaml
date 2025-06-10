@@ -15,6 +15,10 @@ repos:
     hooks:
       - id: prettier
         args: [--single-quote]
+  - repo: https://github.com/crate-ci/typos
+    rev: v1.33.1
+    hooks:
+      - id: typos
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.12.7
     hooks:

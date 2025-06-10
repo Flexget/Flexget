@@ -297,7 +297,7 @@ class LostFilm:
                         logger.debug('The redirect page is downloaded from {}', redirect_url)
                         break
                     logger.verbose(
-                        'Got status {} while retriving the redirect page {}',
+                        'Got status {} while retrieving the redirect page {}',
                         response.status_code,
                         redirect_url,
                     )

@@ -192,7 +192,7 @@ class PluginDownload:
         for entry in task.accepted:
             self.get_temp_file(task, entry, require_path, handle_magnets, fail_html, tmp_path)
 
-    # TODO: a bit silly method, should be get rid of now with simplier exceptions ?
+    # TODO: a bit silly method, should be get rid of now with simpler exceptions ?
     def process_entry(self, task, entry, url, tmp_path):
         """Process `entry` by using `url`. Do not use entry['url'].
 
@@ -370,7 +370,7 @@ class PluginDownload:
                 if any(entry['filename'].endswith(extension) for extension in extensions):
                     logger.debug('Filename {} extension matches to mime-type', entry['filename'])
                 else:
-                    # mimetypes library has no concept of a 'prefered' extension when there are multiple possibilites
+                    # mimetypes library has no concept of a 'preferred' extension when there are multiple possibilities
                     # this causes the first to be used which is not always desirable, e.g. 'ksh' for 'text/plain'
                     extension = mimetypes.guess_extension(entry['mime-type'], strict=False)
                     logger.debug(

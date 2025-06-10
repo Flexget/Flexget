@@ -148,7 +148,7 @@ class OutputQBitTorrent:
         params = {'hashes': hash_torrent}
 
         try:
-            respose = self.session.request(
+            response = self.session.request(
                 'get',
                 url,
                 params=params,
@@ -158,15 +158,15 @@ class OutputQBitTorrent:
             logger.error('Error getting torrent info, request to hash {} failed', hash_torrent)
             return False
 
-        if respose.status_code != 200:
+        if response.status_code != 200:
             logger.error(
                 'Error getting torrent info, hash {} search returned',
                 hash_torrent,
-                respose.status_code,
+                response.status_code,
             )
             return False
 
-        check_file = respose.json()
+        check_file = response.json()
 
         if isinstance(check_file, list) and check_file:
             logger.warning('File with hash {} already in qbittorrent', hash_torrent)

@@ -45,7 +45,7 @@ class TestRTorrentClient:
         fields = list(called_args[2:])
         assert len(fields) == 3
         # TODO: check the note in clients/rtorrent.py about this escaping.
-        # The client should be fixed to work consistenly on all python versions
+        # The client should be fixed to work consistently on all python versions
         # Calling re.escape here is a workaround so test works on python 3.7 and older versions
         assert ('d.directory.set=' + re.escape('/data/downloads')) in fields
         assert 'd.custom1.set=testing' in fields

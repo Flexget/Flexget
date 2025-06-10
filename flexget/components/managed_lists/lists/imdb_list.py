@@ -178,7 +178,7 @@ class ImdbEntrySet(MutableSet):
                     self.user_id = self.get_user_id_and_hidden_value(self.cookies)
                 if not self.user_id:
                     raise PluginError(
-                        'Not possible to retrive userid, please check cookie information'
+                        'Not possible to retrieve userid, please check cookie information'
                     )
 
                 user = IMDBListUser(self.config['login'], self.user_id, self.cookies)

@@ -33,7 +33,7 @@ SCHEMA_SERVER_TAG = {'server': {**SCHEMA_SERVER}}
 
 
 SORT_FIELDS = [
-    'comunity_rating',
+    'community_rating',
     'critic_rating',
     'date_created',
     'date_played',
@@ -71,17 +71,17 @@ field_map = {
         'emby_page': 'page',
     },
     'series': {
-        'emby_serie_year': 'serie_year',
-        'emby_serie_aired_date': 'serie_aired_date',
-        'emby_serie_id': 'serie_id',
-        'emby_serie_name': 'serie_name',
-        'emby_serie_photo': 'serie_photo',
-        'emby_serie_imdb_id': 'serie_imdb_id',
-        'emby_serie_tvdb_id': 'serie_tvdb_id',
-        'emby_serie_overview': 'serie_overview',
-        'emby_serie_page': 'serie_page',
-        'imdb_id': 'serie_imdb_id',
-        'tvdb_id': 'serie_tvdb_id',
+        'emby_series_year': 'series_year',
+        'emby_series_aired_date': 'series_aired_date',
+        'emby_series_id': 'series_id',
+        'emby_series_name': 'series_name',
+        'emby_series_photo': 'series_photo',
+        'emby_series_imdb_id': 'series_imdb_id',
+        'emby_series_tvdb_id': 'series_tvdb_id',
+        'emby_series_overview': 'series_overview',
+        'emby_series_page': 'series_page',
+        'imdb_id': 'series_imdb_id',
+        'tvdb_id': 'series_tvdb_id',
     },
     'season': {
         'emby_season': 'season',
@@ -128,7 +128,7 @@ def simplify_text(text: str) -> str:
     if not isinstance(text, str):
         return text
 
-    # Replace accented chars by their 'normal' couterparts
+    # Replace accented chars by their 'normal' counterparts
     result = normalize('NFKD', text)
 
     # Symbols that should be converted to white space
