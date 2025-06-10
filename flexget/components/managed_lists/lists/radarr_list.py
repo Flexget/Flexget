@@ -1,5 +1,4 @@
 from collections.abc import MutableSet
-from typing import Optional
 from urllib.parse import quote, urlparse
 
 import requests
@@ -455,7 +454,7 @@ class RadarrSet(MutableSet):
         # Radarr is an online service, so yes...
         return True
 
-    def _find_matching_entry(self, entry) -> Optional[Entry]:
+    def _find_matching_entry(self, entry) -> Entry | None:
         """Find a movie by first checking against the ids of the  provided entry, and if none matches, check by title name."""
         for movie_entry in self.items:
             # First check if any of the id attributes match

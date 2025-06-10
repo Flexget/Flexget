@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Callable, Optional, Union
+from typing import TYPE_CHECKING, Any
 
 import sqlalchemy.event
 from loguru import logger
@@ -14,6 +14,9 @@ from flexget.manager import Base, Session
 from flexget.utils.database import with_session
 from flexget.utils.sqlalchemy_utils import table_schema
 from flexget.utils.tools import get_current_flexget_version
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 logger = logger.bind(name='schema')
 
@@ -47,7 +50,7 @@ def set_flexget_db_version(manager=None) -> None:
             logger.debug('current flexget version already exist in db {}', db_version.version)
 
 
-def get_flexget_db_version() -> Optional[str]:
+def get_flexget_db_version() -> str | None:
     with Session() as session:
         version = session.query(FlexgetVersion).first()
         if version:
@@ -71,7 +74,7 @@ class PluginSchema(Base):
 
 
 @with_session
-def get_version(plugin: str, session=None) -> Optional[int]:
+def get_version(plugin: str, session=None) -> int | None:
     schema = session.query(PluginSchema).filter(PluginSchema.plugin == plugin).first()
     if not schema:
         logger.debug('No schema version stored for {}', plugin)
@@ -124,7 +127,7 @@ class UpgradeImpossible(Exception):
     """Exception to be thrown during a db upgrade function which will cause the old tables to be removed and recreated from the new model."""
 
 
-def upgrade(plugin: str) -> Callable:
+def upgrade(plugin: str) -> 'Callable':
     """Use as a decorator to register a schema upgrade function.
 
     The wrapped function will be passed the current schema version and a session object.
@@ -226,7 +229,7 @@ class VersionedBaseMeta(DeclarativeMeta):
             register_plugin_table(new_class.__tablename__, new_class._plugin, new_class._version)
         return new_class
 
-    def register_table(self, table: Union[str, Table]) -> None:
+    def register_table(self, table: str | Table) -> None:
         """Can be used if a plugin is declaring non-declarative sqlalchemy tables.
 
         :param table: Can either be the name of the table, or an :class:`sqlalchemy.Table` instance.
@@ -249,7 +252,7 @@ def versioned_base(plugin: str, version: int) -> VersionedBaseMeta:
 
 
 @sqlalchemy.event.listens_for(Base.metadata, 'after_create')
-def after_table_create(target, connection, tables: Optional[list[Table]] = None, **kw) -> None:
+def after_table_create(target, connection, tables: list[Table] | None = None, **kw) -> None:
     """Set the schema version to most recent for a plugin when it's tables are freshly created."""
     if tables:
         # TODO: Detect if any database upgrading is needed and acquire the lock only in one place
