@@ -199,7 +199,7 @@ Example:
 
 This will generate one entry in the task, notice that entry has two mandatory
 fields ``title`` and ``url``. If ``url`` is not defined the mock plugin will
-generate random url for localhost. The ``description`` filed is just arbitary
+generate random url for localhost. The ``description`` filed is just arbitrary
 field that we define in here. We can define any kind of basic text, number, list
 or dictionary fields in here.
 

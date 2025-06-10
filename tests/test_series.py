@@ -1578,7 +1578,7 @@ class TestImportSeries:
     def test_timeframe_max(self, execute_task):
         """Tests configure_series as well as timeframe with max_quality."""
         task = execute_task('timeframe_max')
-        assert not task.accepted, 'Entry shouldnot have been accepted on first run.'
+        assert not task.accepted, 'Entry shouldnt have been accepted on first run.'
         age_series(minutes=6)
         task = execute_task('timeframe_max')
         assert task.find_entry('accepted', title='the show s03e02 hdtv'), (
@@ -1593,7 +1593,7 @@ class TestImportSeries:
         assert entry['series_name'] == 'the show', 'entry series should be set to the main name'
 
     def test_manual_config_override(self, execute_task):
-        """Settings configued manually in series plugin should override those from configure_series."""
+        """Settings configured manually in series plugin should override those from configure_series."""
         task = execute_task('test_manual_config_override')
         series_config = task.config['series'][0]['my show']
         assert series_config['quality'] == '720p', 'configure_series settings should be merged in'
