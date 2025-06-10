@@ -261,9 +261,11 @@ class OutputAria2:
                         ) as response:
                             content_disposition = response.headers.get('content-disposition', None)
                     except Exception:
-                        logger.warning('Not possible to retrive file info from `{}`', entry['url'])
+                        logger.warning(
+                            'Not possible to retrieve file info from `{}`', entry['url']
+                        )
                         entry.fail(
-                            'Not possible to retrive file info from `{}`'.format(entry['url'])
+                            'Not possible to retrieve file info from `{}`'.format(entry['url'])
                         )
                         return None
 
@@ -287,8 +289,8 @@ class OutputAria2:
                     ext = add_extension if add_extension[0] == '.' else '.' + add_extension
 
                 if not ext:
-                    logger.warning('Not possible to retrive extension')
-                    entry.fail('Not possible to retrive extension')
+                    logger.warning('Not possible to retrieve extension')
+                    entry.fail('Not possible to retrieve extension')
                     return None
 
                 logger.debug('Adding extension `{}` to file `{}`', ext, filename)

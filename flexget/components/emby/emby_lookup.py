@@ -84,7 +84,7 @@ class EmbyLookup:
     @property
     def series_identifier(self):
         """Returns the plugin main identifier type."""
-        return 'emby_serie_id'
+        return 'emby_series_id'
 
 
 @event('plugin.register')
