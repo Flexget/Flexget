@@ -105,7 +105,7 @@ class Decompress:
     to                 Destination path; supports Jinja2 templating on the input entry. Fields such
                        as series_name must be populated prior to input into this plugin using
                        metainfo_series or similar. If no path is specified, archive contents will
-                       be extraced in the same directory as the archve itself.
+                       be extracted in the same directory as the archive itself.
     keep_dirs          [yes|no] (default: yes) Indicates whether to preserve the directory
                        structure from within the archive in the destination path.
     mask               Shell-style file mask; any matching files will be extracted. When used, this
