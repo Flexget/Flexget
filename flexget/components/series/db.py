@@ -291,7 +291,7 @@ class Episode(Base):
     def age(self):
         """Return Pretty string representing age of episode.
 
-        Exmaple: "23d 12h" or "No releases seen"
+        Example: "23d 12h" or "No releases seen"
         """
         if not self.first_seen:
             return 'No releases seen'
@@ -634,7 +634,7 @@ def upgrade(ver: int | None, session: Session) -> int:
         # Warn users about a possible config change needed.
         logger.warning(
             'If you are using `identified_by: id` for the series plugin for a date-identified '
-            'or abolute-numbered series, you will need to update your config. Two new identified_by modes have '
+            'or absolute-numbered series, you will need to update your config. Two new identified_by modes have '
             'been added: `date` and `sequence`. In addition, if you are using `identified_by: auto`, it will'
             'be relearned based on upcoming episodes.'
         )
@@ -895,7 +895,7 @@ def _add_alt_name(alt: str, db_series: Series, series_name: str, session: Sessio
         if not db_series_alt.series:
             # Not sure how this can happen
             logger.debug(
-                'Found an alternate name not attached to series. Re-attatching `{}` to `{}`.',
+                'Found an alternate name not attached to series. Re-attaching `{}` to `{}`.',
                 alt,
                 series_name,
             )

@@ -205,7 +205,7 @@ class OmbiEntry:
 
         except (HTTPError, ApiError) as error:
             if isinstance(error, ApiError):
-                if error.response.get('errrorCode') == 'AlreadyRequested':
+                if error.response.get('errorCode') == 'AlreadyRequested':
                     log.verbose(f'{self.ombi_title} already requested in Ombi.')
                     return True
 
@@ -221,7 +221,7 @@ class OmbiEntry:
         return True
 
     def mark_available(self):
-        """Mark an entry in Ombi as avaliable."""
+        """Mark an entry in Ombi as available."""
         if self.data['available']:
             log.verbose(f'{self.ombi_title} already available in Ombi.')
             return
@@ -263,7 +263,7 @@ class OmbiEntry:
             log.debug(e)
 
     def mark_unavailable(self):
-        """Mark an entry in Ombi as unavaliable."""
+        """Mark an entry in Ombi as unavailable."""
         if not self.data['available']:
             log.verbose(f'{self.ombi_title} already unavailable in Ombi.')
             return
@@ -345,7 +345,7 @@ class OmbiMovie(OmbiEntry):
 
     def mark_requested(self):
         """Mark an entry in Ombi as being requested."""
-        # A status such as approved, denied and avaiable are a sub status of requested.
+        # A status such as approved, denied and available are a sub status of requested.
         # Which means you can not mark an entry as approved, denied or available without first marking it as requested.
         # You also can not mark an entry as requested if it is already approved, denied or available.
         already_requested, status = self.already_requested()

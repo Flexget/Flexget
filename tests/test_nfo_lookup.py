@@ -192,7 +192,7 @@ class TestNfoLookupWithMovies:
         task = execute_task('test_8')
         for entry in task.entries:
             # Since the entry was not processed again then no new fields besides the fields added by the mock
-            # configiration in test_8 should be present.
+            # configuration in test_8 should be present.
             keys = sorted(entry.keys())
             assert entry['nfo_id'] == 'tt2316801'
 
