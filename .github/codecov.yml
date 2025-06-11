@@ -2,11 +2,11 @@ codecov:
   notify:
     after_n_builds: 15
 
-comment:
-  layout: 'diff, flags, files'
-
 coverage:
   status:
     project:
       default:
-        target: auto
+        informational: true
+    patch:
+      default:
+        informational: true

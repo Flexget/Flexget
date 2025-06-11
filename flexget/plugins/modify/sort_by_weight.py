@@ -146,7 +146,7 @@ class PluginSortByWeight:
         elif isinstance(value, bool):
             min_value = False
         elif isinstance(value, datetime):
-            min_value = datetime.now()  # assume date comparision vs now()
+            min_value = datetime.now()  # assume date comparison vs now()
         elif isinstance(value, timedelta):
             min_value = timedelta(0)
         return min_value
