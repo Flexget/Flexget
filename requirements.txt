@@ -24,7 +24,7 @@ brotli==1.1.0 ; platform_python_implementation != 'PyPy'
     # via flask-compress
 brotlicffi==1.1.0.0 ; platform_python_implementation == 'PyPy'
     # via flask-compress
-certifi==2025.4.26
+certifi==2025.6.15
     # via requests
 cffi==1.17.1 ; platform_python_implementation == 'PyPy'
     # via
@@ -55,7 +55,7 @@ flask==3.1.1
     #   flexget
 flask-compress==1.17
     # via flexget
-flask-cors==6.0.0
+flask-cors==6.0.1
     # via flexget
 flask-login==0.6.3
     # via flexget
@@ -157,7 +157,7 @@ referencing==0.36.2
     # via
     #   jsonschema
     #   jsonschema-specifications
-requests==2.32.3
+requests==2.32.4
     # via flexget
 rich==14.0.0
     # via flexget
