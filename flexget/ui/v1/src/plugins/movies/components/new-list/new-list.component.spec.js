@@ -57,7 +57,7 @@ describe('Plugin: New-list.Component', function () {
       expect(moviesService.createList).to.have.been.calledOnce;
     });
 
-    it('should close the dialog when successfull', function () {
+    it('should close the dialog when successful', function () {
       sinon.spy($mdDialog, 'hide');
 
       deferred.resolve();
