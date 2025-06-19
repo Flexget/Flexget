@@ -311,7 +311,7 @@ class TransformingOps(BaseFileOps):
             and dst_ext != src_ext
         ):
             self.logger.verbose('Adding extension `{}` to dst `{}`', src_ext, dst)
-            dst = dst.with_suffix(src_ext)
+            dst = Path(f'{dst}{src_ext}')
             dst_file += dst_ext  # this is used for sibling files. dst_ext turns out not to be an extension!
 
         funct_name = 'move' if self.move else 'copy'
