@@ -153,12 +153,17 @@ _codecs = [
     QualityComponent('codec', 50, 'av1', 'av-?1'),
 ]
 
+hdr = r'hdr([^\w]?10)?'
+hdr_plus = r'hdr(10)?[^\w]?(\+|p|plus)'
+dovi = r'(dolby[^\w]?vision|dv|dovi)'
 _color_ranges = [
     QualityComponent('color_range', 10, '8bit', r'8[^\w]?bits?|hi8p?'),
     QualityComponent('color_range', 20, '10bit', r'10[^\w]?bits?|hi10p?'),
-    QualityComponent('color_range', 30, 'hdr', r'hdr([^\w]?10)?'),
-    QualityComponent('color_range', 40, 'hdrplus', r'hdr(10)?[^\w]?(\+|p|plus)'),
-    QualityComponent('color_range', 50, 'dolbyvision', r'(dolby[^\w]?vision|dv|dovi)'),
+    # Must come before the individual ones since it's stripped from the title
+    QualityComponent('color_range', 60, 'hybrid-hdr', f'(({dovi}|{hdr_plus}|{hdr})\\W?){{2,3}}'),
+    QualityComponent('color_range', 30, 'hdr', hdr),
+    QualityComponent('color_range', 40, 'hdrplus', hdr_plus),
+    QualityComponent('color_range', 50, 'dolbyvision', dovi),
 ]
 
 channels = r'(?:(?:[^\w+]?[1-7][\W_]?(?:0|1|ch)))'
