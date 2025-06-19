@@ -102,6 +102,8 @@ class TestQualityParser:
             ('Test.File.DTSHDMA5.1', 'dtshd'),
             ('Test.File.DD2.0', 'dd5.1', False),
             ('Test.File.AC35.1', 'ac3', False),
+            ('Test.File.HDR.DOVI', 'hybrid-hdr', False),
+            ('Test.File.DV.HDR10+', 'hybrid-hdr', False),
         ],
     )
     def test_quality_failures(self, parser, test_quality):
