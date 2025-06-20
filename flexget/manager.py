@@ -895,8 +895,7 @@ class Manager:
         with open(self.lockfile, 'w', encoding='utf-8') as f:
             f.write(f'PID: {os.getpid()}\n')
             if ipc_info:
-                for key in sorted(ipc_info):
-                    f.write(f'{key}: {ipc_info[key]}\n')
+                f.writelines(f'{key}: {ipc_info[key]}\n' for key in sorted(ipc_info))
 
     def release_lock(self) -> None:
         try:

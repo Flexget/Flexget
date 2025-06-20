@@ -297,10 +297,9 @@ class PluginDownload:
 
             try:
                 with open(datafile, 'wb') as outfile:
-                    for chunk in response.iter_content(
-                        chunk_size=150 * 1024, decode_unicode=False
-                    ):
-                        outfile.write(chunk)
+                    outfile.writelines(
+                        response.iter_content(chunk_size=150 * 1024, decode_unicode=False)
+                    )
             except Exception as e:
                 # don't leave futile files behind
                 logger.debug('Download interrupted, removing datafile')

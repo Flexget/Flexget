@@ -108,5 +108,5 @@ def fire_event(name: str, *args, **kwargs) -> Any:
         for event in get_events(name):
             result = event(*args, **kwargs)
             if result is not None:
-                args = (result,) + args[1:]
+                args = result, *args[1:]
     return args and args[0]
