@@ -75,7 +75,7 @@ else:
 
         def __run_server(self):
             logger.debug('Starting sftp server 127.0.0.1:40022 with root fs at %s', self.__root)
-            try:
+            with contextlib.suppress(ConnectionAbortedError):
                 conn, addr = self.__server_socket.accept()
 
                 host_key = RSAKey.from_private_key_file('test_sftp_server.key')
@@ -93,10 +93,6 @@ else:
 
                 while transport.is_active():
                     time.sleep(1)
-            except ConnectionAbortedError:
-                pass
-            except Exception as e:
-                logger.critical(e, exc_info=True)
 
         def kill(self) -> None:
             with contextlib.suppress(OSError):
