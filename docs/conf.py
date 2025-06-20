@@ -43,7 +43,7 @@ intersphinx_mapping = {
     'loguru': ('https://loguru.readthedocs.io/en/stable', None),
     'python': ('https://docs.python.org/3', None),
     'python-telegram-bot': ('https://docs.python-telegram-bot.org/en/stable', None),
-    'requests': ('https://docs.python-requests.org/en/stable', None),
+    'requests': ('https://requests.readthedocs.io/en/stable', None),
     'rich': ('https://rich.readthedocs.io/en/stable/', None),
     'sqlalchemy': ('https://docs.sqlalchemy.org', None),
     'transmission-rpc': ('https://transmission-rpc.readthedocs.io/en/stable', None),
