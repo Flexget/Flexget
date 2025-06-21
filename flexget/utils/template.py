@@ -4,7 +4,7 @@ from contextlib import suppress
 from copy import copy
 from datetime import date, datetime, time
 from pathlib import Path, PurePosixPath, PureWindowsPath
-from typing import TYPE_CHECKING, Any, AnyStr, Optional, Union, cast
+from typing import TYPE_CHECKING, Any, AnyStr, Optional, cast
 from unicodedata import normalize
 
 import jinja2.filters
@@ -127,7 +127,7 @@ class CoercingDateTime(DateTime):
             self, other = self._same_tz(self, other)
         return DateTime.__sub__(self, other)
 
-    def diff(self, dt: Optional[datetime] = None, abs: bool = True) -> Interval:
+    def diff(self, dt: datetime | None = None, abs: bool = True) -> Interval:
         """Return the difference between two DateTime objects represented as an Interval."""
         if dt is None:
             dt = self.now(self.tz)
@@ -135,35 +135,35 @@ class CoercingDateTime(DateTime):
         return Interval(self, dt, absolute=abs)
 
 
-def filter_pathbase(val: Union[Path, str] = '') -> str:
+def filter_pathbase(val: Path | str = '') -> str:
     """Return base name of a path."""
     if isinstance(val, str):
         val = PureWindowsPath(val)
     return val.name
 
 
-def filter_pathname(val: Union[Path, str] = '') -> str:
+def filter_pathname(val: Path | str = '') -> str:
     """Return base name of a path, without its extension."""
     if isinstance(val, str):
         val = PureWindowsPath(val)
     return val.stem
 
 
-def filter_pathext(val: Union[Path, str] = '') -> str:
+def filter_pathext(val: Path | str = '') -> str:
     """Extension of a path (including the '.')."""
     if isinstance(val, str):
         val = PureWindowsPath(val)
     return val.suffix
 
 
-def filter_pathdir(val: Union[Path, str] = '') -> Union[PureWindowsPath, PurePosixPath, Path]:
+def filter_pathdir(val: Path | str = '') -> PureWindowsPath | PurePosixPath | Path:
     """Directory containing the given path."""
     if isinstance(val, str):
         val = PureWindowsPath(val) if '\\' in val and val[1] == ':' else PurePosixPath(val)
     return val.parent
 
 
-def filter_pathscrub(val: str, os_mode: Optional[str] = None) -> str:
+def filter_pathscrub(val: str, os_mode: str | None = None) -> str:
     """Replace problematic characters in a path."""
     if not isinstance(val, str):
         return val
@@ -204,7 +204,7 @@ def filter_date_suffix(date_str: str):
     return date_str + suffix
 
 
-def filter_format_number(val, places: Optional[int] = None, grouping: bool = True) -> str:
+def filter_format_number(val, places: int | None = None, grouping: bool = True) -> str:
     """Format a number according to the user's locale."""
     if not isinstance(val, (int, float)):
         return val
@@ -219,7 +219,7 @@ def filter_format_number(val, places: Optional[int] = None, grouping: bool = Tru
     return locale.format_string(format_str, val, grouping)
 
 
-def filter_pad(val: Union[int, str], width: int, fillchar: str = '0') -> str:
+def filter_pad(val: int | str, width: int, fillchar: str = '0') -> str:
     """Pad a number or string with fillchar to the specified width."""
     return str(val).rjust(width, fillchar)
 
@@ -271,7 +271,7 @@ def filter_get_year(name: str) -> str:
     return split_title_year(name).year
 
 
-def filter_parse_size(val: str, si: bool = False, match_re: Optional[str] = None) -> int:
+def filter_parse_size(val: str, si: bool = False, match_re: str | None = None) -> int:
     """Parse human-readable file size to bytes."""
     if not isinstance(val, str):
         return val
@@ -288,17 +288,17 @@ def filter_format_size(size: float, si=False, unit=None):
     return format_filesize(size, si=si, unit=unit)
 
 
-def is_fs_file(pathname: Union[Path, str]) -> bool:
+def is_fs_file(pathname: Path | str) -> bool:
     """Test whether item is existing file in filesystem."""
     return Path(pathname).is_file()
 
 
-def is_fs_dir(pathname: Union[Path, str]) -> bool:
+def is_fs_dir(pathname: Path | str) -> bool:
     """Test whether item is existing directory in filesystem."""
     return Path(pathname).is_dir()
 
 
-def is_fs_link(pathname: Union[Path, str]) -> bool:
+def is_fs_link(pathname: Path | str) -> bool:
     """Test whether item is existing link in filesystem."""
     return Path(pathname).is_symlink()
 
@@ -345,7 +345,7 @@ def make_environment(manager: 'Manager') -> None:
             environment.tests[name.split('_', 1)[1]] = test
 
 
-def list_templates(extensions: Optional[list[str]] = None) -> list[str]:
+def list_templates(extensions: list[str] | None = None) -> list[str]:
     """Return all templates names that are configured under environment loader dirs."""
     if environment is None or not hasattr(environment, 'loader'):
         return []
@@ -362,7 +362,7 @@ def get_filters() -> dict:
     return environment.filters
 
 
-def get_template(template_name: str, scope: Optional[str] = 'task') -> FlexGetTemplate:
+def get_template(template_name: str, scope: str | None = 'task') -> FlexGetTemplate:
     """Load a template from disk. Looks in both included plugins and users custom scope dir."""
     if not template_name.endswith('.template'):
         template_name += '.template'
@@ -380,7 +380,7 @@ def get_template(template_name: str, scope: Optional[str] = 'task') -> FlexGetTe
     raise ValueError(err)
 
 
-def render(template: Union[FlexGetTemplate, str], context: 'Mapping', native: bool = False) -> str:
+def render(template: FlexGetTemplate | str, context: 'Mapping', native: bool = False) -> str:
     """Render a Template with `context` as its context.
 
     :param template: Template or template string to render.
@@ -410,7 +410,7 @@ def render(template: Union[FlexGetTemplate, str], context: 'Mapping', native: bo
 
 
 def render_from_entry(
-    template: Union[FlexGetTemplate, str], entry: 'Entry', native: bool = False
+    template: FlexGetTemplate | str, entry: 'Entry', native: bool = False
 ) -> str:
     """Render a Template or template string with an Entry as its context."""
     # Make a copy of the Entry so we can add some more fields
@@ -426,7 +426,7 @@ def render_from_entry(
     return render(template, variables, native=native)
 
 
-def render_from_task(template: Union[FlexGetTemplate, str], task: 'Task') -> str:
+def render_from_task(template: FlexGetTemplate | str, task: 'Task') -> str:
     """Render a Template with a task as its context.
 
     :param template: Template or template string to render.

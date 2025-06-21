@@ -1,7 +1,7 @@
 import ctypes
 import os
 import random
-from typing import NamedTuple, Union
+from typing import NamedTuple
 
 from loguru import logger
 
@@ -14,9 +14,9 @@ logger = logger.bind(name='path_by_space')
 
 class DiskStats(NamedTuple):
     path: str
-    free_bytes: Union[ctypes.c_ulonglong, int]
-    used_bytes: Union[ctypes.c_ulonglong, int]
-    total_bytes: Union[ctypes.c_ulonglong, int]
+    free_bytes: ctypes.c_ulonglong | int
+    used_bytes: ctypes.c_ulonglong | int
+    total_bytes: ctypes.c_ulonglong | int
     free_percent: float
     used_percent: float
 
