@@ -1,5 +1,5 @@
-from collections.abc import Iterable, Mapping, MutableMapping, Sequence
-from typing import Any, Callable, NamedTuple
+from collections.abc import Callable, Iterable, Mapping, MutableMapping, Sequence
+from typing import Any, NamedTuple
 
 from loguru import logger
 

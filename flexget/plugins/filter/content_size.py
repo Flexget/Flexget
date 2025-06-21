@@ -1,5 +1,3 @@
-from typing import Optional
-
 from loguru import logger
 
 from flexget import plugin
@@ -22,7 +20,7 @@ class FilterContentSize:
     }
 
     @staticmethod
-    def process_config(config: dict) -> tuple[Optional[int], Optional[int]]:
+    def process_config(config: dict) -> tuple[int | None, int | None]:
         def _parse_config_size(size):
             if isinstance(size, (int, float)):
                 return size * 1024**2

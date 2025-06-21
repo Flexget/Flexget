@@ -1,7 +1,6 @@
 import ntpath
 import re
 import sys
-from typing import Optional
 
 os_mode = None  # Can be 'windows', 'mac', 'linux' or None. None will auto-detect os.
 # Replacement order is important, don't use dicts to store
@@ -15,7 +14,7 @@ platform_replaces = {
 }
 
 
-def pathscrub(dirty_path: str, os: Optional[str] = None, filename: bool = False) -> str:
+def pathscrub(dirty_path: str, os: str | None = None, filename: bool = False) -> str:
     """Strip illegal characters for a given os from a path.
 
     :param dirty_path: Path to be scrubbed.

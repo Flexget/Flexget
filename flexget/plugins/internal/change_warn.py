@@ -41,10 +41,10 @@ def register_plugin():
 
 @event('manager.startup')
 def startup_warnings(manager):
-    if sys.version_info < (3, 10) and date.today() > date(year=2025, month=10, day=1):
+    if sys.version_info < (3, 11) and date.today() > date(year=2026, month=10, day=1):
         logger.warning(
-            'Python 3.9 is EOL as of October 2025. FlexGet will eventually remove support for it. '
-            'You should upgrade to Python 3.10 or later.'
+            'Python 3.10 is EOL as of October 2026. FlexGet will eventually remove support for it. '
+            'You should upgrade to Python 3.11 or later.'
         )
 
 

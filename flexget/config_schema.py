@@ -6,7 +6,7 @@ from collections import defaultdict
 from json import JSONDecodeError
 from json import loads as json_loads
 from re import Match, Pattern
-from typing import Any, Callable, Optional, Union
+from typing import TYPE_CHECKING, Any
 from urllib.parse import parse_qsl, urlparse
 
 import jsonschema
@@ -23,14 +23,17 @@ from flexget.utils import json, qualities, template
 from flexget.utils.template import get_template
 from flexget.utils.tools import parse_episode_identifier, parse_filesize, parse_timedelta
 
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
 logger = logger.bind(name='config_schema')
 
 BASE_SCHEMA_NAME = 'draft2020-12'
 BASE_SCHEMA_URI = 'https://json-schema.org/draft/2020-12/schema'
 BaseValidator = jsonschema.Draft202012Validator
 # Type hint for json schemas. (If we upgrade to a newer json schema version, the type might allow more than dicts.)
-JsonSchema = Union[dict[str, Any], bool]
-schema_paths: dict[str, Union[JsonSchema, Callable[..., JsonSchema]]] = {}
+JsonSchema = dict[str, Any] | bool
+schema_paths: dict[str, 'JsonSchema | Callable[..., JsonSchema]'] = {}
 
 
 class ConfigValidationError(ValidationError):
@@ -42,7 +45,7 @@ class ConfigError(ValueError):
 
 
 # TODO: Rethink how config key and schema registration work
-def register_schema(path: str, schema: Union[JsonSchema, Callable[..., JsonSchema]]):
+def register_schema(path: str, schema: 'JsonSchema | Callable[..., JsonSchema]'):
     """Register `schema` to be available at `path` for $refs.
 
     :param path: Path to make schema available
@@ -52,7 +55,7 @@ def register_schema(path: str, schema: Union[JsonSchema, Callable[..., JsonSchem
 
 
 # Validator that handles root structure of config.
-_root_config_schema: Optional[JsonSchema] = None
+_root_config_schema: JsonSchema | None = None
 
 
 def register_config_key(key: str, schema: JsonSchema, required: bool = False):
@@ -124,7 +127,7 @@ def retrieve_resource(uri: str) -> Resource:
 
 
 def process_config(
-    config: Any, schema: Optional[JsonSchema] = None, set_defaults: bool = True
+    config: Any, schema: JsonSchema | None = None, set_defaults: bool = True
 ) -> list[ConfigValidationError]:
     """Validate the config, and set defaults within it if `set_defaults` is set.
 
@@ -247,7 +250,7 @@ def is_percent(percent_string) -> bool:
 
 
 @format_checker.checks('regex', raises=ValueError)
-def is_regex(instance) -> Union[bool, Pattern]:
+def is_regex(instance) -> bool | Pattern:
     if not isinstance(instance, str):
         return True
     try:
@@ -282,7 +285,7 @@ def is_path(instance) -> bool:
 
 # TODO: jsonschema has a format checker for uri if rfc3987 is installed, perhaps we should use that
 @format_checker.checks('url')
-def is_url(instance) -> Union[None, bool, Match]:
+def is_url(instance) -> None | bool | Match:
     if not isinstance(instance, str):
         return True
     # Allow looser validation if this appears to start with jinja
@@ -495,7 +498,7 @@ def _rewrite_ref(identifier: str, definition_path: str, defs: dict) -> str:
     return identifier
 
 
-def _inline_refs(schema: JsonSchema, definition_path: str, defs: dict) -> Union[JsonSchema, list]:
+def _inline_refs(schema: JsonSchema, definition_path: str, defs: dict) -> JsonSchema | list:
     if isinstance(schema, dict):
         if '$ref' in schema:
             return {**schema, '$ref': _rewrite_ref(schema['$ref'], definition_path, defs)}

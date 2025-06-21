@@ -2,7 +2,6 @@ import hashlib
 import random
 import socket
 import threading
-from typing import Optional
 
 import cherrypy
 import zxcvbn
@@ -17,7 +16,7 @@ from flexget.utils.database import with_session
 
 logger = logger.bind(name='web_server')
 
-_home: Optional[str] = None
+_home: str | None = None
 _app_register: dict[str, tuple[Flask, str]] = {}
 _default_app = Flask(__name__)
 

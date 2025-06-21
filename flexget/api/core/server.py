@@ -9,7 +9,6 @@ import traceback
 from pathlib import Path
 from time import sleep
 from typing import IO, TYPE_CHECKING
-from typing import Optional as OptionalType
 
 import cherrypy
 import yaml
@@ -305,7 +304,7 @@ def reverse_readline(
     fh: IO, start_byte: int = 0, buf_size: int = 8192
 ) -> 'Generator[str, None, None]':
     """Return the lines of a file in reverse order."""
-    segment: OptionalType[str] = None
+    segment: str | None = None
     offset = 0
     if start_byte:
         fh.seek(start_byte)
@@ -441,7 +440,7 @@ class LogParser:
       * quoted strings;
     """
 
-    def __init__(self, query: OptionalType[str]) -> None:
+    def __init__(self, query: str | None) -> None:
         self._methods = {
             'and': self.evaluate_and,
             'or': self.evaluate_or,

@@ -6,7 +6,7 @@ description = """\
     different sources like RSS-feeds, html-pages, various sites and more.\
 """
 readme = "README.rst"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 authors = [
     { name = "Marko Koivusalo", email = "marko.koivusalo@gmail.com" },
     { name = "Chase Sterling", email = "chase.sterling@gmail.com" },
@@ -19,7 +19,6 @@ dependencies = [
     "feedparser ~=6.0",
     "guessit ~=3.8",
     "html5lib ~=1.1",
-    "importlib-metadata ~=8.5; python_version <'3.10'", # TODO: remove this after we drop python3.9
     "jinja2 ~=3.1",
     "jsonschema ~=4.23",
     "loguru ~=0.7.3",
@@ -35,11 +34,6 @@ dependencies = [
     "rich ~=14.0",
     "rpyc ~=6.0",
     "sqlalchemy ~=2.0",
-    # TODO: urllib3 >=2 has changes that require vcr cassettes to be upgraded. Requirements of some of our deps (boto?)
-    # require urllib3 <2 on python < 3.10. In order to not be running different versions of urllib on different
-    # versions of python, this is pinned in our deps. This can be removed completely if the issue gets solved.
-    # https://github.com/kevin1024/vcrpy/issues/719
-    "urllib3 ~=1.26",
     # WebUI/API Deps
     "cherrypy ~=18.10",
     "flask-compress ~=1.17",
@@ -179,7 +173,6 @@ ignore = [
     "E501", # TODO: enable this rule (requires a lot of manual work)
     "EM", # flake8-errmsg
     "ERA001", # commented-out-code
-    "FA100", # TODO: remove this after Python 3.9 is dropped
     "FBT", # flake8-boolean-trap
     "FIX002", # We use "TODO" comments as a form of documentation
     "FIX004", # We use "HACK" comments as a form of documentation
