@@ -14,7 +14,7 @@ repos:
         args: [--fix]
       - id: ruff-format
   - repo: https://github.com/PyCQA/doc8
-    rev: v1.1.2
+    rev: v2.0.0
     hooks:
       - id: doc8
   - repo: https://github.com/astral-sh/uv-pre-commit
