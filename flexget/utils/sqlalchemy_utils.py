@@ -1,6 +1,6 @@
 """Miscellaneous SQLAlchemy helpers."""
 
-from typing import Any, Optional, Union
+from typing import Any
 
 from loguru import logger
 from sqlalchemy import ColumnDefault, Index, Sequence, text
@@ -47,7 +47,7 @@ def table_schema(name: str, session: Session) -> Table:
     return Table(name, MetaData(), autoload_with=session.bind)
 
 
-def table_columns(table: Union[str, Table], session: Session) -> list[str]:
+def table_columns(table: str | Table, session: Session) -> list[str]:
     """Return list of column names in the table or empty list.
 
     :param string table: Name of table or table schema
@@ -82,9 +82,9 @@ def drop_index(table_name: str, index_name: str, session: Session) -> None:
 
 
 def table_add_column(
-    table: Union[Table, str],
+    table: Table | str,
     name: str,
-    col_type: Union[TypeEngine, type],
+    col_type: TypeEngine | type,
     session: Session,
     default: Any = None,
 ) -> None:
@@ -133,7 +133,7 @@ def drop_tables(names: list[str], session: Session) -> None:
             table.drop()
 
 
-def get_index_by_name(table: Table, name: str) -> Optional[Index]:
+def get_index_by_name(table: Table, name: str) -> Index | None:
     """Find declaratively defined index from table by name.
 
     :param table: Table object

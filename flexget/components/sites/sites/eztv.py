@@ -1,6 +1,5 @@
 import re
 from math import ceil
-from typing import Optional
 from urllib.parse import urlparse, urlunparse
 
 from loguru import logger
@@ -64,7 +63,7 @@ class Eztv:
         entry['urls'] = [m.get('href') for m in mirrors]
         entry['url'] = mirrors[0].get('href')
 
-    def api_call(self, task, entry=None, query: Optional[dict] = None) -> dict:
+    def api_call(self, task, entry=None, query: dict | None = None) -> dict:
         if query is None:
             query = {}
         try:

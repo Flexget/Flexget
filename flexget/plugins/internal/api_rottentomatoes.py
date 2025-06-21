@@ -1,7 +1,7 @@
 import difflib
 import time
 from datetime import datetime, timedelta
-from typing import Any, Optional
+from typing import Any
 from urllib.error import URLError
 from urllib.parse import quote_plus
 
@@ -93,7 +93,7 @@ Base.register_table(directors_table)
 class RottenTomatoesContainer:
     """Base class for RottenTomatoes objects."""
 
-    def __init__(self, init_dict: Optional[dict[str, Any]] = None) -> None:
+    def __init__(self, init_dict: dict[str, Any] | None = None) -> None:
         if isinstance(init_dict, dict):
             self.update_from_dict(init_dict)
 
@@ -257,13 +257,13 @@ class RottenTomatoesSearchResult(Base):
 @internet(logger)
 @with_session
 def lookup_movie(
-    title: Optional[str] = None,
-    year: Optional[int] = None,
-    rottentomatoes_id: Optional[int] = None,
-    smart_match: Optional[bool] = None,
+    title: str | None = None,
+    year: int | None = None,
+    rottentomatoes_id: int | None = None,
+    smart_match: bool | None = None,
     only_cached: bool = False,
-    session: Optional[Session] = None,
-    api_key: Optional[str] = None,
+    session: Session | None = None,
+    api_key: str | None = None,
 ) -> RottenTomatoesMovie:
     """Do a lookup from Rotten Tomatoes for the movie matching the passed arguments.
 
@@ -472,8 +472,8 @@ def lookup_movie(
 def _set_movie_details(
     movie: RottenTomatoesMovie,
     session: Session,
-    movie_data: Optional[dict[str, Any]] = None,
-    api_key: Optional[str] = None,
+    movie_data: dict[str, Any] | None = None,
+    api_key: str | None = None,
 ) -> Any:
     """Populate ``movie`` object from given data.
 
@@ -555,7 +555,7 @@ def _set_movie_details(
     return movie
 
 
-def movies_info(id, api_key: Optional[str] = None):
+def movies_info(id, api_key: str | None = None):
     if not api_key:
         api_key = API_KEY
     url = f'{SERVER}/{API_VER}/movies/{id}.json?apikey={api_key}'
@@ -570,7 +570,7 @@ def lists(
     list_name,
     limit: int = 20,
     page_limit: int = 20,
-    page: Optional[int] = None,
+    page: int | None = None,
     api_key=None,
 ):
     if isinstance(list_type, str):
@@ -596,7 +596,7 @@ def lists(
 
 
 def movies_search(
-    q, page_limit: Optional[int] = None, page: Optional[int] = None, api_key: Optional[str] = None
+    q, page_limit: int | None = None, page: int | None = None, api_key: str | None = None
 ):
     if isinstance(q, str):
         q = quote_plus(q.encode('latin-1', errors='ignore'))
@@ -616,7 +616,7 @@ def movies_search(
     return None
 
 
-def get_json(url: str) -> Optional[dict[str, Any]]:
+def get_json(url: str) -> dict[str, Any] | None:
     try:
         logger.debug('fetching json at {}', url)
         data = session.get(url)

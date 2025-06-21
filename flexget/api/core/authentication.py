@@ -1,6 +1,6 @@
 import base64
 from contextlib import suppress
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from flask import Request, Response, request
 from flask import session as flask_session
@@ -23,7 +23,7 @@ login_manager.init_app(api_app)
 
 @login_manager.request_loader
 @with_session
-def load_user_from_request(request: Request, session: 'Session' = None) -> Optional[User]:
+def load_user_from_request(request: Request, session: 'Session' = None) -> User | None:
     auth_value = request.headers.get('Authorization')
 
     if not auth_value:
@@ -48,12 +48,12 @@ def load_user_from_request(request: Request, session: 'Session' = None) -> Optio
 
 @login_manager.user_loader
 @with_session
-def load_user(username: str, session: 'Session' = None) -> Optional[User]:
+def load_user(username: str, session: 'Session' = None) -> User | None:
     return session.query(User).filter(User.name == username).first()
 
 
 @api_app.before_request
-def check_valid_login() -> Optional[Response]:
+def check_valid_login() -> Response | None:
     # Allow access to root, login and swagger documentation without authentication
     if (
         request.path == '/'

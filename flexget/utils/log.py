@@ -24,7 +24,7 @@ else:
 
 
 @db_schema.upgrade('log_once')
-def upgrade(ver: Optional[int], session: 'Session'):
+def upgrade(ver: int | None, session: 'Session'):
     if ver is None:
         logger.info('Adding index to md5sum column of log_once table.')
         table = table_schema('log_once', session)
@@ -66,7 +66,7 @@ def log_once(
     once_level: str = 'INFO',
     suppressed_level: str = 'VERBOSE',
     session: 'Session' = None,
-) -> Optional[bool]:
+) -> bool | None:
     """Log message only once using given logger`.
 
     Return False if suppressed logging.
