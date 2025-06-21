@@ -1,56 +1,89 @@
 interactions:
-  - request:
-      body: username=invalid&password=invalid&keeplogged=1
-      headers:
-        Accept: ['*/*']
-        Accept-Encoding: ['gzip, deflate']
-        Connection: [keep-alive]
-        Content-Length: ['46']
-        Content-Type: [application/x-www-form-urlencoded]
-        User-Agent: [FlexGet/1.2.464.dev (www.flexget.com)]
-      method: POST
-      uri: https://ssl.what.cd/login.php
-    response:
-      body:
-        string: !!binary |
-          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
-          AAA=
-      headers:
-        cache-control: ['no-cache, must-revalidate, post-check=0, pre-check=0']
-        cf-ray: [27dc15ff8cd819c2-SYD]
-        connection: [keep-alive]
-        content-encoding: [gzip]
-        content-type: [text/html; charset=utf-8]
-        date: ['Thu, 03 Mar 2016 09:33:17 GMT']
-        pragma: [no-cache]
-        server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=de1a8b43978a7fb49438efef98fa727991456997596; expires=Fri,
-            03-Mar-17 09:33:16 GMT; path=/; domain=.what.cd; HttpOnly', 'keeplogged=deleted;
-            expires=Thu, 01-Jan-1970 00:00:01 GMT; Max-Age=0; path=/']
-        strict-transport-security: [max-age=15768000]
-        x-frame-options: [SAMEORIGIN]
-      status: {code: 200, message: OK}
+- request:
+    body: username=invalid&password=invalid&keeplogged=1
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '46'
+      Content-Type:
+      - application/x-www-form-urlencoded
+      User-Agent:
+      - FlexGet/1.2.464.dev (www.flexget.com)
+    method: POST
+    uri: https://ssl.what.cd/login.php
+  response:
+    body:
+      string: "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html
+        xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\" lang=\"en\">\n<head>\n\t<title>Login
+        :: What.CD</title>\n\t<meta http-equiv=\"X-UA-Compatible\" content=\"chrome=1;
+        IE=edge\" />\n\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"
+        />\n\t<link rel=\"shortcut icon\" href=\"favicon.ico\" />\n\t<link rel=\"apple-touch-icon\"
+        href=\"/apple-touch-icon.png\" />\n\t<link href=\"static/styles/public/style.css?v=1381233767\"
+        rel=\"stylesheet\" type=\"text/css\" />\n\t<script src=\"static/functions/jquery.js\"
+        type=\"text/javascript\"></script>\n\t<script src=\"static/functions/script_start.js?v=1424742299\"
+        type=\"text/javascript\"></script>\n\t<script src=\"static/functions/ajax.class.js?v=1401309905\"
+        type=\"text/javascript\"></script>\n\t<script src=\"static/functions/cookie.class.js?v=1369678528\"
+        type=\"text/javascript\"></script>\n\t<script src=\"static/functions/storage.class.js?v=1369678528\"
+        type=\"text/javascript\"></script>\n\t<script src=\"static/functions/global.js?v=1389996001\"
+        type=\"text/javascript\"></script>\n</head>\n<body>\n<div id=\"head\">\n</div>\n<table
+        class=\"layout\" id=\"maincontent\">\n\t<tr>\n\t\t<td align=\"center\" valign=\"middle\">\n\t\t\t<div
+        id=\"logo\">\n\t\t\t\t<ul>\n\t\t\t\t\t<li><a href=\"index.php\">Home</a></li>\n\t\t\t\t\t<li><a
+        href=\"login.php\">Log in</a></li>\n\t\t\t\t</ul>\n\t\t\t</div>\n\t<span id=\"no-cookies\"
+        class=\"hidden warning\">You appear to have cookies disabled.<br /><br /></span>\n\t<noscript><span
+        class=\"warning\">What.CD requires JavaScript to function properly. Please
+        enable JavaScript in your browser.</span><br /><br /></noscript>\n\t<form
+        class=\"auth_form\" name=\"login\" id=\"loginform\" method=\"post\" action=\"login.php\">\n\t<span
+        class=\"warning\">Your username or password was incorrect.<br /><br /></span>\n\tYou
+        have <span class=\"info\">5</span> attempts remaining.<br /><br />\n\t<strong>WARNING:</strong>
+        You will be banned for 6 hours after your login attempts run out!<br /><br
+        />\n\t<table class=\"layout\">\n\t\t<tr>\n\t\t\t<td>Username&nbsp;</td>\n\t\t\t<td
+        colspan=\"2\">\n\t\t\t\t<input type=\"text\" name=\"username\" id=\"username\"
+        class=\"inputtext\" required=\"required\" maxlength=\"20\" pattern=\"[A-Za-z0-9_?\\.]{1,20}\"
+        autofocus=\"autofocus\" placeholder=\"Username\" />\n\t\t\t</td>\n\t\t</tr>\n\t\t<tr>\n\t\t\t<td>Password&nbsp;</td>\n\t\t\t<td
+        colspan=\"2\">\n\t\t\t\t<input type=\"password\" name=\"password\" id=\"password\"
+        class=\"inputtext\" required=\"required\" maxlength=\"100\" pattern=\".{6,100}\"
+        placeholder=\"Password\" />\n\t\t\t</td>\n\t\t</tr>\n\t\t<tr>\n\t\t\t<td></td>\n\t\t\t<td>\n\t\t\t\t<input
+        type=\"checkbox\" id=\"keeplogged\" name=\"keeplogged\" value=\"1\" checked=\"checked\"
+        />\n\t\t\t\t<label for=\"keeplogged\">Remember me</label>\n\t\t\t</td>\n\t\t\t<td><input
+        type=\"submit\" name=\"login\" value=\"Log in\" class=\"submit\" /></td>\n\t\t</tr>\n\t</table>\n\t</form>\n\t<br
+        /><br />\n\tLost your password? <a href=\"login.php?act=recover\" class=\"tooltip\"
+        title=\"Recover your password\">Recover it here!</a>\n<script type=\"text/javascript\"
+        src=\"static/functions/detect_mobile.js\"></script>\n<script type=\"text/javascript\">\ncookie.set('cookie_test',
+        1, 1);\nif (cookie.get('cookie_test') != null) {\n\tcookie.del('cookie_test');\n}
+        else {\n\t$('#no-cookies').gshow();\n}\n</script>\n\t\t</td>\n\t</tr>\n</table>\n<div
+        id=\"foot\">\n\t<span><a href=\"#\">What.CD</a> | <a href=\"https://what.cd/gazelle/\">Project
+        Gazelle</a></span>\n</div>\n</body>\n</html>\n"
+    headers:
+      cache-control:
+      - no-cache, must-revalidate, post-check=0, pre-check=0
+      cf-ray:
+      - 27dc15ff8cd819c2-SYD
+      connection:
+      - keep-alive
+      content-encoding:
+      - gzip
+      content-type:
+      - text/html; charset=utf-8
+      date:
+      - Thu, 03 Mar 2016 09:33:17 GMT
+      pragma:
+      - no-cache
+      server:
+      - cloudflare-nginx
+      set-cookie:
+      - __cfduid=de1a8b43978a7fb49438efef98fa727991456997596; expires=Fri, 03-Mar-17
+        09:33:16 GMT; path=/; domain=.what.cd; HttpOnly
+      - keeplogged=deleted; expires=Thu, 01-Jan-1970 00:00:01 GMT; Max-Age=0; path=/
+      strict-transport-security:
+      - max-age=15768000
+      x-frame-options:
+      - SAMEORIGIN
+    status:
+      code: 200
+      message: OK
 version: 1

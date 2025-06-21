@@ -6,17 +6,17 @@ FlexGet is a program aimed to automate downloading or processing content (torren
 podcasts, etc.) from different sources like RSS-feeds, html-pages, various sites and more.
 """
 readme = "README.rst"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 classifiers = [
     "Topic :: Utilities",
     "Development Status :: 5 - Production/Stable",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Operating System :: MacOS",
     "Operating System :: Microsoft :: Windows",
     "Operating System :: POSIX",
@@ -38,7 +38,6 @@ dependencies = [
     "feedparser ~=6.0",
     "guessit ~=3.8",
     "html5lib ~=1.1",
-    "importlib-metadata ~=8.5; python_version <'3.10'", # TODO: remove this after we drop python3.9
     "jinja2 ~=3.1",
     "jsonschema ~=4.23",
     "loguru ~=0.7.3",
@@ -54,11 +53,6 @@ dependencies = [
     "rich ~=14.0",
     "rpyc ~=6.0",
     "sqlalchemy ~=2.0",
-    # TODO: urllib3 >=2 has changes that require vcr cassettes to be upgraded. Requirements of some of our deps (boto?)
-    # require urllib3 <2 on python < 3.10. In order to not be running different versions of urllib on different
-    # versions of python, this is pinned in our deps. This can be removed completely if the issue gets solved.
-    # https://github.com/kevin1024/vcrpy/issues/719
-    "urllib3 ~=1.26",
     # WebUI/API Deps
     "cherrypy ~=18.10",
     "flask-compress ~=1.17",
@@ -183,7 +177,6 @@ ignore = [
     # TODO
     "B904",
     "E501",
-    "FA100", # Remove this rule once Python 3.9 support is dropped.
     "PERF203", # Remove this rule once Python 3.10 support is dropped.
     "PLC0415",
     "PTH119",

@@ -9,7 +9,6 @@ import fileinput
 import os
 import subprocess
 from pathlib import Path
-from typing import Optional
 
 import click
 import requests
@@ -79,7 +78,7 @@ def bump_version(bump_type):
 
 @cli.command('bundle-webui')
 @click.option('--version', 'ui_version', default=None, type=click.Choice(['v2', 'v1', '']))
-def cli_bundle_webui(ui_version: Optional[str] = None):
+def cli_bundle_webui(ui_version: str | None = None):
     try:
         bundle_webui(ui_version)
     except RuntimeError as exc:

@@ -317,7 +317,7 @@ class RTorrent:
 
         resp = multi_call()
         # TODO: Maybe we should return a named tuple or a Torrent class?
-        return dict(list(zip(self._clean_fields(fields, reverse=True), list(resp))))
+        return dict(list(zip(self._clean_fields(fields, reverse=True), list(resp), strict=False)))
 
     def torrents(self, view='main', fields=None, custom_fields=None):
         if not fields:
@@ -343,7 +343,13 @@ class RTorrent:
 
         # Response is formatted as a list of lists, with just the values
         return [
-            dict(list(zip(self._clean_fields(fields, reverse=True) + custom_fields, val)))
+            dict(
+                list(
+                    zip(
+                        self._clean_fields(fields, reverse=True) + custom_fields, val, strict=False
+                    )
+                )
+            )
             for val in resp
         ]
 

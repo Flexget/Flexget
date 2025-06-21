@@ -6,7 +6,7 @@ import shutil
 from contextlib import contextmanager, suppress
 from http import client
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Callable, Optional, Union
+from typing import TYPE_CHECKING, Any, Union
 from unittest import mock
 
 import jsonschema
@@ -29,6 +29,7 @@ from flexget.webserver import User
 
 if TYPE_CHECKING:
     import argparse
+    from collections.abc import Callable
 
     import flask
 
@@ -76,13 +77,13 @@ def manager(
 
 
 @pytest.fixture
-def execute_task(manager: Manager) -> Callable[..., Task]:
+def execute_task(manager: Manager) -> 'Callable[..., Task]':
     """Can be used to execute and return a named task in `config` argument."""
 
     def execute(
         task_name: str,
         abort: bool = False,
-        options: Optional[Union[dict, 'argparse.Namespace']] = None,
+        options: Union[dict, 'argparse.Namespace'] | None = None,
     ) -> Task:
         """Use to execute one test task from config.
 
@@ -148,7 +149,7 @@ def api_client(manager) -> 'APIClient':
 
 
 @pytest.fixture
-def schema_match(manager) -> Callable[[dict, Any], list[dict]]:
+def schema_match(manager) -> 'Callable[[dict, Any], list[dict]]':
     """Enable verifying JSON Schema.
 
     Return a list of validation error dicts. List is empty if no errors occurred.
@@ -163,7 +164,7 @@ def schema_match(manager) -> Callable[[dict, Any], list[dict]]:
 
 
 @pytest.fixture
-def link_headers(manager) -> Callable[['flask.Response'], dict[str, dict]]:
+def link_headers(manager) -> 'Callable[[flask.Response], dict[str, dict]]':
     """Parse link headers and return them in dict form."""
 
     def headers(response: 'flask.Response') -> dict[str, dict]:
@@ -310,7 +311,7 @@ class MockManager(Manager):
     unit_test = True
 
     def __init__(
-        self, config_text: str, config_name: str, tmp_path: Path, db_uri: Optional[str] = None
+        self, config_text: str, config_name: str, tmp_path: Path, db_uri: str | None = None
     ):
         self._config_name = config_name
         self._tmp_path = tmp_path

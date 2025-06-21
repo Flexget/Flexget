@@ -6,7 +6,7 @@ import time
 import warnings
 from datetime import datetime, timedelta
 from email.message import EmailMessage
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING
 from urllib.parse import urlparse
 from urllib.request import urlopen
 
@@ -35,7 +35,7 @@ if TYPE_CHECKING:
     from typing import TypedDict
 
     class StateCacheDict(TypedDict):
-        tokens: Union[float, int]
+        tokens: float | int
         last_update: datetime
 
 
@@ -85,7 +85,7 @@ class TokenBucketLimiter(DomainLimiter):
         self,
         domain: str,
         tokens: float,
-        rate: Union[str, timedelta],
+        rate: str | timedelta,
         wait: bool = True,
     ) -> None:
         """Init a token bucket rate limiter.
@@ -104,7 +104,7 @@ class TokenBucketLimiter(DomainLimiter):
         )
 
     @property
-    def tokens(self) -> Union[float, int]:
+    def tokens(self) -> float | int:
         return min(self.max_tokens, self.state['tokens'])
 
     @tokens.setter
@@ -139,11 +139,11 @@ class TokenBucketLimiter(DomainLimiter):
 class TimedLimiter(TokenBucketLimiter):
     """Enforces a minimum interval between requests to a given domain."""
 
-    def __init__(self, domain: str, interval: Union[str, timedelta]) -> None:
+    def __init__(self, domain: str, interval: str | timedelta) -> None:
         super().__init__(domain, 1, interval)
 
 
-def _wrap_urlopen(url: str, timeout: Optional[int] = None) -> requests.Response:
+def _wrap_urlopen(url: str, timeout: int | None = None) -> requests.Response:
     """Handle alternate schemes using urllib, wrap the response in a requests.Response.
 
     This is not installed as an adapter in requests, since urls without network locations
