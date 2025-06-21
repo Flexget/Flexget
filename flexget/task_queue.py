@@ -1,7 +1,6 @@
 import queue
 import threading
 import time
-from typing import Optional
 
 from loguru import logger
 from sqlalchemy.exc import OperationalError, ProgrammingError
@@ -22,7 +21,7 @@ class TaskQueue:
         self._shutdown_now = False
         self._shutdown_when_finished = False
 
-        self.current_task: Optional[Task] = None
+        self.current_task: Task | None = None
         self._thread = None
 
     def start(self) -> None:
