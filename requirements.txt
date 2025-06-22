@@ -77,11 +77,11 @@ importlib-resources==6.5.2
     # via flask-restx
 itsdangerous==2.2.0
     # via flask
-jaraco-collections==5.1.0
+jaraco-collections==5.2.1
     # via cherrypy
 jaraco-context==6.0.1
     # via jaraco-text
-jaraco-functools==4.1.0
+jaraco-functools==4.2.1
     # via
     #   cheroot
     #   jaraco-text
@@ -127,7 +127,7 @@ psutil==7.0.0
     # via flexget
 pycparser==2.22 ; platform_python_implementation == 'PyPy'
     # via cffi
-pygments==2.19.1
+pygments==2.19.2
     # via rich
 pynzb==0.1.0
     # via flexget
@@ -181,7 +181,7 @@ soupsieve==2.7
     # via beautifulsoup4
 sqlalchemy==2.0.41
     # via flexget
-tempora==5.8.0
+tempora==5.8.1
     # via portend
 typing-extensions==4.14.0
     # via
