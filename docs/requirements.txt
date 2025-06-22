@@ -35,7 +35,7 @@ markupsafe==3.0.2
 packaging==25.0
     # via sphinx
 pydata-sphinx-theme==0.16.1
-pygments==2.19.1
+pygments==2.19.2
     # via
     #   accessible-pygments
     #   pydata-sphinx-theme
