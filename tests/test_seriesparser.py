@@ -125,7 +125,7 @@ class TestSeriesParser:
         assert s.season == 2, f'failed to parse {s}'
         assert s.episode == 2, f'failed to parse {s}'
 
-    @pytest.mark.xfail(reason='Not supported in guessit, works for internal parser')
+    @pytest.mark.skip(reason='Not supported in guessit, works for internal parser')
     def test_series_episode(self, parse):
         """SeriesParser: series X, episode Y."""
         s = parse(name='Something', data='Something - Series 2, Episode 2')
@@ -477,7 +477,7 @@ class TestSeriesParser:
         for sound in sounds:
             parse(data=f'FooBar {sound} XViD-FlexGet', name='FooBar')
 
-    @pytest.mark.xfail(reason='Bug in guessit, works for internal parser')
+    @pytest.mark.skip(reason='Bug in guessit, works for internal parser')
     def test_ep_as_quality(self, parse):
         """SeriesParser: test that eps are not picked as qualities."""
         from flexget.utils import qualities

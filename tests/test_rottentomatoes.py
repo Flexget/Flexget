@@ -20,7 +20,7 @@ class TestRottenTomatoesLookup:
             rottentomatoes_lookup: yes
     """
 
-    @pytest.mark.xfail(reason='This plugin seems to be broken')
+    @pytest.mark.skip(reason='This plugin seems to be broken')
     def test_rottentomatoes_lookup(self, execute_task):
         task = execute_task('test')
         # check that these were created
