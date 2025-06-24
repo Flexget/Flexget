@@ -157,13 +157,12 @@ hdr = r'hdr([^\w]?10)?'
 hdr_plus = r'hdr(10)?[^\w]?(\+|p|plus)'
 dovi = r'(dolby[^\w]?vision|dv|dovi)'
 _color_ranges = [
-    QualityComponent('color_range', 10, '8bit', r'8[^\w]?bits?|hi8p?'),
+    QualityComponent('color_range', 10, '8bit', r'8[^\w]?bits?|hi8p?|sdr'),
     QualityComponent('color_range', 20, '10bit', r'10[^\w]?bits?|hi10p?'),
-    # Must come before the individual ones since it's stripped from the title
-    QualityComponent('color_range', 60, 'hybrid-hdr', f'(({dovi}|{hdr_plus}|{hdr})\\W?){{2,3}}'),
     QualityComponent('color_range', 30, 'hdr', hdr),
     QualityComponent('color_range', 40, 'hdrplus', hdr_plus),
     QualityComponent('color_range', 50, 'dolbyvision', dovi),
+    QualityComponent('color_range', 60, 'hybrid-hdr', f'(({dovi}|{hdr_plus}|{hdr})\\W?){{2,3}}'),
 ]
 
 channels = r'(?:(?:[^\w+]?[1-7][\W_]?(?:0|1|ch)))'
@@ -226,7 +225,7 @@ class Quality(Serializer):
         self.resolution = self._find_best(_resolutions, _UNKNOWNS['resolution'], False)
         self.source = self._find_best(_sources, _UNKNOWNS['source'])
         self.codec = self._find_best(_codecs, _UNKNOWNS['codec'])
-        self.color_range = self._find_best(_color_ranges, _UNKNOWNS['color_range'])
+        self.color_range = self._find_best(_color_ranges, _UNKNOWNS['color_range'], False)
         self.audio = self._find_best(_audios, _UNKNOWNS['audio'])
         # If any of the matched components have defaults, set them now.
         for component in self.components:
