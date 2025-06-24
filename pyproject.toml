@@ -1,17 +1,36 @@
 ## Build settings
 [project]
 name = "flexget"
-description = """\
-    FlexGet is a program aimed to automate downloading or processing content (torrents, podcasts, etc.) from \
-    different sources like RSS-feeds, html-pages, various sites and more.\
+description = """
+FlexGet is a program aimed to automate downloading or processing content (torrents,
+podcasts, etc.) from different sources like RSS-feeds, html-pages, various sites and more.
 """
 readme = "README.rst"
 requires-python = ">=3.9"
+classifiers = [
+    "Topic :: Utilities",
+    "Development Status :: 5 - Production/Stable",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Operating System :: MacOS",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX",
+    "Operating System :: Unix",
+    "Intended Audience :: End Users/Desktop",
+    "Natural Language :: English",
+    "Typing :: Typed"
+]
 authors = [
     { name = "Marko Koivusalo", email = "marko.koivusalo@gmail.com" },
     { name = "Chase Sterling", email = "chase.sterling@gmail.com" },
 ]
-license = { file = "LICENSE" }
+license = 'MIT'
+license-files = ['LICENSE']
 dynamic = ["version", "optional-dependencies"]
 dependencies = [
     "apscheduler ~=3.11",

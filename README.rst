@@ -1,24 +1,38 @@
-FlexGet
-=======
-.. image:: https://github.com/Flexget/Flexget/actions/workflows/test.yml/badge.svg?branch=develop
-    :target: https://github.com/Flexget/Flexget/actions/workflows/test.yml?query=branch%3Adevelop
+.. image:: https://github.com/flexget/flexget/raw/develop/docs/_static/logo.png
+   :align: center
+   :target: https://flexget.com
+   :height: 50
+
+|
 
 .. image:: https://img.shields.io/pypi/v/Flexget.svg
-    :target: https://pypi.python.org/pypi/Flexget
+   :target: https://pypi.org/project/flexget/
+
+.. image:: https://img.shields.io/pypi/pyversions/Flexget.svg
+   :target: https://pypi.org/project/flexget/
 
 .. image:: https://codecov.io/gh/Flexget/Flexget/graph/badge.svg
    :target: https://codecov.io/gh/Flexget/Flexget
 
 ..
-    Commenting these out for now, as they seem to be broken.
-    .. image:: https://api.codacy.com/project/badge/Grade/86bb847efe984c12948bdeccabcbccad
-        :target: https://www.codacy.com/app/Flexget/Flexget?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Flexget/Flexget&amp;utm_campaign=Badge_Grade
+   Commenting these out for now, as they seem to be broken.
+   .. image:: https://api.codacy.com/project/badge/Grade/86bb847efe984c12948bdeccabcbccad
+      :target: https://www.codacy.com/app/Flexget/Flexget?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Flexget/Flexget&amp;utm_campaign=Badge_Grade
 
-.. image:: https://img.shields.io/discord/536690097056120833?label=discord
-    :target: https://discord.gg/W6CQrJx
+.. image:: https://github.com/Flexget/Flexget/actions/workflows/test.yml/badge.svg?branch=develop
+   :target: https://github.com/Flexget/Flexget/actions/workflows/test.yml?query=branch%3Adevelop
+
+.. image:: https://readthedocs.org/projects/flexget/badge/?version=latest
+   :target: https://flexget.readthedocs.io/en/latest/
 
 .. image:: http://isitmaintained.com/badge/resolution/Flexget/Flexget.svg
-    :target: http://isitmaintained.com/project/Flexget/Flexget
+   :target: http://isitmaintained.com/project/Flexget/Flexget
+
+.. image:: https://img.shields.io/discord/536690097056120833?label=discord
+   :target: https://discord.gg/W6CQrJx
+
+.. image:: https://img.shields.io/badge/Libera%20chat-%23flexget-orange
+   :target: https://web.libera.chat/#flexget
 
 `FlexGet`_ is a multipurpose automation tool for content like torrents, nzbs,
 podcasts, comics, series, movies, etc. It can use different kinds of sources
@@ -69,7 +83,7 @@ Install
 
 FlexGet is installable via pip with the command::
 
-    pip install flexget
+   pip install flexget
 
 For more detailed instructions see the `installation guide`_.
 
