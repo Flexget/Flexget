@@ -12,71 +12,131 @@ permissions: {}
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.number || github.ref || github.run_id }}
   cancel-in-progress: true
+env:
+  REGISTRY_IMAGE: ${{ vars.DOCKER_IMAGE_NAMESPACE }}/flexget
+  GHCR_IMAGE: ghcr.io/${{ github.repository_owner }}/flexget
 jobs:
   build:
     name: Docker build
     if: github.actor != 'github-merge-queue[bot]'
-    permissions:
-      packages: write # to push to ghcr.io
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.operating-system }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: linux/amd64
+            operating-system: ubuntu-latest
+          - platform: linux/arm64
+            operating-system: ubuntu-24.04-arm
     steps:
-      - name: Checkout
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      - name: Prepare
+        run: |
+          platform=${{ matrix.platform }}
+          echo PLATFORM_PAIR=${platform//\//-} >> $GITHUB_ENV
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@902fa8ec7d6ecbf8d84d538b9b233a880e428804 # v5
         with:
-          persist-credentials: false
+          images: |
+            ${{ env.REGISTRY_IMAGE }}
+            ${{ env.GHCR_IMAGE }}
+          tags: |
+            type=ref,event=branch
+            type=pep440,pattern={{version}}
+            type=pep440,pattern={{major}}.{{minor}}
+            type=pep440,pattern={{major}}
 
-      - name: Setup QEMU
-        uses: docker/setup-qemu-action@29109295f81e9208d7d86ff1c6c12d2833863392 # v3
+      - name: Rename meta bake definition file
+        run: |
+          mv ${{ steps.meta.outputs.bake-file }} ${{ runner.temp }}/bake-meta.json
 
-      - name: Setup Docker Buildx
-        id: buildx
-        uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # v3 # zizmor: ignore[cache-poisoning]
+      - name: Upload meta bake definition
+        if: matrix.platform == 'linux/amd64'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          install: true
+          name: bake-meta
+          path: ${{ runner.temp }}/bake-meta.json
+          if-no-files-found: error
+          retention-days: 1
 
-      - name: Log in to Docker Hub
+      - name: Login to Docker Hub
         if: github.event_name == 'push'
         uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772 # v3
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@b5ca514318bd6ebac0fb2aedd5d36ec1b5c232a2 # v3 # zizmor: ignore[cache-poisoning]
+
+      - name: Build
+        id: bake
+        uses: docker/bake-action@76f9fa3a758507623da19f6092dc4089a7e61592 # v6
+        with:
+          files: |
+            ./docker-bake.hcl
+            cwd://${{ runner.temp }}/bake-meta.json
+          targets: all
+          set: |
+            *.tags=
+            *.platform=${{ matrix.platform }}
+            *.output=type=image,name=${{ env.REGISTRY_IMAGE }},push-by-digest=true,push=${{github.event_name == 'push'}}
+
+      - name: Export digest
+        run: |
+          mkdir -p ${{ runner.temp }}/digests
+          digest="${{ fromJSON(steps.bake.outputs.metadata).all['containerimage.digest'] }}"
+          touch "${{ runner.temp }}/digests/${digest#sha256:}"
+
+      - name: Upload digest
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: digests-${{ env.PLATFORM_PAIR }}
+          path: ${{ runner.temp }}/digests/*
+          if-no-files-found: error
+          retention-days: 1
+
+  merge:
+    if: github.event_name == 'push'
+    needs:
+      - build
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write # to push to ghcr.io
+    steps:
+      - name: Download meta bake definition
+        uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4
+        with:
+          name: bake-meta
+          path: ${{ runner.temp }}
+
+      - name: Download digests
+        uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4
+        with:
+          path: ${{ runner.temp }}/digests
+          pattern: digests-*
+          merge-multiple: true
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772 # v3
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772 # v3
-        if: github.event_name == 'push'
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ github.token }}
 
-      - name: Docker metadata
-        id: meta
-        uses: docker/metadata-action@902fa8ec7d6ecbf8d84d538b9b233a880e428804 # v5
-        with:
-          images: |
-            flexget/flexget
-            ghcr.io/${{ github.repository_owner }}/flexget
-          tags: |
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=semver,pattern={{major}}
-            type=ref,event=branch
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@b5ca514318bd6ebac0fb2aedd5d36ec1b5c232a2 # v3 # zizmor: ignore[cache-poisoning]
 
-      - name: Build Base Docker Image
-        id: docker_build
-        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6
-        with:
-          context: ./
-          file: ./Dockerfile
-          builder: ${{ steps.buildx.output.name }}
-          push: ${{ github.event_name == 'push' && github.ref != 'refs/heads/master' }}
-          platforms: linux/amd64,linux/arm64
-          provenance: false
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: |
-            type=gha, scope=${{ github.ref_name }}
-            type=gha, scope=${{ github.base_ref }}
-          cache-to: type=gha, mode=max, scope=${{ github.ref_name }}
-        env:
-          GH_TOKEN: ${{ secrets.flexgetbot_pat }}
+      - name: Create manifest list and push
+        working-directory: ${{ runner.temp }}/digests
+        run: |
+          docker buildx imagetools create $(jq -cr '.target."docker-metadata-action".tags |
+            map(select(startswith("${{ env.REGISTRY_IMAGE }}") or startswith("${{ env.GHCR_IMAGE }}")) | "-t " + .) |
+            join(" ")' ${{ runner.temp }}/bake-meta.json) $(printf '${{ env.REGISTRY_IMAGE }}@sha256:%s ' *)
