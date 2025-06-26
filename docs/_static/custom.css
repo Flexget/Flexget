@@ -1,15 +1,25 @@
-.navbar-brand.logo {
-  height: 55px;
+html {
+  --pst-header-height: 3rem; /* Reduce header height for a more compact look. */
 }
 
 #ethical-ad-placement {
-  max-width: 180px;
+  max-width: 180px; /* Make the Read the Docs ad less obtrusive. */
+}
+
+.search-button-field {
+  padding: 0.3rem; /* To match the compact header. */
 }
 
 .sd-card .sd-card-img-top {
+  /* Main index page overview cards */
   height: 60px;
   width: 60px;
   margin-left: auto;
   margin-right: auto;
   margin-top: 10px;
+}
+
+html[data-theme='dark'] .sd-card img[src*='.svg'] {
+  /* Main index page overview images */
+  filter: invert(0.82) brightness(0.8) contrast(1.2);
 }

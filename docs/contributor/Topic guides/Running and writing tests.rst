@@ -30,11 +30,11 @@ If you want to run tests in parallel to speed up the process, run:
    $ uv run pytest -n logical --dist loadgroup
 
 If you want to run a specific test within a module or run all tests in a class,
-see `Specifying which tests to run <https://docs.pytest.org/en/stable/how-to/usage.html>`__.
+see `specifying which tests to run <https://docs.pytest.org/en/stable/how-to/usage.html>`__.
 
 .. note::
-   If you don't want to prepend ``uv run`` to the ``pytest`` command, you can also choose to
-   enter the virtual environment:
+   To avoid having to prepend ``uv run`` to your commands, you can activate the virtual
+   environment instead:
 
    .. tab-set::
       :sync-group: os
