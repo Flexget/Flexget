@@ -1,7 +1,7 @@
 Plugin schemas
 ==============
 
-Plugins define their desired form of their config using draft 4 of the
+Plugins define their desired form of their config using draft 2020 of the
 `JSON Schema <http://json-schema.org>`_ specification. The schema for a plugin
 should be stored ``schema`` attribute of the plugin class. The schema is used
 for several things including:
