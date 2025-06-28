@@ -275,8 +275,7 @@ def is_path(instance) -> bool:
     if result:
         instance = os.path.dirname(instance[0 : result.start()])
     if not os.path.isdir(os.path.expanduser(instance)):
-        error: str = f'`{instance}` does not exist'
-        logger.warning(error)
+        logger.warning('`{}` does not exist', instance)
     return True
 
 
