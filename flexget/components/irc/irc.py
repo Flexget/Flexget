@@ -355,8 +355,7 @@ class IRCConnection(SimpleIRCBot):
         # If we got this far, let's save our work :)
         save_path = os.path.join(base_dir, tracker_name)
         with open(save_path, 'wb') as tracker_file:
-            for chunk in tracker.iter_content(8192):
-                tracker_file.write(chunk)
+            tracker_file.writelines(tracker.iter_content(8192))
         return cls.read_tracker_config(save_path)
 
     def is_alive(self):
