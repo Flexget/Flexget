@@ -96,16 +96,22 @@ class Notify:
                 config['entries']['what'] = [config['entries']['what']]
         return config
 
-    def send_notification(self, *args, **kwargs):
+    def send_notification(self, task, *args, **kwargs):
         send_notification = plugin.get('notification_framework', 'notify').send_notification
         try:
             send_notification(*args, **kwargs)
         except plugin.PluginError as e:
             logger.error(e)
+            if task.options.test:
+                raise
         except plugin.PluginWarning as e:
             logger.warning(e)
+            if task.options.test:
+                raise
         except Exception:
             logger.exception('Found an error')
+            if task.options.test:
+                raise
 
     @plugin.priority(0)
     def on_task_output(self, task, config):
@@ -131,6 +137,7 @@ class Notify:
                     message = config['entries']['message']
                 for entry in entries:
                     self.send_notification(
+                        task,
                         config['entries']['title'],
                         message,
                         config['entries']['via'],
@@ -150,6 +157,7 @@ class Notify:
                         'Cannot locate template on disk: {}'.format(config['task']['template'])
                     )
             self.send_notification(
+                task,
                 config['task']['title'],
                 template,
                 config['task']['via'],
@@ -162,6 +170,7 @@ class Notify:
                 return
             logger.debug('sending abort notification')
             self.send_notification(
+                task,
                 config['abort']['title'],
                 config['abort']['message'],
                 config['abort']['via'],

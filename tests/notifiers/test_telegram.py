@@ -1,7 +1,5 @@
 import pytest
 
-from flexget.components.notify.notifiers.telegram import TelegramNotifier
-
 
 # workaround for https://github.com/kevin1024/vcrpy/issues/844
 @pytest.fixture
@@ -26,30 +24,65 @@ def fix_patch_vcr():
 @pytest.mark.online
 @pytest.mark.usefixtures('fix_patch_vcr')
 class TestTelegramNotifier:
-    config = '{tasks:{}}'
+    config = """
+        templates:
+            global:
+                mock:
+                  - {title: title}
+                accept_all: yes
+        tasks:
+            chat-id:
+              notify:
+                entries:
+                  message: message
+                  via:
+                    - telegram:
+                        bot_token: 7617087239:AAGUy118YHbBvGNwkDo4CDehF4gFgXq2ZqE
+                        recipients:
+                          - chat_id: 1394032416
+            send-image-as-photo:
+              notify:
+                entries:
+                  message: message
+                  via:
+                    - telegram:
+                        bot_token: 7617087239:AAGUy118YHbBvGNwkDo4CDehF4gFgXq2ZqE
+                        recipients:
+                          - chat_id: 1394032416
+                        images:
+                        - photo.png
+            send-image-as-document:
+              notify:
+                entries:
+                  message: message
+                  via:
+                    - telegram:
+                        bot_token: 7617087239:AAGUy118YHbBvGNwkDo4CDehF4gFgXq2ZqE
+                        recipients:
+                          - chat_id: 1394032416
+                        images:
+                        - document.jpg
+            chat-migrated:
+              notify:
+                entries:
+                  message: message
+                  via:
+                    - telegram:
+                        bot_token: 7617087239:AAGUy118YHbBvGNwkDo4CDehF4gFgXq2ZqE
+                        recipients:
+                          - chat_id: -4882300333
+                        images:
+                          - document.jpg
+        """
 
-    def test_chat_id(self, manager):
-        config = {
-            'bot_token': '7617087239:AAGUy118YHbBvGNwkDo4CDehF4gFgXq2ZqE',
-            'recipients': [{'chat_id': 1394032416}],
-            'disable_previews': False,
-        }
-        TelegramNotifier().notify('title', 'message', config)
+    def test_chat_id(self, execute_task):
+        execute_task('chat-id', options={'test': True})
 
     def test_send_image_as_photo(self, execute_task):
-        config = {
-            'bot_token': '7617087239:AAGUy118YHbBvGNwkDo4CDehF4gFgXq2ZqE',
-            'images': ['photo.png'],
-            'recipients': [{'chat_id': 1394032416}],
-            'disable_previews': False,
-        }
-        TelegramNotifier().notify('title', 'message', config)
+        execute_task('send-image-as-photo', options={'test': True})
 
     def test_send_image_as_document(self, execute_task):
-        config = {
-            'bot_token': '7617087239:AAGUy118YHbBvGNwkDo4CDehF4gFgXq2ZqE',
-            'images': ['document.jpg'],
-            'recipients': [{'chat_id': 1394032416}],
-            'disable_previews': False,
-        }
-        TelegramNotifier().notify('title', 'message', config)
+        execute_task('send-image-as-document', options={'test': True})
+
+    def test_chat_migrated(self, execute_task):
+        execute_task('chat-migrated', options={'test': True})
