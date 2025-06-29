@@ -42,7 +42,15 @@ To start, install ``uv``:
 Installing dependencies using ``uv sync``
 =========================================
 
-.. danger::
+Installing the project and commonly used development dependencies
+-----------------------------------------------------------------
+
+To install the project along with the commonly used development dependencies, run the
+following command::
+
+   $ uv sync
+
+.. note::
 
    By default, an exact sync is performed: ``uv`` removes any packages not explicitly specified in
    the command. Use the ``--inexact`` flag to retain extraneous packages.
@@ -54,14 +62,6 @@ Installing dependencies using ``uv sync``
    you should use::
 
       $ uv sync --group docs --inexact
-
-Installing the project and commonly used development dependencies
------------------------------------------------------------------
-
-To install the project along with the commonly used development dependencies, run the
-following command::
-
-   $ uv sync
 
 Installing extras
 -----------------
@@ -89,7 +89,7 @@ and can be conveniently installed with::
 
    $ uv sync --group plugin-test
 
-.. attention::
+.. note::
    On Windows, running specific FlexGet tests requires enabling ``Developer Mode``.
    To do this, open ``Settings``, search for ``Developer Mode``, and toggle the option on.
 
@@ -114,9 +114,19 @@ Setting up ``pre-commit``
 ``pre-commit`` allows us to run several checks on the codebase every time a new Git commit is made.
 This ensures standards and basic quality control for our code.
 
+Navigate to this repository’s folder and activate it like so::
+
+   $ uv run pre-commit install
+
+By default, ``pre-commit`` runs its checks on staged files.
+If you've modified the ``pre-commit`` hooks configuration—for example, by adding a new ``Ruff``
+rule—you'll need to run it on all files manually instead::
+
+   $ uv run pre-commit run -a
+
 .. note::
-   If you don't want to prepend ``uv run`` to the ``pre-commit`` command, you can also choose to
-   enter the virtual environment:
+   To avoid having to prepend ``uv run`` to the ``pre-commit`` command, you can either globally
+   install ``pre-commit`` or activate the virtual environment:
 
    .. tab-set::
       :sync-group: os
@@ -135,18 +145,6 @@ This ensures standards and basic quality control for our code.
 
             $ Set-ExecutionPolicy Unrestricted -Scope CurrentUser
             $ .venv\Scripts\activate.ps1
-
-Navigate to this repository’s folder and activate it like so::
-
-   $ uv run pre-commit install
-
-.. caution::
-
-   By default, ``pre-commit`` will run its checks on files that have been modified in a commit.
-   If you've modified the ``pre-commit`` hooks configuration—for example, by adding a new ``Ruff``
-   rule—you'll need to run it on all files instead::
-
-      $ pre-commit run -a
 
 .. _linking to upstream:
 

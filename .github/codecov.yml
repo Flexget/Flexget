@@ -7,7 +7,7 @@ coverage:
     patch:
       default:
         target: 100%
-        informational: true
+        informational: true # Once the project achieves high code coverage, consider making it a mandatory check.
     project:
       default:
         target: auto

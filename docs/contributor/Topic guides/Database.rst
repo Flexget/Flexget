@@ -55,7 +55,7 @@ Database cleanups
 -----------------
 
 If the plugin accumulates data into database that should be cleaned at some point
-`manager.db_cleanup` event should be used. This will be automatically called every
+``manager.db_cleanup`` event should be used. This will be automatically called every
 7 days in non intrusive way.
 
 ::
