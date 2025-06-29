@@ -771,6 +771,15 @@ wheels = [
 ]
 
 [[package]]
+name = "defusedxml"
+version = "0.7.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/0f/d5/c66da9b79e5bdb124974bfe172b4daf3c984ebd9c2a06e2b8a4dc7331c72/defusedxml-0.7.1.tar.gz", hash = "sha256:1bb3032db185915b62d7c6209c5a8792be6a32ab2fedacc84e01b52c51aa3e69", size = 75520, upload-time = "2021-03-08T10:59:26.269Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/07/6c/aa3f2f849e01cb6a001cd8554a88d4c77c5c1a31c95bdf1cf9301e6d9ef4/defusedxml-0.7.1-py2.py3-none-any.whl", hash = "sha256:a352e7e428770286cc899e2542b6cdaedb2b4953ff269a210103ec58f6198a61", size = 25604, upload-time = "2021-03-08T10:59:24.45Z" },
+]
+
+[[package]]
 name = "deluge-client"
 version = "1.10.2"
 source = { registry = "https://pypi.org/simple" }
@@ -941,6 +950,18 @@ wheels = [
 ]
 
 [[package]]
+name = "flexcache"
+version = "0.3"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "typing-extensions", marker = "python_full_version >= '3.10'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/55/b0/8a21e330561c65653d010ef112bf38f60890051d244ede197ddaa08e50c1/flexcache-0.3.tar.gz", hash = "sha256:18743bd5a0621bfe2cf8d519e4c3bfdf57a269c15d1ced3fb4b64e0ff4600656", size = 15816, upload-time = "2024-03-09T03:21:07.555Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/27/cd/c883e1a7c447479d6e13985565080e3fea88ab5a107c21684c813dba1875/flexcache-0.3-py3-none-any.whl", hash = "sha256:d43c9fea82336af6e0115e308d9d33a185390b8346a017564611f1466dcd2e32", size = 13263, upload-time = "2024-03-09T03:21:05.635Z" },
+]
+
+[[package]]
 name = "flexget"
 source = { editable = "." }
 dependencies = [
@@ -1010,7 +1031,7 @@ plugin-test = [
     { name = "qbittorrent-api" },
     { name = "rarfile" },
     { name = "subliminal", version = "2.1.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
-    { name = "subliminal", version = "2.2.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
+    { name = "subliminal", version = "2.3.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
     { name = "transmission-rpc" },
 ]
 qbittorrent = [
@@ -1088,12 +1109,24 @@ plugin-test = [
     { name = "python-telegram-bot", extras = ["http2", "socks"], specifier = "~=22.0" },
     { name = "qbittorrent-api", specifier = "~=2025.2" },
     { name = "rarfile", specifier = "~=4.0" },
-    { name = "subliminal", specifier = "<2.3" },
+    { name = "subliminal", specifier = "<2.4" },
     { name = "transmission-rpc", specifier = "~=7.0" },
 ]
 qbittorrent = [{ name = "qbittorrent-api", specifier = "~=2025.2" }]
 telegram = [{ name = "python-telegram-bot", extras = ["http2", "socks"], specifier = "~=22.0" }]
 transmission = [{ name = "transmission-rpc", specifier = "~=7.0" }]
+
+[[package]]
+name = "flexparser"
+version = "0.4"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "typing-extensions", marker = "python_full_version >= '3.10'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/82/99/b4de7e39e8eaf8207ba1a8fa2241dd98b2ba72ae6e16960d8351736d8702/flexparser-0.4.tar.gz", hash = "sha256:266d98905595be2ccc5da964fe0a2c3526fbbffdc45b65b3146d75db992ef6b2", size = 31799, upload-time = "2024-11-07T02:00:56.249Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/fe/5e/3be305568fe5f34448807976dc82fc151d76c3e0e03958f34770286278c1/flexparser-0.4-py3-none-any.whl", hash = "sha256:3738b456192dcb3e15620f324c447721023c0293f6af9955b481e91d00179846", size = 27625, upload-time = "2024-11-07T02:00:54.523Z" },
+]
 
 [[package]]
 name = "greenlet"
@@ -1292,7 +1325,7 @@ name = "importlib-metadata"
 version = "8.7.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "zipp" },
+    { name = "zipp", marker = "python_full_version < '3.10'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/76/66/650a33bd90f786193e4de4b3ad86ea60b53c89b669a5c7be931fac31cdb0/importlib_metadata-8.7.0.tar.gz", hash = "sha256:d13b81ad223b890aa16c5471f2ac3056cf76c5f10f82d6f9292f0b415f389000", size = 56641, upload-time = "2025-04-27T15:29:01.736Z" }
 wheels = [
@@ -1426,6 +1459,23 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/bf/ce/46fbd9c8119cfc3581ee5643ea49464d168028cfb5caff5fc0596d0cf914/jsonschema_specifications-2025.4.1.tar.gz", hash = "sha256:630159c9f4dbea161a6a2205c3011cc4f18ff381b189fff48bb39b9bf26ae608", size = 15513, upload-time = "2025-04-23T12:34:07.418Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/01/0e/b27cdbaccf30b890c40ed1da9fd4a3593a5cf94dae54fb34f8a4b74fcd3f/jsonschema_specifications-2025.4.1-py3-none-any.whl", hash = "sha256:4653bffbd6584f7de83a67e0d620ef16900b390ddc7939d56684d6c81e33f1af", size = 18437, upload-time = "2025-04-23T12:34:05.422Z" },
+]
+
+[[package]]
+name = "knowit"
+version = "0.5.6"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "babelfish", version = "0.6.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
+    { name = "enzyme", marker = "python_full_version >= '3.10'" },
+    { name = "pint", marker = "python_full_version >= '3.10'" },
+    { name = "pymediainfo", marker = "python_full_version >= '3.10'" },
+    { name = "pyyaml", marker = "python_full_version >= '3.10'" },
+    { name = "trakit", marker = "python_full_version >= '3.10'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/3a/0f/229a93f213c77bc0fef300cf973fb39bd72b0cbed80c8c441cb9b106a1ab/knowit-0.5.6.tar.gz", hash = "sha256:6ca8fe4b93d6ec3ff753a8f6f3c641020a6801c11d42545ccb270523281f8cca", size = 28573, upload-time = "2024-10-14T16:52:40.325Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/4b/32/525d13ad3f44d25917a60a52949f8156e09ca8d0de0eec392c208addd835/knowit-0.5.6-py3-none-any.whl", hash = "sha256:a073f65d1717fbdb587be9b29f080798572a2389124a9e6fd76163f2ba6fd473", size = 39524, upload-time = "2024-10-14T16:52:38.728Z" },
 ]
 
 [[package]]
@@ -1867,6 +1917,21 @@ wheels = [
 ]
 
 [[package]]
+name = "pint"
+version = "0.24.4"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "flexcache", marker = "python_full_version >= '3.10'" },
+    { name = "flexparser", marker = "python_full_version >= '3.10'" },
+    { name = "platformdirs", marker = "python_full_version >= '3.10'" },
+    { name = "typing-extensions", marker = "python_full_version >= '3.10'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/20/bb/52b15ddf7b7706ed591134a895dbf6e41c8348171fb635e655e0a4bbb0ea/pint-0.24.4.tar.gz", hash = "sha256:35275439b574837a6cd3020a5a4a73645eb125ce4152a73a2f126bf164b91b80", size = 342225, upload-time = "2024-11-07T16:29:46.061Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/b7/16/bd2f5904557265882108dc2e04f18abc05ab0c2b7082ae9430091daf1d5c/Pint-0.24.4-py3-none-any.whl", hash = "sha256:aa54926c8772159fcf65f82cc0d34de6768c151b32ad1deb0331291c38fe7659", size = 302029, upload-time = "2024-11-07T16:29:43.976Z" },
+]
+
+[[package]]
 name = "platformdirs"
 version = "4.3.8"
 source = { registry = "https://pypi.org/simple" }
@@ -2092,6 +2157,17 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/b0/77/a5b8c569bf593b0140bde72ea885a803b82086995367bf2037de0159d924/pygments-2.19.2.tar.gz", hash = "sha256:636cb2477cec7f8952536970bc533bc43743542f70392ae026374600add5b887", size = 4968631, upload-time = "2025-06-21T13:39:12.283Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/c7/21/705964c7812476f378728bdf590ca4b771ec72385c533964653c68e86bdc/pygments-2.19.2-py3-none-any.whl", hash = "sha256:86540386c03d588bb81d44bc3928634ff26449851e99741617ecb9037ee5ec0b", size = 1225217, upload-time = "2025-06-21T13:39:07.939Z" },
+]
+
+[[package]]
+name = "pymediainfo"
+version = "6.1.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/0f/ed/a02b18943f9162644f90354fe6445410e942c857dd21ded758f630ba41c0/pymediainfo-6.1.0.tar.gz", hash = "sha256:186a0b41a94524f0984d085ca6b945c79a254465b7097f2560dc0c04e8d1d8a5", size = 446466, upload-time = "2023-10-29T16:15:24.336Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/20/47/675bac72d4ab5031f69179b1b8e617a57f766ba063b724a82023da06b9c9/pymediainfo-6.1.0-py3-none-macosx_10_15_x86_64.whl", hash = "sha256:69d5d3cac056c24a68a1129216aec82a222e804a35f88567c08585e8ae7ef2b3", size = 6322766, upload-time = "2023-10-29T16:23:45.953Z" },
+    { url = "https://files.pythonhosted.org/packages/62/13/e3938e187a0c48057ffecc031d473b5739d13056d3eefb8b14b7652c27e1/pymediainfo-6.1.0-py3-none-win32.whl", hash = "sha256:19e6baeca3db71f12ed568f056de899fd02f380990fb10f43a26c32b67362dd3", size = 2762429, upload-time = "2023-10-29T16:39:38.457Z" },
+    { url = "https://files.pythonhosted.org/packages/61/36/369234e2f568e11ed3195292cd89c60e7444346eb1dd25bf5d996dc5d78a/pymediainfo-6.1.0-py3-none-win_amd64.whl", hash = "sha256:f3f6bad666c65ac993dd8d64f45a2b26ba2acd50f9875f74cebb624dbf2f8da0", size = 2963468, upload-time = "2023-10-29T16:41:33.145Z" },
 ]
 
 [[package]]
@@ -2898,7 +2974,7 @@ wheels = [
 
 [[package]]
 name = "subliminal"
-version = "2.2.1"
+version = "2.3.2"
 source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
     "python_full_version >= '3.11' and platform_python_implementation != 'PyPy'",
@@ -2912,20 +2988,20 @@ dependencies = [
     { name = "chardet", marker = "python_full_version >= '3.10'" },
     { name = "click", version = "8.2.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
     { name = "click-option-group", marker = "python_full_version >= '3.10'" },
+    { name = "defusedxml", marker = "python_full_version >= '3.10'" },
     { name = "dogpile-cache", marker = "python_full_version >= '3.10'" },
-    { name = "enzyme", marker = "python_full_version >= '3.10'" },
     { name = "guessit", marker = "python_full_version >= '3.10'" },
+    { name = "knowit", marker = "python_full_version >= '3.10'" },
     { name = "platformdirs", marker = "python_full_version >= '3.10'" },
     { name = "pysubs2", marker = "python_full_version >= '3.10'" },
-    { name = "rarfile", marker = "python_full_version >= '3.10'" },
     { name = "requests", marker = "python_full_version >= '3.10'" },
     { name = "srt", marker = "python_full_version >= '3.10'" },
     { name = "stevedore", marker = "python_full_version >= '3.10'" },
-    { name = "tomli", marker = "python_full_version >= '3.10'" },
+    { name = "tomlkit", marker = "python_full_version >= '3.10'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/e3/24/36cdb82e90afc602e2ed36c34e022ca545d35f5be9aa7ef9ddb0af7967b2/subliminal-2.2.1.tar.gz", hash = "sha256:2ed6024a07bbb3c68fe3db76374244ad91adfca9d93fc24d3ddb9ef61825756e", size = 3122221, upload-time = "2024-06-27T23:07:11.125Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/50/fc/24c86cc9bf5ef2543a14cbff1e71a81165e760e2dfc61814ac3d7d9bfa9d/subliminal-2.3.2.tar.gz", hash = "sha256:e9adee230b8bf46e27214da71ada18a3a0107d968005a25be3db5bc5855fb433", size = 3459550, upload-time = "2025-05-08T23:20:37.689Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/09/d1/cddf58f2556af8c6b353497cdd0e39efe4b75ae50f9e8cfdb7476e62c2f5/subliminal-2.2.1-py3-none-any.whl", hash = "sha256:421a71f2e3f604e5dffb551b2a51d14500c7615d7eaf16c23e713d7ad295504c", size = 87127, upload-time = "2024-06-27T23:07:08.841Z" },
+    { url = "https://files.pythonhosted.org/packages/82/73/b2fb112c699d786d73c35b1697c0f18ca2e10cefd05b96d369de5adad34d/subliminal-2.3.2-py3-none-any.whl", hash = "sha256:9ec9276f742c2273690de49f417aa6f9887d9751c0430c4518a33a28e8a83fff", size = 110565, upload-time = "2025-05-08T23:20:35.357Z" },
 ]
 
 [[package]]
@@ -2978,6 +3054,29 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/5b/b9/1ed31d167be802da0fc95020d04cd27b7d7065cc6fbefdd2f9186f60d7bd/tomli-2.2.1-cp313-cp313-win32.whl", hash = "sha256:d3f5614314d758649ab2ab3a62d4f2004c825922f9e370b29416484086b264ec", size = 98724, upload-time = "2024-11-27T22:38:32.837Z" },
     { url = "https://files.pythonhosted.org/packages/c7/32/b0963458706accd9afcfeb867c0f9175a741bf7b19cd424230714d722198/tomli-2.2.1-cp313-cp313-win_amd64.whl", hash = "sha256:a38aa0308e754b0e3c67e344754dff64999ff9b513e691d0e786265c93583c69", size = 109383, upload-time = "2024-11-27T22:38:34.455Z" },
     { url = "https://files.pythonhosted.org/packages/6e/c2/61d3e0f47e2b74ef40a68b9e6ad5984f6241a942f7cd3bbfbdbd03861ea9/tomli-2.2.1-py3-none-any.whl", hash = "sha256:cb55c73c5f4408779d0cf3eef9f762b9c9f147a77de7b258bef0a5628adc85cc", size = 14257, upload-time = "2024-11-27T22:38:35.385Z" },
+]
+
+[[package]]
+name = "tomlkit"
+version = "0.13.3"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/cc/18/0bbf3884e9eaa38819ebe46a7bd25dcd56b67434402b66a58c4b8e552575/tomlkit-0.13.3.tar.gz", hash = "sha256:430cf247ee57df2b94ee3fbe588e71d362a941ebb545dec29b53961d61add2a1", size = 185207, upload-time = "2025-06-05T07:13:44.947Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/bd/75/8539d011f6be8e29f339c42e633aae3cb73bffa95dd0f9adec09b9c58e85/tomlkit-0.13.3-py3-none-any.whl", hash = "sha256:c89c649d79ee40629a9fda55f8ace8c6a1b42deb912b2a8fd8d942ddadb606b0", size = 38901, upload-time = "2025-06-05T07:13:43.546Z" },
+]
+
+[[package]]
+name = "trakit"
+version = "0.2.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "babelfish", version = "0.6.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
+    { name = "pyyaml", marker = "python_full_version >= '3.10'" },
+    { name = "rebulk", marker = "python_full_version >= '3.10'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/2c/4d/93938a1c55f685cb12176759e645a7d048c8ba07678d98e58e4b29d10955/trakit-0.2.2.tar.gz", hash = "sha256:42e8b7af9949620d12647cd4b9801125d04a15a9ad8bb832230b26b78a723700", size = 17709, upload-time = "2024-06-23T06:01:56.757Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/35/84/3f0d7e86b746f3917df5d807cd8556825b9c028f0fbf63cdb3f941a8ba16/trakit-0.2.2-py3-none-any.whl", hash = "sha256:82ea3e6a27c2a053c4d59df4325f78687c6b88a016b181e65294a5d81514f2e7", size = 18841, upload-time = "2024-06-23T06:01:54.513Z" },
 ]
 
 [[package]]
