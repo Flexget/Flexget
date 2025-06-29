@@ -49,7 +49,7 @@ jobs:
           echo 'tasks: {}' > config.yml
           uv run flexget export-schema --output-file flexget-config.schema.json
       - name: Create GitHub Release
-        uses: ncipollo/release-action@440c8c1cb0ed28b9f43e4d1d670870f059653174 # v1
+        uses: ncipollo/release-action@9128f238eeeeed39b82af6636303729079d51730 # v1
         if: env.release_tag
         with:
           tag: ${{ env.release_tag }}
