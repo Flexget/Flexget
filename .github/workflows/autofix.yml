@@ -12,7 +12,7 @@ concurrency:
 env:
   PYTHON_VERSION: '3.13' # renovate: datasource=python-version depName=python
   # If you rename env.UV_VERSION, you MUST update the YAML parsing below as well.
-  UV_VERSION: 0.7.13 # renovate: datasource=pypi depName=uv
+  UV_VERSION: 0.7.16 # renovate: datasource=pypi depName=uv
 jobs:
   uv-lock:
     name: Update uv.lock
