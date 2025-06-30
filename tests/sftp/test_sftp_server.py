@@ -242,7 +242,7 @@ else:
 
         @staticmethod
         def log_and_return_error_code(e: OSError) -> int:
-            logger.critical(e, exc_info=True)
+            logger.critical(e)
             return SFTPServer.convert_errno(e.errno)
 
     class TestSFTPServer(SFTPServerInterface):
@@ -450,5 +450,5 @@ else:
 
         @staticmethod
         def log_and_return_error_code(e: OSError) -> int:
-            logger.critical(e, exc_info=True)
+            logger.critical(e)
             return SFTPServer.convert_errno(e.errno)

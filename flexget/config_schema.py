@@ -341,7 +341,7 @@ def set_error_message(error: jsonschema.ValidationError) -> None:
         replace = {'object': 'dict', 'array': 'list'}
         valid_types_list = [replace.get(t, t) for t in valid_types_list]
         # Make valid_types into an english list, with commas and 'or'
-        valid_types = ', '.join(valid_types_list[:-2] + ['']) + ' or '.join(valid_types_list[-2:])
+        valid_types = ', '.join([*valid_types_list[:-2], '']) + ' or '.join(valid_types_list[-2:])
         if isinstance(error.instance, dict):
             error.message = f'Got a dict, expected: {valid_types}'
         if isinstance(error.instance, list):

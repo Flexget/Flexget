@@ -127,6 +127,8 @@ class CoercingDateTime(DateTime):
             self, other = self._same_tz(self, other)
         return DateTime.__sub__(self, other)
 
+    __hash__ = DateTime.__hash__
+
     def diff(self, dt: Optional[datetime] = None, abs: bool = True) -> Interval:
         """Return the difference between two DateTime objects represented as an Interval."""
         if dt is None:
