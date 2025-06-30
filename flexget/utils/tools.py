@@ -20,8 +20,6 @@ from typing import (
     TYPE_CHECKING,
     Any,
     NamedTuple,
-    Optional,
-    Union,
 )
 
 import psutil
@@ -41,7 +39,7 @@ def str_to_boolean(string: str) -> bool:
     return string.lower() in ['true', '1', 't', 'y', 'yes']
 
 
-def str_to_int(string: str) -> Optional[int]:
+def str_to_int(string: str) -> int | None:
     try:
         return int(string.replace(',', ''))
     except ValueError:
@@ -183,7 +181,7 @@ else:
         io_encoding = 'ascii'
 
 
-def parse_timedelta(value: Union[timedelta, str, None]) -> timedelta:
+def parse_timedelta(value: timedelta | str | None) -> timedelta:
     """Parse a string like '5 days' into a timedelta object. Also allows timedeltas to pass through."""
     if isinstance(value, timedelta):
         # Allow timedelta objects to pass through
@@ -228,7 +226,7 @@ class TimedDict(MutableMapping):
 
     _instances: dict[int, 'TimedDict'] = weakref.WeakValueDictionary()
 
-    def __init__(self, cache_time: Union[timedelta, str] = '5 minutes'):
+    def __init__(self, cache_time: timedelta | str = '5 minutes'):
         self.cache_time = parse_timedelta(cache_time)
         self._store: dict = {}
         self._last_prune = datetime.now()
@@ -266,7 +264,7 @@ class TimedDict(MutableMapping):
         return len(list(self.__iter__()))
 
     def __repr__(self):
-        return f'{self.__class__.__name__}({dict(list(zip(self._store, (v[1] for v in list(self._store.values())))))!r})'
+        return f'{self.__class__.__name__}({dict(list(zip(self._store, (v[1] for v in list(self._store.values())), strict=False)))!r})'
 
     @classmethod
     def clear_all(cls):
@@ -290,7 +288,7 @@ class BufferQueue(queue.Queue):
 
 class TitleYear(NamedTuple):
     title: str
-    year: Optional[int]
+    year: int | None
 
 
 def split_title_year(title: str) -> TitleYear:
@@ -318,7 +316,7 @@ def split_title_year(title: str) -> TitleYear:
     return TitleYear(title, year)
 
 
-def get_latest_flexget_version_number() -> Optional[str]:
+def get_latest_flexget_version_number() -> str | None:
     """Return latest Flexget version from https://pypi.python.org/pypi/FlexGet/json."""
     try:
         data = requests.get('https://pypi.python.org/pypi/FlexGet/json').json()
@@ -332,7 +330,7 @@ def get_current_flexget_version() -> str:
 
 
 def parse_filesize(
-    text_size: str, si: bool = True, match_re: Optional[Union[str, Pattern[str]]] = None
+    text_size: str, si: bool = True, match_re: str | Pattern[str] | None = None
 ) -> int:
     """Parse a data size and returns its value in bytes.
 
@@ -366,7 +364,7 @@ def parse_filesize(
     return int(amount * (base**order))
 
 
-def format_filesize(num_bytes: float, si: bool = False, unit: Optional[str] = None) -> str:
+def format_filesize(num_bytes: float, si: bool = False, unit: str | None = None) -> str:
     """Return given bytes as prettified string.
 
     :param bool si: If true, decimal based units will be used rather than binary.
@@ -428,9 +426,7 @@ def get_config_as_array(config: dict, key: str) -> list:
     return v
 
 
-def parse_episode_identifier(
-    ep_id: Union[str, int], identify_season: bool = False
-) -> tuple[str, str]:
+def parse_episode_identifier(ep_id: str | int, identify_season: bool = False) -> tuple[str, str]:
     """Parse series episode identifier, raise ValueError if it fails.
 
     :param ep_id: Value to parse
