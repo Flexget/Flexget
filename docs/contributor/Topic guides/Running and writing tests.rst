@@ -30,11 +30,11 @@ If you want to run tests in parallel to speed up the process, run:
    $ uv run pytest -n logical --dist loadgroup
 
 If you want to run a specific test within a module or run all tests in a class,
-see `Specifying which tests to run <https://docs.pytest.org/en/stable/how-to/usage.html>`__.
+see `specifying which tests to run <https://docs.pytest.org/en/stable/how-to/usage.html>`__.
 
 .. note::
-   If you don't want to prepend ``uv run`` to the ``pytest`` command, you can also choose to
-   enter the virtual environment:
+   To avoid having to prepend ``uv run`` to your commands, you can activate the virtual
+   environment instead:
 
    .. tab-set::
       :sync-group: os
@@ -54,8 +54,8 @@ see `Specifying which tests to run <https://docs.pytest.org/en/stable/how-to/usa
             $ Set-ExecutionPolicy Unrestricted -Scope CurrentUser
             $ .venv\Scripts\activate.ps1
 
-Example: Testing a plugin
-=========================
+Testing a plugin
+================
 
 We'll go through an example, starting with creating a plugin and then writing tests for it.
 
@@ -203,6 +203,54 @@ generate random url for localhost. The ``description`` filed is just arbitary
 field that we define in here. We can define any kind of basic text, number, list
 or dictionary fields in here.
 
+Controlling plugin behavior in tests with ``task.options``
+==========================================================
+
+You can leverage the ``task.options`` dictionary to alter a plugin's behavior during test
+execution, which is particularly useful for debugging.
+
+Plugin implementation
+---------------------
+
+The plugin checks for a specific option to decide whether to suppress an exception.
+In a normal run, it logs the error and continues. In a test run, it re-raises the
+exception so the test framework can catch it and fail the test correctly.
+
+::
+
+   def on_task_output(self, task, config):
+       try:
+           # ... business logic ...
+       except Exception:
+           logger.exception('Found an error')
+           # If running under a test, re-raise the exception for clearer failure reports.
+           if task.options.test:
+               raise
+
+Testing code
+------------
+
+The test case passes an ``options`` dictionary when calling ``execute_task``.
+This dictionary becomes accessible as ``task.options`` within the plugin.
+
+::
+
+   def test_something(self, execute_task):
+       # Setting {'test': True} enables the special test-mode behavior in the plugin.
+       execute_task('task-name', options={'test': True})
+
+The key ``test`` is just an example.
+You can use any key-value pair (e.g., ``{'is_testing': True}``) as a flag, as long as
+your plugin and test code are consistent. The core idea is to pass a signal from the
+test runner into the plugin's execution context.
+
+Code coverage
+=============
+
+We enforce two code coverage policies on every pull request:
+
+- ``codecov/patch``: Mandates 100% test coverage for all changed code.
+- ``codecov/project``: Prevents any drop in the overall project coverage.
 
 Inject
 ======
