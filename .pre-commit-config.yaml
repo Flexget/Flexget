@@ -3,7 +3,7 @@ ci:
   skip: [renovate-config-validator, uv-lock]
 repos:
   - repo: https://github.com/pycontribs/mirrors-prettier
-    rev: v3.5.3
+    rev: v3.6.2
     hooks:
       - id: prettier
         args: [--single-quote]
