@@ -230,7 +230,7 @@ div.clear {
                 {% endif %}
 
                 <div id="info-{{ loop.index }}" style="display: none;">
-                    <!-- a hack to keep browser from reseting position to top when clicking the Details link -->
+                    <!-- a hack to keep browser from resetting position to top when clicking the Details link -->
                     <a name="a-{{ loop.index }}" style="display:none;">&nbsp;</a>
 
                     {% if entry.tvdb_genres is defined and entry.tvdb_genres is iterable %}
