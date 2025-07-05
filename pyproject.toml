@@ -158,13 +158,20 @@ extend-exclude = ["flexget/ui"]
 [tool.ruff.lint]
 select = ["ALL"]
 ignore = [
+    # TODO
+    "B904",
+    "E501",
+    "FA100", # Remove this rule once Python 3.9 support is dropped.
+    "PERF203", # Remove this rule once Python 3.10 support is dropped.
+    "PLC0415",
+    "PTH119",
+
+    # Need decision
     "A", # flake8-builtins
     "ANN", # flake8-annotations
     "ARG", # flake8-unused-arguments
-    "B904", # TODO: enable this rule (requires a lot of manual work)
     "BLE001", # blind-except
     "C901", # complex-structure
-    "COM", # Ruff recommends against using this rule alongside the formatter.
     "D100", # undocumented-public-module
     "D101", # undocumented-public-class
     "D102", # undocumented-public-method
@@ -172,21 +179,11 @@ ignore = [
     "D104", # undocumented-public-package
     "D105", # undocumented-magic-method
     "D107", # undocumented-public-init
-    "D203", # incorrect-blank-line-before-class
-    "D213", # multi-line-summary-second-line
-    "D415", # duplicate of D400
     "DTZ", # flake8-datetimez
-    "E501", # TODO: enable this rule (requires a lot of manual work)
     "EM", # flake8-errmsg
     "ERA001", # commented-out-code
-    "FA100", # TODO: remove this after Python 3.9 is dropped
     "FBT", # flake8-boolean-trap
-    "FIX002", # We use "TODO" comments as a form of documentation
-    "FIX004", # We use "HACK" comments as a form of documentation
     "INP001", # implicit-namespace-package
-    "N817", # camelcase-imported-as-acronym
-    "N818", # error-suffix-on-exception-name
-    "PERF203", # TODO: remove this after Python 3.10 is dropped
     "PLE1205", # Maybe can re-enable after https://github.com/astral-sh/ruff/issues/13390
     "PLR0911", # too-many-return-statements
     "PLR0912", # too-many-branches
@@ -197,15 +194,24 @@ ignore = [
     "PLW0603", # global-statement
     "PLW0642", # self-or-cls-assignment
     "PLW2901", # redefined-loop-name
-    "PTH119", # TODO
-    "Q", # Ruff recommends against using this rule alongside the formatter.
     "RUF012", # Maybe can re-enable after https://github.com/astral-sh/ruff/issues/5243
     "S", # flake8-bandit
     "SLF001", # private-member-access
+    "TRY003", # raise-vanilla-args
+
+    # Not applicable
+    "COM", # Ruff recommends against using this rule alongside the formatter.
+    "D203", # Conflicting with other rules
+    "D213", # Conflicting with other rules
+    "D415", # Duplicate of D400
+    "FIX002", # We use "TODO" comments as a form of documentation
+    "FIX004", # We use "HACK" comments as a form of documentation
+    "N817", # camelcase-imported-as-acronym, rejected by @gazpachoking in https://github.com/Flexget/Flexget/pull/4234#discussion_r1951605123
+    "N818", # error-suffix-on-exception-name, rejected by @gazpachoking in https://github.com/Flexget/Flexget/pull/4234#pullrequestreview-2610029402
+    "Q", # Ruff recommends against using this rule alongside the formatter.
     "TD002", # missing-todo-author
     "TD003", # missing-todo-link
-    "TRY003", # raise-vanilla-args
-    "TRY400", # error-instead-of-exception
+    "TRY400", # error-instead-of-exception, rejected by @gazpachoking in https://github.com/Flexget/Flexget/pull/4249#issuecomment-2656387500
 ]
 
 [tool.ruff.lint.flake8-type-checking]

@@ -375,6 +375,8 @@ class Task:
     def __eq__(self, other):
         return (self.priority, self._count) == (other.priority, other._count)
 
+    __hash__ = object.__hash__
+
     def __str__(self):
         return f'<Task(name={self.name},aborted={self.aborted})>'
 

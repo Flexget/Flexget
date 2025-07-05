@@ -85,7 +85,7 @@ def _htmldecode(text: str) -> str:
     def entitydecode(match, uchr=uchr):
         entity = match.group(1)
         if entity.startswith('#x'):
-            return uchr(int(entity[2:], 16))
+            return uchr(int(entity[2:], 16))  # noqa: FURB166
         if entity.startswith('#'):
             return uchr(int(entity[1:]))
         if entity in name2codepoint:
@@ -114,7 +114,7 @@ def merge_dict_from_to(d1: dict, d2: dict) -> None:
         if k in d2:
             if isinstance(v, type(d2[k])):
                 if isinstance(v, dict):
-                    merge_dict_from_to(d1[k], d2[k])
+                    merge_dict_from_to(v, d2[k])
                 elif isinstance(v, list):
                     d2[k].extend(copy.deepcopy(v))
                 elif isinstance(v, (str, bool, int, float, type(None))):
