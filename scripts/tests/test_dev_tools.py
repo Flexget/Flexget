@@ -1,5 +1,4 @@
 import os
-import platform
 import shutil
 from pathlib import Path
 
@@ -50,12 +49,6 @@ class TestDevTools:
         with (tmp_path / 'flexget' / '_version.py').open() as f:
             assert f"__version__ = '{version}'\n" in f
 
-    @pytest.mark.skipif(
-        platform.system() == 'Windows',
-        reason='The cassette generated on the Windows platform is different from the ones generated on Linux/macOS.'
-        'To make the cassette generated on Linux/macOS work on the Windows platform,'
-        'you need to install the zstandard dependency.',
-    )
     @pytest.mark.parametrize(
         'args', [[], ['--version', 'v2'], ['--version', 'v1'], ['--version', '']]
     )
@@ -76,12 +69,6 @@ class TestDevTools:
             assert v1_path.is_dir()
             assert v2_path.is_dir()
 
-    @pytest.mark.skipif(
-        platform.system() == 'Windows',
-        reason='The cassette generated on the Windows platform is different from the ones generated on Linux/macOS.'
-        'To make the cassette generated on Linux/macOS work on the Windows platform,'
-        'you need to install the zstandard dependency.',
-    )
     def test_get_changelog(self, online):
         runner = CliRunner()
         result = runner.invoke(get_changelog, ['v3.13.6'])

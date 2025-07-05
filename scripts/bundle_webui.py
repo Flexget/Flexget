@@ -55,6 +55,8 @@ def bundle_webui(ui_version: Optional[str] = None):
     def download_extract(url, dest_path):
         print(dest_path)
         r = requests.get(url)
+        if r.status_code != 200:
+            raise RuntimeError(f'Unable to retrieve {dest_path}')
         z = zipfile.ZipFile(io.BytesIO(r.content))
         z.extractall(dest_path)
 
@@ -84,22 +86,10 @@ def bundle_webui(ui_version: Optional[str] = None):
             app_path = ui_path / 'v2' / 'dist'
             if app_path.exists():
                 shutil.rmtree(app_path)
-
-            gh_token = os.environ.get('GH_TOKEN')
-            release = requests.get(
-                'https://api.github.com/repos/Flexget/webui/releases/latest',
-                headers={'Authorization': f'Bearer {gh_token}'} if gh_token else {},
-            ).json()
-
-            v2_package = None
-            for asset in release['assets']:
-                if asset['name'] == 'dist.zip':
-                    v2_package = asset['browser_download_url']
-                    break
-
-            if not v2_package:
-                raise RuntimeError('Unable to find dist.zip in assets')
-            download_extract(v2_package, ui_path / 'v2')
+            download_extract(
+                'https://github.com/Flexget/webui/releases/latest/download/dist.zip',
+                ui_path / 'v2',
+            )
         except (OSError, ValueError) as e:
             raise RuntimeError(f'Unable to download and extract WebUI v2 due to {e!s}')
 
