@@ -689,21 +689,16 @@ interactions:
     uri: https://api.thetvdb.com/series/73255/episodes/query?airedSeason=1&airedEpisode=2
   response:
     body:
-      string: !!binary |
-        H4sIAAAAAAAAA3RUwXIaORD9FZUuvgxkAEMSbgTvrlNZb1whXh9SOWhGDaMgpFm1BCEu/3ueZsBL
-        amuLy/Tr192vu9U8SWvcluX8Sa5N4Cjno0Jadfpw9B0fLllbyDbQvv9+LqRWUcn5lydpNIij8u3b
-        aSGVCaRXpNi7LvrCfn8j59PpZHYCf2sNe01/pV1FQc7HhaQTonYk5/JeRQrOxKMselmLHAXHuCyv
-        B6PRYDyBZ5OI4yqqAPlf5MLSd7HapioHfThaIrH0dROUg32vkhV/KJcYxidfGSc+N36nsrmqfYzi
-        FlyOSscX5I7qxvqDqX8AeiSnj8jwg6wl+RUTgKI6+r72PUGv+Hj1u7IWzcN9CAZQ5/xTHQK5msQH
-        1SJf9vo9hb2hAzp6bMgJJSKRUxsSVtXBM5NorToip2HBMZh6C9bBxEYoJ5Izmlw0a6MqS6IKCu1o
-        w5g0FeImDNFMQgrltIgNIbfaiSZxBDl6sTF7Eg0Stwq6IoPHB2gdimWDDMhHastdZKW0cHTgorO2
-        RgswxN2qEFWKPcMfr1g4s2niAA0HH0CxNtXGqWi84yysDWi4o2ujNs6z4U4cY6gXWrOmTmul6m1W
-        yv8kSBTe0VAs+KJeQ8piFjqP3fiA18KnpuFkTGdQUURcF9KeH5Pw6zNg0Lgwbp2CycHd0JZJY8X/
-        Dq1bSLh6mVPf9E4dxTfMEmhOuEYWwa3SUCDz5bhNQli+p1+fNOVneLF32M/5qLxOdR7UElTAtx8f
-        BqNyCi43/vAQLDDZX+RDi6vLVzCajGdvyuvxpMQz3Osbw3U+w8yDeXGAsP57aQCx5zZms79sVbG3
-        Kb6QJvnoLNrvhfcZ+NXryXg6fdUf+/Bbu8kaMX7i9yjeOX/R+e54/hPgxRrVzrpONQG/o7UP9H/4
-        SfnZYXa6yoVkjOUMv8k16tfeRazmExbqNvB9/nswynhs0Moixca/NNlDWtNpUp39aHRsYM+uyzN0
-        S/ktA5vMMsY443P618M3l8DSJwfieDQGbPjOY7NyXj5/ff4JAAD//wMAADCCkVUFAAA=
+      string: '{"links":{"first":1,"last":1,"next":null,"prev":null},"data":[{"id":110995,"airedSeason":1,"airedSeasonID":5536,"airedEpisodeNumber":2,"episodeName":"Paternity","firstAired":"2004-11-23","guestStars":["Alex
+        Skuby","Kylee Cochran","Paul Ganus","Robin Thomas","Scott Hochstadt","Scott
+        Mechlowicz","Wendy Gazelle"],"directors":["Peter O''Fallon"],"writers":["Lawrence
+        Kaplow"],"overview":"When a teenage lacrosse player is stricken with an unidentifiable
+        brain disease, Dr. House and the team hustle to give his parents answers.
+        Chase breaks the bad news, the kid has MS, but the boy''s night-terror hallucinations
+        disprove the diagnosis and send House and his team back to square one. As
+        the boy''s health deteriorates. House''s side-bet on the paternity of the
+        patient infuriates Dr. Cuddy and the teenager''s parents, but may just pay
+        off in spades.","language":{"episodeName":"en","overview":"en"},"productionCode":"HOU-105","showUrl":"","lastUpdated":1326804230,"dvdDiscid":"","dvdSeason":1,"dvdEpisodeNumber":2,"dvdChapter":null,"absoluteNumber":3,"filename":"episodes/73255/110995.jpg","seriesId":73255,"lastUpdatedBy":1,"airsAfterSeason":null,"airsBeforeSeason":null,"airsBeforeEpisode":null,"imdbId":"tt0606034","contentRating":"TV-14","thumbAuthor":null,"thumbAdded":"","thumbWidth":"640","thumbHeight":"360","siteRating":7.8,"siteRatingCount":2128,"isMovie":0}]}'
     headers:
       Cache-Control:
       - private, max-age=86400
@@ -751,21 +746,16 @@ interactions:
     uri: https://api.thetvdb.com/episodes/110995
   response:
     body:
-      string: !!binary |
-        H4sIAAAAAAAAA3RUy3IbNxD8FRQuupA0HyJt80ZTSeRyFKtMKzqkcphdDLkwQWCDAcTQLv17GktS
-        oSqV2tP0NGZ6XvtDG0qk5z+0NXo+Gg3fv5/2NNnIZsUkwQN8ZX+80fPpdDI7gT+1VoLh3/Ku4qjn
-        457mE0I71nN9T4mjt+mge3pto6RFeQXHeDi87o9G/fEEnk1mSatEUfT8D71w/LdabXNVHn06OGa1
-        DHUTycO+p+zUL+SzwPgSKuvV1ybsqJirOqSkbsGVRCa9IHdcNy7sbf0d0CN7c0CE7+wc6z972kBR
-        ncIx9z1Dr/p89TM5h+Lh3kcLqHP+SvvIvmb1iVrEK97wxPHJ8h4VPTbsFanE7GnDylEdgwir1tEB
-        Ma0oSdHWW7D2NjWKvMreGvbJri1VjlUVCeUYK+g099RNHKCYjBDkjUoNIzbtVJMlgZyC2tgnVg0C
-        twRdScCTPbQO1LJBBMRj2kr3siKjPO+l11lbaxQY6m7VU1VOR0Y4XInydtOkPgqOIYLiXK6tp2SD
-        lyKsjSi4oxtLGx/ESidO0NQLrUVTp7WieluUyl8ZElXwPFALucjXMDn0wpS22xCxLXIqGk5Bd/oV
-        J7zrnrTnZVJhfQYsClfWr3O05XHXtGU2GPG/TesGEq9e+nQsekcH9Q29BFoCrhFFSUsGCrAmjvwm
-        41k5jdcrzWUNL+YO+7mn0RmT69KoJaiAbz8/9EfDKbjShP1DdMC6uJIeWhxduYLRZDx7N7weT4ZY
-        wydzY6UuZ1h4MC8OENZ/Lw0g5tymYvrsHE6ykuByeiFNytE5lH8Ufowgb95OxtPpm+OxD761m6IR
-        7Wf5iOSd85XOD4fzT0AWa2Q76zrlBPyB1yHy/+En5WeH3ZmqJNIpDWf4JtfIXwefMJovGKjfwPf1
-        9/6o4KlBKYucmvBS5BEyhk+d6uxHa1IDe3Y9PEO3XHYZ2GRWMMEZn8O/Hby7BJYhexDHozFgK3cB
-        k9Xz4fPzPwAAAP//AwCwrjxJHgUAAA==
+      string: '{"data":{"id":110995,"airedSeason":1,"airedSeasonID":5536,"airedEpisodeNumber":2,"episodeName":"Paternity","firstAired":"2004-11-23","guestStars":["Alex
+        Skuby","Kylee Cochran","Paul Ganus","Robin Thomas","Scott Hochstadt","Scott
+        Mechlowicz","Wendy Gazelle"],"directors":["Peter O''Fallon"],"writers":["Lawrence
+        Kaplow"],"overview":"When a teenage lacrosse player is stricken with an unidentifiable
+        brain disease, Dr. House and the team hustle to give his parents answers.
+        Chase breaks the bad news, the kid has MS, but the boy''s night-terror hallucinations
+        disprove the diagnosis and send House and his team back to square one. As
+        the boy''s health deteriorates. House''s side-bet on the paternity of the
+        patient infuriates Dr. Cuddy and the teenager''s parents, but may just pay
+        off in spades.","language":{"episodeName":"en","overview":"en"},"productionCode":"HOU-105","showUrl":"","lastUpdated":1326804230,"dvdDiscid":"","dvdSeason":1,"dvdEpisodeNumber":2,"dvdChapter":null,"absoluteNumber":3,"filename":"episodes/73255/110995.jpg","seriesId":73255,"lastUpdatedBy":1,"airsAfterSeason":null,"airsBeforeSeason":null,"airsBeforeEpisode":null,"imdbId":"tt0606034","contentRating":"TV-14","thumbAuthor":null,"thumbAdded":"","thumbWidth":"640","thumbHeight":"360","siteRating":7.8,"siteRatingCount":2128,"isMovie":0}}'
     headers:
       Cache-Control:
       - private, max-age=86400
@@ -813,18 +803,18 @@ interactions:
     uri: https://api.thetvdb.com/search/series?name=Doctor+Who+2005
   response:
     body:
-      string: !!binary |
-        H4sIAAAAAAAAA4RSTW/bMAz9K4ROG2CnSfqZ3NpmGDoMG9AF3WHoQbFoW4ksGpKcLCgK9Idsf66/
-        ZJSdzd4h28kWyfdIPr4noWSQYv7tSUijpUfP/2JBWSAHX0uaw7JE6N4e7nGrvQ6oRCKOxRctDt5M
-        x+Pzt/FNm8j1gJV4TMRKWotOzMVJ9+dPavIhfi+vrsZn6fl0tK4LhuXa+XCtHXPOReRKT9PpBSc0
-        B9raRFgMO3IbLri5uYXPFjlNW3RbjTsO9hOC9iAt8IZoYakrhI/kFOSOKghcVRvJXPBeGqNzh3vY
-        8QbByS0azwWOmqJktAHKIUS4tAp8LTMEbVuG5fX94u7LaKAWlJKbgiFbgNE+RGzueADlW3hGVS2t
-        JuvbbiU3A19KXhjW1DiLe65r0ZF/J/cjuLMslVSRSe21LZI2NVhxZRACwevLD4cFsrwy4OvLTx6S
-        oxIs7mBFas84uWE8kD1Ea74AWdYn8O46lIAyK+EPCU85AmB1PfIG/pOskPXtXdJf25um4JRqUykv
-        lsZMTAQZGjaXuCUbtG24vXhOhq77pzsmk+nF5SSdHHHHLJ2lZwdzdKUDd9jGmL+MMRg8YlvpwJJN
-        a0e5DlB16nTLRrV9SS5AzhbKtak8ZGhwFXU5XCfab/nwG9DTs2gf6OAQqbZoQ+Mw6RSWwAzsgyh/
-        32lyClhrT4qfOZP0B046q/Gs+D3TbesIjUPx2GvMwug/B5odPdBseKB3VrGsz4/PvwAAAP//AwAT
-        ik7FHAQAAA==
+      string: "{\"data\":[{\"aliases\":[\"Doctor Who: The Doctors Revisited\",\"The
+        Doctors Revisited\",\"Dr Who (2005)\",\"Doktor Vem\"],\"banner\":\"/banners/posters/78804-52.jpg\",\"firstAired\":\"2005-3-26\",\"id\":78804,\"network\":\"BBC
+        One\",\"overview\":\"The Doctor is an alien Time Lord from the planet Gallifrey
+        who travels through all of time and space in the TARDIS. The Doctor has a
+        long list of friends and companions who have shared journeys along the way.
+        Instead of dying, the Doctor is able to \u201Cregenerate\u201D into a new
+        body, taking on a new personality with each regeneration.  \",\"seriesName\":\"Doctor
+        Who (2005)\",\"slug\":\"doctor-who-2005\",\"status\":\"Continuing\"},{\"aliases\":[],\"banner\":\"/banners/posters/112671-1.jpg\",\"firstAired\":\"2009-9-4\",\"id\":112671,\"network\":null,\"overview\":\"Doctor
+        Who 2009 is a non-profit making series of short fan films celebrating the
+        BBC TV series Doctor Who.  Join the adventure, with a brand new series of
+        13 episodes for the Doctor, in this exciting new fan project.\",\"seriesName\":\"Doctor
+        Who (2009)\",\"slug\":\"doctor-who-2009\",\"status\":\"Ended\"}]}"
     headers:
       Cache-Control:
       - private, max-age=86400
@@ -870,19 +860,16 @@ interactions:
     uri: https://api.thetvdb.com/series/78804
   response:
     body:
-      string: !!binary |
-        H4sIAAAAAAAAA2xTy07bQBT9lSuvWokEx7HJYwekRUhtQZCWRdXFTXxjDzgz1sw4kYuQ+JD25/iS
-        nnECZNGVZ8499zHnHj9GOXuOpo+RyqPpaDyO06PIiVXiLgFEw3Q4GUSv0DdeC8CZWXpj6a409CGJ
-        4+wjCFwpduKi6c+D8JTmpdDu7uhGNsopLzno/8d/hUbsjEaTQQJabZwXi9vu4I67CXtZ0r+vC8QX
-        rHUXLyzXpVpytWcUyWRPWbFm60HZHY6NVYXSb8RBHO+JzrNv8IDo3GivdKN0l66s86fKSlAjPLYX
-        D3vJCSJa/NbYB8BnZ+d0peUd20k3AmAb1OpEy2JcK9ZFw0W4i8a9EG0laHaab0T7xoYiM8trxvd2
-        qUQvhT6rpVfQBOqYjdiNki3y3xUk5Yg1YQOiaY5u9MXYnFbWrMmDVaOreLrgqlIrKy1tsThveSOV
-        A8GapiiRXZFZURgWxXJyNaO10l2F+enN7PK2f7BNKhlNqTK6oEo5H3JXsIjOXZe+NOuaNaZ2XbcS
-        zciVDBnp3jRWSwtelx3qb7nt06XGijkPlfIW4h91oYMnLiohb+jl+Y8VCCeWvbw8/8WQQJm0bGlh
-        8hZ5/IB8MnqP1nCOwcqVx9uVL0l4WdJbEUzZJ+q24/z3Gj9EWPYgG2XjNB1kY5gbJphxe7W6EwkL
-        v210zm20C8x3+z2Zphldfw07R0l4Byv60bu+AKDW+aKzhPdxOjyZTIK1f3OdKN/Bn67jeJTFg9E4
-        lMzzzmuvx7M2muqmqmBQ/CM3+9qTfnoInBv4LJomaTI5AV41oX3eSdeD/r1g3Ojp6R8AAAD//wMA
-        9ID/Pu4DAAA=
+      string: "{\"data\":{\"id\":78804,\"seriesId\":\"34391\",\"seriesName\":\"Doctor
+        Who (2005)\",\"aliases\":[\"Doctor Who: The Doctors Revisited\",\"The Doctors
+        Revisited\"],\"season\":\"12\",\"poster\":\"posters/78804-52.jpg\",\"banner\":\"graphical/78804-g29.jpg\",\"fanart\":\"fanart/original/78804-100.jpg\",\"status\":\"Continuing\",\"firstAired\":\"2005-03-26\",\"network\":\"BBC
+        One\",\"networkId\":\"37\",\"runtime\":\"50\",\"language\":\"en\",\"genre\":[\"Adventure\",\"Drama\",\"Science
+        Fiction\"],\"overview\":\"The Doctor is an alien Time Lord from the planet
+        Gallifrey who travels through all of time and space in the TARDIS. The Doctor
+        has a long list of friends and companions who have shared journeys along the
+        way. Instead of dying, the Doctor is able to \u201Cregenerate\u201D into a
+        new body, taking on a new personality with each regeneration.  \",\"lastUpdated\":1575844158,\"airsDayOfWeek\":\"Sunday\",\"airsTime\":\"6:45
+        PM\",\"rating\":\"TV-PG\",\"imdbId\":\"tt0436992\",\"zap2itId\":\"EP00750178\",\"added\":\"\",\"addedBy\":null,\"siteRating\":9.4,\"siteRatingCount\":24296,\"slug\":\"doctor-who-2005\"}}"
     headers:
       Cache-Control:
       - private, max-age=86400
@@ -932,22 +919,16 @@ interactions:
     uri: https://api.thetvdb.com/series/78804/episodes/query?airedSeason=2&airedEpisode=3
   response:
     body:
-      string: !!binary |
-        H4sIAAAAAAAAA3RUwXIaORD9lS6dBwdjAuO5YSBrZ4k3ZXB8SHIQo2ZGsZAoSWPCuly1X7Mftl+y
-        TzOQsmtrDxTq163u161+8yyMto9BFM9io32IojjPhJHHg+WfONjGmEzsPD9155dMKBmlKL4+C61E
-        cdEfDC8QLbVntWQZnBXF4I19M0O+96P88ojOdzo4xbfNds0eGTLBR0RuWRRiWdbOGbrjxmpkyzpy
-        k3QV3kG/P+r1h73BJTxVwyEuo/Ro4quY2Fg7e6Bl5L30ka5ZKgRdsf0ht9rScqtjDWAqvUPnTFfs
-        /SEBhre00uvEJxNzo4Ncc6xpaaTixGDeVIz4BxlqbavYskL2WLOnKVj7FvnomD7r8tHwobVqSwvm
-        0PoWTamtkjTzhz/5EcCtY0NTI/0jw7pziiY+1o0X3zFh9FpG13X1EfkDXcs9h+Tbex2586zc+kAP
-        NZpyTeDkdE/snzTvMaeFK2XE/Aqa8WbjD/RFGqZrXaGtdsAZLZxVzmY0t5WRVuGAqdX0zX+zMxm5
-        IMx63Jpzy1vNoaBVzfS718boKC1oJWf6AfdMEr8QvbQVU+UwqdBzlmQkSaXbYolqtkE/Iah74h7d
-        f/gjZJRo97SNjLwYdKSy1kZ5BjfwIqdUL2ItkfB0U2lrMYUzENIBFVC0jIHwIMlACnRObtMCK5g1
-        zVyaaEZ3LnCb9RNeig/dUqBOoD3Kp/9EttlhWLjvjKKN12xV+Oevv0WSh60aWXESzdu1bRfl1QPA
-        fknKcaopE50pQgHfTj8s+/l4geBQu/29NwBFp7v7HbSVtvz8/Xg4yIf5qI9leFIzHcokthQH85XM
-        YP1XTgCntdzFZHb6levgTBN/BZ2PkqoM2yP1LkV4N87z/vBdp+mzH7sqkWS0H25QvXW+IXp1QKr8
-        4vwyb6UdJhvUPLE7VgZ8xRvn+f/wI/+TQ2/V+ubYa+lsess7mZ4e0OpL7/NvwKGT7XrSYO9/ddhB
-        SvHxams/aAXBF2I07J+ga4YC8F0TF6OEBYjplH58lr8Gpq6x6UuY54B1+OTwrqLov3x/+RcAAP//
-        AwCd2z+yOAUAAA==
+      string: "{\"links\":{\"first\":1,\"last\":1,\"next\":null,\"prev\":null},\"data\":[{\"id\":302431,\"airedSeason\":2,\"airedSeasonID\":15689,\"airedEpisodeNumber\":3,\"episodeName\":\"School
+        Reunion\",\"firstAired\":\"2006-04-29\",\"guestStars\":[\"Anthony Stewart
+        Head\",\"Benjamin Smith\",\"Caroline Berry\",\"Clem Tibber\",\"Elisabeth Sladen\",\"Eugene
+        Washington\",\"Heather Cameron\",\"Joe Pickley\",\"John Leeson\",\"Lucinda
+        Dryzek\",\"Noel Clarke\",\"Rod Arthur\"],\"directors\":[\"James Hawes\"],\"writers\":[\"Toby
+        Whithouse\"],\"overview\":\"Location: Deffry Vale High School, London, England,
+        Earth \\r\\nDate: 2007 \\r\\nEnemies: The Krillitanes \\r\\n\\r\\nThere are
+        strange goings-on at a comprehensive school - UFOs, over-intelligent children,
+        and odd-tasting school dinners. This attracts the attention of the Tenth Doctor,
+        Rose and Mickey Smith, as well as a couple of old friends\u2026\",\"language\":{\"episodeName\":\"en\",\"overview\":\"en\"},\"productionCode\":\"NCFS087L\",\"showUrl\":\"\",\"lastUpdated\":1574284860,\"dvdDiscid\":\"\",\"dvdSeason\":2,\"dvdEpisodeNumber\":3,\"dvdChapter\":null,\"absoluteNumber\":16,\"filename\":\"episodes/78804/302431.jpg\",\"seriesId\":78804,\"lastUpdatedBy\":183198,\"airsAfterSeason\":null,\"airsBeforeSeason\":null,\"airsBeforeEpisode\":null,\"imdbId\":\"\",\"contentRating\":\"TV-PG\",\"thumbAuthor\":null,\"thumbAdded\":\"\",\"thumbWidth\":\"640\",\"thumbHeight\":\"360\",\"siteRating\":7.8,\"siteRatingCount\":1888,\"isMovie\":0}]}"
     headers:
       Cache-Control:
       - private, max-age=86400
@@ -995,21 +976,16 @@ interactions:
     uri: https://api.thetvdb.com/episodes/302431
   response:
     body:
-      string: !!binary |
-        H4sIAAAAAAAAA3RT23IaORD9lS49Dw5gAuN5w0DWzhJvyuD4YbMPYtTMKNZIlKQxxaZctV+zH5Yv
-        ydEAKbu29mEK+nSr+/TlfBdKRimK70IrUVz2h6PLQSak9qxWLIOzohi+sW/nohi8H+dXJ3Sx08Ep
-        vmubDXtkyASfENmwKMSqrJ0zdM+t1ciWia32IU7TU3iH/f641x/1hlfwVC2HuIrSB1H8KaY21s4e
-        aBV5L32kG5YKQddsv8lGW1o1OtYAZtI7oy3TNXt/SIDhhtZ6k/hkYmF0kBuONa2MVJwYLNqKEf8o
-        Q61tFTtWyB5r9jQDa98hHx3TZ10+GT50Vm1pyRw637IttVWS5v7wNz8BuHNsaGakf2JY907R1Me6
-        9eKvTCj0WkZ37Ooj8ge6kXsOybf3OvLRs3abAz3WaMq1gZPTPbN/1rzHnJaulBHzK2jO260/0Bdp
-        mG50hba6AWe0dFY5m9HCVkZahT+YWk1f/Vc7l5ELwqwnnbmw3GgOBa1rpt+9NkZHaUErOdMH3DNJ
-        fCF6aSumymFSoecsyUiSStfsPNdsg35G0HHFPXr48EfIKNHuaRsZeTHoSGWtjfIMbuBFTqlelCEi
-        4fml0tZiChcgpAMqoGgZA2EhyUAKdE5u2wFrmDXNXZpoRvcucJf1EzbFh+NRoE6gPcqn30S23WFY
-        eO+Moq3XbFX48c+/WBQGVbWy4nT/b8+2O5RXC4D9komdd6otE50ZQgHfzT6s+vlkieBQu/2DNwC7
-        xCE+7CCtdOWD95PRMB/l4z6O4VnNdSiT2FIczFcyg/VfOQGc1XIXk2lbY6C7TXCmjb+CBuOkKsP2
-        RP2YIryb5Hl/9O6o6YtvuyqRZLQfblG9c74hen1AqvxycJV30g7TLWqe2Z0qA77mrfP8f/iJ/9mh
-        G7W5PfVaOpt2eS/T6gGtv/Q+/wYcOmk20xZ3/6vDI6QUn5529qNWEHwhxqP+GbphKCACuxwnLEBM
-        5/STi/w1MHOtjam/HLAOnxz2Kor+y8tPAAAA//8DANxX6YABBQAA
+      string: "{\"data\":{\"id\":302431,\"airedSeason\":2,\"airedSeasonID\":15689,\"airedEpisodeNumber\":3,\"episodeName\":\"School
+        Reunion\",\"firstAired\":\"2006-04-29\",\"guestStars\":[\"Anthony Stewart
+        Head\",\"Benjamin Smith\",\"Caroline Berry\",\"Clem Tibber\",\"Elisabeth Sladen\",\"Eugene
+        Washington\",\"Heather Cameron\",\"Joe Pickley\",\"John Leeson\",\"Lucinda
+        Dryzek\",\"Noel Clarke\",\"Rod Arthur\"],\"directors\":[\"James Hawes\"],\"writers\":[\"Toby
+        Whithouse\"],\"overview\":\"Location: Deffry Vale High School, London, England,
+        Earth \\r\\nDate: 2007 \\r\\nEnemies: The Krillitanes \\r\\n\\r\\nThere are
+        strange goings-on at a comprehensive school - UFOs, over-intelligent children,
+        and odd-tasting school dinners. This attracts the attention of the Tenth Doctor,
+        Rose and Mickey Smith, as well as a couple of old friends\u2026\",\"language\":{\"episodeName\":\"en\",\"overview\":\"en\"},\"productionCode\":\"NCFS087L\",\"showUrl\":\"\",\"lastUpdated\":1574284860,\"dvdDiscid\":\"\",\"dvdSeason\":2,\"dvdEpisodeNumber\":3,\"dvdChapter\":null,\"absoluteNumber\":16,\"filename\":\"episodes/78804/302431.jpg\",\"seriesId\":78804,\"lastUpdatedBy\":183198,\"airsAfterSeason\":null,\"airsBeforeSeason\":null,\"airsBeforeEpisode\":null,\"imdbId\":\"\",\"contentRating\":\"TV-PG\",\"thumbAuthor\":null,\"thumbAdded\":\"\",\"thumbWidth\":\"640\",\"thumbHeight\":\"360\",\"siteRating\":7.8,\"siteRatingCount\":1888,\"isMovie\":0}}"
     headers:
       Cache-Control:
       - private, max-age=86400
