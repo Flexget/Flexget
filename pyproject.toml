@@ -127,6 +127,9 @@ exclude_also = [
     "if TYPE_CHECKING"
 ]
 
+[tool.coverage.run]
+branch = true
+
 [tool.doc8]
 ignore = [ "D004" ]
 max_line_length = 99
