@@ -15,6 +15,7 @@ concurrency:
 jobs:
   build:
     name: Docker build
+    if: github.actor != 'github-merge-queue[bot]'
     permissions:
       packages: write # to push to ghcr.io
     runs-on: ubuntu-latest

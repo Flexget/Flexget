@@ -15,6 +15,7 @@ env:
 jobs:
   tests:
     name: Run Tests
+    if: github.actor != 'github-merge-queue[bot]'
     runs-on: ${{ matrix.operating-system }}
     strategy:
       matrix:
@@ -53,6 +54,7 @@ jobs:
 
   test-scripts:
     name: Test scripts
+    if: github.actor != 'github-merge-queue[bot]'
     runs-on: ubuntu-latest
     env:
       PYTHON_VERSION: '3.13' # renovate: datasource=python-version depName=python
@@ -78,6 +80,7 @@ jobs:
 
   zizmor:
     name: GitHub Actions Security Analysis with zizmor
+    if: github.actor != 'github-merge-queue[bot]'
     runs-on: ubuntu-latest
     permissions:
       security-events: write
@@ -103,12 +106,12 @@ jobs:
 
   test-results:
     name: Test results
+    if: always() && github.event_name != 'push'
     needs:
       - tests
       - test-scripts
       - zizmor
     runs-on: ubuntu-latest
-    if: always()
     steps:
       - name: Decide whether the needed jobs succeeded or failed
         uses: re-actors/alls-green@05ac9388f0aebcb5727afa17fcccfecd6f8ec5fe # v1
