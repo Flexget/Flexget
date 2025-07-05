@@ -149,6 +149,7 @@ markers = [
     'require_optional_deps: mark test as requiring additional dependencies'
 ]
 testpaths = ["tests"]
+xfail_strict = true
 
 [tool.ruff]
 line-length = 99

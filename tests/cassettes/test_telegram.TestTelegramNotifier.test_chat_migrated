@@ -1,0 +1,458 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate, br, zstd
+      connection:
+      - keep-alive
+      content-length:
+      - '0'
+      host:
+      - api.telegram.org
+      user-agent:
+      - python-telegram-bot v22.1 (https://python-telegram-bot.org)
+    method: POST
+    uri: https://api.telegram.org/bot7617087239:AAGUy118YHbBvGNwkDo4CDehF4gFgXq2ZqE/getMe
+  response:
+    body:
+      string: '{"ok":true,"result":{"id":7617087239,"is_bot":true,"first_name":"aazzc","username":"dddxgggfx_bot","can_join_groups":true,"can_read_all_group_messages":false,"supports_inline_queries":false,"can_connect_to_business":false,"has_main_web_app":false}}'
+    headers:
+      Access-Control-Allow-Methods:
+      - GET, POST, OPTIONS
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Expose-Headers:
+      - Content-Length,Content-Type,Date,Server,Connection
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '248'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 24 Jun 2025 03:55:08 GMT
+      Server:
+      - nginx/1.18.0
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+    status:
+      code: 200
+      message: OK
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate, br, zstd
+      connection:
+      - keep-alive
+      content-length:
+      - '0'
+      host:
+      - api.telegram.org
+      user-agent:
+      - python-telegram-bot v22.1 (https://python-telegram-bot.org)
+    method: POST
+    uri: https://api.telegram.org/bot7617087239:AAGUy118YHbBvGNwkDo4CDehF4gFgXq2ZqE/getMe
+  response:
+    body:
+      string: '{"ok":true,"result":{"id":7617087239,"is_bot":true,"first_name":"aazzc","username":"dddxgggfx_bot","can_join_groups":true,"can_read_all_group_messages":false,"supports_inline_queries":false,"can_connect_to_business":false,"has_main_web_app":false}}'
+    headers:
+      Access-Control-Allow-Methods:
+      - GET, POST, OPTIONS
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Expose-Headers:
+      - Content-Length,Content-Type,Date,Server,Connection
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '248'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 24 Jun 2025 03:55:09 GMT
+      Server:
+      - nginx/1.18.0
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+    status:
+      code: 200
+      message: OK
+- request:
+    body: chat_id=-4882300333&text=message&link_preview_options=%7B%22is_disabled%22%3A+false%7D
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate, br, zstd
+      connection:
+      - keep-alive
+      content-length:
+      - '86'
+      content-type:
+      - application/x-www-form-urlencoded
+      host:
+      - api.telegram.org
+      user-agent:
+      - python-telegram-bot v22.1 (https://python-telegram-bot.org)
+    method: POST
+    uri: https://api.telegram.org/bot7617087239:AAGUy118YHbBvGNwkDo4CDehF4gFgXq2ZqE/sendMessage
+  response:
+    body:
+      string: '{"ok":false,"error_code":400,"description":"Bad Request: group chat
+        was upgraded to a supergroup chat","parameters":{"migrate_to_chat_id":-1002541595015}}'
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Expose-Headers:
+      - Content-Length,Content-Type,Date,Server,Connection
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '154'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 24 Jun 2025 03:55:09 GMT
+      Server:
+      - nginx/1.18.0
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+    status:
+      code: 400
+      message: Bad Request
+- request:
+    body: chat_id=-1002541595015&text=message&link_preview_options=%7B%22is_disabled%22%3A+false%7D
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate, br, zstd
+      connection:
+      - keep-alive
+      content-length:
+      - '89'
+      content-type:
+      - application/x-www-form-urlencoded
+      host:
+      - api.telegram.org
+      user-agent:
+      - python-telegram-bot v22.1 (https://python-telegram-bot.org)
+    method: POST
+    uri: https://api.telegram.org/bot7617087239:AAGUy118YHbBvGNwkDo4CDehF4gFgXq2ZqE/sendMessage
+  response:
+    body:
+      string: '{"ok":true,"result":{"message_id":3,"from":{"id":7617087239,"is_bot":true,"first_name":"aazzc","username":"dddxgggfx_bot"},"chat":{"id":-1002541595015,"title":"ferdcszfesd","username":"fdafafvcefrvgrgvf","type":"supergroup"},"date":1750737310,"text":"message"}}'
+    headers:
+      Access-Control-Allow-Methods:
+      - GET, POST, OPTIONS
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Expose-Headers:
+      - Content-Length,Content-Type,Date,Server,Connection
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '261'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 24 Jun 2025 03:55:10 GMT
+      Server:
+      - nginx/1.18.0
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+    status:
+      code: 200
+      message: OK
+- request:
+    body: offset=0&limit=100
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate, br, zstd
+      connection:
+      - keep-alive
+      content-length:
+      - '18'
+      content-type:
+      - application/x-www-form-urlencoded
+      host:
+      - api.telegram.org
+      user-agent:
+      - python-telegram-bot v22.1 (https://python-telegram-bot.org)
+    method: POST
+    uri: https://api.telegram.org/bot7617087239:AAGUy118YHbBvGNwkDo4CDehF4gFgXq2ZqE/getUpdates
+  response:
+    body:
+      string: '{"ok":true,"result":[{"update_id":251886145,
+
+        "my_chat_member":{"chat":{"id":1394032416,"first_name":"o","last_name":"0","username":"chehxlpp","type":"private"},"from":{"id":1394032416,"is_bot":false,"first_name":"o","last_name":"0","username":"chehxlpp","language_code":"zh-hans"},"date":1750736719,"old_chat_member":{"user":{"id":7617087239,"is_bot":true,"first_name":"lk","username":"dddxgggfx_bot"},"status":"kicked","until_date":0},"new_chat_member":{"user":{"id":7617087239,"is_bot":true,"first_name":"lk","username":"dddxgggfx_bot"},"status":"member"}}},{"update_id":251886146,
+
+        "message":{"message_id":39,"from":{"id":1394032416,"is_bot":false,"first_name":"o","last_name":"0","username":"chehxlpp","language_code":"zh-hans"},"chat":{"id":1394032416,"first_name":"o","last_name":"0","username":"chehxlpp","type":"private"},"date":1750736720,"text":"/start","entities":[{"offset":0,"length":6,"type":"bot_command"}]}},{"update_id":251886147,
+
+        "message":{"message_id":40,"from":{"id":1394032416,"is_bot":false,"first_name":"o","last_name":"0","username":"chehxlpp","language_code":"zh-hans"},"chat":{"id":1394032416,"first_name":"o","last_name":"0","username":"chehxlpp","type":"private"},"date":1750736798,"text":"d"}},{"update_id":251886148,
+
+        "my_chat_member":{"chat":{"id":-1002410457412,"title":"avcdafdz","username":"dwesxerfedws","type":"supergroup"},"from":{"id":1394032416,"is_bot":false,"first_name":"o","last_name":"0","username":"chehxlpp","language_code":"zh-hans"},"date":1750736921,"old_chat_member":{"user":{"id":7617087239,"is_bot":true,"first_name":"aazzc","username":"dddxgggfx_bot"},"status":"left"},"new_chat_member":{"user":{"id":7617087239,"is_bot":true,"first_name":"aazzc","username":"dddxgggfx_bot"},"status":"member"}}},{"update_id":251886149,
+
+        "message":{"message_id":2,"from":{"id":1394032416,"is_bot":false,"first_name":"o","last_name":"0","username":"chehxlpp","language_code":"zh-hans"},"chat":{"id":-1002410457412,"title":"avcdafdz","username":"dwesxerfedws","type":"supergroup"},"date":1750736921,"new_chat_participant":{"id":7617087239,"is_bot":true,"first_name":"aazzc","username":"dddxgggfx_bot"},"new_chat_member":{"id":7617087239,"is_bot":true,"first_name":"aazzc","username":"dddxgggfx_bot"},"new_chat_members":[{"id":7617087239,"is_bot":true,"first_name":"aazzc","username":"dddxgggfx_bot"}]}},{"update_id":251886150,
+
+        "my_chat_member":{"chat":{"id":-1002410457412,"title":"avcdafdz","username":"dwesxerfedws","type":"supergroup"},"from":{"id":1087968824,"is_bot":true,"first_name":"Group","username":"GroupAnonymousBot"},"date":1750736987,"old_chat_member":{"user":{"id":7617087239,"is_bot":true,"first_name":"aazzc","username":"dddxgggfx_bot"},"status":"member"},"new_chat_member":{"user":{"id":7617087239,"is_bot":true,"first_name":"aazzc","username":"dddxgggfx_bot"},"status":"left"}}},{"update_id":251886151,
+
+        "my_chat_member":{"chat":{"id":-4929487028,"title":"afdfdz","type":"group","all_members_are_administrators":true,"accepted_gift_types":{"unlimited_gifts":false,"limited_gifts":false,"unique_gifts":false,"premium_subscription":false}},"from":{"id":1394032416,"is_bot":false,"first_name":"o","last_name":"0","username":"chehxlpp","language_code":"zh-hans"},"date":1750737004,"old_chat_member":{"user":{"id":7617087239,"is_bot":true,"first_name":"aazzc","username":"dddxgggfx_bot"},"status":"left"},"new_chat_member":{"user":{"id":7617087239,"is_bot":true,"first_name":"aazzc","username":"dddxgggfx_bot"},"status":"member"}}},{"update_id":251886152,
+
+        "message":{"message_id":41,"from":{"id":1394032416,"is_bot":false,"first_name":"o","last_name":"0","username":"chehxlpp","language_code":"zh-hans"},"chat":{"id":-4929487028,"title":"afdfdz","type":"group","all_members_are_administrators":true,"accepted_gift_types":{"unlimited_gifts":false,"limited_gifts":false,"unique_gifts":false,"premium_subscription":false}},"date":1750737004,"group_chat_created":true}},{"update_id":251886153,
+
+        "my_chat_member":{"chat":{"id":-1002727576573,"title":"afdfdz","type":"supergroup"},"from":{"id":1394032416,"is_bot":false,"first_name":"o","last_name":"0","username":"chehxlpp","language_code":"zh-hans"},"date":1750737018,"old_chat_member":{"user":{"id":7617087239,"is_bot":true,"first_name":"aazzc","username":"dddxgggfx_bot"},"status":"left"},"new_chat_member":{"user":{"id":7617087239,"is_bot":true,"first_name":"aazzc","username":"dddxgggfx_bot"},"status":"member"}}},{"update_id":251886154,
+
+        "message":{"message_id":1,"from":{"id":1087968824,"is_bot":true,"first_name":"Group","username":"GroupAnonymousBot"},"sender_chat":{"id":-1002727576573,"title":"afdfdz","type":"supergroup"},"chat":{"id":-1002727576573,"title":"afdfdz","type":"supergroup"},"date":1750737018,"migrate_from_chat_id":-4929487028}},{"update_id":251886155,
+
+        "message":{"message_id":42,"from":{"id":1394032416,"is_bot":false,"first_name":"o","last_name":"0","username":"chehxlpp","language_code":"zh-hans"},"chat":{"id":-4929487028,"title":"afdfdz","type":"group","all_members_are_administrators":false,"accepted_gift_types":{"unlimited_gifts":false,"limited_gifts":false,"unique_gifts":false,"premium_subscription":false}},"date":1750737018,"migrate_to_chat_id":-1002727576573}},{"update_id":251886156,
+
+        "my_chat_member":{"chat":{"id":-4929487028,"title":"afdfdz","type":"group","all_members_are_administrators":false,"accepted_gift_types":{"unlimited_gifts":false,"limited_gifts":false,"unique_gifts":false,"premium_subscription":false}},"from":{"id":1394032416,"is_bot":false,"first_name":"o","last_name":"0","username":"chehxlpp","language_code":"zh-hans"},"date":1750737054,"old_chat_member":{"user":{"id":7617087239,"is_bot":true,"first_name":"aazzc","username":"dddxgggfx_bot"},"status":"member"},"new_chat_member":{"user":{"id":7617087239,"is_bot":true,"first_name":"aazzc","username":"dddxgggfx_bot"},"status":"left"}}},{"update_id":251886157,
+
+        "my_chat_member":{"chat":{"id":-4929487028,"title":"afdfdz","type":"group","all_members_are_administrators":false,"accepted_gift_types":{"unlimited_gifts":false,"limited_gifts":false,"unique_gifts":false,"premium_subscription":false}},"from":{"id":1394032416,"is_bot":false,"first_name":"o","last_name":"0","username":"chehxlpp","language_code":"zh-hans"},"date":1750737054,"old_chat_member":{"user":{"id":7617087239,"is_bot":true,"first_name":"aazzc","username":"dddxgggfx_bot"},"status":"member"},"new_chat_member":{"user":{"id":7617087239,"is_bot":true,"first_name":"aazzc","username":"dddxgggfx_bot"},"status":"left"}}},{"update_id":251886158,
+
+        "my_chat_member":{"chat":{"id":-1002727576573,"title":"afdfdz","type":"supergroup"},"from":{"id":1087968824,"is_bot":true,"first_name":"Group","username":"GroupAnonymousBot"},"date":1750737054,"old_chat_member":{"user":{"id":7617087239,"is_bot":true,"first_name":"aazzc","username":"dddxgggfx_bot"},"status":"member"},"new_chat_member":{"user":{"id":7617087239,"is_bot":true,"first_name":"aazzc","username":"dddxgggfx_bot"},"status":"left"}}},{"update_id":251886159,
+
+        "my_chat_member":{"chat":{"id":-4882300333,"title":"ferdcszfesd","type":"group","all_members_are_administrators":false,"accepted_gift_types":{"unlimited_gifts":false,"limited_gifts":false,"unique_gifts":false,"premium_subscription":false}},"from":{"id":1394032416,"is_bot":false,"first_name":"o","last_name":"0","username":"chehxlpp","language_code":"zh-hans"},"date":1750737065,"old_chat_member":{"user":{"id":7617087239,"is_bot":true,"first_name":"aazzc","username":"dddxgggfx_bot"},"status":"left"},"new_chat_member":{"user":{"id":7617087239,"is_bot":true,"first_name":"aazzc","username":"dddxgggfx_bot"},"status":"member"}}},{"update_id":251886160,
+
+        "message":{"message_id":43,"from":{"id":1394032416,"is_bot":false,"first_name":"o","last_name":"0","username":"chehxlpp","language_code":"zh-hans"},"chat":{"id":-4882300333,"title":"ferdcszfesd","type":"group","all_members_are_administrators":true,"accepted_gift_types":{"unlimited_gifts":false,"limited_gifts":false,"unique_gifts":false,"premium_subscription":false}},"date":1750737065,"group_chat_created":true}},{"update_id":251886161,
+
+        "my_chat_member":{"chat":{"id":-1002541595015,"title":"ferdcszfesd","type":"supergroup"},"from":{"id":1394032416,"is_bot":false,"first_name":"o","last_name":"0","username":"chehxlpp","language_code":"zh-hans"},"date":1750737141,"old_chat_member":{"user":{"id":7617087239,"is_bot":true,"first_name":"aazzc","username":"dddxgggfx_bot"},"status":"left"},"new_chat_member":{"user":{"id":7617087239,"is_bot":true,"first_name":"aazzc","username":"dddxgggfx_bot"},"status":"member"}}},{"update_id":251886162,
+
+        "message":{"message_id":1,"from":{"id":1087968824,"is_bot":true,"first_name":"Group","username":"GroupAnonymousBot"},"sender_chat":{"id":-1002541595015,"title":"ferdcszfesd","type":"supergroup"},"chat":{"id":-1002541595015,"title":"ferdcszfesd","type":"supergroup"},"date":1750737141,"migrate_from_chat_id":-4882300333}},{"update_id":251886163,
+
+        "message":{"message_id":45,"from":{"id":1394032416,"is_bot":false,"first_name":"o","last_name":"0","username":"chehxlpp","language_code":"zh-hans"},"chat":{"id":-4882300333,"title":"ferdcszfesd","type":"group","all_members_are_administrators":false,"accepted_gift_types":{"unlimited_gifts":false,"limited_gifts":false,"unique_gifts":false,"premium_subscription":false}},"date":1750737141,"migrate_to_chat_id":-1002541595015}}]}'
+    headers:
+      Access-Control-Allow-Methods:
+      - GET, POST, OPTIONS
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Expose-Headers:
+      - Content-Length,Content-Type,Date,Server,Connection
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '9341'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 24 Jun 2025 03:55:11 GMT
+      Server:
+      - nginx/1.18.0
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+    status:
+      code: 200
+      message: OK
+- request:
+    body: !!binary |
+      LS1jNzRjNDFlNGYxMzQ2ZTdkNDU0NzI4YmIzZWQyMTUzMw0KQ29udGVudC1EaXNwb3NpdGlvbjog
+      Zm9ybS1kYXRhOyBuYW1lPSJjaGF0X2lkIg0KDQotNDg4MjMwMDMzMw0KLS1jNzRjNDFlNGYxMzQ2
+      ZTdkNDU0NzI4YmIzZWQyMTUzMw0KQ29udGVudC1EaXNwb3NpdGlvbjogZm9ybS1kYXRhOyBuYW1l
+      PSJwaG90byI7IGZpbGVuYW1lPSJkb2N1bWVudC5qcGciDQpDb250ZW50LVR5cGU6IGltYWdlL2pw
+      ZWcNCg0K/9j/4AAQSkZJRgABAQEAeAB4AAD/2wBDAAIBAQIBAQICAgICAgICAwUDAwMDAwYEBAMF
+      BwYHBwcGBwcICQsJCAgKCAcHCg0KCgsMDAwMBwkODw0MDgsMDAz/2wBDAQICAgMDAwYDAwYMCAcI
+      DAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAz/wAARCABx
+      AA4DASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIE
+      AwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJico
+      KSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZ
+      mqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6
+      /8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAEC
+      AxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNE
+      RUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmq
+      srO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEA
+      PwD9/KKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigD/9kNCi0tYzc0YzQxZTRmMTM0NmU3
+      ZDQ1NDcyOGJiM2VkMjE1MzMtLQ0K
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate, br, zstd
+      connection:
+      - keep-alive
+      content-length:
+      - '933'
+      content-type:
+      - multipart/form-data; boundary=c74c41e4f1346e7d454728bb3ed21533
+      host:
+      - api.telegram.org
+      user-agent:
+      - python-telegram-bot v22.1 (https://python-telegram-bot.org)
+    method: POST
+    uri: https://api.telegram.org/bot7617087239:AAGUy118YHbBvGNwkDo4CDehF4gFgXq2ZqE/sendPhoto
+  response:
+    body:
+      string: '{"ok":false,"error_code":400,"description":"Bad Request: group chat
+        was upgraded to a supergroup chat","parameters":{"migrate_to_chat_id":-1002541595015}}'
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Expose-Headers:
+      - Content-Length,Content-Type,Date,Server,Connection
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '154'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 24 Jun 2025 03:55:11 GMT
+      Server:
+      - nginx/1.18.0
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+    status:
+      code: 400
+      message: Bad Request
+- request:
+    body: !!binary |
+      LS04NDhlOTc0OWRjY2MxYWFlMjA2Y2FiMWM1Mjc3NTVkMg0KQ29udGVudC1EaXNwb3NpdGlvbjog
+      Zm9ybS1kYXRhOyBuYW1lPSJjaGF0X2lkIg0KDQotMTAwMjU0MTU5NTAxNQ0KLS04NDhlOTc0OWRj
+      Y2MxYWFlMjA2Y2FiMWM1Mjc3NTVkMg0KQ29udGVudC1EaXNwb3NpdGlvbjogZm9ybS1kYXRhOyBu
+      YW1lPSJwaG90byI7IGZpbGVuYW1lPSJkb2N1bWVudC5qcGciDQpDb250ZW50LVR5cGU6IGltYWdl
+      L2pwZWcNCg0K/9j/4AAQSkZJRgABAQEAeAB4AAD/2wBDAAIBAQIBAQICAgICAgICAwUDAwMDAwYE
+      BAMFBwYHBwcGBwcICQsJCAgKCAcHCg0KCgsMDAwMBwkODw0MDgsMDAz/2wBDAQICAgMDAwYDAwYM
+      CAcIDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAz/wAAR
+      CABxAA4DASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgED
+      AwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRol
+      JicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWW
+      l5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3
+      +Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3
+      AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5
+      OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaan
+      qKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIR
+      AxEAPwD9/KKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigD/9kNCi0tODQ4ZTk3NDlkY2Nj
+      MWFhZTIwNmNhYjFjNTI3NzU1ZDItLQ0K
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate, br, zstd
+      connection:
+      - keep-alive
+      content-length:
+      - '936'
+      content-type:
+      - multipart/form-data; boundary=848e9749dccc1aae206cab1c527755d2
+      host:
+      - api.telegram.org
+      user-agent:
+      - python-telegram-bot v22.1 (https://python-telegram-bot.org)
+    method: POST
+    uri: https://api.telegram.org/bot7617087239:AAGUy118YHbBvGNwkDo4CDehF4gFgXq2ZqE/sendPhoto
+  response:
+    body:
+      string: '{"ok":true,"result":{"message_id":4,"from":{"id":7617087239,"is_bot":true,"first_name":"aazzc","username":"dddxgggfx_bot"},"chat":{"id":-1002541595015,"title":"ferdcszfesd","username":"fdafafvcefrvgrgvf","type":"supergroup"},"date":1750737312,"photo":[{"file_id":"AgACAgUAAyEGAASXfamHAAMEaFohoBxM27g-TK-BukQeyAfKcC0AAnTDMRslJNBWS4X4AysBN-cBAAMCAANzAAM2BA","file_unique_id":"AQADdMMxGyUk0FZ4","file_size":292,"width":11,"height":90},{"file_id":"AgACAgUAAyEGAASXfamHAAMEaFohoBxM27g-TK-BukQeyAfKcC0AAnTDMRslJNBWS4X4AysBN-cBAAMCAANtAAM2BA","file_unique_id":"AQADdMMxGyUk0FZy","file_size":296,"width":14,"height":113}]}}'
+    headers:
+      Access-Control-Allow-Methods:
+      - GET, POST, OPTIONS
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Expose-Headers:
+      - Content-Length,Content-Type,Date,Server,Connection
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '615'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 24 Jun 2025 03:55:12 GMT
+      Server:
+      - nginx/1.18.0
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+    status:
+      code: 200
+      message: OK
+- request:
+    body: offset=0&limit=100
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate, br, zstd
+      connection:
+      - keep-alive
+      content-length:
+      - '18'
+      content-type:
+      - application/x-www-form-urlencoded
+      host:
+      - api.telegram.org
+      user-agent:
+      - python-telegram-bot v22.1 (https://python-telegram-bot.org)
+    method: POST
+    uri: https://api.telegram.org/bot7617087239:AAGUy118YHbBvGNwkDo4CDehF4gFgXq2ZqE/getUpdates
+  response:
+    body:
+      string: '{"ok":true,"result":[{"update_id":251886145,
+
+        "my_chat_member":{"chat":{"id":1394032416,"first_name":"o","last_name":"0","username":"chehxlpp","type":"private"},"from":{"id":1394032416,"is_bot":false,"first_name":"o","last_name":"0","username":"chehxlpp","language_code":"zh-hans"},"date":1750736719,"old_chat_member":{"user":{"id":7617087239,"is_bot":true,"first_name":"lk","username":"dddxgggfx_bot"},"status":"kicked","until_date":0},"new_chat_member":{"user":{"id":7617087239,"is_bot":true,"first_name":"lk","username":"dddxgggfx_bot"},"status":"member"}}},{"update_id":251886146,
+
+        "message":{"message_id":39,"from":{"id":1394032416,"is_bot":false,"first_name":"o","last_name":"0","username":"chehxlpp","language_code":"zh-hans"},"chat":{"id":1394032416,"first_name":"o","last_name":"0","username":"chehxlpp","type":"private"},"date":1750736720,"text":"/start","entities":[{"offset":0,"length":6,"type":"bot_command"}]}},{"update_id":251886147,
+
+        "message":{"message_id":40,"from":{"id":1394032416,"is_bot":false,"first_name":"o","last_name":"0","username":"chehxlpp","language_code":"zh-hans"},"chat":{"id":1394032416,"first_name":"o","last_name":"0","username":"chehxlpp","type":"private"},"date":1750736798,"text":"d"}},{"update_id":251886148,
+
+        "my_chat_member":{"chat":{"id":-1002410457412,"title":"avcdafdz","username":"dwesxerfedws","type":"supergroup"},"from":{"id":1394032416,"is_bot":false,"first_name":"o","last_name":"0","username":"chehxlpp","language_code":"zh-hans"},"date":1750736921,"old_chat_member":{"user":{"id":7617087239,"is_bot":true,"first_name":"aazzc","username":"dddxgggfx_bot"},"status":"left"},"new_chat_member":{"user":{"id":7617087239,"is_bot":true,"first_name":"aazzc","username":"dddxgggfx_bot"},"status":"member"}}},{"update_id":251886149,
+
+        "message":{"message_id":2,"from":{"id":1394032416,"is_bot":false,"first_name":"o","last_name":"0","username":"chehxlpp","language_code":"zh-hans"},"chat":{"id":-1002410457412,"title":"avcdafdz","username":"dwesxerfedws","type":"supergroup"},"date":1750736921,"new_chat_participant":{"id":7617087239,"is_bot":true,"first_name":"aazzc","username":"dddxgggfx_bot"},"new_chat_member":{"id":7617087239,"is_bot":true,"first_name":"aazzc","username":"dddxgggfx_bot"},"new_chat_members":[{"id":7617087239,"is_bot":true,"first_name":"aazzc","username":"dddxgggfx_bot"}]}},{"update_id":251886150,
+
+        "my_chat_member":{"chat":{"id":-1002410457412,"title":"avcdafdz","username":"dwesxerfedws","type":"supergroup"},"from":{"id":1087968824,"is_bot":true,"first_name":"Group","username":"GroupAnonymousBot"},"date":1750736987,"old_chat_member":{"user":{"id":7617087239,"is_bot":true,"first_name":"aazzc","username":"dddxgggfx_bot"},"status":"member"},"new_chat_member":{"user":{"id":7617087239,"is_bot":true,"first_name":"aazzc","username":"dddxgggfx_bot"},"status":"left"}}},{"update_id":251886151,
+
+        "my_chat_member":{"chat":{"id":-4929487028,"title":"afdfdz","type":"group","all_members_are_administrators":true,"accepted_gift_types":{"unlimited_gifts":false,"limited_gifts":false,"unique_gifts":false,"premium_subscription":false}},"from":{"id":1394032416,"is_bot":false,"first_name":"o","last_name":"0","username":"chehxlpp","language_code":"zh-hans"},"date":1750737004,"old_chat_member":{"user":{"id":7617087239,"is_bot":true,"first_name":"aazzc","username":"dddxgggfx_bot"},"status":"left"},"new_chat_member":{"user":{"id":7617087239,"is_bot":true,"first_name":"aazzc","username":"dddxgggfx_bot"},"status":"member"}}},{"update_id":251886152,
+
+        "message":{"message_id":41,"from":{"id":1394032416,"is_bot":false,"first_name":"o","last_name":"0","username":"chehxlpp","language_code":"zh-hans"},"chat":{"id":-4929487028,"title":"afdfdz","type":"group","all_members_are_administrators":true,"accepted_gift_types":{"unlimited_gifts":false,"limited_gifts":false,"unique_gifts":false,"premium_subscription":false}},"date":1750737004,"group_chat_created":true}},{"update_id":251886153,
+
+        "my_chat_member":{"chat":{"id":-1002727576573,"title":"afdfdz","type":"supergroup"},"from":{"id":1394032416,"is_bot":false,"first_name":"o","last_name":"0","username":"chehxlpp","language_code":"zh-hans"},"date":1750737018,"old_chat_member":{"user":{"id":7617087239,"is_bot":true,"first_name":"aazzc","username":"dddxgggfx_bot"},"status":"left"},"new_chat_member":{"user":{"id":7617087239,"is_bot":true,"first_name":"aazzc","username":"dddxgggfx_bot"},"status":"member"}}},{"update_id":251886154,
+
+        "message":{"message_id":1,"from":{"id":1087968824,"is_bot":true,"first_name":"Group","username":"GroupAnonymousBot"},"sender_chat":{"id":-1002727576573,"title":"afdfdz","type":"supergroup"},"chat":{"id":-1002727576573,"title":"afdfdz","type":"supergroup"},"date":1750737018,"migrate_from_chat_id":-4929487028}},{"update_id":251886155,
+
+        "message":{"message_id":42,"from":{"id":1394032416,"is_bot":false,"first_name":"o","last_name":"0","username":"chehxlpp","language_code":"zh-hans"},"chat":{"id":-4929487028,"title":"afdfdz","type":"group","all_members_are_administrators":false,"accepted_gift_types":{"unlimited_gifts":false,"limited_gifts":false,"unique_gifts":false,"premium_subscription":false}},"date":1750737018,"migrate_to_chat_id":-1002727576573}},{"update_id":251886156,
+
+        "my_chat_member":{"chat":{"id":-4929487028,"title":"afdfdz","type":"group","all_members_are_administrators":false,"accepted_gift_types":{"unlimited_gifts":false,"limited_gifts":false,"unique_gifts":false,"premium_subscription":false}},"from":{"id":1394032416,"is_bot":false,"first_name":"o","last_name":"0","username":"chehxlpp","language_code":"zh-hans"},"date":1750737054,"old_chat_member":{"user":{"id":7617087239,"is_bot":true,"first_name":"aazzc","username":"dddxgggfx_bot"},"status":"member"},"new_chat_member":{"user":{"id":7617087239,"is_bot":true,"first_name":"aazzc","username":"dddxgggfx_bot"},"status":"left"}}},{"update_id":251886157,
+
+        "my_chat_member":{"chat":{"id":-4929487028,"title":"afdfdz","type":"group","all_members_are_administrators":false,"accepted_gift_types":{"unlimited_gifts":false,"limited_gifts":false,"unique_gifts":false,"premium_subscription":false}},"from":{"id":1394032416,"is_bot":false,"first_name":"o","last_name":"0","username":"chehxlpp","language_code":"zh-hans"},"date":1750737054,"old_chat_member":{"user":{"id":7617087239,"is_bot":true,"first_name":"aazzc","username":"dddxgggfx_bot"},"status":"member"},"new_chat_member":{"user":{"id":7617087239,"is_bot":true,"first_name":"aazzc","username":"dddxgggfx_bot"},"status":"left"}}},{"update_id":251886158,
+
+        "my_chat_member":{"chat":{"id":-1002727576573,"title":"afdfdz","type":"supergroup"},"from":{"id":1087968824,"is_bot":true,"first_name":"Group","username":"GroupAnonymousBot"},"date":1750737054,"old_chat_member":{"user":{"id":7617087239,"is_bot":true,"first_name":"aazzc","username":"dddxgggfx_bot"},"status":"member"},"new_chat_member":{"user":{"id":7617087239,"is_bot":true,"first_name":"aazzc","username":"dddxgggfx_bot"},"status":"left"}}},{"update_id":251886159,
+
+        "my_chat_member":{"chat":{"id":-4882300333,"title":"ferdcszfesd","type":"group","all_members_are_administrators":false,"accepted_gift_types":{"unlimited_gifts":false,"limited_gifts":false,"unique_gifts":false,"premium_subscription":false}},"from":{"id":1394032416,"is_bot":false,"first_name":"o","last_name":"0","username":"chehxlpp","language_code":"zh-hans"},"date":1750737065,"old_chat_member":{"user":{"id":7617087239,"is_bot":true,"first_name":"aazzc","username":"dddxgggfx_bot"},"status":"left"},"new_chat_member":{"user":{"id":7617087239,"is_bot":true,"first_name":"aazzc","username":"dddxgggfx_bot"},"status":"member"}}},{"update_id":251886160,
+
+        "message":{"message_id":43,"from":{"id":1394032416,"is_bot":false,"first_name":"o","last_name":"0","username":"chehxlpp","language_code":"zh-hans"},"chat":{"id":-4882300333,"title":"ferdcszfesd","type":"group","all_members_are_administrators":true,"accepted_gift_types":{"unlimited_gifts":false,"limited_gifts":false,"unique_gifts":false,"premium_subscription":false}},"date":1750737065,"group_chat_created":true}},{"update_id":251886161,
+
+        "my_chat_member":{"chat":{"id":-1002541595015,"title":"ferdcszfesd","type":"supergroup"},"from":{"id":1394032416,"is_bot":false,"first_name":"o","last_name":"0","username":"chehxlpp","language_code":"zh-hans"},"date":1750737141,"old_chat_member":{"user":{"id":7617087239,"is_bot":true,"first_name":"aazzc","username":"dddxgggfx_bot"},"status":"left"},"new_chat_member":{"user":{"id":7617087239,"is_bot":true,"first_name":"aazzc","username":"dddxgggfx_bot"},"status":"member"}}},{"update_id":251886162,
+
+        "message":{"message_id":1,"from":{"id":1087968824,"is_bot":true,"first_name":"Group","username":"GroupAnonymousBot"},"sender_chat":{"id":-1002541595015,"title":"ferdcszfesd","type":"supergroup"},"chat":{"id":-1002541595015,"title":"ferdcszfesd","type":"supergroup"},"date":1750737141,"migrate_from_chat_id":-4882300333}},{"update_id":251886163,
+
+        "message":{"message_id":45,"from":{"id":1394032416,"is_bot":false,"first_name":"o","last_name":"0","username":"chehxlpp","language_code":"zh-hans"},"chat":{"id":-4882300333,"title":"ferdcszfesd","type":"group","all_members_are_administrators":false,"accepted_gift_types":{"unlimited_gifts":false,"limited_gifts":false,"unique_gifts":false,"premium_subscription":false}},"date":1750737141,"migrate_to_chat_id":-1002541595015}}]}'
+    headers:
+      Access-Control-Allow-Methods:
+      - GET, POST, OPTIONS
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Expose-Headers:
+      - Content-Length,Content-Type,Date,Server,Connection
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '9341'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 24 Jun 2025 03:55:12 GMT
+      Server:
+      - nginx/1.18.0
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+    status:
+      code: 200
+      message: OK
+version: 1
