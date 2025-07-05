@@ -85,8 +85,10 @@ def bundle_webui(ui_version: Optional[str] = None):
             if app_path.exists():
                 shutil.rmtree(app_path)
 
+            gh_token = os.environ.get('GH_TOKEN')
             release = requests.get(
-                'https://api.github.com/repos/Flexget/webui/releases/latest'
+                'https://api.github.com/repos/Flexget/webui/releases/latest',
+                headers={'Authorization': f'Bearer {gh_token}'} if gh_token else {},
             ).json()
 
             v2_package = None
