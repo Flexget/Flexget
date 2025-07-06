@@ -161,7 +161,7 @@ requests==2.32.4
     # via flexget
 rich==14.0.0
     # via flexget
-rpds-py==0.25.1
+rpds-py==0.26.0
     # via
     #   jsonschema
     #   referencing
@@ -183,7 +183,7 @@ sqlalchemy==2.0.41
     # via flexget
 tempora==5.8.1
     # via portend
-typing-extensions==4.14.0
+typing-extensions==4.14.1
     # via
     #   beautifulsoup4
     #   referencing
