@@ -1,4 +1,5 @@
 import time
+from json import JSONDecodeError
 
 import pendulum
 from loguru import logger
@@ -288,8 +289,9 @@ def relations_lookup(entry: Entry):
         ).json()
         logger.debug('Additional IDs: {}', ids)
     except RequestException as e:
-        logger.verbose(f"Couldn't fetch additional IDs: {e}")
-    if not isinstance(ids, dict):
+        logger.warning('Error fetching additional IDs: {}', e)
+    except JSONDecodeError as e:
+        logger.warning('Unexpected relations: {}', e)
         ids = {}
     entry.update_using_map(RELATIONS_MAP, ids, True)
 
