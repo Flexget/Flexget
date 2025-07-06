@@ -5,8 +5,9 @@ from loguru import logger
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
-from flexget.entry import Entry
+from flexget.entry import Entry, register_lazy_lookup
 from flexget.event import event
+from flexget.utils import requests
 from flexget.utils.cached_input import cached
 from flexget.utils.requests import RequestException, TokenBucketLimiter
 
@@ -21,6 +22,19 @@ ANIME_FORMAT = ['tv', 'tv_short', 'movie', 'special', 'ova', 'ona', 'all']
 TRAILER_SOURCE = {
     'youtube': 'https://www.youtube.com/embed/',
     'dailymotion': 'https://www.dailymotion.com/embed/video/',
+}
+
+RELATIONS_MAP = {
+    'anidb_id': 'anidb',
+    'anime_planet_id': 'anime-planet',
+    'anisearch_id': 'anisearch',
+    'imdb_id': 'imdb',
+    'kitsu_id': 'kitsu',
+    'livechart_id': 'livechart',
+    'mal_id': 'myanimelist',
+    'notify_moe_id': 'notify-moe',
+    'tmdb_id': 'themoviedb',
+    'tvdb_id': 'thetvdb',
 }
 
 
@@ -101,6 +115,7 @@ class AniList:
         logger.debug('Selected Formats: {}', selected_formats)
 
         req_variables = {'user': config['username']}
+        req_amount = min(task.config.get('limit', {}).get('amount', 500), 500)
         req_chunk = 1
         req_fields = (
             'id',
@@ -151,7 +166,7 @@ class AniList:
         while req_chunk:
             req_query = (
                 f'query ($user: String){{ collection: MediaListCollection(userName: $user, '
-                f'type: ANIME, perChunk: 500, chunk: {req_chunk}, status_in: '
+                f'type: ANIME, perChunk: {req_amount}, chunk: {req_chunk}, status_in: '
                 f'[{", ".join([s.upper() for s in selected_list_status])}]) {{ hasNextChunk, '
                 f'statuses: lists{{ status, name, list: entries{{ anime: media{{ {", ".join(req_fields)}'
                 f' }}}}}}}}}}'
@@ -193,26 +208,11 @@ class AniList:
                     ) or 'all' in selected_formats
 
                     if has_selected_type and has_selected_release_status:
-                        ids = {}
-                        try:
-                            ids = task.requests.post(
-                                'https://relations.yuna.moe/api/v2/ids',
-                                json={'anilist': anime.get('id')},
-                            ).json()
-                            logger.debug('Additional IDs: {}', ids)
-                        except RequestException as e:
-                            logger.verbose(f"Couldn't fetch additional IDs: {e}")
-                        if not isinstance(ids, dict):
-                            ids = {}
-
                         logger.debug('Anime Entry: {}', anime)
                         entry = Entry()
-                        entry['al_id'] = anime.get('id', ids.get('anilist'))
-                        entry['anidb_id'] = ids.get('anidb')
-                        entry['kitsu_id'] = ids.get('kitsu')
-                        entry['tvdb_id'] = ids.get('thetvdb')
-                        entry['tmdb_id'] = ids.get('themoviedb')
-                        entry['mal_id'] = anime.get('idMal', ids.get('myanimelist'))
+                        entry['al_id'] = anime.get('id')
+                        if anime.get('idMal'):
+                            entry['mal_id'] = anime['idMal']
                         entry['al_banner'] = anime.get('bannerImage')
                         entry['al_cover'] = anime.get('coverImage', {}).get('large')
                         entry['al_date_end'] = (
@@ -272,9 +272,26 @@ class AniList:
                         ).strip()
                         entry['title'] = entry['series_name']
                         entry['url'] = anime.get('siteUrl')
+                        entry.add_lazy_fields(relations_lookup, RELATIONS_MAP)
                         if entry.isvalid():
                             yield entry
             req_chunk = req_chunk + 1 if list_response['collection']['hasNextChunk'] else False
+
+
+@register_lazy_lookup('relations_lookup')
+def relations_lookup(entry: Entry):
+    ids = {}
+    try:
+        ids: dict[str, str | int] = requests.post(
+            'https://relations.yuna.moe/api/v2/ids',
+            json={'anilist': entry.get('al_id', eval_lazy=False)},
+        ).json()
+        logger.debug('Additional IDs: {}', ids)
+    except RequestException as e:
+        logger.verbose(f"Couldn't fetch additional IDs: {e}")
+    if not isinstance(ids, dict):
+        ids = {}
+    entry.update_using_map(RELATIONS_MAP, ids, True)
 
 
 @event('plugin.register')
