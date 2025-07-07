@@ -39,7 +39,7 @@ repos:
             --output-file=requirements.txt,
           ]
   - repo: https://github.com/renovatebot/pre-commit-hooks
-    rev: 41.21.0
+    rev: 41.23.5
     hooks:
       - id: renovate-config-validator
         args: [--strict]
