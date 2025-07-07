@@ -9,10 +9,15 @@ permissions: {}
 
 jobs:
   deploy:
-    permissions:
-      deployments: write
     runs-on: ubuntu-latest
     steps:
+      - name: Check Commit Status
+        run: |
+          commit_state=$(curl -sf -H 'Accept: application/json' 'https://github.com/${{ github.repository }}/commits/deferred_commit_data/${{ github.ref_name }}' | jq -r '.deferredCommits[0].statusCheckStatus.state // "not_found"')
+          if [[ "$commit_state" != "success" ]]; then
+            echo "::error::Status is '$commit_state'."
+            exit 1
+          fi
       - name: Create Deployment
         uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7
         with:
@@ -21,4 +26,5 @@ jobs:
             await github.rest.repos.createDeployment({
               ...context.repo,
               ref: context.ref.slice(11),
+              required_contexts: []
             });
