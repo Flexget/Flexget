@@ -38,6 +38,10 @@ repos:
             --no-hashes,
             --output-file=requirements.txt,
           ]
+  - repo: https://github.com/rhysd/actionlint
+    rev: v1.7.7
+    hooks:
+      - id: actionlint
   - repo: https://github.com/renovatebot/pre-commit-hooks
     rev: 41.21.0
     hooks:
