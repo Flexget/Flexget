@@ -1,7 +1,7 @@
 import time
 from datetime import date, datetime, timedelta
 from json.decoder import JSONDecodeError
-from typing import Any, Optional
+from typing import Any
 
 from dateutil.parser import parse as dateutil_parse
 from loguru import logger
@@ -75,7 +75,7 @@ class BlurayMovie(Base):
     genres = association_proxy('_genres', 'name')
     updated = Column(DateTime, default=datetime.now, nullable=False)
 
-    def __init__(self, title: str, year: Optional[int]) -> None:
+    def __init__(self, title: str, year: int | None) -> None:
         title_year = f'{title} ({year})' if year else title
 
         params = {
@@ -189,7 +189,7 @@ class BluraySearchResult(Base):
     movie = relationship(BlurayMovie)
 
     def __init__(
-        self, search: str, movie_id: Optional[int] = None, movie: Optional[BlurayMovie] = None
+        self, search: str, movie_id: int | None = None, movie: BlurayMovie | None = None
     ) -> None:
         self.search = search.lower()
         if movie_id:
@@ -203,10 +203,10 @@ class ApiBluray:
 
     @staticmethod
     def lookup(
-        title: Optional[str] = None,
-        year: Optional[int] = None,
+        title: str | None = None,
+        year: int | None = None,
         only_cached: bool = False,
-        session: Optional[Session] = None,
+        session: Session | None = None,
     ):
         if not title:
             raise LookupError('No criteria specified for blu-ray.com lookup')

@@ -1,8 +1,11 @@
 """Provides small event framework."""
 
-from typing import Any, Callable
+from typing import TYPE_CHECKING, Any
 
 from loguru import logger
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 logger = logger.bind(name='event')
 
@@ -10,7 +13,7 @@ logger = logger.bind(name='event')
 class Event:
     """Represents one registered event."""
 
-    def __init__(self, name: str, func: Callable, priority: int = 128) -> None:
+    def __init__(self, name: str, func: 'Callable', priority: int = 128) -> None:
         self.name = name
         self.func = func
         self.priority = priority
@@ -39,10 +42,10 @@ class Event:
 _events: dict[str, list[Event]] = {}
 
 
-def event(name: str, priority: int = 128) -> Callable[[Callable], Callable]:
+def event(name: str, priority: int = 128) -> 'Callable[[Callable], Callable]':
     """Register event to function with a decorator."""
 
-    def decorator(func: Callable) -> Callable:
+    def decorator(func: 'Callable') -> 'Callable':
         add_event_handler(name, func, priority)
         return func
 
@@ -60,7 +63,7 @@ def get_events(name: str) -> list[Event]:
     return _events[name]
 
 
-def add_event_handler(name: str, func: Callable, priority: int = 128) -> Event:
+def add_event_handler(name: str, func: 'Callable', priority: int = 128) -> Event:
     """Return event created.
 
     :param string name: Event name
@@ -87,7 +90,7 @@ def remove_event_handlers(name: str) -> None:
     _events.pop(name, None)
 
 
-def remove_event_handler(name: str, func: Callable) -> None:
+def remove_event_handler(name: str, func: 'Callable') -> None:
     """Remove `func` from the handlers for event `name`."""
     for e in list(_events.get(name, [])):
         if e.func is func:

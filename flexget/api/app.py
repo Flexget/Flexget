@@ -4,7 +4,7 @@ from collections import deque
 from contextlib import suppress
 from functools import partial, wraps
 from pathlib import Path
-from typing import TYPE_CHECKING, Callable, Optional, Union
+from typing import TYPE_CHECKING
 
 from flask import Flask, Request, Response, jsonify, make_response, request
 from flask_compress import Compress
@@ -28,7 +28,7 @@ __version__ = '1.8.0'
 logger = logger.bind(name='api')
 
 if TYPE_CHECKING:
-    from collections.abc import Mapping
+    from collections.abc import Callable, Mapping
     from typing import TypedDict
 
     from flask_restx.reqparse import RequestParser
@@ -59,7 +59,7 @@ class APIClient:
     def __getattr__(self, item: str) -> 'APIEndpoint':
         return APIEndpoint('/api/' + item, self.get_endpoint)
 
-    def get_endpoint(self, url: str, data=None, method: Optional[str] = None):
+    def get_endpoint(self, url: str, data=None, method: str | None = None):
         if method is None:
             method = 'POST' if data is not None else 'GET'
         auth_header = {'Authorization': f'Token {api_key()}'}
@@ -74,7 +74,7 @@ class APIClient:
 
 
 class APIEndpoint:
-    def __init__(self, endpoint: str, caller: Callable) -> None:
+    def __init__(self, endpoint: str, caller: 'Callable') -> None:
         self.endpoint = endpoint
         self.caller = caller
 
@@ -83,11 +83,11 @@ class APIEndpoint:
 
     __getitem__ = __getattr__
 
-    def __call__(self, data=None, method: Optional[str] = None):
+    def __call__(self, data=None, method: str | None = None):
         return self.caller(self.endpoint, data=data, method=method)
 
 
-def api_version(f: Callable[..., Response]):
+def api_version(f: 'Callable[..., Response]'):
     """Add the 'API-Version' header to all responses."""
 
     @wraps(f)
@@ -121,7 +121,7 @@ class API(RestxAPI):
     def validate(
         self,
         model: Model,
-        schema_override: Optional[dict[str, list[dict[str, str]]]] = None,
+        schema_override: dict[str, list[dict[str, str]]] | None = None,
         description=None,
     ):
         """When a method is decorated with this, json data submitted to the endpoint will be validated with the given `model`.
@@ -172,9 +172,9 @@ class API(RestxAPI):
     def pagination_parser(
         self,
         parser: 'RequestParser' = None,
-        sort_choices: Optional[list[str]] = None,
-        default: Optional[str] = None,
-        add_sort: Optional[bool] = None,
+        sort_choices: list[str] | None = None,
+        default: str | None = None,
+        add_sort: bool | None = None,
     ) -> 'RequestParser':
         """Return a standardized pagination parser, to be used for any endpoint that has pagination.
 
@@ -240,7 +240,7 @@ class APIError(Exception):
     status = 'Error'
     response_model = base_message_schema
 
-    def __init__(self, message: Optional[str] = None, payload=None) -> None:
+    def __init__(self, message: str | None = None, payload=None) -> None:
         self.message = message
         self.payload = payload
 
@@ -338,8 +338,8 @@ class ValidationError(APIError):
         }
         super().__init__(message, payload=payload)
 
-    def _verror_to_dict(self, error: 'SchemaValidationError') -> 'Mapping[str, Union[str, list]]':
-        error_dict: dict[str, Union[str, list]] = {}
+    def _verror_to_dict(self, error: 'SchemaValidationError') -> 'Mapping[str, str | list]':
+        error_dict: dict[str, str | list] = {}
         for attr in self.verror_attrs:
             if isinstance(getattr(error, attr), deque):
                 error_dict[attr] = list(getattr(error, attr))
@@ -376,7 +376,7 @@ def api_key(session: 'Session' = None) -> str:
     return session.query(User).first().token
 
 
-def etag(method: Optional[Callable] = None, cache_age: int = 0):
+def etag(method: 'Callable | None' = None, cache_age: int = 0):
     """Add an ETag header to the response and check for the "If-Match" and "If-Not-Match" headers to return an appropriate response.
 
     :param method: A GET or HEAD flask method to wrap
