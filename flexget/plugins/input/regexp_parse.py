@@ -133,12 +133,12 @@ class RegexpParse:
         self.required = []
 
     def flagstr_to_flags(self, flag_str):
-        """Turn a comma seperated list of flags into the int value."""
-        combind_flags = 0
+        """Turn a comma separated list of flags into the int value."""
+        combined_flags = 0
         split_flags = flag_str.split(',')
         for flag in split_flags:
-            combind_flags = combind_flags | RegexpParse.FLAG_VALUES[flag.strip()]
-        return combind_flags
+            combined_flags = combined_flags | RegexpParse.FLAG_VALUES[flag.strip()]
+        return combined_flags
 
     def compile_regexp_dict_list(self, re_list):
         """Turn a list of dicts containing regexps information into a list of compiled regexps."""
@@ -175,15 +175,15 @@ class RegexpParse:
             content = resp.text
 
         sections = []
-        seperators = config.get('sections')
-        if seperators:
-            for sep in seperators:
+        separators = config.get('sections')
+        if separators:
+            for sep in separators:
                 flags = 0
                 if 'flags' in sep:
                     flags = self.flagstr_to_flags(sep['flags'])
                 sections.extend(re.findall(sep['regexp'], content, flags))
 
-        # no seperators just do work on the whole content
+        # no separators just do work on the whole content
         else:
             sections.append(content)
 

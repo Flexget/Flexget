@@ -19,7 +19,7 @@ class PluginDetails:
             else:
                 logger.warning(
                     "Task didn't produce any entries. "
-                    'This is likely due to a mis-configured or non-functional input.'
+                    'This is likely due to a misconfigured or non-functional input.'
                 )
         else:
             logger.verbose('Produced {} entries.', len(task.entries))
