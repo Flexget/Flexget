@@ -16,7 +16,7 @@ if [ "$(git rev-parse HEAD)" != "$(git rev-parse origin/develop)" ]; then
 fi
 
 # Only run if there are new commits
-if git log --skip 1 origin/master..origin/develop|grep '^commit '; then
+if [ -z "$(git tag --points-at HEAD)" ] && [ -z "$(git tag --points-at HEAD~1)" ]; then
 
   # Bump to new release version
   uv run scripts/dev_tools.py bump-version release
@@ -41,10 +41,8 @@ if git log --skip 1 origin/master..origin/develop|grep '^commit '; then
   git add flexget/_version.py
   git commit -m "Prepare v$(uv run scripts/dev_tools.py version)"
 
-  # master branch should be at the release we tagged
-  git branch -f master v${VERSION}
-  # If either of the new branches are not fast forwards, the push will be rejected
-  git push origin master develop
+  # If the new branch is not a fast-forward, the push will be rejected
+  git push origin develop
   # Make sure our branches push before pushing tag
   git push --tags
 else
