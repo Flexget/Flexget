@@ -8,6 +8,9 @@
 .. image:: https://img.shields.io/pypi/v/Flexget.svg
    :target: https://pypi.org/project/flexget/
 
+.. image:: https://img.shields.io/docker/v/flexget/flexget?logo=docker&logoColor=aqua&label=docker%20image&color=aqua
+   :target: https://hub.docker.com/r/flexget/flexget
+
 .. image:: https://img.shields.io/pypi/pyversions/Flexget.svg
    :target: https://pypi.org/project/flexget/
 
