@@ -6,7 +6,7 @@ import random
 import string
 import threading
 from functools import total_ordering, wraps
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING, Union
 
 from loguru import logger
 from sqlalchemy import Column, Integer, String, Unicode
@@ -59,7 +59,7 @@ class TaskConfigHash(Base):
 
 
 @with_session
-def config_changed(task: Optional[str] = None, session: 'ContextSession' = None) -> None:
+def config_changed(task: str | None = None, session: 'ContextSession' = None) -> None:
     """Force config_modified flag to come out true on next run of `task`.
 
     Used when the db changes, and all entries need to be reprocessed.
@@ -136,7 +136,7 @@ class EntryIterator:
 class EntryContainer(list):
     """Container for a list of entries, also contains accepted, rejected failed iterators over them."""
 
-    def __init__(self, iterable: Optional[list] = None):
+    def __init__(self, iterable: list | None = None):
         list.__init__(self, iterable or [])
 
         self._entries = EntryIterator(self, [EntryState.UNDECIDED, EntryState.ACCEPTED])
@@ -289,7 +289,7 @@ class Task:
         # current state
         self.current_phase = None
         self.current_plugin = None
-        self.traceback: Optional[str] = None
+        self.traceback: str | None = None
 
     @property
     def max_reruns(self):
@@ -402,7 +402,7 @@ class Task:
             raise ValueError(f'`{plugin}` is not a valid plugin.')
         self.disabled_plugins.append(plugin)
 
-    def abort(self, reason='Unknown', silent=False, traceback: Optional[str] = None):
+    def abort(self, reason='Unknown', silent=False, traceback: str | None = None):
         """Abort this task execution, no more plugins will be executed except the abort handling ones."""
         self.aborted = True
         self.abort_reason = reason
