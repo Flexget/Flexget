@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 import re
 from datetime import datetime, timedelta
 from functools import total_ordering
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING
 
 from loguru import logger
 from sqlalchemy import (
@@ -124,13 +126,11 @@ class Series(Base):
         return str(self).encode('ascii', 'replace')
 
     def episodes_for_season(self, season_num):
-        return len(
-            [
-                episode
-                for episode in self.episodes
-                if episode.season == season_num and episode.downloaded_releases
-            ]
-        )
+        return len([
+            episode
+            for episode in self.episodes
+            if episode.season == season_num and episode.downloaded_releases
+        ])
 
     @property
     def completed_seasons(self):
@@ -548,7 +548,7 @@ Index('episode_series_identifier', Episode.series_id, Episode.identifier)
 
 
 @db_schema.upgrade('series')
-def upgrade(ver: Optional[int], session: Session) -> int:
+def upgrade(ver: int | None, session: Session) -> int:
     if ver is None:
         if table_exists('episode_qualities', session):
             logger.info(
@@ -616,9 +616,9 @@ def upgrade(ver: Optional[int], session: Session) -> int:
         create_index('series', session, 'name_lower')
         # Fill in lower case name column
         session.execute(
-            update(series_table).values(
-                {series_table.c.name_lower: func.lower(series_table.c.name)}
-            )
+            update(series_table).values({
+                series_table.c.name_lower: func.lower(series_table.c.name)
+            })
         )
         ver = 4
     if ver == 4:
@@ -750,7 +750,7 @@ def db_cleanup(manager, session: Session) -> None:
         logger.verbose('Removed {} series without episodes.', result)
 
 
-def set_alt_names(alt_names: 'Iterable[str]', db_series: Series, session: Session) -> None:
+def set_alt_names(alt_names: Iterable[str], db_series: Series, session: Session) -> None:
     db_alt_names = []
     for alt_name in alt_names:
         db_series_alt = (
@@ -776,12 +776,12 @@ def set_alt_names(alt_names: 'Iterable[str]', db_series: Series, session: Sessio
 
 def show_seasons(
     series: Series,
-    start: Optional[int] = None,
-    stop: Optional[int] = None,
+    start: int | None = None,
+    stop: int | None = None,
     count: bool = False,
     descending: bool = False,
     session: Session = None,
-) -> Union[int, list[Season]]:
+) -> int | list[Season]:
     """Return all seasons of a given series."""
     seasons = session.query(Season).filter(Season.series_id == series.id)
     if count:
@@ -794,7 +794,7 @@ def show_seasons(
 
 def get_all_entities(
     series: Series, session: Session, sort_by: str = 'age', reverse: bool = False
-) -> list[Union[Episode, Season]]:
+) -> list[Episode | Season]:
     episodes = show_episodes(series, session=session)
     seasons = show_seasons(series, session=session)
     if sort_by == 'identifier':
@@ -812,12 +812,12 @@ def get_all_entities(
 
 def get_episode_releases(
     episode: Episode,
-    downloaded: Optional[bool] = None,
-    start: Optional[int] = None,
-    stop: Optional[int] = None,
+    downloaded: bool | None = None,
+    start: int | None = None,
+    stop: int | None = None,
     count: bool = False,
     descending: bool = False,
-    sort_by: Optional[str] = None,
+    sort_by: str | None = None,
     session: Session = None,
 ) -> list[EpisodeRelease]:
     """Return all releases for a given episode."""
@@ -835,14 +835,14 @@ def get_episode_releases(
 
 def get_season_releases(
     season: Season,
-    downloaded: Optional[bool] = None,
-    start: Optional[int] = None,
-    stop: Optional[int] = None,
+    downloaded: bool | None = None,
+    start: int | None = None,
+    stop: int | None = None,
     count: bool = False,
     descending: bool = False,
-    sort_by: Optional[str] = None,
+    sort_by: str | None = None,
     session: Session = None,
-) -> Union[int, list[SeasonRelease]]:
+) -> int | list[SeasonRelease]:
     """Return all releases for a given season."""
     releases = session.query(SeasonRelease).filter(SeasonRelease.season_id == season.id)
     if downloaded is not None:
@@ -915,16 +915,16 @@ def _add_alt_name(alt: str, db_series: Series, series_name: str, session: Sessio
 
 @with_session
 def get_series_summary(
-    configured: Optional[str] = None,
-    premieres: Optional[bool] = None,
-    start: Optional[int] = None,
-    stop: Optional[int] = None,
+    configured: str | None = None,
+    premieres: bool | None = None,
+    start: int | None = None,
+    stop: int | None = None,
     count: bool = False,
     sort_by: str = 'show_name',
-    descending: Optional[bool] = None,
+    descending: bool | None = None,
     session: Session = None,
-    name: Optional[str] = None,
-) -> Union[int, 'Iterable[Series]']:
+    name: str | None = None,
+) -> int | Iterable[Series]:
     """Return a query with results for all series.
 
     :param configured: 'configured' for shows in config, 'unconfigured' for shows not in config, 'all' for both.
@@ -1011,8 +1011,8 @@ def auto_identified_by(series: Series) -> str:
 
 
 def get_latest_season_pack_release(
-    series: Series, downloaded: bool = True, season: Optional[int] = None
-) -> Optional[Season]:
+    series: Series, downloaded: bool = True, season: int | None = None
+) -> Season | None:
     """Return the latest season pack release for a series.
 
     :param Series series: Series object
@@ -1053,8 +1053,8 @@ def get_latest_season_pack_release(
 
 
 def get_latest_episode_release(
-    series: Series, downloaded: bool = True, season: Optional[int] = None
-) -> Optional[Episode]:
+    series: Series, downloaded: bool = True, season: int | None = None
+) -> Episode | None:
     """Return instance of Episode or None if not found.
 
     :param series series: SQLAlchemy session
@@ -1108,8 +1108,8 @@ def get_latest_episode_release(
 
 
 def get_latest_release(
-    series: Series, downloaded: bool = True, season: Optional[int] = None
-) -> Union[EpisodeRelease, SeasonRelease, None]:
+    series: Series, downloaded: bool = True, season: int | None = None
+) -> EpisodeRelease | SeasonRelease | None:
     """Return the latest downloaded entity of a series, either season pack or episode.
 
     :param Series series: Series object
@@ -1160,14 +1160,14 @@ def new_seasons_after(series: Series, since_season: Season, session: Session) ->
     return series_seasons.filter(Season.first_seen > since_season.first_seen).count(), 'seasons'
 
 
-def new_entities_after(since_entity: Union[Season, Episode]) -> tuple[int, str]:
+def new_entities_after(since_entity: Season | Episode) -> tuple[int, str]:
     session = Session.object_session(since_entity)
     series = since_entity.series
     func = new_seasons_after if since_entity.is_season else new_eps_after
     return func(series, since_entity, session)
 
 
-def set_series_begin(series: Series, ep_id: Union[str, int]) -> tuple[str, str]:
+def set_series_begin(series: Series, ep_id: str | int) -> tuple[str, str]:
     """Set beginning for series.
 
     :param Series series: Series instance
@@ -1226,13 +1226,11 @@ def remove_series(name: str, forget: bool = False) -> None:
         if series:
             for s in series:
                 if forget:
-                    downloaded_releases.extend(
-                        [
-                            release.title
-                            for entity in s.episodes + s.seasons
-                            for release in entity.downloaded_releases
-                        ]
-                    )
+                    downloaded_releases.extend([
+                        release.title
+                        for entity in s.episodes + s.seasons
+                        for release in entity.downloaded_releases
+                    ])
                 session.delete(s)
             session.commit()
             logger.debug('Removed series `{}` from database.', name)
@@ -1369,12 +1367,12 @@ def season_release_by_id(release_id: int, session: Session = None) -> SeasonRele
 
 def show_episodes(
     series: Series,
-    start: Optional[int] = None,
-    stop: Optional[int] = None,
+    start: int | None = None,
+    stop: int | None = None,
     count: bool = False,
     descending: bool = False,
     session: Session = None,
-) -> Union[int, list[Episode]]:
+) -> int | list[Episode]:
     """Return all episodes of a given series."""
     episodes = session.query(Episode).filter(Episode.series_id == series.id)
     if count:
@@ -1402,8 +1400,8 @@ def show_episodes(
 
 
 def store_parser(
-    session: Session, parser: 'SeriesParseResult', series: Series = None, quality: 'Quality' = None
-) -> list[Union[SeasonRelease, EpisodeRelease]]:
+    session: Session, parser: SeriesParseResult, series: Series = None, quality: Quality = None
+) -> list[SeasonRelease | EpisodeRelease]:
     """Push series information into database. Returns added/existing release.
 
     :param session: Database session to use
@@ -1517,7 +1515,7 @@ def store_parser(
 
 
 def add_series_entity(
-    session: Session, series: Series, identifier: str, quality: 'Quality' = None
+    session: Session, series: Series, identifier: str, quality: Quality = None
 ) -> None:
     """Add entity identified by `identifier` to series `name` in database.
 

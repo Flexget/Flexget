@@ -60,9 +60,9 @@ class UrlRewriteTorrentleech:
             'rss_key': {'type': 'string'},
             'username': {'type': 'string'},
             'password': {'type': 'string'},
-            'category': one_or_more(
-                {'oneOf': [{'type': 'integer'}, {'type': 'string', 'enum': list(CATEGORIES)}]}
-            ),
+            'category': one_or_more({
+                'oneOf': [{'type': 'integer'}, {'type': 'string', 'enum': list(CATEGORIES)}]
+            }),
         },
         'required': ['rss_key', 'username', 'password'],
         'additionalProperties': False,

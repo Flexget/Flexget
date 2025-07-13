@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 import sys
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from loguru import logger
 
@@ -14,7 +16,7 @@ if TYPE_CHECKING:
     from collections.abc import Sequence
 
 
-def main(args: Optional['Sequence[str]'] = None):
+def main(args: Sequence[str] | None = None):
     """Execute as the main entry point for Command Line Interface."""
     if args is None:
         args = sys.argv[1:]

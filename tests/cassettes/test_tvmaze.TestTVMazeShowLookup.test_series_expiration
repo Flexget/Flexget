@@ -1,168 +1,216 @@
 interactions:
-  - request:
-      body: null
-      headers:
-        Accept: ['*/*']
-        Accept-Encoding: ['gzip, deflate']
-        Connection: [keep-alive]
-        User-Agent: [FlexGet/2.10.20.dev (www.flexget.com)]
-      method: GET
-      uri: https://api.tvmaze.com/singlesearch/shows?embed=seasons&q=Shameless
-    response:
-      body:
-        string: !!binary |
-          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
-      headers:
-        Access-Control-Allow-Origin: ['*']
-        Cache-Control: ['public, max-age=3600']
-        Connection: [keep-alive]
-        Content-Encoding: [gzip]
-        Content-Type: [application/json; charset=UTF-8]
-        Date: ['Sun, 26 Mar 2017 11:10:48 GMT']
-        Server: [nginx/1.10.0 (Ubuntu)]
-        Vary: [Accept-Encoding]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        Accept: ['*/*']
-        Accept-Encoding: ['gzip, deflate']
-        Connection: [keep-alive]
-        User-Agent: [FlexGet/2.10.20.dev (www.flexget.com)]
-      method: GET
-      uri: https://api.tvmaze.com/shows/150/episodebynumber?season=3&number=2
-    response:
-      body:
-        string: !!binary |
-          H4sIAAAAAAAAA4VTy47TQBD8ldZcuNix81hYhdVKILRCWuDC3qOO3fE08TyYR4xZ5d9pJ1mR5cJp
-          5J7q6qqa9rPiVq3n8/lyVagcerVWOiW/rqphGGbpYPA3zRpnKvIcXUuxOmGrqNFQTzGWy1/1okya
-          SikEbtCWbSA0qlBWKsL3pAk+XO7g0+UuEkZn1XopsGy2FNR6USjk0GKamhb1fFnW83JRC5GUE5+4
-          FvN1fanEhMa/Qj6dbgVQ1jdnWMj23Pi2LhQb7IT6WRlqOZu/ToUpcXNtNvveYRurU0uszg2bHm0b
-          G/RUrW4khtXt6t3sh+9EoAvcscWr9P7L+dKyEYkuN5raf1iPhYrZGAyjKL3z9w/sLILGCJEaZ1tI
-          2uVOpwi4dTmBKLZsOzDO0gjJwVfq3oNIBoRWgtiThYeAdg+iresoRNDOUAGDpkBgHUgjDGiFUbMp
-          YMquB3k8H9yB4kS5JZlKAuzHM1o7kBeHn5kpwS7HOMJH3I7weTRMM5GAdtDcy5Qv7N9EkE0y2XIa
-          y0jhwA0B2cbJJAowcNKi9ZsLcn7nlmAUXxq64LKHjicNIkwgJ4sG95NdweHkQYbAIx1kxsA7gkAp
-          Bzt9CIMYBNk2eBwFNCVyzsFnscpWCBvs+8lfIzSt5HuSFmd3lb+X1930bPdx2pxI/W46dSA5X/4U
-          9Hy9PK//FHU8Hv8A4MAqcGUDAAA=
-      headers:
-        Access-Control-Allow-Origin: ['*']
-        Cache-Control: ['public, max-age=3600']
-        Connection: [keep-alive]
-        Content-Encoding: [gzip]
-        Content-Type: [application/json; charset=UTF-8]
-        Date: ['Sun, 26 Mar 2017 11:10:49 GMT']
-        Server: [nginx/1.10.0 (Ubuntu)]
-        Vary: [Accept-Encoding]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        Accept: ['*/*']
-        Accept-Encoding: ['gzip, deflate']
-        Connection: [keep-alive]
-        User-Agent: [FlexGet/2.10.20.dev (www.flexget.com)]
-      method: GET
-      uri: https://api.tvmaze.com/singlesearch/shows?embed=seasons&q=Shameless
-    response:
-      body:
-        string: !!binary |
-          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
-      headers:
-        Access-Control-Allow-Origin: ['*']
-        Cache-Control: ['public, max-age=3600']
-        Connection: [keep-alive]
-        Content-Encoding: [gzip]
-        Content-Type: [application/json; charset=UTF-8]
-        Date: ['Sun, 26 Mar 2017 11:10:49 GMT']
-        Server: [nginx/1.10.0 (Ubuntu)]
-        Vary: [Accept-Encoding]
-      status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - FlexGet/2.10.20.dev (www.flexget.com)
+    method: GET
+    uri: https://api.tvmaze.com/singlesearch/shows?embed=seasons&q=Shameless
+  response:
+    body:
+      string: '{"id":150,"url":"http://www.tvmaze.com/shows/150/shameless","name":"Shameless","type":"Scripted","language":"English","genres":["Drama","Comedy"],"status":"Running","runtime":60,"premiered":"2011-01-09","schedule":{"time":"21:00","days":["Sunday"]},"rating":{"average":8.8},"weight":4,"network":{"id":9,"name":"Showtime","country":{"name":"United
+        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":25117,"thetvdb":161511,"imdb":"tt1586680"},"image":{"medium":"http://static.tvmaze.com/uploads/images/medium_portrait/45/114890.jpg","original":"http://static.tvmaze.com/uploads/images/original_untouched/45/114890.jpg"},"summary":"<p><strong>Shameless</strong>
+        is a fiercely engaging and fearlessly twisted series. Chicagoan Frank Gallagher
+        is the proud single dad of six smart, industrious, independent kids, who without
+        him would be... perhaps better off. When Frank''s not at the bar spending
+        what little money they have, he''s passed out on the floor. But the kids have
+        found ways to grow up in spite of him. They may not be like any family you
+        know, but they make no apologies for being exactly who they are.</p>","updated":1487373839,"_links":{"self":{"href":"http://api.tvmaze.com/shows/150"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/928422"}},"_embedded":{"seasons":[{"id":683,"url":"http://www.tvmaze.com/seasons/683/shameless-season-1","number":1,"name":"","episodeOrder":12,"premiereDate":"2011-01-09","endDate":"2011-03-27","network":{"id":9,"name":"Showtime","country":{"name":"United
+        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"image":{"medium":"http://static.tvmaze.com/uploads/images/medium_portrait/42/106803.jpg","original":"http://static.tvmaze.com/uploads/images/original_untouched/42/106803.jpg"},"summary":"<p>Frank
+        goes missing and turns up in Toronto, tries without success to embrace sobriety,
+        and bends the law to protect his disability checks; Fiona falls for Steve,
+        a handsome player with a nice car, a fat wallet, and a big secret; Ian embraces
+        his sexuality, much to the chagrin of his brainy brother Lip; Debbie goes
+        too far at a child''s birthday party; Monica shows up with an announcement
+        about baby Liam.</p>","_links":{"self":{"href":"http://api.tvmaze.com/seasons/683"}}},{"id":684,"url":"http://www.tvmaze.com/seasons/684/shameless-season-2","number":2,"name":"","episodeOrder":12,"premiereDate":"2012-01-08","endDate":"2012-04-01","network":{"id":9,"name":"Showtime","country":{"name":"United
+        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"image":{"medium":"http://static.tvmaze.com/uploads/images/medium_portrait/42/106804.jpg","original":"http://static.tvmaze.com/uploads/images/original_untouched/42/106804.jpg"},"summary":"<p>Frank
+        and Monica rekindle their self-destructive relationship after Frank''s mother
+        returns from prison to wreak havoc; Fiona is thrown for a loop when Steve
+        returns from Rio with a surprise; Lip makes big changes in preparation for
+        the arrival of his and Karen''s baby; Karen and Sheila clash over Karen''s
+        new husband Jody, a good-hearted but weird guy she met in Sexaholics Anonymous;
+        Ian tries to get into West Point; Debbie prepares for the onset of puberty;
+        Kev and Veronica contemplate starting a family.</p>","_links":{"self":{"href":"http://api.tvmaze.com/seasons/684"}}},{"id":685,"url":"http://www.tvmaze.com/seasons/685/shameless-season-3","number":3,"name":"","episodeOrder":12,"premiereDate":"2013-01-13","endDate":"2013-04-07","network":{"id":9,"name":"Showtime","country":{"name":"United
+        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"image":{"medium":"http://static.tvmaze.com/uploads/images/medium_portrait/42/106805.jpg","original":"http://static.tvmaze.com/uploads/images/original_untouched/42/106805.jpg"},"summary":"<p>Jimmy
+        struggles to balance his relationship with Fiona and his obligations to Estefania;
+        Fiona gets a corporate job; Frank completely alienates his children and then
+        tries to win them back; Karen returns and drives a wedge between Lip and Mandy
+        with dire consequences; Sheila and Jody attempt to parent Karen''s baby; Ian
+        falls in love with Mickey; Debbie suffers from growing pains; Carl goes to
+        camp; Kev and V concoct an extremely unconventional way to have a baby of
+        their own.</p>","_links":{"self":{"href":"http://api.tvmaze.com/seasons/685"}}},{"id":686,"url":"http://www.tvmaze.com/seasons/686/shameless-season-4","number":4,"name":"","episodeOrder":12,"premiereDate":"2014-01-12","endDate":"2014-04-06","network":{"id":9,"name":"Showtime","country":{"name":"United
+        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"image":{"medium":"http://static.tvmaze.com/uploads/images/medium_portrait/42/106806.jpg","original":"http://static.tvmaze.com/uploads/images/original_untouched/42/106806.jpg"},"summary":"<p>Fiona
+        gets into romantic trouble with her boss/boyfriend''s wildcard brother, and
+        serious legal trouble after a party goes horribly wrong; Frank battles liver
+        disease and reconnects with a long lost family member; Lip struggles with
+        the realities of college life; Ian forces Mickey to confront his sexuality;
+        Debbie and Carl both find new love; Sheila tries to adopt a Native American
+        family; Kev and V face the reality of a large family.</p>","_links":{"self":{"href":"http://api.tvmaze.com/seasons/686"}}},{"id":687,"url":"http://www.tvmaze.com/seasons/687/shameless-season-5","number":5,"name":"","episodeOrder":12,"premiereDate":"2015-01-11","endDate":"2015-04-05","network":{"id":9,"name":"Showtime","country":{"name":"United
+        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"image":{"medium":"http://static.tvmaze.com/uploads/images/medium_portrait/42/106807.jpg","original":"http://static.tvmaze.com/uploads/images/original_untouched/42/106807.jpg"},"summary":"<p>Fiona
+        gets into a surprising love triangle and experiences some character-building
+        growing pains; Frank falls in love with a dying doctor; Lip commits himself
+        to college life and becomes romantically involved with a mentor; Ian and Mickey
+        struggle to manage Ian''s bi-polar disorder; Sammi remains a serious thorn
+        in everyone''s side; Debbie becomes a woman in more ways than one; Carl gets
+        in serious trouble with the law; Kev and V experience a rough patch.</p>","_links":{"self":{"href":"http://api.tvmaze.com/seasons/687"}}},{"id":8992,"url":"http://www.tvmaze.com/seasons/8992/shameless-season-6","number":6,"name":"","episodeOrder":12,"premiereDate":"2016-01-10","endDate":"2016-04-03","network":{"id":9,"name":"Showtime","country":{"name":"United
+        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"image":{"medium":"http://static.tvmaze.com/uploads/images/medium_portrait/45/114891.jpg","original":"http://static.tvmaze.com/uploads/images/original_untouched/45/114891.jpg"},"summary":"<p>The
+        Gallaghers are finally getting their acts together and striking out on their
+        own, but growing up could also mean growing apart. One thing''s certain: nothing
+        ever comes easy when your last name is Gallagher -- except trouble.</p>","_links":{"self":{"href":"http://api.tvmaze.com/seasons/8992"}}},{"id":32506,"url":"http://www.tvmaze.com/seasons/32506/shameless-season-7","number":7,"name":"","episodeOrder":12,"premiereDate":"2016-10-02","endDate":"2016-12-18","network":{"id":9,"name":"Showtime","country":{"name":"United
+        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/seasons/32506"}}},{"id":58602,"url":"http://www.tvmaze.com/seasons/58602/shameless-season-8","number":8,"name":"","episodeOrder":12,"premiereDate":null,"endDate":null,"network":{"id":9,"name":"Showtime","country":{"name":"United
+        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"image":null,"summary":null,"_links":{"self":{"href":"http://api.tvmaze.com/seasons/58602"}}}]}}'
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      Cache-Control:
+      - public, max-age=3600
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=UTF-8
+      Date:
+      - Sun, 26 Mar 2017 11:10:48 GMT
+      Server:
+      - nginx/1.10.0 (Ubuntu)
+      Vary:
+      - Accept-Encoding
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - FlexGet/2.10.20.dev (www.flexget.com)
+    method: GET
+    uri: https://api.tvmaze.com/shows/150/episodebynumber?season=3&number=2
+  response:
+    body:
+      string: '{"id":11134,"url":"http://www.tvmaze.com/episodes/11134/shameless-3x02-the-american-dream","name":"The
+        American Dream","season":3,"number":2,"airdate":"2013-01-20","airtime":"21:00","airstamp":"2013-01-20T21:00:00-05:00","runtime":60,"image":{"medium":"http://static.tvmaze.com/uploads/images/medium_landscape/45/114847.jpg","original":"http://static.tvmaze.com/uploads/images/original_untouched/45/114847.jpg"},"summary":"<p>Fiona
+        has second thoughts about loaning money to Meg; and a drunken Frank staggers
+        home, where no one wants him, until he proves to be the only one who can quiet
+        fussy Baby Hymie. Meanwhile, Lip''s community-service encounter with a North
+        Side youth group gives him a moneymaking idea, while Kev''s wife returns with
+        her son Kyle and Frank puts in a call to child services.</p>","_links":{"self":{"href":"http://api.tvmaze.com/episodes/11134"}}}'
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      Cache-Control:
+      - public, max-age=3600
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=UTF-8
+      Date:
+      - Sun, 26 Mar 2017 11:10:49 GMT
+      Server:
+      - nginx/1.10.0 (Ubuntu)
+      Vary:
+      - Accept-Encoding
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - FlexGet/2.10.20.dev (www.flexget.com)
+    method: GET
+    uri: https://api.tvmaze.com/singlesearch/shows?embed=seasons&q=Shameless
+  response:
+    body:
+      string: '{"id":150,"url":"http://www.tvmaze.com/shows/150/shameless","name":"Shameless","type":"Scripted","language":"English","genres":["Drama","Comedy"],"status":"Running","runtime":60,"premiered":"2011-01-09","schedule":{"time":"21:00","days":["Sunday"]},"rating":{"average":8.8},"weight":4,"network":{"id":9,"name":"Showtime","country":{"name":"United
+        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":25117,"thetvdb":161511,"imdb":"tt1586680"},"image":{"medium":"http://static.tvmaze.com/uploads/images/medium_portrait/45/114890.jpg","original":"http://static.tvmaze.com/uploads/images/original_untouched/45/114890.jpg"},"summary":"<p><strong>Shameless</strong>
+        is a fiercely engaging and fearlessly twisted series. Chicagoan Frank Gallagher
+        is the proud single dad of six smart, industrious, independent kids, who without
+        him would be... perhaps better off. When Frank''s not at the bar spending
+        what little money they have, he''s passed out on the floor. But the kids have
+        found ways to grow up in spite of him. They may not be like any family you
+        know, but they make no apologies for being exactly who they are.</p>","updated":1487373839,"_links":{"self":{"href":"http://api.tvmaze.com/shows/150"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/928422"}},"_embedded":{"seasons":[{"id":683,"url":"http://www.tvmaze.com/seasons/683/shameless-season-1","number":1,"name":"","episodeOrder":12,"premiereDate":"2011-01-09","endDate":"2011-03-27","network":{"id":9,"name":"Showtime","country":{"name":"United
+        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"image":{"medium":"http://static.tvmaze.com/uploads/images/medium_portrait/42/106803.jpg","original":"http://static.tvmaze.com/uploads/images/original_untouched/42/106803.jpg"},"summary":"<p>Frank
+        goes missing and turns up in Toronto, tries without success to embrace sobriety,
+        and bends the law to protect his disability checks; Fiona falls for Steve,
+        a handsome player with a nice car, a fat wallet, and a big secret; Ian embraces
+        his sexuality, much to the chagrin of his brainy brother Lip; Debbie goes
+        too far at a child''s birthday party; Monica shows up with an announcement
+        about baby Liam.</p>","_links":{"self":{"href":"http://api.tvmaze.com/seasons/683"}}},{"id":684,"url":"http://www.tvmaze.com/seasons/684/shameless-season-2","number":2,"name":"","episodeOrder":12,"premiereDate":"2012-01-08","endDate":"2012-04-01","network":{"id":9,"name":"Showtime","country":{"name":"United
+        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"image":{"medium":"http://static.tvmaze.com/uploads/images/medium_portrait/42/106804.jpg","original":"http://static.tvmaze.com/uploads/images/original_untouched/42/106804.jpg"},"summary":"<p>Frank
+        and Monica rekindle their self-destructive relationship after Frank''s mother
+        returns from prison to wreak havoc; Fiona is thrown for a loop when Steve
+        returns from Rio with a surprise; Lip makes big changes in preparation for
+        the arrival of his and Karen''s baby; Karen and Sheila clash over Karen''s
+        new husband Jody, a good-hearted but weird guy she met in Sexaholics Anonymous;
+        Ian tries to get into West Point; Debbie prepares for the onset of puberty;
+        Kev and Veronica contemplate starting a family.</p>","_links":{"self":{"href":"http://api.tvmaze.com/seasons/684"}}},{"id":685,"url":"http://www.tvmaze.com/seasons/685/shameless-season-3","number":3,"name":"","episodeOrder":12,"premiereDate":"2013-01-13","endDate":"2013-04-07","network":{"id":9,"name":"Showtime","country":{"name":"United
+        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"image":{"medium":"http://static.tvmaze.com/uploads/images/medium_portrait/42/106805.jpg","original":"http://static.tvmaze.com/uploads/images/original_untouched/42/106805.jpg"},"summary":"<p>Jimmy
+        struggles to balance his relationship with Fiona and his obligations to Estefania;
+        Fiona gets a corporate job; Frank completely alienates his children and then
+        tries to win them back; Karen returns and drives a wedge between Lip and Mandy
+        with dire consequences; Sheila and Jody attempt to parent Karen''s baby; Ian
+        falls in love with Mickey; Debbie suffers from growing pains; Carl goes to
+        camp; Kev and V concoct an extremely unconventional way to have a baby of
+        their own.</p>","_links":{"self":{"href":"http://api.tvmaze.com/seasons/685"}}},{"id":686,"url":"http://www.tvmaze.com/seasons/686/shameless-season-4","number":4,"name":"","episodeOrder":12,"premiereDate":"2014-01-12","endDate":"2014-04-06","network":{"id":9,"name":"Showtime","country":{"name":"United
+        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"image":{"medium":"http://static.tvmaze.com/uploads/images/medium_portrait/42/106806.jpg","original":"http://static.tvmaze.com/uploads/images/original_untouched/42/106806.jpg"},"summary":"<p>Fiona
+        gets into romantic trouble with her boss/boyfriend''s wildcard brother, and
+        serious legal trouble after a party goes horribly wrong; Frank battles liver
+        disease and reconnects with a long lost family member; Lip struggles with
+        the realities of college life; Ian forces Mickey to confront his sexuality;
+        Debbie and Carl both find new love; Sheila tries to adopt a Native American
+        family; Kev and V face the reality of a large family.</p>","_links":{"self":{"href":"http://api.tvmaze.com/seasons/686"}}},{"id":687,"url":"http://www.tvmaze.com/seasons/687/shameless-season-5","number":5,"name":"","episodeOrder":12,"premiereDate":"2015-01-11","endDate":"2015-04-05","network":{"id":9,"name":"Showtime","country":{"name":"United
+        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"image":{"medium":"http://static.tvmaze.com/uploads/images/medium_portrait/42/106807.jpg","original":"http://static.tvmaze.com/uploads/images/original_untouched/42/106807.jpg"},"summary":"<p>Fiona
+        gets into a surprising love triangle and experiences some character-building
+        growing pains; Frank falls in love with a dying doctor; Lip commits himself
+        to college life and becomes romantically involved with a mentor; Ian and Mickey
+        struggle to manage Ian''s bi-polar disorder; Sammi remains a serious thorn
+        in everyone''s side; Debbie becomes a woman in more ways than one; Carl gets
+        in serious trouble with the law; Kev and V experience a rough patch.</p>","_links":{"self":{"href":"http://api.tvmaze.com/seasons/687"}}},{"id":8992,"url":"http://www.tvmaze.com/seasons/8992/shameless-season-6","number":6,"name":"","episodeOrder":12,"premiereDate":"2016-01-10","endDate":"2016-04-03","network":{"id":9,"name":"Showtime","country":{"name":"United
+        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"image":{"medium":"http://static.tvmaze.com/uploads/images/medium_portrait/45/114891.jpg","original":"http://static.tvmaze.com/uploads/images/original_untouched/45/114891.jpg"},"summary":"<p>The
+        Gallaghers are finally getting their acts together and striking out on their
+        own, but growing up could also mean growing apart. One thing''s certain: nothing
+        ever comes easy when your last name is Gallagher -- except trouble.</p>","_links":{"self":{"href":"http://api.tvmaze.com/seasons/8992"}}},{"id":32506,"url":"http://www.tvmaze.com/seasons/32506/shameless-season-7","number":7,"name":"","episodeOrder":12,"premiereDate":"2016-10-02","endDate":"2016-12-18","network":{"id":9,"name":"Showtime","country":{"name":"United
+        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/seasons/32506"}}},{"id":58602,"url":"http://www.tvmaze.com/seasons/58602/shameless-season-8","number":8,"name":"","episodeOrder":12,"premiereDate":null,"endDate":null,"network":{"id":9,"name":"Showtime","country":{"name":"United
+        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"image":null,"summary":null,"_links":{"self":{"href":"http://api.tvmaze.com/seasons/58602"}}}]}}'
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      Cache-Control:
+      - public, max-age=3600
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=UTF-8
+      Date:
+      - Sun, 26 Mar 2017 11:10:49 GMT
+      Server:
+      - nginx/1.10.0 (Ubuntu)
+      Vary:
+      - Accept-Encoding
+    status:
+      code: 200
+      message: OK
 version: 1

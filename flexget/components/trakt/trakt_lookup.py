@@ -1,14 +1,19 @@
-from typing import Optional
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 from loguru import logger
 
 from flexget import plugin
-from flexget.entry import Entry, register_lazy_lookup
+from flexget.entry import register_lazy_lookup
 from flexget.event import event
 from flexget.manager import Session
 
 from . import api_trakt as plugin_api_trakt
 from . import db
+
+if TYPE_CHECKING:
+    from flexget.entry import Entry
 
 # TODO: not very nice ..
 lookup_series = plugin_api_trakt.ApiTrakt.lookup_series
@@ -34,7 +39,7 @@ def is_movie(entry: Entry) -> bool:
     return bool(entry.get('movie_name'))
 
 
-def get_media_type_for_entry(entry: Entry) -> Optional[str]:
+def get_media_type_for_entry(entry: Entry) -> str | None:
     if is_episode(entry):
         return 'episode'
     if is_season(entry):

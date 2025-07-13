@@ -1,12 +1,17 @@
+from __future__ import annotations
+
 import logging
 import webbrowser
 from functools import partial, wraps
 from pathlib import Path
-from typing import Callable, Optional
+from typing import TYPE_CHECKING
 
 from loguru import logger
 
 from flexget import __version__
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 logger = logger.bind(name='tray_icon')
 
@@ -41,8 +46,8 @@ class TrayIcon:
         logging.getLogger('PIL.Image').setLevel(logging.INFO)
 
         self.path_to_image: Path = path_to_image
-        self.icon: Optional[Icon] = None
-        self._menu: Optional[Menu] = None
+        self.icon: Icon | None = None
+        self._menu: Menu | None = None
         self.menu_items: list[MenuItem] = []
 
         self.active: bool = _import_success
@@ -53,10 +58,10 @@ class TrayIcon:
     @check_if_tray_is_active
     def add_menu_item(
         self,
-        text: Optional[str] = None,
-        action: Optional[Callable] = None,
-        menu_item: 'MenuItem' = None,
-        index: Optional[int] = None,
+        text: str | None = None,
+        action: Callable | None = None,
+        menu_item: MenuItem = None,
+        index: int | None = None,
         **kwargs,
     ):
         """Add a menu item by passing its text and function, or pass a created MenuItem. Force position by sending index."""
@@ -70,7 +75,7 @@ class TrayIcon:
             self.menu_items.append(menu_item)
 
     @check_if_tray_is_active
-    def add_menu_separator(self, index: Optional[int] = None):
+    def add_menu_separator(self, index: int | None = None):
         self.add_menu_item(menu_item=Menu.SEPARATOR, index=index)
 
     def add_core_menu_items(self):
@@ -81,7 +86,7 @@ class TrayIcon:
         self.add_menu_item(text='Forum', action=partial(open_web, 'https://discuss.flexget.com/'))
 
     @property
-    def menu(self) -> 'Menu':
+    def menu(self) -> Menu:
         # This is lazy loaded since we'd like to delay the menu build until the tray is requested to run
         if not self._menu:
             self._menu = Menu(*self.menu_items)

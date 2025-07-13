@@ -79,9 +79,9 @@ class UrlRewriteTorrentday:
             'uid': {'oneOf': [{'type': 'integer'}, {'type': 'string'}]},
             'passkey': {'type': 'string'},
             'cfduid': {'type': 'string'},
-            'category': one_or_more(
-                {'oneOf': [{'type': 'integer'}, {'type': 'string', 'enum': list(CATEGORIES)}]}
-            ),
+            'category': one_or_more({
+                'oneOf': [{'type': 'integer'}, {'type': 'string', 'enum': list(CATEGORIES)}]
+            }),
         },
         'required': ['rss_key', 'uid', 'passkey', 'cfduid'],
         'additionalProperties': False,

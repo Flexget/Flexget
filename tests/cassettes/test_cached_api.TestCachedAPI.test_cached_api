@@ -2,10 +2,14 @@ interactions:
 - request:
     body: null
     headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [python-requests/2.11.1]
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.11.1
     method: GET
     uri: http://thetvdb.com/banners/fanart/original/281662-18.jpg
   response:
@@ -5178,28 +5182,47 @@ interactions:
         HyjJzzUJVQSN3ANRL1NKUr3RGgQY3AY96ayrvLAZU9B0/wAaRkLEDPXp/nirccSgMXT5m7/5JrPW
         +45zV7n/2Q==
     headers:
-      accept-ranges: [bytes]
-      cache-control: ['public, max-age=604800']
-      cf-cache-status: [HIT]
-      cf-ray: [2dd254f640c43ce3-CPH]
-      connection: [keep-alive]
-      content-length: ['294412']
-      content-type: [image/jpeg]
-      date: ['Sun, 04 Sep 2016 15:04:04 GMT']
-      expires: ['Sun, 11 Sep 2016 15:04:04 GMT']
-      last-modified: ['Fri, 21 Aug 2015 16:38:09 GMT']
-      server: [cloudflare-nginx]
-      set-cookie: ['__cfduid=d95cb6f99b9241db3501b78a9e1d953821473001444; expires=Mon,
-          04-Sep-17 15:04:04 GMT; path=/; domain=.thetvdb.com; HttpOnly']
-      vary: [Accept-Encoding]
-    status: {code: 200, message: OK}
+      accept-ranges:
+      - bytes
+      cache-control:
+      - public, max-age=604800
+      cf-cache-status:
+      - HIT
+      cf-ray:
+      - 2dd254f640c43ce3-CPH
+      connection:
+      - keep-alive
+      content-length:
+      - '294412'
+      content-type:
+      - image/jpeg
+      date:
+      - Sun, 04 Sep 2016 15:04:04 GMT
+      expires:
+      - Sun, 11 Sep 2016 15:04:04 GMT
+      last-modified:
+      - Fri, 21 Aug 2015 16:38:09 GMT
+      server:
+      - cloudflare-nginx
+      set-cookie:
+      - __cfduid=d95cb6f99b9241db3501b78a9e1d953821473001444; expires=Mon, 04-Sep-17
+        15:04:04 GMT; path=/; domain=.thetvdb.com; HttpOnly
+      vary:
+      - Accept-Encoding
+    status:
+      code: 200
+      message: OK
 - request:
     body: null
     headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [python-requests/2.11.1]
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.11.1
     method: GET
     uri: http://thetvdb.com/banners/fanart/original/281662-18.jpg
   response:
@@ -10372,28 +10395,47 @@ interactions:
         HyjJzzUJVQSN3ANRL1NKUr3RGgQY3AY96ayrvLAZU9B0/wAaRkLEDPXp/nirccSgMXT5m7/5JrPW
         +45zV7n/2Q==
     headers:
-      accept-ranges: [bytes]
-      cache-control: ['public, max-age=604800']
-      cf-cache-status: [HIT]
-      cf-ray: [2dd254f6da7b3cd1-CPH]
-      connection: [keep-alive]
-      content-length: ['294412']
-      content-type: [image/jpeg]
-      date: ['Sun, 04 Sep 2016 15:04:04 GMT']
-      expires: ['Sun, 11 Sep 2016 15:04:04 GMT']
-      last-modified: ['Fri, 21 Aug 2015 16:38:09 GMT']
-      server: [cloudflare-nginx]
-      set-cookie: ['__cfduid=d0803a9131a32628b93438c36ea6e9d5e1473001444; expires=Mon,
-          04-Sep-17 15:04:04 GMT; path=/; domain=.thetvdb.com; HttpOnly']
-      vary: [Accept-Encoding]
-    status: {code: 200, message: OK}
+      accept-ranges:
+      - bytes
+      cache-control:
+      - public, max-age=604800
+      cf-cache-status:
+      - HIT
+      cf-ray:
+      - 2dd254f6da7b3cd1-CPH
+      connection:
+      - keep-alive
+      content-length:
+      - '294412'
+      content-type:
+      - image/jpeg
+      date:
+      - Sun, 04 Sep 2016 15:04:04 GMT
+      expires:
+      - Sun, 11 Sep 2016 15:04:04 GMT
+      last-modified:
+      - Fri, 21 Aug 2015 16:38:09 GMT
+      server:
+      - cloudflare-nginx
+      set-cookie:
+      - __cfduid=d0803a9131a32628b93438c36ea6e9d5e1473001444; expires=Mon, 04-Sep-17
+        15:04:04 GMT; path=/; domain=.thetvdb.com; HttpOnly
+      vary:
+      - Accept-Encoding
+    status:
+      code: 200
+      message: OK
 - request:
     body: null
     headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [python-requests/2.11.1]
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.11.1
     method: GET
     uri: http://thetvdb.com/banners/fanart/original/281662-18.jpg?force=true
   response:
@@ -15566,28 +15608,47 @@ interactions:
         HyjJzzUJVQSN3ANRL1NKUr3RGgQY3AY96ayrvLAZU9B0/wAaRkLEDPXp/nirccSgMXT5m7/5JrPW
         +45zV7n/2Q==
     headers:
-      accept-ranges: [bytes]
-      cache-control: ['public, max-age=1209600']
-      cf-cache-status: [MISS]
-      cf-ray: [2dd254f779213c9b-CPH]
-      connection: [keep-alive]
-      content-length: ['294412']
-      content-type: [image/jpeg]
-      date: ['Sun, 04 Sep 2016 15:04:05 GMT']
-      expires: ['Sun, 18 Sep 2016 15:04:05 GMT']
-      last-modified: ['Fri, 21 Aug 2015 16:38:09 GMT']
-      server: [cloudflare-nginx]
-      set-cookie: ['__cfduid=db00a7b3af8ec5a1adc4abbac43ad90f11473001445; expires=Mon,
-          04-Sep-17 15:04:05 GMT; path=/; domain=.thetvdb.com; HttpOnly']
-      vary: [Accept-Encoding]
-    status: {code: 200, message: OK}
+      accept-ranges:
+      - bytes
+      cache-control:
+      - public, max-age=1209600
+      cf-cache-status:
+      - MISS
+      cf-ray:
+      - 2dd254f779213c9b-CPH
+      connection:
+      - keep-alive
+      content-length:
+      - '294412'
+      content-type:
+      - image/jpeg
+      date:
+      - Sun, 04 Sep 2016 15:04:05 GMT
+      expires:
+      - Sun, 18 Sep 2016 15:04:05 GMT
+      last-modified:
+      - Fri, 21 Aug 2015 16:38:09 GMT
+      server:
+      - cloudflare-nginx
+      set-cookie:
+      - __cfduid=db00a7b3af8ec5a1adc4abbac43ad90f11473001445; expires=Mon, 04-Sep-17
+        15:04:05 GMT; path=/; domain=.thetvdb.com; HttpOnly
+      vary:
+      - Accept-Encoding
+    status:
+      code: 200
+      message: OK
 - request:
     body: null
     headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [python-requests/2.10.0]
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.10.0
     method: GET
     uri: http://thetvdb.com/banners/fanart/original/281662-18.jpg
   response:
@@ -20760,28 +20821,47 @@ interactions:
         HyjJzzUJVQSN3ANRL1NKUr3RGgQY3AY96ayrvLAZU9B0/wAaRkLEDPXp/nirccSgMXT5m7/5JrPW
         +45zV7n/2Q==
     headers:
-      accept-ranges: [bytes]
-      cache-control: ['public, max-age=604800']
-      cf-cache-status: [HIT]
-      cf-ray: [2e65790ba7292780-FRA]
-      connection: [keep-alive]
-      content-length: ['294412']
-      content-type: [image/jpeg]
-      date: ['Thu, 22 Sep 2016 11:38:49 GMT']
-      expires: ['Thu, 29 Sep 2016 11:38:49 GMT']
-      last-modified: ['Fri, 21 Aug 2015 16:38:09 GMT']
-      server: [cloudflare-nginx]
-      set-cookie: ['__cfduid=d23d83ca0a588151839efdd87a0cd79a81474544329; expires=Fri,
-          22-Sep-17 11:38:49 GMT; path=/; domain=.thetvdb.com; HttpOnly']
-      vary: [Accept-Encoding]
-    status: {code: 200, message: OK}
+      accept-ranges:
+      - bytes
+      cache-control:
+      - public, max-age=604800
+      cf-cache-status:
+      - HIT
+      cf-ray:
+      - 2e65790ba7292780-FRA
+      connection:
+      - keep-alive
+      content-length:
+      - '294412'
+      content-type:
+      - image/jpeg
+      date:
+      - Thu, 22 Sep 2016 11:38:49 GMT
+      expires:
+      - Thu, 29 Sep 2016 11:38:49 GMT
+      last-modified:
+      - Fri, 21 Aug 2015 16:38:09 GMT
+      server:
+      - cloudflare-nginx
+      set-cookie:
+      - __cfduid=d23d83ca0a588151839efdd87a0cd79a81474544329; expires=Fri, 22-Sep-17
+        11:38:49 GMT; path=/; domain=.thetvdb.com; HttpOnly
+      vary:
+      - Accept-Encoding
+    status:
+      code: 200
+      message: OK
 - request:
     body: null
     headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [python-requests/2.10.0]
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.10.0
     method: GET
     uri: http://thetvdb.com/banners/fanart/original/281662-18.jpg
   response:
@@ -25954,28 +26034,47 @@ interactions:
         HyjJzzUJVQSN3ANRL1NKUr3RGgQY3AY96ayrvLAZU9B0/wAaRkLEDPXp/nirccSgMXT5m7/5JrPW
         +45zV7n/2Q==
     headers:
-      accept-ranges: [bytes]
-      cache-control: ['public, max-age=604800']
-      cf-cache-status: [HIT]
-      cf-ray: [2e7f1b25919e269c-FRA]
-      connection: [keep-alive]
-      content-length: ['294412']
-      content-type: [image/jpeg]
-      date: ['Sun, 25 Sep 2016 14:18:33 GMT']
-      expires: ['Sun, 02 Oct 2016 14:18:33 GMT']
-      last-modified: ['Fri, 21 Aug 2015 16:38:09 GMT']
-      server: [cloudflare-nginx]
-      set-cookie: ['__cfduid=d6a37407c97144a965ad8b8f7759253781474813113; expires=Mon,
-          25-Sep-17 14:18:33 GMT; path=/; domain=.thetvdb.com; HttpOnly']
-      vary: [Accept-Encoding]
-    status: {code: 200, message: OK}
+      accept-ranges:
+      - bytes
+      cache-control:
+      - public, max-age=604800
+      cf-cache-status:
+      - HIT
+      cf-ray:
+      - 2e7f1b25919e269c-FRA
+      connection:
+      - keep-alive
+      content-length:
+      - '294412'
+      content-type:
+      - image/jpeg
+      date:
+      - Sun, 25 Sep 2016 14:18:33 GMT
+      expires:
+      - Sun, 02 Oct 2016 14:18:33 GMT
+      last-modified:
+      - Fri, 21 Aug 2015 16:38:09 GMT
+      server:
+      - cloudflare-nginx
+      set-cookie:
+      - __cfduid=d6a37407c97144a965ad8b8f7759253781474813113; expires=Mon, 25-Sep-17
+        14:18:33 GMT; path=/; domain=.thetvdb.com; HttpOnly
+      vary:
+      - Accept-Encoding
+    status:
+      code: 200
+      message: OK
 - request:
     body: null
     headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [python-requests/2.10.0]
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.10.0
     method: GET
     uri: http://thetvdb.com/banners/fanart/original/281662-18.jpg
   response:
@@ -31148,19 +31247,34 @@ interactions:
         HyjJzzUJVQSN3ANRL1NKUr3RGgQY3AY96ayrvLAZU9B0/wAaRkLEDPXp/nirccSgMXT5m7/5JrPW
         +45zV7n/2Q==
     headers:
-      accept-ranges: [bytes]
-      cache-control: ['public, max-age=604800']
-      cf-cache-status: [HIT]
-      cf-ray: [2e85879845242750-FRA]
-      connection: [keep-alive]
-      content-length: ['294412']
-      content-type: [image/jpeg]
-      date: ['Mon, 26 Sep 2016 09:01:09 GMT']
-      expires: ['Mon, 03 Oct 2016 09:01:09 GMT']
-      last-modified: ['Fri, 21 Aug 2015 16:38:09 GMT']
-      server: [cloudflare-nginx]
-      set-cookie: ['__cfduid=dc0242958f94122c3ec1d3bad5c5ba4551474880469; expires=Tue,
-          26-Sep-17 09:01:09 GMT; path=/; domain=.thetvdb.com; HttpOnly']
-      vary: [Accept-Encoding]
-    status: {code: 200, message: OK}
+      accept-ranges:
+      - bytes
+      cache-control:
+      - public, max-age=604800
+      cf-cache-status:
+      - HIT
+      cf-ray:
+      - 2e85879845242750-FRA
+      connection:
+      - keep-alive
+      content-length:
+      - '294412'
+      content-type:
+      - image/jpeg
+      date:
+      - Mon, 26 Sep 2016 09:01:09 GMT
+      expires:
+      - Mon, 03 Oct 2016 09:01:09 GMT
+      last-modified:
+      - Fri, 21 Aug 2015 16:38:09 GMT
+      server:
+      - cloudflare-nginx
+      set-cookie:
+      - __cfduid=dc0242958f94122c3ec1d3bad5c5ba4551474880469; expires=Tue, 26-Sep-17
+        09:01:09 GMT; path=/; domain=.thetvdb.com; HttpOnly
+      vary:
+      - Accept-Encoding
+    status:
+      code: 200
+      message: OK
 version: 1

@@ -56,9 +56,9 @@ class MovieList(MutableSet):
 
     def __iter__(self):
         with Session() as session:
-            return iter(
-                [movie.to_entry(self.strip_year) for movie in self._db_list(session).movies]
-            )
+            return iter([
+                movie.to_entry(self.strip_year) for movie in self._db_list(session).movies
+            ])
 
     def __len__(self):
         with Session() as session:

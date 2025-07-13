@@ -1,12 +1,13 @@
+from __future__ import annotations
+
 import copy
 import pickle
 from datetime import datetime, timedelta
 from functools import partial
-from typing import TYPE_CHECKING, Callable, Optional
+from typing import TYPE_CHECKING
 
 from loguru import logger
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Unicode, select
-from sqlalchemy.orm import Session as DBSession
 from sqlalchemy.orm import relationship
 
 from flexget import db_schema
@@ -22,7 +23,9 @@ from flexget.utils.tools import TimedDict, get_config_hash, parse_timedelta
 logger = logger.bind(name='input_cache')
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable
+    from collections.abc import Callable, Iterable
+
+    from sqlalchemy.orm import Session as DBSession
 
     class Base:
         def __init__(self, *args, **kwargs) -> None: ...
@@ -118,11 +121,11 @@ class cached:  # noqa: N801 It acts like a function in usage
 
     cache = TimedDict(cache_time='5 minutes')
 
-    def __init__(self, name: str, persist: Optional[str] = None) -> None:
+    def __init__(self, name: str, persist: str | None = None) -> None:
         # Cast name to unicode to prevent sqlalchemy warnings when filtering
         self.name = str(name)
         # Parse persist time
-        self.persist: Optional[timedelta] = parse_timedelta(persist) if persist else None
+        self.persist: timedelta | None = parse_timedelta(persist) if persist else None
         # Will be set when wrapped function is called
         self.config_hash = None
         self.cache_name = None
@@ -196,7 +199,7 @@ class cached:  # noqa: N801 It acts like a function in usage
             db_cache.added = datetime.now()
             session.merge(db_cache)
 
-    def load_from_db(self, load_expired: bool = False) -> Optional[list[InputCacheEntry]]:
+    def load_from_db(self, load_expired: bool = False) -> list[InputCacheEntry] | None:
         with Session() as session:
             db_cache = (
                 session.query(InputCache)
@@ -221,9 +224,7 @@ class IterableCache:
     If `finished_hook` is supplied, it will be called the first time the iterable is run to the end.
     """
 
-    def __init__(
-        self, iterable: 'Iterable', finished_hook: Optional[Callable[[list], None]] = None
-    ):
+    def __init__(self, iterable: Iterable, finished_hook: Callable[[list], None] | None = None):
         self.iterable = iter(iterable)
         self.cache: list = []
         self.finished_hook = finished_hook

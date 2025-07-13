@@ -2,15 +2,17 @@
 
 # Torrent decoding is a short fragment from effbot.org. Site copyright says:
 # Test scripts and other short code fragments can be considered as being in the public domain.
+from __future__ import annotations
+
 import binascii
 import re
 from contextlib import suppress
-from typing import TYPE_CHECKING, Any, Callable, Optional, Union
+from typing import TYPE_CHECKING, Any
 
 from loguru import logger
 
 if TYPE_CHECKING:
-    from collections.abc import Generator, Iterator
+    from collections.abc import Callable, Generator, Iterator
     from pathlib import Path
 
 logger = logger.bind(name='torrent')
@@ -45,7 +47,7 @@ METAFILE_STD_KEYS = [
 def clean_meta(
     meta: dict[str, Any],
     including_info: bool = False,
-    log_func: Optional[Callable[..., None]] = None,
+    log_func: Callable[..., None] | None = None,
 ):
     """Clean meta dict. Optionally log changes using the given logger.
 
@@ -82,7 +84,7 @@ def clean_meta(
     return modified
 
 
-def is_torrent_file(metafilepath: 'Path') -> bool:
+def is_torrent_file(metafilepath: Path) -> bool:
     """Check whether a file looks like a metafile by peeking into its content.
 
     Note that this doesn't ensure that the file is a complete and valid torrent,
@@ -106,7 +108,7 @@ def is_torrent_file(metafilepath: 'Path') -> bool:
 def tokenize(
     text: bytes,
     match=re.compile(rb'([idel])|(\d+):|(-?\d+)').match,  # type: Callable[[bytes, int], Match[bytes]]
-) -> 'Generator[bytes, None, None]':
+) -> Generator[bytes, None, None]:
     i = 0
     while i < len(text):
         m = match(text, i)
@@ -120,8 +122,8 @@ def tokenize(
             yield s
 
 
-def decode_item(src_iter: 'Iterator[bytes]', token: bytes) -> Union[bytes, str, int, list, dict]:
-    data: Union[bytes, str, int, list, dict]
+def decode_item(src_iter: Iterator[bytes], token: bytes) -> bytes | str | int | list | dict:
+    data: bytes | str | int | list | dict
     if token == b'i':
         # integer: "i" value "e"
         data = int(next(src_iter))
@@ -142,7 +144,7 @@ def decode_item(src_iter: 'Iterator[bytes]', token: bytes) -> Union[bytes, str, 
             data.append(decode_item(src_iter, tok))
             tok = next(src_iter)
         if token == b'd':
-            data = dict(list(zip(data[0::2], data[1::2])))
+            data = dict(list(zip(data[0::2], data[1::2], strict=False)))
     else:
         raise ValueError
     return data
@@ -191,7 +193,7 @@ def encode_dictionary(data: dict) -> bytes:
     return encoded
 
 
-def bencode(data: Union[bytes, str, int, list, dict]) -> bytes:
+def bencode(data: bytes | str | int | list | dict) -> bytes:
     if isinstance(data, bytes):
         return encode_bytes(data)
     if isinstance(data, str):
@@ -214,7 +216,7 @@ class Torrent:
     KEY_TYPE = str
 
     @classmethod
-    def from_file(cls, file: 'Path') -> 'Torrent':
+    def from_file(cls, file: Path) -> Torrent:
         """Create torrent from file on disk."""
         with file.open('rb') as handle:
             return cls(handle.read())
@@ -237,7 +239,7 @@ class Torrent:
             ', '.join(f'{key}={self.content.get(key)!r}' for key in ('announce', 'comment')),
         )
 
-    def get_filelist(self) -> list[dict[str, Union[str, int]]]:
+    def get_filelist(self) -> list[dict[str, str | int]]:
         """Return array containing fileinfo dictionaries (name, length, path)."""
         files = []
         if 'length' in self.content['info']:
@@ -300,7 +302,7 @@ class Torrent:
         return size
 
     @property
-    def private(self) -> Union[int, bool]:
+    def private(self) -> int | bool:
         return self.content['info'].get('private', False)
 
     @property

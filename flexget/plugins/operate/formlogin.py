@@ -1,5 +1,3 @@
-import socket
-
 import requests
 from loguru import logger
 
@@ -80,7 +78,7 @@ class FormLogin:
                     'I have saved the login page content to {} for you to view', filename
                 )
                 raise plugin.PluginError('Unable to find login fields', logger)
-        except socket.timeout:
+        except TimeoutError:
             raise plugin.PluginError(f'Timed out on url {url}')
 
         try:

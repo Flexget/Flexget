@@ -2,7 +2,6 @@ import hashlib
 import random
 import socket
 import threading
-from typing import Optional
 
 import cherrypy
 import zxcvbn
@@ -17,7 +16,7 @@ from flexget.utils.database import with_session
 
 logger = logger.bind(name='web_server')
 
-_home: Optional[str] = None
+_home: str | None = None
 _app_register: dict[str, tuple[Flask, str]] = {}
 _default_app = Flask(__name__)
 
@@ -180,23 +179,19 @@ class WebServer(threading.Thread):
         cherrypy.log.access_log.propagate = False
 
         # Set the configuration of the web server
-        cherrypy.config.update(
-            {
-                'engine.autoreload.on': False,
-                'server.socket_port': self.port,
-                'server.socket_host': self.bind,
-                'log.screen': False,
-            }
-        )
+        cherrypy.config.update({
+            'engine.autoreload.on': False,
+            'server.socket_port': self.port,
+            'server.socket_host': self.bind,
+            'log.screen': False,
+        })
 
         if self.ssl_certificate and self.ssl_private_key:
-            cherrypy.config.update(
-                {
-                    'server.ssl_module': 'builtin',
-                    'server.ssl_certificate': self.ssl_certificate,
-                    'server.ssl_private_key': self.ssl_private_key,
-                }
-            )
+            cherrypy.config.update({
+                'server.ssl_module': 'builtin',
+                'server.ssl_certificate': self.ssl_certificate,
+                'server.ssl_private_key': self.ssl_private_key,
+            })
 
         try:
             host = (

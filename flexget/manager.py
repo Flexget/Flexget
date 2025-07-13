@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import atexit
 import codecs
 import collections
@@ -16,8 +18,6 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import (
     TYPE_CHECKING,
-    Optional,
-    Union,
 )
 
 import sqlalchemy
@@ -59,7 +59,7 @@ if TYPE_CHECKING:
 
 logger = logger.bind(name='manager')
 
-manager: Optional['Manager'] = None
+manager: Manager | None = None
 DB_CLEANUP_INTERVAL = timedelta(days=7)
 
 
@@ -118,7 +118,7 @@ class Manager:
     """
 
     unit_test = False
-    options: 'argparse.Namespace'
+    options: argparse.Namespace
 
     def __init__(self, args: list[str]) -> None:
         """:param args: CLI args"""
@@ -130,11 +130,11 @@ class Manager:
 
         self.args = args
         self.autoreload_config = False
-        self.config_file_hash: Optional[str] = None
-        self._config_path: Optional[Path] = None
+        self.config_file_hash: str | None = None
+        self._config_path: Path | None = None
         self.log_filename: str = ''
         self.db_filename: str = ''
-        self.engine: Optional[Engine] = None
+        self.engine: Engine | None = None
         self.lockfile: str = ''
         self.database_uri: str = ''
         self.db_upgraded = False
@@ -147,7 +147,7 @@ class Manager:
 
         self.config: dict = {}
         # user_config is exactly as loaded from the user's config file. No defaults set or manipulation done.
-        self.user_config: Optional[dict] = None
+        self.user_config: dict | None = None
 
         self.options = self.parse_initial_options(args)
         self._init_config(create=False)
@@ -184,13 +184,13 @@ class Manager:
     def config_base(self) -> Path:
         return self.config_path.parent.resolve()
 
-    def _add_tray_icon_items(self, tray_icon: 'TrayIcon'):
+    def _add_tray_icon_items(self, tray_icon: TrayIcon):
         tray_icon.add_menu_item(text='Shutdown', action=self.shutdown, index=2)
         tray_icon.add_menu_item(text='Reload Config', action=self.load_config, index=3)
         tray_icon.add_menu_separator(index=4)
 
     @staticmethod
-    def parse_initial_options(args: list[str]) -> 'argparse.Namespace':
+    def parse_initial_options(args: list[str]) -> argparse.Namespace:
         """Parse what we can from cli args before plugins are loaded."""
         try:
             options = CoreArgumentParser().parse_known_args(args, do_help=False)[0]
@@ -268,9 +268,9 @@ class Manager:
 
     def execute(
         self,
-        options: Optional[Union[dict, 'argparse.Namespace']] = None,
+        options: dict | argparse.Namespace | None = None,
         priority: int = 1,
-        suppress_warnings: Optional['Sequence[str]'] = None,
+        suppress_warnings: Sequence[str] | None = None,
     ) -> list[tuple[str, str, threading.Event]]:
         """Run all (can be limited with options) tasks from the config.
 
@@ -383,7 +383,7 @@ class Manager:
             self._shutdown()
             return None
 
-    def handle_cli(self, options: Optional['argparse.Namespace'] = None) -> None:
+    def handle_cli(self, options: argparse.Namespace | None = None) -> None:
         """Dispatch a cli command to the appropriate function.
 
         * :meth:`.execute_command`
@@ -410,7 +410,7 @@ class Manager:
             # Otherwise dispatch the command to the callback function
             options.cli_command_callback(self, command_options)
 
-    def execute_command(self, options: 'argparse.Namespace') -> None:
+    def execute_command(self, options: argparse.Namespace) -> None:
         """Handle the 'execute' CLI command.
 
         If there is already a task queue running in this process, adds the execution to the queue.
@@ -447,7 +447,7 @@ class Manager:
             self.task_queue.wait()
         fire_event('manager.execute.completed', self, options)
 
-    def daemon_command(self, options: 'argparse.Namespace') -> None:
+    def daemon_command(self, options: argparse.Namespace) -> None:
         """Handle the 'daemon' CLI command.
 
         Fires events:
@@ -479,7 +479,7 @@ class Manager:
                 logger.debug('Error registering sigterm handler: {}', e)
             self.is_daemon = True
 
-            def run_daemon(tray_icon: 'TrayIcon' = None):
+            def run_daemon(tray_icon: TrayIcon = None):
                 fire_event('manager.daemon.started', self)
                 self.task_queue.start()
                 self.ipc_server.start()
@@ -610,14 +610,14 @@ class Manager:
         self.lockfile = str(self.config_base / f'.{self.config_name}-lock')
         self.db_filename = str(self.config_base / f'db-{self.config_name}.sqlite')
 
-    def hash_config(self) -> Optional[str]:
+    def hash_config(self) -> str | None:
         if not self.user_config:
             return None
         sha1_hash = hashlib.sha1(yaml.dump(self.user_config).encode('utf-8'))
         return sha1_hash.hexdigest()
 
     def load_config(
-        self, output_to_console: bool = True, config_file_hash: Optional[str] = None
+        self, output_to_console: bool = True, config_file_hash: str | None = None
     ) -> None:
         """Load the config file from disk, validate and activate it.
 
@@ -743,7 +743,7 @@ class Manager:
         config_changed()
         fire_event('manager.config_updated', self)
 
-    def validate_config(self, config: Optional[dict] = None) -> dict:
+    def validate_config(self, config: dict | None = None) -> dict:
         """Check all root level keywords are valid.
 
         Config may be modified by before_config_validate hooks. Modified config will be returned.
@@ -791,7 +791,7 @@ class Manager:
             )
         except ImportError:
             logger.opt(exception=True).critical(
-                'FATAL: Unable to use SQLite. Are you running Python 3.9 or newer ?\n'
+                'FATAL: Unable to use SQLite. Are you running Python 3.10 or newer ?\n'
                 'Python should normally have SQLite support built in.\n'
                 "If you're running correct version of Python then it is not equipped with SQLite.\n"
                 'You can try installing `pysqlite`.\n'
@@ -818,10 +818,10 @@ class Manager:
                 )
             raise
 
-    def _read_lock(self) -> Optional[dict]:
+    def _read_lock(self) -> dict | None:
         """Read the values from the lock file. Returns None if there is no current lock file."""
         if self.lockfile and os.path.exists(self.lockfile):
-            result: dict[str, Union[str, int]] = {}
+            result: dict[str, str | int] = {}
             with open(self.lockfile, encoding='utf-8') as f:
                 lines = [line for line in f if line]
             for line in lines:
@@ -852,7 +852,7 @@ class Manager:
         # Don't count it if we hold the lock
         return os.getpid() != lock_info['pid']
 
-    def check_ipc_info(self) -> Optional[dict]:
+    def check_ipc_info(self) -> dict | None:
         """If a daemon has a lock on the database, return info to connect to IPC."""
         lock_info = self._read_lock()
         if lock_info and 'port' in lock_info:
@@ -860,7 +860,7 @@ class Manager:
         return None
 
     @contextmanager
-    def acquire_lock(self, event: bool = True) -> 'Iterator':
+    def acquire_lock(self, event: bool = True) -> Iterator:
         """:param bool event: If True, the 'manager.lock_acquired' event will be fired after a lock is obtained"""
         acquired = False
         try:
@@ -890,7 +890,7 @@ class Manager:
                 self.release_lock()
                 self._has_lock = False
 
-    def write_lock(self, ipc_info: Optional[dict] = None) -> None:
+    def write_lock(self, ipc_info: dict | None = None) -> None:
         assert self._has_lock
         with open(self.lockfile, 'w', encoding='utf-8') as f:
             f.write(f'PID: {os.getpid()}\n')
@@ -1020,7 +1020,7 @@ class Manager:
         global manager
         manager = None
 
-    def matching_tasks(self, task: str) -> Optional[list[str]]:
+    def matching_tasks(self, task: str) -> list[str] | None:
         """Create list of tasks to run, preserving order."""
         task_names = [t for t in self.tasks if fnmatch.fnmatchcase(str(t).lower(), task.lower())]
         if not task_names:

@@ -74,15 +74,13 @@ class TestRTorrentClient:
         assert torrent.get('name') == 'private.torrent'
         assert torrent.get('down_rate') == 123456
 
-        mocked_proxy.system.multicall.assert_called_with(
-            [
-                {'params': (torrent_info_hash,), 'methodName': 'd.base_path'},
-                {'params': (torrent_info_hash,), 'methodName': 'd.name'},
-                {'params': (torrent_info_hash,), 'methodName': 'd.hash'},
-                {'params': (torrent_info_hash,), 'methodName': 'd.custom1'},
-                {'params': (torrent_info_hash,), 'methodName': 'd.down.rate'},
-            ]
-        )
+        mocked_proxy.system.multicall.assert_called_with([
+            {'params': (torrent_info_hash,), 'methodName': 'd.base_path'},
+            {'params': (torrent_info_hash,), 'methodName': 'd.name'},
+            {'params': (torrent_info_hash,), 'methodName': 'd.hash'},
+            {'params': (torrent_info_hash,), 'methodName': 'd.custom1'},
+            {'params': (torrent_info_hash,), 'methodName': 'd.down.rate'},
+        ])
 
     def test_torrents(self, mocked_proxy):
         mocked_proxy = mocked_proxy()
@@ -130,16 +128,14 @@ class TestRTorrentClient:
         resp = client.update(torrent_info_hash, fields=update_fields)
         assert resp == 0
 
-        mocked_proxy.system.multicall.assert_called_with(
-            [
-                {'params': (torrent_info_hash, 'test_custom1'), 'methodName': 'd.custom1.set'},
-                {
-                    'params': (torrent_info_hash, '/data/downloads'),
-                    'methodName': 'd.directory_base.set',
-                },
-                {'params': (torrent_info_hash, 3), 'methodName': 'd.priority.set'},
-            ]
-        )
+        mocked_proxy.system.multicall.assert_called_with([
+            {'params': (torrent_info_hash, 'test_custom1'), 'methodName': 'd.custom1.set'},
+            {
+                'params': (torrent_info_hash, '/data/downloads'),
+                'methodName': 'd.directory_base.set',
+            },
+            {'params': (torrent_info_hash, 3), 'methodName': 'd.priority.set'},
+        ])
 
     def test_delete(self, mocked_proxy):
         mocked_proxy = mocked_proxy()
@@ -170,11 +166,9 @@ class TestRTorrentClient:
 
         assert resp == 0
 
-        mocked_proxy.execute.throw.assert_has_calls(
-            [
-                mock.call('', 'rm', '-drf', '/data/downloads/ubuntu-9.04-desktop-amd64.iso'),
-            ]
-        )
+        mocked_proxy.execute.throw.assert_has_calls([
+            mock.call('', 'rm', '-drf', '/data/downloads/ubuntu-9.04-desktop-amd64.iso'),
+        ])
 
     def test_move(self, mocked_proxy):
         mocked_proxy = mocked_proxy()
@@ -191,12 +185,10 @@ class TestRTorrentClient:
         client = RTorrent('http://localhost/RPC2')
         client.move(torrent_info_hash, '/new/folder')
 
-        mocked_proxy.execute.throw.assert_has_calls(
-            [
-                mock.call('', 'mkdir', '-p', '/new/folder'),
-                mock.call('', 'mv', '-u', '/data/downloads', '/new/folder'),
-            ]
-        )
+        mocked_proxy.execute.throw.assert_has_calls([
+            mock.call('', 'mkdir', '-p', '/new/folder'),
+            mock.call('', 'mv', '-u', '/data/downloads', '/new/folder'),
+        ])
 
     def test_start(self, mocked_proxy):
         mocked_proxy = mocked_proxy()

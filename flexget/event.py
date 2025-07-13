@@ -1,8 +1,13 @@
 """Provides small event framework."""
 
-from typing import Any, Callable
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
 
 from loguru import logger
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 logger = logger.bind(name='event')
 

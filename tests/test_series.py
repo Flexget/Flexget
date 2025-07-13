@@ -14,9 +14,9 @@ def age_series(**kwargs):
     import datetime
 
     session = Session()
-    session.query(db.EpisodeRelease).update(
-        {'first_seen': datetime.datetime.now() - datetime.timedelta(**kwargs)}
-    )
+    session.query(db.EpisodeRelease).update({
+        'first_seen': datetime.datetime.now() - datetime.timedelta(**kwargs)
+    })
     session.commit()
 
 

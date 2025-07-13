@@ -1,15 +1,16 @@
 # /// script
-# requires-python = ">=3.9"
+# requires-python = ">=3.10"
 # dependencies = [
 #     "gitpython~=3.1",
 # ]
 # ///
+from __future__ import annotations
 
 import collections
 import re
 import sys
 from pathlib import Path
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from git import Repo
 
@@ -74,14 +75,14 @@ class MDChangeSet:
                     line = line.replace(cat_match.group(0), '').strip()
                     yield found_cat, line
 
-    def cat_lookup(self, cat: str) -> Optional[str]:
+    def cat_lookup(self, cat: str) -> str | None:
         """Return an official category for `cat` tag text."""
         for cat_item in self.CATEGORIES:
             if cat.lower() in cat_item[1]:
                 return f'### {cat_item[0]}\n\n'
         return None
 
-    def to_md_lines(self) -> 'Generator[str, None, None]':
+    def to_md_lines(self) -> Generator[str, None, None]:
         """Return an iterator over the markdown lines representing this changeset."""
         yield from self.pre_header
         yield self.version_header
@@ -97,8 +98,8 @@ class MDChangeSet:
 
 
 def isplit(
-    start_text: str, iterator: 'Iterable[str]'
-) -> tuple[list[str], Optional[str], 'Iterable[str]']:
+    start_text: str, iterator: Iterable[str]
+) -> tuple[list[str], str | None, Iterable[str]]:
     """Return head, match, tail tuple, where match is the first line that starts with `start_text`."""
     head: list[str] = []
     iterator = iter(iterator)

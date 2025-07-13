@@ -1,10 +1,12 @@
+from __future__ import annotations
+
 import contextlib
 import logging
 import random
 import string
 import threading
 import unittest.mock
-from typing import Callable, Optional
+from typing import TYPE_CHECKING
 
 import rpyc
 from loguru import logger
@@ -13,6 +15,9 @@ from rpyc.utils.server import ThreadedServer
 from flexget import terminal
 from flexget.log import capture_logs
 from flexget.options import get_parser
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 logger = logger.bind(name='ipc')
 
@@ -32,7 +37,7 @@ class RemoteStream:
     logged, but no exception raised.
     """
 
-    def __init__(self, writer: Optional[Callable]):
+    def __init__(self, writer: Callable | None):
         """:param writer: A function which writes a line of text to remote client."""
         self.buffer = ''
         self.writer = writer

@@ -1,86 +1,114 @@
 interactions:
-  - request:
-      body: null
-      headers:
-        Accept: ['*/*']
-        Accept-Encoding: ['gzip, deflate']
-        Connection: [keep-alive]
-        User-Agent: [FlexGet/2.10.20.dev (www.flexget.com)]
-      method: GET
-      uri: https://api.tvmaze.com/singlesearch/shows?embed=seasons&q=House+MD
-    response:
-      body:
-        string: !!binary |
-          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
-          av9UFPtonpmLZ355//4/V6hNzs0nAAA=
-      headers:
-        Access-Control-Allow-Origin: ['*']
-        Cache-Control: ['public, max-age=3600']
-        Connection: [keep-alive]
-        Content-Encoding: [gzip]
-        Content-Type: [application/json; charset=UTF-8]
-        Date: ['Sun, 26 Mar 2017 11:10:40 GMT']
-        Server: [nginx/1.10.0 (Ubuntu)]
-        Vary: [Accept-Encoding]
-      status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - FlexGet/2.10.20.dev (www.flexget.com)
+    method: GET
+    uri: https://api.tvmaze.com/singlesearch/shows?embed=seasons&q=House+MD
+  response:
+    body:
+      string: '{"id":118,"url":"http://www.tvmaze.com/shows/118/house","name":"House","type":"Scripted","language":"English","genres":["Drama","Mystery","Medical"],"status":"Ended","runtime":60,"premiered":"2004-11-16","schedule":{"time":"21:00","days":["Monday"]},"rating":{"average":9},"weight":1,"network":{"id":4,"name":"FOX","country":{"name":"United
+        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":3908,"thetvdb":73255,"imdb":"tt0412142"},"image":{"medium":"http://static.tvmaze.com/uploads/images/medium_portrait/43/109520.jpg","original":"http://static.tvmaze.com/uploads/images/original_untouched/43/109520.jpg"},"summary":"<p>Sink
+        your teeth into meaty drama and intrigue with <strong>House</strong>, FOX''s
+        take on mystery, where the villain is a medical malady and the hero is an
+        irreverent, controversial doctor who trusts no one, least of all his patients.</p>","updated":1488709623,"_links":{"self":{"href":"http://api.tvmaze.com/shows/118"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/9206"}},"_embedded":{"seasons":[{"id":554,"url":"http://www.tvmaze.com/seasons/554/house-season-1","number":1,"name":"","episodeOrder":null,"premiereDate":"2004-11-16","endDate":"2005-05-24","network":{"id":4,"name":"FOX","country":{"name":"United
+        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"image":{"medium":"http://static.tvmaze.com/uploads/images/medium_portrait/24/60735.jpg","original":"http://static.tvmaze.com/uploads/images/original_untouched/24/60735.jpg"},"summary":"<p>We
+        are introduced to the brilliant, famous but extremely exasperating Gregory
+        House. We learn that despite his considerable intellect and talents as a physician,
+        he does next to no work at the hospital, merely coming in from 9 to 5 to oversee
+        his three teaching fellows. This infuriates his boss, Dean of Medicine Lisa
+        Cuddy. However she keeps him on because when the rest of the doctors are stumped,
+        House swings into action.</p>","_links":{"self":{"href":"http://api.tvmaze.com/seasons/554"}}},{"id":555,"url":"http://www.tvmaze.com/seasons/555/house-season-2","number":2,"name":"","episodeOrder":null,"premiereDate":"2005-09-13","endDate":"2006-05-23","network":{"id":4,"name":"FOX","country":{"name":"United
+        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"image":{"medium":"http://static.tvmaze.com/uploads/images/medium_portrait/24/60736.jpg","original":"http://static.tvmaze.com/uploads/images/original_untouched/24/60736.jpg"},"summary":"<p>Stacy
+        Warner returns to PPTH, having been officially hired as the hospital''s General
+        Counsel. House eventually realizes that he still has feelings for her. In
+        an attempt to prove that she feels the same way about him, he breaks into
+        her therapist''s office and reads her file. House learns that she is not sleeping
+        with her husband Mark Warner. He tries to get back with her by killing a rat
+        that has invaded her home, but soon changes his mind after learning that the
+        rat has an illness that brings out the diagnostician in him.</p>","_links":{"self":{"href":"http://api.tvmaze.com/seasons/555"}}},{"id":556,"url":"http://www.tvmaze.com/seasons/556/house-season-3","number":3,"name":"","episodeOrder":null,"premiereDate":"2006-09-05","endDate":"2007-05-29","network":{"id":4,"name":"FOX","country":{"name":"United
+        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"image":{"medium":"http://static.tvmaze.com/uploads/images/medium_portrait/24/60737.jpg","original":"http://static.tvmaze.com/uploads/images/original_untouched/24/60737.jpg"},"summary":"<p>House
+        recovers from his gunshot wounds, but despite his pain temporarily disappearing
+        and the fact that his leg is working again, he is soon back on Vicodin. He
+        runs into a particularly difficult patient at the clinic, who turns out to
+        be a police officer, who then makes it his business to get House sent to jail
+        for possessing Vicodin illegally. Unfortunately, House has used Wilson''s
+        prescription pad to forge his own prescriptions, even though Wilson has been
+        supplying him with Vicodin freely. House nearly goes to jail, but Cuddy then
+        perjures herself in court to have the charges dismissed.</p>","_links":{"self":{"href":"http://api.tvmaze.com/seasons/556"}}},{"id":557,"url":"http://www.tvmaze.com/seasons/557/house-season-4","number":4,"name":"","episodeOrder":null,"premiereDate":"2007-09-25","endDate":"2008-05-19","network":{"id":4,"name":"FOX","country":{"name":"United
+        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"image":{"medium":"http://static.tvmaze.com/uploads/images/medium_portrait/24/60739.jpg","original":"http://static.tvmaze.com/uploads/images/original_untouched/24/60739.jpg"},"summary":"<p>After
+        losing his original diagnostic team, House decides that he doesn''t need fellows
+        as he feels that he can handle a case all on his own but after taking a long
+        time to solve a case, Cuddy insists that he start looking for possible doctors
+        to join his new team. House grudgingly accepts and gets forty applicants together
+        and has a reality show style contest to see which lucky three applicants will
+        stay on to get the vacant fellowship openings. Meanwhile, Cameron and Chase
+        come back to work at the hospital, while Foreman starts work in a job similar
+        to House''s at another hospital. However, Foreman is soon fired for doing
+        exactly what House would do and winds up back at Princeton-Plainsboro. House
+        wants nothing to do with him, but Cuddy insists he can only hire two new fellows
+        and must have Foreman on his team to keep an eye on him.</p>","_links":{"self":{"href":"http://api.tvmaze.com/seasons/557"}}},{"id":558,"url":"http://www.tvmaze.com/seasons/558/house-season-5","number":5,"name":"","episodeOrder":null,"premiereDate":"2008-09-16","endDate":"2009-05-11","network":{"id":4,"name":"FOX","country":{"name":"United
+        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"image":{"medium":"http://static.tvmaze.com/uploads/images/medium_portrait/24/60741.jpg","original":"http://static.tvmaze.com/uploads/images/original_untouched/24/60741.jpg"},"summary":"<p>Wilson
+        slowly starts to recover from Amber''s untimely death, but begins to reevaluate
+        his life and to contemplate resigning from his post at the hospital. House''s
+        original regret over his role in Amber''s death seems to have worn off as
+        instead of being supportive, he merely tries to convince Wilson that he is
+        overreacting to the situation. However, Wilson winds up leaving his post.</p>","_links":{"self":{"href":"http://api.tvmaze.com/seasons/558"}}},{"id":559,"url":"http://www.tvmaze.com/seasons/559/house-season-6","number":6,"name":"","episodeOrder":null,"premiereDate":"2009-09-21","endDate":"2010-05-17","network":{"id":4,"name":"FOX","country":{"name":"United
+        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"image":{"medium":"http://static.tvmaze.com/uploads/images/medium_portrait/24/60742.jpg","original":"http://static.tvmaze.com/uploads/images/original_untouched/24/60742.jpg"},"summary":"<p>After
+        finally realizing that his Vicodin habit is distorting his view of reality,
+        House voluntarily enters Mayfield Psychiatric Hospital to detox. However,
+        detoxing turns out to be the easy part - House can''t get his medical license
+        back until he''s willing to admit his problems run deeper. Although he resists
+        at first, he finally gives in. At the same time, he falls in love, but then
+        finds his paramour has no further interest in him. When he turns to his doctor
+        instead of Vicodin for help, Dr. Nolan realizes he''s ready to return to the
+        practice of medicine.</p>","_links":{"self":{"href":"http://api.tvmaze.com/seasons/559"}}},{"id":560,"url":"http://www.tvmaze.com/seasons/560/house-season-7","number":7,"name":"","episodeOrder":null,"premiereDate":"2010-09-20","endDate":"2011-05-23","network":{"id":4,"name":"FOX","country":{"name":"United
+        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"image":{"medium":"http://static.tvmaze.com/uploads/images/medium_portrait/24/60744.jpg","original":"http://static.tvmaze.com/uploads/images/original_untouched/24/60744.jpg"},"summary":"<p>House
+        and Cuddy make their relationship public, but despite the fact that they are
+        both happier than they have been for years, they both see problems. House
+        is sure that Cuddy is merely hopped up on the sex and good feelings that are
+        typical early in the relationship and that she will dump him once she realizes
+        what she''s gotten herself into. Cuddy is sure that her supervisory role over
+        House is either going to poison their relationship or ruin House''s medical
+        skills, and she''s uncomfortable with many aspects of House''s past, such
+        as the prostitute he''s still seeing for non-sexual purposes. House is also
+        not certain he wants to have a role in Rachel Cuddy''s life and starts to
+        balk at the responsibility, although towards the end of the season, House
+        and Rachel seem to share a strange bond over a cartoon about pirates.</p>","_links":{"self":{"href":"http://api.tvmaze.com/seasons/560"}}},{"id":561,"url":"http://www.tvmaze.com/seasons/561/house-season-8","number":8,"name":"","episodeOrder":null,"premiereDate":"2011-10-03","endDate":"2012-05-21","network":{"id":4,"name":"FOX","country":{"name":"United
+        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"image":{"medium":"http://static.tvmaze.com/uploads/images/medium_portrait/24/60747.jpg","original":"http://static.tvmaze.com/uploads/images/original_untouched/24/60747.jpg"},"summary":"<p>House
+        starts the year in prison, serving out a long term for his various misdeeds
+        in Moving On. However, it turns out that he didn''t even try to get a lesser
+        sentence and took a one-year term without complaint. He blows a chance for
+        early parole in order to prove a fellow patient''s diagnosis. Although he
+        plans to withdraw from the practice of medicine, it appears the real co-dependent
+        relationship is between House and the hospital. With House looking at serving
+        at least another six months, the new Dean of Medicine, Eric Foreman approaches
+        House with an offer to return to work.</p>","_links":{"self":{"href":"http://api.tvmaze.com/seasons/561"}}}]}}'
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      Cache-Control:
+      - public, max-age=3600
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=UTF-8
+      Date:
+      - Sun, 26 Mar 2017 11:10:40 GMT
+      Server:
+      - nginx/1.10.0 (Ubuntu)
+      Vary:
+      - Accept-Encoding
+    status:
+      code: 200
+      message: OK
 version: 1

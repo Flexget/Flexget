@@ -5,10 +5,18 @@ import logging
 import os
 import posixpath
 import socket
+import sys
 import threading
 import time
-from logging import Logger
+import typing
 from pathlib import Path, PurePosixPath
+
+if typing.TYPE_CHECKING:
+    from logging import Logger
+
+# TODO: Workaround for https://github.com/pyca/pynacl/pull/848, remove this completely after the issue is resolved
+if sys.version_info[:2] == (3, 14):
+    typing.ByteString = None  # noqa: PYI057
 
 try:
     from paramiko import (

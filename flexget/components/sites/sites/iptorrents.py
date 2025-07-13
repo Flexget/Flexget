@@ -90,9 +90,9 @@ class UrlRewriteIPTorrents:
             'rss_key': {'type': 'string'},
             'uid': {'oneOf': [{'type': 'integer'}, {'type': 'string'}]},
             'password': {'type': 'string'},
-            'category': one_or_more(
-                {'oneOf': [{'type': 'integer'}, {'type': 'string', 'enum': list(CATEGORIES)}]}
-            ),
+            'category': one_or_more({
+                'oneOf': [{'type': 'integer'}, {'type': 'string', 'enum': list(CATEGORIES)}]
+            }),
             'free': {'type': 'boolean', 'default': False},
         },
         'required': ['rss_key', 'uid', 'password'],

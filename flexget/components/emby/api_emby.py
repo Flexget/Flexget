@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import copy
 import functools
 import re
@@ -574,7 +576,7 @@ class EmbyApiListBase(EmbyApiBase):
         self._add(item)
 
     @abstractmethod
-    def _add(self, item: 'EmbyApiMedia'):
+    def _add(self, item: EmbyApiMedia):
         pass
 
     def remove(self, entry: Entry):
@@ -592,7 +594,7 @@ class EmbyApiListBase(EmbyApiBase):
         self._remove(item)
 
     @abstractmethod
-    def _remove(self, item: 'EmbyApiMedia'):
+    def _remove(self, item: EmbyApiMedia):
         pass
 
     @abstractmethod
@@ -603,7 +605,7 @@ class EmbyApiListBase(EmbyApiBase):
         """Check if list contains item."""
         return bool(self.get(item))
 
-    def get(self, item) -> 'EmbyApiMedia':
+    def get(self, item) -> EmbyApiMedia:
         """Get Item from list."""
         if isinstance(item, EmbyApiMedia):
             s_item = item
@@ -874,10 +876,10 @@ class EmbyApiRootList(EmbyApiListBase):
 
         self._name = 'Root List'
 
-    def _add(self, item: 'EmbyApiMedia'):
+    def _add(self, item: EmbyApiMedia):
         logger.warning('Not possible to add items to root list')
 
-    def _remove(self, item: 'EmbyApiMedia'):
+    def _remove(self, item: EmbyApiMedia):
         logger.warning('Not possible to remove items from root list')
 
     def get_items(self):
@@ -929,14 +931,14 @@ class EmbyApiWatchedList(EmbyApiListBase):
 
         self._name = 'Watched List'
 
-    def _add(self, item: 'EmbyApiMedia'):
+    def _add(self, item: EmbyApiMedia):
         args = {}
         endpoint = EMBY_ENDPOINT_WATCHED.format(userid=self.auth.uid, itemid=item.id)
         additem = EmbyApi.resquest_emby(endpoint, self.auth, 'POST', **args)
         if not additem:
             logger.warning("Not possible to add item '{}' to watched list", item.fullname)
 
-    def _remove(self, item: 'EmbyApiMedia'):
+    def _remove(self, item: EmbyApiMedia):
         args = {}
         endpoint = EMBY_ENDPOINT_WATCHED.format(userid=self.auth.uid, itemid=item.id)
         additem = EmbyApi.resquest_emby(endpoint, self.auth, 'DELETE', **args)
@@ -1002,14 +1004,14 @@ class EmbyApiFavoriteList(EmbyApiListBase):
 
         self._name = 'Favorite List'
 
-    def _add(self, item: 'EmbyApiMedia'):
+    def _add(self, item: EmbyApiMedia):
         args = {}
         endpoint = EMBY_ENDPOINT_FAVORITE.format(userid=self.auth.uid, itemid=item.id)
         additem = EmbyApi.resquest_emby(endpoint, self.auth, 'POST', **args)
         if not additem:
             logger.warning("Not possible to add item '{}' to favorite list", item.fullname)
 
-    def _remove(self, item: 'EmbyApiMedia'):
+    def _remove(self, item: EmbyApiMedia):
         args = {}
         endpoint = EMBY_ENDPOINT_FAVORITE.format(userid=self.auth.uid, itemid=item.id)
         additem = EmbyApi.resquest_emby(endpoint, self.auth, 'DELETE', **args)
@@ -1083,7 +1085,7 @@ class EmbyApiPlayList(EmbyApiListBase):
 
         self.id = list_data['Id']
 
-    def _add(self, item: 'EmbyApiMedia'):
+    def _add(self, item: EmbyApiMedia):
         if not self.created:
             new_list = EmbyApiPlayList.create(item, auth=self.auth, list=self.name)
             self.id = new_list.id
@@ -1364,7 +1366,7 @@ class EmbyApiMedia(EmbyApiBase):
 
         return parents
 
-    def get_libary(self) -> 'EmbyApiLibrary':
+    def get_libary(self) -> EmbyApiLibrary:
         parents = self._get_parents()
         if not parents:
             return None
@@ -1539,19 +1541,17 @@ class EmbyApiMedia(EmbyApiBase):
 
         endpoint = EMBY_ENDPOINT_PHOTOS.format(itemid=self.id)
 
-        qstr = urlencode(
-            {
-                'Tag': self.photo_tag,
-                'CropWhitespace': 'true',
-                'EnableImageEnhancers': 'false',
-                'Format': 'jpg',
-            }
-        )
+        qstr = urlencode({
+            'Tag': self.photo_tag,
+            'CropWhitespace': 'true',
+            'EnableImageEnhancers': 'false',
+            'Format': 'jpg',
+        })
 
         return f'{self.host}{endpoint}?{qstr}'
 
     @classmethod
-    def get_from_child(cls, child: 'EmbyApiMedia') -> 'EmbyApiMedia':
+    def get_from_child(cls, child: EmbyApiMedia) -> EmbyApiMedia:
         parents = cls._get_parents(child)
         if not parents:
             return None
@@ -1565,7 +1565,7 @@ class EmbyApiMedia(EmbyApiBase):
         return None
 
     @staticmethod
-    def cast(**kwargs) -> 'EmbyApiMedia':
+    def cast(**kwargs) -> EmbyApiMedia:
         if EmbyApiEpisode.is_type(**kwargs):
             return EmbyApiEpisode.search(**kwargs)
 
@@ -1593,7 +1593,7 @@ class EmbyApiMedia(EmbyApiBase):
         return split_title_year(string)
 
     @staticmethod
-    def search(**kwargs) -> 'EmbyApiMedia':
+    def search(**kwargs) -> EmbyApiMedia:
         args = {}
 
         auth = EmbyApi.get_auth(**kwargs)
@@ -1719,7 +1719,7 @@ class EmbyApiSerie(EmbyApiMedia):
         return self.tvdb_id
 
     @property
-    def serie_aired_date(self) -> 'datetime':
+    def serie_aired_date(self) -> datetime:
         return self.aired_date
 
     @property
@@ -1756,7 +1756,7 @@ class EmbyApiSerie(EmbyApiMedia):
         return split_title_year(info)
 
     @staticmethod
-    def search(**kwargs) -> 'EmbyApiSerie':
+    def search(**kwargs) -> EmbyApiSerie:
         args = {}
 
         auth = EmbyApi.get_auth(**kwargs)
@@ -1990,7 +1990,7 @@ class EmbyApiSeason(EmbyApiMedia):
             return None
 
     @staticmethod
-    def search(**kwargs) -> 'EmbyApiSeason':
+    def search(**kwargs) -> EmbyApiSeason:
         args = {}
 
         auth = EmbyApi.get_auth(**kwargs)
@@ -2180,7 +2180,7 @@ class EmbyApiEpisode(EmbyApiMedia):
         return self.page
 
     @property
-    def ep_aired_date(self) -> 'datetime':
+    def ep_aired_date(self) -> datetime:
         return self.aired_date
 
     @property
@@ -2200,7 +2200,7 @@ class EmbyApiEpisode(EmbyApiMedia):
         return self._serie
 
     @staticmethod
-    def search(**kwargs) -> 'EmbyApiEpisode':
+    def search(**kwargs) -> EmbyApiEpisode:
         episode_serie = None
         episode_season = None
 
@@ -2420,7 +2420,7 @@ class EmbyApiMovie(EmbyApiMedia):
         return self.photo
 
     @property
-    def movie_aired_date(self) -> 'datetime':
+    def movie_aired_date(self) -> datetime:
         return self.aired_date
 
     @property
@@ -2436,7 +2436,7 @@ class EmbyApiMovie(EmbyApiMedia):
         return split_title_year(string)
 
     @staticmethod
-    def search(**kwargs) -> 'EmbyApiMovie':
+    def search(**kwargs) -> EmbyApiMovie:
         args = {}
 
         auth = EmbyApi.get_auth(**kwargs)
@@ -2542,7 +2542,7 @@ class EmbyApi(EmbyApiBase):
         'Overview',
     ]
 
-    def __init__(self, auth: 'EmbyAuth'):
+    def __init__(self, auth: EmbyAuth):
         self.auth = auth
         EmbyApi._last_auth = auth
 
@@ -2646,7 +2646,7 @@ class EmbyApi(EmbyApiBase):
         yield from mlist
 
     @staticmethod
-    def strtotime(date) -> 'datetime':
+    def strtotime(date) -> datetime:
         # YYYY-MM-DDTHH:MM:SS.0000000+00:00
 
         if not date:
@@ -2679,7 +2679,7 @@ class EmbyApi(EmbyApiBase):
     @staticmethod
     def resquest_emby(
         endpoint: str,
-        auth: 'EmbyAuth',
+        auth: EmbyAuth,
         method: str,
         emby_connect=False,
         **kwargs,

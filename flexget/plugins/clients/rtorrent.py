@@ -317,7 +317,7 @@ class RTorrent:
 
         resp = multi_call()
         # TODO: Maybe we should return a named tuple or a Torrent class?
-        return dict(list(zip(self._clean_fields(fields, reverse=True), list(resp))))
+        return dict(list(zip(self._clean_fields(fields, reverse=True), list(resp), strict=False)))
 
     def torrents(self, view='main', fields=None, custom_fields=None):
         if not fields:
@@ -330,12 +330,10 @@ class RTorrent:
         params = [f'd.{field}=' for field in fields]
 
         # Set custom fields, and values must be escaped if within params
-        params.extend(
-            [
-                'd.custom={}'.format(custom_field.replace('"', '\\"'))
-                for custom_field in custom_fields
-            ]
-        )
+        params.extend([
+            'd.custom={}'.format(custom_field.replace('"', '\\"'))
+            for custom_field in custom_fields
+        ])
 
         params.insert(0, view)
 
@@ -343,7 +341,13 @@ class RTorrent:
 
         # Response is formatted as a list of lists, with just the values
         return [
-            dict(list(zip(self._clean_fields(fields, reverse=True) + custom_fields, val)))
+            dict(
+                list(
+                    zip(
+                        self._clean_fields(fields, reverse=True) + custom_fields, val, strict=False
+                    )
+                )
+            )
             for val in resp
         ]
 

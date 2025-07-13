@@ -1,14 +1,19 @@
+from __future__ import annotations
+
 import functools
 from datetime import datetime
-from typing import Any, Optional, Union
+from typing import TYPE_CHECKING, Any
 
 from sqlalchemy import extract, func
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
-from sqlalchemy.orm import SynonymProperty, synonym
+from sqlalchemy.orm import synonym
 
 from flexget.entry import Entry
 from flexget.manager import Session
 from flexget.utils import json, qualities, serialization
+
+if TYPE_CHECKING:
+    from sqlalchemy.orm import SynonymProperty
 
 
 def with_session(*args, **kwargs):
@@ -43,13 +48,13 @@ def with_session(*args, **kwargs):
 def pipe_list_synonym(name: str) -> SynonymProperty:
     """Convert pipe separated text into a list."""
 
-    def getter(self) -> Optional[list[str]]:
+    def getter(self) -> list[str] | None:
         attr = getattr(self, name)
         if attr:
             return attr.strip('|').split('|')
         return None
 
-    def setter(self, value: Union[str, list[str]]) -> None:
+    def setter(self, value: str | list[str]) -> None:
         if isinstance(value, str):
             setattr(self, name, value)
         else:
@@ -61,10 +66,10 @@ def pipe_list_synonym(name: str) -> SynonymProperty:
 def text_date_synonym(name: str) -> SynonymProperty:
     """Convert Y-M-D date strings into datetime objects."""
 
-    def getter(self) -> Optional[datetime]:
+    def getter(self) -> datetime | None:
         return getattr(self, name)
 
-    def setter(self, value: Union[str, datetime]) -> None:
+    def setter(self, value: str | datetime) -> None:
         if isinstance(value, str):
             try:
                 setattr(self, name, datetime.strptime(value, '%Y-%m-%d'))
@@ -83,7 +88,7 @@ def entry_synonym(name: str) -> SynonymProperty:
     def getter(self) -> Any:
         return serialization.loads(getattr(self, name))
 
-    def setter(self, entry: Union[dict, Entry]) -> None:
+    def setter(self, entry: dict | Entry) -> None:
         if isinstance(entry, dict):
             if entry.get('serializer') == 'Entry' and 'version' in entry and 'value' in entry:
                 # This is already a serialized form of entry
@@ -113,7 +118,7 @@ def json_synonym(name: str) -> SynonymProperty:
 class CaseInsensitiveWord(Comparator):
     """Hybrid value representing a string that compares case insensitively."""
 
-    def __init__(self, word: Union[str, 'CaseInsensitiveWord']):
+    def __init__(self, word: str | CaseInsensitiveWord):
         if isinstance(word, CaseInsensitiveWord):
             self.word: str = word.word
         else:

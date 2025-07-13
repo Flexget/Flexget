@@ -2,20 +2,24 @@ interactions:
 - request:
     body: null
     headers:
-      Content-Type: [application/json]
-      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: ['2']
+      Content-Type:
+      - application/json
+      trakt-api-key:
+      - 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af
+      trakt-api-version:
+      - '2'
     method: GET
     uri: https://api.trakt.tv/search?type=show&query=the+x-files
   response:
-    body: {string: "[{\"type\":\"show\",\"score\":96.0108,\"show\":{\"title\":\"The
-        X-Files\",\"overview\":\"The X-Files focused on the exploits of FBI Agents
-        Fox Mulder, Dana Scully, John Doggett and Monica Reyes and their investigations
-        into the paranormal. From genetic mutants and killer insects to a global conspiracy
-        concerning the colonization of Earth by an alien species, this mind-boggling,
-        humorous and occasionally frightening series created by Chris Carter has been
-        one of the world's most popular sci-fi/drama shows since its humble beginnings
-        in 1993.\",\"year\":1993,\"status\":\"returning series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":4063,\"slug\":\"the-x-files\",\"tvdb\":77398,\"imdb\":\"tt0106179\",\"tmdb\":4087,\"tvrage\":6312}}},{\"type\":\"show\",\"score\":93.0228,\"show\":{\"title\":\"NASA's
+    body:
+      string: "[{\"type\":\"show\",\"score\":96.0108,\"show\":{\"title\":\"The X-Files\",\"overview\":\"The
+        X-Files focused on the exploits of FBI Agents Fox Mulder, Dana Scully, John
+        Doggett and Monica Reyes and their investigations into the paranormal. From
+        genetic mutants and killer insects to a global conspiracy concerning the colonization
+        of Earth by an alien species, this mind-boggling, humorous and occasionally
+        frightening series created by Chris Carter has been one of the world's most
+        popular sci-fi/drama shows since its humble beginnings in 1993.\",\"year\":1993,\"status\":\"returning
+        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":4063,\"slug\":\"the-x-files\",\"tvdb\":77398,\"imdb\":\"tt0106179\",\"tmdb\":4087,\"tvrage\":6312}}},{\"type\":\"show\",\"score\":93.0228,\"show\":{\"title\":\"NASA's
         X-Files\",\"overview\":\"Soar beyond the horizon and into the future of aviation
         with unprecedented behind the scenes access to NASA's Dryden Flight Research
         Center. Experience never-before-seen test flight footage, from the first supersonic
@@ -99,41 +103,68 @@ interactions:
         stand-up comedian, actor and podcast host. He starred on the TNT series Franklin
         & Bash and co-hosts the show The Meltdown with Jonah and Kumail. Nanjiani
         is also a regular on HBO's Silicon Valley. On top of his television and film
-        work, he hosts two podcasts: The Indoor Kids and The X-Files Files.\",\"year\":1969,\"status\":\"\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":75141,\"slug\":\"kumail-nanjiani\",\"tvdb\":276450,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}}]"}
+        work, he hosts two podcasts: The Indoor Kids and The X-Files Files.\",\"year\":1969,\"status\":\"\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":75141,\"slug\":\"kumail-nanjiani\",\"tvdb\":276450,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}}]"
     headers:
-      CF-Cache-Status: [MISS]
-      CF-RAY: [312a5a271aac3d61-CPH]
-      Cache-Control: ['public, max-age=28800']
-      Connection: [keep-alive]
-      Content-Type: [application/json; charset=utf-8]
-      Date: ['Sat, 17 Dec 2016 12:24:28 GMT']
-      ETag: [W/"78f68e47b16f7e347ee3d17550ed0665"]
-      Expires: ['Sat, 17 Dec 2016 20:24:28 GMT']
-      Server: [cloudflare-nginx]
-      Set-Cookie: ['__cfduid=d976b075eb0db30bd15913a9f335e5deb1481977468; expires=Sun,
-          17-Dec-17 12:24:28 GMT; path=/; domain=.trakt.tv; HttpOnly']
-      Vary: [Accept-Encoding]
-      X-Content-Type-Options: [nosniff]
-      X-Frame-Options: [SAMEORIGIN]
-      X-Pagination-Item-Count: ['14']
-      X-Pagination-Limit: ['10']
-      X-Pagination-Page: ['1']
-      X-Pagination-Page-Count: ['2']
-      X-Request-Id: [ce89b62a-2fe4-4fe4-91d9-78d9f2ff3897]
-      X-Runtime: ['0.019106']
-      X-XSS-Protection: [1; mode=block]
-    status: {code: 200, message: OK}
+      CF-Cache-Status:
+      - MISS
+      CF-RAY:
+      - 312a5a271aac3d61-CPH
+      Cache-Control:
+      - public, max-age=28800
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Sat, 17 Dec 2016 12:24:28 GMT
+      ETag:
+      - W/"78f68e47b16f7e347ee3d17550ed0665"
+      Expires:
+      - Sat, 17 Dec 2016 20:24:28 GMT
+      Server:
+      - cloudflare-nginx
+      Set-Cookie:
+      - __cfduid=d976b075eb0db30bd15913a9f335e5deb1481977468; expires=Sun, 17-Dec-17
+        12:24:28 GMT; path=/; domain=.trakt.tv; HttpOnly
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Pagination-Item-Count:
+      - '14'
+      X-Pagination-Limit:
+      - '10'
+      X-Pagination-Page:
+      - '1'
+      X-Pagination-Page-Count:
+      - '2'
+      X-Request-Id:
+      - ce89b62a-2fe4-4fe4-91d9-78d9f2ff3897
+      X-Runtime:
+      - '0.019106'
+      X-XSS-Protection:
+      - 1; mode=block
+    status:
+      code: 200
+      message: OK
 - request:
     body: null
     headers:
-      Content-Type: [application/json]
-      Cookie: [__cfduid=d976b075eb0db30bd15913a9f335e5deb1481977468]
-      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: ['2']
+      Content-Type:
+      - application/json
+      Cookie:
+      - __cfduid=d976b075eb0db30bd15913a9f335e5deb1481977468
+      trakt-api-key:
+      - 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af
+      trakt-api-version:
+      - '2'
     method: GET
     uri: https://api.trakt.tv/shows/4063?extended=full
   response:
-    body: {string: '{"title":"The X-Files","year":1993,"ids":{"trakt":4063,"slug":"the-x-files","tvdb":77398,"imdb":"tt0106179","tmdb":4087,"tvrage":6312},"overview":"The
+    body:
+      string: '{"title":"The X-Files","year":1993,"ids":{"trakt":4063,"slug":"the-x-files","tvdb":77398,"imdb":"tt0106179","tmdb":4087,"tvrage":6312},"overview":"The
         X-Files focused on the exploits of FBI Agents Fox Mulder, Dana Scully, John
         Doggett and Monica Reyes and their investigations into the paranormal. From
         genetic mutants and killer insects to a global conspiracy concerning the colonization
@@ -141,23 +172,41 @@ interactions:
         frightening series created by Chris Carter has been one of the world''s most
         popular sci-fi/drama shows since its humble beginnings in 1993.","first_aired":"1993-09-11T00:00:00.000Z","airs":{"day":"Monday","time":"20:00","timezone":"America/New_York"},"runtime":45,"certification":"TV-14","network":"FOX
         (US)","country":"us","trailer":"http://youtube.com/watch?v=rsBX-8vWgCc","homepage":"http://www.fox.com/the-x-files","status":"returning
-        series","rating":8.78467,"votes":6706,"updated_at":"2016-12-16T11:06:43.000Z","language":"en","available_translations":["ar","bg","bs","cs","da","de","el","en","es","fi","fr","he","hu","it","ja","ko","nl","pl","pt","ro","ru","sv","tr","uk","zh"],"genres":["drama","mystery","science-fiction","fantasy"],"aired_episodes":208}'}
+        series","rating":8.78467,"votes":6706,"updated_at":"2016-12-16T11:06:43.000Z","language":"en","available_translations":["ar","bg","bs","cs","da","de","el","en","es","fi","fr","he","hu","it","ja","ko","nl","pl","pt","ro","ru","sv","tr","uk","zh"],"genres":["drama","mystery","science-fiction","fantasy"],"aired_episodes":208}'
     headers:
-      CF-Cache-Status: [HIT]
-      CF-RAY: [312a5a29cae73d61-CPH]
-      Cache-Control: ['public, max-age=28800']
-      Connection: [keep-alive]
-      Content-Type: [application/json; charset=utf-8]
-      Date: ['Sat, 17 Dec 2016 12:24:28 GMT']
-      ETag: [W/"dc2af9d141fd712fbabcc414809d6812"]
-      Expires: ['Sat, 17 Dec 2016 20:24:28 GMT']
-      Last-Modified: ['Fri, 16 Dec 2016 11:06:43 GMT']
-      Server: [cloudflare-nginx]
-      Vary: [Accept-Encoding]
-      X-Content-Type-Options: [nosniff]
-      X-Frame-Options: [SAMEORIGIN]
-      X-Request-Id: [ba372d22-ee37-48e5-99da-c3d93d6d7bca]
-      X-Runtime: ['0.013177']
-      X-XSS-Protection: [1; mode=block]
-    status: {code: 200, message: OK}
+      CF-Cache-Status:
+      - HIT
+      CF-RAY:
+      - 312a5a29cae73d61-CPH
+      Cache-Control:
+      - public, max-age=28800
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Sat, 17 Dec 2016 12:24:28 GMT
+      ETag:
+      - W/"dc2af9d141fd712fbabcc414809d6812"
+      Expires:
+      - Sat, 17 Dec 2016 20:24:28 GMT
+      Last-Modified:
+      - Fri, 16 Dec 2016 11:06:43 GMT
+      Server:
+      - cloudflare-nginx
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Request-Id:
+      - ba372d22-ee37-48e5-99da-c3d93d6d7bca
+      X-Runtime:
+      - '0.013177'
+      X-XSS-Protection:
+      - 1; mode=block
+    status:
+      code: 200
+      message: OK
 version: 1

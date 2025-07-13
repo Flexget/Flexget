@@ -34,9 +34,9 @@ class UrlRewriteDescargas2020:
         # TODO: This is not used for all requests even ..
         if self._session is None:
             self._session = Session()
-            self._session.headers.update(
-                {'User-Agent': 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'}
-            )
+            self._session.headers.update({
+                'User-Agent': 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
+            })
             self._session.add_domain_limiter(TimedLimiter('descargas2020.org', '2 seconds'))
         return self._session
 

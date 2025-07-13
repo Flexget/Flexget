@@ -2,13 +2,17 @@ interactions:
 - request:
     body: null
     headers:
-      Content-Type: [application/json]
-      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: ['2']
+      Content-Type:
+      - application/json
+      trakt-api-key:
+      - 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af
+      trakt-api-version:
+      - '2'
     method: GET
     uri: https://api.trakt.tv/search?type=show&query=game+of+thrones
   response:
-    body: {string: "[{\"type\":\"show\",\"score\":61.086945,\"show\":{\"title\":\"Game
+    body:
+      string: "[{\"type\":\"show\",\"score\":61.086945,\"show\":{\"title\":\"Game
         of Thrones\",\"overview\":\"Seven noble families fight for control of the
         mythical land of Westeros. Friction between the houses leads to full-scale
         war. All while a very ancient evil awakens in the farthest north. Amidst the
@@ -50,75 +54,124 @@ interactions:
         comedy exploring a world filled with knights, elves, wizards and dwarfs.If
         you enjoy league of legends, game of thrones, world of warcraft, cosplay,
         or just a good laugh check out this animated comedy.\",\"year\":null,\"status\":\"returning
-        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":76745,\"slug\":\"doraleous-and-associates-the-series\",\"tvdb\":262387,\"imdb\":\"tt2292210\",\"tmdb\":null,\"tvrage\":null}}}]"}
+        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":76745,\"slug\":\"doraleous-and-associates-the-series\",\"tvdb\":262387,\"imdb\":\"tt2292210\",\"tmdb\":null,\"tvrage\":null}}}]"
     headers:
-      CF-Cache-Status: [MISS]
-      CF-RAY: [312a5a5ad9ad3d61-CPH]
-      Cache-Control: ['public, max-age=28800']
-      Connection: [keep-alive]
-      Content-Type: [application/json; charset=utf-8]
-      Date: ['Sat, 17 Dec 2016 12:24:36 GMT']
-      ETag: [W/"5b8a8b2814e674c85a743335f7d9fb6c"]
-      Expires: ['Sat, 17 Dec 2016 20:24:36 GMT']
-      Server: [cloudflare-nginx]
-      Set-Cookie: ['__cfduid=dd60dcbe9882e683957ac3cb62a2891491481977476; expires=Sun,
-          17-Dec-17 12:24:36 GMT; path=/; domain=.trakt.tv; HttpOnly']
-      Vary: [Accept-Encoding]
-      X-Content-Type-Options: [nosniff]
-      X-Frame-Options: [SAMEORIGIN]
-      X-Pagination-Item-Count: ['15']
-      X-Pagination-Limit: ['10']
-      X-Pagination-Page: ['1']
-      X-Pagination-Page-Count: ['2']
-      X-Request-Id: [d57f8b9b-008e-42d9-b945-355ad6eed936]
-      X-Runtime: ['0.030864']
-      X-XSS-Protection: [1; mode=block]
-    status: {code: 200, message: OK}
+      CF-Cache-Status:
+      - MISS
+      CF-RAY:
+      - 312a5a5ad9ad3d61-CPH
+      Cache-Control:
+      - public, max-age=28800
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Sat, 17 Dec 2016 12:24:36 GMT
+      ETag:
+      - W/"5b8a8b2814e674c85a743335f7d9fb6c"
+      Expires:
+      - Sat, 17 Dec 2016 20:24:36 GMT
+      Server:
+      - cloudflare-nginx
+      Set-Cookie:
+      - __cfduid=dd60dcbe9882e683957ac3cb62a2891491481977476; expires=Sun, 17-Dec-17
+        12:24:36 GMT; path=/; domain=.trakt.tv; HttpOnly
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Pagination-Item-Count:
+      - '15'
+      X-Pagination-Limit:
+      - '10'
+      X-Pagination-Page:
+      - '1'
+      X-Pagination-Page-Count:
+      - '2'
+      X-Request-Id:
+      - d57f8b9b-008e-42d9-b945-355ad6eed936
+      X-Runtime:
+      - '0.030864'
+      X-XSS-Protection:
+      - 1; mode=block
+    status:
+      code: 200
+      message: OK
 - request:
     body: null
     headers:
-      Content-Type: [application/json]
-      Cookie: [__cfduid=dd60dcbe9882e683957ac3cb62a2891491481977476]
-      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: ['2']
+      Content-Type:
+      - application/json
+      Cookie:
+      - __cfduid=dd60dcbe9882e683957ac3cb62a2891491481977476
+      trakt-api-key:
+      - 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af
+      trakt-api-version:
+      - '2'
     method: GET
     uri: https://api.trakt.tv/shows/1390?extended=full
   response:
-    body: {string: '{"title":"Game of Thrones","year":2011,"ids":{"trakt":1390,"slug":"game-of-thrones","tvdb":121361,"imdb":"tt0944947","tmdb":1399,"tvrage":24493},"overview":"Seven
+    body:
+      string: '{"title":"Game of Thrones","year":2011,"ids":{"trakt":1390,"slug":"game-of-thrones","tvdb":121361,"imdb":"tt0944947","tmdb":1399,"tvrage":24493},"overview":"Seven
         noble families fight for control of the mythical land of Westeros. Friction
         between the houses leads to full-scale war. All while a very ancient evil
         awakens in the farthest north. Amidst the war, a neglected military order
         of misfits, the Night''s Watch, is all that stands between the realms of men
         and the icy horrors beyond.","first_aired":"2011-04-18T01:00:00.000Z","airs":{"day":"Sunday","time":"21:00","timezone":"America/New_York"},"runtime":60,"certification":"TV-MA","network":"HBO","country":"us","trailer":"http://youtube.com/watch?v=BpJYNVhGf1s","homepage":"http://www.hbo.com/game-of-thrones","status":"returning
-        series","rating":9.38255,"votes":52432,"updated_at":"2016-12-14T09:11:41.000Z","language":"en","available_translations":["ar","bg","bs","cs","da","de","el","en","es","fa","fi","fr","he","hr","hu","id","is","it","ko","lb","lt","nl","pl","pt","ro","ru","sk","sr","sv","th","tr","tw","uk","vi","zh"],"genres":["drama","fantasy","science-fiction","action","adventure"],"aired_episodes":60}'}
+        series","rating":9.38255,"votes":52432,"updated_at":"2016-12-14T09:11:41.000Z","language":"en","available_translations":["ar","bg","bs","cs","da","de","el","en","es","fa","fi","fr","he","hr","hu","id","is","it","ko","lb","lt","nl","pl","pt","ro","ru","sk","sr","sv","th","tr","tw","uk","vi","zh"],"genres":["drama","fantasy","science-fiction","action","adventure"],"aired_episodes":60}'
     headers:
-      CF-Cache-Status: [HIT]
-      CF-RAY: [312a5a5dda103d61-CPH]
-      Cache-Control: ['public, max-age=28800']
-      Connection: [keep-alive]
-      Content-Type: [application/json; charset=utf-8]
-      Date: ['Sat, 17 Dec 2016 12:24:36 GMT']
-      ETag: [W/"0396c32f537579c5fe626e8b2dc87fb7"]
-      Expires: ['Sat, 17 Dec 2016 20:24:36 GMT']
-      Last-Modified: ['Wed, 14 Dec 2016 09:11:41 GMT']
-      Server: [cloudflare-nginx]
-      Vary: [Accept-Encoding]
-      X-Content-Type-Options: [nosniff]
-      X-Frame-Options: [SAMEORIGIN]
-      X-Request-Id: [9ba8d72d-d897-45bb-a25d-2ff09300ed22]
-      X-Runtime: ['0.017110']
-      X-XSS-Protection: [1; mode=block]
-    status: {code: 200, message: OK}
+      CF-Cache-Status:
+      - HIT
+      CF-RAY:
+      - 312a5a5dda103d61-CPH
+      Cache-Control:
+      - public, max-age=28800
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Sat, 17 Dec 2016 12:24:36 GMT
+      ETag:
+      - W/"0396c32f537579c5fe626e8b2dc87fb7"
+      Expires:
+      - Sat, 17 Dec 2016 20:24:36 GMT
+      Last-Modified:
+      - Wed, 14 Dec 2016 09:11:41 GMT
+      Server:
+      - cloudflare-nginx
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Request-Id:
+      - 9ba8d72d-d897-45bb-a25d-2ff09300ed22
+      X-Runtime:
+      - '0.017110'
+      X-XSS-Protection:
+      - 1; mode=block
+    status:
+      code: 200
+      message: OK
 - request:
     body: null
     headers:
-      Content-Type: [application/json]
-      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: ['2']
+      Content-Type:
+      - application/json
+      trakt-api-key:
+      - 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af
+      trakt-api-version:
+      - '2'
     method: GET
     uri: https://api.trakt.tv/shows/1390/translations?extended=full
   response:
-    body: {string: "[{\"title\":\"\u0635\u0631\u0627\u0639 \u0627\u0644\u0639\u0631\u0648\u0634\",\"overview\":\"\u0635\u0631\u0627\u0639
+    body:
+      string: "[{\"title\":\"\u0635\u0631\u0627\u0639 \u0627\u0644\u0639\u0631\u0648\u0634\",\"overview\":\"\u0635\u0631\u0627\u0639
         \u0627\u0644\u0639\u0631\u0648\u0634 \u0645\u0628\u0646\u064A\u0651 \u0639\u0644\u0649
         \u0633\u0644\u0633\u0644\u0629 \u0631\u0648\u0627\u064A\u0627\u062A \u0623\u063A\u0646\u064A\u0629
         \u0645\u0646 \u062B\u0644\u062C \u0648\u0646\u0627\u0631\u0648\u064A\u062A\u0628\u0639
@@ -543,24 +596,42 @@ interactions:
         \u0443\u0447\u0430\u0441\u043D\u0438\u043A\u0430 \u0446\u0456\u0454\u0457
         \u0433\u0440\u0438 \u043E\u0447\u0456\u043A\u0443\u0454 \u0430\u0431\u043E
         \u043F\u0435\u0440\u0435\u043C\u043E\u0433\u0430, \u0430\u0431\u043E \u0441\u043C\u0435\u0440\u0442\u044C.\",\"language\":\"uk\"},{\"title\":\"Game
-        of Thrones\",\"overview\":\"\",\"language\":\"vi\"},{\"title\":\"\u51B0\u4E0E\u706B\u4E4B\u6B4C\uFF1A\u6743\u529B\u7684\u6E38\u620F\",\"overview\":\"\u6545\u4E8B\u80CC\u666F\u662F\u4E00\u4E2A\u865A\u6784\u7684\u4E16\u754C\uFF0C\u4E3B\u8981\u5206\u4E3A\u4E24\u7247\u5927\u9646\uFF0C\u4F4D\u4E8E\u897F\u9762\u7684\u662F\u201C\u65E5\u843D\u56FD\u5EA6\u201D\u7EF4\u65AF\u7279\u6D1B\uFF08Westeros\uFF09\uFF0C\u9762\u79EF\u7EA6\u7B49\u4E8E\u5357\u7F8E\u6D32\u3002\u4F4D\u4E8E\u4E1C\u9762\u7684\u662F\u4E00\u5757\u9762\u79EF\u3001\u5F62\u72B6\u8FD1\u4F3C\u4E8E\u4E9A\u6B27\u5927\u9646\u7684\u9646\u5730\u3002\u6545\u4E8B\u7684\u4E3B\u7EBF\u4FBF\u53D1\u751F\u5728\u7EF4\u65AF\u7279\u6D1B\u5927\u9646\u4E0A\u3002\u4ECE\u56FD\u738B\u52B3\u52C3\xB7\u62DC\u62C9\u5E2D\u6069\u524D\u5F80\u6B64\u5730\u62DC\u8BBF\u4ED6\u7684\u597D\u53CB\u4E34\u51AC\u57CE\u4E3B\u3001\u5317\u5883\u5B88\u62A4\u827E\u5FB7\xB7\u53F2\u5854\u514B\u5F00\u59CB\uFF0C\u6E10\u6E10\u5C55\u793A\u4E86\u8FD9\u7247\u56FD\u5EA6\u7684\u5168\u8C8C\u3002\u5355\u7EAF\u7684\u56FD\u738B\uFF0C\u803F\u76F4\u7684\u9996\u76F8\uFF0C\u5404\u6000\u5FC3\u601D\u7684\u5927\u81E3\uFF0C\u62E5\u5175\u81EA\u91CD\u7684\u56DB\u65B9\u8BF8\u4FAF\uFF0C\u5168\u56FD\u4EC5\u9760\u7740\u4E00\u6839\u7EC6\u5F26\u7EF4\u7CFB\u7740\u8868\u9762\u7684\u548C\u5E73\uFF0C\u800C\u5F53\u5F26\u65AD\u4E4B\u65F6\uFF0C\u56FD\u5BB6\u518D\u5EA6\u9677\u5165\u65E0\u5C3D\u7684\u6218\u4E71\u4E4B\u4E2D\u3002\u800C\u66F4\u8BA9\u4EBA\u60CA\u609A\u7684\u3001\u90A3\u4E9B\u8FDC\u53E4\u7684\u4F20\u8BF4\u548C\u65E9\u5DF2\u706D\u7EDD\u7684\u751F\u7269\uFF0C\u6B63\u91CD\u65B0\u56DE\u5230\u8FD9\u7247\u571F\u5730\u3002\",\"language\":\"zh\"}]"}
+        of Thrones\",\"overview\":\"\",\"language\":\"vi\"},{\"title\":\"\u51B0\u4E0E\u706B\u4E4B\u6B4C\uFF1A\u6743\u529B\u7684\u6E38\u620F\",\"overview\":\"\u6545\u4E8B\u80CC\u666F\u662F\u4E00\u4E2A\u865A\u6784\u7684\u4E16\u754C\uFF0C\u4E3B\u8981\u5206\u4E3A\u4E24\u7247\u5927\u9646\uFF0C\u4F4D\u4E8E\u897F\u9762\u7684\u662F\u201C\u65E5\u843D\u56FD\u5EA6\u201D\u7EF4\u65AF\u7279\u6D1B\uFF08Westeros\uFF09\uFF0C\u9762\u79EF\u7EA6\u7B49\u4E8E\u5357\u7F8E\u6D32\u3002\u4F4D\u4E8E\u4E1C\u9762\u7684\u662F\u4E00\u5757\u9762\u79EF\u3001\u5F62\u72B6\u8FD1\u4F3C\u4E8E\u4E9A\u6B27\u5927\u9646\u7684\u9646\u5730\u3002\u6545\u4E8B\u7684\u4E3B\u7EBF\u4FBF\u53D1\u751F\u5728\u7EF4\u65AF\u7279\u6D1B\u5927\u9646\u4E0A\u3002\u4ECE\u56FD\u738B\u52B3\u52C3\xB7\u62DC\u62C9\u5E2D\u6069\u524D\u5F80\u6B64\u5730\u62DC\u8BBF\u4ED6\u7684\u597D\u53CB\u4E34\u51AC\u57CE\u4E3B\u3001\u5317\u5883\u5B88\u62A4\u827E\u5FB7\xB7\u53F2\u5854\u514B\u5F00\u59CB\uFF0C\u6E10\u6E10\u5C55\u793A\u4E86\u8FD9\u7247\u56FD\u5EA6\u7684\u5168\u8C8C\u3002\u5355\u7EAF\u7684\u56FD\u738B\uFF0C\u803F\u76F4\u7684\u9996\u76F8\uFF0C\u5404\u6000\u5FC3\u601D\u7684\u5927\u81E3\uFF0C\u62E5\u5175\u81EA\u91CD\u7684\u56DB\u65B9\u8BF8\u4FAF\uFF0C\u5168\u56FD\u4EC5\u9760\u7740\u4E00\u6839\u7EC6\u5F26\u7EF4\u7CFB\u7740\u8868\u9762\u7684\u548C\u5E73\uFF0C\u800C\u5F53\u5F26\u65AD\u4E4B\u65F6\uFF0C\u56FD\u5BB6\u518D\u5EA6\u9677\u5165\u65E0\u5C3D\u7684\u6218\u4E71\u4E4B\u4E2D\u3002\u800C\u66F4\u8BA9\u4EBA\u60CA\u609A\u7684\u3001\u90A3\u4E9B\u8FDC\u53E4\u7684\u4F20\u8BF4\u548C\u65E9\u5DF2\u706D\u7EDD\u7684\u751F\u7269\uFF0C\u6B63\u91CD\u65B0\u56DE\u5230\u8FD9\u7247\u571F\u5730\u3002\",\"language\":\"zh\"}]"
     headers:
-      CF-Cache-Status: [HIT]
-      CF-RAY: [312a5a5e5c273d4f-CPH]
-      Cache-Control: ['public, max-age=28800']
-      Connection: [keep-alive]
-      Content-Type: [application/json; charset=utf-8]
-      Date: ['Sat, 17 Dec 2016 12:24:36 GMT']
-      ETag: [W/"d4df5c48f209fac29e6c996c9b091481"]
-      Expires: ['Sat, 17 Dec 2016 20:24:36 GMT']
-      Server: [cloudflare-nginx]
-      Set-Cookie: ['__cfduid=d71c1defffed040836e5deba044f690441481977476; expires=Sun,
-          17-Dec-17 12:24:36 GMT; path=/; domain=.trakt.tv; HttpOnly']
-      Vary: [Accept-Encoding]
-      X-Content-Type-Options: [nosniff]
-      X-Frame-Options: [SAMEORIGIN]
-      X-Request-Id: [a009b718-3dbc-479e-b591-cfc7164892fa]
-      X-Runtime: ['0.028599']
-      X-XSS-Protection: [1; mode=block]
-    status: {code: 200, message: OK}
+      CF-Cache-Status:
+      - HIT
+      CF-RAY:
+      - 312a5a5e5c273d4f-CPH
+      Cache-Control:
+      - public, max-age=28800
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Sat, 17 Dec 2016 12:24:36 GMT
+      ETag:
+      - W/"d4df5c48f209fac29e6c996c9b091481"
+      Expires:
+      - Sat, 17 Dec 2016 20:24:36 GMT
+      Server:
+      - cloudflare-nginx
+      Set-Cookie:
+      - __cfduid=d71c1defffed040836e5deba044f690441481977476; expires=Sun, 17-Dec-17
+        12:24:36 GMT; path=/; domain=.trakt.tv; HttpOnly
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Request-Id:
+      - a009b718-3dbc-479e-b591-cfc7164892fa
+      X-Runtime:
+      - '0.028599'
+      X-XSS-Protection:
+      - 1; mode=block
+    status:
+      code: 200
+      message: OK
 version: 1

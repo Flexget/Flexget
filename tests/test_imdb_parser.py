@@ -30,9 +30,11 @@ class TestImdbParser:
         }, 'Actors not parsed correctly'
         assert parser.directors == {'nm0001741': 'Bryan Singer'}, 'Directors not parsed correctly'
         print(parser.genres)
-        assert len(set(parser.genres).intersection(['crime', 'drama', 'mystery'])) == len(
-            ['crime', 'drama', 'mystery']
-        ), 'Genres not parsed correctly'
+        assert len(set(parser.genres).intersection(['crime', 'drama', 'mystery'])) == len([
+            'crime',
+            'drama',
+            'mystery',
+        ]), 'Genres not parsed correctly'
         assert parser.imdb_id == 'tt0114814', 'ID not parsed correctly'
         assert (
             len(set(parser.languages).intersection(['english', 'hungarian', 'spanish', 'french']))

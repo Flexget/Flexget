@@ -85,14 +85,12 @@ class TestSonarrListActions:
     """
 
     def test_sonarr_list_tags(self, execute_task, manager):
-        sonarr = SonarrSet(
-            {
-                'api_key': SONARR_API_KEY,
-                'base_url': SONARR_BASE_URL,
-                'port': SONARRR_PORT,
-                'base_path': '',
-            }
-        )
+        sonarr = SonarrSet({
+            'api_key': SONARR_API_KEY,
+            'base_url': SONARR_BASE_URL,
+            'port': SONARRR_PORT,
+            'base_path': '',
+        })
         tag_by_id = sonarr._sonarr_request('tag', method='post', data={'label': 'tag_by_id'})['id']
         manager.config['tasks']['clear_and_add_to_sonarr_with_tags']['list_add'][0]['sonarr_list'][
             'tags'
@@ -101,9 +99,11 @@ class TestSonarrListActions:
         execute_task('clear_and_add_to_sonarr_with_tags')
         tags = {t['label'].lower(): t['id'] for t in sonarr._sonarr_request('tag')}
         for show in sonarr._sonarr_request('series'):
-            assert sorted(show['tags']) == sorted(
-                [tag_by_id, tags.get('tv'), tags.get('othertag')]
-            )
+            assert sorted(show['tags']) == sorted([
+                tag_by_id,
+                tags.get('tv'),
+                tags.get('othertag'),
+            ])
 
     # TODO: each action should be own test case
     def test_sonarr_list_actions(self, execute_task):

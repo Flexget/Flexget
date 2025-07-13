@@ -29,12 +29,10 @@ class EmbyRefreshLibrary:
         'type': 'object',
         'properties': {
             **SCHEMA_SERVER_TAG,
-            'when': one_or_more(
-                {
-                    'type': 'string',
-                    'enum': ['accepted', 'rejected', 'failed', 'no_entries', 'aborted', 'always'],
-                }
-            ),
+            'when': one_or_more({
+                'type': 'string',
+                'enum': ['accepted', 'rejected', 'failed', 'no_entries', 'aborted', 'always'],
+            }),
         },
         'required': ['server'],
         'additionalProperties': False,

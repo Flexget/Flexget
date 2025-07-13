@@ -960,16 +960,14 @@ class TraktShowIds:
         }
 
     def __bool__(self):
-        return any(
-            [
-                self.trakt_id,
-                self.trakt_slug,
-                self.tmdb_id,
-                self.imdb_id,
-                self.tvdb_id,
-                self.tvrage_id,
-            ]
-        )
+        return any([
+            self.trakt_id,
+            self.trakt_slug,
+            self.tmdb_id,
+            self.imdb_id,
+            self.tvdb_id,
+            self.tvrage_id,
+        ])
 
 
 def get_item_from_cache(table, session, title=None, year=None, trakt_ids=None):

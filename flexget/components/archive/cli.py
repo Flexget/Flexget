@@ -109,14 +109,12 @@ def tag_source(source_name, tag_names=None):
         )
         if not source:
             logger.critical('Source `{}` does not exists', source_name)
-            srcs = ', '.join(
-                [
-                    s.name
-                    for s in session.query(flexget.components.archive.db.ArchiveSource).order_by(
-                        flexget.components.archive.db.ArchiveSource.name
-                    )
-                ]
-            )
+            srcs = ', '.join([
+                s.name
+                for s in session.query(flexget.components.archive.db.ArchiveSource).order_by(
+                    flexget.components.archive.db.ArchiveSource.name
+                )
+            ])
             if srcs:
                 logger.info('Known sources: {}', srcs)
             return

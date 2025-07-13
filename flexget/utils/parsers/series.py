@@ -40,55 +40,45 @@ class SeriesParser(TitleParser):
     ]
 
     # Make sure none of these are found embedded within a word or other numbers
-    ep_regexps = ReList(
-        [
-            TitleParser.re_not_in_word(regexp)
-            for regexp in [
-                rf'(?:series|season|s)\s?(\d{{1,4}})(?:\s(?:.*\s)?)?(?:episode|ep|e|part|pt)\s?(\d{{1,3}}|{roman_numeral_re})(?:\s?e?(\d{{1,2}}))?',
-                r'(?:series|season)\s?(\d{1,4})\s(\d{1,3})\s?of\s?(?:\d{1,3})',
-                r'(\d{1,2})\s?x\s?(\d+)(?:\s(\d{1,2}))?',
-                r'(\d{1,3})\s?of\s?(?:\d{1,3})',
-                rf'(?:episode|e|ep|part|pt)\s?(\d{{1,3}}|{roman_numeral_re})',
-                r'part\s({})'.format('|'.join(map(str, english_numbers))),
-            ]
+    ep_regexps = ReList([
+        TitleParser.re_not_in_word(regexp)
+        for regexp in [
+            rf'(?:series|season|s)\s?(\d{{1,4}})(?:\s(?:.*\s)?)?(?:episode|ep|e|part|pt)\s?(\d{{1,3}}|{roman_numeral_re})(?:\s?e?(\d{{1,2}}))?',
+            r'(?:series|season)\s?(\d{1,4})\s(\d{1,3})\s?of\s?(?:\d{1,3})',
+            r'(\d{1,2})\s?x\s?(\d+)(?:\s(\d{1,2}))?',
+            r'(\d{1,3})\s?of\s?(?:\d{1,3})',
+            rf'(?:episode|e|ep|part|pt)\s?(\d{{1,3}}|{roman_numeral_re})',
+            r'part\s({})'.format('|'.join(map(str, english_numbers))),
         ]
-    )
-    season_pack_regexps = ReList(
-        [
-            # S01 or Season 1 but not Season 1 Episode|Part 2
-            rf'(?:season\s?|s)(\d{{1,}}\b)(?!(?:(?:.*?\s)?(?:episode|e|ep|part|pt)\s?(?:\d{{1,3}}|{roman_numeral_re})|(?:\d{{1,3}})\s?of\s?(?:\d{{1,3}})))',
-            r'(\d{1,3})\s?x\s?all',  # 1xAll
-        ]
-    )
-    unwanted_regexps = ReList(
-        [
-            r'(\d{1,3})\s?x\s?(0+)[^1-9]',  # 5x0
-            r'S(\d{1,3})D(\d{1,3})',  # S3D1
-            r'(?:s|series|\b)\s?\d\s?(?:&\s?\d)?[\s-]*(?:complete|full)',
-            r'disc\s\d',
-        ]
-    )
+    ])
+    season_pack_regexps = ReList([
+        # S01 or Season 1 but not Season 1 Episode|Part 2
+        rf'(?:season\s?|s)(\d{{1,}}\b)(?!(?:(?:.*?\s)?(?:episode|e|ep|part|pt)\s?(?:\d{{1,3}}|{roman_numeral_re})|(?:\d{{1,3}})\s?of\s?(?:\d{{1,3}})))',
+        r'(\d{1,3})\s?x\s?all',  # 1xAll
+    ])
+    unwanted_regexps = ReList([
+        r'(\d{1,3})\s?x\s?(0+)[^1-9]',  # 5x0
+        r'S(\d{1,3})D(\d{1,3})',  # S3D1
+        r'(?:s|series|\b)\s?\d\s?(?:&\s?\d)?[\s-]*(?:complete|full)',
+        r'disc\s\d',
+    ])
     # Make sure none of these are found embedded within a word or other numbers
-    date_regexps = ReList(
-        [
-            TitleParser.re_not_in_word(regexp)
-            for regexp in [
-                rf'(\d{{2,4}}){separators}(\d{{1,2}}){separators}(\d{{1,2}})',
-                rf'(\d{{1,2}}){separators}(\d{{1,2}}){separators}(\d{{2,4}})',
-                rf'(\d{{4}})x(\d{{1,2}}){separators}(\d{{1,2}})',
-                rf'(\d{{1,2}})(?:st|nd|rd|th)?{separators}([a-z]{{3,10}}){separators}(\d{{4}})',
-            ]
+    date_regexps = ReList([
+        TitleParser.re_not_in_word(regexp)
+        for regexp in [
+            rf'(\d{{2,4}}){separators}(\d{{1,2}}){separators}(\d{{1,2}})',
+            rf'(\d{{1,2}}){separators}(\d{{1,2}}){separators}(\d{{2,4}})',
+            rf'(\d{{4}})x(\d{{1,2}}){separators}(\d{{1,2}})',
+            rf'(\d{{1,2}})(?:st|nd|rd|th)?{separators}([a-z]{{3,10}}){separators}(\d{{4}})',
         ]
-    )
-    sequence_regexps = ReList(
-        [
-            TitleParser.re_not_in_word(regexp)
-            for regexp in [
-                r'(\d{1,3})(?:v(?P<version>\d))?',
-                rf'(?:pt|part)\s?(\d+|{roman_numeral_re})',
-            ]
+    ])
+    sequence_regexps = ReList([
+        TitleParser.re_not_in_word(regexp)
+        for regexp in [
+            r'(\d{1,3})(?:v(?P<version>\d))?',
+            rf'(?:pt|part)\s?(\d+|{roman_numeral_re})',
         ]
-    )
+    ])
     unwanted_sequence_regexps = ReList([r'seasons?\s?\d{1,2}'])
     id_regexps = ReList([])
     clean_regexps = ReList([r'\[.*?\]', r'\(.*?\)'])

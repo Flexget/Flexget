@@ -51,13 +51,11 @@ SITE_URLS = [
     'https://www.lostfilm.tv/',
 ]
 
-SIMPLIFY_MAP = str.maketrans(
-    {
-        '&': ' and ',
-        "'": None,
-        '\\': None,
-    }
-)
+SIMPLIFY_MAP = str.maketrans({
+    '&': ' and ',
+    "'": None,
+    '\\': None,
+})
 SIMPLIFY_MAP.update(dict.fromkeys([ord(ch) for ch in '_./-,[](){}:;!?@#%^*+<>=~`$'], ' '))
 
 

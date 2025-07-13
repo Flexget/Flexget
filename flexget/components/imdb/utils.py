@@ -15,16 +15,16 @@ logger = logger.bind(name='imdb.utils')
 
 requests = Session()
 # Declare browser user agent to avoid being classified as a bot and getting a 403
-requests.headers.update(
-    {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0'}
-)
+requests.headers.update({
+    'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0'
+})
 # requests.headers.update({'User-Agent': random.choice(USERAGENTS)})
 
 # this makes most of the titles to be returned in english translation, but not all of them
 requests.headers.update({'Accept-Language': 'en-US,en;q=0.8'})
-requests.headers.update(
-    {'X-Forwarded-For': f'24.110.{random.randint(0, 254)}.{random.randint(0, 254)}'}
-)
+requests.headers.update({
+    'X-Forwarded-For': f'24.110.{random.randint(0, 254)}.{random.randint(0, 254)}'
+})
 
 # give imdb a little break between requests
 requests.add_domain_limiter(TimedLimiter('imdb.com', '3 seconds'))

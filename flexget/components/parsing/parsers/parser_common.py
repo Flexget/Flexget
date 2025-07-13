@@ -1,6 +1,8 @@
+from __future__ import annotations
+
 import re
 from string import capwords
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING
 
 from loguru import logger
 
@@ -52,20 +54,20 @@ def normalize_name(name: str) -> str:
 class MovieParseResult:
     def __init__(
         self,
-        data: Optional[str] = None,
-        name: Optional[str] = None,
-        year: Optional[int] = None,
+        data: str | None = None,
+        name: str | None = None,
+        year: int | None = None,
         quality: Quality = None,
         proper_count: int = 0,
-        release_group: Optional[str] = None,
+        release_group: str | None = None,
         valid: bool = True,
     ) -> None:
         self.name: str = name
         self.data: str = data
-        self.year: Optional[int] = year
+        self.year: int | None = year
         self.quality: Quality = quality if quality is not None else Quality()
         self.proper_count: int = proper_count
-        self.release_group: Optional[str] = release_group
+        self.release_group: str | None = release_group
         self.valid: bool = valid
 
     @property
@@ -103,18 +105,18 @@ class MovieParseResult:
 class SeriesParseResult:
     def __init__(
         self,
-        data: Optional[str] = None,
-        name: Optional[str] = None,
-        identified_by: Optional[str] = None,
-        id_type: Optional[str] = None,
-        id: Optional[Union[tuple[int, int], str, int, 'datetime.date']] = None,
+        data: str | None = None,
+        name: str | None = None,
+        identified_by: str | None = None,
+        id_type: str | None = None,
+        id: tuple[int, int] | str | int | datetime.date | None = None,
         episodes: int = 1,
         season_pack: bool = False,
         strict_name: bool = False,
         quality: Quality = None,
         proper_count: int = 0,
         special: bool = False,
-        group: Optional[str] = None,
+        group: str | None = None,
         valid: bool = True,
     ) -> None:
         self.name: str = name
@@ -122,12 +124,12 @@ class SeriesParseResult:
         self.episodes: int = episodes
         self.season_pack: bool = season_pack
         self.identified_by: str = identified_by
-        self.id: Union[tuple[int, int], str, int, datetime.date] = id
+        self.id: tuple[int, int] | str | int | datetime.date = id
         self.id_type: str = id_type
         self.quality: Quality = quality if quality is not None else Quality()
         self.proper_count: int = proper_count
         self.special: bool = special
-        self.group: Optional[str] = group
+        self.group: str | None = group
         self.valid: bool = valid
         self.strict_name: bool = strict_name
 
@@ -136,18 +138,19 @@ class SeriesParseResult:
         return self.proper_count > 0
 
     @property
-    def season(self) -> Optional[int]:
-        # TODO: Use match-case statement after Python 3.9 is dropped
-        if self.id_type == 'ep':
-            return self.id[0]
-        if self.id_type == 'date':
-            return self.id.year
-        if self.id_type == 'sequence':
-            return 0
-        return None
+    def season(self) -> int | None:
+        match self.id_type:
+            case 'ep':
+                return self.id[0]
+            case 'date':
+                return self.id.year
+            case 'sequence':
+                return 0
+            case _:
+                return None
 
     @property
-    def episode(self) -> Optional[int]:
+    def episode(self) -> int | None:
         if self.id_type == 'ep':
             return self.id[1]
         if self.id_type == 'sequence':

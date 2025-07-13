@@ -71,9 +71,10 @@ class FilterRegexp:
                                         'properties': {
                                             'path': {'type': 'string', 'format': 'path'},
                                             'set': {'type': 'object'},
-                                            'not': one_or_more(
-                                                {'type': 'string', 'format': 'regex'}
-                                            ),
+                                            'not': one_or_more({
+                                                'type': 'string',
+                                                'format': 'regex',
+                                            }),
                                             'from': one_or_more({'type': 'string'}),
                                         },
                                         'additionalProperties': False,

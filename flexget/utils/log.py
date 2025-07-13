@@ -1,8 +1,10 @@
 """Logging utilities."""
 
+from __future__ import annotations
+
 import hashlib
 from datetime import datetime, timedelta
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from loguru import logger
 from sqlalchemy import Column, DateTime, Index, Integer, String
@@ -24,7 +26,7 @@ else:
 
 
 @db_schema.upgrade('log_once')
-def upgrade(ver: Optional[int], session: 'Session'):
+def upgrade(ver: int | None, session: Session):
     if ver is None:
         logger.info('Adding index to md5sum column of log_once table.')
         table = table_schema('log_once', session)
@@ -50,7 +52,7 @@ class LogMessage(Base):
 
 
 @event('manager.db_cleanup')
-def purge(manager, session: 'Session') -> None:
+def purge(manager, session: Session) -> None:
     """Purge old messages from database."""
     old = datetime.now() - timedelta(days=365)
 
@@ -62,11 +64,11 @@ def purge(manager, session: 'Session') -> None:
 @with_session
 def log_once(
     message: str,
-    logger: Optional['loguru.Logger'] = None,
+    logger: loguru.Logger | None = None,
     once_level: str = 'INFO',
     suppressed_level: str = 'VERBOSE',
-    session: 'Session' = None,
-) -> Optional[bool]:
+    session: Session = None,
+) -> bool | None:
     """Log message only once using given logger`.
 
     Return False if suppressed logging.

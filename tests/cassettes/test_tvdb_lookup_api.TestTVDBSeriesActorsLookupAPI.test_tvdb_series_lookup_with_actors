@@ -18,15 +18,7 @@ interactions:
     uri: https://api.thetvdb.com/login
   response:
     body:
-      string: !!binary |
-        H4sIAAAAAAAAAwTByZKiMAAA0Ht/heXdrjDgQt8QWSLNIpHNCwUSMWETQQiZmn+f9/5+rVbrsatw
-        u/5ZrfFyfubGnbjkjAIOBYfAAbb+9q7CHaxecaie5W+8nGtsKsSlGnB4wJxruThUGWBTV5B2xG9Y
-        jbWiLlQ4wEZesqh4ZJEOIO2Yc7oL9unO3FMyPy7f/XOOlSsleFvK+1ndvQ+WUYynyI7jPEQatf5k
-        s/1E6q7hs5w6aj0qeYh+I1QQj9sZaNTDVJp8I0EuzhybY1RfBTvHWlLv0oaV+ttbNu/UbY3EOORC
-        c/RniW7ACF59hYN+e/Nj2ydBCZgwyHibiUnz4NN4W9J+6bRXaUjcSS5ZT5AuchfZIXbopKQqB+Ju
-        +QjPV2a7S5OwdA8x6qTSIsJxaPrpM0X7+Fz60d7sJATa32OKiJnUe6ag+228tUo7wZOqFSH1N8PV
-        GnjtuKBVrFmcG3rRlQpMqTd7vu+wo1SQQL9mslEg/zXGwKw9oTgKbzP83KiW25XAAkvrxPSTMNUg
-        ern++vcfAAD//wMAFd0nLdcBAAA=
+      string: "{\n  \"token\": \"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE0NzUxNTgyNjAsImlkIjoiRmxleEdldCIsIm9yaWdfaWF0IjoxNDc1MDcxODYwfQ.qhwXATjie5g97wC6r8KGdtDWMXXbVSEjK2awMhSC6mzw9_NCltAbVSLWSdiPzMa0mC8vgHz-4Iz3wzeHtWlT1MbeEYl6_mxgFrPy-r_OnGYG8b1mBRw4j-0t0pqkeUq5ZRXMRiUg0x1s9e5a3YmfzvtZy_qyoEpgG4zNYQaqiSF3zOSMVeNjvA_Cz036yu1hpaMOymYx_7IeSo4gKi1BsmqvuvW7XJgRW7Ho4S0nLB_SiHYl7xAScZtZnAnvIDCEdVjR-sTKszlNO0nAKw3wmjQFAk0v_PwPRRNxB4diUFTa9GdSRptX0HlP1dB1rHVuZjEbMk1xUKEo3_uYxCGiFg\"\n}"
     headers:
       cf-ray:
       - 2e97c837bbc126fc-FRA
@@ -69,32 +61,46 @@ interactions:
     uri: https://api.thetvdb.com/search/series?name=The+X-Files
   response:
     body:
-      string: !!binary |
-        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
-        n18AAAD//wMAaGwvS4ELAAA=
+      string: "{\n  \"data\": [\n    {\n      \"aliases\": [\n        \"The X Files\",\n
+        \       \"The X-Files (2016)\",\n        \"The XFiles\"\n      ],\n      \"banner\":
+        \"graphical/61-g.jpg\",\n      \"firstAired\": \"1993-09-10\",\n      \"id\":
+        77398,\n      \"network\": \"FOX (US)\",\n      \"overview\": \"The X-Files
+        focused on the exploits of FBI Agents Fox Mulder, Dana Scully, John Doggett
+        and Monica Reyes and their investigations into the paranormal. From genetic
+        mutants and killer insects to a global conspiracy concerning the colonization
+        of Earth by an alien species, this mind-boggling, humorous and occasionally
+        frightening series created by Chris Carter has been one of the world's most
+        popular sci-fi/drama shows since its humble beginnings in 1993.\",\n      \"seriesName\":
+        \"The X-Files\",\n      \"status\": \"Continuing\"\n    },\n    {\n      \"aliases\":
+        [\n        \"Gichalbirok\",\n        \"Joseon XFiles: Mystery Investigation
+        Record\"\n      ],\n      \"banner\": \"graphical/204501-g.jpg\",\n      \"firstAired\":
+        \"2010-08-20\",\n      \"id\": 204501,\n      \"network\": \"tvN\",\n      \"overview\":
+        \"Joseon X-Files is based on cases detailed in the Annals of Joseon History
+        with a bizarre twist; these incidents incorporate mysterious, supernatural
+        elements that cannot be explained through science. Kim Hyung Do is an inspector
+        of the state whose single-minded focus on his investigations into administrative
+        misdeeds bring him into direct contact with these strange mysteries. Heo Yoon
+        Yi is a government employee who aids him and attempts to understand these
+        scientific impossibilities with an open mind, in contrast to his cynicism.\",\n
+        \     \"seriesName\": \"Joseon X-Files: Mystery Investigation Record\",\n
+        \     \"status\": \"Ended\"\n    },\n    {\n      \"aliases\": [\n        \"Ancient
+        X Files\",\n        \"Ancient Xfiles\"\n      ],\n      \"banner\": \"text/214961.jpg\",\n
+        \     \"firstAired\": \"2010-09-27\",\n      \"id\": 214961,\n      \"network\":
+        \"National Geographic (US)\",\n      \"overview\": \"Ancient X Files travels
+        around the world to solve some intriguing riddles. Each story is a piece of
+        detective work by an expert trying to make sense of some puzzling ancient
+        artefact, to find the truth behind some extraordinary legend, to discover
+        the origins of a bizarre myth or to establish the authenticity of a venerated
+        religious relic. This series explores the bits of archaeology and history
+        which seem to defy explanation.\\r\\n\\r\\nOur experts are following chains
+        of clues and putting theories to the test, in an effort to explain the unexplained.
+        Ancient X Files investigates claims about the whereabouts of the lost Ark
+        of the Covenant; attempts to establish the authenticity of a cup some believe
+        to be the Holy Grail; tries to de-code the mysterious Phaistos disc; investigates
+        a cloth which is believed to carry traces of the DNA of Jesus Christ; and
+        deciphers an encrypted book of alchemy written by the great Sir Isaac Newton.\\r\\n\\r\\n\",\n
+        \     \"seriesName\": \"Ancient X-Files\",\n      \"status\": \"Ended\"\n
+        \   }\n  ]\n}"
     headers:
       cache-control:
       - private, max-age=600
@@ -139,19 +145,23 @@ interactions:
     uri: https://api.thetvdb.com/series/77398
   response:
     body:
-      string: !!binary |
-        H4sIAAAAAAAAA2RTXU/bQBB851eM/NJWSsCGEEjeKDRSK6VUpV9S1YfNeWNve96z7s6Aqfrfq3Mw
-        BfpmzezuzK7nfu8BWUmRsiV+7wFAJmW2xMnJ0eJ0sgMCe+HwnhrOlsg+1Yxv05VYDtl9AVmhwCFb
-        4vsA4L4Kj6vwpBUvD/Ni/uoZt6sfoB/3szekyj4JV57aWgzZg3kxrfZ/tlX2xODb5DubFw9opNgl
-        U9m50yjaiT50bMWHeCaeh55isTia5otpkY+8crxx/lciV5ff8PLz1atn1E5tBH2nUXb3mR2PYMXq
-        +fFR1n2I7Pt/S18ZYTU8XYmJ4vTp5u6a/bXwzbOjY+tMF7iEU8SawbetdRID3Bar129xVrHGgJW7
-        xbqzJfsJLkgJV6aztp/gnasVF66qOEaQllg7FUP4yD2HAYg1i4foNYcoFSVnAaLRDXoteVLnG7L7
-        WHnXoGLlKAZNFykppxG/xFpOMwKbGBAdCJV1G7IwTkMrnkyfPg17Fa2GycZZp3I3CKZt3pCPNTY9
-        SEFWWBFaNsJhglhLQCNaTjeuqqxoNUHdNc67bmfAGUNBnJK1PbZeqjryILTLCoxnilym6ee1l4Bz
-        8pE9agrYMCuccvKQfN04b8sXAY0LEa1rO0sewch0Kwelp4YQancTEEQNI/2Kums2lrHhSjSppvMh
-        pWx/zIalED+3ZfKQLVHMTo7z4iifzcYXJT5cUH+5/co8pHDttKQ+e0R/us/b6TLP8WH9kESKKecp
-        M1+mxWyEpSk3u8jGmBf5vDhZjNQdtYcSd+SbD3men+aL44cQU1nyk6gPwOs+W0I7a8e3JpE/jsqL
-        /8Bz12nMljic53vAn70/fwEAAP//AwBBRUjpdwQAAA==
+      string: "{\n  \"data\": {\n    \"id\": 77398,\n    \"seriesName\": \"The X-Files\",\n
+        \   \"aliases\": [\n      \"The X Files\",\n      \"The X-Files (2016)\",\n
+        \     \"The XFiles\"\n    ],\n    \"banner\": \"graphical/61-g.jpg\",\n    \"seriesId\":
+        \"61\",\n    \"status\": \"Continuing\",\n    \"firstAired\": \"1993-09-10\",\n
+        \   \"network\": \"FOX (US)\",\n    \"networkId\": \"\",\n    \"runtime\":
+        \"45\",\n    \"genre\": [\n      \"Mystery\",\n      \"Science-Fiction\"\n
+        \   ],\n    \"overview\": \"The X-Files focused on the exploits of FBI Agents
+        Fox Mulder, Dana Scully, John Doggett and Monica Reyes and their investigations
+        into the paranormal. From genetic mutants and killer insects to a global conspiracy
+        concerning the colonization of Earth by an alien species, this mind-boggling,
+        humorous and occasionally frightening series created by Chris Carter has been
+        one of the world's most popular sci-fi/drama shows since its humble beginnings
+        in 1993.\",\n    \"lastUpdated\": 1475013044,\n    \"airsDayOfWeek\": \"Monday\",\n
+        \   \"airsTime\": \"8:00 PM\",\n    \"rating\": \"TV-14\",\n    \"imdbId\":
+        \"tt0106179\",\n    \"zap2itId\": \"EP00080955\",\n    \"added\": \"\",\n
+        \   \"addedBy\": null,\n    \"siteRating\": 9,\n    \"siteRatingCount\": 260\n
+        \ }\n}"
     headers:
       cache-control:
       - private, max-age=600
@@ -198,19 +208,95 @@ interactions:
     uri: https://api.thetvdb.com/series/77398/images/query?keyType=poster
   response:
     body:
-      string: !!binary |
-        H4sIAAAAAAAAA7yYwW6cMBCG73kKy+fWmRnbGHiDqlJPvfVQkQ3ZkGxgtbBVV1HfvdoFHLdiIbKG
-        XPaAAf/7efjnt19vhJD3RVfIXPy4EUKI18uvELK6l7mg1Kbu03jpuTx9P+1LmQu5b9quPEg/1B7v
-        vpan88jbtYdqV34rXoL721vndJZ+RvW0377deCjbZnfsqqY+vyBJ4TcCQDBedFW9bb/UD43MvUIh
-        ZPGrPBTb8wR2VCKE3DTHupO5wHQQ/mcclN3j8eWuLqrdeaKfm2LzWN72f+VfaZcHh8f+J5I68u9j
-        I0LsRBKVjjIDJsZEMOnFXWeSEQCOk0k2JpqdCSm/dAEThAgmvbjrTBAI9QpQDDsUnCwUxAgovbjr
-        UIwGY1eAkrBDMWM5B3VCLgJJL20eiVkBiWVHQiqbgIIxhtKLuw4FEcgmepyOz1KQ31Os8qsX1ApS
-        RK0M6ma4gE4T8L2Oj0vGXi1WJePyBViyCCq9tjkohtCtUSzAT2WCSVxM6bXNUbGJcd7G+EoF+aOK
-        VX71glqJ+4SWsgoiGNDeyRi58Hdmmu7MScRHhEut+cLFwFifjFz4O5FW3gKDeqGYxILvaEWW0Ncn
-        Ixf+0ILK79UCLjGei0uxBREsoV8GRiwpu+lOB9woLL24GddFcIleAQvxBxc3med0jLsM6ma5ZGDW
-        4MLfjabdJWo/RMvdCC3RGlz4s4tWPk0E7hJzxkKL4QUxoczv1fnchT7o5CnmRGHQNvcRoQPrYzUj
-        Ff7oYiajS1SLpuXoQgRr7KGJv0W7yagbs4cexM2VyxnLCsmFHHuLZsTSi5vDom2mvZXJ5/IvAAAA
-        //+i0qC2EfVbLvDmOFKBS1bRgtxu4VJQiOWqBQAAAP//AwCjblZo+hcAAA==
+      string: "{\n  \"data\": [\n    {\n      \"id\": 28587,\n      \"keyType\": \"poster\",\n
+        \     \"subKey\": \"\",\n      \"fileName\": \"posters/77398-1.jpg\",\n      \"resolution\":
+        \"680x1000\",\n      \"ratingsInfo\": {\n        \"average\": 5,\n        \"count\":
+        18\n      },\n      \"thumbnail\": \"_cache/posters/77398-1.jpg\"\n    },\n
+        \   {\n      \"id\": 28872,\n      \"keyType\": \"poster\",\n      \"subKey\":
+        \"\",\n      \"fileName\": \"posters/77398-2.jpg\",\n      \"resolution\":
+        \"680x1000\",\n      \"ratingsInfo\": {\n        \"average\": 6.8,\n        \"count\":
+        44\n      },\n      \"thumbnail\": \"_cache/posters/77398-2.jpg\"\n    },\n
+        \   {\n      \"id\": 92001,\n      \"keyType\": \"poster\",\n      \"subKey\":
+        \"\",\n      \"fileName\": \"posters/77398-3.jpg\",\n      \"resolution\":
+        \"680x1000\",\n      \"ratingsInfo\": {\n        \"average\": 2.2,\n        \"count\":
+        10\n      },\n      \"thumbnail\": \"_cache/posters/77398-3.jpg\"\n    },\n
+        \   {\n      \"id\": 102131,\n      \"keyType\": \"poster\",\n      \"subKey\":
+        \"\",\n      \"fileName\": \"posters/77398-4.jpg\",\n      \"resolution\":
+        \"680x1000\",\n      \"ratingsInfo\": {\n        \"average\": 1.8,\n        \"count\":
+        11\n      },\n      \"thumbnail\": \"_cache/posters/77398-4.jpg\"\n    },\n
+        \   {\n      \"id\": 430451,\n      \"keyType\": \"poster\",\n      \"subKey\":
+        \"\",\n      \"fileName\": \"posters/77398-6.jpg\",\n      \"resolution\":
+        \"680x1000\",\n      \"ratingsInfo\": {\n        \"average\": 4,\n        \"count\":
+        27\n      },\n      \"thumbnail\": \"_cache/posters/77398-6.jpg\"\n    },\n
+        \   {\n      \"id\": 430441,\n      \"keyType\": \"poster\",\n      \"subKey\":
+        \"\",\n      \"fileName\": \"posters/77398-5.jpg\",\n      \"resolution\":
+        \"680x1000\",\n      \"ratingsInfo\": {\n        \"average\": 2.9,\n        \"count\":
+        14\n      },\n      \"thumbnail\": \"_cache/posters/77398-5.jpg\"\n    },\n
+        \   {\n      \"id\": 1102563,\n      \"keyType\": \"poster\",\n      \"subKey\":
+        \"\",\n      \"fileName\": \"posters/77398-13.jpg\",\n      \"resolution\":
+        \"680x1000\",\n      \"ratingsInfo\": {\n        \"average\": 5.1,\n        \"count\":
+        12\n      },\n      \"thumbnail\": \"_cache/posters/77398-13.jpg\"\n    },\n
+        \   {\n      \"id\": 1038605,\n      \"keyType\": \"poster\",\n      \"subKey\":
+        \"\",\n      \"fileName\": \"posters/77398-9.jpg\",\n      \"resolution\":
+        \"680x1000\",\n      \"ratingsInfo\": {\n        \"average\": 5.6,\n        \"count\":
+        9\n      },\n      \"thumbnail\": \"_cache/posters/77398-9.jpg\"\n    },\n
+        \   {\n      \"id\": 1042173,\n      \"keyType\": \"poster\",\n      \"subKey\":
+        \"\",\n      \"fileName\": \"posters/77398-10.jpg\",\n      \"resolution\":
+        \"680x1000\",\n      \"ratingsInfo\": {\n        \"average\": 5,\n        \"count\":
+        18\n      },\n      \"thumbnail\": \"_cache/posters/77398-10.jpg\"\n    },\n
+        \   {\n      \"id\": 1056474,\n      \"keyType\": \"poster\",\n      \"subKey\":
+        \"\",\n      \"fileName\": \"posters/77398-12.jpg\",\n      \"resolution\":
+        \"680x1000\",\n      \"ratingsInfo\": {\n        \"average\": 5.3,\n        \"count\":
+        12\n      },\n      \"thumbnail\": \"_cache/posters/77398-12.jpg\"\n    },\n
+        \   {\n      \"id\": 1104039,\n      \"keyType\": \"poster\",\n      \"subKey\":
+        \"\",\n      \"fileName\": \"posters/77398-14.jpg\",\n      \"resolution\":
+        \"680x1000\",\n      \"ratingsInfo\": {\n        \"average\": 2.8,\n        \"count\":
+        16\n      },\n      \"thumbnail\": \"_cache/posters/77398-14.jpg\"\n    },\n
+        \   {\n      \"id\": 1104040,\n      \"keyType\": \"poster\",\n      \"subKey\":
+        \"\",\n      \"fileName\": \"posters/77398-15.jpg\",\n      \"resolution\":
+        \"680x1000\",\n      \"ratingsInfo\": {\n        \"average\": 3.5,\n        \"count\":
+        21\n      },\n      \"thumbnail\": \"_cache/posters/77398-15.jpg\"\n    },\n
+        \   {\n      \"id\": 1105213,\n      \"keyType\": \"poster\",\n      \"subKey\":
+        \"\",\n      \"fileName\": \"posters/77398-16.jpg\",\n      \"resolution\":
+        \"680x1000\",\n      \"ratingsInfo\": {\n        \"average\": 1.7,\n        \"count\":
+        9\n      },\n      \"thumbnail\": \"_cache/posters/77398-16.jpg\"\n    },\n
+        \   {\n      \"id\": 1105215,\n      \"keyType\": \"poster\",\n      \"subKey\":
+        \"\",\n      \"fileName\": \"posters/77398-18.jpg\",\n      \"resolution\":
+        \"680x1000\",\n      \"ratingsInfo\": {\n        \"average\": 1.8,\n        \"count\":
+        9\n      },\n      \"thumbnail\": \"_cache/posters/77398-18.jpg\"\n    },\n
+        \   {\n      \"id\": 1107635,\n      \"keyType\": \"poster\",\n      \"subKey\":
+        \"\",\n      \"fileName\": \"posters/77398-23.jpg\",\n      \"resolution\":
+        \"680x1000\",\n      \"ratingsInfo\": {\n        \"average\": 7.9,\n        \"count\":
+        36\n      },\n      \"thumbnail\": \"_cache/posters/77398-23.jpg\"\n    },\n
+        \   {\n      \"id\": 1109045,\n      \"keyType\": \"poster\",\n      \"subKey\":
+        \"\",\n      \"fileName\": \"posters/77398-22.jpg\",\n      \"resolution\":
+        \"680x1000\",\n      \"ratingsInfo\": {\n        \"average\": 3.5,\n        \"count\":
+        11\n      },\n      \"thumbnail\": \"_cache/posters/77398-22.jpg\"\n    },\n
+        \   {\n      \"id\": 1115225,\n      \"keyType\": \"poster\",\n      \"subKey\":
+        \"\",\n      \"fileName\": \"posters/77398-20.jpg\",\n      \"resolution\":
+        \"680x1000\",\n      \"ratingsInfo\": {\n        \"average\": 3.4,\n        \"count\":
+        8\n      },\n      \"thumbnail\": \"_cache/posters/77398-20.jpg\"\n    },\n
+        \   {\n      \"id\": 1116292,\n      \"keyType\": \"poster\",\n      \"subKey\":
+        \"\",\n      \"fileName\": \"posters/77398-21.jpg\",\n      \"resolution\":
+        \"680x1000\",\n      \"ratingsInfo\": {\n        \"average\": 5,\n        \"count\":
+        10\n      },\n      \"thumbnail\": \"_cache/posters/77398-21.jpg\"\n    },\n
+        \   {\n      \"id\": 1117056,\n      \"keyType\": \"poster\",\n      \"subKey\":
+        \"\",\n      \"fileName\": \"posters/77398-24.jpg\",\n      \"resolution\":
+        \"680x1000\",\n      \"ratingsInfo\": {\n        \"average\": 4.8,\n        \"count\":
+        21\n      },\n      \"thumbnail\": \"_cache/posters/77398-24.jpg\"\n    },\n
+        \   {\n      \"id\": 1122041,\n      \"keyType\": \"poster\",\n      \"subKey\":
+        \"\",\n      \"fileName\": \"posters/77398-26.jpg\",\n      \"resolution\":
+        \"680x1000\",\n      \"ratingsInfo\": {\n        \"average\": 7.3,\n        \"count\":
+        4\n      },\n      \"thumbnail\": \"_cache/posters/77398-26.jpg\"\n    },\n
+        \   {\n      \"id\": 1122043,\n      \"keyType\": \"poster\",\n      \"subKey\":
+        \"\",\n      \"fileName\": \"posters/77398-27.jpg\",\n      \"resolution\":
+        \"680x1000\",\n      \"ratingsInfo\": {\n        \"average\": 7.3,\n        \"count\":
+        4\n      },\n      \"thumbnail\": \"_cache/posters/77398-27.jpg\"\n    },\n
+        \   {\n      \"id\": 1135934,\n      \"keyType\": \"poster\",\n      \"subKey\":
+        \"\",\n      \"fileName\": \"posters/77398-28.jpg\",\n      \"resolution\":
+        \"680x1000\",\n      \"ratingsInfo\": {\n        \"average\": 0,\n        \"count\":
+        0\n      },\n      \"thumbnail\": \"_cache/posters/77398-28.jpg\"\n    }\n
+        \ ]\n}"
     headers:
       cache-control:
       - private, max-age=600
@@ -255,24 +341,69 @@ interactions:
     uri: https://api.thetvdb.com/series/77398/actors
   response:
     body:
-      string: !!binary |
-        H4sIAAAAAAAAA5yQPU8DMQyG9/4Ky3MLd4nSQrZOiKGiAiEGJnOx7tJekyoxQ1Xx39FF4io+ihCL
-        Bz/va1nPcQKAjoTQwvMEAOBYJgB6hxaMUcZMP1aZk+d8O4DFQl9fjSDQjtECLkOgF5YObnzucMQp
-        9gWvYvANwT0fOJ9ojknukuOEFvS49TtqS4kaiSlflk8uNvsWP0eWr9LFoaq0+UKc4+FVVFWtZpWe
-        1RXUxpraGn060lOWx70jOZ8t0bfpGT3zv+tZeWk6WPue29Z/1/NEvXCCh60PgdPPgtSvgub/EvQO
-        AAD//6zS0QrCIBiG4Vv5b2CgTefmWSALgiDqCsyNTRIFc6PdfVAnkWUe7Pw9+R6+j9Gk5hingKoC
-        4WJDATWclhzTP0AsH2injdHSwtZ2vb85GxsJaSWc1WTM8h0IJ4HYKkAVJyzzQa82DVTnAwk56w7E
-        pEY32yXmad0dDpPpft0HJXXqVXQIL1GuzrNN6zT5Oid36X2Aowxeq2uss3ejBeGGoQ/hzecBAAD/
-        /8TXO2/bMBAA4D2/4pDdBh+yZGqL3RquYxdFEqAd0oG1DjZhmSwoKamH/veCclI0sESJgYDuNxw/
-        3IPXe/6IQeaPSCOvDx9RNmLCtRcV/vZiNCZTGlA+KDUs5S6vdHbJc6e2e2kzeLy+U3pnHq9hLfWu
-        rdHaqc5ZDWJFUj7tO6vrWL+VCLCa2WqLsJT22ZispZZmJ7TFe3jEIDyRSJno22p1rJeHkgCeB3OE
-        mZUqa+bZYP6kNCys2asDvoOIkmGISDqhfYnqWD8RDSD6Wm+zI8zG4OZ2cak0VztpsSwR7o/moPQO
-        NlKHLv5zWkNgcdHRbm9HE/GPJpFMArA+q+3e5LKANcpLqJscf8GtPW3xEF5LLhEfD5/SKY/ahbgT
-        IjFQmvK4o5wuYj1CIopZgNBKHrGAL2p7QF3Ayo6bmFzT3Vb23993T6Y6G28VUcFj6i0kOmKsLqQk
-        5V1d9zbWxxSzJIBpLu0JPubP2NBvi9knuCkKVZRSl/BBWXSPd3Msg4XJ82Pbv8nn5tIbZNnxlPVe
-        dnVsOxpPCE+i/mj3JT6hhpeJ1SC3sWP41tumjUJXed5i0XFwRCNCgXJXLYx1PTzgJFuhtSe35TPV
-        dG0g/oSHvTUy+L94TsRXF9GETUnSXhqvrybCXRET0kfob2yHUMDJsZaVVQhLk2fYQLSRVpUS5uZJ
-        Wlv9ULKA/1gmdMQioEl9dr32xxXA96vffwAAAP//AwDzsD0f6hAAAA==
+      string: "{\n  \"data\": [\n    {\n      \"id\": 55255,\n      \"seriesId\":
+        77398,\n      \"name\": \"Annabeth Gish\",\n      \"role\": \"Monica Reyes\",\n
+        \     \"sortOrder\": 3,\n      \"image\": \"actors/55255.jpg\",\n      \"imageAuthor\":
+        235,\n      \"imageAdded\": \"2012-03-10 15:51:53\",\n      \"lastUpdated\":
+        \"2012-03-10 15:51:53\"\n    },\n    {\n      \"id\": 55256,\n      \"seriesId\":
+        77398,\n      \"name\": \"Mitch Pileggi\",\n      \"role\": \"Walter Skinner\",\n
+        \     \"sortOrder\": 2,\n      \"image\": \"actors/55256.jpg\",\n      \"imageAuthor\":
+        235,\n      \"imageAdded\": \"2012-03-10 15:48:11\",\n      \"lastUpdated\":
+        \"2016-01-25 09:53:15\"\n    },\n    {\n      \"id\": 55257,\n      \"seriesId\":
+        77398,\n      \"name\": \"Gillian Anderson\",\n      \"role\": \"Dana Scully\",\n
+        \     \"sortOrder\": 1,\n      \"image\": \"actors/55257.jpg\",\n      \"imageAuthor\":
+        235,\n      \"imageAdded\": \"2012-03-10 15:46:47\",\n      \"lastUpdated\":
+        \"2012-03-10 15:46:47\"\n    },\n    {\n      \"id\": 55258,\n      \"seriesId\":
+        77398,\n      \"name\": \"David Duchovny\",\n      \"role\": \"Fox Mulder\",\n
+        \     \"sortOrder\": 0,\n      \"image\": \"actors/55258.jpg\",\n      \"imageAuthor\":
+        235,\n      \"imageAdded\": \"2012-03-10 15:44:30\",\n      \"lastUpdated\":
+        \"2012-03-10 15:44:30\"\n    },\n    {\n      \"id\": 55259,\n      \"seriesId\":
+        77398,\n      \"name\": \"Robert Patrick\",\n      \"role\": \"John Doggett\",\n
+        \     \"sortOrder\": 3,\n      \"image\": \"actors/55259.jpg\",\n      \"imageAuthor\":
+        235,\n      \"imageAdded\": \"2012-03-10 15:59:40\",\n      \"lastUpdated\":
+        \"2013-12-29 09:19:15\"\n    },\n    {\n      \"id\": 216081,\n      \"seriesId\":
+        77398,\n      \"name\": \"Dean Haglund\",\n      \"role\": \"Richard \\\"Ringo\\\"
+        Langly\",\n      \"sortOrder\": 3,\n      \"image\": \"actors/216081.jpg\",\n
+        \     \"imageAuthor\": 235,\n      \"imageAdded\": \"2012-03-10 15:50:38\",\n
+        \     \"lastUpdated\": \"2012-03-10 15:50:38\"\n    },\n    {\n      \"id\":
+        216091,\n      \"seriesId\": 77398,\n      \"name\": \"Bruce Harwood\",\n
+        \     \"role\": \"John Byers\",\n      \"sortOrder\": 3,\n      \"image\":
+        \"actors/216091.jpg\",\n      \"imageAuthor\": 235,\n      \"imageAdded\":
+        \"2012-03-10 15:49:29\",\n      \"lastUpdated\": \"2012-03-10 15:49:29\"\n
+        \   },\n    {\n      \"id\": 216101,\n      \"seriesId\": 77398,\n      \"name\":
+        \"Tom Braidwood\",\n      \"role\": \"Melvin Frohike\",\n      \"sortOrder\":
+        3,\n      \"image\": \"actors/216101.jpg\",\n      \"imageAuthor\": 235,\n
+        \     \"imageAdded\": \"2012-03-10 15:40:51\",\n      \"lastUpdated\": \"2012-03-10
+        15:40:51\"\n    },\n    {\n      \"id\": 216111,\n      \"seriesId\": 77398,\n
+        \     \"name\": \"William B. Davis\",\n      \"role\": \"Cigarette Smoking
+        Man\",\n      \"sortOrder\": 2,\n      \"image\": \"actors/216111.jpg\",\n
+        \     \"imageAuthor\": 235,\n      \"imageAdded\": \"2012-03-10 15:39:38\",\n
+        \     \"lastUpdated\": \"2013-12-29 09:19:05\"\n    },\n    {\n      \"id\":
+        219751,\n      \"seriesId\": 77398,\n      \"name\": \"Nicholas Lea\",\n      \"role\":
+        \"Alex Krycek\",\n      \"sortOrder\": 3,\n      \"image\": \"actors/219751.jpg\",\n
+        \     \"imageAuthor\": 381834,\n      \"imageAdded\": \"2013-03-06 11:36:51\",\n
+        \     \"lastUpdated\": \"2013-03-06 11:36:51\"\n    },\n    {\n      \"id\":
+        294621,\n      \"seriesId\": 77398,\n      \"name\": \"James Pickens Jr.\",\n
+        \     \"role\": \"Alvin Kursh\",\n      \"sortOrder\": 3,\n      \"image\":
+        \"actors/294621.jpg\",\n      \"imageAuthor\": 219361,\n      \"imageAdded\":
+        \"2012-01-22 15:37:31\",\n      \"lastUpdated\": \"2012-01-22 15:37:31\"\n
+        \   },\n    {\n      \"id\": 296271,\n      \"seriesId\": 77398,\n      \"name\":
+        \"Cary Elwes\",\n      \"role\": \"FBI Assistant Director Brad Follmer\",\n
+        \     \"sortOrder\": 3,\n      \"image\": \"actors/296271.jpg\",\n      \"imageAuthor\":
+        235,\n      \"imageAdded\": \"2012-03-10 15:53:28\",\n      \"lastUpdated\":
+        \"2012-03-10 15:53:28\"\n    },\n    {\n      \"id\": 370374,\n      \"seriesId\":
+        77398,\n      \"name\": \"Steven Williams\",\n      \"role\": \"Mr. X\",\n
+        \     \"sortOrder\": 3,\n      \"image\": \"\",\n      \"imageAuthor\": null,\n
+        \     \"imageAdded\": \"\",\n      \"lastUpdated\": \"2016-04-01 13:37:22\"\n
+        \   },\n    {\n      \"id\": 370376,\n      \"seriesId\": 77398,\n      \"name\":
+        \"Jerry Hardin\",\n      \"role\": \"Deep Throat\",\n      \"sortOrder\":
+        3,\n      \"image\": \"actors/370376.jpg\",\n      \"imageAuthor\": 452807,\n
+        \     \"imageAdded\": \"2016-04-01 09:46:50\",\n      \"lastUpdated\": \"2016-04-01
+        09:46:50\"\n    },\n    {\n      \"id\": 370378,\n      \"seriesId\": 77398,\n
+        \     \"name\": \"Laurie Holden\",\n      \"role\": \"Marita Covarrubias \",\n
+        \     \"sortOrder\": 3,\n      \"image\": \"\",\n      \"imageAuthor\": null,\n
+        \     \"imageAdded\": \"\",\n      \"lastUpdated\": \"2016-01-24 17:46:48\"\n
+        \   }\n  ]\n}"
     headers:
       cache-control:
       - private, max-age=600

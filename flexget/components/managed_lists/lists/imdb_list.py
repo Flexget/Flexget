@@ -311,27 +311,25 @@ class ImdbEntrySet(MutableSet):
                     year = int(row['year']) if row['year'] != '????' else None
                     created = pendulum.parse(row['created']) if row.get('created') else None
                     modified = pendulum.parse(row['modified']) if row.get('modified') else None
-                    entry = Entry(
-                        {
-                            'title': f'{name} ({year})' if year != '????' else name,
-                            'url': row['url'],
-                            'imdb_id': row['const'],
-                            'imdb_url': row['url'],
-                            'imdb_list_position': (
-                                int(row['position']) if 'position' in row else None
-                            ),
-                            'imdb_list_created': created,
-                            'imdb_list_modified': modified,
-                            'imdb_list_description': row.get('description'),
-                            'imdb_name': name,
-                            'imdb_year': year,
-                            'imdb_user_score': (
-                                float(row['imdb rating']) if row['imdb rating'] else None
-                            ),
-                            'imdb_votes': int(row['num votes']) if row['num votes'] else None,
-                            'imdb_genres': [genre.strip() for genre in row['genres'].split(',')],
-                        }
-                    )
+                    entry = Entry({
+                        'title': f'{name} ({year})' if year != '????' else name,
+                        'url': row['url'],
+                        'imdb_id': row['const'],
+                        'imdb_url': row['url'],
+                        'imdb_list_position': (
+                            int(row['position']) if 'position' in row else None
+                        ),
+                        'imdb_list_created': created,
+                        'imdb_list_modified': modified,
+                        'imdb_list_description': row.get('description'),
+                        'imdb_name': name,
+                        'imdb_year': year,
+                        'imdb_user_score': (
+                            float(row['imdb rating']) if row['imdb rating'] else None
+                        ),
+                        'imdb_votes': int(row['num votes']) if row['num votes'] else None,
+                        'imdb_genres': [genre.strip() for genre in row['genres'].split(',')],
+                    })
 
                 except ValueError as e:
                     logger.debug('no movie row detected, skipping. {}. Exception: {}', row, e)

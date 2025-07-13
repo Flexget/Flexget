@@ -107,9 +107,9 @@ class TestDiscover:
         assert len(task.entries) == 1
 
         # Insert a new entry into the search input
-        manager.config['tasks']['test_interval']['discover']['what'][0]['mock'].append(
-            {'title': 'Bar'}
-        )
+        manager.config['tasks']['test_interval']['discover']['what'][0]['mock'].append({
+            'title': 'Bar'
+        })
         task = execute_task('test_interval')
         # First entry should be waiting for interval
         assert len(task.entries) == 1

@@ -33,11 +33,9 @@ class FilterIf:
         # Make entry fields and other utilities available in the eval namespace
         # We need our namespace to be an Entry instance for lazy loading to work
         eval_locals = copy(entry)
-        eval_locals.update(
-            {
-                'has_field': lambda f: f in entry,
-            }
-        )
+        eval_locals.update({
+            'has_field': lambda f: f in entry,
+        })
         try:
             # Restrict eval namespace to have no globals and locals only from eval_locals
             passed = evaluate_expression(condition, eval_locals)

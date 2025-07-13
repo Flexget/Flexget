@@ -203,34 +203,58 @@ interactions:
     uri: https://metadata.provider.plex.tv/library/sections/watchlist/all?includeCollections=1&includeExternalMedia=1
   response:
     body:
-      string: !!binary |
-        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
-        4k7svaBi9FX+rrwfHxXf/g18/A/q7RO9LBYAAA==
+      string: '<?xml version="1.0"?><MediaContainer librarySectionID="watchlist" librarySectionTitle="Watchlist"
+        offset="0" totalSize="3" identifier="tv.plex.provider.metadata" size="3"><Video
+        art="https://metadata-static.plex.tv/2/gracenote/2da4948906992a673bb605731cd99943.jpg"
+        banner="https://artworks.thetvdb.com/banners/v4/movie/5483/banners/6424b1060adb7.jpg"
+        guid="plex://movie/5d7768ba96b655001fdc0408" key="/library/metadata/5d7768ba96b655001fdc0408"
+        rating="7.6" ratingKey="5d7768ba96b655001fdc0408" studio="20th Century Studios"
+        tagline="Return to Pandora." type="movie" thumb="https://metadata-static.plex.tv/8/gracenote/852339eebde7ebea9459515382d2e345.jpg"
+        addedAt="1670976000" duration="11520000" publicPagesURL="https://watch.plex.tv/movie/avatar-the-way-of-water"
+        slug="avatar-the-way-of-water" userState="0" title="Avatar: The Way of Water"
+        contentRating="PG-13" originallyAvailableAt="2022-12-14" year="2022" audienceRating="9.2"
+        audienceRatingImage="rottentomatoes://image.rating.upright" ratingImage="rottentomatoes://image.rating.ripe"
+        imdbRatingCount="509066"><Image alt="Avatar: The Way of Water" type="background"
+        url="https://metadata-static.plex.tv/2/gracenote/2da4948906992a673bb605731cd99943.jpg"/><Image
+        alt="Avatar: The Way of Water" type="banner" url="https://artworks.thetvdb.com/banners/v4/movie/5483/banners/6424b1060adb7.jpg"/><Image
+        alt="Avatar: The Way of Water" type="clearLogo" url="https://metadata-static.plex.tv/7/683a142553/778d817f193e0c9b8e7abe4e7276b200.png"/><Image
+        alt="Avatar: The Way of Water" type="clearLogoWide" url="https://metadata-static.plex.tv/7/683a142553/778d817f193e0c9b8e7abe4e7276b200.png"/><Image
+        alt="Avatar: The Way of Water" type="coverArt" url="https://metadata-static.plex.tv/4/gracenote/4ce7d8af852fdcf6d148d9f82273a6ba.jpg"/><Image
+        alt="Avatar: The Way of Water" type="coverPoster" url="https://metadata-static.plex.tv/8/gracenote/852339eebde7ebea9459515382d2e345.jpg"/><Image
+        alt="Avatar: The Way of Water" type="coverSquare" url="https://metadata-static.plex.tv/e/gracenote/ef637ed436b7ee3c85105a3ba4811a11.jpg"/><Image
+        alt="Avatar: The Way of Water" type="snapshot" url="https://metadata-static.plex.tv/9/gracenote/961d73b515fa8d302860aca7db5efdb9.jpg"/></Video><Video
+        art="https://metadata-static.plex.tv/a/gracenote/a9ba652c2b4bc621c2b7229d15b1d11d.jpg"
+        banner="https://artworks.thetvdb.com/banners/v4/movie/33190/banners/64ff03d608d00.jpg"
+        guid="plex://movie/5d776ca79ab544002151945c" key="/library/metadata/5d776ca79ab544002151945c"
+        rating="3.9" ratingKey="5d776ca79ab544002151945c" studio="New Line Cinema"
+        tagline="Power born from rage." type="movie" thumb="https://metadata-static.plex.tv/c/gracenote/c16be7b0133d85a154ec16a4ed4e1209.jpg"
+        addedAt="1666137600" duration="7500000" publicPagesURL="https://watch.plex.tv/movie/black-adam"
+        slug="black-adam" expiresAt="1893455940" userState="0" title="Black Adam"
+        contentRating="PG-13" originallyAvailableAt="2022-10-19" year="2022" audienceRating="8.8"
+        audienceRatingImage="rottentomatoes://image.rating.upright" ratingImage="rottentomatoes://image.rating.rotten"
+        imdbRatingCount="280345"><Image alt="Black Adam" type="background" url="https://metadata-static.plex.tv/a/gracenote/a9ba652c2b4bc621c2b7229d15b1d11d.jpg"/><Image
+        alt="Black Adam" type="banner" url="https://artworks.thetvdb.com/banners/v4/movie/33190/banners/64ff03d608d00.jpg"/><Image
+        alt="Black Adam" type="clearLogo" url="https://metadata-static.plex.tv/1/683a142553/1b3105476a90c6e68d5a965a89909b77.png"/><Image
+        alt="Black Adam" type="clearLogoWide" url="https://metadata-static.plex.tv/1/683a142553/1b3105476a90c6e68d5a965a89909b77.png"/><Image
+        alt="Black Adam" type="coverArt" url="https://metadata-static.plex.tv/2/gracenote/29f0275f6682bc2376ce073a8692352c.jpg"/><Image
+        alt="Black Adam" type="coverPoster" url="https://metadata-static.plex.tv/c/gracenote/c16be7b0133d85a154ec16a4ed4e1209.jpg"/><Image
+        alt="Black Adam" type="coverSquare" url="https://metadata-static.plex.tv/e/gracenote/e45015e75f033828b7624e3f548fbd06.jpg"/><Image
+        alt="Black Adam" type="snapshot" url="https://metadata-static.plex.tv/9/gracenote/941bed7eb235c10bc794c876d4a4de13.jpg"/></Video><Directory
+        art="https://image.tmdb.org/t/p/original/vO3I7ZpSQIZXVeRfexxbvkqQjZE.jpg"
+        banner="https://artworks.thetvdb.com/banners/v4/series/400160/banners/62a26374cd99d.jpg"
+        guid="plex://show/621656cb3f91a0bf1bbdb41e" key="/library/metadata/621656cb3f91a0bf1bbdb41e/children"
+        ratingKey="621656cb3f91a0bf1bbdb41e" studio="HBO Latin America" type="show"
+        thumb="https://image.tmdb.org/t/p/original/K7SQz8lDXvObNF86bDFlhiyuLZ.jpg"
+        addedAt="1647734400" duration="2280000" publicPagesURL="https://watch.plex.tv/show/amsterdam"
+        slug="amsterdam" userState="0" title="Amsterdam" leafCount="10" childCount="1"
+        contentRating="TV-MA" originallyAvailableAt="2022-03-20" year="2022" audienceRating="6"
+        audienceRatingImage="rottentomatoes://image.rating.upright" imdbRatingCount="386"><Image
+        alt="Amsterdam" type="background" url="https://image.tmdb.org/t/p/original/vO3I7ZpSQIZXVeRfexxbvkqQjZE.jpg"/><Image
+        alt="Amsterdam" type="banner" url="https://artworks.thetvdb.com/banners/v4/series/400160/banners/62a26374cd99d.jpg"/><Image
+        alt="Amsterdam" type="clearLogo" url="https://metadata-static.plex.tv/e/683a142553/ed1efd2c83a26984b91c8bf5915bbbfd.png"/><Image
+        alt="Amsterdam" type="clearLogoWide" url="https://metadata-static.plex.tv/e/683a142553/ed1efd2c83a26984b91c8bf5915bbbfd.png"/><Image
+        alt="Amsterdam" type="coverArt" url="https://image.tmdb.org/t/p/original/vDHB5f2F2v1EgfZCwySnK9DQIZ7.jpg"/><Image
+        alt="Amsterdam" type="coverPoster" url="https://image.tmdb.org/t/p/original/K7SQz8lDXvObNF86bDFlhiyuLZ.jpg"/></Directory></MediaContainer>'
     headers:
       Access-Control-Allow-Origin:
       - '*'
@@ -326,14 +350,16 @@ interactions:
     uri: https://metadata.provider.plex.tv/
   response:
     body:
-      string: !!binary |
-        H4sIAAAAAAAAA3WTTWvDMAyG/0rQfXHL2A4jTtmll1HYYLCz6qitqRNnshKafz+S5qNJu5stPe9r
-        ScjJ5pK7qCYO1hca1vEKNmmyo8ziJ/vaZsSRNW3qJFKGN6XKPvwUBMWauHR0iaVWLRVUToIZCj69
-        vK7iUB8hshkVYg+WWIPUV3zwiAccopK9eONd0BCECXOIxIojDbuRuSnzOV5BmmwJpWKKpClJw2R2
-        pkaDcnbPyM1YE6ilAo1YXwRIk/fuFNlMA2bZt/9BMSdngwxmPaqWWaa2KvqYQUy5r2nLPp9INXuE
-        UWhp3cXmWDDs93t3h07xh+9XxQioNFF908vujXeOOsVyYlMm3A/NeYMz0XC/I3PkM3EYwOF6w5XV
-        3lmjYQ29xOZ4JGEsgvEZcS8ddq/LhnHlypMXf2t3cFh71lAVtp0KusG2dNj8VlTRwrCNT9s4+jps
-        vlo6POpJzOm/DVNd9ipTs0+U/gE0/VlYaQMAAA==
+      string: <?xml version="1.0"?><MediaProvider icon="https://provider-static.plex.tv/icons/metadata-560.svg"
+        identifier="tv.plex.provider.metadata" protocols="stream" title="Metadata"
+        version="1.3.0"><Feature type="metadata" key="/library/metadata"/><Feature
+        type="actions"><Action id="addToWatchlist" key="/actions/addToWatchlist" reverseKey="/actions/removeFromWatchlist"/><Action
+        id="rate" key="/actions/rate"/><Action id="scrobble" key="/actions/scrobble"
+        reverseKey="/actions/unscrobble"/></Feature><Feature type="collection" key="/library/collections"/><Feature
+        type="location" key="/location"/><Feature type="markers" key="/markers"/><Feature
+        public="1" type="imagetranscoder" key="https://images.plex.tv/photo"/><Feature
+        flavor="universal" type="playqueue" key="https://play.provider.plex.tv/playQueues"/><Feature
+        type="match" key="/library/metadata/matches"/></MediaProvider>
     headers:
       Age:
       - '64610'
@@ -431,121 +457,263 @@ interactions:
     uri: https://metadata.provider.plex.tv/library/metadata/5d7768ba96b655001fdc0408?includeBandwidths=1&includeChapters=1&includeGeolocation=1&includeLoudnessRamps=1&includeMarkers=1&includeUserState=1
   response:
     body:
-      string: !!binary |
-        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
-        znf/t5Bv/x/zE5ARU2QAAA==
+      string: "<?xml version=\"1.0\"?><MediaContainer librarySectionID=\"home\" librarySectionTitle=\"Metadata\"
+        offset=\"0\" totalSize=\"1\" identifier=\"tv.plex.provider.metadata\" size=\"1\"><Video
+        art=\"https://metadata-static.plex.tv/2/gracenote/2da4948906992a673bb605731cd99943.jpg\"
+        banner=\"https://artworks.thetvdb.com/banners/v4/movie/5483/banners/6424b1060adb7.jpg\"
+        guid=\"plex://movie/5d7768ba96b655001fdc0408\" key=\"/library/metadata/5d7768ba96b655001fdc0408\"
+        rating=\"7.6\" ratingKey=\"5d7768ba96b655001fdc0408\" studio=\"20th Century
+        Studios\" summary=\"Jake Sully lives with his newfound family formed on the
+        extrasolar moon Pandora. Once a familiar threat returns to finish what was
+        previously started, Jake must work with Neytiri and the army of the Na&apos;vi
+        race to protect their home.\" tagline=\"Return to Pandora.\" type=\"movie\"
+        thumb=\"https://metadata-static.plex.tv/8/gracenote/852339eebde7ebea9459515382d2e345.jpg\"
+        addedAt=\"1670976000\" duration=\"11520000\" publicPagesURL=\"https://watch.plex.tv/movie/avatar-the-way-of-water\"
+        slug=\"avatar-the-way-of-water\" watchlistedAt=\"1725844820\" viewCount=\"0\"
+        viewOffset=\"0\" title=\"Avatar: The Way of Water\" contentRating=\"PG-13\"
+        originallyAvailableAt=\"2022-12-14\" year=\"2022\" audienceRating=\"9.2\"
+        audienceRatingImage=\"rottentomatoes://image.rating.upright\" ratingImage=\"rottentomatoes://image.rating.ripe\"
+        imdbRatingCount=\"509066\"><Image alt=\"Avatar: The Way of Water\" type=\"background\"
+        url=\"https://metadata-static.plex.tv/2/gracenote/2da4948906992a673bb605731cd99943.jpg\"/><Image
+        alt=\"Avatar: The Way of Water\" type=\"banner\" url=\"https://artworks.thetvdb.com/banners/v4/movie/5483/banners/6424b1060adb7.jpg\"/><Image
+        alt=\"Avatar: The Way of Water\" type=\"clearLogo\" url=\"https://metadata-static.plex.tv/7/683a142553/778d817f193e0c9b8e7abe4e7276b200.png\"/><Image
+        alt=\"Avatar: The Way of Water\" type=\"clearLogoWide\" url=\"https://metadata-static.plex.tv/7/683a142553/778d817f193e0c9b8e7abe4e7276b200.png\"/><Image
+        alt=\"Avatar: The Way of Water\" type=\"coverArt\" url=\"https://metadata-static.plex.tv/4/gracenote/4ce7d8af852fdcf6d148d9f82273a6ba.jpg\"/><Image
+        alt=\"Avatar: The Way of Water\" type=\"coverPoster\" url=\"https://metadata-static.plex.tv/8/gracenote/852339eebde7ebea9459515382d2e345.jpg\"/><Image
+        alt=\"Avatar: The Way of Water\" type=\"coverSquare\" url=\"https://metadata-static.plex.tv/e/gracenote/ef637ed436b7ee3c85105a3ba4811a11.jpg\"/><Image
+        alt=\"Avatar: The Way of Water\" type=\"snapshot\" url=\"https://metadata-static.plex.tv/9/gracenote/961d73b515fa8d302860aca7db5efdb9.jpg\"/><Genre
+        filter=\"genre=5d9c046c2192ba001f2ff6c2\" id=\"5d9c046c2192ba001f2ff6c2\"
+        key=\"/library/sections/home/all?genre=5d9c046c2192ba001f2ff6c2\" ratingKey=\"genre_5d9c046c2192ba001f2ff6c2\"
+        slug=\"action\" tag=\"Action\" directory=\"1\" context=\"tag.genre\"/><Genre
+        filter=\"genre=5d9c046c2192ba001f2ff6c3\" id=\"5d9c046c2192ba001f2ff6c3\"
+        key=\"/library/sections/home/all?genre=5d9c046c2192ba001f2ff6c3\" ratingKey=\"genre_5d9c046c2192ba001f2ff6c3\"
+        slug=\"adventure\" tag=\"Adventure\" directory=\"1\" context=\"tag.genre\"/><Genre
+        filter=\"genre=5d9c046c2192ba001f2ff6c4\" id=\"5d9c046c2192ba001f2ff6c4\"
+        key=\"/library/sections/home/all?genre=5d9c046c2192ba001f2ff6c4\" ratingKey=\"genre_5d9c046c2192ba001f2ff6c4\"
+        slug=\"sci-fi\" tag=\"Sci-Fi\" directory=\"1\" context=\"tag.genre\"/><Genre
+        filter=\"genre=5d9c046c705e7a001e6c8daa\" id=\"5d9c046c705e7a001e6c8daa\"
+        key=\"/library/sections/home/all?genre=5d9c046c705e7a001e6c8daa\" ratingKey=\"genre_5d9c046c705e7a001e6c8daa\"
+        slug=\"fantasy\" tag=\"Fantasy\" directory=\"1\" context=\"tag.genre\"/><Guid
+        id=\"imdb://tt1630029\"/><Guid id=\"tmdb://76600\"/><Guid id=\"tvdb://5483\"/><Rating
+        image=\"imdb://image.rating\" type=\"audience\" value=\"7.5\"/><Rating image=\"rottentomatoes://image.rating.ripe\"
+        type=\"critic\" value=\"7.6\"/><Rating image=\"rottentomatoes://image.rating.upright\"
+        type=\"audience\" value=\"9.2\"/><Rating image=\"themoviedb://image.rating\"
+        type=\"audience\" value=\"7.62\"/><Collection art=\"https://image.tmdb.org/t/p/original/gxnvX9kF7RRUQYvB52dMLPgeJkt.jpg\"
+        guid=\"plex://collection/5ec2fdb768742a00415b9917\" key=\"/library/collections/5ec2fdb768742a00415b9917/children\"
+        summary=\"The Avatar Collection tells the story of the world of Pandora, inhabited
+        by the indigenous humanoids, the Na&apos;vi. The main protagonist, Jake Sully
+        (Sam Worthington), is sent to Pandora as an avatar\u2014a hybrid of human
+        and Na&apos;vi. During his mission, Jake discovers the beauty and complexity
+        of the Na&apos;vi world and forms a deep connection with the planet&apos;s
+        inhabitants. The collection focuses on the conflict between humans and the
+        Na&apos;vi and the struggle to save the world of Pandora.\" thumb=\"https://image.tmdb.org/t/p/original/uO2yU3QiGHvVp0L5e5IatTVRkYk.jpg\"
+        tag=\"Avatar Collection\"/><Country tag=\"United States of America\"/><Role
+        key=\"/library/sections/home/all?actor=5d7768268718ba001e311c30&amp;type=99&amp;availabilityType=free\"
+        id=\"5d7768268718ba001e311c30\" order=\"1\" slug=\"sam-worthington\" tag=\"Sam
+        Worthington\" thumb=\"https://metadata-static.plex.tv/7/people/758b4e28c0266718241d9de86f62d650.jpg\"
+        role=\"Jake Sully\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=5d776825999c64001ec2bff1&amp;type=99&amp;availabilityType=free\"
+        id=\"5d776825999c64001ec2bff1\" order=\"2\" slug=\"zoe-saldana\" tag=\"Zoe
+        Salda\xF1a\" thumb=\"https://metadata-static.plex.tv/1/people/1a763f658196c01b4c797149ecfae674.jpg\"
+        role=\"Neytiri\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=5d7768253c3c2a001fbcac3f&amp;type=99&amp;availabilityType=free\"
+        id=\"5d7768253c3c2a001fbcac3f\" order=\"3\" slug=\"sigourney-weaver\" tag=\"Sigourney
+        Weaver\" thumb=\"https://metadata-static.plex.tv/3/people/3bfa42322031e68229215b50abb7dcc2.jpg\"
+        role=\"Kiri\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=5d77682d54c0f0001f3028f3&amp;type=99&amp;availabilityType=free\"
+        id=\"5d77682d54c0f0001f3028f3\" order=\"4\" slug=\"stephen-lang\" tag=\"Stephen
+        Lang\" thumb=\"https://metadata-static.plex.tv/f/people/fe0830268363616247c741671e112f84.jpg\"
+        role=\"Colonel Miles Quaritch\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=5d776825880197001ec9030f&amp;type=99&amp;availabilityType=free\"
+        id=\"5d776825880197001ec9030f\" order=\"5\" slug=\"kate-winslet\" tag=\"Kate
+        Winslet\" thumb=\"https://metadata-static.plex.tv/3/people/3d5ad24e4622cb12c7dcabe1788e8425.jpg\"
+        role=\"Ronal\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=5d776826999c64001ec2c5f9&amp;type=99&amp;availabilityType=free\"
+        id=\"5d776826999c64001ec2c5f9\" order=\"6\" slug=\"cliff-curtis\" tag=\"Cliff
+        Curtis\" thumb=\"https://metadata-static.plex.tv/6/people/6ccabb0d97094043cc3966f8c54b8c7b.jpg\"
+        role=\"Tonowari\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=5d77683485719b001f3a3693&amp;type=99&amp;availabilityType=free\"
+        id=\"5d77683485719b001f3a3693\" order=\"7\" slug=\"joel-david-moore\" tag=\"Joel
+        David Moore\" thumb=\"https://metadata-static.plex.tv/b/people/be68d2d75ccdb77d3e728b1dc7b1cdb6.jpg\"
+        role=\"Norm Spellman\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=5d776828151a60001f24ae5b&amp;type=99&amp;availabilityType=free\"
+        id=\"5d776828151a60001f24ae5b\" order=\"8\" slug=\"cch-pounder\" tag=\"CCH
+        Pounder\" thumb=\"https://metadata-static.plex.tv/3/people/3a3618dd3116e3ee3cf29528d6ea1822.jpg\"
+        role=\"Mo&apos;at\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=5d77682a7e9a3c0020c6b1bb&amp;type=99&amp;availabilityType=free\"
+        id=\"5d77682a7e9a3c0020c6b1bb\" order=\"9\" slug=\"edie-falco\" tag=\"Edie
+        Falco\" thumb=\"https://metadata-static.plex.tv/c/people/c6c938f807fbb88f89af7bc816c0eb4f.jpg\"
+        role=\"General Frances Ardmore\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=5d7768322ec6b5001f6bb740&amp;type=99&amp;availabilityType=free\"
+        id=\"5d7768322ec6b5001f6bb740\" order=\"10\" slug=\"jemaine-clement\" tag=\"Jemaine
+        Clement\" thumb=\"https://metadata-static.plex.tv/people/5d7768322ec6b5001f6bb740.jpg\"
+        role=\"Dr. Ian Garvin\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=5d776825151a60001f24a404&amp;type=99&amp;availabilityType=free\"
+        id=\"5d776825151a60001f24a404\" order=\"11\" slug=\"giovanni-ribisi\" tag=\"Giovanni
+        Ribisi\" thumb=\"https://metadata-static.plex.tv/a/people/a492cd3d471515fdfa81696cf01b261b.jpg\"
+        role=\"Parker Selfridge\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=5d7768bb96b655001fdc0437&amp;type=99&amp;availabilityType=free\"
+        id=\"5d7768bb96b655001fdc0437\" order=\"12\" slug=\"britain-dalton\" tag=\"Britain
+        Dalton\" thumb=\"https://metadata-static.plex.tv/9/people/9d7e7e6f74334e1fcfe2ac70860b33ac.jpg\"
+        role=\"Lo&apos;ak\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=5de8412118b6d6001dac40e8&amp;type=99&amp;availabilityType=free\"
+        id=\"5de8412118b6d6001dac40e8\" order=\"13\" slug=\"jamie-flatters\" tag=\"Jamie
+        Flatters\" thumb=\"https://metadata-static.plex.tv/1/people/1d2c20bae716f31aef219389da31de41.jpg\"
+        role=\"Neteyam\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=5d7768bb96b655001fdc0436&amp;type=99&amp;availabilityType=free\"
+        id=\"5d7768bb96b655001fdc0436\" order=\"14\" slug=\"trinity-bliss\" tag=\"Trinity
+        Bliss\" thumb=\"https://metadata-static.plex.tv/6/people/64ea6b472625a847273c19ded7e940ca.jpg\"
+        role=\"Tuktirey &apos;Tuk&apos;\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=5dcfc9ff4288ee001ec13c00&amp;type=99&amp;availabilityType=free\"
+        id=\"5dcfc9ff4288ee001ec13c00\" order=\"15\" slug=\"jack-champion\" tag=\"Jack
+        Champion\" thumb=\"https://metadata-static.plex.tv/2/people/2d12f63b3a04ebc755b38cd0d1393085.jpg\"
+        role=\"Miles &apos;Spider&apos; Socorro\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=5d77682ae6d55c002040b5c0&amp;type=99&amp;availabilityType=free\"
+        id=\"5d77682ae6d55c002040b5c0\" order=\"16\" slug=\"brendan-cowell\" tag=\"Brendan
+        Cowell\" thumb=\"https://metadata-static.plex.tv/a/people/a70597b105b13fd25cb9b0f5f9968ccf.jpg\"
+        role=\"Mick Scoresby\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=5d776880e6d55c002041460d&amp;type=99&amp;availabilityType=free\"
+        id=\"5d776880e6d55c002041460d\" order=\"17\" slug=\"bailey-bass\" tag=\"Bailey
+        Bass\" thumb=\"https://image.tmdb.org/t/p/original/c0oLL7IHbBOqi8rx6hkuxN0atrg.jpg\"
+        role=\"Tsireya\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=5d7768bb96b655001fdc043a&amp;type=99&amp;availabilityType=free\"
+        id=\"5d7768bb96b655001fdc043a\" order=\"18\" slug=\"filip-geljo\" tag=\"Filip
+        Geljo\" thumb=\"https://metadata-static.plex.tv/4/people/4bdc62c558ca7e97548e36ee8b105ce2.jpg\"
+        role=\"Aonung\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=5d7768bb96b655001fdc043b&amp;type=99&amp;availabilityType=free\"
+        id=\"5d7768bb96b655001fdc043b\" order=\"19\" slug=\"duane-evans-jr\" tag=\"Duane
+        Evans Jr.\" thumb=\"https://metadata-static.plex.tv/8/people/8dcf4d3a5042169e75c3343c74a34edb.jpg\"
+        role=\"Rotxo\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=5d776840e6d55c002040ed42&amp;type=99&amp;availabilityType=free\"
+        id=\"5d776840e6d55c002040ed42\" order=\"20\" slug=\"dileep-rao\" tag=\"Dileep
+        Rao\" thumb=\"https://metadata-static.plex.tv/6/people/6a22d24a245a70a326b9961d07b3830f.jpg\"
+        role=\"Dr. Max Patel\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=5d776833103a2d001f5671f1&amp;type=99&amp;availabilityType=free\"
+        id=\"5d776833103a2d001f5671f1\" order=\"21\" slug=\"matt-gerald\" tag=\"Matt
+        Gerald\" thumb=\"https://metadata-static.plex.tv/5/people/5cd9e85018260c96da50c500ac9ec5eb.jpg\"
+        role=\"Recom Wainfleet\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=5d776df5ad5437001f7e607f&amp;type=99&amp;availabilityType=free\"
+        id=\"5d776df5ad5437001f7e607f\" order=\"22\" slug=\"robert-okumu\" tag=\"Robert
+        Okumu\" thumb=\"https://metadata-static.plex.tv/people/5d776df5ad5437001f7e607f.jpg\"
+        role=\"Ta&apos;unui Olecthan\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=60642e164a54e7002c37ce72&amp;type=99&amp;availabilityType=free\"
+        id=\"60642e164a54e7002c37ce72\" order=\"23\" slug=\"jennifer-stafford-4\"
+        tag=\"Jennifer Stafford\" thumb=\"https://image.tmdb.org/t/p/original/xl6KmG24UGFYvksbuyDHWFaR7eR.jpg\"
+        role=\"Ta&apos;unui Tsahik\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=5d7768cc9ab54400214eba40&amp;type=99&amp;availabilityType=free\"
+        id=\"5d7768cc9ab54400214eba40\" order=\"24\" slug=\"keston-john\" tag=\"Keston
+        John\" thumb=\"https://metadata-static.plex.tv/c/people/c3984747b55eb04b510e17c74b3d6286.jpg\"
+        role=\"Tarsem\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=5d77682c61141d001fb1426d&amp;type=99&amp;availabilityType=free\"
+        id=\"5d77682c61141d001fb1426d\" order=\"25\" slug=\"kevin-dorman\" tag=\"Kevin
+        Dorman\" thumb=\"https://metadata-static.plex.tv/0/people/0d8caa61a5de24a683621f61cdccb81c.jpg\"
+        role=\"Recom Mansk\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=5d7768b33ab0e7001f5083c5&amp;type=99&amp;availabilityType=free\"
+        id=\"5d7768b33ab0e7001f5083c5\" order=\"26\" slug=\"alicia-vela-bailey\" tag=\"Alicia
+        Vela-Bailey\" thumb=\"https://metadata-static.plex.tv/1/people/11326c6c902885e091a418f0fd56b4e6.jpg\"
+        role=\"Recom Zdinarsik\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=5d7768468a7581001f12f8b8&amp;type=99&amp;availabilityType=free\"
+        id=\"5d7768468a7581001f12f8b8\" order=\"27\" slug=\"sean-anthony-moran\" tag=\"Sean
+        Anthony Moran\" thumb=\"https://metadata-static.plex.tv/4/people/4565ab8f734cef18db882fb0fda8552e.jpg\"
+        role=\"Recom Fike\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=5d776abffb0d55001f54fb9c&amp;type=99&amp;availabilityType=free\"
+        id=\"5d776abffb0d55001f54fb9c\" order=\"28\" slug=\"andrew-arrabito\" tag=\"Andrew
+        Arrabito\" thumb=\"https://metadata-static.plex.tv/6/people/6eb54e597af041679d8e3f7a4da5ead2.jpg\"
+        role=\"Recom Prager\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=5d777073ad5437001f822978&amp;type=99&amp;availabilityType=free\"
+        id=\"5d777073ad5437001f822978\" order=\"29\" slug=\"johnny-alexander\" tag=\"Johnny
+        Alexander\" thumb=\"https://metadata-static.plex.tv/5/people/51c96db74069ecd7cf2f853e14cada98.jpg\"
+        role=\"Recom Ja\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=6392ed8e9f97c890128662c6&amp;type=99&amp;availabilityType=free\"
+        id=\"6392ed8e9f97c890128662c6\" order=\"30\" slug=\"kim-do-8\" tag=\"Kim Do\"
+        role=\"Recom Zhang\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=5d776eda51dd69001fe4fb5d&amp;type=99&amp;availabilityType=free\"
+        id=\"5d776eda51dd69001fe4fb5d\" order=\"31\" slug=\"victor-lopez\" tag=\"Victor
+        T. Lopez\" role=\"Recom Lopez\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=5d776b4b9ab5440021509b85&amp;type=99&amp;availabilityType=free\"
+        id=\"5d776b4b9ab5440021509b85\" order=\"32\" slug=\"maria-walker\" tag=\"Maria
+        Walker\" thumb=\"https://metadata-static.plex.tv/people/5d776b4b9ab5440021509b85.jpg\"
+        role=\"Recom Walker\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=5d776876d11dd3002022641a&amp;type=99&amp;availabilityType=free\"
+        id=\"5d776876d11dd3002022641a\" order=\"33\" slug=\"phil-brown-2\" tag=\"Phil
+        Brown\" thumb=\"https://metadata-static.plex.tv/5/people/54df98be4258b2dba4d106784d77a9e7.jpg\"
+        role=\"Stringer\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=5d7768abad5437001f74c903&amp;type=99&amp;availabilityType=free\"
+        id=\"5d7768abad5437001f74c903\" order=\"34\" slug=\"jocelyn-christian\" tag=\"Jocelyn
+        Christian\" thumb=\"https://metadata-static.plex.tv/people/5d7768abad5437001f74c903.jpg\"
+        role=\"Bio Lab Tech\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=5d7768268a7581001f12bde5&amp;type=99&amp;availabilityType=free\"
+        id=\"5d7768268a7581001f12bde5\" order=\"35\" slug=\"joel-tobeck\" tag=\"Joel
+        Tobeck\" thumb=\"https://metadata-static.plex.tv/people/5d7768268a7581001f12bde5.jpg\"
+        role=\"Neuroscientist\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=5f4062262e2b260040b14b88&amp;type=99&amp;availabilityType=free\"
+        id=\"5f4062262e2b260040b14b88\" order=\"36\" slug=\"moana-ete\" tag=\"Moana
+        Ete\" role=\"Female Med-Tech\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=5d776a3396b655001fde63e7&amp;type=99&amp;availabilityType=free\"
+        id=\"5d776a3396b655001fde63e7\" order=\"37\" slug=\"phil-peleton\" tag=\"Phil
+        Peleton\" thumb=\"https://metadata-static.plex.tv/c/people/cfcb1cbdfd4aa88ca05d6e1e21410e2b.jpg\"
+        role=\"Male Med-Tech\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=5d776c459ab5440021514ce6&amp;type=99&amp;availabilityType=free\"
+        id=\"5d776c459ab5440021514ce6\" order=\"38\" slug=\"jamie-landau\" tag=\"Jamie
+        Landau\" thumb=\"https://metadata-static.plex.tv/d/people/debb6ec40a92ddc84b9681639cd7a342.jpg\"
+        role=\"Metkayina Warrior\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=6392ed8f8a73723d92adef7e&amp;type=99&amp;availabilityType=free\"
+        id=\"6392ed8f8a73723d92adef7e\" order=\"39\" slug=\"jim-moore-63\" tag=\"Jim
+        Moore\" role=\"Mako Sub #1 Pilot\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=5d776cb8594b2b001e6fbb7f&amp;type=99&amp;availabilityType=free\"
+        id=\"5d776cb8594b2b001e6fbb7f\" order=\"40\" slug=\"benjamin-hoetjes\" tag=\"Benjamin
+        Hoetjes\" thumb=\"https://metadata-static.plex.tv/people/5d776cb8594b2b001e6fbb7f.jpg\"
+        role=\"Mako Sub #1 Gunner\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=5f404bc6bf3e560040bdad00&amp;type=99&amp;availabilityType=free\"
+        id=\"5f404bc6bf3e560040bdad00\" order=\"41\" slug=\"nikita-tu-bryant\" tag=\"Nikita
+        Tu Bryant\" role=\"Mako Sub #2 Pilot\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=5d77687e6f4521001eaa972c&amp;type=99&amp;availabilityType=free\"
+        id=\"5d77687e6f4521001eaa972c\" order=\"42\" slug=\"anthony-ahern\" tag=\"Anthony
+        Ahern\" thumb=\"https://metadata-static.plex.tv/people/5d77687e6f4521001eaa972c.jpg\"
+        role=\"Mako Sub #2 Gunner\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=5d776826103a2d001f563f23&amp;type=99&amp;availabilityType=free\"
+        id=\"5d776826103a2d001f563f23\" order=\"43\" slug=\"shane-rangi\" tag=\"Shane
+        Rangi\" thumb=\"https://metadata-static.plex.tv/a/people/a360939f5e312729a2dc2edc4c26fc56.jpg\"
+        role=\"Matador Co-Pilot\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=6390bdf5a110c93704466cf0&amp;type=99&amp;availabilityType=free\"
+        id=\"6390bdf5a110c93704466cf0\" order=\"44\" slug=\"rick-lucas-8\" tag=\"Rick
+        Lucas\" role=\"Kestrel Pilot\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=5d7768f5594b2b001e699747&amp;type=99&amp;availabilityType=free\"
+        id=\"5d7768f5594b2b001e699747\" order=\"45\" slug=\"tanya-drewery\" tag=\"Tanya
+        Drewery\" thumb=\"https://metadata-static.plex.tv/e/people/e4186ec9153c689bbad48933d89fd928.jpg\"
+        role=\"Neurotech #1\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=5eb29114d33656004282406a&amp;type=99&amp;availabilityType=free\"
+        id=\"5eb29114d33656004282406a\" order=\"46\" slug=\"ava-diakhaby\" tag=\"Ava
+        Diakhaby\" thumb=\"https://metadata-static.plex.tv/people/5eb29114d33656004282406a.jpg\"
+        role=\"Neurotech #2\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=5e16579a91c2030041235417&amp;type=99&amp;availabilityType=free\"
+        id=\"5e16579a91c2030041235417\" order=\"47\" slug=\"isaac-te-reina-2\" tag=\"Isaac
+        Te Reina\" role=\"Sea Dragon First Mate\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=6390bdf5a110c93704466cf1&amp;type=99&amp;availabilityType=free\"
+        id=\"6390bdf5a110c93704466cf1\" order=\"48\" slug=\"eric-farmer-4\" tag=\"Eric
+        Farmer\" role=\"Crabsuit Pilot\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=6390bdf5a110c93704466cf2&amp;type=99&amp;availabilityType=free\"
+        id=\"6390bdf5a110c93704466cf2\" order=\"49\" slug=\"philip-mtambo\" tag=\"Philip
+        Mtambo\" role=\"Skel Trooper\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=6390bdf5a110c93704466cf3&amp;type=99&amp;availabilityType=free\"
+        id=\"6390bdf5a110c93704466cf3\" order=\"50\" slug=\"daniel-lough\" tag=\"Daniel
+        Lough\" role=\"Spider Double\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=6390bdf5a110c93704466cf4&amp;type=99&amp;availabilityType=free\"
+        id=\"6390bdf5a110c93704466cf4\" order=\"51\" slug=\"cruz-moir-2\" tag=\"Cruz
+        Moir\" role=\"Young Spider\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=6390bdf5a110c93704466cf5&amp;type=99&amp;availabilityType=free\"
+        id=\"6390bdf5a110c93704466cf5\" order=\"52\" slug=\"alex-lucas-16\" tag=\"Alex
+        Lucas\" role=\"Toddler Spider\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=5d776d5d9ab544002151df0f&amp;type=99&amp;availabilityType=free\"
+        id=\"5d776d5d9ab544002151df0f\" order=\"53\" slug=\"scarlett-fernandez\" tag=\"Scarlett
+        Fernandez\" thumb=\"https://metadata-static.plex.tv/5/people/5c20e57d34d7804909d6223d5fbe5f66.jpg\"
+        role=\"Young Kiri\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=5d7768bb96b655001fdc043d&amp;type=99&amp;availabilityType=free\"
+        id=\"5d7768bb96b655001fdc043d\" order=\"54\" slug=\"chloe-coleman\" tag=\"Chloe
+        Coleman\" thumb=\"https://metadata-static.plex.tv/6/people/61f7aa05f809abee44bb63285672ba59.jpg\"
+        role=\"Young Lo&apos;ak\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=5e1656ea91c20300412342e7&amp;type=99&amp;availabilityType=free\"
+        id=\"5e1656ea91c20300412342e7\" order=\"55\" slug=\"jeremy-irwin\" tag=\"Jeremy
+        Irwin\" thumb=\"https://metadata-static.plex.tv/b/people/b67ce1bb670e06d439beb87fdfcc37ec.jpg\"
+        role=\"Young Neteyam\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=5d776c167a53e9001e73931d&amp;type=99&amp;availabilityType=free\"
+        id=\"5d776c167a53e9001e73931d\" order=\"56\" slug=\"jake-mclean\" tag=\"Jake
+        McLean\" role=\"Na&apos;vi (uncredited)\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=5d7768faad5437001f7548d4&amp;type=99&amp;availabilityType=free\"
+        id=\"5d7768faad5437001f7548d4\" order=\"57\" slug=\"cj-jones\" tag=\"CJ Jones\"
+        thumb=\"https://metadata-static.plex.tv/e/people/eeb146c03fe1fcfb584084666170f710.jpg\"
+        role=\"Metkayina Interpreter (uncredited)\" directory=\"1\"/><Director key=\"/library/sections/home/all?director=5d776824151a60001f24a3bc&amp;type=99&amp;availabilityType=free\"
+        id=\"5d776824151a60001f24a3bc\" slug=\"james-cameron\" tag=\"James Cameron\"
+        thumb=\"https://metadata-static.plex.tv/2/people/2cd0c7b1e5201e54cd9cca57a4b15f3f.jpg\"
+        role=\"Director\" directory=\"1\"/><Producer key=\"/library/sections/home/all?producer=5d776824151a60001f24a3bc&amp;type=99&amp;availabilityType=free\"
+        id=\"5d776824151a60001f24a3bc\" slug=\"james-cameron\" tag=\"James Cameron\"
+        thumb=\"https://metadata-static.plex.tv/2/people/2cd0c7b1e5201e54cd9cca57a4b15f3f.jpg\"
+        role=\"Producer\" directory=\"1\"/><Producer key=\"/library/sections/home/all?producer=62fb7cbae0fd83affa30fa17&amp;type=99&amp;availabilityType=free\"
+        id=\"62fb7cbae0fd83affa30fa17\" slug=\"jon-landau-2\" tag=\"Jon Landau\" thumb=\"https://metadata-static.plex.tv/d/people/ddb5b6248dda8b3dce30b5d5ec47c20a.jpg\"
+        role=\"Producer\" directory=\"1\"/><Writer key=\"/library/sections/home/all?writer=5d776824151a60001f24a3bc&amp;type=99&amp;availabilityType=free\"
+        id=\"5d776824151a60001f24a3bc\" slug=\"james-cameron\" tag=\"James Cameron\"
+        thumb=\"https://metadata-static.plex.tv/2/people/2cd0c7b1e5201e54cd9cca57a4b15f3f.jpg\"
+        role=\"Story\" directory=\"1\"/><Writer key=\"/library/sections/home/all?writer=5d77683654c0f0001f303c03&amp;type=99&amp;availabilityType=free\"
+        id=\"5d77683654c0f0001f303c03\" slug=\"rick-jaffa\" tag=\"Rick Jaffa\" thumb=\"https://metadata-static.plex.tv/people/5d77683654c0f0001f303c03.jpg\"
+        role=\"Story\" directory=\"1\"/><Writer key=\"/library/sections/home/all?writer=5d7768366f4521001ea9c49e&amp;type=99&amp;availabilityType=free\"
+        id=\"5d7768366f4521001ea9c49e\" slug=\"amanda-silver\" tag=\"Amanda Silver\"
+        thumb=\"https://metadata-static.plex.tv/people/5d7768366f4521001ea9c49e.jpg\"
+        role=\"Story\" directory=\"1\"/><Writer key=\"/library/sections/home/all?writer=5d77686d6f4521001eaa67b4&amp;type=99&amp;availabilityType=free\"
+        id=\"5d77686d6f4521001eaa67b4\" slug=\"josh-friedman\" tag=\"Josh Friedman\"
+        thumb=\"https://metadata-static.plex.tv/3/people/3b314b2d74ac3ec8142d4e293993c34a.jpg\"
+        role=\"Story\" directory=\"1\"/><Writer key=\"/library/sections/home/all?writer=5d77682685719b001f3a0b28&amp;type=99&amp;availabilityType=free\"
+        id=\"5d77682685719b001f3a0b28\" slug=\"shane-salerno\" tag=\"Shane Salerno\"
+        thumb=\"https://metadata-static.plex.tv/9/people/961761ac4b7faae9f961dff3931a889b.jpg\"
+        role=\"Story\" directory=\"1\"/><Similar guid=\"plex://movie/5d776d057a53e9001e74ed5d\"
+        tag=\"Avatar\"/><Similar guid=\"plex://movie/5d776b5df617c900201752a7\" tag=\"Puss
+        in Boots: The Last Wish\"/><Similar guid=\"plex://movie/5d776ca79ab544002151945c\"
+        tag=\"Black Adam\"/><Similar guid=\"plex://movie/5d77702e6afb3d0020613fd1\"
+        tag=\"Black Panther: Wakanda Forever\"/><Similar guid=\"plex://movie/5e161a83bea6ac004126e148\"
+        tag=\"Ant\u2010Man and the Wasp: Quantumania\"/><Similar guid=\"plex://movie/5e165afd20b9e6003e35a05b\"
+        tag=\"Glass Onion\"/><Similar guid=\"plex://movie/5e5d3b055267d4004009b14c\"
+        tag=\"Infelices para Siempre\"/><Similar guid=\"plex://movie/5e5d3b0bc20b28003df9e33f\"
+        tag=\"Creed III\"/><Similar guid=\"plex://movie/608c2a7f3389fe002c942e3c\"
+        tag=\"Diabolik \u2010 Ginko all&apos;attacco!\"/><Similar guid=\"plex://movie/613c7a5176e17c043fc1e8d7\"
+        tag=\"Diabolik: Ginko Attacks\"/><Similar guid=\"plex://movie/62665a7dafa6cfe387fe7916\"
+        tag=\"Winnie\u2010the\u2010Pooh: Blood and Honey\"/><Studio tag=\"20th Century
+        Studios\"/><Studio tag=\"Lightstorm Entertainment\"/><Summary size=\"100\"
+        tag=\"When a familiar threat resurfaces, Jake and Neytiri must protect their
+        children and their planet.\" type=\"default\"/><Summary size=\"250\" tag=\"Jake
+        Sully, Neytiri and their children explore the mysterious lands of Pandora.
+        When a familiar threat resurfaces, they must fight a difficult war to protect
+        their planet.\" type=\"default\"/><Summary size=\"500\" tag=\"Set more than
+        a decade after the events of the first film, learn the story of the Sully
+        family (Jake, Neytiri, and their kids), the trouble that follows them, the
+        lengths they go to keep each other safe, the battles they fight to stay alive,
+        and the tragedies they endure.\" type=\"default\"/><Summary size=\"250\" tag=\"In
+        &quot;Avatar: The Way of Water,&quot; Jake Sully and his family navigate perilous
+        waters as they seek refuge with the oceanic Metkayina clan. Facing human threats
+        and discovering deep connections, they must unite to protect their home and
+        family in a stunning aquatic world.\" type=\"custom\"/></Video></MediaContainer>"
     headers:
       Access-Control-Allow-Origin:
       - '*'
@@ -643,115 +811,243 @@ interactions:
     uri: https://metadata.provider.plex.tv/library/metadata/5d776ca79ab544002151945c?includeBandwidths=1&includeChapters=1&includeGeolocation=1&includeLoudnessRamps=1&includeMarkers=1&includeUserState=1
   response:
     body:
-      string: !!binary |
-        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
-        366atioCcuddnfwfvj/fr9//w/8C9T6yduVfAAA=
+      string: '<?xml version="1.0"?><MediaContainer librarySectionID="home" librarySectionTitle="Metadata"
+        offset="0" totalSize="1" identifier="tv.plex.provider.metadata" size="1"><Video
+        art="https://metadata-static.plex.tv/a/gracenote/a9ba652c2b4bc621c2b7229d15b1d11d.jpg"
+        banner="https://artworks.thetvdb.com/banners/v4/movie/33190/banners/64ff03d608d00.jpg"
+        guid="plex://movie/5d776ca79ab544002151945c" key="/library/metadata/5d776ca79ab544002151945c"
+        rating="3.9" ratingKey="5d776ca79ab544002151945c" studio="New Line Cinema"
+        summary="Nearly 5,000 years after he was bestowed with the almighty powers
+        of the Egyptian gods--and imprisoned just as quickly--Black Adam is freed
+        from his earthly tomb, ready to unleash his unique form of justice on the
+        modern world." tagline="Power born from rage." type="movie" thumb="https://metadata-static.plex.tv/c/gracenote/c16be7b0133d85a154ec16a4ed4e1209.jpg"
+        addedAt="1666137600" duration="7500000" publicPagesURL="https://watch.plex.tv/movie/black-adam"
+        slug="black-adam" expiresAt="1893455940" watchlistedAt="1725844815" viewCount="0"
+        viewOffset="0" title="Black Adam" contentRating="PG-13" originallyAvailableAt="2022-10-19"
+        year="2022" audienceRating="8.8" audienceRatingImage="rottentomatoes://image.rating.upright"
+        ratingImage="rottentomatoes://image.rating.rotten" imdbRatingCount="280345"><Image
+        alt="Black Adam" type="background" url="https://metadata-static.plex.tv/a/gracenote/a9ba652c2b4bc621c2b7229d15b1d11d.jpg"/><Image
+        alt="Black Adam" type="banner" url="https://artworks.thetvdb.com/banners/v4/movie/33190/banners/64ff03d608d00.jpg"/><Image
+        alt="Black Adam" type="clearLogo" url="https://metadata-static.plex.tv/1/683a142553/1b3105476a90c6e68d5a965a89909b77.png"/><Image
+        alt="Black Adam" type="clearLogoWide" url="https://metadata-static.plex.tv/1/683a142553/1b3105476a90c6e68d5a965a89909b77.png"/><Image
+        alt="Black Adam" type="coverArt" url="https://metadata-static.plex.tv/2/gracenote/29f0275f6682bc2376ce073a8692352c.jpg"/><Image
+        alt="Black Adam" type="coverPoster" url="https://metadata-static.plex.tv/c/gracenote/c16be7b0133d85a154ec16a4ed4e1209.jpg"/><Image
+        alt="Black Adam" type="coverSquare" url="https://metadata-static.plex.tv/e/gracenote/e45015e75f033828b7624e3f548fbd06.jpg"/><Image
+        alt="Black Adam" type="snapshot" url="https://metadata-static.plex.tv/9/gracenote/941bed7eb235c10bc794c876d4a4de13.jpg"/><Genre
+        filter="genre=5d9c046c2192ba001f2ff6c4" id="5d9c046c2192ba001f2ff6c4" key="/library/sections/home/all?genre=5d9c046c2192ba001f2ff6c4"
+        ratingKey="genre_5d9c046c2192ba001f2ff6c4" slug="sci-fi" tag="Sci-Fi" directory="1"
+        context="tag.genre"/><Genre filter="genre=5d9c046c705e7a001e6c8daa" id="5d9c046c705e7a001e6c8daa"
+        key="/library/sections/home/all?genre=5d9c046c705e7a001e6c8daa" ratingKey="genre_5d9c046c705e7a001e6c8daa"
+        slug="fantasy" tag="Fantasy" directory="1" context="tag.genre"/><Genre filter="genre=5d9c046c2192ba001f2ff6c2"
+        id="5d9c046c2192ba001f2ff6c2" key="/library/sections/home/all?genre=5d9c046c2192ba001f2ff6c2"
+        ratingKey="genre_5d9c046c2192ba001f2ff6c2" slug="action" tag="Action" directory="1"
+        context="tag.genre"/><Genre filter="genre=5d9c046c2192ba001f2ff6c3" id="5d9c046c2192ba001f2ff6c3"
+        key="/library/sections/home/all?genre=5d9c046c2192ba001f2ff6c3" ratingKey="genre_5d9c046c2192ba001f2ff6c3"
+        slug="adventure" tag="Adventure" directory="1" context="tag.genre"/><Guid
+        id="imdb://tt6443346"/><Guid id="tmdb://436270"/><Guid id="tvdb://33190"/><Rating
+        image="imdb://image.rating" type="audience" value="6.2"/><Rating image="rottentomatoes://image.rating.rotten"
+        type="critic" value="3.9"/><Rating image="rottentomatoes://image.rating.upright"
+        type="audience" value="8.8"/><Rating image="themoviedb://image.rating" type="audience"
+        value="6.92"/><Country tag="United States of America"/><Role key="/library/sections/home/all?actor=5d77682b6f4521001ea99f61&amp;type=99&amp;availabilityType=free"
+        id="5d77682b6f4521001ea99f61" order="1" slug="dwayne-johnson" tag="Dwayne
+        Johnson" thumb="https://metadata-static.plex.tv/7/people/7e551aecd263c173101c3f70732026e0.jpg"
+        role="Black Adam / Teth Adam" directory="1"/><Role key="/library/sections/home/all?actor=5d77682aeb5d26001f1de2e5&amp;type=99&amp;availabilityType=free"
+        id="5d77682aeb5d26001f1de2e5" order="2" slug="aldis-hodge" tag="Aldis Hodge"
+        thumb="https://metadata-static.plex.tv/8/people/87fb354a5f989c7670bf09cfd5724eef.jpg"
+        role="Hawkman / Carter Hall" directory="1"/><Role key="/library/sections/home/all?actor=5d776875594b2b001e68cf0e&amp;type=99&amp;availabilityType=free"
+        id="5d776875594b2b001e68cf0e" order="3" slug="noah-centineo" tag="Noah Centineo"
+        thumb="https://metadata-static.plex.tv/4/people/49ad13c4e3264c57d611ec66890022bf.jpg"
+        role="Atom Smasher / Al Rothstein" directory="1"/><Role key="/library/sections/home/all?actor=5d7768373c3c2a001fbcec67&amp;type=99&amp;availabilityType=free"
+        id="5d7768373c3c2a001fbcec67" order="4" slug="sarah-shahi" tag="Sarah Shahi"
+        thumb="https://metadata-static.plex.tv/1/people/19e4a1774c66145a0b2c7f5904044564.jpg"
+        role="Adrianna Tomaz" directory="1"/><Role key="/library/sections/home/all?actor=5d77704ef617c9002019d014&amp;type=99&amp;availabilityType=free"
+        id="5d77704ef617c9002019d014" order="5" slug="quintessa-swindell" tag="Quintessa
+        Swindell" thumb="https://metadata-static.plex.tv/0/people/081431a65b81d29c15394264085a7068.jpg"
+        role="Cyclone / Maxine Hunkel" directory="1"/><Role key="/library/sections/home/all?actor=5d7768783ab0e7001f502170&amp;type=99&amp;availabilityType=free"
+        id="5d7768783ab0e7001f502170" order="6" slug="marwan-kenzari" tag="Marwan
+        Kenzari" thumb="https://metadata-static.plex.tv/0/people/03f16daa58d21ab24a541ae53acb4daa.jpg"
+        role="Ishmael / Sabbac / King Ahk-Ton" directory="1"/><Role key="/library/sections/home/all?actor=5d7769b796b655001fdd7728&amp;type=99&amp;availabilityType=free"
+        id="5d7769b796b655001fdd7728" order="7" slug="mohammed-amer" tag="Mo Amer"
+        thumb="https://metadata-static.plex.tv/5/people/50fd7c2119650329507ee472ee5fe1f4.jpg"
+        role="Karim" directory="1"/><Role key="/library/sections/home/all?actor=5e1657f461c6140040d90066&amp;type=99&amp;availabilityType=free"
+        id="5e1657f461c6140040d90066" order="8" slug="bodhi-sabongui-2" tag="Bodhi
+        Sabongui" thumb="https://metadata-static.plex.tv/5/people/52025f5c8753005de6fefa0ff52a563a.jpg"
+        role="Amon Tomaz" directory="1"/><Role key="/library/sections/home/all?actor=5d7768255af944001f1f63cb&amp;type=99&amp;availabilityType=free"
+        id="5d7768255af944001f1f63cb" order="9" slug="pierce-brosnan" tag="Pierce
+        Brosnan" thumb="https://metadata-static.plex.tv/2/people/281dfdd26037421400604d541d118daf.jpg"
+        role="Dr. Fate / Kent Nelson" directory="1"/><Role key="/library/sections/home/all?actor=5e16599a316a39003efa65b6&amp;type=99&amp;availabilityType=free"
+        id="5e16599a316a39003efa65b6" order="10" slug="james-cusati-moyer-2" tag="James
+        Cusati-Moyer" thumb="https://metadata-static.plex.tv/f/people/ff72dae10ba5ed89ddcf6c88e143b35f.jpg"
+        role="Samir" directory="1"/><Role key="/library/sections/home/all?actor=5d776d8523d5a3001f523ee1&amp;type=99&amp;availabilityType=free"
+        id="5d776d8523d5a3001f523ee1" order="11" slug="jalon-christian" tag="Jalon
+        Christian" thumb="https://metadata-static.plex.tv/4/people/49e0866d8d7b2eb5f007c46ad4c8d118.jpg"
+        role="Hurut" directory="1"/><Role key="/library/sections/home/all?actor=5d776a7d96b655001fdeffa5&amp;type=99&amp;availabilityType=free"
+        id="5d776a7d96b655001fdeffa5" order="12" slug="benjamin-patterson" tag="Benjamin
+        Patterson" thumb="https://metadata-static.plex.tv/people/5d776a7d96b655001fdeffa5.jpg"
+        role="Skinny Teth Adam" directory="1"/><Role key="/library/sections/home/all?actor=5e1641debc1372003ea77c2f&amp;type=99&amp;availabilityType=free"
+        id="5e1641debc1372003ea77c2f" order="13" slug="odelya-halevi" tag="Odelya
+        Halevi" thumb="https://metadata-static.plex.tv/people/5e1641debc1372003ea77c2f.jpg"
+        role="Shiruta" directory="1"/><Role key="/library/sections/home/all?actor=5d776989ad5437001f75fca8&amp;type=99&amp;availabilityType=free"
+        id="5d776989ad5437001f75fca8" order="14" slug="uli-latukefu" tag="Uli Latukefu"
+        thumb="https://metadata-static.plex.tv/people/5d776989ad5437001f75fca8.jpg"
+        role="The Champion" directory="1"/><Role key="/library/sections/home/all?actor=5d7768517e9a3c0020c70b0d&amp;type=99&amp;availabilityType=free"
+        id="5d7768517e9a3c0020c70b0d" order="15" slug="jennifer-holland" tag="Jennifer
+        Holland" thumb="https://metadata-static.plex.tv/f/people/f9a5aad24dcc9ff05bed825d2d44a209.jpg"
+        role="Emilia Harcourt" directory="1"/><Role key="/library/sections/home/all?actor=5d77682d54f42c001f8c35f6&amp;type=99&amp;availabilityType=free"
+        id="5d77682d54f42c001f8c35f6" order="16" slug="henry-winkler" tag="Henry Winkler"
+        thumb="https://metadata-static.plex.tv/2/people/23bed3b71421ba84c0862e861992e953.jpg"
+        role="Uncle Al" directory="1"/><Role key="/library/sections/home/all?actor=5d7768337e9a3c0020c6c4df&amp;type=99&amp;availabilityType=free"
+        id="5d7768337e9a3c0020c6c4df" order="17" slug="chaim-girafi" tag="Chaim Jeraffi"
+        thumb="https://metadata-static.plex.tv/people/5d7768337e9a3c0020c6c4df.jpg"
+        role="Djau" directory="1"/><Role key="/library/sections/home/all?actor=5d7768bb1999bc0020dcf72f&amp;type=99&amp;availabilityType=free"
+        id="5d7768bb1999bc0020dcf72f" order="18" slug="sharon-gee" tag="Sharon Gee"
+        thumb="https://metadata-static.plex.tv/people/5d7768bb1999bc0020dcf72f.jpg"
+        role="Mrs. Farmer" directory="1"/><Role key="/library/sections/home/all?actor=5d776826999c64001ec2c667&amp;type=99&amp;availabilityType=free"
+        id="5d776826999c64001ec2c667" order="19" slug="stephan-jones" tag="Stephan
+        Jones" thumb="https://metadata-static.plex.tv/people/5d776826999c64001ec2c667.jpg"
+        role="Commander" directory="1"/><Role key="/library/sections/home/all?actor=5d77705f6afb3d0020618a40&amp;type=99&amp;availabilityType=free"
+        id="5d77705f6afb3d0020618a40" order="20" slug="a-manuel-miranda" tag="A. Manuel
+        Miranda" thumb="https://metadata-static.plex.tv/8/people/8da7e96eea9c3109b0ad2967290eb070.jpg"
+        role="Ancient Mine Soldier" directory="1"/><Role key="/library/sections/home/all?actor=5d7768267228e5001f1dcdb9&amp;type=99&amp;availabilityType=free"
+        id="5d7768267228e5001f1dcdb9" order="21" slug="djimon-hounsou" tag="Djimon
+        Hounsou" thumb="https://metadata-static.plex.tv/2/people/2b58e4d57c581ab16b89a3867d0c6f88.jpg"
+        role="Wizard" directory="1"/><Role key="/library/sections/home/all?actor=5d7769eb594b2b001e6ae0a6&amp;type=99&amp;availabilityType=free"
+        id="5d7769eb594b2b001e6ae0a6" order="22" slug="raj-kala" tag="Raj Kala" role="Wizard
+        #1" directory="1"/><Role key="/library/sections/home/all?actor=5f3fb38dbf3e560040aeed45&amp;type=99&amp;availabilityType=free"
+        id="5f3fb38dbf3e560040aeed45" order="23" slug="e-lloyd-napier-2" tag="E. Lloyd
+        Napier" role="Wizard #2" directory="1"/><Role key="/library/sections/home/all?actor=5f3fc468be690b00430da7ff&amp;type=99&amp;availabilityType=free"
+        id="5f3fc468be690b00430da7ff" order="24" slug="kiara-rashawn" tag="Kiara Rashawn"
+        thumb="https://metadata-static.plex.tv/c/people/c5971456a1ebd2f134616314baf10377.jpg"
+        role="Wizard #3" directory="1"/><Role key="/library/sections/home/all?actor=605621dfca7927002cf45465&amp;type=99&amp;availabilityType=free"
+        id="605621dfca7927002cf45465" order="25" slug="onye-eme-akwari" tag="Onye
+        Eme-Akwari" thumb="https://metadata-static.plex.tv/c/people/c2119ad19871090150f2031d5cd8f08b.jpg"
+        role="Wizard #4" directory="1"/><Role key="/library/sections/home/all?actor=5d776987f617c90020161012&amp;type=99&amp;availabilityType=free"
+        id="5d776987f617c90020161012" order="26" slug="sanna-erica" tag="Sanna Erica"
+        role="Wizard #5" directory="1"/><Role key="/library/sections/home/all?actor=5d77688fdecfcd001f2ec56b&amp;type=99&amp;availabilityType=free"
+        id="5d77688fdecfcd001f2ec56b" order="27" slug="vince-canlas" tag="Vince Canlas"
+        thumb="https://metadata-static.plex.tv/9/people/9a5ef54f5ee96a20f1075739f44d535b.jpg"
+        role="Wizard #6" directory="1"/><Role key="/library/sections/home/all?actor=5d7768294de0ee001fcc934d&amp;type=99&amp;availabilityType=free"
+        id="5d7768294de0ee001fcc934d" order="28" slug="tonea-stewart" tag="Tonea Stewart"
+        thumb="https://metadata-static.plex.tv/people/5d7768294de0ee001fcc934d.jpg"
+        role="Wizard #7" directory="1"/><Role key="/library/sections/home/all?actor=5f403e2703883a0040b65035&amp;type=99&amp;availabilityType=free"
+        id="5f403e2703883a0040b65035" order="29" slug="meghna-nagarajan" tag="Meghna
+        Nagarajan" role="Apartment Resident" directory="1"/><Role key="/library/sections/home/all?actor=5d7768296f4521001ea99a72&amp;type=99&amp;availabilityType=free"
+        id="5d7768296f4521001ea99a72" order="30" slug="patrick-sabongui" tag="Patrick
+        Sabongui" thumb="https://metadata-static.plex.tv/people/5d7768296f4521001ea99a72.jpg"
+        role="Rami" directory="1"/><Role key="/library/sections/home/all?actor=5f406986c63b480040e6b7a4&amp;type=99&amp;availabilityType=free"
+        id="5f406986c63b480040e6b7a4" order="31" slug="alex-parkinson-3" tag="Alex
+        Parkinson" role="Chauffeur" directory="1"/><Role key="/library/sections/home/all?actor=5d776833880197001ec92fef&amp;type=99&amp;availabilityType=free"
+        id="5d776833880197001ec92fef" order="32" slug="joseph-gatt" tag="Joseph Gatt"
+        thumb="https://metadata-static.plex.tv/4/people/4b70c579b81c0dcef80aacc11075c626.jpg"
+        role="Intergang Squad Leader" directory="1"/><Role key="/library/sections/home/all?actor=5d77704e594b2b001e7488f0&amp;type=99&amp;availabilityType=free"
+        id="5d77704e594b2b001e7488f0" order="33" slug="kamen-casey" tag="Kamen Casey"
+        role="Intergang Pilot #2" directory="1"/><Role key="/library/sections/home/all?actor=5f40088ecc4920003b2defd8&amp;type=99&amp;availabilityType=free"
+        id="5f40088ecc4920003b2defd8" order="34" slug="dennis-dawson-3" tag="Dennis
+        Dawson" role="Intergang Pilot #3" directory="1"/><Role key="/library/sections/home/all?actor=5d776aad7a53e9001e70c403&amp;type=99&amp;availabilityType=free"
+        id="5d776aad7a53e9001e70c403" order="35" slug="mike-senior" tag="Mike Senior"
+        thumb="https://metadata-static.plex.tv/people/5d776aad7a53e9001e70c403.jpg"
+        role="Intergang Pilot #4" directory="1"/><Role key="/library/sections/home/all?actor=5d776ca97a53e9001e7498d1&amp;type=99&amp;availabilityType=free"
+        id="5d776ca97a53e9001e7498d1" order="36" slug="jermaine-rivers" tag="Jermaine
+        Rivers" thumb="https://metadata-static.plex.tv/8/people/86e21fd353cdaba7c5437f699f0adb19.jpg"
+        role="Intergang Sniper" directory="1"/><Role key="/library/sections/home/all?actor=5d776b8d96b655001fe14d02&amp;type=99&amp;availabilityType=free"
+        id="5d776b8d96b655001fe14d02" order="37" slug="regina-ting-chen" tag="Regina
+        Ting Chen" thumb="https://metadata-static.plex.tv/people/5d776b8d96b655001fe14d02.jpg"
+        role="Helicopter #1 Pilot #1" directory="1"/><Role key="/library/sections/home/all?actor=5d776a9bfb0d55001f54b3e1&amp;type=99&amp;availabilityType=free"
+        id="5d776a9bfb0d55001f54b3e1" order="38" slug="sekou-laidlow" tag="Sekou Laidlow"
+        thumb="https://metadata-static.plex.tv/7/people/70c1768d0a7100e12dacb3b35dd78c10.jpg"
+        role="Helicopter #2 Pilot #1" directory="1"/><Role key="/library/sections/home/all?actor=5d776a5d7a53e9001e7031de&amp;type=99&amp;availabilityType=free"
+        id="5d776a5d7a53e9001e7031de" order="39" slug="cameron-moir" tag="Cameron
+        Moir" role="Helicopter #2 Pilot #2" directory="1"/><Role key="/library/sections/home/all?actor=5d776b057a53e9001e7173f5&amp;type=99&amp;availabilityType=free"
+        id="5d776b057a53e9001e7173f5" order="40" slug="donny-carrington" tag="Donny
+        Carrington" thumb="https://metadata-static.plex.tv/2/people/206aa11e6f98b60f78227d7e440ecd94.jpg"
+        role="Checkpoint Mercenary #1" directory="1"/><Role key="/library/sections/home/all?actor=5d776ea496b655001fe6ed27&amp;type=99&amp;availabilityType=free"
+        id="5d776ea496b655001fe6ed27" order="41" slug="boone-platt" tag="Boone Platt"
+        thumb="https://metadata-static.plex.tv/9/people/9b1e73639147b14f55b30ffbfb12611c.jpg"
+        role="Checkpoint Mercenary #2" directory="1"/><Role key="/library/sections/home/all?actor=5d776a637a53e9001e703d8a&amp;type=99&amp;availabilityType=free"
+        id="5d776a637a53e9001e703d8a" order="42" slug="philip-fornah" tag="Philip
+        Fornah" thumb="https://metadata-static.plex.tv/people/5d776a637a53e9001e703d8a.jpg"
+        role="Squad Mercenary #1" directory="1"/><Role key="/library/sections/home/all?actor=5d776c46ad5437001f7b92a3&amp;type=99&amp;availabilityType=free"
+        id="5d776c46ad5437001f7b92a3" order="43" slug="derek-russo" tag="Derek Russo"
+        thumb="https://metadata-static.plex.tv/0/people/0219fd9ad18fbd918bc179a257cc7fa2.jpg"
+        role="Squad Mercenary #2" directory="1"/><Role key="/library/sections/home/all?actor=5f40496003883a0040b7da84&amp;type=99&amp;availabilityType=free"
+        id="5f40496003883a0040b7da84" order="44" slug="angel-rosario-jr" tag="Angel
+        Rosario Jr." thumb="https://metadata-static.plex.tv/d/people/df9829e888f4f0d2afb9e355e6076c96.jpg"
+        role="Squad Mercenary #3" directory="1"/><Role key="/library/sections/home/all?actor=5d7768c0594b2b001e694b65&amp;type=99&amp;availabilityType=free"
+        id="5d7768c0594b2b001e694b65" order="45" slug="tang-nguyen" tag="Tang Nguyen"
+        thumb="https://metadata-static.plex.tv/people/5d7768c0594b2b001e694b65.jpg"
+        role="Squad Mercenary #13" directory="1"/><Role key="/library/sections/home/all?actor=5d7769217a53e9001e6e2541&amp;type=99&amp;availabilityType=free"
+        id="5d7769217a53e9001e6e2541" order="46" slug="christopher-matthew-cook" tag="Christopher
+        Matthew Cook" thumb="https://metadata-static.plex.tv/a/people/a9a1dcccb957f472dbba4284647b66cb.jpg"
+        role="Stairwell Mercenary #1" directory="1"/><Role key="/library/sections/home/all?actor=5f400bf6fea1a1003f9cf6ca&amp;type=99&amp;availabilityType=free"
+        id="5f400bf6fea1a1003f9cf6ca" order="47" slug="natasha-ellie" tag="Natasha
+        Ellie" role="Stairwell Mercenary #2" directory="1"/><Role key="/library/sections/home/all?actor=5fc5183ac2dddc002e5c78c5&amp;type=99&amp;availabilityType=free"
+        id="5fc5183ac2dddc002e5c78c5" order="48" slug="daniel-danca" tag="Daniel Danca"
+        thumb="https://metadata-static.plex.tv/4/people/4aad3a38f72835b57e617959e19fdda1.jpg"
+        role="Stairwell Mercenary #3" directory="1"/><Role key="/library/sections/home/all?actor=5f3fd8b902101b0040ee37d5&amp;type=99&amp;availabilityType=free"
+        id="5f3fd8b902101b0040ee37d5" order="49" slug="yssa-mei-panganiban" tag="Yssa
+        Mei Panganiban" thumb="https://metadata-static.plex.tv/2/people/283cabcc738b5b530554b9d3f62f57a6.jpg"
+        role="Stairwell Mercenary #4" directory="1"/><Role key="/library/sections/home/all?actor=5d7770d36afb3d0020622d3e&amp;type=99&amp;availabilityType=free"
+        id="5d7770d36afb3d0020622d3e" order="50" slug="ben-jenkin" tag="Ben Jenkin"
+        thumb="https://metadata-static.plex.tv/1/people/194eebcfc42fc411bc4682cf3371d60b.jpg"
+        role="Intergang Mercenary #8" directory="1"/><Role key="/library/sections/home/all?actor=5d7768253c3c2a001fbca9ae&amp;type=99&amp;availabilityType=free"
+        id="5d7768253c3c2a001fbca9ae" order="51" slug="viola-davis" tag="Viola Davis"
+        thumb="https://metadata-static.plex.tv/9/people/9501c7baf753f068e0ad2a7deab335ce.jpg"
+        role="Amanda Waller (uncredited)" directory="1"/><Role key="/library/sections/home/all?actor=5d77682ca091de001f2e6ddf&amp;type=99&amp;availabilityType=free"
+        id="5d77682ca091de001f2e6ddf" order="52" slug="henry-cavill" tag="Henry Cavill"
+        thumb="https://metadata-static.plex.tv/d/people/d46d5497e40dd26785aba801cbe60ee0.jpg"
+        role="Clark Kent / Superman (uncredited)" directory="1"/><Role key="/library/sections/home/all?actor=5d77685b8a7581001f1311d0&amp;type=99&amp;availabilityType=free"
+        id="5d77685b8a7581001f1311d0" order="53" slug="natalie-burn" tag="Natalie
+        Burn" thumb="https://metadata-static.plex.tv/8/people/8b74e252c836859942da632f5b2b682c.jpg"
+        role="Revolutionary Mercenary #1 (uncredited)" directory="1"/><Role key="/library/sections/home/all?actor=62fe2a3125e7591a51008d78&amp;type=99&amp;availabilityType=free"
+        id="62fe2a3125e7591a51008d78" order="54" slug="maurice-t-johnson-2" tag="Maurice
+        T. Johnson" role="Ancient Slave (uncredited)" directory="1"/><Role key="/library/sections/home/all?actor=5f92fe5498a852002ecf4e7b&amp;type=99&amp;availabilityType=free"
+        id="5f92fe5498a852002ecf4e7b" order="55" slug="tre-ryan-2" tag="Tre Ryan"
+        role="Mercenary (uncredited)" directory="1"/><Role key="/library/sections/home/all?actor=604338ed2f70d4002db3bb1d&amp;type=99&amp;availabilityType=free"
+        id="604338ed2f70d4002db3bb1d" order="56" slug="vanessa-vega-rivera" tag="Vanessa
+        Vega Rivera" role="Khandaqi Resident (uncredited)" directory="1"/><Director
+        key="/library/sections/home/all?director=5d776834eb5d26001f1e096a&amp;type=99&amp;availabilityType=free"
+        id="5d776834eb5d26001f1e096a" slug="jaume-collet-serra" tag="Jaume Collet-Serra"
+        thumb="https://metadata-static.plex.tv/7/people/73dfb43fc89f7ad36e35db295de95b93.jpg"
+        role="Director" directory="1"/><Producer key="/library/sections/home/all?producer=5d776a2c7a53e9001e6fc574&amp;type=99&amp;availabilityType=free"
+        id="5d776a2c7a53e9001e6fc574" slug="hiram-garcia" tag="Hiram Garcia" thumb="https://metadata-static.plex.tv/c/people/c377d82acbb787e23e7f40050d1d4ed2.jpg"
+        role="Producer" directory="1"/><Producer key="/library/sections/home/all?producer=5d77682d4de0ee001fcc9ef7&amp;type=99&amp;availabilityType=free"
+        id="5d77682d4de0ee001fcc9ef7" slug="beau-flynn" tag="Beau Flynn" role="Producer"
+        directory="1"/><Producer key="/library/sections/home/all?producer=5d77699c7a53e9001e6eb058&amp;type=99&amp;availabilityType=free"
+        id="5d77699c7a53e9001e6eb058" slug="dany-garcia" tag="Dany Garcia" thumb="https://metadata-static.plex.tv/b/people/b345872ca8266df6d739b5aa4a7a7982.jpg"
+        role="Producer" directory="1"/><Producer key="/library/sections/home/all?producer=5d77682b6f4521001ea99f61&amp;type=99&amp;availabilityType=free"
+        id="5d77682b6f4521001ea99f61" slug="dwayne-johnson" tag="Dwayne Johnson" thumb="https://metadata-static.plex.tv/7/people/7e551aecd263c173101c3f70732026e0.jpg"
+        role="Producer" directory="1"/><Writer key="/library/sections/home/all?writer=5d77684c103a2d001f56c6f3&amp;type=99&amp;availabilityType=free"
+        id="5d77684c103a2d001f56c6f3" slug="adam-sztykiel" tag="Adam Sztykiel" role="Writer"
+        directory="1"/><Writer key="/library/sections/home/all?writer=64b01a96c1c7f707625784f4&amp;type=99&amp;availabilityType=free"
+        id="64b01a96c1c7f707625784f4" slug="rory-haines-2" tag="Rory Haines" role="Writer"
+        directory="1"/><Writer key="/library/sections/home/all?writer=6320962335207c7911d42e37&amp;type=99&amp;availabilityType=free"
+        id="6320962335207c7911d42e37" slug="sohrab-noshirvani-2" tag="Sohrab Noshirvani"
+        role="Writer" directory="1"/><Similar guid="plex://movie/62ce982e5017b5b6852b5c06"
+        tag="R.I.P.D. 2: Rise of the Damned"/><Similar guid="plex://movie/5d77702e6afb3d0020613fd1"
+        tag="Black Panther: Wakanda Forever"/><Similar guid="plex://movie/5d77706981ba41001faefb19"
+        tag="M3GAN"/><Similar guid="plex://movie/5d776b6df617c90020175f1a" tag="Guillermo
+        del Toro&apos;s Pinocchio"/><Similar guid="plex://movie/5f40912204a8650040aec05e"
+        tag="Terrifier 2"/><Similar guid="plex://movie/5f0e8e3139312e00423eec29" tag="The
+        Woman King"/><Similar guid="plex://movie/5f461bef56ed9f003f2dda70" tag="Troll"/><Similar
+        guid="plex://movie/5fd3b6d0f95f07002d6bd6f5" tag="The Guardians of the Galaxy
+        Holiday Special"/><Similar guid="plex://movie/614edf4304d54032654b3027" tag="Smile"/><Similar
+        guid="plex://movie/5d7770e4fb0d55001f5fb3ce" tag="Violent Night"/><Studio
+        tag="New Line Cinema"/><Studio tag="Flynn Picture Company"/><Studio tag="DC
+        Films"/><Studio tag="Seven Bucks Productions"/><Studio tag="Warner Bros. Pictures"/><Summary
+        size="100" tag="Based on the comic books." type="default"/><Summary size="250"
+        tag="Bestowed with the almighty powers of the gods, Black Adam&apos;s unique
+        form of justice, born out of rage, is challenged by modern-day heroes who
+        form the Justice Society: Hawkman, Dr. Fate, Atom Smasher and Cyclone." type="default"/><Summary
+        size="500" tag="In ancient Kahndaq, Teth Adam was bestowed the almighty powers
+        of the gods. After using these powers for vengeance, he was imprisoned, becoming
+        Black Adam. Nearly 5,000 years have passed, and Black Adam has gone from man
+        to myth to legend. Now free, his unique form of justice, born out of rage,
+        is challenged by modern-day heroes who form the Justice Society: Hawkman,
+        Dr. Fate, Atom Smasher and Cyclone." type="default"/><Summary size="250" tag="In
+        &quot;Black Adam,&quot; Dwayne Johnson transforms into Teth-Adam, an ancient
+        hero awakened in modern Kahndaq. As he confronts his dark past and newfound
+        powers, the Justice Society of America fights to temper his fury, leading
+        to a clash of ideologies and epic battles." type="custom"/></Video></MediaContainer>'
     headers:
       Access-Control-Allow-Origin:
       - '*'
@@ -849,56 +1145,108 @@ interactions:
     uri: https://metadata.provider.plex.tv/library/metadata/621656cb3f91a0bf1bbdb41e?includeBandwidths=1&includeChapters=1&includeGeolocation=1&includeLoudnessRamps=1&includeMarkers=1&includeUserState=1
   response:
     body:
-      string: !!binary |
-        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
+      string: "<?xml version=\"1.0\"?><MediaContainer librarySectionID=\"home\" librarySectionTitle=\"Metadata\"
+        offset=\"0\" totalSize=\"1\" identifier=\"tv.plex.provider.metadata\" size=\"1\"><Directory
+        art=\"https://image.tmdb.org/t/p/original/vO3I7ZpSQIZXVeRfexxbvkqQjZE.jpg\"
+        banner=\"https://artworks.thetvdb.com/banners/v4/series/400160/banners/62a26374cd99d.jpg\"
+        guid=\"plex://show/621656cb3f91a0bf1bbdb41e\" key=\"/library/metadata/621656cb3f91a0bf1bbdb41e/children\"
+        ratingKey=\"621656cb3f91a0bf1bbdb41e\" studio=\"HBO Latin America\" summary=\"Nadia
+        and Mart\xEDn live in the historical &quot;Condesa&quot; in Mexico City. Both
+        are artists and share their home with a stray dog, Amsterdam. Beautiful Mexican
+        scenery and portrayal of life in one of the city&apos;s most popular and artistic
+        areas.\" type=\"show\" thumb=\"https://image.tmdb.org/t/p/original/K7SQz8lDXvObNF86bDFlhiyuLZ.jpg\"
+        addedAt=\"1647734400\" duration=\"2280000\" publicPagesURL=\"https://watch.plex.tv/show/amsterdam\"
+        slug=\"amsterdam\" watchlistedAt=\"1725844815\" viewedLeafCount=\"0\" title=\"Amsterdam\"
+        leafCount=\"10\" childCount=\"1\" contentRating=\"TV-MA\" originallyAvailableAt=\"2022-03-20\"
+        year=\"2022\" audienceRating=\"6\" audienceRatingImage=\"rottentomatoes://image.rating.upright\"
+        imdbRatingCount=\"386\"><Image alt=\"Amsterdam\" type=\"background\" url=\"https://image.tmdb.org/t/p/original/vO3I7ZpSQIZXVeRfexxbvkqQjZE.jpg\"/><Image
+        alt=\"Amsterdam\" type=\"banner\" url=\"https://artworks.thetvdb.com/banners/v4/series/400160/banners/62a26374cd99d.jpg\"/><Image
+        alt=\"Amsterdam\" type=\"clearLogo\" url=\"https://metadata-static.plex.tv/e/683a142553/ed1efd2c83a26984b91c8bf5915bbbfd.png\"/><Image
+        alt=\"Amsterdam\" type=\"clearLogoWide\" url=\"https://metadata-static.plex.tv/e/683a142553/ed1efd2c83a26984b91c8bf5915bbbfd.png\"/><Image
+        alt=\"Amsterdam\" type=\"coverArt\" url=\"https://image.tmdb.org/t/p/original/vDHB5f2F2v1EgfZCwySnK9DQIZ7.jpg\"/><Image
+        alt=\"Amsterdam\" type=\"coverPoster\" url=\"https://image.tmdb.org/t/p/original/K7SQz8lDXvObNF86bDFlhiyuLZ.jpg\"/><Genre
+        filter=\"genre=5d9c046c705e7a001e6c8d9a\" id=\"5d9c046c705e7a001e6c8d9a\"
+        key=\"/library/sections/home/all?genre=5d9c046c705e7a001e6c8d9a\" ratingKey=\"genre_5d9c046c705e7a001e6c8d9a\"
+        slug=\"drama\" tag=\"Drama\" directory=\"1\" context=\"tag.genre\"/><Genre
+        filter=\"genre=5d9c046c705e7a001e6c8d99\" id=\"5d9c046c705e7a001e6c8d99\"
+        key=\"/library/sections/home/all?genre=5d9c046c705e7a001e6c8d99\" ratingKey=\"genre_5d9c046c705e7a001e6c8d99\"
+        slug=\"comedy\" tag=\"Comedy\" directory=\"1\" context=\"tag.genre\"/><Genre
+        filter=\"genre=5d9c046c705e7a001e6c8d9b\" id=\"5d9c046c705e7a001e6c8d9b\"
+        key=\"/library/sections/home/all?genre=5d9c046c705e7a001e6c8d9b\" ratingKey=\"genre_5d9c046c705e7a001e6c8d9b\"
+        slug=\"romance\" tag=\"Romance\" directory=\"1\" context=\"tag.genre\"/><Guid
+        id=\"imdb://tt18814244\"/><Guid id=\"tmdb://158336\"/><Guid id=\"tvdb://400160\"/><Rating
+        image=\"imdb://image.rating\" type=\"audience\" value=\"7.1\"/><Rating image=\"rottentomatoes://image.rating.upright\"
+        type=\"audience\" value=\"6\"/><Rating image=\"themoviedb://image.rating\"
+        type=\"audience\" value=\"4.2\"/><Country tag=\"Mexico\"/><Role key=\"/library/sections/home/all?actor=63209228ca2e5616ff4ce5bf&amp;type=99&amp;availabilityType=free\"
+        id=\"63209228ca2e5616ff4ce5bf\" order=\"1\" slug=\"sebastian-buitron-2\" tag=\"Sebasti\xE1n
+        Buitr\xF3n\" role=\"Mart\xEDn\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=5d7769aa23d5a3001f4facfc&amp;type=99&amp;availabilityType=free\"
+        id=\"5d7769aa23d5a3001f4facfc\" order=\"2\" slug=\"naian-gonzalez-norvind\"
+        tag=\"Naian Gonz\xE1lez Norvind\" thumb=\"https://metadata-static.plex.tv/0/people/06f5f46503da3ad32f1f86ce5f06d020.jpg\"
+        role=\"Nadia\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=5d776aed7a53e9001e713ce9&amp;type=99&amp;availabilityType=free\"
+        id=\"5d776aed7a53e9001e713ce9\" order=\"3\" slug=\"maria-evoli\" tag=\"Mar\xEDa
+        Evoli\" thumb=\"https://metadata-static.plex.tv/b/people/b93d880733718bd43d27750ba7433440.jpg\"
+        role=\"Laura\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=5d776a46fb0d55001f54072f&amp;type=99&amp;availabilityType=free\"
+        id=\"5d776a46fb0d55001f54072f\" order=\"4\" slug=\"danae-reynaud\" tag=\"Danae
+        Reynaud\" thumb=\"https://metadata-static.plex.tv/people/5d776a46fb0d55001f54072f.jpg\"
+        role=\"Violeta\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=5d776ad351dd69001fe28d4c&amp;type=99&amp;availabilityType=free\"
+        id=\"5d776ad351dd69001fe28d4c\" order=\"5\" slug=\"marcelo-subiotto\" tag=\"Marcelo
+        Subiotto\" thumb=\"https://metadata-static.plex.tv/people/5d776ad351dd69001fe28d4c.jpg\"
+        role=\"L\xF3pez\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=5d776a4d23d5a3001f502eec&amp;type=99&amp;availabilityType=free\"
+        id=\"5d776a4d23d5a3001f502eec\" order=\"6\" slug=\"sebastian-aguirre\" tag=\"Sebasti\xE1n
+        Aguirre\" thumb=\"https://metadata-static.plex.tv/c/people/c3e055ecc3ebd01504d9032a7794d1af.jpg\"
+        role=\"Andy\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=5d7768b9594b2b001e693e9f&amp;type=99&amp;availabilityType=free\"
+        id=\"5d7768b9594b2b001e693e9f\" order=\"7\" slug=\"martha-cristiana\" tag=\"Martha
+        Cristiana Merino\" thumb=\"https://metadata-static.plex.tv/people/5d7768b9594b2b001e693e9f.jpg\"
+        role=\"Virginia\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=5e23e65ca85af200409e463c&amp;type=99&amp;availabilityType=free\"
+        id=\"5e23e65ca85af200409e463c\" order=\"8\" slug=\"pierre-louis-2\" tag=\"Pierre
+        Louis\" thumb=\"https://metadata-static.plex.tv/people/5e23e65ca85af200409e463c.jpg\"
+        role=\"Antonio\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=5d7769c296b655001fdd86cf&amp;type=99&amp;availabilityType=free\"
+        id=\"5d7769c296b655001fdd86cf\" order=\"9\" slug=\"ximena-gonzalez-rubio\"
+        tag=\"Ximena Rubio\" thumb=\"https://metadata-static.plex.tv/b/people/beda148039e3fbb3c8009400e44a5fbc.jpg\"
+        role=\"Lola\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=5d776b8747dd6e001f6e040b&amp;type=99&amp;availabilityType=free\"
+        id=\"5d776b8747dd6e001f6e040b\" order=\"10\" slug=\"begona-narvaez\" tag=\"Bego\xF1a
+        Narv\xE1ez\" thumb=\"https://metadata-static.plex.tv/a/people/a9dbddfc6b0de05747726ea2fd629093.jpg\"
+        role=\"Paty\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=5f85d45f7209590041c559b1&amp;type=99&amp;availabilityType=free\"
+        id=\"5f85d45f7209590041c559b1\" order=\"11\" slug=\"pia-watson-3\" tag=\"Pia
+        Watson\" role=\"Caro\" directory=\"1\"/><Role key=\"/library/sections/home/all?actor=5d776aad47dd6e001f6d5d45&amp;type=99&amp;availabilityType=free\"
+        id=\"5d776aad47dd6e001f6d5d45\" order=\"12\" slug=\"hoze-melendez\" tag=\"Hoze
+        Mel\xE9ndez\" thumb=\"https://metadata-static.plex.tv/9/people/98d875fc025dc3a1005086436ec3cd39.jpg\"
+        role=\"Cherny\" directory=\"1\"/><Director key=\"/library/sections/home/all?director=5d7768bb33f255001e85e232&amp;type=99&amp;availabilityType=free\"
+        id=\"5d7768bb33f255001e85e232\" slug=\"gustavo-taretto\" tag=\"Gustavo Taretto\"
+        thumb=\"https://metadata-static.plex.tv/f/people/f5b34eb48a445ff59f92baa82829a967.jpg\"
+        role=\"Director\" directory=\"1\"/><Producer key=\"/library/sections/home/all?producer=5d7768bb33f255001e85e233&amp;type=99&amp;availabilityType=free\"
+        id=\"5d7768bb33f255001e85e233\" slug=\"natacha-cervi\" tag=\"Natacha Cervi\"
+        role=\"Executive Producer\" directory=\"1\"/><Producer key=\"/library/sections/home/all?producer=5d77706acfbb56001fb88993&amp;type=99&amp;availabilityType=free\"
+        id=\"5d77706acfbb56001fb88993\" slug=\"luis-peraza\" tag=\"Luis Peraza\" role=\"Executive
+        Producer\" directory=\"1\"/><Producer key=\"/library/sections/home/all?producer=5d776f0696b655001fe7bc23&amp;type=99&amp;availabilityType=free\"
+        id=\"5d776f0696b655001fe7bc23\" slug=\"sandino-saravia\" tag=\"Sandino Saravia\"
+        role=\"Executive Producer\" directory=\"1\"/><Producer key=\"/library/sections/home/all?producer=5d77706acfbb56001fb8898e&amp;type=99&amp;availabilityType=free\"
+        id=\"5d77706acfbb56001fb8898e\" slug=\"paul-drago-2\" tag=\"Paul Drago\" role=\"Executive
+        Producer\" directory=\"1\"/><Producer key=\"/library/sections/home/all?producer=5e16401e2d4d84003e49a8d4&amp;type=99&amp;availabilityType=free\"
+        id=\"5e16401e2d4d84003e49a8d4\" slug=\"gabriela-remirez-de-estenoz-2\" tag=\"Gabriela
+        Remirez de Estenoz\" role=\"Executive Producer\" directory=\"1\"/><Writer
+        key=\"/library/sections/home/all?writer=5d7768bb33f255001e85e232&amp;type=99&amp;availabilityType=free\"
+        id=\"5d7768bb33f255001e85e232\" slug=\"gustavo-taretto\" tag=\"Gustavo Taretto\"
+        thumb=\"https://metadata-static.plex.tv/f/people/f5b34eb48a445ff59f92baa82829a967.jpg\"
+        role=\"Writer\" directory=\"1\"/><Network tag=\"HBO Latin America\"/><SeasonType
+        id=\"tmdbAiring\" source=\"tmdb\" tag=\"Aired\" title=\"The Movie Database
+        (Aired)\"/><SeasonType id=\"tvdbAiring\" source=\"tvdb\" tag=\"Aired\" title=\"TheTVDB
+        (Aired)\"/><SeasonType id=\"tvdbDvd\" source=\"tvdb\" tag=\"DVD\" title=\"TheTVDB
+        (DVD)\"/><SeasonType id=\"tvdbAbsolute\" source=\"tvdb\" tag=\"Absolute\"
+        title=\"TheTVDB (Absolute)\"/><Similar guid=\"plex://show/5f3a40f5a8dbb60042a37d70\"
+        tag=\"Pokemon Get \u2606 TV\"/><Similar guid=\"plex://show/5d9c089c3c3f87001f353a4c\"
+        tag=\"A Duck&apos;s Life\"/><Similar guid=\"plex://show/615f11ce82f4a6c27387a21b\"
+        tag=\"BKM Mutfak Stand\u2010Up\"/><Similar guid=\"plex://show/655149c53fe0e3567a331be5\"
+        tag=\"Northern Lights\"/><Similar guid=\"plex://show/667550581263debf1a425cf8\"
+        tag=\"\u041C\u0430\u0442\u0440\u0451\u0448\u043A\u0430\"/><Similar guid=\"plex://show/5d9c0821e264b7001fc3cccc\"
+        tag=\"Boku no ikiru michi\"/><Similar guid=\"plex://show/5d9c08217b5c2e001e6552ec\"
+        tag=\"Jackie, Ethel, Joan: The Women of Camelot\"/><Similar guid=\"plex://show/606ee9bb395d54002cf7bdb5\"
+        tag=\"AWA All\u2010Star Wrestling\"/><Similar guid=\"plex://show/5e1621dcc176f9003fa4b147\"
+        tag=\"I Hate Suzie\"/><Studio tag=\"HBO Latin America\"/><Studio tag=\"Cimarr\xF3n
+        Cine\"/><Summary size=\"250\" tag=\"Nadia and Mart\xEDn live in the historical
+        &quot;Condesa&quot; in Mexico City. Both are artists and share their home
+        with a stray dog, Amsterdam. Beautiful Mexican scenery and portrayal of life
+        in one of the city&apos;s most popular and artistic areas.\" type=\"default\"/></Directory></MediaContainer>"
     headers:
       Access-Control-Allow-Origin:
       - '*'

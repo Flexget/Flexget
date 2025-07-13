@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import abc
 import logging
 import time
@@ -6,7 +8,7 @@ import time
 import warnings
 from datetime import datetime, timedelta
 from email.message import EmailMessage
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING
 from urllib.parse import urlparse
 from urllib.request import urlopen
 
@@ -35,7 +37,7 @@ if TYPE_CHECKING:
     from typing import TypedDict
 
     class StateCacheDict(TypedDict):
-        tokens: Union[float, int]
+        tokens: float | int
         last_update: datetime
 
 
@@ -79,13 +81,13 @@ class TokenBucketLimiter(DomainLimiter):
 
     # This is just an in memory cache right now, it works for the daemon, and across tasks in a single execution
     # but not for multiple executions via cron. Do we need to store this to db?
-    state_cache: dict[str, 'StateCacheDict'] = {}
+    state_cache: dict[str, StateCacheDict] = {}
 
     def __init__(
         self,
         domain: str,
         tokens: float,
-        rate: Union[str, timedelta],
+        rate: str | timedelta,
         wait: bool = True,
     ) -> None:
         """Init a token bucket rate limiter.
@@ -104,7 +106,7 @@ class TokenBucketLimiter(DomainLimiter):
         )
 
     @property
-    def tokens(self) -> Union[float, int]:
+    def tokens(self) -> float | int:
         return min(self.max_tokens, self.state['tokens'])
 
     @tokens.setter
@@ -139,11 +141,11 @@ class TokenBucketLimiter(DomainLimiter):
 class TimedLimiter(TokenBucketLimiter):
     """Enforces a minimum interval between requests to a given domain."""
 
-    def __init__(self, domain: str, interval: Union[str, timedelta]) -> None:
+    def __init__(self, domain: str, interval: str | timedelta) -> None:
         super().__init__(domain, 1, interval)
 
 
-def _wrap_urlopen(url: str, timeout: Optional[int] = None) -> requests.Response:
+def _wrap_urlopen(url: str, timeout: int | None = None) -> requests.Response:
     """Handle alternate schemes using urllib, wrap the response in a requests.Response.
 
     This is not installed as an adapter in requests, since urls without network locations
@@ -177,7 +179,7 @@ def limit_domains(url: str, limit_dict: dict[str, DomainLimiter]) -> None:
             break
 
 
-def parse_header(header: str) -> tuple[str, 'Mapping']:
+def parse_header(header: str) -> tuple[str, Mapping]:
     """Parse a MIME header (such as Content-Type) into a main value and a dictionary of parameters.
 
     Replaces function in the deprecated cgi stdlib module.

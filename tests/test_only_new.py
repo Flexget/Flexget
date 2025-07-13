@@ -22,9 +22,10 @@ class TestOnlyNew:
         )
 
         # add another entry to the task
-        manager.config['tasks']['test']['mock'].append(
-            {'title': 'title 2', 'url': 'http://localhost/title2'}
-        )
+        manager.config['tasks']['test']['mock'].append({
+            'title': 'title 2',
+            'url': 'http://localhost/title2',
+        })
         # execute again
         task = execute_task('test')
         # both entries should be present as config has changed

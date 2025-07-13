@@ -6,6 +6,8 @@ generated programmatically. This directive wraps this particular use-case
 in a helper-directive to generate it with a single YAML configuration file.
 """
 
+from __future__ import annotations
+
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, ClassVar
 
@@ -110,7 +112,7 @@ class GalleryGridDirective(SphinxDirective):
         return [container.children[0]]
 
 
-def setup(app: 'Sphinx') -> dict[str, Any]:
+def setup(app: Sphinx) -> dict[str, Any]:
     """Add custom configuration to sphinx app.
 
     Args:

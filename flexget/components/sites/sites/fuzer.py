@@ -48,9 +48,9 @@ class UrlRewriteFuzer:
             'cookie_password': {'type': 'string'},
             'user_id': {'type': 'integer'},
             'rss_key': {'type': 'string'},
-            'category': one_or_more(
-                {'oneOf': [{'type': 'string', 'enum': list(CATEGORIES)}, {'type': 'integer'}]}
-            ),
+            'category': one_or_more({
+                'oneOf': [{'type': 'string', 'enum': list(CATEGORIES)}, {'type': 'integer'}]
+            }),
         },
         'required': ['user_id', 'cookie_password', 'rss_key'],
         'additionalProperties': False,

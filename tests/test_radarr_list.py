@@ -97,9 +97,11 @@ class TestRadarrListActions:
         execute_task('clear_and_add_to_radarr_with_tags')
         tags = {t['label'].lower(): t['id'] for t in radarr.get_tags()}
         for movie in radarr.get_movies():
-            assert sorted(movie['tags']) == sorted(
-                [tag_by_id, tags.get('movies'), tags.get('othertag')]
-            )
+            assert sorted(movie['tags']) == sorted([
+                tag_by_id,
+                tags.get('movies'),
+                tags.get('othertag'),
+            ])
 
     # TODO: each action should be own test case
     def test_radarr_list_actions(self, execute_task):

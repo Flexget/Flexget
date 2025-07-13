@@ -52,9 +52,12 @@ def action_status(options, irc_manager):
                     channels.append(channel_name)
                     if channel_status == IRCChannelStatus.CONNECTED:
                         channels[-1] = colorize('green', '* ' + channels[-1])
-            table_data.append(
-                [name, alive, ', '.join(channels), '{}:{}'.format(info['server'], info['port'])]
-            )
+            table_data.append([
+                name,
+                alive,
+                ', '.join(channels),
+                '{}:{}'.format(info['server'], info['port']),
+            ])
 
     table = TerminalTable(*header, table_type=options.table_type)
     for row in table_data:

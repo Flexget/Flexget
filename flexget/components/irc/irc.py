@@ -465,8 +465,8 @@ class IRCConnection(SimpleIRCBot):
             if match:
                 val_names = [irc_prefix(val.lower()) for val in vals]
                 val_values = [strip_whitespace(x) or '' for x in match.groups()]
-                result.update(dict(zip(val_names, val_values)))
-                logger.debug('Found: {}', dict(zip(val_names, val_values)))
+                result.update(dict(zip(val_names, val_values, strict=False)))
+                logger.debug('Found: {}', dict(zip(val_names, val_values, strict=False)))
                 break
             logger.debug('No matches found for {} in {}', rx.pattern, msg)
         return result
@@ -557,7 +557,7 @@ class IRCConnection(SimpleIRCBot):
                 ]
                 match = re.search(regex, fields[source_var])
                 if match:
-                    fields.update(dict(zip(group_names, match.groups())))
+                    fields.update(dict(zip(group_names, match.groups(), strict=False)))
                 else:
                     logger.debug('No match found for rule extract')
 
@@ -612,7 +612,7 @@ class IRCConnection(SimpleIRCBot):
                             continue
                         match = re.match(regex, fields.get(source_var, ''))
                         if match:
-                            fields.update(dict(zip(vars, match.groups())))
+                            fields.update(dict(zip(vars, match.groups(), strict=False)))
                         else:
                             logger.debug('No match for extract with regex: {}', regex)
                     else:

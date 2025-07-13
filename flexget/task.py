@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import collections.abc
 import contextlib
 import copy
@@ -6,13 +8,13 @@ import random
 import string
 import threading
 from functools import total_ordering, wraps
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING
 
 from loguru import logger
 from sqlalchemy import Column, Integer, String, Unicode
 
 from flexget import config_schema, db_schema
-from flexget.entry import Entry, EntryState, EntryUnicodeError
+from flexget.entry import EntryState, EntryUnicodeError
 from flexget.event import event, fire_event
 from flexget.manager import Session
 from flexget.plugin import (
@@ -38,6 +40,7 @@ if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator
 
     from flexget.db_schema import VersionedBaseMeta
+    from flexget.entry import Entry
     from flexget.utils.sqlalchemy_utils import ContextSession
 
     Base = VersionedBaseMeta
@@ -59,7 +62,7 @@ class TaskConfigHash(Base):
 
 
 @with_session
-def config_changed(task: Optional[str] = None, session: 'ContextSession' = None) -> None:
+def config_changed(task: str | None = None, session: ContextSession = None) -> None:
     """Force config_modified flag to come out true on next run of `task`.
 
     Used when the db changes, and all entries need to be reprocessed.
@@ -95,13 +98,13 @@ def use_task_logging(func):
 class EntryIterator:
     """An iterator over a subset of entries to emulate old task.accepted/rejected/failed/entries properties."""
 
-    def __init__(self, entries: list[Entry], states: Union[EntryState, 'Iterable[EntryState]']):
+    def __init__(self, entries: list[Entry], states: EntryState | Iterable[EntryState]):
         self.all_entries = entries
         if isinstance(states, EntryState):
             states = [states]
         self.filter = lambda e: e._state in states
 
-    def __iter__(self) -> 'Iterator[Entry]':
+    def __iter__(self) -> Iterator[Entry]:
         return filter(self.filter, self.all_entries)
 
     def __bool__(self):
@@ -116,7 +119,7 @@ class EntryIterator:
     def __radd__(self, other):
         return itertools.chain(other, self)
 
-    def __getitem__(self, item) -> Union[Entry, 'Iterable[Entry]']:
+    def __getitem__(self, item) -> Entry | Iterable[Entry]:
         if isinstance(item, slice):
             return list(itertools.islice(self, item.start, item.stop))
         if not isinstance(item, int):
@@ -136,7 +139,7 @@ class EntryIterator:
 class EntryContainer(list):
     """Container for a list of entries, also contains accepted, rejected failed iterators over them."""
 
-    def __init__(self, iterable: Optional[list] = None):
+    def __init__(self, iterable: list | None = None):
         list.__init__(self, iterable or [])
 
         self._entries = EntryIterator(self, [EntryState.UNDECIDED, EntryState.ACCEPTED])
@@ -289,7 +292,7 @@ class Task:
         # current state
         self.current_phase = None
         self.current_plugin = None
-        self.traceback: Optional[str] = None
+        self.traceback: str | None = None
 
     @property
     def max_reruns(self):
@@ -402,7 +405,7 @@ class Task:
             raise ValueError(f'`{plugin}` is not a valid plugin.')
         self.disabled_plugins.append(plugin)
 
-    def abort(self, reason='Unknown', silent=False, traceback: Optional[str] = None):
+    def abort(self, reason='Unknown', silent=False, traceback: str | None = None):
         """Abort this task execution, no more plugins will be executed except the abort handling ones."""
         self.aborted = True
         self.abort_reason = reason
