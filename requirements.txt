@@ -24,12 +24,10 @@ brotli==1.1.0 ; platform_python_implementation != 'PyPy'
     # via flask-compress
 brotlicffi==1.1.0.0 ; platform_python_implementation == 'PyPy'
     # via flask-compress
-certifi==2025.6.15
+certifi==2025.7.9
     # via requests
 cffi==1.17.1 ; platform_python_implementation == 'PyPy'
-    # via
-    #   brotlicffi
-    #   zstandard
+    # via brotlicffi
 charset-normalizer==3.4.2
     # via requests
 cheroot==10.0.1
@@ -53,7 +51,7 @@ flask==3.1.1
     #   flask-login
     #   flask-restx
     #   flexget
-flask-compress==1.17
+flask-compress==1.18
     # via flexget
 flask-cors==6.0.1
     # via flexget
@@ -149,6 +147,8 @@ pywin32==310 ; (python_full_version < '3.10' and implementation_name == 'cpython
     #   plumbum
 pyyaml==6.0.2
     # via flexget
+pyzstd==0.17.0 ; python_full_version < '3.14'
+    # via flask-compress
 rebulk==3.2.0
     # via
     #   flexget
@@ -186,6 +186,7 @@ tempora==5.8.1
 typing-extensions==4.14.1
     # via
     #   beautifulsoup4
+    #   pyzstd
     #   referencing
     #   rich
     #   sqlalchemy
@@ -216,7 +217,5 @@ zipp==3.23.0 ; python_full_version < '3.10'
     # via
     #   importlib-metadata
     #   importlib-resources
-zstandard==0.23.0
-    # via flask-compress
 zxcvbn==4.5.0
     # via flexget
