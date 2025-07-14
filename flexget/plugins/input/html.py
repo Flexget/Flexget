@@ -19,7 +19,7 @@ logger = logger.bind(name='html')
 class InputHtml:
     """Parse urls from html page.
 
-    Usefull on sites which have direct download links of any type (mp3, jpg, torrent, ...).
+    Useful on sites which have direct download links of any type (mp3, jpg, torrent, ...).
 
     Many anime-fansubbers do not provide RSS-feed, this works well in many cases.
 

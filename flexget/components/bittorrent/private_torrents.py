@@ -23,7 +23,7 @@ class FilterPrivateTorrents:
 
     This would reject all public torrents.
 
-    Non-torrent content is not interviened.
+    Non-torrent content is not intervened.
     """
 
     schema = {'type': 'boolean'}

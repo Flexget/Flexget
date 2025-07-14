@@ -47,7 +47,7 @@ class InputPogDesign:
             for s in spantags:
                 s.extract()
             t = row.text
-            # remove newlines and whitepsace
+            # remove newlines and whitespace
             t = t.replace('\n', '').strip()
 
             if t.endswith('[The]'):
