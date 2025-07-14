@@ -24,7 +24,7 @@ brotli==1.1.0 ; platform_python_implementation != 'PyPy'
     # via flask-compress
 brotlicffi==1.1.0.0 ; platform_python_implementation == 'PyPy'
     # via flask-compress
-certifi==2025.7.9
+certifi==2025.7.14
     # via requests
 cffi==1.17.1 ; platform_python_implementation == 'PyPy'
     # via brotlicffi
