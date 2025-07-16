@@ -165,6 +165,7 @@ include = [
 
 [tool.pytest.ini_options]
 addopts = '-p no:legacypath --strict-markers'
+filterwarnings = 'error'
 markers = [
     'filecopy(src, dst): mark test to copy a file from `src` to `dst` before running',
     'online: mark test that goes online. VCR will automatically be used.',
