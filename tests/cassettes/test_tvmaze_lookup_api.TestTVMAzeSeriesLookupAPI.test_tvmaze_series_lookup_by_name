@@ -1,157 +1,233 @@
 interactions:
-  - request:
-      body: null
-      headers:
-        Accept: ['*/*']
-        Accept-Encoding: ['gzip, deflate']
-        Connection: [keep-alive]
-        User-Agent: [FlexGet/2.10.20.dev (www.flexget.com)]
-      method: GET
-      uri: https://api.tvmaze.com/singlesearch/shows?embed=seasons&q=The+X-Files
-    response:
-      body:
-        string: !!binary |
-          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
-          ZSM//PbbfwOBmZT3vEMAAA==
-      headers:
-        Access-Control-Allow-Origin: ['*']
-        Cache-Control: ['public, max-age=3600']
-        Connection: [keep-alive]
-        Content-Encoding: [gzip]
-        Content-Type: [application/json; charset=UTF-8]
-        Date: ['Sun, 26 Mar 2017 12:03:53 GMT']
-        Server: [nginx/1.10.0 (Ubuntu)]
-        Vary: [Accept-Encoding]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        Accept: ['*/*']
-        Accept-Encoding: ['gzip, deflate']
-        Connection: [keep-alive]
-        User-Agent: [FlexGet/2.10.20.dev (www.flexget.com)]
-      method: GET
-      uri: https://api.tvmaze.com/singlesearch/shows?embed=seasons&q=sdfgv35wvg23vg2
-    response:
-      body:
-        string: !!binary |
-          H4sIAAAAAAAAAwMAAAAAAAAAAAA=
-      headers:
-        Access-Control-Allow-Origin: ['*']
-        Cache-Control: ['public, max-age=3600']
-        Connection: [keep-alive]
-        Content-Encoding: [gzip]
-        Content-Type: [application/json; charset=UTF-8]
-        Date: ['Sun, 26 Mar 2017 12:03:53 GMT']
-        Server: [nginx/1.10.0 (Ubuntu)]
-        Vary: [Accept-Encoding]
-      status: {code: 404, message: Not Found}
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - FlexGet/2.10.20.dev (www.flexget.com)
+    method: GET
+    uri: https://api.tvmaze.com/singlesearch/shows?embed=seasons&q=The+X-Files
+  response:
+    body:
+      string: "{\"id\":430,\"url\":\"http://www.tvmaze.com/shows/430/the-x-files\",\"name\":\"The
+        X-Files\",\"type\":\"Scripted\",\"language\":\"English\",\"genres\":[\"Drama\",\"Crime\",\"Science-Fiction\"],\"status\":\"To
+        Be Determined\",\"runtime\":60,\"premiered\":\"1993-09-10\",\"schedule\":{\"time\":\"20:00\",\"days\":[\"Monday\"]},\"rating\":{\"average\":8.9},\"weight\":2,\"network\":{\"id\":4,\"name\":\"FOX\",\"country\":{\"name\":\"United
+        States\",\"code\":\"US\",\"timezone\":\"America/New_York\"}},\"webChannel\":null,\"externals\":{\"tvrage\":6312,\"thetvdb\":77398,\"imdb\":\"tt0106179\"},\"image\":{\"medium\":\"http://static.tvmaze.com/uploads/images/medium_portrait/62/155391.jpg\",\"original\":\"http://static.tvmaze.com/uploads/images/original_untouched/62/155391.jpg\"},\"summary\":\"<p>Two
+        FBI agents, Fox Mulder the believer and Dana Scully the skeptic, investigate
+        the strange and unexplained while hidden forces work to impede their efforts.</p>\",\"updated\":1487500424,\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/shows/430\"},\"previousepisode\":{\"href\":\"http://api.tvmaze.com/episodes/306788\"}},\"_embedded\":{\"seasons\":[{\"id\":1707,\"url\":\"http://www.tvmaze.com/seasons/1707/the-x-files-season-1\",\"number\":1,\"name\":\"\",\"episodeOrder\":null,\"premiereDate\":\"1993-09-10\",\"endDate\":\"1994-05-13\",\"network\":{\"id\":4,\"name\":\"FOX\",\"country\":{\"name\":\"United
+        States\",\"code\":\"US\",\"timezone\":\"America/New_York\"}},\"webChannel\":null,\"image\":{\"medium\":\"http://static.tvmaze.com/uploads/images/medium_portrait/24/60327.jpg\",\"original\":\"http://static.tvmaze.com/uploads/images/original_untouched/24/60327.jpg\"},\"summary\":\"<p>FBI
+        Special Agent Dana Scully is assigned to work with Fox Mulder on a group of
+        unexplained cases labeled as X-files. Mulder believes that the paranormal
+        can explain most of the cases, whereas Scully is more interested in finding
+        a scientific, logical explanation. Her first case with Mulder involved a series
+        of unexplainable deaths of young people in a small Oregon town. Mulder fears
+        that Scully may be a spy for the higher ups at the FBI but still boldly theorizes
+        that it is the work of extraterrestrials. Discovering a non-Human corpse in
+        the coffin of one of the victims they exhume doesn't dissuade Scully's skepticism
+        but as the strange occurrences such as time loss, flashes of light, and strange
+        implants in the corpse mount up even she is willing to believe Mulder's theory
+        a bit. When she comes to Mulder fearing she has the same marks as the victims
+        on her own back, he tells her they are merely mosquito bites. Seeing her vulnerable
+        and embarrassed, he asks her to stay and they get to talking. He confides
+        about the disappearance of his sister Samantha Mulder, his FBI career and
+        study of the supernatural &amp; the X-Files, and of a conspiracy to suppress
+        his work on the X-Files. Scully may not believe everything he is saying but
+        a bond has formed between them.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/seasons/1707\"}}},{\"id\":1708,\"url\":\"http://www.tvmaze.com/seasons/1708/the-x-files-season-2\",\"number\":2,\"name\":\"\",\"episodeOrder\":null,\"premiereDate\":\"1994-09-16\",\"endDate\":\"1995-05-19\",\"network\":{\"id\":4,\"name\":\"FOX\",\"country\":{\"name\":\"United
+        States\",\"code\":\"US\",\"timezone\":\"America/New_York\"}},\"webChannel\":null,\"image\":{\"medium\":\"http://static.tvmaze.com/uploads/images/medium_portrait/24/60328.jpg\",\"original\":\"http://static.tvmaze.com/uploads/images/original_untouched/24/60328.jpg\"},\"summary\":\"<p>The
+        X-Files are no more. Shut down by the FBI, Scully and Mulder have been reassigned.
+        New supernatural events prove that the X-Files investigations are a necessity
+        and Walter Skinner restores them but with a new team, Fox Mulder and Alex
+        Krycek. Mental patient and alien abductee Duane Barry kidnaps Scully and takes
+        her to a mountain where she disappears. Krycek murders Barry. He works for
+        the Cigarette Smoking Man and disappears with his true loyalties revealed.
+        Scully is returned on the edge of death and Mulder faces a critical choice,
+        seek to ambush members of the conspiracy with the help of his new source Mr.
+        X or stay by Scully's bedside. He chooses Scully. Scully recovers and rejoins
+        Mulder on the X-Files.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/seasons/1708\"}}},{\"id\":1709,\"url\":\"http://www.tvmaze.com/seasons/1709/the-x-files-season-3\",\"number\":3,\"name\":\"\",\"episodeOrder\":null,\"premiereDate\":\"1995-09-22\",\"endDate\":\"1996-05-17\",\"network\":{\"id\":4,\"name\":\"FOX\",\"country\":{\"name\":\"United
+        States\",\"code\":\"US\",\"timezone\":\"America/New_York\"}},\"webChannel\":null,\"image\":{\"medium\":\"http://static.tvmaze.com/uploads/images/medium_portrait/24/60329.jpg\",\"original\":\"http://static.tvmaze.com/uploads/images/original_untouched/24/60329.jpg\"},\"summary\":\"<p>Investigating
+        evidence of an alien autopsy, Mulder infiltrates a secretive government train
+        carriage carrying an alien-human hybrid. Mulder is almost killed by a Syndicate
+        operative guarding the hybrid, but is saved by his informant X. X had been
+        tipped off about Mulder's activities by the agent's partner Dana Scully. Scully,
+        meanwhile, meets a group of women with abduction experiences similar to her
+        own, and meets another member of the Syndicate known as the First Elder, who
+        claims during her abduction she was placed on a similar train car and experimented
+        upon by the Japanese scientists. The crew of a French salvage ship trying
+        to raise a World War II-era submarine from the sea floor are stricken with
+        massive radiation burns\u2014except for one, who has been infected with a
+        parasitic black oil discovered on the submarine. The oil is controlling the
+        crewman's body, and after passing through several hosts, has overtaken Alex
+        Krycek, who Mulder has been pursuing. Scully finds that the submarine had
+        been involved in discovering the oil on the sea floor during World War II,
+        under the guise of finding a sunken fighter plane. The infected Krycek makes
+        his way to a missile silo used to hide a UFO, and the oil escapes his body
+        to board the craft. Meanwhile, Scully has tracked down Luis Cardinal, the
+        man responsible for killing her sister.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/seasons/1709\"}}},{\"id\":1710,\"url\":\"http://www.tvmaze.com/seasons/1710/the-x-files-season-4\",\"number\":4,\"name\":\"\",\"episodeOrder\":null,\"premiereDate\":\"1996-10-04\",\"endDate\":\"1997-05-18\",\"network\":{\"id\":4,\"name\":\"FOX\",\"country\":{\"name\":\"United
+        States\",\"code\":\"US\",\"timezone\":\"America/New_York\"}},\"webChannel\":null,\"image\":{\"medium\":\"http://static.tvmaze.com/uploads/images/medium_portrait/24/60330.jpg\",\"original\":\"http://static.tvmaze.com/uploads/images/original_untouched/24/60330.jpg\"},\"summary\":\"<p>When
+        the Syndicate suspect that one of their members is passing information to
+        Mulder and Scully, they organize a canary trap to find the leak, using information
+        about the safety of Mulder's mother as bait. X's role as an informant is discovered,
+        and he is shot dead, although he is able to pass along the name of another
+        informant who can be of use to Mulder\u2014Marita Covarrubias, the Special
+        Representative to the Secretary-General of the United Nations. Covarrubias'
+        aid is sought when Mulder attempts to reach Tunguska in Russia to investigate
+        the source of a further black oil contamination. Whilst there, Mulder is held
+        in a gulag and used as a successful test subject for a black oil vaccine.
+        He escapes and is able to return to America, having found that Alex Krycek
+        is working with the Russians.</p><p>Having been diagnosed with cancer, Scully
+        is unsure of her future with the FBI. Mulder is convinced that her condition
+        is a result of her earlier abduction, and is prepared to make a deal with
+        the Syndicate to find a cure. He is dissuaded by Walter Skinner, who secretly
+        makes such a deal instead. While being pursued by an assassin responsible
+        for a hoax alien corpse discovered on a mountaintop, Mulder fakes his own
+        suicide, mutilating the assassin's face to provide a decoy body. He uses the
+        distraction this offers to infiltrate The Pentagon to find a cure for Scully's
+        cancer, while Scully is able to uncover and reveal a Syndicate connection
+        within the FBI.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/seasons/1710\"}}},{\"id\":1711,\"url\":\"http://www.tvmaze.com/seasons/1711/the-x-files-season-5\",\"number\":5,\"name\":\"\",\"episodeOrder\":null,\"premiereDate\":\"1997-11-02\",\"endDate\":\"1998-05-17\",\"network\":{\"id\":4,\"name\":\"FOX\",\"country\":{\"name\":\"United
+        States\",\"code\":\"US\",\"timezone\":\"America/New_York\"}},\"webChannel\":null,\"image\":{\"medium\":\"http://static.tvmaze.com/uploads/images/medium_portrait/24/60331.jpg\",\"original\":\"http://static.tvmaze.com/uploads/images/original_untouched/24/60331.jpg\"},\"summary\":\"<p>Scully
+        is suffering from cancer while Mulder is doubtful that aliens exist. The agents
+        fake Mulder's death in an effort to discover which members of the FBI they
+        can trust before individually searching for an answer to Scully's cancer.
+        Her condition worsens, however, and she is hospitalized before Mulder is offered
+        an alleged cure by the Cigarette-Smoking Man. The man also brings Mulder a
+        woman who claims to be his sister, Samantha, although she leaves with the
+        Cigarette-Smoking Man shortly thereafter. When the man offers Mulder a deal
+        to join him, Mulder immediately refuses. He returns to the FBI Headquarters,
+        where he announces that Section Chief Scott Blevins is responsible for Scully's
+        cancer. Both the Section Chief and the Cigarette-Smoking Man are shot. Scully
+        begins to recover and eventually resumes her work on the X-files with Mulder.
+        While staying with her family at Christmas time, she learns that the adopted
+        daughter of a deceased woman is apparently her own child.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/seasons/1711\"}}},{\"id\":1712,\"url\":\"http://www.tvmaze.com/seasons/1712/the-x-files-season-6\",\"number\":6,\"name\":\"\",\"episodeOrder\":null,\"premiereDate\":\"1998-11-08\",\"endDate\":\"1999-05-16\",\"network\":{\"id\":4,\"name\":\"FOX\",\"country\":{\"name\":\"United
+        States\",\"code\":\"US\",\"timezone\":\"America/New_York\"}},\"webChannel\":null,\"image\":{\"medium\":\"http://static.tvmaze.com/uploads/images/medium_portrait/24/60332.jpg\",\"original\":\"http://static.tvmaze.com/uploads/images/original_untouched/24/60332.jpg\"},\"summary\":\"<p>Mulder
+        suspects demon fetal harvesting when a woman claims her unborn child had a
+        horn and tail and was taken by a devil while she slept. While others conclude
+        that the woman killed her own baby, Mulder suspects that her husband is involved
+        and that he may be the devil in disguise.vMulder suspects demon fetal harvesting
+        when a woman claims her unborn child had a horn and tail and was taken by
+        a devil while she slept. While others conclude that the woman killed her own
+        baby, Mulder suspects that her husband is involved and that he may be the
+        devil in disguise.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/seasons/1712\"}}},{\"id\":1713,\"url\":\"http://www.tvmaze.com/seasons/1713/the-x-files-season-7\",\"number\":7,\"name\":\"\",\"episodeOrder\":null,\"premiereDate\":\"1999-11-07\",\"endDate\":\"2000-05-21\",\"network\":{\"id\":4,\"name\":\"FOX\",\"country\":{\"name\":\"United
+        States\",\"code\":\"US\",\"timezone\":\"America/New_York\"}},\"webChannel\":null,\"image\":{\"medium\":\"http://static.tvmaze.com/uploads/images/medium_portrait/24/60333.jpg\",\"original\":\"http://static.tvmaze.com/uploads/images/original_untouched/24/60333.jpg\"},\"summary\":\"<p>After
+        the events of the season six finale, Walter Skinner and Michael Kritschgau
+        are desperately attempting to find the truth behind the so-called alien object.
+        Meanwhile, Fox Mulder is still imprisoned by his own frenetic brain activity.
+        Dana Scully and Skinner are unaware of FBI Special Agent Diana Fowley's duplicity\u2014she
+        is working for The Smoking Man. Scully then travels to Africa to unravel the
+        secrets of the alien artifacts, finding something that looks like a spaceship
+        buried under the shoreline off the C\xF4te d'Ivoire coast. The object may
+        prove that life originated elsewhere, and all religion is based on the Navajo
+        contact with alien life. Unsuccessful, Scully returns from Africa to revisit
+        Mulder in Washington, D.C., but instead she finds out that he has disappeared.
+        She contacts Kritschgau and Skinner to find her partner. The Smoking Man has
+        taken Mulder to a place where all his problems seem to have disappeared. Fowley
+        helps Scully locate Mulder, which leads to her death at the hands of The Smoking
+        Man.</p><p>While investigating a bizarre disappearance of a young girl from
+        her home, Mulder becomes obsessed with the number of children who have vanished
+        in similar circumstances. Scully fears that he is emotionally involved due
+        to his sister's disappearance. At the same time it is revealed to him that
+        his mother, Teena Mulder, committed suicide. He then tries to prove that his
+        mother did not take her own life, but is ultimately forced to accept that
+        his mother's death was by her own hand. He is led by a man whose son disappeared
+        years earlier to another truth\u2014that his sister may be among the souls
+        taken by \\\"walk-ins\\\", saving the souls of children doomed to live unhappy
+        lives. Together they locate evidence that proves that Samantha was abducted
+        by The Smoking Man, and was forced to live in a now-abandoned US Army base.
+        It is later revealed that Samantha had become a \\\"walk-in\\\" spirit.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/seasons/1713\"}}},{\"id\":1714,\"url\":\"http://www.tvmaze.com/seasons/1714/the-x-files-season-8\",\"number\":8,\"name\":\"\",\"episodeOrder\":null,\"premiereDate\":\"2000-11-05\",\"endDate\":\"2001-05-20\",\"network\":{\"id\":4,\"name\":\"FOX\",\"country\":{\"name\":\"United
+        States\",\"code\":\"US\",\"timezone\":\"America/New_York\"}},\"webChannel\":null,\"image\":{\"medium\":\"http://static.tvmaze.com/uploads/images/medium_portrait/24/60334.jpg\",\"original\":\"http://static.tvmaze.com/uploads/images/original_untouched/24/60334.jpg\"},\"summary\":\"<p>Scully
+        meets Special Agent John Doggett, the leader of an FBI task force organized
+        to conduct a search for Mulder. Although the search ultimately proves unsuccessful,
+        Doggett is assigned to the X-files and works with Scully to look for explanations
+        to several cases. When Scully learns that several women have reportedly been
+        abducted and impregnated with alien babies, she begins to question her own
+        pregnancy and fears for her unborn child.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/seasons/1714\"}}},{\"id\":1715,\"url\":\"http://www.tvmaze.com/seasons/1715/the-x-files-season-9\",\"number\":9,\"name\":\"\",\"episodeOrder\":null,\"premiereDate\":\"2001-11-11\",\"endDate\":\"2002-05-19\",\"network\":{\"id\":4,\"name\":\"FOX\",\"country\":{\"name\":\"United
+        States\",\"code\":\"US\",\"timezone\":\"America/New_York\"}},\"webChannel\":null,\"image\":{\"medium\":\"http://static.tvmaze.com/uploads/images/medium_portrait/24/60335.jpg\",\"original\":\"http://static.tvmaze.com/uploads/images/original_untouched/24/60335.jpg\"},\"summary\":\"<p>After
+        what happened during the season finale of season eight, Fox Mulder goes into
+        hiding. Dana Scully is again reassigned to the FBI Academy and Monica Reyes
+        becomes John Doggett's new FBI partner at the X-Files office. Doggett asks
+        Scully for help on a case involving an EPA official, Carl Wormus, who died
+        after his car was forced off a bridge by a woman he picked up. Doggett and
+        Walter Skinner travel to a reclamation plant, to find any links between Wormus'
+        work and death. After doing an illegal autopsy on Wormus, Alvin Kersh sends
+        Brad Follmer to locate Doggett. The investigation at the reclamation plant
+        leads to an unknown woman, whose identity is later found to be Shannon McMahon,
+        one of Doggett's former Marine associates. She reveals to Doggett that she
+        is a \\\"Super Soldier\\\". This leads them to a clandestine laboratory where
+        a secret experiment is taking place on board on a naval ship. They later find
+        connections with the experiments on the ship to Scully's child, William.</p><p>Hopeful
+        about reuniting with Mulder, a complete stranger offers his service to drive
+        Mulder out of hiding. Scully takes the offer, but unknowingly gets herself
+        and Mulder in even more danger. The \\\"Shadow Man\\\", a government agent,
+        follows Scully. It is then discovered that he is a \\\"Super Soldier\\\" bent
+        on killing Scully and Mulder. As confirmed in this episode, a \\\"Super Soldier\\\"'s
+        only weakness is magnetite, which leads to the death of the \\\"Shadow Man\\\".
+        Later on, Scully, Doggett and Reyes find evidence of a dangerous UFO cult
+        which has found a second spacecraft similar to one Scully studied in Africa
+        two years ago. Misled by the FBI, the agents enlist the help of The Lone Gunmen
+        to protect Scully's son after they learn that the UFO cult apparently intend
+        to kill the child. Doggett is run over by a car, leading him to be sent to
+        the local hospital. As Follmer and the \\\"Toothpick Man\\\" are trying to
+        uncover the plans of the three agents, Scully and Reyes leaves Washington,
+        D.C. to find Scully's son.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/seasons/1715\"}}},{\"id\":7917,\"url\":\"http://www.tvmaze.com/seasons/7917/the-x-files-season-10\",\"number\":10,\"name\":\"\",\"episodeOrder\":6,\"premiereDate\":\"2016-01-24\",\"endDate\":\"2016-02-22\",\"network\":{\"id\":4,\"name\":\"FOX\",\"country\":{\"name\":\"United
+        States\",\"code\":\"US\",\"timezone\":\"America/New_York\"}},\"webChannel\":null,\"image\":{\"medium\":\"http://static.tvmaze.com/uploads/images/medium_portrait/42/107498.jpg\",\"original\":\"http://static.tvmaze.com/uploads/images/original_untouched/42/107498.jpg\"},\"summary\":\"\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/seasons/7917\"}}}]}}"
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      Cache-Control:
+      - public, max-age=3600
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=UTF-8
+      Date:
+      - Sun, 26 Mar 2017 12:03:53 GMT
+      Server:
+      - nginx/1.10.0 (Ubuntu)
+      Vary:
+      - Accept-Encoding
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - FlexGet/2.10.20.dev (www.flexget.com)
+    method: GET
+    uri: https://api.tvmaze.com/singlesearch/shows?embed=seasons&q=sdfgv35wvg23vg2
+  response:
+    body:
+      string: ''
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      Cache-Control:
+      - public, max-age=3600
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=UTF-8
+      Date:
+      - Sun, 26 Mar 2017 12:03:53 GMT
+      Server:
+      - nginx/1.10.0 (Ubuntu)
+      Vary:
+      - Accept-Encoding
+    status:
+      code: 404
+      message: Not Found
 version: 1

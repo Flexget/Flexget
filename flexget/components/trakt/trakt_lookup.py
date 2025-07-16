@@ -1,5 +1,3 @@
-from typing import Optional
-
 from loguru import logger
 
 from flexget import plugin
@@ -34,7 +32,7 @@ def is_movie(entry: Entry) -> bool:
     return bool(entry.get('movie_name'))
 
 
-def get_media_type_for_entry(entry: Entry) -> Optional[str]:
+def get_media_type_for_entry(entry: Entry) -> str | None:
     if is_episode(entry):
         return 'episode'
     if is_season(entry):

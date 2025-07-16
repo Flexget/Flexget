@@ -2,11 +2,12 @@ import importlib
 import logging
 import time
 from base64 import b64decode
+from collections.abc import Callable
 from dataclasses import dataclass
 from functools import partial
 from pathlib import Path, PurePosixPath
 from stat import S_ISLNK
-from typing import Callable, Optional
+from typing import Optional
 from urllib.parse import quote, urljoin
 
 from loguru import logger
@@ -82,10 +83,10 @@ class SftpClient:
         host: str,
         port: int,
         username: str,
-        password: Optional[str] = None,
-        private_key: Optional[str] = None,
-        private_key_pass: Optional[str] = None,
-        host_key: Optional[HostKey] = None,
+        password: str | None = None,
+        private_key: str | None = None,
+        private_key_pass: str | None = None,
+        host_key: HostKey | None = None,
         connection_tries: int = 3,
     ):
         if not pysftp:
@@ -98,10 +99,10 @@ class SftpClient:
         self.host: str = host
         self.port: int = port
         self.username: str = username
-        self.password: Optional[str] = password
-        self.private_key: Optional[str] = private_key
-        self.private_key_pass: Optional[str] = private_key_pass
-        self.host_key: Optional[HostKey] = host_key
+        self.password: str | None = password
+        self.private_key: str | None = private_key
+        self.private_key_pass: str | None = private_key_pass
+        self.host_key: HostKey | None = host_key
 
         self.prefix: str = self._get_prefix()
         self._sftp: pysftp.Connection = self._connect(connection_tries)
@@ -300,7 +301,7 @@ class SftpClient:
 
         logger.debug('Connecting to {}', self.host)
 
-        sftp: Optional[pysftp.Connection] = None
+        sftp: pysftp.Connection | None = None
 
         while not sftp:
             try:
@@ -443,9 +444,9 @@ class HandlerBuilder:
         self,
         sftp: 'pysftp.Connection',
         url_prefix: str,
-        private_key: Optional[str],
-        private_key_pass: Optional[str],
-        host_key: Optional[HostKey],
+        private_key: str | None,
+        private_key_pass: str | None,
+        host_key: HostKey | None,
     ):
         self._sftp = sftp
         self._prefix = url_prefix
@@ -512,9 +513,9 @@ class Handlers:
         prefix: str,
         get_size: bool,
         dirs_only: bool,
-        private_key: Optional[str],
-        private_key_pass: Optional[str],
-        host_key: Optional[HostKey],
+        private_key: str | None,
+        private_key_pass: str | None,
+        host_key: HostKey | None,
         entry_accumulator: list[Entry],
         path: str,
     ) -> None:
@@ -547,9 +548,9 @@ class Handlers:
         prefix: str,
         get_size: bool,
         files_only: bool,
-        private_key: Optional[str],
-        private_key_pass: Optional[str],
-        host_key: Optional[HostKey],
+        private_key: str | None,
+        private_key_pass: str | None,
+        host_key: HostKey | None,
         entry_accumulator: list[Entry],
         path: str,
     ) -> None:
@@ -601,9 +602,9 @@ class Handlers:
         size_handler: Callable[[str], int],
         get_size,
         path: str,
-        private_key: Optional[str],
-        private_key_pass: Optional[str],
-        host_key: Optional[HostKey],
+        private_key: str | None,
+        private_key_pass: str | None,
+        host_key: HostKey | None,
     ) -> Entry:
         url = urljoin(prefix, quote(path))
         title = PurePosixPath(path).name

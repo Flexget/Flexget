@@ -18,15 +18,7 @@ interactions:
     uri: https://api.thetvdb.com/login
   response:
     body:
-      string: !!binary |
-        H4sIAAAAAAAAAwTByZKiMAAA0Ht/heXdLiKbzA0ISKIQQAK0ly6WKDsqIsvU/Pu89/drs9m++5p1
-        2z+bLVtwkR6zkpT4QlcEnBINqPPFTEcSqh9xqGPlmy24YZZaksrgnJXOTlAvNqQDapsaVX3pt3PD
-        jLzJdTSgVlmSKL8lkcmhqp8dmAEbZguBKrh53xdJuB7uYcnmXWJNwmXFReEaS2P4VXjWWp7J453E
-        sH+9du9EJ8sJqKu09kPzNItsMkCkrd3lcxvcpVJ35UGrn6oMTGF//pS7KbS8+hxQDlR5KMNfQP21
-        KodMbEiUro81/eD7yYDXmuZj+P6V/JgZ2fEF3f5z529aMFA+f5EoqRkthOHK36zukVu+6BiexpE0
-        hrhNfaJ4LjgwqvfGwkMTH8P2frbo1VJgmD6jnXQo5MpoxHqw4n074adkTiWufbuDssdW5a1dAUrd
-        hPTj6cevlcYOGHJG4TyWD1EYf2iwP2r7yQaSL3eqVtix6TQHfBxcLnUJoCoRJSDO9GXzOHM4vQm0
-        ztt+/fsPAAD//wMA1wOBZdcBAAA=
+      string: "{\n  \"token\": \"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE0NzUxNTkyMDUsImlkIjoiRmxleEdldCIsIm9yaWdfaWF0IjoxNDc1MDcyODA1fQ.S64Z8gViex-aHw4SzJhhPEylERjVLBm3e7ugOXDorr-taCOyK1Az6zoslqFhcwE1WBznSvfsPyjA-i8BkqA71F42Lvi-wVHQkLTU01jdV7D_1URzjisc5lOWbzpzbvJgKEDZkUduVt_6RXeEcGrDPovg3fBTsU3drOWakeUh4sZ3fHnpdHR5NEQB0ObXDJmbRO9QP18eUCoEy3DFJGVmgLHUZH9DVbqW-68h7jEl5ksHX2mwJq6FwiJkRMnD7Qez9tBZ1IbPaOouKYRk9lMTeINu4Luip54uYUT2GB2wM16R7nABhMXFNl8JGsP0bPO1UAO5615xUrM3JcN0ClTBnQ\"\n}"
     headers:
       cf-ray:
       - 2e97df477d7e0f7b-FRA
@@ -69,19 +61,23 @@ interactions:
     uri: https://api.thetvdb.com/series/77398
   response:
     body:
-      string: !!binary |
-        H4sIAAAAAAAAA2RTXU/bQBB851eM/NJWSsCGEEjeKDRSK6VUpV9S1YfNeWNve96z7s6Aqfrfq3Mw
-        BfpmzezuzK7nfu8BWUmRsiV+7wFAJmW2xMnJ0eJ0sgMCe+HwnhrOlsg+1Yxv05VYDtl9AVmhwCFb
-        4vsA4L4Kj6vwpBUvD/Ni/uoZt6sfoB/3szekyj4JV57aWgzZg3kxrfZ/tlX2xODb5DubFw9opNgl
-        U9m50yjaiT50bMWHeCaeh55isTia5otpkY+8crxx/lciV5ff8PLz1atn1E5tBH2nUXb3mR2PYMXq
-        +fFR1n2I7Pt/S18ZYTU8XYmJ4vTp5u6a/bXwzbOjY+tMF7iEU8SawbetdRID3Bar129xVrHGgJW7
-        xbqzJfsJLkgJV6aztp/gnasVF66qOEaQllg7FUP4yD2HAYg1i4foNYcoFSVnAaLRDXoteVLnG7L7
-        WHnXoGLlKAZNFykppxG/xFpOMwKbGBAdCJV1G7IwTkMrnkyfPg17Fa2GycZZp3I3CKZt3pCPNTY9
-        SEFWWBFaNsJhglhLQCNaTjeuqqxoNUHdNc67bmfAGUNBnJK1PbZeqjryILTLCoxnilym6ee1l4Bz
-        8pE9agrYMCuccvKQfN04b8sXAY0LEa1rO0sewch0Kwelp4YQancTEEQNI/2Kums2lrHhSjSppvMh
-        pWx/zIalED+3ZfKQLVHMTo7z4iifzcYXJT5cUH+5/co8pHDttKQ+e0R/us/b6TLP8WH9kESKKecp
-        M1+mxWyEpSk3u8jGmBf5vDhZjNQdtYcSd+SbD3men+aL44cQU1nyk6gPwOs+W0I7a8e3JpE/jsqL
-        /8Bz12nMljic53vAn70/fwEAAP//AwBBRUjpdwQAAA==
+      string: "{\n  \"data\": {\n    \"id\": 77398,\n    \"seriesName\": \"The X-Files\",\n
+        \   \"aliases\": [\n      \"The X Files\",\n      \"The X-Files (2016)\",\n
+        \     \"The XFiles\"\n    ],\n    \"banner\": \"graphical/61-g.jpg\",\n    \"seriesId\":
+        \"61\",\n    \"status\": \"Continuing\",\n    \"firstAired\": \"1993-09-10\",\n
+        \   \"network\": \"FOX (US)\",\n    \"networkId\": \"\",\n    \"runtime\":
+        \"45\",\n    \"genre\": [\n      \"Mystery\",\n      \"Science-Fiction\"\n
+        \   ],\n    \"overview\": \"The X-Files focused on the exploits of FBI Agents
+        Fox Mulder, Dana Scully, John Doggett and Monica Reyes and their investigations
+        into the paranormal. From genetic mutants and killer insects to a global conspiracy
+        concerning the colonization of Earth by an alien species, this mind-boggling,
+        humorous and occasionally frightening series created by Chris Carter has been
+        one of the world's most popular sci-fi/drama shows since its humble beginnings
+        in 1993.\",\n    \"lastUpdated\": 1475013044,\n    \"airsDayOfWeek\": \"Monday\",\n
+        \   \"airsTime\": \"8:00 PM\",\n    \"rating\": \"TV-14\",\n    \"imdbId\":
+        \"tt0106179\",\n    \"zap2itId\": \"EP00080955\",\n    \"added\": \"\",\n
+        \   \"addedBy\": null,\n    \"siteRating\": 9,\n    \"siteRatingCount\": 260\n
+        \ }\n}"
     headers:
       cache-control:
       - private, max-age=600
@@ -128,18 +124,95 @@ interactions:
     uri: https://api.thetvdb.com/series/77398/images/query?keyType=poster
   response:
     body:
-      string: !!binary |
-        H4sIAAAAAAAAA8zWT0vDMBQA8Ps+Rch51uTl5U/7DUTw5M2DZFu2Vbd2rK04ht9dKroNCWSGBLz0
-        8JK24cf7k+OEELqwvaUVeZoQQsjx60kIrRe0ImCk0dOf0Ks7PB52jlaE7tqud3t6WuqG2b07jCvn
-        2LLeuAe7vdjf3WotSnPDi5fd6rxx77p2M/R124xblWHvnDF2sW77ull1d82ypdXphIRQ++b2djX+
-        QE7P0Xk7ND2tCDffsY/Tl/r1sJ01tt6MP3qe2/na3fqONrl47beI0ZBeBJKLqMJ4TBAjTCBgUgJj
-        PL2JSG4CBfjyhEWYiIAJZ8BFBhRMjsK9icJ5BAoGUFAwlBlQVHIU9JCAjiBRV5BgBhKZoXhKX57E
-        NBQZKh7OQCqRYfCk7ymy4D4WiJk94aYijGIyvUuZgUV5WMoIlTKIgsB1jmRh//iawoIqUqHGDCqQ
-        IVdEshKCcGtBJsoMLpih43ons4pxwWtckGVwST+JROGrI4i5sfArRpEEnqO7qAw3Of3HnvsJAAD/
-        /8yYwQ3AIAwDVwoOJLD/Yv32kSoowqgr3MM++xOLbWEhNFGblwS3hGXmWNyUgAXnxcVDn9NKukBz
-        Lks6gwsupUtpDyFvozYABhchcIlGUUVeIDkWw2LcLJeep8qjgJZTcRlGoHJeXXqYuaWKRq4ugDA2
-        NIwQupHqlk4528JCMBf4n7F4ikXH0vcwegAAAP//olawUL/lYoAlUMgqWpDbLVwKCrFctQAAAAD/
-        /wMAo25WaPoXAAA=
+      string: "{\n  \"data\": [\n    {\n      \"id\": 28587,\n      \"keyType\": \"poster\",\n
+        \     \"subKey\": \"\",\n      \"fileName\": \"posters/77398-1.jpg\",\n      \"resolution\":
+        \"680x1000\",\n      \"ratingsInfo\": {\n        \"average\": 5,\n        \"count\":
+        18\n      },\n      \"thumbnail\": \"_cache/posters/77398-1.jpg\"\n    },\n
+        \   {\n      \"id\": 28872,\n      \"keyType\": \"poster\",\n      \"subKey\":
+        \"\",\n      \"fileName\": \"posters/77398-2.jpg\",\n      \"resolution\":
+        \"680x1000\",\n      \"ratingsInfo\": {\n        \"average\": 6.8,\n        \"count\":
+        44\n      },\n      \"thumbnail\": \"_cache/posters/77398-2.jpg\"\n    },\n
+        \   {\n      \"id\": 92001,\n      \"keyType\": \"poster\",\n      \"subKey\":
+        \"\",\n      \"fileName\": \"posters/77398-3.jpg\",\n      \"resolution\":
+        \"680x1000\",\n      \"ratingsInfo\": {\n        \"average\": 2.2,\n        \"count\":
+        10\n      },\n      \"thumbnail\": \"_cache/posters/77398-3.jpg\"\n    },\n
+        \   {\n      \"id\": 102131,\n      \"keyType\": \"poster\",\n      \"subKey\":
+        \"\",\n      \"fileName\": \"posters/77398-4.jpg\",\n      \"resolution\":
+        \"680x1000\",\n      \"ratingsInfo\": {\n        \"average\": 1.8,\n        \"count\":
+        11\n      },\n      \"thumbnail\": \"_cache/posters/77398-4.jpg\"\n    },\n
+        \   {\n      \"id\": 430451,\n      \"keyType\": \"poster\",\n      \"subKey\":
+        \"\",\n      \"fileName\": \"posters/77398-6.jpg\",\n      \"resolution\":
+        \"680x1000\",\n      \"ratingsInfo\": {\n        \"average\": 4,\n        \"count\":
+        27\n      },\n      \"thumbnail\": \"_cache/posters/77398-6.jpg\"\n    },\n
+        \   {\n      \"id\": 430441,\n      \"keyType\": \"poster\",\n      \"subKey\":
+        \"\",\n      \"fileName\": \"posters/77398-5.jpg\",\n      \"resolution\":
+        \"680x1000\",\n      \"ratingsInfo\": {\n        \"average\": 2.9,\n        \"count\":
+        14\n      },\n      \"thumbnail\": \"_cache/posters/77398-5.jpg\"\n    },\n
+        \   {\n      \"id\": 1102563,\n      \"keyType\": \"poster\",\n      \"subKey\":
+        \"\",\n      \"fileName\": \"posters/77398-13.jpg\",\n      \"resolution\":
+        \"680x1000\",\n      \"ratingsInfo\": {\n        \"average\": 5.1,\n        \"count\":
+        12\n      },\n      \"thumbnail\": \"_cache/posters/77398-13.jpg\"\n    },\n
+        \   {\n      \"id\": 1038605,\n      \"keyType\": \"poster\",\n      \"subKey\":
+        \"\",\n      \"fileName\": \"posters/77398-9.jpg\",\n      \"resolution\":
+        \"680x1000\",\n      \"ratingsInfo\": {\n        \"average\": 5.6,\n        \"count\":
+        9\n      },\n      \"thumbnail\": \"_cache/posters/77398-9.jpg\"\n    },\n
+        \   {\n      \"id\": 1042173,\n      \"keyType\": \"poster\",\n      \"subKey\":
+        \"\",\n      \"fileName\": \"posters/77398-10.jpg\",\n      \"resolution\":
+        \"680x1000\",\n      \"ratingsInfo\": {\n        \"average\": 5,\n        \"count\":
+        18\n      },\n      \"thumbnail\": \"_cache/posters/77398-10.jpg\"\n    },\n
+        \   {\n      \"id\": 1056474,\n      \"keyType\": \"poster\",\n      \"subKey\":
+        \"\",\n      \"fileName\": \"posters/77398-12.jpg\",\n      \"resolution\":
+        \"680x1000\",\n      \"ratingsInfo\": {\n        \"average\": 5.3,\n        \"count\":
+        12\n      },\n      \"thumbnail\": \"_cache/posters/77398-12.jpg\"\n    },\n
+        \   {\n      \"id\": 1104039,\n      \"keyType\": \"poster\",\n      \"subKey\":
+        \"\",\n      \"fileName\": \"posters/77398-14.jpg\",\n      \"resolution\":
+        \"680x1000\",\n      \"ratingsInfo\": {\n        \"average\": 2.8,\n        \"count\":
+        16\n      },\n      \"thumbnail\": \"_cache/posters/77398-14.jpg\"\n    },\n
+        \   {\n      \"id\": 1104040,\n      \"keyType\": \"poster\",\n      \"subKey\":
+        \"\",\n      \"fileName\": \"posters/77398-15.jpg\",\n      \"resolution\":
+        \"680x1000\",\n      \"ratingsInfo\": {\n        \"average\": 3.5,\n        \"count\":
+        21\n      },\n      \"thumbnail\": \"_cache/posters/77398-15.jpg\"\n    },\n
+        \   {\n      \"id\": 1105213,\n      \"keyType\": \"poster\",\n      \"subKey\":
+        \"\",\n      \"fileName\": \"posters/77398-16.jpg\",\n      \"resolution\":
+        \"680x1000\",\n      \"ratingsInfo\": {\n        \"average\": 1.7,\n        \"count\":
+        9\n      },\n      \"thumbnail\": \"_cache/posters/77398-16.jpg\"\n    },\n
+        \   {\n      \"id\": 1105215,\n      \"keyType\": \"poster\",\n      \"subKey\":
+        \"\",\n      \"fileName\": \"posters/77398-18.jpg\",\n      \"resolution\":
+        \"680x1000\",\n      \"ratingsInfo\": {\n        \"average\": 1.8,\n        \"count\":
+        9\n      },\n      \"thumbnail\": \"_cache/posters/77398-18.jpg\"\n    },\n
+        \   {\n      \"id\": 1107635,\n      \"keyType\": \"poster\",\n      \"subKey\":
+        \"\",\n      \"fileName\": \"posters/77398-23.jpg\",\n      \"resolution\":
+        \"680x1000\",\n      \"ratingsInfo\": {\n        \"average\": 7.9,\n        \"count\":
+        36\n      },\n      \"thumbnail\": \"_cache/posters/77398-23.jpg\"\n    },\n
+        \   {\n      \"id\": 1109045,\n      \"keyType\": \"poster\",\n      \"subKey\":
+        \"\",\n      \"fileName\": \"posters/77398-22.jpg\",\n      \"resolution\":
+        \"680x1000\",\n      \"ratingsInfo\": {\n        \"average\": 3.5,\n        \"count\":
+        11\n      },\n      \"thumbnail\": \"_cache/posters/77398-22.jpg\"\n    },\n
+        \   {\n      \"id\": 1115225,\n      \"keyType\": \"poster\",\n      \"subKey\":
+        \"\",\n      \"fileName\": \"posters/77398-20.jpg\",\n      \"resolution\":
+        \"680x1000\",\n      \"ratingsInfo\": {\n        \"average\": 3.4,\n        \"count\":
+        8\n      },\n      \"thumbnail\": \"_cache/posters/77398-20.jpg\"\n    },\n
+        \   {\n      \"id\": 1116292,\n      \"keyType\": \"poster\",\n      \"subKey\":
+        \"\",\n      \"fileName\": \"posters/77398-21.jpg\",\n      \"resolution\":
+        \"680x1000\",\n      \"ratingsInfo\": {\n        \"average\": 5,\n        \"count\":
+        10\n      },\n      \"thumbnail\": \"_cache/posters/77398-21.jpg\"\n    },\n
+        \   {\n      \"id\": 1117056,\n      \"keyType\": \"poster\",\n      \"subKey\":
+        \"\",\n      \"fileName\": \"posters/77398-24.jpg\",\n      \"resolution\":
+        \"680x1000\",\n      \"ratingsInfo\": {\n        \"average\": 4.8,\n        \"count\":
+        21\n      },\n      \"thumbnail\": \"_cache/posters/77398-24.jpg\"\n    },\n
+        \   {\n      \"id\": 1122041,\n      \"keyType\": \"poster\",\n      \"subKey\":
+        \"\",\n      \"fileName\": \"posters/77398-26.jpg\",\n      \"resolution\":
+        \"680x1000\",\n      \"ratingsInfo\": {\n        \"average\": 7.3,\n        \"count\":
+        4\n      },\n      \"thumbnail\": \"_cache/posters/77398-26.jpg\"\n    },\n
+        \   {\n      \"id\": 1122043,\n      \"keyType\": \"poster\",\n      \"subKey\":
+        \"\",\n      \"fileName\": \"posters/77398-27.jpg\",\n      \"resolution\":
+        \"680x1000\",\n      \"ratingsInfo\": {\n        \"average\": 7.3,\n        \"count\":
+        4\n      },\n      \"thumbnail\": \"_cache/posters/77398-27.jpg\"\n    },\n
+        \   {\n      \"id\": 1135934,\n      \"keyType\": \"poster\",\n      \"subKey\":
+        \"\",\n      \"fileName\": \"posters/77398-28.jpg\",\n      \"resolution\":
+        \"680x1000\",\n      \"ratingsInfo\": {\n        \"average\": 0,\n        \"count\":
+        0\n      },\n      \"thumbnail\": \"_cache/posters/77398-28.jpg\"\n    }\n
+        \ ]\n}"
     headers:
       cache-control:
       - private, max-age=600
