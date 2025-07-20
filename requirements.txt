@@ -90,7 +90,7 @@ jinja2==3.1.6
     # via
     #   flask
     #   flexget
-jsonschema==4.24.0
+jsonschema==4.25.0
     # via
     #   flask-restx
     #   flexget
@@ -141,7 +141,7 @@ python-dateutil==2.9.0.post0
     #   tempora
 pytz==2025.2
     # via flask-restx
-pywin32==310 ; (python_full_version < '3.10' and implementation_name == 'cpython' and sys_platform == 'win32') or (platform_python_implementation != 'PyPy' and sys_platform == 'win32')
+pywin32==311 ; (python_full_version < '3.10' and implementation_name == 'cpython' and sys_platform == 'win32') or (platform_python_implementation != 'PyPy' and sys_platform == 'win32')
     # via
     #   cherrypy
     #   plumbum
