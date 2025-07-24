@@ -17,6 +17,10 @@ repos:
     rev: v2.0.0
     hooks:
       - id: doc8
+  - repo: https://github.com/python-jsonschema/check-jsonschema
+    rev: 0.33.2
+    hooks:
+      - id: check-readthedocs
   - repo: https://github.com/astral-sh/uv-pre-commit
     rev: 0.7.22
     hooks:
