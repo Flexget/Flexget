@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 from flask.helpers import send_file
@@ -28,7 +30,7 @@ class CachedResource(APIResource):
     @api.response(BadRequest)
     @api.response(APIError)
     @api.doc(expect=[cached_parser])
-    def get(self, session: 'Session' = None) -> 'Response':
+    def get(self, session: Session = None) -> Response:
         """Cache remote resources."""
         args = cached_parser.parse_args()
         url = args.get('url')

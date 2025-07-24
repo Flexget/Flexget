@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import contextlib
 import functools
 import logging
@@ -8,15 +10,16 @@ import threading
 import uuid
 import warnings
 from collections import deque
-from typing import TYPE_CHECKING, Callable, Optional, Union
+from typing import TYPE_CHECKING
 
-import loguru
 from loguru import logger
 
 from flexget import __version__
 
 if TYPE_CHECKING:
-    from collections.abc import Iterator
+    from collections.abc import Callable, Iterator
+
+    import loguru
 
 # A level more detailed than INFO
 VERBOSE = 15
@@ -34,7 +37,7 @@ local_context = threading.local()
 
 
 @contextlib.contextmanager
-def capture_logs(*args, **kwargs) -> 'Iterator':
+def capture_logs(*args, **kwargs) -> Iterator:
     """Take the same arguments as `logger.add`, but this sync will only log messages contained in context."""
     old_id = get_log_session_id()
     session_id = local_context.session_id = old_id or str(uuid.uuid4())
@@ -63,7 +66,7 @@ def get_log_session_id() -> str:
     return getattr(local_context, 'session_id', None)
 
 
-def record_patcher(record: 'loguru.Record') -> None:
+def record_patcher(record: loguru.Record) -> None:
     # If a custom name was bound to the logger, move it from extra directly into the record
     name = record['extra'].pop('name', None)
     if name:
@@ -75,7 +78,7 @@ class InterceptHandler(logging.Handler):
 
     def emit(self, record: logging.LogRecord):
         # Get corresponding Loguru level if it exists
-        level: Union[str, int]
+        level: str | int
         try:
             level = logger.level(record.levelname).name
         except ValueError:
@@ -93,11 +96,11 @@ class InterceptHandler(logging.Handler):
 
 
 _logging_configured = False
-_startup_buffer: list['loguru.Record'] = []
-_startup_buffer_id: Optional[int] = None
+_startup_buffer: list[loguru.Record] = []
+_startup_buffer_id: int | None = None
 _logging_started = False
 # Stores the last 100 debug messages
-debug_buffer: deque['loguru.Message'] = deque(maxlen=100)
+debug_buffer: deque[loguru.Message] = deque(maxlen=100)
 _log_filters = []  # Stores filter functions
 
 
@@ -106,12 +109,12 @@ def _log_filterer(record):
     return all(f(record) for f in _log_filters)
 
 
-def add_filter(func: Callable[['loguru.Record'], bool]):
+def add_filter(func: Callable[[loguru.Record], bool]):
     """Add a filter function to the log handlers."""
     _log_filters.append(func)
 
 
-def remove_filter(func: Callable[['loguru.Record'], bool]):
+def remove_filter(func: Callable[[loguru.Record], bool]):
     """Remove a filter function from the log handlers."""
     _log_filters.remove(func)
 
@@ -161,7 +164,7 @@ def initialize(unit_test: bool = False) -> None:
 
 
 def start(
-    filename: Optional[str] = None,
+    filename: str | None = None,
     level: str = 'INFO',
     to_console: bool = True,
     to_file: bool = True,

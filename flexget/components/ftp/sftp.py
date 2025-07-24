@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 from itertools import groupby
-from typing import TYPE_CHECKING, NamedTuple, Optional
+from typing import TYPE_CHECKING, NamedTuple
 from urllib.parse import unquote, urlparse
 
 from loguru import logger
@@ -115,7 +117,7 @@ class SftpList:
         return config
 
     @classmethod
-    def on_task_input(cls, task: 'Task', config: dict) -> list['Entry']:
+    def on_task_input(cls, task: Task, config: dict) -> list[Entry]:
         """Input task handler."""
         config = cls.prepare_config(config)
 
@@ -189,7 +191,7 @@ class SftpDownload:
     }
 
     @classmethod
-    def download_entry(cls, entry: 'Entry', config: dict, sftp: SftpClient) -> None:
+    def download_entry(cls, entry: Entry, config: dict, sftp: SftpClient) -> None:
         """Download the file(s) described in entry."""
         path: str = unquote(urlparse(entry['url']).path) or '.'
         delete_origin: bool = config['delete_origin']
@@ -209,11 +211,11 @@ class SftpDownload:
             entry.fail(e)
 
     @classmethod
-    def on_task_output(cls, task: 'Task', config: dict) -> None:
+    def on_task_output(cls, task: Task, config: dict) -> None:
         """Register this as an output plugin."""
 
     @classmethod
-    def on_task_download(cls, task: 'Task', config: dict) -> None:
+    def on_task_download(cls, task: Task, config: dict) -> None:
         """Task handler for sftp_download plugin."""
         socket_timeout_sec: int = config['socket_timeout_sec']
         connection_tries: int = config['connection_tries']
@@ -223,8 +225,8 @@ class SftpDownload:
             if not sftp_config:
                 continue
 
-            error_message: Optional[str] = None
-            sftp: Optional[SftpClient] = None
+            error_message: str | None = None
+            sftp: SftpClient | None = None
             try:
                 sftp = sftp_connect(sftp_config, socket_timeout_sec, connection_tries)
             except Exception as e:
@@ -239,7 +241,7 @@ class SftpDownload:
                 sftp.close()
 
     @classmethod
-    def _get_sftp_config(cls, entry: 'Entry'):
+    def _get_sftp_config(cls, entry: Entry):
         """Parse a url and return a hashable config, source path, and destination path."""
         # parse url
         parsed = urlparse(entry['url'])
@@ -253,13 +255,13 @@ class SftpDownload:
         private_key_pass: str = entry.get('private_key_pass')
 
         entry_host_key_config: dict = entry.get('host_key')
-        host_key: Optional[HostKey] = None
+        host_key: HostKey | None = None
         if entry_host_key_config:
             host_key = HostKey(
                 entry_host_key_config['key_type'], entry_host_key_config['public_key']
             )
 
-        config: Optional[SftpConfig] = None
+        config: SftpConfig | None = None
 
         if parsed.scheme == 'sftp':
             config = SftpConfig(
@@ -342,7 +344,7 @@ class SftpUpload:
         return config
 
     @classmethod
-    def handle_entry(cls, entry: 'Entry', sftp: SftpClient, config: dict):
+    def handle_entry(cls, entry: Entry, sftp: SftpClient, config: dict):
         to: str = config['to']
         location: Path = entry['location']
         delete_origin: bool = config['delete_origin']
@@ -368,7 +370,7 @@ class SftpUpload:
                 logger.warning('Failed to delete file {} ({})', location, e)
 
     @classmethod
-    def on_task_output(cls, task: 'Task', config: dict) -> None:
+    def on_task_output(cls, task: Task, config: dict) -> None:
         """Upload accepted entries to the specified SFTP server."""
         config = cls.prepare_config(config)
 
@@ -395,7 +397,7 @@ def task_config_to_sftp_config(config: dict) -> SftpConfig:
     private_key: str = config['private_key']
     private_key_pass: str = config['private_key_pass']
 
-    host_key: Optional[HostKey] = None
+    host_key: HostKey | None = None
     if config.get('host_key') is not None:
         host_key = HostKey(config['host_key']['key_type'], config['host_key']['public_key'])
 

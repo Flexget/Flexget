@@ -6,17 +6,17 @@ FlexGet is a program aimed to automate downloading or processing content (torren
 podcasts, etc.) from different sources like RSS-feeds, html-pages, various sites and more.
 """
 readme = "README.rst"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 classifiers = [
     "Topic :: Utilities",
     "Development Status :: 5 - Production/Stable",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Operating System :: MacOS",
     "Operating System :: Microsoft :: Windows",
     "Operating System :: POSIX",
@@ -38,7 +38,6 @@ dependencies = [
     "feedparser ~=6.0",
     "guessit ~=3.8",
     "html5lib ~=1.1",
-    "importlib-metadata ~=8.5; python_version <'3.10'", # TODO: remove this after we drop python3.9
     "jinja2 ~=3.1",
     "jsonschema ~=4.23",
     "loguru ~=0.7.3",
@@ -54,11 +53,6 @@ dependencies = [
     "rich ~=14.0",
     "rpyc ~=6.0",
     "sqlalchemy ~=2.0",
-    # TODO: urllib3 >=2 has changes that require vcr cassettes to be upgraded. Requirements of some of our deps (boto?)
-    # require urllib3 <2 on python < 3.10. In order to not be running different versions of urllib on different
-    # versions of python, this is pinned in our deps. This can be removed completely if the issue gets solved.
-    # https://github.com/kevin1024/vcrpy/issues/719
-    "urllib3 ~=1.26",
     # WebUI/API Deps
     "cherrypy ~=18.10",
     "flask-compress ~=1.17",
@@ -79,7 +73,7 @@ dev = [
     "vcrpy ~=7.0",
 ]
 docs = [
-    'sphinx~=8.2; python_version>="3.11"',
+    'sphinx~=8.1',
     'pydata-sphinx-theme~=0.16',
     'sphinx-copybutton~=0.5',
     'sphinx-design~=0.6'
@@ -176,24 +170,17 @@ xfail_strict = true
 [tool.ruff]
 line-length = 99
 extend-exclude = ["flexget/ui"]
+preview = true
 
 [tool.ruff.lint]
-select = ["ALL"]
 ignore = [
-    # TODO
-    "B904",
-    "E501",
-    "FA100", # Remove this rule once Python 3.9 support is dropped.
-    "PERF203", # Remove this rule once Python 3.10 support is dropped.
-    "PLC0415",
-    "PTH119",
-
-    # Need decision
     "A", # flake8-builtins
     "ANN", # flake8-annotations
     "ARG", # flake8-unused-arguments
+    "B904", # TODO
     "BLE001", # blind-except
     "C901", # complex-structure
+    "COM", # Ruff recommends against using this rule alongside the formatter.
     "D100", # undocumented-public-module
     "D101", # undocumented-public-class
     "D102", # undocumented-public-method
@@ -201,11 +188,21 @@ ignore = [
     "D104", # undocumented-public-package
     "D105", # undocumented-magic-method
     "D107", # undocumented-public-init
+    "D203", # Conflicting with other rules
+    "D213", # Conflicting with other rules
+    "D415", # Duplicate of D400
     "DTZ", # flake8-datetimez
+    "E501", # TODO
     "EM", # flake8-errmsg
     "ERA001", # commented-out-code
     "FBT", # flake8-boolean-trap
+    "FIX002", # We use "TODO" comments as a form of documentation
+    "FIX004", # We use "HACK" comments as a form of documentation
     "INP001", # implicit-namespace-package
+    "N817", # Rejected by @gazpachoking in https://github.com/Flexget/Flexget/pull/4234#discussion_r1951605123
+    "N818",  # Rejected by @gazpachoking in https://github.com/Flexget/Flexget/pull/4234#pullrequestreview-2610029402
+    "PERF203", # TODO: Remove this rule once Python 3.10 support is dropped.
+    "PLC0415", # TODO
     "PLE1205", # Maybe can re-enable after https://github.com/astral-sh/ruff/issues/13390
     "PLR0911", # too-many-return-statements
     "PLR0912", # too-many-branches
@@ -216,25 +213,19 @@ ignore = [
     "PLW0603", # global-statement
     "PLW0642", # self-or-cls-assignment
     "PLW2901", # redefined-loop-name
+    "PTH119", # TODO
+    "Q", # Ruff recommends against using this rule alongside the formatter.
     "RUF012", # Maybe can re-enable after https://github.com/astral-sh/ruff/issues/5243
     "S", # flake8-bandit
     "SLF001", # private-member-access
+    "TD002", # Not applicable
+    "TD003", # Not applicable
     "TRY003", # raise-vanilla-args
-
-    # Not applicable
-    "COM", # Ruff recommends against using this rule alongside the formatter.
-    "D203", # Conflicting with other rules
-    "D213", # Conflicting with other rules
-    "D415", # Duplicate of D400
-    "FIX002", # We use "TODO" comments as a form of documentation
-    "FIX004", # We use "HACK" comments as a form of documentation
-    "N817", # camelcase-imported-as-acronym, rejected by @gazpachoking in https://github.com/Flexget/Flexget/pull/4234#discussion_r1951605123
-    "N818", # error-suffix-on-exception-name, rejected by @gazpachoking in https://github.com/Flexget/Flexget/pull/4234#pullrequestreview-2610029402
-    "Q", # Ruff recommends against using this rule alongside the formatter.
-    "TD002", # missing-todo-author
-    "TD003", # missing-todo-link
-    "TRY400", # error-instead-of-exception, rejected by @gazpachoking in https://github.com/Flexget/Flexget/pull/4249#issuecomment-2656387500
+    "TRY400", # Rejected by @gazpachoking in https://github.com/Flexget/Flexget/pull/4249#issuecomment-2656387500
 ]
+explicit-preview-rules = true
+future-annotations = true
+select = ["ALL"]
 
 [tool.ruff.lint.flake8-type-checking]
 quote-annotations = true

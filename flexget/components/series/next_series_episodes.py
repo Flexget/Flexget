@@ -64,9 +64,9 @@ class NextSeriesEpisodes:
             search_strings = [f'{series.name} {id}' for id in self.ep_identifiers(season, episode)]
             series_id = f'S{season:02d}E{episode:02d}'
             for alt in alts:
-                search_strings.extend(
-                    [f'{alt} {id}' for id in self.ep_identifiers(season, episode)]
-                )
+                search_strings.extend([
+                    f'{alt} {id}' for id in self.ep_identifiers(season, episode)
+                ])
         else:
             search_strings = [f'{series.name} {id}' for id in self.sequence_identifiers(episode)]
             series_id = episode

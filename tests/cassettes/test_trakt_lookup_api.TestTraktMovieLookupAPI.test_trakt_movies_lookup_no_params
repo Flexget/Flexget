@@ -2,16 +2,20 @@ interactions:
 - request:
     body: null
     headers:
-      Content-Type: [application/json]
-      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: ['2']
+      Content-Type:
+      - application/json
+      trakt-api-key:
+      - 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af
+      trakt-api-version:
+      - '2'
     method: GET
     uri: https://api.trakt.tv/search?type=movie&query=the+matrix
   response:
-    body: {string: "[{\"type\":\"movie\",\"score\":69.366,\"movie\":{\"title\":\"The
-        Matrix\",\"overview\":\"Set in the 22nd century, The Matrix tells the story
-        of a computer hacker who joins a group of underground insurgents fighting
-        the vast and powerful computers who now rule the earth.\",\"year\":1999,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":481,\"slug\":\"the-matrix-1999\",\"imdb\":\"tt0133093\",\"tmdb\":603}}},{\"type\":\"movie\",\"score\":64.29628,\"movie\":{\"title\":\"Dot
+    body:
+      string: "[{\"type\":\"movie\",\"score\":69.366,\"movie\":{\"title\":\"The Matrix\",\"overview\":\"Set
+        in the 22nd century, The Matrix tells the story of a computer hacker who joins
+        a group of underground insurgents fighting the vast and powerful computers
+        who now rule the earth.\",\"year\":1999,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":481,\"slug\":\"the-matrix-1999\",\"imdb\":\"tt0133093\",\"tmdb\":603}}},{\"type\":\"movie\",\"score\":64.29628,\"movie\":{\"title\":\"Dot
         Matrix\",\"overview\":\"In 2012, Richard Tuohy made \\\"Screen Tone\\\" using
         patterns of dots printed straight to 16mm film. By doubling this principle
         in \\\"Dot Matrix\\\", a third, dizzying moire pattern and a deafening noise
@@ -69,60 +73,105 @@ interactions:
         (2003) is briefly touched on here in this documentary. Interviews with various
         cast and crew members inform us how they were affected by the deaths of Gloria
         Foster and Aaliyah, and also delve into the making of the visual effects that
-        takes up a lot of screen time. Written by Rhyl Donnelly\",\"year\":2004,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":136173,\"slug\":\"the-matrix-recalibrated-2004\",\"imdb\":\"tt0410519\",\"tmdb\":221495}}}]"}
+        takes up a lot of screen time. Written by Rhyl Donnelly\",\"year\":2004,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":136173,\"slug\":\"the-matrix-recalibrated-2004\",\"imdb\":\"tt0410519\",\"tmdb\":221495}}}]"
     headers:
-      CF-Cache-Status: [MISS]
-      CF-RAY: [312a5a64ccf03cef-CPH]
-      Cache-Control: ['public, max-age=28800']
-      Connection: [keep-alive]
-      Content-Type: [application/json; charset=utf-8]
-      Date: ['Sat, 17 Dec 2016 12:24:38 GMT']
-      ETag: [W/"94804c308f0ad2361b60b945291b9c47"]
-      Expires: ['Sat, 17 Dec 2016 20:24:38 GMT']
-      Server: [cloudflare-nginx]
-      Set-Cookie: ['__cfduid=d9a9fdf7d5de8c9e5577857f2dbe89f161481977477; expires=Sun,
-          17-Dec-17 12:24:37 GMT; path=/; domain=.trakt.tv; HttpOnly']
-      Vary: [Accept-Encoding]
-      X-Content-Type-Options: [nosniff]
-      X-Frame-Options: [SAMEORIGIN]
-      X-Pagination-Item-Count: ['65']
-      X-Pagination-Limit: ['10']
-      X-Pagination-Page: ['1']
-      X-Pagination-Page-Count: ['7']
-      X-Request-Id: [6863ace2-4f10-4b6b-9b7c-0fa0eb06293e]
-      X-Runtime: ['0.033067']
-      X-XSS-Protection: [1; mode=block]
-    status: {code: 200, message: OK}
+      CF-Cache-Status:
+      - MISS
+      CF-RAY:
+      - 312a5a64ccf03cef-CPH
+      Cache-Control:
+      - public, max-age=28800
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Sat, 17 Dec 2016 12:24:38 GMT
+      ETag:
+      - W/"94804c308f0ad2361b60b945291b9c47"
+      Expires:
+      - Sat, 17 Dec 2016 20:24:38 GMT
+      Server:
+      - cloudflare-nginx
+      Set-Cookie:
+      - __cfduid=d9a9fdf7d5de8c9e5577857f2dbe89f161481977477; expires=Sun, 17-Dec-17
+        12:24:37 GMT; path=/; domain=.trakt.tv; HttpOnly
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Pagination-Item-Count:
+      - '65'
+      X-Pagination-Limit:
+      - '10'
+      X-Pagination-Page:
+      - '1'
+      X-Pagination-Page-Count:
+      - '7'
+      X-Request-Id:
+      - 6863ace2-4f10-4b6b-9b7c-0fa0eb06293e
+      X-Runtime:
+      - '0.033067'
+      X-XSS-Protection:
+      - 1; mode=block
+    status:
+      code: 200
+      message: OK
 - request:
     body: null
     headers:
-      Content-Type: [application/json]
-      Cookie: [__cfduid=d9a9fdf7d5de8c9e5577857f2dbe89f161481977477]
-      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: ['2']
+      Content-Type:
+      - application/json
+      Cookie:
+      - __cfduid=d9a9fdf7d5de8c9e5577857f2dbe89f161481977477
+      trakt-api-key:
+      - 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af
+      trakt-api-version:
+      - '2'
     method: GET
     uri: https://api.trakt.tv/movies/481?extended=full
   response:
-    body: {string: '{"title":"The Matrix","year":1999,"ids":{"trakt":481,"slug":"the-matrix-1999","imdb":"tt0133093","tmdb":603},"tagline":"Welcome
+    body:
+      string: '{"title":"The Matrix","year":1999,"ids":{"trakt":481,"slug":"the-matrix-1999","imdb":"tt0133093","tmdb":603},"tagline":"Welcome
         to the Real World.","overview":"Set in the 22nd century, The Matrix tells
         the story of a computer hacker who joins a group of underground insurgents
-        fighting the vast and powerful computers who now rule the earth.","released":"1999-03-30","runtime":136,"trailer":"http://youtube.com/watch?v=m8e-FF8MsqU","homepage":"http://www.warnerbros.com/matrix","rating":8.89357,"votes":22878,"updated_at":"2016-12-16T08:41:42.000Z","language":"en","available_translations":["bg","bs","cs","da","de","el","en","es","fa","fi","fr","he","hu","id","it","ja","ko","mk","nl","no","pl","pt","ro","ru","sk","sr","sv","th","tr","uk","zh"],"genres":["action","science-fiction"],"certification":"R"}'}
+        fighting the vast and powerful computers who now rule the earth.","released":"1999-03-30","runtime":136,"trailer":"http://youtube.com/watch?v=m8e-FF8MsqU","homepage":"http://www.warnerbros.com/matrix","rating":8.89357,"votes":22878,"updated_at":"2016-12-16T08:41:42.000Z","language":"en","available_translations":["bg","bs","cs","da","de","el","en","es","fa","fi","fr","he","hu","id","it","ja","ko","mk","nl","no","pl","pt","ro","ru","sk","sr","sv","th","tr","uk","zh"],"genres":["action","science-fiction"],"certification":"R"}'
     headers:
-      CF-Cache-Status: [HIT]
-      CF-RAY: [312a5a679d5b3cef-CPH]
-      Cache-Control: ['public, max-age=28800']
-      Connection: [keep-alive]
-      Content-Type: [application/json; charset=utf-8]
-      Date: ['Sat, 17 Dec 2016 12:24:38 GMT']
-      ETag: [W/"71bb837d0fdf4e85d8cd6fc76a31fc09"]
-      Expires: ['Sat, 17 Dec 2016 20:24:38 GMT']
-      Last-Modified: ['Fri, 16 Dec 2016 08:41:42 GMT']
-      Server: [cloudflare-nginx]
-      Vary: [Accept-Encoding]
-      X-Content-Type-Options: [nosniff]
-      X-Frame-Options: [SAMEORIGIN]
-      X-Request-Id: [9c974a27-c920-4e4d-971c-06e48254afab]
-      X-Runtime: ['0.012982']
-      X-XSS-Protection: [1; mode=block]
-    status: {code: 200, message: OK}
+      CF-Cache-Status:
+      - HIT
+      CF-RAY:
+      - 312a5a679d5b3cef-CPH
+      Cache-Control:
+      - public, max-age=28800
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Sat, 17 Dec 2016 12:24:38 GMT
+      ETag:
+      - W/"71bb837d0fdf4e85d8cd6fc76a31fc09"
+      Expires:
+      - Sat, 17 Dec 2016 20:24:38 GMT
+      Last-Modified:
+      - Fri, 16 Dec 2016 08:41:42 GMT
+      Server:
+      - cloudflare-nginx
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Request-Id:
+      - 9c974a27-c920-4e4d-971c-06e48254afab
+      X-Runtime:
+      - '0.012982'
+      X-XSS-Protection:
+      - 1; mode=block
+    status:
+      code: 200
+      message: OK
 version: 1

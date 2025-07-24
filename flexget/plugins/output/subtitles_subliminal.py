@@ -179,9 +179,7 @@ class PluginSubliminal:
                     entry_languages = set(entry.get('subtitle_languages', [])) or languages
 
                     if entry['location'].suffix in VIDEO_EXTENSIONS:
-                        video = scan_video(
-                            str(entry['location'])
-                        )  # TODO: remove str() type conversion after Python 3.9 support is dropped
+                        video = scan_video(entry['location'])
                     elif entry['location'].suffix in ARCHIVE_EXTENSIONS:
                         video = scan_archive(entry['location'])
                     else:

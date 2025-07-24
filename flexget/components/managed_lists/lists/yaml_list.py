@@ -2,7 +2,6 @@ import random
 import typing
 from collections import OrderedDict
 from collections.abc import MutableSet
-from typing import Optional
 
 from loguru import logger
 from yaml import dump as dump_yaml
@@ -112,7 +111,7 @@ class YamlManagedList(MutableSet):
         except Exception as e:
             raise PluginError(f'Error writhing data to `{self.filename}`: {e}')
 
-    def get(self, item) -> Optional[Entry]:
+    def get(self, item) -> Entry | None:
         for entry in self.entries:
             if self.matches(item, entry):
                 return entry

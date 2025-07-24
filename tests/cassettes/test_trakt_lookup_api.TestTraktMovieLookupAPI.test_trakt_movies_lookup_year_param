@@ -2,16 +2,20 @@ interactions:
 - request:
     body: null
     headers:
-      Content-Type: [application/json]
-      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: ['2']
+      Content-Type:
+      - application/json
+      trakt-api-key:
+      - 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af
+      trakt-api-version:
+      - '2'
     method: GET
     uri: https://api.trakt.tv/search?year=2003&type=movie&query=the+matrix
   response:
-    body: {string: '[{"type":"movie","score":55.492798,"movie":{"title":"The Matrix
-        Revolutions","overview":"The human city of Zion defends itself against the
-        massive invasion of the machines as Neo fights to end the war at another front
-        while also opposing the rogue Agent Smith.","year":2003,"images":{"poster":{"full":null,"medium":null,"thumb":null},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":483,"slug":"the-matrix-revolutions-2003","imdb":"tt0242653","tmdb":605}}},{"type":"movie","score":55.492798,"movie":{"title":"The
+    body:
+      string: '[{"type":"movie","score":55.492798,"movie":{"title":"The Matrix Revolutions","overview":"The
+        human city of Zion defends itself against the massive invasion of the machines
+        as Neo fights to end the war at another front while also opposing the rogue
+        Agent Smith.","year":2003,"images":{"poster":{"full":null,"medium":null,"thumb":null},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":483,"slug":"the-matrix-revolutions-2003","imdb":"tt0242653","tmdb":605}}},{"type":"movie","score":55.492798,"movie":{"title":"The
         Matrix Reloaded","overview":"Six months after the events depicted in The Matrix,
         Neo has proved to be a good omen for the free humans, as more and more humans
         are being freed from the matrix and brought to Zion, the one and only stronghold
@@ -50,60 +54,105 @@ interactions:
         and Duo discuss leaving the real world while during a samurai sword fight.
         Part of the Animatrix collection of animated shorts set in the Matrix universe.","year":2003,"images":{"poster":{"full":null,"medium":null,"thumb":null},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":15059,"slug":"program-2003","imdb":"tt0366178","tmdb":24959}}},{"type":"movie","score":2.0511503,"movie":{"title":"Matriculated","overview":"The
         human resistance works to convert a sentinel to their side. Part of the Animatrix
-        collection of animated shorts set in the Matrix universe.","year":2003,"images":{"poster":{"full":null,"medium":null,"thumb":null},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":15050,"slug":"matriculated-2003","imdb":"tt0372765","tmdb":24950}}}]'}
+        collection of animated shorts set in the Matrix universe.","year":2003,"images":{"poster":{"full":null,"medium":null,"thumb":null},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":15050,"slug":"matriculated-2003","imdb":"tt0372765","tmdb":24950}}}]'
     headers:
-      CF-Cache-Status: [MISS]
-      CF-RAY: [312a5a6998963cb9-CPH]
-      Cache-Control: ['public, max-age=28800']
-      Connection: [keep-alive]
-      Content-Type: [application/json; charset=utf-8]
-      Date: ['Sat, 17 Dec 2016 12:24:39 GMT']
-      ETag: [W/"d3a8aaef6565243050b5280543043427"]
-      Expires: ['Sat, 17 Dec 2016 20:24:39 GMT']
-      Server: [cloudflare-nginx]
-      Set-Cookie: ['__cfduid=d85c317fc1d0cbb862c18845eab0e43f31481977478; expires=Sun,
-          17-Dec-17 12:24:38 GMT; path=/; domain=.trakt.tv; HttpOnly']
-      Vary: [Accept-Encoding]
-      X-Content-Type-Options: [nosniff]
-      X-Frame-Options: [SAMEORIGIN]
-      X-Pagination-Item-Count: ['12']
-      X-Pagination-Limit: ['10']
-      X-Pagination-Page: ['1']
-      X-Pagination-Page-Count: ['2']
-      X-Request-Id: [9ef8f448-b11b-4096-aded-a4cde98ae859]
-      X-Runtime: ['0.020956']
-      X-XSS-Protection: [1; mode=block]
-    status: {code: 200, message: OK}
+      CF-Cache-Status:
+      - MISS
+      CF-RAY:
+      - 312a5a6998963cb9-CPH
+      Cache-Control:
+      - public, max-age=28800
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Sat, 17 Dec 2016 12:24:39 GMT
+      ETag:
+      - W/"d3a8aaef6565243050b5280543043427"
+      Expires:
+      - Sat, 17 Dec 2016 20:24:39 GMT
+      Server:
+      - cloudflare-nginx
+      Set-Cookie:
+      - __cfduid=d85c317fc1d0cbb862c18845eab0e43f31481977478; expires=Sun, 17-Dec-17
+        12:24:38 GMT; path=/; domain=.trakt.tv; HttpOnly
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Pagination-Item-Count:
+      - '12'
+      X-Pagination-Limit:
+      - '10'
+      X-Pagination-Page:
+      - '1'
+      X-Pagination-Page-Count:
+      - '2'
+      X-Request-Id:
+      - 9ef8f448-b11b-4096-aded-a4cde98ae859
+      X-Runtime:
+      - '0.020956'
+      X-XSS-Protection:
+      - 1; mode=block
+    status:
+      code: 200
+      message: OK
 - request:
     body: null
     headers:
-      Content-Type: [application/json]
-      Cookie: [__cfduid=d85c317fc1d0cbb862c18845eab0e43f31481977478]
-      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: ['2']
+      Content-Type:
+      - application/json
+      Cookie:
+      - __cfduid=d85c317fc1d0cbb862c18845eab0e43f31481977478
+      trakt-api-key:
+      - 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af
+      trakt-api-version:
+      - '2'
     method: GET
     uri: https://api.trakt.tv/movies/483?extended=full
   response:
-    body: {string: '{"title":"The Matrix Revolutions","year":2003,"ids":{"trakt":483,"slug":"the-matrix-revolutions-2003","imdb":"tt0242653","tmdb":605},"tagline":"Everything
+    body:
+      string: '{"title":"The Matrix Revolutions","year":2003,"ids":{"trakt":483,"slug":"the-matrix-revolutions-2003","imdb":"tt0242653","tmdb":605},"tagline":"Everything
         that has a beginning has an end.","overview":"The human city of Zion defends
         itself against the massive invasion of the machines as Neo fights to end the
-        war at another front while also opposing the rogue Agent Smith.","released":"2003-11-05","runtime":129,"trailer":"http://youtube.com/watch?v=Kw3IQpnVtvo","homepage":"http://whatisthematrix.warnerbros.com/","rating":7.14220514052366,"votes":8326,"updated_at":"2016-11-13T08:57:49.000Z","language":"en","available_translations":["bg","cs","da","de","el","en","es","fa","fi","fr","he","hu","it","ja","ko","nl","pl","pt","ro","ru","sk","sv","th","tr","uk","zh"],"genres":["action","adventure","science-fiction","thriller"],"certification":"R"}'}
+        war at another front while also opposing the rogue Agent Smith.","released":"2003-11-05","runtime":129,"trailer":"http://youtube.com/watch?v=Kw3IQpnVtvo","homepage":"http://whatisthematrix.warnerbros.com/","rating":7.14220514052366,"votes":8326,"updated_at":"2016-11-13T08:57:49.000Z","language":"en","available_translations":["bg","cs","da","de","el","en","es","fa","fi","fr","he","hu","it","ja","ko","nl","pl","pt","ro","ru","sk","sv","th","tr","uk","zh"],"genres":["action","adventure","science-fiction","thriller"],"certification":"R"}'
     headers:
-      CF-Cache-Status: [REVALIDATED]
-      CF-RAY: [312a5a6c49043cb9-CPH]
-      Cache-Control: ['public, max-age=28800']
-      Connection: [keep-alive]
-      Content-Type: [application/json; charset=utf-8]
-      Date: ['Sat, 17 Dec 2016 12:24:39 GMT']
-      ETag: [W/"64a9373cc6701f995779487b80bb1eae"]
-      Expires: ['Sat, 17 Dec 2016 20:24:39 GMT']
-      Last-Modified: ['Sun, 13 Nov 2016 08:57:49 GMT']
-      Server: [cloudflare-nginx]
-      Vary: [Accept-Encoding]
-      X-Content-Type-Options: [nosniff]
-      X-Frame-Options: [SAMEORIGIN]
-      X-Request-Id: [f4adc2be-e49e-43e0-9c5b-e1a6dccdc564]
-      X-Runtime: ['0.013746']
-      X-XSS-Protection: [1; mode=block]
-    status: {code: 200, message: OK}
+      CF-Cache-Status:
+      - REVALIDATED
+      CF-RAY:
+      - 312a5a6c49043cb9-CPH
+      Cache-Control:
+      - public, max-age=28800
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Sat, 17 Dec 2016 12:24:39 GMT
+      ETag:
+      - W/"64a9373cc6701f995779487b80bb1eae"
+      Expires:
+      - Sat, 17 Dec 2016 20:24:39 GMT
+      Last-Modified:
+      - Sun, 13 Nov 2016 08:57:49 GMT
+      Server:
+      - cloudflare-nginx
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Request-Id:
+      - f4adc2be-e49e-43e0-9c5b-e1a6dccdc564
+      X-Runtime:
+      - '0.013746'
+      X-XSS-Protection:
+      - 1; mode=block
+    status:
+      code: 200
+      message: OK
 version: 1

@@ -119,19 +119,15 @@ interactions:
     uri: https://api.thetvdb.com/series/260844
   response:
     body:
-      string: !!binary |
-        H4sIAAAAAAAAA1RTXU8bMRD8Kys/JyEJpC15a6FSeSkSpKoq6MPmvLlzceyTP5IciP/e8V0iQEqk
-        2w+vZ8azL0pzYrV8UUar5fzT9MvFxUhFCUbiDTJKnaKfvBXE93KgHz5HQYGt4ShRLR/+li6O3qFj
-        hkrrY5IwHF+zc/13HbhtTMX2bLhnXE/+tTU6Nuw4JHQMH2c+mNq4t77ZsS8mThnXqe9Oiy4HTYjp
-        qwlSkM6ns/l4+nk8m6PiJO19eEL6j8+rvJa3XE9rcXmOTMgumZ7WApFlV2euSygOcS0uIHhQV34r
-        ukPmTkA5dQp0/U7Czsj+vSRkIjHtZU2DZNQGr3MlmtYdrRqhW2e8G72ld4YpNWLCUKFr8E5s6T5l
-        bXwkLS302IpLE7pJZbwcKpuj2QklT0dq1ErAvZDXJdoEvy0zC4xokpwOMmkOTxQ5QS7yGwoDF4qN
-        38fREcaALBUs7DTFHILPThtXU5VtykEmj+HRlf+9OeBi31rBqDZIBMrSt+NgIMaH+VTcID51LUQx
-        DhT6kUxbDhBKk7caHCrvksREe1McQwygbQZ6gKGmF1hLNLXDAe5xUcO7flCkba4ayH4o33BfNGsL
-        7hAdCDzo9HCeZYRBe8HbFcacCu0O91lLzieClhvRI8JzF5/ajiqA0LTxgfBDBod1kd4K4w2KfSyV
-        cV15BPgfiGKBMen9FNOvFvtV7DnFusCt19zdbn6LFGeumhyi5mKsUloNTiy25KKkWrps7UiZrV73
-        nk1pfj7DRhR/P3M7N+m0oaz1xxW4pNliuThfLqan6rdOLS/ml7MF1gi2uDteMX0fXkHTNORsRhE7
-        fRj3wqvX1/8AAAD//wMA7FGKACoEAAA=
+      string: '{"data":{"id":260844,"seriesId":"","seriesName":"Sex House","aliases":[],"season":"1","poster":"","banner":"graphical/260844-g.jpg","fanart":"fanart/original/260844-1.jpg","status":"Ended","firstAired":"2012-07-12","network":"YouTube","networkId":"593","runtime":"5","language":"en","genre":["Comedy","Reality"],"overview":"Sex
+        House is a web series produced by The Onion, produced via their Onion Digital
+        Studios department. It is exclusive to YouTube per a grant from the website.
+        It is a dark satire of reality shows, their production and surrounding culture.\r\n\r\nSix
+        people representing various reality show stereotypes including a married older
+        contest winner are put in a house designed around having as much sex as possible.
+        They soon realize, however, that they will not be fed, medically cared for
+        or allowed to leave until every person has sex.","lastUpdated":0,"airsDayOfWeek":"Thursday","airsTime":"","rating":null,"imdbId":"tt2316082","zap2itId":"","added":"2012-07-19
+        15:53:50","addedBy":42915,"siteRating":0,"siteRatingCount":0,"slug":"sex-house"}}'
     headers:
       Cache-Control:
       - private, max-age=86400
@@ -181,19 +177,15 @@ interactions:
     uri: https://api.thetvdb.com/series/260844
   response:
     body:
-      string: !!binary |
-        H4sIAAAAAAAAA1RTXU8bMRD8Kys/JyEJpC15a6FSeSkSpKoq6MPmvLlzceyTP5IciP/e8V0iQEqk
-        2w+vZ8azL0pzYrV8UUar5fzT9MvFxUhFCUbiDTJKnaKfvBXE93KgHz5HQYGt4ShRLR/+li6O3qFj
-        hkrrY5IwHF+zc/13HbhtTMX2bLhnXE/+tTU6Nuw4JHQMH2c+mNq4t77ZsS8mThnXqe9Oiy4HTYjp
-        qwlSkM6ns/l4+nk8m6PiJO19eEL6j8+rvJa3XE9rcXmOTMgumZ7WApFlV2euSygOcS0uIHhQV34r
-        ukPmTkA5dQp0/U7Czsj+vSRkIjHtZU2DZNQGr3MlmtYdrRqhW2e8G72ld4YpNWLCUKFr8E5s6T5l
-        bXwkLS302IpLE7pJZbwcKpuj2QklT0dq1ErAvZDXJdoEvy0zC4xokpwOMmkOTxQ5QS7yGwoDF4qN
-        38fREcaALBUs7DTFHILPThtXU5VtykEmj+HRlf+9OeBi31rBqDZIBMrSt+NgIMaH+VTcID51LUQx
-        DhT6kUxbDhBKk7caHCrvksREe1McQwygbQZ6gKGmF1hLNLXDAe5xUcO7flCkba4ayH4o33BfNGsL
-        7hAdCDzo9HCeZYRBe8HbFcacCu0O91lLzieClhvRI8JzF5/ajiqA0LTxgfBDBod1kd4K4w2KfSyV
-        cV15BPgfiGKBMen9FNOvFvtV7DnFusCt19zdbn6LFGeumhyi5mKsUloNTiy25KKkWrps7UiZrV73
-        nk1pfj7DRhR/P3M7N+m0oaz1xxW4pNliuThfLqan6rdOLS/ml7MF1gi2uDteMX0fXkHTNORsRhE7
-        fRj3wqvX1/8AAAD//wMA7FGKACoEAAA=
+      string: '{"data":{"id":260844,"seriesId":"","seriesName":"Sex House","aliases":[],"season":"1","poster":"","banner":"graphical/260844-g.jpg","fanart":"fanart/original/260844-1.jpg","status":"Ended","firstAired":"2012-07-12","network":"YouTube","networkId":"593","runtime":"5","language":"en","genre":["Comedy","Reality"],"overview":"Sex
+        House is a web series produced by The Onion, produced via their Onion Digital
+        Studios department. It is exclusive to YouTube per a grant from the website.
+        It is a dark satire of reality shows, their production and surrounding culture.\r\n\r\nSix
+        people representing various reality show stereotypes including a married older
+        contest winner are put in a house designed around having as much sex as possible.
+        They soon realize, however, that they will not be fed, medically cared for
+        or allowed to leave until every person has sex.","lastUpdated":0,"airsDayOfWeek":"Thursday","airsTime":"","rating":null,"imdbId":"tt2316082","zap2itId":"","added":"2012-07-19
+        15:53:50","addedBy":42915,"siteRating":0,"siteRatingCount":0,"slug":"sex-house"}}'
     headers:
       Cache-Control:
       - private, max-age=86400

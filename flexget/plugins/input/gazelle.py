@@ -323,62 +323,58 @@ class InputGazelleMusic(InputGazelle):
         """Set up the majority of parameters that these sites support."""
         super().__init__()
 
-        self.aliases.update(
-            {
-                'artist': 'artistname',
-                'album': 'groupname',
-                'leech_type': 'freetorrent',
-                'release_type': 'releasetype',
-                'tags': 'taglist',
-                'tag_type': 'tags_type',
-                'log': 'haslog',
-            }
-        )
+        self.aliases.update({
+            'artist': 'artistname',
+            'album': 'groupname',
+            'leech_type': 'freetorrent',
+            'release_type': 'releasetype',
+            'tags': 'taglist',
+            'tag_type': 'tags_type',
+            'log': 'haslog',
+        })
 
-        self.params.update(
-            {
-                'taglist': None,
-                'artistname': None,
-                'groupname': None,
-                'year': None,
-                'tags_type': {'any': 0, 'all': 1},
-                'encoding': [
-                    '192',
-                    'APS (VBR)',
-                    'V2 (VBR)',
-                    'V1 (VBR)',
-                    '256',
-                    'APX (VBR)',
-                    'V0 (VBR)',
-                    'q8.x (VBR)',
-                    '320',
-                    'Lossless',
-                    '24bit Lossless',
-                    'Other',
-                ],
-                'format': ['MP3', 'FLAC', 'Ogg Vorbis', 'AAC', 'AC3', 'DTS'],
-                'media': ['CD', 'DVD', 'Vinyl', 'Soundboard', 'SACD', 'DAT', 'Cassette', 'WEB'],
-                'releasetype': {
-                    'album': 1,
-                    'soundtrack': 3,
-                    'EP': 5,
-                    'anthology': 6,
-                    'compilation': 7,
-                    'single': 9,
-                    'live album': 11,
-                    'remix': 13,
-                    'bootleg': 14,
-                    'interview': 15,
-                    'mixtape': 16,
-                    'unknown': 21,
-                },
-                'haslog': {'False': 0, 'True': 1, '100%': 100, '<100%': -1},
-                'freetorrent': {'freeleech': 1, 'neutral': 2, 'either': 3, 'normal': 0},
-                'hascue': {'False': 0, 'True': 1},
-                'scene': {'False': 0, 'True': 1},
-                'vanityhouse': {'False': 0, 'True': 1},
-            }
-        )
+        self.params.update({
+            'taglist': None,
+            'artistname': None,
+            'groupname': None,
+            'year': None,
+            'tags_type': {'any': 0, 'all': 1},
+            'encoding': [
+                '192',
+                'APS (VBR)',
+                'V2 (VBR)',
+                'V1 (VBR)',
+                '256',
+                'APX (VBR)',
+                'V0 (VBR)',
+                'q8.x (VBR)',
+                '320',
+                'Lossless',
+                '24bit Lossless',
+                'Other',
+            ],
+            'format': ['MP3', 'FLAC', 'Ogg Vorbis', 'AAC', 'AC3', 'DTS'],
+            'media': ['CD', 'DVD', 'Vinyl', 'Soundboard', 'SACD', 'DAT', 'Cassette', 'WEB'],
+            'releasetype': {
+                'album': 1,
+                'soundtrack': 3,
+                'EP': 5,
+                'anthology': 6,
+                'compilation': 7,
+                'single': 9,
+                'live album': 11,
+                'remix': 13,
+                'bootleg': 14,
+                'interview': 15,
+                'mixtape': 16,
+                'unknown': 21,
+            },
+            'haslog': {'False': 0, 'True': 1, '100%': 100, '<100%': -1},
+            'freetorrent': {'freeleech': 1, 'neutral': 2, 'either': 3, 'normal': 0},
+            'hascue': {'False': 0, 'True': 1},
+            'scene': {'False': 0, 'True': 1},
+            'vanityhouse': {'False': 0, 'True': 1},
+        })
 
     @property
     def schema(self):
@@ -387,32 +383,30 @@ class InputGazelleMusic(InputGazelle):
         Extends the super's schema
         """
         schema = super().schema
-        schema['properties'].update(
-            {
-                'artist': {'type': 'string'},
-                'album': {'type': 'string'},
-                'year': {'type': ['string', 'integer']},
-                'tags': one_or_more({'type': 'string'}),
-                'tag_type': {'type': 'string', 'enum': list(self._opts('tag_type').keys())},
-                'encoding': {'type': 'string', 'enum': self._opts('encoding')},
-                'format': {'type': 'string', 'enum': self._opts('format')},
-                'media': {'type': 'string', 'enum': self._opts('media')},
-                'release_type': {
-                    'type': 'string',
-                    'enum': list(self._opts('release_type').keys()),
-                },
-                'log': {
-                    'oneOf': [
-                        {'type': 'string', 'enum': list(self._opts('log').keys())},
-                        {'type': 'boolean'},
-                    ]
-                },
-                'leech_type': {'type': 'string', 'enum': list(self._opts('leech_type').keys())},
-                'hascue': {'type': 'boolean'},
-                'scene': {'type': 'boolean'},
-                'vanityhouse': {'type': 'boolean'},
-            }
-        )
+        schema['properties'].update({
+            'artist': {'type': 'string'},
+            'album': {'type': 'string'},
+            'year': {'type': ['string', 'integer']},
+            'tags': one_or_more({'type': 'string'}),
+            'tag_type': {'type': 'string', 'enum': list(self._opts('tag_type').keys())},
+            'encoding': {'type': 'string', 'enum': self._opts('encoding')},
+            'format': {'type': 'string', 'enum': self._opts('format')},
+            'media': {'type': 'string', 'enum': self._opts('media')},
+            'release_type': {
+                'type': 'string',
+                'enum': list(self._opts('release_type').keys()),
+            },
+            'log': {
+                'oneOf': [
+                    {'type': 'string', 'enum': list(self._opts('log').keys())},
+                    {'type': 'boolean'},
+                ]
+            },
+            'leech_type': {'type': 'string', 'enum': list(self._opts('leech_type').keys())},
+            'hascue': {'type': 'boolean'},
+            'scene': {'type': 'boolean'},
+            'vanityhouse': {'type': 'boolean'},
+        })
         return schema
 
     def get_entries(self, search_results):
@@ -463,19 +457,17 @@ class InputNotWhat(InputGazelleMusic):
 
         self.params['media'].extend(['Blu-ray', 'Unknown'])
         self.params['releasetype'].update({'demo': 22, 'dj mix': 23, 'concert recording': 24})
-        self.params['haslog'].update(
-            {
-                'gold': 102,
-                'silver': 101,
-                'gold/silver': 100,
-                'lineage': -5,
-                'unscored': -1,
-                'missing lineage': -6,
-                'missing dr score': -7,
-                'missing sample rate': -8,
-                'missing description': -9,
-            }
-        )
+        self.params['haslog'].update({
+            'gold': 102,
+            'silver': 101,
+            'gold/silver': 100,
+            'lineage': -5,
+            'unscored': -1,
+            'missing lineage': -6,
+            'missing dr score': -7,
+            'missing sample rate': -8,
+            'missing description': -9,
+        })
 
 
 @event('plugin.register')

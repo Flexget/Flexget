@@ -14,12 +14,10 @@ class RunTask:
         'type': 'object',
         'properties': {
             'task': one_or_more({'type': 'string'}),
-            'when': one_or_more(
-                {
-                    'type': 'string',
-                    'enum': ['accepted', 'rejected', 'failed', 'no_entries', 'aborted', 'always'],
-                }
-            ),
+            'when': one_or_more({
+                'type': 'string',
+                'enum': ['accepted', 'rejected', 'failed', 'no_entries', 'aborted', 'always'],
+            }),
         },
         'required': ['task'],
         'additionalProperties': False,

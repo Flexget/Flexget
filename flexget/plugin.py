@@ -1,31 +1,29 @@
+from __future__ import annotations
+
 import os
 import re
 import time
 from functools import total_ordering
 from http.client import BadStatusLine
 from importlib import import_module
+from importlib.metadata import entry_points
 from pathlib import Path
-from typing import TYPE_CHECKING, Callable, Optional, Union
+from typing import TYPE_CHECKING
 from urllib.error import HTTPError, URLError
 
 import loguru
 from requests import RequestException
 
-try:
-    # This is in our requirements for python versions older than 3.10 to get the new style selectable entry points
-    from importlib_metadata import entry_points
-except ImportError:
-    # Python 3.10 and higher has the new functionality
-    from importlib.metadata import entry_points
-
 from flexget import components as components_pkg
 from flexget import config_schema
 from flexget import plugins as plugins_pkg
-from flexget.event import Event, event, fire_event, remove_event_handlers
 from flexget.event import add_event_handler as add_phase_handler
+from flexget.event import event, fire_event, remove_event_handlers
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable
+    from collections.abc import Callable, Iterable
+
+    from flexget.event import Event
 
 logger = loguru.logger.bind(name='plugin')
 
@@ -48,9 +46,9 @@ class DependencyError(Exception):
 
     def __init__(
         self,
-        issued_by: Optional[str] = None,
-        missing: Optional[str] = None,
-        message: Optional[str] = None,
+        issued_by: str | None = None,
+        missing: str | None = None,
+        message: str | None = None,
         silent: bool = False,
     ):
         super().__init__()
@@ -86,7 +84,7 @@ class RegisterException(Exception):
 
 
 class PluginWarning(Warning):
-    def __init__(self, value, logger: 'loguru.Logger' = logger, **kwargs):
+    def __init__(self, value, logger: loguru.Logger = logger, **kwargs):
         super().__init__()
         self.value = value
         self.logger = logger
@@ -97,7 +95,7 @@ class PluginWarning(Warning):
 
 
 class PluginError(Exception):
-    def __init__(self, value, logger: 'loguru.Logger' = logger, **kwargs):
+    def __init__(self, value, logger: loguru.Logger = logger, **kwargs):
         super().__init__()
         # Value is expected to be a string
         if not isinstance(value, str):
@@ -118,7 +116,7 @@ class internet:  # noqa: N801 It acts like a function in usage
     Task handles PluginErrors by aborting the task.
     """
 
-    def __init__(self, logger_: 'loguru.Logger' = logger):
+    def __init__(self, logger_: loguru.Logger = logger):
         if logger_:
             self.logger = logger_
         else:
@@ -193,17 +191,17 @@ phase_methods = {
 phase_methods.update((_phase, 'on_task_' + _phase) for _phase in task_phases)  # DRY
 
 # Mapping of plugin name to PluginInfo instance (logical singletons)
-plugins: dict[str, 'PluginInfo'] = {}
+plugins: dict[str, PluginInfo] = {}
 
 # Loading done?
 plugins_loaded = False
 
 _loaded_plugins = {}
 _plugin_options = []
-_new_phase_queue: dict[str, list[Optional[str]]] = {}
+_new_phase_queue: dict[str, list[str | None]] = {}
 
 
-def register_task_phase(name: str, before: Optional[str] = None, after: Optional[str] = None):
+def register_task_phase(name: str, before: str | None = None, after: str | None = None):
     """Add a new task phase to the available phases."""
     if before and after:
         raise RegisterException('You can only give either before or after for a phase.')
@@ -212,7 +210,7 @@ def register_task_phase(name: str, before: Optional[str] = None, after: Optional
     if name in task_phases or name in _new_phase_queue:
         raise RegisterException(f'Phase {name} already exists.')
 
-    def add_phase(phase_name: str, before: Optional[str], after: Optional[str]):
+    def add_phase(phase_name: str, before: str | None, after: str | None):
         if before is not None and before not in task_phases:
             return False
         if after is not None and after not in task_phases:
@@ -248,12 +246,12 @@ class PluginInfo(dict):
     def __init__(
         self,
         plugin_class: type,
-        name: Optional[str] = None,
-        interfaces: Optional[list[str]] = None,
+        name: str | None = None,
+        interfaces: list[str] | None = None,
         builtin: bool = False,
         debug: bool = False,
         api_ver: int = 1,
-        category: Optional[str] = None,
+        category: str | None = None,
     ) -> None:
         """Register a plugin.
 
@@ -293,7 +291,7 @@ class PluginInfo(dict):
         self.category = category
         self.phase_handlers: dict[str, Event] = {}
         self.schema: config_schema.JsonSchema = {}
-        self.schema_id: Optional[str] = None
+        self.schema_id: str | None = None
 
         self.plugin_class: type = plugin_class
         self.instance: object = None
@@ -413,7 +411,7 @@ def _check_phase_queue() -> None:
             )
 
 
-def _import_plugin(module_name: str, plugin_path: Union[str, Path]) -> None:
+def _import_plugin(module_name: str, plugin_path: str | Path) -> None:
     try:
         import_module(module_name)
     except DependencyError as e:
@@ -476,9 +474,11 @@ def _load_components_from_dirs(dirs: list[Path]) -> None:
             plugin_subpackages = [
                 _f for _f in component_path.relative_to(component_dir).parent.parts if _f
             ]
-            package_name = '.'.join(
-                [components_pkg.__name__, *plugin_subpackages, component_path.stem]
-            )
+            package_name = '.'.join([
+                components_pkg.__name__,
+                *plugin_subpackages,
+                component_path.stem,
+            ])
             _import_plugin(package_name, component_path)
     _check_phase_queue()
 
@@ -518,7 +518,7 @@ def _load_plugins_from_packages() -> None:
 
 
 def load_plugins(
-    extra_plugins: Optional[list[Path]] = None, extra_components: Optional[list[Path]] = None
+    extra_plugins: list[Path] | None = None, extra_components: list[Path] | None = None
 ) -> None:
     """Load plugins from the standard plugin and component paths.
 
@@ -556,12 +556,12 @@ def load_plugins(
 
 
 def get_plugins(
-    phase: Optional[str] = None,
-    interface: Optional[str] = None,
-    category: Optional[str] = None,
-    name: Optional[str] = None,
-    min_api: Optional[int] = None,
-) -> 'Iterable[PluginInfo]':
+    phase: str | None = None,
+    interface: str | None = None,
+    category: str | None = None,
+    name: str | None = None,
+    min_api: int | None = None,
+) -> Iterable[PluginInfo]:
     """Query other plugins characteristics.
 
     :param string phase: Require phase
@@ -588,7 +588,7 @@ def get_plugins(
     return filter(matches, iter(plugins.values()))
 
 
-def plugin_schemas(**kwargs) -> 'config_schema.JsonSchema':
+def plugin_schemas(**kwargs) -> config_schema.JsonSchema:
     """Create a dict schema that matches plugins specified by `kwargs`."""
     return {
         'type': 'object',
@@ -631,7 +631,7 @@ def get_plugin_by_name(name: str, issued_by: str = '???') -> PluginInfo:
     return plugins[name]
 
 
-def get(name: str, requested_by: Union[str, object]) -> object:
+def get(name: str, requested_by: str | object) -> object:
     """Return instance of Plugin class.
 
     :param str name: Name of the requested plugin

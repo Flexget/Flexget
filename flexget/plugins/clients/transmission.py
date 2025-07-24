@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import importlib.metadata
 import os
 import re
@@ -69,7 +71,7 @@ class TransmissionBase:
                 logger.error('netrc: {}, file: {}, line: {}', e.msg, e.filename, e.lineno)
         return config
 
-    def create_rpc_client(self, config) -> 'transmission_rpc.Client':
+    def create_rpc_client(self, config) -> transmission_rpc.Client:
         user, password = config.get('username'), config.get('password')
         urlo = urlparse(config['host'])
 
@@ -104,7 +106,7 @@ class TransmissionBase:
             raise plugin.PluginError('Error connecting to transmission')
         return cli
 
-    def torrent_info(self, torrent: 'Torrent', config):
+    def torrent_info(self, torrent: Torrent, config):
         done = torrent.total_size > 0
         vloc = None
         best = None
@@ -124,7 +126,7 @@ class TransmissionBase:
             vloc = (f'{torrent.download_dir}/{best[0]}').replace('/', os.sep)
         return done, vloc
 
-    def check_seed_limits(self, torrent: 'Torrent', session):
+    def check_seed_limits(self, torrent: Torrent, session):
         seed_limit_ok = True  # will remain if no seed ratio defined
         idle_limit_ok = True  # will remain if no idle limit defined
 

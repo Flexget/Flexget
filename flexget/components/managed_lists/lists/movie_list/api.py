@@ -42,15 +42,13 @@ class ObjectsContainer:
     }
 
     return_movie_list_id_object = copy.deepcopy(input_movie_list_id_object)
-    return_movie_list_id_object.update(
-        {
-            'properties': {
-                'id': {'type': 'integer'},
-                'added_on': {'type': 'string'},
-                'movie_id': {'type': 'integer'},
-            }
+    return_movie_list_id_object.update({
+        'properties': {
+            'id': {'type': 'integer'},
+            'added_on': {'type': 'string'},
+            'movie_id': {'type': 'integer'},
         }
-    )
+    })
 
     movie_list_object = {
         'type': 'object',

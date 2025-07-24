@@ -1,170 +1,227 @@
 interactions:
-  - request:
-      body: null
-      headers:
-        Accept: ['*/*']
-        Accept-Encoding: ['gzip, deflate']
-        Connection: [keep-alive]
-        User-Agent: [FlexGet/2.10.20.dev (www.flexget.com)]
-      method: GET
-      uri: https://api.tvmaze.com/singlesearch/shows?embed=seasons&q=1992
-    response:
-      body:
-        string: !!binary |
-          H4sIAAAAAAAAA8VUy27jNhT9FYJrO7JkO4mEwWwyA7SrAk12RRAw4rXECUUSfFjxBP73HtLJ1N60
-          GGCAriTex7nnPt+4krzb3N60C5685h0fY3RdVc3zfBX3k/hOV72dqjDaOVTZrqrbtuELbsREMH9/
-          xYPLr/veKxdJQq+FGZIYsvT3KLQSBsKBjKfAu7/4Fy8mAcmdV8BZ8N9UiNYf+OOChyhighH/amSB
-          8snEbNVtVwvuPE2KPBQdb1b1drlaL5sNEEI/kkwaZm/8ZM6bulutoJLiUII+JAr454/HBfciKjNk
-          Y7EnX4i2EM+khjHyDpEMxdn6l2ySi7S+ybJT1vcvB3anDJUUegt+oA67d3VO+IC4vZUl/wf8Z0rf
-          rcnvr8lbR9WfFjkdS8znu1EYQ6i/SVovOL1G8kZosEYy+xO9zc31NdoUR4p7+cy7pm3qtllwNeUX
-          j7Fpb9dNu+KAVFPJ6I1PJFWaoH7vay6u6s9bm5y2QoaquITq5PDkrI9eqFg1dbVdb5rrq29uQBrW
-          q0GB2U8gfrg8oUw25S5dgoJuSNMkcgn5J/f5niJThpHw+sAMqhwVBVZqyuaRDEMFPLFZBCaYQTrW
-          zEoS+5ak6pXQcN5TiGooKryiZb31PrlsesUeRhUYxjBpTGqOBDz27Em8MGlnw+yOTcIcmLNaoVYA
-          dMIXDog4k9YM3+wjPFAiE0YC3+xVn/Gze0Bn2YhBYs7bndJ0hrVTQ4JbpkGszDybFTB3Vms7s6Be
-          mSPr4DOPNhDTCskgFOVEyMcZBZFwiWPh4IVTEnXqMUBozHAWCRsoQy8cLRi9OhuyNtPeCb9Etv2Y
-          BWpyoo+ZdFYNngB+SuhHwT5V7jM6n5wUebW7eoM53NY3LfbhSSvzUqY0kN7laR094fsxbmB3Pmv/
-          nJE8pFjlvbIpkFOhbMp/eL/bhWq9ut2027I7TzQ9k8x3ArEDiWBNXvXTytbbVQOS/3rYTi5VMS23
-          bXlCWdbI2SSge6T8Y/MhfKfxh5dFhQAfN+kLCoTcL84SGXkh3iybgvz/HZdfdxs2TVWvrutm80uP
-          wyXqxXVA9X924s77i4k5Ph6PfwPfhyI/9QYAAA==
-      headers:
-        Access-Control-Allow-Origin: ['*']
-        Cache-Control: ['public, max-age=3600']
-        Connection: [keep-alive]
-        Content-Encoding: [gzip]
-        Content-Type: [application/json; charset=UTF-8]
-        Date: ['Sun, 26 Mar 2017 11:10:50 GMT']
-        Server: [nginx/1.10.0 (Ubuntu)]
-        Vary: [Accept-Encoding]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        Accept: ['*/*']
-        Accept-Encoding: ['gzip, deflate']
-        Connection: [keep-alive]
-        User-Agent: [FlexGet/2.10.20.dev (www.flexget.com)]
-      method: GET
-      uri: https://api.tvmaze.com/shows/4879/episodebynumber?season=1&number=2
-    response:
-      body:
-        string: !!binary |
-          H4sIAAAAAAAAA32QQW/CMAyF/4qV61qaBtBGhbjthqYddp9Ma9aIpIniFMYQ/32GbodddrGj5++9
-          yL4o26lmrp8WT4+FGpNTjepzjk1VnU6nWT56/KJZG3xF0XLoiKsJrurVypT1pzblz6Q0qlADepKI
-          5wmGm8SEHAbV1DId/Y6Sakyh0KYO8401ul6Wel6ahcAiZ3uPMKbRelI4o49/yLf7VIAHXU9YGofJ
-          uNSFsh4/JHoYnZP/R+8xncW/jpsthQFTF+Al5EyAUnzMDDlAbzuSwuDHdDhDRM6ADAgJO9uiA0d7
-          Udpsj5ZzAafeOoLt2CK8ChsSQcYDMbQoz7AHDp4gUpLtxb0b2Q7EPIN1FTey2Luzw4FVc5ELuf2t
-          94mk/94fo/3n/up6vX4Dh0COrb0BAAA=
-      headers:
-        Access-Control-Allow-Origin: ['*']
-        Cache-Control: ['public, max-age=3600']
-        Connection: [keep-alive]
-        Content-Encoding: [gzip]
-        Content-Type: [application/json; charset=UTF-8]
-        Date: ['Sun, 26 Mar 2017 11:10:50 GMT']
-        Server: [nginx/1.10.0 (Ubuntu)]
-        Vary: [Accept-Encoding]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        Accept: ['*/*']
-        Accept-Encoding: ['gzip, deflate']
-        Connection: [keep-alive]
-        User-Agent: [FlexGet/2.10.20.dev (www.flexget.com)]
-      method: GET
-      uri: https://api.tvmaze.com/singlesearch/shows?embed=seasons&q=24
-    response:
-      body:
-        string: !!binary |
-          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
-          a4VPopeHhxcnAtcvX778HxDeeXf0JgAA
-      headers:
-        Access-Control-Allow-Origin: ['*']
-        Cache-Control: ['public, max-age=3600']
-        Connection: [keep-alive]
-        Content-Encoding: [gzip]
-        Content-Type: [application/json; charset=UTF-8]
-        Date: ['Sun, 26 Mar 2017 11:10:51 GMT']
-        Server: [nginx/1.10.0 (Ubuntu)]
-        Vary: [Accept-Encoding]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        Accept: ['*/*']
-        Accept-Encoding: ['gzip, deflate']
-        Connection: [keep-alive]
-        User-Agent: [FlexGet/2.10.20.dev (www.flexget.com)]
-      method: GET
-      uri: https://api.tvmaze.com/shows/167/episodebynumber?season=1&number=1
-    response:
-      body:
-        string: !!binary |
-          H4sIAAAAAAAAA3WQTU7EMAyFr4K8bpq4ghFkNwdgx35kaGAi4rTKzxQY9e64qWbBgtWz7Pc+W76C
-          H8EiPj5hBzUFsHAuZbZaL8vSlwvTj+vfJtZu9nkaXdbNq4d7hV8GFQ7GKGKFTaCDSOwEgoM15u7Y
-          P/cKb5VMs6M8RVkoxsqvLrWSfBqpbDGhCROVOYhZ2sU32rAx9k4uxPMf50ubikGZh92WatyDB9OB
-          Z/oQdKwhyP7KTOlb8kI7BR8/M9irnBXeNz0nJ3r7AM3+/w/Auq6/QPMzlz0BAAA=
-      headers:
-        Access-Control-Allow-Origin: ['*']
-        Cache-Control: ['public, max-age=3600']
-        Connection: [keep-alive]
-        Content-Encoding: [gzip]
-        Content-Type: [application/json; charset=UTF-8]
-        Date: ['Sun, 26 Mar 2017 11:10:51 GMT']
-        Server: [nginx/1.10.0 (Ubuntu)]
-        Vary: [Accept-Encoding]
-      status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - FlexGet/2.10.20.dev (www.flexget.com)
+    method: GET
+    uri: https://api.tvmaze.com/singlesearch/shows?embed=seasons&q=1992
+  response:
+    body:
+      string: '{"id":4879,"url":"http://www.tvmaze.com/shows/4879/1992","name":"1992","type":"Scripted","language":"Italian","genres":["Drama","Crime","History"],"status":"Ended","runtime":50,"premiered":"2015-03-24","schedule":{"time":"21:00","days":["Tuesday"]},"rating":{"average":9},"weight":0,"network":{"id":370,"name":"Sky
+        Cinema","country":{"name":"Italy","code":"IT","timezone":"Europe/Rome"}},"webChannel":null,"externals":{"tvrage":47669,"thetvdb":292192,"imdb":"tt2983290"},"image":{"medium":"http://static.tvmaze.com/uploads/images/medium_portrait/21/53426.jpg","original":"http://static.tvmaze.com/uploads/images/original_untouched/21/53426.jpg"},"summary":"<p>Set
+        in early nineties Italy when there was a nationwide judicial investigation
+        into corruption. This resulted in the break down of many political parties
+        as well as the arrest and conviction of some high profile political figures.
+        The story will follow six people whose lives are intertwined with the rapidly
+        changing political landscape, exposing the far-reaching impact of the greed
+        and corruption.</p>","updated":1466951790,"_links":{"self":{"href":"http://api.tvmaze.com/shows/4879"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/308495"}},"_embedded":{"seasons":[{"id":15020,"url":"http://www.tvmaze.com/seasons/15020/1992-season-1","number":1,"name":"","episodeOrder":10,"premiereDate":"2015-03-24","endDate":"2015-04-21","network":{"id":370,"name":"Sky
+        Cinema","country":{"name":"Italy","code":"IT","timezone":"Europe/Rome"}},"webChannel":null,"image":{"medium":"http://static.tvmaze.com/uploads/images/medium_portrait/42/106124.jpg","original":"http://static.tvmaze.com/uploads/images/original_untouched/42/106124.jpg"},"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/seasons/15020"}}}]}}'
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      Cache-Control:
+      - public, max-age=3600
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=UTF-8
+      Date:
+      - Sun, 26 Mar 2017 11:10:50 GMT
+      Server:
+      - nginx/1.10.0 (Ubuntu)
+      Vary:
+      - Accept-Encoding
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - FlexGet/2.10.20.dev (www.flexget.com)
+    method: GET
+    uri: https://api.tvmaze.com/shows/4879/episodebynumber?season=1&number=2
+  response:
+    body:
+      string: '{"id":308487,"url":"http://www.tvmaze.com/episodes/308487/1992-1x02-episode-2","name":"Episode
+        2","season":1,"number":2,"airdate":"2015-03-24","airtime":"22:00","airstamp":"2015-03-24T22:00:00+01:00","runtime":50,"image":null,"summary":"<p>Leonardo
+        Notte attempts to hide his murky past as a radical left activist, while Luca
+        Pastore takes care of some personal business. </p>","_links":{"self":{"href":"http://api.tvmaze.com/episodes/308487"}}}'
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      Cache-Control:
+      - public, max-age=3600
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=UTF-8
+      Date:
+      - Sun, 26 Mar 2017 11:10:50 GMT
+      Server:
+      - nginx/1.10.0 (Ubuntu)
+      Vary:
+      - Accept-Encoding
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - FlexGet/2.10.20.dev (www.flexget.com)
+    method: GET
+    uri: https://api.tvmaze.com/singlesearch/shows?embed=seasons&q=24
+  response:
+    body:
+      string: '{"id":167,"url":"http://www.tvmaze.com/shows/167/24","name":"24","type":"Scripted","language":"English","genres":["Drama","Action","Thriller"],"status":"Ended","runtime":60,"premiered":"2001-11-06","schedule":{"time":"21:00","days":["Monday"]},"rating":{"average":8.5},"weight":1,"network":{"id":4,"name":"FOX","country":{"name":"United
+        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":2445,"thetvdb":76290,"imdb":"tt0285331"},"image":{"medium":"http://static.tvmaze.com/uploads/images/medium_portrait/0/2330.jpg","original":"http://static.tvmaze.com/uploads/images/original_untouched/0/2330.jpg"},"summary":"<p>Jack
+        Bauer, agent of CTU (Counter Terrorist Unit) faces threats against his country
+        and himself in this action packed show. Each season contains of one day, each
+        episode shows one hour of Jack Bauer''s day. <strong>24</strong> is the only
+        action show in real time and gained a lot of fans during the years with this
+        concept.</p>","updated":1488576231,"_links":{"self":{"href":"http://api.tvmaze.com/shows/167"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/12094"}},"_embedded":{"seasons":[{"id":739,"url":"http://www.tvmaze.com/seasons/739/24-season-1","number":1,"name":"","episodeOrder":24,"premiereDate":"2001-11-06","endDate":"2002-05-21","network":{"id":4,"name":"FOX","country":{"name":"United
+        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"image":{"medium":"http://static.tvmaze.com/uploads/images/medium_portrait/42/106126.jpg","original":"http://static.tvmaze.com/uploads/images/original_untouched/42/106126.jpg"},"summary":"<p>Begins
+        at midnight on the day of the California presidential primary Jack bauer''s
+        protocol is to protect Senator David Palmer from an assassination plot and
+        rescue his own family from those responsible for the plot, who seek retribution
+        for Jack and Palmer''s involvement with a covert American mission in the Balkans.</p>","_links":{"self":{"href":"http://api.tvmaze.com/seasons/739"}}},{"id":740,"url":"http://www.tvmaze.com/seasons/740/24-season-2","number":2,"name":"","episodeOrder":24,"premiereDate":"2002-10-29","endDate":"2003-05-20","network":{"id":4,"name":"FOX","country":{"name":"United
+        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"image":{"medium":"http://static.tvmaze.com/uploads/images/medium_portrait/42/106127.jpg","original":"http://static.tvmaze.com/uploads/images/original_untouched/42/106127.jpg"},"summary":"<p>Is
+        set 18 months after Season 1 ends. It begins at 8:00 a.m. Jack must stop a
+        nuclear bomb from detonating in Los Angeles, then assist President David Palmer
+        in proving who is responsible for the threat. This is necessary to avoid an
+        unfounded war between the U.S. and three Middle Eastern countries.</p>","_links":{"self":{"href":"http://api.tvmaze.com/seasons/740"}}},{"id":741,"url":"http://www.tvmaze.com/seasons/741/24-season-3","number":3,"name":"","episodeOrder":24,"premiereDate":"2003-10-28","endDate":"2004-05-25","network":{"id":4,"name":"FOX","country":{"name":"United
+        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"image":{"medium":"http://static.tvmaze.com/uploads/images/medium_portrait/42/106128.jpg","original":"http://static.tvmaze.com/uploads/images/original_untouched/42/106128.jpg"},"summary":"<p>Is
+        set three years after Season 2 ends. It begins at 1:00 p.m. Jack must again
+        infiltrate a Mexican drug cartel to seize a deadly virus being marketed underground.
+        Meanwhile, Palmer attempts to be devoid of further political scandal which
+        could cost him his presidency. Later, Jack and Palmer must cooperate with
+        terrorist Stephen Saunders, who eventually gains possession of the virus,
+        and stop him from releasing it in several American cities.</p>","_links":{"self":{"href":"http://api.tvmaze.com/seasons/741"}}},{"id":742,"url":"http://www.tvmaze.com/seasons/742/24-season-4","number":4,"name":"","episodeOrder":24,"premiereDate":"2005-01-09","endDate":"2005-05-23","network":{"id":4,"name":"FOX","country":{"name":"United
+        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"image":{"medium":"http://static.tvmaze.com/uploads/images/medium_portrait/42/106129.jpg","original":"http://static.tvmaze.com/uploads/images/original_untouched/42/106129.jpg"},"summary":"<p>Is
+        set 18 months after Season 3 ended. It begins at 7:00 a.m. Jack must save
+        the lives of his new boss, Secretary of Defense James Heller and his daughter
+        Audrey Raines when they are kidnapped by terrorists. However Habib Marwan
+        uses this as a disguise to launch further attacks against America, and Jack
+        is forced to use unorthodox methods to stop him, which results in long-term
+        consequences for both Jack and the United States.</p>","_links":{"self":{"href":"http://api.tvmaze.com/seasons/742"}}},{"id":743,"url":"http://www.tvmaze.com/seasons/743/24-season-5","number":5,"name":"","episodeOrder":24,"premiereDate":"2006-01-15","endDate":"2006-05-22","network":{"id":4,"name":"FOX","country":{"name":"United
+        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"image":{"medium":"http://static.tvmaze.com/uploads/images/medium_portrait/42/106130.jpg","original":"http://static.tvmaze.com/uploads/images/original_untouched/42/106130.jpg"},"summary":"<p>Is
+        set 18 months after Season 4 ended. It begins at 7:00 a.m. Jack is believed
+        to be dead by everyone except a few of his closest friends. He is forced to
+        resurface when some of those friends are murdered and he is framed by terrorists
+        with connections to the American government. The acquisition of nerve gas
+        to protect U.S. oil interests in Asia backfires, and Jack discovers an insidious
+        conspiracy while trying to stop those responsible.</p>","_links":{"self":{"href":"http://api.tvmaze.com/seasons/743"}}},{"id":744,"url":"http://www.tvmaze.com/seasons/744/24-season-6","number":6,"name":"","episodeOrder":24,"premiereDate":"2007-01-14","endDate":"2007-05-21","network":{"id":4,"name":"FOX","country":{"name":"United
+        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"image":{"medium":"http://static.tvmaze.com/uploads/images/medium_portrait/42/106131.jpg","original":"http://static.tvmaze.com/uploads/images/original_untouched/42/106131.jpg"},"summary":"<p>Is
+        set 20 months after Season 5 ended. It begins at 6:00 a.m. Jack is released
+        after being detained in a Chinese prison following the events of Season 5.
+        Terrorists who hold a vendetta against Jack plot to set off suitcase nuclear
+        devices in America and he must secure them. Later, Jack is forced to choose
+        between those he loves and national security when the Chinese set their sights
+        on sensitive circuitry that could trigger a war between the U.S. and Russia.</p>","_links":{"self":{"href":"http://api.tvmaze.com/seasons/744"}}},{"id":745,"url":"http://www.tvmaze.com/seasons/745/24-season-7","number":7,"name":"","episodeOrder":24,"premiereDate":"2009-01-11","endDate":"2009-05-18","network":{"id":4,"name":"FOX","country":{"name":"United
+        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"image":{"medium":"http://static.tvmaze.com/uploads/images/medium_portrait/42/106132.jpg","original":"http://static.tvmaze.com/uploads/images/original_untouched/42/106132.jpg"},"summary":"<p>Is
+        set 65 days after the end of <i>R<em>edemption</em>.</i> It begins at 8:00
+        a.m. Jack is assisted by the FBI and covert operatives when the firewall for
+        America''s federal computer infrastructure is breached by the same people
+        responsible for a conflict in Sangala. Jack must uncover who is corrupted
+        within President Taylor''s administration, which has allowed for the Sangalans
+        to raid the White House and capture Taylor. She is later blackmailed by a
+        fictional private military company in an attempt to release biological weapons
+        on U.S. soil. Jack must thwart these attacks so the conspirators will fail
+        to cement their power at a government level.</p>","_links":{"self":{"href":"http://api.tvmaze.com/seasons/745"}}},{"id":746,"url":"http://www.tvmaze.com/seasons/746/24-season-8","number":8,"name":"","episodeOrder":24,"premiereDate":"2010-01-17","endDate":"2010-05-24","network":{"id":4,"name":"FOX","country":{"name":"United
+        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"image":{"medium":"http://static.tvmaze.com/uploads/images/medium_portrait/42/106133.jpg","original":"http://static.tvmaze.com/uploads/images/original_untouched/42/106133.jpg"},"summary":"<p>Is
+        set 18 months after Season 7 ended. It begins at 4:00 p.m. Jack is brought
+        in by CTU to uncover a Russian plot to assassinate Islamic leader Omar Hassan
+        during peace negotiations with U.S. President Taylor. Russia''s contingency
+        plan involves engineering a dirty bomb, which Islamic extremists threaten
+        to detonate unless Hassan is handed over. Jack seeks retribution for personal
+        losses suffered after Charles Logan convinces Taylor to cover up these crimes
+        to protect the peace agreement. Jack becomes a fugitive from Russian and American
+        governments and disappears.</p>","_links":{"self":{"href":"http://api.tvmaze.com/seasons/746"}}},{"id":747,"url":"http://www.tvmaze.com/seasons/747/24-season-9","number":9,"name":"Live
+        Another Day","episodeOrder":12,"premiereDate":"2014-05-05","endDate":"2014-07-14","network":{"id":4,"name":"FOX","country":{"name":"United
+        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"image":{"medium":"http://static.tvmaze.com/uploads/images/medium_portrait/42/106134.jpg","original":"http://static.tvmaze.com/uploads/images/original_untouched/42/106134.jpg"},"summary":"<p>Is
+        set four years after Season 8 ended. It begins at 11:00 a.m. and finds fugitive
+        Jack in London trying to stop an assassination attempt on President James
+        Heller by terrorist Margot Al-Harazi. Later, Jack must prevent an old enemy
+        and a Russian diplomat from sparking a war between the U.S. and China.</p>","_links":{"self":{"href":"http://api.tvmaze.com/seasons/747"}}}]}}'
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      Cache-Control:
+      - public, max-age=3600
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=UTF-8
+      Date:
+      - Sun, 26 Mar 2017 11:10:51 GMT
+      Server:
+      - nginx/1.10.0 (Ubuntu)
+      Vary:
+      - Accept-Encoding
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - FlexGet/2.10.20.dev (www.flexget.com)
+    method: GET
+    uri: https://api.tvmaze.com/shows/167/episodebynumber?season=1&number=1
+  response:
+    body:
+      string: '{"id":11891,"url":"http://www.tvmaze.com/episodes/11891/24-1x01-1200-am-100-am","name":"12:00
+        A.M.-1:00 A.M.","season":1,"number":1,"airdate":"2001-11-06","airtime":"21:00","airstamp":"2001-11-06T21:00:00-05:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/11891"}}}'
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      Cache-Control:
+      - public, max-age=3600
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=UTF-8
+      Date:
+      - Sun, 26 Mar 2017 11:10:51 GMT
+      Server:
+      - nginx/1.10.0 (Ubuntu)
+      Vary:
+      - Accept-Encoding
+    status:
+      code: 200
+      message: OK
 version: 1

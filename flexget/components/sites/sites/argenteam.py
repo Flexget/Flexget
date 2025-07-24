@@ -76,15 +76,13 @@ class SearchArgenteam:
                     ):
                         e = Entry()
 
-                        e['title'] = ' '.join(
-                            (
-                                search_string,
-                                release['source'],
-                                release['codec'],
-                                release['team'],
-                                release['tags'],
-                            )
-                        )
+                        e['title'] = ' '.join((
+                            search_string,
+                            release['source'],
+                            release['codec'],
+                            release['team'],
+                            release['tags'],
+                        ))
                         e['url'] = torrent['uri']
 
                         # Save aRGENTeaM subtitle URL for this release

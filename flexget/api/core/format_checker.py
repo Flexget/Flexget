@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 from flexget.api import APIResource, api
@@ -39,7 +41,7 @@ format_checker_schema = api.schema_model('format_checker', ObjectContainer.forma
 class SchemaTest(APIResource):
     @api.validate(format_checker_schema)
     @api.response(200, model=base_message_schema)
-    def post(self, session: 'Session' = None) -> 'Response':
+    def post(self, session: Session = None) -> Response:
         """Validate flexget custom schema."""
         # If validation passed, all is well
         return success_response('payload is valid')

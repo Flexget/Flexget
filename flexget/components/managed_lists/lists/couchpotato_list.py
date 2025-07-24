@@ -77,16 +77,14 @@ class CouchPotatoBase:
         # Separate strings are needed for each QualityComponent
         # TODO: list is converted to set because if a quality has 3d type in CP, it gets duplicated during the conversion
         # TODO: when (and if) 3d is supported in flexget this will be needed to removed
-        res_string = '|'.join(
-            {
-                resolutions[quality]
-                for quality in quality_profile['qualities']
-                if quality in resolutions
-            }
-        )
-        source_string = '|'.join(
-            {sources[quality] for quality in quality_profile['qualities'] if quality in sources}
-        )
+        res_string = '|'.join({
+            resolutions[quality]
+            for quality in quality_profile['qualities']
+            if quality in resolutions
+        })
+        source_string = '|'.join({
+            sources[quality] for quality in quality_profile['qualities'] if quality in sources
+        })
 
         quality_requirement = (res_string + ' ' + source_string).rstrip()
         logger.debug('quality requirement is {}', quality_requirement)

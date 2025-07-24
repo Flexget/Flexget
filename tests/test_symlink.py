@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import stat
 from typing import TYPE_CHECKING
 
@@ -11,7 +13,7 @@ dirname = 'symlink_test_dir'
 subdirs = ['hardlink', 'softlink']
 
 
-def is_hard_link(file1: 'Path', file2: 'Path') -> bool:
+def is_hard_link(file1: Path, file2: Path) -> bool:
     s1 = file1.stat()
     s2 = file2.stat()
     return (s1[stat.ST_INO], s1[stat.ST_DEV]) == (s2[stat.ST_INO], s2[stat.ST_DEV])

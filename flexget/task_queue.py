@@ -1,12 +1,17 @@
+from __future__ import annotations
+
 import queue
 import threading
 import time
-from typing import Optional
+from typing import TYPE_CHECKING
 
 from loguru import logger
 from sqlalchemy.exc import OperationalError, ProgrammingError
 
-from flexget.task import Task, TaskAbort
+from flexget.task import TaskAbort
+
+if TYPE_CHECKING:
+    from flexget.task import Task
 
 logger = logger.bind(name='task_queue')
 
@@ -22,7 +27,7 @@ class TaskQueue:
         self._shutdown_now = False
         self._shutdown_when_finished = False
 
-        self.current_task: Optional[Task] = None
+        self.current_task: Task | None = None
         self._thread = None
 
     def start(self) -> None:

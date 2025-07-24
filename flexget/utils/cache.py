@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import hashlib
 import os
 from typing import TYPE_CHECKING
@@ -14,11 +16,11 @@ logger = logger.bind(name='utils.cache')
 # TODO: refactor this to use lru_cache
 def cached_resource(
     url: str,
-    base_dir: 'Path',
+    base_dir: Path,
     force: bool = False,
     max_size: int = 250,
     directory: str = 'cached_resources',
-) -> tuple['Path', str]:
+) -> tuple[Path, str]:
     """Cache a remote resource to local filesystem.
 
     Return a tuple of local file name and mime type, use primarily for API/WebUI.
@@ -58,7 +60,7 @@ def cached_resource(
     return file_path, mime_type
 
 
-def dir_size(directory: 'Path') -> int:
+def dir_size(directory: Path) -> int:
     """Sum the size of all files in a given dir. Not recursive.
 
     :param directory: Directory to check
@@ -71,7 +73,7 @@ def dir_size(directory: 'Path') -> int:
     return size
 
 
-def trim_dir(directory: 'Path') -> None:
+def trim_dir(directory: Path) -> None:
     """Remove the least accessed file on a given dir.
 
     :param directory: Directory to check

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import copy
 import random
 import string
@@ -14,19 +16,22 @@ from argparse import (
     _VersionAction,
 )
 from argparse import ArgumentParser as ArgParser
-from typing import IO, Any, Callable, Optional, TextIO
+from typing import IO, TYPE_CHECKING, Any, TextIO
 
 import flexget
 from flexget.entry import Entry
 from flexget.event import fire_event
 from flexget.utils.tools import get_current_flexget_version, get_latest_flexget_version_number
 
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
 _UNSET = object()
 
-core_parser: Optional['CoreArgumentParser'] = None
+core_parser: CoreArgumentParser | None = None
 
 
-def get_parser(command: Optional[str] = None) -> 'ArgumentParser':
+def get_parser(command: str | None = None) -> ArgumentParser:
     global core_parser
     if not core_parser:
         core_parser = CoreArgumentParser()
@@ -38,8 +43,8 @@ def get_parser(command: Optional[str] = None) -> 'ArgumentParser':
 
 
 def register_command(
-    command: str, callback: Callable[['flexget.manager.Manager', Namespace], Any], **kwargs
-) -> 'ArgumentParser':
+    command: str, callback: Callable[[flexget.manager.Manager, Namespace], Any], **kwargs
+) -> ArgumentParser:
     """Register a callback function to be executed when flexget is launched with the given `command`.
 
     :param command: The command being defined.
@@ -207,7 +212,7 @@ class NestedSubparserAction(_SubParsersAction):
         self.parent_defaults = {}
         super().__init__(*args, **kwargs)
 
-    def add_parser(self, name: str, parent_defaults: Optional[dict] = None, **kwargs):
+    def add_parser(self, name: str, parent_defaults: dict | None = None, **kwargs):
         if parent_defaults:
             self.parent_defaults[name] = parent_defaults
         return super().add_parser(name, **kwargs)
@@ -270,7 +275,7 @@ class ArgumentParser(ArgParser):
     """
 
     # These are created as a class attribute so that we can set it for parser and all subparsers at once
-    file: Optional[IO[str]] = None
+    file: IO[str] | None = None
     do_help = True
 
     def __init__(self, **kwargs):
@@ -337,10 +342,10 @@ class ArgumentParser(ArgParser):
 
     def parse_args(
         self,
-        args: Optional[list[str]] = None,
-        namespace: Optional[Namespace] = None,
+        args: list[str] | None = None,
+        namespace: Namespace | None = None,
         raise_errors: bool = False,
-        file: Optional[TextIO] = None,
+        file: TextIO | None = None,
     ):
         """:param raise_errors: If this is true, errors will be raised as ``ParserError`` instead of calling sys.exit"""
         ArgumentParser.file = file
@@ -355,9 +360,9 @@ class ArgumentParser(ArgParser):
 
     def parse_known_args(
         self,
-        args: Optional[list[str]] = None,
-        namespace: Optional[Namespace] = None,
-        do_help: Optional[bool] = None,
+        args: list[str] | None = None,
+        namespace: Namespace | None = None,
+        do_help: bool | None = None,
     ):
         if args is None:
             args = sys.argv[1:]

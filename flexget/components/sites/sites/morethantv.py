@@ -252,16 +252,14 @@ class SearchMoreThanTV:
 
         entries = set()
 
-        params.update(
-            {
-                'tags_type': int(config['all_tags']),
-                'order_by': config['order_by'],
-                'search_submit': 1,
-                'order_way': config['order_way'],
-                'action': 'basic',
-                'group_results': 0,
-            }
-        )
+        params.update({
+            'tags_type': int(config['all_tags']),
+            'order_by': config['order_by'],
+            'search_submit': 1,
+            'order_way': config['order_way'],
+            'action': 'basic',
+            'group_results': 0,
+        })
 
         for search_string in entry.get('search_strings', [entry['title']]):
             params['searchstr'] = search_string.replace("'", '')
@@ -290,9 +288,9 @@ class SearchMoreThanTV:
                 )
                 torrent_info = result.findAll('td', attrs={'class': 'number_column'})
                 size = re.search(r'(\d+(?:[.,]\d+)*)\s?([KMG]B)', torrent_info[0].text)
-                torrent_tags = ', '.join(
-                    [tag.text for tag in group_info.findAll('div', attrs={'class': 'tags'})]
-                )
+                torrent_tags = ', '.join([
+                    tag.text for tag in group_info.findAll('div', attrs={'class': 'tags'})
+                ])
 
                 e = Entry()
 

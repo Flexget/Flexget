@@ -22,16 +22,16 @@ class Generate:
 
             entry['url'] = 'http://localhost/generate/{}/{}'.format(
                 i,
-                ''.join(
-                    [random.choice(string.ascii_letters + string.digits) for x in range(1, 30)]
-                ),
+                ''.join([
+                    random.choice(string.ascii_letters + string.digits) for x in range(1, 30)
+                ]),
             )
-            entry['title'] = ''.join(
-                [random.choice(string.ascii_letters + string.digits) for x in range(1, 30)]
-            )
-            entry['description'] = ''.join(
-                [random.choice(string.ascii_letters + string.digits) for x in range(1, 1000)]
-            )
+            entry['title'] = ''.join([
+                random.choice(string.ascii_letters + string.digits) for x in range(1, 30)
+            ])
+            entry['description'] = ''.join([
+                random.choice(string.ascii_letters + string.digits) for x in range(1, 1000)
+            ])
             entries.append(entry)
         return entries
 

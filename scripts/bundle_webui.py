@@ -1,5 +1,5 @@
 # /// script
-# requires-python = ">=3.9"
+# requires-python = ">=3.10"
 # dependencies = [
 #     "requests~=2.32",
 # ]
@@ -9,7 +9,7 @@ import os
 import shutil
 import zipfile
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 # If hatchling is available (like in the build environment) this file provides
 # a hook for bundling the webui into our wheel release.
@@ -44,7 +44,7 @@ else:
             build_data['force_include']['flexget/ui/v2/dist'] = '/flexget/ui/v2/dist'
 
 
-def bundle_webui(ui_version: Optional[str] = None):
+def bundle_webui(ui_version: str | None = None):
     """Bundle webui for release packaging."""
     # We delay this import so that the hatchling build hook can register itself without requests installed.
     # once it is registered it can install the dep automatically during the build process.

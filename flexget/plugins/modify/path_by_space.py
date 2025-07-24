@@ -1,7 +1,7 @@
 import ctypes
 import os
 import random
-from typing import NamedTuple, Union
+from typing import NamedTuple
 
 from loguru import logger
 
@@ -14,9 +14,9 @@ logger = logger.bind(name='path_by_space')
 
 class DiskStats(NamedTuple):
     path: str
-    free_bytes: Union[ctypes.c_ulonglong, int]
-    used_bytes: Union[ctypes.c_ulonglong, int]
-    total_bytes: Union[ctypes.c_ulonglong, int]
+    free_bytes: ctypes.c_ulonglong | int
+    used_bytes: ctypes.c_ulonglong | int
+    total_bytes: ctypes.c_ulonglong | int
     free_percent: float
     used_percent: float
 
@@ -53,14 +53,11 @@ def _path_selector(paths, within, stat_attr):
     valid_paths = [paths_stats[0].path]
 
     if within > 0:
-        valid_paths.extend(
-            [
-                path_stat.path
-                for path_stat in paths_stats[1:]
-                if abs(getattr(path_stat, stat_attr) - getattr(paths_stats[0], stat_attr))
-                <= within
-            ]
-        )
+        valid_paths.extend([
+            path_stat.path
+            for path_stat in paths_stats[1:]
+            if abs(getattr(path_stat, stat_attr) - getattr(paths_stats[0], stat_attr)) <= within
+        ])
 
     return random.choice(valid_paths)
 

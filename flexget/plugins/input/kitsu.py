@@ -33,15 +33,14 @@ class KitsuAnime:
         'properties': {
             'username': {'type': 'string'},
             'user_id': {'type': 'string'},
-            'lists': one_or_more(
-                {
-                    'type': 'string',
-                    'enum': ['current', 'planned', 'completed', 'on_hold', 'dropped'],
-                }
-            ),
-            'type': one_or_more(
-                {'type': 'string', 'enum': ['ona', 'ova', 'tv', 'movie', 'music', 'special']}
-            ),
+            'lists': one_or_more({
+                'type': 'string',
+                'enum': ['current', 'planned', 'completed', 'on_hold', 'dropped'],
+            }),
+            'type': one_or_more({
+                'type': 'string',
+                'enum': ['ona', 'ova', 'tv', 'movie', 'music', 'special'],
+            }),
             'latest': {'type': 'boolean', 'default': False},
             'status': {'type': 'string', 'enum': ['airing', 'finished']},
         },

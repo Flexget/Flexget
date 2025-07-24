@@ -1,6 +1,7 @@
+from __future__ import annotations
+
 import typing
 from collections.abc import MutableSet
-from typing import Optional, Union
 
 from loguru import logger
 
@@ -18,7 +19,7 @@ if typing.TYPE_CHECKING:
     from plexapi.video import Movie, Show
 
 
-def import_plexaccount() -> 'type[MyPlexAccount]':
+def import_plexaccount() -> type[MyPlexAccount]:
     try:
         from plexapi.myplex import MyPlexAccount
     except ImportError:
@@ -26,7 +27,7 @@ def import_plexaccount() -> 'type[MyPlexAccount]':
     return MyPlexAccount
 
 
-def to_entry(plex_item: 'Union[Movie, Show]') -> Entry:
+def to_entry(plex_item: Movie | Show) -> Entry:
     entry = Entry(
         title=f'{plex_item.title} ({plex_item.year})' if plex_item.year else plex_item.title,
         url=plex_item.guid,
@@ -75,22 +76,22 @@ def to_plex_item(entry):
 class PlexManagedWatchlist(MutableSet):
     def __init__(
         self,
-        username: Optional[str] = None,
-        password: Optional[str] = None,
-        token: Optional[str] = None,
-        filter: Optional[str] = None,
-        type: Optional[str] = None,
+        username: str | None = None,
+        password: str | None = None,
+        token: str | None = None,
+        filter: str | None = None,
+        type: str | None = None,
     ):
         self.username = username
         self.password = password
         self.token = token
         self.type = type
         self.filter = filter
-        self._items: Optional[list[Entry]] = None
-        self._account: Optional[MyPlexAccount] = None
+        self._items: list[Entry] | None = None
+        self._account: MyPlexAccount | None = None
 
     @property
-    def account(self) -> 'MyPlexAccount':
+    def account(self) -> MyPlexAccount:
         MyPlexAccount = import_plexaccount()  # noqa: N806 It's a class
         if self._account is None:
             self._account = MyPlexAccount(self.username, self.password, self.token)
@@ -114,7 +115,7 @@ class PlexManagedWatchlist(MutableSet):
     def __contains__(self, entry) -> bool:
         return self._find_entry(entry) is not None
 
-    def get(self, entry) -> Optional[Entry]:
+    def get(self, entry) -> Entry | None:
         return self._find_entry(entry)
 
     def add(self, entry: Entry) -> None:

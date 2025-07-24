@@ -1,12 +1,14 @@
+from __future__ import annotations
+
 import importlib
 import logging
 import time
 from base64 import b64decode
+from collections.abc import Callable
 from dataclasses import dataclass
 from functools import partial
 from pathlib import Path, PurePosixPath
 from stat import S_ISLNK
-from typing import Callable, Optional
 from urllib.parse import quote, urljoin
 
 from loguru import logger
@@ -82,10 +84,10 @@ class SftpClient:
         host: str,
         port: int,
         username: str,
-        password: Optional[str] = None,
-        private_key: Optional[str] = None,
-        private_key_pass: Optional[str] = None,
-        host_key: Optional[HostKey] = None,
+        password: str | None = None,
+        private_key: str | None = None,
+        private_key_pass: str | None = None,
+        host_key: HostKey | None = None,
         connection_tries: int = 3,
     ):
         if not pysftp:
@@ -98,10 +100,10 @@ class SftpClient:
         self.host: str = host
         self.port: int = port
         self.username: str = username
-        self.password: Optional[str] = password
-        self.private_key: Optional[str] = private_key
-        self.private_key_pass: Optional[str] = private_key_pass
-        self.host_key: Optional[HostKey] = host_key
+        self.password: str | None = password
+        self.private_key: str | None = private_key
+        self.private_key_pass: str | None = private_key_pass
+        self.host_key: HostKey | None = host_key
 
         self.prefix: str = self._get_prefix()
         self._sftp: pysftp.Connection = self._connect(connection_tries)
@@ -294,13 +296,13 @@ class SftpClient:
         """
         self._sftp.timeout = socket_timeout_sec
 
-    def _connect(self, connection_tries: int) -> 'pysftp.Connection':
+    def _connect(self, connection_tries: int) -> pysftp.Connection:
         tries: int = connection_tries
         retry_interval: int = RETRY_INTERVAL_SEC
 
         logger.debug('Connecting to {}', self.host)
 
-        sftp: Optional[pysftp.Connection] = None
+        sftp: pysftp.Connection | None = None
 
         while not sftp:
             try:
@@ -331,7 +333,7 @@ class SftpClient:
 
         return sftp
 
-    def _get_cnopts(self) -> Optional['pysftp.CnOpts']:
+    def _get_cnopts(self) -> pysftp.CnOpts | None:
         if not self.host_key:
             return None
         KeyClass = getattr(  # noqa: N806 It's a class
@@ -441,11 +443,11 @@ class HandlerBuilder:
 
     def __init__(
         self,
-        sftp: 'pysftp.Connection',
+        sftp: pysftp.Connection,
         url_prefix: str,
-        private_key: Optional[str],
-        private_key_pass: Optional[str],
-        host_key: Optional[HostKey],
+        private_key: str | None,
+        private_key_pass: str | None,
+        host_key: HostKey | None,
     ):
         self._sftp = sftp
         self._prefix = url_prefix
@@ -508,13 +510,13 @@ class Handlers:
     @classmethod
     def handle_file(
         cls,
-        sftp: 'pysftp.Connection',
+        sftp: pysftp.Connection,
         prefix: str,
         get_size: bool,
         dirs_only: bool,
-        private_key: Optional[str],
-        private_key_pass: Optional[str],
-        host_key: Optional[HostKey],
+        private_key: str | None,
+        private_key_pass: str | None,
+        host_key: HostKey | None,
         entry_accumulator: list[Entry],
         path: str,
     ) -> None:
@@ -543,13 +545,13 @@ class Handlers:
     @classmethod
     def handle_directory(
         cls,
-        sftp: 'pysftp.Connection',
+        sftp: pysftp.Connection,
         prefix: str,
         get_size: bool,
         files_only: bool,
-        private_key: Optional[str],
-        private_key_pass: Optional[str],
-        host_key: Optional[HostKey],
+        private_key: str | None,
+        private_key_pass: str | None,
+        host_key: HostKey | None,
         entry_accumulator: list[Entry],
         path: str,
     ) -> None:
@@ -596,14 +598,14 @@ class Handlers:
 
     @staticmethod
     def _get_entry(
-        sftp: 'pysftp.Connection',
+        sftp: pysftp.Connection,
         prefix: str,
         size_handler: Callable[[str], int],
         get_size,
         path: str,
-        private_key: Optional[str],
-        private_key_pass: Optional[str],
-        host_key: Optional[HostKey],
+        private_key: str | None,
+        private_key_pass: str | None,
+        host_key: HostKey | None,
     ) -> Entry:
         url = urljoin(prefix, quote(path))
         title = PurePosixPath(path).name
@@ -629,7 +631,7 @@ class Handlers:
         return entry
 
     @classmethod
-    def _dir_size(cls, sftp: 'pysftp.Connection', path: str) -> int:
+    def _dir_size(cls, sftp: pysftp.Connection, path: str) -> int:
         sizes: list[int] = []
 
         size_accumulator = partial(cls._accumulate_file_size, sftp, sizes)
@@ -639,11 +641,11 @@ class Handlers:
 
     @classmethod
     def _accumulate_file_size(
-        cls, sftp: 'pysftp.Connection', size_accumulator: list[int], path: str
+        cls, sftp: pysftp.Connection, size_accumulator: list[int], path: str
     ) -> None:
         size_accumulator.append(cls._file_size(sftp, path))
 
     @staticmethod
-    def _file_size(sftp: 'pysftp.Connection', path: str) -> int:
+    def _file_size(sftp: pysftp.Connection, path: str) -> int:
         """Get the size of a file node."""
         return sftp.lstat(path).st_size

@@ -1,7 +1,12 @@
-from collections.abc import Iterable, Mapping, MutableMapping, Sequence
-from typing import Any, Callable, NamedTuple
+from __future__ import annotations
+
+from collections.abc import MutableMapping
+from typing import TYPE_CHECKING, Any, NamedTuple
 
 from loguru import logger
+
+if TYPE_CHECKING:
+    from collections.abc import Callable, Iterable, Mapping, Sequence
 
 logger = logger.bind(name='lazy_lookup')
 
@@ -20,7 +25,7 @@ class LazyLookup:
     There should be one instance of this class per LazyDict.
     """
 
-    def __init__(self, store: 'LazyDict') -> None:
+    def __init__(self, store: LazyDict) -> None:
         self.store = store
         self.callee_list: list[LazyCallee] = []
 

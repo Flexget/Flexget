@@ -7,7 +7,6 @@ from pathlib import Path
 from textwrap import wrap
 from typing import TYPE_CHECKING
 
-import sqlalchemy
 from loguru import logger
 from packaging.version import Version
 from sqlalchemy import Column, Integer, String
@@ -19,6 +18,8 @@ from flexget.plugin import PluginError
 
 if TYPE_CHECKING:
     from collections.abc import AsyncGenerator
+
+    import sqlalchemy
 
 try:
     if Version(version('python-telegram-bot')) < Version('21.9'):

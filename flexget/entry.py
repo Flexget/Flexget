@@ -1,10 +1,12 @@
+from __future__ import annotations
+
 import functools
 import types
 import warnings
 from datetime import date, datetime
 from enum import Enum
 from pathlib import Path
-from typing import TYPE_CHECKING, Callable, Optional, Union
+from typing import TYPE_CHECKING
 
 import pendulum
 from loguru import logger
@@ -15,7 +17,7 @@ from flexget.utils.serialization import Serializer, deserialize, serialize
 from flexget.utils.template import CoercingDateTime, FlexGetTemplate, render_from_entry
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable, Mapping, Sequence
+    from collections.abc import Callable, Iterable, Mapping, Sequence
 
 logger = logger.bind(name='entry')
 
@@ -94,9 +96,9 @@ class Entry(LazyDict, Serializer):
 
     def trace(
         self,
-        message: Optional[str],
-        operation: Optional[str] = None,
-        plugin: Optional[str] = None,
+        message: str | None,
+        operation: str | None = None,
+        plugin: str | None = None,
     ) -> None:
         """Add trace message to the entry which should contain useful information about why plugin did not operate on entry.
 
@@ -166,7 +168,7 @@ class Entry(LazyDict, Serializer):
         """
         self.add_hook('complete', func, **kwargs)
 
-    def accept(self, reason: Optional[str] = None, **kwargs) -> None:
+    def accept(self, reason: str | None = None, **kwargs) -> None:
         if self.rejected:
             logger.debug('tried to accept rejected {!r}', self)
         elif not self.accepted:
@@ -175,7 +177,7 @@ class Entry(LazyDict, Serializer):
             # Run entry on_accept hooks
             self.run_hooks('accept', reason=reason, **kwargs)
 
-    def reject(self, reason: Optional[str] = None, **kwargs) -> None:
+    def reject(self, reason: str | None = None, **kwargs) -> None:
         # ignore rejections on immortal entries
         if self.get('immortal'):
             reason_str = f'({reason})' if reason else ''
@@ -188,7 +190,7 @@ class Entry(LazyDict, Serializer):
             # Run entry on_reject hooks
             self.run_hooks('reject', reason=reason, **kwargs)
 
-    def fail(self, reason: Optional[str] = None, **kwargs):
+    def fail(self, reason: str | None = None, **kwargs):
         logger.debug("Marking entry '{}' as failed", self['title'])
         if not self.failed:
             self._state = EntryState.FAILED
@@ -281,7 +283,7 @@ class Entry(LazyDict, Serializer):
         return isinstance(self['title'], str)
 
     def update_using_map(
-        self, field_map: dict, source_item: Union[dict, object], ignore_none: bool = False
+        self, field_map: dict, source_item: dict | object, ignore_none: bool = False
     ):
         """Populate entry fields from a source object using a dictionary that maps from entry field names to attributes (or keys) in the source object.
 
@@ -304,7 +306,7 @@ class Entry(LazyDict, Serializer):
                 continue
             self[field] = v
 
-    def render(self, template: Union[str, FlexGetTemplate], native: bool = False) -> str:
+    def render(self, template: str | FlexGetTemplate, native: bool = False) -> str:
         """Render a template string based on fields in the entry.
 
         :param template: A template string or FlexGetTemplate that uses jinja2 or python string replacement format.
@@ -320,7 +322,7 @@ class Entry(LazyDict, Serializer):
         return render_from_entry(template, self, native=native)
 
     @classmethod
-    def serialize(cls, entry: 'Entry') -> dict:
+    def serialize(cls, entry: Entry) -> dict:
         fields = {}
         for key in entry:
             if key.startswith('_') or entry.is_lazy(key):
@@ -340,7 +342,7 @@ class Entry(LazyDict, Serializer):
         return {'fields': fields, 'lazy_lookups': lazy_lookups}
 
     @classmethod
-    def deserialize(cls, data, version) -> 'Entry':
+    def deserialize(cls, data, version) -> Entry:
         result = cls()
         for key, value in data['fields'].items():
             result[key] = deserialize(value)
@@ -350,10 +352,10 @@ class Entry(LazyDict, Serializer):
 
     def add_lazy_fields(
         self,
-        lazy_func: Union[Callable[['Entry'], None], str],
-        fields: 'Iterable[str]',
-        args: Optional['Sequence'] = None,
-        kwargs: Optional['Mapping'] = None,
+        lazy_func: Callable[[Entry], None] | str,
+        fields: Iterable[str],
+        args: Sequence | None = None,
+        kwargs: Mapping | None = None,
     ):
         """Add lazy fields to an entry.
 

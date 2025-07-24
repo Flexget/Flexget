@@ -1,12 +1,16 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Callable
+from typing import TYPE_CHECKING, Any
 
 import pytest
 
-from flexget.task import Task, TaskAbort
+from flexget.task import TaskAbort
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from flexget.task import Task
+
     from .test_sftp_server import TestSFTPFileSystem, TestSFTPServerController
 
 

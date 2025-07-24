@@ -74,9 +74,10 @@ class OutputDigest:
                 'type': 'object',
                 'properties': {
                     'list': {'type': 'string'},
-                    'state': one_or_more(
-                        {'type': 'string', 'enum': ['accepted', 'rejected', 'failed', 'undecided']}
-                    ),
+                    'state': one_or_more({
+                        'type': 'string',
+                        'enum': ['accepted', 'rejected', 'failed', 'undecided'],
+                    }),
                 },
                 'required': ['list'],
                 'additionalProperties': False,

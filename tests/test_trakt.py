@@ -132,9 +132,9 @@ class TestTraktShowLookup:
                 'should have added Shameless and not Shameless (2010)'
             )
             # change the search query
-            session.query(TraktShowSearchResult).update(
-                {'search': 'shameless.s01e03.hdtv-flexget'}
-            )
+            session.query(TraktShowSearchResult).update({
+                'search': 'shameless.s01e03.hdtv-flexget'
+            })
             session.commit()
 
             lookupargs = {'title': 'Shameless.S01E03.HDTV-FlexGet'}
@@ -457,9 +457,9 @@ class TestTraktMovieLookup:
             )
 
             # change the search query
-            session.query(TraktMovieSearchResult).update(
-                {'search': "harry.potter.and.the.philosopher's"}
-            )
+            session.query(TraktMovieSearchResult).update({
+                'search': "harry.potter.and.the.philosopher's"
+            })
             session.commit()
 
             lookupargs = {'title': "harry.potter.and.the.philosopher's"}

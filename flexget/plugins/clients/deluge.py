@@ -588,15 +588,13 @@ class OutputDeluge(DelugePlugin):
                 if client.host in ['127.0.0.1', 'localhost']:
                     counter = 2
                     while file_exists(name):
-                        name = ''.join(
-                            [
-                                os.path.splitext(name)[0],
-                                ' (',
-                                str(counter),
-                                ')',
-                                os.path.splitext(name)[1],
-                            ]
-                        )
+                        name = ''.join([
+                            os.path.splitext(name)[0],
+                            ' (',
+                            str(counter),
+                            ')',
+                            os.path.splitext(name)[1],
+                        ])
                         counter += 1
                 else:
                     logger.debug(

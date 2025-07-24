@@ -115,9 +115,12 @@ class SearchBTN:
                     entry = Entry()
                     entry['title'] = item['ReleaseName']
                     if config['append_quality']:
-                        entry['title'] += ' '.join(
-                            ['', item['Resolution'], item['Source'], item['Codec']]
-                        )
+                        entry['title'] += ' '.join([
+                            '',
+                            item['Resolution'],
+                            item['Source'],
+                            item['Codec'],
+                        ])
                     entry['url'] = item['DownloadURL']
                     entry['torrent_seeds'] = int(item['Seeders'])
                     entry['torrent_leeches'] = int(item['Leechers'])

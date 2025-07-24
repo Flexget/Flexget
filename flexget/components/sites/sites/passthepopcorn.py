@@ -116,15 +116,13 @@ class SearchPassThePopcorn:
 
         entries = set()
 
-        params.update(
-            {
-                'order_by': ORDERING[config['order_by']],
-                'order_way': ordering,
-                'action': 'advanced',
-                'json': 'noredirect',
-                'grouping': grouping,
-            }
-        )
+        params.update({
+            'order_by': ORDERING[config['order_by']],
+            'order_way': ordering,
+            'action': 'advanced',
+            'json': 'noredirect',
+            'grouping': grouping,
+        })
 
         search_strings = entry.get('search_strings', [entry['title']])
 

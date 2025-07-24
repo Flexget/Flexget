@@ -231,15 +231,13 @@ class SearchAlphaRatio:
 
         entries = set()
 
-        params.update(
-            {
-                'order_by': config['order_by'],
-                'search_submit': 1,
-                'action': 'basic',
-                'order_way': ordering,
-                'freeleech': LEECHSTATUS[config['leechstatus']],
-            }
-        )
+        params.update({
+            'order_by': config['order_by'],
+            'search_submit': 1,
+            'action': 'basic',
+            'order_way': ordering,
+            'freeleech': LEECHSTATUS[config['leechstatus']],
+        })
 
         for search_string in entry.get('search_strings', [entry['title']]):
             params['searchstr'] = remove_special_characters(search_string)
@@ -283,9 +281,9 @@ class SearchAlphaRatio:
                 size_col = torrent_info[size_idx].text
                 logger.debug('AlphaRatio size: {}', size_col)
                 size = re.search(r'(\d+(?:[.,]\d+)*)\s?([KMGTP]B)', size_col)
-                torrent_tags = ', '.join(
-                    [tag.text for tag in group_info.findAll('div', attrs={'class': 'tags'})]
-                )
+                torrent_tags = ', '.join([
+                    tag.text for tag in group_info.findAll('div', attrs={'class': 'tags'})
+                ])
 
                 e = Entry()
 

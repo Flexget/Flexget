@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 import copy
 import functools
 import re
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING
 
 from loguru import logger
 
@@ -20,9 +22,9 @@ class QualityComponent:
         type: str,
         value: int,
         name: str,
-        regexp: Optional[str] = None,
-        modifier: Optional[int] = None,
-        defaults: Optional[list['QualityComponent']] = None,
+        regexp: str | None = None,
+        modifier: int | None = None,
+        defaults: list[QualityComponent] | None = None,
     ) -> None:
         """Init an instance.
 
@@ -194,7 +196,7 @@ for items in (_resolutions, _sources, _codecs, _color_ranges, _audios):
         _registry[item.name] = item
 
 
-def all_components() -> 'Iterator[QualityComponent]':
+def all_components() -> Iterator[QualityComponent]:
     return iter(_registry.values())
 
 
@@ -271,11 +273,11 @@ class Quality(Serializer):
         return [self.resolution, self.source, self.codec, self.color_range, self.audio]
 
     @classmethod
-    def serialize(cls, quality: 'Quality') -> str:
+    def serialize(cls, quality: Quality) -> str:
         return str(quality)
 
     @classmethod
-    def deserialize(cls, data: str, version: int) -> 'Quality':
+    def deserialize(cls, data: str, version: int) -> Quality:
         return cls(data)
 
     @property
@@ -350,8 +352,8 @@ class RequirementComponent:
 
     def __init__(self, type: str) -> None:
         self.type = type
-        self.min: Optional[QualityComponent] = None
-        self.max: Optional[QualityComponent] = None
+        self.min: QualityComponent | None = None
+        self.max: QualityComponent | None = None
         self.acceptable: set[QualityComponent] = set()
         self.none_of: set[QualityComponent] = set()
 
@@ -417,9 +419,12 @@ class RequirementComponent:
         )
 
     def __hash__(self) -> int:
-        return hash(
-            (self.min, self.max, tuple(sorted(self.acceptable)), tuple(sorted(self.none_of)))
-        )
+        return hash((
+            self.min,
+            self.max,
+            tuple(sorted(self.acceptable)),
+            tuple(sorted(self.none_of)),
+        ))
 
 
 class Requirements:
@@ -469,7 +474,7 @@ class Requirements:
         except KeyError as e:
             raise ValueError(f'{e.args[0]} is not a valid quality component.')
 
-    def allows(self, qual: Union[Quality, str], loose: bool = False) -> bool:
+    def allows(self, qual: Quality | str, loose: bool = False) -> bool:
         """Determine whether this set of requirements allows a given quality.
 
         :param Quality qual: The quality to evaluate.
@@ -479,7 +484,7 @@ class Requirements:
         """
         if isinstance(qual, str):
             qual = Quality(qual)
-        for r_component, q_component in zip(self.components, qual.components):
+        for r_component, q_component in zip(self.components, qual.components, strict=False):
             if not r_component.allows(q_component, loose=loose):
                 return False
         return True

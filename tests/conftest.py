@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import itertools
 import logging
 import os
@@ -6,7 +8,7 @@ import shutil
 from contextlib import contextmanager, suppress
 from http import client
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Callable, Optional, Union
+from typing import TYPE_CHECKING, Any
 from unittest import mock
 
 import jsonschema
@@ -29,6 +31,7 @@ from flexget.webserver import User
 
 if TYPE_CHECKING:
     import argparse
+    from collections.abc import Callable
 
     import flask
 
@@ -82,7 +85,7 @@ def execute_task(manager: Manager) -> Callable[..., Task]:
     def execute(
         task_name: str,
         abort: bool = False,
-        options: Optional[Union[dict, 'argparse.Namespace']] = None,
+        options: dict | argparse.Namespace | None = None,
     ) -> Task:
         """Use to execute one test task from config.
 
@@ -137,7 +140,7 @@ def use_vcr(request, monkeypatch):
 
 
 @pytest.fixture
-def api_client(manager) -> 'APIClient':
+def api_client(manager) -> APIClient:
     with Session() as session:
         user = session.query(User).first()
         if not user:
@@ -163,10 +166,10 @@ def schema_match(manager) -> Callable[[dict, Any], list[dict]]:
 
 
 @pytest.fixture
-def link_headers(manager) -> Callable[['flask.Response'], dict[str, dict]]:
+def link_headers(manager) -> Callable[[flask.Response], dict[str, dict]]:
     """Parse link headers and return them in dict form."""
 
-    def headers(response: 'flask.Response') -> dict[str, dict]:
+    def headers(response: flask.Response) -> dict[str, dict]:
         links = {}
         for link in requests.utils.parse_header_links(response.headers.get('link')):
             url = link['url']
@@ -260,9 +263,10 @@ def no_requests(monkeypatch):
     except ImportError:
         pass
 
-    online_funcs.extend(
-        ['http.client.HTTPConnection.request', 'http.client.HTTPSConnection.request']
-    )
+    online_funcs.extend([
+        'http.client.HTTPConnection.request',
+        'http.client.HTTPSConnection.request',
+    ])
 
     for func in online_funcs:
         monkeypatch.setattr(
@@ -310,7 +314,7 @@ class MockManager(Manager):
     unit_test = True
 
     def __init__(
-        self, config_text: str, config_name: str, tmp_path: Path, db_uri: Optional[str] = None
+        self, config_text: str, config_name: str, tmp_path: Path, db_uri: str | None = None
     ):
         self._config_name = config_name
         self._tmp_path = tmp_path
@@ -392,43 +396,43 @@ class APIClient:
 
         kwargs['headers'][key] = value
 
-    def json_post(self, *args, **kwargs) -> 'flask.Response':
+    def json_post(self, *args, **kwargs) -> flask.Response:
         self._append_header('Content-Type', 'application/json', kwargs)
         if kwargs.get('auth', True):
             self._append_header('Authorization', f'Token {self.api_key}', kwargs)
         return self.client.post(*args, **kwargs)
 
-    def json_put(self, *args, **kwargs) -> 'flask.Response':
+    def json_put(self, *args, **kwargs) -> flask.Response:
         self._append_header('Content-Type', 'application/json', kwargs)
         if kwargs.get('auth', True):
             self._append_header('Authorization', f'Token {self.api_key}', kwargs)
         return self.client.put(*args, **kwargs)
 
-    def json_patch(self, *args, **kwargs) -> 'flask.Response':
+    def json_patch(self, *args, **kwargs) -> flask.Response:
         self._append_header('Content-Type', 'application/json', kwargs)
         if kwargs.get('auth', True):
             self._append_header('Authorization', f'Token {self.api_key}', kwargs)
         return self.client.patch(*args, **kwargs)
 
-    def get(self, *args, **kwargs) -> 'flask.Response':
+    def get(self, *args, **kwargs) -> flask.Response:
         if kwargs.get('auth', True):
             self._append_header('Authorization', f'Token {self.api_key}', kwargs)
 
         return self.client.get(*args, **kwargs)
 
-    def delete(self, *args, **kwargs) -> 'flask.Response':
+    def delete(self, *args, **kwargs) -> flask.Response:
         if kwargs.get('auth', True):
             self._append_header('Authorization', f'Token {self.api_key}', kwargs)
 
         return self.client.delete(*args, **kwargs)
 
-    def json_delete(self, *args, **kwargs) -> 'flask.Response':
+    def json_delete(self, *args, **kwargs) -> flask.Response:
         self._append_header('Content-Type', 'application/json', kwargs)
         if kwargs.get('auth', True):
             self._append_header('Authorization', f'Token {self.api_key}', kwargs)
         return self.client.delete(*args, **kwargs)
 
-    def head(self, *args, **kwargs) -> 'flask.Response':
+    def head(self, *args, **kwargs) -> flask.Response:
         if kwargs.get('auth', True):
             self._append_header('Authorization', f'Token {self.api_key}', kwargs)
 

@@ -7,18 +7,16 @@ from flexget.event import event
 
 logger = logger.bind(name='output.sns')
 
-DEFAULT_TEMPLATE_VALUE = json.dumps(
-    {
-        'entry': {
-            'title': '{{title}}',
-            'url': '{{url}}',
-            'original_url': '{{original_url}}',
-            'series': '{{series_name}}',
-            'series_id': '{{series_id}}',
-        },
-        'task': '{{task}}',
-    }
-)
+DEFAULT_TEMPLATE_VALUE = json.dumps({
+    'entry': {
+        'title': '{{title}}',
+        'url': '{{url}}',
+        'original_url': '{{original_url}}',
+        'series': '{{series_name}}',
+        'series_id': '{{series_id}}',
+    },
+    'task': '{{task}}',
+})
 
 
 class SNSNotification:

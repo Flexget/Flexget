@@ -1,6 +1,8 @@
 """Miscellaneous SQLAlchemy helpers."""
 
-from typing import Any, Optional, Union
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
 
 from loguru import logger
 from sqlalchemy import ColumnDefault, Index, Sequence, text
@@ -8,6 +10,9 @@ from sqlalchemy.exc import NoSuchTableError, OperationalError
 from sqlalchemy.orm import Session
 from sqlalchemy.schema import MetaData, Table
 from sqlalchemy.types import TypeEngine
+
+if TYPE_CHECKING:
+    from typing_extensions import Self
 
 logger = logger.bind(name='sql_utils')
 
@@ -47,7 +52,7 @@ def table_schema(name: str, session: Session) -> Table:
     return Table(name, MetaData(), autoload_with=session.bind)
 
 
-def table_columns(table: Union[str, Table], session: Session) -> list[str]:
+def table_columns(table: str | Table, session: Session) -> list[str]:
     """Return list of column names in the table or empty list.
 
     :param string table: Name of table or table schema
@@ -82,9 +87,9 @@ def drop_index(table_name: str, index_name: str, session: Session) -> None:
 
 
 def table_add_column(
-    table: Union[Table, str],
+    table: Table | str,
     name: str,
-    col_type: Union[TypeEngine, type],
+    col_type: TypeEngine | type,
     session: Session,
     default: Any = None,
 ) -> None:
@@ -133,7 +138,7 @@ def drop_tables(names: list[str], session: Session) -> None:
             table.drop()
 
 
-def get_index_by_name(table: Table, name: str) -> Optional[Index]:
+def get_index_by_name(table: Table, name: str) -> Index | None:
     """Find declaratively defined index from table by name.
 
     :param table: Table object
@@ -168,7 +173,7 @@ class ContextSession(Session):
     # TODO: This auto-committing might be a bad idea and need to be removed
     # might be hard to figure out where exactly code needs to be updated to compensate though.
 
-    def __enter__(self) -> 'ContextSession':
+    def __enter__(self) -> Self:
         return super().__enter__()
 
     def __exit__(self, exc_type, exc_val, exc_tb):

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import TYPE_CHECKING, NamedTuple
 
 from loguru import logger
@@ -79,8 +81,8 @@ class AssumeQuality:
             config = {'any': config}
 
         class Assume(NamedTuple):
-            target: 'Requirements'
-            quality: 'Quality'
+            target: Requirements
+            quality: Quality
 
         self.assumptions = []
         for target, quality in list(config.items()):

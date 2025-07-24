@@ -46,12 +46,10 @@ class GenSeries:
                             f'series {num} name - S{season + 1:02d}E{episode + 1:02d} - {quality}'
                         )
                         entry['url'] = 'http://localhost/mock/{}'.format(
-                            ''.join(
-                                [
-                                    random.choice(string.ascii_letters + string.digits)
-                                    for x in range(1, 30)
-                                ]
-                            )
+                            ''.join([
+                                random.choice(string.ascii_letters + string.digits)
+                                for x in range(1, 30)
+                            ])
                         )
                         self.entries.append(entry)
         logger.info('Generated {} entries', len(self.entries))

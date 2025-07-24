@@ -31,9 +31,10 @@ class EmbyInput:
         'properties': {
             **SCHEMA_SERVER_TAG,
             'list': {'type': 'string'},
-            'types': one_or_more(
-                {'type': 'string', 'enum': ['movie', 'series', 'season', 'episode']}
-            ),
+            'types': one_or_more({
+                'type': 'string',
+                'enum': ['movie', 'series', 'season', 'episode'],
+            }),
             'watched': {'type': 'boolean'},
             'favorite': {'type': 'boolean'},
             'sort': {

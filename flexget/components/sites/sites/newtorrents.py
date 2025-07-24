@@ -33,9 +33,10 @@ class NewTorrents:
     # UrlRewriter plugin API
     def url_rewrite(self, task, entry):
         url = entry['url']
-        if url.startswith(
-            ('http://www.newtorrents.info/?q=', 'http://www.newtorrents.info/search')
-        ):
+        if url.startswith((
+            'http://www.newtorrents.info/?q=',
+            'http://www.newtorrents.info/search',
+        )):
             results = self.entries_from_search(entry['title'], url=url)
             if not results:
                 raise UrlRewritingError('No matches for {}'.format(entry['title']))

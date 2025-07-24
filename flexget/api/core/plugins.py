@@ -1,7 +1,9 @@
-from math import ceil
-from typing import TYPE_CHECKING, Optional
+from __future__ import annotations
 
-from flask import Response, jsonify, request
+from math import ceil
+from typing import TYPE_CHECKING
+
+from flask import jsonify, request
 from flask_restx import inputs
 from loguru import logger
 
@@ -62,6 +64,7 @@ plugins_parser.add_argument(
 if TYPE_CHECKING:
     from typing import TypedDict
 
+    from flask import Response
     from sqlalchemy.orm import Session
 
     from flexget.config_schema import JsonSchema
@@ -74,14 +77,14 @@ if TYPE_CHECKING:
         name: str
         api_ver: int
         builtin: bool
-        category: Optional[str]
+        category: str | None
         debug: bool
-        interfaces: Optional[list[str]]
+        interfaces: list[str] | None
         phase_handlers: list[_PhaseHandler]
-        schema: Optional[JsonSchema]
+        schema: JsonSchema | None
 
 
-def plugin_to_dict(plugin) -> 'PluginDict':
+def plugin_to_dict(plugin) -> PluginDict:
     return {
         'name': plugin.name,
         'api_ver': plugin.api_ver,
@@ -103,7 +106,7 @@ class PluginsAPI(APIResource):
     @api.response(BadRequest)
     @api.response(NotFoundError)
     @api.doc(expect=[plugins_parser])
-    def get(self, session: 'Session' = None) -> Response:
+    def get(self, session: Session = None) -> Response:
         """Get list of registered plugins."""
         args = plugins_parser.parse_args()
 

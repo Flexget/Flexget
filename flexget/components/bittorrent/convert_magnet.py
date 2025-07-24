@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import time
 from typing import TYPE_CHECKING
 from urllib.parse import quote
@@ -32,7 +34,7 @@ class ConvertMagnet:
         ]
     }
 
-    def magnet_to_torrent(self, magnet_uri, destination_folder: 'Path', timeout) -> str:
+    def magnet_to_torrent(self, magnet_uri, destination_folder: Path, timeout) -> str:
         import libtorrent
 
         params = libtorrent.parse_magnet_uri(magnet_uri)

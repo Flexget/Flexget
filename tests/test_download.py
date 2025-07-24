@@ -43,9 +43,10 @@ class TestDownload:
         temp_path_2 = tmp_path / 'temp_path_2'
         temp_path_2.mkdir()
 
-        return Template(self._config).render(
-            {'temp_path_1': temp_path_1, 'temp_path_2': temp_path_2}
-        )
+        return Template(self._config).render({
+            'temp_path_1': temp_path_1,
+            'temp_path_2': temp_path_2,
+        })
 
     def test_path_and_temp(self, execute_task):
         """Download plugin: Path and Temp directories set."""

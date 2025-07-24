@@ -1,8 +1,10 @@
+from __future__ import annotations
+
 import contextlib
 import os
 import threading
 from textwrap import wrap
-from typing import TYPE_CHECKING, Any, Optional, TextIO, Union
+from typing import TYPE_CHECKING, Any, TextIO
 
 import rich
 import rich.box
@@ -50,7 +52,7 @@ class _Console(rich.console.Console):
         title: rich.text.TextType = '',
         *,
         characters: str = '─',
-        style: Union[str, rich.console.Style] = 'rule.line',
+        style: str | rich.console.Style = 'rule.line',
         align: rich.text.AlignMethod = 'left',
         # This is a custom FlexGet argument
         indent: int = 3,
@@ -152,7 +154,7 @@ class TerminalTable(rich.table.Table):
         'heavy-head': {'box': rich.box.HEAVY_HEAD},
     }
 
-    def __init__(self, *args, table_type: Optional[str] = None, **kwargs) -> None:
+    def __init__(self, *args, table_type: str | None = None, **kwargs) -> None:
         self.table_type = table_type
         if table_type:
             kwargs = {**kwargs, **self.TABLE_TYPES[table_type]}
@@ -218,7 +220,7 @@ def disable_colors():
 
 
 @contextlib.contextmanager
-def capture_console(filelike: TextIO) -> 'Iterator':
+def capture_console(filelike: TextIO) -> Iterator:
     old_output = get_console_output()
     local_context.output = filelike
     try:
@@ -227,7 +229,7 @@ def capture_console(filelike: TextIO) -> 'Iterator':
         local_context.output = old_output
 
 
-def get_console_output() -> Optional[TextIO]:
+def get_console_output() -> TextIO | None:
     return getattr(local_context, 'output', None)
 
 

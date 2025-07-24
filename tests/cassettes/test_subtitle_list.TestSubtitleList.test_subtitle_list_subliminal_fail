@@ -50,11 +50,8 @@ interactions:
     uri: https://api.opensubtitles.org/xml-rpc
   response:
     body:
-      string: !!binary |
-        H4sIAAAAAAAAA2WPSw7CMAxEr1JlT50iFizc9A5IHCBtDFRqnCqfCnF6AkoRlJU1ntGzB7u7naqF
-        fBgdt6KppaiIB2dGvrYixcvuKDqFluLNmROF2XEghbP22oYyFS56Snkbok9DfKVtT14ha0sqRB1T
-        QHiLr2Q+oA6yqc6sU4b78UEGoRgIJQgr65dJg2OzhRqX+omUrKXcIxT1T4L1zY9TWsDaCjZ1n9+9
-        AnIlAQAA
+      string: <?xml version="1.0" encoding="utf-8"?><methodResponse><params><param><value><struct><member><name>status</name><value><string>401
+        Unauthorized</string></value></member><member><name>seconds</name><value><double>0.002</double></value></member></struct></value></param></params></methodResponse>
     headers:
       Accept-Ranges:
       - bytes
