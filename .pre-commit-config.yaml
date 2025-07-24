@@ -13,6 +13,10 @@ repos:
       - id: ruff-check
         args: [--fix]
       - id: ruff-format
+  - repo: https://github.com/tox-dev/pyproject-fmt
+    rev: v2.6.0
+    hooks:
+      - id: pyproject-fmt
   - repo: https://github.com/PyCQA/doc8
     rev: v2.0.0
     hooks:
