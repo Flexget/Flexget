@@ -359,7 +359,7 @@ class Entry(LazyDict, Serializer):
     ):
         """Add lazy fields to an entry.
 
-        :param lazy_func: should be a funciton previously registered with the `register_lazy_func` decorator,
+        :param lazy_func: should be a function previously registered with the `register_lazy_func` decorator,
             or the name it was registered under.
         :param fields: list of fields this function will fill
         :param args: Arguments that will be passed to the lazy lookup function when called.
