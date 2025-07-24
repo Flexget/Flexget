@@ -50,12 +50,16 @@
   },
   packageRules: [
     {
+      extends: [':automergeAll'],
+      matchManagers: ['pre-commit'],
+    },
+    {
       description: 'This pre-commit env takes a long time to rebuild. Limit updates to monthly.',
       matchPackageNames: ['renovatebot/pre-commit-hooks'],
       extends: ['schedule:monthly'],
     },
     {
-      description: 'Group all uv updates together. Wait before merge so both sources are out.',
+      description: 'Group all uv updates together. Wait before merge so all sources are out.',
       groupName: 'uv',
       matchPackageNames: [
         'uv',
@@ -63,6 +67,7 @@
         'astral-sh/uv-pre-commit',
       ],
       minimumReleaseAge: '6 hours',
+      extends: [':automergeAll'],
     },
   ],
 }
