@@ -14,7 +14,7 @@ from pathlib import Path, PurePosixPath
 if typing.TYPE_CHECKING:
     from logging import Logger
 
-# TODO: Workaround for https://github.com/pyca/pynacl/pull/848, remove this completely after the issue is resolved
+# TODO: Python 3.14 compatibility workaround for PyNaCl — delete the code below when PyNaCl 1.6 is out. https://pypi.org/project/PyNaCl/
 if sys.version_info[:2] == (3, 14):
     typing.ByteString = None  # noqa: PYI057
 
