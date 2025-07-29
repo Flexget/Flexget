@@ -16,7 +16,6 @@ requires-python = ">=3.10"
 classifiers = [
   "Development Status :: 5 - Production/Stable",
   "Intended Audience :: End Users/Desktop",
-  "License :: OSI Approved :: MIT License",
   "Natural Language :: English",
   "Operating System :: MacOS",
   "Operating System :: Microsoft :: Windows",
