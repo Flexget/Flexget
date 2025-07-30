@@ -66,7 +66,6 @@
         'ghcr.io/astral-sh/uv',
         'astral-sh/uv-pre-commit',
       ],
-      minimumReleaseAge: '6 hours',
       extends: [':automergeAll'],
     },
   ],
