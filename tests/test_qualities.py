@@ -102,8 +102,8 @@ class TestQualityParser:
             ('Test.File.DTSHDMA5.1', 'dtshd'),
             ('Test.File.DD2.0', 'dd5.1', False),
             ('Test.File.AC35.1', 'ac3', False),
-            ('Test.File.HDR.DOVI', 'hybrid-hdr', False),
-            ('Test.File.DV.HDR10+', 'hybrid-hdr', False),
+            ('Test.File.HDR.DOVI', 'hybrid_hdr', False),
+            ('Test.File.DV.HDR10+', 'hybrid_hdr', False),
         ],
     )
     def test_quality_failures(self, parser, test_quality):
@@ -166,6 +166,13 @@ class TestFilterQuality:
             mock:
               - {title: 'Test S01E01 HDTV 1080p', quality: 'hdtv 1080p dd+5.1'}
             accept_all: yes
+          hybrid:
+            template: no_global
+            mock:
+              - {title: 'Test.File.DV.HDR10+'}
+              - {title: 'Test.File.DV'}
+            quality: "hybrid_hdr"
+            accept_all: yes
     """
 
     @pytest.fixture(scope='class', params=['internal', 'guessit'], ids=['internal', 'guessit'])
@@ -224,6 +231,13 @@ class TestFilterQuality:
             'Wrong quality type, should be Quality not str'
         )
         assert str(entry['quality']) == '1080p hdtv dd+5.1'
+
+    def test_hybrid(self, execute_task):
+        task = execute_task('hybrid')
+        entry = task.find_entry('accepted', title='Test.File.DV.HDR10+')
+        assert len(task.rejected) == 1, 'wrong number of entries rejected'
+        assert len(task.accepted) == 1, 'wrong number of entries accepted'
+        assert str(entry['quality']) == 'hybrid_hdr'
 
 
 class TestQualityAudio:
