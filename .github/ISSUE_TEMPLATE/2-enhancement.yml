@@ -1,0 +1,17 @@
+name: Feature request
+description: Suggest an idea for this project
+labels: ['enhancement']
+body:
+  - type: checkboxes
+    attributes:
+      label: Contributing guidelines
+      description: >
+        Make sure you've read the contributing guidelines before proceeding.
+      options:
+        - label: I've read the [issue guidelines](https://github.com/Flexget/Flexget/blob/develop/.github/CONTRIBUTING.md#issues).
+          required: true
+  - type: textarea
+    attributes:
+      label: Describe the feature you'd like.
+    validations:
+      required: true
