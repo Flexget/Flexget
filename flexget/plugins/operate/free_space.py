@@ -1,4 +1,6 @@
 import shutil
+import sys
+import typing
 from pathlib import Path
 
 from loguru import logger
@@ -16,6 +18,10 @@ ABORT_ABOVE = 'above'
 def get_free_space(config, task):
     """Return folder/drive free space (in megabytes)."""
     if 'host' in config:
+        # TODO: Python 3.14 compatibility workaround for PyNaCl — delete the code below when PyNaCl 1.6 is out. https://pypi.org/project/PyNaCl/
+        if sys.version_info[:2] == (3, 14):
+            typing.ByteString = None  # noqa: PYI057
+
         import paramiko
 
         ssh = paramiko.SSHClient()
