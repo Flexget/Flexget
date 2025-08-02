@@ -164,7 +164,7 @@ _color_ranges = [
     QualityComponent('color_range', 30, 'hdr', hdr),
     QualityComponent('color_range', 40, 'hdrplus', hdr_plus),
     QualityComponent('color_range', 50, 'dolbyvision', dovi),
-    QualityComponent('color_range', 60, 'hybrid-hdr', f'(({dovi}|{hdr_plus}|{hdr})\\W?){{2,3}}'),
+    QualityComponent('color_range', 60, 'hybrid_hdr', f'(({dovi}|{hdr_plus}|{hdr})\\W?){{2,3}}'),
 ]
 
 channels = r'(?:(?:[^\w+]?[1-7][\W_]?(?:0|1|ch)))'
