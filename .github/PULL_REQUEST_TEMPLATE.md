@@ -1,25 +1,5 @@
-### Motivation for changes:
-
-### Detailed changes:
-
--
-
-### Addressed issues/feature requests:
-
-- Fixes # .
-
-### Config usage if relevant (new plugin or updated schema):
-
-```
-paste_config_here
-```
-
-### Log and/or tests output (preferably both):
-
-```
-paste output here
-```
-
-#### To Do:
-
-- [ ] Stuff..
+<!-- Thank you for submitting a pull request. Please:
+* Read our pull request guidelines:
+  https://github.com/Flexget/Flexget/blob/develop/.github/CONTRIBUTING.md#pull-requests
+* Include a description of the proposed changes and how to test them.
+-->

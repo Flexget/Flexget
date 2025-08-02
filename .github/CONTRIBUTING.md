@@ -4,11 +4,10 @@ Use GitHub issues for feature requests.
 
 # Issues
 
-If you are looking for help, rather than reporting a problem, please use the [forum.](https://github.com/Flexget/Flexget/discussions)
-
 Before submitting an issue, make sure you:
 
 - Are running the latest version of FlexGet (check `flexget --version`)
+- Check the [upgrade actions](https://flexget.com/UpgradeActions) after updating to a major or minor version.
 - Check if there is already an issue open about the problem.
 - Fully describe the problem, explain what you expected to happen.
 - Include the relevant config of the task having the trouble. (Remember to censor private info though.)
@@ -30,7 +29,7 @@ When submitting pull requests:
 - Submit PRs against the [develop](https://github.com/Flexget/Flexget/tree/develop) branch.
 - Explain in your PR the bug you are fixing or feature you are adding. Reference issue numbers if relevant.
 - If config changes are needed, mention those as well. They will be needed for the
-  [UpgradeActions](http://flexget.com/wiki/UpgradeActions) page upon merging anyway.
+  [UpgradeActions](http://flexget.com/UpgradeActions) page upon merging anyway.
 - Make separate PRs for separate ideas. The smaller each PR is the easier it is to get it reviewed and merged.
   You don't want a bugfix to get held up by a new feature you also added.
 
