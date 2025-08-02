@@ -2,6 +2,10 @@ ci:
   autoupdate_schedule: quarterly
   skip: [renovate-config-validator, uv-lock]
 repos:
+  - repo: https://github.com/tox-dev/pyproject-fmt
+    rev: v2.6.0
+    hooks:
+      - id: pyproject-fmt
   - repo: https://github.com/pycontribs/mirrors-prettier
     rev: v3.6.2
     hooks:

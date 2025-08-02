@@ -1,137 +1,115 @@
-## Build settings
+[build-system]
+build-backend = "hatchling.build"
+requires = [ "hatchling" ]
+
 [project]
 name = "flexget"
-description = """
-FlexGet is a program aimed to automate downloading or processing content (torrents,
-podcasts, etc.) from different sources like RSS-feeds, html-pages, various sites and more.
-"""
+description = "FlexGet is a program aimed to automate downloading or processing content (torrents, podcasts, etc.) from different sources like RSS-feeds, html-pages, various sites and more."
 readme = "README.rst"
+license = 'MIT'
+license-files = [ 'LICENSE' ]
+authors = [
+  { name = "Chase Sterling", email = "chase.sterling@gmail.com" },
+  { name = "Marko Koivusalo", email = "marko.koivusalo@gmail.com" },
+]
 requires-python = ">=3.10"
 classifiers = [
-    "Topic :: Utilities",
-    "Development Status :: 5 - Production/Stable",
-    "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-    "Programming Language :: Python :: 3.13",
-    "Programming Language :: Python :: 3.14",
-    "Operating System :: MacOS",
-    "Operating System :: Microsoft :: Windows",
-    "Operating System :: POSIX",
-    "Operating System :: Unix",
-    "Intended Audience :: End Users/Desktop",
-    "Natural Language :: English",
-    "Typing :: Typed"
+  "Development Status :: 5 - Production/Stable",
+  "Intended Audience :: End Users/Desktop",
+  "Natural Language :: English",
+  "Operating System :: MacOS",
+  "Operating System :: Microsoft :: Windows",
+  "Operating System :: POSIX",
+  "Operating System :: Unix",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Topic :: Utilities",
+  "Typing :: Typed",
 ]
-authors = [
-    { name = "Marko Koivusalo", email = "marko.koivusalo@gmail.com" },
-    { name = "Chase Sterling", email = "chase.sterling@gmail.com" },
-]
-license = 'MIT'
-license-files = ['LICENSE']
-dynamic = ["version", "optional-dependencies"]
+dynamic = [ "optional-dependencies", "version" ]
 dependencies = [
-    "apscheduler ~=3.11",
-    "beautifulsoup4 ~=4.12",
-    "feedparser ~=6.0",
-    "guessit ~=3.8",
-    "html5lib ~=1.1",
-    "jinja2 ~=3.1",
-    "jsonschema ~=4.23",
-    "loguru ~=0.7.3",
-    "packaging ~=25.0",
-    "pendulum ~=3.0",
-    "psutil ~=7.0",
-    "pynzb ~=0.1.0",
-    "pyrss2gen ~=1.1",
-    "python-dateutil ~=2.9",
-    "pyyaml ~=6.0",
-    "rebulk ~=3.2",
-    "requests ~=2.32",
-    "rich ~=14.0",
-    "rpyc ~=6.0",
-    "sqlalchemy ~=2.0",
-    # WebUI/API Deps
-    "cherrypy ~=18.10",
-    "flask-compress ~=1.17",
-    "flask-cors ~=6.0",
-    "flask-login ~=0.6.3",
-    "flask-restx ~=1.3",
-    "flask ~=3.1",
-    "pyparsing ~=3.2",
-    "werkzeug ~=3.1",
-    "zxcvbn ~=4.4",
+  "apscheduler~=3.11",
+  "beautifulsoup4~=4.12",
+  "cherrypy~=18.10",
+  "feedparser~=6.0",
+  "flask~=3.1",
+  "flask-compress~=1.17",
+  "flask-cors~=6.0",
+  "flask-login~=0.6.3",
+  "flask-restx~=1.3",
+  "guessit~=3.8",
+  "html5lib~=1.1",
+  "jinja2~=3.1",
+  "jsonschema~=4.23",
+  "loguru~=0.7.3",
+  "packaging~=25.0",
+  "pendulum~=3.0",
+  "psutil~=7.0",
+  "pynzb~=0.1.0",
+  "pyparsing~=3.2",
+  "pyrss2gen~=1.1",
+  "python-dateutil~=2.9",
+  "pyyaml~=6.0",
+  "rebulk~=3.2",
+  "requests~=2.32",
+  "rich~=14.0",
+  "rpyc~=6.0",
+  "sqlalchemy~=2.0",
+  "werkzeug~=3.1",
+  "zxcvbn~=4.4",
 ]
+urls."Forum" = "https://github.com/Flexget/Flexget/discussions"
+urls."Homepage" = "https://flexget.com"
+urls."Issue Tracker" = "https://github.com/Flexget/Flexget/issues"
+urls."Repository" = "https://github.com/Flexget/Flexget"
+scripts.flexget = "flexget:main"
+gui-scripts.flexget-headless = "flexget:main" # This is useful on Windows to avoid a cmd popup
+
 [dependency-groups]
 dev = [
-    "pre-commit ~=4.0",
-    "pytest ~=8.3",
-    'pytest-cov~=6.1',
-    "pytest-xdist ~=3.6",
-    "vcrpy ~=7.0",
+  "pre-commit~=4.0",
+  "pytest~=8.3",
+  "pytest-cov~=6.1",
+  "pytest-xdist~=3.6",
+  "vcrpy~=7.0",
 ]
 docs = [
-    'sphinx~=8.1',
-    'pydata-sphinx-theme~=0.16',
-    'sphinx-copybutton~=0.5',
-    'sphinx-design~=0.6'
+  "pydata-sphinx-theme~=0.16",
+  "sphinx~=8.1",
+  "sphinx-copybutton~=0.5",
+  "sphinx-design~=0.6",
 ]
 plugin-test = [
-    # These are optional dependencies for plugins that have tests in the test suite
-    # Tests that need these must add the `require_optional_deps` pytest mark
-    "boto3 ~=1.35",
-    "pillow~=11.0",
-    "plexapi ~=4.16",
-    "pysftp ~=0.2.9",
-    'rarfile~=4.0',
-    'subliminal<2.3', # TODO: Update subliminal after https://github.com/Diaoul/subliminal/issues/1302 is resolved.
-    { include-group = "all" }
+  # These are optional dependencies for plugins that have tests in the test suite
+  # Tests that need these must add the `require_optional_deps` pytest mark
+  "boto3~=1.35",
+  "pillow~=11.0",
+  "plexapi~=4.16",
+  "pysftp~=0.2.9",
+  "rarfile~=4.0",
+  "subliminal<2.3",          # TODO: Update subliminal after https://github.com/Diaoul/subliminal/issues/1302 is resolved.
+  { include-group = "all" },
 ]
-deluge = ['deluge-client~=1.10']
-qbittorrent = ['qbittorrent-api~=2025.2']
-telegram = ['python-telegram-bot[http2,socks]~=22.0']
-transmission = ['transmission-rpc~=7.0']
+deluge = [ "deluge-client~=1.10" ]
+qbittorrent = [ "qbittorrent-api~=2025.2" ]
+telegram = [ "python-telegram-bot[http2,socks]~=22.0" ]
+transmission = [ "transmission-rpc~=7.0" ]
 # This is all our optional deps installable via extras. Not actually 'all'
 all = [
-    { include-group = "deluge" },
-    { include-group = "qbittorrent" },
-    { include-group = "telegram" },
-    { include-group = "transmission" }
+  { include-group = "deluge" },
+  { include-group = "qbittorrent" },
+  { include-group = "telegram" },
+  { include-group = "transmission" },
 ]
-[project.urls]
-"Homepage" = "https://flexget.com"
-"Issue Tracker" = "https://github.com/Flexget/Flexget/issues"
-"Repository" = "https://github.com/Flexget/Flexget"
-"Forum" = "https://github.com/Flexget/Flexget/discussions"
-
-[project.scripts]
-flexget = "flexget:main"
-
-[project.gui-scripts]
-flexget-headless = "flexget:main"  # This is useful on Windows to avoid a cmd popup
-
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
-
-[tool.coverage.report]
-exclude_also = [
-    "if TYPE_CHECKING"
-]
-
-[tool.coverage.run]
-branch = true
-
-[tool.doc8]
-ignore = [ "D004" ]
-max_line_length = 99
 
 [tool.hatch.metadata.hooks.custom]
 # Extras with locked dependencies will be generated if BUILD_LOCKED env variable is specified
 path = "scripts/build_locked_extras.py"
-locked-groups = ["deluge", "qbittorrent", "telegram", "transmission", "all"]
+locked-groups = [ "deluge", "qbittorrent", "telegram", "transmission", "all" ]
 
 [tool.hatch.version]
 path = "flexget/_version.py"
@@ -141,9 +119,9 @@ skip-excluded-dirs = true
 
 [tool.hatch.build.targets.sdist]
 include = [
-    "/flexget",
-    "/scripts/build_locked_extras.py",
-    "/scripts/bundle_webui.py"
+  "/flexget",
+  "/scripts/build_locked_extras.py",
+  "/scripts/bundle_webui.py",
 ]
 
 [tool.hatch.build.targets.wheel.hooks.custom]
@@ -152,92 +130,95 @@ path = "scripts/bundle_webui.py"
 
 [tool.hatch.build.targets.wheel]
 include = [
-    "/flexget"
+  "/flexget",
 ]
 
-## Other tool settings
+[tool.ruff]
+line-length = 99
+extend-exclude = [ "flexget/ui" ]
+preview = true
+format.quote-style = "single"
+lint.select = [ "ALL" ]
+lint.ignore = [
+  "A",       # flake8-builtins
+  "ANN",     # flake8-annotations
+  "ARG",     # flake8-unused-arguments
+  "B904",    # TODO
+  "BLE001",  # blind-except
+  "C901",    # complex-structure
+  "COM",     # Ruff recommends against using this rule alongside the formatter.
+  "D100",    # undocumented-public-module
+  "D101",    # undocumented-public-class
+  "D102",    # undocumented-public-method
+  "D103",    # undocumented-public-function
+  "D104",    # undocumented-public-package
+  "D105",    # undocumented-magic-method
+  "D107",    # undocumented-public-init
+  "D203",    # Conflicting with other rules
+  "D213",    # Conflicting with other rules
+  "D415",    # Duplicate of D400
+  "DTZ",     # flake8-datetimez
+  "E501",    # TODO
+  "EM",      # flake8-errmsg
+  "ERA001",  # commented-out-code
+  "FBT",     # flake8-boolean-trap
+  "FIX002",  # We use "TODO" comments as a form of documentation
+  "FIX004",  # We use "HACK" comments as a form of documentation
+  "INP001",  # implicit-namespace-package
+  "N817",    # Rejected by @gazpachoking in https://github.com/Flexget/Flexget/pull/4234#discussion_r1951605123
+  "N818",    # Rejected by @gazpachoking in https://github.com/Flexget/Flexget/pull/4234#pullrequestreview-2610029402
+  "PERF203", # TODO: Remove this rule once Python 3.10 support is dropped.
+  "PLC0415", # TODO
+  "PLE1205", # Maybe can re-enable after https://github.com/astral-sh/ruff/issues/13390
+  "PLR0911", # too-many-return-statements
+  "PLR0912", # too-many-branches
+  "PLR0913", # too-many-arguments
+  "PLR0915", # too-many-statements
+  "PLR1704", # redefined-argument-from-local
+  "PLR2004", # magic-value-comparison
+  "PLW0603", # global-statement
+  "PLW0642", # self-or-cls-assignment
+  "PLW2901", # redefined-loop-name
+  "PTH119",  # TODO
+  "Q",       # Ruff recommends against using this rule alongside the formatter.
+  "RUF012",  # Maybe can re-enable after https://github.com/astral-sh/ruff/issues/5243
+  "S",       # flake8-bandit
+  "SLF001",  # private-member-access
+  "TD002",   # Not applicable
+  "TD003",   # Not applicable
+  "TRY003",  # raise-vanilla-args
+  "TRY400",  # Rejected by @gazpachoking in https://github.com/Flexget/Flexget/pull/4249#issuecomment-2656387500
+]
+lint.explicit-preview-rules = true
+lint.per-file-ignores.'docs/scripts/*' = [ "T20" ]
+lint.per-file-ignores.'scripts/*' = [ "T20" ]
+lint.per-file-ignores.'tests/*' = [ "T20" ]
+lint.per-file-ignores."flexget/*" = [ "PTH" ] # TODO
+lint.flake8-type-checking.quote-annotations = true
+lint.isort.known-first-party = [ 'flexget' ]
+lint.future-annotations = true
+
+[tool.pyproject-fmt]
+max_supported_python = '3.14'
 
 [tool.pytest.ini_options]
 addopts = '-p no:legacypath --strict-markers'
 markers = [
-    'filecopy(src, dst): mark test to copy a file from `src` to `dst` before running',
-    'online: mark test that goes online. VCR will automatically be used.',
-    'require_optional_deps: mark test as requiring additional dependencies'
+  'filecopy(src, dst): mark test to copy a file from `src` to `dst` before running',
+  'online: mark test that goes online. VCR will automatically be used.',
+  'require_optional_deps: mark test as requiring additional dependencies',
 ]
-testpaths = ["tests"]
+testpaths = [ "tests" ]
 xfail_strict = true
 
-[tool.ruff]
-line-length = 99
-extend-exclude = ["flexget/ui"]
-preview = true
-
-[tool.ruff.lint]
-ignore = [
-    "A", # flake8-builtins
-    "ANN", # flake8-annotations
-    "ARG", # flake8-unused-arguments
-    "B904", # TODO
-    "BLE001", # blind-except
-    "C901", # complex-structure
-    "COM", # Ruff recommends against using this rule alongside the formatter.
-    "D100", # undocumented-public-module
-    "D101", # undocumented-public-class
-    "D102", # undocumented-public-method
-    "D103", # undocumented-public-function
-    "D104", # undocumented-public-package
-    "D105", # undocumented-magic-method
-    "D107", # undocumented-public-init
-    "D203", # Conflicting with other rules
-    "D213", # Conflicting with other rules
-    "D415", # Duplicate of D400
-    "DTZ", # flake8-datetimez
-    "E501", # TODO
-    "EM", # flake8-errmsg
-    "ERA001", # commented-out-code
-    "FBT", # flake8-boolean-trap
-    "FIX002", # We use "TODO" comments as a form of documentation
-    "FIX004", # We use "HACK" comments as a form of documentation
-    "INP001", # implicit-namespace-package
-    "N817", # Rejected by @gazpachoking in https://github.com/Flexget/Flexget/pull/4234#discussion_r1951605123
-    "N818",  # Rejected by @gazpachoking in https://github.com/Flexget/Flexget/pull/4234#pullrequestreview-2610029402
-    "PERF203", # TODO: Remove this rule once Python 3.10 support is dropped.
-    "PLC0415", # TODO
-    "PLE1205", # Maybe can re-enable after https://github.com/astral-sh/ruff/issues/13390
-    "PLR0911", # too-many-return-statements
-    "PLR0912", # too-many-branches
-    "PLR0913", # too-many-arguments
-    "PLR0915", # too-many-statements
-    "PLR1704", # redefined-argument-from-local
-    "PLR2004", # magic-value-comparison
-    "PLW0603", # global-statement
-    "PLW0642", # self-or-cls-assignment
-    "PLW2901", # redefined-loop-name
-    "PTH119", # TODO
-    "Q", # Ruff recommends against using this rule alongside the formatter.
-    "RUF012", # Maybe can re-enable after https://github.com/astral-sh/ruff/issues/5243
-    "S", # flake8-bandit
-    "SLF001", # private-member-access
-    "TD002", # Not applicable
-    "TD003", # Not applicable
-    "TRY003", # raise-vanilla-args
-    "TRY400", # Rejected by @gazpachoking in https://github.com/Flexget/Flexget/pull/4249#issuecomment-2656387500
+[tool.coverage.report]
+exclude_also = [
+  "if TYPE_CHECKING",
 ]
-explicit-preview-rules = true
-future-annotations = true
-select = ["ALL"]
 
-[tool.ruff.lint.flake8-type-checking]
-quote-annotations = true
+[tool.coverage.run]
+branch = true
 
-[tool.ruff.lint.isort]
-known-first-party = ['flexget']
-
-[tool.ruff.lint.per-file-ignores]
-'docs/scripts/*'=['T20']
-"flexget/*"=["PTH"] # TODO
-'scripts/*' = ['T20']
-'tests/*' = ['T20']
-
-[tool.ruff.format]
-quote-style = "single"
+[tool.doc8]
+ignore = [ "D004" ]
+max_line_length = 99
