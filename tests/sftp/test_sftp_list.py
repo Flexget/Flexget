@@ -198,7 +198,7 @@ class TestSftpList:
                 'url': 'sftp://test_user:test_pass@127.0.0.1:40022/home/test_user/dir',
                 'content_size': 100,
             },
-            allow_unexpected_entires=True,
+            allow_unexpected_entries=True,
         )
 
     def test_sftp_list_symlink_file(
@@ -277,7 +277,7 @@ def assert_entries(
     task: Task,
     entry_matcher: dict[str, Any],
     *argv: dict[str, Any],
-    allow_unexpected_entires: bool = False,
+    allow_unexpected_entries: bool = False,
 ):
     """Assert that the entries generated for a given task match the list of dictionaries given as entry matches.
 
@@ -286,17 +286,17 @@ def assert_entries(
     :param task: Task to assert the entries from.
     :param entry_matcher: Dict continain the expected entry values, must have at least a 'title'
                           set.
-    :param allow_unexpected_entires: bool to assert if there are any additional entries generated
+    :param allow_unexpected_entries: bool to assert if there are any additional entries generated
                                      that matchers arn't specified for.
     """
     expected = [m['title'] for m in [entry_matcher, *argv]]
     found = [m['title'] for m in task.all_entries]
-    if not allow_unexpected_entires:
+    if not allow_unexpected_entries:
         unexpected: list[str] = [title for title in found if title not in expected]
         assert not unexpected, f'Found unexpected entries {unexpected}'
 
     not_found: list[str] = [title for title in expected if title not in found]
-    assert not not_found, f'Entires not found {not_found} in {found}'
+    assert not not_found, f'Entries not found {not_found} in {found}'
 
     for matcher in [entry_matcher, *argv]:
         entry = task.find_entry(title=matcher['title'])
@@ -311,7 +311,7 @@ def assert_entries(
 def assert_no_entries(task: Task):
     """Assert that there are no entries generated for a given task.
 
-    :param task: Task to assert no entires are generated for.
+    :param task: Task to assert no entries are generated for.
     """
     assert len(task.all_entries) == 0, (
         f'Expected no entries, but found {[m["title"] for m in task.all_entries]}'

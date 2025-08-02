@@ -141,7 +141,7 @@ class InputGazelle:
         task.no_entries_ok = True
 
     def resume_session(self):
-        """Resume an existing session from the datebase.
+        """Resume an existing session from the database.
 
         Return True on successful recovery, False otherwise
         """
