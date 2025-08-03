@@ -5,4 +5,4 @@ contact_links:
     about: Use GitHub discussions for message-board style questions and discussions.
   - name: Report an issue with Web UI
     url: https://github.com/Flexget/webui/issues/new/choose
-    about: Please report issues for our Web UI in the `webui` repository.
+    about: Please report issues for our Web UI in the Flexget/webui repository.

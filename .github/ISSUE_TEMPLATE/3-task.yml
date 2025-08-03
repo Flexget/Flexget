@@ -1,0 +1,17 @@
+name: Task
+description: Describe a task that needs to be completed
+type: Task
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Before You Start...**
+
+        - Read the [issue guidelines](https://github.com/Flexget/Flexget/blob/develop/.github/CONTRIBUTING.md#issues)
+  - type: textarea
+    attributes:
+      label: Summary
+      description: >
+        Provide a clear and concise description of the task.
+    validations:
+      required: true
