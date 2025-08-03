@@ -12,7 +12,7 @@ repos:
       - id: prettier
         args: [--single-quote]
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.12.5
+    rev: v0.12.7
     hooks:
       - id: ruff-check
         args: [--fix]
