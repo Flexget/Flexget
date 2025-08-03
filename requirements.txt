@@ -22,7 +22,7 @@ brotli==1.1.0 ; platform_python_implementation != 'PyPy'
     # via flask-compress
 brotlicffi==1.1.0.0 ; platform_python_implementation == 'PyPy'
     # via flask-compress
-certifi==2025.7.14
+certifi==2025.8.3
     # via requests
 cffi==1.17.1 ; platform_python_implementation == 'PyPy'
     # via brotlicffi
@@ -169,7 +169,7 @@ six==1.17.0
     #   python-dateutil
 soupsieve==2.7
     # via beautifulsoup4
-sqlalchemy==2.0.41
+sqlalchemy==2.0.42
     # via flexget
 tempora==5.8.1
     # via portend
