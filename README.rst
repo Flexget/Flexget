@@ -5,16 +5,16 @@
 
 |
 
-.. image:: https://img.shields.io/pypi/v/Flexget.svg
+.. image:: https://img.shields.io/pypi/v/flexget?style=flat-square&logo=pypi
    :target: https://pypi.org/project/flexget/
 
-.. image:: https://img.shields.io/docker/v/flexget/flexget?logo=docker&logoColor=aqua&label=docker%20image&color=aqua
+.. image:: https://img.shields.io/docker/v/flexget/flexget/latest?style=flat-square&logo=docker&label=docker
    :target: https://hub.docker.com/r/flexget/flexget
 
-.. image:: https://img.shields.io/pypi/pyversions/Flexget.svg
+.. image:: https://img.shields.io/pypi/pyversions/flexget?style=flat-square&logo=python
    :target: https://pypi.org/project/flexget/
 
-.. image:: https://codecov.io/gh/Flexget/Flexget/graph/badge.svg
+.. image:: https://img.shields.io/codecov/c/github/flexget/flexget?style=flat-square&logo=codecov
    :target: https://codecov.io/gh/Flexget/Flexget
 
 ..
@@ -22,20 +22,14 @@
    .. image:: https://api.codacy.com/project/badge/Grade/86bb847efe984c12948bdeccabcbccad
       :target: https://www.codacy.com/app/Flexget/Flexget?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Flexget/Flexget&amp;utm_campaign=Badge_Grade
 
-.. image:: https://github.com/Flexget/Flexget/actions/workflows/test.yml/badge.svg?branch=develop
+.. image:: https://img.shields.io/github/actions/workflow/status/flexget/flexget/test.yml?style=flat-square&logo=github&label=tests
    :target: https://github.com/Flexget/Flexget/actions/workflows/test.yml?query=branch%3Adevelop
 
-.. image:: https://readthedocs.org/projects/flexget/badge/?version=latest
+.. image:: https://img.shields.io/readthedocs/flexget?style=flat-square&logo=readthedocs
    :target: https://flexget.readthedocs.io/en/latest/
 
-.. image:: http://isitmaintained.com/badge/resolution/Flexget/Flexget.svg
-   :target: http://isitmaintained.com/project/Flexget/Flexget
-
-.. image:: https://img.shields.io/discord/536690097056120833?label=discord
+.. image:: https://img.shields.io/discord/536690097056120833?style=flat-square&logo=discord&label=discord
    :target: https://discord.gg/W6CQrJx
-
-.. image:: https://img.shields.io/badge/Libera%20chat-%23flexget-orange
-   :target: https://web.libera.chat/#flexget
 
 `FlexGet`_ is a multipurpose automation tool for content like torrents, nzbs,
 podcasts, comics, series, movies, etc. It can use different kinds of sources
