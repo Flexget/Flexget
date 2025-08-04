@@ -1,0 +1,20 @@
+name: Close pre-commit-ci pull requests
+on:
+  pull_request:
+    paths: [.pre-commit-config.yaml]
+    types: [opened]
+permissions: {}
+jobs:
+  close-pr:
+    name: Close pre-commit-ci pull requests
+    if: github.event.pull_request.user.login == 'pre-commit-ci[bot]'
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Close pre-commit-ci[bot] pull requests
+        run: |
+          gh pr close ${{ github.event.pull_request.number }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
