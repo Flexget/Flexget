@@ -1,6 +1,6 @@
 ci:
   autoupdate_schedule: quarterly
-  skip: [renovate-config-validator, uv-lock]
+  skip: [uv-lock]
 repos:
   - repo: https://github.com/tox-dev/pyproject-fmt
     rev: v2.6.0
@@ -50,8 +50,3 @@ repos:
     rev: v1.7.7
     hooks:
       - id: actionlint
-  - repo: https://github.com/renovatebot/pre-commit-hooks
-    rev: 41.43.0
-    hooks:
-      - id: renovate-config-validator
-        args: [--strict]
