@@ -1,0 +1,22 @@
+name: Renovate config validation
+on:
+  push:
+    branches: [develop]
+    paths: [.github/renovate.json5]
+  pull_request:
+    paths: [.github/renovate.json5]
+permissions: {}
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.number || github.ref || github.run_id }}
+  cancel-in-progress: true
+jobs:
+  validate-renovate-config:
+    name: Validate Renovate config
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        with:
+          persist-credentials: false
+      - name: Validate Renovate config
+        run: npx --yes --package renovate@latest -- renovate-config-validator --strict
