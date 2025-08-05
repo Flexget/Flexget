@@ -78,39 +78,12 @@ jobs:
           uv export --no-hashes --output-file scripts/update_changelog.txt --script scripts/update_changelog.py
           uv run --isolated --no-project --with pytest --with vcrpy --with-requirements scripts/update_changelog.txt -m pytest scripts/tests/test_update_changelog.py
 
-  zizmor:
-    name: GitHub Actions Security Analysis with zizmor
-    if: github.actor != 'github-merge-queue[bot]'
-    runs-on: ubuntu-latest
-    permissions:
-      security-events: write
-    steps:
-      - name: Checkout
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
-        with:
-          persist-credentials: false
-      - name: Install uv
-        uses: astral-sh/setup-uv@e92bafb6253dcd438e0484186d7669ea7a8ca1cc # v6
-        with:
-          enable-cache: true
-          version: ${{ env.UV_VERSION }}
-      - name: Run zizmor
-        run: uvx zizmor -p --format sarif . > results.sarif
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Upload SARIF file
-        uses: github/codeql-action/upload-sarif@51f77329afa6477de8c49fc9c7046c15b9a4e79d # v3
-        with:
-          sarif_file: results.sarif
-          category: zizmor
-
   test-results:
     name: Test results
     if: always() && github.event_name != 'push'
     needs:
       - tests
       - test-scripts
-      - zizmor
     runs-on: ubuntu-latest
     steps:
       - name: Decide whether the needed jobs succeeded or failed

@@ -4,7 +4,15 @@ on:
   push:
     branches:
       - develop
+    paths:
+      - pyproject.toml
+      - uv.lock
+      - .github/workflows/autofix.yml # This is needed because there might be `uv.lock` changes caused by a uv update.
   pull_request_target: # zizmor: ignore[dangerous-triggers]
+    paths:
+      - pyproject.toml
+      - uv.lock
+      - .github/workflows/autofix.yml # This is needed because there might be `uv.lock` changes caused by a uv update.
 permissions: {}
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.number || github.ref || github.run_id }}
