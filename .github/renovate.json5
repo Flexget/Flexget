@@ -54,6 +54,12 @@
       matchManagers: ['pre-commit'],
     },
     {
+      description: 'Group all ruff updates together.',
+      groupName: 'ruff',
+      matchPackageNames: ['ruff', 'astral-sh/ruff-pre-commit'],
+      extends: [':automergeAll'],
+    },
+    {
       description: 'Group all uv updates together.',
       groupName: 'uv',
       matchPackageNames: [
