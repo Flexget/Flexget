@@ -205,6 +205,19 @@ max_supported_python = '3.14'
 
 [tool.pytest.ini_options]
 addopts = '-p no:legacypath --strict-markers'
+filterwarnings = [
+  'error',
+  "ignore:jsonschema.RefResolver is deprecated as of v4.18.0",     # triggered by `python-restx` Consider migrate to `flask-smorest` to eliminate it. See https://github.com/python-restx/flask-restx/issues/633#issuecomment-2962412240
+  "ignore:'count' is passed as positional argument",               # triggered by `feedparser`
+  'ignore:tzname PST identified but not understood.',              # triggered by `dateutil`
+  'ignore:tzname EDT identified but not understood.',              # triggered by `dateutil`
+  "ignore:unclosed file <_io.BufferedReader name='photo.png'>",    # triggered by `python-telegram-bot`
+  "ignore:unclosed file <_io.BufferedReader name='document.jpg'>", # triggered by `python-telegram-bot`
+  "ignore:unclosed file <_io.BufferedReader name='",               # needs investigation
+  "ignore:unclosed file <_io.TextIOWrapper name='",                # needs investigation
+  "ignore:Implicitly cleaning up <addinfourl at ",                 # needs investigation
+  'ignore:Failed to load HostKeys from',                           # triggered by `pysftp` intermittently
+]
 markers = [
   'filecopy(src, dst): mark test to copy a file from `src` to `dst` before running',
   'online: mark test that goes online. VCR will automatically be used.',

@@ -71,8 +71,6 @@ class TestTelegramNotifier:
                         bot_token: 7617087239:AAGUy118YHbBvGNwkDo4CDehF4gFgXq2ZqE
                         recipients:
                           - chat_id: -4882300333
-                        images:
-                          - document.jpg
         """
 
     def test_chat_id(self, execute_task):

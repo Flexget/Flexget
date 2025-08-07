@@ -1,5 +1,5 @@
 import re
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from unittest import mock
 
 import pytest
@@ -217,7 +217,7 @@ class TestTVDBExpire:
         test_run()
 
         # Should not expire as it was checked less then an hour ago
-        persist['last_check'] = datetime.utcnow() - timedelta(hours=1)
+        persist['last_check'] = datetime.now(timezone.utc) - timedelta(hours=1)
         with (
             mock.patch(
                 'requests.sessions.Session.request',
@@ -251,7 +251,7 @@ class TestTVDBExpire:
         test_run()
 
         # Should expire
-        persist['last_check'] = datetime.utcnow() - timedelta(hours=3)
+        persist['last_check'] = datetime.now(timezone.utc) - timedelta(hours=3)
 
         expired_data = [
             {'id': 73255, 'lastUpdated': 1458186055},

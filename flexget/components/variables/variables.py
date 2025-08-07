@@ -1,4 +1,3 @@
-import codecs
 import os
 from datetime import datetime
 
@@ -37,7 +36,7 @@ def variables_from_file(config_base, filename):
     if not os.path.exists(variables_file):
         raise PluginError(f'File {variables_file} does not exist!')
     try:
-        with codecs.open(variables_file, 'rb', 'utf-8') as f:
+        with open(variables_file, 'rb') as f:
             variables_dict = yaml.safe_load(f.read())
     except yaml.YAMLError as e:
         raise PluginError(f'Invalid variables file: {e}')

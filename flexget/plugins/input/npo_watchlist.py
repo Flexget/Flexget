@@ -234,7 +234,7 @@ class NPOWatchlist:
         if tiles is not None:
             for tile in tiles:
                 # there is only one list_item per tile
-                for list_item in get_soup(tile).findAll('div', class_='npo-asset-tile-container'):
+                for list_item in get_soup(tile).find_all('div', class_='npo-asset-tile-container'):
                     episode_id = list_item['data-id']
                     premium = 'npo-premium-content' in list_item['class']
                     logger.debug('Parsing episode: {}', episode_id)
