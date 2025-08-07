@@ -2,9 +2,13 @@ name: Renovate config validation
 on:
   push:
     branches: [develop]
-    paths: [.github/renovate.json5]
+    paths:
+      - .github/renovate.json5
+      - .github/workflows/renovate-config-validation.yml
   pull_request:
-    paths: [.github/renovate.json5]
+    paths:
+      - .github/renovate.json5
+      - .github/workflows/renovate-config-validation.yml
 permissions: {}
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.number || github.ref || github.run_id }}
