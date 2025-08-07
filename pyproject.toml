@@ -87,11 +87,12 @@ plugin-test = [
   # These are optional dependencies for plugins that have tests in the test suite
   # Tests that need these must add the `require_optional_deps` pytest mark
   "boto3~=1.35",
+  "paramiko~=3.5",
   "pillow~=11.0",
   "plexapi~=4.16",
-  "pysftp~=0.2.9",
+  "pysftp~=0.2.9",           # TODO: `pysftp` was last updated in 2016 and is merely a wrapper around `paramiko`. It is now incompatible with `paramiko` 4.0, so consider migrating to `paramiko` directly. See https://github.com/Flexget/Flexget/issues/4532
   "rarfile~=4.0",
-  "subliminal<2.3",          # TODO: Update subliminal after https://github.com/Diaoul/subliminal/issues/1302 is resolved.
+  "subliminal==2.2.1",       # TODO: Update subliminal after https://github.com/Diaoul/subliminal/issues/1302 is resolved.
   { include-group = "all" },
 ]
 deluge = [ "deluge-client~=1.10" ]
