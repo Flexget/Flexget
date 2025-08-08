@@ -94,7 +94,9 @@ else:
                 server = TestServer(
                     username=self.__username, password=self.__password, key_only=self.__key_only
                 )
-                transport.start_server(server=server)
+                # These exceptions are expected when the client finishes its work and closes the connection. We can treat this as a normal shutdown.
+                with contextlib.suppress(ConnectionResetError, EOFError):
+                    transport.start_server(server=server)
 
                 # TODO: Things break if we don't assign this to something?
                 channel = transport.accept()  # noqa: F841
