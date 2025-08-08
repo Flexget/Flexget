@@ -30,7 +30,6 @@ jobs:
       - name: Install uv and Python
         uses: astral-sh/setup-uv@e92bafb6253dcd438e0484186d7669ea7a8ca1cc # v6
         with:
-          enable-cache: true
           python-version: ${{ matrix.python-version }}
           version: ${{ env.UV_VERSION }}
       - name: Run tests not requiring optional dependencies
@@ -66,7 +65,6 @@ jobs:
       - name: Install uv and Python
         uses: astral-sh/setup-uv@e92bafb6253dcd438e0484186d7669ea7a8ca1cc # v6
         with:
-          enable-cache: true
           python-version: ${{ env.PYTHON_VERSION }}
           version: ${{ env.UV_VERSION }}
       - name: Run tests for scripts
