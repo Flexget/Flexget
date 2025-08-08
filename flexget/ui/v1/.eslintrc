@@ -68,7 +68,7 @@
 		"angular/typecheck-object": 2,
    		"angular/typecheck-string": 2,
 		"angular/window-service": 2,
-   
+
    		"no-use-before-define": 0
 	}
 }

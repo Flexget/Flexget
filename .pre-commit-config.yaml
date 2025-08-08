@@ -2,6 +2,26 @@ ci:
   autoupdate_schedule: quarterly
   skip: [uv-lock]
 repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-case-conflict
+      - id: check-executables-have-shebangs
+      - id: check-illegal-windows-names
+      - id: check-shebang-scripts-are-executable
+      - id: check-symlinks
+      - id: check-vcs-permalinks
+      - id: destroyed-symlinks
+      - id: end-of-file-fixer
+      - id: file-contents-sorter
+        files: .dockerignore
+      - id: file-contents-sorter
+        files: .gitignore
+      - id: fix-byte-order-marker
+      - id: mixed-line-ending
+        args: [--fix=lf]
+      - id: trailing-whitespace
+        exclude_types: [python]
   - repo: https://github.com/henryiii/validate-pyproject-schema-store
     rev: 2025.08.07
     hooks:
