@@ -225,7 +225,7 @@ def filecopy(request):
         dst = Path(dst)
         paths: itertools.chain[Path] = itertools.chain(
             *(Path().glob(str(src)) for src in sources)
-        )  # TODO: remove str(src) type convertion once Python 3.12 support dropped
+        )  # TODO: remove str(src) type conversion once Python 3.12 support dropped
         for f in paths:
             dest_path = dst
             if dest_path.is_dir():
@@ -382,7 +382,7 @@ class DoublePhaseChecker:
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(DoublePhaseChecker, 'test_dobule_phase', api_ver=2, debug=True, builtin=True)
+    plugin.register(DoublePhaseChecker, 'test_double_phase', api_ver=2, debug=True, builtin=True)
 
 
 class APIClient:

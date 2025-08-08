@@ -2,7 +2,7 @@
 describe('Config Routes:', function () {
   beforeEach(function () {
     //Create abstract parent state first
-    //TODO: create funcion for this, so we can just call the function and not need to inject the entire block everywhere
+    //TODO: create function for this, so we can just call the function and not need to inject the entire block everywhere
     module('ui.router', function ($stateProvider) {
       $stateProvider.state('flexget', { abstract: true });
     });

@@ -201,11 +201,11 @@ class SearchPassThePopcorn:
                     release_res = torrent['Resolution']
                     release_res = release_res.replace(
                         'PAL', '576p'
-                    )  # Common PAL DVD vertial resolution
+                    )  # Common PAL DVD vertical resolution
                     release_res = release_res.replace(
                         'NTSC', '480p'
-                    )  # Common NTSC DVD vertial resolution
-                    # many older releases have a resolution defined as 624x480 for example this will split the value at take the hight
+                    )  # Common NTSC DVD vertical resolution
+                    # many older releases have a resolution defined as 624x480 for example this will split the value at take the height
                     tsplit = release_res.split('x', 1)
                     if len(tsplit) > 1:
                         release_res = tsplit[1] + 'p'

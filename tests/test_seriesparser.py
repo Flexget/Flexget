@@ -451,7 +451,7 @@ class TestSeriesParser:
         s = parse('Red Tomato (US) S01E02 720p-FlexGet', name='Red Tomato', strict_name=True)
         assert not s.valid, 'Red Tomato (US) should not match Red Tomato in exact mode'
 
-    def test_name_word_boundries(self, parse):
+    def test_name_word_boundaries(self, parse):
         name = 'test'
         s = parse('Test.S01E02.720p-FlexGet', name=name)
         assert s.valid, 'normal failed'
