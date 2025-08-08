@@ -1,0 +1,84 @@
+interactions:
+- request:
+    body: '{"blocks": [{"type": "section", "text": {"type": "mrkdwn", "text": "<https://thetvdb.com/series/star-trek-picard/episodes/7550686|Star
+      Trek: Picard (S01E03)>"}}, {"type": "section", "text": {"type": "mrkdwn", "text":
+      "Completely unaware of her special nature, Soji continues her work and captures
+      the attention of the Borg cube research project\u2019s executive director. After
+      rehashing past events with a reluctant Raffi, Picard seeks others willing to
+      join his search for Bruce Maddox, including pilot and former Starfleet officer
+      Crist\u00f3bal Rios."}, "accessory": {"type": "image", "image_url": "https://api.slack.com/img/blocks/bkb_template_images/plants.png",
+      "alt_text": "plants"}, "fields": [{"type": "mrkdwn", "text": "*Score*"}, {"type":
+      "mrkdwn", "text": "*Genres*"}, {"type": "mrkdwn", "text": "8.6"}, {"type": "mrkdwn",
+      "text": "Action, Adventure, Drama, Sci-Fi"}, {"type": "mrkdwn", "text": "*Rating*"},
+      {"type": "mrkdwn", "text": "*Cast*"}, {"type": "mrkdwn", "text": "TV-MA"}, {"type":
+      "mrkdwn", "text": "Patrick Stewart,  Alison Pill,  Isa Briones,  Harry Treadaway
+      "}]}, {"type": "image", "image_url": "https://artworks.thetvdb.com/banners/v4/series/364093/posters/61e846a7440f8.jpg",
+      "alt_text": "Star Trek: Picard Banner"}, {"type": "divider"}, {"type": "context",
+      "elements": [{"type": "image", "image_url": "https://image.freepik.com/free-photo/red-drawing-pin_1156-445.jpg",
+      "alt_text": "red pin"}, {"type": "mrkdwn", "text": ":round_pushpin:"}, {"type":
+      "mrkdwn", "text": "Task: slack"}]}]}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate, br
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '1517'
+      Content-Type:
+      - application/json
+      User-Agent:
+      - FlexGet/3.17.8.dev (www.flexget.com)
+    method: POST
+    uri: https://hooks.slack.com/services/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
+  response:
+    body:
+      string: ok
+    headers:
+      access-control-allow-origin:
+      - '*'
+      content-encoding:
+      - br
+      content-length:
+      - '6'
+      content-type:
+      - text/html
+      date:
+      - Sun, 10 Aug 2025 09:10:02 GMT
+      referrer-policy:
+      - no-referrer
+      server:
+      - Apache
+      strict-transport-security:
+      - max-age=31536000; includeSubDomains; preload
+      timing-allow-origin:
+      - '*'
+      vary:
+      - Accept-Encoding
+      via:
+      - 1.1 slack-prod.tinyspeck.com, envoy-www-iad-gkaxujhk,envoy-edge-nrt-efigbjib
+      x-backend:
+      - main_normal main_canary_with_overflow main_control_with_overflow
+      x-edge-backend:
+      - envoy-www
+      x-envoy-attempt-count:
+      - '1'
+      x-envoy-upstream-service-time:
+      - '543'
+      x-frame-options:
+      - SAMEORIGIN
+      x-server:
+      - slack-www-hhvm-main-iad-yhxu
+      x-slack-backend:
+      - r
+      x-slack-edge-shared-secret-outcome:
+      - no-match
+      x-slack-shared-secret-outcome:
+      - no-match
+      x-slack-unique-id:
+      - aJhh6RNZ3ZRTOLBXO2aOigAAEAA
+    status:
+      code: 200
+      message: OK
+version: 1
