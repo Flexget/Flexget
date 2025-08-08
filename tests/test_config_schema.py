@@ -175,7 +175,7 @@ class TestSchemaFormats:
                 config_schema.format_checker.check(item, format)
                 if invalid:
                     failures.append(f"'{item}' should not be a valid '{format}")
-            except jsonschema.FormatError as e:
+            except jsonschema.exceptions.FormatError as e:
                 if not invalid:
                     failures.append(e.message)
         return failures

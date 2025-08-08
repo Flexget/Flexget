@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from loguru import logger
 from sqlalchemy import Boolean, Column, DateTime, Float, Integer, Table, Text, Unicode
@@ -762,17 +762,19 @@ def mark_expired(session):
     last_check = persist.get('last_check')
 
     if not last_check:
-        persist['last_check'] = datetime.utcnow()
+        persist['last_check'] = datetime.now(timezone.utc)
         return
-    if datetime.utcnow() - last_check <= timedelta(hours=2):
+    if datetime.now(timezone.utc) - last_check <= timedelta(hours=2):
         # It has been less than 2 hour, don't check again
         return
 
-    new_last_check = datetime.utcnow()
+    new_last_check = datetime.now(timezone.utc)
 
     try:
         # Calculate seconds since epoch minus a minute for buffer
-        last_check_epoch = int((last_check - datetime(1970, 1, 1)).total_seconds()) - 60
+        last_check_epoch = (
+            int((last_check - datetime(1970, 1, 1, tzinfo=timezone.utc)).total_seconds()) - 60
+        )
         logger.debug('Getting updates from thetvdb ({})', last_check_epoch)
         updates = TVDBRequest().get('updated/query', fromTime=last_check_epoch)
     except requests.RequestException as e:
