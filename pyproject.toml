@@ -93,7 +93,7 @@ plugin-test = [
   "plexapi~=4.16",
   "pysftp~=0.2.9",           # TODO: `pysftp` was last updated in 2016 and is merely a wrapper around `paramiko`. It is now incompatible with `paramiko` 4.0, so consider migrating to `paramiko` directly. See https://github.com/Flexget/Flexget/issues/4532
   "rarfile~=4.0",
-  "subliminal==2.2.1",       # TODO: Update subliminal after https://github.com/Diaoul/subliminal/issues/1302 is resolved.
+  "subliminal==2.3.2",       # TODO: Update subliminal after https://github.com/Diaoul/subliminal/issues/1302 is resolved.
   { include-group = "all" },
 ]
 deluge = [ "deluge-client~=1.10" ]
