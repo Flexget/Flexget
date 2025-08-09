@@ -146,8 +146,7 @@ class TimedLimiter(TokenBucketLimiter):
 
 
 class UrllibResponseWrapper:
-    """
-    A file-like object that wraps a urllib response, making it compatible
+    """A file-like object that wraps a urllib response, making it compatible
     with requests' streaming machinery and ensuring it gets closed properly.
     """
 
@@ -155,17 +154,12 @@ class UrllibResponseWrapper:
         self._urllib_response = urllib_response
         # Delegate all attributes except the ones we override
         # This makes our wrapper transparent for attributes like .headers, .code, etc.
-        self.__dict__.update(
-            {
-                k: v
-                for k, v in urllib_response.__dict__.items()
-                if not k.startswith('_')
-            }
-        )
+        self.__dict__.update({
+            k: v for k, v in urllib_response.__dict__.items() if not k.startswith('_')
+        })
 
     def read(self, size=-1, **kwargs):
-        """
-        Read from the response. The `decode_content` kwarg is ignored,
+        """Read from the response. The `decode_content` kwarg is ignored,
         as urllib handles content decoding transparently.
         """
         return self._urllib_response.read(size)
@@ -181,6 +175,8 @@ class UrllibResponseWrapper:
     def __iter__(self):
         """Allow iterating over the response."""
         return iter(self._urllib_response)
+
+
 def _wrap_urlopen(url: str, timeout: int | None = None) -> requests.Response:
     """Handle alternate schemes using urllib, wrap the response in a requests.Response.
 
