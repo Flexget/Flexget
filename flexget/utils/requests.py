@@ -145,21 +145,54 @@ class TimedLimiter(TokenBucketLimiter):
         super().__init__(domain, 1, interval)
 
 
+class UrllibResponseWrapper:
+    """A file-like object that wraps a urllib response, making it compatible
+    with requests' streaming machinery and ensuring it gets closed properly.
+    """
+
+    def __init__(self, urllib_response):
+        self._urllib_response = urllib_response
+        # Delegate all attributes except the ones we override
+        # This makes our wrapper transparent for attributes like .headers, .code, etc.
+        self.__dict__.update({
+            k: v for k, v in urllib_response.__dict__.items() if not k.startswith('_')
+        })
+
+    def read(self, size=-1, **kwargs):
+        """Read from the response. The `decode_content` kwarg is ignored,
+        as urllib handles content decoding transparently.
+        """
+        return self._urllib_response.read(size)
+
+    def close(self):
+        """Ensure the underlying urllib response is closed."""
+        return self._urllib_response.close()
+
+    def __getattr__(self, name):
+        """Delegate any other attribute access to the underlying response object."""
+        return getattr(self._urllib_response, name)
+
+    def __iter__(self):
+        """Allow iterating over the response."""
+        return iter(self._urllib_response)
+
+
 def _wrap_urlopen(url: str, timeout: int | None = None) -> requests.Response:
     """Handle alternate schemes using urllib, wrap the response in a requests.Response.
 
     This is not installed as an adapter in requests, since urls without network locations
-    (e.g. file:///somewhere) will cause errors
-
+    (e.g. file:///somewhere) will cause errors.
+    This wrapper ensures that the underlying urllib object is closed correctly.
     """
     try:
         raw = urlopen(url, timeout=timeout)
     except OSError as e:
         msg = f'Error getting {url}: {e}'
         logger.error(msg)
-        raise RequestException(msg)
+        raise RequestException(msg) from e
     resp = requests.Response()
-    resp.raw = raw
+    # Wrap the raw urllib response to ensure it's handled correctly by requests
+    resp.raw = UrllibResponseWrapper(raw)
     # requests passes the `decode_content` kwarg to read
     orig_read = raw.read
     resp.raw.read = lambda size, **kwargs: orig_read(size)

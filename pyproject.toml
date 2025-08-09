@@ -215,8 +215,7 @@ filterwarnings = [
   "ignore:unclosed file <_io.BufferedReader name='document.jpg'>", # triggered by `python-telegram-bot`
   "ignore:unclosed file <_io.BufferedReader name='",               # needs investigation
   "ignore:unclosed file <_io.TextIOWrapper name='",                # needs investigation
-  "ignore:Implicitly cleaning up <addinfourl at ",                 # needs investigation
-  'ignore:Failed to load HostKeys from',                           # triggered by `pysftp` intermittently
+  'ignore:Failed to load HostKeys from',                           # needs investigation — related to `pysftp`, occurs intermittently
 ]
 markers = [
   'filecopy(src, dst): mark test to copy a file from `src` to `dst` before running',
