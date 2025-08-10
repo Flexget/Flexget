@@ -12,7 +12,7 @@ beautifulsoup4==4.13.4
     # via pydata-sphinx-theme
 certifi==2025.8.3
     # via requests
-charset-normalizer==3.4.2
+charset-normalizer==3.4.3
     # via requests
 colorama==0.4.6 ; sys_platform == 'win32'
     # via sphinx
