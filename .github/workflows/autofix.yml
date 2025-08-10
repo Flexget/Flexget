@@ -16,7 +16,7 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.number || github.ref || github.run_id }}
   cancel-in-progress: true
 env:
-  UV_VERSION: 0.8.4 # renovate: datasource=pypi depName=uv
+  UV_VERSION: 0.8.8 # renovate: datasource=pypi depName=uv
 jobs:
   uv-lock:
     name: autofix uv.lock
