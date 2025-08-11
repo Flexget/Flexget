@@ -214,7 +214,6 @@ filterwarnings = [
   "ignore:unclosed file <_io.BufferedReader name='photo.png'>",    # triggered by `python-telegram-bot`
   "ignore:unclosed file <_io.BufferedReader name='document.jpg'>", # triggered by `python-telegram-bot`
   "ignore:unclosed file <_io.BufferedReader name='",               # needs investigation
-  "ignore:unclosed file <_io.TextIOWrapper name='",                # needs investigation
   'ignore:Failed to load HostKeys from',                           # needs investigation — related to `pysftp`, occurs intermittently
 ]
 markers = [
