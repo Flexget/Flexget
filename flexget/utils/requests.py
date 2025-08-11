@@ -3,6 +3,7 @@ from __future__ import annotations
 import abc
 import logging
 import time
+import types
 
 # Allow some request objects to be imported from here instead of requests
 import warnings
@@ -165,6 +166,12 @@ def _wrap_urlopen(url: str, timeout: int | None = None) -> requests.Response:
     resp.raw.read = lambda size, **kwargs: orig_read(size)
     resp.status_code = raw.code or 200
     resp.headers = requests.structures.CaseInsensitiveDict(raw.headers)
+    if url.startswith('file://'):
+
+        def close(self):
+            self.raw.close()
+
+        resp.close = types.MethodType(close, resp)
     return resp
 
 
