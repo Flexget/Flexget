@@ -761,20 +761,19 @@ def mark_expired(session):
     # Only get the expired list every hour
     last_check = persist.get('last_check')
 
+    utcnow = datetime.now(timezone.utc).replace(tzinfo=None)
     if not last_check:
-        persist['last_check'] = datetime.now(timezone.utc)
+        persist['last_check'] = utcnow
         return
-    if datetime.now(timezone.utc) - last_check <= timedelta(hours=2):
+    if utcnow - last_check <= timedelta(hours=2):
         # It has been less than 2 hour, don't check again
         return
 
-    new_last_check = datetime.now(timezone.utc)
+    new_last_check = utcnow
 
     try:
         # Calculate seconds since epoch minus a minute for buffer
-        last_check_epoch = (
-            int((last_check - datetime(1970, 1, 1, tzinfo=timezone.utc)).total_seconds()) - 60
-        )
+        last_check_epoch = int((last_check - datetime(1970, 1, 1)).total_seconds()) - 60
         logger.debug('Getting updates from thetvdb ({})', last_check_epoch)
         updates = TVDBRequest().get('updated/query', fromTime=last_check_epoch)
     except requests.RequestException as e:
