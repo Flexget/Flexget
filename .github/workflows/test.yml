@@ -37,7 +37,7 @@ jobs:
         run: uv run pytest -m 'not require_optional_deps' -n logical --cov --cov-branch --cov-report=xml --dist loadgroup --junit-xml core_test_results.xml
       - name: Run tests requiring optional dependencies
         if: ${{!cancelled() && steps.core-tests.outcome != 'skipped'}}
-        run: uv run --group plugin-test pytest -m 'require_optional_deps' -n logical --cov --cov-append --cov-branch --cov-report=xml --dist loadgroup --junit-xml optional_test_results.xml
+        run: uv run --group all pytest -m 'require_optional_deps' -n logical --cov --cov-append --cov-branch --cov-report=xml --dist loadgroup --junit-xml optional_test_results.xml
       - name: Upload test results to Codecov
         if: ${{ !cancelled() }}
         uses: codecov/test-results-action@47f89e9acb64b76debcd5ea40642d25a4adced9f # v1

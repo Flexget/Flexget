@@ -84,26 +84,32 @@ docs = [
   "sphinx-copybutton~=0.5",
   "sphinx-design~=0.6",
 ]
-plugin-test = [
-  # These are optional dependencies for plugins that have tests in the test suite
-  # Tests that need these must add the `require_optional_deps` pytest mark
-  "boto3~=1.35",
-  "paramiko~=3.5",
-  "pillow~=11.0",
-  "plexapi~=4.16",
-  "pysftp~=0.2.9",           # TODO: `pysftp` was last updated in 2016 and is merely a wrapper around `paramiko`. It is now incompatible with `paramiko` 4.0, so consider migrating to `paramiko` directly. See https://github.com/Flexget/Flexget/issues/4532
-  "rarfile~=4.0",
-  "subliminal==2.2.1",       # TODO: Update subliminal after https://github.com/Diaoul/subliminal/issues/1302 is resolved.
-  { include-group = "all" },
-]
+boto3 = [ "boto3~=1.35" ]
 deluge = [ "deluge-client~=1.10" ]
+ftp = [ "ftputil~=5.1" ]
+plexapi = [ "plexapi~=4.16" ]
 qbittorrent = [ "qbittorrent-api~=2025.2" ]
-telegram = [ "python-telegram-bot[http2,socks]~=22.0" ]
+rarfile = [ "rarfile~=4.0" ]
+sftp = [
+  "paramiko~=3.5",
+  "pysftp~=0.2.9", # TODO: `pysftp` was last updated in 2016 and is merely a wrapper around `paramiko`. It is now incompatible with `paramiko` 4.0, so consider migrating to `paramiko` directly. See https://github.com/Flexget/Flexget/issues/4532
+]
+subliminal = [
+  "subliminal==2.2.1", # TODO: Update subliminal after https://github.com/Diaoul/subliminal/issues/1302 is resolved.
+]
+telegram = [ "pillow~=11.0", "python-telegram-bot[http2,socks]~=22.0" ]
 transmission = [ "transmission-rpc~=7.0" ]
-# This is all our optional deps installable via extras. Not actually 'all'
+# This is all our optional deps installable via extras, not actually 'all'.
+# Tests that need these must add the `require_optional_deps` pytest mark.
 all = [
+  { include-group = "boto3" },
   { include-group = "deluge" },
+  { include-group = "ftp" },
+  { include-group = "plexapi" },
   { include-group = "qbittorrent" },
+  { include-group = "rarfile" },
+  { include-group = "sftp" },
+  { include-group = "subliminal" },
   { include-group = "telegram" },
   { include-group = "transmission" },
 ]
@@ -111,7 +117,19 @@ all = [
 [tool.hatch.metadata.hooks.custom]
 # Extras with locked dependencies will be generated if BUILD_LOCKED env variable is specified
 path = "scripts/build_locked_extras.py"
-locked-groups = [ "deluge", "qbittorrent", "telegram", "transmission", "all" ]
+locked-groups = [
+  'boto3',
+  "deluge",
+  'ftp',
+  'plexapi',
+  "qbittorrent",
+  'rarfile',
+  'sftp',
+  'subliminal',
+  "telegram",
+  "transmission",
+  "all",
+]
 
 [tool.hatch.version]
 path = "flexget/_version.py"
