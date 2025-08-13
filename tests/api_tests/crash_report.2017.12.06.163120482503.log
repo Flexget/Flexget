@@ -22,7 +22,7 @@
 2017-12-06 16:31 VERBOSE  details       t_e             Summary - Accepted: 1 (Rejected: 0 Undecided: 0 Failed: 0)
 2017-12-06 16:31 VERBOSE  list_add      t_e             adding accepted entries into entry_list - test
 2017-12-06 16:31 DEBUG    entry_list    t_e             adding entry <Entry(title=My Show S01E01,state=accepted)> to list test
-2017-12-06 16:31 CRITICAL task          t_e             BUG: Unhandled error in plugin list_add: 
+2017-12-06 16:31 CRITICAL task          t_e             BUG: Unhandled error in plugin list_add:
 Traceback (most recent call last):
   File "/Users/orcarmi/PycharmProjects/Flexget/flexget/task.py", line 486, in __run_plugin
     return method(*args, **kwargs)

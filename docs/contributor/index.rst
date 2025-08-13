@@ -44,4 +44,3 @@ we list them in alphabetical order):
    :caption: About the project
 
    About the project/Contributors and collaborators
-

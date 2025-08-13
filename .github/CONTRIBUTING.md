@@ -44,7 +44,7 @@ prefix with with square brackets and one of the following tags, followed by plug
 - `deprecate` or `deprecated` for the `Deprecated` category
 - `remove` or `removed` for the `Removed` category.
 
-Example:  
+Example:\
 `[add] pending_approval - Pending approval plugin, CLI & API`
 
 Note that the changelog can always be updated manually, but sticking to this structure allows for easier generation.
