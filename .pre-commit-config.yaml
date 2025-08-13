@@ -14,6 +14,8 @@ repos:
       - id: destroyed-symlinks
       - id: end-of-file-fixer
       - id: file-contents-sorter
+        files: .github/CODEOWNERS
+      - id: file-contents-sorter
         files: .dockerignore
       - id: file-contents-sorter
         files: .gitignore
