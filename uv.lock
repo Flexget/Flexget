@@ -668,6 +668,15 @@ wheels = [
 ]
 
 [[package]]
+name = "defusedxml"
+version = "0.7.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/0f/d5/c66da9b79e5bdb124974bfe172b4daf3c984ebd9c2a06e2b8a4dc7331c72/defusedxml-0.7.1.tar.gz", hash = "sha256:1bb3032db185915b62d7c6209c5a8792be6a32ab2fedacc84e01b52c51aa3e69", size = 75520, upload-time = "2021-03-08T10:59:26.269Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/07/6c/aa3f2f849e01cb6a001cd8554a88d4c77c5c1a31c95bdf1cf9301e6d9ef4/defusedxml-0.7.1-py2.py3-none-any.whl", hash = "sha256:a352e7e428770286cc899e2542b6cdaedb2b4953ff269a210103ec58f6198a61", size = 25604, upload-time = "2021-03-08T10:59:24.45Z" },
+]
+
+[[package]]
 name = "deluge-client"
 version = "1.10.2"
 source = { registry = "https://pypi.org/simple" }
@@ -977,7 +986,7 @@ all = [
     { name = "python-telegram-bot", extras = ["http2", "socks"], specifier = "~=22.0" },
     { name = "qbittorrent-api", specifier = "~=2025.2" },
     { name = "rarfile", specifier = "~=4.0" },
-    { name = "subliminal", specifier = "==2.2.1" },
+    { name = "subliminal", specifier = "==2.3.2" },
     { name = "transmission-rpc", specifier = "~=7.0" },
 ]
 boto3 = [{ name = "boto3", specifier = "~=1.35" }]
@@ -1004,7 +1013,7 @@ sftp = [
     { name = "paramiko", specifier = "~=3.5" },
     { name = "pysftp", specifier = "~=0.2.9" },
 ]
-subliminal = [{ name = "subliminal", specifier = "==2.2.1" }]
+subliminal = [{ name = "subliminal", specifier = "==2.3.2" }]
 telegram = [
     { name = "pillow", specifier = "~=11.0" },
     { name = "python-telegram-bot", extras = ["http2", "socks"], specifier = "~=22.0" },
@@ -1322,6 +1331,22 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/bf/ce/46fbd9c8119cfc3581ee5643ea49464d168028cfb5caff5fc0596d0cf914/jsonschema_specifications-2025.4.1.tar.gz", hash = "sha256:630159c9f4dbea161a6a2205c3011cc4f18ff381b189fff48bb39b9bf26ae608", size = 15513, upload-time = "2025-04-23T12:34:07.418Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/01/0e/b27cdbaccf30b890c40ed1da9fd4a3593a5cf94dae54fb34f8a4b74fcd3f/jsonschema_specifications-2025.4.1-py3-none-any.whl", hash = "sha256:4653bffbd6584f7de83a67e0d620ef16900b390ddc7939d56684d6c81e33f1af", size = 18437, upload-time = "2025-04-23T12:34:05.422Z" },
+]
+
+[[package]]
+name = "knowit"
+version = "0.5.11"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "babelfish" },
+    { name = "enzyme" },
+    { name = "pymediainfo" },
+    { name = "pyyaml" },
+    { name = "trakit" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/98/aa/827183a60bdea775d408240dfa20d3ff46b110f0d82157a4419c7eb1aac6/knowit-0.5.11.tar.gz", hash = "sha256:9045d6640b1bd00fcc49f2f7e81992cdc6c7279767db199d7f3b63e2f5007b58", size = 59398, upload-time = "2025-07-29T17:19:49.334Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/15/cd/d130e3e87a4c91f7576e5cf7434c1c9a65bfc6aa79826d007d6dd65b2fb4/knowit-0.5.11-py3-none-any.whl", hash = "sha256:25f4632695f5aabb935f7ec5638de5170da5e3e400984c6694c4c9aee7cbb9b0", size = 40803, upload-time = "2025-07-29T17:19:48.103Z" },
 ]
 
 [[package]]
@@ -1941,6 +1966,19 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/b0/77/a5b8c569bf593b0140bde72ea885a803b82086995367bf2037de0159d924/pygments-2.19.2.tar.gz", hash = "sha256:636cb2477cec7f8952536970bc533bc43743542f70392ae026374600add5b887", size = 4968631, upload-time = "2025-06-21T13:39:12.283Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/c7/21/705964c7812476f378728bdf590ca4b771ec72385c533964653c68e86bdc/pygments-2.19.2-py3-none-any.whl", hash = "sha256:86540386c03d588bb81d44bc3928634ff26449851e99741617ecb9037ee5ec0b", size = 1225217, upload-time = "2025-06-21T13:39:07.939Z" },
+]
+
+[[package]]
+name = "pymediainfo"
+version = "7.0.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/4d/80/80a6fb21005b81e30f6193d45cba13857df09f5d483e0551fa6fbb3aaeed/pymediainfo-7.0.1.tar.gz", hash = "sha256:0d5df59ecc615e24c56f303b8f651579c6accab7265715e5d429186d7ba21514", size = 441563, upload-time = "2025-02-12T14:33:15.038Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a6/4a/d895646df3d3ff617b54d7f06a02ed9d6f5b86673030a543927310e0f7ed/pymediainfo-7.0.1-py3-none-macosx_10_10_universal2.whl", hash = "sha256:286f3bf6299be0997093254e0f371855bc5cf2aaf8641d19455a011e3ee3a84d", size = 6983332, upload-time = "2025-02-12T14:42:47.412Z" },
+    { url = "https://files.pythonhosted.org/packages/77/df/bc6b5a08e908c64a81f6ff169716d408ce7380ceff44e1eceb095f49e0dc/pymediainfo-7.0.1-py3-none-manylinux_2_27_aarch64.whl", hash = "sha256:3648e2379fa67bd02433d1e28c707df3a53834dd480680615a9fefd2266f1182", size = 5768082, upload-time = "2025-02-12T14:33:10.543Z" },
+    { url = "https://files.pythonhosted.org/packages/02/10/a9bc1446a48d3a15940eb1af79a71978f368f27e2cc86f9ec3ec2d206a20/pymediainfo-7.0.1-py3-none-manylinux_2_27_x86_64.whl", hash = "sha256:cde98112f1ce486589b17a12e5da42085faea996224f7c67fa45b8c1dca719c6", size = 6001553, upload-time = "2025-02-12T14:33:12.663Z" },
+    { url = "https://files.pythonhosted.org/packages/ed/7f/c48f8514cb60c9ff9be81b6f383e73e66c7461ef854a1b62628e3c823f13/pymediainfo-7.0.1-py3-none-win32.whl", hash = "sha256:01bcaf82b72cefbf4b96f13b2547e1b2e0e734bab7173d7c33f7f01acc07c98b", size = 3125046, upload-time = "2025-02-12T15:04:39.89Z" },
+    { url = "https://files.pythonhosted.org/packages/e7/26/9d50c2a330541bc36c0ea7ce29eeff5b0c35c2624139660df8bcfa9ae3ce/pymediainfo-7.0.1-py3-none-win_amd64.whl", hash = "sha256:13224fa7590e198763b8baf072e704ea81d334e71aa32a469091460e243893c7", size = 3271232, upload-time = "2025-02-12T15:07:13.672Z" },
 ]
 
 [[package]]
@@ -2778,7 +2816,7 @@ wheels = [
 
 [[package]]
 name = "subliminal"
-version = "2.2.1"
+version = "2.3.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "babelfish" },
@@ -2786,20 +2824,20 @@ dependencies = [
     { name = "chardet" },
     { name = "click" },
     { name = "click-option-group" },
+    { name = "defusedxml" },
     { name = "dogpile-cache" },
-    { name = "enzyme" },
     { name = "guessit" },
+    { name = "knowit" },
     { name = "platformdirs" },
     { name = "pysubs2" },
-    { name = "rarfile" },
     { name = "requests" },
     { name = "srt" },
     { name = "stevedore" },
-    { name = "tomli" },
+    { name = "tomlkit" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/e3/24/36cdb82e90afc602e2ed36c34e022ca545d35f5be9aa7ef9ddb0af7967b2/subliminal-2.2.1.tar.gz", hash = "sha256:2ed6024a07bbb3c68fe3db76374244ad91adfca9d93fc24d3ddb9ef61825756e", size = 3122221, upload-time = "2024-06-27T23:07:11.125Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/50/fc/24c86cc9bf5ef2543a14cbff1e71a81165e760e2dfc61814ac3d7d9bfa9d/subliminal-2.3.2.tar.gz", hash = "sha256:e9adee230b8bf46e27214da71ada18a3a0107d968005a25be3db5bc5855fb433", size = 3459550, upload-time = "2025-05-08T23:20:37.689Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/09/d1/cddf58f2556af8c6b353497cdd0e39efe4b75ae50f9e8cfdb7476e62c2f5/subliminal-2.2.1-py3-none-any.whl", hash = "sha256:421a71f2e3f604e5dffb551b2a51d14500c7615d7eaf16c23e713d7ad295504c", size = 87127, upload-time = "2024-06-27T23:07:08.841Z" },
+    { url = "https://files.pythonhosted.org/packages/82/73/b2fb112c699d786d73c35b1697c0f18ca2e10cefd05b96d369de5adad34d/subliminal-2.3.2-py3-none-any.whl", hash = "sha256:9ec9276f742c2273690de49f417aa6f9887d9751c0430c4518a33a28e8a83fff", size = 110565, upload-time = "2025-05-08T23:20:35.357Z" },
 ]
 
 [[package]]
@@ -2852,6 +2890,28 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/5b/b9/1ed31d167be802da0fc95020d04cd27b7d7065cc6fbefdd2f9186f60d7bd/tomli-2.2.1-cp313-cp313-win32.whl", hash = "sha256:d3f5614314d758649ab2ab3a62d4f2004c825922f9e370b29416484086b264ec", size = 98724, upload-time = "2024-11-27T22:38:32.837Z" },
     { url = "https://files.pythonhosted.org/packages/c7/32/b0963458706accd9afcfeb867c0f9175a741bf7b19cd424230714d722198/tomli-2.2.1-cp313-cp313-win_amd64.whl", hash = "sha256:a38aa0308e754b0e3c67e344754dff64999ff9b513e691d0e786265c93583c69", size = 109383, upload-time = "2024-11-27T22:38:34.455Z" },
     { url = "https://files.pythonhosted.org/packages/6e/c2/61d3e0f47e2b74ef40a68b9e6ad5984f6241a942f7cd3bbfbdbd03861ea9/tomli-2.2.1-py3-none-any.whl", hash = "sha256:cb55c73c5f4408779d0cf3eef9f762b9c9f147a77de7b258bef0a5628adc85cc", size = 14257, upload-time = "2024-11-27T22:38:35.385Z" },
+]
+
+[[package]]
+name = "tomlkit"
+version = "0.13.3"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/cc/18/0bbf3884e9eaa38819ebe46a7bd25dcd56b67434402b66a58c4b8e552575/tomlkit-0.13.3.tar.gz", hash = "sha256:430cf247ee57df2b94ee3fbe588e71d362a941ebb545dec29b53961d61add2a1", size = 185207, upload-time = "2025-06-05T07:13:44.947Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/bd/75/8539d011f6be8e29f339c42e633aae3cb73bffa95dd0f9adec09b9c58e85/tomlkit-0.13.3-py3-none-any.whl", hash = "sha256:c89c649d79ee40629a9fda55f8ace8c6a1b42deb912b2a8fd8d942ddadb606b0", size = 38901, upload-time = "2025-06-05T07:13:43.546Z" },
+]
+
+[[package]]
+name = "trakit"
+version = "0.2.5"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "babelfish" },
+    { name = "rebulk" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/59/0c/28f6a6f60cf58f383142c2daf73dd9b97cd8436e71f121a4bcb35e1b459e/trakit-0.2.5.tar.gz", hash = "sha256:d7e530ed82906eeadf7982d6a357883ae0490f34bbd18f8232b8fc5f250a4ae7", size = 34873, upload-time = "2025-07-29T17:04:55.348Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/77/b0/e1ec7c99a0bfb66b179f8cf15f7f2aad213289c5502175534e742a250288/trakit-0.2.5-py3-none-any.whl", hash = "sha256:216cf57faa658f7a47c0b356a616cb23dfb14626e505d0de723efc073c2294b9", size = 19164, upload-time = "2025-07-29T17:04:53.669Z" },
 ]
 
 [[package]]
