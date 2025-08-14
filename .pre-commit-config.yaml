@@ -18,6 +18,8 @@ repos:
       - id: file-contents-sorter
         files: .dockerignore
       - id: file-contents-sorter
+        files: .gitattributes
+      - id: file-contents-sorter
         files: .gitignore
       - id: fix-byte-order-marker
       - id: mixed-line-ending
