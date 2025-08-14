@@ -29,3 +29,4 @@ jobs:
           days-before-pr-close: ${{ env.DAYS_BEFORE_PR_CLOSE }}
           operations-per-run: 100
           ascending: true
+          exempt-pr-labels: dependencies

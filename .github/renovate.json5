@@ -8,7 +8,6 @@
     ':prConcurrentLimitNone',
     ':prHourlyLimitNone',
     ':preserveSemverRanges',
-    ':rebaseStalePrs',
   ],
   schedule: ['* 16-23 * * 0', '* 0-12 * * 1'],
   lockFileMaintenance: {
@@ -19,6 +18,7 @@
     'github-actions[bot]@users.noreply.github.com',
     '66853113+pre-commit-ci[bot]@users.noreply.github.com',
   ],
+  addLabels: ['dependencies'],
   customManagers: [
     {
       customType: 'regex',
