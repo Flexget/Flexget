@@ -307,7 +307,7 @@ class SearchAlphaRatio:
                     if src not in torrent_info:
                         continue
 
-                    # Some values are tagged with a ',' insted of a '.', replace them
+                    # Some values are tagged with a ',' instead of a '.', replace them
                     value = torrent_info[src].text.replace(',', '.')
 
                     try:

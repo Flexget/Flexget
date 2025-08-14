@@ -45,8 +45,8 @@ class NPOWatchlist:
           auto_escape: yes
           on_output:
             for_accepted:
-              - download-npo -o "path/to/directory/{{series_name_plain}}" -f "{serie_titel} - {datum} \
-                  {aflevering_titel} ({episode_id})" -t {{url}}
+              - download-npo -o "path/to/directory/{{series_name_plain}}" -f "{series_title} - {datum} \
+                  {aflevering_title} ({episode_id})" -t {{url}}
     """
 
     schema = {
@@ -121,7 +121,7 @@ class NPOWatchlist:
 
             if 'isAuthenticatedUser' not in requests.cookies:
                 raise plugin.PluginError('Failed to login. Check username and password.')
-            logger.debug('Succesfully logged in: {}', email)
+            logger.debug('Successfully logged in: {}', email)
         except RequestException as e:
             raise plugin.PluginError(f'Request error: {e!s}')
 

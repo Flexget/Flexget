@@ -53,5 +53,5 @@ class TestUniques:
     def test_missing_field(self, execute_task):
         """Unique plugin: Ensure we ignore entries with missing fields."""
         task = execute_task('missing_field')
-        assert len(task.rejected) == 1, 'should reject 1 entires'
+        assert len(task.rejected) == 1, 'should reject 1 entries'
         assert task.rejected[0]['title'] == 'bla3', 'should reject bla3'

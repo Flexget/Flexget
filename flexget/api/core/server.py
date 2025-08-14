@@ -562,7 +562,7 @@ class LogParser:
 
 @server_api.route('/crash_logs/')
 class ServerCrashLogAPI(APIResource):
-    @api.response(200, 'Succesfully retreived crash logs', model=crash_logs_schema)
+    @api.response(200, 'Successfully retrieved crash logs', model=crash_logs_schema)
     def get(self, session: Session):
         """Get Crash logs."""
         path = self.manager.config_base

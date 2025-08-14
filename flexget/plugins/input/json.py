@@ -24,7 +24,7 @@ class Json:
         - <entry field>: <corresponding JSON key>
 
     Note: each entry must have at least two fields, 'title' and 'url'. If not specified in the config,
-    this plugin asssumes that keys named 'title' and 'url' exist within the JSON.
+    this plugin assumes that keys named 'title' and 'url' exist within the JSON.
     'encoding' defaults to 'utf-8'
 
     Example::

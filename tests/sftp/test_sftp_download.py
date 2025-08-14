@@ -56,7 +56,7 @@ class TestSftpDownload:
             sftp_download:
               to: {{ download_path }}
 
-          sftp_download_dir_recusive_true:
+          sftp_download_dir_recursive_true:
             mock:
               - *mock_dir
             accept_all: True
@@ -114,14 +114,14 @@ class TestSftpDownload:
         assert filecmp.dircmp(remote_file, download_path / 'dir/file.mkv')
         assert not (download_path / 'nested/file.mkv').exists()
 
-    def test_sftp_download_dir_recusive(
+    def test_sftp_download_dir_recursive(
         self, execute_task, download_path: Path, sftp_fs: TestSFTPFileSystem
     ):
         remote_dir = sftp_fs.create_dir('dir')
         sftp_fs.create_file('dir/file.mkv', 100)
         sftp_fs.create_file('dir/nested/file.mkv', 100)
 
-        execute_task('sftp_download_dir_recusive_true')
+        execute_task('sftp_download_dir_recursive_true')
         assert filecmp.dircmp(remote_dir, download_path / 'dir')
 
     def test_sftp_download_file_and_delete(

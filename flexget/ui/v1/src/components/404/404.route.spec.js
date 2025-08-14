@@ -28,8 +28,8 @@ describe('404 Routes: ', function () {
       expect($state.is('404')).to.be.true;
     });
 
-    it("should work with '/unkown' path", function () {
-      $location.path('/unkown');
+    it("should work with '/unknown' path", function () {
+      $location.path('/unknown');
       $rootScope.$digest();
       expect($state.is('404')).to.be.true;
     });

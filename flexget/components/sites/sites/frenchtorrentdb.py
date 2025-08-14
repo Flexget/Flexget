@@ -26,7 +26,7 @@ class UrlRewriteFTDB:
 
         new_url = self.parse_download_page(page_url, task.requests)
         logger.debug('PAGE URL NEEDED : {}', page_url)
-        logger.debug('{} OLD is rewrited to NEW {}', old_url, new_url)
+        logger.debug('{} OLD is rewritten to NEW {}', old_url, new_url)
         entry['url'] = new_url
 
     def parse_download_page(self, page_url, requests):
