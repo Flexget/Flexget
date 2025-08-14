@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import importlib
 import logging
+import sys
 import time
+import typing
 from base64 import b64decode
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -26,6 +28,9 @@ HOST_KEY_TYPES: dict = {
 }
 
 try:
+    # TODO: Python 3.14 compatibility workaround for PyNaCl — delete the code below when PyNaCl 1.6 is out. https://pypi.org/project/PyNaCl/
+    if sys.version_info[:2] == (3, 14):
+        typing.ByteString = None  # noqa: PYI057
     import paramiko
     import pysftp
 
