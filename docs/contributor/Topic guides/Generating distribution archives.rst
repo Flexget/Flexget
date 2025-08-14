@@ -28,7 +28,7 @@ Steps to generate distribution packages
 
          ::
 
-            $ $env:BUNDLE_WEBUI = true
+            $ $env:BUNDLE_WEBUI = 'true'
 
 #. To provide extras, the ``BUILD_LOCKED_EXTRAS`` environment variable must be set:
 
@@ -47,7 +47,7 @@ Steps to generate distribution packages
 
          ::
 
-            $ $env:BUILD_LOCKED_EXTRAS = true
+            $ $env:BUILD_LOCKED_EXTRAS = 'true'
 
    This environment variable prevents circular dependency resolution.
    Also see https://github.com/Flexget/Flexget/pull/4190.
