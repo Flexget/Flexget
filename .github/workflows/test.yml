@@ -70,11 +70,11 @@ jobs:
       - name: Run tests for scripts
         run: |
           uv export --no-hashes --output-file scripts/bundle_webui.txt --script scripts/bundle_webui.py
-          uv run --isolated --no-project --with pytest --with vcrpy --with-requirements scripts/bundle_webui.txt -m pytest scripts/tests/test_bundle_webui.py
+          uv run --isolated --no-project --with pytest --with vcrpy --with-requirements scripts/bundle_webui.txt -m pytest --override-ini filterwarnings=error scripts/tests/test_bundle_webui.py
           uv export --no-hashes --output-file scripts/dev_tools.txt --script scripts/dev_tools.py
-          uv run --isolated --no-project --with pytest --with vcrpy --with-requirements scripts/dev_tools.txt -m pytest scripts/tests/test_dev_tools.py
+          uv run --isolated --no-project --with pytest --with vcrpy --with-requirements scripts/dev_tools.txt -m pytest --override-ini filterwarnings=error scripts/tests/test_dev_tools.py
           uv export --no-hashes --output-file scripts/update_changelog.txt --script scripts/update_changelog.py
-          uv run --isolated --no-project --with pytest --with vcrpy --with-requirements scripts/update_changelog.txt -m pytest scripts/tests/test_update_changelog.py
+          uv run --isolated --no-project --with pytest --with vcrpy --with-requirements scripts/update_changelog.txt -m pytest --override-ini filterwarnings=error scripts/tests/test_update_changelog.py
 
   test-results:
     name: Test results

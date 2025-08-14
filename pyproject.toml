@@ -225,14 +225,12 @@ max_supported_python = '3.14'
 addopts = '-p no:legacypath --strict-markers'
 filterwarnings = [
   'error',
-  "ignore:jsonschema.RefResolver is deprecated as of v4.18.0",     # triggered by `python-restx` Consider migrate to `flask-smorest` to eliminate it. See https://github.com/python-restx/flask-restx/issues/633#issuecomment-2962412240
-  "ignore:'count' is passed as positional argument",               # triggered by `feedparser`
-  'ignore:tzname PST identified but not understood.',              # triggered by `dateutil`
-  'ignore:tzname EDT identified but not understood.',              # triggered by `dateutil`
-  "ignore:unclosed file <_io.BufferedReader name='photo.png'>",    # triggered by `python-telegram-bot`
-  "ignore:unclosed file <_io.BufferedReader name='document.jpg'>", # triggered by `python-telegram-bot`
-  "ignore:unclosed file <_io.BufferedReader name='",               # needs investigation
-  'ignore:Failed to load HostKeys from',                           # needs investigation — related to `pysftp`, occurs intermittently
+  "ignore:jsonschema.RefResolver is deprecated as of v4.18.0:DeprecationWarning:flask_restx.api",                            # Can’t be fixed, consider migrating to `flask-smorest` to eliminate it. See https://github.com/python-restx/flask-restx/issues/633#issuecomment-2962412240
+  "ignore:'count' is passed as positional argument:DeprecationWarning:feedparser.html",                                      # Can’t be fixed, feedparser is no longer maintained unless we migrate to an alternative library.
+  'ignore:tzname PST identified but not understood.:dateutil.parser._parser.UnknownTimezoneWarning:dateutil.parser._parser', # needs investigation, tests/test_input_sites.py::TestInputSites::test_apple_trailers_simple  tests/test_input_sites.py::TestInputSites::test_apple_trailers
+  'ignore:tzname EDT identified but not understood.:dateutil.parser._parser.UnknownTimezoneWarning:dateutil.parser._parser', # needs investigation, tests/test_rss.py::TestRssOnline::test_rss_online
+  "ignore:unclosed file <_io.BufferedReader name=':ResourceWarning",                                                         # needs investigation, tests/api_tests/test_cached_api.py::TestCachedAPI::test_cached_api
+  'ignore:Failed to load HostKeys from:UserWarning:pysftp',                                                                  # Can’t be fixed, https://stackoverflow.com/q/56521549 It's a bug in pysftp 0.2.9, not in 0.2.8
 ]
 markers = [
   'filecopy(src, dst): mark test to copy a file from `src` to `dst` before running',
