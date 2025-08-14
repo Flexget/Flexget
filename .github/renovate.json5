@@ -57,6 +57,7 @@
       description: 'Group all ruff updates together.',
       groupName: 'ruff',
       matchPackageNames: ['ruff', 'astral-sh/ruff-pre-commit'],
+      minimumGroupSize: 2,
       extends: [':automergeAll'],
     },
     {
@@ -67,6 +68,7 @@
         'ghcr.io/astral-sh/uv',
         'astral-sh/uv-pre-commit',
       ],
+      minimumGroupSize: 3,
       extends: [':automergeAll'],
     },
   ],
