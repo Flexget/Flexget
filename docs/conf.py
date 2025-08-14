@@ -106,6 +106,7 @@ html_theme_options = {
         },
     ],
     'navbar_center': ['version-switcher', 'navbar-nav'],
+    'back_to_top_button': False,
     'show_toc_level': 2,
     'use_edit_page_button': True,
     'footer_start': [],

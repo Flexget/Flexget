@@ -15,7 +15,7 @@ Running the tests
 =================
 
 If you need to run specific FlexGet tests locally, :ref:`additional testing dependencies
-<Installing additional testing dependencies>` must be installed.
+<Installing optional dependencies>` must be installed.
 
 To run all tests, simply execute:
 
@@ -176,7 +176,7 @@ Marks
 - For tests necessitating file duplication, one may leverage
   ``@pytest.mark.filecopy(source, destination)``, wherein ``source`` and ``destination`` may be
   instantiated as either ``str`` or ``Path``.
-- For tests contingent upon auxiliary dependencies (enumerated under the ``plugin-test`` group in
+- For tests contingent upon auxiliary dependencies (enumerated under the ``all`` group in
   ``pyproject.toml``), it is imperative to annotate them with
   ``@pytest.mark.require_optional_deps`` to ensure their execution within the CI pipeline.
 

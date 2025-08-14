@@ -63,31 +63,24 @@ following command::
 
       $ uv sync --group docs --inexact
 
-Installing extras
------------------
+.. _Installing optional dependencies:
 
-We provide several extras that install optional dependencies required by specific plugins:
+Installing optional dependencies
+--------------------------------
 
-- ``deluge``
-- ``qbittorrent``
-- ``transmission``
-- ``telegram``
-- ``all`` (this will include all of the above)
+To use and test certain plugins, you need to install optional dependencies.
+These can be installed using "extras".
 
-For example, to install ``deluge`` and ``qbittorrent``, run::
+Available extras include ``qbittorrent``, ``sftp``, and ``telegram``.
+For example, to install ``qbittorrent`` and ``telegram``, run::
 
-   $ uv sync --group deluge --group qbittorrent
+   $ uv sync --group qbittorrent --group telegram
 
-.. _Installing additional testing dependencies:
+All extras are listed in the ``[project.dependency-groups]`` table within the ``pyproject.toml``
+file. For convenience, an ``all`` extra is also provided, which will install all the optional
+dependencies at once. You can install it using::
 
-Installing additional testing dependencies
-------------------------------------------
-
-If you need to run specific FlexGet tests locally, additional testing dependencies must be
-installed. These dependencies are listed under the ``plugin-test`` group in ``pyproject.toml``
-and can be conveniently installed with::
-
-   $ uv sync --group plugin-test
+   $ uv sync --group all
 
 .. note::
    On Windows, running specific FlexGet tests requires enabling ``Developer Mode``.
