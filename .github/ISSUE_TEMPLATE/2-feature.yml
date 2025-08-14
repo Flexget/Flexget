@@ -1,5 +1,5 @@
 name: Feature request
-description: Suggest an idea for this project
+description: Suggest a request, idea, or new functionality
 type: Feature
 body:
   - type: markdown
@@ -8,6 +8,7 @@ body:
         **Before You Start...**
 
         - Read the [issue guidelines](https://github.com/Flexget/Flexget/blob/develop/.github/CONTRIBUTING.md#issues)
+        - Check if there is already an issue about the feature request
   - type: textarea
     attributes:
       label: Summary

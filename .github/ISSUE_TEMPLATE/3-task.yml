@@ -1,5 +1,5 @@
 name: Task
-description: Describe a task that needs to be completed
+description: Describe a specific piece of work
 type: Task
 body:
   - type: markdown
@@ -8,6 +8,7 @@ body:
         **Before You Start...**
 
         - Read the [issue guidelines](https://github.com/Flexget/Flexget/blob/develop/.github/CONTRIBUTING.md#issues)
+        - Check if there is already an issue about the task
   - type: textarea
     attributes:
       label: Summary

@@ -1,5 +1,5 @@
 name: Bug report
-description: Create a report to help us improve
+description: Report an unexpected problem or behavior
 type: Bug
 body:
   - type: markdown
@@ -8,7 +8,8 @@ body:
         **Before You Start...**
 
         - Read the [issue guidelines](https://github.com/Flexget/Flexget/blob/develop/.github/CONTRIBUTING.md#issues)
-        - Be aware that you should check the [upgrade actions](https://flexget.com/UpgradeActions) after updating to a major or minor version.
+        - Check if there is already an issue about the problem
+        - Be aware that you should check the [upgrade actions](https://flexget.com/UpgradeActions) after updating to a major or minor version
   - type: textarea
     attributes:
       label: Summary
@@ -32,9 +33,8 @@ body:
     attributes:
       label: Additional information
       value: |
-        **FlexGet version: **
-        **Python version: **
-        **Installation method: **
-        **Using daemon (yes/no): **
-        **OS and version: **
-        **Link to crash log: **
+        **FlexGet Version: **
+        **Python Version: **
+        **OS Version: **
+        **Installation Method: **
+        **Using Daemon (yes/no): **
