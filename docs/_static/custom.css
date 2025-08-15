@@ -6,8 +6,10 @@ html {
   padding: 0.3rem; /* To match the compact header. */
 }
 
-.bd-sidebar-primary {
-  width: 20%; /* Enlarge the document viewing area. */
+@media (min-width: 960px) {
+  .bd-sidebar-primary {
+    width: 20%; /* Enlarge the document viewing area. */
+  }
 }
 
 #ethical-ad-placement {
