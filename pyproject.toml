@@ -249,5 +249,5 @@ exclude_also = [
 branch = true
 
 [tool.doc8]
-ignore = [ "D004" ]
+ignore = [ 'D001', "D004" ]
 max_line_length = 99
