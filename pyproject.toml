@@ -87,6 +87,7 @@ docs = [
 boto3 = [ "boto3~=1.35" ]
 deluge = [ "deluge-client~=1.10" ]
 ftp = [ "ftputil~=5.1" ]
+matrix = [ "matrix-nio~=0.25.2" ]
 plexapi = [ "plexapi~=4.16" ]
 qbittorrent = [ "qbittorrent-api~=2025.2" ]
 rarfile = [ "rarfile~=4.0" ]
@@ -105,6 +106,7 @@ all = [
   { include-group = "boto3" },
   { include-group = "deluge" },
   { include-group = "ftp" },
+  { include-group = "matrix" },
   { include-group = "plexapi" },
   { include-group = "qbittorrent" },
   { include-group = "rarfile" },
@@ -121,6 +123,7 @@ locked-groups = [
   'boto3',
   "deluge",
   'ftp',
+  "matrix",
   'plexapi',
   "qbittorrent",
   'rarfile',
