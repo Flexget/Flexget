@@ -91,7 +91,7 @@ plexapi = [ "plexapi~=4.16" ]
 qbittorrent = [ "qbittorrent-api~=2025.2" ]
 rarfile = [ "rarfile~=4.0" ]
 sftp = [
-  "paramiko~=3.5",
+  "paramiko~=4.0",
   "pysftp~=0.2.9", # TODO: `pysftp` was last updated in 2016 and is merely a wrapper around `paramiko`. It is now incompatible with `paramiko` 4.0, so consider migrating to `paramiko` directly. See https://github.com/Flexget/Flexget/issues/4532
 ]
 subliminal = [
