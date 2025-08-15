@@ -1,11 +1,20 @@
 import os
 import sys
+from datetime import datetime
 from pathlib import Path
 
 from sphinx.util import logging
 
+import flexget
+
 logger = logging.getLogger(__name__)
 sys.path.append(str(Path.cwd()))
+
+# -- Project information -----------------------------------------------------
+
+project = 'FlexGet'
+copyright = f'2008-{datetime.now().year}, FlexGet Developers'
+release = flexget.__version__
 
 # -- General configuration ---------------------------------------------------
 
