@@ -1,11 +1,20 @@
 import os
 import sys
+from datetime import datetime
 from pathlib import Path
 
 from sphinx.util import logging
 
+import flexget
+
 logger = logging.getLogger(__name__)
 sys.path.append(str(Path.cwd()))
+
+# -- Project information -----------------------------------------------------
+
+project = 'FlexGet'
+copyright = f'2008-{datetime.now().year}, FlexGet Developers'
+release = flexget.__version__
 
 # -- General configuration ---------------------------------------------------
 
@@ -44,7 +53,7 @@ intersphinx_mapping = {
     'python': ('https://docs.python.org/3', None),
     'python-telegram-bot': ('https://docs.python-telegram-bot.org/en/stable', None),
     'requests': ('https://requests.readthedocs.io/en/stable', None),
-    'rich': ('https://rich.readthedocs.io/en/stable/', None),
+    'rich': ('https://rich.readthedocs.io/en/stable', None),
     'sqlalchemy': ('https://docs.sqlalchemy.org', None),
     'transmission-rpc': ('https://transmission-rpc.readthedocs.io/en/stable', None),
 }

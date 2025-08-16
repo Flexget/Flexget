@@ -44,6 +44,10 @@ repos:
       - id: ruff-check
         args: [--fix]
       - id: ruff-format
+  - repo: https://github.com/sphinx-contrib/sphinx-lint
+    rev: v1.0.0
+    hooks:
+      - id: sphinx-lint
   - repo: https://github.com/PyCQA/doc8
     rev: v2.0.0
     hooks:

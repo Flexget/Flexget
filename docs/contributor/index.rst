@@ -30,6 +30,7 @@ we list them in alphabetical order):
    Topic guides/List interface
    Topic guides/Docstrings and documentation
    Topic guides/Generating distribution archives
+   Topic guides/Maintainer guide/index
 
 .. toctree::
    :maxdepth: 2
