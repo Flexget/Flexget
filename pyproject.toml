@@ -95,7 +95,7 @@ sftp = [
   "pysftp~=0.2.9", # TODO: `pysftp` was last updated in 2016 and is merely a wrapper around `paramiko`. It is now incompatible with `paramiko` 4.0, so consider migrating to `paramiko` directly. See https://github.com/Flexget/Flexget/issues/4532
 ]
 subliminal = [
-  "subliminal==2.2.1", # TODO: Update subliminal after https://github.com/Diaoul/subliminal/issues/1302 is resolved.
+  "subliminal==2.3.2", # TODO: Update subliminal after https://github.com/Diaoul/subliminal/issues/1302 is resolved.
 ]
 telegram = [ "pillow~=11.0", "python-telegram-bot[http2,socks]~=22.0" ]
 transmission = [ "transmission-rpc~=7.0" ]
