@@ -101,7 +101,7 @@ class MovieParser(TitleParser):
         if cut_part != 256:
             logger.debug('parts: {}, cut is: {}', parts, parts[cut_part])
 
-        # calculate cut positon from cut_part
+        # calculate cut position from cut_part
         abs_cut = len(' '.join(parts[:cut_part]))
 
         logger.debug(

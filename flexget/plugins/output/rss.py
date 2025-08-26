@@ -94,7 +94,7 @@ class OutputRSS:
 
     RSS feed properties:
 
-    You can specify the URL, title, and description to include in tthe header
+    You can specify the URL, title, and description to include in the header
     of the RSS feed.
 
     Example::

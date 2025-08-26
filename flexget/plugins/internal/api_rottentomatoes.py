@@ -280,7 +280,7 @@ def lookup_movie(
     :param smart_match: attempt to clean and parse title and year from a string
     :param only_cached: if this is specified, an online lookup will not occur if the movie is not in the cache
     :param session: optionally specify a session to use, if specified, returned Movie will be live in that session
-    :param api_key: optionaly specify an API key to use
+    :param api_key: optionally specify an API key to use
     :returns: The Movie object populated with data from Rotten Tomatoes
     :raises: PluginError if a match cannot be found or there are other problems with the lookup
     """
@@ -405,7 +405,7 @@ def lookup_movie(
                                 continue
 
                         if not results:
-                            raise PluginError('no appropiate results')
+                            raise PluginError('no appropriate results')
 
                         if len(results) == 1:
                             logger.debug('SUCCESS: only one movie remains')

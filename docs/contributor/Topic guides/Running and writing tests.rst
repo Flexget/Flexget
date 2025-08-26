@@ -284,7 +284,7 @@ Example:
 
 This will generate one entry in the task, notice that entry has two mandatory
 fields ``title`` and ``url``. If ``url`` is not defined the mock plugin will
-generate random url for localhost. The ``description`` filed is just arbitary
+generate random url for localhost. The ``description`` filed is just arbitrary
 field that we define in here. We can define any kind of basic text, number, list
 or dictionary fields in here.
 
@@ -350,7 +350,7 @@ Example:
   $ flexget inject "another test title"
 
 The ``inject`` will disable any other inputs in the task. It is possible to set
-arbitrary fields trough inject much like with mock. See
+arbitrary fields through inject much like with mock. See
 `full documentation <https://flexget.com/en/CLI/inject>`__.
 
 Commandline values

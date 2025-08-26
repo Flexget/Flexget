@@ -309,7 +309,7 @@ class ParserGuessit:
                 ):
                     valid = False
             except GuessitException:
-                logger.warning('Parsing {} serie with guessit failed.', name)
+                logger.warning('Parsing {} series with guessit failed.', name)
 
         # Check the full list of 'episode_details' for special,
         # since things like 'pilot' and 'unaired' can also show up there

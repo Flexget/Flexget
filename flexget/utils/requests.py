@@ -25,7 +25,7 @@ logger = logger.bind(name='utils.requests')
 
 # Don't emit info level urllib3 log messages or below
 logging.getLogger('requests.packages.urllib3').setLevel(logging.WARNING)
-# same as above, but for systems where urllib3 isn't part of the requests pacakge (i.e., Ubuntu)
+# same as above, but for systems where urllib3 isn't part of the requests package (i.e., Ubuntu)
 logging.getLogger('urllib3').setLevel(logging.WARNING)
 
 # Time to wait before trying an unresponsive site again

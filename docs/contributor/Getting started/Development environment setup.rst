@@ -94,7 +94,7 @@ dependencies at once. You can install it using::
 Installing the docs dependencies
 --------------------------------
 
-If you want to build the documentaion locally, additional docs dependencies must be installed::
+If you want to build the documentation locally, additional docs dependencies must be installed::
 
    $ uv sync --group docs
 

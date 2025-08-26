@@ -291,7 +291,7 @@ class Episode(Base):
     def age(self):
         """Return Pretty string representing age of episode.
 
-        Exmaple: "23d 12h" or "No releases seen"
+        Example: "23d 12h" or "No releases seen"
         """
         if not self.first_seen:
             return 'No releases seen'

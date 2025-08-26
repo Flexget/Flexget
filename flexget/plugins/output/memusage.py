@@ -18,7 +18,7 @@ logger = logger.bind(name='mem_usage')
 # def update():
 #     print heapy.heap()
 #
-# # Print relative memory consumption since last sycle
+# # Print relative memory consumption since last cycle
 # def update():
 #     print heapy.heap()
 #     heapy.setref()

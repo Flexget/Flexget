@@ -244,7 +244,7 @@ filter_d = filter_default
 
 
 def filter_asciify(text: str) -> str:
-    """Siplify text."""
+    """Simplify text."""
     if not isinstance(text, str):
         return text
 

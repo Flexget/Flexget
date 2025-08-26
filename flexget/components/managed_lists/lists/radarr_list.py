@@ -78,7 +78,7 @@ def request_post_json(url, headers, data):
             if len(json_response) > 0 and 'errorMessage' in json_response[0]:
                 error_message = json_response[0]['errorMessage']
         except ValueError:
-            # Raised by response.json() if JSON couln't be decoded
+            # Raised by response.json() if JSON couldn't be decoded
             logger.error('Radarr returned non-JSON error result: {}', response.content)
 
         raise RadarrRequestError(
@@ -220,7 +220,7 @@ class RadarrAPIService:
 
 
 # Maps (lowercase) Radarr qualities to flexget
-# quality reqirement strings
+# quality requirement strings
 QUALITIES_MAP = {
     'workprint': 'workprint',
     'cam': 'cam',
@@ -409,7 +409,7 @@ class RadarrSet(MutableSet):
         # The following implementation is what's done in every other
         # list plugin. Does not makes sense.
         # As I understand it, it aims to be an override to base class Set._from_iterable.
-        # However, thats a classmethod and this does not even match its signature
+        # However, that's a classmethod and this does not even match its signature
         # https://blog.devzero.com/2013/01/28/how-to-override-a-class-method-in-python/
         return set(it)
 

@@ -115,7 +115,7 @@ class MyEpisodes:
                 logger.warning(w)
 
     def _validate_entry(self, entry):
-        """Check an entry for all of the fields needed to comunicate with myepidoes.
+        """Check an entry for all of the fields needed to communicate with myepidoes.
 
         Return: boolean
         """
@@ -279,7 +279,7 @@ class MyEpisodes:
         logger.info('Marked {} of `{}` as acquired.', entry['series_id'], entry['series_name'])
 
     def _login(self, config):
-        """Authenicate with the myepisodes service and return a requests session.
+        """Authenticate with the myepisodes service and return a requests session.
 
         Return:
             requests session

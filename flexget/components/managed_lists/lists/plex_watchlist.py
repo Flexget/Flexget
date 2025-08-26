@@ -65,7 +65,7 @@ class VideoStub:
     title: str
 
 
-# plexapi objects are build fomr XML. So we create a simple stub that works for watchlist calls
+# plexapi objects are build from XML. So we create a simple stub that works for watchlist calls
 def to_plex_item(entry):
     item = VideoStub()
     item.guid = entry['plex_guid']

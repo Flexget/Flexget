@@ -178,7 +178,7 @@ class DiscordNotifier:
                 tokens_reset = timedelta(
                     seconds=int(req.headers.get('x-ratelimit-reset-after', 3))
                 )
-                logger.trace(f'Remaining rate tokens: {tokens}. Resets afer {tokens_reset} secs.')
+                logger.trace(f'Remaining rate tokens: {tokens}. Resets after {tokens_reset} secs.')
                 session.add_domain_limiter(
                     TokenBucketLimiter('discord.com', tokens=tokens, rate=tokens_reset)
                 )

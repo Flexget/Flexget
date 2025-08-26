@@ -53,7 +53,7 @@ class SftpList:
     recursive             Indicates whether the listing should be recursive.
     get_size              Indicates whetern to calculate the size of the remote file/directory.
                           WARNING: This can be very slow when computing the size of directories!
-    files_only            Indicates wheter to omit diredtories from the results.
+    files_only            Indicates whether to omit diredtories from the results.
     dirs_only             Indicates whether to omit files from the results.
     dirs                  List of directories to download.
     socket_timeout_sec    Socket timeout in seconds (default 15 seconds).

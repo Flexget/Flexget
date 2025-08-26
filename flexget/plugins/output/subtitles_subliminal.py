@@ -55,7 +55,7 @@ class PluginSubliminal:
           authentication:
             legendastv:
               username: myuser
-              passsword: mypassword
+              password: mypassword
     """
 
     schema = {

@@ -106,14 +106,14 @@ class FilterImdb:
     def on_task_filter(self, task, config):
         lookup = plugin.get('imdb_lookup', self).lookup
 
-        # since the plugin does not reject anything, no sense going trough accepted
+        # since the plugin does not reject anything, no sense going through accepted
         for entry in task.undecided:
             force_accept = False
 
             try:
                 lookup(entry)
             except plugin.PluginError as e:
-                # logs skip message once trough log_once (info) and then only when ran from cmd line (w/o --cron)
+                # logs skip message once through log_once (info) and then only when ran from cmd line (w/o --cron)
                 log_once(
                     'Skipping {} because of an error: {}'.format(entry['title'], e.value),
                     logger=logger,

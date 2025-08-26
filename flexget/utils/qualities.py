@@ -51,7 +51,7 @@ class QualityComponent:
     def matches(self, text: str) -> tuple[bool, str]:
         """Test if quality matches to text.
 
-        :param string text: data te be tested against
+        :param string text: data to be tested against
         :returns: tuple (matches, remaining text without quality data)
         """
         qual_removed = self.regexp.sub('', text)

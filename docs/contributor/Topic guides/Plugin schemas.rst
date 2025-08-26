@@ -19,7 +19,7 @@ The following list of keywords is not exhaustive, just a general primer, as
 well as some FlexGet specific notes. The JSON schema spec should be referred to
 for more details, or if a keyword is not covered here. Take not that our
 schemas will be defined as python objects equivalent to parsed JSON. The full
-list of valid keywords can be found in the `validaton spec`_.
+list of valid keywords can be found in the `validation spec`_.
 
 .. _validaton spec: https://json-schema.org/latest/json-schema-validation
 
@@ -167,7 +167,7 @@ plugin or component of FlexGet::
 ^^^^^^^^^^^^^^^
 
 This keyword does not affect validation, it is merely used to define parts of
-your schema that may get re-used in more than one place. It should be in the
+your schema that may get reused in more than one place. It should be in the
 form of a dictionary mapping arbitrary names to a schema.
 
 The following schema defines a definition called posNumber, and references it

@@ -10,7 +10,7 @@ logger = logger.bind(name='emby_lookup')
 
 
 class EmbyLookup:
-    """Preforms Emby Lookup.
+    """Performs Emby Lookup.
 
     Example:
         emby_lookup:

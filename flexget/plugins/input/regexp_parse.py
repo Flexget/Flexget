@@ -133,7 +133,7 @@ class RegexpParse:
         self.required = []
 
     def flagstr_to_flags(self, flag_str):
-        """Turn a comma seperated list of flags into the int value."""
+        """Turn a comma separated list of flags into the int value."""
         combind_flags = 0
         split_flags = flag_str.split(',')
         for flag in split_flags:
@@ -175,15 +175,15 @@ class RegexpParse:
             content = resp.text
 
         sections = []
-        seperators = config.get('sections')
-        if seperators:
-            for sep in seperators:
+        separators = config.get('sections')
+        if separators:
+            for sep in separators:
                 flags = 0
                 if 'flags' in sep:
                     flags = self.flagstr_to_flags(sep['flags'])
                 sections.extend(re.findall(sep['regexp'], content, flags))
 
-        # no seperators just do work on the whole content
+        # no separators just do work on the whole content
         else:
             sections.append(content)
 

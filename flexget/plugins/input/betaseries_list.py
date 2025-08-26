@@ -16,7 +16,7 @@ API_URL_PREFIX = 'https://api.betaseries.com/'
 
 
 class BetaSeriesList:
-    """Emit an entry for each serie followed by one or more BetaSeries account.
+    """Emit an entry for each series followed by one or more BetaSeries account.
 
     See https://www.betaseries.com/
 
@@ -168,7 +168,7 @@ def query_series(api_key, user_token, member_name=None):
     :param string user_token: Obtained with a call to create_token()
     :param string member_name: [optional] A member name to get the list of series from. If None, will query the member
         for whom the user_token was for
-    :return: List of serie titles or empty list
+    :return: List of series titles or empty list
     """
     params = {}
     if member_name:

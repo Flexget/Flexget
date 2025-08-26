@@ -81,7 +81,7 @@ def register_web_server(manager):
 
     config = manager.config.get('web_server')
     if get_config_hash(config) == config_hash:
-        logger.debug("web server config has'nt changed")
+        logger.debug("web server config hasn't changed")
         return
 
     config_hash = get_config_hash(config)

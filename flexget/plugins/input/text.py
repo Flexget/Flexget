@@ -24,7 +24,7 @@ class Text:
       format:
         <field>: <python string formatting>
 
-    Note: each entry must have atleast two fields, title and url
+    Note: each entry must have at least two fields, title and url
 
     Example::
 
@@ -120,7 +120,7 @@ class Text:
 
                 # if all fields have been found
                 if len(used) == len(entry_config):
-                    # check that entry has atleast title and url
+                    # check that entry has at least title and url
                     if not entry.isvalid():
                         logger.info(
                             'Invalid data, constructed entry is missing mandatory fields (title or url)'

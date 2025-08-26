@@ -219,7 +219,7 @@ class EmbyAuth(EmbyApiBase):
 
                     self._connect_token = connect_data['AccessToken']
 
-                    # Retrive emby connect servers
+                    # Retrieve emby connect servers
                     args = {'userId': connect_data['User']['Id']}
                     connect_servers = EmbyApi.resquest_emby(
                         EMBY_ENDPOINT_CONNECT_SERVERS, self, 'GET', emby_connect=True, **args
@@ -1744,7 +1744,7 @@ class EmbyApiSerie(EmbyApiMedia):
             info = re.search(r'(.+) [s]([0-9]+)', string, re.IGNORECASE)
             if not info or not info.groups():
                 if force_parse:
-                    # I assume that it's only a serie if contains pathern, but I might need to assume it's a serie
+                    # I assume that it's only a series if contains pathern, but I might need to assume it's a series
                     return split_title_year(string)
                 return None, None
 
@@ -1792,14 +1792,14 @@ class EmbyApiSerie(EmbyApiMedia):
 
         args['IncludeItemTypes'] = 'Series'
 
-        logger.debug('Search serie with: {}', args)
+        logger.debug('Search series with: {}', args)
         series = EmbyApi.resquest_emby(EMBY_ENDPOINT_SEARCH, auth, 'GET', **args)
         if not series or 'Items' not in series or not series['Items']:
             if EmbyApi.has_provideres_search_arg(**parameters):
                 EmbyApi.remove_provideres_search(parameters)
                 return EmbyApiSerie.search(**parameters)
 
-            logger.warning('No serie found')
+            logger.warning('No series found')
             return None
 
         if len(series['Items']) == 1:
@@ -1817,12 +1817,12 @@ class EmbyApiSerie(EmbyApiMedia):
             if len(serie_filter) == 1:
                 serie = serie_filter[0]
             else:
-                logger.warning('More than one serie found')
+                logger.warning('More than one series found')
                 return None
 
         serie_api = EmbyApiSerie(auth=auth, **serie)
         if serie_api:
-            logger.debug("Found serie '{}' in emby server", serie_api.fullname)
+            logger.debug("Found series '{}' in emby server", serie_api.fullname)
             return serie_api
         return None
 
@@ -2015,7 +2015,7 @@ class EmbyApiSeason(EmbyApiMedia):
             season_serie = EmbyApiSerie.search(**kwargs)
 
         if not season_serie:
-            logger.warning('Not possible to determine season, serie not found')
+            logger.warning('Not possible to determine season, series not found')
             return None
 
         if 'season_id' in parameters:
@@ -2229,7 +2229,7 @@ class EmbyApiEpisode(EmbyApiMedia):
             episode_serie = EmbyApiSerie.search(**kwargs)
 
         if not episode_serie:
-            logger.warning('Not possible to determine episode, serie not found')
+            logger.warning('Not possible to determine episode, series not found')
             return None
 
         # We need to have information regarding the season
@@ -2733,7 +2733,7 @@ class EmbyApi(EmbyApiBase):
                     allow_redirects=True,
                     verify=verify_certificates,
                 )
-        except HTTPError as e:  # Autentication Problem
+        except HTTPError as e:  # Authentication Problem
             if e.response.status_code == 401:
                 logger.error('Autentication Error: {}', str(e))
                 return False
