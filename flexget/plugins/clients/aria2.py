@@ -261,7 +261,9 @@ class OutputAria2:
                         ) as response:
                             content_disposition = response.headers.get('content-disposition', None)
                     except Exception:
-                        logger.warning('Not possible to retrieve file info from `{}`', entry['url'])
+                        logger.warning(
+                            'Not possible to retrieve file info from `{}`', entry['url']
+                        )
                         entry.fail(
                             'Not possible to retrieve file info from `{}`'.format(entry['url'])
                         )
