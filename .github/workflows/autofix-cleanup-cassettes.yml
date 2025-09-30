@@ -3,7 +3,7 @@ on:
   pull_request:
     paths:
       - .github/workflows/autofix-cleanup-cassettes.yml
-      - tests/cassettes
+      - tests/cassettes/**
 permissions: {}
 concurrency:
   group: ${{ github.workflow_ref }}-${{ github.event.number || github.ref || github.run_id }}
