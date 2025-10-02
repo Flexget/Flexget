@@ -4,6 +4,8 @@ build:
   os: ubuntu-lts-latest
   tools:
     python: '3.13' # renovate: datasource=python-version depName=python
+  apt_packages:
+    - librsvg2-bin
   jobs:
     post_install:
       - sphinx-apidoc -ePT --remove-old -o docs/api flexget
@@ -11,6 +13,9 @@ build:
 sphinx:
   configuration: docs/conf.py
   fail_on_warning: true
+
+formats:
+  - pdf
 
 python:
   install:

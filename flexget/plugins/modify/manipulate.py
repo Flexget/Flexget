@@ -26,7 +26,10 @@ class Manipulate:
             [remove]: <boolean>
             [erase]: <list of regexps>
 
-    Example::
+    Example:
+
+    .. code:: yaml
+
       manipulate:
         - title:
             extract: \[\d\d\d\d\](.*)
@@ -34,6 +37,7 @@ class Manipulate:
             erase:
               - "^unwanted.noise."
               - "^more.advertisement."
+
     """
 
     schema = {

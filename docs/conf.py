@@ -14,6 +14,7 @@ sys.path.append(str(Path.cwd()))
 
 project = 'FlexGet'
 copyright = f'2008-{datetime.now().year}, FlexGet Developers'
+author = 'FlexGet Developers'
 release = flexget.__version__
 
 # -- General configuration ---------------------------------------------------
@@ -26,6 +27,7 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinx_copybutton',
     'sphinx_design',
+    'sphinxcontrib.rsvgconverter',
     '_extensions.gallery_directive',
 ]
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
@@ -127,3 +129,8 @@ html_context = {
     'custom_edit_url': _custom_edit_url,
     'edit_page_provider_name': 'GitHub',
 }
+
+# -- Options for LaTeX output -------------------------------------------------
+
+latex_engine = 'xelatex'
+latex_use_modindex = False
