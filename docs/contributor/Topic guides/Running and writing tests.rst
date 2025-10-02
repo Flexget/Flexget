@@ -152,16 +152,8 @@ Let's supplement the testsuite with the test:
 Testing network-dependent code
 ==============================
 
-Overview
---------
-
-To ensure our test suite remains fast, deterministic, and capable of running in offline environments, we employ the `vcrpy`_ library to manage tests that rely on network I/O.
+To ensure our test suite remains fast, deterministic, and capable of running in offline environments, we employ the `vcrpy <https://vcrpy.readthedocs.io>`__ library to manage tests that rely on network I/O.
 This system works by recording real HTTP interactions to a file (a "cassette") and replaying them on subsequent test runs.
-
-This document outlines the standard procedure for creating and maintaining these tests.
-
-Standard usage: the ``@pytest.mark.online`` decorator
------------------------------------------------------
 
 Any test function that initiates a network connection must be decorated with :term:`@pytest.mark.online`. ::
 
@@ -183,55 +175,12 @@ This methodology provides several key advantages:
 *   Performance: Bypassing network latency drastically reduces test execution time.
 *   Offline Execution: The entire test suite can be run without an active internet connection.
 
-.. _`vcrpy`: https://vcrpy.readthedocs.io/
+A cassette file (located in ``tests/cassettes/``) is considered an essential artifact of the test and must be committed to the repository.
+If an API endpoint changes or a test requires an update, you must re-record the corresponding cassette. To do this, manually delete the cassette file and then re-run the test.
 
-Workflow for new cassettes
---------------------------
+.. todo::
 
-When a new test decorated with ``@pytest.mark.online`` is executed, a corresponding cassette file is generated within the ``tests/cassettes/`` directory.
-This file is considered an essential artifact of the test and must be committed to the repository.
-
-To add a newly generated cassette, use the following command:
-
-.. code:: console
-
-   git add tests/cassettes/my_new_test_cassette.yaml
-
-Advanced usage: record modes
-----------------------------
-
-During development, such as when an API endpoint changes or a test needs to be updated, you may need to force re-recording of a cassette.
-Our test infrastructure, configured in ``conftest.py``, allows you to override the default recording behavior by setting the ``VCR_RECORD_MODE`` environment variable.
-
-To run tests with a specific record mode, prefix the ``pytest`` command:
-
-.. tab-set::
-   :sync-group: os
-
-   .. tab-item:: Unix
-      :sync: Unix
-
-      .. code:: console
-
-         $ VCR_RECORD_MODE=all pytest tests/path/to/test_module.py
-
-   .. tab-item:: Windows
-      :sync: Windows
-
-      .. code:: console
-
-         $ powershell -c { $env:VCR_RECORD_MODE='all'; pytest tests/path/to/test_module.py }
-
-The following modes are supported:
-
-``once`` (Default)
-    Records interactions if the cassette does not yet exist. If the cassette exists, it replays from it. If a new, unrecorded request is made, an error is raised.
-``new_episodes``
-    Replays existing interactions from the cassette and records any new interactions. Useful for incrementally adding calls to a test.
-``all``
-    Disables replay and forces re-recording of all interactions for the targeted tests, overwriting the existing cassette. Use this mode to update a cassette after an API has changed.
-``none``
-    Disables recording entirely. Only replays from the cassette. If any request is made that is not found in the cassette, an error is raised. This is useful for CI environments to guarantee no external network calls are made.
+   If https://github.com/kevin1024/vcrpy/issues/578 is implemented, you will be able to overwrite an existing cassette by setting the ``VCR_RECORD_MODE`` environment variable, instead of manually deleting the cassette.
 
 Provided fixtures and marks
 ===========================
