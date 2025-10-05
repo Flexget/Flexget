@@ -13,7 +13,6 @@ from typing import TYPE_CHECKING
 from urllib.parse import urlparse
 
 import packaging.specifiers
-import packaging.version
 import pendulum
 from loguru import logger
 

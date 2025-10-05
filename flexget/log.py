@@ -3,7 +3,6 @@ from __future__ import annotations
 import contextlib
 import functools
 import logging
-import logging.handlers
 import os
 import sys
 import threading

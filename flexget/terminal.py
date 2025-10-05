@@ -6,7 +6,6 @@ import threading
 from textwrap import wrap
 from typing import TYPE_CHECKING, Any, TextIO
 
-import rich
 import rich.box
 import rich.console
 import rich.rule
