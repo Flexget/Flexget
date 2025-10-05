@@ -14,7 +14,7 @@ babelfish==0.6.1
     # via guessit
 backports-tarfile==1.2.0 ; python_full_version < '3.12'
     # via jaraco-context
-beautifulsoup4==4.14.0
+beautifulsoup4==4.14.2
     # via flexget
 blinker==1.9.0
     # via flask
@@ -22,7 +22,7 @@ brotli==1.1.0 ; platform_python_implementation != 'PyPy'
     # via flask-compress
 brotlicffi==1.1.0.0 ; platform_python_implementation == 'PyPy'
     # via flask-compress
-certifi==2025.8.3
+certifi==2025.10.5
     # via requests
 cffi==2.0.0 ; platform_python_implementation == 'PyPy'
     # via brotlicffi
@@ -135,7 +135,7 @@ pywin32==311 ; platform_python_implementation != 'PyPy' and sys_platform == 'win
     # via plumbum
 pyyaml==6.0.3
     # via flexget
-pyzstd==0.17.0 ; python_full_version < '3.14'
+pyzstd==0.18.0 ; python_full_version < '3.14'
     # via flask-compress
 rebulk==3.2.0
     # via
