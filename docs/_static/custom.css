@@ -1,10 +1,5 @@
 html {
-  --pst-header-height: 3rem; /* Reduce header height for a more compact look. */
   --pst-sidebar-secondary: 28%; /* Slightly widen the right sidebar */
-}
-
-.search-button-field {
-  padding: 0.3rem; /* To match the compact header. */
 }
 
 @media (min-width: 960px) {

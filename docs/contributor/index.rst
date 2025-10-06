@@ -1,5 +1,5 @@
 #################
-Contributor guide
+Contributor Guide
 #################
 
 Not a coder? Not a problem! FlexGet is multi-faceted, and we can use a lot of help.

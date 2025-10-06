@@ -54,16 +54,18 @@ class MyEpisodes:
     In some cases, the TVDB name is either not unique or won't even be discovered.
     In that case you need to specify the MyEpisodes id manually using the set plugin.
 
-    tasks:
-      tvshows:
-        myepisodes:
-          username: <username>
-          password: <password>
-        series:
-         - human target:
-             set:
-               myepisodes_id: 5111
-         - chuck
+    .. code:: yaml
+
+        tasks:
+          tvshows:
+            myepisodes:
+              username: <username>
+              password: <password>
+            series:
+             - human target:
+                 set:
+                   myepisodes_id: 5111
+             - chuck
 
     How to find the MyEpisodes id: http://matrixagents.org/screencasts/myep_example-20110507-131555.png
     """

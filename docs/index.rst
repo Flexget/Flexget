@@ -75,4 +75,4 @@ It supports torrents, NZBs, podcasts, comics, TV shows, movies, RSS feeds, HTML,
    :hidden:
 
    contributor/index
-   API reference <api/flexget>
+   API Reference <api/flexget>

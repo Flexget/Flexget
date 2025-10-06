@@ -14,6 +14,7 @@ sys.path.append(str(Path.cwd()))
 
 project = 'FlexGet'
 copyright = f'2008-{datetime.now().year}, FlexGet Developers'
+author = 'FlexGet Developers'
 release = flexget.__version__
 
 # -- General configuration ---------------------------------------------------
@@ -26,6 +27,7 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinx_copybutton',
     'sphinx_design',
+    'sphinxcontrib.rsvgconverter',
     '_extensions.gallery_directive',
 ]
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
@@ -85,9 +87,12 @@ html_static_path = ['_static']
 html_css_files = ['custom.css']
 html_js_files = ['custom-icon.js']
 html_favicon = '_static/logo.svg'
-html_logo = '_static/logo.png'
+html_logo = '_static/logo.svg'
 html_show_sourcelink = False
 html_theme_options = {
+    'logo': {
+        'text': 'FlexGet',
+    },
     'switcher': {
         'json_url': 'https://flexget.readthedocs.io/en/latest/_static/switcher.json',
         'version_match': os.environ.get('READTHEDOCS_VERSION'),
@@ -95,7 +100,7 @@ html_theme_options = {
     'external_links': [
         {
             'url': 'https://flexget.com',
-            'name': 'User guide',
+            'name': 'User Guide',
         },
     ],
     'icon_links': [
@@ -115,7 +120,7 @@ html_theme_options = {
             'icon': 'fa-brands fa-docker',
         },
     ],
-    'navbar_center': ['version-switcher', 'navbar-nav'],
+    'navbar_end': ['version-switcher', 'theme-switcher', 'navbar-icon-links'],
     'back_to_top_button': False,
     'show_toc_level': 2,
     'use_edit_page_button': True,
@@ -127,3 +132,8 @@ html_context = {
     'custom_edit_url': _custom_edit_url,
     'edit_page_provider_name': 'GitHub',
 }
+
+# -- Options for LaTeX output -------------------------------------------------
+
+latex_engine = 'xelatex'
+latex_use_modindex = False
