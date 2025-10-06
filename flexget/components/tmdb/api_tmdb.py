@@ -24,9 +24,10 @@ from flexget.event import event
 from flexget.manager import Session
 from flexget.utils import requests
 from flexget.utils.database import json_synonym, with_session, year_property
+from flexget.utils.sqlalchemy_utils import table_add_column
 
 logger = logger.bind(name='api_tmdb')
-Base = db_schema.versioned_base('api_tmdb', 6)
+Base = db_schema.versioned_base('api_tmdb', 7)
 
 # This is a FlexGet API key
 API_KEY = 'bdfc018dbdb7c243dc7cb1454ff74b95'
@@ -79,6 +80,10 @@ def tmdb_request(endpoint, **params):
 def upgrade(ver, session):
     if ver is None or ver <= 5:
         raise db_schema.UpgradeImpossible
+    if ver == 6:
+        logger.info('Adding `iso_3166_1` column to tmdb_images table.')
+        table_add_column('tmdb_images', 'iso_3166_1', Unicode, session)
+        ver = 7
     return ver
 
 
@@ -228,6 +233,7 @@ class TMDBImage(Base):
     vote_average = Column(Float)
     vote_count = Column(Integer)
     iso_639_1 = Column(Unicode)
+    iso_3166_1 = Column(Unicode)
     type = Column(Unicode)
     __mapper_args__ = {'polymorphic_on': type}
 
