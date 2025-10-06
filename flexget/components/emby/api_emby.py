@@ -1582,7 +1582,7 @@ class EmbyApiMedia(EmbyApiBase):
 
     @staticmethod
     def parse_string(string: str):
-        """Return Relevante Information from string."""
+        """Return Relevant Information from string."""
         if not string:
             return None, None
 
@@ -1735,7 +1735,7 @@ class EmbyApiSeries(EmbyApiMedia):
 
     @staticmethod
     def parse_string(string: str, force_parse=False):
-        """Return Relevante Information from string."""
+        """Return Relevant Information from string."""
         if not string:
             return None, None
 
@@ -1974,7 +1974,7 @@ class EmbyApiSeason(EmbyApiMedia):
 
     @staticmethod
     def parse_string(string: str):
-        """Return Relevante Information from string."""
+        """Return Relevant Information from string."""
         if not string:
             return None
 
@@ -2305,7 +2305,7 @@ class EmbyApiEpisode(EmbyApiMedia):
 
     @staticmethod
     def parse_string(string: str):
-        """Return Relevante Information from string."""
+        """Return Relevant Information from string."""
         if not string:
             return None
 
@@ -2429,7 +2429,7 @@ class EmbyApiMovie(EmbyApiMedia):
 
     @staticmethod
     def parse_string(string: str):
-        """Return Relevante Information from string."""
+        """Return Relevant Information from string."""
         if not string:
             return None, None
 
