@@ -57,7 +57,7 @@ class TestPlex:
     def test_list_add(self, execute_task):
         task = execute_task('test_list_add')
         task = execute_task('plex_watchlist')
-        assert len(task.entries) == 3
+        assert len(task.entries) == 4
 
     def test_list_match(self, execute_task):
         task = execute_task('test_list_match')
@@ -66,4 +66,4 @@ class TestPlex:
     def test_list_remove(self, execute_task):
         task = execute_task('test_list_remove')
         task = execute_task('plex_watchlist')
-        assert len(task.entries) == 1
+        assert len(task.entries) == 2

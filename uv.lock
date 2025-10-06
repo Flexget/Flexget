@@ -446,7 +446,7 @@ name = "brotlicffi"
 version = "1.1.0.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "cffi" },
+    { name = "cffi", marker = "platform_python_implementation == 'PyPy'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/95/9d/70caa61192f570fcf0352766331b735afa931b4c6bc9a348a0925cc13288/brotlicffi-1.1.0.0.tar.gz", hash = "sha256:b77827a689905143f87915310b93b273ab17888fd43ef350d4832c4a71083c13", size = 465192, upload-time = "2023-09-14T14:22:40.707Z" }
 wheels = [
@@ -931,7 +931,7 @@ name = "exceptiongroup"
 version = "1.3.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
+    { name = "typing-extensions", marker = "python_full_version < '3.11'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/0b/9f/a65090624ecf468cdca03533906e7c69ed7588582240cfe7cc9e770b50eb/exceptiongroup-1.3.0.tar.gz", hash = "sha256:b241f5885f560bc56a59ee63ca4c6a8bfa46ae4ad651af316d4e81817bb9fd88", size = 29749, upload-time = "2025-05-10T17:42:51.123Z" }
 wheels = [
@@ -1188,7 +1188,7 @@ all = [
     { name = "matrix-nio", specifier = "~=0.25.2" },
     { name = "paramiko", specifier = "~=3.5" },
     { name = "pillow", specifier = "~=11.0" },
-    { name = "plexapi", specifier = "==4.17.0" },
+    { name = "plexapi", specifier = "~=4.17" },
     { name = "pysftp", specifier = "~=0.2.9" },
     { name = "python-telegram-bot", extras = ["http2", "socks"], specifier = "~=22.0" },
     { name = "qbittorrent-api", specifier = "~=2025.2" },
@@ -1216,7 +1216,7 @@ docs = [
 ]
 ftp = [{ name = "ftputil", specifier = "~=5.1" }]
 matrix = [{ name = "matrix-nio", specifier = "~=0.25.2" }]
-plexapi = [{ name = "plexapi", specifier = "==4.17.0" }]
+plexapi = [{ name = "plexapi", specifier = "~=4.17" }]
 qbittorrent = [{ name = "qbittorrent-api", specifier = "~=2025.2" }]
 rarfile = [{ name = "rarfile", specifier = "~=4.0" }]
 sftp = [
@@ -2090,14 +2090,14 @@ wheels = [
 
 [[package]]
 name = "plexapi"
-version = "4.17.0"
+version = "4.17.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "requests" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/94/79/129a01479ae08d934782a4ae2ece5bb1eee7e9576c14cf41b467a403dcb6/plexapi-4.17.0.tar.gz", hash = "sha256:065ff984a9500e049a9cc30927ab3245e518e39edc2f4058e31528be1a0a2aef", size = 154599, upload-time = "2025-04-19T02:24:08.532Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/2a/02/1bebd67c3cd94a45f6c3520da971791b66457535c9771d8e0068746d7bc2/plexapi-4.17.1.tar.gz", hash = "sha256:1e5bfb486bb150e058a80ff4fb9aff9e3efce644c56d52bb5297272e005d8241", size = 154746, upload-time = "2025-08-26T00:11:02.819Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/24/42/400828990b1884bb3d18d6cdbd1c26f91f1ca256619d057bd5f5d8a9ec7b/plexapi-4.17.0-py3-none-any.whl", hash = "sha256:cf42a990205c0327a2ab1d2871087a91b50596e6e960b99a185bf657525e6938", size = 166667, upload-time = "2025-04-19T02:24:06.899Z" },
+    { url = "https://files.pythonhosted.org/packages/c3/1c/9fdaa0e1f797dde3c3cb56d7b222109009f70380e7f49fc0ff42d5705409/plexapi-4.17.1-py3-none-any.whl", hash = "sha256:9d51adb112a2b0b7aa91a928c8b5c0dfffc0d51108cea67d86fea08cee06c998", size = 166861, upload-time = "2025-08-26T00:11:00.89Z" },
 ]
 
 [[package]]
