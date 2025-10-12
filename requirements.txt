@@ -4,7 +4,7 @@ aniso8601==10.0.1
     # via flask-restx
 apscheduler==3.11.0
     # via flexget
-attrs==25.3.0
+attrs==25.4.0
     # via
     #   jsonschema
     #   referencing
@@ -55,13 +55,13 @@ flask-login==0.6.3
     # via flexget
 flask-restx==1.3.2
     # via flexget
-greenlet==3.2.4 ; (python_full_version < '3.14' and platform_machine == 'AMD64') or (python_full_version < '3.14' and platform_machine == 'WIN32') or (python_full_version < '3.14' and platform_machine == 'aarch64') or (python_full_version < '3.14' and platform_machine == 'amd64') or (python_full_version < '3.14' and platform_machine == 'ppc64le') or (python_full_version < '3.14' and platform_machine == 'win32') or (python_full_version < '3.14' and platform_machine == 'x86_64')
+greenlet==3.2.4 ; platform_machine == 'AMD64' or platform_machine == 'WIN32' or platform_machine == 'aarch64' or platform_machine == 'amd64' or platform_machine == 'ppc64le' or platform_machine == 'win32' or platform_machine == 'x86_64'
     # via sqlalchemy
 guessit==3.8.0
     # via flexget
 html5lib==1.1
     # via flexget
-idna==3.10
+idna==3.11
     # via requests
 importlib-resources==6.5.2
     # via flask-restx
@@ -148,7 +148,7 @@ referencing==0.36.2
     #   jsonschema-specifications
 requests==2.32.5
     # via flexget
-rich==14.1.0
+rich==14.2.0
     # via flexget
 rpds-py==0.27.1
     # via
@@ -168,7 +168,7 @@ six==1.17.0
     #   python-dateutil
 soupsieve==2.8
     # via beautifulsoup4
-sqlalchemy==2.0.43
+sqlalchemy==2.0.44
     # via flexget
 tempora==5.8.1
     # via portend
