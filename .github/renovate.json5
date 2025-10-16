@@ -30,11 +30,20 @@
     {
       customType: 'regex',
       managerFilePatterns: ['/^\\.readthedocs\\.yaml$/'],
-      matchStrings: [
-        'python:\\s*["\']?(?<currentValue>.+?)["\']?\\s*# renovate: datasource=(?<datasource>.+?) depName=(?<depName>.+?)\\s',
-      ],
+      matchStrings: ['python:\\s*["\']?(?<currentValue>.+?)["\']?\\s+'],
+      depNameTemplate: 'python',
+      versioningTemplate: 'semver-coerced',
+      datasourceTemplate: 'custom.readthedocsPython',
     },
   ],
+  customDatasources: {
+    readthedocsPython: {
+      defaultRegistryUrlTemplate: 'https://raw.githubusercontent.com/readthedocs/readthedocs.org/master/readthedocs/rtd_tests/fixtures/spec/v2/schema.json',
+      transformTemplates: [
+        '{"releases":properties.build.properties.tools.properties.python.enum[$match($,/^\\d+\\.\\d+$/)].{"version":$}}',
+      ],
+    },
+  },
   npm: {
     enabled: false,
   },
