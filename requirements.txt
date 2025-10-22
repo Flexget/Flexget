@@ -14,6 +14,8 @@ babelfish==0.6.1
     # via guessit
 backports-tarfile==1.2.0 ; python_full_version < '3.12'
     # via jaraco-context
+backports-zstd==1.0.0 ; python_full_version < '3.14'
+    # via flask-compress
 beautifulsoup4==4.14.2
     # via flexget
 blinker==1.9.0
@@ -26,7 +28,7 @@ certifi==2025.10.5
     # via requests
 cffi==2.0.0 ; platform_python_implementation == 'PyPy'
     # via brotlicffi
-charset-normalizer==3.4.3
+charset-normalizer==3.4.4
     # via requests
 cheroot==11.0.0
     # via cherrypy
@@ -47,7 +49,7 @@ flask==3.1.2
     #   flask-login
     #   flask-restx
     #   flexget
-flask-compress==1.18
+flask-compress==1.20
     # via flexget
 flask-cors==6.0.1
     # via flexget
@@ -113,7 +115,7 @@ plumbum==1.9.0
     # via rpyc
 portend==3.2.1
     # via cherrypy
-psutil==7.1.0
+psutil==7.1.1
     # via flexget
 pycparser==2.23 ; implementation_name != 'PyPy' and platform_python_implementation == 'PyPy'
     # via cffi
@@ -135,13 +137,11 @@ pywin32==311 ; platform_python_implementation != 'PyPy' and sys_platform == 'win
     # via plumbum
 pyyaml==6.0.3
     # via flexget
-pyzstd==0.18.0 ; python_full_version < '3.14'
-    # via flask-compress
 rebulk==3.2.0
     # via
     #   flexget
     #   guessit
-referencing==0.36.2
+referencing==0.37.0
     # via
     #   flask-restx
     #   jsonschema
@@ -175,7 +175,6 @@ tempora==5.8.1
 typing-extensions==4.15.0
     # via
     #   beautifulsoup4
-    #   pyzstd
     #   referencing
     #   sqlalchemy
 tzdata==2025.2
