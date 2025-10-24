@@ -85,11 +85,18 @@ class Eztv:
 
         for page in range(min(pages, 15)):
             for result in results.get('torrents', []):
+                torrent_url = result.get('torrent_url')
+                magnet_url = result.get('magnet_url')
+                if not (torrent_url or magnet_url):
+                    logger.debug('skipping entry with no usable url', result.get('title'))
+                    continue
+                if not torrent_url:
+                    torrent_url = magnet_url
                 yield Entry(
                     title=result.get('title'),
-                    url=result.get('torrent_url'),
+                    url=torrent_url,
                     filename=result.get('filename'),
-                    torrent_magnet=result.get('magnet_url'),
+                    torrent_magnet=magnet_url,
                     content_size=int(result.get('size_bytes')),
                     torrent_info_hash=result.get('hash'),
                     torrent_seeds=result.get('seeds'),
