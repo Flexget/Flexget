@@ -115,7 +115,7 @@ plumbum==1.9.0
     # via rpyc
 portend==3.2.1
     # via cherrypy
-psutil==7.1.1
+psutil==7.1.2
     # via flexget
 pycparser==2.23 ; implementation_name != 'PyPy' and platform_python_implementation == 'PyPy'
     # via cffi
@@ -150,7 +150,7 @@ requests==2.32.5
     # via flexget
 rich==14.2.0
     # via flexget
-rpds-py==0.27.1
+rpds-py==0.28.0
     # via
     #   jsonschema
     #   referencing
