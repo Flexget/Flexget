@@ -3,9 +3,11 @@ revision = 3
 requires-python = ">=3.10"
 resolution-markers = [
     "python_full_version >= '3.14' and platform_python_implementation != 'PyPy'",
-    "python_full_version >= '3.11' and python_full_version < '3.14' and platform_python_implementation != 'PyPy'",
+    "python_full_version >= '3.12' and python_full_version < '3.14' and platform_python_implementation != 'PyPy'",
+    "python_full_version == '3.11.*' and platform_python_implementation != 'PyPy'",
     "python_full_version < '3.11' and platform_python_implementation != 'PyPy'",
-    "python_full_version >= '3.11' and platform_python_implementation == 'PyPy'",
+    "python_full_version >= '3.12' and platform_python_implementation == 'PyPy'",
+    "python_full_version == '3.11.*' and platform_python_implementation == 'PyPy'",
     "python_full_version < '3.11' and platform_python_implementation == 'PyPy'",
 ]
 
@@ -575,7 +577,7 @@ name = "brotlicffi"
 version = "1.1.0.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "cffi" },
+    { name = "cffi", marker = "platform_python_implementation == 'PyPy'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/95/9d/70caa61192f570fcf0352766331b735afa931b4c6bc9a348a0925cc13288/brotlicffi-1.1.0.0.tar.gz", hash = "sha256:b77827a689905143f87915310b93b273ab17888fd43ef350d4832c4a71083c13", size = 465192, upload-time = "2023-09-14T14:22:40.707Z" }
 wheels = [
@@ -1085,7 +1087,7 @@ name = "exceptiongroup"
 version = "1.3.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
+    { name = "typing-extensions", marker = "python_full_version < '3.11'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/0b/9f/a65090624ecf468cdca03533906e7c69ed7588582240cfe7cc9e770b50eb/exceptiongroup-1.3.0.tar.gz", hash = "sha256:b241f5885f560bc56a59ee63ca4c6a8bfa46ae4ad651af316d4e81817bb9fd88", size = 29749, upload-time = "2025-05-10T17:42:51.123Z" }
 wheels = [
@@ -1239,7 +1241,6 @@ all = [
     { name = "ftputil" },
     { name = "matrix-nio" },
     { name = "paramiko" },
-    { name = "pillow" },
     { name = "plexapi" },
     { name = "pysftp" },
     { name = "python-telegram-bot", extra = ["http2", "socks"] },
@@ -1294,8 +1295,23 @@ subliminal = [
     { name = "subliminal" },
 ]
 telegram = [
-    { name = "pillow" },
     { name = "python-telegram-bot", extra = ["http2", "socks"] },
+]
+test = [
+    { name = "boto3" },
+    { name = "deluge-client" },
+    { name = "ftputil" },
+    { name = "matrix-nio" },
+    { name = "paramiko" },
+    { name = "pillow" },
+    { name = "plexapi" },
+    { name = "pysftp" },
+    { name = "pytest-localftpserver" },
+    { name = "python-telegram-bot", extra = ["http2", "socks"] },
+    { name = "qbittorrent-api" },
+    { name = "rarfile" },
+    { name = "subliminal" },
+    { name = "transmission-rpc" },
 ]
 transmission = [
     { name = "transmission-rpc" },
@@ -1341,7 +1357,6 @@ all = [
     { name = "ftputil", specifier = "~=5.1" },
     { name = "matrix-nio", specifier = "~=0.25.2" },
     { name = "paramiko", specifier = "~=3.5" },
-    { name = "pillow", specifier = "~=11.0" },
     { name = "plexapi", specifier = "~=4.17" },
     { name = "pysftp", specifier = "~=0.2.9" },
     { name = "python-telegram-bot", extras = ["http2", "socks"], specifier = "~=22.0" },
@@ -1378,9 +1393,22 @@ sftp = [
     { name = "pysftp", specifier = "~=0.2.9" },
 ]
 subliminal = [{ name = "subliminal", specifier = "==2.2.1" }]
-telegram = [
+telegram = [{ name = "python-telegram-bot", extras = ["http2", "socks"], specifier = "~=22.0" }]
+test = [
+    { name = "boto3", specifier = "~=1.35" },
+    { name = "deluge-client", specifier = "~=1.10" },
+    { name = "ftputil", specifier = "~=5.1" },
+    { name = "matrix-nio", specifier = "~=0.25.2" },
+    { name = "paramiko", specifier = "~=3.5" },
     { name = "pillow", specifier = "~=11.0" },
+    { name = "plexapi", specifier = "~=4.17" },
+    { name = "pysftp", specifier = "~=0.2.9" },
+    { name = "pytest-localftpserver", specifier = "~=1.3" },
     { name = "python-telegram-bot", extras = ["http2", "socks"], specifier = "~=22.0" },
+    { name = "qbittorrent-api", specifier = "~=2025.2" },
+    { name = "rarfile", specifier = "~=4.0" },
+    { name = "subliminal", specifier = "==2.2.1" },
+    { name = "transmission-rpc", specifier = "~=7.0" },
 ]
 transmission = [{ name = "transmission-rpc", specifier = "~=7.0" }]
 
@@ -2507,6 +2535,27 @@ wheels = [
 ]
 
 [[package]]
+name = "pyasynchat"
+version = "1.0.4"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pyasyncore", marker = "python_full_version >= '3.12'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/8a/fd/aacc6309abcc5a388c66915829cd8175daccac583828fde40a1eea5768e4/pyasynchat-1.0.4.tar.gz", hash = "sha256:3f5333df649e46c56d48c57e6a4b7163fd07f626bfd884e22ef373ab3c3a4670", size = 9747, upload-time = "2024-02-28T08:55:35.794Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/c2/4f/b4a7aa2a35858d40f970bdb63ab3e9deda35d0d2116b9175f929f37d764d/pyasynchat-1.0.4-py3-none-any.whl", hash = "sha256:167feb25d635a01b61338e17e9ab1e3372cd9274005af4083dcda52d51f64a76", size = 7753, upload-time = "2024-02-28T08:55:34.638Z" },
+]
+
+[[package]]
+name = "pyasyncore"
+version = "1.0.4"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/25/6e/956e2bc9b47e3310cd524036f506b779a77788c2a1eb732e544240ad346f/pyasyncore-1.0.4.tar.gz", hash = "sha256:2c7a8b9b750ba6260f1e5a061456d61320a80579c6a43d42183417da89c7d5d6", size = 15339, upload-time = "2024-02-28T08:49:47.234Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/38/46/aaa0999302d7a584a033ec23b6ca21a452cf9c7f6d8dce8d174ac407eb3f/pyasyncore-1.0.4-py3-none-any.whl", hash = "sha256:9e5f6dc9dc057c56370b7a5cdb4c4670fd4b0556de2913ed1f428cd6a5366895", size = 10032, upload-time = "2024-02-28T08:49:45.696Z" },
+]
+
+[[package]]
 name = "pycparser"
 version = "2.23"
 source = { registry = "https://pypi.org/simple" }
@@ -2570,6 +2619,16 @@ wheels = [
 ]
 
 [[package]]
+name = "pyftpdlib"
+version = "2.1.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pyasynchat", marker = "python_full_version >= '3.12'" },
+    { name = "pyasyncore", marker = "python_full_version >= '3.12'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/fc/67/3299ce20585601d21e05153eb9275cb799ae408fe15ab93e48e4582ea9fe/pyftpdlib-2.1.0.tar.gz", hash = "sha256:5e92e7ba37c3e458ec458e5c201e2deb992cb6011c963e6a8512a634d8d80116", size = 205767, upload-time = "2025-09-25T13:03:19.419Z" }
+
+[[package]]
 name = "pygments"
 version = "2.19.2"
 source = { registry = "https://pypi.org/simple" }
@@ -2623,6 +2682,19 @@ dependencies = [
     { name = "setuptools" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/b1/90/b71ca66e2fee3f46281b3ecc853abe407a5ecd0cb4898af5bab48af63590/pynzb-0.1.0.tar.gz", hash = "sha256:0735b3889a1174bbb65418ee503629d3f5e4a63f04b16f46ffba18253ec3ef17", size = 5598, upload-time = "2009-05-11T08:14:43.592Z" }
+
+[[package]]
+name = "pyopenssl"
+version = "25.3.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "cryptography" },
+    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/80/be/97b83a464498a79103036bc74d1038df4a7ef0e402cfaf4d5e113fb14759/pyopenssl-25.3.0.tar.gz", hash = "sha256:c981cb0a3fd84e8602d7afc209522773b94c1c2446a3c710a75b06fe1beae329", size = 184073, upload-time = "2025-09-17T00:32:21.037Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d1/81/ef2b1dfd1862567d573a4fdbc9f969067621764fbb74338496840a1d2977/pyopenssl-25.3.0-py3-none-any.whl", hash = "sha256:1fda6fc034d5e3d179d39e59c1895c9faeaf40a79de5fc4cbbfbe0d36f4a77b6", size = 57268, upload-time = "2025-09-17T00:32:19.474Z" },
+]
 
 [[package]]
 name = "pyparsing"
@@ -2687,6 +2759,20 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/5e/f7/c933acc76f5208b3b00089573cf6a2bc26dc80a8aece8f52bb7d6b1855ca/pytest_cov-7.0.0.tar.gz", hash = "sha256:33c97eda2e049a0c5298e91f519302a1334c26ac65c1a483d6206fd458361af1", size = 54328, upload-time = "2025-09-09T10:57:02.113Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/ee/49/1377b49de7d0c1ce41292161ea0f721913fa8722c19fb9c1e3aa0367eecb/pytest_cov-7.0.0-py3-none-any.whl", hash = "sha256:3b8e9558b16cc1479da72058bdecf8073661c7f57f7d3c5f22a1c23507f2d861", size = 22424, upload-time = "2025-09-09T10:57:00.695Z" },
+]
+
+[[package]]
+name = "pytest-localftpserver"
+version = "1.3.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pyftpdlib" },
+    { name = "pyopenssl" },
+    { name = "pytest" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/83/bc/51fd0a05b8f4652d842489f142cf1d3a8f67e8412597ce1b427273984fc7/pytest_localftpserver-1.3.2.tar.gz", hash = "sha256:ee54a43c4782acefeb608596b5e8090ebaa7aa1e418855c72bb6da4dd832d3f3", size = 48883, upload-time = "2024-05-19T18:04:28.419Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/1d/39/1c219128f8c8a77d71e7391ed648c5b884bda7748de176290d6f0773cf3c/pytest_localftpserver-1.3.2-py3-none-any.whl", hash = "sha256:82501ad85a1e328735c3a9a1b713bfaf7caddf992c8824949063abddda0829bb", size = 21912, upload-time = "2024-05-19T18:04:27.274Z" },
 ]
 
 [[package]]
@@ -3201,8 +3287,10 @@ version = "8.2.3"
 source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
     "python_full_version >= '3.14' and platform_python_implementation != 'PyPy'",
-    "python_full_version >= '3.11' and python_full_version < '3.14' and platform_python_implementation != 'PyPy'",
-    "python_full_version >= '3.11' and platform_python_implementation == 'PyPy'",
+    "python_full_version >= '3.12' and python_full_version < '3.14' and platform_python_implementation != 'PyPy'",
+    "python_full_version == '3.11.*' and platform_python_implementation != 'PyPy'",
+    "python_full_version >= '3.12' and platform_python_implementation == 'PyPy'",
+    "python_full_version == '3.11.*' and platform_python_implementation == 'PyPy'",
 ]
 dependencies = [
     { name = "alabaster", marker = "python_full_version >= '3.11'" },
@@ -3526,7 +3614,8 @@ name = "urllib3"
 version = "1.26.20"
 source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
-    "python_full_version >= '3.11' and platform_python_implementation == 'PyPy'",
+    "python_full_version >= '3.12' and platform_python_implementation == 'PyPy'",
+    "python_full_version == '3.11.*' and platform_python_implementation == 'PyPy'",
     "python_full_version < '3.11' and platform_python_implementation == 'PyPy'",
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/e4/e8/6ff5e6bc22095cfc59b6ea711b687e2b7ed4bdb373f7eeec370a97d7392f/urllib3-1.26.20.tar.gz", hash = "sha256:40c2dc0c681e47eb8f90e7e27bf6ff7df2e677421fd46756da1161c39ca70d32", size = 307380, upload-time = "2024-08-29T15:43:11.37Z" }
@@ -3540,7 +3629,8 @@ version = "2.5.0"
 source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
     "python_full_version >= '3.14' and platform_python_implementation != 'PyPy'",
-    "python_full_version >= '3.11' and python_full_version < '3.14' and platform_python_implementation != 'PyPy'",
+    "python_full_version >= '3.12' and python_full_version < '3.14' and platform_python_implementation != 'PyPy'",
+    "python_full_version == '3.11.*' and platform_python_implementation != 'PyPy'",
     "python_full_version < '3.11' and platform_python_implementation != 'PyPy'",
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/15/22/9ee70a2574a4f4599c47dd506532914ce044817c7752a79b6a51286319bc/urllib3-2.5.0.tar.gz", hash = "sha256:3fc47733c7e419d4bc3f6b3dc2b4f890bb743906a30d56ba4a5bfa4bbff92760", size = 393185, upload-time = "2025-06-18T14:07:41.644Z" }
