@@ -2,7 +2,7 @@
 #    uv export --frozen --no-dev --no-emit-project --no-hashes --output-file=requirements.txt
 aniso8601==10.0.1
     # via flask-restx
-apscheduler==3.11.0
+apscheduler==3.11.1
     # via flexget
 attrs==25.4.0
     # via
@@ -30,7 +30,7 @@ cffi==2.0.0 ; platform_python_implementation == 'PyPy'
     # via brotlicffi
 charset-normalizer==3.4.4
     # via requests
-cheroot==11.0.0
+cheroot==11.1.1
     # via cherrypy
 cherrypy==18.10.0
     # via flexget
@@ -49,7 +49,7 @@ flask==3.1.2
     #   flask-login
     #   flask-restx
     #   flexget
-flask-compress==1.20
+flask-compress==1.21
     # via flexget
 flask-cors==6.0.1
     # via flexget
@@ -111,11 +111,11 @@ packaging==25.0
     # via flexget
 pendulum==3.1.0
     # via flexget
-plumbum==1.9.0
+plumbum==1.10.0
     # via rpyc
 portend==3.2.1
     # via cherrypy
-psutil==7.1.2
+psutil==7.1.3
     # via flexget
 pycparser==2.23 ; implementation_name != 'PyPy' and platform_python_implementation == 'PyPy'
     # via cffi
