@@ -71,7 +71,7 @@ repos:
         args: [--fix]
       - id: ruff-format
   - repo: https://github.com/sphinx-contrib/sphinx-lint
-    rev: v1.0.0
+    rev: v1.0.1
     hooks:
       - id: sphinx-lint
   - repo: https://github.com/PyCQA/doc8
