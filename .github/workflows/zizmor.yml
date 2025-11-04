@@ -31,7 +31,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Upload SARIF file
-        uses: github/codeql-action/upload-sarif@755f44910c12a3d7ca0d8c6e42c048b3362f7cec # v3
+        uses: github/codeql-action/upload-sarif@5d5cd550d3e189c569da8f16ea8de2d821c9bf7a # v3
         with:
           sarif_file: results.sarif
           category: zizmor
