@@ -1,8 +1,7 @@
 FROM docker.io/python:3.11-alpine@sha256:610ede222c1fa9675c694c99429f8d2c1b4e243f1982246da9e540eb5800ee4a AS builder
 ENV PYTHONUNBUFFERED=1
 
-RUN --mount=type=cache,target=/var/cache/apk \
-    apk update && apk add --upgrade \
+RUN apk update && apk add --upgrade \
         ca-certificates \
         nodejs \
         build-base \
