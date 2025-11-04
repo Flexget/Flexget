@@ -27,6 +27,7 @@ class OutputQBitTorrent:
           use_ssl: <SSL> (default: False)
           verify_cert: <VERIFY> (default: True)
           path: <OUTPUT_DIR> (default: (none))
+          incomplete_path: <INCOMPLETE_OUTPUT_DIR> (default: (none))
           label: <LABEL> (default: (none))
           tags: <TAGS> (default: (none))
           maxupspeed: <torrent upload speed limit> (default: 0)
@@ -49,6 +50,7 @@ class OutputQBitTorrent:
                     'use_ssl': {'type': 'boolean'},
                     'verify_cert': {'type': 'boolean'},
                     'path': {'type': 'string'},
+                    'incomplete_path': {'type': 'string'},
                     'label': {'type': 'string'},
                     'tags': {'type': 'array', 'items': {'type': 'string'}},
                     'maxupspeed': {'type': 'integer'},
@@ -237,6 +239,15 @@ class OutputQBitTorrent:
             except RenderError as e:
                 logger.error('Error setting path for {}: {}', entry['title'], e)
 
+            try:
+                download_path = entry.render(
+                    entry.get('incomplete_path', config.get('incomplete_path', ''))
+                )
+                if download_path:
+                    form_data['downloadPath'] = download_path
+            except RenderError as e:
+                logger.error('Error setting incomplete_path for {}: {}', entry['title'], e)
+
             label = entry.render(entry.get('label', config.get('label', '')))
             if label:
                 form_data['label'] = label  # qBittorrent v3.3.3-
@@ -287,6 +298,7 @@ class OutputQBitTorrent:
                 else:
                     logger.info('Url: {}', entry.get('url'))
                 logger.info('Save path: {}', form_data.get('savepath'))
+                logger.info('Download path: {}', form_data.get('downloadPath'))
                 logger.info('Label: {}', form_data.get('label'))
                 logger.info('Tags: {}', form_data.get('tags'))
                 logger.info('Paused: {}', form_data.get('paused', 'false'))

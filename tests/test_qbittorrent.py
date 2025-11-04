@@ -17,6 +17,9 @@ class TestQbittorrent:
           ratio_limit:
             qbittorrent:
               ratio_limit: 1.65
+          incomplete_path:
+            qbittorrent:
+              incomplete_path: /tmp
         """
 
     def test_default(self, execute_task):
@@ -25,4 +28,8 @@ class TestQbittorrent:
 
     def test_ratio_limit(self, execute_task):
         task = execute_task('ratio_limit')
+        assert task.accepted
+
+    def test_incomplete_path(self, execute_task):
+        task = execute_task('incomplete_path')
         assert task.accepted
