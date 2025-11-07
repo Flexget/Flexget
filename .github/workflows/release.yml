@@ -1,12 +1,15 @@
 name: Build and release to PyPI
-on: [deployment]
+on:
+  schedule:
+    - cron: 0 15 * * *
+  workflow_dispatch: {}
 permissions: {}
 jobs:
   release:
     permissions:
+      actions: write # for cancel workflow runs
       contents: write # for release
-      deployments: write # to create a deployment status
-
+      deployments: write # to create a deployment
     runs-on: ubuntu-latest
     env:
       PYTHON_VERSION: '3.13' # renovate: datasource=python-version depName=python
@@ -18,49 +21,89 @@ jobs:
           token: ${{ secrets.flexgetbot_pat }}
           persist-credentials: true
           fetch-depth: 0
-      - name: Setup Git User
+      - name: Error if running on a branch other than develop
         run: |
-          git config user.email github-actions[bot]@users.noreply.github.com
-          git config user.name github-actions[bot]
+          if [ "$(git rev-parse HEAD)" != "$(git rev-parse origin/develop)" ]; then
+            echo "Release script should be run from develop branch."
+            exit 1
+          fi
+      - name: Cancel workflow run if there are no new commits
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
+        with:
+          script: |
+            const { execSync } = require('child_process');
+            const hasTag = ref => !!execSync(`git tag --points-at ${ref}`).toString();
+            if (hasTag('HEAD') || hasTag('HEAD~1')) {
+              core.info("No new commits, skipping release");
+              await github.rest.actions.cancelWorkflowRun({
+                ...context.repo,
+                run_id: context.runId
+              });
+              await new Promise(r => setTimeout(r, 60000));
+              core.setFailed("Failed to cancel the workflow run; forcibly terminated.");
+            }
+      - name: Create Deployment
+        id: create-deployment
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
+        with:
+          script: |
+            let res = await github.rest.repos.createDeployment({
+              ...context.repo,
+              ref: context.ref.slice(11),
+              required_contexts: []
+            });
+            core.setOutput('deployment_id', res.data.id);
+      - name: Set Deployment Status in_progress
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
+        with:
+          script: |
+            await github.rest.repos.createDeploymentStatus({
+                ...context.repo,
+                deployment_id: ${{steps.create-deployment.outputs.deployment_id}},
+                log_url: `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}/job/${{job.check_run_id}}`,
+                state: 'in_progress',
+            })
+      - name: Check Commit Status
+        run: |
+          commit_state=$(curl -sf -H 'Accept: application/json' 'https://github.com/${{ github.repository }}/commits/deferred_commit_data/${{ github.ref_name }}' | jq -r --arg commit_id "$(git rev-parse HEAD)" '.deferredCommits[] | select(.oid == $commit_id) | .statusCheckStatus.state // "not_found"')
+          if [[ "$commit_state" != "success" ]]; then
+            echo "::error::Status is '$commit_state'."
+            exit 1
+          fi
       - name: Install uv and Python
         uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           version: ${{ env.UV_VERSION }}
-      - name: Set Deployment Status Pending
-        uses: justacodename/deployment-status@f758c04198a9855518022f1e3b990989381d9543 # v2
-        with:
-          state: pending
       - name: Run release script
         env:
           UV_PUBLISH_TOKEN: ${{ secrets.pypi_token }}
         run: scripts/release.sh
-      - name: Build Changelog
-        id: changelog
-        if: env.release_tag
-        run: |
-          echo 'CHANGELOG_BODY<<EOF' >> $GITHUB_ENV
-          uv run scripts/dev_tools.py get-changelog ${{ env.release_tag }} >> $GITHUB_ENV
-          echo 'EOF' >> $GITHUB_ENV
-      - name: Export config schema
-        if: env.release_tag
-        run: |
-          echo 'tasks: {}' > config.yml
-          uv run flexget export-schema --output-file flexget-config.schema.json
       - name: Create GitHub Release
         uses: ncipollo/release-action@b7eabc95ff50cbeeedec83973935c8f306dfcd0b # v1
-        if: env.release_tag
         with:
-          tag: ${{ env.release_tag }}
+          tag: ${{ env.RELEASE_TAG }}
           artifacts: dist/*,flexget-config.schema.json
           token: ${{ secrets.GITHUB_TOKEN }}
           body: ${{ env.CHANGELOG_BODY }}
       - name: Set Deployment Status Success
-        uses: justacodename/deployment-status@f758c04198a9855518022f1e3b990989381d9543 # v2
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
         with:
-          state: success
+          script: |
+            await github.rest.repos.createDeploymentStatus({
+                ...context.repo,
+                deployment_id: ${{steps.create-deployment.outputs.deployment_id}},
+                log_url: `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}/job/${{job.check_run_id}}`,
+                state: 'success',
+            })
       - name: Set Deployment Status Failure
-        if: failure() || cancelled()
-        uses: justacodename/deployment-status@f758c04198a9855518022f1e3b990989381d9543 # v2
+        if: failure()
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
         with:
-          state: failure
+          script: |
+            await github.rest.repos.createDeploymentStatus({
+                ...context.repo,
+                deployment_id: ${{steps.create-deployment.outputs.deployment_id}},
+                log_url: `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}/job/${{job.check_run_id}}`,
+                state: 'error',
+            })
