@@ -9,42 +9,48 @@ set -e
 # Show commands executing
 set -x
 
-# Error if running on a branch other than develop
-if [ "$(git rev-parse HEAD)" != "$(git rev-parse origin/develop)" ]; then
-  echo "Release script should be run from develop branch."
-  exit 1
-fi
+# Bump to new release version
+uv run scripts/dev_tools.py bump-version release
+RELEASE_TAG=v$(uv run scripts/dev_tools.py version)
 
-# Only run if there are new commits
-if [ -z "$(git tag --points-at HEAD)" ] && [ -z "$(git tag --points-at HEAD~1)" ]; then
+# Save tag name to github actions environment
+echo "RELEASE_TAG=$RELEASE_TAG" >> "$GITHUB_ENV"
 
-  # Bump to new release version
-  uv run scripts/dev_tools.py bump-version release
-  VERSION=$(uv run scripts/dev_tools.py version)
-  export VERSION
+# Build distribution archive.
+# These env variables activate hatch build hooks to modify the release
+BUNDLE_WEBUI=true BUILD_LOCKED_EXTRAS=true uv build
 
-  # Build and upload to pypi.
-  # These env variables activate hatch build hooks to modify the release
-  BUNDLE_WEBUI=true BUILD_LOCKED_EXTRAS=true uv build
-  uv publish
+# Setup git user
+git config user.email github-actions[bot]@users.noreply.github.com
+git config user.name github-actions[bot]
 
-  # Commit and tag released version
-  git add flexget/_version.py
-  git commit -m "v${VERSION}"
-  git tag -a -f "v${VERSION}" -m "v${VERSION} release"
+# Commit and tag released version
+git add flexget/_version.py
+git commit -m "$RELEASE_TAG"
+git tag -a -f "$RELEASE_TAG" -m "$RELEASE_TAG release"
 
-  # Save tag name to github actions environment
-  echo "release_tag=v${VERSION}" >> "$GITHUB_ENV"
+# Bump to new dev version, then commit again
+uv run scripts/dev_tools.py bump-version dev
+git add flexget/_version.py
+git commit -m "Prepare v$(uv run scripts/dev_tools.py version)"
 
-  # Bump to new dev version, then commit again
-  uv run scripts/dev_tools.py bump-version dev
-  git add flexget/_version.py
-  git commit -m "Prepare v$(uv run scripts/dev_tools.py version)"
+# Automatically merge commits without conflicts
+git pull --no-edit
+git push origin develop
+# Make sure our branches push before pushing tag
+git push --tags
 
-  # If the new branch is not a fast-forward, the push will be rejected
-  git push origin develop
-  # Make sure our branches push before pushing tag
-  git push --tags
-else
-  echo "No commits, skipping release"
-fi
+# Publish to PyPI after performing `git push` — this prevents the situation where the package has
+# already been published to PyPI but the `git push` fails, causing all subsequent runs to fail.
+uv publish
+
+# Build changelog
+{
+  echo 'CHANGELOG_BODY<<EOF'
+  uv run scripts/dev_tools.py get-changelog "$RELEASE_TAG"
+  echo 'EOF'
+} >> "$GITHUB_ENV"
+
+# Export config schema
+echo 'tasks: {}' > config.yml
+uv run flexget export-schema --output-file flexget-config.schema.json
