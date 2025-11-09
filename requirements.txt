@@ -20,7 +20,7 @@ beautifulsoup4==4.14.2
     # via flexget
 blinker==1.9.0
     # via flask
-brotli==1.1.0 ; platform_python_implementation != 'PyPy'
+brotli==1.2.0 ; platform_python_implementation != 'PyPy'
     # via flask-compress
 brotlicffi==1.1.0.0 ; platform_python_implementation == 'PyPy'
     # via flask-compress
@@ -30,7 +30,7 @@ cffi==2.0.0 ; platform_python_implementation == 'PyPy'
     # via brotlicffi
 charset-normalizer==3.4.4
     # via requests
-cheroot==11.1.1
+cheroot==11.1.2
     # via cherrypy
 cherrypy==18.10.0
     # via flexget
@@ -49,7 +49,7 @@ flask==3.1.2
     #   flask-login
     #   flask-restx
     #   flexget
-flask-compress==1.21
+flask-compress==1.23
     # via flexget
 flask-cors==6.0.1
     # via flexget
