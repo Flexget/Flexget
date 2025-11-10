@@ -161,15 +161,15 @@ wheels = [
 
 [[package]]
 name = "aiohttp-socks"
-version = "0.10.1"
+version = "0.10.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiohttp" },
     { name = "python-socks", extra = ["asyncio"] },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/25/c0/dfc948c2aff58db2846192d744dc889bd634b9f3cc7d0fca85ef3c7e9cd4/aiohttp_socks-0.10.1.tar.gz", hash = "sha256:49f2e1f8051f2885719beb1b77e312b5a27c3e4b60f0b045a388f194d995e068", size = 10445, upload-time = "2024-12-26T07:06:26.244Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/75/07/1598f292433bcdceb069515811ba5221034f4f12535d06c3372a1b71a785/aiohttp_socks-0.10.2.tar.gz", hash = "sha256:942d7c86e2e579418fc7a734610dd97daaf00707c7462f6ccf679b2325767930", size = 11307, upload-time = "2025-11-10T08:50:44.723Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/d3/04/7ff144f7465e83cf87459ffd74688871918496acd4816507cca1af5623d3/aiohttp_socks-0.10.1-py3-none-any.whl", hash = "sha256:6fd4d46c09f952f971a011ff446170daab8d539cf5310c0627f8423df2fb15ea", size = 10119, upload-time = "2024-12-26T07:06:22.236Z" },
+    { url = "https://files.pythonhosted.org/packages/7f/51/906d2ef2e9dfe2f3e76e53696f2d73c508f99b54c05d7e9acd8e7033d505/aiohttp_socks-0.10.2-py3-none-any.whl", hash = "sha256:84b29d14356bcda4affa03ef267108416390e1c9029922c66be18ef4b106f980", size = 10470, upload-time = "2025-11-10T08:50:42.065Z" },
 ]
 
 [[package]]
@@ -2726,11 +2726,11 @@ wheels = [
 
 [[package]]
 name = "python-socks"
-version = "2.7.2"
+version = "2.7.3"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/c0/fb/49fc4c3d61dbc8404879bed6c94c0595e654951ac9145645b057c4883966/python_socks-2.7.2.tar.gz", hash = "sha256:4c845d4700352bc7e7382f302dfc6baf0af0de34d2a6d70ba356b2539d4dbb62", size = 229950, upload-time = "2025-08-01T06:47:05.488Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/09/13/24c319ca6a19852d50850893a09e44c72d0f8eee38e62c55d2ee10e9149e/python_socks-2.7.3.tar.gz", hash = "sha256:06f4ae34c5828c96f631872e102425bbf44ad841d65ce68329e8dc1af428c1f1", size = 273160, upload-time = "2025-11-10T08:32:08.483Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/8d/e6/1fdebffa733e79e67b43ee8930e4e5049eb51eae3608caeafc83518798aa/python_socks-2.7.2-py3-none-any.whl", hash = "sha256:d311aefbacc0ddfaa1fa1c32096c436d4fe75b899c24d78e677e1b0623c52c48", size = 55048, upload-time = "2025-08-01T06:47:03.734Z" },
+    { url = "https://files.pythonhosted.org/packages/21/ab/b1bb545bcbb72d4e65662988c79ff6d4601c43424439030cb62027f45540/python_socks-2.7.3-py3-none-any.whl", hash = "sha256:e0fda261fa8d08bbcbb7852cdf5e7f576f15d5e55559f6bc16db1bad8bad399b", size = 55076, upload-time = "2025-11-10T08:32:05.928Z" },
 ]
 
 [package.optional-dependencies]
