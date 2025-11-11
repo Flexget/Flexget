@@ -1,3 +1,6 @@
 rules:
+  concurrency-limits:
+    ignore:
+      - release.yml
   template-injection:
     disable: true
