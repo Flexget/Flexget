@@ -79,6 +79,11 @@ dev = [
   "ruff==0.14.4",
   "vcrpy~=7.0",
 ]
+test = [
+  "pillow~=11.0",
+  "pytest-localftpserver~=1.3",
+  { include-group = "all" },
+]
 docs = [
   "pydata-sphinx-theme~=0.16.1",
   "sphinx~=8.1",
@@ -100,7 +105,7 @@ sftp = [
 subliminal = [
   "subliminal==2.2.1", # TODO: Update subliminal after https://github.com/Diaoul/subliminal/issues/1302 is resolved.
 ]
-telegram = [ "pillow~=11.0", "python-telegram-bot[http2,socks]~=22.0" ]
+telegram = [ "python-telegram-bot[http2,socks]~=22.0" ]
 transmission = [ "transmission-rpc~=7.0" ]
 # This is all our optional deps installable via extras, not actually 'all'.
 # Tests that need these must add the `require_optional_deps` pytest mark.

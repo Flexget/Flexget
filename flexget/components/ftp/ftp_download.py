@@ -1,7 +1,7 @@
 import ftplib
 import os
 import time
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from urllib.parse import unquote, urlparse
 
 from loguru import logger
@@ -51,7 +51,7 @@ class OutputFtp:
         config.setdefault('download_empty_dirs', False)
         return config
 
-    def ftp_connect(self, config, ftp_url, current_path: Path):
+    def ftp_connect(self, config, ftp_url, current_path: PurePosixPath):
         ftp = ftplib.FTP_TLS() if config['use-ssl'] else ftplib.FTP()
 
         # ftp.set_debuglevel(2)
@@ -67,7 +67,7 @@ class OutputFtp:
 
         return ftp
 
-    def check_connection(self, ftp, config, ftp_url, current_path: Path):
+    def check_connection(self, ftp, config, ftp_url, current_path: PurePosixPath):
         try:
             ftp.voidcmd('NOOP')
         except (OSError, ftplib.Error):
@@ -78,18 +78,18 @@ class OutputFtp:
         config = self.prepare_config(config, task)
         for entry in task.accepted:
             ftp_url = urlparse(entry.get('url'))
-            ftp_url.path = unquote(ftp_url.path)
-            current_path = Path(ftp_url.path).parent
+            ftp_url = ftp_url._replace(path=unquote(ftp_url.path))
+            current_path = PurePosixPath(ftp_url.path).parent
             try:
                 ftp = self.ftp_connect(config, ftp_url, current_path)
             except ftplib.all_errors as e:
                 entry.fail(f'Unable to connect to server : {e}')
                 break
 
-            to_path = Path(config['ftp_tmp_path'])
+            to_path = config['ftp_tmp_path']
 
             try:
-                to_path = entry.render(str(to_path))
+                to_path = Path(entry.render(to_path))
             except RenderError as err:
                 raise plugin.PluginError(
                     f'Path value replacement `{to_path}` failed: {err.args[0]}'
@@ -107,7 +107,9 @@ class OutputFtp:
                 # Directory
                 ftp = self.check_connection(ftp, config, ftp_url, current_path)
                 ftp.cwd(file_name)
-                self.ftp_walk(ftp, to_path / file_name, config, ftp_url, Path(ftp_url.path))
+                self.ftp_walk(
+                    ftp, to_path / file_name, config, ftp_url, PurePosixPath(ftp_url.path)
+                )
                 ftp = self.check_connection(ftp, config, ftp_url, current_path)
                 ftp.cwd('..')
                 if config['delete_origin']:
@@ -121,7 +123,7 @@ class OutputFtp:
     def on_task_output(self, task, config):
         """Count this as an output plugin."""
 
-    def ftp_walk(self, ftp, tmp_path: Path, config, ftp_url, current_path: Path):
+    def ftp_walk(self, ftp, tmp_path: Path, config, ftp_url, current_path: PurePosixPath):
         logger.debug('DIR->{}', ftp.pwd())
         logger.debug('FTP tmp_path : {}', tmp_path)
         try:
@@ -163,7 +165,9 @@ class OutputFtp:
                 )
         return self.check_connection(ftp, config, ftp_url, current_path)
 
-    def ftp_down(self, ftp, file_name, tmp_path: Path, config, ftp_url, current_path: Path):
+    def ftp_down(
+        self, ftp, file_name, tmp_path: Path, config, ftp_url, current_path: PurePosixPath
+    ):
         logger.debug('Downloading {} into {}', file_name, tmp_path)
 
         if not tmp_path.exists():
