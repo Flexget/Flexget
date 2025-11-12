@@ -72,7 +72,7 @@ gui-scripts.flexget-headless = "flexget:main" # This is useful on Windows to avo
 [dependency-groups]
 dev = [
   "pre-commit~=4.0",
-  "pytest~=8.3",
+  "pytest~=9.0",
   "pytest-cov~=7.0",
   "pytest-socket~=0.7.0",
   "pytest-xdist~=3.6",
