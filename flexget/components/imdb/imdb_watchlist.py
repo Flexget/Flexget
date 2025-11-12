@@ -64,6 +64,11 @@ class ImdbWatchlist:
         'error_anyOf': 'user_id is required if not using a custom list (lsXXXXXXXXX format)',
     }
 
+    default_user_agent = (
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebkit/537.36 (KHTML, like Gecko) '
+        'Chrome/69.0.3497.100 Safari/537.36'
+    )
+
     def prepare_config(self, config):
         if 'type' not in config:
             config['type'] = ['all']
@@ -80,14 +85,17 @@ class ImdbWatchlist:
         # Create movie entries by parsing imdb list page(s) html using beautifulsoup
         logger.verbose('Retrieving imdb list: {}', config['list'])
 
-        headers = {'Accept-Language': config.get('force_language')}
+        headers = {
+            'Accept-Language': config.get('force_language'),
+            'User-Agent': self.default_user_agent,
+        }
         params = {'view': 'detail', 'page': 1}
         if config['list'] in USER_LISTS:
-            url = 'http://www.imdb.com/user/{}/{}'.format(config['user_id'], config['list'])
+            url = 'https://www.imdb.com/user/{}/{}'.format(config['user_id'], config['list'])
             if config['list'] == 'watchlist':
                 params = {'view': 'detail'}
         else:
-            url = 'http://www.imdb.com/list/{}'.format(config['list'])
+            url = 'https://www.imdb.com/list/{}'.format(config['list'])
         if 'all' not in config['type']:
             title_types = [TITLE_TYPE_MAP[title_type] for title_type in config['type']]
             params['title_type'] = ','.join(title_types)
