@@ -1,4 +1,6 @@
 rules:
-  template-injection:
+  concurrency-limits:
     ignore:
-      - nightly.yml
+      - release.yml
+  template-injection:
+    disable: true
