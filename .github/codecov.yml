@@ -2,6 +2,9 @@ codecov:
   notify:
     after_n_builds: 13
 
+comment:
+  require_changes: 'coverage_drop OR uncovered_patch'
+
 coverage:
   status:
     patch:
