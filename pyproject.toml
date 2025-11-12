@@ -72,7 +72,7 @@ gui-scripts.flexget-headless = "flexget:main" # This is useful on Windows to avo
 [dependency-groups]
 dev = [
   "pre-commit~=4.0",
-  "pytest~=8.3",
+  "pytest~=9.0",
   "pytest-cov~=7.0",
   "pytest-socket~=0.7.0",
   "pytest-xdist~=3.6",
@@ -242,8 +242,8 @@ skip = [
 max_supported_python = '3.14'
 keep_full_version = true
 
-[tool.pytest.ini_options]
-addopts = '-p no:legacypath --strict-config --strict-markers'
+[tool.pytest]
+addopts = [ '-p no:legacypath' ]
 filterwarnings = [
   'error',
   'ignore:Failed to load HostKeys from:UserWarning:pysftp', # It's a bug in pysftp (unmaintained) 0.2.9, not in 0.2.8: https://stackoverflow.com/q/56521549
@@ -253,8 +253,8 @@ markers = [
   'online: mark test that goes online. VCR will automatically be used.',
   'require_optional_deps: mark test as requiring additional dependencies',
 ]
+strict = true
 testpaths = [ "tests" ]
-xfail_strict = true
 
 [tool.coverage.report]
 exclude_also = [
