@@ -24,7 +24,7 @@ brotli==1.2.0 ; platform_python_implementation != 'PyPy'
     # via flask-compress
 brotlicffi==1.1.0.0 ; platform_python_implementation == 'PyPy'
     # via flask-compress
-certifi==2025.10.5
+certifi==2025.11.12
     # via requests
 cffi==2.0.0 ; platform_python_implementation == 'PyPy'
     # via brotlicffi
@@ -34,7 +34,7 @@ cheroot==11.1.2
     # via cherrypy
 cherrypy==18.10.0
     # via flexget
-click==8.3.0
+click==8.3.1
     # via flask
 colorama==0.4.6 ; sys_platform == 'win32'
     # via
@@ -150,7 +150,7 @@ requests==2.32.5
     # via flexget
 rich==14.2.0
     # via flexget
-rpds-py==0.28.0
+rpds-py==0.29.0
     # via
     #   jsonschema
     #   referencing
