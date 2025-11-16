@@ -10,7 +10,7 @@ babel==2.17.0
     #   sphinx
 beautifulsoup4==4.14.2
     # via pydata-sphinx-theme
-certifi==2025.10.5
+certifi==2025.11.12
     # via requests
 charset-normalizer==3.4.4
     # via requests
