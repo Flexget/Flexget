@@ -79,7 +79,7 @@ repos:
     hooks:
       - id: doc8
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.34.1
+    rev: 0.35.0
     hooks:
       - id: check-github-issue-config
       - id: check-github-issue-forms
