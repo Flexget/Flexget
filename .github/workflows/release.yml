@@ -21,18 +21,18 @@ jobs:
           script: |
             if (context.ref !== 'refs/heads/develop')
               core.setFailed("Release script should be run from develop branch.");
-            const release = await github.rest.repos.getLatestRelease({...context.repo}).catch(() => null);
-            if (release === null) {
-              core.info("No release exists, or the latest release has been deleted.");
+            const release = await github.rest.repos.getLatestRelease(context.repo).catch(() => null);
+            if (!release) {
+              core.info("No release exists, or the latest release has been deleted. Assuming new commits exist.");
               core.setOutput('new_commits', 'true');
               return;
             }
-            const { data: compareData } = await github.rest.repos.compareCommitsWithBasehead({
+            const { data: diff } = await github.rest.repos.compareCommitsWithBasehead({
               ...context.repo,
               basehead: `${release.data.tag_name}...${context.ref}`,
             });
-            core.info(`${context.ref} is ${compareData.ahead_by} commits ahead of and ${compareData.behind_by} commits behind ${release.data.tag_name}.`);
-            core.setOutput('new_commits', compareData.ahead_by > 1 || compareData.behind_by > 0);
+            core.info(`${context.ref} is ${diff.ahead_by} commits ahead of and ${diff.behind_by} commits behind ${release.data.tag_name}.`);
+            core.setOutput('new_commits', diff.ahead_by > 1 || diff.behind_by > 0);
   release:
     name: Build and release
     permissions:
