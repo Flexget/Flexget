@@ -1,6 +1,6 @@
 codecov:
   notify:
-    after_n_builds: 13
+    after_n_builds: 15
 
 comment:
   require_changes: 'coverage_drop OR uncovered_patch'
