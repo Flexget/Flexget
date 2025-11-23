@@ -14,7 +14,7 @@ babelfish==0.6.1
     # via guessit
 backports-tarfile==1.2.0 ; python_full_version < '3.12'
     # via jaraco-context
-backports-zstd==1.0.0 ; python_full_version < '3.14'
+backports-zstd==1.1.0 ; python_full_version < '3.14'
     # via flask-compress
 beautifulsoup4==4.14.2
     # via flexget
@@ -22,7 +22,7 @@ blinker==1.9.0
     # via flask
 brotli==1.2.0 ; platform_python_implementation != 'PyPy'
     # via flask-compress
-brotlicffi==1.1.0.0 ; platform_python_implementation == 'PyPy'
+brotlicffi==1.2.0.0 ; platform_python_implementation == 'PyPy'
     # via flask-compress
 certifi==2025.11.12
     # via requests
