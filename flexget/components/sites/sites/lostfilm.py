@@ -184,7 +184,7 @@ class LostFilm:
             logger.error('Failed to get the RSS feed')
             return None
 
-        # Use failed site locations as the last resot option for the redirect page
+        # Use failed site locations as the last resort option for the redirect page
         site_urls.extend(tried_urls)
 
         entries = []
@@ -315,7 +315,7 @@ class LostFilm:
                 response = None
                 tried_urls.append(site_urls.pop(0))
 
-            # Use failed site locations as the last resot option for the next attempts
+            # Use failed site locations as the last resort option for the next attempts
             site_urls.extend(tried_urls)
 
             if not response:
@@ -369,12 +369,12 @@ class LostFilm:
             if not download_page_url:
                 if config.get('lf_session') is not None:
                     logger.error(
-                        'Links were not foung on lostfilm.tv torrent download page. '
+                        'Links are not found on lostfilm.tv redirect page. '
                         'Check whether "lf_session" parameter is correct.'
                     )
                 else:
                     logger.error(
-                        'Links were not foung on lostfilm.tv torrent download page. '
+                        'Links are not found on lostfilm.tv redirect page. '
                         'Specify your "lf_session" cookie value in plugin parameters.'
                     )
                 continue
