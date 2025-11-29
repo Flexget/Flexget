@@ -24,6 +24,10 @@ RSS_LINK_REGEXP = re.compile(
     r'^https?://[a-zA-Z0-9./_-]+/series/(?P<sr_org2>.+)/season_(?P<season>\d+)/episode_(?P<episode>\d+)/$'
 )
 RSS_LF_ID_REGEXP = re.compile(r'/Images/(?P<id>\d+)/Posters/image\.(?:png|jpg|jpeg)')
+RSS_TITLE_MOVIE_REGEXP = re.compile(
+    r'^(?P<movie_name_rus>[^)(]+?)(?: \((?P<movie_name>[^)]+)\))?\. \(Фильм\)$'
+)
+RSS_LINK_MOVIE_REGEXP = re.compile(r'^https?://[a-zA-Z0-9./_-]+/movies/(?P<movie_name2>[^/]+)$')
 PAGE_TEXT_REGEXP = re.compile(
     r'^\s*(?P<season>\d+)\s+сезон\s+(?P<episode>\d+)\s+серия\.(?:\s(?P<ep_rus>[^(]+?(?:\([^)]+?\))??))?(?:\s+\((?P<ep_org>[^)(]*?(?:\([^)]+?\))??)\s?\))?$'
 )
@@ -212,6 +216,14 @@ class LostFilm:
                     episode_num = int(title_match['episode'])
                     episode_name_rus = title_match['ep_rus']
                 else:
+                    title_movie_match = RSS_TITLE_MOVIE_REGEXP.fullmatch(item['title'])
+                    if title_movie_match is not None:
+                        logger.debug(
+                            'Skipping movie "{}" ("{}")',
+                            title_movie_match['movie_name'],
+                            title_movie_match['movie_name_rus'],
+                        )
+                        continue
                     logger.warning('Cannot parse RSS item title: {}', item['title'])
 
             # Skip series names that are not configured.
@@ -265,7 +277,14 @@ class LostFilm:
                     continue
                 link_match = RSS_LINK_REGEXP.fullmatch(item['link'])
                 if link_match is None:
-                    logger.warning('Cannot parse RSS item link, skipping: {}', item['link'])
+                    link_movie_match = RSS_LINK_MOVIE_REGEXP.fullmatch(item['link'])
+                    if link_movie_match is not None:
+                        logger.warning(
+                            'Strange: series item has "{}" movie download link',
+                            link_movie_match['movie_name2'],
+                        )
+                    else:
+                        logger.warning('Cannot parse RSS item link, skipping: {}', item['link'])
                     continue
                 series_name_org = link_match['sr_org2'].replace('_', ' ')
                 season_num = int(link_match['season'])
