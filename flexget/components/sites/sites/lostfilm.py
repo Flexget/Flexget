@@ -334,19 +334,38 @@ class LostFilm:
             page = get_soup(response.content)
 
             download_page_url = None
-            find_item = page.find('html', recursive=False)
-            if find_item is not None:
-                find_item = find_item.find('head', recursive=False)
-                if find_item is not None:
-                    find_item = find_item.find(
+            html_item = page.find('html', recursive=False)
+            if html_item is not None:
+                found_item = html_item.find('head', recursive=False)
+                if found_item is not None:
+                    found_item = found_item.find(
                         'meta', attrs={'http-equiv': 'refresh'}, recursive=False
                     )
-                    if (
-                        find_item is not None
-                        and find_item.has_attr('content')
-                        and find_item['content'].startswith('0; url=http')
-                    ):
-                        download_page_url = find_item['content'][7:]
+                    if found_item is not None:
+                        if found_item.has_attr('content'):
+                            if found_item['content'].startswith('0; url=/'):
+                                download_page_url = site_urls[0] + found_item['content'][7:]
+                            elif (
+                                found_item['content'].startswith('0; url=https://')
+                                or found_item['content'].startswith('0; url=http://')
+                            ):
+                                download_page_url = found_item['content'][7:]
+                            else:
+                                logger.debug(
+                                    'Failed to parse "content" value "{}"', found_item['content']
+                                )
+                        else:
+                            logger.debug(
+                                'Header meta "refresh" item has no "content": {}', found_item
+                            )
+                    else:
+                        logger.debug('Header meta "refresh" item not found')
+                else:
+                    logger.debug('Failed to find the "<head>" section on the redirect page')
+            else:
+                logger.debug('Failed to parse the redirect page as HTML data')
+            found_item = None
+            html_item = None
             if not download_page_url:
                 if config.get('lf_session') is not None:
                     logger.error(
