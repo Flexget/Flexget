@@ -40,15 +40,15 @@ quality_map = {
 
 # All URLs must have '/' at the end
 SITE_URLS = [
+    'https://www.lostfilm.download/',
+    'https://www.lostfilm.today/',
     'https://www.lostfilmtv2.site/',
     'https://www.lostfilm.top/',
-    'https://www.lostfilm.tw/',
-    'https://www.lostfilmtv.site/',
-    'https://www.lostfilmtv.uno/',
     'https://www.lostfilm.run/',
     'https://www.lostfilm.uno/',
-    'https://www.lostfilm.win/',
+    'https://www.lostfilmtv3.site/',
     'https://www.lostfilm.tv/',
+    'https://www.lostfilm.tw/',
 ]
 
 SIMPLIFY_MAP = str.maketrans({
