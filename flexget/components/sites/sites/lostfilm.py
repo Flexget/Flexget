@@ -21,9 +21,13 @@ RSS_TITLE_REGEXP = re.compile(
     r'^(?P<sr_rus>[^)(]+?)(?: \((?P<sr_org>[^)]+)\))?\. (?:(?P<ep_rus>.*)\. )?\(S(?P<season>\d+)E(?P<episode>\d+)\)$'
 )
 RSS_LINK_REGEXP = re.compile(
-    r'^https?://[a-z./]+/series/(?P<sr_org2>.+)/season_(?P<season>\d+)/episode_(?P<episode>\d+)/$'
+    r'^https?://[a-zA-Z0-9./_-]+/series/(?P<sr_org2>.+)/season_(?P<season>\d+)/episode_(?P<episode>\d+)/$'
 )
 RSS_LF_ID_REGEXP = re.compile(r'/Images/(?P<id>\d+)/Posters/image\.(?:png|jpg|jpeg)')
+RSS_TITLE_MOVIE_REGEXP = re.compile(
+    r'^(?P<movie_name_rus>[^)(]+?)(?: \((?P<movie_name>[^)]+)\))?\. \(Фильм\)$'
+)
+RSS_LINK_MOVIE_REGEXP = re.compile(r'^https?://[a-zA-Z0-9./_-]+/movies/(?P<movie_name2>[^/]+)$')
 PAGE_TEXT_REGEXP = re.compile(
     r'^\s*(?P<season>\d+)\s+сезон\s+(?P<episode>\d+)\s+серия\.(?:\s(?P<ep_rus>[^(]+?(?:\([^)]+?\))??))?(?:\s+\((?P<ep_org>[^)(]*?(?:\([^)]+?\))??)\s?\))?$'
 )
@@ -32,23 +36,23 @@ PAGE_LINKMAIN_REGEXP = re.compile(
 )
 
 quality_map = {
-    'SD': '480p.mp3.xvid',
-    '1080': '1080p.ac3.h264',
-    'MP4': '720p.aac.h264',
-    'HD': '720p.ac3.h264',
+    'SD': '480p.xvid.sdr.mp3',
+    '1080': '1080p.h264.sdr.ac3',
+    'MP4': '720p.h264.sdr.aac',
+    'HD': '720p.h264.sdr.ac3',
 }
 
 # All URLs must have '/' at the end
 SITE_URLS = [
+    'https://www.lostfilm.download/',
+    'https://www.lostfilm.today/',
     'https://www.lostfilmtv2.site/',
     'https://www.lostfilm.top/',
-    'https://www.lostfilm.tw/',
-    'https://www.lostfilmtv.site/',
-    'https://www.lostfilmtv.uno/',
     'https://www.lostfilm.run/',
     'https://www.lostfilm.uno/',
-    'https://www.lostfilm.win/',
+    'https://www.lostfilmtv3.site/',
     'https://www.lostfilm.tv/',
+    'https://www.lostfilm.tw/',
 ]
 
 SIMPLIFY_MAP = str.maketrans({
@@ -184,7 +188,7 @@ class LostFilm:
             logger.error('Failed to get the RSS feed')
             return None
 
-        # Use failed site locations as the last resot option for the redirect page
+        # Use failed site locations as the last resort option for the redirect page
         site_urls.extend(tried_urls)
 
         entries = []
@@ -212,6 +216,14 @@ class LostFilm:
                     episode_num = int(title_match['episode'])
                     episode_name_rus = title_match['ep_rus']
                 else:
+                    title_movie_match = RSS_TITLE_MOVIE_REGEXP.fullmatch(item['title'])
+                    if title_movie_match is not None:
+                        logger.debug(
+                            'Skipping movie "{}" ("{}")',
+                            title_movie_match['movie_name'],
+                            title_movie_match['movie_name_rus'],
+                        )
+                        continue
                     logger.warning('Cannot parse RSS item title: {}', item['title'])
 
             # Skip series names that are not configured.
@@ -228,8 +240,8 @@ class LostFilm:
                         folded_name = None
                     if folded_name and folded_name not in prefilter_list:
                         if idx != len(rss.entries) or entries or task.no_entries_ok:
-                            logger.debug(
-                                'Skipping "{}" as "{}" was not found in the list of configured series',
+                            logger.verbose(
+                                'Skipping "{}" as "{}" is not found in the list of configured series',
                                 item['title'],
                                 series_name_org,
                             )
@@ -265,7 +277,14 @@ class LostFilm:
                     continue
                 link_match = RSS_LINK_REGEXP.fullmatch(item['link'])
                 if link_match is None:
-                    logger.warning('Cannot parse RSS item link, skipping: {}', item['link'])
+                    link_movie_match = RSS_LINK_MOVIE_REGEXP.fullmatch(item['link'])
+                    if link_movie_match is not None:
+                        logger.warning(
+                            'Strange: series item has "{}" movie download link',
+                            link_movie_match['movie_name2'],
+                        )
+                    else:
+                        logger.warning('Cannot parse RSS item link, skipping: {}', item['link'])
                     continue
                 series_name_org = link_match['sr_org2'].replace('_', ' ')
                 season_num = int(link_match['season'])
@@ -315,7 +334,7 @@ class LostFilm:
                 response = None
                 tried_urls.append(site_urls.pop(0))
 
-            # Use failed site locations as the last resot option for the next attempts
+            # Use failed site locations as the last resort option for the next attempts
             site_urls.extend(tried_urls)
 
             if not response:
@@ -334,28 +353,46 @@ class LostFilm:
             page = get_soup(response.content)
 
             download_page_url = None
-            find_item = page.find('html', recursive=False)
-            if find_item is not None:
-                find_item = find_item.find('head', recursive=False)
-                if find_item is not None:
-                    find_item = find_item.find(
+            html_item = page.find('html', recursive=False)
+            if html_item is not None:
+                found_item = html_item.find('head', recursive=False)
+                if found_item is not None:
+                    found_item = found_item.find(
                         'meta', attrs={'http-equiv': 'refresh'}, recursive=False
                     )
-                    if (
-                        find_item is not None
-                        and find_item.has_attr('content')
-                        and find_item['content'].startswith('0; url=http')
-                    ):
-                        download_page_url = find_item['content'][7:]
+                    if found_item is not None:
+                        if found_item.has_attr('content'):
+                            if found_item['content'].startswith('0; url=/'):
+                                download_page_url = site_urls[0] + found_item['content'][7:]
+                            elif found_item['content'].startswith('0; url=https://') or found_item[
+                                'content'
+                            ].startswith('0; url=http://'):
+                                download_page_url = found_item['content'][7:]
+                            else:
+                                logger.debug(
+                                    'Failed to parse "content" value "{}"', found_item['content']
+                                )
+                        else:
+                            logger.debug(
+                                'Header meta "refresh" item has no "content": {}', found_item
+                            )
+                    else:
+                        logger.debug('Header meta "refresh" item not found')
+                else:
+                    logger.debug('Failed to find the "<head>" section on the redirect page')
+            else:
+                logger.debug('Failed to parse the redirect page as HTML data')
+            found_item = None
+            html_item = None
             if not download_page_url:
                 if config.get('lf_session') is not None:
                     logger.error(
-                        'Links were not foung on lostfilm.tv torrent download page. '
+                        'Links are not found on lostfilm.tv redirect page. '
                         'Check whether "lf_session" parameter is correct.'
                     )
                 else:
                     logger.error(
-                        'Links were not foung on lostfilm.tv torrent download page. '
+                        'Links are not found on lostfilm.tv redirect page. '
                         'Specify your "lf_session" cookie value in plugin parameters.'
                     )
                 continue
