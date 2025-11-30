@@ -240,8 +240,8 @@ class LostFilm:
                         folded_name = None
                     if folded_name and folded_name not in prefilter_list:
                         if idx != len(rss.entries) or entries or task.no_entries_ok:
-                            logger.debug(
-                                'Skipping "{}" as "{}" was not found in the list of configured series',
+                            logger.verbose(
+                                'Skipping "{}" as "{}" is not found in the list of configured series',
                                 item['title'],
                                 series_name_org,
                             )
