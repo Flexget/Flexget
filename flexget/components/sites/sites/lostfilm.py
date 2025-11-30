@@ -36,10 +36,10 @@ PAGE_LINKMAIN_REGEXP = re.compile(
 )
 
 quality_map = {
-    'SD': '480p.mp3.xvid',
-    '1080': '1080p.ac3.h264',
-    'MP4': '720p.aac.h264',
-    'HD': '720p.ac3.h264',
+    'SD': '480p.xvid.sdr.mp3',
+    '1080': '1080p.h264.sdr.ac3',
+    'MP4': '720p.h264.sdr.aac',
+    'HD': '720p.h264.sdr.ac3',
 }
 
 # All URLs must have '/' at the end
