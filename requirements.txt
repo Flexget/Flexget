@@ -150,7 +150,7 @@ requests==2.32.5
     # via flexget
 rich==14.2.0
     # via flexget
-rpds-py==0.29.0
+rpds-py==0.30.0
     # via
     #   jsonschema
     #   referencing
