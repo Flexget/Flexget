@@ -43,7 +43,7 @@ jobs:
     environment: production
     env:
       PYTHON_VERSION: '3.13' # renovate: datasource=python-version depName=python
-      UV_VERSION: 0.9.11 # renovate: datasource=pypi depName=uv
+      UV_VERSION: 0.9.13 # renovate: datasource=pypi depName=uv
     steps:
       - name: Checkout
         uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5

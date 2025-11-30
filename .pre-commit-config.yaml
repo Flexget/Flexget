@@ -85,7 +85,7 @@ repos:
       - id: check-github-issue-forms
       - id: check-readthedocs
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.9.11
+    rev: 0.9.13
     hooks:
       - id: uv-lock
       - id: uv-export
