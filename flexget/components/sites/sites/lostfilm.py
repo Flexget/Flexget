@@ -21,7 +21,7 @@ RSS_TITLE_REGEXP = re.compile(
     r'^(?P<sr_rus>[^)(]+?)(?: \((?P<sr_org>[^)]+)\))?\. (?:(?P<ep_rus>.*)\. )?\(S(?P<season>\d+)E(?P<episode>\d+)\)$'
 )
 RSS_LINK_REGEXP = re.compile(
-    r'^https?://[a-z./]+/series/(?P<sr_org2>.+)/season_(?P<season>\d+)/episode_(?P<episode>\d+)/$'
+    r'^https?://[a-zA-Z0-9./_-]+/series/(?P<sr_org2>.+)/season_(?P<season>\d+)/episode_(?P<episode>\d+)/$'
 )
 RSS_LF_ID_REGEXP = re.compile(r'/Images/(?P<id>\d+)/Posters/image\.(?:png|jpg|jpeg)')
 PAGE_TEXT_REGEXP = re.compile(
