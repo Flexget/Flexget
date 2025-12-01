@@ -283,10 +283,17 @@ class AniList:
 def relations_lookup(entry: Entry):
     ids = {}
     try:
-        ids: dict[str, str | int] = requests.post(
+        response = requests.post(
             'https://relations.yuna.moe/api/v2/ids',
             json={'anilist': entry.get('al_id', eval_lazy=False)},
-        ).json()
+        )
+        ids: dict[str, str | int] = response.json()
+        if ids is None:
+            logger.warning(
+                'Relations API returned None for AniList ID {}',
+                entry.get('al_id', eval_lazy=False),
+            )
+            ids = {}
         logger.debug('Additional IDs: {}', ids)
     except RequestException as e:
         logger.warning('Error fetching additional IDs: {}', e)
