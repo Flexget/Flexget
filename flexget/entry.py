@@ -296,6 +296,9 @@ class Entry(LazyDict, Serializer):
         :param ignore_none:
           Ignore any None values, do not record it to the Entry
         """
+        if source_item is None:
+            logger.debug('source_item is None, skipping update_using_map')
+            return
         func = dict.get if isinstance(source_item, dict) else getattr
         for field, value in field_map.items():
             if isinstance(value, str):
