@@ -1,4 +1,5 @@
 import datetime
+import fnmatch
 from datetime import timedelta
 
 from sqlalchemy import and_, desc, func
@@ -16,6 +17,9 @@ from . import db
 def do_cli(manager, options):
     if options.table_type == 'porcelain':
         disable_colors()
+    if options.status_action == 'remove':
+        do_cli_remove(manager, options)
+        return
     if options.task:
         do_cli_task(manager, options)
     else:
@@ -159,10 +163,40 @@ def do_cli_summary(manager, options):
     console(table)
 
 
+def do_cli_remove(manager, options):
+    with Session() as session:
+        all_tasks = session.query(db.StatusTask).all()
+        pattern = options.task_name.lower()
+        matching_tasks = [
+            task for task in all_tasks if fnmatch.fnmatchcase(task.name.lower(), pattern)
+        ]
+        if not matching_tasks:
+            console(f'Task pattern `{options.task_name}` does not match any tasks')
+            return
+        task_names = []
+        for task in matching_tasks:
+            console(f'Removing task `{task.name}` ...')
+            session.delete(task)
+            task_names.append(task.name)
+        session.commit()
+
+
 @event('options.register')
 def register_parser_arguments():
     parser = options.register_command(
         'status', do_cli, help='View task health status', parents=[table_parser]
+    )
+    subparsers = parser.add_subparsers(
+        title='actions', metavar='<action>', dest='status_action', required=False
+    )
+    remove_parser = subparsers.add_parser(
+        'remove',
+        help='Remove a task and all its execution records. Supports glob pattern matching.',
+    )
+    remove_parser.add_argument(
+        'task_name',
+        metavar='TASK',
+        help='Name or glob pattern of the task(s) to remove (e.g., "task-*")',
     )
     parser.add_argument(
         '--task', action='store', metavar='TASK', help='Limit to results in specified %(metavar)s'
