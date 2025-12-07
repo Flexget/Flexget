@@ -79,5 +79,5 @@ typing-extensions==4.15.0
     #   pydata-sphinx-theme
 urllib3==1.26.20 ; platform_python_implementation == 'PyPy'
     # via requests
-urllib3==2.5.0 ; platform_python_implementation != 'PyPy'
+urllib3==2.6.0 ; platform_python_implementation != 'PyPy'
     # via requests
