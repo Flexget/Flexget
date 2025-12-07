@@ -76,7 +76,7 @@ dev = [
   "pytest-cov~=7.0",
   "pytest-socket~=0.7.0",
   "pytest-xdist~=3.6",
-  "ruff==0.14.7",
+  "ruff==0.14.8",
   "vcrpy~=7.0",
 ]
 test = [
