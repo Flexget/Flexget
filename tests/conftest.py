@@ -68,13 +68,11 @@ def config(request):
 
     This is used by `manager` fixture, and can be parametrized.
     """
-    return getattr(request.cls, "config", 'tasks: {}')
+    return getattr(request.cls, 'config', 'tasks: {}')
 
 
 @pytest.fixture
-def manager(
-    request, config, caplog, monkeypatch, filecopy, tmp_path_factory
-):
+def manager(request, config, caplog, monkeypatch, filecopy, tmp_path_factory):
     """Create a :class:`MockManager` for this test based on `config` argument."""
     # enforce filecopy is run before manager
     config = config.replace('__tmp__', str(request.getfixturevalue('tmp_path')))
@@ -96,7 +94,7 @@ def execute_task(manager: Manager) -> Callable[..., Task]:
         task_name: str,
         abort: bool = False,
         options: dict | argparse.Namespace | None = None,
-        config: str = ''
+        config: str = '',
     ) -> Task:
         """Use to execute one test task from config.
 

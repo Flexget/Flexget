@@ -1,19 +1,9 @@
 import filecmp
-import platform
-import sys
 from pathlib import Path
 
 import pytest
 
 
-@pytest.mark.skipif(
-    platform.system() == 'Darwin',
-    reason='pytest-localftpserver is incompatible with macOS (https://github.com/oz123/pytest-localftpserver/issues/151)',
-)
-@pytest.mark.skipif(
-    platform.system() == 'Linux' and sys.version_info[:2] == (3, 14),
-    reason='pytest-localftpserver is incompatible with Python 3.14,Linux (https://github.com/oz123/pytest-localftpserver/issues/378)',
-)
 @pytest.mark.require_optional_deps
 @pytest.mark.xdist_group(name='ftp')
 class TestFtpDownload:

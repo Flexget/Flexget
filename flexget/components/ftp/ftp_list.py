@@ -69,7 +69,7 @@ class FTPList:
     def prepare_config(config):
         config.setdefault('retrieve', ['files'])
         config.setdefault('ssl', False)
-        config.setdefault('dirs', [''])
+        config.setdefault('dirs', ['/'])
         config.setdefault('port', 21)
         config.setdefault('encoding', 'utf-8')
         config.setdefault('recursion', False)
