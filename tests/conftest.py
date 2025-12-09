@@ -68,14 +68,15 @@ def config(request):
 
     This is used by `manager` fixture, and can be parametrized.
     """
-    return request.cls.config
+    return getattr(request.cls, "config", 'tasks: {}')
 
 
 @pytest.fixture
 def manager(
     request, config, caplog, monkeypatch, filecopy, tmp_path_factory
-):  # enforce filecopy is run before manager
+):
     """Create a :class:`MockManager` for this test based on `config` argument."""
+    # enforce filecopy is run before manager
     config = config.replace('__tmp__', str(request.getfixturevalue('tmp_path')))
     try:
         mockmanager = MockManager(config, request.cls.__name__, tmp_path_factory.mktemp('manager'))
@@ -95,15 +96,17 @@ def execute_task(manager: Manager) -> Callable[..., Task]:
         task_name: str,
         abort: bool = False,
         options: dict | argparse.Namespace | None = None,
+        config: str = ''
     ) -> Task:
         """Use to execute one test task from config.
 
         :param task_name: Name of task to execute.
         :param abort: If `True` expect (and require) this task to abort.
         :param options: Options for the execution.
+        :param config: A config passed in as a parameter rather than defined in a manager
         """
         logger.info('********** Running task: {} ********** ', task_name)
-        config = manager.config['tasks'][task_name]
+        config = manager.config['tasks'].get(task_name) or yaml.safe_load(config)
         task = Task(manager, task_name, config=config, options=options)
 
         try:
