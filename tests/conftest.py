@@ -50,6 +50,7 @@ def scrub_txnid(request):
 
 vcr = VCR(
     cassette_library_dir=str(VCR_CASSETTE_DIR),
+    drop_unused_requests=True,
     record_mode=VCR_RECORD_MODE,
     custom_patches=(
         (client, 'HTTPSConnection', VCRHTTPSConnection),

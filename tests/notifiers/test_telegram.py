@@ -1,28 +1,8 @@
 import pytest
 
 
-# workaround for https://github.com/kevin1024/vcrpy/issues/844
-@pytest.fixture
-def fix_patch_vcr():
-    import vcr.stubs.httpx_stubs
-    from vcr.request import Request as VcrRequest
-
-    def _make_vcr_request(httpx_request, **kwargs):
-        body_bytes = httpx_request.read()
-        try:
-            body = body_bytes.decode('utf-8')
-        except UnicodeDecodeError:
-            body = body_bytes
-        uri = str(httpx_request.url)
-        headers = dict(httpx_request.headers)
-        return VcrRequest(httpx_request.method, uri, body, headers)
-
-    vcr.stubs.httpx_stubs._make_vcr_request = _make_vcr_request
-
-
 @pytest.mark.require_optional_deps
 @pytest.mark.online
-@pytest.mark.usefixtures('fix_patch_vcr')
 class TestTelegramNotifier:
     config = """
         templates:
