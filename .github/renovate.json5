@@ -38,6 +38,8 @@
   ],
   customDatasources: {
     readthedocsPython: {
+      // TODO: Schema lists Python versions that the build environment doesn’t support yet, which leads to Renovate opening PRs too early.
+      // Blocked by https://github.com/readthedocs/readthedocs.org/issues/12619
       defaultRegistryUrlTemplate: 'https://raw.githubusercontent.com/readthedocs/readthedocs.org/master/readthedocs/rtd_tests/fixtures/spec/v2/schema.json',
       transformTemplates: [
         '{"releases":properties.build.properties.tools.properties.python.enum[$match($,/^\\d+\\.\\d+$/)].{"version":$}}',
