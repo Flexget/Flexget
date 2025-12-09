@@ -87,7 +87,7 @@ class FTPList:
 
         entry['title'] = title
         entry['location'] = Path(location)
-        entry['url'] = f'ftp://{self.username}:{self.password}@{self.host}:{self.port}/{location}'
+        entry['url'] = f'ftp://{self.username}:{self.password}@{self.host}:{self.port}{location}'
         entry['filename'] = title
 
         logger.debug('adding entry {}', entry)
