@@ -147,7 +147,7 @@ class CaseInsensitiveWord(Comparator):
 
 def quality_property(text_attr):
     def getter(self):
-        return qualities.Quality(getattr(self, text_attr))
+        return qualities.get(getattr(self, text_attr))
 
     def setter(self, value):
         if isinstance(value, str):
