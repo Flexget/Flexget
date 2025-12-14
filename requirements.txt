@@ -51,7 +51,7 @@ flask==3.1.2
     #   flexget
 flask-compress==1.23
     # via flexget
-flask-cors==6.0.1
+flask-cors==6.0.2
     # via flexget
 flask-login==0.6.3
     # via flexget
@@ -168,7 +168,7 @@ six==1.17.0
     #   python-dateutil
 soupsieve==2.8
     # via beautifulsoup4
-sqlalchemy==2.0.44
+sqlalchemy==2.0.45
     # via flexget
 tempora==5.8.1
     # via portend
@@ -177,15 +177,13 @@ typing-extensions==4.15.0
     #   beautifulsoup4
     #   referencing
     #   sqlalchemy
-tzdata==2025.2
+tzdata==2025.3
     # via
     #   pendulum
     #   tzlocal
 tzlocal==5.3.1
     # via apscheduler
-urllib3==1.26.20 ; platform_python_implementation == 'PyPy'
-    # via requests
-urllib3==2.6.0 ; platform_python_implementation != 'PyPy'
+urllib3==2.6.2
     # via requests
 webencodings==0.5.1
     # via html5lib
