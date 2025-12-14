@@ -16,7 +16,7 @@ jobs:
     permissions:
       security-events: write
     env:
-      UV_VERSION: 0.9.16 # renovate: datasource=pypi depName=uv
+      UV_VERSION: 0.9.17 # renovate: datasource=pypi depName=uv
     steps:
       - name: Checkout
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
