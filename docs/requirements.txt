@@ -77,7 +77,5 @@ typing-extensions==4.15.0
     # via
     #   beautifulsoup4
     #   pydata-sphinx-theme
-urllib3==1.26.20 ; platform_python_implementation == 'PyPy'
-    # via requests
-urllib3==2.6.0 ; platform_python_implementation != 'PyPy'
+urllib3==2.6.2
     # via requests
