@@ -75,7 +75,8 @@ class RegexpList(MutableSet):
                     res = regexp
         else:
             res = (
-                self._db_list(session)
+                self
+                ._db_list(session)
                 .regexps.filter(db.RegexListRegexp.regexp == entry.get('regexp', entry['title']))
                 .first()
             )

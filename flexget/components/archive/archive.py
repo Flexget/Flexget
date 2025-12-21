@@ -37,7 +37,8 @@ class Archive:
             processed.append(entry)
 
             ae = (
-                task.session.query(db.ArchiveEntry)
+                task.session
+                .query(db.ArchiveEntry)
                 .filter(db.ArchiveEntry.title == entry['title'])
                 .filter(db.ArchiveEntry.url == entry['url'])
                 .first()

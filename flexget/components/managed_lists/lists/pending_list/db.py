@@ -99,7 +99,8 @@ def get_pending_lists(name=None, session=None):
 def get_list_by_exact_name(name, session=None):
     logger.debug('returning pending list with name {}', name)
     return (
-        session.query(PendingListList)
+        session
+        .query(PendingListList)
         .filter(func.lower(PendingListList.name) == name.lower())
         .one()
     )
@@ -152,7 +153,8 @@ def get_entry_by_title(list_id, title, session=None):
     if entry_list:
         logger.debug('fetching entry with title `{}` from list id {}', title, list_id)
         return (
-            session.query(PendingListEntry)
+            session
+            .query(PendingListEntry)
             .filter(and_(PendingListEntry.title == title, PendingListEntry.list_id == list_id))
             .first()
         )
@@ -163,7 +165,8 @@ def get_entry_by_title(list_id, title, session=None):
 def get_entry_by_id(list_id, entry_id, session=None):
     logger.debug('fetching entry with id {} from list id {}', entry_id, list_id)
     return (
-        session.query(PendingListEntry)
+        session
+        .query(PendingListEntry)
         .filter(and_(PendingListEntry.id == entry_id, PendingListEntry.list_id == list_id))
         .one()
     )

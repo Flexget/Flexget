@@ -148,7 +148,8 @@ class InputGazelle:
         logger.debug('Attempting to find an existing session in the DB')
         with Session() as session:
             db_session = (
-                session.query(GazelleSession)
+                session
+                .query(GazelleSession)
                 .filter(
                     GazelleSession.base_url == self.base_url,
                     GazelleSession.username == self.username,

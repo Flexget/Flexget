@@ -53,7 +53,8 @@ def imdb_query(session):
         # movie = session.query(Movie).options(subqueryload(Movie.genres)).filter(Movie.url == url).one()
 
         movie = (
-            session.query(Movie)
+            session
+            .query(Movie)
             .options(
                 joinedload(Movie.genres),
                 joinedload(Movie.languages),

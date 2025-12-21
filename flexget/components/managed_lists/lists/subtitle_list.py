@@ -190,7 +190,8 @@ class SubtitleList(MutableSet):
 
     def _db_list(self, session):
         return (
-            session.query(SubtitleListList)
+            session
+            .query(SubtitleListList)
             .filter(SubtitleListList.name == self.config['list'])
             .first()
         )
@@ -292,7 +293,8 @@ class SubtitleList(MutableSet):
     @with_session
     def _find_language(self, file_id, language, session=None):
         return (
-            session.query(SubtitleListLanguage)
+            session
+            .query(SubtitleListLanguage)
             .filter(
                 and_(
                     func.lower(SubtitleListLanguage.language) == str(language).lower(),

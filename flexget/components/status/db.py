@@ -123,7 +123,8 @@ def db_cleanup(manager, session):
 
     # Purge task executions older than 1 year
     result = (
-        session.query(TaskExecution)
+        session
+        .query(TaskExecution)
         .filter(TaskExecution.start < datetime.datetime.now() - timedelta(days=365))
         .delete()
     )

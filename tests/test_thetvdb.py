@@ -231,7 +231,8 @@ class TestTVDBExpire:
         ):  # Ensure series is not marked as expired
             mark_expired(session)
             ep = (
-                session.query(TVDBEpisode)
+                session
+                .query(TVDBEpisode)
                 .filter(TVDBEpisode.series_id == 73255)
                 .filter(TVDBEpisode.episode_number == 2)
                 .filter(TVDBEpisode.season_number == 2)
@@ -269,7 +270,8 @@ class TestTVDBExpire:
         ):
             mark_expired(session)
             ep = (
-                session.query(TVDBEpisode)
+                session
+                .query(TVDBEpisode)
                 .filter(TVDBEpisode.series_id == 73255)
                 .filter(TVDBEpisode.episode_number == 2)
                 .filter(TVDBEpisode.season_number == 2)
@@ -283,7 +285,8 @@ class TestTVDBExpire:
 
         with Session() as session:
             ep = (
-                session.query(TVDBEpisode)
+                session
+                .query(TVDBEpisode)
                 .filter(TVDBEpisode.series_id == 73255)
                 .filter(TVDBEpisode.episode_number == 2)
                 .filter(TVDBEpisode.season_number == 2)

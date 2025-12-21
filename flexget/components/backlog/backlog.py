@@ -63,7 +63,8 @@ class InputBacklog:
             snapshot = serialize(entry)
         expire_time = datetime.now() + parse_timedelta(amount)
         backlog_entry = (
-            session.query(BacklogEntry)
+            session
+            .query(BacklogEntry)
             .filter(BacklogEntry.title == entry['title'])
             .filter(BacklogEntry.task == task.name)
             .first()

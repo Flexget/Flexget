@@ -101,7 +101,8 @@ class FilterProperMovies:
             logger.debug('current proper count: {}', parser.proper_count)
 
             proper_movie = (
-                task.session.query(ProperMovie)
+                task.session
+                .query(ProperMovie)
                 .filter(ProperMovie.imdb_id == entry['imdb_id'])
                 .filter(ProperMovie.quality == quality)
                 .order_by(desc(ProperMovie.proper_count))
@@ -157,7 +158,8 @@ class FilterProperMovies:
             logger.debug('proper count: {}', parser.proper_count)
 
             proper_movie = (
-                task.session.query(ProperMovie)
+                task.session
+                .query(ProperMovie)
                 .filter(ProperMovie.imdb_id == entry['imdb_id'])
                 .filter(ProperMovie.quality == quality)
                 .filter(ProperMovie.proper_count == parser.proper_count)

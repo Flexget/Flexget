@@ -463,7 +463,8 @@ class FilterSeries(FilterSeriesBase):
             # str() added to make sure number shows (e.g. 24) are turned into strings
             series_names = [str(next(iter(s.keys()))) for s in config]
             existing_series = (
-                session.query(db.Series)
+                session
+                .query(db.Series)
                 .filter(db.Series.name.in_(series_names))
                 .options(joinedload(db.Series.alternate_names))
                 .all()
@@ -1091,13 +1092,15 @@ class FilterSeries(FilterSeriesBase):
                     season_num = ep_num = 0
                     if entry['season_pack']:
                         season_num = (
-                            session.query(db.SeasonRelease)
+                            session
+                            .query(db.SeasonRelease)
                             .filter(db.SeasonRelease.id.in_(entry['series_releases']))
                             .update({'downloaded': True}, synchronize_session=False)
                         )
                     else:
                         ep_num = (
-                            session.query(db.EpisodeRelease)
+                            session
+                            .query(db.EpisodeRelease)
                             .filter(db.EpisodeRelease.id.in_(entry['series_releases']))
                             .update({'downloaded': True}, synchronize_session=False)
                         )
@@ -1133,7 +1136,8 @@ class SeriesDBManager(FilterSeriesBase):
             # Prefetch series
             names = [str(next(iter(series.keys()))) for series in config]
             existing_series = (
-                session.query(db.Series)
+                session
+                .query(db.Series)
                 .filter(db.Series.name.in_(names))
                 .options(joinedload(db.Series.alternate_names))
                 .all()

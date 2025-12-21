@@ -75,16 +75,16 @@ def do_cli_summary(manager, options):
 
         # Subquery to find the last execution time for each task
         last_execution_subq = (
-            session.query(LastExecution.task_id, func.max(LastExecution.start).label('last_start'))
+            session
+            .query(LastExecution.task_id, func.max(LastExecution.start).label('last_start'))
             .group_by(LastExecution.task_id)
             .subquery()
         )
 
         # Subquery to find the last successful execution with produced > 0 for each task
         last_success_subq = (
-            session.query(
-                LastSuccess.task_id, func.max(LastSuccess.start).label('last_success_start')
-            )
+            session
+            .query(LastSuccess.task_id, func.max(LastSuccess.start).label('last_success_start'))
             .filter(and_(LastSuccess.succeeded, LastSuccess.produced > 0))
             .group_by(LastSuccess.task_id)
             .subquery()
@@ -92,7 +92,8 @@ def do_cli_summary(manager, options):
 
         # Main query with left joins to get all required data in a single query
         query = (
-            session.query(
+            session
+            .query(
                 db.StatusTask,
                 last_execution_subq.c.last_start,
                 LastSuccess.start,

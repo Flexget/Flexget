@@ -66,7 +66,8 @@ def consolidate():
             # orig.task = None
 
             for dupe in (
-                session.query(flexget.components.archive.db.ArchiveEntry)
+                session
+                .query(flexget.components.archive.db.ArchiveEntry)
                 .filter(flexget.components.archive.db.ArchiveEntry.id != orig.id)
                 .filter(flexget.components.archive.db.ArchiveEntry.title == orig.title)
                 .filter(flexget.components.archive.db.ArchiveEntry.url == orig.url)
@@ -103,7 +104,8 @@ def tag_source(source_name, tag_names=None):
     try:
         # check that source exists
         source = (
-            session.query(flexget.components.archive.db.ArchiveSource)
+            session
+            .query(flexget.components.archive.db.ArchiveSource)
             .filter(flexget.components.archive.db.ArchiveSource.name == source_name)
             .first()
         )
@@ -125,7 +127,8 @@ def tag_source(source_name, tag_names=None):
         # tag 'em
         logger.verbose('Please wait while adding tags {} ...', ', '.join(tag_names))
         for a in (
-            session.query(flexget.components.archive.db.ArchiveEntry)
+            session
+            .query(flexget.components.archive.db.ArchiveEntry)
             .filter(flexget.components.archive.db.ArchiveEntry.sources.any(name=source_name))
             .yield_per(5)
         ):

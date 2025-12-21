@@ -289,7 +289,8 @@ def get_translations(ident, style):
         with Session() as session:
             for result in results:
                 translation = (
-                    session.query(trakt_translation)
+                    session
+                    .query(trakt_translation)
                     .filter(
                         and_(
                             trakt_translation.language == result.get('language'),
@@ -667,7 +668,8 @@ class TraktShow(Base):
     def get_episode(self, season, number, session, only_cached=False):
         # TODO: Does series data being expired mean all episode data should be refreshed?
         episode = (
-            self.episodes.filter(TraktEpisode.season == season)
+            self.episodes
+            .filter(TraktEpisode.season == season)
             .filter(TraktEpisode.number == number)
             .first()
         )
@@ -983,7 +985,8 @@ def get_item_from_cache(table, session, title=None, year=None, trakt_ids=None):
     result = None
     if trakt_ids:
         result = (
-            session.query(table)
+            session
+            .query(table)
             .filter(
                 or_(getattr(table, col) == val for col, val in trakt_ids.to_dict().items() if val)
             )

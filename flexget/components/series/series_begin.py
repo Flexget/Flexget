@@ -25,7 +25,8 @@ class SetSeriesBegin:
         for entry in task.accepted:
             if entry.get('series_name') and entry.get('series_id'):
                 fshow = (
-                    task.session.query(db.Series)
+                    task.session
+                    .query(db.Series)
                     .filter(db.Series.name == entry['series_name'])
                     .first()
                 )

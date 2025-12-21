@@ -163,7 +163,8 @@ class MyEpisodes:
         """
         lc_series_name = entry['series_name'].lower()
         info = (
-            self.db_session.query(MyEpisodesInfo)
+            self.db_session
+            .query(MyEpisodesInfo)
             .filter(MyEpisodesInfo.series_name == lc_series_name)
             .first()
         )
@@ -227,7 +228,8 @@ class MyEpisodes:
         """
         # if we already have the a record for that id, update the name so that we find it next time
         db_item = (
-            self.db_session.query(MyEpisodesInfo)
+            self.db_session
+            .query(MyEpisodesInfo)
             .filter(MyEpisodesInfo.myepisodes_id == myepisodes_id)
             .first()
         )

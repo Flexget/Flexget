@@ -173,7 +173,8 @@ class NextSeriesEpisodes:
                     elif latest:
                         start_at_ep = 1
                         episodes_this_season = (
-                            session.query(db.Episode)
+                            session
+                            .query(db.Episode)
                             .filter(db.Episode.series_id == series.id)
                             .filter(db.Episode.season == season)
                         )
@@ -188,7 +189,8 @@ class NextSeriesEpisodes:
                         ).first()
                         if latest_ep_this_season:
                             downloaded_this_season = (
-                                episodes_this_season.join(db.Episode.releases)
+                                episodes_this_season
+                                .join(db.Episode.releases)
                                 .filter(db.EpisodeRelease.downloaded)
                                 .all()
                             )
@@ -256,7 +258,8 @@ class NextSeriesEpisodes:
             )
             latest = db.get_latest_release(series)
             db_release = (
-                session.query(db.EpisodeRelease)
+                session
+                .query(db.EpisodeRelease)
                 .join(db.EpisodeRelease.episode)
                 .join(db.Episode.series)
                 .filter(db.Series.name == entry['series_name'])

@@ -150,7 +150,8 @@ def get_list_by_id(list_id, session=None):
 def get_movie_by_id(list_id, movie_id, session=None):
     logger.debug('fetching movie with id {} from list id {}', movie_id, list_id)
     return (
-        session.query(MovieListMovie)
+        session
+        .query(MovieListMovie)
         .filter(and_(MovieListMovie.id == movie_id, MovieListMovie.list_id == list_id))
         .one()
     )
@@ -162,7 +163,8 @@ def get_movie_by_title_and_year(list_id, title, year=None, session=None):
     if movie_list:
         logger.debug('searching for movie {} in list {}', title, list_id)
         return (
-            session.query(MovieListMovie)
+            session
+            .query(MovieListMovie)
             .filter(
                 and_(
                     func.lower(MovieListMovie.title) == title.lower(),
@@ -178,7 +180,8 @@ def get_movie_by_title_and_year(list_id, title, year=None, session=None):
 @with_session
 def get_movie_identifier(identifier_name, identifier_value, movie_id=None, session=None):
     db_movie_id = (
-        session.query(MovieListID)
+        session
+        .query(MovieListID)
         .filter(
             and_(
                 MovieListID.id_name == identifier_name,

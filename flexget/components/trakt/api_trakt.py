@@ -155,7 +155,8 @@ class ApiTrakt:
         found = None
         if not series and title:
             found = (
-                session.query(db.TraktShowSearchResult)
+                session
+                .query(db.TraktShowSearchResult)
                 .filter(db.TraktShowSearchResult.search == title.lower())
                 .first()
             )
@@ -185,7 +186,8 @@ class ApiTrakt:
                 return series
             if series and title and not found:
                 if (
-                    not session.query(db.TraktShowSearchResult)
+                    not session
+                    .query(db.TraktShowSearchResult)
                     .filter(db.TraktShowSearchResult.search == title.lower())
                     .first()
                 ):
@@ -209,7 +211,8 @@ class ApiTrakt:
         found = None
         if not movie and title:
             found = (
-                session.query(db.TraktMovieSearchResult)
+                session
+                .query(db.TraktMovieSearchResult)
                 .filter(db.TraktMovieSearchResult.search == title.lower())
                 .first()
             )
@@ -244,7 +247,8 @@ class ApiTrakt:
                 return movie
             if movie and title and not found:
                 if (
-                    not session.query(db.TraktMovieSearchResult)
+                    not session
+                    .query(db.TraktMovieSearchResult)
                     .filter(db.TraktMovieSearchResult.search == title.lower())
                     .first()
                 ):

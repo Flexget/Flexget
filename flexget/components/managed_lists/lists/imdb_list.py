@@ -186,7 +186,8 @@ class ImdbEntrySet(MutableSet):
                 cached_credentials = True
             else:
                 user = (
-                    session.query(IMDBListUser)
+                    session
+                    .query(IMDBListUser)
                     .filter(IMDBListUser.user_name == self.config.get('login'))
                     .one_or_none()
                 )

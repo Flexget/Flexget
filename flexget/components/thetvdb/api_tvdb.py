@@ -736,7 +736,8 @@ def search_for_series(
     if not force_search:
         logger.debug('trying to fetch TVDB search results from DB')
         series_search_results = (
-            session.query(TVDBSeriesSearchResult)
+            session
+            .query(TVDBSeriesSearchResult)
             .filter(TVDBSeriesSearchResult.lookup_term == lookup_term)
             .all()
         )
@@ -785,12 +786,14 @@ def mark_expired(session):
     # Update our cache to mark the items that have expired
     for chunk in chunked(expired_series):
         series_updated = (
-            session.query(TVDBSeries)
+            session
+            .query(TVDBSeries)
             .filter(TVDBSeries.id.in_(chunk))
             .update({'expired': True}, 'fetch')
         )
         episodes_updated = (
-            session.query(TVDBEpisode)
+            session
+            .query(TVDBEpisode)
             .filter(TVDBEpisode.series_id.in_(chunk))
             .update({'expired': True}, 'fetch')
         )

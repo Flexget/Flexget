@@ -18,7 +18,8 @@ logger = logger.bind(name=plugin_name)
 class PendingListSet(MutableSet):
     def _db_list(self, session):
         return (
-            session.query(db.PendingListList)
+            session
+            .query(db.PendingListList)
             .filter(db.PendingListList.name == self.list_name)
             .first()
         )
@@ -40,7 +41,8 @@ class PendingListSet(MutableSet):
 
     def _entry_query(self, session, entry, approved=None):
         query = (
-            session.query(db.PendingListEntry)
+            session
+            .query(db.PendingListEntry)
             .filter(db.PendingListEntry.list_id == self._db_list(session).id)
             .filter(
                 or_(

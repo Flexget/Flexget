@@ -328,7 +328,8 @@ class IRCConnection(SimpleIRCBot):
                 logger.debug('Trying to search list of tracker files on Github')
                 # Try to see if it's not found due to case sensitivity
                 trackers = (
-                    requests.get(
+                    requests
+                    .get(
                         'https://api.github.com/repos/autodl-community/'
                         'autodl-trackers/git/trees/master?recursive=1'
                     )

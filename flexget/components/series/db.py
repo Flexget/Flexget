@@ -723,7 +723,8 @@ def upgrade(ver: int | None, session: Session) -> int:
 def db_cleanup(manager, session: Session) -> None:
     # Clean up old undownloaded releases
     result = (
-        session.query(EpisodeRelease)
+        session
+        .query(EpisodeRelease)
         .filter(~EpisodeRelease.downloaded)
         .filter(EpisodeRelease.first_seen < datetime.now() - timedelta(days=120))
         .delete(False)
@@ -732,7 +733,8 @@ def db_cleanup(manager, session: Session) -> None:
         logger.verbose('Removed {} undownloaded episode releases.', result)
     # Clean up episodes without releases
     result = (
-        session.query(Episode)
+        session
+        .query(Episode)
         .filter(~Episode.releases.any())
         .filter(~Episode.begins_series.any())
         .delete(False)
@@ -741,7 +743,8 @@ def db_cleanup(manager, session: Session) -> None:
         logger.verbose('Removed {} episodes without releases.', result)
     # Clean up series without episodes that aren't in any tasks
     result = (
-        session.query(Series)
+        session
+        .query(Series)
         .filter(~Series.episodes.any())
         .filter(~Series.in_tasks.any())
         .delete(False)
@@ -942,7 +945,8 @@ def get_series_summary(
         )
     query = session.query(Series)
     query = (
-        query.outerjoin(Series.episodes)
+        query
+        .outerjoin(Series.episodes)
         .outerjoin(Episode.releases)
         .outerjoin(Series.in_tasks)
         .group_by(Series.id)
@@ -973,7 +977,8 @@ def auto_identified_by(series: Series) -> str:
     """
     session = Session.object_session(series)
     type_totals = dict(
-        session.query(Episode.identified_by, func.count(Episode.identified_by))
+        session
+        .query(Episode.identified_by, func.count(Episode.identified_by))
         .join(Episode.series)
         .filter(Series.id == series.id)
         .group_by(Episode.identified_by)
@@ -1022,7 +1027,8 @@ def get_latest_season_pack_release(
     """
     session = Session.object_session(series)
     releases = (
-        session.query(Season)
+        session
+        .query(Season)
         .join(Season.releases)
         .join(Season.series)
         .filter(Series.id == series.id)
@@ -1063,7 +1069,8 @@ def get_latest_episode_release(
     """
     session = Session.object_session(series)
     releases = (
-        session.query(Episode)
+        session
+        .query(Episode)
         .join(Episode.releases)
         .join(Episode.series)
         .filter(Series.id == series.id)
@@ -1189,7 +1196,8 @@ def set_series_begin(series: Series, ep_id: str | int) -> tuple[str, str]:
         )
     series.identified_by = identified_by
     episode = (
-        session.query(Episode)
+        session
+        .query(Episode)
         .filter(Episode.series_id == series.id)
         .filter(Episode.identified_by == series.identified_by)
         .filter(Episode.identifier == str(ep_id))
@@ -1270,7 +1278,8 @@ def remove_series_entity(name: str, identifier: str, forget: bool = False) -> No
         removed = False
         if parsed.season_pack:
             season = (
-                session.query(Season)
+                session
+                .query(Season)
                 .filter(Season.season == parsed.season)
                 .filter(Season.series_id == series.id)
                 .first()
@@ -1323,7 +1332,8 @@ def delete_season_release_by_id(release_id: int) -> None:
 def shows_by_name(normalized_name: str, session: Session = None) -> list[Series]:
     """Return all series matching `normalized_name`."""
     return (
-        session.query(Series)
+        session
+        .query(Series)
         .filter(Series._name_normalized.contains(normalized_name))
         .order_by(func.char_length(Series.name))
         .all()
@@ -1333,7 +1343,8 @@ def shows_by_name(normalized_name: str, session: Session = None) -> list[Series]
 def shows_by_exact_name(normalized_name: str, session: Session = None) -> list[Series]:
     """Return all series matching `normalized_name`."""
     return (
-        session.query(Series)
+        session
+        .query(Series)
         .filter(Series._name_normalized == normalized_name)
         .order_by(func.char_length(Series.name))
         .all()
@@ -1415,7 +1426,8 @@ def store_parser(
     if not series:
         # if series does not exist in database, add new
         series = (
-            session.query(Series)
+            session
+            .query(Series)
             .filter(Series.name == parser.name)
             .filter(Series.id.is_not(None))
             .first()
@@ -1432,7 +1444,8 @@ def store_parser(
         if parser.season_pack:
             # Checks if season object exist
             season = (
-                session.query(Season)
+                session
+                .query(Season)
                 .filter(Season.season == parser.season)
                 .filter(Season.series_id == series.id)
                 .filter(Season.identifier == identifier)
@@ -1457,7 +1470,8 @@ def store_parser(
         else:
             # if episode does not exist in series, add new
             episode = (
-                session.query(Episode)
+                session
+                .query(Episode)
                 .filter(Episode.series_id == series.id)
                 .filter(Episode.identifier == identifier)
                 .filter(Episode.series_id.is_not(None))
@@ -1493,7 +1507,8 @@ def store_parser(
         # to database but doesn't have episode_id, this causes all kinds of havoc with the plugin.
         # perhaps a bug in sqlalchemy?
         release = (
-            session.query(table)
+            session
+            .query(table)
             .filter(filter_by == filter_id)
             .filter(table.title == parser.data)
             .filter(table.quality == quality)

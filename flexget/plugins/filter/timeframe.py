@@ -79,7 +79,8 @@ class FilterTimeFrame:
         with Session() as session:
             # Prefetch Data
             existing_ids = (
-                session.query(EntryTimeFrame)
+                session
+                .query(EntryTimeFrame)
                 .filter(EntryTimeFrame.id.in_(grouped_entries.keys()))
                 .all()
             )
@@ -176,7 +177,8 @@ class FilterTimeFrame:
         with Session() as session:
             # Prefetch Data
             existing_ids = (
-                session.query(EntryTimeFrame)
+                session
+                .query(EntryTimeFrame)
                 .filter(EntryTimeFrame.id.in_(grouped_entries.keys()))
                 .all()
             )

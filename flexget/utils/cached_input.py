@@ -45,7 +45,8 @@ def upgrade(ver: int, session: DBSession) -> int:
             try:
                 p = pickle.loads(row['entry'])
                 session.execute(
-                    table.update()
+                    table
+                    .update()
                     .where(table.c.id == row['id'])
                     .values(json=json.dumps(p, encode_datetime=True))
                 )
@@ -99,7 +100,8 @@ class InputCacheEntry(Base):
 def db_cleanup(manager, session: DBSession) -> None:
     """Remove old input caches from plugins that are no longer configured."""
     result = (
-        session.query(InputCache)
+        session
+        .query(InputCache)
         .filter(InputCache.added < datetime.now() - timedelta(days=7))
         .delete()
     )
@@ -188,7 +190,8 @@ class cached:  # noqa: N801 It acts like a function in usage
         logger.debug('Storing cache {} to database.', self.cache_name)
         with Session() as session:
             db_cache = (
-                session.query(InputCache)
+                session
+                .query(InputCache)
                 .filter(InputCache.name == self.name)
                 .filter(InputCache.hash == self.config_hash)
                 .first()
@@ -202,7 +205,8 @@ class cached:  # noqa: N801 It acts like a function in usage
     def load_from_db(self, load_expired: bool = False) -> list[InputCacheEntry] | None:
         with Session() as session:
             db_cache = (
-                session.query(InputCache)
+                session
+                .query(InputCache)
                 .filter(InputCache.name == self.name)
                 .filter(InputCache.hash == self.config_hash)
             )

@@ -71,7 +71,8 @@ class PendingEntry(Base):
 def db_cleanup(manager, session):
     # Clean unapproved entries older than 1 year
     deleted = (
-        session.query(PendingEntry)
+        session
+        .query(PendingEntry)
         .filter(PendingEntry.added < datetime.now() - timedelta(days=365))
         .delete()
     )
