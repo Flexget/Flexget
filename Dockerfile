@@ -1,4 +1,4 @@
-FROM docker.io/python:3.11-alpine@sha256:d174db33fa506083fbd941b265f7bae699e7c338c77c415f85dddff4f176d1de AS builder
+FROM docker.io/python:3.11-alpine@sha256:c825a02ff096b3dc3d362015f9e9f6527f66b73e11f9ad2db1f0da4e09ba7030 AS builder
 ENV PYTHONUNBUFFERED=1
 
 RUN apk update && apk add --upgrade \
@@ -23,7 +23,7 @@ ADD . /flexget
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen --no-dev --group=all
 
-FROM docker.io/python:3.11-alpine@sha256:d174db33fa506083fbd941b265f7bae699e7c338c77c415f85dddff4f176d1de
+FROM docker.io/python:3.11-alpine@sha256:c825a02ff096b3dc3d362015f9e9f6527f66b73e11f9ad2db1f0da4e09ba7030
 ENV PYTHONUNBUFFERED=1
 
 RUN --mount=type=cache,target=/var/cache/apk \
