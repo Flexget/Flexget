@@ -150,7 +150,8 @@ class SearchAlphaRatio:
         if not force:
             with Session() as session:
                 saved_cookie = (
-                    session.query(AlphaRatioCookie)
+                    session
+                    .query(AlphaRatioCookie)
                     .filter(AlphaRatioCookie.username == username)
                     .first()
                 )

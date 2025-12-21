@@ -42,7 +42,8 @@ class FilterRememberRejected:
             elif not task.is_rerun:
                 # Delete expired items if this is not a rerun
                 deleted = (
-                    session.query(db.RememberEntry)
+                    session
+                    .query(db.RememberEntry)
                     .filter(db.RememberEntry.task_id == old_task.id)
                     .filter(db.RememberEntry.expires < datetime.now())
                     .delete()
@@ -109,7 +110,8 @@ class FilterRememberRejected:
                     expires = datetime.now() + entry['remember_rejected']
 
                 (remember_task_id,) = (
-                    session.query(db.RememberTask.id)
+                    session
+                    .query(db.RememberTask.id)
                     .filter(db.RememberTask.name == task.name)
                     .first()
                 )

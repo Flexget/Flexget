@@ -32,7 +32,8 @@ def upgrade(ver, session):
             try:
                 p = pickle.loads(row['entry'])
                 session.execute(
-                    table.update()
+                    table
+                    .update()
                     .where(table.c.id == row['id'])
                     .values(json=json.dumps(p, encode_datetime=True))
                 )
@@ -112,7 +113,8 @@ class DBEntrySet(MutableSet):
 
     def _entry_query(self, session, entry):
         return (
-            session.query(EntryListEntry)
+            session
+            .query(EntryListEntry)
             .filter(
                 and_(
                     EntryListEntry.list_id == self._db_list(session).id,
@@ -241,7 +243,8 @@ def get_entry_by_title(list_id, title, session=None):
     entry_list = get_list_by_id(list_id=list_id, session=session)
     if entry_list:
         return (
-            session.query(EntryListEntry)
+            session
+            .query(EntryListEntry)
             .filter(and_(EntryListEntry.title == title, EntryListEntry.list_id == list_id))
             .first()
         )
@@ -252,7 +255,8 @@ def get_entry_by_title(list_id, title, session=None):
 def get_entry_by_id(list_id, entry_id, session=None):
     logger.debug('fetching entry with id {} from list id {}', entry_id, list_id)
     return (
-        session.query(EntryListEntry)
+        session
+        .query(EntryListEntry)
         .filter(and_(EntryListEntry.id == entry_id, EntryListEntry.list_id == list_id))
         .one()
     )

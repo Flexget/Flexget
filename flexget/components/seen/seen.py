@@ -88,7 +88,8 @@ class FilterSeen:
                         found.value,
                     )
                     se = (
-                        task.session.query(db.SeenEntry)
+                        task.session
+                        .query(db.SeenEntry)
                         .filter(db.SeenEntry.id == found.seen_entry_id)
                         .one()
                     )

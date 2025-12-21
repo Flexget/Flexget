@@ -225,7 +225,8 @@ class ApiBluray:
         movie = movie_filter.first()
         if not movie:
             found = (
-                session.query(BluraySearchResult)
+                session
+                .query(BluraySearchResult)
                 .filter(BluraySearchResult.search == title_year.lower())
                 .first()
             )

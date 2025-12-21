@@ -72,8 +72,9 @@ class PluginThetvdbLookup:
         'tvdb_banner': 'banner',
         'tvdb_language': 'language',
         'tvdb_airs_day_of_week': 'airs_dayofweek',
-        'imdb_url': lambda series: series.imdb_id
-        and f'http://www.imdb.com/title/{series.imdb_id}',
+        'imdb_url': lambda series: (
+            series.imdb_id and f'http://www.imdb.com/title/{series.imdb_id}'
+        ),
         'imdb_id': 'imdb_id',
         'zap2it_id': 'zap2it_id',
         'tvdb_id': 'id',

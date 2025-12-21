@@ -141,7 +141,8 @@ class RejectedEntry(APIResource):
         """Return a rejected entry."""
         try:
             entry = (
-                session.query(db.RememberEntry)
+                session
+                .query(db.RememberEntry)
                 .filter(db.RememberEntry.id == rejected_entry_id)
                 .one()
             )
@@ -154,7 +155,8 @@ class RejectedEntry(APIResource):
         """Delete a rejected entry."""
         try:
             entry = (
-                session.query(db.RememberEntry)
+                session
+                .query(db.RememberEntry)
                 .filter(db.RememberEntry.id == rejected_entry_id)
                 .one()
             )

@@ -61,7 +61,8 @@ def get_regexp_lists(name=None, session=None):
 def get_list_by_exact_name(name, session=None):
     logger.debug('returning list with name {}', name)
     return (
-        session.query(RegexpListList)
+        session
+        .query(RegexpListList)
         .filter(func.lower(RegexpListList.name) == name.lower())
         .one_or_none()
     )
@@ -94,7 +95,8 @@ def get_regexp(list_id, regexp, session=None):
     if regexp_list:
         logger.debug('searching for regexp {} in list {}', regexp, list_id)
         return (
-            session.query(RegexListRegexp)
+            session
+            .query(RegexListRegexp)
             .filter(
                 and_(
                     func.lower(RegexListRegexp.regexp) == regexp.lower(),

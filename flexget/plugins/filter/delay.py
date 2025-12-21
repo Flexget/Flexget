@@ -51,7 +51,8 @@ def upgrade(ver, session):
             try:
                 p = pickle.loads(row['entry'])
                 session.execute(
-                    table.update()
+                    table
+                    .update()
                     .where(table.c.id == row['id'])
                     .values(json=json.dumps(p, encode_datetime=True))
                 )
@@ -113,7 +114,8 @@ class FilterDelay:
             logger.debug('Delaying {}', entry['title'])
             # check if already in queue
             if (
-                not task.session.query(DelayedEntry)
+                not task.session
+                .query(DelayedEntry)
                 .filter(DelayedEntry.title == entry['title'])
                 .filter(DelayedEntry.task == task.name)
                 .first()
@@ -130,7 +132,8 @@ class FilterDelay:
 
         # Generate the list of entries whose delay has passed
         passed_delay = (
-            task.session.query(DelayedEntry)
+            task.session
+            .query(DelayedEntry)
             .filter(datetime.now() > DelayedEntry.expire)
             .filter(DelayedEntry.task == task.name)
         )

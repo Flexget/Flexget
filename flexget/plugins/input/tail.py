@@ -80,7 +80,8 @@ class InputTail:
         encoding = config.get('encoding', 'utf-8')
         with Session() as session:
             db_pos = (
-                session.query(TailPosition)
+                session
+                .query(TailPosition)
                 .filter(TailPosition.task == task.name)
                 .filter(TailPosition.filename == filename)
                 .first()

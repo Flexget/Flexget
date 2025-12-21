@@ -367,7 +367,8 @@ def from_cache(session=None, search_params=None, cache_type=None):
         list(search_params.items()),
     )
     return (
-        session.query(cache_type)
+        session
+        .query(cache_type)
         .filter(or_(getattr(cache_type, col) == val for col, val in search_params.items() if val))
         .first()
     )
@@ -515,7 +516,8 @@ class APITVMaze:
         # See if season already exists in cache
         logger.debug('searching for season {} of show {} in cache', season_number, series.name)
         season = (
-            session.query(TVMazeSeason)
+            session
+            .query(TVMazeSeason)
             .filter(TVMazeSeason.series_id == series.tvmaze_id)
             .filter(TVMazeSeason.number == season_number)
             .one_or_none()
@@ -535,7 +537,8 @@ class APITVMaze:
 
         # Query again
         season = (
-            session.query(TVMazeSeason)
+            session
+            .query(TVMazeSeason)
             .filter(TVMazeSeason.tvmaze_id == series.tvmaze_id)
             .filter(TVMazeSeason.number == season_number)
             .one_or_none()
@@ -576,7 +579,8 @@ class APITVMaze:
         # See if episode already exists in cache
         logger.debug('searching for episode of show {} in cache', series.name)
         episode = (
-            session.query(TVMazeEpisodes)
+            session
+            .query(TVMazeEpisodes)
             .filter(
                 and_(
                     TVMazeEpisodes.series_id == series.tvmaze_id,
@@ -626,7 +630,8 @@ class APITVMaze:
         # See if episode exists in DB
         try:
             episode = (
-                session.query(TVMazeEpisodes)
+                session
+                .query(TVMazeEpisodes)
                 .filter(
                     or_(
                         TVMazeEpisodes.tvmaze_id == tvmaze_episode['id'],
@@ -647,7 +652,8 @@ class APITVMaze:
                 'Episode lookup in cache returned multiple results. Deleting the cached data.'
             )
             deleted_rows = (
-                session.query(TVMazeEpisodes)
+                session
+                .query(TVMazeEpisodes)
                 .filter(
                     and_(
                         TVMazeEpisodes.season_number == tvmaze_episode['season'],

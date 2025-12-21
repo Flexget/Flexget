@@ -19,7 +19,8 @@ class PendingApproval:
     @staticmethod
     def _item_query(entry, task, session):
         return (
-            session.query(db.PendingEntry)
+            session
+            .query(db.PendingEntry)
             .filter(db.PendingEntry.task_name == task.name)
             .filter(db.PendingEntry.title == entry['title'])
             .filter(db.PendingEntry.url == entry['url'])
@@ -33,7 +34,8 @@ class PendingApproval:
         approved_entries = []
         with Session() as session:
             for approved_entry in (
-                session.query(db.PendingEntry)
+                session
+                .query(db.PendingEntry)
                 .filter(db.PendingEntry.task_name == task.name)
                 .filter(db.PendingEntry.approved)
                 .all()

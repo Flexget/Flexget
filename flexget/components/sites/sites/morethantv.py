@@ -184,7 +184,8 @@ class SearchMoreThanTV:
         if not force:
             with Session() as session:
                 saved_cookie = (
-                    session.query(MoreThanTVCookie)
+                    session
+                    .query(MoreThanTVCookie)
                     .filter(MoreThanTVCookie.username == username)
                     .first()
                 )

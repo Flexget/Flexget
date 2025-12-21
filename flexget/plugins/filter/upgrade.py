@@ -112,7 +112,8 @@ class FilterUpgrade:
         with Session() as session:
             # Prefetch Data
             existing_ids = (
-                session.query(EntryUpgrade)
+                session
+                .query(EntryUpgrade)
                 .filter(EntryUpgrade.id.in_(grouped_entries.keys()))
                 .all()
             )
@@ -193,7 +194,8 @@ class FilterUpgrade:
         with Session() as session:
             # Prefetch Data
             existing_ids = (
-                session.query(EntryUpgrade)
+                session
+                .query(EntryUpgrade)
                 .filter(EntryUpgrade.id.in_(grouped_entries.keys()))
                 .all()
             )

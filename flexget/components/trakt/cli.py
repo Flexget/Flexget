@@ -41,7 +41,8 @@ def action_list(options):
 
         # Show a specific account
         acc = (
-            session.query(db.TraktUserAuth)
+            session
+            .query(db.TraktUserAuth)
             .filter(db.TraktUserAuth.account == options.account)
             .first()
         )

@@ -179,7 +179,8 @@ def search(session, text, tags=None, sources=None, desc=False):
 def db_cleanup(manager, session):
     """Remove ArchiveEntry records older than 2 years."""
     result = (
-        session.query(ArchiveEntry)
+        session
+        .query(ArchiveEntry)
         .filter(ArchiveEntry.added < datetime.now() - timedelta(days=730))
         .delete()
     )

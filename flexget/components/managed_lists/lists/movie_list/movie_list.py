@@ -103,7 +103,8 @@ class MovieList(MutableSet):
             if entry.get(id_name):
                 logger.debug('trying to match movie based off id {}: {}', id_name, entry[id_name])
                 res = (
-                    self._db_list(session)
+                    self
+                    ._db_list(session)
                     .movies.join(db.MovieListMovie.ids)
                     .filter(
                         and_(
@@ -127,7 +128,8 @@ class MovieList(MutableSet):
             return None
         logger.debug('trying to match movie based of name: {} and year: {}', name, year)
         res = (
-            self._db_list(session)
+            self
+            ._db_list(session)
             .movies.filter(func.lower(db.MovieListMovie.title) == name.lower())
             .filter(db.MovieListMovie.year == year)
             .first()

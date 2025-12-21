@@ -230,7 +230,8 @@ class OutputRSS:
             return
 
         db_items = (
-            task.session.query(RSSEntry)
+            task.session
+            .query(RSSEntry)
             .filter(RSSEntry.file == config['file'])
             .order_by(RSSEntry.published.desc())
             .all()

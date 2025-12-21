@@ -25,7 +25,8 @@ class EstimatesSeriesInternal:
             if not series:
                 return None
             episodes = (
-                session.query(db.Episode)
+                session
+                .query(db.Episode)
                 .join(db.Episode.series)
                 .filter(db.Episode.season.is_not(None))
                 .filter(db.Series.id == series.id)

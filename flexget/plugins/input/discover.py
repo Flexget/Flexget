@@ -242,7 +242,8 @@ class Discover:
         with Session() as session:
             for entry in entries:
                 discover_entry = (
-                    session.query(DiscoverEntry)
+                    session
+                    .query(DiscoverEntry)
                     .filter(DiscoverEntry.title == entry['title'])
                     .filter(DiscoverEntry.task == task.name)
                     .first()

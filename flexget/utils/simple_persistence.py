@@ -65,7 +65,8 @@ def upgrade(ver, session):
             try:
                 p = pickle.loads(row['value'])
                 session.execute(
-                    table.update()
+                    table
+                    .update()
                     .where(table.c.id == row['id'])
                     .values(json=json.dumps(p, encode_datetime=True))
                 )
@@ -177,7 +178,8 @@ class SimplePersistence(MutableMapping):
             for pluginname in cls.class_store[task]:
                 for key, value in cls.class_store[task][pluginname].items():
                     query = (
-                        session.query(SimpleKeyValue)
+                        session
+                        .query(SimpleKeyValue)
                         .filter(SimpleKeyValue.task == task)
                         .filter(SimpleKeyValue.plugin == pluginname)
                         .filter(SimpleKeyValue.key == key)

@@ -85,7 +85,8 @@ class PluginFailed:
         with Session() as session:
             # query item's existence
             item = (
-                session.query(db.FailedEntry)
+                session
+                .query(db.FailedEntry)
                 .filter(db.FailedEntry.title == entry['title'])
                 .filter(db.FailedEntry.url == entry['original_url'])
                 .first()
@@ -119,7 +120,8 @@ class PluginFailed:
         max_count = config['max_retries']
         for entry in task.entries:
             item = (
-                task.session.query(db.FailedEntry)
+                task.session
+                .query(db.FailedEntry)
                 .filter(db.FailedEntry.title == entry['title'])
                 .filter(db.FailedEntry.url == entry['original_url'])
                 .first()

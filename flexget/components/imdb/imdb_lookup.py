@@ -150,7 +150,8 @@ class ImdbLookup:
         # search is known to fail
         if not entry.get('imdb_url', eval_lazy=False):
             result = (
-                session.query(db.SearchResult)
+                session
+                .query(db.SearchResult)
                 .filter(db.SearchResult.title == entry['title'])
                 .first()
             )

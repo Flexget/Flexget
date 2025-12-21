@@ -310,7 +310,8 @@ def lookup_movie(
     # Try to lookup from cache
     if rottentomatoes_id:
         movie = (
-            session.query(RottenTomatoesMovie)
+            session
+            .query(RottenTomatoesMovie)
             .filter(RottenTomatoesMovie.id == rottentomatoes_id)
             .first()
         )
@@ -324,7 +325,8 @@ def lookup_movie(
         if not movie:
             logger.debug('No matches in movie cache found, checking search cache.')
             found = (
-                session.query(RottenTomatoesSearchResult)
+                session
+                .query(RottenTomatoesSearchResult)
                 .filter(func.lower(RottenTomatoesSearchResult.search) == search_string)
                 .first()
             )
@@ -437,7 +439,8 @@ def lookup_movie(
                             result = results[0]
 
                         movie = (
-                            session.query(RottenTomatoesMovie)
+                            session
+                            .query(RottenTomatoesMovie)
                             .filter(RottenTomatoesMovie.id == result['id'])
                             .first()
                         )
@@ -506,7 +509,8 @@ def _set_movie_details(
         if genres:
             for name in genres:
                 genre = (
-                    session.query(RottenTomatoesGenre)
+                    session
+                    .query(RottenTomatoesGenre)
                     .filter(func.lower(RottenTomatoesGenre.name) == name.lower())
                     .first()
                 )
@@ -525,7 +529,8 @@ def _set_movie_details(
         if cast:
             for res_actor in cast:
                 actor = (
-                    session.query(RottenTomatoesActor)
+                    session
+                    .query(RottenTomatoesActor)
                     .filter(func.lower(RottenTomatoesActor.rt_id) == res_actor['id'])
                     .first()
                 )
@@ -536,7 +541,8 @@ def _set_movie_details(
         if directors:
             for res_director in directors:
                 director = (
-                    session.query(RottenTomatoesDirector)
+                    session
+                    .query(RottenTomatoesDirector)
                     .filter(
                         func.lower(RottenTomatoesDirector.name) == res_director['name'].lower()
                     )
