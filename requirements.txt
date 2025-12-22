@@ -2,7 +2,7 @@
 #    uv export --frozen --no-dev --no-emit-project --no-hashes --output-file=requirements.txt
 aniso8601==10.0.1
     # via flask-restx
-apscheduler==3.11.1
+apscheduler==3.11.2
     # via flexget
 attrs==25.4.0
     # via
