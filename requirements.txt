@@ -115,7 +115,7 @@ plumbum==1.10.0
     # via rpyc
 portend==3.2.1
     # via cherrypy
-psutil==7.2.0
+psutil==7.2.1
     # via flexget
 pycparser==2.23 ; implementation_name != 'PyPy' and platform_python_implementation == 'PyPy'
     # via cffi
