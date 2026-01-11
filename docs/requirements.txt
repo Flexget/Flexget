@@ -73,11 +73,11 @@ sphinxcontrib-qthelp==2.0.0
 sphinxcontrib-serializinghtml==2.0.0
     # via sphinx
 sphinxcontrib-svg2pdfconverter==2.0.0
-tomli==2.3.0 ; python_full_version < '3.11'
+tomli==2.4.0 ; python_full_version < '3.11'
     # via sphinx
 typing-extensions==4.15.0
     # via
     #   beautifulsoup4
     #   pydata-sphinx-theme
-urllib3==2.6.2
+urllib3==2.6.3
     # via requests
