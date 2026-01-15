@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 import time
 from datetime import datetime, timedelta
+from typing import TYPE_CHECKING
 
 from dateutil.parser import parse as dateutil_parse
 from loguru import logger
@@ -13,6 +16,9 @@ from flexget.terminal import console
 from flexget.utils import requests
 from flexget.utils.database import json_synonym
 from flexget.utils.tools import split_title_year
+
+if TYPE_CHECKING:
+    from flexget.entry import Entry
 
 Base = db_schema.versioned_base('api_trakt', 7)
 AuthBase = db_schema.versioned_base('trakt_auth', 0)
@@ -218,7 +224,7 @@ def upgrade(ver, session):
     return ver
 
 
-def get_entry_ids(entry):
+def get_entry_ids(entry: Entry):
     """Create a trakt ids dict from id fields on an entry. Prefer already populated info over lazy lookups."""
     ids = {}
     for lazy in [False, True]:
