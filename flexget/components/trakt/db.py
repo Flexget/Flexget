@@ -464,10 +464,10 @@ class TraktEpisode(Base):
             raise ValueError('Tried to update db ep with different ep data')
         if not self.id:
             self.id = trakt_episode['ids']['trakt']
-        self.imdb_id = trakt_episode['ids']['imdb']
-        self.tmdb_id = trakt_episode['ids']['tmdb']
-        self.tvrage_id = trakt_episode['ids']['tvrage']
-        self.tvdb_id = trakt_episode['ids']['tvdb']
+        self.imdb_id = trakt_episode['ids'].get('imdb')
+        self.tmdb_id = trakt_episode['ids'].get('tmdb')
+        self.tvrage_id = trakt_episode['ids'].get('tvrage')
+        self.tvdb_id = trakt_episode['ids'].get('tvdb')
         self.first_aired = None
         if trakt_episode.get('first_aired'):
             self.first_aired = dateutil_parse(trakt_episode['first_aired'], ignoretz=True)
@@ -513,9 +513,9 @@ class TraktSeason(Base):
             raise ValueError('Tried to update db season with different season data')
         if not self.id:
             self.id = trakt_season['ids']['trakt']
-        self.tmdb_id = trakt_season['ids']['tmdb']
-        self.tvrage_id = trakt_season['ids']['tvrage']
-        self.tvdb_id = trakt_season['ids']['tvdb']
+        self.tmdb_id = trakt_season['ids'].get('tmdb')
+        self.tvrage_id = trakt_season['ids'].get('tvrage')
+        self.tvdb_id = trakt_season['ids'].get('tvdb')
         self.first_aired = None
         if trakt_season.get('first_aired'):
             self.first_aired = dateutil_parse(trakt_season['first_aired'], ignoretz=True)
@@ -620,10 +620,10 @@ class TraktShow(Base):
         if not self.id:
             self.id = trakt_show['ids']['trakt']
         self.slug = trakt_show['ids']['slug']
-        self.imdb_id = trakt_show['ids']['imdb']
-        self.tmdb_id = trakt_show['ids']['tmdb']
-        self.tvrage_id = trakt_show['ids']['tvrage']
-        self.tvdb_id = trakt_show['ids']['tvdb']
+        self.imdb_id = trakt_show['ids'].get('imdb')
+        self.tmdb_id = trakt_show['ids'].get('tmdb')
+        self.tvrage_id = trakt_show['ids'].get('tvrage')
+        self.tvdb_id = trakt_show['ids'].get('tvdb')
         if trakt_show.get('airs'):
             airs = trakt_show.get('airs')
             self.air_day = airs.get('day')
@@ -668,8 +668,7 @@ class TraktShow(Base):
     def get_episode(self, season, number, session, only_cached=False):
         # TODO: Does series data being expired mean all episode data should be refreshed?
         episode = (
-            self.episodes
-            .filter(TraktEpisode.season == season)
+            self.episodes.filter(TraktEpisode.season == season)
             .filter(TraktEpisode.number == number)
             .first()
         )
@@ -820,8 +819,8 @@ class TraktMovie(Base):
         if not self.id:
             self.id = trakt_movie['ids']['trakt']
         self.slug = trakt_movie['ids']['slug']
-        self.imdb_id = trakt_movie['ids']['imdb']
-        self.tmdb_id = trakt_movie['ids']['tmdb']
+        self.imdb_id = trakt_movie['ids'].get('imdb')
+        self.tmdb_id = trakt_movie['ids'].get('tmdb')
         for col in [
             'title',
             'overview',
