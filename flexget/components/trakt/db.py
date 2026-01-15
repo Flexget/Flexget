@@ -674,7 +674,8 @@ class TraktShow(Base):
     def get_episode(self, season, number, session, only_cached=False):
         # TODO: Does series data being expired mean all episode data should be refreshed?
         episode = (
-            self.episodes.filter(TraktEpisode.season == season)
+            self.episodes
+            .filter(TraktEpisode.season == season)
             .filter(TraktEpisode.number == number)
             .first()
         )
