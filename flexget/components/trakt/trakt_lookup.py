@@ -14,6 +14,7 @@ from . import db
 
 if TYPE_CHECKING:
     from flexget.entry import Entry
+    from flexget.utils.sqlalchemy_utils import ContextSession
 
 # TODO: not very nice ..
 lookup_series = plugin_api_trakt.ApiTrakt.lookup_series
@@ -60,7 +61,13 @@ def trakt_user_data_lookup(entry, field_name, data_type, media_type, username, a
         with Session() as session:
             result = user_data_lookup(get_db_data_for(media_type, entry, session), entry['title'])
     except LookupError as e:
-        logger.debug(e)
+        logger.debug(
+            "Failed lazy lookup of `{}` field `{}` from `{}`'s `{}`",
+            media_type,
+            e,
+            username,
+            data_type,
+        )
     else:
         entry[field_name] = result
 
@@ -93,7 +100,7 @@ def _get_lookup_args(entry: Entry) -> dict:
     return args
 
 
-def get_db_data_for(data_type: str, entry: Entry, session: Session):
+def get_db_data_for(data_type: str, entry: Entry, session: ContextSession):
     if data_type == 'movie':
         movie_lookup_args = _get_lookup_args(entry)
         return lookup_movie(session=session, **movie_lookup_args)
@@ -200,12 +207,12 @@ lazy_lookup_types = {
 
 
 @register_lazy_lookup('trakt_lazy_lookup')
-def lazy_lookup(entry, lazy_lookup_name, media_type):
+def lazy_lookup(entry: Entry, lazy_lookup_name: str, media_type: str):
     with Session() as session:
         try:
             db_data = get_db_data_for(media_type, entry, session)
         except LookupError as e:
-            logger.debug(e)
+            logger.debug('Failed {} lazy lookup: {}', media_type, e)
         else:
             entry.update_using_map(lazy_lookup_types[lazy_lookup_name], db_data)
     return entry
