@@ -71,7 +71,7 @@ itsdangerous==2.2.0
     # via flask
 jaraco-collections==5.2.1
     # via cherrypy
-jaraco-context==6.0.2
+jaraco-context==6.1.0
     # via jaraco-text
 jaraco-functools==4.4.0
     # via
@@ -166,7 +166,7 @@ six==1.17.0
     # via
     #   html5lib
     #   python-dateutil
-soupsieve==2.8.1
+soupsieve==2.8.2
     # via beautifulsoup4
 sqlalchemy==2.0.45
     # via flexget
