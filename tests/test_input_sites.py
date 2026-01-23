@@ -45,7 +45,6 @@ class TestInputSites:
         task = execute_task('test_sceper')
         assert task.entries, 'no entries created / site may be down'
 
-    @pytest.mark.online
     def test_apple_trailers(self, execute_task):
         task = execute_task('test_apple_trailers')
         assert task.entries, 'no entries created / site may be down'
