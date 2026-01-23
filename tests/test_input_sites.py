@@ -19,7 +19,25 @@ class TestInputSites:
               genres: ['Action and Adventure']
           test_apple_trailers_simple:
             apple_trailers: 720p
-
+          test_from_piratebay_all:
+            from_piratebay:
+              list: top
+          test_from_piratebay_cat:
+            from_piratebay:
+              category: HD - Movies
+          test_from_piratebay_all_48h:
+            from_piratebay:
+              list: top48h
+          test_from_piratebay_cat_48h:
+            from_piratebay:
+              category: HD - Movies
+              list: top48h
+          test_from_piratebay_rank:
+            from_piratebay:
+              rank: supermod
+          test_from_piratebay_query:
+            from_piratebay:
+              query: user:metheguy
     """
 
     @pytest.mark.skip(reason='Missing a usable urlrewriter for uploadgig?')
@@ -35,3 +53,27 @@ class TestInputSites:
     def test_apple_trailers_simple(self, execute_task):
         task = execute_task('test_apple_trailers_simple')
         assert task.entries, 'no entries created / site may be down'
+
+    def test_from_piratebay_all(self, execute_task):
+        task = execute_task('test_from_piratebay_all')
+        assert task.entries, 'no entries created / site may be down'
+
+    def test_from_piratebay_cat(self, execute_task):
+        task = execute_task('test_from_piratebay_cat')
+        assert task.entries, 'no entries created / site may be down'
+
+    def test_from_piratebay_all_48h(self, execute_task):
+        task = execute_task('test_from_piratebay_all_48h')
+        assert task.entries, 'no entries created / site may be down'
+
+    def test_from_piratebay_cat_48h(self, execute_task):
+        task = execute_task('test_from_piratebay_cat_48h')
+        assert task.entries, 'no entries created / site may be down'
+
+    def test_from_piratebay_rank(self, execute_task):
+        # unlikely to return entries
+        execute_task('test_from_piratebay_rank')
+
+    def test_from_piratebay_query(self, execute_task):
+        # unlikely to return entries
+        execute_task('test_from_piratebay_query')
