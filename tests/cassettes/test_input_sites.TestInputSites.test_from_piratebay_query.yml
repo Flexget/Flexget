@@ -1,0 +1,92 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate, br
+      Connection:
+      - keep-alive
+      User-Agent:
+      - Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko)
+        Chrome/35.0.1916.114 Safari/537.36
+    method: GET
+    uri: https://apibay.org/q.php?q=user%3Ametheguy
+  response:
+    body:
+      string: '[{"id":"81813698","name":"McLeod''s Daughters (2001) Season 1-8 S01-S08
+        (1080p AMZN WEB-DL x265","info_hash":"FF83739B4871C5EA7E24917B3EE165B130A05750","leechers":"19","seeders":"7","size":"281363602563","num_files":"224","username":"metheguy","added":"1768489453","status":"trusted","category":"208","imdb":""},{"id":"81793219","name":"winux-11.25.12-noble-lts.iso","info_hash":"77332749600A5A0C603C8FBBFCD40F77C1E18006","leechers":"0","seeders":"32","size":"6197538816","num_files":"1","username":"metheguy","added":"1768327947","status":"trusted","category":"303","imdb":""},{"id":"81714351","name":"Jack
+        El-Hai - The Nazi and the Psychiatrist","info_hash":"C5BCE1E315CA145051922A272CE6A30B8FC4E2DF","leechers":"3","seeders":"18","size":"255567684","num_files":"4","username":"metheguy","added":"1767711704","status":"trusted","category":"102","imdb":""},{"id":"81610195","name":"Moriarty,
+        Liane - Nine Perfect Strangers (2018)","info_hash":"2AF70D28E8A8A743217741F3861FB3F68AAF24C5","leechers":"2","seeders":"7","size":"551039852","num_files":"87","username":"metheguy","added":"1766841869","status":"trusted","category":"102","imdb":""},{"id":"81610194","name":"Liane
+        Moriarty - 2020 - Three Wishes (Fiction)","info_hash":"A141F8E38A68357C98FA4FD04CCCD17E1601FB6C","leechers":"0","seeders":"6","size":"333034627","num_files":"21","username":"metheguy","added":"1766841639","status":"trusted","category":"102","imdb":""},{"id":"81610094","name":"Liane
+        Moriarty - Apples Never Fall","info_hash":"A55E01C326A53E83A49E3C71F0F7C52F7523D11B","leechers":"5","seeders":"5","size":"520590360","num_files":"2","username":"metheguy","added":"1766841422","status":"trusted","category":"102","imdb":""},{"id":"81610090","name":"Moriarty
+        Liane, What Alice Forgot","info_hash":"0ABBA8329E6AF356797F605411FAC24BF4602D93","leechers":"9","seeders":"10","size":"780468330","num_files":"12","username":"metheguy","added":"1766840821","status":"trusted","category":"102","imdb":""},{"id":"81609989","name":"Liane
+        Moriarty-Truly Madly Guilty","info_hash":"C05334B223FF417F923BBBC3E685BD5456063644","leechers":"7","seeders":"7","size":"500269124","num_files":"19","username":"metheguy","added":"1766840681","status":"trusted","category":"102","imdb":""},{"id":"81609982","name":"Liane
+        Moriarty - Here One Moment","info_hash":"A44AF1F6C6CB21A93473BAC562E492E30D75994E","leechers":"0","seeders":"14","size":"431903486","num_files":"2","username":"metheguy","added":"1766840417","status":"trusted","category":"102","imdb":""},{"id":"81609879","name":"Liane
+        Moriarty - Big Little Lies","info_hash":"5DCABC6B327551BBE9157F3A9F1F462C46CB7C87","leechers":"0","seeders":"18","size":"503958425","num_files":"3","username":"metheguy","added":"1766840025","status":"trusted","category":"102","imdb":""},{"id":"81465943","name":"Private
+        10 - James Patterson, Kathryn Fox - Private 10 - Missing","info_hash":"807C286BC1779F3D5827B0743CF03EF8C44DF484","leechers":"0","seeders":"9","size":"218764322","num_files":"3","username":"metheguy","added":"1765552817","status":"trusted","category":"102","imdb":""},{"id":"81433449","name":"James
+        Patterson - 3 Days to Live","info_hash":"E2143A6BCF028AD5B5E81C08717DEE907FF54BC2","leechers":"10","seeders":"13","size":"263217930","num_files":"3","username":"metheguy","added":"1765291070","status":"trusted","category":"102","imdb":""},{"id":"81412514","name":"James
+        Patterson - Texas Ranger 03 - The Texas Murders.m4b","info_hash":"4ACE9F97E935644ADD82645E93A98D45E8A85FED","leechers":"0","seeders":"8","size":"272128226","num_files":"1","username":"metheguy","added":"1765123741","status":"trusted","category":"102","imdb":""},{"id":"81411597","name":"James
+        Patterson, Maxine Paetro - Women''s Murder Club 25 - 25 Alive","info_hash":"0FFA07D19EB804E236F27C79C920E451FF928D5A","leechers":"0","seeders":"6","size":"381767091","num_files":"2","username":"metheguy","added":"1765116868","status":"trusted","category":"102","imdb":""},{"id":"81411595","name":"James
+        Patterson, David Ellis - Lies He Told Me.m4b","info_hash":"A548FA84BEB50663E7EF664C4B07FFFEFF8739C9","leechers":"1","seeders":"7","size":"181117691","num_files":"1","username":"metheguy","added":"1765116810","status":"trusted","category":"102","imdb":""},{"id":"81411592","name":"James
+        Patterson, Brendan DuBois - Alex Cross 31 - Cross Down","info_hash":"3FEDBA5675822C489FC0B8330C7C148EB4BA51A0","leechers":"0","seeders":"9","size":"287789887","num_files":"3","username":"metheguy","added":"1765116723","status":"trusted","category":"102","imdb":""},{"id":"81411590","name":"James
+        Patterson - Michael Bennett 17 - Paranoia.m4b","info_hash":"F6BF6FED32AB0152FBE8F8B15A711795952EBB1D","leechers":"0","seeders":"13","size":"493420193","num_files":"1","username":"metheguy","added":"1765116636","status":"trusted","category":"102","imdb":""},{"id":"81411588","name":"24
+        The 24th Hour - WOMEN''S MURDER CLUB BOOK 24","info_hash":"4C9D28B76024378D4C864F7AAA61CE0DCF0F3B25","leechers":"0","seeders":"6","size":"217787178","num_files":"7","username":"metheguy","added":"1765116567","status":"trusted","category":"102","imdb":""},{"id":"81368453","name":"The
+        Proving Ground_ A Lincoln Lawyer Novel.mp3","info_hash":"1E0576DDD634F5619AEC1FFC1046311B113F097D","leechers":"1","seeders":"16","size":"273035923","num_files":"1","username":"metheguy","added":"1764765705","status":"trusted","category":"102","imdb":""},{"id":"81368451","name":"Gone
+        Before Goodbye.mp3","info_hash":"9FE71D8C760C7B768A164DB1882BD0DBF2B3AF6A","leechers":"0","seeders":"21","size":"265240081","num_files":"1","username":"metheguy","added":"1764765653","status":"trusted","category":"102","imdb":""},{"id":"81351689","name":"John
+        Grisham - The Widow","info_hash":"64D3630FA9F2B2D43033DC6DCBBB06E9BD1DF2A4","leechers":"1","seeders":"38","size":"430180533","num_files":"2","username":"metheguy","added":"1764632381","status":"trusted","category":"102","imdb":""},{"id":"81304477","name":"Exit
+        Strategy - Lee Child, Andrew Child","info_hash":"AD761350950E28406DF5F83FCD053BD9F85A3BF8","leechers":"3","seeders":"69","size":"534948611","num_files":"4","username":"metheguy","added":"1764257501","status":"trusted","category":"102","imdb":""},{"id":"81304474","name":"Lee
+        Child - In Too Deep","info_hash":"DE1E9978869C94329F94EFA56630255DCAA6D49E","leechers":"0","seeders":"5","size":"287111095","num_files":"2","username":"metheguy","added":"1764257215","status":"trusted","category":"102","imdb":""},{"id":"80824919","name":"Queen
+        Been Rearing-Ebook","info_hash":"5980C46883B6D6258DF2A6A678514FA2AFA478BE","leechers":"0","seeders":"2","size":"22450360","num_files":"3","username":"metheguy","added":"1760453869","status":"trusted","category":"601","imdb":""},{"id":"80796059","name":"Muslim
+        and Jew_ Aaron W_ Hughes.pdf","info_hash":"EE5622BF031BB914293262704C046D198D4242ED","leechers":"0","seeders":"7","size":"724554","num_files":"1","username":"metheguy","added":"1760216652","status":"trusted","category":"601","imdb":""},{"id":"80796058","name":"Anna
+        and Dr Helmy _ How an Arab Doctor Saved a Jewish Girl -- Steinke, Ronen.epub","info_hash":"2C3AA755EBA8679E821DAC3A34C9C67B24A66F3E","leechers":"0","seeders":"7","size":"1664893","num_files":"1","username":"metheguy","added":"1760216595","status":"trusted","category":"601","imdb":""},{"id":"80718997","name":"PBS
+        Nature - 2007.10.29 - Silence of the Bees (720p.HDTV.AC3-SoS).avi","info_hash":"152DC78F6B384E3BE93DE3B9C113B64BABA34B88","leechers":"0","seeders":"2","size":"2005811200","num_files":"1","username":"metheguy","added":"1759585209","status":"trusted","category":"208","imdb":""},{"id":"80699220","name":"Abdullah
+        Yusuf Ali - translator - The Audio Quran (Full-Cast Edition).m4b","info_hash":"6946615832A614EE5CCA19D51F7C6AB5ED66C5A4","leechers":"1","seeders":"26","size":"635529789","num_files":"1","username":"metheguy","added":"1759431409","status":"trusted","category":"102","imdb":""},{"id":"80600678","name":"pmagic_2025_09_18.iso","info_hash":"CE427CB33EBA85A3993EDF547F05B0AAFCEDABC3","leechers":"1","seeders":"6","size":"2907832320","num_files":"1","username":"metheguy","added":"1758646312","status":"trusted","category":"303","imdb":""},{"id":"80580587","name":"gimp-3.0.4-setup.exe","info_hash":"8E948D57305B0002E983D55EC9ABF514046BB90C","leechers":"0","seeders":"30","size":"300178176","num_files":"1","username":"metheguy","added":"1758476689","status":"trusted","category":"301","imdb":""},{"id":"80495441","name":"J.
+        D. Robb - Framed in Death","info_hash":"D82B5FB268A6B65DE3732EB66822BC179D59CFCB","leechers":"7","seeders":"41","size":"388280186","num_files":"2","username":"metheguy","added":"1757714316","status":"trusted","category":"102","imdb":""},{"id":"80461340","name":"proxmox-ve_9.0-1.iso","info_hash":"37F3CB44DA49F5F9B6E659DE70848308FA3644A6","leechers":"24","seeders":"49","size":"1641615360","num_files":"1","username":"metheguy","added":"1757448711","status":"trusted","category":"303","imdb":""},{"id":"80447445","name":"openmediavault_7.4.17-amd64.iso","info_hash":"F73A58B0BBBB58B66ABF58A95C4CA91BA5C507C4","leechers":"2","seeders":"22","size":"985661440","num_files":"1","username":"metheguy","added":"1757340958","status":"trusted","category":"303","imdb":""},{"id":"80414342","name":"Richard
+        Osman - The Thursday MurderClup-Book 1-4","info_hash":"90DB0E51CA265D833A7F4FDDC313F89E1C97CD56","leechers":"2","seeders":"25","size":"2376048653","num_files":"4","username":"metheguy","added":"1757078371","status":"trusted","category":"102","imdb":""},{"id":"80403824","name":"linuxmint-22.2-cinnamon-64bit.iso","info_hash":"4A984EE35F1F09E95E50C224AB70B775A43E8E06","leechers":"1","seeders":"101","size":"3055239168","num_files":"1","username":"metheguy","added":"1757002882","status":"trusted","category":"303","imdb":""},{"id":"80067546","name":"National_Geographic_Inside_Mecca_DivX.avi","info_hash":"D98C78FC32E42AF860E731D9B01C540CCF0DC3E6","leechers":"3","seeders":"2","size":"1318786710","num_files":"1","username":"metheguy","added":"1754338725","status":"trusted","category":"208","imdb":"tt0427389"},{"id":"80067539","name":"Muhammad.Legacy.of.a.Prophet.Xvid.mp3.MVGroup.Forum.avi","info_hash":"B98EECCEF26F3D55C2D334DB30EECB6EC50CB316","leechers":"0","seeders":"3","size":"1565818880","num_files":"1","username":"metheguy","added":"1754338219","status":"trusted","category":"208","imdb":"tt0396743"},{"id":"80046563","name":"clonezilla-live-3.2.2-15-amd64.iso","info_hash":"C1051638187ACAFAC2F41A303C332E83EEE7B323","leechers":"0","seeders":"48","size":"484442112","num_files":"1","username":"metheguy","added":"1754171318","status":"trusted","category":"303","imdb":""},{"id":"79990210","name":"The
+        Message (1976) [ARABIC] [1080p] [BluRay] [5.1] [YTS.MX","info_hash":"3E9A793F9565FA297BCA4778BA26A6438A75356F","leechers":"14","seeders":"20","size":"4090920969","num_files":"4","username":"metheguy","added":"1753724484","status":"trusted","category":"207","imdb":""},{"id":"79990201","name":"The
+        Message (1976) [1080p] [BluRay] [5.1] [YTS.MX]","info_hash":"E0389A21574080089A2120722FC6318F6011DC13","leechers":"3","seeders":"44","size":"3529354147","num_files":"2","username":"metheguy","added":"1753724179","status":"trusted","category":"207","imdb":""},{"id":"79259053","name":"WinPE11_10_Sergei_Strelec_x64_2025.05.22_English","info_hash":"379FA7E3FD324D6C057B0FB07BC15E47D6C2AEF0","leechers":"15","seeders":"5","size":"3405047045","num_files":"76","username":"metheguy","added":"1748034501","status":"trusted","category":"301","imdb":""},{"id":"79034735","name":"America''s
+        Burning 2024 English [ORG 5.1] 1080p WEB-DL x264 6CH ESubs.mkv","info_hash":"EEA650F7F571357CD11F424DBEAC2EC390832C33","leechers":"2","seeders":"2","size":"1695848041","num_files":"1","username":"metheguy","added":"1746294057","status":"trusted","category":"207","imdb":"tt32148575"},{"id":"79024100","name":"Justice
+        for Some_ Law and the Question of Palestine by Noura Erakat EPUB","info_hash":"0C6EFEBB0846762F2AC02F1EB34AF98D37D3DB5C","leechers":"2","seeders":"10","size":"6447615","num_files":"3","username":"metheguy","added":"1746212311","status":"trusted","category":"601","imdb":""},{"id":"78945566","name":"Oum.Kalthoum.1080p.RL","info_hash":"6F2FAF08D04B15313B2A2B29DF36B4BBC92C0B33","leechers":"0","seeders":"2","size":"18560130856","num_files":"39","username":"metheguy","added":"1745613147","status":"trusted","category":"208","imdb":""},{"id":"78841978","name":"Ngaio
+        Marsh Collection - Ngaio Marsh","info_hash":"5D50FE58A1C742F10644255CACF94CC3DAD81D99","leechers":"2","seeders":"9","size":"4263044880","num_files":"399","username":"metheguy","added":"1744834002","status":"trusted","category":"102","imdb":""},{"id":"78839511","name":"Mysteries","info_hash":"4E76E8DCDBFE374B3BE00960C7ADD774C9BA7A2A","leechers":"0","seeders":"1","size":"1101342","num_files":"1","username":"metheguy","added":"1744815143","status":"trusted","category":"102","imdb":""}]'
+    headers:
+      Age:
+      - '864'
+      CF-RAY:
+      - 9c29d50cf9e5aa39-EWR
+      Cache-Control:
+      - max-age=7200
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json
+      Date:
+      - Fri, 23 Jan 2026 19:52:34 GMT
+      Expires:
+      - Fri, 23 Jan 2026 19:53:09 GMT
+      Nel:
+      - '{"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}'
+      Pragma:
+      - no-cache
+      Report-To:
+      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=ru64evYpKJu5entYaHYKZimLqNqPDUaUCI5eLlcueg1r0tvh%2FmP7Xw%2BfhxjvpRWljZAD78q%2BmZbWSaW%2FLyep2GHfX8b1wDVLQbU%3D"}]}'
+      Server:
+      - cloudflare
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      - Accept-Encoding
+      alt-svc:
+      - h3=":443"; ma=86400
+      cf-cache-status:
+      - HIT
+      last-modified:
+      - Fri, 23 Jan 2026 19:38:09 GMT
+    status:
+      code: 200
+      message: OK
+version: 1
