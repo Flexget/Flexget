@@ -6,7 +6,7 @@ requires = [ "hatchling" ]
 name = "flexget"
 description = "FlexGet is a program aimed to automate downloading or processing content (torrents, podcasts, etc.) from different sources like RSS-feeds, html-pages, various sites and more."
 readme = "README.rst"
-license = 'MIT'
+license = "MIT"
 license-files = [ 'LICENSE' ]
 authors = [
   { name = "Chase Sterling", email = "chase.sterling@gmail.com" },
@@ -123,6 +123,25 @@ all = [
   { include-group = "transmission" },
 ]
 
+[tool.hatch.build]
+skip-excluded-dirs = true
+
+[tool.hatch.build.targets.sdist]
+include = [
+  "/flexget",
+  "/scripts/build_locked_extras.py",
+  "/scripts/bundle_webui.py",
+]
+
+[tool.hatch.build.targets.wheel]
+include = [
+  "/flexget",
+]
+
+[tool.hatch.build.targets.wheel.hooks.custom]
+# The webui will be bundled when the BUNDLE_WEBUI env variable is defined
+path = "scripts/bundle_webui.py"
+
 [tool.hatch.metadata.hooks.custom]
 # Extras with locked dependencies will be generated if BUILD_LOCKED env variable is specified
 path = "scripts/build_locked_extras.py"
@@ -143,25 +162,6 @@ locked-groups = [
 
 [tool.hatch.version]
 path = "flexget/_version.py"
-
-[tool.hatch.build]
-skip-excluded-dirs = true
-
-[tool.hatch.build.targets.sdist]
-include = [
-  "/flexget",
-  "/scripts/build_locked_extras.py",
-  "/scripts/bundle_webui.py",
-]
-
-[tool.hatch.build.targets.wheel.hooks.custom]
-# The webui will be bundled when the BUNDLE_WEBUI env variable is defined
-path = "scripts/bundle_webui.py"
-
-[tool.hatch.build.targets.wheel]
-include = [
-  "/flexget",
-]
 
 [tool.ruff]
 line-length = 99
@@ -247,6 +247,33 @@ skip = [
 max_supported_python = '3.14'
 keep_full_version = true
 
+[tool.typos.default]
+extend-ignore-re = [
+  "idel",
+  "parametros",
+  'Programe',
+  'searchin',
+  'SerieS',
+  '23BA98',
+  'IST',
+]
+
+[tool.typos.default.extend-identifiers]
+McClory = 'McClory'
+
+[tool.typos.default.extend-words]
+nd = 'nd'
+sur = 'sur'
+hime = 'hime'
+
+[tool.typos.files]
+extend-exclude = [
+  "**/cassettes/*",
+  'tests/couchpotato_movie_list_test_response.json',
+  'tests/couchpotato_quality_profile_test_response.json',
+  'tests/test_thetvdb.py',
+]
+
 [tool.pytest]
 addopts = [ '-p no:legacypath' ]
 filterwarnings = [
@@ -272,30 +299,3 @@ branch = true
 [tool.doc8]
 ignore = [ 'D001', "D004" ]
 max_line_length = 99
-
-[tool.typos.default]
-extend-ignore-re = [
-  "idel",
-  "parametros",
-  'Programe',
-  'searchin',
-  'SerieS',
-  '23BA98',
-  'IST',
-]
-
-[tool.typos.default.extend-words]
-nd = 'nd'
-sur = 'sur'
-hime = 'hime'
-
-[tool.typos.default.extend-identifiers]
-McClory = 'McClory'
-
-[tool.typos.files]
-extend-exclude = [
-  "**/cassettes/*",
-  'tests/couchpotato_movie_list_test_response.json',
-  'tests/couchpotato_quality_profile_test_response.json',
-  'tests/test_thetvdb.py',
-]
