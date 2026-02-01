@@ -109,13 +109,13 @@ more-itertools==10.8.0
     #   jaraco-text
 packaging==25.0
     # via flexget
-pendulum==3.1.0
+pendulum==3.2.0
     # via flexget
 plumbum==1.10.0
     # via rpyc
 portend==3.2.1
     # via cherrypy
-psutil==7.2.1
+psutil==7.2.2
     # via flexget
 pycparser==3.0 ; implementation_name != 'PyPy' and platform_python_implementation == 'PyPy'
     # via cffi
@@ -148,7 +148,7 @@ referencing==0.37.0
     #   jsonschema-specifications
 requests==2.32.5
     # via flexget
-rich==14.3.1
+rich==14.3.2
     # via flexget
 rpds-py==0.30.0
     # via

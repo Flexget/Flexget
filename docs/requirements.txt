@@ -4,7 +4,7 @@ accessible-pygments==0.0.5
     # via pydata-sphinx-theme
 alabaster==1.0.0
     # via sphinx
-babel==2.17.0
+babel==2.18.0
     # via
     #   pydata-sphinx-theme
     #   sphinx
