@@ -248,13 +248,33 @@ class ImdbParser:
             page = requests.get(url)
             soup = get_soup(page.text)
 
-        data = json.loads(soup.find('script', {'type': 'application/ld+json'}).string)
+        ld_json_script = soup.find('script', {'type': 'application/ld+json'})
+        if ld_json_script is None or ld_json_script.string is None:
+            raise plugin.PluginError(
+                'IMDB parser needs updating, imdb format changed. Please report on Github.'
+            )
+        try:
+            data = json.loads(ld_json_script.string)
+        except (json.JSONDecodeError, ValueError) as e:
+            raise plugin.PluginError(
+                f'IMDB parser failed to parse JSON data: {e}. Please report on Github.'
+            )
         if not data:
             raise plugin.PluginError(
                 'IMDB parser needs updating, imdb format changed. Please report on Github.'
             )
 
-        props_data = json.loads(soup.find('script', {'type': 'application/json'}).string)
+        json_script = soup.find('script', {'type': 'application/json'})
+        if json_script is None or json_script.string is None:
+            raise plugin.PluginError(
+                'IMDB parser needs updating, imdb props_data format changed. Please report on Github.'
+            )
+        try:
+            props_data = json.loads(json_script.string)
+        except (json.JSONDecodeError, ValueError) as e:
+            raise plugin.PluginError(
+                f'IMDB parser failed to parse props_data JSON: {e}. Please report on Github.'
+            )
         if (
             not props_data
             or not props_data.get('props')
