@@ -1192,7 +1192,7 @@ def set_series_begin(series: Series, ep_id: str | int) -> tuple[str, str]:
             ep_id += 'E01'
     if series.identified_by not in ['auto', '', None] and identified_by != series.identified_by:
         raise ValueError(
-            f'`begin` value `{ep_id}` does not match identifier type for identified_by `{series.identified_by}`'
+            f'Series `{series.name}` `begin` value `{ep_id}` does not match identifier type for identified_by `{series.identified_by}`'
         )
     series.identified_by = identified_by
     episode = (
