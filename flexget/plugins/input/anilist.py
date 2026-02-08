@@ -283,9 +283,9 @@ class AniList:
 def relations_lookup(entry: Entry):
     ids = {}
     try:
-        response = requests.post(
+        response = requests.get(
             'https://relations.yuna.moe/api/v2/ids',
-            json={'anilist': entry.get('al_id', eval_lazy=False)},
+            params={'anilist': entry.get('al_id', eval_lazy=False)},
         )
         ids: dict[str, str | int] = response.json()
         if ids is None:
