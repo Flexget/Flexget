@@ -284,7 +284,7 @@ def relations_lookup(entry: Entry):
     ids = {}
     try:
         response = requests.get(
-            'https://relations.yuna.moe/api/v2/ids',
+            'https://arm.haglund.dev/api/v2/ids',
             params={'anilist': entry.get('al_id', eval_lazy=False)},
         )
         ids: dict[str, str | int] = response.json()
