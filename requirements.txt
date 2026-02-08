@@ -156,7 +156,7 @@ rpds-py==0.30.0
     #   referencing
 rpyc==6.0.2
     # via flexget
-setuptools==80.10.2
+setuptools==82.0.0
     # via
     #   pynzb
     #   zc-lockfile
