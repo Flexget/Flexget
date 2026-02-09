@@ -140,7 +140,7 @@ class API(RestxAPI):
             def wrapper(*args, **kwargs):
                 payload = request.json
                 try:
-                    schema = schema_override if schema_override else model.__schema__
+                    schema = schema_override or model.__schema__
                     errors = process_config(config=payload, schema=schema, set_defaults=False)
 
                     if errors:

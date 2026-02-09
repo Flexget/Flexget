@@ -77,7 +77,7 @@ class TransmissionBase:
         if urlo.scheme == '':
             urlo = urlparse('http://' + config['host'])
 
-        protocol = urlo.scheme if urlo.scheme else 'http'
+        protocol = urlo.scheme or 'http'
         port = str(urlo.port) if urlo.port else config['port']
         path = urlo.path.rstrip('rpc') if urlo.path else '/transmission/'
 

@@ -81,7 +81,7 @@ class OutputQBitTorrent:
             response = self.session.request(method, url, **kwargs)
             if response.text == 'Ok.':
                 return True
-            msg = msg_on_fail if msg_on_fail else f'Failure. URL: {url}, data: {kwargs}'
+            msg = msg_on_fail or f'Failure. URL: {url}, data: {kwargs}'
         except RequestException as e:
             msg = str(e)
         logger.error('Error when trying to send request to qBittorrent: {}', msg)
@@ -107,7 +107,7 @@ class OutputQBitTorrent:
                 self.api_url_info = '/query/torrents'
                 return response
 
-            msg = msg_on_fail if msg_on_fail else f'Failure. URL: {url}'
+            msg = msg_on_fail or f'Failure. URL: {url}'
         except RequestException as e:
             msg = str(e)
         raise plugin.PluginError(f'Error when trying to send request to qBittorrent: {msg}')

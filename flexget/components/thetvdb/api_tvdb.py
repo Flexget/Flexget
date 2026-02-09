@@ -50,7 +50,7 @@ class TVDBRequest:
 
                 logger.debug(
                     'Authenticating to TheTVDB with {}',
-                    self.username if self.username else 'api_key',
+                    self.username or 'api_key',
                 )
 
                 auth_token.token = (

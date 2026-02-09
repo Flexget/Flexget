@@ -351,7 +351,7 @@ class EmbyAuth(EmbyApiBase):
 
         if login_type == LOGIN_CONNECT:
             self._host_name = self.host
-            connect_username = self._connect_username if self._connect_username else self._username
+            connect_username = self._connect_username or self._username
             if (
                 'token' not in token_data
                 or 'userid' not in token_data
