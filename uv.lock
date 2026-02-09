@@ -1775,7 +1775,7 @@ wheels = [
 
 [[package]]
 name = "jaraco-text"
-version = "4.0.0"
+version = "4.1.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "autocommand" },
@@ -1783,9 +1783,9 @@ dependencies = [
     { name = "jaraco-functools" },
     { name = "more-itertools" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/4f/00/1b4dbbc5c6dcb87a4278cc229b2b560484bf231bba7922686c5139e5f934/jaraco_text-4.0.0.tar.gz", hash = "sha256:5b71fecea69ab6f939d4c906c04fee1eda76500d1641117df6ec45b865f10db0", size = 17009, upload-time = "2024-07-26T18:08:41.262Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/cf/fe/b848795b0255d87e1f9b5e9465e63542b4a220b3116cdf3bbfecba52b115/jaraco_text-4.1.0.tar.gz", hash = "sha256:d69b22dec062a6fcbcffef67205cbd20258c48df2d417b35185fa0fd8dd860ff", size = 19153, upload-time = "2026-02-08T21:50:37.956Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/2f/29/350039bde32fbd7000e2fb81e1c4e42a857b5e77bcbaf6267c806c70ab9a/jaraco.text-4.0.0-py3-none-any.whl", hash = "sha256:08de508939b5e681b14cdac2f1f73036cd97f6f8d7b25e96b8911a9a428ca0d1", size = 11542, upload-time = "2024-07-26T18:08:39.667Z" },
+    { url = "https://files.pythonhosted.org/packages/d5/3c/5e145e758acb5044950f15c3ca87c841053f71be5f2594669194356ab062/jaraco_text-4.1.0-py3-none-any.whl", hash = "sha256:389bbde1244fec831d06108197e097a8facf49f8104b3c309c3813aff86904f2", size = 13003, upload-time = "2026-02-08T21:50:37.051Z" },
 ]
 
 [[package]]
