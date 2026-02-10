@@ -29,8 +29,14 @@
     },
     {
       customType: 'regex',
-      managerFilePatterns: ['/^\\.readthedocs\\.yaml$/'],
-      matchStrings: ['python:\\s*["\']?(?<currentValue>.+?)["\']?\\s+'],
+      managerFilePatterns: [
+        '/^\\.readthedocs\\.yaml$/',
+        '/^pyproject\\.toml$/',
+      ],
+      matchStrings: [
+        'python:\\s*["\']?(?<currentValue>.+?)["\']?\\s+',
+        'docs\\s*=\\s*\\{\\s*requires-python\\s*=\\s*["\']+>=(?<currentValue>.+?)["\']+\\s*\\}',
+      ],
       depNameTemplate: 'python',
       versioningTemplate: 'semver-coerced',
       datasourceTemplate: 'custom.readthedocsPython',
