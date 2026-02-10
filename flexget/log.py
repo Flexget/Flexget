@@ -151,7 +151,7 @@ def initialize(unit_test: bool = False) -> None:
 
     # Add a handler that sores the last 100 debug lines to `debug_buffer` for use in crash reports
     logger.add(
-        lambda message: debug_buffer.append(message),
+        debug_buffer.append,
         level='DEBUG',
         format=LOG_FORMAT,
         backtrace=True,

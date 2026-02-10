@@ -100,7 +100,7 @@ class NextSeriesSeasons:
                     session.delete(seriestask)
                     continue
 
-                if series.identified_by not in ['ep']:
+                if series.identified_by != 'ep':
                     logger.trace('unsupported identified_by scheme')
                     reason = series.identified_by or 'auto'
                     impossible.setdefault(reason, []).append(series.name)

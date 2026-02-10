@@ -99,7 +99,7 @@ class InputDeluge(DelugePlugin):
         'total_size': 'content_size',
         'files': ('content_files', lambda file_dicts: [f['path'] for f in file_dicts]),
         # Convert to datetimes for easier use in 'if' plugin and templates
-        'time_added': ('deluge_date_added', lambda timestamp: pendulum.from_timestamp(timestamp)),
+        'time_added': ('deluge_date_added', pendulum.from_timestamp),
         'completed_time': (
             'deluge_date_completed',
             lambda timestamp: pendulum.from_timestamp(timestamp) if timestamp else None,
