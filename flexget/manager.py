@@ -755,7 +755,7 @@ class Manager:
         :raises: `ValueError` when config fails validation. There will be an `errors` attribute with the schema errors.
         :returns: Final validated config.
         """
-        conf = config if config else self.config
+        conf = config or self.config
         conf = fire_event('manager.before_config_validate', conf, self)
         errors = config_schema.process_config(conf)
         if errors:

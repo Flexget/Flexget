@@ -273,7 +273,7 @@ else:
             try:
                 # Ensure Binary mode.
                 flags |= getattr(os, 'O_BINARY', 0)
-                mode = attr.st_mode if attr.st_mode else 0o666  # rw-rw-rw-
+                mode = attr.st_mode or 0o666  # rw-rw-rw-
                 fd = os.open(canonicalized_path, flags, mode)
             except OSError as e:
                 logger.critical(e, exc_info=True)

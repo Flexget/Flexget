@@ -122,7 +122,7 @@ class MovieList(MutableSet):
             self._parse_title(entry)
         if entry.get('movie_name'):
             name = entry['movie_name']
-            year = entry.get('movie_year') if entry.get('movie_year') else None
+            year = entry.get('movie_year')
         else:
             logger.warning('Could not get a movie name, skipping')
             return None
