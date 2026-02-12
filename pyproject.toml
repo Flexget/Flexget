@@ -88,7 +88,7 @@ docs = [
   "pydata-sphinx-theme~=0.16.1",
   "sphinx~=8.1",
   "sphinx-copybutton~=0.5.2",
-  "sphinx-design~=0.6.1",
+  "sphinx-design~=0.7.0",
   "sphinxcontrib-svg2pdfconverter~=2.0",
 ]
 boto3 = [ "boto3~=1.35" ]
