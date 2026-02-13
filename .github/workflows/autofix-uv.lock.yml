@@ -2,15 +2,12 @@ name: autofix.ci
 on:
   push:
     branches: [develop]
-    paths:
+    paths: &paths
       - .github/workflows/autofix-uv.lock.yml
       - pyproject.toml
       - uv.lock
   pull_request:
-    paths:
-      - .github/workflows/autofix-uv.lock.yml
-      - pyproject.toml
-      - uv.lock
+    paths: *paths
 permissions: {}
 concurrency:
   group: ${{ github.workflow_ref }}-${{ github.event.number || github.ref || github.run_id }}

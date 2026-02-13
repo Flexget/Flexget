@@ -2,9 +2,9 @@ name: GitHub Actions security analysis with zizmor
 on:
   push:
     branches: [develop]
-    paths: [.github/workflows/*]
+    paths: &paths [.github/workflows/*]
   pull_request:
-    paths: [.github/workflows/*]
+    paths: *paths
 permissions: {}
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.number || github.ref || github.run_id }}
