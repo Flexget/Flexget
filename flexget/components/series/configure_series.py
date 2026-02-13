@@ -54,7 +54,11 @@ class ConfigureSeries(plugin_series.FilterSeriesBase):
                 logger.warning('Error during input plugin {}: {}', input_name, e)
                 continue
             if not result:
-                logger.warning('Input {} did not return anything', input_name)
+                msg = f'Input {input_name} did not return anything'
+                if getattr(task, 'no_entries_ok', False):
+                    logger.verbose(msg)
+                else:
+                    logger.warning(msg)
                 continue
 
             for entry in result:
