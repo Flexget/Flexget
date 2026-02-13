@@ -4,10 +4,13 @@ requires = [ "hatchling" ]
 
 [project]
 name = "flexget"
-description = "FlexGet is a program aimed to automate downloading or processing content (torrents, podcasts, etc.) from different sources like RSS-feeds, html-pages, various sites and more."
+description = """\
+  FlexGet is a program aimed to automate downloading or processing content (torrents, podcasts, etc.) from different \
+  sources like RSS-feeds, html-pages, various sites and more.\
+  """
 readme = "README.rst"
 license = "MIT"
-license-files = [ 'LICENSE' ]
+license-files = [ "LICENSE" ]
 authors = [
   { name = "Chase Sterling", email = "chase.sterling@gmail.com" },
   { name = "Marko Koivusalo", email = "marko.koivusalo@gmail.com" },
@@ -67,7 +70,7 @@ urls."Homepage" = "https://flexget.com"
 urls."Issue Tracker" = "https://github.com/Flexget/Flexget/issues"
 urls."Repository" = "https://github.com/Flexget/Flexget"
 scripts.flexget = "flexget:main"
-gui-scripts.flexget-headless = "flexget:main" # This is useful on Windows to avoid a cmd popup
+gui-scripts.flexget-headless = "flexget:main"  # This is useful on Windows to avoid a cmd popup
 
 [dependency-groups]
 dev = [
@@ -91,6 +94,21 @@ docs = [
   "sphinx-design~=0.6.1",
   "sphinxcontrib-svg2pdfconverter~=2.0",
 ]
+# This is all our optional deps installable via extras, not actually 'all'.
+# Tests that need these must add the `require_optional_deps` pytest mark.
+all = [
+  { include-group = "boto3" },
+  { include-group = "deluge" },
+  { include-group = "ftp" },
+  { include-group = "matrix" },
+  { include-group = "plexapi" },
+  { include-group = "qbittorrent" },
+  { include-group = "rarfile" },
+  { include-group = "sftp" },
+  { include-group = "subliminal" },
+  { include-group = "telegram" },
+  { include-group = "transmission" },
+]
 boto3 = [ "boto3~=1.35" ]
 deluge = [ "deluge-client~=1.10" ]
 ftp = [ "ftputil~=5.1" ]
@@ -107,68 +125,43 @@ subliminal = [
 ]
 telegram = [ "python-telegram-bot[http2,socks]~=22.0" ]
 transmission = [ "transmission-rpc~=7.0" ]
-# This is all our optional deps installable via extras, not actually 'all'.
-# Tests that need these must add the `require_optional_deps` pytest mark.
-all = [
-  { include-group = "boto3" },
-  { include-group = "deluge" },
-  { include-group = "ftp" },
-  { include-group = "matrix" },
-  { include-group = "plexapi" },
-  { include-group = "qbittorrent" },
-  { include-group = "rarfile" },
-  { include-group = "sftp" },
-  { include-group = "subliminal" },
-  { include-group = "telegram" },
-  { include-group = "transmission" },
-]
 
-[tool.hatch.build]
-skip-excluded-dirs = true
-
-[tool.hatch.build.targets.sdist]
-include = [
+[tool.hatch]
+build.skip-excluded-dirs = true
+build.targets.sdist.include = [
   "/flexget",
   "/scripts/build_locked_extras.py",
   "/scripts/bundle_webui.py",
 ]
-
-[tool.hatch.build.targets.wheel]
-include = [
+build.targets.wheel.include = [
   "/flexget",
 ]
-
-[tool.hatch.build.targets.wheel.hooks.custom]
 # The webui will be bundled when the BUNDLE_WEBUI env variable is defined
-path = "scripts/bundle_webui.py"
-
-[tool.hatch.metadata.hooks.custom]
+build.targets.wheel.hooks.custom.path = "scripts/bundle_webui.py"
 # Extras with locked dependencies will be generated if BUILD_LOCKED env variable is specified
-path = "scripts/build_locked_extras.py"
-locked-groups = [
-  'boto3',
+metadata.hooks.custom.path = "scripts/build_locked_extras.py"
+metadata.hooks.custom.locked-groups = [
+  "boto3",
   "deluge",
-  'ftp',
+  "ftp",
   "matrix",
-  'plexapi',
+  "plexapi",
   "qbittorrent",
-  'rarfile',
-  'sftp',
-  'subliminal',
+  "rarfile",
+  "sftp",
+  "subliminal",
   "telegram",
   "transmission",
   "all",
 ]
-
-[tool.hatch.version]
-path = "flexget/_version.py"
+version.path = "flexget/_version.py"
 
 [tool.ruff]
 line-length = 99
 extend-exclude = [ "flexget/ui" ]
 preview = true
 format.quote-style = "single"
-format.docstring-code-format = true # Ruff’s documentation claims that this will become the default behavior in the future, so we won’t need to specify it explicitly.
+format.docstring-code-format = true  # Ruff’s documentation claims that this will become the default behavior in the future, so we won’t need to specify it explicitly.
 lint.select = [ "ALL" ]
 lint.ignore = [
   "A",       # flake8-builtins
@@ -221,12 +214,12 @@ lint.ignore = [
   "TRY400",  # Rejected by @gazpachoking in https://github.com/Flexget/Flexget/pull/4249#issuecomment-2656387500
 ]
 lint.explicit-preview-rules = true
-lint.per-file-ignores.'docs/scripts/*' = [ "T20" ]
-lint.per-file-ignores.'scripts/*' = [ "T20" ]
-lint.per-file-ignores.'tests/*' = [ "T20" ]
-lint.per-file-ignores."flexget/*" = [ "PTH" ] # TODO
+lint.per-file-ignores."docs/scripts/*" = [ "T20" ]
+lint.per-file-ignores."flexget/*" = [ "PTH" ]  # TODO
+lint.per-file-ignores."scripts/*" = [ "T20" ]
+lint.per-file-ignores."tests/*" = [ "T20" ]
 lint.flake8-type-checking.quote-annotations = true
-lint.isort.known-first-party = [ 'flexget' ]
+lint.isort.known-first-party = [ "flexget" ]
 lint.future-annotations = true
 per-file-target-version."scripts/cleanup_cassettes.py" = "py312"
 
@@ -235,67 +228,59 @@ skip = [
   "**/cassettes/*",
   "flexget/api/templates/api_response.html",
   "flexget/api/templates/swagger-ui.html",
-  'flexget/utils/bittorrent.py',
-  'flexget/utils/parsers/series.py',
-  'tests/couchpotato_movie_list_test_response.json',
-  'tests/LICENSE.torrent',
-  'tests/test_thetvdb.py',
-  'pyproject.toml',
+  "flexget/utils/bittorrent.py",
+  "flexget/utils/parsers/series.py",
+  "tests/couchpotato_movie_list_test_response.json",
+  "tests/LICENSE.torrent",
+  "tests/test_thetvdb.py",
+  "pyproject.toml",
 ]
 
 [tool.pyproject-fmt]
-max_supported_python = '3.14'
+max_supported_python = "3.14"
 keep_full_version = true
 
-[tool.typos.default]
-extend-ignore-re = [
+[tool.typos]
+default.extend-ignore-re = [
   "idel",
   "parametros",
-  'Programe',
-  'searchin',
-  'SerieS',
-  '23BA98',
-  'IST',
+  "Programe",
+  "searchin",
+  "SerieS",
+  "23BA98",
+  "IST",
 ]
-
-[tool.typos.default.extend-identifiers]
-McClory = 'McClory'
-
-[tool.typos.default.extend-words]
-nd = 'nd'
-sur = 'sur'
-hime = 'hime'
-
-[tool.typos.files]
-extend-exclude = [
+default.extend-identifiers.McClory = "McClory"
+default.extend-words.nd = "nd"
+default.extend-words.sur = "sur"
+default.extend-words.hime = "hime"
+files.extend-exclude = [
   "**/cassettes/*",
-  'tests/couchpotato_movie_list_test_response.json',
-  'tests/couchpotato_quality_profile_test_response.json',
-  'tests/test_thetvdb.py',
+  "tests/couchpotato_movie_list_test_response.json",
+  "tests/couchpotato_quality_profile_test_response.json",
+  "tests/test_thetvdb.py",
 ]
 
 [tool.pytest]
-addopts = [ '-p no:legacypath' ]
+addopts = [ "-p no:legacypath" ]
 filterwarnings = [
-  'error',
-  'ignore:Failed to load HostKeys from:UserWarning:pysftp', # It's a bug in pysftp (unmaintained) 0.2.9, not in 0.2.8: https://stackoverflow.com/q/56521549
+  "error",
+  "ignore:Failed to load HostKeys from:UserWarning:pysftp", # It's a bug in pysftp (unmaintained) 0.2.9, not in 0.2.8: https://stackoverflow.com/q/56521549
 ]
 markers = [
-  'filecopy(src, dst): mark test to copy a file from `src` to `dst` before running',
-  'online: mark test that goes online. VCR will automatically be used.',
-  'require_optional_deps: mark test as requiring additional dependencies',
+  "filecopy(src, dst): mark test to copy a file from `src` to `dst` before running",
+  "online: mark test that goes online. VCR will automatically be used.",
+  "require_optional_deps: mark test as requiring additional dependencies",
 ]
 strict = true
 testpaths = [ "tests" ]
 
-[tool.coverage.report]
-exclude_also = [
+[tool.coverage]
+run.branch = true
+report.exclude_also = [
   "if TYPE_CHECKING",
 ]
 
-[tool.coverage.run]
-branch = true
-
 [tool.doc8]
-ignore = [ 'D001', "D004" ]
+ignore = [ "D001", "D004" ]
 max_line_length = 99
