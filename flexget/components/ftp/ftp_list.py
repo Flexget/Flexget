@@ -69,7 +69,7 @@ class FTPList:
     def prepare_config(config):
         config.setdefault('retrieve', ['files'])
         config.setdefault('ssl', False)
-        config.setdefault('dirs', [''])
+        config.setdefault('dirs', ['/'])
         config.setdefault('port', 21)
         config.setdefault('encoding', 'utf-8')
         config.setdefault('recursion', False)
@@ -87,7 +87,7 @@ class FTPList:
 
         entry['title'] = title
         entry['location'] = Path(location)
-        entry['url'] = f'ftp://{self.username}:{self.password}@{self.host}:{self.port}/{location}'
+        entry['url'] = f'ftp://{self.username}:{self.password}@{self.host}:{self.port}{location}'
         entry['filename'] = title
 
         logger.debug('adding entry {}', entry)
