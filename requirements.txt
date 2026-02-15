@@ -2,14 +2,14 @@
 #    uv export --frozen --no-dev --no-emit-project --no-hashes --output-file=requirements.txt
 aniso8601==10.0.1
     # via flask-restx
+annotated-doc==0.0.4
+    # via typer
 apscheduler==3.11.2
     # via flexget
 attrs==25.4.0
     # via
     #   jsonschema
     #   referencing
-autocommand==2.2.2
-    # via jaraco-text
 babelfish==0.6.1
     # via guessit
 backports-tarfile==1.2.0 ; python_full_version < '3.12'
@@ -35,7 +35,9 @@ cheroot==11.1.2
 cherrypy==18.10.0
     # via flexget
 click==8.3.1
-    # via flask
+    # via
+    #   flask
+    #   typer
 colorama==0.4.6 ; sys_platform == 'win32'
     # via
     #   click
@@ -78,7 +80,7 @@ jaraco-functools==4.4.0
     #   cheroot
     #   jaraco-text
     #   tempora
-jaraco-text==4.1.0
+jaraco-text==4.2.0
     # via jaraco-collections
 jinja2==3.1.6
     # via
@@ -149,7 +151,9 @@ referencing==0.37.0
 requests==2.32.5
     # via flexget
 rich==14.3.2
-    # via flexget
+    # via
+    #   flexget
+    #   typer
 rpds-py==0.30.0
     # via
     #   jsonschema
@@ -162,6 +166,8 @@ setuptools==82.0.0
     #   zc-lockfile
 sgmllib3k==1.0.0
     # via feedparser
+shellingham==1.5.4
+    # via typer
 six==1.17.0
     # via
     #   html5lib
@@ -172,6 +178,10 @@ sqlalchemy==2.0.46
     # via flexget
 tempora==5.8.1
     # via portend
+typer==0.23.1
+    # via typer-slim
+typer-slim==0.23.1
+    # via jaraco-text
 typing-extensions==4.15.0
     # via
     #   beautifulsoup4
