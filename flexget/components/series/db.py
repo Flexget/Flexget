@@ -1020,8 +1020,8 @@ def get_latest_season_pack_release(
 ) -> Season | None:
     """Return the latest season pack release for a series.
 
-    :param Series series: Series object
-    :param bool downloaded: Flag to return only downloaded season packs
+    :param series: Series object
+    :param downloaded: Flag to return only downloaded season packs
     :param season: Filter by season number
     :return: Latest release of a season object
     """
@@ -1063,7 +1063,7 @@ def get_latest_episode_release(
 ) -> Episode | None:
     """Return instance of Episode or None if not found.
 
-    :param series series: SQLAlchemy session
+    :param series: SQLAlchemy session
     :param downloaded: find only downloaded releases
     :param season: season to find newest release for
     """

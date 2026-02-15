@@ -31,7 +31,10 @@ extensions = [
     '_extensions.gallery_directive',
 ]
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
-suppress_warnings = ['config.cache']
+suppress_warnings = [
+    'config.cache',
+    'ref.python',  # Can be removed after https://github.com/sphinx-doc/sphinx/issues/14223 is resolved
+]
 nitpicky = False  # TODO: Enable after https://github.com/sphinx-doc/sphinx/issues/11991
 
 # -- sphinx.ext.autodoc options ----------------------------------------------

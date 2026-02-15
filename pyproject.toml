@@ -89,9 +89,9 @@ test = [
 ]
 docs = [
   "pydata-sphinx-theme~=0.16.1",
-  "sphinx~=8.1",
+  "sphinx~=9.1",
   "sphinx-copybutton~=0.5.2",
-  "sphinx-design~=0.6.1",
+  "sphinx-design~=0.7.0",
   "sphinxcontrib-svg2pdfconverter~=2.0",
 ]
 # This is all our optional deps installable via extras, not actually 'all'.
@@ -155,6 +155,9 @@ metadata.hooks.custom.locked-groups = [
   "all",
 ]
 version.path = "flexget/_version.py"
+
+[tool.uv]
+dependency-groups.docs = { requires-python = ">=3.13" }
 
 [tool.ruff]
 line-length = 99
