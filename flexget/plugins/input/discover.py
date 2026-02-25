@@ -185,19 +185,23 @@ class Discover:
 
             if est_date is None:
                 if estimation_mode['mode'] == 'strict':
-                    logger.debug('No release date could be determined for {}', entry['title'])
+                    logger.verbose(
+                        'Skipping discovery for `{}`, no release date could be determined. '
+                        'To discover anyway, add `release_estimations: ignore` to your configuration.',
+                        entry['title'],
+                    )
                     entry.reject('has no release date')
                     entry.complete()
                 elif estimation_mode['mode'] == 'smart' and data_exists:
                     logger.debug(
-                        'No release date could be determined for {}, but exists data',
+                        'No release date could be determined for `{}`, but exists data',
                         entry['title'],
                     )
                     entry.reject('exists but has no release date')
                     entry.complete()
                 elif estimation_mode['mode'] == 'smart' and not data_exists:
                     logger.debug(
-                        "Discovering because mode is '{}' and no data is found for entry",
+                        'Discovering because mode is `{}` and no data is found for entry',
                         estimation_mode['mode'],
                     )
                     result.append(entry)
