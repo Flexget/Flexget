@@ -335,8 +335,11 @@ class PluginSubtitleList:
         try:
             import subliminal
 
-            existing_subtitles = set(subliminal.core.search_external_subtitles(file).values())
-            if wanted_languages and len(wanted_languages - existing_subtitles) == 0:
+            existing_languages = {
+                subtitle.language
+                for subtitle in subliminal.core.search_external_subtitles(file).values()
+            }
+            if wanted_languages and len(wanted_languages - existing_languages) == 0:
                 logger.info('Local subtitle(s) already exists for {}.', file)
                 return True
         except ImportError:
