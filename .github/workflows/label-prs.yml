@@ -1,0 +1,28 @@
+name: Label PRs
+on:
+  pull_request_target:
+permissions: {}
+concurrency:
+  group: ${{ github.workflow_ref }}-${{ github.event.number || github.ref || github.run_id }}
+  cancel-in-progress: true
+jobs:
+  trigger-autofix:
+    name: Trigger pre-commit.ci autofix
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write # for labeling PRs
+    steps:
+      - name: Apply the label "pre-commit.ci autofix"
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
+        with:
+          script: |
+            const { data } = await github.rest.pulls.listCommits({
+              ...context.repo,
+              pull_number: context.issue.number
+            });
+            if (data.at(-1).author.node_id === 'BOT_kgDOBtghQg')
+              await github.rest.issues.addLabels({
+                ...context.repo,
+                issue_number: context.issue.number,
+                labels: ['pre-commit.ci autofix'],
+              });

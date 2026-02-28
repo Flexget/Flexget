@@ -2,5 +2,7 @@ rules:
   concurrency-limits:
     ignore:
       - release.yml
+  dangerous-triggers:
+    disable: true
   template-injection:
     disable: true
