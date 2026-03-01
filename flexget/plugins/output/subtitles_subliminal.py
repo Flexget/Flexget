@@ -116,7 +116,7 @@ class PluginSubliminal:
         from babelfish import Language
         from dogpile.cache.exception import RegionAlreadyConfigured
         from subliminal import save_subtitles, scan_video
-        from subliminal.cli import MutexLock
+        from subliminal.cli.helpers import MutexLock
         from subliminal.core import (
             ARCHIVE_EXTENSIONS,
             refine,
@@ -191,8 +191,7 @@ class PluginSubliminal:
                     # use metadata refiner to get mkv metadata
                     refiner = ('metadata',)
                     refine(video, episode_refiners=refiner, movie_refiners=refiner)
-                    existing_subtitles = set(search_external_subtitles(entry['location']).values())
-                    video.subtitle_languages |= existing_subtitles
+                    video.subtitles.extend(search_external_subtitles(entry['location']).values())
                     if isinstance(video, subliminal.Episode):
                         title = video.series
                         hash_scores = episode_scores['hash']

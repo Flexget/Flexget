@@ -32,7 +32,7 @@ class MetainfoSubs:
                 'subliminal', 'subliminal', f'Subliminal module required. ImportError: {e}'
             )
         from dogpile.cache.exception import RegionAlreadyConfigured
-        from subliminal.cli import MutexLock
+        from subliminal.cli.helpers import MutexLock
 
         with contextlib.suppress(RegionAlreadyConfigured):
             subliminal.region.configure(
@@ -67,15 +67,20 @@ class MetainfoSubs:
         try:
             video = scan_video(entry['location'])
             # grab external and internal subtitles
-            subtitles = video.subtitle_languages
+            languages = video.subtitle_languages
             refiner = ('metadata',)
             refine(video, episode_refiners=refiner, movie_refiners=refiner)
-            subtitles |= set(search_external_subtitles(entry['location']).values())
-            if subtitles:
+            languages |= {
+                subtitle.language
+                for subtitle in search_external_subtitles(entry['location']).values()
+            }
+            if languages:
                 # convert to human-readable strings
-                subtitles = [str(s) for s in subtitles]
-                entry['subtitles'] = subtitles
-                logger.debug('Found subtitles {} for {}', '/'.join(subtitles), entry['title'])
+                languages = [str(s) for s in languages]
+                entry['subtitles'] = languages
+                logger.debug(
+                    'Found subtitle languages {} for {}', '/'.join(languages), entry['title']
+                )
         except Exception as e:
             logger.error('Error checking local subtitles for {}: {}', entry['title'], e)
 
