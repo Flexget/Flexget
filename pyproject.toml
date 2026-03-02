@@ -242,7 +242,7 @@ max_supported_python = "3.14"
 keep_full_version = true
 
 [tool.typos]
-default.extend-ignore-re = [
+default.extend-ignore-identifiers-re = [
   "idel",
   "parametros",
   "Programe",
@@ -250,11 +250,14 @@ default.extend-ignore-re = [
   "SerieS",
   "23BA98",
   "IST",
+  "McClory",
+  "[Pp]yload",
 ]
-default.extend-identifiers.McClory = "McClory"
-default.extend-words.nd = "nd"
-default.extend-words.sur = "sur"
-default.extend-words.hime = "hime"
+default.extend-ignore-words-re = [
+  "nd",
+  "sur",
+  "hime",
+]
 files.extend-exclude = [
   "**/cassettes/*",
   "tests/couchpotato_movie_list_test_response.json",
