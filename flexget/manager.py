@@ -129,7 +129,7 @@ class Manager:
             logger.info('last manager was not torn down correctly')
 
         self.args = args
-        self.autoreload_config = False
+        self.autoreload_config = True
         self.config_file_hash: str | None = None
         self._config_path: Path | None = None
         self.log_filename: str = ''
@@ -469,8 +469,8 @@ class Manager:
                 return
             if options.daemonize:
                 self.daemonize()
-            if options.autoreload_config:
-                self.autoreload_config = True
+            if options.no_autoreload_config:
+                self.autoreload_config = False
             try:
                 signal.signal(signal.SIGTERM, self._handle_sigterm)
             except ValueError as e:
