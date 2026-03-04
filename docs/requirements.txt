@@ -22,7 +22,7 @@ docutils==0.22.4 ; python_full_version >= '3.13'
     #   sphinx
 idna==3.11 ; python_full_version >= '3.13'
     # via requests
-imagesize==1.4.1 ; python_full_version >= '3.13'
+imagesize==2.0.0 ; python_full_version >= '3.13'
     # via sphinx
 jinja2==3.1.6 ; python_full_version >= '3.13'
     # via sphinx
