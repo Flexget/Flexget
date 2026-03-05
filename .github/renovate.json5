@@ -15,8 +15,9 @@
     schedule: ['* 16-23 * * 0', '* 0-12 * * 1'],
   },
   gitIgnoredAuthors: [
-    'github-actions[bot]@users.noreply.github.com',
+    '114827586+autofix-ci[bot]@users.noreply.github.com',
     '66853113+pre-commit-ci[bot]@users.noreply.github.com',
+    'github-actions[bot]@users.noreply.github.com',
   ],
   addLabels: ['dependencies'],
   customManagers: [
