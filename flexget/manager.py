@@ -469,6 +469,10 @@ class Manager:
                 return
             if options.daemonize:
                 self.daemonize()
+            if options.autoreload_config:
+                logger.warning(
+                    'The "--autoreload-config" flag is now default and deprecated. It is slated for removal in a future version, after which its use will cause an error. Please remove it from your command.'
+                )
             if options.no_autoreload_config:
                 self.autoreload_config = False
             try:

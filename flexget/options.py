@@ -546,6 +546,11 @@ class CoreArgumentParser(ArgumentParser):
         start_parser = daemon_parser.add_subparser('start', help='start the daemon')
         start_parser.add_argument('-d', '--daemonize', action='store_true', help=daemonize_help)
         start_parser.add_argument(
+            '--autoreload-config',
+            action='store_true',
+            help='This option is already the default behavior. It is retained only for compatibility and will be removed in a future version. Please stop using this option.',
+        )
+        start_parser.add_argument(
             '--no-autoreload-config',
             action='store_true',
             help='do not automatically reload the config from disk if the daemon detects any changes',
