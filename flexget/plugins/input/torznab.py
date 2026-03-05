@@ -3,12 +3,13 @@ from xml.etree import ElementTree as ET
 
 from loguru import logger
 
-from flexget import plugin
+from flexget import options, plugin
 from flexget.components.sites.utils import torrent_availability
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.plugin import PluginError
-from flexget.utils.requests import RequestException
+from flexget.terminal import console
+from flexget.utils.requests import RequestException, Session
 from flexget.utils.tools import parse_timedelta
 
 logger = logger.bind(name='torznab')
@@ -33,16 +34,17 @@ class Torznab:
                     'enum': ['movie', 'tv', 'tvsearch', 'search'],
                     'default': 'search',
                 },
-                'website': {'type': 'string', 'format': 'url'},
+                'url': {'type': 'string', 'format': 'url'},
                 'timeout': {'type': 'string', 'format': 'interval'},
             },
-            'required': ['website', 'apikey'],
+            'required': ['url'],
             'additionalProperties': False,
         }
 
     def search(self, task, entry, config=None):
         """Search interface."""
         self._setup(task, config)
+        logger.debug('Searching for: {}', entry['title'])
         params = {}
         if self.params['t'] == 'movie':
             params = self._convert_query_parameters(entry, ['imdbid'])
@@ -55,6 +57,7 @@ class Torznab:
 
         entries = []
         for search_string in entry.get('search_strings', [query]):
+            logger.debug('Searching for: {}', search_string)
             params['q'] = search_string
             results = self.create_entries_from_query(self._build_url(**params), task)
             entries.extend(results)
@@ -70,14 +73,16 @@ class Torznab:
 
     def _setup(self, task, config):
         """Set up parameters."""
-        self.base_url = config['website'].rstrip('/')
+        self.base_url = config['url'].rstrip('/')
         config.setdefault('timeout', '30 seconds')
         self.timeout = parse_timedelta(config['timeout']).total_seconds()
         self.supported_params = []
         if config['searcher'] == 'tv':
             config['searcher'] = 'tvsearch'
 
-        self.params = {'apikey': config['apikey'], 'extended': 1}
+        self.params = {'extended': 1}
+        if 'apikey' in config:
+            self.params['apikey'] = config['apikey']
 
         logger.debug('Config: {}', config)
         self._setup_caps(task, config['searcher'], config['categories'])
@@ -166,11 +171,20 @@ class Torznab:
         root = ET.fromstring(response.content)
         for item in root.findall('.//item'):
             entry = Entry()
-            enclosure = item.find("enclosure[@type='application/x-bittorrent']")
+            # Look for enclosure with bittorrent-related type (handles both standard and magnet types)
+            enclosure = None
+            for enc in item.findall('enclosure'):
+                enc_type = enc.get('type')
+                if enc_type and 'x-bittorrent' in enc_type:
+                    enclosure = enc
+                    break
             if enclosure is None:
-                logger.warning(
-                    "Item '{}' does not contain a bittorrent enclosure.", item.title.string
-                )
+                # Fallback to any enclosure element
+                enclosure = item.find('enclosure')
+            if enclosure is None:
+                title_element = item.find('title')
+                title = title_element.text if title_element is not None else 'Unknown'
+                logger.warning('Item `{}` does not contain a bittorrent enclosure.', title)
                 continue
             entry['url'] = enclosure.attrib['url']
             try:
@@ -274,6 +288,90 @@ class Torznab:
                 break
 
         return params
+
+
+def torznab_capabilities_cli(manager, options):
+    """CLI command to fetch and display torznab capabilities."""
+    url = options.url.rstrip('/')
+    apikey = options.apikey
+
+    # Build the capabilities URL
+    params = {'t': 'caps'}
+    if apikey:
+        params['apikey'] = apikey
+    caps_url = f'{url}/api?{urlencode(params)}'
+
+    logger.info('Fetching capabilities from: {}', caps_url)
+
+    try:
+        # Use a requests session to fetch capabilities
+        session = Session()
+        response = session.get(caps_url, timeout=30)
+        response.raise_for_status()
+
+        # Parse and format the XML response
+        root = ET.fromstring(response.content)
+        format_capabilities_output(root)
+
+    except RequestException as e:
+        logger.error('Error fetching capabilities: {}', e)
+    except ET.ParseError:
+        logger.exception('Error parsing XML response')
+    except Exception:
+        logger.exception('Unexpected error')
+
+
+def format_capabilities_output(xml_root):
+    """Format and display the capabilities XML in a clean way."""
+    # Display server information
+    server = xml_root.find('server')
+    if server is not None:
+        title = server.get('title', 'Unknown')
+        console(f'Server: {title}')
+
+    # Display limits
+    limits = xml_root.find('limits')
+    if limits is not None:
+        max_limit = limits.get('max', 'N/A')
+        default_limit = limits.get('default', 'N/A')
+        console(f'Limits: max={max_limit}, default={default_limit}')
+
+    # Display searching capabilities
+    searching = xml_root.find('searching')
+    if searching is not None:
+        console('\nSearching capabilities:')
+        for search_type in searching:
+            available = search_type.get('available', 'no')
+            supported_params = search_type.get('supportedParams', '')
+            status_icon = '✓' if available == 'yes' else '✗'
+            console(f'  {status_icon} {search_type.tag}: {available}')
+            if supported_params:
+                console(f'    Supported params: {supported_params}')
+
+    # Display categories
+    categories = xml_root.find('categories')
+    if categories is not None:
+        console('\nCategories:')
+        for category in categories.findall('category'):
+            cat_id = category.get('id', 'N/A')
+            cat_name = category.get('name', 'Unknown')
+            console(f'  {cat_id}: {cat_name}')
+
+            # Display subcategories
+            for subcat in category.findall('subcat'):
+                subcat_id = subcat.get('id', 'N/A')
+                subcat_name = subcat.get('name', 'Unknown')
+                console(f'    └─ {subcat_id}: {subcat_name}')
+
+
+@event('options.register')
+def register_parser_arguments():
+    """Register the torznab CLI command."""
+    parser = options.register_command(
+        'torznab', torznab_capabilities_cli, help='Query torznab indexer capabilities'
+    )
+    parser.add_argument('url', help='Torznab indexer URL')
+    parser.add_argument('apikey', nargs='?', help='API key for the torznab indexer')
 
 
 @event('plugin.register')
