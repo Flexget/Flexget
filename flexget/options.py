@@ -548,7 +548,12 @@ class CoreArgumentParser(ArgumentParser):
         start_parser.add_argument(
             '--autoreload-config',
             action='store_true',
-            help='automatically reload the config from disk if the daemon detects any changes',
+            help='This option is already the default behavior. It is retained only for compatibility and will be removed in a future version. Please stop using this option.',
+        )
+        start_parser.add_argument(
+            '--no-autoreload-config',
+            action='store_true',
+            help='do not automatically reload the config from disk if the daemon detects any changes',
         )
         start_parser.add_argument(
             '--enable-tray-icon',

@@ -129,7 +129,7 @@ class Manager:
             logger.info('last manager was not torn down correctly')
 
         self.args = args
-        self.autoreload_config = False
+        self.autoreload_config = True
         self.config_file_hash: str | None = None
         self._config_path: Path | None = None
         self.log_filename: str = ''
@@ -470,7 +470,11 @@ class Manager:
             if options.daemonize:
                 self.daemonize()
             if options.autoreload_config:
-                self.autoreload_config = True
+                logger.warning(
+                    'The "--autoreload-config" flag is now default and deprecated. It is slated for removal in a future version, after which its use will cause an error. Please remove it from your command.'
+                )
+            if options.no_autoreload_config:
+                self.autoreload_config = False
             try:
                 signal.signal(signal.SIGTERM, self._handle_sigterm)
             except ValueError as e:
