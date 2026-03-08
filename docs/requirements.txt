@@ -12,7 +12,7 @@ beautifulsoup4==4.14.3 ; python_full_version >= '3.13'
     # via pydata-sphinx-theme
 certifi==2026.2.25 ; python_full_version >= '3.13'
     # via requests
-charset-normalizer==3.4.4 ; python_full_version >= '3.13'
+charset-normalizer==3.4.5 ; python_full_version >= '3.13'
     # via requests
 colorama==0.4.6 ; python_full_version >= '3.13' and sys_platform == 'win32'
     # via sphinx
@@ -64,7 +64,7 @@ sphinxcontrib-qthelp==2.0.0 ; python_full_version >= '3.13'
     # via sphinx
 sphinxcontrib-serializinghtml==2.0.0 ; python_full_version >= '3.13'
     # via sphinx
-sphinxcontrib-svg2pdfconverter==2.0.0 ; python_full_version >= '3.13'
+sphinxcontrib-svg2pdfconverter==2.1.0 ; python_full_version >= '3.13'
 typing-extensions==4.15.0 ; python_full_version >= '3.13'
     # via
     #   beautifulsoup4

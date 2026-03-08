@@ -22,13 +22,13 @@ blinker==1.9.0
     # via flask
 brotli==1.2.0 ; platform_python_implementation != 'PyPy'
     # via flask-compress
-brotlicffi==1.2.0.0 ; platform_python_implementation == 'PyPy'
+brotlicffi==1.2.0.1 ; platform_python_implementation == 'PyPy'
     # via flask-compress
 certifi==2026.2.25
     # via requests
 cffi==2.0.0 ; platform_python_implementation == 'PyPy'
     # via brotlicffi
-charset-normalizer==3.4.4
+charset-normalizer==3.4.5
     # via requests
 cheroot==11.1.2
     # via cherrypy
@@ -73,7 +73,7 @@ itsdangerous==2.2.0
     # via flask
 jaraco-collections==5.2.1
     # via cherrypy
-jaraco-context==6.1.0
+jaraco-context==6.1.1
     # via jaraco-text
 jaraco-functools==4.4.0
     # via
