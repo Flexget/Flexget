@@ -35,7 +35,7 @@ repos:
       - id: typos
         args: [--force-exclude]
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.4.1
+    rev: v2.4.2
     hooks:
       - id: codespell
   - repo: https://github.com/shellcheck-py/shellcheck-py
