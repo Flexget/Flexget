@@ -63,7 +63,7 @@ repos:
         args: [--line-length, '98', --pyi]
         language: python
         additional_dependencies:
-          - black==26.1.0
+          - black==26.3.0
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.15.5
     hooks:
