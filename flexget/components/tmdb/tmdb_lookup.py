@@ -58,7 +58,7 @@ class PluginTmdbLookup:
     }
 
     @register_lazy_lookup('tmdb_lookup')
-    def lazy_loader(self, entry, language):
+    def lazy_loader(self, entry, language='en'):
         """Do the lookup for this entry and populate the entry fields."""
         lookup = plugin.get('api_tmdb', self).lookup
 
@@ -78,7 +78,7 @@ class PluginTmdbLookup:
         except LookupError:
             log_once('TMDB lookup failed for {}'.format(entry['title']), logger, 'WARNING')
 
-    def lookup(self, entry, language):
+    def lookup(self, entry, language='en'):
         """Populate all lazy fields to an Entry.
 
         May be called by other plugins requiring tmdb info on an Entry

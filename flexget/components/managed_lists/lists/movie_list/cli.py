@@ -33,10 +33,16 @@ def lookup_movie(title, session, identifiers=None):
         for identifier in identifiers:
             for key, value in identifier.items():
                 entry[key] = value
-    try:
-        imdb_lookup(entry, session=session)
-    # IMDB lookup raises PluginError instead of the normal ValueError
-    except PluginError:
+
+    imdb_failed = imdb_lookup is None
+    if imdb_lookup:
+        try:
+            imdb_lookup(entry, session=session)
+        # IMDB lookup raises PluginError instead of the normal ValueError
+        except PluginError:
+            imdb_failed = True
+
+    if imdb_failed and tmdb_lookup:
         tmdb_lookup(entry)
 
     # Return only if lookup was successful
