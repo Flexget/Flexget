@@ -286,8 +286,8 @@ def relations_lookup(entry: Entry):
         response = requests.get(
             'https://arm.haglund.dev/api/v2/ids',
             params={
-                "source": "anilist",
-                "id": entry.get("al_id", eval_lazy=False),
+                'source': 'anilist',
+                'id': entry.get('al_id', eval_lazy=False),
             },
         )
         ids: dict[str, str | int] = response.json()
