@@ -65,10 +65,10 @@ dependencies = [
   "werkzeug~=3.1",
   "zxcvbn~=4.4",
 ]
-urls."Forum" = "https://github.com/Flexget/Flexget/discussions"
-urls."Homepage" = "https://flexget.com"
 urls."Issue Tracker" = "https://github.com/Flexget/Flexget/issues"
-urls."Repository" = "https://github.com/Flexget/Flexget"
+urls.Forum = "https://github.com/Flexget/Flexget/discussions"
+urls.Homepage = "https://flexget.com"
+urls.Repository = "https://github.com/Flexget/Flexget"
 scripts.flexget = "flexget:main"
 gui-scripts.flexget-headless = "flexget:main"  # This is useful on Windows to avoid a cmd popup
 
