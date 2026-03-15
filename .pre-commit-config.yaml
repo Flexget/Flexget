@@ -47,7 +47,7 @@ repos:
     hooks:
       - id: validate-pyproject
   - repo: https://github.com/tox-dev/pyproject-fmt
-    rev: v2.16.2
+    rev: v2.18.1
     hooks:
       - id: pyproject-fmt
   - repo: https://github.com/pycontribs/mirrors-prettier
