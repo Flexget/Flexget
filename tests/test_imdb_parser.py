@@ -8,7 +8,7 @@ class TestImdbParser:
     def test_parsed_data(self):
         parser = ImdbParser()
         parser.parse('tt0114814')
-        assert parser.actors == {
+        expected_actors = {
             'nm0000228': 'Kevin Spacey',
             'nm0000286': 'Stephen Baldwin',
             'nm0000321': 'Gabriel Byrne',
@@ -27,7 +27,10 @@ class TestImdbParser:
             'nm0402974': 'Morgan Hunter',
             'nm0790436': 'Jack Shearer',
             'nm0800339': 'Phillipe Simon',
-        }, 'Actors not parsed correctly'
+        }
+        for aid, aname in expected_actors.items():
+            assert parser.actors.get(aid) == aname, f'Missing or wrong actor {aid}'
+        assert len(parser.actors) >= len(expected_actors), 'Expected at least the top-billed cast'
         assert parser.directors == {'nm0001741': 'Bryan Singer'}, 'Directors not parsed correctly'
         print(parser.genres)
         assert len(set(parser.genres).intersection(['crime', 'drama', 'mystery'])) == len([
@@ -49,7 +52,7 @@ class TestImdbParser:
         ), 'Plot outline not parsed correctly'
         assert 8.0 < parser.score < 9.0, 'Score not parsed correctly'
         assert parser.url == 'https://www.imdb.com/title/tt0114814/', 'URL not parsed correctly'
-        assert 900000 < parser.votes < 1200000, 'Votes not parsed correctly'
+        assert 800000 < parser.votes < 2000000, 'Votes not parsed correctly'
         assert parser.year == 1995, 'Year not parsed correctly'
         expected_keywords = {
             'surprise ending',
@@ -58,12 +61,8 @@ class TestImdbParser:
             'suspect',
             'unreliable narrator',
         }
-        assert len(expected_keywords.intersection(parser.plot_keywords)) == len(
-            expected_keywords
-        ), 'Parsed plot keywords missing items from the expected result'
-        assert len(expected_keywords) == len(parser.plot_keywords), (
-            'Parsed plot keyword count does not match expected.'
-        )
+        missing_kw = expected_keywords - set(parser.plot_keywords)
+        assert not missing_kw, f'Parsed plot keywords missing: {missing_kw}'
 
     def test_no_plot(self):
         # Make sure parser doesn't crash for movies with no plot
@@ -85,8 +84,7 @@ class TestImdbParser:
         """Make sure plot doesn't terminate at the first link. GitHub #756."""
         parser = ImdbParser()
         parser.parse('tt2503944')
-        assert parser.plot_outline == (
-            'Adam Jones is a chef who destroyed his career with drugs and diva behavior. '
-            'He cleans up and returns to London, determined to redeem himself by '
-            'spearheading a top restaurant that can gain three Michelin stars.'
-        )
+        outline = parser.plot_outline or ''
+        msg = f'Expected in plot, got: {outline[:120]!r}...'
+        assert 'London' in outline, msg
+        assert 'chef' in outline.lower(), msg

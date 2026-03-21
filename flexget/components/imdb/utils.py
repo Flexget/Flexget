@@ -5,6 +5,7 @@ import re
 from urllib.parse import quote
 
 from loguru import logger
+from requests import RequestException
 
 from flexget import plugin
 from flexget.utils.requests import Session, TimedLimiter
@@ -28,6 +29,38 @@ requests.headers.update({
 
 # give imdb a little break between requests
 requests.add_domain_limiter(TimedLimiter('imdb.com', '3 seconds'))
+
+# Title pages are often served as an AWS WAF challenge to non-browser clients; use the same
+# GraphQL endpoint the site uses.
+IMDB_GRAPHQL_URL = 'https://caching.graphql.imdb.com/'
+
+IMDB_TITLE_GQL = """
+query ImdbTitle($id: ID!) {
+  title(id: $id) {
+    id
+    titleText { text }
+    originalTitleText { text }
+    releaseYear { year }
+    ratingsSummary { aggregateRating voteCount }
+    metacritic { metascore { score } }
+    certificate { rating country { text } }
+    primaryImage { url }
+    plot { plotText { plainText } }
+    titleGenres { genres { genre { text } } }
+    spokenLanguages { spokenLanguages { text } }
+    keywords(first: 50) {
+      edges { node { keyword { text { text } } } }
+    }
+    principalCredits {
+      category { text }
+      credits { name { id nameText { text } } }
+    }
+    credits(first: 80) {
+      edges { node { category { text } name { id nameText { text } } } }
+    }
+  }
+}
+"""
 
 
 def is_imdb_url(url):
@@ -215,7 +248,7 @@ class ImdbSearch:
 
 
 class ImdbParser:
-    """Quick-hack to parse relevant imdb details."""
+    """Fetches title details via IMDb GraphQL, with HTML/JSON scrape as fallback."""
 
     def __init__(self):
         self.genres = []
@@ -244,10 +277,176 @@ class ImdbParser:
         url = make_url(self.imdb_id)
         self.url = url
 
-        if not soup:
+        if soup is None:
+            try:
+                self._parse_from_graphql()
+            except plugin.PluginError as err:
+                logger.debug(
+                    'IMDb GraphQL failed for {}: {}; falling back to HTML scrape',
+                    self.imdb_id,
+                    err,
+                )
+            except RequestException as err:
+                logger.debug(
+                    'IMDb GraphQL request failed for {}: {}; falling back to HTML scrape',
+                    self.imdb_id,
+                    err,
+                )
+            except (json.JSONDecodeError, KeyError, TypeError, ValueError) as err:
+                logger.debug(
+                    'IMDb GraphQL response invalid for {}: {!r}; falling back to HTML scrape',
+                    self.imdb_id,
+                    err,
+                )
+            except Exception as err:
+                logger.debug(
+                    'IMDb GraphQL failed for {} ({!r}); falling back to HTML scrape',
+                    self.imdb_id,
+                    err,
+                )
+            else:
+                logger.debug(
+                    'IMDb parsed {} via GraphQL (score={} votes={})',
+                    self.imdb_id,
+                    self.score,
+                    self.votes,
+                )
+                return
             page = requests.get(url)
             soup = get_soup(page.text)
+        else:
+            logger.debug('IMDb parsing {} from provided HTML', self.imdb_id)
 
+        self._parse_from_html(soup)
+
+    def _parse_from_graphql(self):
+        """Populate fields from IMDb's GraphQL API."""
+        resp = requests.post(
+            IMDB_GRAPHQL_URL,
+            json={'query': IMDB_TITLE_GQL, 'variables': {'id': self.imdb_id}},
+            headers={'Content-Type': 'application/json'},
+            timeout=30,
+        )
+        logger.debug(
+            'IMDb GraphQL POST {} status={} bytes={}',
+            self.imdb_id,
+            resp.status_code,
+            len(resp.content),
+        )
+        resp.raise_for_status()
+        body = resp.json()
+        if body.get('errors'):
+            msgs = [e.get('message', str(e)) for e in body['errors']]
+            logger.debug('IMDb GraphQL errors for {}: {}', self.imdb_id, msgs)
+            raise plugin.PluginError('IMDb GraphQL error: {}'.format('; '.join(msgs[:3])), logger)
+        title = (body.get('data') or {}).get('title')
+        if not title:
+            raise plugin.PluginError(f'IMDb GraphQL returned no title for {self.imdb_id}', logger)
+
+        tt = title.get('titleText') or {}
+        self.name = tt.get('text')
+        if not self.name:
+            raise plugin.PluginError(f'IMDb GraphQL missing title text for {self.imdb_id}', logger)
+
+        orig = title.get('originalTitleText') or {}
+        self.original_name = orig.get('text')
+        if not self.original_name:
+            logger.debug('No original title from GraphQL for {}', self.imdb_id)
+
+        ry = title.get('releaseYear') or {}
+        self.year = ry.get('year') or 0
+        if not self.year:
+            logger.debug('No year from GraphQL for {}', self.imdb_id)
+
+        rs = title.get('ratingsSummary') or {}
+        agg = rs.get('aggregateRating')
+        if agg is not None:
+            self.score = float(agg)
+        else:
+            logger.debug('No aggregateRating from GraphQL for {}', self.imdb_id)
+        vc = rs.get('voteCount')
+        if vc is not None:
+            self.votes = int(vc)
+        else:
+            logger.debug('No voteCount from GraphQL for {}', self.imdb_id)
+
+        mc = title.get('metacritic') or {}
+        ms = (mc.get('metascore') or {}).get('score')
+        if ms is not None:
+            self.meta_score = int(ms)
+        if not self.meta_score:
+            logger.debug('No Metacritic score from GraphQL for {}', self.imdb_id)
+
+        cert = title.get('certificate') or {}
+        self.mpaa_rating = cert.get('rating') or ''
+        if not self.mpaa_rating:
+            logger.debug('No certificate from GraphQL for {}', self.imdb_id)
+
+        img = title.get('primaryImage') or {}
+        self.photo = img.get('url')
+        if not self.photo:
+            logger.debug('No primary image from GraphQL for {}', self.imdb_id)
+
+        plot = title.get('plot') or {}
+        pt = (plot.get('plotText') or {}).get('plainText')
+        if pt:
+            self.plot_outline = pt
+        else:
+            logger.debug('No plot from GraphQL for {}', self.imdb_id)
+
+        tgen = (title.get('titleGenres') or {}).get('genres') or []
+        self.genres = []
+        for row in tgen:
+            g = (row.get('genre') or {}).get('text')
+            if g:
+                self.genres.append(g.lower())
+
+        sl = (title.get('spokenLanguages') or {}).get('spokenLanguages') or []
+        self.languages = []
+        for row in sl:
+            t = row.get('text')
+            if t:
+                self.languages.append(t.lower())
+
+        kw_edges = ((title.get('keywords') or {}).get('edges')) or []
+        self.plot_keywords = []
+        for edge in kw_edges:
+            node = edge.get('node') or {}
+            kw = ((node.get('keyword') or {}).get('text') or {}).get('text')
+            if kw:
+                self.plot_keywords.append(kw)
+
+        self.directors = {}
+        self.writers = {}
+        for group in title.get('principalCredits') or []:
+            cat = ((group.get('category') or {}).get('text') or '').lower()
+            for cr in group.get('credits') or []:
+                nm = cr.get('name') or {}
+                pid = nm.get('id')
+                ptext = (nm.get('nameText') or {}).get('text')
+                if not pid or not ptext:
+                    continue
+                if cat == 'directors':
+                    self.directors[pid] = ptext
+                elif cat == 'writers':
+                    self.writers[pid] = ptext
+
+        self.actors = {}
+        max_actors = 60
+        for edge in ((title.get('credits') or {}).get('edges')) or []:
+            node = edge.get('node') or {}
+            cat = (node.get('category') or {}).get('text') or ''
+            if cat not in ('Actor', 'Actress'):
+                continue
+            nm = node.get('name') or {}
+            aid = nm.get('id')
+            atext = (nm.get('nameText') or {}).get('text')
+            if aid and atext:
+                self.actors[aid] = atext
+            if len(self.actors) >= max_actors:
+                break
+
+    def _parse_from_html(self, soup):
         ld_json_script = soup.find('script', {'type': 'application/ld+json'})
         if ld_json_script is None or ld_json_script.string is None:
             raise plugin.PluginError(
