@@ -42,13 +42,13 @@ jobs:
         run: uv run --group test pytest -m 'require_optional_deps' -n logical --allow-hosts ::1,127.0.0.1 --cov --cov-append --cov-report=xml --dist loadgroup --junit-xml optional_test_results.xml
       - name: Upload test results to Codecov
         if: ${{ !cancelled() }}
-        uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5
+        uses: codecov/codecov-action@1af58845a975a7985b0beb0cbe6fbbb71a41dbad # v5
         with:
           files: core_test_results.xml,optional_test_results.xml
           report_type: test_results
           token: ${{ secrets.CODECOV_TOKEN }}
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5
+        uses: codecov/codecov-action@1af58845a975a7985b0beb0cbe6fbbb71a41dbad # v5
         with:
           name: ${{ matrix.operating-system }}-${{ matrix.python-version }}
           token: ${{ secrets.CODECOV_TOKEN }}
