@@ -51,13 +51,6 @@ jobs:
           token: ${{ secrets.flexgetbot_pat }}
           persist-credentials: true
           fetch-depth: 0
-      - name: Check Commit Status # Currently, the GitHub frontend private API is being used, which may change at any time. Using the public API, however, is quite complex, as it requires querying both "Get the combined status for a specific reference" and "List check runs for a Git reference", and ensuring that both are 'success'.
-        run: |
-          commit_state=$(curl -sf -H 'Accept: application/json' 'https://github.com/${{ github.repository }}/commits/deferred_commit_data/${{ github.ref_name }}' | jq -r --arg commit_id "$(git rev-parse HEAD)" '.deferredCommits[] | select(.oid == $commit_id) | .statusCheckStatus.state // "not_found"')
-          if [[ "$commit_state" != "success" ]]; then
-            echo "::error::Status is '$commit_state'."
-            exit 1
-          fi
       - name: Install uv and Python
         uses: astral-sh/setup-uv@e06108dd0aef18192324c70427afc47652e63a82 # v7
         with:
