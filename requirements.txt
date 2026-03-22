@@ -6,7 +6,7 @@ annotated-doc==0.0.4
     # via typer
 apscheduler==3.11.2
     # via flexget
-attrs==25.4.0
+attrs==26.1.0
     # via
     #   jsonschema
     #   referencing
@@ -73,7 +73,7 @@ itsdangerous==2.2.0
     # via flask
 jaraco-collections==5.2.1
     # via cherrypy
-jaraco-context==6.1.1
+jaraco-context==6.1.2
     # via jaraco-text
 jaraco-functools==4.4.0
     # via
