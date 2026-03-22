@@ -37,9 +37,9 @@ Codebase verification
 Finalizing changes
 ==================
 
-- Run pre-commit:
+- Run prek:
 
-  - Execute ``pre-commit run -a`` to ensure all code formatting and quality checks pass with the new changes.
+  - Execute ``prek run -a`` to ensure all code formatting and quality checks pass with the new changes.
 
 - Bump application version:
 

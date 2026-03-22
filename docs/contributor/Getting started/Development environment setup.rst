@@ -101,25 +101,25 @@ If you want to build the documentation locally, additional docs dependencies mus
 .. seealso::
    :ref:`Docstrings and documentation`
 
-Setting up ``pre-commit``
+Setting up ``prek``
 =========================
 
-``pre-commit`` allows us to run several checks on the codebase every time a new Git commit is made.
+``prek`` allows us to run several checks on the codebase every time a new Git commit is made.
 This ensures standards and basic quality control for our code.
 
 Navigate to this repository’s folder and activate it like so::
 
-   $ uv run pre-commit install
+   $ uv run prek install
 
-By default, ``pre-commit`` runs its checks on staged files.
-If you've modified the ``pre-commit`` hooks configuration—for example, by adding a new ``Ruff``
+By default, ``prek`` runs its checks on staged files.
+If you've modified the hooks configuration—for example, by adding a new ``Ruff``
 rule—you'll need to run it on all files manually instead::
 
-   $ uv run pre-commit run -a
+   $ uv run prek run -a
 
 .. note::
-   To avoid having to prepend ``uv run`` to the ``pre-commit`` command, you can either globally
-   install ``pre-commit`` or activate the virtual environment:
+   To avoid having to prepend ``uv run`` to the ``prek`` command, you can either globally
+   install ``prek`` or activate the virtual environment:
 
    .. tab-set::
       :sync-group: os

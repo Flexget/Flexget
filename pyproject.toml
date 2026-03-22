@@ -74,7 +74,7 @@ gui-scripts.flexget-headless = "flexget:main"  # This is useful on Windows to av
 
 [dependency-groups]
 dev = [
-  "pre-commit~=4.0",
+  "prek~=0.3.6",
   "pytest~=9.0",
   "pytest-cov~=7.0",
   "pytest-socket~=0.7.0",
