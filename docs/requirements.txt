@@ -36,7 +36,7 @@ pygments==2.19.2 ; python_full_version >= '3.13'
     #   accessible-pygments
     #   pydata-sphinx-theme
     #   sphinx
-requests==2.32.5 ; python_full_version >= '3.13'
+requests==2.33.0 ; python_full_version >= '3.13'
     # via sphinx
 roman-numerals==4.1.0 ; python_full_version >= '3.13'
     # via sphinx

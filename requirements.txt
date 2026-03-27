@@ -148,7 +148,7 @@ referencing==0.37.0
     #   flask-restx
     #   jsonschema
     #   jsonschema-specifications
-requests==2.32.5
+requests==2.33.0
     # via flexget
 rich==14.3.3
     # via
