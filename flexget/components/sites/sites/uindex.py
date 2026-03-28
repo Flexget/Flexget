@@ -74,7 +74,7 @@ class UIndex:
             logger.warning('Unable to retrieve UIndex section `{}` {}: {}', section, context, e)
             return None
         soup = get_soup(response.content)
-        table = soup.find('table', class_='maintable')
+        table = soup.find('table', class_='sr-table')
         if not table:
             logger.warning(
                 'No results table found for UIndex section `{}` ({}){}',
