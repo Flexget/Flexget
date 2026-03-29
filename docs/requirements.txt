@@ -31,7 +31,7 @@ markupsafe==3.0.3 ; python_full_version >= '3.13'
 packaging==26.0 ; python_full_version >= '3.13'
     # via sphinx
 pydata-sphinx-theme==0.16.1 ; python_full_version >= '3.13'
-pygments==2.19.2 ; python_full_version >= '3.13'
+pygments==2.20.0 ; python_full_version >= '3.13'
     # via
     #   accessible-pygments
     #   pydata-sphinx-theme
