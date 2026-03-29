@@ -121,7 +121,7 @@ psutil==7.2.2
     # via flexget
 pycparser==3.0 ; implementation_name != 'PyPy' and platform_python_implementation == 'PyPy'
     # via cffi
-pygments==2.19.2
+pygments==2.20.0
     # via rich
 pynzb==0.1.0
     # via flexget
@@ -197,7 +197,7 @@ urllib3==2.6.3
     # via requests
 webencodings==0.5.1
     # via html5lib
-werkzeug==3.1.6
+werkzeug==3.1.7
     # via
     #   flask
     #   flask-cors
