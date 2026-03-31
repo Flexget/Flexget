@@ -8,6 +8,7 @@ import threading
 import unittest.mock
 from typing import TYPE_CHECKING
 
+import rich.text
 import rpyc
 from loguru import logger
 from rpyc.utils.server import ThreadedServer
@@ -99,7 +100,7 @@ class DaemonService(rpyc.Service):
 
     @property
     def client_out_stream(self):
-        return RemoteStream(self._conn.root.console)
+        return RemoteStream(self._conn.root.write)
 
     def client_log_sink(self, message):
         return self._conn.root.log_sink(message)
@@ -120,6 +121,11 @@ class ClientService(rpyc.Service):
 
     def exposed_console(self, text, *args, **kwargs):
         text = rpyc.classic.obtain(text)
+        terminal.console(text, *args, **kwargs)
+
+    def exposed_write(self, text, *args, **kwargs):
+        text = rpyc.classic.obtain(text)
+        text = rich.text.Text.from_ansi(text)
         terminal.console(text, *args, **kwargs)
 
     def exposed_log_sink(self, message):
