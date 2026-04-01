@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import contextlib
 import logging
+import os
 import random
 import string
 import threading
@@ -74,14 +75,15 @@ class DaemonService(rpyc.Service):
     def exposed_handle_cli(self, args):
         args = rpyc.utils.classic.obtain(args)
         logger.verbose('Running command `{}` for client.', ' '.join(args))
-        parser = get_parser()
-        try:
-            options = parser.parse_args(args, file=self.client_out_stream)
-        except SystemExit as e:
-            if e.code:
-                # TODO: Not sure how to properly propagate the exit code back to client
-                logger.debug('Parsing cli args caused system exit with status {}.', e.code)
-            return
+        with unittest.mock.patch.dict(os.environ, {'FORCE_COLOR': '1'}):
+            parser = get_parser()
+            try:
+                options = parser.parse_args(args, file=self.client_out_stream)
+            except SystemExit as e:
+                if e.code:
+                    # TODO: Not sure how to properly propagate the exit code back to client
+                    logger.debug('Parsing cli args caused system exit with status {}.', e.code)
+                return
         context_managers = []
         # Don't capture any output when used with --cron
         if not options.cron:
