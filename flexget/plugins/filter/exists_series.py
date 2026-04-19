@@ -25,6 +25,8 @@ class FilterExistsSeries:
       exists_series: /storage/series/
     """
 
+    VIDEO_EXTENSIONS = {'.avi', '.mkv', '.mp4', '.mpg', '.m4v', '.ts', '.wmv', '.webm'}
+
     schema = {
         'anyOf': [
             one_or_more({'type': 'string', 'format': 'path'}),
@@ -90,6 +92,8 @@ class FilterExistsSeries:
                     continue
 
                 for filename in folder.rglob('*') if config.get('recursive') else folder.iterdir():
+                    if filename.is_file() and filename.suffix.lower() not in self.VIDEO_EXTENSIONS:
+                        continue
                     # run parser on filename data
                     try:
                         disk_parser = plugin.get('parsing', self).parse_series(
