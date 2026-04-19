@@ -36,6 +36,7 @@ class FilterExistsSeries:
                         'enum': ['better', True, False],
                         'default': False,
                     },
+                    'recursive': {'type': 'boolean', 'default': False},
                 },
                 'required': ['path'],
                 'additionalProperties': False,
@@ -88,7 +89,7 @@ class FilterExistsSeries:
                     logger.warning('Directory {} does not exist', folder)
                     continue
 
-                for filename in folder.iterdir():
+                for filename in folder.rglob('*') if config.get('recursive') else folder.iterdir():
                     # run parser on filename data
                     try:
                         disk_parser = plugin.get('parsing', self).parse_series(
