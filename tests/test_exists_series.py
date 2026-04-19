@@ -84,6 +84,13 @@ class TestExistsSeries:
             - title: jinja2 s01e01
             accept_all: yes
             exists_series: __tmp__
+
+          test_non_video_skipped:
+            mock:
+              - {title: 'Foo.Bar.S01E02.XViD'}
+            series:
+              - foo bar
+            exists_series: __tmp__/nonvideo
     """
 
     test_dirs = [
@@ -102,6 +109,11 @@ class TestExistsSeries:
         """Override and parametrize default config fixture for all series tests."""
         for test_dir in self.test_dirs:
             (tmp_path / test_dir).mkdir(parents=True)
+        # Create non-video directory with subtitle/nfo files matching a series
+        nonvideo = tmp_path / 'nonvideo'
+        nonvideo.mkdir(exist_ok=True)
+        (nonvideo / 'Foo.Bar.S01E02.XViD.srt').touch()
+        (nonvideo / 'Foo.Bar.S01E02.XViD.nfo').touch()
         return self._config.replace('__parser__', request.param).replace('__tmp__', str(tmp_path))
 
     def test_existing(self, execute_task):
@@ -176,4 +188,11 @@ class TestExistsSeries:
         )
         assert task.find_entry('accepted', title='jinja s01e02'), (
             'jinja s01e02 should have been accepted'
+        )
+
+    def test_non_video_skipped(self, execute_task):
+        """Non-video files (srt, nfo) should be ignored by exists_series."""
+        task = execute_task('test_non_video_skipped')
+        assert task.find_entry('accepted', title='Foo.Bar.S01E02.XViD'), (
+            'Foo.Bar.S01E02.XViD should have been accepted (only non-video files on disk)'
         )
