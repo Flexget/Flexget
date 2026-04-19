@@ -150,7 +150,7 @@ referencing==0.37.0
     #   jsonschema-specifications
 requests==2.33.1
     # via flexget
-rich==14.3.4
+rich==15.0.0
     # via
     #   flexget
     #   typer
