@@ -291,7 +291,7 @@ class AnimeRelations:
             {
                 'anidb': 0,
                 'anilist': int(dt.timestamp(dt.now() + CACHE_DURATION)),
-                'imdb': api_response['sha'],
+                'imdb': api_response['sha'][:6],
             },
             *items,
         ]
@@ -315,7 +315,7 @@ class AnimeRelations:
             {
                 'anidb': 0,
                 'anilist': int(dt.timestamp(dt.now() + CACHE_DURATION)),
-                'animeplanet': api_response['sha'],
+                'animeplanet': api_response['sha'][:6],
             },
             *entries,
         ]
@@ -335,13 +335,14 @@ class AnimeRelations:
             *self.parse_json(
                 json_api,
                 force=bool(
-                    self.history and json_api.get('sha') != getattr(self.history, 'animeplanet', 0)
+                    self.history
+                    and json_api.get('sha')[:6] != getattr(self.history, 'animeplanet', 0)
                 ),
             ),
             *self.parse_xml(
                 xml_api,
                 force=bool(
-                    self.history and xml_api.get('sha') != getattr(self.history, 'imdb', 0)
+                    self.history and xml_api.get('sha')[:6] != getattr(self.history, 'imdb', 0)
                 ),
             ),
         ]
