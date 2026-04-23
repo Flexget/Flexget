@@ -21,7 +21,9 @@ from flexget.utils.requests import TimedLimiter
 if TYPE_CHECKING:
     from typing_extensions import NotRequired, TypedDict
 
+    from flexget.entry import Entry
     from flexget.manager import Task
+    from flexget.utils.sqlalchemy_utils import ContextSession
 
     class GitHubAPIResponse(TypedDict):
         name: str
@@ -191,7 +193,6 @@ class AnimeRelations:
         if not config:
             return
         self.cached = not task.options.nocache
-        logger.info(self.cached)
 
         self.uncached_session = RequestSession()
         self.uncached_session.add_domain_limiter(
@@ -208,18 +209,16 @@ class AnimeRelations:
             if self.cached
             else self.uncached_session
         )
+
         with Session() as session:
             history = session.query(AnimeRelationsDB).filter_by(anidb=0).first()
-            logger.debug('History {}', history)
-            if history is not None:
-                self.history = history.as_dict()
-        expired = 'anilist' in self.history and self.history['anilist'] < dt.now().timestamp()
+            self.history = history.as_dict() if history is not None else {}
+        self.expired = 'anilist' in self.history and self.history['anilist'] < dt.now().timestamp()
+        logger.debug('History: {} - Expired: {}', bool(self.history), self.expired)
 
         for entry in task.entries:
             field = None
             for f in ENTRY_TO_DB:
-                if f[:4] in ('tmdb', 'tvdb', 'imdb'):
-                    continue
                 if entry.get(f, eval_lazy=False):
                     field = f
                     break
@@ -227,30 +226,19 @@ class AnimeRelations:
                 logger.info('No valid fields available')
                 continue
             with Session() as session:
-                db_entry = (
-                    session
-                    .query(AnimeRelationsDB)
-                    .filter(getattr(AnimeRelationsDB, ENTRY_TO_DB[field]) == entry[field])
-                    .first()
-                )
+                db_entry = self.db_query(session, field, entry)
                 if db_entry is not None:
                     logger.debug('Hit the cache! \\o/')
-                if expired or not db_entry:
+                if self.expired or not db_entry:
                     drop = delete(AnimeRelationsDB)
                     session.execute(drop)
                     entries = self.populate_relations()
                     session.add_all([self.compile_db_entry(rel) for rel in entries])
-                    db_entry = (
-                        session
-                        .query(AnimeRelationsDB)
-                        .filter(getattr(AnimeRelationsDB, ENTRY_TO_DB[field]) == entry[field])
-                        .first()
-                    )
+                    db_entry = self.db_query(session, field, entry)
 
                 if not db_entry:
                     return
                 logger.verbose('DB_ENTRY: {}', db_entry)  # pyright: ignore[reportAttributeAccessIssue]  Verbose logging isn't typed
-                db_entry = db_entry.as_dict()
 
             for k, v in db_entry.items():
                 entry[DB_TO_ENTRY[k]] = v
@@ -260,6 +248,25 @@ class AnimeRelations:
         for k, v in entry.items():
             setattr(relation, k, v)
         return relation
+
+    def db_query(self, session: ContextSession, field: str, entry: Entry):
+        result = session.query(AnimeRelationsDB)
+        column: Column[int] | Column[str] = getattr(AnimeRelationsDB, ENTRY_TO_DB[field])
+        if field[-2:] != 'id':
+            return {}
+        if field == 'imdb_id':
+            result = (
+                result.filter(
+                    column.like(f'%{entry[field]}%')
+                )  # field can have multiple IMDB IDs split by commas
+            )
+        else:
+            result = result.filter(column == entry[field])
+            if field in ('tvdb_id', 'tmdb_id'):  # Try to search for season to narrow it further
+                season = entry.get(field.replace('id', 'season'), entry.get('series_season'))
+                result = result.filter(column == season) if season is not None else result
+        result = result.order_by(AnimeRelationsDB.anidb.desc()).first()
+        return result.as_dict() if result is not None else {}
 
     def parse_xml(self, api_response: GitHubAPIResponse, force: bool = False) -> list[DBType]:
         root = ET.fromstring(
