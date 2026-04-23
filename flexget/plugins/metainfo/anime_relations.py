@@ -161,11 +161,6 @@ class AnimeRelationsDB(Base):
     tvdb_offset = Column(Integer)
     tvdb_season = Column(Integer)
 
-    def __init__(self, **kargs: dict[str, str | int]):
-        for par, val in kargs.items():
-            if not par.startswith('_'):
-                self.set(par, val)
-
     def as_dict(self) -> DBType:
         dbr: DBType = {'anidb': 0}
         for k, v in self.__dict__.items():
