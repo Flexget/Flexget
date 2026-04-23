@@ -21,7 +21,7 @@ class TestAnimeRelations:
               - {title: 'MyAnimeList', mal_id: 39587}
               - {title: 'Simkl', simkl_id: 1063491}
               - {title: 'TMDB', tmdb_id: 65942}
-              - {title: 'TVDB', tvdb_id: 305089}
+              - {title: 'TVDB', tvdb_id: 305089, series_season: 2}
     """
 
     def test_anime_relations(self, request, execute_task):
@@ -37,13 +37,25 @@ class TestAnimeRelations:
             ['LiveChart', 'livechart_id', 9387],
             ['MyAnimeList', 'mal_id', 39587],
             ['Simkl', 'simkl_id', 1063491],
+            ['TVDB', 'tvdb_id', 305089],
+        ]
+        #  Shouldn't test for TMDB or IMDB since they are not unique.
+        #  TVDB isn't either but the test entry has the season to anchor it
+        extra_fields = [
+            ('imdb_id', 'tt5607616'),
+            ('tmdb_id', 65942),
+            ('tmdb_season', 1),
+            ('tmdb_offset', 26),
+            ('tvdb_season', 2),
+            ('tvdb_offset', None),
         ]
 
         def check_fields(entry):
             for fields in valid_entries:
                 name, field, value = fields
-                assert entry[field] == value, (
-                    f'Entry {name} should have field {field} set to {value}'
+                result = entry.get(field)
+                assert result == value, (
+                    f'Entry {name} should have field {field} set to {value} instead of {result}'
                 )
 
         for valid in valid_entries:
@@ -51,10 +63,8 @@ class TestAnimeRelations:
             if entry is None:
                 raise AssertionError(f'Could not find {valid[0]}')
             check_fields(entry)
-
-        #  The plugin should not populate based on these fields since they are not unique
-        invalid_entries = ['IMDB', 'TMDB', 'TVDB']
-
-        for name in invalid_entries:
-            entry = task.find_entry(title=name)
-            assert 'anidb_id' not in entry, f'Entry {name} should not have the anidb_id field'
+            for field, value in extra_fields:
+                result = entry.get(field)
+                assert result == value, (
+                    f'Entry {valid[0]} should have field {field} set to {value} instead of {result}'
+                )
