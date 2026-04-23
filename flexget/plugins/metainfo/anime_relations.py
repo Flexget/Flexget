@@ -6,7 +6,7 @@ import xml.etree.ElementTree as ET
 from datetime import datetime as dt
 from datetime import timedelta
 from pathlib import Path
-from typing import TYPE_CHECKING, NotRequired, TypedDict
+from typing import TYPE_CHECKING
 
 from requests_cache import CachedSession
 from sqlalchemy import Column, Integer, Unicode, delete
@@ -19,6 +19,8 @@ from flexget.utils.requests import Session as RequestSession
 from flexget.utils.requests import TimedLimiter
 
 if TYPE_CHECKING:
+    from typing_extensions import NotRequired, TypedDict
+
     from flexget.manager import Task
 
     class GitHubAPIResponse(TypedDict):
