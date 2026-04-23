@@ -372,9 +372,4 @@ class AnimeRelations:
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(
-        AnimeRelations,
-        'anime_relations',
-        api_ver=2,
-        interfaces=['task', 'series_metainfo', 'movie_metainfo'],
-    )
+    plugin.register(AnimeRelations, 'anime_relations', api_ver=2)
