@@ -164,18 +164,6 @@ class AnimeRelationsDB(Base):
             if not par.startswith('_'):
                 self.set(par, val)
 
-    def set(self, name, value):
-        self.__setattr__(name, value)
-
-    def __setitem__(self, name, value):
-        self.set(name, value)
-
-    def __getitem__(self, key):
-        return self.get(key)
-
-    def get(self, key, default=None):
-        return self.__getattribute__(key) or default
-
     def as_dict(self) -> DBType:
         dbr: DBType = {'anidb': 0}
         for k, v in self.__dict__.items():
@@ -198,7 +186,6 @@ class AnimeRelations:
     }
 
     cached = True
-    history = {}
 
     def on_task_metainfo(self, task: Task, config: bool):
         if not config:
