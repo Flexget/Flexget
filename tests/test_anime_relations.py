@@ -37,25 +37,28 @@ class TestAnimeRelations:
             ['LiveChart', 'livechart_id', 9387],
             ['MyAnimeList', 'mal_id', 39587],
             ['Simkl', 'simkl_id', 1063491],
-            ['TVDB', 'tvdb_id', 305089],
         ]
-        #  Shouldn't test for TMDB or IMDB since they are not unique.
-        #  TVDB isn't either but the test entry has the season to anchor it
+        #  Shouldn't test for TMDB, TVDB or IMDB since they are not unique.
+        #  TVDB has the season to narrow it down but it's a split-cour so there's an offset
         extra_fields = [
             ('imdb_id', 'tt5607616'),
             ('tmdb_id', 65942),
             ('tmdb_season', 1),
             ('tmdb_offset', 26),
+            ('tvdb_id', 305089),
             ('tvdb_season', 2),
             ('tvdb_offset', None),
         ]
 
         def check_fields(entry):
             for fields in valid_entries:
-                name, field, value = fields
-                result = entry.get(field)
+                _name, field, value = fields
+                try:
+                    result = entry[field]
+                except KeyError:
+                    result = None
                 assert result == value, (
-                    f'Entry {name} should have field {field} set to {value} instead of {result}'
+                    f'Entry {entry["title"]} should have field {field} set to {value} instead of {result}'
                 )
 
         for valid in valid_entries:
@@ -64,7 +67,10 @@ class TestAnimeRelations:
                 raise AssertionError(f'Could not find {valid[0]}')
             check_fields(entry)
             for field, value in extra_fields:
-                result = entry.get(field)
+                try:
+                    result = entry[field]
+                except KeyError:
+                    result = None
                 assert result == value, (
                     f'Entry {valid[0]} should have field {field} set to {value} instead of {result}'
                 )

@@ -252,7 +252,7 @@ class AnimeRelations:
     def db_query(self, session: ContextSession, field: str, entry: Entry):
         result = session.query(AnimeRelationsDB)
         column: Column[int] | Column[str] = getattr(AnimeRelationsDB, ENTRY_TO_DB[field])
-        if field[-2:] != 'id':
+        if not field.endswith('_id'):
             return {}
         if field == 'imdb_id':
             result = (
@@ -264,7 +264,14 @@ class AnimeRelations:
             result = result.filter(column == entry[field])
             if field in ('tvdb_id', 'tmdb_id'):  # Try to search for season to narrow it further
                 season = entry.get(field.replace('id', 'season'), entry.get('series_season'))
-                result = result.filter(column == season) if season is not None else result
+                result = (
+                    result.filter(
+                        getattr(AnimeRelationsDB, ENTRY_TO_DB[field.replace('id', 'season')])
+                        == season
+                    )
+                    if season is not None
+                    else result
+                )
         result = result.order_by(AnimeRelationsDB.anidb.desc()).first()
         return result.as_dict() if result is not None else {}
 
