@@ -212,29 +212,30 @@ class AnimeRelations:
         logger.debug('History: {} - Expired: {}', bool(self.history), self.expired)
 
         for entry in task.entries:
-            field = None
-            for f in ENTRY_TO_DB:
-                if entry.get(f, eval_lazy=False):
-                    field = f
-                    break
-            if not field:
-                logger.info('No valid fields available')
-                continue
-            with Session() as session:
-                db_entry = self.db_query(session, field, entry)
-                if self.expired or not db_entry:
-                    drop = delete(AnimeRelationsDB)
-                    session.execute(drop)
-                    entries = self.populate_relations()
-                    session.add_all([self.compile_db_entry(rel) for rel in entries])
+            for field in ENTRY_TO_DB:
+                if entry.get(field, eval_lazy=False) is None:
+                    continue
+                with Session() as session:
                     db_entry = self.db_query(session, field, entry)
+                    if self.expired or not db_entry:
+                        drop = delete(AnimeRelationsDB)
+                        session.execute(drop)
+                        entries = self.populate_relations()
+                        session.add_all([self.compile_db_entry(rel) for rel in entries])
+                        db_entry = self.db_query(session, field, entry)
 
-                if not db_entry:
-                    return
-                logger.verbose('DB_ENTRY: {}', db_entry)  # pyright: ignore[reportAttributeAccessIssue]  Verbose logging isn't typed
+                    if not db_entry:
+                        logger.debug('No matches for {}={}', field, entry[field])
+                    else:
+                        break
 
-            for k, v in db_entry.items():
-                entry[DB_TO_ENTRY[k]] = v
+            if not db_entry:
+                logger.debug('No Relations for `{}`', entry['title'])
+                return
+            logger.verbose(  # pyright: ignore[reportAttributeAccessIssue]  Verbose logging isn't typed
+                'Relations for `{}` ({}): {}', entry['title'], f'{field}={entry[field]}', db_entry
+            )
+            entry.update_using_map(ENTRY_TO_DB, db_entry)
 
     def compile_db_entry(self, entry: DBType) -> AnimeRelationsDB:
         relation = AnimeRelationsDB()
