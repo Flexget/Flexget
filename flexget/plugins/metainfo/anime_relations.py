@@ -252,12 +252,15 @@ class AnimeRelations:
             result = (
                 result.filter(
                     column.like(f'%{entry[field]}%')
-                )  # field can have multiple IMDB IDs split by commas
+                )  # Movie fields can have multiple IDs split by commas
+                # but can't wildcard TMDB because they can have as few a 2 digits
             )
         else:
             result = result.filter(column == entry[field])
-            if field in ('tvdb_id', 'tmdb_id'):  # Try to search for season to narrow it further
-                season = entry.get(field.replace('id', 'season'), entry.get('series_season'))
+        if field in ('tvdb_id', 'tmdb_id'):
+            # Try to search for season to narrow it further
+            season = entry.get(field.replace('id', 'season'), entry.get('series_season'))
+            if season is not None:
                 result = (
                     result.filter(
                         getattr(AnimeRelationsDB, ENTRY_TO_DB[field.replace('id', 'season')])
@@ -266,7 +269,7 @@ class AnimeRelations:
                     if season is not None
                     else result
                 )
-        result = result.order_by(AnimeRelationsDB.anidb.desc()).first()
+        result = result.order_by(AnimeRelationsDB.anidb.desc()).first()  # Return the newest entry
         return result.as_dict() if result is not None else {}
 
     def parse_xml(self, api_response: GitHubAPIResponse, force: bool = False) -> list[DBType]:
@@ -280,7 +283,8 @@ class AnimeRelations:
                 if key in XML_TO_DB
             }
             for anime in root.findall('anime')
-        ]  # pyright: ignore[reportAssignmentType]  Type check failing because can't verify AniDB field but it is always present on list items
+        ]  # pyright: ignore[reportAssignmentType]
+        # Type check fails because list comprehension can't verify AniDB field but it is always present on the XML
         logger.debug('{} XML anime', len(items))
         return [
             {
