@@ -222,8 +222,6 @@ class AnimeRelations:
                 continue
             with Session() as session:
                 db_entry = self.db_query(session, field, entry)
-                if db_entry is not None:
-                    logger.debug('Hit the cache! \\o/')
                 if self.expired or not db_entry:
                     drop = delete(AnimeRelationsDB)
                     session.execute(drop)
@@ -306,7 +304,6 @@ class AnimeRelations:
                 new_entry[db_key] = val
             entries.append(new_entry)
         logger.debug('{} JSON anime', len(entries))
-        logger.debug(entries[1])
         return [
             {
                 'anidb': 0,
