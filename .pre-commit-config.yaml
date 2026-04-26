@@ -65,7 +65,7 @@ repos:
         additional_dependencies:
           - black==26.3.1
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.11
+    rev: v0.15.12
     hooks:
       - id: ruff-check
         args: [--fix]
