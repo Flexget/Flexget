@@ -215,6 +215,7 @@ class AnimeRelations:
             for field in ENTRY_TO_DB:
                 if entry.get(field, eval_lazy=False) is None:
                     continue
+                db_entry = None
                 with Session() as session:
                     db_entry = self.db_query(session, field, entry)
                     if self.expired or not db_entry:
@@ -229,13 +230,17 @@ class AnimeRelations:
                     else:
                         break
 
-            if not db_entry:
-                logger.debug('No Relations for `{}`', entry['title'])
-                return
-            logger.verbose(  # pyright: ignore[reportAttributeAccessIssue]  Verbose logging isn't typed
-                'Relations for `{}` ({}): {}', entry['title'], f'{field}={entry[field]}', db_entry
-            )
-            entry.update_using_map(ENTRY_TO_DB, db_entry)
+                if not db_entry:
+                    logger.debug('No Relations for `{}`', entry['title'])
+                    break
+                logger.verbose(  # pyright: ignore[reportAttributeAccessIssue]  Verbose logging isn't typed
+                    'Relations for `{}` ({}): {}',
+                    entry['title'],
+                    f'{field}={entry[field]}',
+                    db_entry,
+                )
+                entry.update_using_map(ENTRY_TO_DB, db_entry)
+                break
 
     def compile_db_entry(self, entry: DBType) -> AnimeRelationsDB:
         relation = AnimeRelationsDB()
@@ -243,11 +248,11 @@ class AnimeRelations:
             setattr(relation, k, v)
         return relation
 
-    def db_query(self, session: ContextSession, field: str, entry: Entry):
+    def db_query(self, session: ContextSession, field: str, entry: Entry) -> DBType | None:
         result = session.query(AnimeRelationsDB)
         column: Column[int] | Column[str] = getattr(AnimeRelationsDB, ENTRY_TO_DB[field])
         if not field.endswith('_id'):
-            return {}
+            return None
         if field == 'imdb_id':
             result = (
                 result.filter(
@@ -270,7 +275,7 @@ class AnimeRelations:
                     else result
                 )
         result = result.order_by(AnimeRelationsDB.anidb.desc()).first()  # Return the newest entry
-        return result.as_dict() if result is not None else {}
+        return result.as_dict() if result is not None else None
 
     def parse_xml(self, api_response: GitHubAPIResponse, force: bool = False) -> list[DBType]:
         root = ET.fromstring(
