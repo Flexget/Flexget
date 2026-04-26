@@ -204,42 +204,60 @@ class AnimeRelations:
             if self.cached
             else self.uncached_session
         )
+        self.json_api: GitHubAPIResponse = self.get(
+            GH_API_FILE.format(repo='fribb/anime-lists', file='anime-list-mini.json'),
+            cache_session=False,
+        ).json()
+        self.xml_api: GitHubAPIResponse = self.get(
+            GH_API_FILE.format(repo='Anime-Lists/anime-lists', file='anime-list.xml'),
+            cache_session=False,
+        ).json()
 
         with Session() as session:
             history = session.query(AnimeRelationsDB).filter_by(anidb=0).first()
-            self.history = history.as_dict() if history is not None else {}
-        self.expired = 'anilist' in self.history and self.history['anilist'] < dt.now().timestamp()
+            self.history = None if history is None else history.as_dict()
+        self.expired = (
+            True
+            if self.history is None
+            else self.history.get('anilist', 0) < dt.now().timestamp()
+            # Exploiting Unicode fields to avoid creating another table for cache-busting
+            or self.history.get('imdb') != self.xml_api.get('sha', '')[:6]
+            or self.history.get('animeplanet') != self.json_api.get('sha', '')[:6]
+        )
         logger.debug('History: {} - Expired: {}', bool(self.history), self.expired)
+
+        if self.expired:
+            with Session() as session:
+                session.execute(delete(AnimeRelationsDB))
+                entries = self.populate_relations()
+                session.add_all([self.compile_db_entry(rel) for rel in entries])
+                history = session.query(AnimeRelationsDB).filter_by(anidb=0).first()
+                self.history = None if history is None else history.as_dict()
 
         for entry in task.entries:
             for field in ENTRY_TO_DB:
                 if entry.get(field, eval_lazy=False) is None:
                     continue
-                db_entry = None
                 with Session() as session:
                     db_entry = self.db_query(session, field, entry)
-                    if self.expired or not db_entry:
-                        drop = delete(AnimeRelationsDB)
-                        session.execute(drop)
-                        entries = self.populate_relations()
-                        session.add_all([self.compile_db_entry(rel) for rel in entries])
-                        db_entry = self.db_query(session, field, entry)
-
                     if not db_entry:
-                        logger.debug('No matches for {}={}', field, entry[field])
-                    else:
-                        break
+                        logger.debug(
+                            'No matches for {}={}: `{}`', field, entry[field], entry['title']
+                        )
 
                 if not db_entry:
-                    logger.debug('No Relations for `{}`', entry['title'])
+                    logger.verbose(  # pyright: ignore[reportAttributeAccessIssue]  Verbose logging isn't typed
+                        'No Relations for `{}`', entry['title']
+                    )
                     break
                 logger.verbose(  # pyright: ignore[reportAttributeAccessIssue]  Verbose logging isn't typed
-                    'Relations for `{}` ({}): {}',
+                    'Relations for {}={} `{}`: {}',
+                    field,
+                    entry[field],
                     entry['title'],
-                    f'{field}={entry[field]}',
                     db_entry,
                 )
-                entry.update_using_map(ENTRY_TO_DB, db_entry)
+                entry.update_using_map(ENTRY_TO_DB, db_entry, ignore_none=True)
                 break
 
     def compile_db_entry(self, entry: DBType) -> AnimeRelationsDB:
@@ -324,28 +342,19 @@ class AnimeRelations:
         ]
 
     def populate_relations(self) -> list[DBType]:
-        json_api: GitHubAPIResponse = self.get(
-            GH_API_FILE.format(repo='fribb/anime-lists', file='anime-list-mini.json'),
-            cache_session=False,
-        ).json()
-        xml_api: GitHubAPIResponse = self.get(
-            GH_API_FILE.format(repo='Anime-Lists/anime-lists', file='anime-list.xml'),
-            cache_session=False,
-        ).json()
-
-        # Exploiting Unicode fields to avoid creating another table for cache-busting
         entries: list[DBType] = [
             *self.parse_json(
-                json_api,
+                self.json_api,
                 force=bool(
                     self.history
-                    and json_api.get('sha')[:6] != getattr(self.history, 'animeplanet', 0)
+                    and self.json_api.get('sha', '')[:6] != getattr(self.history, 'animeplanet', 0)
                 ),
             ),
             *self.parse_xml(
-                xml_api,
+                self.xml_api,
                 force=bool(
-                    self.history and xml_api.get('sha')[:6] != getattr(self.history, 'imdb', 0)
+                    self.history
+                    and self.xml_api.get('sha', '')[:6] != getattr(self.history, 'imdb', 0)
                 ),
             ),
         ]
