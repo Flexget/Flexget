@@ -28,7 +28,7 @@ brotlicffi==1.2.0.1 ; platform_python_implementation == 'PyPy'
     # via flask-compress
 cattrs==26.1.0
     # via requests-cache
-certifi==2026.2.25
+certifi==2026.4.22
     # via requests
 cffi==2.0.0 ; platform_python_implementation == 'PyPy'
     # via brotlicffi
@@ -38,7 +38,7 @@ cheroot==11.1.2
     # via cherrypy
 cherrypy==18.10.0
     # via flexget
-click==8.3.2
+click==8.3.3
     # via
     #   flask
     #   typer
@@ -71,10 +71,8 @@ guessit==3.8.0
     # via flexget
 html5lib==1.1
     # via flexget
-idna==3.11
-    # via
-    #   requests
-    #   url-normalize
+idna==3.13
+    # via requests
 importlib-resources==7.1.0
     # via flask-restx
 itsdangerous==2.2.0
@@ -117,7 +115,7 @@ more-itertools==11.0.2
     #   cherrypy
     #   jaraco-functools
     #   jaraco-text
-packaging==26.1
+packaging==26.2
     # via flexget
 pendulum==3.2.0
     # via flexget
@@ -192,7 +190,7 @@ sqlalchemy==2.0.49
     # via flexget
 tempora==5.8.1
     # via portend
-typer==0.24.1
+typer==0.25.0
     # via typer-slim
 typer-slim==0.24.0
     # via jaraco-text
@@ -203,7 +201,7 @@ typing-extensions==4.15.0
     #   exceptiongroup
     #   referencing
     #   sqlalchemy
-tzdata==2026.1
+tzdata==2026.2
     # via
     #   pendulum
     #   tzlocal

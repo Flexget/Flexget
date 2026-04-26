@@ -10,7 +10,7 @@ babel==2.18.0 ; python_full_version >= '3.13'
     #   sphinx
 beautifulsoup4==4.14.3 ; python_full_version >= '3.13'
     # via pydata-sphinx-theme
-certifi==2026.2.25 ; python_full_version >= '3.13'
+certifi==2026.4.22 ; python_full_version >= '3.13'
     # via requests
 charset-normalizer==3.4.7 ; python_full_version >= '3.13'
     # via requests
@@ -20,7 +20,7 @@ docutils==0.22.4 ; python_full_version >= '3.13'
     # via
     #   pydata-sphinx-theme
     #   sphinx
-idna==3.11 ; python_full_version >= '3.13'
+idna==3.13 ; python_full_version >= '3.13'
     # via requests
 imagesize==2.0.0 ; python_full_version >= '3.13'
     # via sphinx
@@ -28,9 +28,9 @@ jinja2==3.1.6 ; python_full_version >= '3.13'
     # via sphinx
 markupsafe==3.0.3 ; python_full_version >= '3.13'
     # via jinja2
-packaging==26.1 ; python_full_version >= '3.13'
+packaging==26.2 ; python_full_version >= '3.13'
     # via sphinx
-pydata-sphinx-theme==0.17.0 ; python_full_version >= '3.13'
+pydata-sphinx-theme==0.17.1 ; python_full_version >= '3.13'
 pygments==2.20.0 ; python_full_version >= '3.13'
     # via
     #   accessible-pygments
