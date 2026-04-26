@@ -72,7 +72,9 @@ guessit==3.8.0
 html5lib==1.1
     # via flexget
 idna==3.13
-    # via requests
+    # via
+    #   requests
+    #   url-normalize
 importlib-resources==7.1.0
     # via flask-restx
 itsdangerous==2.2.0
