@@ -3,7 +3,6 @@ from __future__ import annotations
 import functools
 import logging
 import xml.etree.ElementTree as ET
-from datetime import datetime as dt
 from datetime import timedelta
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -15,6 +14,7 @@ from flexget import db_schema, plugin
 from flexget.event import event
 from flexget.log import logger
 from flexget.manager import Session
+from flexget.plugin import internet
 from flexget.utils.requests import Session as RequestSession
 from flexget.utils.requests import TimedLimiter
 
@@ -86,6 +86,7 @@ Base = db_schema.versioned_base('anime_relations', 0)
 
 GH_API_FILE = 'https://api.github.com/repos/{repo}/contents/{file}'
 
+###  FIELD MAPS  ###
 XML_TO_DB = {
     'anidbid': 'anidb',
     'tvdbid': 'tvdb',
@@ -219,9 +220,8 @@ class AnimeRelations:
         self.expired = (
             True
             if self.history is None
-            else self.history.get('anilist', 0) < dt.now().timestamp()
             # Exploiting Unicode fields to avoid creating another table for cache-busting
-            or self.history.get('imdb') != self.xml_api.get('sha', '')[:6]
+            else self.history.get('imdb') != self.xml_api.get('sha', '')[:6]
             or self.history.get('animeplanet') != self.json_api.get('sha', '')[:6]
         )
         logger.debug('History: {} - Expired: {}', bool(self.history), self.expired)
@@ -233,6 +233,7 @@ class AnimeRelations:
                 session.add_all([self.compile_db_entry(rel) for rel in entries])
                 history = session.query(AnimeRelationsDB).filter_by(anidb=0).first()
                 self.history = None if history is None else history.as_dict()
+                self.expired = False
 
         for entry in task.entries:
             for field in ENTRY_TO_DB:
@@ -295,68 +296,15 @@ class AnimeRelations:
         result = result.order_by(AnimeRelationsDB.anidb.desc()).first()  # Return the newest entry
         return result.as_dict() if result is not None else None
 
-    def parse_xml(self, api_response: GitHubAPIResponse, force: bool = False) -> list[DBType]:
-        root = ET.fromstring(
-            self.get(api_response['download_url'], force=force).content.decode(encoding='utf-8')
-        )
-        items: list[DBType] = [
-            {
-                XML_TO_DB[key]: int(val) if val.isdigit() else val
-                for key, val in anime.attrib.items()
-                if key in XML_TO_DB
-            }
-            for anime in root.findall('anime')
-        ]  # pyright: ignore[reportAssignmentType]
-        # Type check fails because list comprehension can't verify AniDB field but it is always present on the XML
-        logger.debug('{} XML anime', len(items))
-        return [
-            {
-                'anidb': 0,
-                'anilist': int(dt.timestamp(dt.now() + CACHE_DURATION)),
-                'imdb': api_response['sha'][:6],
-            },
-            *items,
-        ]
-
-    def parse_json(self, api_response: GitHubAPIResponse, force: bool = False) -> list[DBType]:
-        request = self.get(api_response['download_url'], force=force).json()
-        entries: list[DBType] = []
-        for anime in request:
-            if not anime.get('anidb_id'):
-                continue
-            new_entry: DBType = {'anidb': 99999999}
-            for json_key, db_key in JSON_TO_DB.items():
-                val = functools.reduce(lambda x, y: dict.get(x, y, {}), json_key.split('.'), anime)
-                if val is None or all((repr(val) == r'{}', isinstance(val, dict))):
-                    continue
-                new_entry[db_key] = val
-            entries.append(new_entry)
-        logger.debug('{} JSON anime', len(entries))
-        return [
-            {
-                'anidb': 0,
-                'anilist': int(dt.timestamp(dt.now() + CACHE_DURATION)),
-                'animeplanet': api_response['sha'][:6],
-            },
-            *entries,
-        ]
-
     def populate_relations(self) -> list[DBType]:
         entries: list[DBType] = [
-            *self.parse_json(
-                self.json_api,
-                force=bool(
-                    self.history
-                    and self.json_api.get('sha', '')[:6] != getattr(self.history, 'animeplanet', 0)
-                ),
-            ),
-            *self.parse_xml(
-                self.xml_api,
-                force=bool(
-                    self.history
-                    and self.xml_api.get('sha', '')[:6] != getattr(self.history, 'imdb', 0)
-                ),
-            ),
+            {
+                'anidb': 0,
+                'animeplanet': self.json_api['sha'][:6],
+                'imdb': self.xml_api['sha'][:6],
+            },
+            *self.parse_json(),
+            *self.parse_xml(),
         ]
 
         # Merge fields together based on AniDB
@@ -369,13 +317,57 @@ class AnimeRelations:
         logger.debug('{} Unique entries', len(filter))
         return unique
 
-    def get(self, url: str, cache_session: bool = cached, force: bool = False):
+    def parse_json(self) -> list[DBType]:
+        request = self.get(
+            self.json_api['download_url'],
+            refresh=bool(
+                self.history and self.xml_api.get('sha', '')[:6] != self.history.get('imdb')
+            ),
+        ).json()
+        entries: list[DBType] = []
+        for anime in request:
+            if not anime.get('anidb_id'):
+                continue
+            new_entry: DBType = {'anidb': 99999999}
+            for json_key, db_key in JSON_TO_DB.items():
+                val = functools.reduce(lambda x, y: dict.get(x, y, {}), json_key.split('.'), anime)
+                if val is None or all((repr(val) == r'{}', isinstance(val, dict))):
+                    continue
+                new_entry[db_key] = val
+            entries.append(new_entry)
+        logger.debug('{} JSON anime', len(entries))
+        return entries
+
+    def parse_xml(self) -> list[DBType]:
+        root = ET.fromstring(
+            self.get(
+                self.xml_api['download_url'],
+                refresh=bool(
+                    self.history
+                    and self.json_api.get('sha', '')[:6] != self.history.get('animeplanet')
+                ),
+            ).content.decode(encoding='utf-8')
+        )
+        items: list[DBType] = [
+            {
+                XML_TO_DB[key]: int(val) if val.isdigit() else val
+                for key, val in anime.attrib.items()
+                if key in XML_TO_DB
+            }
+            for anime in root.findall('anime')
+        ]  # pyright: ignore[reportAssignmentType]
+        # Type check fails because list comprehension can't verify AniDB field but it is always present on the XML
+        logger.debug('{} XML anime', len(items))
+        return items
+
+    @internet(logger)
+    def get(self, url: str, *, cache_session: bool = cached, refresh: bool = False):
         if cache_session:
             session = self.cached_session
-            if force and isinstance(session, CachedSession):
-                logger.debug('Clearing Requests cache')
+            if refresh and isinstance(session, CachedSession):
+                logger.debug('Clearing cache for {}', url)
                 session.cache.delete(urls=[url])
-            logger.debug('GET-ing {}', url)
+            logger.debug('GETing {}', url)
         else:
             session = self.uncached_session
 
