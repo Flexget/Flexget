@@ -13,7 +13,7 @@ from sqlalchemy import Column, Integer, Unicode, delete
 from flexget import db_schema, plugin
 from flexget.event import event
 from flexget.log import logger
-from flexget.manager import Session
+from flexget.manager import Session as DBSession
 from flexget.plugin import internet
 from flexget.utils.requests import Session as RequestSession
 from flexget.utils.requests import TimedLimiter
@@ -78,14 +78,10 @@ if TYPE_CHECKING:
 
 
 logger = logger.bind(name='anime_relations')
-logging.getLogger('requests_cache').setLevel(logging.WARNING)
+logging.getLogger('requests_cache').setLevel(logging.WARNING)  # Suppress Requests-Cache logs
 
 CACHE_DURATION = timedelta(days=5)
-
-Base = db_schema.versioned_base('anime_relations', 0)
-
 GH_API_FILE = 'https://api.github.com/repos/{repo}/contents/{file}'
-
 ###  FIELD MAPS  ###
 XML_TO_DB = {
     'anidbid': 'anidb',
@@ -137,6 +133,8 @@ DB_TO_ENTRY = {
     'tvdb_season': 'tvdb_season',
 }
 ENTRY_TO_DB = {v: k for k, v in DB_TO_ENTRY.items()}
+
+Base = db_schema.versioned_base('anime_relations', 0)
 
 
 class AnimeRelationsDB(Base):
@@ -214,7 +212,7 @@ class AnimeRelations:
             cache_session=False,
         ).json()
 
-        with Session() as session:
+        with DBSession() as session:
             history = session.query(AnimeRelationsDB).filter_by(anidb=0).first()
             self.history = None if history is None else history.as_dict()
         self.expired = (
@@ -227,7 +225,7 @@ class AnimeRelations:
         logger.debug('History: {} - Expired: {}', bool(self.history), self.expired)
 
         if self.expired:
-            with Session() as session:
+            with DBSession() as session:
                 session.execute(delete(AnimeRelationsDB))
                 entries = self.populate_relations()
                 session.add_all([self.compile_db_entry(rel) for rel in entries])
@@ -239,7 +237,7 @@ class AnimeRelations:
             for field in ENTRY_TO_DB:
                 if entry.get(field, eval_lazy=False) is None:
                     continue
-                with Session() as session:
+                with DBSession() as session:
                     db_entry = self.db_query(session, field, entry)
                     if not db_entry:
                         logger.debug(
