@@ -259,6 +259,7 @@ class AnimeRelations:
                     db_entry,
                 )
                 entry.update_using_map(ENTRY_TO_DB, db_entry, ignore_none=True)
+                entry['relations'] = db_entry
                 break
 
     def compile_db_entry(self, entry: DBType) -> AnimeRelationsDB:
