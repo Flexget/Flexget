@@ -311,6 +311,12 @@ class AnimeRelations:
         for entry in entries:
             idx = str(entry['anidb'])
             for k, v in entry.items():
+                # Ignore TVDB IDs like 'movie', 'ova', 'tv special', etc...
+                if k == 'tvdb' and isinstance(v, str) and not v.isdigit():
+                    continue
+                # Absolute season becomes 1
+                if v == 'a' and k in ('tmdb_season', 'tvdb_season'):
+                    v = 1
                 filter[idx][k] = v
         unique: list[DBType] = list(filter.values())
         logger.debug('{} Unique entries', len(filter))
