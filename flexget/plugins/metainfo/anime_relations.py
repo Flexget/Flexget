@@ -206,7 +206,8 @@ class AnimeRelations:
         relations = self.populate_relations()
 
         if (
-            self.history is None
+            not self.cached
+            or self.history is None
             # Exploiting Unicode fields to avoid creating another table for ETags
             or relations[0].get('imdb') != self.history.get('imdb')
             or relations[0].get('animeplanet') != self.history.get('animeplanet')
