@@ -2,23 +2,24 @@ from __future__ import annotations
 
 import functools
 import logging
+import lzma
 import xml.etree.ElementTree as ET
 from datetime import timedelta
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from requests_cache import CachedSession
+from requests_cache import CachedSession, SerializerPipeline, Stage, pickle_serializer
 from sqlalchemy import Column, Integer, Unicode, delete
 
 from flexget import db_schema, plugin
 from flexget.event import event
 from flexget.log import logger
 from flexget.manager import Session as DBSession
-from flexget.plugin import internet
 from flexget.utils.requests import Session as RequestSession
-from flexget.utils.requests import TimedLimiter
+from flexget.utils.requests import TokenBucketLimiter
 
 if TYPE_CHECKING:
+    from requests import Response
     from typing_extensions import NotRequired, TypedDict
 
     from flexget.entry import Entry
@@ -80,8 +81,8 @@ if TYPE_CHECKING:
 logger = logger.bind(name='anime_relations')
 logging.getLogger('requests_cache').setLevel(logging.WARNING)  # Suppress Requests-Cache logs
 
-CACHE_DURATION = timedelta(days=5)
-GH_API_FILE = 'https://api.github.com/repos/{repo}/contents/{file}'
+CACHE_DURATION = timedelta(days=7)
+GH_RAW_FILE = 'https://raw.githubusercontent.com/{repo}/master/{file}'
 ###  FIELD MAPS  ###
 XML_TO_DB = {
     'anidbid': 'anidb',
@@ -190,48 +191,43 @@ class AnimeRelations:
 
         self.uncached_session = RequestSession()
         self.uncached_session.add_domain_limiter(
-            TimedLimiter('githubusercontent.com', '2 seconds')
+            TokenBucketLimiter('githubusercontent.com', 60, '1 hour')
         )
-        self.uncached_session.add_domain_limiter(TimedLimiter('github.com', '2 seconds'))
-        self.cached_session = (
-            CachedSession(
+
+        if self.cached:
+            self.cached_session = CachedSession(
                 Path(task.manager.config_base, 'cached_requests'),
                 cache_control=False,
+                ignored_parameters=['expires', 'max-age'],
                 expire_after=CACHE_DURATION,
+                stale_if_error=True,
                 backend='filesystem',
+                serializer=SerializerPipeline(
+                    [pickle_serializer, Stage(dumps=lzma.compress, loads=lzma.decompress)],
+                    is_binary=True,
+                ),
             )
-            if self.cached
-            else self.uncached_session
-        )
-        self.json_api: GitHubAPIResponse = self.get(
-            GH_API_FILE.format(repo='fribb/anime-lists', file='anime-list-mini.json'),
-            cache_session=False,
-        ).json()
-        self.xml_api: GitHubAPIResponse = self.get(
-            GH_API_FILE.format(repo='Anime-Lists/anime-lists', file='anime-list.xml'),
-            cache_session=False,
-        ).json()
+            self.cached_session.headers.update(self.uncached_session.headers)
+            self.cached_session.cache.delete(older_than=CACHE_DURATION)
+            self.cached_session.cache.delete(invalid=True)
 
         with DBSession() as session:
             history = session.query(AnimeRelationsDB).filter_by(anidb=0).first()
             self.history = None if history is None else history.as_dict()
-        self.expired = (
-            True
-            if self.history is None
-            # Exploiting Unicode fields to avoid creating another table for cache-busting
-            else self.history.get('imdb') != self.xml_api.get('sha', '')[:6]
-            or self.history.get('animeplanet') != self.json_api.get('sha', '')[:6]
-        )
-        logger.debug('History: {} - Expired: {}', bool(self.history), self.expired)
+        logger.debug('History: {}', self.history)
 
-        if self.expired:
+        relations = self.populate_relations()
+
+        if (
+            self.history is None
+            or relations[0].get('imdb') != self.history.get('imdb')
+            or relations[0].get('animeplanet') != self.history.get('animeplanet')
+        ):
             with DBSession() as session:
                 session.execute(delete(AnimeRelationsDB))
-                entries = self.populate_relations()
-                session.add_all([self.compile_db_entry(rel) for rel in entries])
+                session.add_all([self.compile_db_entry(rel) for rel in relations])
                 history = session.query(AnimeRelationsDB).filter_by(anidb=0).first()
                 self.history = None if history is None else history.as_dict()
-                self.expired = False
 
         for entry in task.entries:
             for field in ENTRY_TO_DB:
@@ -297,11 +293,6 @@ class AnimeRelations:
 
     def populate_relations(self) -> list[DBType]:
         entries: list[DBType] = [
-            {
-                'anidb': 0,
-                'animeplanet': self.json_api['sha'][:6],
-                'imdb': self.xml_api['sha'][:6],
-            },
             *self.parse_json(),
             *self.parse_xml(),
         ]
@@ -325,14 +316,12 @@ class AnimeRelations:
         return unique
 
     def parse_json(self) -> list[DBType]:
-        request = self.get(
-            self.json_api['download_url'],
-            refresh=bool(
-                self.history and self.xml_api.get('sha', '')[:6] != self.history.get('imdb')
-            ),
-        ).json()
-        entries: list[DBType] = []
-        for anime in request:
+        request: Response = self.get(
+            GH_RAW_FILE.format(repo='fribb/anime-lists', file='anime-list-mini.json'),
+            etag=self.history.get('imdb', '') if self.history else '',
+        )
+        entries: list[DBType] = [{'anidb': 0, 'imdb': request.headers.get('ETag', '')}]
+        for anime in request.json():
             if not anime.get('anidb_id'):
                 continue
             new_entry: DBType = {'anidb': 99999999}
@@ -346,39 +335,37 @@ class AnimeRelations:
         return entries
 
     def parse_xml(self) -> list[DBType]:
-        root = ET.fromstring(
-            self.get(
-                self.xml_api['download_url'],
-                refresh=bool(
-                    self.history
-                    and self.json_api.get('sha', '')[:6] != self.history.get('animeplanet')
-                ),
-            ).content.decode(encoding='utf-8')
+        response: Response = self.get(
+            GH_RAW_FILE.format(repo='Anime-Lists/anime-lists', file='anime-list.xml'),
+            etag=self.history.get('animeplanet', '') if self.history else '',
         )
+        root = ET.fromstring(response.content.decode(encoding='utf-8'))
         items: list[DBType] = [
-            {
-                XML_TO_DB[key]: int(val) if val.isdigit() else val
-                for key, val in anime.attrib.items()
-                if key in XML_TO_DB
-            }
-            for anime in root.findall('anime')
-        ]  # pyright: ignore[reportAssignmentType]
+            {'anidb': 0, 'animeplanet': response.headers.get('ETag', '')},
+            *[
+                {
+                    XML_TO_DB[key]: int(val) if val.isdigit() else val
+                    for key, val in anime.attrib.items()
+                    if key in XML_TO_DB
+                }
+                for anime in root.findall('anime')
+            ],  # pyright: ignore[reportAssignmentType]
+        ]
         # Type check fails because list comprehension can't verify AniDB field but it is always present on the XML
         logger.debug('{} XML anime', len(items))
         return items
 
-    @internet(logger)
-    def get(self, url: str, *, cache_session: bool = cached, refresh: bool = False):
-        if cache_session:
+    def get(self, url: str, *, etag: str) -> Response:
+        headers = {'Cache-Control': f'max-age={CACHE_DURATION.seconds}'}
+        if self.cached:
             session = self.cached_session
-            if refresh and isinstance(session, CachedSession):
-                logger.debug('Clearing cache for {}', url)
-                session.cache.delete(urls=[url])
+            if etag:
+                headers['If-None-Match'] = etag
             logger.debug('GETing {}', url)
         else:
             session = self.uncached_session
 
-        resp = session.get(url)
+        resp = session.get(url, headers=headers)
         if getattr(resp, 'from_cache', None):
             logger.debug('Request was cached!')
         return resp

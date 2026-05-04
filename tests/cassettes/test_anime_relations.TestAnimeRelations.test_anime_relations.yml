@@ -1,304 +1,166 @@
 interactions:
-  - request:
-      body: null
-      headers:
-        Accept:
-          - '*/*'
-        Accept-Encoding:
-          - gzip, deflate, br, zstd
-        Connection:
-          - keep-alive
-        User-Agent:
-          - FlexGet/3.19.15.dev (www.flexget.com)
-      method: GET
-      uri: https://api.github.com/repos/fribb/anime-lists/contents/anime-list-mini.json
-    response:
-      body:
-        string: '{"name":"anime-list-mini.json","path":"anime-list-mini.json","sha":"5729f2b6cd99790335c1447f2749c8a5d88ad07f","size":5666055,"url":"https://api.github.com/repos/Fribb/anime-lists/contents/anime-list-mini.json?ref=master","html_url":"https://github.com/Fribb/anime-lists/blob/master/anime-list-mini.json","git_url":"https://api.github.com/repos/Fribb/anime-lists/git/blobs/5729f2b6cd99790335c1447f2749c8a5d88ad07f","download_url":"https://raw.githubusercontent.com/Fribb/anime-lists/master/anime-list-mini.json","type":"file","content":"","encoding":"none","_links":{"self":"https://api.github.com/repos/Fribb/anime-lists/contents/anime-list-mini.json?ref=master","git":"https://api.github.com/repos/Fribb/anime-lists/git/blobs/5729f2b6cd99790335c1447f2749c8a5d88ad07f","html":"https://github.com/Fribb/anime-lists/blob/master/anime-list-mini.json"}}'
-      headers:
-        Accept-Ranges:
-          - bytes
-        Access-Control-Allow-Origin:
-          - '*'
-        Access-Control-Expose-Headers:
-          - ETag, Link, Location, Retry-After, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining,
-            X-RateLimit-Used, X-RateLimit-Resource, X-RateLimit-Reset, X-OAuth-Scopes,
-            X-Accepted-OAuth-Scopes, X-Poll-Interval, X-GitHub-Media-Type, X-GitHub-SSO,
-            X-GitHub-Request-Id, Deprecation, Sunset
-        Cache-Control:
-          - public, max-age=60, s-maxage=60
-        Content-Length:
-          - '849'
-        Content-Security-Policy:
-          - default-src 'none'
-        Content-Type:
-          - application/json; charset=utf-8
-        Date:
-          - Thu, 23 Apr 2026 05:57:40 GMT
-        ETag:
-          - '"5729f2b6cd99790335c1447f2749c8a5d88ad07f"'
-        Last-Modified:
-          - Tue, 21 Apr 2026 15:53:18 GMT
-        Referrer-Policy:
-          - origin-when-cross-origin, strict-origin-when-cross-origin
-        Server:
-          - github.com
-        Vary:
-          - Accept, Accept-Encoding, Accept, X-Requested-With
-        X-Content-Type-Options:
-          - nosniff
-        X-Frame-Options:
-          - deny
-        X-GitHub-Media-Type:
-          - github.v3; format=json
-        X-GitHub-Request-Id:
-          - 356C:330B5F:BEC8B:EF237:69E9B4D3
-        X-RateLimit-Limit:
-          - '60'
-        X-RateLimit-Remaining:
-          - '58'
-        X-RateLimit-Reset:
-          - '1776926395'
-        X-RateLimit-Resource:
-          - core
-        X-RateLimit-Used:
-          - '2'
-        X-XSS-Protection:
-          - '0'
-        x-github-api-version-selected:
-          - '2022-11-28'
-      status:
-        code: 200
-        message: OK
-  - request:
-      body: null
-      headers:
-        Accept:
-          - '*/*'
-        Accept-Encoding:
-          - gzip, deflate, br, zstd
-        Connection:
-          - keep-alive
-        User-Agent:
-          - FlexGet/3.19.15.dev (www.flexget.com)
-      method: GET
-      uri: https://api.github.com/repos/Anime-Lists/anime-lists/contents/anime-list.xml
-    response:
-      body:
-        string: '{"name":"anime-list.xml","path":"anime-list.xml","sha":"eb52ebe640cafa8aa452e1b9797ec21b0c8a3fc8","size":1680543,"url":"https://api.github.com/repos/Anime-Lists/anime-lists/contents/anime-list.xml?ref=master","html_url":"https://github.com/Anime-Lists/anime-lists/blob/master/anime-list.xml","git_url":"https://api.github.com/repos/Anime-Lists/anime-lists/git/blobs/eb52ebe640cafa8aa452e1b9797ec21b0c8a3fc8","download_url":"https://raw.githubusercontent.com/Anime-Lists/anime-lists/master/anime-list.xml","type":"file","content":"","encoding":"none","_links":{"self":"https://api.github.com/repos/Anime-Lists/anime-lists/contents/anime-list.xml?ref=master","git":"https://api.github.com/repos/Anime-Lists/anime-lists/git/blobs/eb52ebe640cafa8aa452e1b9797ec21b0c8a3fc8","html":"https://github.com/Anime-Lists/anime-lists/blob/master/anime-list.xml"}}'
-      headers:
-        Accept-Ranges:
-          - bytes
-        Access-Control-Allow-Origin:
-          - '*'
-        Access-Control-Expose-Headers:
-          - ETag, Link, Location, Retry-After, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining,
-            X-RateLimit-Used, X-RateLimit-Resource, X-RateLimit-Reset, X-OAuth-Scopes,
-            X-Accepted-OAuth-Scopes, X-Poll-Interval, X-GitHub-Media-Type, X-GitHub-SSO,
-            X-GitHub-Request-Id, Deprecation, Sunset
-        Cache-Control:
-          - public, max-age=60, s-maxage=60
-        Content-Length:
-          - '849'
-        Content-Security-Policy:
-          - default-src 'none'
-        Content-Type:
-          - application/json; charset=utf-8
-        Date:
-          - Thu, 23 Apr 2026 05:57:42 GMT
-        ETag:
-          - '"eb52ebe640cafa8aa452e1b9797ec21b0c8a3fc8"'
-        Last-Modified:
-          - Sun, 19 Apr 2026 04:09:42 GMT
-        Referrer-Policy:
-          - origin-when-cross-origin, strict-origin-when-cross-origin
-        Server:
-          - github.com
-        Vary:
-          - Accept, Accept-Encoding, Accept, X-Requested-With
-        X-Content-Type-Options:
-          - nosniff
-        X-Frame-Options:
-          - deny
-        X-GitHub-Media-Type:
-          - github.v3; format=json
-        X-GitHub-Request-Id:
-          - 35A5:18600B:C7594:F7AFB:69E9B4D5
-        X-RateLimit-Limit:
-          - '60'
-        X-RateLimit-Remaining:
-          - '57'
-        X-RateLimit-Reset:
-          - '1776926395'
-        X-RateLimit-Resource:
-          - core
-        X-RateLimit-Used:
-          - '3'
-        X-XSS-Protection:
-          - '0'
-        x-github-api-version-selected:
-          - '2022-11-28'
-      status:
-        code: 200
-        message: OK
-  - request:
-      body: null
-      headers:
-        Accept:
-          - '*/*'
-        Accept-Encoding:
-          - gzip, deflate, br, zstd
-        Connection:
-          - keep-alive
-        User-Agent:
-          - FlexGet/3.19.15.dev (www.flexget.com)
-      method: GET
-      uri: https://raw.githubusercontent.com/Fribb/anime-lists/master/anime-list-mini.json
-    response:
-      body:
-        string: '[{"type":"TV","anidb_id":1,"anilist_id":290,"animecountdown_id":36462,"animenewsnetwork_id":14,"anime-planet_id":"crest-of-the-stars","anisearch_id":3039,"imdb_id":"tt0286390","kitsu_id":265,"livechart_id":4157,"mal_id":290,"simkl_id":36462,"themoviedb_id":26209,"tvdb_id":72025,"season":{"tvdb":1,"tmdb":1}},{"type":"OVA","anidb_id":2,"anilist_id":300,"animecountdown_id":38433,"animenewsnetwork_id":382,"anime-planet_id":"3x3-eyes","anisearch_id":2747,"kitsu_id":7749,"livechart_id":5777,"mal_id":300,"simkl_id":38433,"themoviedb_id":62913,"tvdb_id":70973,"season":{"tvdb":1,"tmdb":1}},{"type":"OVA","anidb_id":3,"anilist_id":1225,"animecountdown_id":40976,"animenewsnetwork_id":792,"anime-planet_id":"3x3-eyes-seima-densetsu","anisearch_id":3354,"kitsu_id":1102,"livechart_id":6605,"mal_id":1225,"simkl_id":40976,"themoviedb_id":62913,"tvdb_id":70973,"season":{"tvdb":2,"tmdb":2}},{"type":"TV","anidb_id":4,"anilist_id":396,"animecountdown_id":37584,"animenewsnetwork_id":447,"anime-planet_id":"banner-of-the-stars","anisearch_id":375,"imdb_id":"tt0286390","kitsu_id":363,"livechart_id":4531,"mal_id":396,"simkl_id":37584,"themoviedb_id":26209,"tvdb_id":72025,"season":{"tvdb":2,"tmdb":2}},{"type":"TV","anidb_id":5,"anilist_id":397,"animecountdown_id":36399,"animenewsnetwork_id":448,"anime-planet_id":"banner-of-the-stars-ii","anisearch_id":772,"imdb_id":"tt0286390","kitsu_id":364,"livechart_id":5589,"mal_id":397,"simkl_id":36399,"themoviedb_id":26209,"tvdb_id":72025,"season":{"tvdb":3,"tmdb":3}},{"type":"TV","anidb_id":14792,"anilist_id":108632,"animecountdown_id":1063491,"animenewsnetwork_id":22005,"anime-planet_id":"re-zero-starting-life-in-another-world-season-2","anisearch_id":14302,"imdb_id":"tt5607616","kitsu_id":42198,"livechart_id":9387,"mal_id":39587,"simkl_id":1063491,"themoviedb_id":65942,"tvdb_id":305089,"season":{"tvdb":2,"tmdb":1}},{"type":"ONA","anidb_id":14793,"anilist_id":108726,"animecountdown_id":1063493,"animenewsnetwork_id":22002,"anime-planet_id":"ojamajo-doremi-owarai-gekijou","anisearch_id":14296,"kitsu_id":42537,"livechart_id":9389,"mal_id":39588,"simkl_id":1063493},{"type":"ONA","anidb_id":14794,"anilist_id":116330,"animecountdown_id":1063495,"anime-planet_id":"kouya-no-kotobuki-hikoutai-gaiden-oozora-no-harukaze-hikoutai","anisearch_id":14410,"kitsu_id":42377,"livechart_id":9385,"mal_id":39589,"simkl_id":1063495,"themoviedb_id":83454,"tvdb_id":354636,"season":{"tvdb":0,"tmdb":0}},{"type":"TV","anidb_id":14795,"anilist_id":110867,"animecountdown_id":1063497,"animenewsnetwork_id":22001,"anime-planet_id":"africa-salaryman-2019","anisearch_id":14635,"imdb_id":"tt11157604","kitsu_id":42550,"livechart_id":9388,"mal_id":39590,"simkl_id":1063497,"themoviedb_id":94294,"tvdb_id":368553,"season":{"tvdb":1,"tmdb":1}}]'
-      headers:
-        Accept-Ranges:
-          - bytes
-        Access-Control-Allow-Origin:
-          - '*'
-        Cache-Control:
-          - max-age=300
-        Connection:
-          - keep-alive
-        Content-Encoding:
-          - gzip
-        Content-Length:
-          - '1168318'
-        Content-Security-Policy:
-          - default-src 'none'; style-src 'unsafe-inline'; sandbox
-        Content-Type:
-          - text/plain; charset=utf-8
-        Cross-Origin-Resource-Policy:
-          - cross-origin
-        Date:
-          - Thu, 23 Apr 2026 05:57:42 GMT
-        ETag:
-          - W/"51fe9ee7e944e329a1b80ee0886a82d629d1ae5817b87f3f55c283d23c85c8f0"
-        Expires:
-          - Thu, 23 Apr 2026 06:02:42 GMT
-        Source-Age:
-          - '0'
-        Strict-Transport-Security:
-          - max-age=31536000
-        Vary:
-          - Authorization,Accept-Encoding
-        Via:
-          - 1.1 varnish
-        X-Cache:
-          - MISS
-        X-Cache-Hits:
-          - '0'
-        X-Content-Type-Options:
-          - nosniff
-        X-Fastly-Request-ID:
-          - eaa75774299f77ef709ebe3b5d11d7b24f7c52dd
-        X-Frame-Options:
-          - deny
-        X-GitHub-Request-Id:
-          - 910A:3DF1B4:77C6F:F86B3:69E9B4D5
-        X-Served-By:
-          - cache-gig2250051-GIG
-        X-Timer:
-          - S1776923862.479000,VS0,VE425
-        X-XSS-Protection:
-          - 1; mode=block
-      status:
-        code: 200
-        message: OK
-  - request:
-      body: null
-      headers:
-        Accept:
-          - '*/*'
-        Accept-Encoding:
-          - gzip, deflate, br, zstd
-        Connection:
-          - keep-alive
-        User-Agent:
-          - FlexGet/3.19.15.dev (www.flexget.com)
-      method: GET
-      uri: https://raw.githubusercontent.com/Anime-Lists/anime-lists/master/anime-list.xml
-    response:
-      body:
-        string: "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<anime-list>\n  <anime
-          anidbid=\"1\" tvdbid=\"72025\" defaulttvdbseason=\"1\" tmdbtv=\"26209\" tmdbseason=\"1\">\n
-          \   <name>Seikai no Monshou</name>\n    <supplemental-info>\n      <studio>Sunrise</studio>\n
-          \   </supplemental-info>\n  </anime>\n  <anime anidbid=\"2\" tvdbid=\"70973\"
-          defaulttvdbseason=\"1\" tmdbtv=\"62913\" tmdbseason=\"1\">\n    <name>3x3
-          Eyes</name>\n  </anime>\n  <anime anidbid=\"14792\"
-          tvdbid=\"305089\" defaulttvdbseason=\"2\" tmdbtv=\"65942\" tmdbseason=\"1\"
-          tmdboffset=\"26\">\n    <name>Re:Zero kara Hajimeru Isekai Seikatsu (2020)</name>\n
-          \   <mapping-list>\n      <mapping anidbseason=\"0\" tvdbseason=\"0\" start=\"1\"
-          end=\"13\" offset=\"29\"/>\n    </mapping-list>\n  </anime>\n  <anime anidbid=\"14794\"
-          tvdbid=\"354636\" defaulttvdbseason=\"0\" tmdbtv=\"83454\" tmdbseason=\"0\">\n
-          \   <name>Kouya no Kotobuki Hikoutai Gaiden: Oozora no Harukaze Hikoutai</name>\n
-          \ </anime>\n  <anime anidbid=\"14795\" tvdbid=\"368553\" defaulttvdbseason=\"1\"
-          tmdbtv=\"94294\" tmdbseason=\"1\">\n    <name>Africa no Salaryman (2019)</name>\n
-          \ </anime>\n  <anime anidbid=\"14796\" tvdbid=\"259640\" defaulttvdbseason=\"4\"
-          tmdbtv=\"45782\" tmdbseason=\"4\">\n    <name>Sword Art Online: Alicization
-          - War of Underworld</name>\n    <mapping-list>\n      <mapping anidbseason=\"0\"
-          tvdbseason=\"0\">;1-26;</mapping>\n    </mapping-list>\n  </anime>\n  <anime
-          anidbid=\"14797\" tvdbid=\"313435\" defaulttvdbseason=\"0\" episodeoffset=\"2\"
-          tmdbtv=\"67676\" tmdbseason=\"0\" tmdboffset=\"2\">\n    <name>Saiki Kusuo
-          no Sainan: Saishidou Hen</name>\n  </anime>\n</anime-list>\n"
-      headers:
-        Accept-Ranges:
-          - bytes
-        Access-Control-Allow-Origin:
-          - '*'
-        Cache-Control:
-          - max-age=300
-        Connection:
-          - keep-alive
-        Content-Encoding:
-          - gzip
-        Content-Length:
-          - '323378'
-        Content-Security-Policy:
-          - default-src 'none'; style-src 'unsafe-inline'; sandbox
-        Content-Type:
-          - text/plain; charset=utf-8
-        Cross-Origin-Resource-Policy:
-          - cross-origin
-        Date:
-          - Thu, 23 Apr 2026 05:57:44 GMT
-        ETag:
-          - W/"0ba10dde3279d2d93db960d8a1cd9fa392122e35cdcba5ee8c7c6408fd6fa3e6"
-        Expires:
-          - Thu, 23 Apr 2026 06:02:44 GMT
-        Source-Age:
-          - '0'
-        Strict-Transport-Security:
-          - max-age=31536000
-        Vary:
-          - Authorization,Accept-Encoding
-        Via:
-          - 1.1 varnish
-        X-Cache:
-          - HIT
-        X-Cache-Hits:
-          - '0'
-        X-Content-Type-Options:
-          - nosniff
-        X-Fastly-Request-ID:
-          - 5403becdc073549c245daa41e273da84cf6bfb35
-        X-Frame-Options:
-          - deny
-        X-GitHub-Request-Id:
-          - FB1A:31760:1CD059:376E25:69E74F4C
-        X-Served-By:
-          - cache-gig2250038-GIG
-        X-Timer:
-          - S1776923864.458951,VS0,VE127
-        X-XSS-Protection:
-          - 1; mode=block
-      status:
-        code: 200
-        message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate, br, zstd
+      Cache-Control:
+      - max-age=0
+      Connection:
+      - keep-alive
+      User-Agent:
+      - FlexGet/3.19.15.dev (www.flexget.com)
+    method: GET
+    uri: https://raw.githubusercontent.com/fribb/anime-lists/master/anime-list-mini.json
+  response:
+    body:
+      string: '[{"type":"TV","anidb_id":1,"anilist_id":290,"animecountdown_id":36462,"animenewsnetwork_id":14,"anime-planet_id":"crest-of-the-stars","anisearch_id":3039,"imdb_id":"tt0286390","kitsu_id":265,"livechart_id":4157,"mal_id":290,"simkl_id":36462,"themoviedb_id":26209,"tvdb_id":72025,"season":{"tvdb":1,"tmdb":1}},{"type":"OVA","anidb_id":2,"anilist_id":300,"animecountdown_id":38433,"animenewsnetwork_id":382,"anime-planet_id":"3x3-eyes","anisearch_id":2747,"kitsu_id":7749,"livechart_id":5777,"mal_id":300,"simkl_id":38433,"themoviedb_id":62913,"tvdb_id":70973,"season":{"tvdb":1,"tmdb":1}},{"type":"OVA","anidb_id":3,"anilist_id":1225,"animecountdown_id":40976,"animenewsnetwork_id":792,"anime-planet_id":"3x3-eyes-seima-densetsu","anisearch_id":3354,"kitsu_id":1102,"livechart_id":6605,"mal_id":1225,"simkl_id":40976,"themoviedb_id":62913,"tvdb_id":70973,"season":{"tvdb":2,"tmdb":2}},{"type":"TV","anidb_id":4,"anilist_id":396,"animecountdown_id":37584,"animenewsnetwork_id":447,"anime-planet_id":"banner-of-the-stars","anisearch_id":375,"imdb_id":"tt0286390","kitsu_id":363,"livechart_id":4531,"mal_id":396,"simkl_id":37584,"themoviedb_id":26209,"tvdb_id":72025,"season":{"tvdb":2,"tmdb":2}},{"type":"TV","anidb_id":5,"anilist_id":397,"animecountdown_id":36399,"animenewsnetwork_id":448,"anime-planet_id":"banner-of-the-stars-ii","anisearch_id":772,"imdb_id":"tt0286390","kitsu_id":364,"livechart_id":5589,"mal_id":397,"simkl_id":36399,"themoviedb_id":26209,"tvdb_id":72025,"season":{"tvdb":3,"tmdb":3}},{"type":"TV","anidb_id":14792,"anilist_id":108632,"animecountdown_id":1063491,"animenewsnetwork_id":22005,"anime-planet_id":"re-zero-starting-life-in-another-world-season-2","anisearch_id":14302,"imdb_id":"tt5607616","kitsu_id":42198,"livechart_id":9387,"mal_id":39587,"simkl_id":1063491,"themoviedb_id":65942,"tvdb_id":305089,"season":{"tvdb":2,"tmdb":1}},{"type":"ONA","anidb_id":14793,"anilist_id":108726,"animecountdown_id":1063493,"animenewsnetwork_id":22002,"anime-planet_id":"ojamajo-doremi-owarai-gekijou","anisearch_id":14296,"kitsu_id":42537,"livechart_id":9389,"mal_id":39588,"simkl_id":1063493},{"type":"ONA","anidb_id":14794,"anilist_id":116330,"animecountdown_id":1063495,"anime-planet_id":"kouya-no-kotobuki-hikoutai-gaiden-oozora-no-harukaze-hikoutai","anisearch_id":14410,"kitsu_id":42377,"livechart_id":9385,"mal_id":39589,"simkl_id":1063495,"themoviedb_id":83454,"tvdb_id":354636,"season":{"tvdb":0,"tmdb":0}},{"type":"TV","anidb_id":14795,"anilist_id":110867,"animecountdown_id":1063497,"animenewsnetwork_id":22001,"anime-planet_id":"africa-salaryman-2019","anisearch_id":14635,"imdb_id":"tt11157604","kitsu_id":42550,"livechart_id":9388,"mal_id":39590,"simkl_id":1063497,"themoviedb_id":94294,"tvdb_id":368553,"season":{"tvdb":1,"tmdb":1}}]'
+    headers:
+      Accept-Ranges:
+      - bytes
+      Access-Control-Allow-Origin:
+      - '*'
+      Cache-Control:
+      - max-age=300
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Length:
+      - '1168610'
+      Content-Security-Policy:
+      - default-src 'none'; style-src 'unsafe-inline'; sandbox
+      Content-Type:
+      - text/plain; charset=utf-8
+      Cross-Origin-Resource-Policy:
+      - cross-origin
+      Date:
+      - Mon, 04 May 2026 15:24:31 GMT
+      ETag:
+      - W/"c04edf1fd87e872ace5a3df72f92ad561b576fe465eb3018b2a26807fecb40f6"
+      Expires:
+      - Mon, 04 May 2026 15:29:31 GMT
+      Source-Age:
+      - '254'
+      Strict-Transport-Security:
+      - max-age=31536000
+      Vary:
+      - Authorization,Accept-Encoding
+      Via:
+      - 1.1 varnish
+      X-Cache:
+      - HIT
+      X-Cache-Hits:
+      - '0'
+      X-Content-Type-Options:
+      - nosniff
+      X-Fastly-Request-ID:
+      - 721b10ed9d809a27380f20863ad19515629b6870
+      X-Frame-Options:
+      - deny
+      X-GitHub-Request-Id:
+      - 8F70:8F2CE:246E2:2D6DD:69F890E6
+      X-Served-By:
+      - cache-gig2250081-GIG
+      X-Timer:
+      - S1777908271.383043,VS0,VE1
+      X-XSS-Protection:
+      - 1; mode=block
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate, br, zstd
+      Cache-Control:
+      - max-age=0
+      Connection:
+      - keep-alive
+      User-Agent:
+      - FlexGet/3.19.15.dev (www.flexget.com)
+    method: GET
+    uri: https://raw.githubusercontent.com/Anime-Lists/anime-lists/master/anime-list.xml
+  response:
+    body:
+      string: "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<anime-list>\n  <anime
+        anidbid=\"1\" tvdbid=\"72025\" defaulttvdbseason=\"1\" tmdbtv=\"26209\" tmdbseason=\"1\">\n
+        \   <name>Seikai no Monshou</name>\n    <supplemental-info>\n      <studio>Sunrise</studio>\n
+        \   </supplemental-info>\n  </anime>\n  <anime anidbid=\"2\" tvdbid=\"70973\"
+        defaulttvdbseason=\"1\" tmdbtv=\"62913\" tmdbseason=\"1\">\n    <name>3x3
+        Eyes</name>\n  </anime>\n  <anime anidbid=\"14792\"
+        tvdbid=\"305089\" defaulttvdbseason=\"2\" tmdbtv=\"65942\" tmdbseason=\"1\"
+        tmdboffset=\"26\">\n    <name>Re:Zero kara Hajimeru Isekai Seikatsu (2020)</name>\n
+        \   <mapping-list>\n      <mapping anidbseason=\"0\" tvdbseason=\"0\" start=\"1\"
+        end=\"13\" offset=\"29\"/>\n    </mapping-list>\n  </anime>\n  <anime anidbid=\"14794\"
+        tvdbid=\"354636\" defaulttvdbseason=\"0\" tmdbtv=\"83454\" tmdbseason=\"0\">\n
+        \   <name>Kouya no Kotobuki Hikoutai Gaiden: Oozora no Harukaze Hikoutai</name>\n
+        \ </anime>\n  <anime anidbid=\"14795\" tvdbid=\"368553\" defaulttvdbseason=\"1\"
+        tmdbtv=\"94294\" tmdbseason=\"1\">\n    <name>Africa no Salaryman (2019)</name>\n
+        \ </anime>\n  <anime anidbid=\"14796\" tvdbid=\"259640\" defaulttvdbseason=\"4\"
+        tmdbtv=\"45782\" tmdbseason=\"4\">\n    <name>Sword Art Online: Alicization
+        - War of Underworld</name>\n    <mapping-list>\n      <mapping anidbseason=\"0\"
+        tvdbseason=\"0\">;1-26;</mapping>\n    </mapping-list>\n  </anime>\n  <anime
+        anidbid=\"14797\" tvdbid=\"313435\" defaulttvdbseason=\"0\" episodeoffset=\"2\"
+        tmdbtv=\"67676\" tmdbseason=\"0\" tmdboffset=\"2\">\n    <name>Saiki Kusuo
+        no Sainan: Saishidou Hen</name>\n  </anime>\n</anime-list>\n"
+    headers:
+      Accept-Ranges:
+      - bytes
+      Access-Control-Allow-Origin:
+      - '*'
+      Cache-Control:
+      - max-age=300
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Length:
+      - '324587'
+      Content-Security-Policy:
+      - default-src 'none'; style-src 'unsafe-inline'; sandbox
+      Content-Type:
+      - text/plain; charset=utf-8
+      Cross-Origin-Resource-Policy:
+      - cross-origin
+      Date:
+      - Mon, 04 May 2026 15:24:32 GMT
+      ETag:
+      - W/"b8ffe1cd4f566dd2f6db465bb622bb50eeb8ae99a13e1e7ecd440d39fb25e729"
+      Expires:
+      - Mon, 04 May 2026 15:29:32 GMT
+      Source-Age:
+      - '252'
+      Strict-Transport-Security:
+      - max-age=31536000
+      Vary:
+      - Authorization,Accept-Encoding
+      Via:
+      - 1.1 varnish
+      X-Cache:
+      - HIT
+      X-Cache-Hits:
+      - '0'
+      X-Content-Type-Options:
+      - nosniff
+      X-Fastly-Request-ID:
+      - b87bf39fa1efc935f54f614bd78c2d34d515b2ef
+      X-Frame-Options:
+      - deny
+      X-GitHub-Request-Id:
+      - D342:16C061:79BE78:CCA00A:69F7E17C
+      X-Served-By:
+      - cache-gig2250062-GIG
+      X-Timer:
+      - S1777908273.699100,VS0,VE1
+      X-XSS-Protection:
+      - 1; mode=block
+    status:
+      code: 200
+      message: OK
 version: 1
