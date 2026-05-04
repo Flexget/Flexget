@@ -307,12 +307,14 @@ class AnimeRelations:
         ]
 
         # Merge fields together based on AniDB
-        filter: dict[str, DBType] = {str(entry['anidb']): entry for entry in entries}
+        filter: dict[str, DBType] = {
+            str(entry['anidb']): {'anidb': entry['anidb']} for entry in entries
+        }
         for entry in entries:
             idx = str(entry['anidb'])
             for k, v in entry.items():
                 # Ignore TVDB IDs like 'movie', 'ova', 'tv special', etc...
-                if k == 'tvdb' and isinstance(v, str) and not v.isdigit():
+                if k == 'tvdb' and not str(v).isdigit():
                     continue
                 # Absolute season becomes 1
                 if v == 'a' and k in ('tmdb_season', 'tvdb_season'):
