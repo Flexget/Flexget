@@ -26,19 +26,6 @@ if TYPE_CHECKING:
     from flexget.manager import Task
     from flexget.utils.sqlalchemy_utils import ContextSession
 
-    class GitHubAPIResponse(TypedDict):
-        name: str
-        path: str
-        sha: str
-        size: int
-        url: str
-        html_url: str
-        git_url: str
-        download_url: str
-        type: str
-        content: str
-        encoding: str
-
     class EntryType(TypedDict):
         anidb_id: int
         anilist_id: NotRequired[int]
