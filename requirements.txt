@@ -65,7 +65,7 @@ guessit==3.8.0
     # via flexget
 html5lib==1.1
     # via flexget
-idna==3.13
+idna==3.14
     # via requests
 importlib-resources==7.1.0
     # via flask-restx
