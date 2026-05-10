@@ -138,7 +138,9 @@ class ImdbWatchlist:
                     locale=headers.get('Accept-Language', 'en-us').replace('-', '_'),
                 )
                 page = context.new_page()
-                page.set_extra_http_headers({'Accept-Language': headers.get('Accept-Language', 'en-us')})
+                page.set_extra_http_headers({
+                    'Accept-Language': headers.get('Accept-Language', 'en-us')
+                })
                 page.goto(
                     url + '?' + '&'.join(f'{k}={v}' for k, v in params.items()),
                     wait_until='networkidle',
