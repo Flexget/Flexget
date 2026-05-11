@@ -252,6 +252,7 @@ default.extend-ignore-identifiers-re = [
   "IST",
   "McClory",
   "[Pp]yload",
+  "Namee",
 ]
 default.extend-ignore-words-re = [
   "nd",
