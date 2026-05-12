@@ -8,15 +8,13 @@ apscheduler==3.11.2
     # via flexget
 attrs==26.1.0
     # via
-    #   cattrs
     #   jsonschema
     #   referencing
-    #   requests-cache
 babelfish==0.6.1
     # via guessit
 backports-tarfile==1.2.0 ; python_full_version < '3.12'
     # via jaraco-context
-backports-zstd==1.3.0 ; python_full_version < '3.14'
+backports-zstd==1.4.0 ; python_full_version < '3.14'
     # via flask-compress
 beautifulsoup4==4.14.3
     # via flexget
@@ -26,8 +24,6 @@ brotli==1.2.0 ; platform_python_implementation != 'PyPy'
     # via flask-compress
 brotlicffi==1.2.0.1 ; platform_python_implementation == 'PyPy'
     # via flask-compress
-cattrs==26.1.0
-    # via requests-cache
 certifi==2026.4.22
     # via requests
 cffi==2.0.0 ; platform_python_implementation == 'PyPy'
@@ -46,8 +42,6 @@ colorama==0.4.6 ; sys_platform == 'win32'
     # via
     #   click
     #   loguru
-exceptiongroup==1.3.1 ; python_full_version < '3.11'
-    # via cattrs
 feedparser==6.0.12
     # via flexget
 flask==3.1.3
@@ -65,24 +59,26 @@ flask-login==0.6.3
     # via flexget
 flask-restx==1.3.2
     # via flexget
-greenlet==3.4.0 ; platform_machine == 'AMD64' or platform_machine == 'WIN32' or platform_machine == 'aarch64' or platform_machine == 'amd64' or platform_machine == 'ppc64le' or platform_machine == 'win32' or platform_machine == 'x86_64'
+greenlet==3.5.0 ; platform_machine == 'AMD64' or platform_machine == 'WIN32' or platform_machine == 'aarch64' or platform_machine == 'amd64' or platform_machine == 'ppc64le' or platform_machine == 'win32' or platform_machine == 'x86_64'
     # via sqlalchemy
 guessit==3.8.0
     # via flexget
 html5lib==1.1
     # via flexget
-idna==3.13
-    # via
-    #   requests
-    #   url-normalize
+idna==3.14
+    # via requests
 importlib-resources==7.1.0
     # via flask-restx
 itsdangerous==2.2.0
     # via flask
 jaraco-collections==5.2.1
-    # via cherrypy
+    # via
+    #   cherrypy
+    #   tempora
 jaraco-context==6.1.2
-    # via jaraco-text
+    # via
+    #   jaraco-text
+    #   tempora
 jaraco-functools==4.4.0
     # via
     #   cheroot
@@ -102,7 +98,7 @@ jsonschema-specifications==2025.9.1
     # via jsonschema
 loguru==0.7.3
     # via flexget
-markdown-it-py==4.0.0
+markdown-it-py==4.2.0
     # via rich
 markupsafe==3.0.3
     # via
@@ -117,12 +113,11 @@ more-itertools==11.0.2
     #   cherrypy
     #   jaraco-functools
     #   jaraco-text
+    #   tempora
 packaging==26.2
     # via flexget
 pendulum==3.2.0
     # via flexget
-platformdirs==4.9.6
-    # via requests-cache
 plumbum==1.10.0
     # via rpyc
 portend==3.2.1
@@ -159,10 +154,6 @@ referencing==0.37.0
     #   jsonschema
     #   jsonschema-specifications
 requests==2.33.1
-    # via
-    #   flexget
-    #   requests-cache
-requests-cache==1.3.1
     # via flexget
 rich==15.0.0
     # via
@@ -190,17 +181,15 @@ soupsieve==2.8.3
     # via beautifulsoup4
 sqlalchemy==2.0.49
     # via flexget
-tempora==5.8.1
+tempora==5.9.0
     # via portend
-typer==0.25.0
+typer==0.25.1
     # via typer-slim
 typer-slim==0.24.0
     # via jaraco-text
 typing-extensions==4.15.0
     # via
     #   beautifulsoup4
-    #   cattrs
-    #   exceptiongroup
     #   referencing
     #   sqlalchemy
 tzdata==2026.2
@@ -209,12 +198,8 @@ tzdata==2026.2
     #   tzlocal
 tzlocal==5.3.1
     # via apscheduler
-url-normalize==2.2.1
-    # via requests-cache
-urllib3==2.6.3
-    # via
-    #   requests
-    #   requests-cache
+urllib3==2.7.0
+    # via requests
 webencodings==0.5.1
     # via html5lib
 werkzeug==3.1.8
