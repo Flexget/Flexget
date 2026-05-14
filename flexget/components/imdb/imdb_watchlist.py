@@ -154,7 +154,7 @@ class ImdbWatchlist:
                 logger.debug('Successfully obtained aws-waf-token from Playwright')
                 return cookie_dict
             logger.warning('Playwright did not receive aws-waf-token cookie')
-            return None
+            return None  # noqa: TRY300
         except Exception as e:
             logger.warning('Failed to solve AWS WAF challenge with Playwright: {}', e)
             return None
