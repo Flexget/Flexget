@@ -20,7 +20,7 @@ docutils==0.22.4 ; python_full_version >= '3.13'
     # via
     #   pydata-sphinx-theme
     #   sphinx
-idna==3.14 ; python_full_version >= '3.13'
+idna==3.15 ; python_full_version >= '3.13'
     # via requests
 imagesize==2.0.0 ; python_full_version >= '3.13'
     # via sphinx
@@ -36,7 +36,7 @@ pygments==2.20.0 ; python_full_version >= '3.13'
     #   accessible-pygments
     #   pydata-sphinx-theme
     #   sphinx
-requests==2.33.1 ; python_full_version >= '3.13'
+requests==2.34.2 ; python_full_version >= '3.13'
     # via sphinx
 roman-numerals==4.1.0 ; python_full_version >= '3.13'
     # via sphinx
