@@ -14,7 +14,7 @@ babelfish==0.6.1
     # via guessit
 backports-tarfile==1.2.0 ; python_full_version < '3.12'
     # via jaraco-context
-backports-zstd==1.4.0 ; python_full_version < '3.14'
+backports-zstd==1.5.0 ; python_full_version < '3.14'
     # via flask-compress
 beautifulsoup4==4.14.3
     # via flexget
@@ -34,7 +34,7 @@ cheroot==11.1.2
     # via cherrypy
 cherrypy==18.10.0
     # via flexget
-click==8.3.3
+click==8.4.0
     # via
     #   flask
     #   typer
@@ -65,7 +65,7 @@ guessit==3.8.0
     # via flexget
 html5lib==1.1
     # via flexget
-idna==3.14
+idna==3.15
     # via requests
 importlib-resources==7.1.0
     # via flask-restx
@@ -79,7 +79,7 @@ jaraco-context==6.1.2
     # via
     #   jaraco-text
     #   tempora
-jaraco-functools==4.4.0
+jaraco-functools==4.5.0
     # via
     #   cheroot
     #   jaraco-text
@@ -153,7 +153,7 @@ referencing==0.37.0
     #   flask-restx
     #   jsonschema
     #   jsonschema-specifications
-requests==2.33.1
+requests==2.34.2
     # via flexget
 rich==15.0.0
     # via
