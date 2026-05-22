@@ -79,7 +79,7 @@ class OutputQBitTorrent:
     def _request(self, method, url, msg_on_fail=None, **kwargs):
         try:
             response = self.session.request(method, url, **kwargs)
-            if response.text == 'Ok.':
+            if response.ok:
                 return True
             msg = msg_on_fail or f'Failure. URL: {url}, data: {kwargs}'
         except RequestException as e:

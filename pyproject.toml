@@ -80,7 +80,7 @@ dev = [
   "pytest-cov~=7.0",
   "pytest-socket~=0.7.0",
   "pytest-xdist~=3.6",
-  "ruff==0.15.12",
+  "ruff==0.15.13",
   "vcrpy~=8.1",
 ]
 test = [
@@ -253,6 +253,7 @@ default.extend-ignore-identifiers-re = [
   "IST",
   "McClory",
   "[Pp]yload",
+  "Namee",
 ]
 default.extend-ignore-words-re = [
   "nd",
