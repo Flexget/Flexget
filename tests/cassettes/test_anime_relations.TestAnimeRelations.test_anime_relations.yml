@@ -11,12 +11,12 @@ interactions:
       Connection:
       - keep-alive
       User-Agent:
-      - FlexGet/3.19.15.dev (www.flexget.com)
+      - FlexGet/3.19.22.dev (www.flexget.com)
     method: GET
     uri: https://raw.githubusercontent.com/fribb/anime-lists/master/anime-list-mini.json
   response:
     body:
-      string: '[{"type":"TV","anidb_id":1,"anilist_id":290,"animecountdown_id":36462,"animenewsnetwork_id":14,"anime-planet_id":"crest-of-the-stars","anisearch_id":3039,"imdb_id":"tt0286390","kitsu_id":265,"livechart_id":4157,"mal_id":290,"simkl_id":36462,"themoviedb_id":26209,"tvdb_id":72025,"season":{"tvdb":1,"tmdb":1}},{"type":"OVA","anidb_id":2,"anilist_id":300,"animecountdown_id":38433,"animenewsnetwork_id":382,"anime-planet_id":"3x3-eyes","anisearch_id":2747,"kitsu_id":7749,"livechart_id":5777,"mal_id":300,"simkl_id":38433,"themoviedb_id":62913,"tvdb_id":70973,"season":{"tvdb":1,"tmdb":1}},{"type":"OVA","anidb_id":3,"anilist_id":1225,"animecountdown_id":40976,"animenewsnetwork_id":792,"anime-planet_id":"3x3-eyes-seima-densetsu","anisearch_id":3354,"kitsu_id":1102,"livechart_id":6605,"mal_id":1225,"simkl_id":40976,"themoviedb_id":62913,"tvdb_id":70973,"season":{"tvdb":2,"tmdb":2}},{"type":"TV","anidb_id":4,"anilist_id":396,"animecountdown_id":37584,"animenewsnetwork_id":447,"anime-planet_id":"banner-of-the-stars","anisearch_id":375,"imdb_id":"tt0286390","kitsu_id":363,"livechart_id":4531,"mal_id":396,"simkl_id":37584,"themoviedb_id":26209,"tvdb_id":72025,"season":{"tvdb":2,"tmdb":2}},{"type":"TV","anidb_id":5,"anilist_id":397,"animecountdown_id":36399,"animenewsnetwork_id":448,"anime-planet_id":"banner-of-the-stars-ii","anisearch_id":772,"imdb_id":"tt0286390","kitsu_id":364,"livechart_id":5589,"mal_id":397,"simkl_id":36399,"themoviedb_id":26209,"tvdb_id":72025,"season":{"tvdb":3,"tmdb":3}},{"type":"TV","anidb_id":14792,"anilist_id":108632,"animecountdown_id":1063491,"animenewsnetwork_id":22005,"anime-planet_id":"re-zero-starting-life-in-another-world-season-2","anisearch_id":14302,"imdb_id":"tt5607616","kitsu_id":42198,"livechart_id":9387,"mal_id":39587,"simkl_id":1063491,"themoviedb_id":65942,"tvdb_id":305089,"season":{"tvdb":2,"tmdb":1}},{"type":"ONA","anidb_id":14793,"anilist_id":108726,"animecountdown_id":1063493,"animenewsnetwork_id":22002,"anime-planet_id":"ojamajo-doremi-owarai-gekijou","anisearch_id":14296,"kitsu_id":42537,"livechart_id":9389,"mal_id":39588,"simkl_id":1063493},{"type":"ONA","anidb_id":14794,"anilist_id":116330,"animecountdown_id":1063495,"anime-planet_id":"kouya-no-kotobuki-hikoutai-gaiden-oozora-no-harukaze-hikoutai","anisearch_id":14410,"kitsu_id":42377,"livechart_id":9385,"mal_id":39589,"simkl_id":1063495,"themoviedb_id":83454,"tvdb_id":354636,"season":{"tvdb":0,"tmdb":0}},{"type":"TV","anidb_id":14795,"anilist_id":110867,"animecountdown_id":1063497,"animenewsnetwork_id":22001,"anime-planet_id":"africa-salaryman-2019","anisearch_id":14635,"imdb_id":"tt11157604","kitsu_id":42550,"livechart_id":9388,"mal_id":39590,"simkl_id":1063497,"themoviedb_id":94294,"tvdb_id":368553,"season":{"tvdb":1,"tmdb":1}}]'
+      string: '[{"type":"TV","anidb_id":14791,"anilist_id":108631,"animecountdown_id":1063489,"animenewsnetwork_id":22007,"anime-planet_id":"cells-at-work-2","anisearch_id":14287,"imdb_id":"tt8673610","kitsu_id":42202,"livechart_id":9386,"mal_id":39586,"simkl_id":1063489,"themoviedb_id":{"tv":80671},"tvdb_id":346931,"season":{"tvdb":2,"tmdb":2}},{"type":"TV","anidb_id":14792,"anilist_id":108632,"animecountdown_id":1063491,"animenewsnetwork_id":22005,"anime-planet_id":"re-zero-starting-life-in-another-world-season-2","anisearch_id":14302,"imdb_id":"tt5607616","kitsu_id":42198,"livechart_id":9387,"mal_id":39587,"simkl_id":1063491,"themoviedb_id":{"tv":65942},"tvdb_id":305089,"season":{"tvdb":2,"tmdb":1}},{"type":"ONA","anidb_id":14793,"anilist_id":108726,"animecountdown_id":1063493,"animenewsnetwork_id":22002,"anime-planet_id":"ojamajo-doremi-owarai-gekijou","anisearch_id":14296,"kitsu_id":42537,"livechart_id":9389,"mal_id":39588,"simkl_id":1063493},{"type":"ONA","anidb_id":14794,"anilist_id":116330,"animecountdown_id":1063495,"anime-planet_id":"kouya-no-kotobuki-hikoutai-gaiden-oozora-no-harukaze-hikoutai","anisearch_id":14410,"imdb_id":"tt9314454","kitsu_id":42377,"livechart_id":9385,"mal_id":39589,"simkl_id":1063495,"themoviedb_id":{"tv":83454},"tvdb_id":354636,"season":{"tvdb":0,"tmdb":0}},{"type":"TV","anidb_id":14795,"anilist_id":110867,"animecountdown_id":1063497,"animenewsnetwork_id":22001,"anime-planet_id":"africa-salaryman-2019","anisearch_id":14635,"imdb_id":"tt11157604","kitsu_id":42550,"livechart_id":9388,"mal_id":39590,"simkl_id":1063497,"themoviedb_id":{"tv":94294},"tvdb_id":368553,"season":{"tvdb":1,"tmdb":1}},{"type":"TV","anidb_id":14796,"anilist_id":108759,"animecountdown_id":1063499,"animenewsnetwork_id":22044,"anime-planet_id":"sword-art-online-alicization-war-of-underworld","anisearch_id":14323,"imdb_id":"tt2250192","kitsu_id":42213,"livechart_id":9404,"mal_id":39597,"simkl_id":1063499,"themoviedb_id":{"tv":45782},"tvdb_id":259640,"season":{"tvdb":4,"tmdb":4}},{"type":"ONA","anidb_id":14797,"anilist_id":112625,"animecountdown_id":1063993,"animenewsnetwork_id":22601,"anime-planet_id":"the-disastrous-life-of-saiki-k-reawakened","anisearch_id":14701,"imdb_id":"tt6354518","kitsu_id":42623,"livechart_id":9391,"mal_id":40542,"simkl_id":1063993,"themoviedb_id":{"tv":67676},"tvdb_id":313435,"season":{"tvdb":0,"tmdb":0}},{"type":"TV","anidb_id":14798,"anilist_id":108713,"animecountdown_id":1065197,"animenewsnetwork_id":22604,"anime-planet_id":"dropout-idol-fruit-tart","anisearch_id":14311,"imdb_id":"tt12044608","kitsu_id":42216,"livechart_id":9394,"mal_id":39609,"simkl_id":1065197,"themoviedb_id":{"tv":95909},"tvdb_id":372959,"season":{"tvdb":1,"tmdb":1}},{"type":"OVA","anidb_id":14799,"anilist_id":108714,"animecountdown_id":1065199,"animenewsnetwork_id":23517,"anime-planet_id":"acca-13-territory-inspection-dept-regards","anisearch_id":14326,"kitsu_id":42596,"livechart_id":9393,"mal_id":39610,"simkl_id":1065199},{"type":"MOVIE","anidb_id":14800,"animecountdown_id":1363067,"anime-planet_id":"the-mouse-and-his-child","kitsu_id":3472,"livechart_id":12001,"simkl_id":1363067},{"type":"TV","anidb_id":14801,"anilist_id":108725,"animecountdown_id":1066341,"animenewsnetwork_id":23263,"anime-planet_id":"the-promised-neverland-2nd-season","anisearch_id":14315,"imdb_id":"tt8788458","kitsu_id":42220,"livechart_id":9395,"mal_id":39617,"simkl_id":1066341,"themoviedb_id":{"tv":83097},"tvdb_id":348002,"season":{"tvdb":2,"tmdb":2}},{"type":"MOVIE","anidb_id":14802,"anilist_id":108735,"animecountdown_id":1066343,"animenewsnetwork_id":22045,"anime-planet_id":"bang-dream-film-live","anisearch_id":14573,"imdb_id":"tt11056458","kitsu_id":43370,"livechart_id":9396,"mal_id":39619,"simkl_id":1066343,"themoviedb_id":{"tv":69236},"tvdb_id":320002,"season":{"tvdb":0,"tmdb":0}},{"type":"TV","anidb_id":14803,"anime-planet_id":"vampire"},{"type":"OVA","anidb_id":14804,"animecountdown_id":1067025,"anisearch_id":14656,"imdb_id":"tt10915840","simkl_id":1067025,"themoviedb_id":{"tv":45844},"tvdb_id":259675,"season":{"tvdb":3,"tmdb":3}},{"type":"TV","anidb_id":14805,"anilist_id":109929,"animecountdown_id":1067027,"animenewsnetwork_id":22257,"anime-planet_id":"hakata-mentai-pirikarako-chan","anisearch_id":14414,"kitsu_id":42369,"livechart_id":9398,"mal_id":39620,"simkl_id":1067027,"themoviedb_id":{"tv":90847},"tvdb_id":366358,"season":{"tvdb":1,"tmdb":1}},{"type":"TV","anidb_id":14806,"anilist_id":110089,"animecountdown_id":1067029,"animenewsnetwork_id":23082,"anime-planet_id":"kaijuu-step-wandabada","anisearch_id":14642,"kitsu_id":42594,"livechart_id":9399,"mal_id":39628,"simkl_id":1067029},{"type":"ONA","anidb_id":14807,"anilist_id":116073,"animecountdown_id":1067031,"animenewsnetwork_id":24074,"anime-planet_id":"aihime-megohime","anisearch_id":15157,"livechart_id":9812,"mal_id":39629,"simkl_id":1067031},{"anidb_id":14808},{"type":"TV","anidb_id":14809,"animecountdown_id":1067675,"anime-planet_id":"daifuku-kun-kin-tele-2nd-season","anisearch_id":15055,"mal_id":39635,"simkl_id":1067675},{"type":"OVA","anidb_id":14810,"anilist_id":108758,"animecountdown_id":1067677,"anime-planet_id":"hyperdimension-neptunia-neptunes-summer-vacation","anisearch_id":14322,"imdb_id":"tt2859264","kitsu_id":42367,"livechart_id":9400,"mal_id":39638,"simkl_id":1067677,"themoviedb_id":{"tv":63525},"tvdb_id":267705,"season":{"tvdb":0,"tmdb":0}},{"type":"ONA","anidb_id":14811,"anilist_id":109153,"animecountdown_id":1068205,"anime-planet_id":"shoujo-conto-all-starlight","anisearch_id":14515,"imdb_id":"tt13091360","kitsu_id":42454,"livechart_id":9405,"mal_id":39643,"simkl_id":1068205,"themoviedb_id":{"tv":90865},"tvdb_id":366411,"season":{"tvdb":1,"tmdb":1}},{"type":"ONA","anidb_id":14812,"anilist_id":110419,"animecountdown_id":1126983,"anime-planet_id":"gundam-vs-hello-kitty","anisearch_id":14332,"kitsu_id":42495,"mal_id":39674,"simkl_id":1126983},{"type":"ONA","anidb_id":14813,"anilist_id":121687,"animecountdown_id":1069659,"anime-planet_id":"mahou-no-lumitear","anisearch_id":14361,"livechart_id":9377,"mal_id":39621,"simkl_id":1069659},{"anidb_id":14814},{"type":"TV","anidb_id":14815,"anilist_id":115069,"animecountdown_id":1070481,"animenewsnetwork_id":23530,"anime-planet_id":"d4dj-first-mix","anisearch_id":14363,"imdb_id":"tt12768008","kitsu_id":43557,"livechart_id":9783,"mal_id":39681,"simkl_id":1070481,"themoviedb_id":{"tv":102655},"tvdb_id":386713,"season":{"tvdb":1,"tmdb":1}},{"type":"ONA","anidb_id":14816,"anisearch_id":17571},{"type":"SPECIAL","anidb_id":14817,"anilist_id":115873,"animecountdown_id":1073751,"anime-planet_id":"daisukitte-imi-da-yo","anisearch_id":14411,"kitsu_id":43134,"mal_id":39682,"simkl_id":1073751},{"type":"TV","anidb_id":14818,"anilist_id":21809,"animecountdown_id":1162109,"animenewsnetwork_id":18489,"anime-planet_id":"gra-p-and-rodeo","anisearch_id":11681,"kitsu_id":9838,"livechart_id":3277,"mal_id":27521,"simkl_id":1162109},{"type":"TV","anidb_id":14819,"anilist_id":108928,"animecountdown_id":1072473,"animenewsnetwork_id":22138,"anime-planet_id":"the-seven-deadly-sins-imperial-wrath-of-the-gods","anisearch_id":14343,"imdb_id":"tt3909224","kitsu_id":42263,"livechart_id":9410,"mal_id":39701,"simkl_id":1072473,"themoviedb_id":{"tv":62104},"tvdb_id":284131,"season":{"tvdb":3,"tmdb":3}},{"type":"SPECIAL","anidb_id":14820,"anilist_id":110694,"animecountdown_id":1162823,"anime-planet_id":"ani-x-para-who-is-your-hero","anisearch_id":14390,"kitsu_id":41769,"livechart_id":9854,"mal_id":37290,"simkl_id":1162823},{"type":"TV","anidb_id":14821,"anilist_id":112008,"animecountdown_id":1073195,"animenewsnetwork_id":22083,"anime-planet_id":"wacky-tv-na-na-na-exciting-caveland","anisearch_id":14348,"kitsu_id":42258,"livechart_id":9413,"mal_id":39581,"simkl_id":1073195},{"type":"TV","anidb_id":14822,"anilist_id":109020,"animecountdown_id":1073749,"anime-planet_id":"sing-yesterday-for-me","anisearch_id":14347,"imdb_id":"tt10204658","kitsu_id":43063,"livechart_id":9412,"mal_id":39710,"simkl_id":1073749,"themoviedb_id":{"tv":95550},"tvdb_id":372534,"season":{"tvdb":1,"tmdb":1}},{"type":"ONA","anidb_id":14823,"animecountdown_id":1328183,"anime-planet_id":"koeda-chan","anisearch_id":14269,"mal_id":38926,"simkl_id":1328183},{"type":"TV","anidb_id":14824,"anilist_id":109010,"animecountdown_id":1074951,"animenewsnetwork_id":23791,"anime-planet_id":"i-chu-etoile-stage","anisearch_id":14364,"imdb_id":"tt13415416","kitsu_id":43307,"livechart_id":9414,"mal_id":39725,"simkl_id":1074951,"themoviedb_id":{"tv":112667},"tvdb_id":394678,"season":{"tvdb":1,"tmdb":1}},{"type":"ONA","anidb_id":14825,"anilist_id":109217,"animecountdown_id":1075553,"animenewsnetwork_id":22602,"anime-planet_id":"eden","anisearch_id":14413,"imdb_id":"tt10545250","kitsu_id":42267,"livechart_id":9415,"mal_id":39728,"simkl_id":1075553,"themoviedb_id":{"tv":92584},"tvdb_id":371311,"season":{"tvdb":1,"tmdb":1}},{"type":"OVA","anidb_id":14826,"anilist_id":124472,"animecountdown_id":1075555,"anime-planet_id":"himote-house-ova","anisearch_id":14362,"kitsu_id":42759,"livechart_id":9418,"mal_id":39722,"simkl_id":1075555},{"type":"TV","anidb_id":14827,"anilist_id":109019,"animecountdown_id":1075557,"animenewsnetwork_id":22570,"anime-planet_id":"diary-of-our-days-at-the-breakwater","anisearch_id":14355,"imdb_id":"tt12065758","kitsu_id":42296,"livechart_id":9417,"mal_id":39730,"simkl_id":1075557,"themoviedb_id":{"tv":94631},"tvdb_id":372361,"season":{"tvdb":1,"tmdb":1}},{"type":"TV","anidb_id":14828,"animecountdown_id":1192437,"anime-planet_id":"malasong-wangzi","mal_id":46324,"simkl_id":1192437},{"type":"ONA","anidb_id":14829,"anilist_id":102663,"animecountdown_id":1199589,"anime-planet_id":"luo-xiaohei-zhan-ji","anisearch_id":15981,"kitsu_id":12748,"mal_id":33443,"simkl_id":1199589},{"type":"TV","anidb_id":14830,"anilist_id":9952,"animecountdown_id":1079821,"anime-planet_id":"weiqi-shaonian","anisearch_id":17459,"kitsu_id":5961,"livechart_id":11220,"mal_id":9952,"simkl_id":1079821},{"type":"TV","anidb_id":14832,"animecountdown_id":1079819,"anisearch_id":14476,"mal_id":45289,"simkl_id":1079819},{"type":"TV","anidb_id":14833,"animecountdown_id":1190209,"anime-planet_id":"bai-ge-dao","mal_id":43875,"simkl_id":1190209},{"type":"TV","anidb_id":14834,"animecountdown_id":1192431,"mal_id":46151,"simkl_id":1192431},{"type":"TV","anidb_id":14835,"animecountdown_id":1192433,"anime-planet_id":"tebie-chedui","mal_id":43673,"simkl_id":1192433},{"type":"ONA","anidb_id":14836,"anisearch_id":12866},{"type":"TV","anidb_id":14837,"animecountdown_id":1192441,"anime-planet_id":"haier-xiongdi","mal_id":43958,"simkl_id":1192441},{"type":"TV","anidb_id":14838,"anilist_id":206181,"animecountdown_id":1192435,"anime-planet_id":"lata-dawang-qiyu-ji","anisearch_id":15462,"mal_id":43613,"simkl_id":1192435},{"type":"OVA","anidb_id":14839,"anilist_id":112010,"animecountdown_id":1076151,"animenewsnetwork_id":23078,"anime-planet_id":"bajas-studio-baja-and-the-sea","anisearch_id":15057,"kitsu_id":42366,"livechart_id":9554,"mal_id":39735,"simkl_id":1076151},{"type":"MOVIE","anidb_id":14840,"anilist_id":109190,"animecountdown_id":1077743,"animenewsnetwork_id":22377,"anime-planet_id":"violet-evergarden-eternity-and-the-auto-memory-doll","anisearch_id":14357,"imdb_id":"tt10477558","kitsu_id":42340,"livechart_id":9419,"mal_id":39741,"simkl_id":1077743,"themoviedb_id":{"movie":610892},"tvdb_id":330139,"season":{"tvdb":0}},{"type":"SPECIAL","anidb_id":14843,"anilist_id":103743,"anime-planet_id":"disco-k2-twins-juicy-jungle","anisearch_id":14423,"kitsu_id":12160,"mal_id":32092},{"type":"ONA","anidb_id":14844,"animecountdown_id":1084383,"anime-planet_id":"pinky-monkey-no-umareta-hi","kitsu_id":10302,"mal_id":29393,"simkl_id":1084383},{"type":"ONA","anidb_id":14852,"anilist_id":102725,"animecountdown_id":2502790,"anime-planet_id":"nude-batter-tetsuo","anisearch_id":13345,"kitsu_id":12163,"mal_id":33283,"simkl_id":2502790},{"type":"ONA","anidb_id":14853,"anilist_id":115824,"animecountdown_id":1192425,"anime-planet_id":"bai-gui-youeryuan","anisearch_id":13892,"kitsu_id":43375,"livechart_id":10712,"mal_id":42443,"simkl_id":1192425},{"type":"ONA","anidb_id":14854,"anilist_id":108980,"animecountdown_id":1192427,"anime-planet_id":"jian-wang-3-xia-gan-yi-dan-shen-jianxin","anisearch_id":13886,"imdb_id":"tt27480205","kitsu_id":42513,"livechart_id":10067,"mal_id":39419,"simkl_id":1192427,"themoviedb_id":{"tv":82497},"tvdb_id":364538,"season":{"tvdb":1,"tmdb":1}},{"type":"ONA","anidb_id":14855,"anilist_id":107909,"animecountdown_id":1237385,"anime-planet_id":"beyond-the-ocean","anisearch_id":20414,"mal_id":38690,"simkl_id":1237385},{"type":"ONA","anidb_id":14857,"anilist_id":115238,"animecountdown_id":1091601,"anime-planet_id":"chokotto-anime-kemono-friends-3","anisearch_id":14365,"imdb_id":"tt6562940","kitsu_id":42617,"livechart_id":9408,"mal_id":39653,"simkl_id":1091601,"themoviedb_id":{"tv":69288},"tvdb_id":319997,"season":{"tvdb":0,"tmdb":0}},{"type":"TV","anidb_id":14858,"anilist_id":111400,"animecountdown_id":1078443,"anime-planet_id":"tenka-hyakken-meiji-kan-e-youkoso","anisearch_id":14580,"imdb_id":"tt16162692","kitsu_id":42520,"livechart_id":9420,"mal_id":40320,"simkl_id":1078443,"themoviedb_id":{"tv":93828},"tvdb_id":369749,"season":{"tvdb":1,"tmdb":1}},{"type":"ONA","anidb_id":14860,"anilist_id":107743,"animecountdown_id":1079825,"anime-planet_id":"be-my-wife","anisearch_id":14359,"kitsu_id":42157,"livechart_id":9975,"mal_id":39188,"simkl_id":1079825},{"type":"ONA","anidb_id":14861,"anilist_id":112032,"animecountdown_id":1079101,"anime-planet_id":"kuiba-yao-xia-zhuan","anisearch_id":19829,"kitsu_id":41200,"mal_id":37187,"simkl_id":1079101},{"type":"TV","anidb_id":14862,"anilist_id":19839,"animecountdown_id":1079823,"anime-planet_id":"weiqi-shaonian-2","kitsu_id":9775,"mal_id":19839,"simkl_id":1079823},{"type":"TV","anidb_id":14863,"anilist_id":187060,"anime-planet_id":"jing-hua-yuan","mal_id":43808},{"type":"TV","anidb_id":14864},{"type":"TV","anidb_id":14865,"anime-planet_id":"shi-er-shengxiao","mal_id":43676},{"type":"TV","anidb_id":14866},{"type":"ONA","anidb_id":14867,"anilist_id":101907,"animecountdown_id":1083669,"anime-planet_id":"zhanguo-fan","anisearch_id":12620,"kitsu_id":14012,"livechart_id":8331,"mal_id":36428,"simkl_id":1083669},{"type":"ONA","anidb_id":14868,"animecountdown_id":1079827,"anime-planet_id":"tuktak-man","mal_id":47663,"simkl_id":1079827},{"type":"ONA","anidb_id":14869,"anilist_id":129649,"animecountdown_id":1079829,"anime-planet_id":"xiong-bing-lian-zhi-zhu-tian-jianglin","anisearch_id":17399,"kitsu_id":45914,"mal_id":44570,"simkl_id":1079829},{"type":"ONA","anidb_id":14870,"anilist_id":115864,"animecountdown_id":1079831,"anime-planet_id":"aotu-shijie-3","anisearch_id":20571,"kitsu_id":45200,"livechart_id":9369,"mal_id":39410,"simkl_id":1079831},{"type":"ONA","anidb_id":14871,"anilist_id":114111,"animecountdown_id":1079833,"anime-planet_id":"wangu-xian-qiong-iii","anisearch_id":15958,"kitsu_id":43096,"mal_id":39572,"simkl_id":1079833},{"type":"ONA","anidb_id":14872,"anilist_id":115825,"animecountdown_id":1079835,"anime-planet_id":"bai-gui-youeryuan-2nd-season","anisearch_id":14387,"kitsu_id":43376,"livechart_id":10711,"mal_id":42444,"simkl_id":1079835},{"type":"MOVIE","anidb_id":14873,"animecountdown_id":1079837,"anime-planet_id":"qingwa-wangzi-lixian-ji","anisearch_id":14383,"mal_id":45085,"simkl_id":1079837},{"type":"ONA","anidb_id":14874,"anilist_id":109484,"animecountdown_id":1079839,"anime-planet_id":"fights-break-sphere-2nd-season-specials","anisearch_id":14991,"kitsu_id":42665,"mal_id":39178,"simkl_id":1079839},{"type":"TV","anidb_id":14875,"anilist_id":104105,"animecountdown_id":1093399,"anime-planet_id":"flowering-heart-2","anisearch_id":17026,"imdb_id":"tt9899342","kitsu_id":14183,"mal_id":36618,"simkl_id":1093399,"themoviedb_id":{"tv":70607},"tvdb_id":311607,"season":{"tvdb":2,"tmdb":2}},{"type":"MOVIE","anidb_id":14876,"anilist_id":107371,"animecountdown_id":1079841,"anime-planet_id":"white-snake","anisearch_id":14147,"kitsu_id":42683,"livechart_id":9619,"mal_id":38740,"simkl_id":1079841},{"type":"MOVIE","anidb_id":14877,"animecountdown_id":1079843,"anime-planet_id":"gangtie-feilong-zaijian-ultraman","anisearch_id":20031,"mal_id":44295,"simkl_id":1079843},{"type":"MOVIE","anidb_id":14878,"animecountdown_id":1079845,"anisearch_id":19365,"mal_id":44296,"simkl_id":1079845},{"type":"MOVIE","anidb_id":14879,"animecountdown_id":1079847,"anisearch_id":15405,"mal_id":40440,"simkl_id":1079847},{"type":"MOVIE","anidb_id":14880,"animecountdown_id":1079849,"anime-planet_id":"can-wa-yu-tianchi-guaishou-ruixue-zhao-fengnian","anisearch_id":14541,"mal_id":45095,"simkl_id":1079849},{"type":"MOVIE","anidb_id":14881,"animecountdown_id":1079851,"anime-planet_id":"kung-fu-si-xia","mal_id":44963,"simkl_id":1079851},{"type":"MOVIE","anidb_id":14882,"animecountdown_id":1079853,"anime-planet_id":"kung-fu-si-xia-yong-chuang-digong","anisearch_id":14386,"mal_id":44964,"simkl_id":1079853},{"type":"MOVIE","anidb_id":14883,"anilist_id":109125,"animecountdown_id":1079855,"animenewsnetwork_id":22922,"anime-planet_id":"love-me-love-me-not","anisearch_id":14360,"imdb_id":"tt11427380","kitsu_id":43393,"livechart_id":9422,"mal_id":39753,"simkl_id":1079855,"themoviedb_id":{"movie":624812}},{"type":"SPECIAL","anidb_id":14884,"anilist_id":148589,"animecountdown_id":1080539,"anime-planet_id":"mahou-shoujuu-sherbert","anisearch_id":14409,"kitsu_id":46115,"livechart_id":9423,"simkl_id":1080539},{"type":"ONA","anidb_id":14885,"anilist_id":126258,"animecountdown_id":1083671,"anime-planet_id":"hana-no-zundamaru-junk","anisearch_id":9622,"kitsu_id":9163,"mal_id":22953,"simkl_id":1083671},{"type":"MOVIE","anidb_id":14886,"anilist_id":113653,"animecountdown_id":1081833,"animenewsnetwork_id":22901,"anime-planet_id":"detective-conan-movie-24-the-scarlet-bullet","anisearch_id":14687,"imdb_id":"tt12093860","kitsu_id":43686,"livechart_id":9692,"mal_id":39764,"simkl_id":1081833,"themoviedb_id":{"movie":662638}},{"type":"MOVIE","anidb_id":14887,"anilist_id":109215,"animecountdown_id":1081835,"anime-planet_id":"shishigari","anisearch_id":14405,"kitsu_id":42293,"livechart_id":9424,"mal_id":59773,"simkl_id":1081835},{"type":"ONA","anidb_id":14888,"anilist_id":130866,"animecountdown_id":1084381,"anime-planet_id":"sanguo-yanyi","anisearch_id":18239,"kitsu_id":46991,"mal_id":46447,"simkl_id":1084381}]'
     headers:
       Accept-Ranges:
       - bytes
@@ -29,7 +29,7 @@ interactions:
       Content-Encoding:
       - gzip
       Content-Length:
-      - '1168610'
+      - '1179985'
       Content-Security-Policy:
       - default-src 'none'; style-src 'unsafe-inline'; sandbox
       Content-Type:
@@ -37,13 +37,13 @@ interactions:
       Cross-Origin-Resource-Policy:
       - cross-origin
       Date:
-      - Mon, 04 May 2026 15:24:31 GMT
+      - Fri, 22 May 2026 23:23:42 GMT
       ETag:
-      - W/"c04edf1fd87e872ace5a3df72f92ad561b576fe465eb3018b2a26807fecb40f6"
+      - W/"a0dbb046fbec247948cf002ff45c75483d05883cd416daf63ccca871982f7b7a"
       Expires:
-      - Mon, 04 May 2026 15:29:31 GMT
+      - Fri, 22 May 2026 23:28:42 GMT
       Source-Age:
-      - '254'
+      - '2'
       Strict-Transport-Security:
       - max-age=31536000
       Vary:
@@ -53,19 +53,19 @@ interactions:
       X-Cache:
       - HIT
       X-Cache-Hits:
-      - '0'
+      - '1'
       X-Content-Type-Options:
       - nosniff
       X-Fastly-Request-ID:
-      - 721b10ed9d809a27380f20863ad19515629b6870
+      - 0bc0c4256bbdf8661e782068a36273532826921e
       X-Frame-Options:
       - deny
       X-GitHub-Request-Id:
-      - 8F70:8F2CE:246E2:2D6DD:69F890E6
+      - 44D8:1ED835:41BC92:6FCA2C:6A10E572
       X-Served-By:
-      - cache-gig2250081-GIG
+      - cache-gig2250024-GIG
       X-Timer:
-      - S1777908271.383043,VS0,VE1
+      - S1779492223.931841,VS0,VE10
       X-XSS-Protection:
       - 1; mode=block
     status:
@@ -83,17 +83,14 @@ interactions:
       Connection:
       - keep-alive
       User-Agent:
-      - FlexGet/3.19.15.dev (www.flexget.com)
+      - FlexGet/3.19.22.dev (www.flexget.com)
     method: GET
     uri: https://raw.githubusercontent.com/Anime-Lists/anime-lists/master/anime-list.xml
   response:
     body:
-      string: "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<anime-list>\n  <anime
-        anidbid=\"1\" tvdbid=\"72025\" defaulttvdbseason=\"1\" tmdbtv=\"26209\" tmdbseason=\"1\">\n
-        \   <name>Seikai no Monshou</name>\n    <supplemental-info>\n      <studio>Sunrise</studio>\n
-        \   </supplemental-info>\n  </anime>\n  <anime anidbid=\"2\" tvdbid=\"70973\"
-        defaulttvdbseason=\"1\" tmdbtv=\"62913\" tmdbseason=\"1\">\n    <name>3x3
-        Eyes</name>\n  </anime>\n  <anime anidbid=\"14792\"
+      string: "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<anime-list>\n  <anime anidbid=\"14791\"
+        tvdbid=\"346931\" defaulttvdbseason=\"2\" tmdbtv=\"80671\" tmdbseason=\"2\">\n
+        \   <name>Hataraku Saibou!!</name>\n  </anime>\n  <anime anidbid=\"14792\"
         tvdbid=\"305089\" defaulttvdbseason=\"2\" tmdbtv=\"65942\" tmdbseason=\"1\"
         tmdboffset=\"26\">\n    <name>Re:Zero kara Hajimeru Isekai Seikatsu (2020)</name>\n
         \   <mapping-list>\n      <mapping anidbseason=\"0\" tvdbseason=\"0\" start=\"1\"
@@ -108,7 +105,60 @@ interactions:
         tvdbseason=\"0\">;1-26;</mapping>\n    </mapping-list>\n  </anime>\n  <anime
         anidbid=\"14797\" tvdbid=\"313435\" defaulttvdbseason=\"0\" episodeoffset=\"2\"
         tmdbtv=\"67676\" tmdbseason=\"0\" tmdboffset=\"2\">\n    <name>Saiki Kusuo
-        no Sainan: Saishidou Hen</name>\n  </anime>\n</anime-list>\n"
+        no Sainan: Saishidou Hen</name>\n  </anime>\n  <anime anidbid=\"14798\" tvdbid=\"372959\"
+        defaulttvdbseason=\"1\" tmdbtv=\"95909\" tmdbseason=\"1\">\n    <name>Ochikobore
+        Fruit Tart</name>\n  </anime>\n  <anime anidbid=\"14801\" tvdbid=\"348002\"
+        defaulttvdbseason=\"2\" tmdbtv=\"83097\" tmdbseason=\"2\">\n    <name>Yakusoku
+        no Neverland (2021)</name>\n  </anime>\n  <anime anidbid=\"14802\" tvdbid=\"320002\"
+        defaulttvdbseason=\"0\" episodeoffset=\"11\" tmdbtv=\"69236\" tmdbseason=\"0\"
+        tmdboffset=\"11\" imdbid=\"tt11056458\">\n    <name>Bang Dream! Film Live</name>\n
+        \ </anime>\n  <anime anidbid=\"14804\" tvdbid=\"259675\" defaulttvdbseason=\"3\"
+        tmdbtv=\"45844\" tmdbseason=\"3\" imdbid=\"tt10915840\">\n    <name>Uchuu
+        Senkan Yamato 2205: Aratanaru Tabidachi</name>\n    <mapping-list>\n      <mapping
+        anidbseason=\"0\" tvdbseason=\"3\">;401-1;402-2;403-3;404-4;405-5;406-6;407-7;408-8;</mapping>\n
+        \     <mapping anidbseason=\"1\" tvdbseason=\"3\">;1-0;2-0;</mapping>\n    </mapping-list>\n
+        \ </anime>\n  <anime anidbid=\"14805\" tvdbid=\"366358\" defaulttvdbseason=\"1\"
+        tmdbtv=\"90847\" tmdbseason=\"1\">\n    <name>Hakata Mentai! Pirikarako-chan</name>\n
+        \ </anime>\n  <anime anidbid=\"14808\" tvdbid=\"hentai\">\n    <name>Tenioha!
+        2: Nee, Motto Ecchi na Koto Ippai Shiyo? The Animation</name>\n  </anime>\n
+        \ <anime anidbid=\"14810\" tvdbid=\"267705\" defaulttvdbseason=\"0\" episodeoffset=\"1\"
+        tmdbtv=\"63525\" tmdbseason=\"0\" tmdboffset=\"1\">\n    <name>Choujigen Game
+        Neptune The Animation (2019)</name>\n  </anime>\n  <anime anidbid=\"14811\"
+        tvdbid=\"366411\" defaulttvdbseason=\"1\" tmdbtv=\"90865\" tmdbseason=\"1\">\n
+        \   <name>Shoujo Conte All Starlight</name>\n  </anime>\n  <anime anidbid=\"14814\"
+        tvdbid=\"hentai\">\n    <name>Shakuen no Eris</name>\n  </anime>\n  <anime
+        anidbid=\"14815\" tvdbid=\"386713\" defaulttvdbseason=\"1\" tmdbtv=\"102655\"
+        tmdbseason=\"1\">\n    <name>D4DJ First Mix</name>\n  </anime>\n  <anime anidbid=\"14817\"
+        tvdbid=\"music video\">\n    <name>Daisuki tte Imi Da yo</name>\n  </anime>\n
+        \ <anime anidbid=\"14819\" tvdbid=\"284131\" defaulttvdbseason=\"3\" tmdbtv=\"62104\"
+        tmdbseason=\"3\">\n    <name>Nanatsu no Taizai: Kamigami no Gekirin</name>\n
+        \ </anime>\n  <anime anidbid=\"14822\" tvdbid=\"372534\" defaulttvdbseason=\"1\"
+        tmdbtv=\"95550\" tmdbseason=\"1\">\n    <name>Yesterday o Utatte</name>\n
+        \ </anime>\n  <anime anidbid=\"14824\" tvdbid=\"394678\" defaulttvdbseason=\"1\"
+        tmdbtv=\"112667\" tmdbseason=\"1\">\n    <name>I-Chu: Halfway Through the
+        Idol</name>\n  </anime>\n  <anime anidbid=\"14825\" tvdbid=\"371311\" defaulttvdbseason=\"1\"
+        tmdbtv=\"92584\" tmdbseason=\"1\">\n    <name>Eden (2021)</name>\n  </anime>\n
+        \ <anime anidbid=\"14827\" tvdbid=\"372361\" defaulttvdbseason=\"1\" tmdbtv=\"94631\"
+        tmdbseason=\"1\">\n    <name>Houkago Teibou Nisshi</name>\n  </anime>\n  <anime
+        anidbid=\"14840\" tvdbid=\"330139\" defaulttvdbseason=\"0\" episodeoffset=\"1\"
+        tmdbid=\"610892\" imdbid=\"tt10477558\">\n    <name>Violet Evergarden Gaiden:
+        Eien to Jidou Shuki Ningyou</name>\n  </anime>\n  <anime anidbid=\"14854\"
+        tvdbid=\"364538\" defaulttvdbseason=\"1\" tmdbtv=\"82497\" tmdbseason=\"1\">\n
+        \   <name>Jian Wang 3: Xiaganyidan Shen Jianxin</name>\n  </anime>\n  <anime
+        anidbid=\"14857\" tvdbid=\"319997\" defaulttvdbseason=\"0\" episodeoffset=\"4\"
+        tmdbtv=\"69288\" tmdbseason=\"0\" tmdboffset=\"4\">\n    <name>Chokotto Anime
+        Kemono Friends 3</name>\n  </anime>\n  <anime anidbid=\"14858\" tvdbid=\"369749\"
+        defaulttvdbseason=\"1\" tmdbtv=\"93828\" tmdbseason=\"1\">\n    <name>Tenka
+        Hyakken: Meiji-kan e Youkoso!</name>\n  </anime>\n  <anime anidbid=\"14875\"
+        tvdbid=\"311607\" defaulttvdbseason=\"2\" tmdbtv=\"70607\" tmdbseason=\"2\">\n
+        \   <name>Flowering Heart 2</name>\n  </anime>\n  <anime anidbid=\"14883\"
+        tvdbid=\"movie\" imdbid=\"tt11427380\">\n    <name>Omoi, Omoware, Furi, Furare</name>\n
+        \ </anime>\n  <anime anidbid=\"14886\" tvdbid=\"movie\" tmdbid=\"662638\"
+        imdbid=\"tt12093860\">\n    <name>Meitantei Conan: Hiiro no Dangan</name>\n
+        \ </anime>\n  <anime anidbid=\"14890\" tvdbid=\"284131\" defaulttvdbseason=\"0\"
+        tmdbtv=\"62104\" tmdbseason=\"0\">\n    <name>Nanatsu no Taizai: Imashime
+        no Fukkatsu (2018)</name>\n    <mapping-list>\n      <mapping anidbseason=\"1\"
+        tvdbseason=\"0\">;1-10;</mapping>\n    </mapping-list>\n  </anime>\n</anime-list>\n"
     headers:
       Accept-Ranges:
       - bytes
@@ -121,7 +171,7 @@ interactions:
       Content-Encoding:
       - gzip
       Content-Length:
-      - '324587'
+      - '325150'
       Content-Security-Policy:
       - default-src 'none'; style-src 'unsafe-inline'; sandbox
       Content-Type:
@@ -129,13 +179,13 @@ interactions:
       Cross-Origin-Resource-Policy:
       - cross-origin
       Date:
-      - Mon, 04 May 2026 15:24:32 GMT
+      - Fri, 22 May 2026 23:23:43 GMT
       ETag:
-      - W/"b8ffe1cd4f566dd2f6db465bb622bb50eeb8ae99a13e1e7ecd440d39fb25e729"
+      - W/"58719d9b20b28de0f445127ab7e32ce852924076886f16b10e5e248407b1e2c4"
       Expires:
-      - Mon, 04 May 2026 15:29:32 GMT
+      - Fri, 22 May 2026 23:28:43 GMT
       Source-Age:
-      - '252'
+      - '196'
       Strict-Transport-Security:
       - max-age=31536000
       Vary:
@@ -149,15 +199,15 @@ interactions:
       X-Content-Type-Options:
       - nosniff
       X-Fastly-Request-ID:
-      - b87bf39fa1efc935f54f614bd78c2d34d515b2ef
+      - 9a5e8fa49c3f465bcaefa7b42dd8cdb9a5cd3f3b
       X-Frame-Options:
       - deny
       X-GitHub-Request-Id:
-      - D342:16C061:79BE78:CCA00A:69F7E17C
+      - DF74:DB15B:19A596:2C90E8:6A0C13EC
       X-Served-By:
-      - cache-gig2250062-GIG
+      - cache-gig2250027-GIG
       X-Timer:
-      - S1777908273.699100,VS0,VE1
+      - S1779492224.878942,VS0,VE1
       X-XSS-Protection:
       - 1; mode=block
     status:
