@@ -35,13 +35,12 @@ cheroot==11.1.2
 cherrypy==18.10.0
     # via flexget
 click==8.4.1
-    # via
-    #   flask
-    #   typer
+    # via flask
 colorama==0.4.6 ; sys_platform == 'win32'
     # via
     #   click
     #   loguru
+    #   typer
 feedparser==6.0.12
     # via flexget
 flask==3.1.3
@@ -65,7 +64,7 @@ guessit==3.8.0
     # via flexget
 html5lib==1.1
     # via flexget
-idna==3.16
+idna==3.17
     # via requests
 importlib-resources==7.1.0
     # via flask-restx
@@ -159,7 +158,11 @@ rich==15.0.0
     # via
     #   flexget
     #   typer
-rpds-py==0.30.0
+rpds-py==0.30.0 ; python_full_version < '3.11'
+    # via
+    #   jsonschema
+    #   referencing
+rpds-py==2026.5.1 ; python_full_version >= '3.11'
     # via
     #   jsonschema
     #   referencing
@@ -183,7 +186,7 @@ sqlalchemy==2.0.50
     # via flexget
 tempora==5.9.0
     # via portend
-typer==0.25.1
+typer==0.26.4
     # via typer-slim
 typer-slim==0.24.0
     # via jaraco-text
