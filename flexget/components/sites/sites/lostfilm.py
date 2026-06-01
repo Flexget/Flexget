@@ -363,7 +363,9 @@ class LostFilm:
                     if found_item is not None:
                         if found_item.has_attr('content'):
                             if found_item['content'].startswith('0; url=/'):
-                                download_page_url = site_urls[0].rstrip('/') + found_item['content'][7:]
+                                download_page_url = (
+                                    site_urls[0].rstrip('/') + found_item['content'][7:]
+                                )
                             elif found_item['content'].startswith('0; url=https://') or found_item[
                                 'content'
                             ].startswith('0; url=http://'):
