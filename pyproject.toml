@@ -100,6 +100,7 @@ all = [
   { include-group = "boto3" },
   { include-group = "deluge" },
   { include-group = "ftp" },
+  { include-group = "imdb" },
   { include-group = "matrix" },
   { include-group = "plexapi" },
   { include-group = "qbittorrent" },
@@ -108,12 +109,11 @@ all = [
   { include-group = "subliminal" },
   { include-group = "telegram" },
   { include-group = "transmission" },
-  { include-group = "imdb" },
 ]
 boto3 = [ "boto3~=1.35" ]
 deluge = [ "deluge-client~=1.10" ]
 ftp = [ "ftputil~=5.1" ]
-imdb = ["playwright~=1.60"]
+imdb = [ "playwright~=1.60" ]
 matrix = [ "matrix-nio~=0.25.2" ]
 plexapi = [ "plexapi~=4.17" ]
 qbittorrent = [ "qbittorrent-api~=2025.2" ]
