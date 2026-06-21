@@ -97,10 +97,10 @@ JSON_TO_DB = {
     'themoviedb_id.movie': 'tmdb',
     'themoviedb_id.tv': 'tmdb',
     'season.tmdb': 'tmdb_season',
-    'episodes_offset.tmdb': 'tmdb_offset',
+    'episode_offset.tmdb': 'tmdb_offset',
     'tvdb_id': 'tvdb',
     'season.tvdb': 'tvdb_season',
-    'episodes_offset.tvdb': 'tvdb_offset',
+    'episode_offset.tvdb': 'tvdb_offset',
 }
 DB_TO_ENTRY = {
     'anidb': 'anidb_id',
@@ -317,7 +317,9 @@ class AnimeRelations:
             new_entry: DBType = {'anidb': 99999999}
             for json_key, db_key in JSON_TO_DB.items():
                 val = functools.reduce(lambda x, y: dict.get(x, y, {}), json_key.split('.'), anime)
-                if val is None or all((repr(val) == r'{}', isinstance(val, dict))):
+                if isinstance(val, list):
+                    val = ','.join(val)
+                if not isinstance(val, (str, int)):
                     continue
                 new_entry[db_key] = val
             entries.append(new_entry)
