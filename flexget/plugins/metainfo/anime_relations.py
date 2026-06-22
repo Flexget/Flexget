@@ -318,7 +318,7 @@ class AnimeRelations:
             for json_key, db_key in JSON_TO_DB.items():
                 val = functools.reduce(lambda x, y: dict.get(x, y, {}), json_key.split('.'), anime)
                 if isinstance(val, list):
-                    val = ','.join(val)
+                    val = ','.join([str(x) for x in val])
                 if not isinstance(val, (str, int)):
                     continue
                 new_entry[db_key] = val
