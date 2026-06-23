@@ -11,7 +11,7 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.number || github.ref || github.run_id }}
   cancel-in-progress: true
 env:
-  UV_VERSION: 0.11.14 # renovate: datasource=pypi depName=uv
+  UV_VERSION: 0.11.23 # renovate: datasource=pypi depName=uv
 jobs:
   tests:
     name: Run Tests
@@ -26,7 +26,7 @@ jobs:
       VCR_RECORD_MODE: none
     steps:
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
         with:
           persist-credentials: false
       - name: Install uv and Python
@@ -42,13 +42,13 @@ jobs:
         run: uv run --group test pytest -m 'require_optional_deps' -n logical --allow-hosts ::1,127.0.0.1 --cov --cov-append --cov-report=xml --dist loadgroup --junit-xml optional_test_results.xml
       - name: Upload test results to Codecov
         if: ${{ !cancelled() }}
-        uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2 # v6
+        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v6
         with:
           files: core_test_results.xml,optional_test_results.xml
           report_type: test_results
           token: ${{ secrets.CODECOV_TOKEN }}
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2 # v6
+        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v6
         with:
           name: ${{ matrix.operating-system }}-${{ matrix.python-version }}
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -61,7 +61,7 @@ jobs:
       PYTHON_VERSION: '3.13' # renovate: datasource=python-version depName=python
     steps:
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
         with:
           persist-credentials: false
       - name: Install uv and Python
