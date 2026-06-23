@@ -26,6 +26,8 @@ brotli==1.2.0 ; platform_python_implementation != 'PyPy'
     # via flask-compress
 brotlicffi==1.2.0.1 ; platform_python_implementation == 'PyPy'
     # via flask-compress
+cattrs==26.1.0
+    # via requests-cache
 certifi==2026.5.20
     # via requests
 cffi==2.0.0 ; platform_python_implementation == 'PyPy'
@@ -43,6 +45,8 @@ colorama==0.4.6 ; sys_platform == 'win32'
     #   click
     #   loguru
     #   typer
+exceptiongroup==1.3.1 ; python_full_version < '3.11'
+    # via cattrs
 feedparser==6.0.12
     # via flexget
 flask==3.1.3
@@ -67,7 +71,9 @@ guessit==3.8.0
 html5lib==1.1
     # via flexget
 idna==3.17
-    # via requests
+    # via
+    #   requests
+    #   url-normalize
 importlib-resources==7.1.0
     # via flask-restx
 itsdangerous==2.2.0
@@ -119,7 +125,7 @@ packaging==26.2
     # via flexget
 pendulum==3.2.0
     # via flexget
-platformdirs==4.9.6
+platformdirs==4.10.0
     # via requests-cache
 plumbum==1.10.0
     # via rpyc
