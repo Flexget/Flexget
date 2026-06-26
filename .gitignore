@@ -1,3 +1,4 @@
+!.env.example
 *.iml
 *.noseids
 *.pyc
@@ -11,6 +12,7 @@
 .coverage
 .devcontainer/
 .dmypy.json
+.env
 .idea/
 .mypy_cache/
 .project
@@ -49,3 +51,4 @@ received/
 setuptools-*.tar.gz
 share/
 tests/cover/
+webui-dist.zip
