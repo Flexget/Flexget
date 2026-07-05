@@ -80,8 +80,8 @@ class BotarrSearch:
         data = response.json()
         results = data.get('results', [])
 
-        if config.get('max_results'):
-            results = results[: config['max_results']]
+        max_res = config.get('max_results', 20)
+        results = results[:max_res]
 
         entries = []
         for res in results:
