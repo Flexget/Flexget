@@ -116,7 +116,9 @@ class BotarrSearch:
         """Return entries from a Botarr search query (standalone input mode)."""
         query = config.get('query', '')
         if not query:
-            raise plugin.PluginError('`query` is required when botarr_search is used as an input plugin.')
+            raise plugin.PluginError(
+                '`query` is required when botarr_search is used as an input plugin.'
+            )
         return self._perform_search(task, config, query)
 
     def search(self, task, entry, config):
@@ -125,7 +127,9 @@ class BotarrSearch:
         try:
             query_string = entry.render(query_template)
         except RenderError as e:
-            logger.error('Failed to render botarr_search query template `{}`: {}', query_template, e)
+            logger.error(
+                'Failed to render botarr_search query template `{}`: {}', query_template, e
+            )
             return []
 
         return self._perform_search(task, config, query_string)

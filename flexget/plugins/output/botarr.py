@@ -71,7 +71,9 @@ class Botarr:
                 continue
 
             if not irc_url.startswith('irc://'):
-                entry.fail(f"Entry url '{irc_url}' is not an IRC XDCC url (must start with irc://).")
+                entry.fail(
+                    f"Entry url '{irc_url}' is not an IRC XDCC url (must start with irc://)."
+                )
                 continue
 
             payload = {
@@ -94,11 +96,13 @@ class Botarr:
                         error_msg = e.response.json().get('error', e.response.text)
                     except Exception:
                         error_msg = e.response.text
-                    
+
                     if 'Duplicate release' in error_msg or 'Transfer already exists' in error_msg:
                         logger.info('Botarr already has `{}`: {}', entry['title'], error_msg)
                     else:
-                        logger.error('Botarr rejected submission for `{}`: {}', entry['title'], error_msg)
+                        logger.error(
+                            'Botarr rejected submission for `{}`: {}', entry['title'], error_msg
+                        )
                         entry.fail(f'Botarr rejected submission: {error_msg}')
                 else:
                     logger.error('Failed to connect to Botarr at `{}`: {}', base_url, e)
@@ -109,7 +113,9 @@ class Botarr:
             transfer_id = result.get('transfer_id')
 
             if not transfer_id:
-                logger.warning('Botarr returned success but no transfer_id for `{}`', entry['title'])
+                logger.warning(
+                    'Botarr returned success but no transfer_id for `{}`', entry['title']
+                )
                 continue
 
             entry['botarr_transfer_id'] = transfer_id
@@ -150,7 +156,7 @@ class Botarr:
                         entry['botarr_size'] = transfer.get('size')
                         logger.info('Botarr download completed: {}', transfer.get('filename'))
                         return
-                    elif status in ('failed', 'cancelled'):
+                    if status in ('failed', 'cancelled'):
                         error_msg = transfer.get('error') or status
                         entry['botarr_status'] = status
                         logger.error('Botarr download {}: {}', status, error_msg)

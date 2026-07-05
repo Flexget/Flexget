@@ -78,7 +78,9 @@ class BotarrHistory:
         data = response.json()
         items = data.get('items', [])
 
-        logger.debug('Botarr history returned {} items (total: {})', len(items), data.get('total', '?'))
+        logger.debug(
+            'Botarr history returned {} items (total: {})', len(items), data.get('total', '?')
+        )
 
         # Load previously seen transfer IDs for only_new filtering
         only_new = config.get('only_new', True)
