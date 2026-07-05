@@ -270,8 +270,11 @@ files.extend-exclude = [
 addopts = [ "-p no:legacypath" ]
 filterwarnings = [
   "error",
-  "ignore:Failed to load HostKeys from:UserWarning:pysftp",                                                         # It's a bug in pysftp (unmaintained) 0.2.9, not in 0.2.8: https://stackoverflow.com/q/56521549
-  "ignore:urllib3 \\(.*\\) or chardet \\(.*\\)/charset_normalizer \\(.*\\) doesn't match a supported version!::requests", # This can be removed once requests makes a new release
+  "ignore:Failed to load HostKeys from:UserWarning:pysftp", # It's a bug in pysftp (unmaintained) 0.2.9, not in 0.2.8: https://stackoverflow.com/q/56521549
+  """\
+  ignore:chardet.universaldetector is deprecated, import UniversalDetector from chardet or chardet.detector \
+  instead:DeprecationWarning:html5lib._inputstream\
+  """  # `html5lib` uses a deprecated module from `chardet`
 ]
 markers = [
   "filecopy(src, dst): mark test to copy a file from `src` to `dst` before running",
