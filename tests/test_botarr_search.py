@@ -3,8 +3,6 @@ from unittest import mock
 import pytest
 from requests import RequestException
 
-from flexget.plugins.input.botarr_search import BotarrSearch
-
 
 class TestBotarrSearch:
     config = """
@@ -70,18 +68,23 @@ class TestBotarrSearch:
                 },
                 {
                     'filename': 'Breaking Bad S01E02.mkv',
-                    'url': {'network': 'Rizon', 'channel': '#channel1', 'bot': 'Bot1', 'slot': 101},
+                    'url': {
+                        'network': 'Rizon',
+                        'channel': '#channel1',
+                        'bot': 'Bot1',
+                        'slot': 101,
+                    },
                 },
                 {
-                    'url': {'network': 'Rizon'}, # missing filename
-                }
+                    'url': {'network': 'Rizon'},  # missing filename
+                },
             ]
         }
         mock_resp.raise_for_status.return_value = None
         mock_get.return_value = mock_resp
 
         task = execute_task('test_search_input')
-        
+
         # max_results was 1, so only 1 entry should be produced
         assert len(task.entries) == 1
         entry = task.entries[0]
@@ -109,8 +112,8 @@ class TestBotarrSearch:
                     'server': 'Rizon',
                 },
                 {
-                    'url': {'network': 'Rizon'}, # missing filename
-                }
+                    'url': {'network': 'Rizon'},  # missing filename
+                },
             ]
         }
         mock_resp.raise_for_status.return_value = None
@@ -131,7 +134,12 @@ class TestBotarrSearch:
             'results': [
                 {
                     'filename': "Frieren Beyond Journey's End S01E01.mkv",
-                    'url': {'network': 'Rizon', 'channel': '#channel1', 'bot': 'Bot1', 'slot': 101},
+                    'url': {
+                        'network': 'Rizon',
+                        'channel': '#channel1',
+                        'bot': 'Bot1',
+                        'slot': 101,
+                    },
                 }
             ]
         }
@@ -139,12 +147,12 @@ class TestBotarrSearch:
         mock_get.return_value = mock_resp
 
         task = execute_task('test_search_plugin')
-        
+
         # Discover will produce the entry from the search plugin
         assert len(task.entries) == 1
         entry = task.entries[0]
         assert entry['title'] == "Frieren Beyond Journey's End S01E01.mkv"
-        
+
         mock_get.assert_called_once()
         args, kwargs = mock_get.call_args
         assert kwargs['params']['query'] == "Frieren Beyond Journey's End S01E01"

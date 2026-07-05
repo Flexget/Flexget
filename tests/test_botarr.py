@@ -1,6 +1,5 @@
 from unittest import mock
 
-import pytest
 from requests import RequestException
 
 from flexget.plugins.output.botarr import Botarr
@@ -169,8 +168,9 @@ class TestBotarr:
         task = execute_task('test_botarr_success')
         mock_post.reset_mock()
         task.options.learn = True
-        from flexget.plugins.output.botarr import Botarr
-        Botarr().on_task_output(task, {'url': 'http://localhost:3001', 'priority': 'normal', 'poll_for_result': False})
+        Botarr().on_task_output(
+            task, {'url': 'http://localhost:3001', 'priority': 'normal', 'poll_for_result': False}
+        )
         mock_post.assert_not_called()
 
     @mock.patch('flexget.utils.requests.Session.post')
@@ -183,10 +183,12 @@ class TestBotarr:
     @mock.patch('flexget.utils.requests.Session.post')
     def test_botarr_duplicate(self, mock_post, execute_task):
         mock_response = mock.Mock()
-        mock_response.raise_for_status.side_effect = RequestException(response=mock.Mock(
-            json=lambda: {'error': 'Duplicate release detected'},
-            text='Duplicate release detected'
-        ))
+        mock_response.raise_for_status.side_effect = RequestException(
+            response=mock.Mock(
+                json=lambda: {'error': 'Duplicate release detected'},
+                text='Duplicate release detected',
+            )
+        )
         mock_post.return_value = mock_response
 
         task = execute_task('test_botarr_duplicate')
@@ -197,10 +199,11 @@ class TestBotarr:
     @mock.patch('flexget.utils.requests.Session.post')
     def test_botarr_http_error(self, mock_post, execute_task):
         mock_response = mock.Mock()
-        mock_response.raise_for_status.side_effect = RequestException(response=mock.Mock(
-            json=mock.Mock(side_effect=ValueError("Invalid JSON")),
-            text='Some other error'
-        ))
+        mock_response.raise_for_status.side_effect = RequestException(
+            response=mock.Mock(
+                json=mock.Mock(side_effect=ValueError('Invalid JSON')), text='Some other error'
+            )
+        )
         mock_post.return_value = mock_response
 
         task = execute_task('test_botarr_http_error')
@@ -332,7 +335,7 @@ class TestBotarr:
         mock_post_resp.raise_for_status.return_value = None
         mock_post.return_value = mock_post_resp
 
-        mock_get.side_effect = RequestException("Poll error")
+        mock_get.side_effect = RequestException('Poll error')
 
         with mock.patch('time.time', side_effect=[0, 0, 70, 80]):
             execute_task('test_botarr_poll_404')

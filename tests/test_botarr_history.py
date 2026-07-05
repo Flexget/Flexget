@@ -3,8 +3,6 @@ from unittest import mock
 import pytest
 from requests import RequestException
 
-from flexget.plugins.input.botarr_history import BotarrHistory
-
 
 class TestBotarrHistory:
     config = """
@@ -54,16 +52,16 @@ class TestBotarrHistory:
                 {
                     'status': 'Completed',
                     'file_name': 'File3.mkv',
-                }
+                },
             ],
-            'total': 3
+            'total': 3,
         }
         mock_resp.raise_for_status.return_value = None
         mock_get.return_value = mock_resp
 
         task = execute_task('test_history')
         assert len(task.entries) == 3
-        
+
         e1, e2, e3 = task.entries
         assert e1['title'] == 'File1.mkv'
         assert e1['url'] == 'irc://Rizon/#channel1/Bot1/100'
@@ -82,7 +80,7 @@ class TestBotarrHistory:
         mock_resp.json.return_value = {
             'items': [
                 {'id': 'uuid-1', 'status': 'Completed', 'file_name': 'File1.mkv'},
-                {'id': 'uuid-2', 'status': 'Failed', 'file_name': 'File2.mkv'}
+                {'id': 'uuid-2', 'status': 'Failed', 'file_name': 'File2.mkv'},
             ]
         }
         mock_resp.raise_for_status.return_value = None
@@ -125,8 +123,8 @@ class TestBotarrHistory:
     @mock.patch('flexget.utils.requests.Session.get')
     def test_botarr_history_error(self, mock_get, execute_task):
         mock_get.side_effect = RequestException('Connection error')
-        
+
         with pytest.raises(Exception) as excinfo:
             execute_task('test_history_error')
-            
+
         assert 'Failed to fetch Botarr history' in str(excinfo.value)
