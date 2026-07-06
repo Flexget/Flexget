@@ -1982,6 +1982,7 @@ class TestCLI:
         execute_task('learn_series')
         import os
         from unittest import mock
+
         options = get_parser().parse_args(['series', 'list', '--porcelain'])
         buffer = StringIO()
         with mock.patch.dict(os.environ, {'COLUMNS': '120'}), capture_console(buffer):
