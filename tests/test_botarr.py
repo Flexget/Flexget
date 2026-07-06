@@ -1,5 +1,5 @@
-from unittest import mock
 import itertools
+from unittest import mock
 
 from requests import RequestException
 
