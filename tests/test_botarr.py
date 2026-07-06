@@ -1,4 +1,5 @@
 from unittest import mock
+import itertools
 
 from requests import RequestException
 
@@ -288,7 +289,7 @@ class TestBotarr:
         mock_get.return_value = mock_get_resp
 
         # Mock time.time to simulate timeout immediately
-        with mock.patch('time.time', side_effect=[0, 0, 70, 80]):
+        with mock.patch('time.time', side_effect=itertools.count(0, 30)):
             task = execute_task('test_botarr_poll_timeout')
 
         assert len(task.accepted) == 1
@@ -323,7 +324,7 @@ class TestBotarr:
         mock_get_resp.status_code = 500
         mock_get.return_value = mock_get_resp
 
-        with mock.patch('time.time', side_effect=[0, 0, 70, 80]):
+        with mock.patch('time.time', side_effect=itertools.count(0, 30)):
             execute_task('test_botarr_poll_404')
 
     @mock.patch('time.sleep')
@@ -337,5 +338,5 @@ class TestBotarr:
 
         mock_get.side_effect = RequestException('Poll error')
 
-        with mock.patch('time.time', side_effect=[0, 0, 70, 80]):
+        with mock.patch('time.time', side_effect=itertools.count(0, 30)):
             execute_task('test_botarr_poll_404')
