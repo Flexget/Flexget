@@ -13,12 +13,12 @@ class TestBotarrSearch:
               query: "Breaking Bad"
               providers: [Nibl, SubsPlease]
               max_results: 1
-              
+
           test_search_input_no_max:
             botarr_search:
               url: http://localhost:3001
               query: "Breaking Bad"
-              
+
           test_search_input_no_query:
             botarr_search:
               url: http://localhost:3001
@@ -123,9 +123,8 @@ class TestBotarrSearch:
         assert len(task.entries) == 1
 
     def test_botarr_search_input_no_query(self, execute_task):
-        with pytest.raises(Exception) as excinfo:
+        with pytest.raises(Exception, match='`query` is required'):
             execute_task('test_search_input_no_query')
-        assert '`query` is required' in str(excinfo.value)
 
     @mock.patch('flexget.utils.requests.Session.get')
     def test_botarr_search_plugin(self, mock_get, execute_task):
@@ -154,7 +153,7 @@ class TestBotarrSearch:
         assert entry['title'] == "Frieren Beyond Journey's End S01E01.mkv"
 
         mock_get.assert_called_once()
-        args, kwargs = mock_get.call_args
+        _args, kwargs = mock_get.call_args
         assert kwargs['params']['query'] == "Frieren Beyond Journey's End S01E01"
 
     @mock.patch('flexget.utils.requests.Session.get')

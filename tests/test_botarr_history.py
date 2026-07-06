@@ -11,7 +11,7 @@ class TestBotarrHistory:
             botarr_history:
               url: http://localhost:3001
               only_new: no
-              
+
           test_history_status:
             botarr_history:
               url: http://localhost:3001
@@ -62,7 +62,7 @@ class TestBotarrHistory:
         task = execute_task('test_history')
         assert len(task.entries) == 3
 
-        e1, e2, e3 = task.entries
+        e1, e2, _e3 = task.entries
         assert e1['title'] == 'File1.mkv'
         assert e1['url'] == 'irc://Rizon/#channel1/Bot1/100'
         assert e1['botarr_transfer_id'] == 'uuid-1'
@@ -124,7 +124,5 @@ class TestBotarrHistory:
     def test_botarr_history_error(self, mock_get, execute_task):
         mock_get.side_effect = RequestException('Connection error')
 
-        with pytest.raises(Exception) as excinfo:
+        with pytest.raises(Exception, match='Failed to fetch Botarr history'):
             execute_task('test_history_error')
-
-        assert 'Failed to fetch Botarr history' in str(excinfo.value)

@@ -161,7 +161,7 @@ class TestBotarr:
 
     @mock.patch('flexget.utils.requests.Session.post')
     def test_botarr_learn(self, mock_post, execute_task):
-        task = execute_task('test_botarr_learn', options=dict(learn=True))
+        execute_task('test_botarr_learn', options={'learn': True})
         mock_post.assert_not_called()
 
     @mock.patch('flexget.utils.requests.Session.post')
