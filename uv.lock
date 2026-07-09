@@ -580,6 +580,20 @@ wheels = [
 ]
 
 [[package]]
+name = "cattrs"
+version = "26.1.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "attrs" },
+    { name = "exceptiongroup", marker = "python_full_version < '3.11'" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/a0/ec/ba18945e7d6e55a58364d9fb2e46049c1c2998b3d805f19b703f14e81057/cattrs-26.1.0.tar.gz", hash = "sha256:fa239e0f0ec0715ba34852ce813986dfed1e12117e209b816ab87401271cdd40", size = 495672, upload-time = "2026-02-18T22:15:19.406Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/80/56/60547f7801b97c67e97491dc3d9ade9fbccbd0325058fd3dfcb2f5d98d90/cattrs-26.1.0-py3-none-any.whl", hash = "sha256:d1e0804c42639494d469d08d4f26d6b9de9b8ab26b446db7b5f8c2e97f7c3096", size = 73054, upload-time = "2026-02-18T22:15:17.958Z" },
+]
+
+[[package]]
 name = "certifi"
 version = "2026.5.20"
 source = { registry = "https://pypi.org/simple" }
@@ -1253,6 +1267,7 @@ dependencies = [
     { name = "pyyaml" },
     { name = "rebulk" },
     { name = "requests" },
+    { name = "requests-cache" },
     { name = "rich" },
     { name = "rpyc" },
     { name = "sqlalchemy" },
@@ -1368,6 +1383,7 @@ requires-dist = [
     { name = "pyyaml", specifier = "~=6.0" },
     { name = "rebulk", specifier = "~=3.2" },
     { name = "requests", specifier = "~=2.32" },
+    { name = "requests-cache", specifier = "~=1.3" },
     { name = "rich", specifier = "~=15.0" },
     { name = "rpyc", specifier = "~=6.0" },
     { name = "sqlalchemy", specifier = "~=2.0" },
@@ -3082,6 +3098,23 @@ wheels = [
 ]
 
 [[package]]
+name = "requests-cache"
+version = "1.3.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "attrs" },
+    { name = "cattrs" },
+    { name = "platformdirs" },
+    { name = "requests" },
+    { name = "url-normalize" },
+    { name = "urllib3" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/c3/ae/90a0f931c7f6b5a674b98c25ecb2593a173bcee14f0d8c148471df3d7b26/requests_cache-1.3.2.tar.gz", hash = "sha256:bdc3680931f98a1dea509d339ea6b45cea526945b47b250ce63ffd2744ee0b14", size = 100167, upload-time = "2026-05-11T04:09:53.233Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/b0/ff/d87d1a7700463afc5440bec80cfbcb56ef929f05fbfdc946ce031b13d040/requests_cache-1.3.2-py3-none-any.whl", hash = "sha256:c52666c76b08daa94d05a99327dd24afc46f405abc044e8c2267b540f90673d0", size = 70633, upload-time = "2026-05-11T04:09:51.554Z" },
+]
+
+[[package]]
 name = "rich"
 version = "15.0.0"
 source = { registry = "https://pypi.org/simple" }
@@ -3863,6 +3896,18 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/4d/f8/114266b21a7a9e3d09b352bb63c9d61d918bb7aa35d08c722793bfbfd28f/unpaddedbase64-2.1.0.tar.gz", hash = "sha256:7273c60c089de39d90f5d6d4a7883a79e319dc9d9b1c8924a7fab96178a5f005", size = 5621, upload-time = "2021-03-09T11:35:47.729Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/4c/a7/563b2d8fb7edc07320bf69ac6a7eedcd7a1a9d663a6bb90a4d9bd2eda5f7/unpaddedbase64-2.1.0-py3-none-any.whl", hash = "sha256:485eff129c30175d2cd6f0cd8d2310dff51e666f7f36175f738d75dfdbd0b1c6", size = 6083, upload-time = "2021-03-09T11:35:46.7Z" },
+]
+
+[[package]]
+name = "url-normalize"
+version = "3.0.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "idna" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/8b/cd/846d87d6d49d963b04ef4429b73d71d3c17468059956bab360866a9b0aec/url_normalize-3.0.0.tar.gz", hash = "sha256:0552cbf2831a32a28994a13d29bca58a60e10ff6c0380e343ec6d1c2a0d232d8", size = 21777, upload-time = "2026-04-25T00:31:59.514Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/13/8a/f72344eab18674fd7b174f35abbce41ed88fea72927f111726732d0ca779/url_normalize-3.0.0-py3-none-any.whl", hash = "sha256:95234bd359f86831c1fd87c248877f2a6887db2f3b5087120083f2fffcba4889", size = 16854, upload-time = "2026-04-25T00:31:58.271Z" },
 ]
 
 [[package]]
