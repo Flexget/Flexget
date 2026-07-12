@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Close stale issues and PRs
-        uses: actions/stale@eb5cf3af3ac0a1aa4c9c45633dd1ae542a27a899 # v10
+        uses: actions/stale@1e223db275d687790206a7acac4d1a11bd6fe629 # v10
         with:
           stale-issue-message: This issue is stale because it has been open ${{ env.DAYS_BEFORE_ISSUE_STALE }} days with no activity. Remove stale label or comment or this will be closed in ${{ env.DAYS_BEFORE_ISSUE_CLOSE }} days.
           close-issue-message: This issue has been stale for ${{ env.DAYS_BEFORE_ISSUE_CLOSE }} days and is being closed.
