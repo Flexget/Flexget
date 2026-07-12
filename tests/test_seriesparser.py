@@ -8,7 +8,8 @@ class TestSeriesParser:
     @pytest.fixture(
         scope='class', params=(ParserInternal, ParserGuessit), ids=['internal', 'guessit']
     )
-    def parse(self, request):
+    @classmethod
+    def parse(cls, request):
         p = request.param()
 
         def parse(data, name=None, **kwargs):
@@ -17,7 +18,8 @@ class TestSeriesParser:
         return parse
 
     @pytest.fixture(scope='class')
-    def parse_invalid(self, parse):
+    @classmethod
+    def parse_invalid(cls, parse):
         def parse_invalid(name, data, **kwargs):
             """Make sure either ParseWarning is raised, or return is invalid."""
             r = parse(data, name, **kwargs)
@@ -27,7 +29,8 @@ class TestSeriesParser:
         return parse_invalid
 
     @pytest.fixture(scope='class')
-    def parse_valid(self, parse):
+    @classmethod
+    def parse_valid(cls, parse):
         def parse_valid(name, data, **kwargs):
             """Make sure return is valid."""
             r = parse(data, name, **kwargs)

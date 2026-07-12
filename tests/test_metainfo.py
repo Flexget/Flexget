@@ -118,9 +118,10 @@ class TestMetainfoSeries:
     """
 
     @pytest.fixture(scope='class', params=['internal', 'guessit'], ids=['internal', 'guessit'])
-    def config(self, request):
+    @classmethod
+    def config(cls, request):
         """Override and parametrize default config fixture for all series tests."""
-        return self._config.replace('__parser__', request.param)
+        return cls._config.replace('__parser__', request.param)
 
     def test_metainfo_series(self, execute_task):
         """Metainfo series: name/episode."""

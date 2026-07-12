@@ -8,7 +8,8 @@ class TestParser:
     @pytest.fixture(
         scope='class', params=(ParserInternal, ParserGuessit), ids=['internal', 'guessit']
     )
-    def parse(self, request):
+    @classmethod
+    def parse(cls, request):
         p = request.param()
 
         def parse(data, name=None, **kwargs):

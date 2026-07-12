@@ -21,7 +21,8 @@ class TestQualityParser:
     @pytest.fixture(
         scope='class', params=['internal', 'guessit'], ids=['internal', 'guessit'], autouse=True
     )
-    def parser(self, request):
+    @classmethod
+    def parser(cls, request):
         if request.param == 'internal':
             return ParserInternal
         if request.param == 'guessit':
@@ -176,9 +177,10 @@ class TestFilterQuality:
     """
 
     @pytest.fixture(scope='class', params=['internal', 'guessit'], ids=['internal', 'guessit'])
-    def config(self, request):
+    @classmethod
+    def config(cls, request):
         """Override and parametrize default config fixture."""
-        return Template(self._config).render({'parser': request.param})
+        return Template(cls._config).render({'parser': request.param})
 
     def test_quality(self, execute_task):
         task = execute_task('qual')

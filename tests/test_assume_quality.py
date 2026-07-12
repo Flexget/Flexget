@@ -82,9 +82,10 @@ class TestAssumeQuality:
     """
 
     @pytest.fixture(scope='class', params=['internal', 'guessit'], ids=['internal', 'guessit'])
-    def config(self, request):
+    @classmethod
+    def config(cls, request):
         """Override and parametrize default config fixture."""
-        return Template(self._config).render({'parser': request.param})
+        return Template(cls._config).render({'parser': request.param})
 
     def test_matching(self, execute_task):
         task = execute_task('test_matching')
