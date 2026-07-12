@@ -445,6 +445,11 @@ class OutputDeluge(DelugePlugin):
                         logger.opt(exception=True).debug('Error adding magnet:')
                         entry.fail('Could not be added to deluge')
                     else:
+                        # Queue to top before the magnetization wait, so the torrent is
+                        # eligible for an active slot while waiting for its metadata
+                        if modify_opts.get('queue_to_top'):
+                            client.call('core.queue_top', [added_torrent])
+                            logger.debug('{} moved to top of queue', entry['title'])
                         if config.get('magnetization_timeout'):
                             timeout = config['magnetization_timeout']
                             logger.verbose(
