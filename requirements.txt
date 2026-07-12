@@ -26,9 +26,9 @@ brotlicffi==1.2.0.1 ; platform_python_implementation == 'PyPy'
     # via flask-compress
 certifi==2026.6.17
     # via requests
-cffi==2.0.0 ; platform_python_implementation == 'PyPy'
+cffi==2.1.0 ; platform_python_implementation == 'PyPy'
     # via brotlicffi
-charset-normalizer==3.4.7
+charset-normalizer==3.4.9
     # via requests
 cheroot==11.1.2
     # via cherrypy
@@ -195,7 +195,7 @@ typing-extensions==4.16.0
     #   plumbum
     #   referencing
     #   sqlalchemy
-tzdata==2026.2
+tzdata==2026.3
     # via
     #   pendulum
     #   tzlocal
