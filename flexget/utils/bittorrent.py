@@ -107,7 +107,9 @@ def is_torrent_file(metafilepath: Path) -> bool:
 
 def tokenize(
     text: bytes,
-    match=re.compile(rb'([idel])|(\d+):|(-?\d+)').match,  # type: Callable[[bytes, int], Match[bytes]]
+    match: Callable[[bytes, int], re.Match[bytes] | None] = re.compile(
+        rb'([idel])|(\d+):|(-?\d+)'
+    ).match,
 ) -> Generator[bytes, None, None]:
     i = 0
     while i < len(text):
