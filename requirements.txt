@@ -83,7 +83,7 @@ jaraco-functools==4.5.0
     #   cheroot
     #   jaraco-text
     #   tempora
-jaraco-text==4.2.0
+jaraco-text==4.3.0
     # via jaraco-collections
 jinja2==3.1.6
     # via
@@ -112,7 +112,6 @@ more-itertools==11.1.0
     #   cherrypy
     #   jaraco-functools
     #   jaraco-text
-    #   tempora
 packaging==26.2
     # via flexget
 pendulum==3.2.0
@@ -182,7 +181,7 @@ soupsieve==2.8.4
     # via beautifulsoup4
 sqlalchemy==2.0.51
     # via flexget
-tempora==5.9.0
+tempora==5.10.0
     # via portend
 typer==0.26.8
     # via typer-slim
@@ -195,6 +194,7 @@ typing-extensions==4.16.0
     #   plumbum
     #   referencing
     #   sqlalchemy
+    #   tempora
 tzdata==2026.3
     # via
     #   pendulum
