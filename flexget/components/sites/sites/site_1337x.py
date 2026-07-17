@@ -16,6 +16,7 @@ logger = logger.bind(name='1337x')
 
 URL = 'http://1337x.to/'
 
+
 class Site1337x:
     """1337x search plugin."""
 
@@ -30,7 +31,7 @@ class Site1337x:
                         'type': 'string',
                         'enum': ['seeders', 'leechers', 'time', 'size'],
                         'default': 'seeders',
-                    }
+                    },
                 },
                 'additionalProperties': False,
             },
@@ -44,7 +45,11 @@ class Site1337x:
         url = entry['url']
         if url.endswith('.torrent'):
             return False
-        return bool(url.startswith('http://1337x.to/')) or bool(url.startswith('http://l337xdarkkaqfwzntnfk5bmoaroivtl6xsbatabvlb52umg6v3ch44yd.onion/'))
+        return bool(url.startswith('http://1337x.to/')) or bool(
+            url.startswith(
+                'http://l337xdarkkaqfwzntnfk5bmoaroivtl6xsbatabvlb52umg6v3ch44yd.onion/'
+            )
+        )
 
     def url_rewrite(self, task, entry):
         """Get the download information for 1337x result."""
