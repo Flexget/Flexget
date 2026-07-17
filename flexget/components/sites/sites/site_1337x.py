@@ -14,6 +14,7 @@ from flexget.utils.tools import parse_filesize
 
 logger = logger.bind(name='1337x')
 
+URL = 'http://1337x.to/'
 
 class Site1337x:
     """1337x search plugin."""
@@ -24,6 +25,7 @@ class Site1337x:
             {
                 'type': 'object',
                 'properties': {
+                    'url': {'type': 'string', 'default': URL, 'format': 'url'},
                     'order_by': {
                         'type': 'string',
                         'enum': ['seeders', 'leechers', 'time', 'size'],
@@ -35,7 +37,6 @@ class Site1337x:
         ]
     }
 
-    base_url = 'http://1337x.to/'
     errors = False
 
     # urlrewriter API
@@ -43,7 +44,7 @@ class Site1337x:
         url = entry['url']
         if url.endswith('.torrent'):
             return False
-        return bool(url.startswith('http://1337x.to/'))
+        return bool(url.startswith('http://1337x.to/')) or bool(url.startswith('http://l337xdarkkaqfwzntnfk5bmoaroivtl6xsbatabvlb52umg6v3ch44yd.onion/'))
 
     def url_rewrite(self, task, entry):
         """Get the download information for 1337x result."""
@@ -70,6 +71,7 @@ class Site1337x:
     @plugin.internet(logger)
     def search(self, task, entry, config):
         """Search for entries on 1337x."""
+        url = config.get('url').rstrip('/')
         if not isinstance(config, dict):
             config = {}
 
@@ -89,7 +91,7 @@ class Site1337x:
                 'Using search params: {}; ordering by: {}', search_string, order_by or 'default'
             )
             try:
-                page = task.requests.get(self.base_url + query)
+                page = task.requests.get(url + query)
                 logger.debug('requesting: {}', page.url)
             except RequestException as e:
                 logger.error('1337x request failed: {}', e)
@@ -103,7 +105,7 @@ class Site1337x:
                     li = link.parent.parent
 
                     title = str(link.text).replace('...', '')
-                    info_url = self.base_url + str(link.get('href'))[1:]
+                    info_url = url + str(link.get('href'))[1:]
                     seeds = int(li.find('td', class_='seeds').string)
                     leeches = int(li.find('td', class_='leeches').string)
                     size = str(li.find('td', class_='coll-4').contents[0])
