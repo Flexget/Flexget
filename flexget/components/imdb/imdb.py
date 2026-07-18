@@ -185,7 +185,7 @@ class FilterImdb:
                 rejected = config['reject_actors']
                 for actor_id, actor_name in entry.get('imdb_actors', {}).items():
                     if actor_id in rejected or actor_name in rejected:
-                        reasons.append(f'reject_actors {actor_name}' or actor_id)
+                        reasons.append(f'reject_actors {actor_name or actor_id}')
                         break
 
             # Accept if actors contains an accepted actor, but don't reject otherwise
@@ -203,7 +203,7 @@ class FilterImdb:
                 rejected = config['reject_directors']
                 for director_id, director_name in entry.get('imdb_directors', {}).items():
                     if director_id in rejected or director_name in rejected:
-                        reasons.append(f'reject_directors {director_name}' or director_id)
+                        reasons.append(f'reject_directors {director_name or director_id}')
                         break
 
             # Accept if the director is in the accept list, but do not reject if the director is unknown
@@ -222,7 +222,7 @@ class FilterImdb:
                 rejected = config['reject_writers']
                 for writer_id, writer_name in entry.get('imdb_writers', {}).items():
                     if writer_id in rejected or writer_name in rejected:
-                        reasons.append(f'reject_writers {writer_name}' or writer_id)
+                        reasons.append(f'reject_writers {writer_name or writer_id}')
                         break
 
             # Accept if the writer is in the accept list, but do not reject if the writer is unknown
