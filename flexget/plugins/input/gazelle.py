@@ -156,7 +156,11 @@ class InputGazelle:
                 )
                 .one_or_none()
             )
-            if db_session and db_session.expires and db_session.expires >= datetime.now(timezone.utc):
+            if (
+                db_session
+                and db_session.expires
+                and db_session.expires >= datetime.now(timezone.utc)
+            ):
                 # Found a valid session in the DB - use it
                 self._session.cookies.update(db_session.cookies)
                 self.authkey = db_session.authkey
