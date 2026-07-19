@@ -78,7 +78,7 @@ jaraco-context==6.1.2
     # via
     #   jaraco-text
     #   tempora
-jaraco-functools==4.5.0
+jaraco-functools==4.6.0
     # via
     #   cheroot
     #   jaraco-text
@@ -177,13 +177,13 @@ six==1.17.0
     # via
     #   html5lib
     #   python-dateutil
-soupsieve==2.8.4
+soupsieve==2.9
     # via beautifulsoup4
 sqlalchemy==2.0.51
     # via flexget
-tempora==5.10.0
+tempora==5.12.0
     # via portend
-typer==0.26.8
+typer==0.27.0
     # via typer-slim
 typer-slim==0.24.0
     # via jaraco-text
