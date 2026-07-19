@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from loguru import logger
 from sqlalchemy import Column, DateTime, String, Unicode
@@ -156,7 +156,7 @@ class InputGazelle:
                 )
                 .one_or_none()
             )
-            if db_session and db_session.expires and db_session.expires >= datetime.utcnow():
+            if db_session and db_session.expires and db_session.expires >= datetime.now(timezone.utc):
                 # Found a valid session in the DB - use it
                 self._session.cookies.update(db_session.cookies)
                 self.authkey = db_session.authkey
@@ -171,7 +171,7 @@ class InputGazelle:
             expires = None
             for c in self._session.cookies:
                 if c.name == 'session':
-                    expires = datetime.utcfromtimestamp(c.expires)
+                    expires = datetime.fromtimestamp(c.expires, tz=timezone.utc)
             db_session = GazelleSession(
                 username=self.username,
                 base_url=self.base_url,

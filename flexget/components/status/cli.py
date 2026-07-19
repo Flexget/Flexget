@@ -144,7 +144,7 @@ def do_cli_summary(manager, options):
                 duration = success_end - success_start if success_end else None
                 last_success = success_start.strftime('%Y-%m-%d %H:%M')
 
-                age = datetime.datetime.utcnow() - success_start
+                age = datetime.datetime.now(datetime.timezone.utc) - success_start
                 if age > timedelta(days=7):
                     last_success = colorize('red', last_success)
                 elif age < timedelta(minutes=10):

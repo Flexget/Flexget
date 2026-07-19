@@ -41,7 +41,7 @@ class RSSEntry(Base):
     link = Column(String)
     rsslink = Column(String)
     file = Column(Unicode)
-    published = Column(DateTime, default=datetime.datetime.utcnow)
+    published = Column(DateTime, default=datetime.datetime.now(datetime.timezone.utc)
     enc_length = Column(Integer)
     enc_type = Column(String)
 
@@ -279,7 +279,7 @@ class OutputRSS:
             title=config.get('rsstitle', 'FlexGet'),
             link=config.get('rsslink', 'http://flexget.com'),
             description=config.get('rssdesc', 'FlexGet generated RSS feed'),
-            lastBuildDate=datetime.datetime.utcnow() if config['timestamp'] else None,
+            lastBuildDate=datetime.datetime.now(datetime.timezone.utc) if config['timestamp'] else None,
             items=rss_items,
         )
 
