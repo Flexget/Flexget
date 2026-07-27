@@ -68,7 +68,7 @@ class PluginSubliminal:
             'providers': {'type': 'array', 'items': {'type': 'string', 'enum': PROVIDERS}},
             'single': {'type': 'boolean', 'default': True},
             'directory': {'type': 'string'},
-            'hearing_impaired': {'type': 'boolean', 'default': False},
+            'subtitle_categories': {'type': 'string', 'default': ''},
             'authentication': {'type': 'object', 'properties': AUTHENTICATION_SCHEMA},
         },
         'required': ['languages'],
@@ -159,7 +159,7 @@ class PluginSubliminal:
         # we ignore the configuration and add the language code to the
         # potentially downloaded files
         single_mode = config.get('single', '') and len(languages | alternative_languages) <= 1
-        hearing_impaired = config.get('hearing_impaired', False)
+        subtitle_categories = config['subtitle_categories']
 
         with subliminal.core.ProviderPool(
             providers=providers_list, provider_configs=provider_configs
@@ -217,7 +217,7 @@ class PluginSubliminal:
                             video,
                             entry_languages,
                             min_score=msc,
-                            hearing_impaired=hearing_impaired,
+                            subtitle_categories=subtitle_categories,
                         )
                     except TypeError as e:
                         logger.error(
@@ -235,7 +235,7 @@ class PluginSubliminal:
                             video,
                             alternative_languages,
                             min_score=msc,
-                            hearing_impaired=hearing_impaired,
+                            subtitle_categories=subtitle_categories,
                         )
 
                         if subtitles:
