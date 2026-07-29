@@ -88,7 +88,7 @@ def _custom_edit_url(file_name: str) -> str:
 html_theme = 'pydata_sphinx_theme'
 html_static_path = ['_static']
 html_css_files = ['custom.css']
-html_js_files = ['custom-icon.js']
+html_js_files = [('custom-icons.js', {'defer': 'defer'})]
 html_favicon = '_static/logo.svg'
 html_logo = '_static/logo.svg'
 html_show_sourcelink = False
