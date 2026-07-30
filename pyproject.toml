@@ -77,7 +77,7 @@ dev = [
   "prek~=0.3.6",
   "pytest~=9.0",
   "pytest-cov~=7.0",
-  "pytest-socket~=0.7.0",
+  "pytest-socket~=0.8.0",
   "pytest-xdist~=3.6",
   "ruff==0.15.22",
   "vcrpy~=8.1",
