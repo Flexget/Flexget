@@ -114,7 +114,7 @@ deluge = [ "deluge-client~=1.10" ]
 ftp = [ "ftputil~=5.1" ]
 matrix = [ "matrix-nio~=0.25.2" ]
 plexapi = [ "plexapi~=4.17" ]
-qbittorrent = [ "qbittorrent-api~=2025.2" ]
+qbittorrent = [ "qbittorrent-api~=2026.8" ]
 rarfile = [ "rarfile~=4.0" ]
 sftp = [
   "paramiko~=3.5",
