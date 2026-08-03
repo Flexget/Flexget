@@ -7,13 +7,10 @@ import os
 import sys
 import threading
 import uuid
-import warnings
 from collections import deque
 from typing import TYPE_CHECKING
 
 from loguru import logger
-
-from flexget import __version__
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
@@ -126,10 +123,6 @@ def initialize(unit_test: bool = False) -> None:
 
     if _logging_configured:
         return
-
-    if 'dev' in __version__:
-        warnings.filterwarnings('always', category=DeprecationWarning, module='flexget.*')
-    warnings.simplefilter('once', append=True)
 
     logger.level('VERBOSE', no=VERBOSE, color='<bold>', icon='👄')
 
