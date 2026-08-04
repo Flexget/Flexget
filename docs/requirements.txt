@@ -10,7 +10,7 @@ babel==2.18.0 ; python_full_version >= '3.13'
     #   sphinx
 beautifulsoup4==4.15.0 ; python_full_version >= '3.13'
     # via pydata-sphinx-theme
-certifi==2026.6.17 ; python_full_version >= '3.13'
+certifi==2026.7.22 ; python_full_version >= '3.13'
     # via requests
 charset-normalizer==3.4.9 ; python_full_version >= '3.13'
     # via requests
@@ -42,7 +42,7 @@ roman-numerals==4.1.0 ; python_full_version >= '3.13'
     # via sphinx
 snowballstemmer==3.1.1 ; python_full_version >= '3.13'
     # via sphinx
-soupsieve==2.9 ; python_full_version >= '3.13'
+soupsieve==2.9.1 ; python_full_version >= '3.13'
     # via beautifulsoup4
 sphinx==9.1.0 ; python_full_version >= '3.13'
     # via
