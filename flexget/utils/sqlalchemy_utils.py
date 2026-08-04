@@ -12,7 +12,10 @@ from sqlalchemy.schema import MetaData, Table
 from sqlalchemy.types import TypeEngine
 
 if TYPE_CHECKING:
-    from typing_extensions import Self
+    try:
+        from typing import Self
+    except ImportError:
+        from typing_extensions import Self  # for python<=3.10
 
 logger = logger.bind(name='sql_utils')
 

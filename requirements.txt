@@ -191,6 +191,7 @@ typing-extensions==4.16.0
     # via
     #   beautifulsoup4
     #   flask-cors
+    #   flexget
     #   plumbum
     #   referencing
     #   sqlalchemy

@@ -27,7 +27,7 @@ Codebase verification
 
 - Search for obsolete version mentions:
 
-  - Perform a batch search for the Python version being removed and the next subsequent version to identify any related TODOs or version-specific logic that needs to be updated. For example, search for ``python 3.10``, ``python3.10``, ``python 3.11``, and ``python3.11``.
+  - Perform a batch search for the Python version being removed and the next subsequent version to identify any related TODOs or version-specific logic that needs to be updated. For example, search for ``[pP]ython.*3\.10``, ``[pP]ython.*3\.11``.
 
 - Review ``sys.version_info`` usage:
 
