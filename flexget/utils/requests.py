@@ -6,7 +6,6 @@ import time
 import types
 
 # Allow some request objects to be imported from here instead of requests
-import warnings
 from datetime import datetime, timedelta
 from email.message import EmailMessage
 from typing import TYPE_CHECKING
@@ -19,6 +18,11 @@ from requests import RequestException
 
 from flexget import __version__ as version
 from flexget.utils.tools import TimedDict, parse_timedelta
+
+try:
+    from warnings import deprecated
+except ImportError:
+    from typing_extensions import deprecated  # for python<=3.12
 
 # If we use just 'requests' here, we'll get the logger created by requests, rather than our own
 logger = logger.bind(name='utils.requests')
@@ -216,19 +220,13 @@ class Session(requests.Session):
         for cookie in cookiejar:
             self.cookies.set_cookie(cookie)
 
+    @deprecated('set_domain_delay is deprecated, use add_domain_limiter')
     def set_domain_delay(self, domain, delay):
-        """Do not use this anymore as it is DEPRECATED. Use `add_domain_limiter`.
-
-        Register a minimum interval between requests to `domain`
+        """Register a minimum interval between requests to `domain`.
 
         :param domain: The domain to set the interval on
         :param delay: The amount of time between requests, can be a timedelta or string like '3 seconds'
         """
-        warnings.warn(
-            'set_domain_delay is deprecated, use add_domain_limiter',
-            DeprecationWarning,
-            stacklevel=2,
-        )
         self.domain_limiters[domain] = TimedLimiter(domain, delay)
 
     def add_domain_limiter(self, limiter: DomainLimiter, replace: bool = True) -> None:

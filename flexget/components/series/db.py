@@ -42,6 +42,11 @@ from flexget.utils.sqlalchemy_utils import (
 )
 from flexget.utils.tools import parse_episode_identifier
 
+try:
+    from warnings import deprecated
+except ImportError:
+    from typing_extensions import deprecated  # for python<=3.12
+
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
@@ -426,13 +431,8 @@ class EpisodeRelease(Base):
         self.first_seen = datetime.now()
 
     @property
+    @deprecated('accessing deprecated release.proper, use release.proper_count instead')
     def proper(self):
-        # TODO: TEMP
-        import warnings
-
-        warnings.warn(
-            'accessing deprecated release.proper, use release.proper_count instead', stacklevel=2
-        )
         return self.proper_count > 0
 
     def __str__(self):
@@ -470,13 +470,8 @@ class SeasonRelease(Base):
         self.first_seen = datetime.now()
 
     @property
+    @deprecated('accessing deprecated release.proper, use release.proper_count instead')
     def proper(self):
-        # TODO: TEMP
-        import warnings
-
-        warnings.warn(
-            'accessing deprecated release.proper, use release.proper_count instead', stacklevel=2
-        )
         return self.proper_count > 0
 
     def __str__(self):
