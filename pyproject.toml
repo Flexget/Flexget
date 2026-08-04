@@ -238,8 +238,8 @@ skip = [
 ]
 
 [tool.pyproject-fmt]
-max_supported_python = "3.14"
 keep_full_version = true
+max_supported_python = "3.14"
 
 [tool.typos]
 default.extend-ignore-identifiers-re = [
@@ -270,11 +270,12 @@ files.extend-exclude = [
 addopts = [ "-p no:legacypath" ]
 filterwarnings = [
   "error",
-  "ignore:Failed to load HostKeys from:UserWarning:pysftp", # It's a bug in pysftp (unmaintained) 0.2.9, not in 0.2.8: https://stackoverflow.com/q/56521549
+  "ignore:Failed to load HostKeys from:UserWarning:pysftp",                                  # It's a bug in pysftp (unmaintained) 0.2.9, not in 0.2.8: https://stackoverflow.com/q/56521549
+  "ignore:chardet.universaldetector is deprecated:DeprecationWarning:html5lib._inputstream", # See https://github.com/html5lib/html5lib-python/pull/602
   """\
-  ignore:chardet.universaldetector is deprecated, import UniversalDetector from chardet or chardet.detector \
-  instead:DeprecationWarning:html5lib._inputstream\
-  """  # `html5lib` uses a deprecated module from `chardet`
+  ignore:In ftputil 6.0.0, the default file path encoding will change from Latin-1 to \
+  UTF-8.:DeprecationWarning:flexget.components.ftp.ftp_list\
+  """
 ]
 markers = [
   "filecopy(src, dst): mark test to copy a file from `src` to `dst` before running",
