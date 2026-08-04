@@ -331,7 +331,10 @@ class Task:
 
     @property
     def undecided(self):
-        """.. deprecated:: Use API v3.
+        """Return an iterator over entries that are still in an undecided state.
+
+        .. deprecated:: 1.2.0
+           Use API v3.
 
         .. note:: We did not migrate to v3
 
@@ -349,27 +352,47 @@ class Task:
 
     @property
     def failed(self):
-        """.. deprecated:: Use API v3."""
+        """Return an iterator over entries that have failed.
+
+        .. deprecated:: 1.2.0
+           Use API v3.
+        """
         return self.all_entries.failed
 
     @property
     def rejected(self):
-        """.. deprecated:: Use API v3."""
+        """Return an iterator over entries that have been rejected.
+
+        .. deprecated:: 1.2.0
+           Use API v3.
+        """
         return self.all_entries.rejected
 
     @property
     def accepted(self):
-        """.. deprecated:: Use API v3."""
+        """Return an iterator over entries that have been accepted.
+
+        .. deprecated:: 1.2.0
+           Use API v3.
+        """
         return self.all_entries.accepted
 
     @property
     def entries(self):
-        """.. deprecated:: Use API v3."""
+        """Return an iterator over entries that are undecided or accepted.
+
+        .. deprecated:: 1.2.0
+           Use API v3.
+        """
         return self.all_entries.entries
 
     @property
     def all_entries(self):
-        """.. deprecated:: Use API v3."""
+        """Return an iterator over all entries that were processed in the task.
+
+        .. deprecated:: 1.2.0
+           Use API v3.
+        """
         return self._all_entries
 
     def __lt__(self, other):

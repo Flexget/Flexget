@@ -226,6 +226,9 @@ class Session(requests.Session):
 
         :param domain: The domain to set the interval on
         :param delay: The amount of time between requests, can be a timedelta or string like '3 seconds'
+
+        .. deprecated:: 1.2.460
+           Use :meth:`add_domain_limiter` instead.
         """
         self.domain_limiters[domain] = TimedLimiter(domain, delay)
 

@@ -390,6 +390,11 @@ class Entry(LazyDict, Serializer):
         'This plugin should be updated to work with the latest versions of FlexGet'
     )
     def register_lazy_func(self, func, keys):
+        """Add lazy fields to an entry.
+
+        .. deprecated:: 3.1.11
+           Use :meth:`add_lazy_fields` instead.
+        """
         super().register_lazy_func(func, keys, [], {})
 
     def __eq__(self, other):

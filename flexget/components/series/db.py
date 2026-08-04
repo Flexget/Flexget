@@ -433,6 +433,14 @@ class EpisodeRelease(Base):
     @property
     @deprecated('accessing deprecated release.proper, use release.proper_count instead')
     def proper(self):
+        """Number of PROPER/REPACK revisions for the release.
+
+        A value of 0 indicates the original release.
+        Higher values indicate newer corrected releases (e.g. PROPER2).
+
+        .. deprecated:: 2.19.2
+           Use :attr:`proper_count` instead.
+        """
         return self.proper_count > 0
 
     def __str__(self):
@@ -472,6 +480,14 @@ class SeasonRelease(Base):
     @property
     @deprecated('accessing deprecated release.proper, use release.proper_count instead')
     def proper(self):
+        """Number of PROPER/REPACK revisions for the release.
+
+        A value of 0 indicates the original release.
+        Higher values indicate newer corrected releases (e.g. PROPER2).
+
+        .. deprecated:: 2.19.2
+           Use :attr:`proper_count` instead.
+        """
         return self.proper_count > 0
 
     def __str__(self):
