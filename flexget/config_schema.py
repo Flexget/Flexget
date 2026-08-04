@@ -286,7 +286,7 @@ def is_path(instance) -> bool:
 
 # TODO: jsonschema has a format checker for uri if rfc3987 is installed, perhaps we should use that
 @format_checker.checks('url')
-def is_url(instance) -> None | bool | Match:
+def is_url(instance) -> bool | Match | None:
     if not isinstance(instance, str):
         return True
     # Allow looser validation if this appears to start with jinja
