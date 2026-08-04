@@ -113,7 +113,7 @@ all = [
 boto3 = [ "boto3~=1.35" ]
 deluge = [ "deluge-client~=1.10" ]
 ftp = [ "ftputil~=5.1" ]
-matrix = [ "matrix-nio~=0.25.2" ]
+matrix = [ "matrix-nio~=0.26.0" ]
 plexapi = [ "plexapi~=4.17" ]
 qbittorrent = [ "qbittorrent-api~=2026.8" ]
 rarfile = [ "rarfile~=4.0" ]

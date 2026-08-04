@@ -1402,7 +1402,7 @@ all = [
     { name = "boto3", specifier = "~=1.35" },
     { name = "deluge-client", specifier = "~=1.10" },
     { name = "ftputil", specifier = "~=5.1" },
-    { name = "matrix-nio", specifier = "~=0.25.2" },
+    { name = "matrix-nio", specifier = "~=0.26.0" },
     { name = "paramiko", specifier = "~=3.5" },
     { name = "plexapi", specifier = "~=4.17" },
     { name = "pysftp", specifier = "~=0.2.9" },
@@ -1431,7 +1431,7 @@ docs = [
     { name = "sphinxcontrib-svg2pdfconverter", marker = "python_full_version >= '3.13'", specifier = "~=2.0" },
 ]
 ftp = [{ name = "ftputil", specifier = "~=5.1" }]
-matrix = [{ name = "matrix-nio", specifier = "~=0.25.2" }]
+matrix = [{ name = "matrix-nio", specifier = "~=0.26.0" }]
 plexapi = [{ name = "plexapi", specifier = "~=4.17" }]
 qbittorrent = [{ name = "qbittorrent-api", specifier = "~=2026.8" }]
 rarfile = [{ name = "rarfile", specifier = "~=4.0" }]
@@ -1445,7 +1445,7 @@ test = [
     { name = "boto3", specifier = "~=1.35" },
     { name = "deluge-client", specifier = "~=1.10" },
     { name = "ftputil", specifier = "~=5.1" },
-    { name = "matrix-nio", specifier = "~=0.25.2" },
+    { name = "matrix-nio", specifier = "~=0.26.0" },
     { name = "paramiko", specifier = "~=3.5" },
     { name = "pillow", specifier = "~=12.1" },
     { name = "plexapi", specifier = "~=4.17" },
@@ -2035,7 +2035,7 @@ wheels = [
 
 [[package]]
 name = "matrix-nio"
-version = "0.25.2"
+version = "0.26.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiofiles" },
@@ -2047,9 +2047,9 @@ dependencies = [
     { name = "pycryptodome" },
     { name = "unpaddedbase64" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/33/50/c20129fd6f0e1aad3510feefd3229427fc8163a111f3911ed834e414116b/matrix_nio-0.25.2.tar.gz", hash = "sha256:8ef8180c374e12368e5c83a692abfb3bab8d71efcd17c5560b5c40c9b6f2f600", size = 155480, upload-time = "2024-10-04T07:51:41.62Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/a5/74/46fe787ef96993903bfa40f806f28f0f16eb4b482c69cb70a1ff8b774223/matrix_nio-0.26.0.tar.gz", hash = "sha256:6aff7aa1d9e6e5351df8f979f4b647a3b347f635e306b26e2682fd3b59d8e6a8", size = 157175, upload-time = "2026-07-23T10:10:53.855Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/7b/0f/8b958d46e23ed4f69d2cffd63b46bb097a1155524e2e7f5c4279c8691c4a/matrix_nio-0.25.2-py3-none-any.whl", hash = "sha256:9c2880004b0e475db874456c0f79b7dd2b6285073a7663bcaca29e0754a67495", size = 181982, upload-time = "2024-10-04T07:51:39.451Z" },
+    { url = "https://files.pythonhosted.org/packages/6c/e9/fbb39da3f2ed164a6a92e09b2f86a177a3b24daa3a5d7b817ba3c6f1a8f6/matrix_nio-0.26.0-py3-none-any.whl", hash = "sha256:1803d7ba6dbc54a101a02695a5a767a1fb53632e46aced9d116990f4a98eadf3", size = 183482, upload-time = "2026-07-23T10:10:52.365Z" },
 ]
 
 [[package]]
