@@ -3,11 +3,10 @@
 from __future__ import annotations
 
 from collections.abc import MutableSet
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, Literal, TypedDict
 
 from loguru import logger
 from requests import HTTPError
-from typing_extensions import TypedDict  # for Python <3.11 with (Not)Required
 
 from flexget import plugin
 from flexget.entry import Entry
@@ -16,7 +15,10 @@ from flexget.utils import requests
 from flexget.utils.requests import RequestException
 
 if TYPE_CHECKING:
-    from typing_extensions import NotRequired
+    try:
+        from typing import NotRequired
+    except ImportError:
+        from typing_extensions import NotRequired  # for python<=3.10
 
 log = logger.bind(name='ombi_list')
 

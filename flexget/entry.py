@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import functools
 import types
-import warnings
 from datetime import date, datetime
 from enum import Enum
 from pathlib import Path
@@ -15,6 +14,11 @@ from flexget import plugin
 from flexget.utils.lazy_dict import LazyDict, LazyLookup
 from flexget.utils.serialization import Serializer, deserialize, serialize
 from flexget.utils.template import CoercingDateTime, FlexGetTemplate, render_from_entry
+
+try:
+    from warnings import deprecated
+except ImportError:
+    from typing_extensions import deprecated  # for python<=3.12
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Mapping, Sequence
@@ -381,17 +385,16 @@ class Entry(LazyDict, Serializer):
         super().register_lazy_func(func.function, fields, args, kwargs)
         self.lazy_lookups.append((lazy_func, fields, args, kwargs))
 
+    @deprecated(
+        '`register_lazy_func` is deprecated. `add_lazy_fields` should be used instead. '
+        'This plugin should be updated to work with the latest versions of FlexGet'
+    )
     def register_lazy_func(self, func, keys):
-        """Do not use this anymore as it is DEPRECATED.
+        """Add lazy fields to an entry.
 
-        Use `add_lazy_fields` instead.
+        .. deprecated:: 3.1.11
+           Use :meth:`add_lazy_fields` instead.
         """
-        warnings.warn(
-            '`register_lazy_func` is deprecated. `add_lazy_fields` should be used instead. '
-            'This plugin should be updated to work with the latest versions of FlexGet',
-            DeprecationWarning,
-            stacklevel=2,
-        )
         super().register_lazy_func(func, keys, [], {})
 
     def __eq__(self, other):
