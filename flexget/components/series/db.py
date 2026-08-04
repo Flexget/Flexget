@@ -251,11 +251,9 @@ class Season(Base):
         """:return: Latest downloaded Release or None"""
         if not self.releases:
             return None
-        return sorted(
-            self.downloaded_releases,
-            key=lambda rel: rel.first_seen if rel.downloaded else None,
-            reverse=True,
-        )[0]
+        return max(
+            self.downloaded_releases, key=lambda rel: rel.first_seen if rel.downloaded else None
+        )
 
 
 @total_ordering
@@ -333,11 +331,9 @@ class Episode(Base):
         """:return: Latest downloaded Release or None"""
         if not self.releases:
             return None
-        return sorted(
-            self.downloaded_releases,
-            key=lambda rel: rel.first_seen if rel.downloaded else None,
-            reverse=True,
-        )[0]
+        return max(
+            self.downloaded_releases, key=lambda rel: rel.first_seen if rel.downloaded else None
+        )
 
     def __str__(self):
         return f'<Episode(id={self.id},identifier={self.identifier},season={self.season},number={self.number},identified_by={self.identified_by})>'
