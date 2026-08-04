@@ -89,7 +89,7 @@ test = [
   { include-group = "all" },
 ]
 docs = [
-  "pydata-sphinx-theme~=0.17.0",
+  "pydata-sphinx-theme~=0.20.0",
   "sphinx~=9.1",
   "sphinx-copybutton~=0.5.2",
   "sphinx-design~=0.7.0",
