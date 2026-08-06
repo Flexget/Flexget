@@ -273,9 +273,8 @@ def filter_strip_year(name: str) -> str:
     return split_title_year(name).title
 
 
-def filter_get_year(name: str) -> str:
-    year = split_title_year(name).year
-    return str(year) if year is not None else ''
+def filter_get_year(name: str) -> int | None:
+    return split_title_year(name).year
 
 
 def filter_parse_size(val: str, si: bool = False, match_re: str | None = None) -> int:
