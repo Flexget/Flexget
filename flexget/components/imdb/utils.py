@@ -8,6 +8,7 @@ from loguru import logger
 from requests import RequestException
 
 from flexget import plugin
+from flexget.components.imdb.waf import imdb_get, set_domain_limiter
 from flexget.utils.requests import Session, TimedLimiter
 from flexget.utils.soup import get_soup
 from flexget.utils.tools import str_to_int
@@ -28,7 +29,9 @@ requests.headers.update({
 })
 
 # give imdb a little break between requests
-requests.add_domain_limiter(TimedLimiter('imdb.com', '3 seconds'))
+imdb_limiter = TimedLimiter('imdb.com', '3 seconds')
+requests.add_domain_limiter(imdb_limiter)
+set_domain_limiter(imdb_limiter)
 
 # Title pages are often served as an AWS WAF challenge to non-browser clients; use the same
 # GraphQL endpoint the site uses.
@@ -312,7 +315,7 @@ class ImdbParser:
                     self.votes,
                 )
                 return
-            page = requests.get(url)
+            page = imdb_get(url)
             soup = get_soup(page.text)
         else:
             logger.debug('IMDb parsing {} from provided HTML', self.imdb_id)
@@ -588,27 +591,48 @@ class ImdbParser:
         if not self.plot_outline:
             logger.debug('No storyline found for {}', self.imdb_id)
 
-        storyline_keywords = data.get('keywords') or ''
-        if storyline_keywords:
-            self.plot_keywords = storyline_keywords.split(',')
-
         genres = (above_the_fold_data.get('genres', {}) or {}).get('genres', [])
         self.genres = [g['text'].lower() for g in genres]
 
-        # Cast section
-        cast_data = main_column_data.get('cast', {}) or {}
-        for cast_node in cast_data.get('edges') or []:
-            actor_node = (cast_node.get('node') or {}).get('name') or {}
-            actor_id = actor_node.get('id')
-            actor_name = (actor_node.get('nameText') or {}).get('text')
-            if actor_id and actor_name:
-                self.actors[actor_id] = actor_name
+        keywords_data = above_the_fold_data.get('keywords')
+        if keywords_data and keywords_data.get('edges'):
+            self.plot_keywords = [
+                edge['node']['text']
+                for edge in keywords_data['edges']
+                if edge.get('node', {}).get('text')
+            ]
+        elif storyline_keywords := data.get('keywords') or '':
+            self.plot_keywords = storyline_keywords.split(',')
 
-        principal_cast_data = main_column_data.get('principalCast', []) or []
-        if principal_cast_data:
-            for cast_node in principal_cast_data[0].get('credits') or []:
-                actor_node = cast_node.get('name') or {}
+        # Cast section (castV2 is the current format)
+        for cast_group in main_column_data.get('castV2') or []:
+            self._parse_person_credits(cast_group.get('credits'), self.actors)
+
+        # Legacy cast formats
+        if not self.actors:
+            cast_data = main_column_data.get('cast', {}) or {}
+            for cast_node in cast_data.get('edges') or []:
+                actor_node = (cast_node.get('node') or {}).get('name') or {}
                 actor_id = actor_node.get('id')
                 actor_name = (actor_node.get('nameText') or {}).get('text')
                 if actor_id and actor_name:
                     self.actors[actor_id] = actor_name
+
+        if not self.actors:
+            principal_cast_data = main_column_data.get('principalCast', []) or []
+            if principal_cast_data:
+                for cast_node in principal_cast_data[0].get('credits') or []:
+                    actor_node = cast_node.get('name') or {}
+                    actor_id = actor_node.get('id')
+                    actor_name = (actor_node.get('nameText') or {}).get('text')
+                    if actor_id and actor_name:
+                        self.actors[actor_id] = actor_name
+
+    @staticmethod
+    def _parse_person_credits(credits, persons):
+        for credit in credits or []:
+            name_node = credit.get('name') or {}
+            person_id = name_node.get('id')
+            person_name = (name_node.get('nameText') or {}).get('text')
+            if person_id and person_name:
+                persons[person_id] = person_name

@@ -1,0 +1,106 @@
+[
+  {
+    "webgl_unmasked_renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M2 Pro, Unspecified Version)",
+    "webgl": [
+      {
+        "webgl_extensions": "ANGLE_instanced_arrays;EXT_blend_minmax;EXT_clip_control;EXT_color_buffer_half_float;EXT_depth_clamp;EXT_disjoint_timer_query;EXT_float_blend;EXT_frag_depth;EXT_polygon_offset_clamp;EXT_shader_texture_lod;EXT_texture_compression_bptc;EXT_texture_compression_rgtc;EXT_texture_filter_anisotropic;EXT_texture_mirror_clamp_to_edge;EXT_sRGB;KHR_parallel_shader_compile;OES_element_index_uint;OES_fbo_render_mipmap;OES_standard_derivatives;OES_texture_float;OES_texture_float_linear;OES_texture_half_float;OES_texture_half_float_linear;OES_vertex_array_object;WEBGL_blend_func_extended;WEBGL_color_buffer_float;WEBGL_compressed_texture_astc;WEBGL_compressed_texture_etc;WEBGL_compressed_texture_etc1;WEBGL_compressed_texture_pvrtc;WEBGL_compressed_texture_s3tc;WEBGL_compressed_texture_s3tc_srgb;WEBGL_debug_renderer_info;WEBGL_debug_shaders;WEBGL_depth_texture;WEBGL_draw_buffers;WEBGL_lose_context;WEBGL_multi_draw;WEBGL_polygon_mode",
+        "webgl_extensions_hash": "9cbeeda2b4ce5415b07e1d1e43783a58",
+        "webgl_renderer": "WebKit WebGL",
+        "webgl_vendor": "WebKit",
+        "webgl_version": "WebGL 1.0 (OpenGL ES 2.0 Chromium)",
+        "webgl_shading_language_version": "WebGL GLSL ES 1.0 (OpenGL ES GLSL ES 1.0 Chromium)",
+        "webgl_aliased_line_width_range": "[1, 1]",
+        "webgl_aliased_point_size_range": "[1, 511]",
+        "webgl_antialiasing": true,
+        "webgl_bits": "8,8,24,8,8,0",
+        "webgl_max_params": "16,32,16384,1024,16384,16,16,30,16,16,1024",
+        "webgl_max_viewport_dims": "[16384, 16384]",
+        "webgl_unmasked_vendor": "Google Inc. (Apple)",
+        "webgl_unmasked_renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M2 Pro, Unspecified Version)",
+        "webgl_vsf_params": "23,127,127,23,127,127,23,127,127",
+        "webgl_vsi_params": "0,31,30,0,31,30,0,31,30",
+        "webgl_fsf_params": "23,127,127,23,127,127,23,127,127",
+        "webgl_fsi_params": "0,31,30,0,31,30,0,31,30",
+        "webgl_hash_webgl": "a5c294663e62715a685b8a5f7d436da2"
+      }
+    ]
+  },
+  {
+    "webgl_unmasked_renderer": "ANGLE (AMD, AMD Radeon(TM) Graphics (0x00001681) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+    "webgl": [
+      {
+        "webgl_extensions": "ANGLE_instanced_arrays;EXT_blend_minmax;EXT_clip_control;EXT_color_buffer_half_float;EXT_depth_clamp;EXT_disjoint_timer_query;EXT_float_blend;EXT_frag_depth;EXT_polygon_offset_clamp;EXT_shader_texture_lod;EXT_texture_compression_bptc;EXT_texture_compression_rgtc;EXT_texture_filter_anisotropic;EXT_texture_mirror_clamp_to_edge;EXT_sRGB;KHR_parallel_shader_compile;OES_element_index_uint;OES_fbo_render_mipmap;OES_standard_derivatives;OES_texture_float;OES_texture_float_linear;OES_texture_half_float;OES_texture_half_float_linear;OES_vertex_array_object;WEBGL_blend_func_extended;WEBGL_color_buffer_float;WEBGL_compressed_texture_s3tc;WEBGL_compressed_texture_s3tc_srgb;WEBGL_debug_renderer_info;WEBGL_debug_shaders;WEBGL_depth_texture;WEBGL_draw_buffers;WEBGL_lose_context;WEBGL_multi_draw;WEBGL_polygon_mode",
+        "webgl_extensions_hash": "7300c23f4e6fa34e534fc99c1b628588",
+        "webgl_renderer": "WebKit WebGL",
+        "webgl_vendor": "WebKit",
+        "webgl_version": "WebGL 1.0 (OpenGL ES 2.0 Chromium)",
+        "webgl_shading_language_version": "WebGL GLSL ES 1.0 (OpenGL ES GLSL ES 1.0 Chromium)",
+        "webgl_aliased_line_width_range": "[1, 1]",
+        "webgl_aliased_point_size_range": "[1, 1024]",
+        "webgl_antialiasing": true,
+        "webgl_bits": "8,8,24,8,8,0",
+        "webgl_max_params": "16,32,16384,1024,16384,16,16,30,16,16,4096",
+        "webgl_max_viewport_dims": "[32767, 32767]",
+        "webgl_unmasked_vendor": "Google Inc. (AMD)",
+        "webgl_unmasked_renderer": "ANGLE (AMD, AMD Radeon(TM) Graphics (0x00001681) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "webgl_vsf_params": "23,127,127,23,127,127,23,127,127",
+        "webgl_vsi_params": "0,31,30,0,31,30,0,31,30",
+        "webgl_fsf_params": "23,127,127,23,127,127,23,127,127",
+        "webgl_fsi_params": "0,31,30,0,31,30,0,31,30",
+        "webgl_hash_webgl": "16b93cc1541b205283c1a77320ce4fc0"
+      }
+    ]
+  },
+  {
+    "webgl_unmasked_renderer": "ANGLE (Intel, Intel(R) Iris(R) Xe Graphics (0x00009A49) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+    "webgl": [
+      {
+        "webgl_extensions": "ANGLE_instanced_arrays;EXT_blend_minmax;EXT_clip_control;EXT_color_buffer_half_float;EXT_depth_clamp;EXT_disjoint_timer_query;EXT_float_blend;EXT_frag_depth;EXT_polygon_offset_clamp;EXT_shader_texture_lod;EXT_texture_compression_bptc;EXT_texture_compression_rgtc;EXT_texture_filter_anisotropic;EXT_texture_mirror_clamp_to_edge;EXT_sRGB;KHR_parallel_shader_compile;OES_element_index_uint;OES_fbo_render_mipmap;OES_standard_derivatives;OES_texture_float;OES_texture_float_linear;OES_texture_half_float;OES_texture_half_float_linear;OES_vertex_array_object;WEBGL_blend_func_extended;WEBGL_color_buffer_float;WEBGL_compressed_texture_s3tc;WEBGL_compressed_texture_s3tc_srgb;WEBGL_debug_renderer_info;WEBGL_debug_shaders;WEBGL_depth_texture;WEBGL_draw_buffers;WEBGL_lose_context;WEBGL_multi_draw;WEBGL_polygon_mode",
+        "webgl_extensions_hash": "7300c23f4e6fa34e534fc99c1b628588",
+        "webgl_renderer": "WebKit WebGL",
+        "webgl_vendor": "WebKit",
+        "webgl_version": "WebGL 1.0 (OpenGL ES 2.0 Chromium)",
+        "webgl_shading_language_version": "WebGL GLSL ES 1.0 (OpenGL ES GLSL ES 1.0 Chromium)",
+        "webgl_aliased_line_width_range": "[1, 1]",
+        "webgl_aliased_point_size_range": "[1, 1024]",
+        "webgl_antialiasing": true,
+        "webgl_bits": "8,8,24,8,8,0",
+        "webgl_max_params": "16,32,16384,1024,16384,16,16,30,16,16,4096",
+        "webgl_max_viewport_dims": "[32767, 32767]",
+        "webgl_unmasked_vendor": "Google Inc. (Intel)",
+        "webgl_unmasked_renderer": "ANGLE (Intel, Intel(R) Iris(R) Xe Graphics (0x00009A49) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "webgl_vsf_params": "23,127,127,23,127,127,23,127,127",
+        "webgl_vsi_params": "0,31,30,0,31,30,0,31,30",
+        "webgl_fsf_params": "23,127,127,23,127,127,23,127,127",
+        "webgl_fsi_params": "0,31,30,0,31,30,0,31,30",
+        "webgl_hash_webgl": "d794114e20f8a75cec3b812f98a42b7e"
+      }
+    ]
+  },
+  {
+    "webgl_unmasked_renderer": "ANGLE (Intel, Intel(R) Iris(R) Xe Graphics (0x000046A6) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+    "webgl": [
+      {
+        "webgl_extensions": "ANGLE_instanced_arrays;EXT_blend_minmax;EXT_clip_control;EXT_color_buffer_half_float;EXT_depth_clamp;EXT_disjoint_timer_query;EXT_float_blend;EXT_frag_depth;EXT_polygon_offset_clamp;EXT_shader_texture_lod;EXT_texture_compression_bptc;EXT_texture_compression_rgtc;EXT_texture_filter_anisotropic;EXT_texture_mirror_clamp_to_edge;EXT_sRGB;KHR_parallel_shader_compile;OES_element_index_uint;OES_fbo_render_mipmap;OES_standard_derivatives;OES_texture_float;OES_texture_float_linear;OES_texture_half_float;OES_texture_half_float_linear;OES_vertex_array_object;WEBGL_blend_func_extended;WEBGL_color_buffer_float;WEBGL_compressed_texture_s3tc;WEBGL_compressed_texture_s3tc_srgb;WEBGL_debug_renderer_info;WEBGL_debug_shaders;WEBGL_depth_texture;WEBGL_draw_buffers;WEBGL_lose_context;WEBGL_multi_draw;WEBGL_polygon_mode",
+        "webgl_extensions_hash": "7300c23f4e6fa34e534fc99c1b628588",
+        "webgl_renderer": "WebKit WebGL",
+        "webgl_vendor": "WebKit",
+        "webgl_version": "WebGL 1.0 (OpenGL ES 2.0 Chromium)",
+        "webgl_shading_language_version": "WebGL GLSL ES 1.0 (OpenGL ES GLSL ES 1.0 Chromium)",
+        "webgl_aliased_line_width_range": "[1, 1]",
+        "webgl_aliased_point_size_range": "[1, 1024]",
+        "webgl_antialiasing": true,
+        "webgl_bits": "8,8,24,8,8,0",
+        "webgl_max_params": "16,32,16384,1024,16384,16,16,30,16,16,4096",
+        "webgl_max_viewport_dims": "[32767, 32767]",
+        "webgl_unmasked_vendor": "Google Inc. (Intel)",
+        "webgl_unmasked_renderer": "ANGLE (Intel, Intel(R) Iris(R) Xe Graphics (0x000046A6) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "webgl_vsf_params": "23,127,127,23,127,127,23,127,127",
+        "webgl_vsi_params": "0,31,30,0,31,30,0,31,30",
+        "webgl_fsf_params": "23,127,127,23,127,127,23,127,127",
+        "webgl_fsi_params": "0,31,30,0,31,30,0,31,30",
+        "webgl_hash_webgl": "134cccc7e07355b85e9546597e143227"
+      }
+    ]
+  }
+]
