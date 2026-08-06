@@ -25,9 +25,14 @@ brotli==1.2.0 ; platform_python_implementation != 'PyPy'
 brotlicffi==1.2.0.1 ; platform_python_implementation == 'PyPy'
     # via flask-compress
 certifi==2026.7.22
-    # via requests
-cffi==2.1.1 ; platform_python_implementation == 'PyPy'
-    # via brotlicffi
+    # via
+    #   curl-cffi
+    #   requests
+cffi==2.1.1
+    # via
+    #   brotlicffi
+    #   cryptography
+    #   curl-cffi
 charset-normalizer==3.4.9
     # via requests
 cheroot==11.1.2
@@ -41,6 +46,10 @@ colorama==0.4.6 ; sys_platform == 'win32'
     #   click
     #   loguru
     #   typer
+cryptography==45.0.7
+    # via flexget
+curl-cffi==0.16.0
+    # via flexget
 feedparser==6.0.14
     # via flexget
 feedparser-sgmllib==2.1.0
@@ -124,7 +133,7 @@ portend==3.2.1
     # via cherrypy
 psutil==7.2.2
     # via flexget
-pycparser==3.0 ; implementation_name != 'PyPy' and platform_python_implementation == 'PyPy'
+pycparser==3.0 ; implementation_name != 'PyPy'
     # via cffi
 pygments==2.20.0
     # via rich
@@ -133,6 +142,8 @@ pynzb==0.1.0
 pyparsing==3.3.2
     # via flexget
 pyrss2gen==1.1
+    # via flexget
+pyscrypt==1.6.2
     # via flexget
 python-dateutil==2.9.0.post0
     # via

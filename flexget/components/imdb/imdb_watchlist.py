@@ -1,11 +1,11 @@
 from loguru import logger
 
 from flexget import plugin
+from flexget.components.imdb.waf import imdb_get
 from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils import json
-from flexget.components.imdb.waf import imdb_get
 from flexget.utils.cached_input import cached
 from flexget.utils.soup import get_soup
 
@@ -101,8 +101,7 @@ class ImdbWatchlist:
             params['title_type'] = ','.join(title_types)
             params['sort'] = 'list_order%2Casc'
 
-        entries = self.parse_html_list(task, config, url, params, headers)
-        return entries
+        return self.parse_html_list(task, config, url, params, headers)
 
     def fetch_page(self, task, url, params, headers):
         logger.debug('Requesting: {} {}', url, headers)

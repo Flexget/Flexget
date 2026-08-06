@@ -248,6 +248,9 @@ keep_full_version = true
 max_supported_python = "3.14"
 
 [tool.typos]
+default.extend-ignore-re = [
+  "(?s)#\\s*typos:off.*?\\n\\s*#\\s*typos:on",
+]
 default.extend-ignore-identifiers-re = [
   "idel",
   "parametros",
@@ -267,6 +270,7 @@ default.extend-ignore-words-re = [
 ]
 files.extend-exclude = [
   "**/cassettes/*",
+  "flexget/utils/waf/webgl.json",
   "tests/couchpotato_movie_list_test_response.json",
   "tests/couchpotato_quality_profile_test_response.json",
   "tests/test_thetvdb.py",

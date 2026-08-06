@@ -13,9 +13,7 @@ def test_is_waf_challenge_status_202():
 
 
 def test_is_waf_challenge_header():
-    assert is_waf_challenge(
-        FakeResponse(200, headers={'x-amzn-waf-action': 'challenge'})
-    )
+    assert is_waf_challenge(FakeResponse(200, headers={'x-amzn-waf-action': 'challenge'}))
 
 
 def test_is_waf_challenge_goku_props():

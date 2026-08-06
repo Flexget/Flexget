@@ -1,9 +1,11 @@
-import os
 import base64
+import os
+
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
-key = bytes.fromhex("6f71a512b1e035eaab53d8be73120d3fb68a0ca346b9560aab3e5cdf753d5e98")
+key = bytes.fromhex('6f71a512b1e035eaab53d8be73120d3fb68a0ca346b9560aab3e5cdf753d5e98')
 aesgcm = AESGCM(key)
+
 
 def encrypt(plaintext: bytes) -> str:
     iv = os.urandom(12)
@@ -14,10 +16,11 @@ def encrypt(plaintext: bytes) -> str:
 
     iv_b64 = base64.b64encode(iv).decode('utf-8')
 
-    return f"{iv_b64}::{tag.hex()}::{ciphertext.hex()}"
+    return f'{iv_b64}::{tag.hex()}::{ciphertext.hex()}'
+
 
 def decrypt(encrypted: str) -> bytes:
-    iv_b64, tag_hex, ct_hex = encrypted.split("::")
+    iv_b64, tag_hex, ct_hex = encrypted.split('::')
     iv = base64.b64decode(iv_b64)
 
     tag = bytes.fromhex(tag_hex)
