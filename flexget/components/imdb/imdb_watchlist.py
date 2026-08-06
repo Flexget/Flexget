@@ -101,12 +101,7 @@ class ImdbWatchlist:
             params['title_type'] = ','.join(title_types)
             params['sort'] = 'list_order%2Casc'
 
-        if config['list'] == 'watchlist':
-            entries = self.parse_html_list(
-                task, config, url, params, headers, kind='predefinedList'
-            )
-        else:
-            entries = self.parse_html_list(task, config, url, params, headers)
+        entries = self.parse_html_list(task, config, url, params, headers)
         return entries
 
     def fetch_page(self, task, url, params, headers):
@@ -122,7 +117,7 @@ class ImdbWatchlist:
             )
         return page
 
-    def parse_html_list(self, task, config, url, params, headers, kind='list') -> list[Entry]:
+    def parse_html_list(self, task, config, url, params, headers) -> list[Entry]:
         logger.debug('Parsing imdb list: {}', url)
         page = self.fetch_page(task, url, params, headers)
         soup = get_soup(page.text)
@@ -130,22 +125,14 @@ class ImdbWatchlist:
             query_result = json.loads(
                 soup.find('script', id='__NEXT_DATA__', type='application/json').string
             )
-
-            # Handle different JSON structures for different list types
+            advanced_search = query_result['props']['pageProps']['mainColumnData'][
+                'advancedTitleSearch'
+            ]
             if config['list'] == 'ratings':
-                # Ratings use advancedTitleSearch structure
-                advanced_search = query_result['props']['pageProps']['mainColumnData'][
-                    'advancedTitleSearch'
-                ]
                 total_item_count = advanced_search['total']
-                items = advanced_search['edges']
             else:
-                # Watchlists and other lists use the existing structure
                 total_item_count = query_result['props']['pageProps']['totalItems']
-                items = query_result['props']['pageProps']['mainColumnData'][kind][
-                    'titleListItemSearch'
-                ]['edges']
-
+            items = advanced_search['edges']
             logger.verbose('imdb list contains {} items', total_item_count)
         except Exception:
             total_item_count = 0
@@ -166,26 +153,15 @@ class ImdbWatchlist:
                 query_result = json.loads(
                     soup.find('script', id='__NEXT_DATA__', type='application/json').string
                 )
-
-                # Handle pagination for different structures
-                if config['list'] == 'ratings':
-                    new_items = query_result['props']['pageProps']['mainColumnData'][
-                        'advancedTitleSearch'
-                    ]['edges']
-                else:
-                    new_items = query_result['props']['pageProps']['mainColumnData'][kind][
-                        'titleListItemSearch'
-                    ]['edges']
-                items.extend(new_items)
+                items.extend(
+                    query_result['props']['pageProps']['mainColumnData']['advancedTitleSearch'][
+                        'edges'
+                    ]
+                )
             except Exception:
                 raise plugin.PluginError('Received invalid list data')
 
-        # Extract the actual list items from the different structures
-        if config['list'] == 'ratings':
-            # For ratings, items are directly in edges with 'node' containing the title
-            return [self.parse_entry(item['node']['title'], config) for item in items]
-        # For other lists, items are in edges with 'listItem' structure
-        return [self.parse_entry(item['listItem'], config) for item in items]
+        return [self.parse_entry(item['node']['title'], config) for item in items]
 
     def parse_entry(self, item, config) -> Entry:
         entry = Entry()
