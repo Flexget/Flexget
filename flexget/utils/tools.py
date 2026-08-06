@@ -63,7 +63,7 @@ def strip_html(text: str) -> str:
     from bs4 import BeautifulSoup
 
     try:
-        text = ' '.join(BeautifulSoup(text).find_all(text=True))
+        text = ' '.join(str(s) for s in BeautifulSoup(text).find_all(text=True))
         return ' '.join(text.split())
     except Exception:
         return text
@@ -77,14 +77,7 @@ charrefpat = re.compile(r'&(#(\d+|x[\da-fA-F]+)|[\w.:-]+);?')
 def _htmldecode(text: str) -> str:
     """Decode HTML entities in the given text."""
     # From screpe.py - licensed under apache 2.0 .. should not be a problem for a MIT afaik
-    if isinstance(text, str):
-        uchr = chr
-    else:
-
-        def uchr(value):
-            (value > 127 and chr(value)) or chr(value)
-
-    def entitydecode(match, uchr=uchr):
+    def entitydecode(match, uchr=chr):
         entity = match.group(1)
         if entity.startswith('#x'):
             return uchr(int(entity[2:], 16))  # noqa: FURB166
@@ -153,7 +146,7 @@ class ReList(list):
             self.flags = kwargs.pop('flags')
         list.__init__(self, *args, **kwargs)
 
-    def __getitem__(self, k) -> Pattern:
+    def __getitem__(self, k) -> Pattern:  # pyright: ignore[reportIncompatibleMethodOverride]
         # Doesn't support slices. Do we care?
         item = list.__getitem__(self, k)
         if isinstance(item, str):
@@ -228,7 +221,7 @@ _bin_ops = {
 class TimedDict(MutableMapping):
     """Acts like a normal dict, but keys will only remain in the dictionary for a specified time span."""
 
-    _instances: dict[int, TimedDict] = weakref.WeakValueDictionary()
+    _instances: weakref.WeakValueDictionary[int, TimedDict] = weakref.WeakValueDictionary()
 
     def __init__(self, cache_time: timedelta | str = '5 minutes'):
         self.cache_time = parse_timedelta(cache_time)
