@@ -76,6 +76,7 @@ charrefpat = re.compile(r'&(#(\d+|x[\da-fA-F]+)|[\w.:-]+);?')
 
 def _htmldecode(text: str) -> str:
     """Decode HTML entities in the given text."""
+
     # From screpe.py - licensed under apache 2.0 .. should not be a problem for a MIT afaik
     def entitydecode(match, uchr=chr):
         entity = match.group(1)

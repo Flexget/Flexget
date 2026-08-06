@@ -174,7 +174,9 @@ class Manager:
 
     @property
     def config_path(self) -> Path:
-        assert self._config_path is not None, 'find_config must be called before config_path is used'
+        assert self._config_path is not None, (
+            'find_config must be called before config_path is used'
+        )
         return self._config_path
 
     @property
