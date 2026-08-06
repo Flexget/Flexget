@@ -1,8 +1,8 @@
 import random, json
 
 from curl_cffi import requests
-from flexget.components.imdb.awswaf.fingerprint import get_fp
-from flexget.components.imdb.awswaf.verify import CHALLENGE_TYPES
+from flexget.utils.waf.fingerprint import get_fp
+from flexget.utils.waf.verify import CHALLENGE_TYPES
 
 
 class AwsWaf:
@@ -11,26 +11,30 @@ class AwsWaf:
                  domain: str,
                  user_agent: str = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36",
                  ):
-        self.session = requests.Session(impersonate="chrome")
-        self.session.headers = {
-            "connection": "keep-alive",
-            "sec-ch-ua-platform": "\"Windows\"",
-            "user-agent": user_agent,
-            "sec-ch-ua": "\"Chromium\";v=\"136\", \"Google Chrome\";v=\"136\", \"Not.A/Brand\";v=\"99\"",
-            "sec-ch-ua-mobile": "?0",
-            "accept": "*/*",
-            #"origin": "https://www.binance.com",
-            "sec-fetch-site": "cross-site",
-            "sec-fetch-mode": "cors",
-            "sec-fetch-dest": "empty",
-            #"referer": "https://www.binance.com/",
-            "accept-encoding": "gzip, deflate, br, zstd",
-            "accept-language": "en-US,en;q=0.9"
-        }
         self.goku_props = goku_props
         self.user_agent = user_agent
         self.domain = domain
         self.endpoint = endpoint
+        self.session = requests.Session(impersonate="chrome")
+        self.session.headers = self._headers()
+
+    def _headers(self, content_type: str | None = None) -> dict:
+        headers = {
+            "connection": "keep-alive",
+            "sec-ch-ua-platform": "\"Windows\"",
+            "user-agent": self.user_agent,
+            "sec-ch-ua": "\"Chromium\";v=\"136\", \"Google Chrome\";v=\"136\", \"Not.A/Brand\";v=\"99\"",
+            "sec-ch-ua-mobile": "?0",
+            "accept": "*/*",
+            "sec-fetch-site": "cross-site",
+            "sec-fetch-mode": "cors",
+            "sec-fetch-dest": "empty",
+            "accept-encoding": "gzip, deflate, br, zstd",
+            "accept-language": "en-US,en;q=0.9"
+        }
+        if content_type:
+            headers["content-type"] = content_type
+        return headers
 
     @staticmethod
     def extract(html: str):
@@ -174,22 +178,7 @@ class AwsWaf:
         }
 
     def verify(self, payload):
-        self.session.headers = {
-            "connection": "keep-alive",
-            "sec-ch-ua-platform": "\"Windows\"",
-            "user-agent": self.user_agent,
-            "sec-ch-ua": "\"Chromium\";v=\"136\", \"Google Chrome\";v=\"136\", \"Not.A/Brand\";v=\"99\"",
-            "content-type": "text/plain;charset=UTF-8",
-            "sec-ch-ua-mobile": "?0",
-            "accept": "*/*",
-            #"origin": "https://www.binance.com",
-            "sec-fetch-site": "cross-site",
-            "sec-fetch-mode": "cors",
-            "sec-fetch-dest": "empty",
-            #"referer": "https://www.binance.com/",
-            "accept-encoding": "gzip, deflate, br, zstd",
-            "accept-language": "en-US,en;q=0.9"
-        }
+        self.session.headers = self._headers(content_type="text/plain;charset=UTF-8")
         res = self.session.post(
             f"https://{self.endpoint}/verify",
             json=payload).json()

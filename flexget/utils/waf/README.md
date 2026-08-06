@@ -4,4 +4,4 @@ Source:
 
 https://github.com/xKiian/awswaf
 
-Licence: MIT
+License: MIT

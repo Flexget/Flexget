@@ -1,4 +1,4 @@
-from flexget.components.imdb.waf import is_waf_challenge
+from flexget.utils.waf import is_waf_challenge
 
 
 class FakeResponse:

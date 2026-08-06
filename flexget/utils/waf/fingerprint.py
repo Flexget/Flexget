@@ -5,7 +5,7 @@ import uuid
 import zlib
 from pathlib import Path
 
-from flexget.components.imdb.awswaf.crypto import encrypt
+from flexget.utils.waf.crypto import encrypt
 
 
 def encode_with_crc(obj):
