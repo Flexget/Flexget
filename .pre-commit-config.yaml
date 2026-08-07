@@ -86,14 +86,6 @@ repos:
         args:
           [
             --frozen,
-            --no-hashes,
-            --only-group=docs,
-            --output-file=docs/requirements.txt,
-          ]
-      - id: uv-export
-        args:
-          [
-            --frozen,
             --no-dev,
             --no-emit-project,
             --no-hashes,
