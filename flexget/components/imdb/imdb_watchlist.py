@@ -1,18 +1,13 @@
 from loguru import logger
 
 from flexget import plugin
+from flexget.components.imdb.waf import imdb_get
 from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils import json
 from flexget.utils.cached_input import cached
-from flexget.utils.requests import RequestException
 from flexget.utils.soup import get_soup
-
-try:
-    from playwright.sync_api import sync_playwright
-except ImportError:
-    sync_playwright = None
 
 logger = logger.bind(name='imdb_watchlist')
 USER_ID_RE = r'^ur\d{7,9}$'
@@ -33,9 +28,6 @@ TITLE_TYPE_MAP = {
 
 class ImdbWatchlist:
     """Creates an entry for each movie in your imdb list."""
-
-    def __init__(self):
-        self._waf_cookies = None
 
     schema = {
         'type': 'object',
@@ -109,80 +101,14 @@ class ImdbWatchlist:
             params['title_type'] = ','.join(title_types)
             params['sort'] = 'list_order%2Casc'
 
-        if config['list'] == 'watchlist':
-            entries = self.parse_html_list(
-                task, config, url, params, headers, kind='predefinedList'
-            )
-        else:
-            entries = self.parse_html_list(task, config, url, params, headers)
-        return entries
-
-    def _solve_waf(self, url, params, headers):
-        """Bypass AWS WAF JS challenge using Playwright (optional dep).
-
-        Returns cookies dict with aws-waf-token, or None on failure.
-        """
-        if sync_playwright is None:
-            logger.warning(
-                'AWS WAF challenge detected. Install playwright to bypass: '
-                'pip install playwright && playwright install chromium'
-            )
-            return None
-
-        logger.info('Solving AWS WAF challenge via Playwright headless browser...')
-        try:
-            with sync_playwright() as pw:
-                browser = pw.chromium.launch(headless=True)
-                context = browser.new_context(
-                    user_agent=headers.get('User-Agent', self.default_user_agent),
-                    locale=headers.get('Accept-Language', 'en-us').replace('-', '_'),
-                )
-                page = context.new_page()
-                page.set_extra_http_headers({
-                    'Accept-Language': headers.get('Accept-Language', 'en-us')
-                })
-                page.goto(
-                    url + '?' + '&'.join(f'{k}={v}' for k, v in params.items()),
-                    wait_until='networkidle',
-                    timeout=30000,
-                )
-                cookies = page.context.cookies()
-                browser.close()
-
-            cookie_dict = {c['name']: c['value'] for c in cookies}
-            if 'aws-waf-token' in cookie_dict:
-                logger.debug('Successfully obtained aws-waf-token from Playwright')
-                return cookie_dict
-            logger.warning('Playwright did not receive aws-waf-token cookie')
-            return None  # noqa: TRY300
-        except Exception as e:
-            logger.warning('Failed to solve AWS WAF challenge with Playwright: {}', e)
-            return None
+        return self.parse_html_list(task, config, url, params, headers)
 
     def fetch_page(self, task, url, params, headers):
         logger.debug('Requesting: {} {}', url, headers)
-
-        # If we have cached WAF cookies from a previous solve, attach them
-        if self._waf_cookies:
-            task.requests.cookies.update(self._waf_cookies)
-
         try:
-            page = task.requests.get(url, params=params, headers=headers)
-        except RequestException as e:
-            raise plugin.PluginError(str(e))
-
-        # AWS WAF JS challenge detected — solve it via Playwright
-        if page.status_code == 202 and page.headers.get('x-amzn-waf-action') == 'challenge':
-            logger.info('IMDB WAF challenge triggered, attempting to bypass...')
-            waf_cookies = self._solve_waf(url, params, headers)
-            if waf_cookies:
-                self._waf_cookies = waf_cookies
-                task.requests.cookies.update(waf_cookies)
-                try:
-                    page = task.requests.get(url, params=params, headers=headers)
-                except RequestException as e:
-                    raise plugin.PluginError(str(e))
-
+            page = imdb_get(url, params=params, headers=headers, raise_status=False)
+        except Exception as e:
+            raise plugin.PluginError(str(e)) from e
         if page.status_code != 200:
             raise plugin.PluginError(
                 f'Unable to get imdb list. Either list is private or does not exist. '
@@ -190,7 +116,7 @@ class ImdbWatchlist:
             )
         return page
 
-    def parse_html_list(self, task, config, url, params, headers, kind='list') -> list[Entry]:
+    def parse_html_list(self, task, config, url, params, headers) -> list[Entry]:
         logger.debug('Parsing imdb list: {}', url)
         page = self.fetch_page(task, url, params, headers)
         soup = get_soup(page.text)
@@ -198,22 +124,14 @@ class ImdbWatchlist:
             query_result = json.loads(
                 soup.find('script', id='__NEXT_DATA__', type='application/json').string
             )
-
-            # Handle different JSON structures for different list types
+            advanced_search = query_result['props']['pageProps']['mainColumnData'][
+                'advancedTitleSearch'
+            ]
             if config['list'] == 'ratings':
-                # Ratings use advancedTitleSearch structure
-                advanced_search = query_result['props']['pageProps']['mainColumnData'][
-                    'advancedTitleSearch'
-                ]
                 total_item_count = advanced_search['total']
-                items = advanced_search['edges']
             else:
-                # Watchlists and other lists use the existing structure
                 total_item_count = query_result['props']['pageProps']['totalItems']
-                items = query_result['props']['pageProps']['mainColumnData'][kind][
-                    'titleListItemSearch'
-                ]['edges']
-
+            items = advanced_search['edges']
             logger.verbose('imdb list contains {} items', total_item_count)
         except Exception:
             total_item_count = 0
@@ -234,26 +152,15 @@ class ImdbWatchlist:
                 query_result = json.loads(
                     soup.find('script', id='__NEXT_DATA__', type='application/json').string
                 )
-
-                # Handle pagination for different structures
-                if config['list'] == 'ratings':
-                    new_items = query_result['props']['pageProps']['mainColumnData'][
-                        'advancedTitleSearch'
-                    ]['edges']
-                else:
-                    new_items = query_result['props']['pageProps']['mainColumnData'][kind][
-                        'titleListItemSearch'
-                    ]['edges']
-                items.extend(new_items)
+                items.extend(
+                    query_result['props']['pageProps']['mainColumnData']['advancedTitleSearch'][
+                        'edges'
+                    ]
+                )
             except Exception:
                 raise plugin.PluginError('Received invalid list data')
 
-        # Extract the actual list items from the different structures
-        if config['list'] == 'ratings':
-            # For ratings, items are directly in edges with 'node' containing the title
-            return [self.parse_entry(item['node']['title'], config) for item in items]
-        # For other lists, items are in edges with 'listItem' structure
-        return [self.parse_entry(item['listItem'], config) for item in items]
+        return [self.parse_entry(item['node']['title'], config) for item in items]
 
     def parse_entry(self, item, config) -> Entry:
         entry = Entry()

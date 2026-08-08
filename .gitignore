@@ -25,6 +25,7 @@
 /.Python
 /lib64
 FlexGet.egg-info/
+__pycache__/
 bin/
 build/
 cached_resources/

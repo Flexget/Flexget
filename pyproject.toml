@@ -38,6 +38,8 @@ dependencies = [
   "apscheduler~=3.11",
   "beautifulsoup4~=4.12",
   "cherrypy~=18.10",
+  "cryptography~=45.0",
+  "curl-cffi~=0.16",
   "feedparser~=6.0",
   "flask~=3.1",
   "flask-compress~=1.17",
@@ -55,6 +57,7 @@ dependencies = [
   "pynzb~=0.1.0",
   "pyparsing~=3.2",
   "pyrss2gen~=1.1",
+  "pyscrypt~=1.6",
   "python-dateutil~=2.9",
   "pyyaml~=6.0",
   "rebulk~=3.2",
@@ -245,6 +248,9 @@ keep_full_version = true
 max_supported_python = "3.14"
 
 [tool.typos]
+default.extend-ignore-re = [
+  "(?s)#\\s*typos:off.*?\\n\\s*#\\s*typos:on",
+]
 default.extend-ignore-identifiers-re = [
   "idel",
   "parametros",
@@ -264,6 +270,7 @@ default.extend-ignore-words-re = [
 ]
 files.extend-exclude = [
   "**/cassettes/*",
+  "flexget/utils/waf/webgl.json",
   "tests/couchpotato_movie_list_test_response.json",
   "tests/couchpotato_quality_profile_test_response.json",
   "tests/test_thetvdb.py",

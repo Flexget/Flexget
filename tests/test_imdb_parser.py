@@ -47,8 +47,9 @@ class TestImdbParser:
         assert parser.name == 'The Usual Suspects', 'Name not parsed correctly'
         assert parser.photo, 'Photo not parsed correctly'
         assert parser.plot_outline == (
-            'A sole survivor tells of the twisty events leading up to a horrific gun battle on a boat, which began '
-            'when five criminals met at a seemingly random police lineup.'
+            'The sole survivor of a pier shoot-out tells the story of how a notorious criminal '
+            'influenced the events that began with five criminals meeting in a seemingly random '
+            'police lineup.'
         ), 'Plot outline not parsed correctly'
         assert 8.0 < parser.score < 9.0, 'Score not parsed correctly'
         assert parser.url == 'https://www.imdb.com/title/tt0114814/', 'URL not parsed correctly'
