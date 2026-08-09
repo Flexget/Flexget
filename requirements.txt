@@ -201,6 +201,7 @@ typer-slim==0.24.0
 typing-extensions==4.16.0
     # via
     #   beautifulsoup4
+    #   cryptography
     #   flask-cors
     #   flexget
     #   plumbum
