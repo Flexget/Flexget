@@ -46,7 +46,7 @@ colorama==0.4.6 ; sys_platform == 'win32'
     #   click
     #   loguru
     #   typer
-cryptography==45.0.7
+cryptography==50.0.0
     # via flexget
 curl-cffi==0.16.0
     # via flexget
