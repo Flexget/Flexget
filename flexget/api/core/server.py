@@ -516,7 +516,7 @@ class LogParser:
             + Word(printables).set_results_name('plugin')
             + (
                 White(' ', min=16).set_parse_action(lambda t: ['']).set_results_name('task')
-                | White(' ', max=15) + Word(alphas).set_results_name('task')
+                | White(' ', max=15) + Word(alphanums + '_-').set_results_name('task')
             ).leave_whitespace()
             + rest_of_line.set_parse_action(lambda t: [t[0].strip()]).set_results_name('message')
         )
