@@ -153,7 +153,7 @@ python-dateutil==2.9.0.post0
     #   tempora
 pyyaml==6.0.3
     # via flexget
-rebulk==3.2.0
+rebulk==6.0.1
     # via
     #   flexget
     #   guessit
