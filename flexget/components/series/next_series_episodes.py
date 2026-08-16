@@ -1,4 +1,5 @@
 import contextlib
+import itertools
 import re
 
 from loguru import logger
@@ -8,6 +9,7 @@ from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.manager import Session
+from flexget.utils.qualities import Quality, Requirements, _registry
 
 from . import db
 
@@ -37,6 +39,7 @@ class NextSeriesEpisodes:
                         'they will not be emitted.',
                     },
                     'only_same_season': {'type': 'boolean', 'default': False},
+                    'include_quality': {'type': 'boolean', 'default': True},
                 },
                 'additionalProperties': False,
             },
@@ -45,6 +48,78 @@ class NextSeriesEpisodes:
 
     def __init__(self):
         self.rerun_entries = []
+        self.series_settings = {}
+
+    def _component_candidates(self, req_component) -> list[str] | None:
+        """Return the concrete values a single requirement component allows, highest first.
+
+        Handles bare values ("bluray"), pipe alternatives ("720p|1080p"), and
+        min-max ranges ("720p-2160p") uniformly since all three enumerate to a
+        finite set of literal values.
+
+        :return: [] if unconstrained (contributes nothing to the search term), None if
+            the requirement is an open-ended comparator (e.g. "<720p", "1080p+") or a
+            "!" exclusion, neither of which can be written as a literal search term.
+        """
+        if req_component.acceptable:
+            candidates = req_component.acceptable
+        elif req_component.min and req_component.max:
+            candidates = [
+                comp
+                for comp in _registry.values()
+                if comp.type == req_component.type
+                and req_component.min.value <= comp.value <= req_component.max.value
+            ]
+        elif req_component.min or req_component.max or req_component.none_of:
+            return None
+        else:
+            return []
+        return [comp.name for comp in sorted(candidates, key=lambda c: c.value, reverse=True)]
+
+    def _extract_quality_strings(self, series_config: dict) -> list[str]:
+        """Extract quality strings from series configuration for use in search queries.
+
+        Resolution ranges ("720p-2160p") and alternatives on any component
+        ("720p|1080p", "bluray|webdl") are expanded into every combination.
+        Requirements that can't be expressed as literal search terms (e.g. "<=1080p",
+        "!hdr") are skipped.
+
+        :param series_config: Series configuration dict
+        :return: List of quality strings, sorted highest first
+        """
+        quality_strings = []
+        for key in ('qualities', 'target', 'quality'):
+            value = series_config.get(key)
+            if isinstance(value, list):
+                quality_strings.extend(value)
+            elif value:
+                quality_strings.append(value)
+
+        expanded_strings = []
+        for q_str in quality_strings:
+            try:
+                req = Requirements(q_str)
+            except ValueError:
+                logger.debug('Invalid quality requirement string: {}', q_str)
+                continue
+
+            per_component_candidates = []
+            for req_component in req.components:
+                candidates = self._component_candidates(req_component)
+                if candidates is None:
+                    logger.debug(
+                        'Skipping quality requirement not usable as search text: {}', q_str
+                    )
+                    break
+                if candidates:
+                    per_component_candidates.append(candidates)
+            else:
+                expanded_strings.extend(
+                    ' '.join(combo) for combo in itertools.product(*per_component_candidates)
+                )
+
+        # Quality is directly sortable (highest first); dedupe while we're at it.
+        return sorted(dict.fromkeys(expanded_strings), key=Quality, reverse=True)
 
     def ep_identifiers(self, season, episode):
         return [f'S{season:02d}E{episode:02d}', f'{season}x{episode:02d}']
@@ -72,6 +147,20 @@ class NextSeriesEpisodes:
             series_id = episode
             for alt in alts:
                 search_strings.extend([f'{alt} {id}' for id in self.sequence_identifiers(episode)])
+
+        # Append quality strings if include_quality option is enabled
+        if self.config.get('include_quality'):
+            series_config = self.series_settings.get(series.name)
+            if series_config:
+                quality_strings = self._extract_quality_strings(series_config)
+                if quality_strings:
+                    # For each quality (highest first), append all episode identifier variations
+                    search_strings = [
+                        f'{search_str} {quality_str}'
+                        for quality_str in quality_strings
+                        for search_str in search_strings
+                    ]
+
         entry = Entry(
             title=search_strings[0],
             url='',
@@ -96,6 +185,7 @@ class NextSeriesEpisodes:
         if isinstance(config, bool):
             config = {}
         config.setdefault('backfill_limit', BACKFILL_LIMIT_DEFAULT)
+        config.setdefault('include_quality', True)
         self.config = config
         if task.is_rerun:
             # Just return calculated next eps on reruns
@@ -103,6 +193,13 @@ class NextSeriesEpisodes:
             self.rerun_entries = []
             return entries
         self.rerun_entries = []
+
+        self.series_settings = {}
+        if config.get('include_quality'):
+            series_plugin = plugin.get('series', self)
+            for series_item in series_plugin.prepare_config(task.config.get('series', {})):
+                series_name, series_config = next(iter(series_item.items()))
+                self.series_settings[series_name] = series_config
 
         entries = []
         impossible = {}
