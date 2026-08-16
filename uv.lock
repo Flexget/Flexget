@@ -2989,9 +2989,27 @@ sdist = { url = "https://files.pythonhosted.org/packages/36/60/45f30390a38b1f92e
 name = "pysubs2"
 version = "1.8.1"
 source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version == '3.11.*'",
+    "python_full_version < '3.11'",
+]
 sdist = { url = "https://files.pythonhosted.org/packages/c4/73/eff32fcc4babb32b76d7fce6d74995de2d04201f7b43c9a7764554d6ab49/pysubs2-1.8.1.tar.gz", hash = "sha256:af3a288643da87db6bb13dbde70e94c9570765cc8f6423b1c21de11f16d734da", size = 1153150, upload-time = "2026-03-19T17:25:01.941Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/0b/bb/0dc8b9a38609701ca3f107dc516300b317641bed9b2ef1c964a9ad37ae9e/pysubs2-1.8.1-py3-none-any.whl", hash = "sha256:eb5d8872b7f87208070dd6f0d85fc110b7ad6cc2a7ec422f5b12363e9194e4e4", size = 44269, upload-time = "2026-03-19T17:24:59.953Z" },
+]
+
+[[package]]
+name = "pysubs2"
+version = "1.9.0"
+source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version >= '3.14'",
+    "python_full_version == '3.13.*'",
+    "python_full_version == '3.12.*'",
+]
+sdist = { url = "https://files.pythonhosted.org/packages/f2/20/9071b8b0012d9102e90292c71fe3f1181c33e772e28cbabb4779c0087603/pysubs2-1.9.0.tar.gz", hash = "sha256:4592405e5d961e23cd39c81e2875fb85c30346ae37d100f144cd7fd8ec560e42", size = 1147418, upload-time = "2026-08-16T19:54:51.267Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/4f/43/6b89c84f5a6753b1dbc43b8d010443b8f2314a2b94f34e448975d115c962/pysubs2-1.9.0-py3-none-any.whl", hash = "sha256:83f1979cb7e064294f0c8473ef672ca2e5c0a7172bbf8ae9b4337899d5cdf01f", size = 48175, upload-time = "2026-08-16T19:54:49.927Z" },
 ]
 
 [[package]]
@@ -3178,16 +3196,16 @@ wheels = [
 
 [[package]]
 name = "qbittorrent-api"
-version = "2026.8.0"
+version = "2026.8.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "packaging" },
     { name = "requests" },
     { name = "urllib3" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/eb/d2/4a6d6ae6aaca1ba83039d27f28e5bf30bacef27ff4eb635c729d2d582363/qbittorrent_api-2026.8.0.tar.gz", hash = "sha256:4127a9c1d5c7ad9cd4e8de16f83daeea2e8b2ed962f99f284d238f927479391a", size = 1430678, upload-time = "2026-08-01T21:05:55.88Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/04/00/b7f41dfe8af6c3991f7182f9c14c46851379b8e66ac74c819f0952e9923d/qbittorrent_api-2026.8.1.tar.gz", hash = "sha256:9642c4528baee67216eab87022ce297048ac96df2f8c9f1cf920de078eb50b62", size = 1436760, upload-time = "2026-08-16T20:30:28.35Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/5b/81/b456688c20e75cae5964700b58712630930b9dfaf32ce7c6a8881658d0d0/qbittorrent_api-2026.8.0-py3-none-any.whl", hash = "sha256:03b3db598d351194fd3c65f1d3e53843f65f85bef1d5077791efaa2e26869d2b", size = 68196, upload-time = "2026-08-01T21:05:54.376Z" },
+    { url = "https://files.pythonhosted.org/packages/e6/60/77c7b63675f12ba492dee9f8aabab0fc61ced5d2131a83bd7e92dcc335c1/qbittorrent_api-2026.8.1-py3-none-any.whl", hash = "sha256:c17260e416ec5832c3ed7aff46fb0e2b47e70b90de182e89c34133b9d4ce5a6e", size = 71970, upload-time = "2026-08-16T20:30:26.67Z" },
 ]
 
 [[package]]
@@ -3832,7 +3850,8 @@ dependencies = [
     { name = "guessit" },
     { name = "knowit" },
     { name = "platformdirs" },
-    { name = "pysubs2" },
+    { name = "pysubs2", version = "1.8.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "pysubs2", version = "1.9.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
     { name = "requests" },
     { name = "srt" },
     { name = "stevedore", version = "5.8.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
