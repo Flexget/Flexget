@@ -135,7 +135,7 @@ psutil==7.2.2
     # via flexget
 pycparser==3.0 ; implementation_name != 'PyPy'
     # via cffi
-pygments==2.20.0
+pygments==2.21.0
     # via rich
 pynzb==0.1.0
     # via flexget
