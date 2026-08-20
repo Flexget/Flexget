@@ -36,10 +36,10 @@ jobs:
           version: ${{ env.UV_VERSION }}
       - name: Run tests not requiring optional dependencies
         id: core-tests
-        run: uv run pytest -m 'not require_optional_deps' -n logical --allow-hosts ::1,127.0.0.1 --cov --cov-report=xml --dist loadgroup --junit-xml core_test_results.xml
+        run: uv run pytest -m 'not require_optional_deps' -n logical --allow-hosts ::1,127.0.0.1 --allow-unix-socket --cov --cov-report=xml --dist loadgroup --junit-xml core_test_results.xml
       - name: Run tests requiring optional dependencies
         if: ${{!cancelled() && steps.core-tests.outcome != 'skipped'}}
-        run: uv run --group test pytest -m 'require_optional_deps' -n logical --allow-hosts ::1,127.0.0.1 --cov --cov-append --cov-report=xml --dist loadgroup --junit-xml optional_test_results.xml
+        run: uv run --group test pytest -m 'require_optional_deps' -n logical --allow-hosts ::1,127.0.0.1 --allow-unix-socket --cov --cov-append --cov-report=xml --dist loadgroup --junit-xml optional_test_results.xml
       - name: Upload test results to Codecov
         if: ${{ !cancelled() }}
         uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7
