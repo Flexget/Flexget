@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING
 
 from loguru import logger
 from packaging.version import Version
-from sqlalchemy import Column, Integer, String
+from sqlalchemy.orm import Mapped, mapped_column
 
 from flexget import db_schema, plugin
 from flexget.event import event
@@ -61,11 +61,11 @@ logger = logger.bind(name=_PLUGIN_NAME)
 class ChatIdEntry(ChatIdsBase):
     __tablename__ = 'telegram_chat_ids'
 
-    id = Column(Integer, primary_key=True)
-    username = Column(String, index=True, nullable=True)
-    firstname = Column(String, index=True, nullable=True)
-    surname = Column(String, index=True, nullable=True)
-    group = Column(String, index=True, nullable=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    username: Mapped[str | None] = mapped_column(index=True)  # explicitly allows None
+    firstname: Mapped[str | None] = mapped_column(index=True)  # explicitly allows None
+    surname: Mapped[str | None] = mapped_column(index=True)  # explicitly allows None
+    group: Mapped[str | None] = mapped_column(index=True)  # explicitly allows None
 
     def __str__(self):
         x = [f'id={self.id}']

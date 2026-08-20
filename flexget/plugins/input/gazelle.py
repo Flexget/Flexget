@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from loguru import logger
-from sqlalchemy import Column, DateTime, String, Unicode
+from sqlalchemy.orm import Mapped, mapped_column
 
 from flexget import db_schema, plugin
 from flexget.components.sites.utils import normalize_unicode
@@ -22,14 +22,14 @@ Base = db_schema.versioned_base('gazelle_session', 0)
 class GazelleSession(Base):
     __tablename__ = 'gazelle_session'
 
-    username = Column(Unicode, primary_key=True)
-    base_url = Column(String, primary_key=True)
+    username: Mapped[str] = mapped_column(primary_key=True)
+    base_url: Mapped[str] = mapped_column(primary_key=True)
 
-    authkey = Column(String)
-    passkey = Column(String)
-    _cookies = Column('cookie', Unicode)
+    authkey: Mapped[str | None]
+    passkey: Mapped[str | None]
+    _cookies: Mapped[str | None] = mapped_column('cookie')
     cookies = json_synonym('_cookies')
-    expires = Column(DateTime)
+    expires: Mapped[datetime | None]
 
 
 class InputGazelle:

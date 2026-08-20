@@ -1,8 +1,10 @@
+from __future__ import annotations
+
 from datetime import datetime, timedelta
 
 from loguru import logger
-from sqlalchemy import Boolean, Column, DateTime, Float, Integer, String, Table, Unicode
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, Table
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.schema import ForeignKey, Index
 
 from flexget import db_schema
@@ -19,8 +21,8 @@ Base = db_schema.versioned_base('imdb_lookup', SCHEMA_VER)
 genres_table = Table(
     'imdb_movie_genres',
     Base.metadata,
-    Column('movie_id', Integer, ForeignKey('imdb_movies.id')),
-    Column('genre_id', Integer, ForeignKey('imdb_genres.id')),
+    Column('movie_id', ForeignKey('imdb_movies.id')),
+    Column('genre_id', ForeignKey('imdb_genres.id')),
     Index('ix_imdb_movie_genres', 'movie_id', 'genre_id'),
 )
 Base.register_table(genres_table)
@@ -28,8 +30,8 @@ Base.register_table(genres_table)
 actors_table = Table(
     'imdb_movie_actors',
     Base.metadata,
-    Column('movie_id', Integer, ForeignKey('imdb_movies.id')),
-    Column('actor_id', Integer, ForeignKey('imdb_actors.id')),
+    Column('movie_id', ForeignKey('imdb_movies.id')),
+    Column('actor_id', ForeignKey('imdb_actors.id')),
     Index('ix_imdb_movie_actors', 'movie_id', 'actor_id'),
 )
 Base.register_table(actors_table)
@@ -37,8 +39,8 @@ Base.register_table(actors_table)
 directors_table = Table(
     'imdb_movie_directors',
     Base.metadata,
-    Column('movie_id', Integer, ForeignKey('imdb_movies.id')),
-    Column('director_id', Integer, ForeignKey('imdb_directors.id')),
+    Column('movie_id', ForeignKey('imdb_movies.id')),
+    Column('director_id', ForeignKey('imdb_directors.id')),
     Index('ix_imdb_movie_directors', 'movie_id', 'director_id'),
 )
 Base.register_table(directors_table)
@@ -46,8 +48,8 @@ Base.register_table(directors_table)
 writers_table = Table(
     'imdb_movie_writers',
     Base.metadata,
-    Column('movie_id', Integer, ForeignKey('imdb_movies.id')),
-    Column('writer_id', Integer, ForeignKey('imdb_writers.id')),
+    Column('movie_id', ForeignKey('imdb_movies.id')),
+    Column('writer_id', ForeignKey('imdb_writers.id')),
     Index('ix_imdb_movie_writers', 'movie_id', 'writer_id'),
 )
 Base.register_table(writers_table)
@@ -55,8 +57,8 @@ Base.register_table(writers_table)
 plot_keywords_table = Table(
     'imdb_movie_plot_keywords',
     Base.metadata,
-    Column('movie_id', Integer, ForeignKey('imdb_movies.id')),
-    Column('keyword_id', Integer, ForeignKey('imdb_plot_keywords.id')),
+    Column('movie_id', ForeignKey('imdb_movies.id')),
+    Column('keyword_id', ForeignKey('imdb_plot_keywords.id')),
     Index('ix_imdb_movie_plot_keywords', 'movie_id', 'keyword_id'),
 )
 Base.register_table(plot_keywords_table)
@@ -65,30 +67,34 @@ Base.register_table(plot_keywords_table)
 class Movie(Base):
     __tablename__ = 'imdb_movies'
 
-    id = Column(Integer, primary_key=True)
-    title = Column(Unicode)
-    original_title = Column(Unicode)
-    url = Column(String, index=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    title: Mapped[str | None]
+    original_title: Mapped[str | None]
+    url: Mapped[str | None] = mapped_column(index=True)
 
     # many-to-many relations
-    genres = relationship('Genre', secondary=genres_table, backref='movies')
-    actors = relationship('Actor', secondary=actors_table, backref='movies')
-    directors = relationship('Director', secondary=directors_table, backref='movies')
-    writers = relationship('Writer', secondary=writers_table, backref='movies')
-    plot_keywords = relationship('PlotKeyword', secondary=plot_keywords_table, backref='movies')
-    languages = relationship('MovieLanguage', order_by='MovieLanguage.prominence')
+    genres: Mapped[list[Genre]] = relationship(secondary=genres_table, back_populates='movies')
+    actors: Mapped[list[Actor]] = relationship(secondary=actors_table, back_populates='movies')
+    directors: Mapped[list[Director]] = relationship(
+        secondary=directors_table, back_populates='movies'
+    )
+    writers: Mapped[list[Writer]] = relationship(secondary=writers_table, back_populates='movies')
+    plot_keywords: Mapped[list[PlotKeyword]] = relationship(
+        secondary=plot_keywords_table, back_populates='movies'
+    )
+    languages: Mapped[list[MovieLanguage]] = relationship(order_by='MovieLanguage.prominence')
 
-    score = Column(Float)
-    votes = Column(Integer)
-    meta_score = Column(Integer)
-    year = Column(Integer)
-    plot_outline = Column(Unicode)
-    mpaa_rating = Column(String, default='')
-    photo = Column(String)
+    score: Mapped[float | None]
+    votes: Mapped[int | None]
+    meta_score: Mapped[int | None]
+    year: Mapped[int | None]
+    plot_outline: Mapped[str | None]
+    mpaa_rating: Mapped[str | None] = mapped_column(default='')
+    photo: Mapped[str | None]
 
     # updated time, so we can grab new rating counts after 48 hours
     # set a default, so existing data gets updated with a rating
-    updated = Column(DateTime)
+    updated: Mapped[datetime | None]
 
     @property
     def imdb_id(self):
@@ -115,11 +121,11 @@ class Movie(Base):
 class MovieLanguage(Base):
     __tablename__ = 'imdb_movie_languages'
 
-    movie_id = Column(Integer, ForeignKey('imdb_movies.id'), primary_key=True)
-    language_id = Column(Integer, ForeignKey('imdb_languages.id'), primary_key=True)
-    prominence = Column(Integer)
+    movie_id: Mapped[int] = mapped_column(ForeignKey('imdb_movies.id'), primary_key=True)
+    language_id: Mapped[int] = mapped_column(ForeignKey('imdb_languages.id'), primary_key=True)
+    prominence: Mapped[int | None]
 
-    language = relationship('Language')
+    language: Mapped[Language] = relationship()
 
     def __init__(self, language, prominence=None):
         self.language = language
@@ -129,8 +135,8 @@ class MovieLanguage(Base):
 class Language(Base):
     __tablename__ = 'imdb_languages'
 
-    id = Column(Integer, primary_key=True)
-    name = Column(Unicode)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str | None]
 
     def __init__(self, name):
         self.name = name
@@ -139,8 +145,9 @@ class Language(Base):
 class Genre(Base):
     __tablename__ = 'imdb_genres'
 
-    id = Column(Integer, primary_key=True)
-    name = Column(String)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str | None]
+    movies: Mapped[list[Movie]] = relationship(secondary=genres_table, back_populates='genres')
 
     def __init__(self, name):
         self.name = name
@@ -149,9 +156,10 @@ class Genre(Base):
 class Actor(Base):
     __tablename__ = 'imdb_actors'
 
-    id = Column(Integer, primary_key=True)
-    imdb_id = Column(String)
-    name = Column(Unicode)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    imdb_id: Mapped[str | None]
+    name: Mapped[str | None]
+    movies: Mapped[list[Movie]] = relationship(secondary=actors_table, back_populates='actors')
 
     def __init__(self, imdb_id, name=None):
         self.imdb_id = imdb_id
@@ -161,9 +169,12 @@ class Actor(Base):
 class Director(Base):
     __tablename__ = 'imdb_directors'
 
-    id = Column(Integer, primary_key=True)
-    imdb_id = Column(String)
-    name = Column(Unicode)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    imdb_id: Mapped[str | None]
+    name: Mapped[str | None]
+    movies: Mapped[list[Movie]] = relationship(
+        secondary=directors_table, back_populates='directors'
+    )
 
     def __init__(self, imdb_id, name=None):
         self.imdb_id = imdb_id
@@ -173,9 +184,10 @@ class Director(Base):
 class Writer(Base):
     __tablename__ = 'imdb_writers'
 
-    id = Column(Integer, primary_key=True)
-    imdb_id = Column(String)
-    name = Column(Unicode)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    imdb_id: Mapped[str | None]
+    name: Mapped[str | None]
+    movies: Mapped[list[Movie]] = relationship(secondary=writers_table, back_populates='writers')
 
     def __init__(self, imdb_id, name=None):
         self.imdb_id = imdb_id
@@ -185,8 +197,11 @@ class Writer(Base):
 class PlotKeyword(Base):
     __tablename__ = 'imdb_plot_keywords'
 
-    id = Column(Integer, primary_key=True)
-    name = Column(String)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str | None]
+    movies: Mapped[list[Movie]] = relationship(
+        secondary=plot_keywords_table, back_populates='plot_keywords'
+    )
 
     def __init__(self, name):
         self.name = name
@@ -195,11 +210,11 @@ class PlotKeyword(Base):
 class SearchResult(Base):
     __tablename__ = 'imdb_search'
 
-    id = Column(Integer, primary_key=True)
-    title = Column(Unicode, index=True)
-    url = Column(String)
-    fails = Column(Boolean, default=False)
-    queried = Column(DateTime)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    title: Mapped[str | None] = mapped_column(index=True)
+    url: Mapped[str | None]
+    fails: Mapped[bool | None] = mapped_column(default=False)
+    queried: Mapped[datetime | None] = mapped_column(default=datetime.now)
 
     @property
     def imdb_id(self):
@@ -208,7 +223,6 @@ class SearchResult(Base):
     def __init__(self, title, url=None):
         self.title = title
         self.url = url
-        self.queried = datetime.now()
 
     def __repr__(self):
         return f'<SearchResult(title={self.title},url={self.url},fails={self.fails})>'

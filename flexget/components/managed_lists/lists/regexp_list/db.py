@@ -1,8 +1,10 @@
+from __future__ import annotations
+
 from datetime import datetime
 
 from loguru import logger
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, Unicode, and_, func
-from sqlalchemy.orm import relationship
+from sqlalchemy import ForeignKey, and_, func
+from sqlalchemy.orm import DynamicMapped, Mapped, mapped_column, relationship
 
 from flexget.db_schema import versioned_base, with_session
 from flexget.entry import Entry
@@ -13,11 +15,11 @@ Base = versioned_base('regexp_list', 1)
 
 class RegexpListList(Base):
     __tablename__ = 'regexp_list_lists'
-    id = Column(Integer, primary_key=True)
-    name = Column(Unicode, unique=True)
-    added = Column(DateTime, default=datetime.now)
-    regexps = relationship(
-        'RegexListRegexp', backref='list', cascade='all, delete, delete-orphan', lazy='dynamic'
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str | None] = mapped_column(unique=True)
+    added: Mapped[datetime | None] = mapped_column(default=datetime.now)
+    regexps: DynamicMapped[RegexListRegexp] = relationship(
+        back_populates='list_', cascade='all, delete-orphan'
     )
 
     def __repr__(self):
@@ -29,13 +31,14 @@ class RegexpListList(Base):
 
 class RegexListRegexp(Base):
     __tablename__ = 'regexp_list_regexps'
-    id = Column(Integer, primary_key=True)
-    added = Column(DateTime, default=datetime.now)
-    regexp = Column(Unicode)
-    list_id = Column(Integer, ForeignKey(RegexpListList.id), nullable=False)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    added: Mapped[datetime | None] = mapped_column(default=datetime.now)
+    regexp: Mapped[str | None]
+    list_id: Mapped[int] = mapped_column(ForeignKey(RegexpListList.id))
+    list_: Mapped[RegexpListList] = relationship(back_populates='regexps')
 
     def __repr__(self):
-        return f'<RegexListRegexp regexp={self.regexp},list_name={self.list.name}>'
+        return f'<RegexListRegexp regexp={self.regexp},list_name={self.list_.name}>'
 
     def to_entry(self):
         entry = Entry()

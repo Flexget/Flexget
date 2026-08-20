@@ -1,14 +1,13 @@
+import contextlib
+
 from loguru import logger
 
-from flexget import options, plugin
+from flexget import options
 from flexget.event import event
 from flexget.terminal import console
 
-try:
+with contextlib.suppress(ImportError):
     from guppy import hpy
-except ImportError:
-    # this will leave the plugin unloaded
-    raise plugin.DependencyError(issued_by='memusage', missing='guppy3', silent=True)
 
 logger = logger.bind(name='mem_usage')
 

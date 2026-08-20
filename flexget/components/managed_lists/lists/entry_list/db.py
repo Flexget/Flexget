@@ -1,10 +1,12 @@
+from __future__ import annotations
+
 import pickle
 from collections.abc import MutableSet
 from datetime import datetime
 
 from loguru import logger
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, Unicode, func, or_, select
-from sqlalchemy.orm import relationship
+from sqlalchemy import ForeignKey, Unicode, func, or_, select
+from sqlalchemy.orm import DynamicMapped, Mapped, mapped_column, relationship
 from sqlalchemy.sql.elements import and_
 
 from flexget import db_schema
@@ -60,11 +62,11 @@ def upgrade(ver, session):
 
 class EntryListList(Base):
     __tablename__ = 'entry_list_lists'
-    id = Column(Integer, primary_key=True)
-    name = Column(Unicode, unique=True)
-    added = Column(DateTime, default=datetime.now)
-    entries = relationship(
-        'EntryListEntry', backref='list', cascade='all, delete, delete-orphan', lazy='dynamic'
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str | None] = mapped_column(unique=True)
+    added: Mapped[datetime | None] = mapped_column(default=datetime.now)
+    entries: DynamicMapped[EntryListEntry] = relationship(
+        back_populates='list_', cascade='all, delete-orphan'
     )
 
     def to_dict(self):
@@ -73,12 +75,13 @@ class EntryListList(Base):
 
 class EntryListEntry(Base):
     __tablename__ = 'entry_list_entries'
-    id = Column(Integer, primary_key=True)
-    list_id = Column(Integer, ForeignKey(EntryListList.id), nullable=False)
-    added = Column(DateTime, default=datetime.now)
-    title = Column(Unicode)
-    original_url = Column(Unicode)
-    _json = Column('json', Unicode)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    list_id: Mapped[int] = mapped_column(ForeignKey(EntryListList.id))
+    added: Mapped[datetime | None] = mapped_column(default=datetime.now)
+    title: Mapped[str | None]
+    original_url: Mapped[str | None]
+    _json: Mapped[str | None] = mapped_column('json')
+    list_: Mapped[EntryListList] = relationship(back_populates='entries')
     entry = entry_synonym('_json')
 
     def __init__(self, entry, entry_list_id):

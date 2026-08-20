@@ -8,8 +8,8 @@ from urllib.error import URLError
 from urllib.parse import quote_plus
 
 from loguru import logger
-from sqlalchemy import Column, DateTime, Integer, String, Table, func, sql
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, String, Table, func, sql
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.schema import ForeignKey, Index
 
 from flexget import db_schema, plugin
@@ -69,8 +69,8 @@ def upgrade(ver: int, session: Session) -> int:
 genres_table = Table(
     'rottentomatoes_movie_genres',
     Base.metadata,
-    Column('movie_id', Integer, ForeignKey('rottentomatoes_movies.id')),
-    Column('genre_id', Integer, ForeignKey('rottentomatoes_genres.id')),
+    Column('movie_id', ForeignKey('rottentomatoes_movies.id')),
+    Column('genre_id', ForeignKey('rottentomatoes_genres.id')),
     Index('ix_rottentomatoes_movie_genres', 'movie_id', 'genre_id'),
 )
 Base.register_table(genres_table)
@@ -78,8 +78,8 @@ Base.register_table(genres_table)
 actors_table = Table(
     'rottentomatoes_movie_actors',
     Base.metadata,
-    Column('movie_id', Integer, ForeignKey('rottentomatoes_movies.id')),
-    Column('actor_id', Integer, ForeignKey('rottentomatoes_actors.id')),
+    Column('movie_id', ForeignKey('rottentomatoes_movies.id')),
+    Column('actor_id', ForeignKey('rottentomatoes_actors.id')),
     Index('ix_rottentomatoes_movie_actors', 'movie_id', 'actor_id'),
 )
 Base.register_table(actors_table)
@@ -87,8 +87,8 @@ Base.register_table(actors_table)
 directors_table = Table(
     'rottentomatoes_movie_directors',
     Base.metadata,
-    Column('movie_id', Integer, ForeignKey('rottentomatoes_movies.id')),
-    Column('director_id', Integer, ForeignKey('rottentomatoes_directors.id')),
+    Column('movie_id', ForeignKey('rottentomatoes_movies.id')),
+    Column('director_id', ForeignKey('rottentomatoes_directors.id')),
     Index('ix_rottentomatoes_movie_directors', 'movie_id', 'director_id'),
 )
 Base.register_table(directors_table)
@@ -112,38 +112,46 @@ class RottenTomatoesContainer:
 class RottenTomatoesMovie(RottenTomatoesContainer, Base):
     __tablename__ = 'rottentomatoes_movies'
 
-    id = Column(Integer, primary_key=True, autoincrement=False, nullable=False)
-    title = Column(String)
-    year = Column(Integer)
-    genres = relationship('RottenTomatoesGenre', secondary=genres_table, backref='movies')
-    mpaa_rating = Column(String)
-    runtime = Column(Integer)
-    critics_consensus = Column(String)
-    release_dates = relationship(
-        'ReleaseDate', backref='movie', cascade='all, delete, delete-orphan'
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=False)
+    title: Mapped[str | None]
+    year: Mapped[int | None]
+    genres: Mapped[list[RottenTomatoesGenre]] = relationship(
+        secondary=genres_table, back_populates='movies'
     )
-    critics_rating = Column(String)
-    critics_score = Column(Integer)
-    audience_rating = Column(String)
-    audience_score = Column(Integer)
-    synopsis = Column(String)
-    posters = relationship(
-        'RottenTomatoesPoster', backref='movie', cascade='all, delete, delete-orphan'
+    mpaa_rating: Mapped[str | None]
+    runtime: Mapped[int | None]
+    critics_consensus: Mapped[str | None]
+    release_dates: Mapped[list[ReleaseDate]] = relationship(
+        back_populates='movie', cascade='all, delete-orphan'
     )
-    cast = relationship('RottenTomatoesActor', secondary=actors_table, backref='movies')
-    directors = relationship('RottenTomatoesDirector', secondary=directors_table, backref='movies')
-    studio = Column(String)
+    critics_rating: Mapped[str | None]
+    critics_score: Mapped[int | None]
+    audience_rating: Mapped[str | None]
+    audience_score: Mapped[int | None]
+    synopsis: Mapped[str | None]
+    posters: Mapped[list[RottenTomatoesPoster]] = relationship(
+        back_populates='movie', cascade='all, delete-orphan'
+    )
+    cast: Mapped[list[RottenTomatoesActor]] = relationship(
+        secondary=actors_table, back_populates='movies'
+    )
+    directors: Mapped[list[RottenTomatoesDirector]] = relationship(
+        secondary=directors_table, back_populates='movies'
+    )
+    studio: Mapped[str | None]
     # NOTE: alternate_ids is not anymore used, it used to store imdb_id
-    alternate_ids = relationship(
-        'RottenTomatoesAlternateId', backref='movie', cascade='all, delete, delete-orphan'
+    alternate_ids: Mapped[list[RottenTomatoesAlternateId]] = relationship(
+        back_populates='movie', cascade='all, delete-orphan'
     )
-    links = relationship(
-        'RottenTomatoesLink', backref='movie', cascade='all, delete, delete-orphan'
+    links: Mapped[list[RottenTomatoesLink]] = relationship(
+        back_populates='movie', cascade='all, delete-orphan'
     )
 
     # updated time, so we can grab new rating counts after 48 hours
     # set a default, so existing data gets updated with a rating
-    updated = Column(DateTime)
+    updated: Mapped[datetime | None]
+
+    search_strings: Mapped[list[RottenTomatoesSearchResult]] = relationship(back_populates='movie')
 
     @property
     def expired(self) -> bool:
@@ -165,8 +173,11 @@ class RottenTomatoesMovie(RottenTomatoesContainer, Base):
 class RottenTomatoesGenre(Base):
     __tablename__ = 'rottentomatoes_genres'
 
-    id = Column(Integer, primary_key=True)
-    name = Column(String)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str | None]
+    movies: Mapped[list[RottenTomatoesMovie]] = relationship(
+        secondary=genres_table, back_populates='genres'
+    )
 
     def __init__(self, name: str) -> None:
         self.name = name
@@ -175,11 +186,12 @@ class RottenTomatoesGenre(Base):
 class ReleaseDate(Base):
     __tablename__ = 'rottentomatoes_releasedates'
 
-    db_id = Column(Integer, primary_key=True)
-    movie_id = Column(Integer, ForeignKey('rottentomatoes_movies.id'))
-    name = Column(String)
+    db_id: Mapped[int] = mapped_column(primary_key=True)
+    movie_id: Mapped[int | None] = mapped_column(ForeignKey('rottentomatoes_movies.id'))
+    movie: Mapped[RottenTomatoesMovie | None] = relationship(back_populates='release_dates')
+    name: Mapped[str | None]
     date = text_date_synonym('_date')
-    _date = Column('date', DateTime)
+    _date: Mapped[datetime | None] = mapped_column('date')
 
     def __init__(self, name: str, date: datetime) -> None:
         self.name = name
@@ -189,10 +201,11 @@ class ReleaseDate(Base):
 class RottenTomatoesPoster(Base):
     __tablename__ = 'rottentomatoes_posters'
 
-    db_id = Column(Integer, primary_key=True)
-    movie_id = Column(Integer, ForeignKey('rottentomatoes_movies.id'))
-    name = Column(String)
-    url = Column(String)
+    db_id: Mapped[int] = mapped_column(primary_key=True)
+    movie_id: Mapped[int | None] = mapped_column(ForeignKey('rottentomatoes_movies.id'))
+    movie: Mapped[RottenTomatoesMovie | None] = relationship(back_populates='posters')
+    name: Mapped[str | None]
+    url: Mapped[str | None]
 
     def __init__(self, name: str, url: str) -> None:
         self.name = name
@@ -202,9 +215,12 @@ class RottenTomatoesPoster(Base):
 class RottenTomatoesActor(Base):
     __tablename__ = 'rottentomatoes_actors'
 
-    id = Column(Integer, primary_key=True)
-    rt_id = Column(String)
-    name = Column(String)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    rt_id: Mapped[str | None]
+    name: Mapped[str | None]
+    movies: Mapped[list[RottenTomatoesMovie]] = relationship(
+        secondary=actors_table, back_populates='cast'
+    )
 
     def __init__(self, name: str, rt_id: str) -> None:
         self.name = name
@@ -214,8 +230,11 @@ class RottenTomatoesActor(Base):
 class RottenTomatoesDirector(Base):
     __tablename__ = 'rottentomatoes_directors'
 
-    id = Column(Integer, primary_key=True)
-    name = Column(String)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str | None]
+    movies: Mapped[list[RottenTomatoesMovie]] = relationship(
+        secondary=directors_table, back_populates='directors'
+    )
 
     def __init__(self, name: str) -> None:
         self.name = name
@@ -224,10 +243,11 @@ class RottenTomatoesDirector(Base):
 class RottenTomatoesAlternateId(Base):
     __tablename__ = 'rottentomatoes_alternate_ids'
 
-    db_id = Column(Integer, primary_key=True)
-    movie_id = Column(Integer, ForeignKey('rottentomatoes_movies.id'))
-    name = Column(String)
-    id = Column(String)
+    db_id: Mapped[int] = mapped_column(primary_key=True)
+    movie_id: Mapped[int | None] = mapped_column(ForeignKey('rottentomatoes_movies.id'))
+    movie: Mapped[RottenTomatoesMovie | None] = relationship(back_populates='alternate_ids')
+    name: Mapped[str | None]
+    id: Mapped[str | None]
 
     def __init__(self, name: str, id: str) -> None:
         self.name = name
@@ -237,10 +257,11 @@ class RottenTomatoesAlternateId(Base):
 class RottenTomatoesLink(Base):
     __tablename__ = 'rottentomatoes_links'
 
-    db_id = Column(Integer, primary_key=True)
-    movie_id = Column(Integer, ForeignKey('rottentomatoes_movies.id'))
-    name = Column(String)
-    url = Column(String)
+    db_id: Mapped[int] = mapped_column(primary_key=True)
+    movie_id: Mapped[int | None] = mapped_column(ForeignKey('rottentomatoes_movies.id'))
+    movie: Mapped[RottenTomatoesMovie | None] = relationship(back_populates='links')
+    name: Mapped[str | None]
+    url: Mapped[str | None]
 
     def __init__(self, name: str, url: str) -> None:
         self.name = name
@@ -250,10 +271,10 @@ class RottenTomatoesLink(Base):
 class RottenTomatoesSearchResult(Base):
     __tablename__ = 'rottentomatoes_search_results'
 
-    id = Column(Integer, primary_key=True)
-    search = Column(String, nullable=False)
-    movie_id = Column(Integer, ForeignKey('rottentomatoes_movies.id'), nullable=False)
-    movie = relationship(RottenTomatoesMovie, backref='search_strings')
+    id: Mapped[int] = mapped_column(primary_key=True)
+    search: Mapped[str]
+    movie_id: Mapped[int] = mapped_column(ForeignKey('rottentomatoes_movies.id'))
+    movie: Mapped[RottenTomatoesMovie] = relationship(back_populates='search_strings')
 
     def __repr__(self) -> str:
         return f'<RottenTomatoesSearchResult(search={self.search},movie_id={self.movie_id},movie={self.movie})>'
