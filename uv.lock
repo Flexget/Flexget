@@ -1503,7 +1503,7 @@ test = [
     { name = "pillow" },
     { name = "plexapi" },
     { name = "pysftp" },
-    { name = "pytest-ftpserver" },
+    { name = "pytest-localftpserver" },
     { name = "python-telegram-bot", extra = ["http2", "socks"] },
     { name = "qbittorrent-api" },
     { name = "rarfile" },
@@ -1604,7 +1604,7 @@ test = [
     { name = "pillow", specifier = "~=12.1" },
     { name = "plexapi", specifier = "~=4.17" },
     { name = "pysftp", specifier = "~=0.2.9" },
-    { name = "pytest-ftpserver", specifier = "~=1.0" },
+    { name = "pytest-localftpserver", specifier = ">=1.6" },
     { name = "python-telegram-bot", extras = ["http2", "socks"], specifier = "~=22.0" },
     { name = "qbittorrent-api", specifier = "~=2026.8" },
     { name = "rarfile", specifier = "~=4.0" },
@@ -3045,17 +3045,17 @@ wheels = [
 ]
 
 [[package]]
-name = "pytest-ftpserver"
-version = "1.0.1"
+name = "pytest-localftpserver"
+version = "1.6.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pyftpdlib" },
     { name = "pyopenssl" },
     { name = "pytest" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/f5/86/f1b880bfd770b0bd54e96f92652c84aa80eb06e0edac1b2483552f3b012d/pytest_ftpserver-1.0.1.tar.gz", hash = "sha256:48111ee2325d2dd3a7e10740bcc737f2e78967f333cfd614936f136230d2c645", size = 49806, upload-time = "2026-02-10T13:24:15.844Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/ce/2f/9cbf6948d77fe340a84831f994a83798abb6eb66a90330c33353793f74ec/pytest_localftpserver-1.6.0.tar.gz", hash = "sha256:3190199592f87f47ffbf4da8a9ad7d208df0ab0089e744a5da540af507a23818", size = 49432, upload-time = "2026-08-11T08:40:00.808Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/61/e3/cd9d1b617b1b826f4a6daf84690500e2a7bc7144ab2478d9da04db0110ea/pytest_ftpserver-1.0.1-py3-none-any.whl", hash = "sha256:a5632b693f393196350e93a82f25d64fb7b60136fc938aa01f34c7579088d580", size = 22141, upload-time = "2026-02-10T13:24:14.44Z" },
+    { url = "https://files.pythonhosted.org/packages/fe/01/f7b3fb43c2f1ce4cdc096ba37fb73cebb209fa4ce55388ead539babbc8a4/pytest_localftpserver-1.6.0-py3-none-any.whl", hash = "sha256:05c661faa14a9d76b8e06fb19fa31e27b82575776d3f7975c6462a84713ece88", size = 21936, upload-time = "2026-08-11T08:39:59.487Z" },
 ]
 
 [[package]]
