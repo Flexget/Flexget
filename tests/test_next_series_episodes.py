@@ -680,6 +680,8 @@ class TestNextSeriesEpisodesQuality:
                   identified_by: ep
               - Test Series 8:
                   identified_by: ep
+              - Test Series 9:
+                  identified_by: ep
           test_quality_target:
             next_series_episodes:
               include_quality: yes
@@ -759,6 +761,14 @@ class TestNextSeriesEpisodesQuality:
             - Test Series 8:
                 identified_by: ep
                 target: "1080p bluray|webdl hdr|dolbyvision"
+            max_reruns: 0
+          test_quality_min_only:
+            next_series_episodes:
+              include_quality: yes
+            series:
+            - Test Series 9:
+                identified_by: ep
+                target: "720p+"
             max_reruns: 0
     """
 
@@ -864,4 +874,16 @@ class TestNextSeriesEpisodesQuality:
             'Test Series 8 1x02 1080p webdl dolbyvision',
             'Test Series 8 S01E02 1080p webdl hdr',
             'Test Series 8 1x02 1080p webdl hdr',
+        ]
+
+    def test_quality_min_only_uses_floor_value(self, execute_task):
+        # "720p+" is a lower-bound-only comparator; it should fall back to its floor
+        # value (720p) as the search term rather than being dropped entirely.
+        self.inject_series(execute_task, 'Test Series 9 S01E01')
+        task = execute_task('test_quality_min_only')
+        entry = task.find_entry(title='Test Series 9 S01E02 720p')
+        assert entry
+        assert entry['search_strings'] == [
+            'Test Series 9 S01E02 720p',
+            'Test Series 9 1x02 720p',
         ]

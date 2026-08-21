@@ -58,8 +58,9 @@ class NextSeriesEpisodes:
         finite set of literal values.
 
         :return: [] if unconstrained (contributes nothing to the search term), None if
-            the requirement is an open-ended comparator (e.g. "<720p", "1080p+") or a
-            "!" exclusion, neither of which can be written as a literal search term.
+            the requirement is an open-ended upper-bound comparator (e.g. "<720p") or a
+            "!" exclusion, neither of which can be written as a literal search term. A
+            lower-bound-only comparator (e.g. "720p+") falls back to its floor value.
         """
         if req_component.acceptable:
             candidates = req_component.acceptable
@@ -70,7 +71,9 @@ class NextSeriesEpisodes:
                 if comp.type == req_component.type
                 and req_component.min.value <= comp.value <= req_component.max.value
             ]
-        elif req_component.min or req_component.max or req_component.none_of:
+        elif req_component.min:
+            candidates = [req_component.min]
+        elif req_component.max or req_component.none_of:
             return None
         else:
             return []
