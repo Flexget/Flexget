@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
     from flexget.task import Task
 
-    from .test_sftp_server import TestSFTPFileSystem, TestSFTPServerController
+    from .sftp_test_server import TestSFTPFileSystem, TestSFTPServerController
 
 
 @pytest.mark.require_optional_deps
@@ -97,7 +97,7 @@ class TestSftpList:
         with pytest.raises(TaskAbort) as ex:
             execute_task('sftp_list_bad_login')
 
-        assert ex.value.reason == 'Failed to connect to 127.0.0.1'
+        assert ex.value.reason == 'Permission denied for user test_user on host 127.0.0.1'
 
     def test_sftp_list_files(self, execute_task: Callable[..., Task], sftp_fs: TestSFTPFileSystem):
         sftp_fs.create_file('file.mkv')

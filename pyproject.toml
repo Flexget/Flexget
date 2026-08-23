@@ -87,6 +87,7 @@ dev = [
   "vcrpy~=8.1",
 ]
 test = [
+  "paramiko~=5.0",
   "pillow~=12.1",
   "pytest-ftpserver~=1.0",
   { include-group = "all" },
@@ -120,10 +121,7 @@ matrix = [ "matrix-nio~=0.26.0" ]
 plexapi = [ "plexapi~=4.17" ]
 qbittorrent = [ "qbittorrent-api~=2026.8" ]
 rarfile = [ "rarfile~=4.0" ]
-sftp = [
-  "paramiko~=3.5",
-  "pysftp~=0.2.9", # TODO: `pysftp` was last updated in 2016 and is merely a wrapper around `paramiko`. It is now incompatible with `paramiko` 4.0, so consider migrating to `paramiko` directly. See https://github.com/Flexget/Flexget/issues/4532
-]
+sftp = [ "anyio~=4.14", "asyncssh~=2.24" ]
 subliminal = [ "subliminal~=2.7.1" ]
 telegram = [ "python-telegram-bot[http2,socks]~=22.0" ]
 transmission = [ "transmission-rpc~=7.0" ]
@@ -280,7 +278,6 @@ files.extend-exclude = [
 addopts = [ "-p no:legacypath" ]
 filterwarnings = [
   "error",
-  "ignore:Failed to load HostKeys from:UserWarning:pysftp",                                  # It's a bug in pysftp (unmaintained) 0.2.9, not in 0.2.8: https://stackoverflow.com/q/56521549
   "ignore:chardet.universaldetector is deprecated:DeprecationWarning:html5lib._inputstream", # See https://github.com/html5lib/html5lib-python/pull/602
   """\
   ignore:In ftputil 6.0.0, the default file path encoding will change from Latin-1 to \
