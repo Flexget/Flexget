@@ -54,7 +54,11 @@ def get_output_path(to: str, entry) -> Path:
 
 def extract_info(info, archive, to: Path, keep_dirs, test=False):
     """Extract ArchiveInfo object."""
-    destination = get_destination_path(info, to, keep_dirs)
+    try:
+        destination = get_destination_path(info, to, keep_dirs)
+    except archiveutil.PathTraversalError as error:
+        logger.error('Skipping malicious archive entry: {}', error)
+        return
 
     if test:
         logger.info('Would extract: {} to {}', info.filename, destination)
@@ -73,7 +77,13 @@ def extract_info(info, archive, to: Path, keep_dirs, test=False):
 def get_destination_path(info, to: Path, keep_dirs) -> Path:
     """Generate the destination path for a given file."""
     path_suffix = info.path if keep_dirs else os.path.basename(info.path)
-    return to / path_suffix
+    destination = (to / path_suffix).resolve()
+    root = to.resolve()
+    if not destination.is_relative_to(root):
+        raise archiveutil.PathTraversalError(
+            f'archive entry {info.path!r} would extract outside of {root}'
+        )
+    return destination
 
 
 def is_match(info, pattern):

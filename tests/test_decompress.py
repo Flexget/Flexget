@@ -2,6 +2,9 @@ from pathlib import Path
 
 import pytest
 
+from flexget.components.archives import utils as archiveutil
+from flexget.components.archives.decompress import get_destination_path
+
 
 @pytest.mark.require_optional_deps
 class TestExtract:
@@ -145,3 +148,32 @@ class TestExtract:
         assert self.error_not_exists in caplog.text, (
             'Plugin logs an error when file does not exist.'
         )
+
+
+class FakeInfo:
+    def __init__(self, path):
+        self.path = path
+
+
+class TestGetDestinationPath:
+    """Regression tests for the Zip Slip / path traversal fix."""
+
+    @pytest.mark.parametrize(
+        'evil_path',
+        [
+            '../../../etc/passwd',
+            '../outside.txt',
+            '/etc/passwd',
+        ],
+    )
+    def test_rejects_paths_escaping_destination(self, tmp_path, evil_path):
+        to = tmp_path / 'safe_extract'
+        to.mkdir()
+        with pytest.raises(archiveutil.PathTraversalError):
+            get_destination_path(FakeInfo(evil_path), to, keep_dirs=True)
+
+    def test_allows_normal_paths(self, tmp_path):
+        to = tmp_path / 'safe_extract'
+        to.mkdir()
+        destination = get_destination_path(FakeInfo('subdir/file.txt'), to, keep_dirs=True)
+        assert destination == (to / 'subdir' / 'file.txt').resolve()

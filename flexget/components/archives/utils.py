@@ -47,6 +47,10 @@ class FileAlreadyExists(ArchiveError):
     """Exception to be raised when destination file already exists."""
 
 
+class PathTraversalError(ArchiveError):
+    """Exception to be raised when an archive member would extract outside the destination directory."""
+
+
 def rarfile_set_tool_path(config):
     """Manually set the path of unrar executable if it can't be resolved from the PATH environment variable."""
     unrar_tool = config['unrar_tool']
