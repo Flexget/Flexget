@@ -653,3 +653,237 @@ class TestNextSeriesEpisodesSeasonPack:
             for result_title in this_test[2]:
                 assert task.find_entry(title=result_title)
             assert len(task.all_entries) == len(this_test[2])
+
+
+class TestNextSeriesEpisodesQuality:
+    config = """
+        templates:
+          global:
+            parsing:
+              series: internal
+        tasks:
+          inject_series:
+            series:
+              - Test Series 1:
+                  identified_by: ep
+              - Test Series 2:
+                  identified_by: ep
+              - Test Series 3:
+                  identified_by: ep
+              - Test Series 4:
+                  identified_by: ep
+              - Test Series 5:
+                  identified_by: ep
+              - Test Series 6:
+                  identified_by: ep
+              - Test Series 7:
+                  identified_by: ep
+              - Test Series 8:
+                  identified_by: ep
+              - Test Series 9:
+                  identified_by: ep
+          test_quality_target:
+            next_series_episodes:
+              include_quality: yes
+            series:
+            - Test Series 2:
+                identified_by: ep
+                target: 1080p
+            max_reruns: 0
+          test_quality_qualities_list:
+            next_series_episodes:
+              include_quality: yes
+            series:
+            - Test Series 3:
+                identified_by: ep
+                qualities:
+                  - 720p
+                  - 1080p
+            max_reruns: 0
+          test_quality_range:
+            next_series_episodes:
+              include_quality: yes
+            series:
+            - Test Series 4:
+                identified_by: ep
+                target: 720p-1080p
+            max_reruns: 0
+          test_quality_disabled:
+            next_series_episodes:
+              include_quality: no
+            series:
+            - Test Series 5:
+                identified_by: ep
+            max_reruns: 0
+          test_quality_bool_shorthand_default:
+            next_series_episodes: yes
+            series:
+            - Test Series 5:
+                identified_by: ep
+                target: 1080p
+            max_reruns: 0
+          test_quality_no_series_settings:
+            next_series_episodes:
+              include_quality: yes
+            series:
+            - Test Series 1
+            max_reruns: 0
+          test_quality_grouped_series:
+            next_series_episodes:
+              include_quality: yes
+            series:
+              settings:
+                my_group:
+                  target: 1080p
+              my_group:
+                - Test Series 1
+            max_reruns: 0
+          test_quality_unsupported_syntax:
+            next_series_episodes:
+              include_quality: yes
+            series:
+            - Test Series 6:
+                identified_by: ep
+                target: "<=1080p"
+            max_reruns: 0
+          test_quality_pipe_alternatives:
+            next_series_episodes:
+              include_quality: yes
+            series:
+            - Test Series 7:
+                identified_by: ep
+                target: "720p|1080p"
+            max_reruns: 0
+          test_quality_multi_axis_pipe:
+            next_series_episodes:
+              include_quality: yes
+            series:
+            - Test Series 8:
+                identified_by: ep
+                target: "1080p bluray|webdl hdr|dolbyvision"
+            max_reruns: 0
+          test_quality_min_only:
+            next_series_episodes:
+              include_quality: yes
+            series:
+            - Test Series 9:
+                identified_by: ep
+                target: "720p+"
+            max_reruns: 0
+    """
+
+    def inject_series(self, execute_task, release_name):
+        execute_task(
+            'inject_series',
+            options={'inject': [Entry(title=release_name, url='')]},
+        )
+
+    def test_quality_target_appended_to_search_strings(self, execute_task):
+        self.inject_series(execute_task, 'Test Series 2 S01E01')
+        task = execute_task('test_quality_target')
+        entry = task.find_entry(title='Test Series 2 S01E02 1080p')
+        assert entry
+        assert entry['search_strings'] == [
+            'Test Series 2 S01E02 1080p',
+            'Test Series 2 1x02 1080p',
+        ]
+
+    def test_quality_qualities_list_sorted_highest_first(self, execute_task):
+        self.inject_series(execute_task, 'Test Series 3 S01E01')
+        task = execute_task('test_quality_qualities_list')
+        # Highest configured quality (1080p) is used for the entry title.
+        entry = task.find_entry(title='Test Series 3 S01E02 1080p')
+        assert entry
+        # Every base identifier is repeated once per configured quality.
+        assert len(entry['search_strings']) == 4
+        assert any(s.endswith('720p') for s in entry['search_strings'])
+        assert any(s.endswith('1080p') for s in entry['search_strings'])
+
+    def test_quality_range_expands_all_resolutions(self, execute_task):
+        self.inject_series(execute_task, 'Test Series 4 S01E01')
+        task = execute_task('test_quality_range')
+        entry = task.find_entry(title='Test Series 4 S01E02 1080p')
+        assert entry
+        assert 'Test Series 4 S01E02 720p' in entry['search_strings']
+        assert 'Test Series 4 S01E02 1080p' in entry['search_strings']
+
+    def test_quality_disabled_does_not_append_quality(self, execute_task):
+        self.inject_series(execute_task, 'Test Series 5 S01E01')
+        task = execute_task('test_quality_disabled')
+        entry = task.find_entry(title='Test Series 5 S01E02')
+        assert entry
+        assert not any('1080p' in s for s in entry['search_strings'])
+
+    def test_quality_default_enabled_with_bool_shorthand_config(self, execute_task):
+        # Regression: `next_series_episodes: yes` must still apply the include_quality
+        # default (True) from the schema, not silently disable the feature.
+        self.inject_series(execute_task, 'Test Series 5 S01E01')
+        task = execute_task('test_quality_bool_shorthand_default')
+        assert task.find_entry(title='Test Series 5 S01E02 1080p')
+
+    def test_quality_series_without_settings_does_not_crash(self, execute_task):
+        # Regression: plain string series list entries (no per-series settings dict)
+        # used to crash `_get_series_config` with AttributeError.
+        self.inject_series(execute_task, 'Test Series 1 S01E01')
+        task = execute_task('test_quality_no_series_settings')
+        assert task.find_entry(title='Test Series 1 S01E02')
+
+    def test_quality_grouped_series_settings(self, execute_task):
+        # Regression: series config in grouped/settings form used to crash, and
+        # group-level settings need to be merged in to be picked up.
+        self.inject_series(execute_task, 'Test Series 1 S01E01')
+        task = execute_task('test_quality_grouped_series')
+        assert task.find_entry(title='Test Series 1 S01E02 1080p')
+
+    def test_quality_unsupported_syntax_is_skipped(self, execute_task):
+        # Comparator syntax ("<=1080p") can't be expressed as a literal search
+        # token, it should be dropped rather than leaking into the query.
+        self.inject_series(execute_task, 'Test Series 6 S01E01')
+        task = execute_task('test_quality_unsupported_syntax')
+        entry = task.find_entry(title='Test Series 6 S01E02')
+        assert entry
+        assert not any('<' in s or '=' in s for s in entry['search_strings'])
+
+    def test_quality_pipe_alternatives_expand_highest_first(self, execute_task):
+        # "720p|1080p" enumerates both alternatives, same as a range would, with the
+        # highest quality used for the entry title/first search string.
+        self.inject_series(execute_task, 'Test Series 7 S01E01')
+        task = execute_task('test_quality_pipe_alternatives')
+        entry = task.find_entry(title='Test Series 7 S01E02 1080p')
+        assert entry
+        assert entry['search_strings'] == [
+            'Test Series 7 S01E02 1080p',
+            'Test Series 7 1x02 1080p',
+            'Test Series 7 S01E02 720p',
+            'Test Series 7 1x02 720p',
+        ]
+
+    def test_quality_multiple_pipe_axes_cross_product(self, execute_task):
+        # "bluray|webdl hdr|dolbyvision" pipes two different component types at once;
+        # every combination (2 x 2 = 4) should be enumerated, highest quality first.
+        self.inject_series(execute_task, 'Test Series 8 S01E01')
+        task = execute_task('test_quality_multi_axis_pipe')
+        entry = task.find_entry(title='Test Series 8 S01E02 1080p bluray dolbyvision')
+        assert entry
+        assert entry['search_strings'] == [
+            'Test Series 8 S01E02 1080p bluray dolbyvision',
+            'Test Series 8 1x02 1080p bluray dolbyvision',
+            'Test Series 8 S01E02 1080p bluray hdr',
+            'Test Series 8 1x02 1080p bluray hdr',
+            'Test Series 8 S01E02 1080p webdl dolbyvision',
+            'Test Series 8 1x02 1080p webdl dolbyvision',
+            'Test Series 8 S01E02 1080p webdl hdr',
+            'Test Series 8 1x02 1080p webdl hdr',
+        ]
+
+    def test_quality_min_only_uses_floor_value(self, execute_task):
+        # "720p+" is a lower-bound-only comparator; it should fall back to its floor
+        # value (720p) as the search term rather than being dropped entirely.
+        self.inject_series(execute_task, 'Test Series 9 S01E01')
+        task = execute_task('test_quality_min_only')
+        entry = task.find_entry(title='Test Series 9 S01E02 720p')
+        assert entry
+        assert entry['search_strings'] == [
+            'Test Series 9 S01E02 720p',
+            'Test Series 9 1x02 720p',
+        ]
