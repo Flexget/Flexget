@@ -88,7 +88,7 @@ dev = [
 ]
 test = [
   "pillow~=12.1",
-  "pytest-ftpserver~=1.0",
+  "pytest-localftpserver>=1.6",
   { include-group = "all" },
 ]
 docs = [
