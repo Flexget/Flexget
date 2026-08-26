@@ -139,7 +139,7 @@ class ScrobSet(MutableSet):
                 or media.get('season_number') is not None
             ):
                 logger.debug(
-                    'Skipping list item `%s` - not a whole movie or series.', media.get("title")
+                    'Skipping list item `%s` - not a whole movie or series.', media.get('title')
                 )
                 continue
             entry = _entry_from_item(item, strip_year=self.config.get('strip_year', False))
@@ -197,7 +197,7 @@ class ScrobSet(MutableSet):
             return
         tmdb_id = entry.get('tmdb_id')
         if not tmdb_id:
-            logger.warning('Not adding `%s` to Scrob list: entry has no tmdb_id.', entry["title"])
+            logger.warning('Not adding `%s` to Scrob list: entry has no tmdb_id.', entry['title'])
             return
         media_type = _entry_media_type(entry)
         body = {'tmdb_id': tmdb_id, 'media_type': media_type}
@@ -205,9 +205,9 @@ class ScrobSet(MutableSet):
             self.api.post(f'lists/{self.list_id}/items', json=body)
         except ScrobApiError as e:
             if e.status_code == 409:
-                logger.debug('`%s` is already in the Scrob list.', entry["title"])
+                logger.debug('`%s` is already in the Scrob list.', entry['title'])
             else:
-                logger.error('Failed to add `%s` to Scrob list: %s', entry["title"], e)
+                logger.error('Failed to add `%s` to Scrob list: %s', entry['title'], e)
                 return
         self.invalidate_cache()
 
@@ -218,7 +218,7 @@ class ScrobSet(MutableSet):
         try:
             self.api.delete(f'lists/{self.list_id}/items/{found["scrob_list_item_id"]}')
         except ScrobApiError as e:
-            logger.error('Failed to remove `%s` from Scrob list: %s', entry["title"], e)
+            logger.error('Failed to remove `%s` from Scrob list: %s', entry['title'], e)
             return
         self.invalidate_cache()
 
