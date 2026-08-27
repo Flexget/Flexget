@@ -48,8 +48,13 @@ class MockedScrobBackend:
                 'id': 1,
                 'name': 'Watchlist',
                 'items': [
-                    _mock_item(1, _mock_media(603692, 'movie', 'Deadpool', release_date='2016-02-12')),  # movie
-                    _mock_item(2, _mock_media(1399, 'series', 'Game of Thrones', release_date='2011-04-17')),  # series
+                    _mock_item(
+                        1, _mock_media(603692, 'movie', 'Deadpool', release_date='2016-02-12')
+                    ),  # movie
+                    _mock_item(
+                        2,
+                        _mock_media(1399, 'series', 'Game of Thrones', release_date='2011-04-17'),
+                    ),  # series
                     # season
                     _mock_item(
                         3,
@@ -62,7 +67,9 @@ class MockedScrobBackend:
                         ),
                     ),
                     _mock_item(4, _mock_media(1399, 'episode', 'Winter Is Coming')),  # episode
-                    _mock_item(5, _mock_media(9999999, 'movie', 'No Imdb Movie', release_date=None)),  # broken movie
+                    _mock_item(
+                        5, _mock_media(9999999, 'movie', 'No Imdb Movie', release_date=None)
+                    ),  # broken movie
                 ],
             }
         }
@@ -73,7 +80,7 @@ class MockedScrobBackend:
         self.deletes = []
 
     def __call__(self, method, path, **kwargs):
-        if method == 'get' and path.startswith('lists/') and '/' not in path[len('lists/'):]:
+        if method == 'get' and path.startswith('lists/') and '/' not in path[len('lists/') :]:
             list_id = int(path.split('/')[1])
             lst = self.lists.get(list_id)
             if lst is None:
@@ -133,7 +140,7 @@ def _config(list_id=1, strip_year=False):
         'base_url': 'http://scrob.test',
         'api_key': 'testkey',
         'list_id': list_id,
-        'strip_year': strip_year
+        'strip_year': strip_year,
     }
 
 
