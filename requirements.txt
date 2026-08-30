@@ -39,16 +39,15 @@ cheroot==11.1.2
     # via cherrypy
 cherrypy==18.10.0
     # via flexget
-click==8.4.2
+click==8.5.0
     # via flask
 colorama==0.4.6 ; sys_platform == 'win32'
     # via
-    #   click
     #   loguru
     #   typer
-cryptography==50.0.0
+cryptography==50.0.1
     # via flexget
-curl-cffi==0.16.1
+curl-cffi==0.16.2
     # via flexget
 feedparser==6.0.14
     # via flexget
@@ -194,7 +193,7 @@ sqlalchemy==2.0.52
     # via flexget
 tempora==5.12.0
     # via portend
-typer==0.27.1
+typer==0.27.2
     # via typer-slim
 typer-slim==0.24.0
     # via jaraco-text
