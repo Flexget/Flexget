@@ -26,7 +26,8 @@ def main(args: Sequence[str] | None = None):
         try:
             manager = Manager(args)
         except (OSError, ValueError):
-            options = Manager.parse_initial_options(args)
+            # A `--help` request must show the help message, not the config-loading failure.
+            options = Manager.parse_initial_options(args, do_help=True)
             log.start(level=options.loglevel, to_file=False)
             if _is_debug():
                 import traceback

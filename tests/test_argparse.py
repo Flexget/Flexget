@@ -1,5 +1,7 @@
 from argparse import Action
 
+import pytest
+
 from flexget.options import ArgumentParser
 
 
@@ -59,3 +61,13 @@ def test_post_defaults():
     # Custom action should be allowed to set default
     result = p.parse_args(['--custom'])
     assert result.post_set == 'custom'
+
+
+def test_help_when_config_is_missing(capsys):
+    """`flexget --help` must print the help message, not fail to load a config (#4924)."""
+    import flexget
+
+    with pytest.raises(SystemExit) as exc_info:
+        flexget.main(['-c', '/nonexistent/flexget-test-config.yml', '--help'])
+    assert exc_info.value.code == 0
+    assert 'usage: flexget' in capsys.readouterr().out
