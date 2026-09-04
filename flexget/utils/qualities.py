@@ -84,7 +84,7 @@ class QualityComponent:
     def __add__(self, other):
         if not isinstance(other, int):
             raise TypeError
-        component_list = globals().get('_' + self.type + 's')
+        component_list = _COMPONENT_LISTS[self.type]
         index = component_list.index(self) + other
         if index >= len(component_list):
             index = -1
@@ -93,7 +93,7 @@ class QualityComponent:
     def __sub__(self, other):
         if not isinstance(other, int):
             raise TypeError
-        component_list = globals().get('_' + self.type + 's')
+        component_list = _COMPONENT_LISTS[self.type]
         index = component_list.index(self) - other
         index = max(index, 0)
         return component_list[index]
@@ -190,6 +190,14 @@ _UNKNOWNS = {
     'audio': QualityComponent('audio', 0, 'unknown'),
 }
 
+_COMPONENT_LISTS: dict[str, list[QualityComponent]] = {
+    'resolution': _resolutions,
+    'source': _sources,
+    'codec': _codecs,
+    'color_range': _color_ranges,
+    'audio': _audios,
+}
+
 _registry: dict[str, QualityComponent] = {}
 for items in (_resolutions, _sources, _codecs, _color_ranges, _audios):
     for item in items:
@@ -232,7 +240,6 @@ class Quality(Serializer):
         # If any of the matched components have defaults, set them now.
         for component in self.components:
             for default in component.defaults:
-                default = _registry[default]
                 if not getattr(self, default.type):
                     setattr(self, default.type, default)
 
@@ -273,8 +280,8 @@ class Quality(Serializer):
         return [self.resolution, self.source, self.codec, self.color_range, self.audio]
 
     @classmethod
-    def serialize(cls, quality: Quality) -> str:
-        return str(quality)
+    def serialize(cls, value: Quality) -> str:
+        return str(value)
 
     @classmethod
     def deserialize(cls, data: str, version: int) -> Quality:

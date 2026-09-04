@@ -32,7 +32,7 @@ from flexget.utils.sqlalchemy_utils import ContextSession
 from flexget.utils.tools import get_current_flexget_version, io_encoding, pid_exists
 
 Base = declarative_base()
-Session: type[ContextSession] = sessionmaker(class_=ContextSession)
+Session: sessionmaker[ContextSession] = sessionmaker(class_=ContextSession)
 
 import flexget.log  # noqa: E402
 from flexget import config_schema, db_schema, plugin  # noqa: E402
@@ -174,6 +174,9 @@ class Manager:
 
     @property
     def config_path(self) -> Path:
+        assert self._config_path is not None, (
+            'find_config must be called before config_path is used'
+        )
         return self._config_path
 
     @property
@@ -250,7 +253,7 @@ class Manager:
         if db_schema.upgrade_required():
             logger.info('Database upgrade is required. Attempting now.')
             fire_event('manager.upgrade', self)
-            if manager.db_upgraded:
+            if self.db_upgraded:
                 fire_event('manager.db_upgraded', self)
         fire_event('manager.startup', self)
         self.initialized = True
@@ -282,11 +285,12 @@ class Manager:
             set when each respective task has finished running
         """
         if options is None:
-            options = copy.copy(self.options.execute)
+            task_options = copy.copy(self.options.execute)
         elif isinstance(options, dict):
-            options_namespace = copy.copy(self.options.execute)
-            options_namespace.__dict__.update(options)
-            options = options_namespace
+            task_options = copy.copy(self.options.execute)
+            task_options.__dict__.update(options)
+        else:
+            task_options = options
         task_names = self.tasks
         # Only reload config if daemon
         config_hash = self.hash_config()
@@ -298,14 +302,14 @@ class Manager:
             except Exception as e:
                 logger.error('Reloading config failed: {}', e)
         # Handle --tasks
-        if options.tasks:
+        if task_options.tasks:
             # Consider '*' the same as not specifying any tasks.
             # (So manual plugin doesn't consider them explicitly enabled.)
-            if options.tasks == ['*']:
-                options.tasks = None
+            if task_options.tasks == ['*']:
+                task_options.tasks = None
             else:
                 task_names = []
-                for task in options.tasks:
+                for task in task_options.tasks:
                     try:
                         task_names.extend(
                             m for m in self.matching_tasks(task) if m not in task_names
@@ -313,7 +317,7 @@ class Manager:
                     except ValueError as e:
                         logger.error(e)
                         continue
-                options.tasks = task_names
+                task_options.tasks = task_names
         # TODO: 1.2 This is a hack to make task priorities work still, not sure if it's the best one
         task_names = sorted(
             task_names, key=lambda t: self.config['tasks'][t].get('priority', 65535)
@@ -324,7 +328,7 @@ class Manager:
             task = Task(
                 self,
                 task_name,
-                options=options,
+                options=task_options,
                 output=get_console_output(),
                 session_id=flexget.log.get_log_session_id(),
                 priority=priority,
@@ -433,7 +437,9 @@ class Manager:
                 self.task_queue = TaskQueue()
                 self.task_queue.start()
             if len(self.task_queue):
-                logger.verbose('There is a task already running, execution queued.')
+                logger.verbose(  # pyright: ignore[reportAttributeAccessIssue]
+                    'There is a task already running, execution queued.'
+                )
             finished_events = self.execute(options)
             if not options.cron:
                 # Wait until execution of all tasks has finished
@@ -483,7 +489,7 @@ class Manager:
                 logger.debug('Error registering sigterm handler: {}', e)
             self.is_daemon = True
 
-            def run_daemon(tray_icon: TrayIcon = None):
+            def run_daemon(tray_icon: TrayIcon | None = None):
                 fire_event('manager.daemon.started', self)
                 self.task_queue.start()
                 self.ipc_server.start()
@@ -786,7 +792,9 @@ class Manager:
             self.database_uri = f'sqlite:///{filename}'
 
         if self.db_filename and not os.path.exists(self.db_filename):
-            logger.verbose('Creating new database {} - DO NOT INTERRUPT ...', self.db_filename)
+            logger.verbose(  # pyright: ignore[reportAttributeAccessIssue]
+                'Creating new database {} - DO NOT INTERRUPT ...', self.db_filename
+            )
 
         # fire up the engine
         logger.debug('Connecting to: {}', self.database_uri)
@@ -814,13 +822,13 @@ class Manager:
             if os.path.exists(self.db_filename):
                 logger.critical(
                     '{} - make sure you have write permissions to file {}',
-                    e.message,
+                    str(e),
                     self.db_filename,
                 )
             else:
                 logger.critical(
                     '{} - make sure you have write permissions to directory {}',
-                    e.message,
+                    str(e),
                     self.config_base,
                 )
             raise
@@ -839,14 +847,14 @@ class Manager:
                     continue
                 result[key.strip().lower()] = value.strip()
             for key, value in result.items():
-                if value.isdigit():
+                if isinstance(value, str) and value.isdigit():
                     result[key] = int(value)
-            result.setdefault('pid', None)
-            if not result['pid']:
+            pid = result.get('pid')
+            if not isinstance(pid, int):
                 logger.error(
                     'Invalid lock file. Make sure FlexGet is not running, then delete it.'
                 )
-            elif not pid_exists(result['pid']):
+            elif not pid_exists(pid):
                 return None
             return result
         return None
@@ -931,7 +939,7 @@ class Manager:
             pid = os.fork()
             if pid > 0:
                 # Don't run the exit handlers on the parent
-                atexit._exithandlers = []
+                atexit._exithandlers = []  # pyright: ignore[reportAttributeAccessIssue]
                 # exit first parent
                 sys.exit(0)
         except OSError as e:
@@ -948,7 +956,7 @@ class Manager:
             pid = os.fork()
             if pid > 0:
                 # Don't run the exit handlers on the parent
-                atexit._exithandlers = []
+                atexit._exithandlers = []  # pyright: ignore[reportAttributeAccessIssue]
                 # exit from second parent
                 sys.exit(0)
         except OSError as e:
@@ -1016,6 +1024,7 @@ class Manager:
         fire_event('manager.shutdown', self)
         if not self.unit_test:  # don't scroll "nosetests" summary results when logging is enabled
             logger.debug('Shutting down')
+        assert self.engine is not None, '_shutdown must be called after initialize'
         self.engine.dispose()
         # remove temporary database used in test mode
         if self.options.test:
@@ -1027,7 +1036,7 @@ class Manager:
         global manager
         manager = None
 
-    def matching_tasks(self, task: str) -> list[str] | None:
+    def matching_tasks(self, task: str) -> list[str]:
         """Create list of tasks to run, preserving order."""
         task_names = [t for t in self.tasks if fnmatch.fnmatchcase(str(t).lower(), task.lower())]
         if not task_names:

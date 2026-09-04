@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any, NamedTuple
 from loguru import logger
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Iterable, Mapping, Sequence
+    from collections.abc import Callable, Mapping, Sequence
 
 logger = logger.bind(name='lazy_lookup')
 
@@ -116,7 +116,7 @@ class LazyDict(MutableMapping):
         return LazyLookup(self)
 
     def register_lazy_func(
-        self, func: Callable[[Mapping], None], keys: Iterable, args: Sequence, kwargs: Mapping
+        self, func: Callable[[Mapping], None], keys: Sequence, args: Sequence, kwargs: Mapping
     ):
         """Register a list of fields to be lazily loaded by callback func.
 

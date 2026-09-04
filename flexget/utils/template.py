@@ -78,14 +78,14 @@ class CoercingDateTime(DateTime):
     """
 
     @staticmethod
-    def _same_tz(first, second):
+    def _same_tz(first: datetime, second: date) -> tuple[datetime, datetime]:
         if not isinstance(first, datetime) or not isinstance(second, date):
             raise TypeError(
                 f'Cannot compare instances of {first.__class__.__name__} and {second.__class__.__name__}'
             )
         if not first or not second:
-            return first, second
-        if isinstance(second, date) and not isinstance(second, datetime):
+            return first, cast('datetime', second)
+        if not isinstance(second, datetime):
             second = CoercingDateTime.create(
                 second.year, second.month, second.day, tz=first.tzinfo
             )
@@ -97,37 +97,38 @@ class CoercingDateTime(DateTime):
 
     def __lt__(self, other):
         self, other = self._same_tz(self, other)
-        return DateTime.__lt__(self, other)
+        return datetime.__lt__(self, other)
 
     def __le__(self, other):
         self, other = self._same_tz(self, other)
-        return DateTime.__le__(self, other)
+        return datetime.__le__(self, other)
 
     def __gt__(self, other):
         self, other = self._same_tz(self, other)
-        return DateTime.__gt__(self, other)
+        return datetime.__gt__(self, other)
 
     def __ge__(self, other):
         self, other = self._same_tz(self, other)
-        return DateTime.__ge__(self, other)
+        return datetime.__ge__(self, other)
 
     def __eq__(self, other):
         # stdlib and pendulum dates and datetimes all subclass 'date'
         if not isinstance(other, date):
             return False
         self, other = self._same_tz(self, other)
-        return DateTime.__eq__(self, other)
+        return datetime.__eq__(self, other)
 
     def __ne__(self, other):
         if not isinstance(other, date):
             return True
         self, other = self._same_tz(self, other)
-        return DateTime.__ne__(self, other)
+        return datetime.__ne__(self, other)
 
     def __sub__(self, other):
         if isinstance(other, datetime):
             self, other = self._same_tz(self, other)
-        return DateTime.__sub__(self, other)
+        # DateTime.__sub__ gives a pendulum Interval instead of stdlib timedelta.
+        return DateTime.__sub__(cast('DateTime', self), cast('Any', other))
 
     __hash__ = DateTime.__hash__
 
@@ -141,30 +142,29 @@ class CoercingDateTime(DateTime):
 
 def filter_pathbase(val: Path | str = '') -> str:
     """Return base name of a path."""
-    if isinstance(val, str):
-        val = PureWindowsPath(val)
-    return val.name
+    path = PureWindowsPath(val) if isinstance(val, str) else val
+    return path.name
 
 
 def filter_pathname(val: Path | str = '') -> str:
     """Return base name of a path, without its extension."""
-    if isinstance(val, str):
-        val = PureWindowsPath(val)
-    return val.stem
+    path = PureWindowsPath(val) if isinstance(val, str) else val
+    return path.stem
 
 
 def filter_pathext(val: Path | str = '') -> str:
     """Extension of a path (including the '.')."""
-    if isinstance(val, str):
-        val = PureWindowsPath(val)
-    return val.suffix
+    path = PureWindowsPath(val) if isinstance(val, str) else val
+    return path.suffix
 
 
 def filter_pathdir(val: Path | str = '') -> PureWindowsPath | PurePosixPath | Path:
     """Directory containing the given path."""
     if isinstance(val, str):
-        val = PureWindowsPath(val) if '\\' in val and val[1] == ':' else PurePosixPath(val)
-    return val.parent
+        path = PureWindowsPath(val) if '\\' in val and val[1] == ':' else PurePosixPath(val)
+    else:
+        path = val
+    return path.parent
 
 
 def filter_pathscrub(val: str, os_mode: str | None = None) -> str:
@@ -198,7 +198,7 @@ def filter_formatdate(val, format_str):
 
 def filter_parsedate(val):
     """Attempt to parse a date according to the rules in ISO 8601 and RFC 2822."""
-    return CoercingDateTime.instance(pendulum.parse(val, strict=False, tz=None))
+    return CoercingDateTime.instance(cast('datetime', pendulum.parse(val, strict=False, tz=None)))
 
 
 def filter_date_suffix(date_str: str):
@@ -230,9 +230,11 @@ def filter_pad(val: int | str, width: int, fillchar: str = '0') -> str:
 
 def filter_to_date(date_time_val):
     """Return the date from any date-time object."""
-    if not isinstance(date_time_val, (datetime, date, time)):
+    if isinstance(date_time_val, datetime):
+        return date_time_val.date()
+    if not isinstance(date_time_val, (date, time)):
         return date_time_val
-    return date_time_val.date()
+    return date_time_val
 
 
 def filter_default(value, default_value: str = '', boolean: bool = True) -> str:
@@ -271,7 +273,7 @@ def filter_strip_year(name: str) -> str:
     return split_title_year(name).title
 
 
-def filter_get_year(name: str) -> str:
+def filter_get_year(name: str) -> int | None:
     return split_title_year(name).year
 
 
@@ -312,7 +314,7 @@ class FlexGetTemplate(Template):
 
     def new_context(self, vars=None, shared=False, locals=None):
         context = super().new_context(vars, shared, locals)
-        context.parent = LazyDict(context.parent)
+        context.parent = cast('dict', LazyDict(context.parent))
         return context
 
 
@@ -323,7 +325,7 @@ class FlexGetNativeTemplate(FlexGetTemplate, NativeTemplate):
 class FlexGetEnvironment(Environment):
     """Environment with template_class support."""
 
-    template_class: type[FlexGetTemplate]
+    template_class = FlexGetTemplate
 
 
 @event('manager.initialize')
@@ -338,7 +340,6 @@ def make_environment(manager: Manager) -> None:
         ]),
         extensions=['jinja2.ext.loopcontrols'],
     )
-    environment.template_class = FlexGetTemplate
     for name, filt in list(globals().items()):
         if name.startswith('filter_'):
             environment.filters[name.split('_', 1)[1]] = filt

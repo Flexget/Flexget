@@ -114,6 +114,8 @@ def tokenize(
     i = 0
     while i < len(text):
         m = match(text, i)
+        if m is None or m.lastindex is None:
+            raise ValueError('unexpected data while tokenizing bencoded input')
         s = m.group(m.lastindex)
         i = m.end()
         if m.lastindex == 2:
@@ -160,6 +162,8 @@ def bdecode(text: bytes) -> dict[str, Any]:
             raise SyntaxError('trailing junk')
     except (AttributeError, ValueError, StopIteration, TypeError) as e:
         raise SyntaxError(f'syntax error: {e}') from e
+    if not isinstance(data, dict):
+        raise SyntaxError('bencoded data is not a dictionary')
     return data
 
 
