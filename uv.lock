@@ -1461,11 +1461,11 @@ dev = [
     { name = "vcrpy" },
 ]
 docs = [
-    { name = "pydata-sphinx-theme", marker = "python_full_version >= '3.13'" },
-    { name = "sphinx", marker = "python_full_version >= '3.13'" },
-    { name = "sphinx-copybutton", marker = "python_full_version >= '3.13'" },
-    { name = "sphinx-design", marker = "python_full_version >= '3.13'" },
-    { name = "sphinxcontrib-svg2pdfconverter", marker = "python_full_version >= '3.13'" },
+    { name = "pydata-sphinx-theme", marker = "python_full_version >= '3.14'" },
+    { name = "sphinx", marker = "python_full_version >= '3.14'" },
+    { name = "sphinx-copybutton", marker = "python_full_version >= '3.14'" },
+    { name = "sphinx-design", marker = "python_full_version >= '3.14'" },
+    { name = "sphinxcontrib-svg2pdfconverter", marker = "python_full_version >= '3.14'" },
 ]
 ftp = [
     { name = "ftputil" },
@@ -1576,11 +1576,11 @@ dev = [
     { name = "vcrpy", specifier = "~=8.1" },
 ]
 docs = [
-    { name = "pydata-sphinx-theme", marker = "python_full_version >= '3.13'", specifier = "~=0.20.0" },
-    { name = "sphinx", marker = "python_full_version >= '3.13'", specifier = "~=9.1" },
-    { name = "sphinx-copybutton", marker = "python_full_version >= '3.13'", specifier = "~=0.5.2" },
-    { name = "sphinx-design", marker = "python_full_version >= '3.13'", specifier = "~=0.7.0" },
-    { name = "sphinxcontrib-svg2pdfconverter", marker = "python_full_version >= '3.13'", specifier = "~=2.0" },
+    { name = "pydata-sphinx-theme", marker = "python_full_version >= '3.14'", specifier = "~=0.20.0" },
+    { name = "sphinx", marker = "python_full_version >= '3.14'", specifier = "~=9.1" },
+    { name = "sphinx-copybutton", marker = "python_full_version >= '3.14'", specifier = "~=0.5.2" },
+    { name = "sphinx-design", marker = "python_full_version >= '3.14'", specifier = "~=0.7.0" },
+    { name = "sphinxcontrib-svg2pdfconverter", marker = "python_full_version >= '3.14'", specifier = "~=2.0" },
 ]
 ftp = [{ name = "ftputil", specifier = "~=5.1" }]
 matrix = [{ name = "matrix-nio", specifier = "~=0.26.0" }]
