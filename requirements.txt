@@ -70,7 +70,7 @@ flask-restx==1.3.2
     # via flexget
 greenlet==3.5.5 ; platform_machine == 'AMD64' or platform_machine == 'WIN32' or platform_machine == 'aarch64' or platform_machine == 'amd64' or platform_machine == 'ppc64le' or platform_machine == 'win32' or platform_machine == 'x86_64'
     # via sqlalchemy
-guessit==3.8.0
+guessit==4.4.0
     # via flexget
 html5lib==1.1
     # via flexget
