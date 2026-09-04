@@ -1980,9 +1980,12 @@ class TestCLI:
     def test_series_list(self, manager, execute_task):
         """Very rudimentary test, mostly makes sure this doesn't crash."""
         execute_task('learn_series')
+        import os
+        from unittest import mock
+
         options = get_parser().parse_args(['series', 'list', '--porcelain'])
         buffer = StringIO()
-        with capture_console(buffer):
+        with mock.patch.dict(os.environ, {'COLUMNS': '120'}), capture_console(buffer):
             manager.handle_cli(options=options)
         lines = buffer.getvalue().split('\n')
         assert all(
