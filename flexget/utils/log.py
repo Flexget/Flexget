@@ -7,7 +7,8 @@ from datetime import datetime, timedelta
 from typing import TYPE_CHECKING
 
 from loguru import logger
-from sqlalchemy import Column, DateTime, Index, Integer, String
+from sqlalchemy import Index
+from sqlalchemy.orm import Mapped, Session, mapped_column
 
 from flexget import db_schema
 from flexget.event import event
@@ -16,13 +17,11 @@ from flexget.utils.sqlalchemy_utils import table_schema
 
 logger = logger.bind(name='util.log')
 
+
 if TYPE_CHECKING:
     import loguru
-    from sqlalchemy.orm import Session
 
-    Base = object
-else:
-    Base = db_schema.versioned_base('log_once', 0)
+Base = db_schema.versioned_base('log_once', 0)
 
 
 @db_schema.upgrade('log_once')
@@ -40,9 +39,9 @@ class LogMessage(Base):
 
     __tablename__ = 'log_once'
 
-    id = Column(Integer, primary_key=True)
-    md5sum = Column(String, unique=True)
-    added = Column(DateTime, default=datetime.now())
+    id: Mapped[int] = mapped_column(primary_key=True)
+    md5sum: Mapped[str | None] = mapped_column(unique=True)
+    added: Mapped[datetime | None] = mapped_column(default=datetime.now)
 
     def __init__(self, md5sum: str) -> None:
         self.md5sum = md5sum

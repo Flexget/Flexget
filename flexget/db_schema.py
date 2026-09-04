@@ -5,10 +5,9 @@ from typing import TYPE_CHECKING, Any
 
 import sqlalchemy.event
 from loguru import logger
-from sqlalchemy import Column, DateTime, Integer, String
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.ext.declarative import DeclarativeMeta
-from sqlalchemy.orm import as_declarative
+from sqlalchemy.orm import Mapped, as_declarative, mapped_column
 
 import flexget
 from flexget.event import event
@@ -31,8 +30,8 @@ plugin_schemas: dict[str, dict[str, Any]] = {}
 class FlexgetVersion(Base):
     __tablename__ = 'flexget_version'
 
-    version = Column(String, primary_key=True)
-    created = Column(DateTime, default=datetime.now)
+    version: Mapped[str] = mapped_column(primary_key=True)
+    created: Mapped[datetime | None] = mapped_column(default=datetime.now)
 
     def __init__(self):
         self.version = get_current_flexget_version()
@@ -65,9 +64,9 @@ def get_flexget_db_version() -> str | None:
 class PluginSchema(Base):
     __tablename__ = 'plugin_schema'
 
-    id = Column(Integer, primary_key=True)
-    plugin = Column(String)
-    version = Column(Integer)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    plugin: Mapped[str | None]
+    version: Mapped[int | None]
 
     def __init__(self, plugin: str, version: int = 0):
         self.plugin = plugin

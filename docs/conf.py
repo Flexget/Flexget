@@ -1,4 +1,6 @@
+import importlib
 import os
+import pkgutil
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -47,7 +49,6 @@ autodoc_default_options = {
 }
 autodoc_member_order = 'groupwise'
 autodoc_typehints = 'description'
-autodoc_mock_imports = ['guppy']
 
 # -- sphinx.ext.intersphinx options ------------------------------------------
 
@@ -140,3 +141,12 @@ html_context = {
 
 latex_engine = 'xelatex'
 latex_use_modindex = False
+
+# -- Miscellaneous ------------------------------------------------------------
+
+# Workaround for https://github.com/sphinx-doc/sphinx/issues/14618
+for module_info in pkgutil.walk_packages(
+    flexget.__path__,
+    prefix=f'{flexget.__name__}.',
+):
+    importlib.import_module(module_info.name)

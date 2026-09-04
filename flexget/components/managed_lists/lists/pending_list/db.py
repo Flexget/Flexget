@@ -1,8 +1,10 @@
+from __future__ import annotations
+
 from datetime import datetime
 
 from loguru import logger
-from sqlalchemy import Boolean, Column, DateTime, Integer, Unicode, func, select
-from sqlalchemy.orm import relationship
+from sqlalchemy import func, select
+from sqlalchemy.orm import DynamicMapped, Mapped, mapped_column, relationship
 from sqlalchemy.sql.elements import and_
 from sqlalchemy.sql.schema import ForeignKey
 
@@ -41,11 +43,11 @@ def upgrade(ver, session):
 
 class PendingListList(Base):
     __tablename__ = 'pending_list_lists'
-    id = Column(Integer, primary_key=True)
-    name = Column(Unicode, unique=True)
-    added = Column(DateTime, default=datetime.now)
-    entries = relationship(
-        'PendingListEntry', backref='list', cascade='all, delete, delete-orphan', lazy='dynamic'
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str | None] = mapped_column(unique=True)
+    added: Mapped[datetime | None] = mapped_column(default=datetime.now)
+    entries: DynamicMapped[PendingListEntry] = relationship(
+        back_populates='list_', cascade='all, delete-orphan'
     )
 
     def to_dict(self):
@@ -54,14 +56,15 @@ class PendingListList(Base):
 
 class PendingListEntry(Base):
     __tablename__ = 'wait_list_entries'
-    id = Column(Integer, primary_key=True)
-    list_id = Column(Integer, ForeignKey(PendingListList.id), nullable=False)
-    added = Column(DateTime, default=datetime.now)
-    title = Column(Unicode)
-    original_url = Column(Unicode)
-    _json = Column('json', Unicode)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    list_id: Mapped[int] = mapped_column(ForeignKey(PendingListList.id))
+    list_: Mapped[PendingListList] = relationship(back_populates='entries')
+    added: Mapped[datetime | None] = mapped_column(default=datetime.now)
+    title: Mapped[str | None]
+    original_url: Mapped[str | None]
+    _json: Mapped[str | None] = mapped_column('json')
     entry = entry_synonym('_json')
-    approved = Column(Boolean)
+    approved: Mapped[bool | None]
 
     def __init__(self, entry, pending_list_id):
         self.title = entry['title']

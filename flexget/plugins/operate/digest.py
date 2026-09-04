@@ -2,7 +2,8 @@ import pickle
 from datetime import datetime
 
 from loguru import logger
-from sqlalchemy import Column, DateTime, Integer, Unicode, select
+from sqlalchemy import Unicode, select
+from sqlalchemy.orm import Mapped, mapped_column
 
 from flexget import db_schema, plugin
 from flexget.config_schema import one_or_more
@@ -60,10 +61,10 @@ def upgrade(ver, session):
 
 class DigestEntry(Base):
     __tablename__ = 'digest_entries'
-    id = Column(Integer, primary_key=True)
-    list = Column(Unicode, index=True)
-    added = Column(DateTime, default=datetime.now)
-    _json = Column('json', Unicode)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    list: Mapped[str | None] = mapped_column(index=True)
+    added: Mapped[datetime | None] = mapped_column(default=datetime.now)
+    _json: Mapped[str | None] = mapped_column('json')
     entry = entry_synonym('_json')
 
 

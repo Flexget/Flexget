@@ -15,6 +15,7 @@ import threading
 import traceback
 from contextlib import contextmanager
 from datetime import datetime, timedelta
+from importlib.metadata import version
 from pathlib import Path
 from typing import (
     TYPE_CHECKING,
@@ -23,16 +24,21 @@ from typing import (
 import sqlalchemy
 import yaml
 from loguru import logger
+from packaging.version import Version
 from sqlalchemy.exc import OperationalError
-from sqlalchemy.orm import declarative_base, sessionmaker
+from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
 # These need to be declared before we start importing from other flexget modules, since they might import them
 from flexget.config_schema import ConfigError
 from flexget.utils.sqlalchemy_utils import ContextSession
 from flexget.utils.tools import get_current_flexget_version, io_encoding, pid_exists
 
-Base = declarative_base()
-Session: type[ContextSession] = sessionmaker(class_=ContextSession)
+
+class Base(DeclarativeBase):
+    pass
+
+
+Session = sessionmaker(class_=ContextSession)
 
 import flexget.log  # noqa: E402
 from flexget import config_schema, db_schema, plugin  # noqa: E402
@@ -771,9 +777,9 @@ class Manager:
     def init_sqlalchemy(self) -> None:
         """Initialize SQLAlchemy."""
         try:
-            if [int(part) for part in sqlalchemy.__version__.split('.')] < [0, 7, 0]:
+            if Version(version('sqlalchemy')) < Version('2'):
                 logger.critical(
-                    'FATAL: SQLAlchemy 0.7.0 or newer required. Please upgrade your SQLAlchemy.'
+                    'FATAL: SQLAlchemy 2 or newer required. Please upgrade your SQLAlchemy.'
                 )
                 sys.exit(1)
         except ValueError:

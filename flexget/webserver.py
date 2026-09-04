@@ -8,7 +8,8 @@ import zxcvbn
 from flask import Flask, abort, redirect
 from flask_login import UserMixin
 from loguru import logger
-from sqlalchemy import Column, Integer, Unicode
+from sqlalchemy import String
+from sqlalchemy.orm import Mapped, mapped_column
 from werkzeug.security import generate_password_hash
 
 from flexget.manager import Base
@@ -78,10 +79,10 @@ class User(Base, UserMixin):
 
     __tablename__ = 'users'
 
-    id = Column(Integer, primary_key=True)
-    name = Column(Unicode(50), unique=True)
-    token = Column(Unicode, default=generate_key)
-    password = Column(Unicode)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str | None] = mapped_column(String(50), unique=True)
+    token: Mapped[str | None] = mapped_column(default=generate_key)
+    password: Mapped[str | None]
 
     def __repr__(self):
         return f'<User {self.name!r}>'
@@ -95,8 +96,8 @@ class WebSecret(Base):
 
     __tablename__ = 'secret'
 
-    id = Column(Unicode, primary_key=True)
-    value = Column(Unicode)
+    id: Mapped[str] = mapped_column(primary_key=True)
+    value: Mapped[str | None]
 
 
 def register_app(path, application, name):

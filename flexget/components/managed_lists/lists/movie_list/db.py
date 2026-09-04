@@ -1,8 +1,10 @@
+from __future__ import annotations
+
 from datetime import datetime
 
 from loguru import logger
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, Unicode, func
-from sqlalchemy.orm import relationship
+from sqlalchemy import ForeignKey, func
+from sqlalchemy.orm import DynamicMapped, Mapped, mapped_column, relationship
 from sqlalchemy.sql.elements import and_
 
 from flexget import plugin
@@ -26,11 +28,11 @@ class MovieListBase:
 
 class MovieListList(Base):
     __tablename__ = 'movie_list_lists'
-    id = Column(Integer, primary_key=True)
-    name = Column(Unicode, unique=True)
-    added = Column(DateTime, default=datetime.now)
-    movies = relationship(
-        'MovieListMovie', backref='list', cascade='all, delete, delete-orphan', lazy='dynamic'
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str | None] = mapped_column(unique=True)
+    added: Mapped[datetime | None] = mapped_column(default=datetime.now)
+    movies: DynamicMapped[MovieListMovie] = relationship(
+        back_populates='list_', cascade='all, delete-orphan'
     )
 
     def __repr__(self):
@@ -42,12 +44,15 @@ class MovieListList(Base):
 
 class MovieListMovie(Base):
     __tablename__ = 'movie_list_movies'
-    id = Column(Integer, primary_key=True)
-    added = Column(DateTime, default=datetime.now)
-    title = Column(Unicode)
-    year = Column(Integer)
-    list_id = Column(Integer, ForeignKey(MovieListList.id), nullable=False)
-    ids = relationship('MovieListID', backref='movie', cascade='all, delete, delete-orphan')
+    id: Mapped[int] = mapped_column(primary_key=True)
+    added: Mapped[datetime | None] = mapped_column(default=datetime.now)
+    title: Mapped[str | None]
+    year: Mapped[int | None]
+    list_id: Mapped[int] = mapped_column(ForeignKey(MovieListList.id))
+    list_: Mapped[MovieListList] = relationship(back_populates='movies')
+    ids: Mapped[list[MovieListID]] = relationship(
+        back_populates='movie', cascade='all, delete-orphan'
+    )
 
     def __repr__(self):
         return f'<MovieListMovie title={self.title},year={self.year},list_id={self.list_id}>'
@@ -83,11 +88,12 @@ class MovieListMovie(Base):
 
 class MovieListID(Base):
     __tablename__ = 'movie_list_ids'
-    id = Column(Integer, primary_key=True)
-    added = Column(DateTime, default=datetime.now)
-    id_name = Column(Unicode)
-    id_value = Column(Unicode)
-    movie_id = Column(Integer, ForeignKey(MovieListMovie.id))
+    id: Mapped[int] = mapped_column(primary_key=True)
+    added: Mapped[datetime | None] = mapped_column(default=datetime.now)
+    id_name: Mapped[str | None]
+    id_value: Mapped[str | None]
+    movie_id: Mapped[int | None] = mapped_column(ForeignKey(MovieListMovie.id))
+    movie: Mapped[MovieListMovie | None] = relationship(back_populates='ids')
 
     def __repr__(self):
         return f'<MovieListID id_name={self.id_name},id_value={self.id_value},movie_id={self.movie_id}>'

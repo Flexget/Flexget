@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 from collections.abc import MutableSet
 from datetime import datetime
@@ -5,8 +7,8 @@ from pathlib import Path
 
 from babelfish import Language
 from loguru import logger
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, Unicode, and_, func
-from sqlalchemy.orm import relationship
+from sqlalchemy import ForeignKey, and_, func
+from sqlalchemy.orm import DynamicMapped, Mapped, mapped_column, relationship
 
 from flexget import plugin
 from flexget.db_schema import versioned_base, with_session
@@ -109,11 +111,11 @@ def normalize_language(language):
 
 class SubtitleListList(Base):
     __tablename__ = 'subtitle_list_lists'
-    id = Column(Integer, primary_key=True)
-    name = Column(Unicode, unique=True)
-    added = Column(DateTime, default=datetime.now)
-    files = relationship(
-        'SubtitleListFile', backref='list', cascade='all, delete, delete-orphan', lazy='dynamic'
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str | None] = mapped_column(unique=True)
+    added: Mapped[datetime | None] = mapped_column(default=datetime.now)
+    files: DynamicMapped[SubtitleListFile] = relationship(
+        back_populates='list_', cascade='all, delete-orphan'
     )
 
     def __repr__(self):
@@ -125,18 +127,19 @@ class SubtitleListList(Base):
 
 class SubtitleListFile(Base):
     __tablename__ = 'subtitle_list_files'
-    id = Column(Integer, primary_key=True)
-    added = Column(DateTime, default=datetime.now)
-    title = Column(Unicode)
-    location = Column(Unicode)
-    list_id = Column(Integer, ForeignKey(SubtitleListList.id), nullable=False)
-    languages = relationship(
-        'SubtitleListLanguage', backref='file', lazy='joined', cascade='all, delete-orphan'
+    id: Mapped[int] = mapped_column(primary_key=True)
+    added: Mapped[datetime | None] = mapped_column(default=datetime.now)
+    title: Mapped[str | None]
+    location: Mapped[str | None]
+    list_id: Mapped[int] = mapped_column(ForeignKey(SubtitleListList.id))
+    languages: Mapped[list[SubtitleListLanguage]] = relationship(
+        back_populates='file', lazy='joined', cascade='all, delete-orphan'
     )
-    remove_after = Column(Unicode)
+    remove_after: Mapped[str | None]
+    list_: Mapped[SubtitleListList] = relationship(back_populates='files')
 
     def __repr__(self):
-        return f'<SubtitleListFile title={self.title},path={self.location},list_name={self.list.name}>'
+        return f'<SubtitleListFile title={self.title},path={self.location},list_name={self.list_.name}>'
 
     def to_entry(self):
         entry = Entry()
@@ -165,10 +168,11 @@ class SubtitleListFile(Base):
 
 class SubtitleListLanguage(Base):
     __tablename__ = 'subtitle_list_languages'
-    id = Column(Integer, primary_key=True)
-    added = Column(DateTime, default=datetime.now)
-    language = Column(Unicode)
-    subtitle_list_file_id = Column(Integer, ForeignKey('subtitle_list_files.id'))
+    id: Mapped[int] = mapped_column(primary_key=True)
+    added: Mapped[datetime | None] = mapped_column(default=datetime.now)
+    language: Mapped[str | None]
+    subtitle_list_file_id: Mapped[int | None] = mapped_column(ForeignKey('subtitle_list_files.id'))
+    file: Mapped[SubtitleListFile] = relationship(back_populates='languages')
 
 
 class SubtitleList(MutableSet):

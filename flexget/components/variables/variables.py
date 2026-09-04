@@ -5,8 +5,7 @@ import yaml
 from jinja2 import TemplateError
 from jinja2.nativetypes import NativeEnvironment
 from loguru import logger
-from sqlalchemy import Column
-from sqlalchemy.sql.sqltypes import DateTime, Integer, Unicode
+from sqlalchemy.orm import Mapped, mapped_column
 
 from flexget import db_schema
 from flexget.config_schema import register_config_key
@@ -25,10 +24,10 @@ Base = db_schema.versioned_base('variables', DB_VERSION)
 class Variables(Base):
     __tablename__ = 'variables'
 
-    id = Column(Integer, primary_key=True)
-    _variables = Column('variables', Unicode)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    _variables: Mapped[str | None] = mapped_column('variables')
     variables = json_synonym('_variables')
-    added = Column(DateTime, default=datetime.now)
+    added: Mapped[datetime | None] = mapped_column(default=datetime.now)
 
 
 def variables_from_file(config_base, filename):
