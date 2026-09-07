@@ -584,7 +584,7 @@ class TestSeriesParser:
         assert s.id_type == 'date'
 
         # Future dates should not be considered dates
-        s = parse(name='Something', data='Something 01.02.32')
+        s = parse(name='Something', data='Something 01.02.35')
         assert s.id_type != 'date'
 
         # Dates with parts used to be parsed as episodes.
