@@ -57,7 +57,6 @@ dependencies = [
   "pynzb~=0.1.0",
   "pyparsing~=3.2",
   "pyrss2gen~=1.1",
-  "pyscrypt~=1.6",
   "python-dateutil~=2.9",
   "pyyaml~=6.0",
   "rebulk~=6.0",

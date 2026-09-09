@@ -144,6 +144,7 @@ class ImdbWatchlist:
         page_no = 1
 
         while len(items) < total_item_count:
+            item_count_before = len(items)
             page_no += 1
             params['page'] = page_no
             page = self.fetch_page(task, url, params, headers)
@@ -159,6 +160,16 @@ class ImdbWatchlist:
                 )
             except Exception:
                 raise plugin.PluginError('Received invalid list data')
+            if len(items) == item_count_before:
+                # IMDb caps advancedTitleSearch paging, so totalItems can exceed what it will
+                # actually serve. Without this the loop never terminates.
+                logger.warning(
+                    'imdb list page {} returned no items, stopping at {} of {} items',
+                    page_no,
+                    len(items),
+                    total_item_count,
+                )
+                break
 
         return [self.parse_entry(item['node']['title'], config) for item in items]
 
