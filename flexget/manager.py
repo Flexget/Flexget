@@ -281,6 +281,16 @@ class Manager:
         :returns: a list of :class:`threading.Event` instances which will be
             set when each respective task has finished running
         """
+        # A dead task queue silently swallows anything queued to it: the tasks never run and
+        # their finished_events are never set. Recover here, at the funnel every caller
+        # (scheduler, api, irc, cli) routes through, rather than only in execute_command.
+        if self.task_queue.has_died():
+            logger.error(
+                'Task queue has died unexpectedly. Restarting it. Please open an issue on Github and include'
+                ' any previous error logs.'
+            )
+            self.task_queue = TaskQueue()
+            self.task_queue.start()
         if options is None:
             options = copy.copy(self.options.execute)
         elif isinstance(options, dict):
@@ -425,13 +435,6 @@ class Manager:
         """
         fire_event('manager.execute.started', self, options)
         if self.task_queue.is_alive() or self.is_daemon:
-            if not self.task_queue.is_alive():
-                logger.error(
-                    'Task queue has died unexpectedly. Restarting it. Please open an issue on Github and include'
-                    ' any previous error logs.'
-                )
-                self.task_queue = TaskQueue()
-                self.task_queue.start()
             if len(self.task_queue):
                 logger.verbose('There is a task already running, execution queued.')
             finished_events = self.execute(options)
