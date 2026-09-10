@@ -1417,7 +1417,6 @@ dependencies = [
     { name = "pynzb" },
     { name = "pyparsing" },
     { name = "pyrss2gen" },
-    { name = "pyscrypt" },
     { name = "python-dateutil" },
     { name = "pyyaml" },
     { name = "rebulk" },
@@ -1536,7 +1535,6 @@ requires-dist = [
     { name = "pynzb", specifier = "~=0.1.0" },
     { name = "pyparsing", specifier = "~=3.2" },
     { name = "pyrss2gen", specifier = "~=1.1" },
-    { name = "pyscrypt", specifier = "~=1.6" },
     { name = "python-dateutil", specifier = "~=2.9" },
     { name = "pyyaml", specifier = "~=6.0" },
     { name = "rebulk", specifier = "~=6.0" },
@@ -2967,12 +2965,6 @@ name = "pyrss2gen"
 version = "1.1"
 source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/6d/01/fd610d5fc86f7dbdbefc4baa8f7fe15a2e5484244c41dcf363ca7e89f60c/PyRSS2Gen-1.1.tar.gz", hash = "sha256:7960aed7e998d2482bf58716c316509786f596426f879b05f8d84e98b82c6ee7", size = 6854, upload-time = "2013-02-21T03:23:02.807Z" }
-
-[[package]]
-name = "pyscrypt"
-version = "1.6.2"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/c6/56/51603b5714d221b784e4cbc2790b1215b3fb108e4d308a0bd52e4c3ce532/pyscrypt-1.6.2.tar.gz", hash = "sha256:bafdd195f10f7c7395f0133bad09746a68e0e6b66da202c9bdb6b1eb4abba5e9", size = 36555, upload-time = "2015-02-03T21:44:52.793Z" }
 
 [[package]]
 name = "pysftp"

@@ -20,7 +20,7 @@ class AwsWaf:
         self.domain = domain
         self.endpoint = endpoint
         self.session = requests.Session(impersonate='chrome')
-        self.session.headers = self._headers()
+        self.session.headers.update(self._headers())
 
     def _headers(self, content_type: str | None = None) -> dict:
         headers = {
@@ -50,7 +50,12 @@ class AwsWaf:
         return self.session.get(f'https://{self.endpoint}/inputs?client=browser').json()
 
     def build_payload(self, inputs: dict):
-        verify = CHALLENGE_TYPES[inputs['challenge_type']]
+        challenge_type = inputs['challenge_type']
+        verify = CHALLENGE_TYPES.get(challenge_type)
+        if not callable(verify):
+            raise NotImplementedError(
+                f'No solver implemented for challenge type: {verify or challenge_type}'
+            )
         checksum, fp = get_fp(self.user_agent)
         return {
             'challenge': inputs['challenge'],
@@ -89,11 +94,15 @@ class AwsWaf:
         }
 
     def verify(self, payload):
-        self.session.headers = self._headers(content_type='text/plain;charset=UTF-8')
+        self.session.headers.update(self._headers(content_type='text/plain;charset=UTF-8'))
         res = self.session.post(f'https://{self.endpoint}/verify', json=payload).json()
         return res['token']
 
     def __call__(self):
-        inputs = self.get_inputs()
-        payload = self.build_payload(inputs)
-        return self.verify(payload)
+        try:
+            inputs = self.get_inputs()
+            payload = self.build_payload(inputs)
+            return self.verify(payload)
+        finally:
+            # A fresh session (and curl handle) is created per solve; don't leak it.
+            self.session.close()

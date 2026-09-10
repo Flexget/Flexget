@@ -142,8 +142,6 @@ pyparsing==3.3.2
     # via flexget
 pyrss2gen==1.1
     # via flexget
-pyscrypt==1.6.2
-    # via flexget
 python-dateutil==2.9.0.post0
     # via
     #   flexget

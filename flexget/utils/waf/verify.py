@@ -3,12 +3,20 @@ from __future__ import annotations
 import binascii
 import hashlib
 import itertools
+import time
 from typing import TYPE_CHECKING, Any
-
-import pyscrypt
 
 if TYPE_CHECKING:
     from collections.abc import Callable
+
+# The nonce search below is a brute force loop whose length is dictated by the server supplied
+# difficulty. A single task blocks the whole daemon task queue, so give up rather than wedge it.
+# ponytail: fixed budget, make it a config option if anyone actually needs a longer one.
+SOLVE_TIMEOUT = 60.0
+
+# How often to check the deadline. Checking every nonce would cost more than the hash itself
+# for the sha256 solver.
+_DEADLINE_CHECK_INTERVAL = 256
 
 
 def _check(digest: bytes, difficulty: int) -> bool:
@@ -18,9 +26,19 @@ def _check(digest: bytes, difficulty: int) -> bool:
     return not (rem and digest[full] >> (8 - rem))
 
 
+def _check_deadline(deadline: float, difficulty: int) -> None:
+    if time.monotonic() > deadline:
+        raise TimeoutError(
+            f'AWS WAF challenge (difficulty {difficulty}) not solved in {SOLVE_TIMEOUT} seconds'
+        )
+
+
 def hash_pow(challenge_input, checksum, difficulty):
+    deadline = time.monotonic() + SOLVE_TIMEOUT
     combined_bytes = (challenge_input + checksum).encode('utf-8')
     for nonce in itertools.count(0):
+        if nonce % _DEADLINE_CHECK_INTERVAL == 0:
+            _check_deadline(deadline, difficulty)
         data = combined_bytes + str(nonce).encode()
         digest = hashlib.sha256(data).digest()
         if _check(digest, difficulty):
@@ -30,17 +48,20 @@ def hash_pow(challenge_input, checksum, difficulty):
 
 def scrypt_func(input_str, salt_str, memory_cost):
     return binascii.hexlify(
-        pyscrypt.hash(
-            password=input_str.encode(), salt=salt_str.encode(), N=memory_cost, r=8, p=1, dkLen=16
+        hashlib.scrypt(
+            input_str.encode(), salt=salt_str.encode(), n=memory_cost, r=8, p=1, dklen=16
         )
     ).decode()
 
 
 def compute_scrypt_nonce(challenge_input, checksum, difficulty):
+    deadline = time.monotonic() + SOLVE_TIMEOUT
     combined = challenge_input + checksum
     salt = checksum
     memory = 128
     for nonce in itertools.count(0):
+        if nonce % _DEADLINE_CHECK_INTERVAL == 0:
+            _check_deadline(deadline, difficulty)
         result = scrypt_func(f'{combined}{nonce}', salt, memory)
         if _check(binascii.unhexlify(result), difficulty):
             return str(nonce)
@@ -48,7 +69,7 @@ def compute_scrypt_nonce(challenge_input, checksum, difficulty):
 
 
 # typos:off
-CHALLENGE_TYPES: dict[str, Callable[[Any, Any, Any], str] | str] = {
+CHALLENGE_TYPES: dict[str, Callable[[Any, Any, Any], str | None] | str] = {
     'h72f957df656e80ba55f5d8ce2e8c7ccb59687dba3bfb273d54b08a261b2f3002': compute_scrypt_nonce,
     'h7b0c470f0cfe3a80a9e26526ad185f484f6817d0832712a4a37a908786a6a67f': hash_pow,
     'ha9faaffd31b4d5ede2a2e19d2d7fd525f66fee61911511960dcbb52d3c48ce25': 'mp_verify',
