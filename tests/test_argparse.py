@@ -63,10 +63,14 @@ def test_post_defaults():
     assert result.post_set == 'custom'
 
 
-def test_help_when_config_is_missing(capsys):
+def test_help_when_config_is_missing(capsys, monkeypatch):
     """`flexget --help` must print the help message, not fail to load a config (#4924)."""
     import flexget
 
+    # main() re-initializes logging, which would remove the pytest log
+    # capture handler set up by conftest; stub it out, it plays no part in
+    # the --help path (HelpAction exits before log.start is reached).
+    monkeypatch.setattr(flexget.log, 'initialize', lambda *args, **kwargs: None)
     with pytest.raises(SystemExit) as exc_info:
         flexget.main(['-c', '/nonexistent/flexget-test-config.yml', '--help'])
     assert exc_info.value.code == 0
