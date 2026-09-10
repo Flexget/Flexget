@@ -66,6 +66,7 @@ class TestJinjaFilters:
         'format_size',
         'asciify',
         'strip_symbols',
+        'shell_quote',
     ]
 
     def test_stripyear(self, execute_task):
