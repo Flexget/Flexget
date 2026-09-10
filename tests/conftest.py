@@ -218,6 +218,28 @@ def caplog(pytestconfig, _caplog):  # noqa: F811
     logger.remove(handler_id)
 
 
+@pytest.fixture(autouse=True)
+def _stub_curl_cffi_session(monkeypatch):
+    """Curl_cffi bypasses vcrpy; give it a plain requests.Session so tests can see it.
+
+    curl_cffi (used by the AWS WAF / IMDb solver) talks to libcurl directly
+    and never touches http.client, so it bypasses both vcrpy cassette replay
+    (use_vcr) and the no_requests network guard. Give it a plain
+    requests.Session instead, which both already know how to handle.
+
+    ponytail: unconditional swap, so re-recording one of the IMDb cassettes
+    from scratch needs a manual workaround (real WAF-solving needs the real
+    curl_cffi session) -- upgrade to a conditional stub if that's needed often.
+    """
+
+    def fake_session(*args, **kwargs):
+        kwargs.pop('impersonate', None)
+        return requests.Session()
+
+    monkeypatch.setattr('curl_cffi.requests.Session', fake_session)
+    monkeypatch.setattr('flexget.components.imdb.waf._session', None)
+
+
 # --- End Public Fixtures ---
 
 
