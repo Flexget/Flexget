@@ -72,6 +72,13 @@ class TaskQueue:
     def is_alive(self) -> bool:
         return self._thread and self._thread.is_alive()
 
+    def has_died(self) -> bool:
+        """Return True if the queue thread was started and is no longer running.
+
+        Distinct from ``not is_alive()``, which is also true for a queue that was never started.
+        """
+        return self._thread is not None and not self._thread.is_alive()
+
     def put(self, task: Task):
         """Add a task to be executed to the queue."""
         self.run_queue.put(task)

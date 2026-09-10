@@ -90,6 +90,9 @@ main_schema = {
 scheduler = None
 scheduler_job_map = {}
 
+# How often a scheduled run checks that the task queue is still alive while waiting for a task.
+QUEUE_LIVENESS_INTERVAL = 60
+
 
 def job_id(conf):
     """Create a unique id for a schedule item in config."""
@@ -103,8 +106,17 @@ def run_job(tasks):
         options={'tasks': tasks, 'cron': True, 'allow_manual': False}, priority=5
     )
     for _, task_name, event_ in finished_events:
+        # A slow task is fine and keeps waiting, but if the queue thread dies its finished_event
+        # is never set. An unbounded wait there pins this job instance forever, and apscheduler
+        # then skips every later run with 'maximum number of running instances reached'.
+        while not event_.wait(timeout=QUEUE_LIVENESS_INTERVAL):
+            if manager.task_queue.has_died():
+                logger.error(
+                    'Task queue died while waiting for task {} to finish, abandoning this run.',
+                    task_name,
+                )
+                return
         logger.debug('task finished executing: {}', task_name)
-        event_.wait()
     logger.debug('all tasks in schedule finished executing')
 
 
