@@ -1,3 +1,4 @@
+import shlex
 import subprocess
 
 from loguru import logger
@@ -13,23 +14,28 @@ logger = logger.bind(name='exec')
 
 
 class EscapingEntry(Entry):
-    """Helper class, same as a Entry, but returns all string value with quotes escaped."""
+    """Copy of an Entry whose string field values are pre-quoted for safe use in a shell command line.
 
-    def __init__(self, entry):
-        super().__init__(entry)
+    Used by the `auto_escape` option. The store is populated directly
+    (bypassing Entry's normal per-field __setitem__ coercion, e.g.
+    `location` -> `Path`) so the quoting survives untouched. Disposable,
+    one-shot rendering context only -- not a real Entry (no accept/reject/fail
+    state).
+    """
 
-    def __getitem__(self, key):
-        value = super().__getitem__(key)
-        # TODO: May need to be different depending on OS
-        if isinstance(value, str):
-            value = value.replace('"', '\\"')
-        return value
+    def __init__(self, entry: Entry) -> None:
+        super().__init__()
+        self.store = {
+            key: shlex.quote(value) if isinstance(value, str) else value
+            for key, value in entry.store.items()
+        }
+        self.task = entry.task
 
 
 class PluginExec:
     """Execute commands.
 
-    Simple example, xecute command for entries that reach output::
+    Simple example, execute command for entries that reach output::
 
       exec: echo 'found {{title}} at {{url}}' > file
 
@@ -44,6 +50,44 @@ class PluginExec:
           for_accepted: echo 'accepted {{title}} - {{url}} > file
 
     You can use all (available) entry fields in the command.
+
+    Security
+    --------
+    Commands run in a real shell (``shell=True``). Entry fields (``title``,
+    ``url``, and anything else that came from a feed/site) are
+    attacker-controlled: a malicious feed can put shell metacharacters
+    (backticks, ``$()``, ``;``, ``|``, quotes, newlines, ...) in a field and
+    have them run as part of your command. This does not apply to the
+    ``phase`` key, which templates from the task rather than an entry.
+
+    To safely substitute untrusted entry fields, either:
+
+    - Set ``auto_escape: yes`` to shell-quote every substituted entry field
+      automatically::
+
+        exec:
+          auto_escape: yes
+          on_output:
+            for_accepted: echo 'accepted {{title}}' >> log.txt
+
+    - Or apply the ``shell_quote`` filter to individual fields (works
+      everywhere, including ``phase:``)::
+
+        exec:
+          on_output:
+            for_accepted: echo {{title|shell_quote}} >> log.txt
+
+    Important: do not wrap an escaped field in your own quotes
+    (``"{{title}}"`` or ``'{{title}}'``). That is not just redundant, it can
+    reopen the hole: a backtick is still expanded by the shell inside double
+    quotes, and an embedded quote from the escaping can break out of your own
+    single quotes. Leave the field bare (or adjacent to plain unquoted text,
+    e.g. ``/path/{{title|shell_quote}}``).
+
+    Neither option protects shell syntax *you* write literally: ``;``,
+    ``|``, ``>``, backticks etc. that you type yourself in the command are
+    still your responsibility. They only ensure a substituted value can't
+    break out of its own token to run something else.
     """
 
     NAME = 'exec'

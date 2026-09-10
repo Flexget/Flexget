@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import locale
 import re
+import shlex
 from contextlib import suppress
 from copy import copy
 from datetime import date, datetime, time
@@ -172,6 +173,11 @@ def filter_pathscrub(val: str, os_mode: str | None = None) -> str:
     if not isinstance(val, str):
         return val
     return pathscrub(val, os_mode)
+
+
+def filter_shell_quote(val) -> str:
+    """Quote a value so it is safe to use as a single token in a shell command line."""
+    return shlex.quote(str(val))
 
 
 def filter_re_replace(val: AnyStr, pattern: str, repl: str) -> str:
