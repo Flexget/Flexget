@@ -1,4 +1,3 @@
-import shlex
 import subprocess
 
 from loguru import logger
@@ -7,7 +6,12 @@ from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.utils.template import RenderError, render_from_entry, render_from_task
+from flexget.utils.template import (
+    RenderError,
+    filter_shell_quote,
+    render_from_entry,
+    render_from_task,
+)
 from flexget.utils.tools import io_encoding
 
 logger = logger.bind(name='exec')
@@ -26,7 +30,7 @@ class EscapingEntry(Entry):
     def __init__(self, entry: Entry) -> None:
         super().__init__()
         self.store = {
-            key: shlex.quote(value) if isinstance(value, str) else value
+            key: filter_shell_quote(value) if isinstance(value, str) else value
             for key, value in entry.store.items()
         }
         self.task = entry.task
