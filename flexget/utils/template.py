@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import locale
+import os
 import re
+import shlex
 from contextlib import suppress
 from copy import copy
 from datetime import date, datetime, time
@@ -172,6 +174,46 @@ def filter_pathscrub(val: str, os_mode: str | None = None) -> str:
     if not isinstance(val, str):
         return val
     return pathscrub(val, os_mode)
+
+
+def _quote_windows(value: str) -> str:
+    """Quote a value as a single safe argument for a command run via cmd.exe (Windows shell=True).
+
+    Unlike `subprocess.list2cmdline`, this *always* wraps in quotes (not just when the value
+    has whitespace/quotes), so cmd.exe treats characters it would otherwise parse itself
+    (`&|<>()^`) as inert content instead of command syntax.
+
+    ponytail: doesn't neutralize `%var%` expansion (cmd.exe performs it even inside quotes,
+    with no clean escape outside a batch file) or a value that mixes a literal `"` with those
+    metacharacters (the embedded-quote escape can end the quoted region early); reach for a
+    dedicated library (e.g. mslex) if either becomes a real threat.
+    """
+    out = ['"']
+    i, n = 0, len(value)
+    while i < n:
+        char = value[i]
+        if char == '\\':
+            j = i
+            while j < n and value[j] == '\\':
+                j += 1
+            run = j - i
+            out.append('\\' * (run * 2 if j == n or value[j] == '"' else run))
+            i = j
+        elif char == '"':
+            out.append('\\"')
+            i += 1
+        else:
+            out.append(char)
+            i += 1
+    out.append('"')
+    return ''.join(out)
+
+
+def filter_shell_quote(val) -> str:
+    """Quote a value so it is safe to use as a single token in a shell command line."""
+    if os.name == 'nt':
+        return _quote_windows(str(val))
+    return shlex.quote(str(val))
 
 
 def filter_re_replace(val: AnyStr, pattern: str, repl: str) -> str:

@@ -1,11 +1,8 @@
 import sys
 from pathlib import Path
 
-import pytest
-
 
 class TestExec:
-    __tmp__ = True
     config = (
         """
         templates:
@@ -38,7 +35,24 @@ class TestExec:
               on_output:
                 for_entries: """
         + sys.executable
-        + """ exec.py "{{temp_dir}}" "{{title}}" "{{quotes}}" "/start/{{quotes}}" "{{otherchars}}"
+        + """ exec.py "{{temp_dir}}" "{{title}}" {{quotes}} /start/{{quotes}} {{otherchars}}
+          test_auto_escape_injection:
+            mock:
+              - {title: 'inject `touch __tmp__/pwned_backtick` and $(touch __tmp__/pwned_subshell); echo done'}
+            exec:
+              auto_escape: yes
+              on_output:
+                for_entries: """
+        + sys.executable
+        + """ exec.py "{{temp_dir}}" result {{title}}
+          test_shell_quote_filter_injection:
+            mock:
+              - {title: 'inject `touch __tmp__/pwned_backtick2` and $(touch __tmp__/pwned_subshell2); echo done'}
+            exec:
+              on_output:
+                for_entries: """
+        + sys.executable
+        + """ exec.py "{{temp_dir}}" result {{title|shell_quote}}
     """
     )
 
@@ -65,15 +79,39 @@ class TestExec:
                     f'{line} != /a hybrid/path/with spaces'
                 )
 
-    # TODO: This doesn't work on linux.
-    @pytest.mark.skip(reason="This doesn't work on linux")
-    def test_auto_escape(self, execute_task):
+    def test_auto_escape(self, execute_task, tmp_path):
         task = execute_task('test_auto_escape')
         for entry in task.accepted:
-            with (self.__tmp__ / entry['title']).open() as infile:
-                line = infile.readline().rstrip('\n')
-                assert line == 'single \' double"', f'{line} != single \' double"'
-                line = infile.readline().rstrip('\n')
-                assert line == '/start/single \' double"', f'{line} != /start/single \' double"'
-                line = infile.readline().rstrip('\n')
-                assert line == '% a $a! ` *', f'{line} != % a $a! ` *'
+            with (tmp_path / entry['title']).open() as infile:
+                lines = infile.read().splitlines()
+            assert lines[0] == entry['quotes'], f'{lines[0]!r} != {entry["quotes"]!r}'
+            assert lines[1] == '/start/' + entry['quotes']
+            assert lines[2] == entry['otherchars']
+
+    def test_auto_escape_blocks_injection(self, execute_task, tmp_path):
+        task = execute_task('test_auto_escape_injection')
+        assert len(task.accepted) == 1
+        entry = task.accepted[0]
+        with (tmp_path / 'result').open() as infile:
+            line = infile.readline().rstrip('\n')
+        assert line == entry['title'], (
+            'malicious title was not passed through as one safe argument'
+        )
+        assert not (tmp_path / 'pwned_backtick').exists(), (
+            'backtick command substitution executed!'
+        )
+        assert not (tmp_path / 'pwned_subshell').exists(), '$() command substitution executed!'
+
+    def test_shell_quote_filter_blocks_injection(self, execute_task, tmp_path):
+        task = execute_task('test_shell_quote_filter_injection')
+        assert len(task.accepted) == 1
+        entry = task.accepted[0]
+        with (tmp_path / 'result').open() as infile:
+            line = infile.readline().rstrip('\n')
+        assert line == entry['title'], (
+            'malicious title was not passed through as one safe argument'
+        )
+        assert not (tmp_path / 'pwned_backtick2').exists(), (
+            'backtick command substitution executed!'
+        )
+        assert not (tmp_path / 'pwned_subshell2').exists(), '$() command substitution executed!'
