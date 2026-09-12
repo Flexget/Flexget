@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from loguru import logger
-from sqlalchemy import ColumnDefault, Index, Sequence, text
+from sqlalchemy import Index, text
 from sqlalchemy.exc import NoSuchTableError, OperationalError
 from sqlalchemy.orm import Session
 from sqlalchemy.schema import MetaData, Table
@@ -52,7 +52,7 @@ def index_exists(table_name: str, index_name: str, session: Session) -> bool:
 
 def table_schema(name: str, session: Session) -> Table:
     """Return Table schema using SQLAlchemy reflect as it currently exists in the db."""
-    return Table(name, MetaData(), autoload_with=session.bind)
+    return Table(name, MetaData(), autoload_with=session.get_bind())
 
 
 def table_columns(table: str | Table, session: Session) -> list[str]:
@@ -66,13 +66,13 @@ def table_columns(table: str | Table, session: Session) -> list[str]:
     return [column.name for column in table.columns]
 
 
-def table_index(table_name: str, index_name: str, session: Session) -> Index:
+def table_index(table_name: str, index_name: str, session: Session) -> Index | None:
     """Find an index by table name and index name.
 
     :param string table_name: Name of table
     :param string index_name: Name of the index
     :param Session session: SQLAlchemy Session
-    :returns: The requested index
+    :returns: The requested index, or None if it doesn't exist
     """
     table = table_schema(table_name, session)
     return get_index_by_name(table, index_name)
@@ -86,7 +86,9 @@ def drop_index(table_name: str, index_name: str, session: Session) -> None:
     :param Session session: SQLAlchemy Session
     """
     index = table_index(table_name, index_name, session)
-    index.drop(bind=session.bind)
+    if index is None:
+        raise ValueError(f'No index named {index_name} on table {table_name}')
+    index.drop(bind=session.get_bind())
 
 
 def table_add_column(
@@ -116,7 +118,7 @@ def table_add_column(
     if not isinstance(col_type, TypeEngine):
         # If we got a type class instead of an instance of one, instantiate it
         col_type = col_type()
-    type_string = session.bind.engine.dialect.type_compiler.process(col_type)
+    type_string = session.get_bind().engine.dialect.type_compiler.process(col_type)
     statement = f'ALTER TABLE {table.name} ADD {name} {type_string}'
     session.execute(text(statement))
     session.commit()
@@ -124,21 +126,21 @@ def table_add_column(
     if default is not None:
         # Get the new schema with added column
         table = table_schema(table.name, session)
-        if not isinstance(default, (ColumnDefault, Sequence)):
-            default = ColumnDefault(default)
-        default._set_parent(getattr(table.c, name))
-        statement = table.update().values({name: default.execute(bind=session.bind)})
+        if callable(default):
+            default = default()
+        statement = table.update().values({name: default})
         session.execute(statement)
         session.commit()
 
 
 def drop_tables(names: list[str], session: Session) -> None:
     """Take a list of table names and drops them from the database if they exist."""
+    bind = session.get_bind()
     metadata = MetaData()
-    metadata.reflect(bind=session.bind)
+    metadata.reflect(bind=bind)
     for table in metadata.sorted_tables:
         if table.name in names:
-            table.drop()
+            table.drop(bind=bind)
 
 
 def get_index_by_name(table: Table, name: str) -> Index | None:
@@ -165,7 +167,7 @@ def create_index(table_name: str, session: Session, *column_names: str) -> None:
     table = table_schema(table_name, session)
     columns = [getattr(table.c, column) for column in column_names]
     try:
-        Index(index_name, *columns).create(bind=session.bind)
+        Index(index_name, *columns).create(bind=session.get_bind())
     except OperationalError:
         logger.opt(exception=True).debug('Error creating index.')
 

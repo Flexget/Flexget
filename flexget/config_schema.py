@@ -7,10 +7,12 @@ import re
 from collections import defaultdict
 from json import JSONDecodeError
 from json import loads as json_loads
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 from urllib.parse import parse_qsl, urlparse
 
 import jsonschema
+import jsonschema._utils
+import jsonschema.validators
 from jsonschema import ValidationError
 from loguru import logger
 from referencing import Registry as _Registry
@@ -26,7 +28,6 @@ from flexget.utils.tools import parse_episode_identifier, parse_filesize, parse_
 
 if TYPE_CHECKING:
     from collections.abc import Callable
-    from re import Match, Pattern
 
 logger = logger.bind(name='config_schema')
 
@@ -71,6 +72,7 @@ def register_config_key(key: str, schema: JsonSchema, required: bool = False):
       Specify whether this is a mandatory key.
     """
     root_schema = get_schema()
+    assert isinstance(root_schema, dict)
     root_schema['properties'][key] = schema
     if required:
         root_schema.setdefault('required', []).append(key)
@@ -94,6 +96,7 @@ def get_schema() -> JsonSchema:
 
 def one_or_more(schema: JsonSchema, unique_items: bool = False) -> JsonSchema:
     """Construct a schema that validates items matching `schema` or an array containing items matching `schema`."""
+    assert isinstance(schema, dict)
     schema.setdefault('title', 'single value')
     default = schema.pop('default', None)
     result = {
@@ -113,13 +116,14 @@ def one_or_more(schema: JsonSchema, unique_items: bool = False) -> JsonSchema:
     return result
 
 
-def resolve_ref(uri: str) -> JsonSchema:
+def resolve_ref(uri: str) -> dict[str, Any]:
     """Find and return a schema pointed to by `uri` that has been registered in the register_schema function."""
     parsed = urlparse(uri)
     if parsed.path in schema_paths:
         schema = schema_paths[parsed.path]
         if callable(schema):
             schema = schema(**dict(parse_qsl(parsed.query)))
+        assert isinstance(schema, dict)
         return {'$schema': BASE_SCHEMA_URI, **schema}
     raise Unresolvable(f'{uri} could not be resolved')
 
@@ -152,7 +156,7 @@ def process_config(
     else:
         validator = SchemaValidator(schema, registry=registry, format_checker=format_checker)
     try:
-        errors: list[ValidationError] = list(validator.iter_errors(config))
+        errors = cast('list[ConfigValidationError]', list(validator.iter_errors(config)))
     finally:
         # Make sure we don't leave the default setting validator installed
         jsonschema.validators.validates(BASE_SCHEMA_NAME)(SchemaValidator)
@@ -210,17 +214,17 @@ format_checker = jsonschema.FormatChecker(('email',))
 
 
 @format_checker.checks('quality', raises=ValueError)
-def is_quality(instance):
+def is_quality(instance) -> bool:
     if not isinstance(instance, str):
         return True
-    return qualities.get(instance)
+    return bool(qualities.get(instance))
 
 
 @format_checker.checks('quality_requirements', raises=ValueError)
-def is_quality_req(instance):
+def is_quality_req(instance) -> bool:
     if not isinstance(instance, str):
         return True
-    return qualities.Requirements(instance)
+    return bool(qualities.Requirements(instance))
 
 
 @format_checker.checks('time', raises=ValueError)
@@ -241,7 +245,7 @@ def is_interval(interval_string) -> bool:
 def is_size(size_string) -> bool:
     if not isinstance(size_string, (str, int)):
         return True
-    return parse_size(size_string) is not None
+    return parse_size(str(size_string)) is not None
 
 
 @format_checker.checks('percent', raises=ValueError)
@@ -252,11 +256,11 @@ def is_percent(percent_string) -> bool:
 
 
 @format_checker.checks('regex', raises=ValueError)
-def is_regex(instance) -> bool | Pattern:
+def is_regex(instance) -> bool:
     if not isinstance(instance, str):
         return True
     try:
-        return re.compile(instance)
+        return bool(re.compile(instance))
     except re.error as e:
         raise ValueError(f'Error parsing regex: {e}')
 
@@ -286,7 +290,7 @@ def is_path(instance) -> bool:
 
 # TODO: jsonschema has a format checker for uri if rfc3987 is installed, perhaps we should use that
 @format_checker.checks('url')
-def is_url(instance) -> bool | Match | None:
+def is_url(instance) -> bool:
     if not isinstance(instance, str):
         return True
     # Allow looser validation if this appears to start with jinja
@@ -297,7 +301,7 @@ def is_url(instance) -> bool | Match | None:
         'ftp|http|https|file|udp|socks5h?'
         r'):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?'
     )
-    return re.match(regexp, instance)
+    return re.match(regexp, instance) is not None
 
 
 @format_checker.checks('episode_identifier', raises=ValueError)
@@ -341,7 +345,7 @@ def set_error_message(error: jsonschema.ValidationError) -> None:
         if isinstance(error.validator_value, str):
             valid_types_list = [error.validator_value]
         else:
-            valid_types_list = list(error.validator_value)
+            valid_types_list = list(cast('Any', error.validator_value))
         # Replace some types with more pythony ones
         replace = {'object': 'dict', 'array': 'list'}
         valid_types_list = [replace.get(t, t) for t in valid_types_list]
@@ -357,12 +361,14 @@ def set_error_message(error: jsonschema.ValidationError) -> None:
             error.message = str(error.cause)
     elif error.validator == 'enum':
         error.message = 'Must be one of the following: {}'.format(
-            ', '.join(map(str, error.validator_value))
+            ', '.join(map(str, cast('Any', error.validator_value)))
         )
     elif error.validator == 'additionalProperties':
         if error.validator_value is False:
             extras = set(
-                jsonschema._utils.find_additional_properties(error.instance, error.schema)
+                jsonschema._utils.find_additional_properties(
+                    cast('Any', error.instance), cast('Any', error.schema)
+                )
             )
             if len(extras) == 1:
                 error.message = f'The key `{extras.pop()}` is not valid here.'
@@ -375,7 +381,8 @@ def set_error_message(error: jsonschema.ValidationError) -> None:
         error.message = re.sub("u'(.*?)'", '`\\1`', error.message)
 
     # Then update with any custom error message supplied from the schema
-    custom_error = error.schema.get(f'error_{error.validator}', error.schema.get('error'))
+    error_schema = cast('dict', error.schema)
+    custom_error = error_schema.get(f'error_{error.validator}', error_schema.get('error'))
     if custom_error:
         error.message = template.render(custom_error, error.__dict__)
 
@@ -512,9 +519,10 @@ def _inline_refs(schema: JsonSchema, definition_path: str, defs: dict) -> JsonSc
 def inline_refs(schema: JsonSchema) -> JsonSchema:
     """Include all $refs to subschemas in the $defs section of the schema, and rewrite the $refs to point to the right place."""
     definitions = {}
-    schema = _inline_refs(schema, '', definitions)
-    schema.setdefault('$defs', {}).update(definitions)
-    return schema
+    inlined = _inline_refs(schema, '', definitions)
+    assert isinstance(inlined, dict)
+    inlined.setdefault('$defs', {}).update(definitions)
+    return inlined
 
 
 def export_schema(manager, namespace):

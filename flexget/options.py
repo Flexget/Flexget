@@ -16,7 +16,7 @@ from argparse import (
     _VersionAction,
 )
 from argparse import ArgumentParser as ArgParser
-from typing import IO, TYPE_CHECKING, Any, TextIO
+from typing import IO, TYPE_CHECKING, Any, NoReturn, TextIO, cast
 
 from packaging.version import Version
 
@@ -26,7 +26,9 @@ from flexget.event import fire_event
 from flexget.utils.tools import get_current_flexget_version, get_latest_flexget_version_number
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
+    from collections.abc import Callable, Iterable
+
+    from flexget.manager import Manager
 
 _UNSET = object()
 
@@ -45,7 +47,7 @@ def get_parser(command: str | None = None) -> ArgumentParser:
 
 
 def register_command(
-    command: str, callback: Callable[[flexget.manager.Manager, Namespace], Any], **kwargs
+    command: str, callback: Callable[[Manager, Namespace], Any], **kwargs
 ) -> ArgumentParser:
     """Register a callback function to be executed when flexget is launched with the given `command`.
 
@@ -128,7 +130,10 @@ class CronAction(Action):
 
 # This makes the old --inject form forwards compatible
 class InjectAction(Action):
-    def __call__(self, parser, namespace, values, option_string=None):
+    # nargs='+' on the registered argument guarantees a non-empty list here
+    def __call__(  # pyright: ignore[reportIncompatibleMethodOverride]
+        self, parser, namespace, values: list, option_string=None
+    ):
         kwargs = {'title': values.pop(0)}
         if values:
             kwargs['url'] = values.pop(0)
@@ -219,7 +224,9 @@ class NestedSubparserAction(_SubParsersAction):
             self.parent_defaults[name] = parent_defaults
         return super().add_parser(name, **kwargs)
 
-    def __call__(self, parser, namespace, values, option_string=None):
+    def __call__(  # pyright: ignore[reportIncompatibleMethodOverride]
+        self, parser, namespace, values: list, option_string=None
+    ):
         parser_name = values[0]
         if parser_name in self.parent_defaults:
             for dest in self.parent_defaults[parser_name]:
@@ -243,7 +250,7 @@ class NestedSubparserAction(_SubParsersAction):
 
 
 class ParserError(Exception):
-    def __init__(self, message, parser):
+    def __init__(self, message: str, parser: ArgumentParser):
         self.message = message
         self.parser = parser
 
@@ -339,19 +346,21 @@ class ArgumentParser(ArgParser):
             if action.dest in kwargs:
                 action.default = SUPPRESS
 
-    def error(self, msg: str):
-        raise ParserError(msg, self)
+    def error(self, message: str) -> NoReturn:
+        raise ParserError(message, self)
 
-    def parse_args(
+    def parse_args(  # pyright: ignore[reportIncompatibleMethodOverride]
         self,
-        args: list[str] | None = None,
+        args: Iterable[str] | None = None,
         namespace: Namespace | None = None,
         raise_errors: bool = False,
         file: TextIO | None = None,
-    ):
+    ) -> Namespace:
         """:param raise_errors: If this is true, errors will be raised as ``ParserError`` instead of calling sys.exit"""
         ArgumentParser.file = file
         try:
+            if namespace is None:
+                return super().parse_args(args)
             return super().parse_args(args, namespace)
         except ParserError as e:
             if raise_errors:
@@ -360,9 +369,9 @@ class ArgumentParser(ArgParser):
         finally:
             ArgumentParser.file = None
 
-    def parse_known_args(
+    def parse_known_args(  # pyright: ignore[reportIncompatibleMethodOverride]
         self,
-        args: list[str] | None = None,
+        args: Iterable[str] | None = None,
         namespace: Namespace | None = None,
         do_help: bool | None = None,
     ):
@@ -408,13 +417,13 @@ class ArgumentParser(ArgParser):
             raise TypeError('This parser does not have subparsers')
         return self.subparsers.add_parser(name, **kwargs)
 
-    def get_subparser(self, name: str, default=_UNSET):
+    def get_subparser(self, name: str, default: object = _UNSET) -> ArgumentParser:
         if not self.subparsers:
             raise TypeError('This parser does not have subparsers')
         p = self.subparsers.choices.get(name, default)
         if p is _UNSET:
             raise ValueError(f'{name} is not an existing subparser name')
-        return p
+        return cast('ArgumentParser', p)
 
     def _get_values(self, action, arg_strings):
         """Complete the full name for partial subcommands."""
@@ -572,10 +581,10 @@ class CoreArgumentParser(ArgumentParser):
             'reload-config', help='causes a running daemon to reload the config from disk'
         )
 
-    def add_subparsers(self, **kwargs):
+    def add_subparsers(self, **kwargs) -> _SubParsersAction[ArgumentParser]:
         # The subparsers should not be CoreArgumentParsers
         kwargs.setdefault('parser_class', ArgumentParser)
-        return super().add_subparsers(**kwargs)
+        return cast('_SubParsersAction[ArgumentParser]', super().add_subparsers(**kwargs))
 
     def parse_args(self, *args, **kwargs):
         result = super().parse_args(*args, **kwargs)

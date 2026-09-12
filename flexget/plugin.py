@@ -8,7 +8,7 @@ from http.client import BadStatusLine
 from importlib import import_module
 from importlib.metadata import entry_points
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 from urllib.error import HTTPError, URLError
 
 import loguru
@@ -146,11 +146,13 @@ class internet:  # noqa: N801 It acts like a function in usage
                 raise PluginError(e)
             except OSError as e:
                 logger.opt(exception=True).debug('decorator caught OSError. handled traceback:')
-                if hasattr(e, 'reason'):
-                    raise PluginError(f'Failed to reach server. Reason: {e.reason}', self.logger)
-                if hasattr(e, 'code'):
+                reason = getattr(e, 'reason', None)
+                if reason is not None:
+                    raise PluginError(f'Failed to reach server. Reason: {reason}', self.logger)
+                code = getattr(e, 'code', None)
+                if code is not None:
                     raise PluginError(
-                        f"The server couldn't fulfill the request. Error code: {e.code}",
+                        f"The server couldn't fulfill the request. Error code: {code}",
                         self.logger,
                     )
                 raise PluginError(f'OSError when connecting to server: {e}', self.logger)
@@ -162,7 +164,7 @@ def priority(value: int) -> Callable[[Callable], Callable]:
     """Priority decorator for phase methods."""
 
     def decorator(target: Callable) -> Callable:
-        target.priority = value
+        target.priority = value  # pyright: ignore[reportFunctionMemberAccess]
         return target
 
     return decorator
@@ -294,7 +296,8 @@ class PluginInfo(dict):
         self.schema_id: str | None = None
 
         self.plugin_class: type = plugin_class
-        self.instance: object = None
+        # The plugin instance is an arbitrary user-defined class, duck-typed throughout this class
+        self.instance: Any = None
 
         if self.name in plugins:
             PluginInfo.dupe_counter += 1
@@ -339,10 +342,14 @@ class PluginInfo(dict):
                 if not callable(method):
                     continue
                 # check for priority decorator
-                handler_prio = method.priority if hasattr(method, 'priority') else PRIORITY_DEFAULT
+                handler_prio = (
+                    method.priority  # pyright: ignore[reportFunctionMemberAccess]
+                    if hasattr(method, 'priority')
+                    else PRIORITY_DEFAULT
+                )
                 event = add_phase_handler(f'plugin.{self.name}.{phase}', method, handler_prio)
                 # provides backwards compatibility
-                event.plugin = self
+                event.plugin = self  # pyright: ignore[reportAttributeAccessIssue]
                 self.phase_handlers[phase] = event
 
     def __getattr__(self, attr: str):
@@ -365,7 +372,7 @@ class PluginInfo(dict):
     def __lt__(self, other):
         return self.name < other.name
 
-    def __hash__(self):
+    def __hash__(self):  # pyright: ignore[reportIncompatibleVariableOverride]
         return hash(self.name)
 
     __repr__ = __str__
@@ -494,7 +501,7 @@ def _load_plugins_from_packages() -> None:
             else:
                 msg = (
                     'Plugin `%s` requires `%s` to load.',
-                    e.issued_by or entrypoint.module_name,
+                    e.issued_by or entrypoint.module,
                     e.missing or 'N/A',
                 )
             if not e.silent:
@@ -503,11 +510,11 @@ def _load_plugins_from_packages() -> None:
                 logger.debug(msg)
         except ImportError:
             logger.opt(exception=True).critical(
-                'Plugin `{}` failed to import dependencies', entrypoint.module_name
+                'Plugin `{}` failed to import dependencies', entrypoint.module
             )
         except Exception:
             logger.opt(exception=True).critical(
-                'Exception while loading plugin {}', entrypoint.module_name
+                'Exception while loading plugin {}', entrypoint.module
             )
             raise
         else:
@@ -631,7 +638,7 @@ def get_plugin_by_name(name: str, issued_by: str = '???') -> PluginInfo:
     return plugins[name]
 
 
-def get(name: str, requested_by: str | object) -> object:
+def get(name: str, requested_by: Any) -> object:
     """Return instance of Plugin class.
 
     :param str name: Name of the requested plugin

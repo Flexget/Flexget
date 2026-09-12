@@ -20,7 +20,7 @@ def cached_resource(
     force: bool = False,
     max_size: int = 250,
     directory: str = 'cached_resources',
-) -> tuple[Path, str]:
+) -> tuple[Path, str | None]:
     """Cache a remote resource to local filesystem.
 
     Return a tuple of local file name and mime type, use primarily for API/WebUI.
@@ -34,7 +34,7 @@ def cached_resource(
     mime_type = None
     hashed_name = hashlib.md5(url.encode('utf-8')).hexdigest()
     file_path = base_dir / directory / hashed_name
-    directory = file_path.parent
+    cache_dir = file_path.parent
 
     if not file_path.exists() or force:
         logger.debug('caching {}', url)
@@ -42,18 +42,18 @@ def cached_resource(
         response.raise_for_status()
         mime_type = response.headers.get('content-type')
         content = response.content
-        if not directory.exists():
-            directory.mkdir(parents=True)
+        if not cache_dir.exists():
+            cache_dir.mkdir(parents=True)
 
         # Checks directory size and trims if necessary.
-        size = dir_size(directory) / (1024 * 1024.0)
+        size = dir_size(cache_dir) / (1024 * 1024.0)
         if not force:
             while size >= max_size:
                 logger.debug(
                     'directory {} size is over the allowed limit of {}, trimming', size, max_size
                 )
-                trim_dir(directory)
-                size = dir_size(directory) / (1024 * 1024.0)
+                trim_dir(cache_dir)
+                size = dir_size(cache_dir) / (1024 * 1024.0)
 
         with file_path.open('wb') as file:
             file.write(content)
