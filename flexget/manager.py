@@ -190,15 +190,19 @@ class Manager:
         tray_icon.add_menu_separator(index=4)
 
     @staticmethod
-    def parse_initial_options(args: list[str]) -> argparse.Namespace:
-        """Parse what we can from cli args before plugins are loaded."""
+    def parse_initial_options(args: list[str], do_help: bool = False) -> argparse.Namespace:
+        """Parse what we can from cli args before plugins are loaded.
+
+        :param do_help: If True, a ``--help`` argument prints the help message and exits, rather
+            than being ignored. Used when there is no manager left to hand the request off to.
+        """
         try:
-            options = CoreArgumentParser().parse_known_args(args, do_help=False)[0]
+            options = CoreArgumentParser().parse_known_args(args, do_help=do_help)[0]
         except ParserError as exc:
             try:
                 # If a non-built-in command was used, we need to parse with a parser that
                 # doesn't define the subparsers
-                options = manager_parser.parse_known_args(args, do_help=False)[0]
+                options = manager_parser.parse_known_args(args, do_help=do_help)[0]
             except ParserError:
                 manager_parser.print_help()
                 logger.critical('Error: {}', exc.message)
