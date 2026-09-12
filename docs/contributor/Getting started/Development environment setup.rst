@@ -4,6 +4,19 @@
 Development environment setup
 =============================
 
+Quick setup
+===========
+
+For most contributors, the fastest way to get started is to run the provided setup
+script from the repo root::
+
+   $ ./setup.sh
+
+This installs ``uv`` if it is not already available, then creates a ``.venv`` virtual
+environment and installs all project dependencies — including the ``dev`` and ``test``
+groups. The remaining sections on this page describe the individual steps the script
+performs, which is useful if you need a customised setup.
+
 Cloning the repository
 ======================
 
@@ -140,6 +153,42 @@ rule—you'll need to run it on all files manually instead::
             $ .venv\Scripts\activate.ps1
 
 .. _linking to upstream:
+
+Environment variables
+=====================
+
+Several scripts and build processes are controlled by environment variables.
+A reference file listing all supported variables with descriptions is provided at the
+repo root. Copy it to create your own local configuration::
+
+   $ cp .env.example .env
+
+Edit ``.env`` to suit your workflow. The file is git-ignored so your local values will
+never be committed. When running commands via ``uv run``, variables in ``.env`` are
+loaded automatically.
+
+Running the development server
+==============================
+
+A helper script is provided to start, stop, and restart the FlexGet daemon
+during local development::
+
+   $ ./run_server.sh           # start the daemon if it is not already running
+   $ ./run_server.sh restart   # stop then restart (picks up code changes)
+   $ ./run_server.sh stop      # stop the running daemon
+
+The script reads ``.env`` from the repo root before starting, so any
+environment variables you have configured there are available to the daemon
+without needing to export them manually.
+
+**Config file**
+
+By default the script looks for a ``FLEXGET_CONFIG`` environment variable. If
+it is not set, it falls back to ``.venv/config.yml``, creating that file with a
+minimal example task if it does not already exist. You can point the server at
+a different config by setting the variable in your ``.env`` file::
+
+   FLEXGET_CONFIG=/path/to/your/config.yml
 
 Linking your repository to the upstream repo
 ============================================
