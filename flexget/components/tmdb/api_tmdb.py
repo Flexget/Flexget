@@ -1,22 +1,18 @@
-from datetime import datetime, timedelta
+from __future__ import annotations
+
+from datetime import date, datetime, timedelta
 
 from dateutil.parser import parse as dateutil_parse
 from loguru import logger
 from sqlalchemy import (
-    Boolean,
     Column,
-    Date,
-    DateTime,
-    Float,
-    Integer,
-    String,
     Table,
     Unicode,
     func,
     or_,
 )
 from sqlalchemy.ext.associationproxy import association_proxy
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.schema import ForeignKey
 
 from flexget import db_schema, plugin
@@ -39,10 +35,10 @@ _tmdb_config = None
 class TMDBConfig(Base):
     __tablename__ = 'tmdb_configuration'
 
-    id = Column(Integer, primary_key=True)
-    _configuration = Column('configuration', Unicode)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    _configuration: Mapped[str | None] = mapped_column('configuration')
     configuration = json_synonym('_configuration')
-    updated = Column(DateTime, default=datetime.now, nullable=False)
+    updated: Mapped[datetime] = mapped_column(default=datetime.now)
 
     def __init__(self):
         try:
@@ -91,8 +87,8 @@ def upgrade(ver, session):
 genres_table = Table(
     'tmdb_movie_genres',
     Base.metadata,
-    Column('movie_id', Integer, ForeignKey('tmdb_movies.id')),
-    Column('genre_id', Integer, ForeignKey('tmdb_genres.id')),
+    Column('movie_id', ForeignKey('tmdb_movies.id')),
+    Column('genre_id', ForeignKey('tmdb_genres.id')),
 )
 Base.register_table(genres_table)
 
@@ -100,33 +96,37 @@ Base.register_table(genres_table)
 class TMDBMovie(Base):
     __tablename__ = 'tmdb_movies'
 
-    id = Column(Integer, primary_key=True, autoincrement=False, nullable=False)
-    imdb_id = Column(Unicode)
-    url = Column(Unicode)
-    name = Column(Unicode)
-    original_name = Column(Unicode)
-    alternative_name = Column(Unicode)
-    released = Column(Date)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=False)
+    imdb_id: Mapped[str | None]
+    url: Mapped[str | None]
+    name: Mapped[str | None]
+    original_name: Mapped[str | None]
+    alternative_name: Mapped[str | None]
+    released: Mapped[date | None]
     year = year_property('released')
-    runtime = Column(Integer)
-    language = Column(Unicode)
-    overview = Column(Unicode)
-    tagline = Column(Unicode)
-    rating = Column(Float)
-    votes = Column(Integer)
-    popularity = Column(Float)
-    adult = Column(Boolean)
-    budget = Column(Integer)
-    revenue = Column(Integer)
-    homepage = Column(Unicode)
-    lookup_language = Column(String)
-    _posters = relationship('TMDBPoster', backref='movie', cascade='all, delete, delete-orphan')
-    _backdrops = relationship(
-        'TMDBBackdrop', backref='movie', cascade='all, delete, delete-orphan'
+    runtime: Mapped[int | None]
+    language: Mapped[str | None]
+    overview: Mapped[str | None]
+    tagline: Mapped[str | None]
+    rating: Mapped[float | None]
+    votes: Mapped[int | None]
+    popularity: Mapped[float | None]
+    adult: Mapped[bool | None]
+    budget: Mapped[int | None]
+    revenue: Mapped[int | None]
+    homepage: Mapped[str | None]
+    lookup_language: Mapped[str | None]
+    _posters: Mapped[list[TMDBPoster]] = relationship(
+        back_populates='movie', cascade='all, delete-orphan'
     )
-    _genres = relationship('TMDBGenre', secondary=genres_table, backref='movies')
+    _backdrops: Mapped[list[TMDBBackdrop]] = relationship(
+        back_populates='movie', cascade='all, delete-orphan'
+    )
+    _genres: Mapped[list[TMDBGenre]] = relationship(
+        secondary=genres_table, back_populates='movies'
+    )
     genres = association_proxy('_genres', 'name')
-    updated = Column(DateTime, default=datetime.now, nullable=False)
+    updated: Mapped[datetime] = mapped_column(default=datetime.now)
 
     def __init__(self, id, language):
         """Look up movie on tmdb and create a new database model for it.
@@ -217,24 +217,27 @@ class TMDBMovie(Base):
 class TMDBGenre(Base):
     __tablename__ = 'tmdb_genres'
 
-    id = Column(Integer, primary_key=True, autoincrement=False)
-    name = Column(Unicode, nullable=False)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=False)
+    name: Mapped[str]
+    movies: Mapped[list[TMDBMovie]] = relationship(
+        secondary=genres_table, back_populates='_genres'
+    )
 
 
 class TMDBImage(Base):
     __tablename__ = 'tmdb_images'
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    movie_id = Column(Integer, ForeignKey('tmdb_movies.id'))
-    file_path = Column(Unicode)
-    width = Column(Integer)
-    height = Column(Integer)
-    aspect_ratio = Column(Float)
-    vote_average = Column(Float)
-    vote_count = Column(Integer)
-    iso_639_1 = Column(Unicode)
-    iso_3166_1 = Column(Unicode)
-    type = Column(Unicode)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    movie_id: Mapped[int | None] = mapped_column(ForeignKey('tmdb_movies.id'))
+    file_path: Mapped[str | None]
+    width: Mapped[int | None]
+    height: Mapped[int | None]
+    aspect_ratio: Mapped[float | None]
+    vote_average: Mapped[float | None]
+    vote_count: Mapped[int | None]
+    iso_639_1: Mapped[str | None]
+    iso_3166_1: Mapped[str | None]
+    type: Mapped[str | None] = mapped_column()
     __mapper_args__ = {'polymorphic_on': type}
 
     def url(self, size):
@@ -259,18 +262,22 @@ class TMDBImage(Base):
 
 class TMDBPoster(TMDBImage):
     __mapper_args__ = {'polymorphic_identity': 'poster'}
+    movie: Mapped[TMDBMovie | None] = relationship(back_populates='_posters')
 
 
 class TMDBBackdrop(TMDBImage):
     __mapper_args__ = {'polymorphic_identity': 'backdrop'}
+    movie: Mapped[TMDBMovie | None] = relationship(back_populates='_backdrops')
 
 
 class TMDBSearchResult(Base):
     __tablename__ = 'tmdb_search_results'
 
-    search = Column(Unicode, primary_key=True)
-    movie_id = Column(Integer, ForeignKey('tmdb_movies.id'), nullable=True)
-    movie = relationship(TMDBMovie)
+    search: Mapped[str] = mapped_column(primary_key=True)
+    movie_id: Mapped[int | None] = mapped_column(
+        ForeignKey('tmdb_movies.id')
+    )  # explicitly allows None
+    movie: Mapped[TMDBMovie | None] = relationship()
 
     def __init__(self, search, movie_id=None, movie=None):
         self.search = search.lower()

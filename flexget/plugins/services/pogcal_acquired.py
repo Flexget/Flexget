@@ -2,7 +2,7 @@ import re
 from datetime import datetime
 
 from loguru import logger
-from sqlalchemy import Column, Integer, Unicode
+from sqlalchemy.orm import Mapped, mapped_column
 
 from flexget import plugin
 from flexget.db_schema import versioned_base
@@ -18,8 +18,8 @@ session = requests.Session(max_retries=3)
 
 class PogcalShow(Base):
     __tablename__ = 'pogcal_shows'
-    id = Column(Integer, primary_key=True, autoincrement=False, nullable=False)
-    name = Column(Unicode)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=False)
+    name: Mapped[str | None]
 
 
 class PogcalAcquired:

@@ -2,7 +2,8 @@ import pickle
 from datetime import datetime
 
 from loguru import logger
-from sqlalchemy import Column, DateTime, Index, Integer, String, Unicode, select
+from sqlalchemy import Index, Unicode, select
+from sqlalchemy.orm import Mapped, mapped_column
 
 from flexget import db_schema, plugin
 from flexget.entry import Entry
@@ -19,11 +20,11 @@ Base = db_schema.versioned_base('delay', 3)
 class DelayedEntry(Base):
     __tablename__ = 'delay'
 
-    id = Column(Integer, primary_key=True)
-    task = Column('feed', String)
-    title = Column(Unicode)
-    expire = Column(DateTime)
-    _json = Column('json', Unicode)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    task: Mapped[str | None] = mapped_column('feed')
+    title: Mapped[str | None]
+    expire: Mapped[datetime | None]
+    _json: Mapped[str | None] = mapped_column('json')
     entry = entry_synonym('_json')
 
     def __repr__(self):

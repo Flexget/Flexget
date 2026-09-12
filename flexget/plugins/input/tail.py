@@ -2,7 +2,7 @@ import os
 import re
 
 from loguru import logger
-from sqlalchemy import Column, Integer, Unicode
+from sqlalchemy.orm import Mapped, mapped_column
 
 from flexget import options, plugin
 from flexget.db_schema import versioned_base
@@ -16,10 +16,10 @@ Base = versioned_base('tail', 0)
 
 class TailPosition(Base):
     __tablename__ = 'tail'
-    id = Column(Integer, primary_key=True)
-    task = Column(Unicode)
-    filename = Column(Unicode)
-    position = Column(Integer)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    task: Mapped[str | None]
+    filename: Mapped[str | None]
+    position: Mapped[int | None]
 
 
 class InputTail:

@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from loguru import logger
-from sqlalchemy import Column, DateTime
+from sqlalchemy.orm import Mapped, mapped_column
 
 from flexget import db_schema, plugin
 from flexget.event import event
@@ -15,7 +15,7 @@ Base = db_schema.versioned_base('version_checker', 0)
 class LastVersionCheck(Base):
     __tablename__ = 'last_version_check'
 
-    last_check_time = Column(DateTime, primary_key=True)
+    last_check_time: Mapped[datetime] = mapped_column(primary_key=True)
 
     def __init__(self):
         self.update()

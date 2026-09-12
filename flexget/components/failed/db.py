@@ -1,7 +1,8 @@
 from datetime import datetime, timedelta
 
 from loguru import logger
-from sqlalchemy import Column, DateTime, Integer, String, Unicode
+from sqlalchemy import DateTime, Unicode
+from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.schema import Index
 
 from flexget import db_schema
@@ -31,19 +32,18 @@ def upgrade(ver, session):
 class FailedEntry(Base):
     __tablename__ = 'failed'
 
-    id = Column(Integer, primary_key=True)
-    title = Column(Unicode)
-    url = Column(String)
-    tof = Column(DateTime)
-    reason = Column(Unicode)
-    count = Column(Integer, default=1)
-    retry_time = Column(DateTime)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    title: Mapped[str | None]
+    url: Mapped[str | None]
+    tof: Mapped[datetime | None] = mapped_column(default=datetime.now)
+    reason: Mapped[str | None]
+    count: Mapped[int | None] = mapped_column(default=1)
+    retry_time: Mapped[datetime | None]
 
     def __init__(self, title, url, reason=None):
         self.title = title
         self.url = url
         self.reason = reason
-        self.tof = datetime.now()
 
     def __str__(self):
         return f'<Failed(title={self.title})>'

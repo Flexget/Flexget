@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from loguru import logger
-from sqlalchemy import Column, DateTime, Integer, String, Unicode
+from sqlalchemy.orm import Mapped, mapped_column
 
 from flexget import db_schema, plugin
 from flexget.db_schema import Session
@@ -21,13 +21,13 @@ entry_actions = {'accept': Entry.accept, 'reject': Entry.reject, 'fail': Entry.f
 class EntryUpgrade(Base):
     __tablename__ = 'upgrade'
 
-    id = Column(Unicode, primary_key=True, index=True)
-    title = Column(Unicode)
-    _quality = Column('quality', String)
+    id: Mapped[str] = mapped_column(primary_key=True)
+    title: Mapped[str | None]
+    _quality: Mapped[str | None] = mapped_column('quality')
     quality = quality_property('_quality')
-    proper_count = Column(Integer, default=0)
-    first_seen = Column(DateTime, default=datetime.now)
-    updated = Column(DateTime, index=True, default=datetime.now)
+    proper_count: Mapped[int | None] = mapped_column(default=0)
+    first_seen: Mapped[datetime | None] = mapped_column(default=datetime.now)
+    updated: Mapped[datetime | None] = mapped_column(index=True, default=datetime.now)
 
     def __str__(self):
         return f'<Upgrade(id={self.id},added={self.added},quality={self.quality})>'

@@ -1,10 +1,11 @@
-import datetime
-from datetime import timedelta
+from __future__ import annotations
+
+from datetime import datetime, timedelta
 
 from loguru import logger
-from sqlalchemy import Boolean, Column, DateTime, Integer, String, func, select
+from sqlalchemy import func, select
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import DynamicMapped, Mapped, mapped_column, relationship
 from sqlalchemy.schema import ForeignKey
 
 from flexget import db_schema
@@ -46,10 +47,10 @@ def upgrade(ver, session):
 
 class StatusTask(Base):
     __tablename__ = 'status_task'
-    id = Column(Integer, primary_key=True)
-    name = Column('task', String)
-    executions = relationship(
-        'TaskExecution', backref='task', cascade='all, delete, delete-orphan', lazy='dynamic'
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str | None] = mapped_column('task')
+    executions: DynamicMapped[TaskExecution] = relationship(
+        back_populates='task', cascade='all, delete-orphan'
     )
 
     def __repr__(self):
@@ -82,18 +83,18 @@ class StatusTask(Base):
 
 class TaskExecution(Base):
     __tablename__ = 'status_execution'
-    id = Column(Integer, primary_key=True)
-    task_id = Column(Integer, ForeignKey('status_task.id'), index=True)
-
-    start = Column(DateTime)
-    end = Column(DateTime)
-    succeeded = Column(Boolean, default=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    task_id: Mapped[int | None] = mapped_column(ForeignKey('status_task.id'), index=True)
+    task: Mapped[StatusTask] = relationship(back_populates='executions')
+    start: Mapped[datetime | None]
+    end: Mapped[datetime | None]
+    succeeded: Mapped[bool | None] = mapped_column(default=True)
     # Entry amounts
-    produced = Column(Integer)
-    accepted = Column(Integer)
-    rejected = Column(Integer)
-    failed = Column(Integer)
-    abort_reason = Column(String, nullable=True)
+    produced: Mapped[int | None]
+    accepted: Mapped[int | None]
+    rejected: Mapped[int | None]
+    failed: Mapped[int | None]
+    abort_reason: Mapped[str | None]  # explicitly allows None
 
     def __repr__(self):
         return f'<TaskExecution(task_id={self.task_id},start={self.start},end={self.end},succeeded={self.succeeded},p={self.produced},a={self.accepted},r={self.rejected},f={self.failed},reason={self.abort_reason})>'
@@ -125,7 +126,7 @@ def db_cleanup(manager, session):
     result = (
         session
         .query(TaskExecution)
-        .filter(TaskExecution.start < datetime.datetime.now() - timedelta(days=365))
+        .filter(TaskExecution.start < datetime.now() - timedelta(days=365))
         .delete()
     )
     if result:

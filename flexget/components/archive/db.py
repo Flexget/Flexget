@@ -1,10 +1,12 @@
+from __future__ import annotations
+
 import re
 from datetime import datetime, timedelta
 
 from loguru import logger
-from sqlalchemy import Column, DateTime, ForeignKey, Index, Integer, Table, Unicode
+from sqlalchemy import Column, ForeignKey, Index, Table
 from sqlalchemy.exc import NoResultFound
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from flexget import db_schema
 from flexget.event import event
@@ -19,16 +21,16 @@ Base = db_schema.versioned_base('archive', SCHEMA_VER)
 archive_tags_table = Table(
     'archive_entry_tags',
     Base.metadata,
-    Column('entry_id', Integer, ForeignKey('archive_entry.id')),
-    Column('tag_id', Integer, ForeignKey('archive_tag.id')),
+    Column('entry_id', ForeignKey('archive_entry.id')),
+    Column('tag_id', ForeignKey('archive_tag.id')),
     Index('ix_archive_tags', 'entry_id', 'tag_id'),
 )
 
 archive_sources_table = Table(
     'archive_entry_sources',
     Base.metadata,
-    Column('entry_id', Integer, ForeignKey('archive_entry.id')),
-    Column('source_id', Integer, ForeignKey('archive_source.id')),
+    Column('entry_id', ForeignKey('archive_entry.id')),
+    Column('source_id', ForeignKey('archive_source.id')),
     Index('ix_archive_sources', 'entry_id', 'source_id'),
 )
 
@@ -40,20 +42,19 @@ class ArchiveEntry(Base):
     __tablename__ = 'archive_entry'
     __table_args__ = (Index('ix_archive_title_url', 'title', 'url'),)
 
-    id = Column(Integer, primary_key=True)
-    title = Column(Unicode, index=True)
-    url = Column(Unicode, index=True)
-    description = Column(Unicode)
-    task = Column('feed', Unicode)  # DEPRECATED, but SQLite does not support drop column
-    added = Column(DateTime, index=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    title: Mapped[str | None] = mapped_column(index=True)
+    url: Mapped[str | None] = mapped_column(index=True)
+    description: Mapped[str | None]
+    task: Mapped[str | None] = mapped_column(
+        'feed'
+    )  # DEPRECATED, but SQLite does not support drop column
+    added: Mapped[datetime | None] = mapped_column(index=True, default=datetime.now)
 
-    tags = relationship('ArchiveTag', secondary=archive_tags_table)
-    sources = relationship(
-        'ArchiveSource', secondary=archive_sources_table, backref='archive_entries'
+    tags: Mapped[list[ArchiveTag]] = relationship(secondary=archive_tags_table)
+    sources: Mapped[list[ArchiveSource]] = relationship(
+        secondary=archive_sources_table, back_populates='archive_entries'
     )
-
-    def __init__(self):
-        self.added = datetime.now()
 
     def __str__(self):
         return '<ArchiveEntry(title={},url={},task={},added={})>'.format(
@@ -67,8 +68,8 @@ class ArchiveEntry(Base):
 class ArchiveTag(Base):
     __tablename__ = 'archive_tag'
 
-    id = Column(Integer, primary_key=True)
-    name = Column(Unicode, index=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str | None] = mapped_column(index=True)
 
     def __init__(self, name):
         self.name = name
@@ -80,8 +81,11 @@ class ArchiveTag(Base):
 class ArchiveSource(Base):
     __tablename__ = 'archive_source'
 
-    id = Column(Integer, primary_key=True)
-    name = Column(Unicode, index=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str | None] = mapped_column(index=True)
+    archive_entries: Mapped[list[ArchiveEntry]] = relationship(
+        secondary=archive_sources_table, back_populates='sources'
+    )
 
     def __init__(self, name):
         self.name = name

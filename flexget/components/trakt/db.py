@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 import time
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
+from datetime import time as datetimetime
 from typing import TYPE_CHECKING
 
 from dateutil.parser import parse as dateutil_parse
 from loguru import logger
-from sqlalchemy import Column, Date, DateTime, Integer, String, Table, Time, Unicode, and_, or_
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, Table, and_, or_
+from sqlalchemy.orm import DynamicMapped, Mapped, mapped_column, relationship
 from sqlalchemy.schema import ForeignKey
 
 from flexget import db_schema, plugin
@@ -34,11 +35,11 @@ PIN_URL = 'https://trakt.tv/pin/346'
 class TraktUserAuth(AuthBase):
     __tablename__ = 'trakt_user_auth'
 
-    account = Column(Unicode, primary_key=True)
-    access_token = Column(Unicode)
-    refresh_token = Column(Unicode)
-    created = Column(DateTime)
-    expires = Column(DateTime)
+    account: Mapped[str] = mapped_column(primary_key=True)
+    access_token: Mapped[str | None]
+    refresh_token: Mapped[str | None]
+    created: Mapped[datetime | None]
+    expires: Mapped[datetime | None]
 
     def __init__(self, account, access_token, refresh_token, created, expires):
         self.account = account
@@ -250,12 +251,13 @@ def get_entry_ids(entry: Entry):
 class TraktMovieTranslation(Base):
     __tablename__ = 'trakt_movie_translations'
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    language = Column(Unicode)
-    overview = Column(Unicode)
-    tagline = Column(Unicode)
-    title = Column(Unicode)
-    movie_id = Column(Integer, ForeignKey('trakt_movies.id'))
+    id: Mapped[int] = mapped_column(primary_key=True)
+    language: Mapped[str | None]
+    overview: Mapped[str | None]
+    tagline: Mapped[str | None]
+    title: Mapped[str | None]
+    movie_id: Mapped[int | None] = mapped_column(ForeignKey('trakt_movies.id'))
+    movie: Mapped[TraktMovie] = relationship(back_populates='_translations')
 
     def __init__(self, translation, session):
         super().__init__()
@@ -269,11 +271,11 @@ class TraktMovieTranslation(Base):
 class TraktShowTranslation(Base):
     __tablename__ = 'trakt_show_translations'
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    language = Column(Unicode)
-    overview = Column(Unicode)
-    title = Column(Unicode)
-    show_id = Column(Integer, ForeignKey('trakt_shows.id'))
+    id: Mapped[int] = mapped_column(primary_key=True)
+    language: Mapped[str | None]
+    overview: Mapped[str | None]
+    title: Mapped[str | None]
+    show_id: Mapped[int | None] = mapped_column(ForeignKey('trakt_shows.id'))
 
     def __init__(self, translation, session):
         super().__init__()
@@ -317,22 +319,22 @@ def get_translations(ident, style):
 class TraktGenre(Base):
     __tablename__ = 'trakt_genres'
 
-    name = Column(Unicode, primary_key=True)
+    name: Mapped[str] = mapped_column(primary_key=True)
 
 
 show_genres_table = Table(
     'trakt_show_genres',
     Base.metadata,
-    Column('show_id', Integer, ForeignKey('trakt_shows.id')),
-    Column('genre_id', Unicode, ForeignKey('trakt_genres.name')),
+    Column('show_id', ForeignKey('trakt_shows.id')),
+    Column('genre_id', ForeignKey('trakt_genres.name')),
 )
 Base.register_table(show_genres_table)
 
 movie_genres_table = Table(
     'trakt_movie_genres',
     Base.metadata,
-    Column('movie_id', Integer, ForeignKey('trakt_movies.id')),
-    Column('genre_id', Unicode, ForeignKey('trakt_genres.name')),
+    Column('movie_id', ForeignKey('trakt_movies.id')),
+    Column('genre_id', ForeignKey('trakt_genres.name')),
 )
 Base.register_table(movie_genres_table)
 
@@ -340,15 +342,15 @@ Base.register_table(movie_genres_table)
 class TraktActor(Base):
     __tablename__ = 'trakt_actors'
 
-    id = Column(Integer, primary_key=True, nullable=False)
-    name = Column(Unicode)
-    slug = Column(Unicode)
-    tmdb = Column(Integer)
-    imdb = Column(Unicode)
-    biography = Column(Unicode)
-    birthday = Column(Date)
-    death = Column(Date)
-    homepage = Column(Unicode)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str | None]
+    slug: Mapped[str | None]
+    tmdb: Mapped[int | None]
+    imdb: Mapped[str | None]
+    biography: Mapped[str | None]
+    birthday: Mapped[date | None]
+    death: Mapped[date | None]
+    homepage: Mapped[str | None]
 
     def __init__(self, actor, session):
         super().__init__()
@@ -378,16 +380,16 @@ class TraktActor(Base):
 show_actors_table = Table(
     'trakt_show_actors',
     Base.metadata,
-    Column('show_id', Integer, ForeignKey('trakt_shows.id')),
-    Column('actors_id', Integer, ForeignKey('trakt_actors.id')),
+    Column('show_id', ForeignKey('trakt_shows.id')),
+    Column('actors_id', ForeignKey('trakt_actors.id')),
 )
 Base.register_table(show_actors_table)
 
 movie_actors_table = Table(
     'trakt_movie_actors',
     Base.metadata,
-    Column('movie_id', Integer, ForeignKey('trakt_movies.id')),
-    Column('actors_id', Integer, ForeignKey('trakt_actors.id')),
+    Column('movie_id', ForeignKey('trakt_movies.id')),
+    Column('actors_id', ForeignKey('trakt_actors.id')),
 )
 Base.register_table(movie_actors_table)
 
@@ -444,21 +446,22 @@ def list_actors(actors):
 class TraktEpisode(Base):
     __tablename__ = 'trakt_episodes'
 
-    id = Column(Integer, primary_key=True, autoincrement=False)
-    tvdb_id = Column(Integer)
-    imdb_id = Column(Unicode)
-    tmdb_id = Column(Integer)
-    tvrage_id = Column(Unicode)
-    title = Column(Unicode)
-    season = Column(Integer)
-    number = Column(Integer)
-    number_abs = Column(Integer)
-    overview = Column(Unicode)
-    first_aired = Column(DateTime)
-    updated_at = Column(DateTime)
-    cached_at = Column(DateTime)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=False)
+    tvdb_id: Mapped[int | None]
+    imdb_id: Mapped[str | None]
+    tmdb_id: Mapped[int | None]
+    tvrage_id: Mapped[str | None]
+    title: Mapped[str | None]
+    season: Mapped[int | None]
+    number: Mapped[int | None]
+    number_abs: Mapped[int | None]
+    overview: Mapped[str | None]
+    first_aired: Mapped[datetime | None]
+    updated_at: Mapped[datetime | None]
+    cached_at: Mapped[datetime | None]
 
-    series_id = Column(Integer, ForeignKey('trakt_shows.id'), nullable=False)
+    series_id: Mapped[int] = mapped_column(ForeignKey('trakt_shows.id'))
+    show: Mapped[TraktShow] = relationship(back_populates='episodes')
 
     def __init__(self, trakt_episode, session):
         super().__init__()
@@ -492,22 +495,23 @@ class TraktEpisode(Base):
 class TraktSeason(Base):
     __tablename__ = 'trakt_seasons'
 
-    id = Column(Integer, primary_key=True, autoincrement=False)
-    tvdb_id = Column(Integer)
-    tmdb_id = Column(Integer)
-    tvrage_id = Column(Unicode)
-    title = Column(Unicode)
-    number = Column(Integer)
-    episode_count = Column(Integer)
-    aired_episodes = Column(Integer)
-    overview = Column(Unicode)
-    first_aired = Column(DateTime)
-    ratings = Column(Integer)
-    votes = Column(Integer)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=False)
+    tvdb_id: Mapped[int | None]
+    tmdb_id: Mapped[int | None]
+    tvrage_id: Mapped[str | None]
+    title: Mapped[str | None]
+    number: Mapped[int | None]
+    episode_count: Mapped[int | None]
+    aired_episodes: Mapped[int | None]
+    overview: Mapped[str | None]
+    first_aired: Mapped[datetime | None]
+    ratings: Mapped[int | None]
+    votes: Mapped[int | None]
 
-    cached_at = Column(DateTime)
+    cached_at: Mapped[datetime | None]
 
-    series_id = Column(Integer, ForeignKey('trakt_shows.id'), nullable=False)
+    series_id: Mapped[int] = mapped_column(ForeignKey('trakt_shows.id'))
+    show: Mapped[TraktShow] = relationship(back_populates='seasons')
 
     def __init__(self, trakt_season, session):
         super().__init__()
@@ -547,43 +551,44 @@ class TraktSeason(Base):
 class TraktShow(Base):
     __tablename__ = 'trakt_shows'
 
-    id = Column(Integer, primary_key=True, autoincrement=False)
-    title = Column(Unicode)
-    year = Column(Integer)
-    slug = Column(Unicode)
-    tvdb_id = Column(Integer)
-    imdb_id = Column(Unicode)
-    tmdb_id = Column(Integer)
-    tvrage_id = Column(Unicode)
-    overview = Column(Unicode)
-    first_aired = Column(DateTime)
-    air_day = Column(Unicode)
-    air_time = Column(Time)
-    timezone = Column(Unicode)
-    runtime = Column(Integer)
-    certification = Column(Unicode)
-    network = Column(Unicode)
-    country = Column(Unicode)
-    status = Column(String)
-    rating = Column(Integer)
-    votes = Column(Integer)
-    language = Column(Unicode)
-    homepage = Column(Unicode)
-    trailer = Column(Unicode)
-    aired_episodes = Column(Integer)
-    _translations = relationship(TraktShowTranslation)
-    _translation_languages = Column('translation_languages', Unicode)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=False)
+    title: Mapped[str | None]
+    year: Mapped[int | None]
+    slug: Mapped[str | None]
+    tvdb_id: Mapped[int | None]
+    imdb_id: Mapped[str | None]
+    tmdb_id: Mapped[int | None]
+    tvrage_id: Mapped[str | None]
+    overview: Mapped[str | None]
+    first_aired: Mapped[datetime | None]
+    air_day: Mapped[str | None]
+    air_time: Mapped[datetimetime | None]
+    timezone: Mapped[str | None]
+    runtime: Mapped[int | None]
+    certification: Mapped[str | None]
+    network: Mapped[str | None]
+    country: Mapped[str | None]
+    status: Mapped[str | None]
+    rating: Mapped[int | None]
+    votes: Mapped[int | None]
+    language: Mapped[str | None]
+    homepage: Mapped[str | None]
+    trailer: Mapped[str | None]
+    aired_episodes: Mapped[int | None]
+    _translations: Mapped[list[TraktShowTranslation]] = relationship()
+    _translation_languages: Mapped[str | None] = mapped_column('translation_languages')
     translation_languages = json_synonym('_translation_languages')
-    episodes = relationship(
-        TraktEpisode, backref='show', cascade='all, delete, delete-orphan', lazy='dynamic'
+    episodes: DynamicMapped[TraktEpisode] = relationship(
+        back_populates='show', cascade='all, delete-orphan'
     )
-    seasons = relationship(
-        TraktSeason, backref='show', cascade='all, delete, delete-orphan', lazy='dynamic'
+    seasons: DynamicMapped[TraktSeason] = relationship(
+        back_populates='show', cascade='all, delete-orphan'
     )
-    genres = relationship(TraktGenre, secondary=show_genres_table)
-    _actors = relationship(TraktActor, secondary=show_actors_table)
-    updated_at = Column(DateTime)
-    cached_at = Column(DateTime)
+    genres: Mapped[list[TraktGenre]] = relationship(secondary=show_genres_table)
+    _actors: Mapped[list[TraktActor]] = relationship(secondary=show_actors_table)
+    updated_at: Mapped[datetime | None]
+    cached_at: Mapped[datetime | None]
+    search_strings: Mapped[list[TraktShowSearchResult]] = relationship(back_populates='series')
 
     def to_dict(self):
         return {
@@ -770,28 +775,29 @@ class TraktShow(Base):
 class TraktMovie(Base):
     __tablename__ = 'trakt_movies'
 
-    id = Column(Integer, primary_key=True, autoincrement=False)
-    title = Column(Unicode)
-    year = Column(Integer)
-    slug = Column(Unicode)
-    imdb_id = Column(Unicode)
-    tmdb_id = Column(Integer)
-    tagline = Column(Unicode)
-    overview = Column(Unicode)
-    released = Column(Date)
-    runtime = Column(Integer)
-    rating = Column(Integer)
-    votes = Column(Integer)
-    trailer = Column(Unicode)
-    homepage = Column(Unicode)
-    language = Column(Unicode)
-    updated_at = Column(DateTime)
-    cached_at = Column(DateTime)
-    _translations = relationship(TraktMovieTranslation, backref='movie')
-    _translation_languages = Column('translation_languages', Unicode)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=False)
+    title: Mapped[str | None]
+    year: Mapped[int | None]
+    slug: Mapped[str | None]
+    imdb_id: Mapped[str | None]
+    tmdb_id: Mapped[int | None]
+    tagline: Mapped[str | None]
+    overview: Mapped[str | None]
+    released: Mapped[date | None]
+    runtime: Mapped[int | None]
+    rating: Mapped[int | None]
+    votes: Mapped[int | None]
+    trailer: Mapped[str | None]
+    homepage: Mapped[str | None]
+    language: Mapped[str | None]
+    updated_at: Mapped[datetime | None]
+    cached_at: Mapped[datetime | None]
+    _translations: Mapped[list[TraktMovieTranslation]] = relationship(back_populates='movie')
+    _translation_languages: Mapped[str | None] = mapped_column('translation_languages')
     translation_languages = json_synonym('_translation_languages')
-    genres = relationship(TraktGenre, secondary=movie_genres_table)
-    _actors = relationship(TraktActor, secondary=movie_actors_table)
+    genres: Mapped[list[TraktGenre]] = relationship(secondary=movie_genres_table)
+    _actors: Mapped[list[TraktActor]] = relationship(secondary=movie_actors_table)
+    search_strings: Mapped[list[TraktMovieSearchResult]] = relationship(back_populates='movie')
 
     def __init__(self, trakt_movie, session):
         super().__init__()
@@ -879,10 +885,12 @@ class TraktMovie(Base):
 class TraktShowSearchResult(Base):
     __tablename__ = 'trakt_show_search_results'
 
-    id = Column(Integer, primary_key=True)
-    search = Column(Unicode, unique=True, nullable=False)
-    series_id = Column(Integer, ForeignKey('trakt_shows.id'), nullable=True)
-    series = relationship(TraktShow, backref='search_strings')
+    id: Mapped[int] = mapped_column(primary_key=True)
+    search: Mapped[str] = mapped_column(unique=True)
+    series_id: Mapped[int | None] = mapped_column(
+        ForeignKey('trakt_shows.id')
+    )  # explicitly allows None
+    series: Mapped[TraktShow | None] = relationship(back_populates='search_strings')
 
     def __init__(self, search, series_id=None, series=None):
         self.search = search.lower()
@@ -895,10 +903,12 @@ class TraktShowSearchResult(Base):
 class TraktMovieSearchResult(Base):
     __tablename__ = 'trakt_movie_search_results'
 
-    id = Column(Integer, primary_key=True)
-    search = Column(Unicode, unique=True, nullable=False)
-    movie_id = Column(Integer, ForeignKey('trakt_movies.id'), nullable=True)
-    movie = relationship(TraktMovie, backref='search_strings')
+    id: Mapped[int] = mapped_column(primary_key=True)
+    search: Mapped[str] = mapped_column(unique=True)
+    movie_id: Mapped[int | None] = mapped_column(
+        ForeignKey('trakt_movies.id')
+    )  # explicitly allows None
+    movie: Mapped[TraktMovie | None] = relationship(back_populates='search_strings')
 
     def __init__(self, search, movie_id=None, movie=None):
         self.search = search.lower()

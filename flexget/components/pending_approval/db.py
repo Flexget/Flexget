@@ -1,7 +1,8 @@
 from datetime import datetime, timedelta
 
 from loguru import logger
-from sqlalchemy import Boolean, Column, DateTime, Integer, String, Unicode, select
+from sqlalchemy import select
+from sqlalchemy.orm import Mapped, mapped_column
 
 from flexget import db_schema
 from flexget.entry import Entry
@@ -37,14 +38,14 @@ def upgrade(ver, session):
 class PendingEntry(Base):
     __tablename__ = 'pending_entries'
 
-    id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
-    task_name = Column(Unicode)
-    title = Column(Unicode)
-    url = Column(String)
-    approved = Column(Boolean)
-    _json = Column('json', Unicode)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    task_name: Mapped[str | None]
+    title: Mapped[str | None]
+    url: Mapped[str | None]
+    approved: Mapped[bool | None]
+    _json: Mapped[str | None] = mapped_column('json')
     entry = entry_synonym('_json')
-    added = Column(DateTime, default=datetime.now)
+    added: Mapped[datetime] = mapped_column(default=datetime.now)
 
     def __init__(self, task_name, entry):
         self.task_name = task_name

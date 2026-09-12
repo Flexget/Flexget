@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import datetime, timedelta
 
 from dateutil import parser
@@ -5,17 +7,12 @@ from loguru import logger
 from requests.exceptions import RequestException
 from sqlalchemy import (
     Column,
-    DateTime,
-    Float,
     ForeignKey,
-    Integer,
-    String,
     Table,
-    Unicode,
     and_,
     or_,
 )
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.orm.exc import MultipleResultsFound
 
 from flexget import db_schema, plugin
@@ -49,15 +46,15 @@ def upgrade(ver, session):
 class TVMazeGenre(Base):
     __tablename__ = 'tvmaze_genres'
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(Unicode, unique=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str | None] = mapped_column(unique=True)
 
 
 genres_table = Table(
     'tvmaze_series_genres',
     Base.metadata,
-    Column('series_id', Integer, ForeignKey('tvmaze_series.tvmaze_id')),
-    Column('genre_id', Integer, ForeignKey('tvmaze_genres.id')),
+    Column('series_id', ForeignKey('tvmaze_series.tvmaze_id')),
+    Column('genre_id', ForeignKey('tvmaze_genres.id')),
 )
 
 Base.register_table(genres_table)
@@ -66,10 +63,10 @@ Base.register_table(genres_table)
 class TVMazeLookup(Base):
     __tablename__ = 'tvmaze_lookup'
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    search_name = Column(Unicode, index=True, unique=True)
-    series_id = Column(Integer, ForeignKey('tvmaze_series.tvmaze_id'))
-    series = relationship('TVMazeSeries', backref='search_strings')
+    id: Mapped[int] = mapped_column(primary_key=True)
+    search_name: Mapped[str | None] = mapped_column(index=True, unique=True)
+    series_id: Mapped[int | None] = mapped_column(ForeignKey('tvmaze_series.tvmaze_id'))
+    series: Mapped[TVMazeSeries | None] = relationship(back_populates='search_strings')
 
     def __init__(self, search_name, series_id=None, series=None):
         self.search_name = search_name.lower()
@@ -85,42 +82,41 @@ class TVMazeLookup(Base):
 class TVMazeSeries(Base):
     __tablename__ = 'tvmaze_series'
 
-    tvmaze_id = Column(Integer, primary_key=True)
-    status = Column(Unicode)
-    rating = Column(Float)
-    genres = relationship(TVMazeGenre, secondary=genres_table)
-    weight = Column(Integer)
-    updated = Column(DateTime)  # last time show was updated at tvmaze
-    name = Column(Unicode)
-    language = Column(Unicode)
-    _schedule = Column('schedule', Unicode)
+    tvmaze_id: Mapped[int] = mapped_column(primary_key=True)
+    status: Mapped[str | None]
+    rating: Mapped[float | None]
+    genres: Mapped[list[TVMazeGenre]] = relationship(secondary=genres_table)
+    weight: Mapped[int | None]
+    updated: Mapped[datetime | None]  # last time show was updated at tvmaze
+    name: Mapped[str | None]
+    language: Mapped[str | None]
+    _schedule: Mapped[str | None] = mapped_column('schedule')
     schedule = json_synonym('_schedule')
-    url = Column(String)
-    original_image = Column(String)
-    medium_image = Column(String)
-    tvdb_id = Column(Integer)
-    tvrage_id = Column(Integer)
-    premiered = Column(DateTime)
-    year = Column(Integer)
-    summary = Column(Unicode)
-    webchannel = Column(String)
-    runtime = Column(Integer)
-    show_type = Column(String)
-    network = Column(Unicode)
-    episodes = relationship(
-        'TVMazeEpisodes',
+    url: Mapped[str | None]
+    original_image: Mapped[str | None]
+    medium_image: Mapped[str | None]
+    tvdb_id: Mapped[int | None]
+    tvrage_id: Mapped[int | None]
+    premiered: Mapped[datetime | None]
+    year: Mapped[int | None]
+    summary: Mapped[str | None]
+    webchannel: Mapped[str | None]
+    runtime: Mapped[int | None]
+    show_type: Mapped[str | None]
+    network: Mapped[str | None]
+    episodes: Mapped[list[TVMazeEpisodes]] = relationship(
         order_by='TVMazeEpisodes.season_number',
-        cascade='all, delete, delete-orphan',
-        backref='series',
+        cascade='all, delete-orphan',
+        back_populates='series',
     )
-    seasons = relationship(
-        'TVMazeSeason',
+    seasons: Mapped[list[TVMazeSeason]] = relationship(
         order_by='TVMazeSeason.number',
-        cascade='all, delete, delete-orphan',
-        backref='series',
+        cascade='all, delete-orphan',
+        back_populates='series',
     )
 
-    last_update = Column(DateTime)  # last time we updated the db for the show
+    last_update: Mapped[datetime | None]  # last time we updated the db for the show
+    search_strings: Mapped[list[TVMazeLookup]] = relationship(back_populates='series')
 
     def __init__(self, series, session):
         self.tvmaze_id = series['id']
@@ -208,19 +204,20 @@ class TVMazeSeries(Base):
 class TVMazeSeason(Base):
     __tablename__ = 'tvmaze_seasons'
 
-    tvmaze_id = Column(Integer, primary_key=True)
-    series_id = Column(Integer, ForeignKey('tvmaze_series.tvmaze_id'), nullable=False)
+    tvmaze_id: Mapped[int] = mapped_column(primary_key=True)
+    series_id: Mapped[int] = mapped_column(ForeignKey('tvmaze_series.tvmaze_id'))
+    series: Mapped[TVMazeSeries] = relationship(back_populates='seasons')
 
-    number = Column(Integer)
-    url = Column(String)
-    name = Column(Unicode)
-    episode_order = Column(Integer)
-    airdate = Column(DateTime)
-    end_date = Column(DateTime)
-    network = Column(Unicode)
-    web_channel = Column(Unicode)
-    image = Column(String)
-    summary = Column(Unicode)
+    number: Mapped[int | None]
+    url: Mapped[str | None]
+    name: Mapped[str | None]
+    episode_order: Mapped[int | None]
+    airdate: Mapped[datetime | None]
+    end_date: Mapped[datetime | None]
+    network: Mapped[str | None]
+    web_channel: Mapped[str | None]
+    image: Mapped[str | None]
+    summary: Mapped[str | None]
 
     def __init__(self, season, series_id):
         self.tvmaze_id = season['id']
@@ -248,20 +245,21 @@ class TVMazeSeason(Base):
 class TVMazeEpisodes(Base):
     __tablename__ = 'tvmaze_episode'
 
-    tvmaze_id = Column(Integer, primary_key=True)
-    series_id = Column(Integer, ForeignKey('tvmaze_series.tvmaze_id'), nullable=False)
-    number = Column(Integer, nullable=False)
-    season_number = Column(Integer, nullable=False)
+    tvmaze_id: Mapped[int] = mapped_column(primary_key=True)
+    series_id: Mapped[int] = mapped_column(ForeignKey('tvmaze_series.tvmaze_id'))
+    series: Mapped[TVMazeSeries] = relationship(back_populates='episodes')
+    number: Mapped[int]
+    season_number: Mapped[int]
 
-    title = Column(Unicode)
-    airdate = Column(DateTime)
-    url = Column(String)
-    original_image = Column(String)
-    medium_image = Column(String)
-    airstamp = Column(DateTime)
-    runtime = Column(Integer)
-    summary = Column(Unicode)
-    last_update = Column(DateTime)
+    title: Mapped[str | None]
+    airdate: Mapped[datetime | None]
+    url: Mapped[str | None]
+    original_image: Mapped[str | None]
+    medium_image: Mapped[str | None]
+    airstamp: Mapped[datetime | None]
+    runtime: Mapped[int | None]
+    summary: Mapped[str | None]
+    last_update: Mapped[datetime | None]
 
     def to_dict(self):
         return {
