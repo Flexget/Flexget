@@ -25,6 +25,7 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.log import capture_logs
 from flexget.options import get_parser
+from flexget.plugin import get as get_plugin
 from flexget.task import task_phases
 from flexget.terminal import capture_console
 from flexget.utils import json, requests
@@ -156,6 +157,11 @@ class ObjectsContainer:
                 'type': 'boolean',
                 'default': True,
                 'description': 'Include dump of entries including fields',
+            },
+            'second_guess_metadata': {
+                'type': 'boolean',
+                'default': False,
+                'description': "After execution, rerun metadata 'guess' functionality for each entry in 'entry_dump', 'to maximise likelihood of returning entry metadata",
             },
             'inject': {
                 'type': 'array',
@@ -598,6 +604,23 @@ def update_stream(task, status: str = 'pending') -> None:
     task.stream['queue'].put(json.dumps({'progress': progress, 'task_id': task.id}))
 
 
+def _apply_second_guess_metadata(entries):
+    """Re-run series and movie metadata guessing against entries in their final state.
+
+    Called when both entry_dump and second_guess_metadata are requested. Mutates entries
+    in-place by populating series_* and movie_* fields where they were not already set
+    during the normal metainfo phase (e.g. because title reformatting occurred after that
+    phase ran).
+    """
+    metainfo_series = get_plugin('metainfo_series', 'tasks')
+    metainfo_movie = get_plugin('metainfo_movie', 'tasks')
+    for entry in entries:
+        if not entry.get('series_name'):
+            metainfo_series.guess_entry(entry)
+        if not entry.get('movie_name'):
+            metainfo_movie.guess_entry(entry)
+
+
 @event('task.execute.started')
 def start_task(task):
     task.stream = _streams.get(task.id)
@@ -613,9 +636,14 @@ def finish_task(task):
             update_stream(task, status='complete')
 
         if task.stream['args'].get('entry_dump'):
-            entries = [entry.store for entry in task.entries]
+            entries_to_dump = list(task.entries)
+            if task.stream['args'].get('second_guess_metadata'):
+                _apply_second_guess_metadata(entries_to_dump)
             task.stream['queue'].put(
-                EntryDecoder().encode({'entry_dump': entries, 'task_id': task.id})
+                EntryDecoder().encode({
+                    'entry_dump': [e.store for e in entries_to_dump],
+                    'task_id': task.id,
+                })
             )
 
         if task.stream['args'].get('summary'):
