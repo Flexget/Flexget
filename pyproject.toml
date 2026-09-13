@@ -82,7 +82,7 @@ dev = [
   "pytest-cov~=7.0",
   "pytest-socket~=0.8.0",
   "pytest-xdist~=3.6",
-  "ruff==0.16.6",
+  "ruff==0.16.7",
   "vcrpy~=8.1",
 ]
 test = [
