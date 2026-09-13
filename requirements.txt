@@ -205,7 +205,7 @@ typing-extensions==4.16.0
     #   referencing
     #   sqlalchemy
     #   tempora
-tzdata==2026.3
+tzdata==2026.4
     # via
     #   pendulum
     #   tzlocal
