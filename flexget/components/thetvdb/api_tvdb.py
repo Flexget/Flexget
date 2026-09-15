@@ -1,9 +1,11 @@
+from __future__ import annotations
+
 from datetime import datetime, timedelta, timezone
 
 from loguru import logger
-from sqlalchemy import Boolean, Column, DateTime, Float, Integer, Table, Text, Unicode
+from sqlalchemy import Column, Table
 from sqlalchemy.ext.associationproxy import association_proxy
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.schema import ForeignKey
 
 from flexget import db_schema
@@ -115,8 +117,8 @@ def upgrade(ver, session):
 genres_table = Table(
     'tvdb_series_genres',
     Base.metadata,
-    Column('series_id', Integer, ForeignKey('tvdb_series.id')),
-    Column('genre_id', Integer, ForeignKey('tvdb_genres.id')),
+    Column('series_id', ForeignKey('tvdb_series.id')),
+    Column('genre_id', ForeignKey('tvdb_genres.id')),
 )
 Base.register_table(genres_table)
 
@@ -124,10 +126,10 @@ Base.register_table(genres_table)
 class TVDBTokens(Base):
     __tablename__ = 'tvdb_tokens'
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(Unicode)
-    token = Column(Text)
-    refreshed = Column(DateTime)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str | None]
+    token: Mapped[str | None]
+    refreshed: Mapped[datetime | None]
 
     def has_expired(self):
         if not self.token or not self.refreshed:
@@ -140,36 +142,39 @@ class TVDBTokens(Base):
 class TVDBSeries(Base):
     __tablename__ = 'tvdb_series'
 
-    id = Column(Integer, primary_key=True, autoincrement=False)
-    last_updated = Column(Integer)
-    expired = Column(Boolean)
-    name = Column(Unicode)
-    language = Column(Unicode)
-    rating = Column(Float)
-    status = Column(Unicode)
-    runtime = Column(Integer)
-    airs_time = Column(Unicode)
-    airs_dayofweek = Column(Unicode)
-    content_rating = Column(Unicode)
-    network = Column(Unicode)
-    overview = Column(Unicode)
-    imdb_id = Column(Unicode)
-    zap2it_id = Column(Unicode)
-    _banner = Column('banner', Unicode)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=False)
+    last_updated: Mapped[int | None]
+    expired: Mapped[bool | None]
+    name: Mapped[str | None]
+    language: Mapped[str | None]
+    rating: Mapped[float | None]
+    status: Mapped[str | None]
+    runtime: Mapped[int | None]
+    airs_time: Mapped[str | None]
+    airs_dayofweek: Mapped[str | None]
+    content_rating: Mapped[str | None]
+    network: Mapped[str | None]
+    overview: Mapped[str | None]
+    imdb_id: Mapped[str | None]
+    zap2it_id: Mapped[str | None]
+    _banner: Mapped[str | None] = mapped_column('banner')
 
-    _first_aired = Column('first_aired', DateTime)
+    _first_aired: Mapped[datetime | None] = mapped_column('first_aired')
     first_aired = text_date_synonym('_first_aired')
-    _aliases = Column('aliases', Unicode)
+    _aliases: Mapped[str | None] = mapped_column('aliases')
     aliases = json_synonym('_aliases')
-    _actors = Column('actors', Unicode)
+    _actors: Mapped[str | None] = mapped_column('actors')
     actors_list = json_synonym('_actors')
-    _posters = Column('posters', Unicode)
+    _posters: Mapped[str | None] = mapped_column('posters')
     posters_list = json_synonym('_posters')
 
-    _genres = relationship('TVDBGenre', secondary=genres_table)
+    _genres: Mapped[list[TVDBGenre]] = relationship(secondary=genres_table)
     genres = association_proxy('_genres', 'name')
 
-    episodes = relationship('TVDBEpisode', backref='series', cascade='all, delete, delete-orphan')
+    episodes: Mapped[list[TVDBEpisode]] = relationship(
+        back_populates='series', cascade='all, delete-orphan'
+    )
+    search_strings: Mapped[list[TVDBSearchResult]] = relationship(back_populates='series')
 
     def __init__(self, tvdb_id, language):
         """Look up movie on tvdb and create a new database model for it.
@@ -304,7 +309,7 @@ class TVDBSeries(Base):
 
 class TVDBGenre(Base):
     __tablename__ = 'tvdb_genres'
-    id = Column(Unicode, primary_key=True)
+    id: Mapped[str] = mapped_column(primary_key=True)
 
     @property
     def name(self):
@@ -314,21 +319,22 @@ class TVDBGenre(Base):
 class TVDBEpisode(Base):
     __tablename__ = 'tvdb_episodes'
 
-    id = Column(Integer, primary_key=True, autoincrement=False)
-    expired = Column(Boolean)
-    last_updated = Column(Integer)
-    season_number = Column(Integer)
-    episode_number = Column(Integer)
-    absolute_number = Column(Integer)
-    name = Column(Unicode)
-    overview = Column(Unicode)
-    rating = Column(Float)
-    director = Column(Unicode)
-    _image = Column(Unicode)
-    _first_aired = Column('firstaired', DateTime)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=False)
+    expired: Mapped[bool | None]
+    last_updated: Mapped[int | None]
+    season_number: Mapped[int | None]
+    episode_number: Mapped[int | None]
+    absolute_number: Mapped[int | None]
+    name: Mapped[str | None]
+    overview: Mapped[str | None]
+    rating: Mapped[float | None]
+    director: Mapped[str | None]
+    _image: Mapped[str | None]
+    _first_aired: Mapped[datetime | None] = mapped_column('firstaired')
     first_aired = text_date_synonym('_first_aired')
 
-    series_id = Column(Integer, ForeignKey('tvdb_series.id'), nullable=False)
+    series_id: Mapped[int] = mapped_column(ForeignKey('tvdb_series.id'))
+    series: Mapped[TVDBSeries] = relationship(back_populates='episodes')
 
     def __init__(self, series_id, ep_id, language=None):
         """Look up movie on tvdb and create a new database model for it.
@@ -388,10 +394,12 @@ class TVDBEpisode(Base):
 class TVDBSearchResult(Base):
     __tablename__ = 'tvdb_search_results'
 
-    id = Column(Integer, primary_key=True)
-    search = Column(Unicode, nullable=False, unique=True)
-    series_id = Column(Integer, ForeignKey('tvdb_series.id'), nullable=True)
-    series = relationship(TVDBSeries, backref='search_strings')
+    id: Mapped[int] = mapped_column(primary_key=True)
+    search: Mapped[str] = mapped_column(unique=True)
+    series_id: Mapped[int | None] = mapped_column(
+        ForeignKey('tvdb_series.id')
+    )  # explicitly allows None
+    series: Mapped[TVDBSeries] = relationship(back_populates='search_strings')
 
     def __init__(self, search, series_id=None, series=None):
         self.search = search.lower()
@@ -406,24 +414,24 @@ class TVDBSeriesSearchResult(Base):
 
     __tablename__ = 'tvdb_series_search_results'
 
-    id = Column(Integer, primary_key=True, autoincrement=False)
-    lookup_term = Column(Unicode)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=False)
+    lookup_term: Mapped[str | None]
 
-    name = Column(Unicode)
-    status = Column(Unicode)
-    network = Column(Unicode)
-    overview = Column(Unicode)
+    name: Mapped[str | None]
+    status: Mapped[str | None]
+    network: Mapped[str | None]
+    overview: Mapped[str | None]
 
-    _banner = Column('banner', Unicode)
+    _banner: Mapped[str | None] = mapped_column('banner')
 
-    _first_aired = Column('first_aired', DateTime)
+    _first_aired: Mapped[datetime | None] = mapped_column('first_aired')
     first_aired = text_date_synonym('_first_aired')
 
-    _aliases = Column('aliases', Unicode)
+    _aliases: Mapped[str | None] = mapped_column('aliases')
     aliases = json_synonym('_aliases')
 
-    created_at = Column(DateTime)
-    search_name = Column(Unicode)
+    created_at: Mapped[datetime | None] = mapped_column(default=datetime.now)
+    search_name: Mapped[str | None]
 
     def __init__(self, series, lookup_term=None):
         self.lookup_term = lookup_term
@@ -435,7 +443,6 @@ class TVDBSeriesSearchResult(Base):
         self.status = series['status']
         self._banner = series['banner']
         self.aliases = series['aliases']
-        self.created_at = datetime.now()
 
     @property
     def banner(self):
