@@ -1524,7 +1524,7 @@ requires-dist = [
     { name = "flask-cors", specifier = "~=6.0" },
     { name = "flask-login", specifier = "~=0.6.3" },
     { name = "flask-restx", specifier = "~=1.3" },
-    { name = "guessit", specifier = "~=3.8" },
+    { name = "guessit", specifier = "~=4.2.1" },
     { name = "html5lib", specifier = "~=1.1" },
     { name = "jinja2", specifier = "~=3.1" },
     { name = "jsonschema", specifier = "~=4.23" },
@@ -1811,16 +1811,16 @@ wheels = [
 
 [[package]]
 name = "guessit"
-version = "3.8.0"
+version = "4.2.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "babelfish" },
     { name = "python-dateutil" },
     { name = "rebulk" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/d0/07/5a88020bfe2591af2ffc75841200b2c17ff52510779510346af5477e64cd/guessit-3.8.0.tar.gz", hash = "sha256:6619fcbbf9a0510ec8c2c33744c4251cad0507b1d573d05c875de17edc5edbed", size = 271285, upload-time = "2023-12-14T10:24:20.582Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/87/e2/45b14ca957b0ecda929f9661d2c3319289e0a4f178244c8da270851a2238/guessit-4.2.1.tar.gz", hash = "sha256:511cd34e6666d501277e6eb6f28830ebfaa1298fe0e5c07648c090af90d7173f", size = 473141, upload-time = "2026-07-30T15:17:51.266Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/b8/9b/924a8f9709c3143d4c9a301a88042cbce37e09789378217284b19d4f8132/guessit-3.8.0-py3-none-any.whl", hash = "sha256:eb5747b1d0fbca926562c1e5894dbc3f6507c35e8c0bd9e38148401cd9579d83", size = 206049, upload-time = "2023-12-14T10:24:17.753Z" },
+    { url = "https://files.pythonhosted.org/packages/5b/d2/c61dcf55cebadac33f32860aa8371c1ad104c8fab8008be9f73a09d4743d/guessit-4.2.1-py3-none-any.whl", hash = "sha256:040165263cd11284be59e2d1381e80b035de4f2b914b33e7ba2881329bb7fea4", size = 327012, upload-time = "2026-07-30T15:17:49.958Z" },
 ]
 
 [[package]]

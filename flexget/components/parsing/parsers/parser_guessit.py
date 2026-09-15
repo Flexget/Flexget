@@ -222,7 +222,6 @@ class ParserGuessit:
         if parse_type:
             guessit_options['type'] = parse_type
 
-        # NOTE: Guessit expects str on PY3 and unicode on PY2 hence the use of future.utils.native
         try:
             guess_result = guessit_api.guessit(data, options=guessit_options)
         except GuessitException:
