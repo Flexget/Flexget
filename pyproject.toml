@@ -15,7 +15,7 @@ authors = [
   { name = "Chase Sterling", email = "chase.sterling@gmail.com" },
   { name = "Marko Koivusalo", email = "marko.koivusalo@gmail.com" },
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 classifiers = [
   "Development Status :: 5 - Production/Stable",
   "Intended Audience :: End Users/Desktop",
@@ -25,11 +25,11 @@ classifiers = [
   "Operating System :: POSIX",
   "Operating System :: Unix",
   "Programming Language :: Python :: 3 :: Only",
-  "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: 3.14",
+  "Programming Language :: Python :: 3.15",
   "Topic :: Utilities",
   "Typing :: Typed",
 ]
@@ -210,7 +210,6 @@ lint.ignore = [
   "too-many-positional-arguments",
   "too-many-return-statements",
   "too-many-statements",
-  "try-except-in-loop",                # TODO: Remove this rule once Python 3.10 support is dropped.
   "undocumented-magic-method",
   "undocumented-public-class",
   "undocumented-public-function",
@@ -244,7 +243,7 @@ skip = [
 
 [tool.pyproject-fmt]
 keep_full_version = true
-max_supported_python = "3.14"
+max_supported_python = "3.15"
 
 [tool.typos]
 default.extend-ignore-re = [

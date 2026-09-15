@@ -1,7 +1,6 @@
 import contextlib
 import datetime
 import os
-import platform
 from pathlib import Path
 
 import pytest
@@ -259,10 +258,6 @@ class TestSubtitleList:
 
     @pytest.mark.require_optional_deps
     @pytest.mark.online
-    @pytest.mark.skipif(
-        platform.system() == 'Darwin',
-        reason='This test fails intermittently on macOS',
-    )
     def test_subtitle_list_subliminal_fail(self, execute_task):
         task = execute_task('subtitle_add_with_languages')
 

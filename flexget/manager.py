@@ -801,7 +801,7 @@ class Manager:
             )
         except ImportError:
             logger.opt(exception=True).critical(
-                'FATAL: Unable to use SQLite. Are you running Python 3.10 or newer ?\n'
+                'FATAL: Unable to use SQLite. Are you running Python 3.11 or newer ?\n'
                 'Python should normally have SQLite support built in.\n'
                 "If you're running correct version of Python then it is not equipped with SQLite.\n"
                 'You can try installing `pysqlite`.\n'

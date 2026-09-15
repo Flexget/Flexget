@@ -165,11 +165,7 @@ rich==15.0.0
     # via
     #   flexget
     #   typer
-rpds-py==0.30.0 ; python_full_version < '3.11'
-    # via
-    #   jsonschema
-    #   referencing
-rpds-py==2026.6.3 ; python_full_version >= '3.11'
+rpds-py==2026.6.3
     # via
     #   jsonschema
     #   referencing
@@ -198,8 +194,6 @@ typer-slim==0.24.0
 typing-extensions==4.16.0
     # via
     #   beautifulsoup4
-    #   cryptography
-    #   flask-cors
     #   flexget
     #   plumbum
     #   referencing
