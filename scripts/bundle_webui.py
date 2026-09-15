@@ -54,11 +54,16 @@ def bundle_webui(ui_version: str | None = None):
 
     def download_extract(url, dest_path):
         print(dest_path)
-        r = requests.get(url)
-        if r.status_code != 200:
-            raise RuntimeError(f'Unable to retrieve {dest_path}')
-        z = zipfile.ZipFile(io.BytesIO(r.content))
-        z.extractall(dest_path)
+        if url.startswith(('http://', 'https://')):
+            r = requests.get(url)
+            if r.status_code != 200:
+                raise RuntimeError(f'Unable to retrieve {dest_path}')
+            data = io.BytesIO(r.content)
+        else:
+            with Path(url).expanduser().open('rb') as f:
+                data = io.BytesIO(f.read())
+
+        zipfile.ZipFile(data).extractall(dest_path)
 
     if not ui_version or ui_version == 'v1':
         # WebUI V1
@@ -87,7 +92,10 @@ def bundle_webui(ui_version: str | None = None):
             if app_path.exists():
                 shutil.rmtree(app_path)
             download_extract(
-                'https://github.com/Flexget/webui/releases/latest/download/dist.zip',
+                os.environ.get(
+                    'V2_WEBUI_LOCATION',
+                    'https://github.com/Flexget/webui/releases/latest/download/dist.zip',
+                ),
                 ui_path / 'v2',
             )
         except (OSError, ValueError) as e:
