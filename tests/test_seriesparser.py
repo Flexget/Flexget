@@ -128,9 +128,11 @@ class TestSeriesParser:
         assert s.season == 2, f'failed to parse {s}'
         assert s.episode == 2, f'failed to parse {s}'
 
-    @pytest.mark.skip(reason='Not supported in guessit, works for internal parser')
-    def test_series_episode(self, parse):
+    def test_series_episode(self, request, parse):
         """SeriesParser: series X, episode Y."""
+        if request.node.callspec.params['parse'] is ParserGuessit:
+            pytest.skip(reason='Not supported in guessit')
+
         s = parse(name='Something', data='Something - Series 2, Episode 2')
         assert s.season == 2, f'failed to parse {s}'
         assert s.episode == 2, f'failed to parse {s}'
@@ -480,9 +482,11 @@ class TestSeriesParser:
         for sound in sounds:
             parse(data=f'FooBar {sound} XViD-FlexGet', name='FooBar')
 
-    @pytest.mark.skip(reason='Bug in guessit, works for internal parser')
-    def test_ep_as_quality(self, parse):
+    def test_ep_as_quality(self, request, parse):
         """SeriesParser: test that eps are not picked as qualities."""
+        if request.node.callspec.params['parse'] is ParserGuessit:
+            pytest.skip(reason='Bug in guessit')
+
         from flexget.utils import qualities
 
         for quality1 in qualities.all_components():
