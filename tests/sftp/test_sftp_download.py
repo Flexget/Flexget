@@ -1,8 +1,6 @@
 from __future__ import annotations
 
 import filecmp
-import platform
-import sys
 from typing import TYPE_CHECKING
 
 import pytest
@@ -15,10 +13,6 @@ if TYPE_CHECKING:
 
 
 @pytest.mark.require_optional_deps
-@pytest.mark.skipif(
-    platform.system() == 'Windows' and sys.version_info[:2] == (3, 10),
-    reason='This test fails intermittently on Windows, Python 3.10.',
-)
 @pytest.mark.xdist_group(name='sftp')
 class TestSftpDownload:
     _config = """

@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from loguru import logger
 from sqlalchemy import Boolean, Column, DateTime, Float, Integer, Table, Text, Unicode
@@ -762,7 +762,7 @@ def mark_expired(session):
     # Only get the expired list every hour
     last_check = persist.get('last_check')
 
-    utcnow = datetime.now(timezone.utc).replace(tzinfo=None)
+    utcnow = datetime.now(UTC).replace(tzinfo=None)
     if not last_check:
         persist['last_check'] = utcnow
         return

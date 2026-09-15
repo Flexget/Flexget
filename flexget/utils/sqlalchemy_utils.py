@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import Any, Self
 
 from loguru import logger
 from sqlalchemy import ColumnDefault, Index, Sequence, text
@@ -10,12 +10,6 @@ from sqlalchemy.exc import NoSuchTableError, OperationalError
 from sqlalchemy.orm import Session
 from sqlalchemy.schema import MetaData, Table
 from sqlalchemy.types import TypeEngine
-
-if TYPE_CHECKING:
-    try:
-        from typing import Self
-    except ImportError:
-        from typing_extensions import Self  # for python<=3.10
 
 logger = logger.bind(name='sql_utils')
 
