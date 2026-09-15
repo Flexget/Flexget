@@ -38,6 +38,7 @@ logger = logger.bind(name='task')
 
 if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator
+    from contextlib import AbstractContextManager
 
     from flexget.db_schema import VersionedBaseMeta
     from flexget.entry import Entry
@@ -62,7 +63,7 @@ class TaskConfigHash(Base):
 
 
 @with_session
-def config_changed(task: str | None = None, session: ContextSession = None) -> None:
+def config_changed(task: str | None = None, session: ContextSession | None = None) -> None:
     """Force config_modified flag to come out true on next run of `task`.
 
     Used when the db changes, and all entries need to be reprocessed.
@@ -73,6 +74,7 @@ def config_changed(task: str | None = None, session: ContextSession = None) -> N
     :param session: sqlalchemy Session instance
     """
     logger.debug('Marking config for {} as changed.', (task or 'all tasks'))
+    assert session is not None
     task_hash = session.query(TaskConfigHash)
     if task:
         task_hash = task_hash.filter(TaskConfigHash.task == task)
@@ -83,7 +85,9 @@ def use_task_logging(func):
     @wraps(func)
     def wrapper(self, *args, **kw):
         # Set the appropriate logger context while running task
-        cms = [logger.contextualize(task=self.name, task_id=self.id, session_id=self.session_id)]
+        cms: list[AbstractContextManager] = [
+            logger.contextualize(task=self.name, task_id=self.id, session_id=self.session_id)
+        ]
         # Capture console output if configured to do so
         if self.output:
             cms.append(capture_console(self.output))
@@ -130,7 +134,7 @@ class EntryIterator:
         raise IndexError(f'{item} is out of bounds')
 
     def reverse(self):
-        self.all_entries.sort(reverse=True)
+        self.all_entries.reverse()
 
     def sort(self, *args, **kwargs):
         self.all_entries.sort(*args, **kwargs)
@@ -153,11 +157,11 @@ class EntryContainer(list):
         self._undecided = EntryIterator(self, EntryState.UNDECIDED)  # undecided entries (default)
 
     # Make these read-only properties
-    entries: EntryIterator = property(lambda self: self._entries)
-    accepted: EntryIterator = property(lambda self: self._accepted)
-    rejected: EntryIterator = property(lambda self: self._rejected)
-    failed: EntryIterator = property(lambda self: self._failed)
-    undecided: EntryIterator = property(lambda self: self._undecided)
+    entries = property(lambda self: self._entries)
+    accepted = property(lambda self: self._accepted)
+    rejected = property(lambda self: self._rejected)
+    failed = property(lambda self: self._failed)
+    undecided = property(lambda self: self._undecided)
 
     def __repr__(self) -> str:
         return f'<EntryContainer({list.__repr__(self)})>'
@@ -751,6 +755,7 @@ class Task:
     @staticmethod
     def validate_config(config):
         schema = plugin_schemas(interface='task')
+        assert isinstance(schema, dict)
         # Don't validate commented out plugins
         schema['patternProperties'] = {'^_': {}}
         return config_schema.process_config(config, schema)

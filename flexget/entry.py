@@ -329,7 +329,8 @@ class Entry(LazyDict, Serializer):
         return render_from_entry(template, self, native=native)
 
     @classmethod
-    def serialize(cls, entry: Entry) -> dict:
+    def serialize(cls, value: Entry) -> dict:
+        entry = value
         fields = {}
         for key in entry:
             if key.startswith('_') or entry.is_lazy(key):
@@ -372,24 +373,30 @@ class Entry(LazyDict, Serializer):
         :param args: Arguments that will be passed to the lazy lookup function when called.
         :param kwargs: Keyword arguments which will be passed to the lazy lookup function when called.
         """
-        if not isinstance(lazy_func, str):
-            lazy_func = getattr(lazy_func, 'lazy_func_id', None)
-        if lazy_func not in lazy_func_registry:
+        if isinstance(lazy_func, str):
+            lazy_func_id = lazy_func
+        else:
+            lazy_func_id = getattr(lazy_func, 'lazy_func_id', None)
+        if lazy_func_id not in lazy_func_registry:
             raise ValueError(
                 'Lazy lookup functions/methods must be registered with the `register_lazy_lookup` decorator'
             )
         # Make sure fields is a plain list. If it is a dict, (or some other iterable) we may try to serialize
         # extra/unserializable stuff.
         fields = list(fields)
-        func = lazy_func_registry[lazy_func]
+        args = args if args is not None else []
+        kwargs = kwargs if kwargs is not None else {}
+        func = lazy_func_registry[lazy_func_id]
         super().register_lazy_func(func.function, fields, args, kwargs)
-        self.lazy_lookups.append((lazy_func, fields, args, kwargs))
+        self.lazy_lookups.append((lazy_func_id, fields, args, kwargs))
 
     @deprecated(
         '`register_lazy_func` is deprecated. `add_lazy_fields` should be used instead. '
         'This plugin should be updated to work with the latest versions of FlexGet'
     )
-    def register_lazy_func(self, func, keys):
+    def register_lazy_func(  # pyright: ignore[reportIncompatibleMethodOverride]
+        self, func, keys
+    ):
         """Add lazy fields to an entry.
 
         .. deprecated:: 3.1.11
@@ -422,13 +429,14 @@ class LazyFunc:
             raise RuntimeError(
                 f'The name {self.name} is already registered to another lazy function.'
             )
-        func.lazy_func_id = self.name
+        func.lazy_func_id = self.name  # pyright: ignore[reportFunctionMemberAccess]
         self._func = func
         lazy_func_registry[self.name] = self
         return func
 
     @property
     def function(self) -> Callable:
+        assert self._func is not None
         if '.' in self._func.__qualname__:
             # This is a method of a plugin class, bind the function to the plugin instance
             plugin_class_name = self._func.__qualname__.split('.')[0]
