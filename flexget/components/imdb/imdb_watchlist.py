@@ -101,6 +101,16 @@ class ImdbWatchlist:
             params['title_type'] = ','.join(title_types)
             params['sort'] = 'list_order%2Casc'
 
+        if config['list'] == 'ratings':
+            # IMDb no longer serves the owner's rating per title, only a range
+            # filter; 10 filtered fetches is the cheapest way to recover it.
+            entries = []
+            for rating in range(1, 11):
+                params['single_user_rating'] = f'{rating},{rating}'
+                for entry in self.parse_html_list(task, config, url, params, headers):
+                    entry['imdb_user_score'] = rating
+                    entries.append(entry)
+            return entries
         return self.parse_html_list(task, config, url, params, headers)
 
     def fetch_page(self, task, url, params, headers):
@@ -203,7 +213,7 @@ class ImdbWatchlist:
 
         rating = item['ratingsSummary']['aggregateRating']
         if isinstance(rating, float):
-            entry['imdb_user_score'] = entry['imdb_score'] = rating
+            entry['imdb_score'] = rating
             entry['imdb_votes'] = item['ratingsSummary']['voteCount']
 
         return entry
