@@ -7,8 +7,6 @@ from typing import TYPE_CHECKING
 
 from loguru import logger
 from sqlalchemy import (
-    Boolean,
-    Column,
     DateTime,
     ForeignKey,
     Index,
@@ -25,7 +23,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
-from sqlalchemy.orm import backref, relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from flexget import db_schema, plugin
 from flexget.components.series.utils import normalize_series_name
@@ -74,37 +72,34 @@ class Series(Base):
 
     __tablename__ = 'series'
 
-    id = Column(Integer, primary_key=True)
-    _name = Column('name', Unicode)
-    _name_normalized = Column('name_lower', Unicode, index=True, unique=True)
-    identified_by = Column(String)
-    begin_episode_id = Column(
-        Integer, ForeignKey('series_episodes.id', name='begin_episode_id', use_alter=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    _name: Mapped[str | None] = mapped_column('name')
+    _name_normalized: Mapped[str | None] = mapped_column('name_lower', index=True, unique=True)
+    identified_by: Mapped[str | None]
+    begin_episode_id: Mapped[str | None] = mapped_column(
+        ForeignKey('series_episodes.id', name='begin_episode_id', use_alter=True)
     )
-    begin = relationship(
-        'Episode',
-        uselist=False,
-        primaryjoin='Series.begin_episode_id == Episode.id',
+    begin: Mapped[Episode | None] = relationship(
         foreign_keys=[begin_episode_id],
         post_update=True,
-        backref='begins_series',
+        back_populates='begins_series',
     )
-    episodes = relationship(
-        'Episode',
-        backref='series',
-        cascade='all, delete, delete-orphan',
+    episodes: Mapped[list[Episode]] = relationship(
+        back_populates='series',
+        cascade='all, delete-orphan',
         primaryjoin='Series.id == Episode.series_id',
     )
-    in_tasks = relationship(
-        'SeriesTask',
-        backref=backref('series', uselist=False),
-        cascade='all, delete, delete-orphan',
+    in_tasks: Mapped[list[SeriesTask]] = relationship(
+        back_populates='series',
+        cascade='all, delete-orphan',
     )
-    alternate_names = relationship(
-        'AlternateNames', backref='series', cascade='all, delete, delete-orphan'
+    alternate_names: Mapped[list[AlternateNames]] = relationship(
+        back_populates='series', cascade='all, delete-orphan'
     )
 
-    seasons = relationship('Season', backref='series', cascade='all, delete, delete-orphan')
+    seasons: Mapped[list[Season]] = relationship(
+        back_populates='series', cascade='all, delete-orphan'
+    )
 
     # Make a special property that does indexed case insensitive lookups on name, but stores/returns specified case
     @hybrid_property
@@ -145,15 +140,16 @@ class Series(Base):
 class Season(Base):
     __tablename__ = 'series_seasons'
 
-    id = Column(Integer, primary_key=True)
-    identifier = Column(String)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    identifier: Mapped[str | None]
 
-    identified_by = Column(String)
-    season = Column(Integer)
-    series_id = Column(Integer, ForeignKey('series.id'), nullable=False)
+    identified_by: Mapped[str | None]
+    season: Mapped[int | None]
+    series_id: Mapped[int] = mapped_column(ForeignKey('series.id'))
+    series: Mapped[Series] = relationship(back_populates='seasons')
 
-    releases = relationship(
-        'SeasonRelease', backref='season', cascade='all, delete, delete-orphan'
+    releases: Mapped[list[SeasonRelease]] = relationship(
+        back_populates='season', cascade='all, delete-orphan'
     )
 
     is_season = True
@@ -260,19 +256,23 @@ class Season(Base):
 class Episode(Base):
     __tablename__ = 'series_episodes'
 
-    id = Column(Integer, primary_key=True)
-    identifier = Column(String)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    identifier: Mapped[str | None]
 
-    season = Column(Integer)
-    number = Column(Integer)
+    season: Mapped[int | None]
+    number: Mapped[int | None]
 
-    identified_by = Column(String)
-    series_id = Column(Integer, ForeignKey('series.id'), nullable=False)
-    releases = relationship(
-        'EpisodeRelease', backref='episode', cascade='all, delete, delete-orphan'
+    identified_by: Mapped[str | None]
+    series_id: Mapped[int] = mapped_column(ForeignKey('series.id'))
+    series: Mapped[Series] = relationship(back_populates='episodes', foreign_keys=series_id)
+    releases: Mapped[list[EpisodeRelease]] = relationship(
+        back_populates='episode', cascade='all, delete-orphan'
     )
 
     is_season = False
+    begins_series: Mapped[list[Series]] = relationship(
+        back_populates='begin', foreign_keys=Series.begin_episode_id, post_update=True
+    )
 
     @hybrid_property
     def first_seen(self):
@@ -413,18 +413,16 @@ class Episode(Base):
 class EpisodeRelease(Base):
     __tablename__ = 'episode_releases'
 
-    id = Column(Integer, primary_key=True)
-    episode_id = Column(Integer, ForeignKey('series_episodes.id'), nullable=False, index=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    episode_id: Mapped[int] = mapped_column(ForeignKey('series_episodes.id'), index=True)
+    episode: Mapped[Episode] = relationship(back_populates='releases')
 
-    _quality = Column('quality', String)
+    _quality: Mapped[str | None] = mapped_column('quality')
     quality = quality_property('_quality')
-    downloaded = Column(Boolean, default=False)
-    proper_count = Column(Integer, default=0)
-    title = Column(Unicode)
-    first_seen = Column(DateTime)
-
-    def __init__(self):
-        self.first_seen = datetime.now()
+    downloaded: Mapped[bool | None] = mapped_column(default=False)
+    proper_count: Mapped[int | None] = mapped_column(default=0)
+    title: Mapped[str | None]
+    first_seen: Mapped[datetime | None] = mapped_column(default=datetime.now)
 
     @property
     @deprecated('accessing deprecated release.proper, use release.proper_count instead')
@@ -460,18 +458,16 @@ class EpisodeRelease(Base):
 class SeasonRelease(Base):
     __tablename__ = 'season_releases'
 
-    id = Column(Integer, primary_key=True)
-    season_id = Column(Integer, ForeignKey('series_seasons.id'), nullable=False, index=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    season_id: Mapped[int] = mapped_column(ForeignKey('series_seasons.id'), index=True)
+    season: Mapped[Season] = relationship(back_populates='releases')
 
-    _quality = Column('quality', String)
+    _quality: Mapped[str | None] = mapped_column('quality')
     quality = quality_property('_quality')
-    downloaded = Column(Boolean, default=False)
-    proper_count = Column(Integer, default=0)
-    title = Column(Unicode)
-    first_seen = Column(DateTime)
-
-    def __init__(self):
-        self.first_seen = datetime.now()
+    downloaded: Mapped[bool | None] = mapped_column(default=False)
+    proper_count: Mapped[int | None] = mapped_column(default=0)
+    title: Mapped[str | None]
+    first_seen: Mapped[datetime | None] = mapped_column(default=datetime.now)
 
     @property
     @deprecated('accessing deprecated release.proper, use release.proper_count instead')
@@ -508,10 +504,13 @@ class AlternateNames(Base):
     """Similar to Series. Name is handled case insensitively transparently."""
 
     __tablename__ = 'series_alternate_names'
-    id = Column(Integer, primary_key=True)
-    _alt_name = Column('alt_name', Unicode)
-    _alt_name_normalized = Column('alt_name_normalized', Unicode, index=True, unique=True)
-    series_id = Column(Integer, ForeignKey('series.id'), nullable=False)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    _alt_name: Mapped[str | None] = mapped_column('alt_name')
+    _alt_name_normalized: Mapped[str | None] = mapped_column(
+        'alt_name_normalized', index=True, unique=True
+    )
+    series_id: Mapped[int] = mapped_column(ForeignKey('series.id'))
+    series: Mapped[Series] = relationship(back_populates='alternate_names')
 
     @hybrid_property
     def alt_name(self):
@@ -543,9 +542,10 @@ class AlternateNames(Base):
 class SeriesTask(Base):
     __tablename__ = 'series_tasks'
 
-    id = Column(Integer, primary_key=True)
-    series_id = Column(Integer, ForeignKey('series.id'), nullable=False)
-    name = Column(Unicode, index=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    series_id: Mapped[int] = mapped_column(ForeignKey('series.id'))
+    series: Mapped[Series] = relationship(back_populates='in_tasks')
+    name: Mapped[str | None] = mapped_column(index=True)
 
     def __init__(self, name):
         self.name = name

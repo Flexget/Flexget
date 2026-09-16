@@ -1,9 +1,10 @@
-import datetime
 import itertools
 import random
+from datetime import date, datetime, time
 
 from loguru import logger
-from sqlalchemy import Column, DateTime, Index, Integer, Unicode
+from sqlalchemy import Index
+from sqlalchemy.orm import Mapped, mapped_column
 
 from flexget import db_schema, options, plugin
 from flexget.event import event
@@ -17,10 +18,10 @@ Base = db_schema.versioned_base('discover', 0)
 class DiscoverEntry(Base):
     __tablename__ = 'discover_entry'
 
-    id = Column(Integer, primary_key=True)
-    title = Column(Unicode, index=True)
-    task = Column(Unicode, index=True)
-    last_execution = Column(DateTime)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    title: Mapped[str | None] = mapped_column(index=True)
+    task: Mapped[str | None] = mapped_column(index=True)
+    last_execution: Mapped[datetime | None]
 
     def __init__(self, title, task):
         self.title = title
@@ -36,7 +37,7 @@ Index('ix_discover_entry_title_task', DiscoverEntry.title, DiscoverEntry.task)
 
 @event('manager.db_cleanup')
 def db_cleanup(manager, session):
-    value = datetime.datetime.now() - parse_timedelta('7 days')
+    value = datetime.now() - parse_timedelta('7 days')
     for discover_entry in (
         session.query(DiscoverEntry).filter(DiscoverEntry.last_execution <= value).all()
     ):
@@ -208,15 +209,13 @@ class Discover:
                 else:
                     result.append(entry)
                 continue
-            if isinstance(est_date, datetime.date):
+            if isinstance(est_date, date):
                 # If we just got a date, add a time so we can compare it to now()
-                est_date = datetime.datetime.combine(est_date, datetime.time())
-            if datetime.datetime.now() >= est_date:
+                est_date = datetime.combine(est_date, time())
+            if datetime.now() >= est_date:
                 logger.debug('{} has been released at {}', entry['title'], est_date)
                 result.append(entry)
-            elif datetime.datetime.now() >= est_date - parse_timedelta(
-                estimation_mode['optimistic']
-            ):
+            elif datetime.now() >= est_date - parse_timedelta(estimation_mode['optimistic']):
                 logger.debug(
                     '{} will be released at {}. Ignoring release estimation because estimated release date is in less than {}',
                     entry['title'],
@@ -262,7 +261,7 @@ class Discover:
                 ) or not discover_entry.last_execution:
                     # First time we execute (and on --discover-now) we randomize time to avoid clumping
                     delta = multiply_timedelta(interval, random.random())
-                    discover_entry.last_execution = datetime.datetime.now() - delta
+                    discover_entry.last_execution = datetime.now() - delta
                 else:
                     next_time = discover_entry.last_execution + interval
                     logger.debug(
@@ -271,13 +270,13 @@ class Discover:
                         config['interval'],
                         next_time,
                     )
-                    if datetime.datetime.now() < next_time:
+                    if datetime.now() < next_time:
                         logger.debug('interval not met')
                         interval_count += 1
                         entry.reject('discover interval not met')
                         entry.complete()
                         continue
-                    discover_entry.last_execution = datetime.datetime.now()
+                    discover_entry.last_execution = datetime.now()
                 logger.trace('interval passed for {}', entry['title'])
                 result.append(entry)
         if interval_count and not task.is_rerun:

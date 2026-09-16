@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 
 from loguru import logger
-from sqlalchemy import Column, DateTime, Integer, String, Unicode
+from sqlalchemy.orm import Mapped, mapped_column
 
 from flexget.event import event
 from flexget.manager import Base
@@ -12,16 +12,13 @@ logger = logger.bind(name='history.db')
 class History(Base):
     __tablename__ = 'history'
 
-    id = Column(Integer, primary_key=True)
-    task = Column('feed', String)
-    filename = Column(String)
-    url = Column(String)
-    title = Column(Unicode)
-    time = Column(DateTime)
-    details = Column(String)
-
-    def __init__(self):
-        self.time = datetime.now()
+    id: Mapped[int] = mapped_column(primary_key=True)
+    task: Mapped[str | None] = mapped_column('feed')
+    filename: Mapped[str | None]
+    url: Mapped[str | None]
+    title: Mapped[str | None]
+    time: Mapped[datetime | None] = mapped_column(default=datetime.now)
+    details: Mapped[str | None]
 
     def __str__(self):
         return f'<History(filename={self.filename},task={self.task})>'
