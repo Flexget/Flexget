@@ -411,6 +411,9 @@ def _check_phase_queue() -> None:
             )
 
 
+_warned_dependencies: set[str] = set()
+
+
 def _import_plugin(module_name: str, plugin_path: str | Path) -> None:
     try:
         import_module(module_name)
@@ -422,10 +425,11 @@ def _import_plugin(module_name: str, plugin_path: str | Path) -> None:
                 e.issued_by or module_name,
                 e.missing or 'N/A',
             )
-        if not e.silent:
-            logger.warning(msg)
-        else:
+        if e.silent or msg in _warned_dependencies:
             logger.debug(msg)
+        else:
+            _warned_dependencies.add(msg)
+            logger.warning(msg)
     except ImportError:
         logger.opt(exception=True).critical(
             'Plugin `{}` failed to import dependencies', module_name
