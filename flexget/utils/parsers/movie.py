@@ -22,7 +22,6 @@ def diff_pos(string1, string2):
 
 class MovieParser(TitleParser):
     def __init__(self):
-        self.data = None
         self.reset()
         TitleParser.__init__(self)
 
@@ -37,13 +36,10 @@ class MovieParser(TitleParser):
     def __str__(self):
         return f'<MovieParser(name={self.name},year={self.year},quality={self.quality})>'
 
-    def parse(self, data=None):
+    def parse(self, data: str):
         """Parse movie name. Populates name, year, quality and proper_count attributes."""
         # Reset before parsing, so the parser can be reused.
         self.reset()
-
-        if data is None:
-            data = self.data
 
         # Move anything in leading brackets to the end
         data = re.sub(r'^\[(.*?)\](.*)', r'\2 \1', data)
