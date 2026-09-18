@@ -1,7 +1,16 @@
 import json
 import random
 
-from curl_cffi import requests
+try:
+    from curl_cffi import requests
+except ImportError:
+    from flexget import plugin
+
+    raise plugin.DependencyError(
+        issued_by='imdb',
+        missing='curl-cffi',
+        message='curl-cffi is not available on this platform, IMDB plugins are disabled',
+    )
 
 from flexget.utils.waf.fingerprint import get_fp
 from flexget.utils.waf.verify import CHALLENGE_TYPES

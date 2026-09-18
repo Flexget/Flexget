@@ -21,6 +21,7 @@ class TestImdbWatchlistParseEntry:
         assert entry['movie_year'] == 2013
         assert entry['imdb_score'] == 6.9
         assert entry['imdb_votes'] == 562211
+        assert 'imdb_user_score' not in entry
         assert entry['url'] == 'https://www.imdb.com/title/tt1663662/'
 
     def test_parse_entry_strip_dates(self):
