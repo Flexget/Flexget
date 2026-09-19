@@ -1,9 +1,9 @@
-import datetime
 import re
+from datetime import datetime
 
 from loguru import logger
 from requests.exceptions import TooManyRedirects
-from sqlalchemy import Column, DateTime, Unicode
+from sqlalchemy.orm import Mapped, mapped_column
 
 from flexget import db_schema, plugin
 from flexget.config_schema import one_or_more
@@ -106,10 +106,10 @@ TAGS = [
 class MoreThanTVCookie(Base):
     __tablename__ = 'morethantv_cookie'
 
-    username = Column(Unicode, primary_key=True)
-    _cookie = Column('cookie', Unicode)
+    username: Mapped[str] = mapped_column(primary_key=True)
+    _cookie: Mapped[str | None] = mapped_column('cookie')
     cookie = json_synonym('_cookie')
-    expires = Column(DateTime)
+    expires: Mapped[datetime | None]
 
 
 class SearchMoreThanTV:
@@ -192,7 +192,7 @@ class SearchMoreThanTV:
                 if (
                     saved_cookie
                     and saved_cookie.expires
-                    and saved_cookie.expires >= datetime.datetime.now()
+                    and saved_cookie.expires >= datetime.now()
                 ):
                     logger.debug('Found valid login cookie')
                     return saved_cookie.cookie
@@ -224,7 +224,7 @@ class SearchMoreThanTV:
                 if c.name == 'session':
                     expires = c.expires
             if expires:
-                expires = datetime.datetime.fromtimestamp(expires)
+                expires = datetime.fromtimestamp(expires)
             logger.debug('Saving or updating MoreThanTV cookie in db')
             cookie = MoreThanTVCookie(
                 username=username, cookie=dict(requests.cookies), expires=expires

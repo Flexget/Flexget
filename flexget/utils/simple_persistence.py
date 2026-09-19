@@ -10,7 +10,8 @@ from collections.abc import MutableMapping
 from datetime import datetime
 
 from loguru import logger
-from sqlalchemy import Column, DateTime, Index, Integer, String, Unicode, select
+from sqlalchemy import Index, Unicode, select
+from sqlalchemy.orm import Mapped, mapped_column
 
 from flexget import db_schema
 from flexget.event import event
@@ -94,13 +95,13 @@ def db_cleanup(manager, session):
 class SimpleKeyValue(Base):
     __tablename__ = 'simple_persistence'
 
-    id = Column(Integer, primary_key=True)
-    task = Column('feed', String)
-    plugin = Column(String)
-    key = Column(String)
-    _json = Column('json', Unicode)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    task: Mapped[str | None] = mapped_column('feed')
+    plugin: Mapped[str | None]
+    key: Mapped[str | None]
+    _json: Mapped[str | None] = mapped_column('json')
     value = json_synonym('_json')
-    added = Column(DateTime, default=datetime.now())
+    added: Mapped[datetime | None] = mapped_column(default=datetime.now)
 
     def __init__(self, task, plugin, key, value):
         self.task = task

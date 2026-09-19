@@ -1,8 +1,10 @@
+from __future__ import annotations
+
 from datetime import datetime, timedelta
 
 from loguru import logger
-from sqlalchemy import Column, DateTime, ForeignKey, Index, Integer, String, Unicode
-from sqlalchemy.orm import relationship
+from sqlalchemy import DateTime, ForeignKey, Index, String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from flexget import db_schema
 from flexget.event import event
@@ -39,24 +41,27 @@ def upgrade(ver, session):
 class RememberTask(Base):
     __tablename__ = 'remember_rejected_feeds'
 
-    id = Column(Integer, primary_key=True)
-    name = Column(Unicode)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str | None]
 
-    entries = relationship('RememberEntry', backref='task', cascade='all, delete, delete-orphan')
+    entries: Mapped[list[RememberEntry]] = relationship(
+        back_populates='task', cascade='all, delete-orphan'
+    )
 
 
 class RememberEntry(Base):
     __tablename__ = 'remember_rejected_entry'
 
-    id = Column(Integer, primary_key=True)
-    added = Column(DateTime, default=datetime.now)
-    expires = Column(DateTime)
-    title = Column(Unicode)
-    url = Column(String)
-    rejected_by = Column(String)
-    reason = Column(String)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    added: Mapped[datetime | None] = mapped_column(default=datetime.now)
+    expires: Mapped[datetime | None]
+    title: Mapped[str | None]
+    url: Mapped[str | None]
+    rejected_by: Mapped[str | None]
+    reason: Mapped[str | None]
 
-    task_id = Column('feed_id', Integer, ForeignKey('remember_rejected_feeds.id'), nullable=False)
+    task_id: Mapped[int] = mapped_column('feed_id', ForeignKey('remember_rejected_feeds.id'))
+    task: Mapped[RememberTask] = relationship(back_populates='entries')
 
 
 Index('remember_feed_title_url', RememberEntry.task_id, RememberEntry.title, RememberEntry.url)
