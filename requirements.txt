@@ -60,7 +60,7 @@ flask==3.1.3
     #   flask-login
     #   flask-restx
     #   flexget
-flask-compress==1.24
+flask-compress==1.25
     # via flexget
 flask-cors==6.0.5
     # via flexget
@@ -68,13 +68,13 @@ flask-login==0.6.3
     # via flexget
 flask-restx==1.3.2
     # via flexget
-greenlet==3.5.5 ; platform_machine == 'AMD64' or platform_machine == 'WIN32' or platform_machine == 'aarch64' or platform_machine == 'amd64' or platform_machine == 'ppc64le' or platform_machine == 'win32' or platform_machine == 'x86_64'
+greenlet==3.5.6 ; platform_machine == 'AMD64' or platform_machine == 'WIN32' or platform_machine == 'aarch64' or platform_machine == 'amd64' or platform_machine == 'ppc64le' or platform_machine == 'win32' or platform_machine == 'x86_64'
     # via sqlalchemy
 guessit==4.2.1
     # via flexget
 html5lib==1.1
     # via flexget
-idna==3.19
+idna==3.20
     # via requests
 importlib-resources==7.1.0
     # via flask-restx
@@ -183,7 +183,7 @@ six==1.17.0
     #   python-dateutil
 soupsieve==2.9.2
     # via beautifulsoup4
-sqlalchemy==2.0.52
+sqlalchemy==2.0.54
     # via flexget
 tempora==5.12.0
     # via portend
@@ -205,7 +205,7 @@ tzdata==2026.4
     #   tzlocal
 tzlocal==5.4.4
     # via apscheduler
-urllib3==2.7.0
+urllib3==2.8.0
     # via requests
 webencodings==0.6.1
     # via html5lib
