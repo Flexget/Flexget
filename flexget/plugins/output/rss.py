@@ -1,10 +1,11 @@
 import base64
-import datetime
 import hashlib
 import os
+from datetime import datetime, timedelta
 
 from loguru import logger
-from sqlalchemy import Column, DateTime, Integer, String, Unicode
+from sqlalchemy import String
+from sqlalchemy.orm import Mapped, mapped_column
 
 from flexget import db_schema, plugin
 from flexget.event import event
@@ -35,15 +36,15 @@ def upgrade(ver, session):
 class RSSEntry(Base):
     __tablename__ = 'make_rss'
 
-    id = Column(Integer, primary_key=True)
-    title = Column(Unicode)
-    description = Column(Unicode)
-    link = Column(String)
-    rsslink = Column(String)
-    file = Column(Unicode)
-    published = Column(DateTime, default=datetime.datetime.utcnow)
-    enc_length = Column(Integer)
-    enc_type = Column(String)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    title: Mapped[str | None]
+    description: Mapped[str | None]
+    link: Mapped[str | None]
+    rsslink: Mapped[str | None]
+    file: Mapped[str | None]
+    published: Mapped[datetime | None] = mapped_column(default=datetime.utcnow)
+    enc_length: Mapped[int | None]
+    enc_type: Mapped[str | None]
 
 
 class OutputRSS:
@@ -244,8 +245,7 @@ class OutputRSS:
             if config['items'] != -1 and len(rss_items) > config['items']:
                 add = False
             if config['days'] != -1 and (
-                datetime.datetime.today() - datetime.timedelta(days=config['days'])
-                > db_item.published
+                datetime.today() - timedelta(days=config['days']) > db_item.published
             ):
                 add = False
             if add:
@@ -279,7 +279,7 @@ class OutputRSS:
             title=config.get('rsstitle', 'FlexGet'),
             link=config.get('rsslink', 'http://flexget.com'),
             description=config.get('rssdesc', 'FlexGet generated RSS feed'),
-            lastBuildDate=datetime.datetime.utcnow() if config['timestamp'] else None,
+            lastBuildDate=datetime.utcnow() if config['timestamp'] else None,
             items=rss_items,
         )
 

@@ -7,8 +7,8 @@ from functools import partial
 from typing import TYPE_CHECKING
 
 from loguru import logger
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Unicode, select
-from sqlalchemy.orm import relationship
+from sqlalchemy import ForeignKey, Unicode, select
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from flexget import db_schema
 from flexget.entry import Entry
@@ -27,11 +27,7 @@ if TYPE_CHECKING:
 
     from sqlalchemy.orm import Session as DBSession
 
-    class Base:
-        def __init__(self, *args, **kwargs) -> None: ...
-
-else:
-    Base = db_schema.versioned_base('input_cache', 2)
+Base = db_schema.versioned_base('input_cache', 2)
 
 
 @db_schema.upgrade('input_cache')
@@ -76,24 +72,25 @@ def upgrade(ver: int, session: DBSession) -> int:
 class InputCache(Base):
     __tablename__ = 'input_cache'
 
-    id = Column(Integer, primary_key=True)
-    name = Column(Unicode)
-    hash = Column(String)
-    added = Column(DateTime, default=datetime.now)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str | None]
+    hash: Mapped[str | None]
+    added: Mapped[datetime | None] = mapped_column(default=datetime.now)
 
-    entries = relationship(
-        'InputCacheEntry', backref='cache', cascade='all, delete, delete-orphan'
+    entries: Mapped[list[InputCacheEntry]] = relationship(
+        back_populates='cache', cascade='all, delete-orphan'
     )
 
 
 class InputCacheEntry(Base):
     __tablename__ = 'input_cache_entry'
 
-    id = Column(Integer, primary_key=True)
-    _json = Column('json', Unicode)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    _json: Mapped[str | None] = mapped_column('json')
     entry = entry_synonym('_json')
 
-    cache_id = Column(Integer, ForeignKey('input_cache.id'), nullable=False)
+    cache_id: Mapped[int] = mapped_column(ForeignKey('input_cache.id'))
+    cache: Mapped[InputCache] = relationship(back_populates='entries')
 
 
 @event('manager.db_cleanup')

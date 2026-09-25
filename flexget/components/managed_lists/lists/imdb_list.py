@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import csv
 import re
 from collections.abc import MutableSet
@@ -10,8 +12,7 @@ import pendulum
 from loguru import logger
 from requests.exceptions import RequestException
 from requests.utils import cookiejar_from_dict
-from sqlalchemy import Column, String, Unicode
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.schema import ForeignKey
 
 from flexget import db_schema, plugin
@@ -37,12 +38,14 @@ OTHER_TYPES = ['videogame']
 class IMDBListUser(Base):
     __tablename__ = 'imdb_list_user'
 
-    user_id = Column(String, primary_key=True)
-    user_name = Column(Unicode)
-    _cookies = Column('cookies', Unicode)
+    user_id: Mapped[str] = mapped_column(primary_key=True)
+    user_name: Mapped[str | None]
+    _cookies: Mapped[str | None] = mapped_column('cookies')
     cookies = json_synonym('_cookies')
 
-    lists = relationship('IMDBListList', backref='imdb_user', cascade='all, delete, delete-orphan')
+    lists: Mapped[list[IMDBListList]] = relationship(
+        back_populates='imdb_user', cascade='all, delete-orphan'
+    )
 
     def __init__(self, user_name, user_id, cookies):
         self.user_name = user_name
@@ -53,9 +56,10 @@ class IMDBListUser(Base):
 class IMDBListList(Base):
     __tablename__ = 'imdb_list_lists'
 
-    list_id = Column(Unicode, primary_key=True)
-    list_name = Column(Unicode)
-    user_id = Column(String, ForeignKey('imdb_list_user.user_id'))
+    list_id: Mapped[str] = mapped_column(primary_key=True)
+    list_name: Mapped[str | None]
+    user_id: Mapped[str] = mapped_column(ForeignKey('imdb_list_user.user_id'))
+    imdb_user: Mapped[IMDBListUser] = relationship(back_populates='lists')
 
     def __init__(self, list_id, list_name, user_id):
         self.list_id = list_id
