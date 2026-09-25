@@ -1447,7 +1447,7 @@ dev = [
     { name = "vcrpy", specifier = "~=8.1" },
 ]
 docs = [
-    { name = "pydata-sphinx-theme", marker = "python_full_version >= '3.13'", specifier = "~=0.20.0" },
+    { name = "pydata-sphinx-theme", marker = "python_full_version >= '3.13'", specifier = "~=0.22.0" },
     { name = "sphinx", marker = "python_full_version >= '3.13'", specifier = "~=9.1" },
     { name = "sphinx-copybutton", marker = "python_full_version >= '3.13'", specifier = "~=0.5.2" },
     { name = "sphinx-design", marker = "python_full_version >= '3.13'", specifier = "~=0.7.0" },
@@ -2680,7 +2680,7 @@ wheels = [
 
 [[package]]
 name = "pydata-sphinx-theme"
-version = "0.20.0"
+version = "0.22.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "accessible-pygments" },
@@ -2692,9 +2692,9 @@ dependencies = [
     { name = "requests" },
     { name = "sphinx" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/ae/8e/add936feaaa9dade7d5b87c6852566d85e518b38ad32224dea32ef958984/pydata_sphinx_theme-0.20.0.tar.gz", hash = "sha256:0da172d41e19a66de875f4002f7054b385372ec65763852193791e658d50bb4a", size = 5004756, upload-time = "2026-07-09T09:09:14.693Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/73/7f/42064a2f02ea074c230a73b9eb6ee4a1a1ea0d9ae76ba32336d7ce9ed32c/pydata_sphinx_theme-0.22.0.tar.gz", hash = "sha256:5a18c517494f7ea285263d117b0b22e56d4eb689fcab72d9f70e3a6d766a77f1", size = 5013837, upload-time = "2026-09-25T09:46:38.273Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/80/08/28e2194ed1c3c3a3e86e0600e2dcc7f21dcd670bd31f3efab2e3e2cf0cbd/pydata_sphinx_theme-0.20.0-py3-none-any.whl", hash = "sha256:56744483c9d72c783e075de716ab95d486108b69605df7528078090b73f11f69", size = 6201166, upload-time = "2026-07-09T09:09:12.899Z" },
+    { url = "https://files.pythonhosted.org/packages/bc/c1/36d3002684e7ff60f939bcfc3f20d369dd3f16ad6b540d50df722554372d/pydata_sphinx_theme-0.22.0-py3-none-any.whl", hash = "sha256:b76a6fc2efcca26aa7fd34f05302a223d4d07fbcc4d03129d56f416f2d4408c0", size = 6213182, upload-time = "2026-09-25T09:46:36.142Z" },
 ]
 
 [[package]]
