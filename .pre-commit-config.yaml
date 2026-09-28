@@ -95,3 +95,6 @@ repos:
     rev: v1.7.12
     hooks:
       - id: actionlint
+        args:
+          - -ignore
+          - reusable workflow call "\$/.+" at "uses" is not following the format
