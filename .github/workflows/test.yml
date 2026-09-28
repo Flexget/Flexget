@@ -4,11 +4,10 @@ on:
   push:
     branches:
       - develop
-  pull_request:
-  merge_group:
+  workflow_call:
 permissions: {}
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.number || github.ref || github.run_id }}
+  group: test-${{ github.event.number || github.ref || github.run_id }}
   cancel-in-progress: true
 env:
   UV_VERSION: 0.12.19 # renovate: datasource=pypi depName=uv
@@ -74,16 +73,3 @@ jobs:
           uv run --isolated --no-project --with pytest --with vcrpy --with-requirements scripts/bundle_webui.py -m pytest --override-ini filterwarnings=error scripts/tests/test_bundle_webui.py
           uv run --isolated --no-project --with pytest --with vcrpy --with-requirements scripts/dev_tools.py -m pytest --override-ini filterwarnings=error scripts/tests/test_dev_tools.py
           uv run --isolated --no-project --with pytest --with vcrpy --with-requirements scripts/update_changelog.py -m pytest --override-ini filterwarnings=error scripts/tests/test_update_changelog.py
-
-  test-results:
-    name: Test results
-    if: always() && github.event_name != 'push'
-    needs:
-      - tests
-      - test-scripts
-    runs-on: ubuntu-latest
-    steps:
-      - name: Decide whether the needed jobs succeeded or failed
-        uses: re-actors/alls-green@05ac9388f0aebcb5727afa17fcccfecd6f8ec5fe # v1.2.2
-        with:
-          jobs: ${{ toJSON(needs) }}
