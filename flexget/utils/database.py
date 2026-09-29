@@ -124,7 +124,7 @@ class CaseInsensitiveWord(Comparator):
         else:
             self.word = word
 
-    def lower(self) -> str:
+    def lower(self) -> Any:
         if isinstance(self.word, str):
             return self.word.lower()
         return func.lower(self.word)
@@ -134,7 +134,7 @@ class CaseInsensitiveWord(Comparator):
             other = CaseInsensitiveWord(other)
         return op(self.lower(), other.lower())
 
-    def __clause_element__(self) -> str:
+    def __clause_element__(self) -> Any:
         return self.lower()
 
     def __str__(self) -> str:
@@ -164,8 +164,8 @@ def quality_property(text_attr):
                 other = other.name
             return op(self.__clause_element__(), other)
 
-    def comparator(self):
-        return QualComparator(getattr(self, text_attr))
+    def comparator(cls):
+        return QualComparator(getattr(cls, text_attr))
 
     prop = hybrid_property(getter, setter)
     return prop.comparator(comparator)

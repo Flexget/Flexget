@@ -15,6 +15,7 @@ from flexget.utils.database import with_session
 from flexget.utils.sqlalchemy_utils import table_schema
 
 logger = logger.bind(name='util.log')
+_module_logger = logger
 
 if TYPE_CHECKING:
     import loguru
@@ -30,7 +31,7 @@ def upgrade(ver: int | None, session: Session):
     if ver is None:
         logger.info('Adding index to md5sum column of log_once table.')
         table = table_schema('log_once', session)
-        Index('log_once_md5sum', table.c.md5sum, unique=True).create(bind=session.bind)
+        Index('log_once_md5sum', table.c.md5sum, unique=True).create(bind=session.get_bind())
         ver = 0
     return ver
 
@@ -58,7 +59,7 @@ def purge(manager, session: Session) -> None:
 
     result = session.query(LogMessage).filter(LogMessage.added < old).delete()
     if result:
-        logger.verbose('Purged {} entries from log_once table.', result)
+        logger.verbose('Purged {} entries from log_once table.', result)  # pyright: ignore[reportAttributeAccessIssue]
 
 
 @with_session
@@ -67,7 +68,7 @@ def log_once(
     logger: loguru.Logger | None = None,
     once_level: str = 'INFO',
     suppressed_level: str = 'VERBOSE',
-    session: Session = None,
+    session: Session | None = None,
 ) -> bool | None:
     """Log message only once using given logger`.
 
@@ -75,7 +76,7 @@ def log_once(
     When suppressed, `suppressed_level` level is still logged.
     """
     if logger is None:
-        logger = globals()['logger'].bind(name='log_once')
+        logger = _module_logger.bind(name='log_once')
     # If there is no active manager, don't access the db
     from flexget.manager import manager
 
@@ -83,6 +84,9 @@ def log_once(
         logger.warning('DB not initialized. log_once will not work properly.')
         logger.log(once_level, message)
         return None
+
+    # @with_session always supplies a session when the manager is active
+    assert session is not None
 
     digest = hashlib.md5()
     digest.update(message.encode('latin1', 'replace'))

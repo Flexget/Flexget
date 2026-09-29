@@ -8,13 +8,16 @@ import types
 # Allow some request objects to be imported from here instead of requests
 from datetime import datetime, timedelta
 from email.message import EmailMessage
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 from urllib.parse import urlparse
 from urllib.request import urlopen
 
 import requests
 from loguru import logger
 from requests import RequestException
+from requests.adapters import HTTPAdapter
+from requests.structures import CaseInsensitiveDict
+from urllib3.util import Retry
 
 from flexget import __version__ as version
 from flexget.utils.tools import TimedDict, parse_timedelta
@@ -167,9 +170,9 @@ def _wrap_urlopen(url: str, timeout: int | None = None) -> requests.Response:
     resp.raw = raw
     # requests passes the `decode_content` kwarg to read
     orig_read = raw.read
-    resp.raw.read = lambda size, **kwargs: orig_read(size)
+    resp.raw.read = lambda amt=None, **kwargs: orig_read(amt)  # pyright: ignore[reportAttributeAccessIssue]
     resp.status_code = raw.code or 200
-    resp.headers = requests.structures.CaseInsensitiveDict(raw.headers)
+    resp.headers = CaseInsensitiveDict(raw.headers)
     if url.startswith('file://'):
 
         def close(self):
@@ -207,7 +210,7 @@ class Session(requests.Session):
         """Set some defaults for our session if not explicitly defined."""
         super().__init__()
         self.timeout = timeout
-        self.adapters['http://'].max_retries = max_retries
+        cast('HTTPAdapter', self.adapters['http://']).max_retries = Retry.from_int(max_retries)
         # Stores min intervals between requests for certain sites
         self.domain_limiters: dict[str, DomainLimiter] = {}
         self.headers.update({'User-Agent': f'FlexGet/{version} (www.flexget.com)'})
