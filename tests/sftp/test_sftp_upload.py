@@ -9,7 +9,7 @@ from jinja2 import Template
 if TYPE_CHECKING:
     from pathlib import Path
 
-    from .test_sftp_server import TestSFTPFileSystem, TestSFTPServerController
+    from .sftp_test_server import TestSFTPFileSystem, TestSFTPServerController
 
 
 @pytest.mark.require_optional_deps
