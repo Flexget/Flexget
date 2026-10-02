@@ -13,15 +13,15 @@ COPY --from=ghcr.io/astral-sh/uv:0.12.19@sha256:04d046b13e60d6bcec73cbc5e1cad25d
 ENV UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy
 WORKDIR /flexget
 RUN --mount=type=cache,target=/root/.cache/uv \
-    --mount=type=bind,source=scripts/bundle_webui.py,target=scripts/bundle_webui.py \
-    uv run scripts/bundle_webui.py
-RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
     uv sync --frozen --no-dev --group=all --no-install-project
 ADD . /flexget
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen --no-dev --group=all
+ARG V2_WEBUI_LOCATION
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv run scripts/bundle_webui.py
 
 FROM docker.io/python:3.11-alpine@sha256:cd04730b8511def3fbf14204d66a0c1536f290b8e896ed5a94cd64cb15ac1356
 ENV PYTHONUNBUFFERED=1
