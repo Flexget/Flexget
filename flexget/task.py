@@ -11,7 +11,7 @@ from functools import total_ordering, wraps
 from typing import TYPE_CHECKING
 
 from loguru import logger
-from sqlalchemy import Column, Integer, String, Unicode
+from sqlalchemy.orm import Mapped, mapped_column
 
 from flexget import config_schema, db_schema
 from flexget.entry import EntryState, EntryUnicodeError
@@ -53,9 +53,9 @@ class TaskConfigHash(Base):
 
     __tablename__ = 'feed_config_hash'
 
-    id = Column(Integer, primary_key=True)
-    task = Column('name', Unicode, index=True, nullable=False)
-    hash = Column('hash', String)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    task: Mapped[str] = mapped_column('name', index=True)
+    hash: Mapped[str | None]
 
     def __repr__(self) -> str:
         return f'<TaskConfigHash(task={self.task},hash={self.hash})>'

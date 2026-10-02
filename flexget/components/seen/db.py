@@ -9,22 +9,20 @@ forget (string)
     title will be forgotten. With field value only that particular field is forgotten.
 """
 
+from __future__ import annotations
+
 from datetime import datetime
 
 from loguru import logger
 from sqlalchemy import (
     Boolean,
-    Column,
-    DateTime,
     ForeignKey,
     Index,
-    Integer,
-    Unicode,
     or_,
     select,
     update,
 )
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from flexget import db_schema, plugin
 from flexget.event import event
@@ -77,14 +75,16 @@ def upgrade(ver, session):
 class SeenEntry(Base):
     __tablename__ = 'seen_entry'
 
-    id = Column(Integer, primary_key=True)
-    title = Column(Unicode)
-    reason = Column(Unicode)
-    task = Column('feed', Unicode)
-    added = Column(DateTime)
-    local = Column(Boolean)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    title: Mapped[str | None]
+    reason: Mapped[str | None]
+    task: Mapped[str | None] = mapped_column('feed')
+    added: Mapped[datetime | None] = mapped_column(default=datetime.now)
+    local: Mapped[bool | None]
 
-    fields = relationship('SeenField', backref='seen_entry', cascade='all, delete, delete-orphan')
+    fields: Mapped[list[SeenField]] = relationship(
+        back_populates='seen_entry', cascade='all, delete-orphan'
+    )
 
     def __init__(self, title, task, reason=None, local=None):
         if local is None:
@@ -92,7 +92,6 @@ class SeenEntry(Base):
         self.title = title
         self.reason = reason
         self.task = task
-        self.added = datetime.now()
         self.local = local
 
     def __str__(self):
@@ -115,16 +114,16 @@ class SeenEntry(Base):
 class SeenField(Base):
     __tablename__ = 'seen_field'
 
-    id = Column(Integer, primary_key=True)
-    seen_entry_id = Column(Integer, ForeignKey('seen_entry.id'), nullable=False, index=True)
-    field = Column(Unicode)
-    value = Column(Unicode, index=True)
-    added = Column(DateTime)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    seen_entry_id: Mapped[int] = mapped_column(ForeignKey('seen_entry.id'), index=True)
+    seen_entry: Mapped[SeenEntry] = relationship(back_populates='fields')
+    field: Mapped[str | None]
+    value: Mapped[str | None] = mapped_column(index=True)
+    added: Mapped[datetime | None] = mapped_column(default=datetime.now)
 
     def __init__(self, field, value):
         self.field = field
         self.value = value
-        self.added = datetime.now()
 
     def __str__(self):
         return f'<SeenField(field={self.field},value={self.value},added={self.added})>'

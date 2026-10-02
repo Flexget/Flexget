@@ -7,9 +7,9 @@ from typing import TYPE_CHECKING, Any
 
 from dateutil.parser import parse as dateutil_parse
 from loguru import logger
-from sqlalchemy import Column, Date, DateTime, Float, Integer, Table, Unicode, func
+from sqlalchemy import Column, Table, func
 from sqlalchemy.ext.associationproxy import association_proxy
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.schema import ForeignKey
 
 from flexget import db_schema, plugin
@@ -29,8 +29,8 @@ Base = db_schema.versioned_base('api_bluray', 0)
 genres_table = Table(
     'bluray_movie_genres',
     Base.metadata,
-    Column('movie_id', Integer, ForeignKey('bluray_movies.id')),
-    Column('genre_name', Integer, ForeignKey('bluray_genres.name')),
+    Column('movie_id', ForeignKey('bluray_movies.id')),
+    Column('genre_name', ForeignKey('bluray_genres.name')),
 )
 Base.register_table(genres_table)
 
@@ -64,21 +64,23 @@ def extract_release_date(bluray_entry: dict[str, Any]) -> date:
 class BlurayMovie(Base):
     __tablename__ = 'bluray_movies'
 
-    id = Column(Integer, primary_key=True, autoincrement=False, nullable=False)
-    name = Column(Unicode)
-    url = Column(Unicode)
-    release_date = Column(Date)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=False)
+    name: Mapped[str | None]
+    url: Mapped[str | None]
+    release_date: Mapped[date | None]
     year = year_property('release_date')
-    runtime = Column(Integer)
-    overview = Column(Unicode)
-    country = Column(Unicode)
-    studio = Column(Unicode)
-    rating = Column(Float)
-    bluray_rating = Column(Integer)
-    certification = Column(Unicode)
-    _genres = relationship('BlurayGenre', secondary=genres_table, backref='movies')
+    runtime: Mapped[int | None]
+    overview: Mapped[str | None]
+    country: Mapped[str | None]
+    studio: Mapped[str | None]
+    rating: Mapped[float | None]
+    bluray_rating: Mapped[int | None]
+    certification: Mapped[str | None]
+    _genres: Mapped[list[BlurayGenre]] = relationship(
+        secondary=genres_table, back_populates='movies'
+    )
     genres = association_proxy('_genres', 'name')
-    updated = Column(DateTime, default=datetime.now, nullable=False)
+    updated: Mapped[datetime] = mapped_column(default=datetime.now)
 
     def __init__(self, title: str, year: int | None) -> None:
         title_year = f'{title} ({year})' if year else title
@@ -183,15 +185,20 @@ class BlurayMovie(Base):
 class BlurayGenre(Base):
     __tablename__ = 'bluray_genres'
 
-    name = Column(Unicode, primary_key=True, nullable=False)
+    name: Mapped[str] = mapped_column(primary_key=True)
+    movies: Mapped[list[BlurayMovie]] = relationship(
+        secondary=genres_table, back_populates='_genres'
+    )
 
 
 class BluraySearchResult(Base):
     __tablename__ = 'bluray_search_results'
 
-    search = Column(Unicode, primary_key=True)
-    movie_id = Column(Integer, ForeignKey('bluray_movies.id'), nullable=True)
-    movie = relationship(BlurayMovie)
+    search: Mapped[str] = mapped_column(primary_key=True)
+    movie_id: Mapped[int | None] = mapped_column(
+        ForeignKey('bluray_movies.id')
+    )  # explicitly allows None
+    movie: Mapped[BlurayMovie | None] = relationship()
 
     def __init__(
         self, search: str, movie_id: int | None = None, movie: BlurayMovie | None = None

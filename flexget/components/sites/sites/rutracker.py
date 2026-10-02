@@ -2,12 +2,13 @@ import json
 import re
 from datetime import datetime, timedelta
 from time import sleep
+from typing import Any
 
 from loguru import logger
 from requests.auth import AuthBase
 from requests.exceptions import RequestException
 from requests.utils import dict_from_cookiejar
-from sqlalchemy import Column, DateTime, Integer, Unicode
+from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.types import VARCHAR, TypeDecorator
 
 from flexget import plugin
@@ -49,10 +50,10 @@ class JSONEncodedDict(TypeDecorator):
 
 class RutrackerAccount(Base):
     __tablename__ = 'rutracker_accoounts'
-    id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
-    login = Column(Unicode, index=True)
-    cookies = Column(JSONEncodedDict)
-    expiry_time = Column(DateTime)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    login: Mapped[str | None] = mapped_column(index=True)
+    cookies: Mapped[dict[str, Any] | None] = mapped_column(JSONEncodedDict)
+    expiry_time: Mapped[datetime | None]
 
 
 class RutrackerAuth(AuthBase):
