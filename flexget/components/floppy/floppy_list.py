@@ -263,11 +263,7 @@ class FloppySet(MutableSet):
             if not item['title']:
                 logger.warning('Item in floppy list does not appear to have a title, skipping.')
                 continue
-            entry = self.entry_from_item(item, kind, show_titles)
-            if entry.isvalid():
-                yield entry
-            else:
-                logger.debug('Invalid entry created? {}', entry)
+            yield self.entry_from_item(item, kind, show_titles)
 
     def generate_title(self, item):
         year = (item.get('release_datetime') or '')[:4]
@@ -277,11 +273,17 @@ class FloppySet(MutableSet):
 
     def entry_from_item(self, item, kind, show_titles):
         entry = Entry()
-        entry['url'] = '{}{}'.format(
+        url = '{}{}'.format(
             self.base_url,
             item.get('url')
             or '/details/{}/{}/{}'.format(item['source'], item['media_type'], item['media_id']),
         )
+        # Seasons and episodes share the page of their show, but every entry needs its own url
+        if kind == 'season':
+            url += '#S{:02d}'.format(item['season_number'])
+        elif kind == 'episode':
+            url += '#S{:02d}E{:02d}'.format(item['season_number'], item['episode_number'])
+        entry['url'] = url
         ids = dict(item.get('ids') or {})
         if item['source'] in ['tmdb', 'tvdb']:
             ids[item['source']] = item['media_id']
@@ -309,13 +311,11 @@ class FloppySet(MutableSet):
         entry['series_season'] = item['season_number']
         if kind == 'season':
             entry['title'] = '{} S{:02d}'.format(series_name, item['season_number'])
-            entry['url'] += '#S{:02d}'.format(item['season_number'])
             return entry
 
         entry['series_episode'] = item['episode_number']
         entry['series_id'] = 'S{:02d}E{:02d}'.format(item['season_number'], item['episode_number'])
         entry['title'] = '{} {}'.format(series_name, entry['series_id'])
-        entry['url'] += '#{}'.format(entry['series_id'])
         return entry
 
     @property

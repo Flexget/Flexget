@@ -4,6 +4,9 @@ import pytest
 
 from flexget.components.floppy import floppy_list
 from flexget.components.floppy.floppy_list import FloppySet
+from flexget.entry import Entry, register_lazy_lookup
+from flexget.plugin import PluginError
+from flexget.utils.requests import RequestException
 
 BASE_URL = 'http://floppy.test'
 API_KEY = 'flp_test'
@@ -30,6 +33,8 @@ class FakeResponse:
         self.text = str(data)
 
     def json(self):
+        if self._data is ValueError:
+            raise ValueError('not json')
         return self._data
 
 
@@ -43,6 +48,12 @@ class FakeFloppy:
         self.collection = []
         self.calls = []
         self.tmdb_calls = []
+        # path -> response to return, or exception to raise, instead of the normal answer
+        self.overrides = {}
+        # Answer to every submit, when set
+        self.submit_response = None
+        # endpoint -> answer of tmdb, or exception to raise, instead of the normal answer
+        self.tmdb_overrides = {}
 
     def page(self, rows, params):
         offset = params['offset']
@@ -59,6 +70,10 @@ class FakeFloppy:
         assert session.headers['Authorization'] == f'Bearer {API_KEY}'
         assert url.startswith(f'{BASE_URL}/api/v1/')
         path = url[len(f'{BASE_URL}/api/v1/') :].strip('/')
+        if path in self.overrides:
+            if isinstance(self.overrides[path], Exception):
+                raise self.overrides[path]
+            return self.overrides[path]
         if method == 'get':
             if path == 'lists':
                 rows = [{'id': id, 'name': name} for id, (name, _) in self.lists.items()]
@@ -69,6 +84,8 @@ class FakeFloppy:
             items = self.lists[int(match.group(1))][1]
             return self.page([{'item': item} for item in items], kwargs['params'])
         self.calls.append((method, path, kwargs.get('json')))
+        if self.submit_response is not None:
+            return self.submit_response
         if method == 'delete':
             return FakeResponse(204)
         return FakeResponse(201 if path.endswith('collection') else 200, {})
@@ -86,6 +103,10 @@ def floppy(monkeypatch):
 
     def tmdb_request(endpoint, **params):
         fake.tmdb_calls.append((endpoint, params))
+        if endpoint in fake.tmdb_overrides:
+            if isinstance(fake.tmdb_overrides[endpoint], Exception):
+                raise fake.tmdb_overrides[endpoint]
+            return fake.tmdb_overrides[endpoint]
         if endpoint == 'search/tv':
             return {
                 'results': [
@@ -311,3 +332,291 @@ class TestFloppyList:
         assert [entry['title'] for entry in task.accepted] == [
             'Breaking.Bad.S02E05.720p.HDTV.x264-FlexGet'
         ]
+
+
+@register_lazy_lookup('floppy_list_test_tmdb_id')
+def lazy_tmdb_id(entry):
+    entry['tmdb_id'] = 603
+
+
+def floppy_set(list_name='To Download', **config):
+    return FloppySet({'base_url': BASE_URL, 'api_key': API_KEY, 'list': list_name, **config})
+
+
+def episode_entry(season=2, episode=5, series_name='Breaking Bad', **fields):
+    return Entry(
+        title=f'{series_name} episode',
+        url='mock://episode',
+        series_name=series_name,
+        series_season=season,
+        series_episode=episode,
+        **fields,
+    )
+
+
+class TestFloppySet:
+    config = 'tasks: {}'
+
+    def test_set_interface(self, floppy):
+        floppy.lists[1][1].append(floppy_item('movie', 603, 'The Matrix', year=1999))
+        matrix = Entry(title='The Matrix', url='mock://matrix', tmdb_id=603)
+        inception = Entry(title='Inception', url='mock://inception', tmdb_id=27205)
+        the_list = floppy_set()
+
+        assert the_list.online
+        assert the_list.immutable is None
+        assert len(the_list) == 1
+        assert matrix in the_list
+        assert inception not in the_list
+        assert the_list.get(matrix)['title'] == 'The Matrix (1999)'
+
+        the_list.add(inception)
+        the_list.discard(matrix)
+        assert floppy.calls == [
+            ('put', 'media/movie/tmdb/27205/lists/1', None),
+            ('delete', 'media/movie/tmdb/603/lists/1', None),
+        ]
+
+    def test_clear(self, floppy):
+        floppy.lists[1][1].extend([
+            floppy_item('movie', 603, 'The Matrix'),
+            floppy_item('tv', 1396, 'Breaking Bad'),
+            floppy_item('season', 1396, 'Breaking Bad', season=2),
+        ])
+
+        floppy_set().clear()
+        # An empty list has nothing to clear
+        floppy_set('Empty').clear()
+
+        assert floppy.calls == [
+            ('delete', 'media/movie/tmdb/603/lists/1', None),
+            ('delete', 'media/tv/tmdb/1396/lists/1', None),
+            ('delete', 'media/tv/tmdb/1396/2/lists/1', None),
+        ]
+
+    def test_items_are_cached_until_the_list_changes(self, floppy):
+        floppy.lists[1][1].append(floppy_item('movie', 603, 'The Matrix'))
+        the_list = floppy_set()
+        assert len(the_list) == 1
+
+        floppy.lists[1][1].append(floppy_item('movie', 27205, 'Inception'))
+        assert len(the_list) == 1
+
+        the_list.add(Entry(title='Dune', url='mock://dune', tmdb_id=438631))
+        assert len(the_list) == 2
+
+    @pytest.mark.parametrize(
+        ('list_type', 'titles'),
+        [
+            ('movies', ['The Matrix']),
+            ('shows', ['Breaking Bad']),
+            ('seasons', ['Breaking Bad S02']),
+            ('episodes', ['Breaking Bad S02E05']),
+        ],
+    )
+    def test_type_limits_items(self, floppy, list_type, titles):
+        floppy.lists[1][1].extend([
+            floppy_item('movie', 603, 'The Matrix'),
+            floppy_item('tv', 1396, 'Breaking Bad'),
+            floppy_item('season', 1396, 'Breaking Bad', season=2),
+            floppy_item('episode', 1396, 'Breaking Bad', season=2, episode=5),
+        ])
+
+        assert [entry['title'] for entry in floppy_set(type=list_type)] == titles
+
+    def test_strip_dates(self, floppy):
+        floppy.lists[1][1].extend([
+            floppy_item('movie', 603, 'The Matrix', year=1999),
+            floppy_item('tv', 1396, 'Breaking Bad', year=2008),
+        ])
+
+        entries = list(floppy_set(strip_dates=True))
+
+        assert [entry['title'] for entry in entries] == ['The Matrix', 'Breaking Bad']
+        assert entries[0]['movie_year'] == 1999
+
+    def test_items_without_usable_data(self, floppy):
+        anime = floppy_item('anime', 2001, 'Cowboy Bebop', ids={'imdb': None})
+        anime.update(source='mal', url=None)
+        anime_season = floppy_item('season', 2001, 'Cowboy Bebop', season=1)
+        anime_season['source'] = 'mal'
+        floppy.lists[1][1].extend([floppy_item('movie', 1, ''), anime, anime_season])
+
+        entries = [dict(entry) for entry in floppy_set()]
+
+        # The untitled movie is skipped, and ids that are not tmdb ids are not passed off as such
+        assert entries == [
+            {
+                'title': 'Cowboy Bebop',
+                'original_title': 'Cowboy Bebop',
+                'series_name': 'Cowboy Bebop',
+                'url': f'{BASE_URL}/details/mal/anime/2001',
+                'original_url': f'{BASE_URL}/details/mal/anime/2001',
+            },
+            {
+                'title': 'Cowboy Bebop S01',
+                'original_title': 'Cowboy Bebop S01',
+                'series_name': 'Cowboy Bebop',
+                'series_season': 1,
+                'url': f'{BASE_URL}/details/tmdb/season/2001/slug#S01',
+                'original_url': f'{BASE_URL}/details/tmdb/season/2001/slug#S01',
+            },
+        ]
+
+    @pytest.mark.parametrize(
+        ('path', 'response', 'message'),
+        [
+            ('lists/1/items', FakeResponse(404), 'does not appear to exist'),
+            ('lists', FakeResponse(401), 'Authentication error'),
+            ('lists/1/items', FakeResponse(403), 'Authentication error'),
+            ('lists/1/items', FakeResponse(500, 'boom'), 'Error getting data from floppy: boom'),
+            ('lists/1/items', FakeResponse(200, ValueError), 'Error getting list from floppy'),
+            ('lists/1/items', RequestException('down'), 'Could not retrieve list from floppy'),
+        ],
+    )
+    def test_read_errors(self, floppy, path, response, message):
+        floppy.overrides[path] = response
+        with pytest.raises(PluginError, match=message):
+            list(floppy_set())
+
+    def test_matching(self, floppy):
+        floppy.lists[1][1].extend([
+            floppy_item('movie', 603, 'The Matrix', year=1999),
+            floppy_item('tv', 1396, 'Breaking Bad', year=2008, ids={'tvdb': '81189'}),
+            floppy_item('season', 1399, 'Game of Thrones', season=1),
+        ])
+        the_list = floppy_set()
+
+        def movie(**fields):
+            return Entry(title='a movie', url='mock://movie', **fields)
+
+        def show(name, **fields):
+            return Entry(title=name, url='mock://show', series_name=name, **fields)
+
+        assert movie(movie_name='The Matrix', movie_year=1999) in the_list
+        assert movie(movie_name='The Matrix', movie_year=2021) not in the_list
+        assert movie() not in the_list
+        # By id, whatever the name
+        assert show('BrBa', tvdb_id=81189) in the_list
+        # By name, the year only has to agree when both sides know it
+        assert show('breaking bad') in the_list
+        assert show('Breaking Bad (2008)') in the_list
+        assert show('Breaking Bad (2025)') not in the_list
+        # A season in the list matches its own episodes only
+        thrones = {'series_name': 'Game of Thrones'}
+        assert the_list.get(episode_entry(season=1, episode=3, **thrones))['series_season'] == 1
+        assert episode_entry(season=1, episode=3, **thrones) in the_list
+        assert episode_entry(season=2, episode=3, **thrones) not in the_list
+        assert show('Game of Thrones') not in the_list
+        # An item that is not a show can not be matched as one
+        assert not the_list.show_match(show('The Matrix'), movie(movie_name='The Matrix'))
+
+
+class TestFloppySubmit:
+    config = 'tasks: {}'
+
+    @pytest.mark.parametrize(
+        ('list_name', 'list_type', 'entry', 'call'),
+        [
+            ('To Download', 'auto', episode_entry(episode=None), 'media/tv/tmdb/1396/2/lists/1'),
+            ('To Download', 'seasons', episode_entry(), 'media/tv/tmdb/1396/2/lists/1'),
+            ('To Download', 'seasons', episode_entry(season=None, episode=None), None),
+            ('To Download', 'episodes', episode_entry(episode=None), None),
+            ('To Download', 'shows', Entry(title='The Matrix', url='mock://', tmdb_id=603), None),
+            ('To Download', 'movies', episode_entry(), 'media/movie/tmdb/1396/lists/1'),
+            ('collection', 'auto', episode_entry(episode=None), None),
+        ],
+    )
+    def test_what_is_submitted(self, floppy, list_name, list_type, entry, call):
+        entry['tmdb_id'] = entry.get('tmdb_id') or 1396
+
+        floppy_set(list_name, type=list_type).add(entry)
+
+        assert [path for _, path, _ in floppy.calls] == ([call] if call else [])
+
+    def test_movie_tmdb_id_from_lazy_lookup(self, floppy):
+        entry = Entry(title='The Matrix', url='mock://matrix')
+        entry.add_lazy_fields(lazy_tmdb_id, ['tmdb_id'])
+
+        floppy_set().add(entry)
+
+        assert floppy.calls == [('put', 'media/movie/tmdb/603/lists/1', None)]
+        assert floppy.tmdb_calls == []
+
+    def test_tmdb_lookups_are_cached(self, floppy):
+        by_tvdb = [episode_entry(episode=number, tvdb_id=81189) for number in (1, 2)]
+        by_name = [episode_entry(episode=number) for number in (3, 4)]
+
+        floppy_set('collection').__ior__(by_tvdb + by_name)
+
+        assert len(floppy.calls) == 4
+        assert [endpoint for endpoint, _ in floppy.tmdb_calls] == ['find/81189', 'search/tv']
+
+    def test_falls_back_when_an_id_is_unknown_to_tmdb(self, floppy):
+        floppy.tmdb_overrides['find/1'] = {'tv_results': []}
+        floppy.tmdb_overrides['find/tt0903747'] = RequestException('down')
+
+        floppy_set().add(
+            Entry(
+                title='Breaking Bad',
+                url='mock://show',
+                series_name='Breaking Bad',
+                tvdb_id=1,
+                imdb_id='tt0903747',
+            )
+        )
+
+        assert [endpoint for endpoint, _ in floppy.tmdb_calls] == [
+            'find/1',
+            'find/tt0903747',
+            'search/tv',
+        ]
+        assert floppy.calls == [('put', 'media/tv/tmdb/1396/lists/1', None)]
+
+    @pytest.mark.parametrize(
+        ('entry', 'search'),
+        [
+            # Nothing to search for
+            (Entry(title='Unknown', url='mock://unknown'), None),
+            (Entry(title='Dune', url='mock://dune', movie_name='Dune'), {'results': []}),
+            (Entry(title='Dune', url='mock://dune', movie_name='Dune'), RequestException('down')),
+        ],
+    )
+    def test_not_submitted_without_tmdb_id(self, floppy, entry, search):
+        floppy.tmdb_overrides['search/movie'] = search
+
+        floppy_set().add(entry)
+
+        assert floppy.calls == []
+        assert len(floppy.tmdb_calls) == (0 if search is None else 1)
+
+    @pytest.mark.parametrize('status', [409, 404, 500])
+    def test_rejected_submit_does_not_stop_the_rest(self, floppy, status):
+        floppy.lists[1][1].append(floppy_item('movie', 603, 'The Matrix'))
+        the_list = floppy_set()
+        assert len(the_list) == 1
+        floppy.submit_response = FakeResponse(status, 'nope')
+        floppy.lists[1][1].append(floppy_item('movie', 27205, 'Inception'))
+
+        the_list |= [
+            Entry(title='The Matrix', url='mock://matrix', tmdb_id=603),
+            Entry(title='Inception', url='mock://inception', tmdb_id=27205),
+        ]
+
+        assert len(floppy.calls) == 2
+        # Nothing changed, so the items are not fetched again
+        assert len(the_list) == 1
+
+    @pytest.mark.parametrize('failure', [FakeResponse(401), FakeResponse(403), 'exception'])
+    def test_failed_submit_stops(self, floppy, failure):
+        if failure == 'exception':
+            floppy.overrides['media/movie/tmdb/603/lists/1'] = RequestException('down')
+        else:
+            floppy.submit_response = failure
+
+        floppy_set().__ior__([
+            Entry(title='The Matrix', url='mock://matrix', tmdb_id=603),
+            Entry(title='Inception', url='mock://inception', tmdb_id=27205),
+        ])
+
+        assert len(floppy.calls) == (0 if failure == 'exception' else 1)
