@@ -497,7 +497,7 @@ class TestFloppySet:
         assert movie(movie_name='The Matrix', movie_year=2021) not in the_list
         assert movie() not in the_list
         # By id, whatever the name
-        assert show('BrBa', tvdb_id=81189) in the_list
+        assert show('Some Other Name', tvdb_id=81189) in the_list
         # By name, the year only has to agree when both sides know it
         assert show('breaking bad') in the_list
         assert show('Breaking Bad (2008)') in the_list
