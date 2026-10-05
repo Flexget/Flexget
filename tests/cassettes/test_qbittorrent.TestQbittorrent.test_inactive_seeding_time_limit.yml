@@ -1,0 +1,92 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate, br, zstd
+      Connection:
+      - keep-alive
+      Cookie:
+      - SID=acnKad9OWbfB0a5nk8mnkbmf1/tNdis2; QBT_SID_8080=tU2LkUcUXLgvjmlsj/TX4wkGdvx+7ijE
+      User-Agent:
+      - python-requests/2.34.2
+    method: GET
+    uri: http://localhost:8080/api/v2/app/webapiVersion
+  response:
+    body:
+      string: 2.15.1
+    headers:
+      connection:
+      - keep-alive
+      content-length:
+      - '6'
+      content-security-policy:
+      - default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;
+        script-src 'self' 'unsafe-inline'; object-src 'none'; form-action 'self';
+        frame-src 'self' blob:; frame-ancestors 'self';
+      content-type:
+      - text/plain; charset=UTF-8
+      cross-origin-opener-policy:
+      - same-origin
+      date:
+      - Mon, 05 Oct 2026 11:15:06 GMT
+      referrer-policy:
+      - same-origin
+      x-content-type-options:
+      - nosniff
+      x-frame-options:
+      - SAMEORIGIN
+      x-xss-protection:
+      - 1; mode=block
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate, br, zstd
+      Connection:
+      - keep-alive
+      Cookie:
+      - SID=acnKad9OWbfB0a5nk8mnkbmf1/tNdis2; QBT_SID_8080=tU2LkUcUXLgvjmlsj/TX4wkGdvx+7ijE
+      User-Agent:
+      - python-requests/2.34.2
+    method: GET
+    uri: http://localhost:8080/api/v2/torrents/info?hashes=2a8959bed2be495bb0e3ea96f497d873d5faed05
+  response:
+    body:
+      string: '[{"added_on":1791198903,"amount_left":0,"auto_tmm":false,"availability":0,"category":"","comment":"","completed":0,"completion_on":-1,"connections_count":0,"connections_limit":100,"content_path":"","created_by":"","creation_date":-1,"dl_limit":0,"dlspeed":0,"download_path":"","downloaded":0,"downloaded_session":0,"eta":8640000,"f_l_piece_prio":false,"force_start":false,"has_metadata":false,"hash":"2a8959bed2be495bb0e3ea96f497d873d5faed05","inactive_seeding_time_limit":-2,"infohash_v1":"2a8959bed2be495bb0e3ea96f497d873d5faed05","infohash_v2":"","last_activity":1791198903,"magnet_uri":"magnet:?xt=urn:btih:2a8959bed2be495bb0e3ea96f497d873d5faed05&dn=some.thing.720p","max_inactive_seeding_time":-1,"max_ratio":-1,"max_seeding_time":1440,"name":"some.thing.720p","num_complete":0,"num_incomplete":2,"num_leechs":0,"num_seeds":0,"piece_size":-1,"pieces_have":0,"pieces_num":-1,"popularity":0,"priority":7,"private":null,"progress":0,"ratio":0,"ratio_limit":-2,"reannounce":0,"root_path":"","save_path":"C:\\Users\\liuch\\Downloads","seeding_time":0,"seeding_time_limit":1440,"seen_complete":-1,"seq_dl":false,"share_limit_action":"Default","size":0,"state":"metaDL","super_seeding":false,"tags":"","time_active":4,"total_size":-1,"total_wasted":0,"tracker":"","trackers_count":0,"up_limit":0,"uploaded":0,"uploaded_session":0,"upspeed":0}]'
+    headers:
+      connection:
+      - keep-alive
+      content-encoding:
+      - gzip
+      content-length:
+      - '595'
+      content-security-policy:
+      - default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;
+        script-src 'self' 'unsafe-inline'; object-src 'none'; form-action 'self';
+        frame-src 'self' blob:; frame-ancestors 'self';
+      content-type:
+      - application/json
+      cross-origin-opener-policy:
+      - same-origin
+      date:
+      - Mon, 05 Oct 2026 11:15:08 GMT
+      referrer-policy:
+      - same-origin
+      x-content-type-options:
+      - nosniff
+      x-frame-options:
+      - SAMEORIGIN
+      x-xss-protection:
+      - 1; mode=block
+    status:
+      code: 200
+      message: OK
+version: 1

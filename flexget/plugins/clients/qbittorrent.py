@@ -35,6 +35,7 @@ class OutputQBitTorrent:
           add_paused: <ADD_PAUSED> (default: False)
           ratio_limit: <RATIO_LIMIT> (default: -2)
           seeding_time_limit: <SEEDING_TIME_LIMIT> (default: -1)
+          inactive_seeding_time_limit: <INACTIVE_SEEDING_TIME_LIMIT>
     """
 
     schema = {
@@ -60,6 +61,7 @@ class OutputQBitTorrent:
                     'skip_check': {'type': 'boolean'},
                     'ratio_limit': {'type': 'number'},
                     'seeding_time_limit': {'type': 'string', 'format': 'interval'},
+                    'inactive_seeding_time_limit': {'type': 'string', 'format': 'interval'},
                 },
                 'additionalProperties': False,
             },
@@ -286,6 +288,13 @@ class OutputQBitTorrent:
             if seeding_time_limit:
                 form_data['seedingTimeLimit'] = int(
                     parse_timedelta(seeding_time_limit).total_seconds() / 60
+                )
+
+            if inactive_seeding_time_limit := entry.get(
+                'inactive_seeding_time_limit', config.get('inactive_seeding_time_limit')
+            ):
+                form_data['inactiveSeedingTimeLimit'] = int(
+                    parse_timedelta(inactive_seeding_time_limit).total_seconds() / 60
                 )
 
             is_magnet = entry['url'].startswith('magnet:')

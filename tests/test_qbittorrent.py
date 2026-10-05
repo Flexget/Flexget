@@ -17,6 +17,12 @@ class TestQbittorrent:
           ratio_limit:
             qbittorrent:
               ratio_limit: 1.65
+          seeding_time_limit:
+            qbittorrent:
+              seeding_time_limit: 1 day
+          inactive_seeding_time_limit:
+            qbittorrent:
+              inactive_seeding_time_limit: 3 weeks
           incomplete_path:
             qbittorrent:
               incomplete_path: /tmp
@@ -28,6 +34,14 @@ class TestQbittorrent:
 
     def test_ratio_limit(self, execute_task):
         task = execute_task('ratio_limit')
+        assert task.accepted
+
+    def test_seeding_time_limit(self, execute_task):
+        task = execute_task('seeding_time_limit')
+        assert task.accepted
+
+    def test_inactive_seeding_time_limit(self, execute_task):
+        task = execute_task('inactive_seeding_time_limit')
         assert task.accepted
 
     def test_incomplete_path(self, execute_task):

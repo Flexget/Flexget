@@ -1,0 +1,142 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate, br, zstd
+      Connection:
+      - keep-alive
+      Cookie:
+      - SID=acnKad9OWbfB0a5nk8mnkbmf1/tNdis2
+      User-Agent:
+      - python-requests/2.34.2
+    method: GET
+    uri: http://localhost:8080/api/v2/app/webapiVersion
+  response:
+    body:
+      string: 2.15.1
+    headers:
+      connection:
+      - keep-alive
+      content-length:
+      - '6'
+      content-security-policy:
+      - default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;
+        script-src 'self' 'unsafe-inline'; object-src 'none'; form-action 'self';
+        frame-src 'self' blob:; frame-ancestors 'self';
+      content-type:
+      - text/plain; charset=UTF-8
+      cross-origin-opener-policy:
+      - same-origin
+      date:
+      - Mon, 05 Oct 2026 11:14:59 GMT
+      referrer-policy:
+      - same-origin
+      set-cookie:
+      - QBT_SID_8080=tU2LkUcUXLgvjmlsj/TX4wkGdvx+7ijE; HttpOnly; SameSite=Lax; expires=Mon,
+        05-Oct-2026 12:14:59 GMT; path=/
+      x-content-type-options:
+      - nosniff
+      x-frame-options:
+      - SAMEORIGIN
+      x-xss-protection:
+      - 1; mode=block
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate, br, zstd
+      Connection:
+      - keep-alive
+      Cookie:
+      - SID=acnKad9OWbfB0a5nk8mnkbmf1/tNdis2; QBT_SID_8080=tU2LkUcUXLgvjmlsj/TX4wkGdvx+7ijE
+      User-Agent:
+      - python-requests/2.34.2
+    method: GET
+    uri: http://localhost:8080/api/v2/torrents/info?hashes=2a8959bed2be495bb0e3ea96f497d873d5faed05
+  response:
+    body:
+      string: '[]'
+    headers:
+      connection:
+      - keep-alive
+      content-length:
+      - '2'
+      content-security-policy:
+      - default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;
+        script-src 'self' 'unsafe-inline'; object-src 'none'; form-action 'self';
+        frame-src 'self' blob:; frame-ancestors 'self';
+      content-type:
+      - application/json
+      cross-origin-opener-policy:
+      - same-origin
+      date:
+      - Mon, 05 Oct 2026 11:15:01 GMT
+      referrer-policy:
+      - same-origin
+      x-content-type-options:
+      - nosniff
+      x-frame-options:
+      - SAMEORIGIN
+      x-xss-protection:
+      - 1; mode=block
+    status:
+      code: 200
+      message: OK
+- request:
+    body: "--8b9b9ec059f4e85a64328412430c34c0\r\nContent-Disposition: form-data; name=\"seedingTimeLimit\"\r\n\r\n1440\r\n--8b9b9ec059f4e85a64328412430c34c0\r\nContent-Disposition:
+      form-data; name=\"urls\"\r\n\r\nmagnet:?xt=urn:btih:2a8959bed2be495bb0e3ea96f497d873d5faed05&dn=some.thing.720p\r\n--8b9b9ec059f4e85a64328412430c34c0--\r\n"
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate, br, zstd
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '303'
+      Content-Type:
+      - multipart/form-data; boundary=8b9b9ec059f4e85a64328412430c34c0
+      Cookie:
+      - SID=acnKad9OWbfB0a5nk8mnkbmf1/tNdis2; QBT_SID_8080=tU2LkUcUXLgvjmlsj/TX4wkGdvx+7ijE
+      User-Agent:
+      - python-requests/2.34.2
+    method: POST
+    uri: http://localhost:8080/api/v2/torrents/add
+  response:
+    body:
+      string: '{"added_torrent_ids":["2a8959bed2be495bb0e3ea96f497d873d5faed05"],"failure_count":0,"pending_count":0,"success_count":1}'
+    headers:
+      connection:
+      - keep-alive
+      content-length:
+      - '120'
+      content-security-policy:
+      - default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;
+        script-src 'self' 'unsafe-inline'; object-src 'none'; form-action 'self';
+        frame-src 'self' blob:; frame-ancestors 'self';
+      content-type:
+      - application/json
+      cross-origin-opener-policy:
+      - same-origin
+      date:
+      - Mon, 05 Oct 2026 11:15:03 GMT
+      referrer-policy:
+      - same-origin
+      x-content-type-options:
+      - nosniff
+      x-frame-options:
+      - SAMEORIGIN
+      x-xss-protection:
+      - 1; mode=block
+    status:
+      code: 200
+      message: OK
+version: 1
