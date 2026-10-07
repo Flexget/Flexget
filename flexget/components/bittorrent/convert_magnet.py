@@ -39,15 +39,7 @@ class ConvertMagnet:
 
         params = libtorrent.parse_magnet_uri(magnet_uri)
         session = libtorrent.session()
-        lt_version = [int(v) for v in libtorrent.version.split('.')]
-        if lt_version > [0, 16, 13, 0] and lt_version < [1, 1, 3, 0]:
-            # for some reason the info_hash needs to be bytes but it's a struct called sha1_hash
-            params['info_hash'] = params['info_hash'].to_bytes()
-        if lt_version < [1, 2]:
-            # for versions < 1.2
-            params['url'] = magnet_uri
-        else:
-            params.url = magnet_uri
+        params.url = magnet_uri
         params.save_path = str(destination_folder)
         handle = session.add_torrent(params)
         logger.debug('Acquiring torrent metadata for magnet {}', magnet_uri)
