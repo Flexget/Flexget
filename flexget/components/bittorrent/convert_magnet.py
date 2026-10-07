@@ -27,7 +27,7 @@ class ConvertMagnet:
                 'type': 'object',
                 'properties': {
                     'timeout': {'type': 'string', 'format': 'interval'},
-                    'force': {'type': 'boolean'},
+                    'fail_entry_on_error': {'type': 'boolean'},
                 },
                 'additionalProperties': False,
             },
@@ -70,7 +70,7 @@ class ConvertMagnet:
         if not isinstance(config, dict):
             config = {}
         config.setdefault('timeout', '30 seconds')
-        config.setdefault('force', False)
+        config.setdefault('fail_entry_on_error', False)
         return config
 
     @plugin.priority(plugin.PRIORITY_FIRST)
@@ -107,7 +107,7 @@ class ConvertMagnet:
                     logger.error(
                         'Unable to convert Magnet URI for entry {}: {}', entry['title'], e
                     )
-                    if config['force']:
+                    if config['fail_entry_on_error']:
                         entry.fail('Magnet URI conversion failed')
                     continue
                 # Windows paths need an extra / prepended to them for url
