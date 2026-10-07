@@ -3,6 +3,7 @@ import sys
 import pytest
 
 
+@pytest.mark.skip(reason='This test requires real network access and is therefore unstable')
 @pytest.mark.skipif(
     sys.version_info >= (3, 14),
     reason='libtorrent does not provide wheels for Python 3.14+.',
