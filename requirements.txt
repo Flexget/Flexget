@@ -209,7 +209,7 @@ urllib3==2.8.0
     # via requests
 webencodings==0.6.1
     # via html5lib
-werkzeug==3.1.8
+werkzeug==3.1.9
     # via
     #   flask
     #   flask-cors
