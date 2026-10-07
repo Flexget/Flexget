@@ -100,7 +100,7 @@ class ConvertMagnet:
                 try:
                     logger.info('Converting entry {} magnet URI to a torrent file', entry['title'])
                     torrent_file = self.magnet_to_torrent(entry['url'], converted_path, timeout)
-                except (plugin.PluginError, TypeError) as e:
+                except plugin.PluginError as e:
                     logger.error(
                         'Unable to convert Magnet URI for entry {}: {}', entry['title'], e
                     )
