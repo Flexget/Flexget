@@ -103,6 +103,7 @@ all = [
   { include-group = "boto3" },
   { include-group = "deluge" },
   { include-group = "ftp" },
+  "libtorrent~=2.1; python_version<='3.13'", # libtorrent does not provide wheels for Python 3.14+.
   { include-group = "matrix" },
   { include-group = "plexapi" },
   { include-group = "qbittorrent" },
@@ -115,6 +116,7 @@ all = [
 boto3 = [ "boto3~=1.35" ]
 deluge = [ "deluge-client~=1.10" ]
 ftp = [ "ftputil~=5.1" ]
+libtorrent = [ "libtorrent~=2.1" ]
 matrix = [ "matrix-nio~=0.26.0" ]
 plexapi = [ "plexapi~=4.17" ]
 qbittorrent = [ "qbittorrent-api~=2026.8" ]
@@ -133,6 +135,7 @@ metadata.hooks.custom.locked-groups = [
   "boto3",
   "deluge",
   "ftp",
+  "libtorrent",
   "matrix",
   "plexapi",
   "qbittorrent",
