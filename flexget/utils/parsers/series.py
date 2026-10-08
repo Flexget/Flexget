@@ -522,21 +522,19 @@ class SeriesParser(TitleParser):
                     yearfirst_opts = [True, False]
                     if self.date_yearfirst is not None:
                         yearfirst_opts = [self.date_yearfirst]
-                    kwargs_list = (
-                        {'dayfirst': d, 'yearfirst': y}
-                        for d in dayfirst_opts
-                        for y in yearfirst_opts
-                    )
-                    for kwargs in kwargs_list:
-                        possdate = parsedate(' '.join(match.groups()), **kwargs)
-                        # Don't accept dates farther than a day in the future
-                        if possdate > datetime.now() + timedelta(days=1):
-                            continue
-                        # Don't accept dates that are too old
-                        if possdate < datetime(1970, 1, 1):
-                            continue
-                        if possdate not in possdates:
-                            possdates.append(possdate)
+                    for dayfirst in dayfirst_opts:
+                        for yearfirst in yearfirst_opts:
+                            possdate = parsedate(
+                                ' '.join(match.groups()), dayfirst=dayfirst, yearfirst=yearfirst
+                            )
+                            # Don't accept dates farther than a day in the future
+                            if possdate > datetime.now() + timedelta(days=1):
+                                continue
+                            # Don't accept dates that are too old
+                            if possdate < datetime(1970, 1, 1):
+                                continue
+                            if possdate not in possdates:
+                                possdates.append(possdate)
                 except ValueError:
                     logger.trace('{} is not a valid date, skipping', match.group(0))
                     continue

@@ -9,6 +9,8 @@ from loguru import logger
 if TYPE_CHECKING:
     from collections.abc import Callable
 
+    from flexget.plugin import PluginInfo
+
 logger = logger.bind(name='event')
 
 
@@ -19,6 +21,8 @@ class Event:
         self.name = name
         self.func = func
         self.priority = priority
+        # Set by PluginInfo.build_phase_handlers for backwards compatibility
+        self.plugin: PluginInfo | None = None
 
     def __call__(self, *args, **kwargs):
         return self.func(*args, **kwargs)

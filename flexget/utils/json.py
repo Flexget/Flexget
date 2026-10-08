@@ -20,7 +20,7 @@ except ImportError:
     except ImportError:
         try:
             # Google Appengine offers simplejson via django
-            from django.utils import simplejson as json
+            from django.utils import simplejson as json  # pyright: ignore[reportMissingImports]
         except ImportError:
             raise DependencyError(missing='simplejson')
 
@@ -28,7 +28,7 @@ DATE_FMT = '%Y-%m-%d'
 ISO8601_FMT = '%Y-%m-%dT%H:%M:%SZ'
 
 
-class DTDecoder(json.JSONDecoder):
+class DTDecoder(json.JSONDecoder):  # pyright: ignore[reportGeneralTypeIssues]
     def decode(self, obj, **kwargs):
         # The built-in `json` library will `unicode` strings, except for empty strings. patch this for
         # consistency so that `unicode` is always returned.
