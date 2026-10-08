@@ -2,7 +2,7 @@ import re
 from datetime import datetime
 
 from loguru import logger
-from sqlalchemy import Column, DateTime, Integer, String
+from sqlalchemy.orm import Mapped, mapped_column
 
 from flexget import plugin
 from flexget.db_schema import versioned_base
@@ -16,15 +16,14 @@ Base = versioned_base('myepisodes', 0)
 class MyEpisodesInfo(Base):
     __tablename__ = 'myepisodes'
 
-    id = Column(Integer, primary_key=True)
-    series_name = Column(String, unique=True)
-    myepisodes_id = Column(Integer, unique=True)
-    updated = Column(DateTime)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    series_name: Mapped[str | None] = mapped_column(unique=True)
+    myepisodes_id: Mapped[int | None] = mapped_column(unique=True)
+    updated: Mapped[datetime | None] = mapped_column(default=datetime.now)
 
     def __init__(self, series_name, myepisodes_id):
         self.series_name = series_name
         self.myepisodes_id = myepisodes_id
-        self.updated = datetime.now()
 
     def __repr__(self):
         return (
