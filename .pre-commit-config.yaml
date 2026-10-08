@@ -38,8 +38,8 @@ repos:
     rev: v2.4.3
     hooks:
       - id: codespell
-  - repo: https://github.com/shellcheck-py/shellcheck-py
-    rev: v0.11.0.1
+  - repo: https://github.com/koalaman/shellcheck-precommit
+    rev: v0.11.0
     hooks:
       - id: shellcheck
   - repo: https://github.com/abravalheri/validate-pyproject
