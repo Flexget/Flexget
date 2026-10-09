@@ -37,6 +37,7 @@ class ImdbLookup:
         'imdb_year': 'year',
         'imdb_genres': lambda movie: [genre.name for genre in movie.genres],
         'imdb_languages': lambda movie: [lang.language.name for lang in movie.languages],
+        'imdb_country_of_origin': lambda movie: movie.countries if movie._countries else [],
         'imdb_actors': lambda movie: {actor.imdb_id: actor.name for actor in movie.actors},
         'imdb_directors': lambda movie: {
             director.imdb_id: director.name for director in movie.directors
@@ -242,6 +243,7 @@ class ImdbLookup:
             'year',
             'genres',
             'languages',
+            'countries',
             'actors',
             'directors',
             'writers',
@@ -272,6 +274,7 @@ class ImdbLookup:
         movie.year = parser.year
         movie.mpaa_rating = parser.mpaa_rating
         movie.plot_outline = parser.plot_outline
+        movie.countries = parser.countries
         movie.url = imdb_url
         session.add(movie)
         for name in parser.genres:

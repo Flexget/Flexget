@@ -10,10 +10,11 @@ from sqlalchemy.schema import ForeignKey, Index
 from flexget import db_schema
 from flexget.components.imdb.utils import extract_id
 from flexget.db_schema import UpgradeImpossible
+from flexget.utils.database import json_synonym
 
 logger = logger.bind(name='imdb.db')
 
-SCHEMA_VER = 10
+SCHEMA_VER = 11
 
 Base = db_schema.versioned_base('imdb_lookup', SCHEMA_VER)
 
@@ -91,6 +92,8 @@ class Movie(Base):
     plot_outline: Mapped[str | None]
     mpaa_rating: Mapped[str | None] = mapped_column(default='')
     photo: Mapped[str | None]
+    _countries: Mapped[str | None] = mapped_column('countries')
+    countries = json_synonym('_countries')
 
     # updated time, so we can grab new rating counts after 48 hours
     # set a default, so existing data gets updated with a rating
@@ -236,7 +239,8 @@ def upgrade(ver, session):
     # v8  Added writers to the DB Schema
     # v9  Added Metacritic score exftraction/filtering
     # v10 Added plot keywords to the DB schema
-    if ver is None or ver <= 9:
+    # v11 Added countries of origin to the DB schema
+    if ver is None or ver <= 10:
         raise UpgradeImpossible(
             'Resetting imdb_lookup caches because bad data may have been cached.'
         )
