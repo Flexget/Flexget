@@ -1,25 +1,3 @@
-html {
-  --pst-sidebar-secondary: 28%; /* Slightly widen the right sidebar */
-}
-
-@media (min-width: 960px) {
-  .bd-page-width {
-    max-width: 100rem; /* Reduce the page’s side margins */
-  }
-
-  .bd-sidebar-primary {
-    width: 22%; /* Slightly narrow the left sidebar */
-  }
-}
-
-.bd-main .bd-content .bd-article-container {
-  max-width: 61em; /* To match .bd-page-width */
-}
-
-#ethical-ad-placement {
-  max-width: 180px; /* Make the Read the Docs ad less obtrusive. */
-}
-
 .sd-card .sd-card-img-top {
   /* Main index page overview cards */
   height: 60px;
