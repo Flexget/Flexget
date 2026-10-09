@@ -577,7 +577,11 @@ class SeriesParser(TitleParser):
                     return False
                 # Convert season and episode to integers
                 try:
-                    season = int(season)
+                    try:
+                        season = int(season)
+                    except ValueError:
+                        # in case user's custom ep_regex tries to match roman numerals
+                        season = self.roman_to_int(season)
                     if not episode.isdigit():
                         try:
                             idx = self.english_numbers.index(str(episode).lower())
