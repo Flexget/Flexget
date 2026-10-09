@@ -216,7 +216,7 @@ else:
         def get_allowed_auths(self, username: str) -> str:
             if self.__key_only:
                 return 'publickey'
-            return 'password, publickey'
+            return 'password,publickey'
 
     class TestSFTPHandle(SFTPHandle):
         __test__ = False
