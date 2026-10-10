@@ -18,7 +18,7 @@ echo "RELEASE_TAG=$RELEASE_TAG" >> "$GITHUB_ENV"
 
 # Build distribution archive.
 # These env variables activate hatch build hooks to modify the release
-BUNDLE_WEBUI=true BUILD_LOCKED_EXTRAS=true uv build
+BUNDLE_WEBUI_MODE=download BUILD_LOCKED_EXTRAS=true uv build
 
 # Setup git user
 git config user.email github-actions[bot]@users.noreply.github.com

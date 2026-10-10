@@ -1,4 +1,4 @@
-name: Test
+name: test
 
 on:
   push:
@@ -13,7 +13,7 @@ env:
   UV_VERSION: 0.12.23 # renovate: datasource=pypi depName=uv
 jobs:
   tests:
-    name: Run Tests
+    name: py${{ matrix.python-version }} ${{ matrix.operating-system }}
     if: github.actor != 'github-merge-queue[bot]'
     runs-on: ${{ matrix.operating-system }}
     strategy:
@@ -52,8 +52,8 @@ jobs:
           name: ${{ matrix.operating-system }}-${{ matrix.python-version }}
           token: ${{ secrets.CODECOV_TOKEN }}
 
-  test-scripts:
-    name: Test scripts
+  scripts:
+    name: scripts
     if: github.actor != 'github-merge-queue[bot]'
     runs-on: ubuntu-latest
     env:

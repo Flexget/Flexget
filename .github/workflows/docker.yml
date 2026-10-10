@@ -1,0 +1,42 @@
+name: docker
+
+on:
+  push:
+    branches:
+      - develop
+    tags:
+      - v*.*.*
+  workflow_call:
+permissions: {}
+concurrency:
+  group: docker-${{ github.event.number || github.ref || github.run_id }}
+  cancel-in-progress: true
+jobs:
+  build:
+    uses: docker/github-builder/.github/workflows/build.yml@58cb9f5b71b1836d6f690c1e95effdeb9b98cb8a # v1
+    permissions:
+      packages: write # to push to ghcr.io
+      id-token: write # for signing attestations and cache entries with GitHub OIDC
+    with:
+      output: image
+      push: ${{ github.event_name == 'push' }}
+      platforms: linux/amd64,linux/arm64
+      meta-images: |
+        ${{ vars.DOCKERHUB_NAMESPACE || 'flexget' }}/flexget
+        ghcr.io/${{ github.repository_owner }}/flexget
+      meta-tags: |
+        type=ref,event=branch
+        type=ref,event=pr
+        type=pep440,pattern={{version}}
+        type=pep440,pattern={{major}}.{{minor}}
+        type=pep440,pattern={{major}}
+      cache: true
+      cache-mode: max
+    secrets:
+      registry-auths: |
+        - registry: docker.io
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+        - registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}

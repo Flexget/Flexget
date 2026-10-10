@@ -1,4 +1,4 @@
-name: CI
+name: ci
 on:
   pull_request:
   merge_group:
@@ -12,7 +12,8 @@ jobs:
   docker:
     permissions:
       packages: write # to push to ghcr.io
-    uses: $/.github/workflows/docker-image.yml
+      id-token: write # for signing attestations and cache entries with GitHub OIDC
+    uses: $/.github/workflows/docker.yml
   required-checks-passed:
     name: required checks passed
     if: always()

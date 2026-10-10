@@ -23,9 +23,9 @@ else:
         PLUGIN_NAME = 'bundle-webui'
 
         def dependencies(self) -> list[str]:
-            if os.environ.get('BUNDLE_WEBUI') not in ['1', 'true']:
-                return []
-            return ['requests']
+            if os.environ.get('BUNDLE_WEBUI_MODE') == 'download':
+                return ['requests']
+            return []
 
         def clean(self, versions: list[str]) -> None:
             p = Path(__file__).resolve().parents[1]
@@ -37,9 +37,17 @@ else:
                 shutil.rmtree(v2_path)
 
         def initialize(self, version: str, build_data: dict[str, Any]) -> None:
-            if os.environ.get('BUNDLE_WEBUI') not in ['1', 'true']:
-                return
-            bundle_webui()
+            match os.environ.get('BUNDLE_WEBUI_MODE'):
+                case 'download':
+                    bundle_webui()
+                case 'local':
+                    pass
+                case None:
+                    return
+                case other:
+                    raise RuntimeError(
+                        f'Invalid BUNDLE_WEBUI_MODE: {other!r}. Expected "download", "local", or an unset variable.'
+                    )
             build_data['force_include']['flexget/ui/v1/app'] = '/flexget/ui/v1/app'
             build_data['force_include']['flexget/ui/v2/dist'] = '/flexget/ui/v2/dist'
 
