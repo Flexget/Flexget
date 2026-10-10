@@ -152,7 +152,7 @@ build.skip-excluded-dirs = true
 build.targets.wheel.include = [
   "/flexget",
 ]
-# The webui will be bundled when the BUNDLE_WEBUI env variable is defined
+# The webui will be bundled when the BUNDLE_WEBUI_MODE env variable is defined
 build.targets.wheel.hooks.custom.path = "scripts/bundle_webui.py"
 build.targets.sdist.include = [
   "/flexget",

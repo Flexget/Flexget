@@ -3,7 +3,6 @@ ENV PYTHONUNBUFFERED=1
 
 RUN apk update && apk add --upgrade \
         ca-certificates \
-        nodejs \
         build-base \
         libffi-dev \
         openssl-dev \
@@ -17,11 +16,10 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     uv run scripts/bundle_webui.py
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
-    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv sync --frozen --no-dev --group=all --no-install-project
-ADD . /flexget
+    uv export --frozen --no-dev --group=all --no-emit-project | uv pip install --prefix /root-dir/usr/local -r -
+COPY . /flexget
 RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync --frozen --no-dev --group=all
+    uv export --locked --no-dev --no-editable | BUNDLE_WEBUI_MODE=local uv pip install --prefix /root-dir/usr/local -r -
 
 FROM docker.io/python:3.11-alpine@sha256:d9368b3a5ac59afea7b5d4f2e2aea0941dbf9fdee9c369c5bec00b98244bc929
 ENV PYTHONUNBUFFERED=1
@@ -33,10 +31,7 @@ RUN --mount=type=cache,target=/var/cache/apk \
         tzdata
 
 # Copy the application from the builder
-COPY --from=builder --chown=app:app /flexget /flexget
-
-# Place executables in the environment at the front of the path
-ENV PATH="/flexget/.venv/bin:$PATH"
+COPY --from=builder --chown=app:app /root-dir /
 
 VOLUME /config
 WORKDIR /config

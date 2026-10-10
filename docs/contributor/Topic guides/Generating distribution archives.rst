@@ -11,7 +11,7 @@ are archives that are uploaded to the Python Package Index and can be installed 
 Steps to generate distribution packages
 =======================================
 
-#. To have the web UI bundled, the ``BUNDLE_WEBUI`` environment variable must be set:
+#. To bundle the web UI, set the `BUNDLE_WEBUI_MODE` environment variable to `download` or `local`:
 
    .. tab-set::
       :sync-group: os
@@ -21,14 +21,14 @@ Steps to generate distribution packages
 
          ::
 
-            $ export BUNDLE_WEBUI=true
+            $ export BUNDLE_WEBUI_MODE=download
 
       .. tab-item:: Windows
          :sync: Windows
 
          ::
 
-            $ $env:BUNDLE_WEBUI = 'true'
+            $ $env:BUNDLE_WEBUI_MODE = 'download'
 
 #. To provide extras, the ``BUILD_LOCKED_EXTRAS`` environment variable must be set:
 
