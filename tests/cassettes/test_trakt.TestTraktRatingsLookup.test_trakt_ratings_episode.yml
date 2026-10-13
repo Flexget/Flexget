@@ -273,7 +273,7 @@ interactions:
       trakt-api-version:
       - '2'
     method: GET
-    uri: https://api.trakt.tv/users/flexgettest/ratings/episodes
+    uri: https://api.trakt.tv/users/flexgettest/ratings/episodes?limit=250&page=1
   response:
     body:
       string: '[{"rated_at":"2017-04-23T19:36:34.000Z","rating":10,"type":"episode","episode":{"season":5,"number":14,"title":"Ozymandias","ids":{"trakt":73541,"tvdb":4553040,"imdb":"tt2301451","tmdb":62162,"tvrage":null}},"show":{"title":"Breaking

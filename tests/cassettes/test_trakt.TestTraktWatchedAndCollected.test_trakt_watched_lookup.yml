@@ -240,7 +240,7 @@ interactions:
       trakt-api-version:
       - '2'
     method: GET
-    uri: https://api.trakt.tv/users/flexgettest/watched/shows
+    uri: https://api.trakt.tv/users/flexgettest/watched/shows?limit=250&page=1
   response:
     body:
       string: '[{"plays":6,"last_watched_at":"2017-04-23T18:45:04.000Z","last_updated_at":"2017-04-23T18:45:04.000Z","reset_at":null,"show":{"title":"Into

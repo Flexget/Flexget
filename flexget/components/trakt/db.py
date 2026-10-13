@@ -1103,11 +1103,25 @@ def get_user_data(data_type, media_type, session, username):
     :param media_type: Type of media we want <data_type> for eg. shows, episodes, movies.
     :param session: A trakt requests session with a valid token
     :param username: Username of the user to fetch data
-    :return:
+    :return: List of items from all result pages
     """
     endpoint = f'{data_type}/{media_type}'
+    url = get_api_url('users', username, data_type, media_type)
+    limit_per_page = 250
+    data = []
     try:
-        data = session.get(get_api_url('users', username, data_type, media_type)).json()
+        # trakt only returns the first page (100 items) when no pagination params are sent
+        page = 1
+        while True:
+            response = session.get(url, params={'limit': limit_per_page, 'page': page})
+            page_data = response.json()
+            if not page_data:
+                break
+            data.extend(page_data)
+            if page >= int(response.headers.get('X-Pagination-Page-Count', 1)):
+                break
+            page += 1
+
         if not data:
             logger.warning('No {} data returned from trakt endpoint {}.', data_type, endpoint)
             return []

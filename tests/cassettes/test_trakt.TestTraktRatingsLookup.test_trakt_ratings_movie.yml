@@ -179,7 +179,7 @@ interactions:
       trakt-api-version:
       - '2'
     method: GET
-    uri: https://api.trakt.tv/users/flexgettest/ratings/movies
+    uri: https://api.trakt.tv/users/flexgettest/ratings/movies?limit=250&page=1
   response:
     body:
       string: '[{"rated_at":"2017-04-23T19:37:42.000Z","rating":9,"type":"movie","movie":{"title":"Doctor

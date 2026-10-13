@@ -242,7 +242,7 @@ interactions:
       trakt-api-version:
       - '2'
     method: GET
-    uri: https://api.trakt.tv/users/flexgettest/collection/shows
+    uri: https://api.trakt.tv/users/flexgettest/collection/shows?limit=250&page=1
   response:
     body:
       string: '[{"last_collected_at":"2017-04-23T18:44:42.000Z","last_updated_at":"2017-04-23T18:44:42.000Z","show":{"title":"The
