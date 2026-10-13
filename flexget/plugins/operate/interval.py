@@ -1,4 +1,4 @@
-import datetime
+import datetime as dt
 
 from loguru import logger
 
@@ -36,14 +36,14 @@ class PluginInterval:
             logger.debug('interval: {}', config)
             next_time = last_time + parse_interval(config)
             logger.debug('next_time: {!r}', next_time)
-            if datetime.datetime.now() < next_time:
+            if dt.datetime.now() < next_time:
                 logger.verbose(
                     'Interval {} not met on task {}. Use --now to override.', config, task.name
                 )
                 task.abort('Interval not met', silent=True)
                 return
         logger.debug('interval passed')
-        task.simple_persistence['last_time'] = datetime.datetime.now()
+        task.simple_persistence['last_time'] = dt.datetime.now()
 
 
 @event('plugin.register')
