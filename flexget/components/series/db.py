@@ -58,12 +58,15 @@ Base = db_schema.versioned_base('series', SCHEMA_VER)
 
 
 class NormalizedComparator(Comparator):
-    def operate(self, op, other):
-        if isinstance(other, list):
-            other = [normalize_series_name(o) for o in other]
-        else:
-            other = normalize_series_name(other)
-
+    def operate(self, op, *args):
+        if not args:
+            return op(self.__clause_element__())
+        other = args[0]
+        other = (
+            [normalize_series_name(o) for o in other]
+            if isinstance(other, list)
+            else normalize_series_name(other)
+        )
         return op(self.__clause_element__(), other)
 
 
@@ -101,7 +104,7 @@ class Series(Base):
         back_populates='series', cascade='all, delete-orphan'
     )
 
-    # Make a special property that does indexed case insensitive lookups on name, but stores/returns specified case
+    # Make a special property that indexes case-insensitive lookups on name, but stores/returns specified case
     @hybrid_property
     def name(self):
         return self._name
@@ -112,8 +115,8 @@ class Series(Base):
         self._name_normalized = normalize_series_name(value)
 
     @name.comparator
-    def name(self):
-        return NormalizedComparator(self._name_normalized)
+    def name(cls):
+        return NormalizedComparator(cls._name_normalized)
 
     @property
     def name_normalized(self):
@@ -522,8 +525,8 @@ class AlternateNames(Base):
         self._alt_name_normalized = normalize_series_name(value)
 
     @alt_name.comparator
-    def alt_name(self):
-        return NormalizedComparator(self._alt_name_normalized)
+    def alt_name(cls):
+        return NormalizedComparator(cls._alt_name_normalized)
 
     @property
     def name_normalized(self):
