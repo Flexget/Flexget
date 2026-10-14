@@ -22,6 +22,7 @@ class OutputQBitTorrent:
         qbittorrent:
           username: <USERNAME> (default: (none))
           password: <PASSWORD> (default: (none))
+          api_key: <API_KEY> (default: (none), qBittorrent 5.2+, replaces username/password)
           host: <HOSTNAME> (default: localhost)
           port: <PORT> (default: 8080)
           use_ssl: <SSL> (default: False)
@@ -46,6 +47,7 @@ class OutputQBitTorrent:
                 'properties': {
                     'username': {'type': 'string'},
                     'password': {'type': 'string'},
+                    'api_key': {'type': 'string'},
                     'host': {'type': 'string'},
                     'port': {'type': 'integer'},
                     'use_ssl': {'type': 'boolean'},
@@ -118,12 +120,22 @@ class OutputQBitTorrent:
         """Connect to qBittorrent Web UI.
 
         Username and password not necessary if 'Bypass authentication for localhost' is checked and host is 'localhost'.
+        An API key (qBittorrent 5.2+) is used instead of username and password when set.
         """
         self.url = '{}://{}:{}'.format(
             'https' if config['use_ssl'] else 'http', config['host'], config['port']
         )
-        self.check_api_version('Check API version failed.', verify=config['verify_cert'])
-        if config.get('username') and config.get('password'):
+        if config.get('api_key'):
+            self.session.headers['Authorization'] = f'Bearer {config["api_key"]}'
+        response = self.check_api_version(
+            'Check API version failed.', verify=config['verify_cert']
+        )
+        if config.get('api_key'):
+            if response.status_code in (401, 403):
+                raise plugin.PluginError(
+                    'Authentication with API key failed (requires qBittorrent 5.2 or later).'
+                )
+        elif config.get('username') and config.get('password'):
             data = {'username': config['username'], 'password': config['password']}
             if not self._request(
                 'post',
@@ -368,26 +380,40 @@ class FromQBitTorrent:
             'completed': {'type': 'boolean'},
             'username': {'type': 'string'},
             'password': {'type': 'string'},
+            'api_key': {'type': 'string'},
             'host': {'type': 'string'},
             'port': {'type': 'integer'},
         },
         'additionalProperties': False,
-        'required': ['username', 'password', 'host', 'port'],
+        'required': ['host', 'port'],
+        'anyOf': [{'required': ['api_key']}, {'required': ['username', 'password']}],
     }
 
     @staticmethod
-    def client(host: str, port: int, username: str, password: str):
+    def client(
+        host: str,
+        port: int,
+        username: str | None = None,
+        password: str | None = None,
+        api_key: str | None = None,
+    ):
         """Import client or abort task."""
         try:
             import qbittorrentapi
         except ImportError:
             raise plugin.DependencyError(issued_by='from_qbittorrent', missing='qbittorrent-api')
 
-        return qbittorrentapi.Client(host=host, port=port, username=username, password=password)
+        return qbittorrentapi.Client(
+            host=host, port=port, username=username, password=password, api_key=api_key
+        )
 
     def on_task_input(self, task, config):
         client = self.client(
-            config['host'], int(config['port']), config['username'], config['password']
+            config['host'],
+            int(config['port']),
+            config.get('username'),
+            config.get('password'),
+            config.get('api_key'),
         )
 
         for torrent in client.torrents_info():
