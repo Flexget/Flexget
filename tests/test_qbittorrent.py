@@ -26,6 +26,10 @@ class TestQbittorrent:
           incomplete_path:
             qbittorrent:
               incomplete_path: /tmp
+          username_password:
+            qbittorrent:
+              username: admin
+              password: flexgettest
           api_key:
             qbittorrent:
               api_key: qbt_FlexGetTestKey0000000000000
@@ -60,15 +64,22 @@ class TestQbittorrent:
         task = execute_task('incomplete_path')
         assert task.accepted
 
+    def test_username_password(self, execute_task, use_vcr):
+        task = execute_task('username_password')
+        assert task.accepted
+        requests = use_vcr.requests if use_vcr else []
+        assert all('Authorization' not in r.headers for r in requests)
+        assert use_vcr is None or any(r.path.endswith('/auth/login') for r in requests)
+
     def test_api_key(self, execute_task, use_vcr):
         task = execute_task('api_key')
         assert task.accepted
-        if use_vcr:
-            assert all(
-                r.headers.get('Authorization') == 'Bearer qbt_FlexGetTestKey0000000000000'
-                for r in use_vcr.requests
-            )
-            assert not any(r.path.endswith('/auth/login') for r in use_vcr.requests)
+        requests = use_vcr.requests if use_vcr else []
+        assert all(
+            r.headers.get('Authorization') == 'Bearer qbt_FlexGetTestKey0000000000000'
+            for r in requests
+        )
+        assert not any(r.path.endswith('/auth/login') for r in requests)
 
     def test_wrong_api_key(self, execute_task):
         execute_task('wrong_api_key', abort=True)
