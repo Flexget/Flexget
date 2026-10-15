@@ -1,0 +1,48 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate, br, zstd
+      Authorization:
+      - Bearer qbt_WrongKey00000000000000000000
+      Connection:
+      - keep-alive
+      Cookie:
+      - SID=qMHzQLDzjqLDMyLTqNotALIST6OWKwdn
+      User-Agent:
+      - python-requests/2.34.2
+    method: GET
+    uri: http://localhost:8080/api/v2/app/webapiVersion
+  response:
+    body:
+      string: Forbidden
+    headers:
+      connection:
+      - keep-alive
+      content-length:
+      - '9'
+      content-security-policy:
+      - default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;
+        script-src 'self' 'unsafe-inline'; object-src 'none'; form-action 'self';
+        frame-src 'self' blob:; frame-ancestors 'self';
+      content-type:
+      - text/plain; charset=UTF-8
+      cross-origin-opener-policy:
+      - same-origin
+      date:
+      - Wed, 14 Oct 2026 12:12:05 GMT
+      referrer-policy:
+      - same-origin
+      x-content-type-options:
+      - nosniff
+      x-frame-options:
+      - SAMEORIGIN
+      x-xss-protection:
+      - 1; mode=block
+    status:
+      code: 403
+      message: Forbidden
+version: 1
