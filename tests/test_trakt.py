@@ -13,6 +13,7 @@ from flexget.components.trakt.db import (
     get_user_data,
 )
 from flexget.manager import Session
+from flexget.plugin import PluginError
 
 lookup_series = ApiTrakt.lookup_series
 
@@ -690,4 +691,56 @@ class TestTraktUserDataPagination:
         data = get_user_data('watched', 'shows', session, 'flexgettest')
 
         assert session.get.call_count == 2
+        assert [item['ids']['trakt'] for item in data] == [1]
+
+    def test_raises_on_non_list_response(self):
+        session = mock.Mock()
+        session.get.side_effect = [
+            self._response({'error': 'foobar'}, {'X-Pagination-Page-Count': '5'}),
+            # Any further page is a sign the loop did not stop as it should.
+            self._response([self._watched_show(1)], {'X-Pagination-Page-Count': '5'}),
+        ]
+
+        with pytest.raises(PluginError):
+            get_user_data('watched', 'shows', session, 'flexgettest')
+
+        assert session.get.call_count == 1
+
+    def test_non_list_response_returns_collected_data(self):
+        session = mock.Mock()
+        session.get.side_effect = [
+            self._response([self._watched_show(1)], {'X-Pagination-Page-Count': '5'}),
+            self._response({'error': 'foobar'}, {'X-Pagination-Page-Count': '5'}),
+            # Any further page is a sign the loop did not stop as it should.
+            self._response([self._watched_show(2)], {'X-Pagination-Page-Count': '5'}),
+        ]
+
+        data = get_user_data('watched', 'shows', session, 'flexgettest')
+
+        assert session.get.call_count == 2
+        assert [item['ids']['trakt'] for item in data] == [1]
+
+    def test_hard_page_limit_prevents_infinite_loop(self):
+        session = mock.Mock()
+        # Header always claims there are more pages, so only the hard backstop can stop the loop.
+        session.get.side_effect = lambda *args, **kwargs: self._response(
+            [self._watched_show(1)], {'X-Pagination-Page-Count': '999999'}
+        )
+
+        data = get_user_data('watched', 'shows', session, 'flexgettest')
+
+        assert session.get.call_count == 1000
+        assert len(data) == 1000
+
+    def test_stops_on_garbage_pagination_header(self):
+        session = mock.Mock()
+        session.get.side_effect = [
+            self._response([self._watched_show(1)], {'X-Pagination-Page-Count': 'not-a-number'}),
+            # Any further page is a sign the loop did not stop as it should.
+            self._response([self._watched_show(2)], {'X-Pagination-Page-Count': 'not-a-number'}),
+        ]
+
+        data = get_user_data('watched', 'shows', session, 'flexgettest')
+
+        assert session.get.call_count == 1
         assert [item['ids']['trakt'] for item in data] == [1]
