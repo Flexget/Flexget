@@ -49,6 +49,13 @@ __version__ = '>=7.0.3,<8.0.0'
 __package__ = 'transmission-rpc'
 __requirement__ = packaging.specifiers.SpecifierSet(__version__)
 
+# Read once at import: the installed metadata can disappear while the daemon keeps
+# running with the module already imported (e.g. after an in-place upgrade).
+try:
+    _installed_version = importlib.metadata.version(__package__)
+except importlib.metadata.PackageNotFoundError:
+    _installed_version = None
+
 
 class TransmissionBase:
     def prepare_config(self, config):
@@ -154,8 +161,7 @@ class TransmissionBase:
                 f'{__package__} module version {__version__} required.', logger
             )
 
-        v = importlib.metadata.version(__package__)
-        if not __requirement__.contains(v):
+        if _installed_version is not None and not __requirement__.contains(_installed_version):
             raise plugin.PluginError(
                 f'{__package__} module version mismatch, requiring {__package__}{__version__}',
                 logger,
