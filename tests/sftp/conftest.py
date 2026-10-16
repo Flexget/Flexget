@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from pathlib import Path
 
 if find_spec('paramiko'):
-    from tests.sftp.test_sftp_server import TestSFTPServerController
+    from tests.sftp.sftp_test_server import TestSFTPServerController
 
 
 @pytest.fixture
