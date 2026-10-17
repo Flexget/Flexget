@@ -16,6 +16,7 @@ from flexget.manager import Session
 from flexget.terminal import console
 from flexget.utils import requests
 from flexget.utils.database import json_synonym
+from flexget.utils.requests import TimedLimiter
 from flexget.utils.tools import split_title_year
 
 if TYPE_CHECKING:
@@ -198,6 +199,8 @@ def get_session(account=None, token=None):
         'trakt-api-version': '2',
         'trakt-api-key': CLIENT_ID,
     }
+    # Courtesy rate limit so we don't hammer the trakt API (e.g. when paginating user data)
+    session.add_domain_limiter(TimedLimiter('trakt.tv', '2 seconds'))
     if account:
         access_token = get_access_token(account, token) if account else None
         if access_token:
@@ -1103,11 +1106,56 @@ def get_user_data(data_type, media_type, session, username):
     :param media_type: Type of media we want <data_type> for eg. shows, episodes, movies.
     :param session: A trakt requests session with a valid token
     :param username: Username of the user to fetch data
-    :return:
+    :return: List of items from all result pages
     """
     endpoint = f'{data_type}/{media_type}'
+    url = get_api_url('users', username, data_type, media_type)
+    limit_per_page = 250
+    # Backstop so a missing or garbage pagination header can never make us loop forever.
+    max_pages = 1000
+    data = []
     try:
-        data = session.get(get_api_url('users', username, data_type, media_type)).json()
+        # trakt only returns the first page (100 items) when no pagination params are sent
+        page = 1
+        while page <= max_pages:
+            response = session.get(url, params={'limit': limit_per_page, 'page': page})
+            page_data = response.json()
+            if not page_data:
+                break
+            if not isinstance(page_data, list):
+                # A healthy response is a list of items. Anything else (e.g. an error
+                # object like {"error": ...}) means we cannot keep paginating.
+                if data:
+                    logger.warning(
+                        'Unexpected non-list response from trakt endpoint {} for user {} on '
+                        'page {}; returning the {} records collected so far.',
+                        endpoint,
+                        username,
+                        page,
+                        len(data),
+                    )
+                    break
+                raise plugin.PluginError(
+                    f'Unexpected response from trakt.tv endpoint {endpoint} for user '
+                    f'{username}: {page_data}'
+                )
+            data.extend(page_data)
+            try:
+                page_count = int(response.headers.get('X-Pagination-Page-Count', 1))
+            except (TypeError, ValueError):
+                # A missing or garbage header means we treat this as the last page.
+                break
+            if page >= page_count:
+                break
+            page += 1
+        else:
+            logger.warning(
+                'Reached the {} page limit while fetching trakt endpoint {} for user {}.',
+                max_pages,
+                endpoint,
+                username,
+            )
+
         if not data:
             logger.warning('No {} data returned from trakt endpoint {}.', data_type, endpoint)
             return []

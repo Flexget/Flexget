@@ -1,3 +1,5 @@
+from unittest import mock
+
 import pytest
 
 from flexget.components.trakt.api import ObjectsContainer as OC
@@ -7,8 +9,11 @@ from flexget.components.trakt.db import (
     TraktMovieSearchResult,
     TraktShow,
     TraktShowSearchResult,
+    get_api_url,
+    get_user_data,
 )
 from flexget.manager import Session
+from flexget.plugin import PluginError
 
 lookup_series = ApiTrakt.lookup_series
 
@@ -626,3 +631,116 @@ class TestTraktRatingsLookup:
         entry = task.entries[0]
 
         assert entry['trakt_movie_user_rating'] == 9, 'Wrong rating received for Doctor Strange'
+
+
+class TestTraktUserDataPagination:
+    @staticmethod
+    def _response(items, headers=None):
+        response = mock.Mock(headers=headers or {})
+        response.json.return_value = items
+        return response
+
+    @staticmethod
+    def _watched_show(trakt_id):
+        return {
+            'plays': 1,
+            'last_watched_at': '2026-01-01T00:00:00.000Z',
+            'show': {'title': f'Show {trakt_id}', 'ids': {'trakt': trakt_id}},
+        }
+
+    def test_fetches_all_pages(self):
+        session = mock.Mock()
+        session.get.side_effect = [
+            self._response(
+                [self._watched_show(1), self._watched_show(2)],
+                {'X-Pagination-Page': '1', 'X-Pagination-Page-Count': '2'},
+            ),
+            self._response(
+                [self._watched_show(3)],
+                {'X-Pagination-Page': '2', 'X-Pagination-Page-Count': '2'},
+            ),
+        ]
+
+        data = get_user_data('watched', 'shows', session, 'flexgettest')
+
+        url = get_api_url('users', 'flexgettest', 'watched', 'shows')
+        assert session.get.call_args_list == [
+            mock.call(url, params={'limit': 250, 'page': 1}),
+            mock.call(url, params={'limit': 250, 'page': 2}),
+        ]
+        assert [item['ids']['trakt'] for item in data] == [1, 2, 3]
+        assert all('show' not in item for item in data)
+        assert data[2]['title'] == 'Show 3'
+
+    def test_stops_without_pagination_headers(self):
+        session = mock.Mock()
+        session.get.return_value = self._response([self._watched_show(1)])
+
+        data = get_user_data('watched', 'shows', session, 'flexgettest')
+
+        assert session.get.call_count == 1
+        assert [item['ids']['trakt'] for item in data] == [1]
+
+    def test_stops_on_empty_page(self):
+        session = mock.Mock()
+        session.get.side_effect = [
+            self._response([self._watched_show(1)], {'X-Pagination-Page-Count': '3'}),
+            self._response([], {'X-Pagination-Page-Count': '3'}),
+        ]
+
+        data = get_user_data('watched', 'shows', session, 'flexgettest')
+
+        assert session.get.call_count == 2
+        assert [item['ids']['trakt'] for item in data] == [1]
+
+    def test_raises_on_non_list_response(self):
+        session = mock.Mock()
+        session.get.side_effect = [
+            self._response({'error': 'foobar'}, {'X-Pagination-Page-Count': '5'}),
+            # Any further page is a sign the loop did not stop as it should.
+            self._response([self._watched_show(1)], {'X-Pagination-Page-Count': '5'}),
+        ]
+
+        with pytest.raises(PluginError):
+            get_user_data('watched', 'shows', session, 'flexgettest')
+
+        assert session.get.call_count == 1
+
+    def test_non_list_response_returns_collected_data(self):
+        session = mock.Mock()
+        session.get.side_effect = [
+            self._response([self._watched_show(1)], {'X-Pagination-Page-Count': '5'}),
+            self._response({'error': 'foobar'}, {'X-Pagination-Page-Count': '5'}),
+            # Any further page is a sign the loop did not stop as it should.
+            self._response([self._watched_show(2)], {'X-Pagination-Page-Count': '5'}),
+        ]
+
+        data = get_user_data('watched', 'shows', session, 'flexgettest')
+
+        assert session.get.call_count == 2
+        assert [item['ids']['trakt'] for item in data] == [1]
+
+    def test_hard_page_limit_prevents_infinite_loop(self):
+        session = mock.Mock()
+        # Header always claims there are more pages, so only the hard backstop can stop the loop.
+        session.get.side_effect = lambda *args, **kwargs: self._response(
+            [self._watched_show(1)], {'X-Pagination-Page-Count': '999999'}
+        )
+
+        data = get_user_data('watched', 'shows', session, 'flexgettest')
+
+        assert session.get.call_count == 1000
+        assert len(data) == 1000
+
+    def test_stops_on_garbage_pagination_header(self):
+        session = mock.Mock()
+        session.get.side_effect = [
+            self._response([self._watched_show(1)], {'X-Pagination-Page-Count': 'not-a-number'}),
+            # Any further page is a sign the loop did not stop as it should.
+            self._response([self._watched_show(2)], {'X-Pagination-Page-Count': 'not-a-number'}),
+        ]
+
+        data = get_user_data('watched', 'shows', session, 'flexgettest')
+
+        assert session.get.call_count == 1
+        assert [item['ids']['trakt'] for item in data] == [1]
