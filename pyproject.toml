@@ -63,7 +63,7 @@ dependencies = [
   "requests~=2.32",
   "rich~=15.0",
   "rpyc~=6.0",
-  "sqlalchemy~=2.0",
+  "sqlalchemy~=2.1",
   "typing-extensions>=4.16; python_version<='3.12'",
   "werkzeug~=3.1",
   "zxcvbn~=4.4",
@@ -226,10 +226,15 @@ lint.per-file-ignores."docs/scripts/*" = [ "T20" ]
 lint.per-file-ignores."flexget/*" = [ "PTH" ]  # TODO
 lint.per-file-ignores."scripts/*" = [ "T20" ]
 lint.per-file-ignores."tests/*" = [ "T20" ]
-lint.flake8-type-checking.quote-annotations = true
+lint.flake8-type-checking.quote-annotations = true  # Remove when Python 3.13 support is dropped
 lint.isort.known-first-party = [ "flexget" ]
-lint.future-annotations = true
-per-file-target-version."scripts/cleanup_cassettes.py" = "py312"
+lint.pep8-naming.classmethod-decorators = [
+  "comparator",    # SQLAlchemy's `@field.comparator`
+  "declared_attr", # @sqlalchemy.orm.declared_attr
+  "expression",    # SQLAlchemy's `@field.expression`
+]
+lint.future-annotations = true  # Remove when Python 3.13 support is dropped
+per-file-target-version."scripts/cleanup_cassettes.py" = "py312"  # Remove when Python 3.11 support is dropped
 
 [tool.codespell]
 skip = [
