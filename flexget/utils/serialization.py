@@ -1,4 +1,4 @@
-import datetime
+import datetime as dt
 from abc import ABC, abstractmethod
 from typing import Any
 
@@ -128,10 +128,10 @@ class Serializer(ABC):
 class DateTimeSerializer(Serializer):
     @classmethod
     def serializer_handles(cls, value):
-        return isinstance(value, datetime.datetime)
+        return isinstance(value, dt.datetime)
 
     @classmethod
-    def serialize(cls, value: datetime.datetime):
+    def serialize(cls, value: dt.datetime):
         result = value.strftime(DATETIME_FMT)
         # See note above
         year, rest = result.split('-', maxsplit=1)
@@ -140,21 +140,21 @@ class DateTimeSerializer(Serializer):
         return result
 
     @classmethod
-    def deserialize(cls, data: str, version: int) -> datetime.datetime:
+    def deserialize(cls, data: str, version: int) -> dt.datetime:
         try:
-            return datetime.datetime.strptime(data, DATETIME_FMT)
+            return dt.datetime.strptime(data, DATETIME_FMT)
         except ValueError:
             logger.error('Error deserializing datetime `{}`', data)
-            return datetime.datetime.min
+            return dt.datetime.min
 
 
 class DateSerializer(Serializer):
     @classmethod
     def serializer_handles(cls, value):
-        return isinstance(value, datetime.date) and not isinstance(value, datetime.datetime)
+        return isinstance(value, dt.date) and not isinstance(value, dt.datetime)
 
     @classmethod
-    def serialize(cls, value: datetime.date):
+    def serialize(cls, value: dt.date):
         result = value.strftime(DATE_FMT)
         # See note above
         year, rest = result.split('-', maxsplit=1)
@@ -163,12 +163,12 @@ class DateSerializer(Serializer):
         return result
 
     @classmethod
-    def deserialize(cls, data: str, version: int) -> datetime.date:
+    def deserialize(cls, data: str, version: int) -> dt.date:
         try:
-            return datetime.datetime.strptime(data, DATE_FMT).date()
+            return dt.datetime.strptime(data, DATE_FMT).date()
         except ValueError:
             logger.error('Error deserializing date `{}`', data)
-            return datetime.date.min
+            return dt.date.min
 
 
 class SetSerializer(Serializer):

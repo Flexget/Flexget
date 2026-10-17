@@ -1,4 +1,4 @@
-import datetime
+import datetime as dt
 
 from loguru import logger
 from requests import RequestException
@@ -89,18 +89,18 @@ class TraktCalendar:
 
     @cached('trakt_calendar', persist='2 hours')
     def on_task_input(self, task, config):
-        start_date = datetime.datetime.now().date() + datetime.timedelta(days=config['start_day'])
+        start_date = dt.datetime.now().date() + dt.timedelta(days=config['start_day'])
         entries = set()
 
         # The API limit is max_number_of_days days for a single call.
         for start_day in range(0, config['days'], max_number_of_days):
-            current_start_date = start_date + datetime.timedelta(days=start_day)
+            current_start_date = start_date + dt.timedelta(days=start_day)
             number_of_days = min(config['days'] - start_day, max_number_of_days)
 
             logger.debug(
                 'Start date for calendar: {}, end date: {}',
                 current_start_date,
-                current_start_date + datetime.timedelta(days=number_of_days),
+                current_start_date + dt.timedelta(days=number_of_days),
             )
 
             url = db.get_api_url(
