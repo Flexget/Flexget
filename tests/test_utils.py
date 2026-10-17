@@ -1,8 +1,10 @@
 from datetime import datetime
 
 import pytest
+from urllib3.util.retry import Retry
 
 from flexget.utils import json
+from flexget.utils.requests import Session
 from flexget.utils.tools import merge_dict_from_to, parse_filesize, split_title_year
 
 
@@ -131,3 +133,10 @@ class TestDictMerge:
         d2 = {'setting': 'string_2'}
         merge_dict_from_to(d1, d2)
         assert d2 == {'setting': 'string_2'}
+
+
+class TestRequestsSession:
+    @pytest.mark.parametrize('url', ['http://example.com', 'https://example.com'])
+    def test_max_retries_applies_to_every_scheme(self, url):
+        session = Session(max_retries=3)
+        assert Retry.from_int(session.get_adapter(url).max_retries).total == 3

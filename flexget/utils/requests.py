@@ -207,7 +207,9 @@ class Session(requests.Session):
         """Set some defaults for our session if not explicitly defined."""
         super().__init__()
         self.timeout = timeout
-        self.adapters['http://'].max_retries = max_retries
+        # requests mounts separate adapters for http:// and https://
+        for adapter in self.adapters.values():
+            adapter.max_retries = max_retries
         # Stores min intervals between requests for certain sites
         self.domain_limiters: dict[str, DomainLimiter] = {}
         self.headers.update({'User-Agent': f'FlexGet/{version} (www.flexget.com)'})
