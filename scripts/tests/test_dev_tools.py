@@ -53,7 +53,6 @@ class TestDevTools:
         'args', [[], ['--version', 'v2'], ['--version', 'v1'], ['--version', '']]
     )
     def test_cli_bundle_webui(self, args, online):
-        os.environ['BUNDLE_WEBUI'] = 'true'
         v1_path = Path(__file__).parents[2] / 'flexget' / 'ui' / 'v1' / 'app'
         v2_path = Path(__file__).parents[2] / 'flexget' / 'ui' / 'v2' / 'dist'
         shutil.rmtree(v1_path, ignore_errors=True)
