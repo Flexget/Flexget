@@ -86,7 +86,7 @@ dev = [
   "vcrpy~=8.1",
 ]
 test = [
-  "pillow~=12.1",
+  "pillow~=13.0",
   "pytest-localftpserver>=1.6",
   { include-group = "all" },
 ]
