@@ -1,5 +1,6 @@
 import os
 import xml.etree.ElementTree as ET
+from pathlib import Path
 
 from loguru import logger
 
@@ -118,7 +119,7 @@ class NfoLookup:
             The file name of the 'nfo' file, or None it there is no 'nfo' file.
 
         """
-        location = entry.get('location')
+        location = Path(entry.get('location'))
         nfo_full_filename = str(location.parent / location.stem) + self.nfo_file_extension
 
         if os.path.isfile(nfo_full_filename):

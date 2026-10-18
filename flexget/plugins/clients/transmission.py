@@ -228,7 +228,7 @@ class PluginTransmissionInput(TransmissionBase):
             )
             # Location of torrent is only valid if transmission is on same machine as flexget
             if config['host'] in ('localhost', '127.0.0.1'):
-                entry['location'] = Path(torrent.torrent_file)
+                entry['location'] = torrent.torrent_file
                 entry['url'] = Path(torrent.torrent_file).as_uri()
             for attr, field in {
                 'id': 'id',

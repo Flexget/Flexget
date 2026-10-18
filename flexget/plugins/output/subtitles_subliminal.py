@@ -3,6 +3,7 @@ import contextlib
 import logging
 import os
 import tempfile
+from pathlib import Path
 
 from loguru import logger
 
@@ -168,7 +169,7 @@ class PluginSubliminal:
                 if 'location' not in entry:
                     logger.warning('Cannot act on entries that do not represent a local file.')
                     continue
-                if not entry['location'].exists():
+                if not Path(entry['location']).exists():
                     entry.fail('file not found: {}'.format(entry['location']))
                     continue
                 if '$RECYCLE.BIN' in str(
@@ -179,9 +180,9 @@ class PluginSubliminal:
                 try:
                     entry_languages = set(entry.get('subtitle_languages', [])) or languages
 
-                    if entry['location'].suffix in VIDEO_EXTENSIONS:
+                    if Path(entry['location']).suffix in VIDEO_EXTENSIONS:
                         video = scan_video(entry['location'])
-                    elif entry['location'].suffix in ARCHIVE_EXTENSIONS:
+                    elif Path(entry['location']).suffix in ARCHIVE_EXTENSIONS:
                         video = scan_archive(entry['location'])
                     else:
                         entry.reject(

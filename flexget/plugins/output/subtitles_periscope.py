@@ -1,6 +1,7 @@
 import logging
 import os
 import tempfile
+from pathlib import Path
 
 from loguru import logger
 
@@ -83,7 +84,7 @@ class PluginPeriscope:
         for entry in task.accepted:
             if 'location' not in entry:
                 logger.warning('Cannot act on entries that do not represent a local file.')
-            elif not entry['location'].exists():
+            elif not Path(entry['location']).exists():
                 entry.fail('file not found: {}'.format(entry['location']))
             elif '$RECYCLE.BIN' in str(entry['location']):
                 continue  # ignore deleted files in Windows shares

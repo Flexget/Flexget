@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from itertools import groupby
+from pathlib import Path
 from typing import TYPE_CHECKING, NamedTuple
 from urllib.parse import unquote, urlparse
 
@@ -13,8 +14,6 @@ from flexget.event import event
 from flexget.utils.template import RenderError, render_from_entry
 
 if TYPE_CHECKING:
-    from pathlib import Path
-
     from flexget.entry import Entry
     from flexget.task import Task
 
@@ -346,7 +345,7 @@ class SftpUpload:
     @classmethod
     def handle_entry(cls, entry: Entry, sftp: SftpClient, config: dict):
         to: str = config['to']
-        location: Path = entry['location']
+        location: Path = Path(entry['location'])
         delete_origin: bool = config['delete_origin']
 
         if to:
