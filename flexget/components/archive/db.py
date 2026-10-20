@@ -61,7 +61,7 @@ class ArchiveEntry(Base):
             self.title,
             self.url,
             self.task,
-            self.added.strftime('%Y-%m-%d %H:%M'),
+            self.added.strftime('%Y-%m-%d %H:%M') if self.added else None,
         )
 
 
