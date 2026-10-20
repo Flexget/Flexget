@@ -1,5 +1,4 @@
 import sys
-from pathlib import Path
 
 
 class TestExec:
@@ -69,13 +68,13 @@ class TestExec:
         for entry in task.accepted:
             with (tmp_path / entry['title']).open('r') as infile:
                 line = infile.readline().rstrip('\n')
-                assert Path(line) == Path('/path/with spaces'), f'{line} != /path/with spaces'
+                assert line == '/path/with spaces', f'{line} != /path/with spaces'
                 line = infile.readline().rstrip('\n')
                 assert line == '/the/final destination/', f'{line} != /the/final destination/'
                 line = infile.readline().rstrip('\n')
                 assert line == "a with'quote", f"{line} != a with'quote"
                 line = infile.readline().rstrip('\n')
-                assert Path(line) == Path('/a hybrid/path/with spaces'), (
+                assert line == '/a hybrid/path/with spaces', (
                     f'{line} != /a hybrid/path/with spaces'
                 )
 

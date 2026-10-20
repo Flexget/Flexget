@@ -1,4 +1,5 @@
 import re
+from pathlib import Path
 
 from loguru import logger
 
@@ -44,12 +45,12 @@ class MetainfoContentSize:
             # If this entry has a local file, (it was added by filesystem plugin) grab the size.
             if entry.get('location'):
                 # If it is a .torrent or .nzb, don't bother getting the size as it will not be the content's size
-                location = entry['location']
+                location = Path(entry['location'])
                 if location.suffix in ('.nzb', '.torrent'):
                     continue
                 try:
                     if location.is_file():
-                        amount = entry['location'].stat().st_size
+                        amount = location.stat().st_size
                         logger.trace('setting content size to {}', format_filesize(amount))
                         entry['content_size'] = amount
                         continue

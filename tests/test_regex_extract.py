@@ -26,7 +26,7 @@ class TestRegexExtract:
             regex_extract:
               field: title
               regex:
-                - The\.Event\.(?P<loc>.*)
+                - The\.Event\.(?P<location>.*)
 
           test_4:
             mock:
@@ -56,8 +56,8 @@ class TestRegexExtract:
         task = execute_task('test_3')
         entry = task.find_entry('entries', title='The.Event.New.York')
         assert entry is not None
-        assert 'loc' in entry
-        assert entry['loc'] == 'New.York'
+        assert 'location' in entry
+        assert entry['location'] == 'New.York'
 
     def test_multi_group(self, execute_task):
         task = execute_task('test_4')

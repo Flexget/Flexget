@@ -79,9 +79,8 @@ def makepath(path: Path) -> None:
 class Archive:
     """Base archive class. Assumes an interface similar to zipfile.ZipFile or rarfile.RarFile."""
 
-    def __init__(self, archive_object, path):
-        self.path = path
-
+    def __init__(self, archive_object, path: str | Path):
+        self.path = Path(path)
         self.archive = archive_object(self.path)
 
     def close(self):
@@ -89,20 +88,14 @@ class Archive:
         self.archive.close()
 
     def delete(self):
-        """Delete the volumes that make up this archive."""
-        volumes = self.volumes()
+        """Delete the archive."""
         self.close()
 
         try:
-            for volume in volumes:
-                Path(volume).unlink()
-                logger.verbose('Deleted archive: {}', volume)
+            self.path.unlink()
+            logger.verbose('Deleted archive: {}', self.path)
         except OSError as error:
             raise FSError(error)
-
-    def volumes(self):
-        """Return the list of volumes that comprise this archive."""
-        return [self.path]
 
     def infolist(self):
         """Return a list of info objects describing the contents of this archive."""
@@ -217,11 +210,11 @@ class ArchiveInfo:
             raise
 
 
-def open_archive(archive_path):
+def open_archive(archive_path: str | Path):
     """Return the appropriate archive object."""
     archive = None
 
-    if not archive_path.exists():
+    if not Path(archive_path).exists():
         raise PathError("Path doesn't exist")
 
     if zipfile.is_zipfile(archive_path):
@@ -236,9 +229,10 @@ def open_archive(archive_path):
     return archive
 
 
-def is_archive(path):
+def is_archive(path: str | Path | None) -> bool:
     """Attempt to open an entry as an archive; return True on success, False on failure."""
-    archive = None
+    if not path:
+        return False
 
     try:
         archive = open_archive(path)

@@ -11,8 +11,8 @@ logger = logger.bind(name='torrent_match')
 
 
 class TorrentMatchFile:
-    def __init__(self, path, size):
-        self.path = path
+    def __init__(self, path: str | Path, size: int):
+        self.path = Path(path)
         self.size = size
 
     def __repr__(self):
@@ -46,6 +46,7 @@ class TorrentMatch:
         result = []
         for entry in entries:
             location = entry.get('location')
+            location = None if location is None else Path(location)
             if not location or not location.exists():
                 logger.warning('{} is not a local file. Skipping.', entry['title'])
                 entry.reject('not a local file')
@@ -134,7 +135,7 @@ class TorrentMatch:
                         ):
                             # if the filename with ext is contained in 'location', we must grab its parent as path
                             if torrent_file.path.name in str(local_entry['location']):
-                                entry['path'] = local_entry['location'].parent
+                                entry['path'] = Path(local_entry['location']).parent
                             else:
                                 entry['path'] = local_entry['location']
                             logger.debug('Path for {} set to {}', entry['title'], entry['path'])
@@ -147,13 +148,13 @@ class TorrentMatch:
                     path = ''
 
                     candidate_files = []
-                    # Find candidate files ie. files whose path contains the torrent name
+                    # Find candidate files i.e. files whose path contains the torrent name
                     for local_file in local_files:
                         if entry['torrent'].name in str(local_file.path):
                             # we need to find the path that contains the torrent name since it's multi-file
                             if not path:
                                 # attempt to extract path from the absolute file path
-                                path = local_file.path
+                                path = str(local_file.path)
 
                                 while entry['torrent'].name in path:
                                     path = os.path.dirname(path)
@@ -165,7 +166,7 @@ class TorrentMatch:
                     for torrent_file in torrent_files:
                         for candidate in candidate_files:
                             if (
-                                str(torrent_file.path) in candidate.path
+                                str(torrent_file.path) in str(candidate.path)
                                 and torrent_file.size == candidate.size
                             ):
                                 logger.debug(
