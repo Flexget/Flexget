@@ -1441,7 +1441,7 @@ all = [
     { name = "python-telegram-bot", extras = ["http2", "socks"], specifier = "~=22.0" },
     { name = "qbittorrent-api", specifier = "~=2026.8" },
     { name = "rarfile", specifier = "~=4.0" },
-    { name = "subliminal", specifier = "~=2.7.1" },
+    { name = "subliminal", specifier = "~=2.8.0" },
     { name = "transmission-rpc", specifier = "~=7.0" },
 ]
 boto3 = [{ name = "boto3", specifier = "~=1.35" }]
@@ -1472,7 +1472,7 @@ sftp = [
     { name = "paramiko", specifier = "~=3.5" },
     { name = "pysftp", specifier = "~=0.2.9" },
 ]
-subliminal = [{ name = "subliminal", specifier = "~=2.7.1" }]
+subliminal = [{ name = "subliminal", specifier = "~=2.8.0" }]
 telegram = [{ name = "python-telegram-bot", extras = ["http2", "socks"], specifier = "~=22.0" }]
 test = [
     { name = "boto3", specifier = "~=1.35" },
@@ -1488,7 +1488,7 @@ test = [
     { name = "python-telegram-bot", extras = ["http2", "socks"], specifier = "~=22.0" },
     { name = "qbittorrent-api", specifier = "~=2026.8" },
     { name = "rarfile", specifier = "~=4.0" },
-    { name = "subliminal", specifier = "~=2.7.1" },
+    { name = "subliminal", specifier = "~=2.8.0" },
     { name = "transmission-rpc", specifier = "~=7.0" },
 ]
 transmission = [{ name = "transmission-rpc", specifier = "~=7.0" }]
@@ -3539,7 +3539,7 @@ wheels = [
 
 [[package]]
 name = "subliminal"
-version = "2.7.1"
+version = "2.8.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "babelfish" },
@@ -3558,10 +3558,11 @@ dependencies = [
     { name = "srt" },
     { name = "stevedore" },
     { name = "tomlkit" },
+    { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/9f/08/f602bac8c35f04021e6dfcd0bebea917cd2b57116229a74a0b97e63c72ab/subliminal-2.7.1.tar.gz", hash = "sha256:f2649914d3067904effa2b4ce8d83aae994cd47008253311d5ae7949f467939f", size = 4017704, upload-time = "2026-07-23T00:02:19.013Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/e7/3d/ff49ee5bffbac38dc4d4a154d11115e854859c0d65315594090a8275e1ed/subliminal-2.8.0.tar.gz", hash = "sha256:0d784e621d0fa7d173f75798427b3572d4ab071a90bc0b9a8a88f1925670f691", size = 4030249, upload-time = "2026-10-13T22:42:03.265Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/5f/63/a47a01fc3387963c28507050f7d8212a6c00fa49fcb5f5a96f6877441460/subliminal-2.7.1-py3-none-any.whl", hash = "sha256:a52db51fde5fbe3f7d3afa6c939bd4337a1ede610c701ee1d89a6f7a066ecd80", size = 123188, upload-time = "2026-07-23T00:02:17.606Z" },
+    { url = "https://files.pythonhosted.org/packages/4f/d6/ffc717aee49e2d9485b6fb50caa3c1c5ddf2a146215561ed607aff04fba9/subliminal-2.8.0-py3-none-any.whl", hash = "sha256:b26d22796ab426c3ef97ff0f37b57f9413adbd17bea92351252b82d0f87b5143", size = 125504, upload-time = "2026-10-13T22:42:01.504Z" },
 ]
 
 [[package]]
