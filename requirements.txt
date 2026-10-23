@@ -14,17 +14,17 @@ babelfish==0.6.1
     # via guessit
 backports-tarfile==1.2.0 ; python_full_version < '3.12'
     # via jaraco-context
-backports-zstd==1.7.0 ; python_full_version < '3.14'
+backports-zstd==1.8.0 ; python_full_version < '3.14'
     # via flask-compress
 beautifulsoup4==4.15.0
     # via flexget
 blinker==1.9.0
     # via flask
-brotli==1.2.0 ; platform_python_implementation != 'PyPy'
+brotli==1.2.1 ; platform_python_implementation != 'PyPy'
     # via flask-compress
-brotlicffi==1.2.0.2 ; platform_python_implementation == 'PyPy'
+brotlicffi==1.2.1.0 ; platform_python_implementation == 'PyPy'
     # via flask-compress
-certifi==2026.7.22
+certifi==2026.10.23
     # via
     #   curl-cffi
     #   requests
@@ -33,7 +33,7 @@ cffi==2.1.1
     #   brotlicffi
     #   cryptography
     #   curl-cffi
-charset-normalizer==3.5.1
+charset-normalizer==3.5.2
     # via requests
 cheroot==11.1.2
     # via cherrypy
@@ -45,7 +45,7 @@ colorama==0.4.6 ; sys_platform == 'win32'
     # via
     #   loguru
     #   typer
-cryptography==50.0.1
+cryptography==50.0.2
     # via flexget
 curl-cffi==0.16.3 ; platform_system in 'Linux Darwin Windows'
     # via flexget
@@ -109,14 +109,14 @@ loguru==0.7.3
     # via flexget
 markdown-it-py==4.2.0
     # via rich
-markupsafe==3.0.3
+markupsafe==3.0.4
     # via
     #   flask
     #   jinja2
     #   werkzeug
 mdurl==0.1.2
     # via markdown-it-py
-more-itertools==11.1.0
+more-itertools==11.2.1
     # via
     #   cheroot
     #   cherrypy
@@ -124,7 +124,7 @@ more-itertools==11.1.0
     #   jaraco-text
 packaging==26.3
     # via flexget
-pendulum==3.2.0
+pendulum==3.3.0
     # via flexget
 plumbum==2.0.2
     # via rpyc
@@ -132,7 +132,7 @@ portend==3.2.1
     # via cherrypy
 psutil==7.2.2
     # via flexget
-pycparser==3.0 ; implementation_name != 'PyPy'
+pycparser==3.12 ; implementation_name != 'PyPy'
     # via cffi
 pygments==2.21.0
     # via rich
@@ -165,13 +165,13 @@ rich==15.0.0
     # via
     #   flexget
     #   typer
-rpds-py==2026.6.3
+rpds-py==2026.9.1
     # via
     #   jsonschema
     #   referencing
 rpyc==6.0.2
     # via flexget
-setuptools==84.0.0
+setuptools==84.2.1
     # via
     #   pynzb
     #   zc-lockfile
@@ -181,13 +181,15 @@ six==1.17.0
     # via
     #   html5lib
     #   python-dateutil
-soupsieve==2.9.2
+soupsieve==2.10 ; python_full_version < '3.11.5'
     # via beautifulsoup4
-sqlalchemy==2.0.54
+soupsieve==3.0.4 ; python_full_version >= '3.11.5'
+    # via beautifulsoup4
+sqlalchemy==2.0.55
     # via flexget
-tempora==5.12.0
+tempora==5.13.0
     # via portend
-typer==0.27.2
+typer==0.27.3
     # via typer-slim
 typer-slim==0.24.0
     # via jaraco-text
@@ -199,11 +201,11 @@ typing-extensions==4.16.0
     #   referencing
     #   sqlalchemy
     #   tempora
-tzdata==2026.4
+tzdata==2026.5
     # via
     #   pendulum
     #   tzlocal
-tzlocal==5.4.4
+tzlocal==5.4.5
     # via apscheduler
 urllib3==2.8.0
     # via requests
