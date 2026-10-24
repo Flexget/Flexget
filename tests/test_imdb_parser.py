@@ -44,6 +44,7 @@ class TestImdbParser:
             == 4
         ), 'Languages not parsed correctly'
         assert parser.mpaa_rating == 'R', 'Rating not parsed correctly'
+        assert parser.countries == ['united states', 'germany'], 'Countries not parsed correctly'
         assert parser.name == 'The Usual Suspects', 'Name not parsed correctly'
         assert parser.photo, 'Photo not parsed correctly'
         assert parser.plot_outline == (

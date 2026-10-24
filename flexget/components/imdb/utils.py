@@ -51,6 +51,7 @@ query ImdbTitle($id: ID!) {
     plot { plotText { plainText } }
     titleGenres { genres { genre { text } } }
     spokenLanguages { spokenLanguages { text } }
+    countriesOfOrigin { countries { text } }
     keywords(first: 50) {
       edges { node { keyword { text { text } } } }
     }
@@ -256,6 +257,7 @@ class ImdbParser:
     def __init__(self):
         self.genres = []
         self.languages = []
+        self.countries = []
         self.actors = {}
         self.directors = {}
         self.writers = {}
@@ -410,6 +412,9 @@ class ImdbParser:
             t = row.get('text')
             if t:
                 self.languages.append(t.lower())
+
+        co = (title.get('countriesOfOrigin') or {}).get('countries') or []
+        self.countries = [row['text'].lower() for row in co if row.get('text')]
 
         kw_edges = ((title.get('keywords') or {}).get('edges')) or []
         self.plot_keywords = []
@@ -579,6 +584,14 @@ class ImdbParser:
 
         for language in (main_column_data.get('spokenLanguages') or {}).get('spokenLanguages', []):
             self.languages.append(language['text'].lower())
+        # Page JSON only carries ISO codes for countries; the rendered details list has the names.
+        origin = soup.find('li', {'data-testid': 'title-details-origin'})
+        self.countries = (
+            [a.get_text(strip=True).lower() for a in origin.find_all('a')] if origin else []
+        )
+        if not self.countries:
+            countries = (above_the_fold_data.get('countriesOfOrigin') or {}).get('countries') or []
+            self.countries = [c['id'].lower() for c in countries if c.get('id')]
 
         # Storyline section
         # NOTE: We cannot use the get default approach here .(get(x, {}))
