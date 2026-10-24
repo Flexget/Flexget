@@ -1,4 +1,4 @@
-import datetime
+import datetime as dt
 
 import pytest
 
@@ -20,11 +20,11 @@ class TestSerialization:
             'dictfield': {'a': 1, 'b': 2},
             'intfield': 5,
             'floatfield': 5.5,
-            'datefield': datetime.date(1999, 9, 9),
-            'datetimefield': datetime.datetime(1999, 9, 9, 9, 9),
+            'datefield': dt.date(1999, 9, 9),
+            'datetimefield': dt.datetime(1999, 9, 9, 9, 9),
             'qualityfield': qualities.Quality('720p hdtv'),
             'nestedlist': [qualities.Quality('1080p')],
-            'nesteddict': {'a': datetime.date(1999, 9, 9)},
+            'nesteddict': {'a': dt.date(1999, 9, 9)},
         })
         entry1.add_lazy_fields('lazy function', ['lazyfield'])
         assert entry1.is_lazy('lazyfield')
@@ -41,8 +41,8 @@ class TestSerialization:
         value = {
             'a': 'aoeu',
             'b': [1, 2, 3.5],
-            'c': (1, datetime.datetime(2019, 12, 12, 12, 12)),
-            'd': {'a', 1, datetime.date(2019, 11, 11)},
+            'c': (1, dt.datetime(2019, 12, 12, 12, 12)),
+            'd': {'a', 1, dt.date(2019, 11, 11)},
         }
         out = serialization.dumps(value)
         backin = serialization.loads(out)

@@ -1,4 +1,4 @@
-import datetime
+import datetime as dt
 
 from loguru import logger
 from requests.exceptions import RequestException
@@ -113,7 +113,7 @@ class PushoverNotifier:
                     if e.response.status_code == 429:
                         app_reset = e.response.headers.get('X-Limit-App-Reset')
                         if app_reset:
-                            reset_time = datetime.datetime.fromtimestamp(int(app_reset)).strftime(
+                            reset_time = dt.datetime.fromtimestamp(int(app_reset)).strftime(
                                 '%Y-%m-%d %H:%M:%S'
                             )
                             error_message = (
@@ -126,7 +126,7 @@ class PushoverNotifier:
                     error_message = str(e)
                 raise PluginWarning(error_message)
 
-            reset_time = datetime.datetime.fromtimestamp(
+            reset_time = dt.datetime.fromtimestamp(
                 int(response.headers['X-Limit-App-Reset'])
             ).strftime('%Y-%m-%d %H:%M:%S')
             remaining = response.headers['X-Limit-App-Remaining']
