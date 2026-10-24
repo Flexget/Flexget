@@ -345,7 +345,7 @@ interactions:
       trakt-api-version:
       - '2'
     method: GET
-    uri: https://api.trakt.tv/users/flexgettest/ratings/seasons
+    uri: https://api.trakt.tv/users/flexgettest/ratings/seasons?limit=250&page=1
   response:
     body:
       string: '[{"rated_at":"2017-04-23T19:35:14.000Z","rating":10,"type":"season","season":{"number":1,"ids":{"trakt":83179,"tvdb":582849,"tmdb":69635,"tvrage":null}},"show":{"title":"The

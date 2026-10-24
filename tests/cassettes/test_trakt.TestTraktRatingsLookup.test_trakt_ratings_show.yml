@@ -215,7 +215,7 @@ interactions:
       trakt-api-version:
       - '2'
     method: GET
-    uri: https://api.trakt.tv/users/flexgettest/ratings/shows
+    uri: https://api.trakt.tv/users/flexgettest/ratings/shows?limit=250&page=1
   response:
     body:
       string: '[{"rated_at":"2017-04-23T19:37:10.000Z","rating":1,"type":"show","show":{"title":"Time

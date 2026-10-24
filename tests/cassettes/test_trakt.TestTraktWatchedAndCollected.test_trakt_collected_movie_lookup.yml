@@ -385,7 +385,7 @@ interactions:
       trakt-api-version:
       - '2'
     method: GET
-    uri: https://api.trakt.tv/users/flexgettest/collection/movies
+    uri: https://api.trakt.tv/users/flexgettest/collection/movies?limit=250&page=1
   response:
     body:
       string: '[{"collected_at":"2015-06-19T00:00:00.000Z","updated_at":"2015-11-08T18:54:44.000Z","movie":{"title":"Inside
