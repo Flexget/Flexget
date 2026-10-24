@@ -58,13 +58,15 @@ Base = db_schema.versioned_base('series', SCHEMA_VER)
 
 
 class NormalizedComparator(Comparator):
-    def operate(self, op, other):
-        if isinstance(other, list):
-            other = [normalize_series_name(o) for o in other]
-        else:
-            other = normalize_series_name(other)
-
-        return op(self.__clause_element__(), other)
+    def operate(self, op, *other, **kwargs):
+        # Unary operators such as desc() pass no operand.
+        other = [
+            [normalize_series_name(o) for o in arg]
+            if isinstance(arg, list)
+            else normalize_series_name(arg)
+            for arg in other
+        ]
+        return op(self.__clause_element__(), *other, **kwargs)
 
 
 class Series(Base):

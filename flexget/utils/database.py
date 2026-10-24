@@ -129,10 +129,9 @@ class CaseInsensitiveWord(Comparator):
             return self.word.lower()
         return func.lower(self.word)
 
-    def operate(self, op, other):
-        if not isinstance(other, CaseInsensitiveWord):
-            other = CaseInsensitiveWord(other)
-        return op(self.lower(), other.lower())
+    def operate(self, op, *other, **kwargs):
+        other = [CaseInsensitiveWord(o).lower() for o in other]
+        return op(self.lower(), *other, **kwargs)
 
     def __clause_element__(self) -> str:
         return self.lower()
@@ -159,10 +158,9 @@ def quality_property(text_attr):
             setattr(self, text_attr, value.name)
 
     class QualComparator(Comparator):
-        def operate(self, op, other):
-            if isinstance(other, qualities.Quality):
-                other = other.name
-            return op(self.__clause_element__(), other)
+        def operate(self, op, *other, **kwargs):
+            other = [o.name if isinstance(o, qualities.Quality) else o for o in other]
+            return op(self.__clause_element__(), *other, **kwargs)
 
     def comparator(self):
         return QualComparator(getattr(self, text_attr))
