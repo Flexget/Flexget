@@ -38,6 +38,7 @@ class InputPlex:
     username            Myplex (http://my.plexapp.com) username, used to connect to shared PMS'.
     password            Myplex (http://my.plexapp.com) password, used to connect to shared PMS'.
     server              Host/IP of PMS to connect to.
+    ssl                 Use HTTPS.
     lowercase_title     Convert filename (title) to lower case.
     strip_non_alpha     Sanitize filename (title), stripping all non-alphanumeric letters.
                         Better to turn off in case of non-english titles.
@@ -83,6 +84,7 @@ class InputPlex:
         'properties': {
             'server': {'type': 'string', 'default': '127.0.0.1'},
             'port': {'type': 'integer', 'default': 32400},
+            'ssl': {'type': 'boolean', 'default': False},
             'username': {'type': 'string'},
             'password': {'type': 'string'},
             'token': {'type': 'string'},
@@ -174,6 +176,7 @@ class InputPlex:
 
     def on_task_input(self, task, config):
         config = self.prepare_config(config)
+        scheme = 'https' if config['ssl'] else 'http'
         urlconfig = {}
         urlappend = '?'
         entries = []
@@ -198,8 +201,8 @@ class InputPlex:
             try:
                 path = '/library/sections/'
                 r = requests.get(
-                    'http://{}:{}{}{}'.format(
-                        config['plexserver'], config['port'], path, urlappend
+                    '{}://{}:{}{}{}'.format(
+                        scheme, config['plexserver'], config['port'], path, urlappend
                     )
                 )
             except requests.RequestException as e:
@@ -212,7 +215,8 @@ class InputPlex:
             raise plugin.PluginError("Could not find section '{}'".format(config['section']))
 
         logger.debug(
-            'Fetching http://{}:{}/library/sections/{}/{}{}',
+            'Fetching {}://{}:{}/library/sections/{}/{}{}',
+            scheme,
             config['server'],
             config['port'],
             config['section'],
@@ -222,7 +226,9 @@ class InputPlex:
         try:
             path = '/library/sections/{}/{}'.format(config['section'], config['selection'])
             r = requests.get(
-                'http://{}:{}{}{}'.format(config['plexserver'], config['port'], path, urlappend)
+                '{}://{}:{}{}{}'.format(
+                    scheme, config['plexserver'], config['port'], path, urlappend
+                )
             )
         except requests.RequestException as e:
             raise plugin.PluginError(
@@ -280,26 +286,30 @@ class InputPlex:
                 entries.append(e)
                 # show ends here.
                 continue
-            e['plex_art'] = 'http://{}:{}{}{}'.format(
+            e['plex_art'] = '{}://{}:{}{}{}'.format(
+                scheme,
                 config['server'],
                 config['port'],
                 node.getAttribute(arttag),
                 urlappend,
             )
-            e['plex_cover'] = 'http://{}:{}{}{}'.format(
+            e['plex_cover'] = '{}://{}:{}{}{}'.format(
+                scheme,
                 config['server'],
                 config['port'],
                 node.getAttribute(covertag),
                 urlappend,
             )
-            e['plex_season_cover'] = 'http://{}:{}{}{}'.format(
+            e['plex_season_cover'] = '{}://{}:{}{}{}'.format(
+                scheme,
                 config['server'],
                 config['port'],
                 node.getAttribute(seasoncovertag),
                 urlappend,
             )
             if viewgroup == 'episode':
-                e['plex_thumb'] = 'http://{}:{}{}{}'.format(
+                e['plex_thumb'] = '{}://{}:{}{}{}'.format(
+                    scheme,
                     config['server'],
                     config['port'],
                     node.getAttribute('thumb'),
@@ -397,14 +407,16 @@ class InputPlex:
                             container,
                         )
                         entry['title'] = filename
-                    entry['plex_url'] = 'http://{}:{}{}{}'.format(
+                    entry['plex_url'] = '{}://{}:{}{}{}'.format(
+                        scheme,
                         config['server'],
                         config['port'],
                         key,
                         urlappend,
                     )
                     entry['plex_path'] = key
-                    entry['url'] = 'http://{}:{}{}{}'.format(
+                    entry['url'] = '{}://{}:{}{}{}'.format(
+                        scheme,
                         config['server'],
                         config['port'],
                         key,
