@@ -216,7 +216,7 @@ werkzeug==3.1.9
     #   flask-login
     #   flask-restx
     #   flexget
-win32-setctime==1.2.0 ; sys_platform == 'win32'
+win32-setctime==1.2.1 ; sys_platform == 'win32'
     # via loguru
 zc-lockfile==4.0
     # via cherrypy
