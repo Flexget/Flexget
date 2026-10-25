@@ -1,5 +1,4 @@
 import ftplib
-from pathlib import Path
 
 from loguru import logger
 
@@ -86,7 +85,7 @@ class FTPList:
         location = self.FTP.path.abspath(path)
 
         entry['title'] = title
-        entry['location'] = Path(location)
+        entry['location'] = location
         entry['url'] = f'ftp://{self.username}:{self.password}@{self.host}:{self.port}{location}'
         entry['filename'] = title
 

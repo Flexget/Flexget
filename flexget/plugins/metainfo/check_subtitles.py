@@ -2,6 +2,7 @@ import contextlib
 import logging
 import os
 import tempfile
+from pathlib import Path
 
 from loguru import logger
 
@@ -58,7 +59,7 @@ class MetainfoSubs:
             entry.get('subtitles', eval_lazy=False)
             or 'location' not in entry
             or ('$RECYCLE.BIN' in str(entry['location']))
-            or not entry['location'].exists()
+            or not Path(entry['location']).exists()
         ):
             return
         from subliminal import scan_video

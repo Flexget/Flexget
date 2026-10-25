@@ -145,7 +145,7 @@ class SubtitleListFile(Base):
         entry = Entry()
         entry['title'] = self.title
         entry['url'] = f'mock://localhost/subtitle_list/{self.id}'
-        entry['location'] = Path(self.location)
+        entry['location'] = self.location
         entry['remove_after'] = self.remove_after
         entry['added'] = self.added
         entry['subtitle_languages'] = []
@@ -223,12 +223,12 @@ class SubtitleList(MutableSet):
         path = ''
         if isinstance(self.config.get('path'), str):
             try:
-                path = Path(entry.render(self.config['path']))
+                path = entry.render(self.config['path'])
             except RenderError as e:
                 logger.error(e)
         else:
             path = entry.get('location')
-        return path.resolve()
+        return Path(path).resolve()
 
     def add(self, entry):
         with Session() as session:
@@ -357,18 +357,19 @@ class PluginSubtitleList:
         # A hack to not output certain files without deleting them from the list
         temp_discarded_items = set()
         for item in subtitle_list:
-            if not config['force_file_existence'] and not item['location'].exists():
-                logger.error('File {} does not exist. Skipping.', item['location'])
+            location = Path(item['location'])
+            if not config['force_file_existence'] and not location.exists():
+                logger.error('File {} does not exist. Skipping.', location)
                 temp_discarded_items.add(item)
                 continue
-            if not item['location'].exists():
-                logger.error('File {} does not exist. Removing from list.', item['location'])
+            if not location.exists():
+                logger.error('File {} does not exist. Removing from list.', location)
                 subtitle_list.discard(item)
                 continue
             if self._expired(item, config):
                 logger.info(
                     'File {} has been in the list for {}. Removing from list.',
-                    item['location'],
+                    location,
                     item['remove_after'] or config['remove_after'],
                 )
                 subtitle_list.discard(item)
@@ -377,10 +378,10 @@ class PluginSubtitleList:
             languages = set(item['subtitle_languages']) or set(config.get('languages', []))
             num_potential_files = 0
             num_added_files = 0
-            if item['location'].is_dir():
+            if location.is_dir():
                 # recursion depth 1 is no recursion
-                max_depth = len(item['location'].resolve().parts) + recursion_depth - 1
-                for root_dir, _, files in os.walk(item['location']):
+                max_depth = len(location.resolve().parts) + recursion_depth - 1
+                for root_dir, _, files in os.walk(location):
                     current_depth = len(Path(root_dir).parts)
                     if current_depth > max_depth:
                         break
@@ -407,16 +408,14 @@ class PluginSubtitleList:
                     logger.debug(
                         'Added {} file(s) from {} to subtitle list {}',
                         num_added_files,
-                        item['location'],
+                        location,
                         config['list'],
                     )
                     subtitle_list.discard(item)
                 else:
-                    logger.debug('No files found in {}. Skipping.', item['location'])
+                    logger.debug('No files found in {}. Skipping.', location)
                     temp_discarded_items.add(item)
-            elif config['check_subtitles'] and self.all_subtitles_exist(
-                item['location'], languages
-            ):
+            elif config['check_subtitles'] and self.all_subtitles_exist(location, languages):
                 subtitle_list.discard(item)
 
         return list(set(subtitle_list) - temp_discarded_items)

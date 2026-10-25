@@ -89,7 +89,7 @@ class BaseFileOps:
                     'Cannot handle {} because it does not have the field location.', entry['title']
                 )
                 continue
-            src = entry['location']
+            src = Path(entry['location'])
             src_isdir = src.is_dir()
             try:
                 # check location
@@ -136,7 +136,7 @@ class BaseFileOps:
         min_size = entry.get('clean_source', config.get('clean_source', -1))
         if min_size < 0:
             return
-        base_path = entry.get('old_location', entry['location']).parent
+        base_path = Path(entry.get('old_location', entry['location'])).parent
         # everything here happens after a successful execution of the main action: the entry has been moved in a
         # different location, or it does not exists anymore. so from here we can just log warnings and move on.
         if not base_path.is_dir():
@@ -188,8 +188,8 @@ class DeleteFiles(BaseFileOps):
     logger = logger.bind(name='delete')
 
     def handle_entry(self, task, config, entry, siblings):
-        src = entry['location']
-        src_isdir = os.path.isdir(src)
+        src = Path(entry['location'])
+        src_isdir = src.is_dir()
         if task.options.test:
             if src_isdir:
                 self.logger.info('Would delete `{}` and all its content.', src)
@@ -203,7 +203,7 @@ class DeleteFiles(BaseFileOps):
             shutil.rmtree(src)
             self.logger.info('`{}` and all its content has been deleted.', src)
         else:
-            os.remove(src)
+            src.unlink()
             self.logger.info('`{}` has been deleted.', src)
         # further errors will not have any effect (the entry does not exists anymore)
         for s in siblings:
@@ -236,7 +236,7 @@ class TransformingOps(BaseFileOps):
                 raise
 
     def handle_entry(self, task, config, entry, siblings):
-        src = entry['location']
+        src = Path(entry['location'])
         src_isdir = src.is_dir()
         src_path = src.parent
         src_name = src.name
@@ -269,7 +269,7 @@ class TransformingOps(BaseFileOps):
 
         # Join path and filename
         dst = dst_path / dst_name
-        if dst == entry['location']:
+        if dst == Path(entry['location']):
             raise plugin.PluginWarning('source and destination are the same.')
 
         if not dst_path.exists():
