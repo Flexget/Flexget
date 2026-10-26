@@ -1,7 +1,7 @@
-import datetime
 import os
 import stat
 import time
+from datetime import date, datetime
 from pathlib import Path
 
 import pendulum
@@ -166,12 +166,12 @@ class TestEntryCoercion:
     def test_datetime_coercion(self):
         # In order for easier use in templates and 'if' plugin, datetimes should be our special instance
         e = Entry('title', 'url')
-        e['dt'] = datetime.datetime.now()
+        e['dt'] = datetime.now()
         assert isinstance(e['dt'], CoercingDateTime)
 
     def test_date_coercion(self):
         e = Entry('title', 'url')
-        e['date'] = datetime.date(2023, 9, 3)
+        e['date'] = date(2023, 9, 3)
         assert isinstance(e['date'], pendulum.Date)
 
 

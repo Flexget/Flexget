@@ -9,7 +9,7 @@ from loguru import logger
 from flexget.utils.qualities import Quality
 
 if TYPE_CHECKING:
-    import datetime
+    import datetime as dt
 
 logger = logger.bind(name='parser')
 
@@ -109,7 +109,7 @@ class SeriesParseResult:
         name: str | None = None,
         identified_by: str | None = None,
         id_type: str | None = None,
-        id: tuple[int, int] | str | int | datetime.date | None = None,
+        id: tuple[int, int] | str | int | dt.date | None = None,
         episodes: int = 1,
         season_pack: bool = False,
         strict_name: bool = False,
@@ -124,7 +124,7 @@ class SeriesParseResult:
         self.episodes: int = episodes
         self.season_pack: bool = season_pack
         self.identified_by: str = identified_by
-        self.id: tuple[int, int] | str | int | datetime.date = id
+        self.id: tuple[int, int] | str | int | dt.date = id
         self.id_type: str = id_type
         self.quality: Quality = quality if quality is not None else Quality()
         self.proper_count: int = proper_count

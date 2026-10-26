@@ -11,12 +11,10 @@ from flexget.terminal import capture_console
 
 
 def age_series(**kwargs):
-    import datetime
+    from datetime import datetime, timedelta
 
     session = Session()
-    session.query(db.EpisodeRelease).update({
-        'first_seen': datetime.datetime.now() - datetime.timedelta(**kwargs)
-    })
+    session.query(db.EpisodeRelease).update({'first_seen': datetime.now() - timedelta(**kwargs)})
     session.commit()
 
 

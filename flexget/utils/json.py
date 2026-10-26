@@ -5,9 +5,9 @@ Plugins can just import the methods from this module.
 Also allows date and datetime objects to be encoded/decoded.
 """
 
-import datetime
 from collections.abc import Iterable, Mapping
 from contextlib import suppress
+from datetime import date, datetime
 from typing import Any
 
 from flexget.plugin import DependencyError
@@ -38,18 +38,18 @@ class DTDecoder(json.JSONDecoder):
         if isinstance(obj, str):
             dt_str = obj.strip('"')
             try:
-                return datetime.datetime.strptime(dt_str, ISO8601_FMT)
+                return datetime.strptime(dt_str, ISO8601_FMT)
             except (ValueError, TypeError):
                 with suppress(ValueError, TypeError):
-                    return datetime.datetime.strptime(dt_str, DATE_FMT)
+                    return datetime.strptime(dt_str, DATE_FMT)
 
         return super().decode(obj, **kwargs)
 
 
-def _datetime_encoder(obj: datetime.datetime | datetime.date) -> str:
-    if isinstance(obj, datetime.datetime):
+def _datetime_encoder(obj: datetime | date) -> str:
+    if isinstance(obj, datetime):
         return obj.strftime(ISO8601_FMT)
-    if isinstance(obj, datetime.date):
+    if isinstance(obj, date):
         return obj.strftime(DATE_FMT)
     raise TypeError
 
@@ -63,11 +63,11 @@ def _datetime_decoder(dict_: dict) -> dict:
             continue
 
         try:
-            datetime_obj = datetime.datetime.strptime(value, ISO8601_FMT)
+            datetime_obj = datetime.strptime(value, ISO8601_FMT)
             dict_[key] = datetime_obj
         except (ValueError, TypeError):
             with suppress(ValueError, TypeError):
-                date_obj = datetime.datetime.strptime(value, DATE_FMT)
+                date_obj = datetime.strptime(value, DATE_FMT)
                 dict_[key] = date_obj.date()
 
     return dict_
@@ -121,9 +121,9 @@ def coerce(obj) -> str | int | float | bool | dict | list | None:
     """
     if isinstance(obj, (str, int, float, bool, type(None))):
         return obj
-    if isinstance(obj, datetime.datetime):
+    if isinstance(obj, datetime):
         return obj.strftime(ISO8601_FMT)
-    if isinstance(obj, datetime.date):
+    if isinstance(obj, date):
         return obj.strftime(DATE_FMT)
     if isinstance(obj, Mapping):
         return {k: coerce(v) for k, v in obj.items()}

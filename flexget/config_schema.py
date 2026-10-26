@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-import datetime
 import functools
 import os
 import re
 from collections import defaultdict
+from datetime import datetime, time, timedelta
 from json import JSONDecodeError
 from json import loads as json_loads
 from typing import TYPE_CHECKING, Any
@@ -163,18 +163,18 @@ def process_config(
     return errors
 
 
-def parse_time(time_string: str) -> datetime.time:
+def parse_time(time_string: str) -> time:
     """Parse a time string from the config into a :class:`datetime.time` object."""
     formats = ['%I:%M %p', '%H:%M', '%H:%M:%S']
     for f in formats:
         try:
-            return datetime.datetime.strptime(time_string, f).time()
+            return datetime.strptime(time_string, f).time()
         except ValueError:
             continue
     raise ValueError(f'invalid time `{time_string}`')
 
 
-def parse_interval(interval_string: str) -> datetime.timedelta:
+def parse_interval(interval_string: str) -> timedelta:
     """Take an interval string from the config and turn it into a :class:`datetime.timedelta` object."""
     regexp = r'^\d+ (second|minute|hour|day|week)s?$'
     if not re.match(regexp, interval_string):

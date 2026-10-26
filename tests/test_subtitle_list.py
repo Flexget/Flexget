@@ -1,6 +1,6 @@
 import contextlib
-import datetime
 import os
+from datetime import datetime, timedelta
 from pathlib import Path
 
 import pytest
@@ -251,7 +251,7 @@ class TestSubtitleList:
 
         with Session() as session:
             s = session.query(SubtitleListFile).first()
-            s.added = datetime.datetime.now() + datetime.timedelta(-8)
+            s.added = datetime.now() + timedelta(-8)
 
         task = execute_task('subtitle_emit')
         assert len(task.entries) == 0, 'File should have expired.'
