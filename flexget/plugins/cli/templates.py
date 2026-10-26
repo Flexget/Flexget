@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from flexget import options
 from flexget.event import event
 from flexget.terminal import TerminalTable, console, table_parser
@@ -24,7 +26,7 @@ def list_file_templates(manager, options):
         else:
             plugin = '-'
         name = template_name.replace('.template', '').split('/')[-1]
-        with open(template.filename) as contents:
+        with Path(template.filename).open() as contents:
             table.add_row(name, plugin, template.filename, contents.read().strip())
 
     console(table)

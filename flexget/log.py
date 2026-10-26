@@ -14,6 +14,7 @@ from loguru import logger
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
+    from pathlib import Path
 
     import loguru
 
@@ -156,7 +157,7 @@ def initialize(unit_test: bool = False) -> None:
 
 
 def start(
-    filename: str | None = None,
+    filename: str | Path | None = None,
     level: str = 'INFO',
     to_console: bool = True,
     to_file: bool = True,

@@ -2,11 +2,11 @@ from __future__ import annotations
 
 import datetime
 import functools
-import os
 import re
 from collections import defaultdict
 from json import JSONDecodeError
 from json import loads as json_loads
+from pathlib import Path
 from typing import TYPE_CHECKING, Any
 from urllib.parse import parse_qsl, urlparse
 
@@ -265,7 +265,7 @@ def is_regex(instance) -> bool | Pattern:
 def is_file(instance) -> bool:
     if not isinstance(instance, str):
         return True
-    if os.path.isfile(os.path.expanduser(instance)):
+    if Path(instance).expanduser().is_file():
         return True
     raise ValueError(f'`{instance}` does not exist')
 
@@ -278,8 +278,8 @@ def is_path(instance) -> bool:
     pat = re.compile(r'{[{%].*[}%]}')
     result = pat.search(instance)
     if result:
-        instance = os.path.dirname(instance[0 : result.start()])
-    if not os.path.isdir(os.path.expanduser(instance)):
+        instance = Path(instance[0 : result.start()]).parent
+    if not Path(instance).expanduser().is_dir():
         logger.warning('`{}` does not exist', instance)
     return True
 
@@ -520,7 +520,7 @@ def inline_refs(schema: JsonSchema) -> JsonSchema:
 def export_schema(manager, namespace):
     schema = inline_refs(get_schema())
     if namespace.output_file:
-        with open(namespace.output_file, 'w') as f:
+        with Path(namespace.output_file).open('w') as f:
             f.write(json.dumps(schema, indent=2))
         console(f'Schema written to {namespace.output_file}')
         return

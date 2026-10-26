@@ -1,6 +1,5 @@
-import codecs
-import os
 import re
+from pathlib import Path
 
 from loguru import logger
 
@@ -164,9 +163,8 @@ class RegexpParse:
         encoding = config.get('encoding')
 
         # if it's a file open it and read into content (assume utf-8 encoding)
-        if os.path.isfile(os.path.expanduser(url)):
-            with codecs.open(url, 'r', encoding=encoding or 'utf-8') as u:
-                content = u.read()
+        if Path(url).expanduser().is_file():
+            content = Path(url).read_text(encoding=encoding or 'utf-8')
         # else use requests to get the data
         else:
             resp = task.requests.get(url)
