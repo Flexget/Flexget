@@ -1,0 +1,23 @@
+name: curl_cffi on FreeBSD
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Test curl_cffi
+        uses: vmactions/freebsd-vm@v1
+        with:
+          release: '15.1'
+          usesh: true
+          prepare: |
+            pkg install -y python315
+            python3.15 -m ensurepip
+            python3.15 -m pip install --upgrade pip
+            python3.15 -m pip install curl_cffi
+          run: |
+            python3.15 -c "from curl_cffi import requests; r = requests.get('https://example.com', impersonate='chrome'); print(r.status_code); r.raise_for_status()"
