@@ -1516,7 +1516,7 @@ requires-dist = [
     { name = "beautifulsoup4", specifier = "~=4.12" },
     { name = "cherrypy", specifier = "~=18.10" },
     { name = "cryptography", specifier = "~=50.0" },
-    { name = "curl-cffi", specifier = "~=0.16" },
+    { name = "curl-cffi", specifier = "~=0.17" },
     { name = "feedparser", specifier = "~=6.0" },
     { name = "flask", specifier = "~=3.1" },
     { name = "flask-compress", specifier = "~=1.17" },
