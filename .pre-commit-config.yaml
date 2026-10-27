@@ -82,15 +82,6 @@ repos:
     rev: 0.13.5
     hooks:
       - id: uv-lock
-      - id: uv-export
-        args:
-          [
-            --frozen,
-            --no-dev,
-            --no-emit-project,
-            --no-hashes,
-            --output-file=requirements.txt,
-          ]
   - repo: https://github.com/rhysd/actionlint
     rev: v1.7.12
     hooks:
