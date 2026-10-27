@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 
 from loguru import logger
 
@@ -29,7 +29,7 @@ class Status:
                 session.add(st)
 
         self.execution = db.TaskExecution()
-        self.execution.start = datetime.datetime.now()
+        self.execution.start = datetime.now()
         self.execution.task = st
 
     @plugin.priority(plugin.PRIORITY_LAST)
@@ -49,7 +49,7 @@ class Status:
             if task.aborted:
                 self.execution.succeeded = False
                 self.execution.abort_reason = task.abort_reason
-            self.execution.end = datetime.datetime.now()
+            self.execution.end = datetime.now()
             session.merge(self.execution)
 
     on_task_abort = on_task_exit

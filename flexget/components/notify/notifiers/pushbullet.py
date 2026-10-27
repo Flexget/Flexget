@@ -1,5 +1,5 @@
 import base64
-import datetime
+from datetime import datetime
 
 from loguru import logger
 from requests.exceptions import RequestException
@@ -114,7 +114,7 @@ class PushbulletNotifier:
                 if e.response.status_code == 429:
                     reset_time = e.response.headers.get('X-Ratelimit-Reset')
                     if reset_time:
-                        reset_time = datetime.datetime.fromtimestamp(int(reset_time)).strftime(
+                        reset_time = datetime.fromtimestamp(int(reset_time)).strftime(
                             '%Y-%m-%d %H:%M:%S'
                         )
                         message = f'Monthly Pushbullet database operations limit reached. Next reset: {reset_time}'
@@ -127,7 +127,7 @@ class PushbulletNotifier:
         reset_time = response.headers.get('X-Ratelimit-Reset')
         remaining = response.headers.get('X-Ratelimit-Remaining')
         if reset_time and remaining:
-            reset_time = datetime.datetime.fromtimestamp(int(reset_time))
+            reset_time = datetime.fromtimestamp(int(reset_time))
             logger.debug(
                 'Pushbullet notification sent. Database operations remaining until next reset: {}. '
                 'Next reset at: {}',

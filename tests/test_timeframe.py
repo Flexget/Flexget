@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime, timedelta
 
 from flexget.manager import Session
 from flexget.plugins.filter.timeframe import EntryTimeFrame
@@ -6,9 +6,7 @@ from flexget.plugins.filter.timeframe import EntryTimeFrame
 
 def age_timeframe(**kwargs):
     with Session() as session:
-        session.query(EntryTimeFrame).update({
-            'first_seen': datetime.datetime.now() - datetime.timedelta(**kwargs)
-        })
+        session.query(EntryTimeFrame).update({'first_seen': datetime.now() - timedelta(**kwargs)})
 
 
 class TestTimeFrame:
