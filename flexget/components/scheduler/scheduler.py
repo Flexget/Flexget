@@ -1,6 +1,5 @@
 import hashlib
 import logging
-import os
 
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -128,9 +127,7 @@ def setup_scheduler(manager):
         logging.getLogger('apscheduler').setLevel(logging.WARNING)
     # Since APScheduler runs in a separate thread, slower devices can sometimes get a DB lock, so use a separate db
     # for the jobs to avoid this
-    db_filename = os.path.join(manager.config_base, f'db-{manager.config_name}-jobs.sqlite')
-    # in case running on windows, needs double \\
-    db_filename = db_filename.replace('\\', '\\\\')
+    db_filename = manager.config_base / f'db-{manager.config_name}-jobs.sqlite'
     database_uri = f'sqlite:///{db_filename}'
     jobstores = {'default': SQLAlchemyJobStore(url=database_uri)}
     # If job was meant to run within last day while daemon was shutdown, run it once when continuing

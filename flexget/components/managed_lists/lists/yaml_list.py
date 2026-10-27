@@ -2,6 +2,7 @@ import random
 import typing
 from collections import OrderedDict
 from collections.abc import MutableSet
+from pathlib import Path
 
 from loguru import logger
 from yaml import dump as dump_yaml
@@ -20,13 +21,13 @@ logger = logger.bind(name=PLUGIN_NAME)
 
 class YamlManagedList(MutableSet):
     def __init__(self, path: str, fields: list, encoding: str):
-        self.filename = path
+        self.filename = Path(path)
         self.fields = fields
         self.encoding = encoding
 
         self.entries = []
         try:
-            with open(self.filename, encoding=self.encoding) as content:
+            with self.filename.open(encoding=self.encoding) as content:
                 try:
                     # TODO: use the load from our serialization system if that goes in
                     entries = load_yaml(content)
@@ -106,7 +107,7 @@ class YamlManagedList(MutableSet):
             out_bytes = dump_yaml(out, default_flow_style=False, encoding=self.encoding)
 
         try:
-            with open(self.filename, 'wb') as outfile:
+            with self.filename.open('wb') as outfile:
                 outfile.write(out_bytes)
         except Exception as e:
             raise PluginError(f'Error writhing data to `{self.filename}`: {e}')

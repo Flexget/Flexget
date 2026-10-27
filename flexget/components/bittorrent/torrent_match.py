@@ -154,10 +154,10 @@ class TorrentMatch:
                             # we need to find the path that contains the torrent name since it's multi-file
                             if not path:
                                 # attempt to extract path from the absolute file path
-                                path = str(local_file.path)
+                                path = local_file.path
 
-                                while entry['torrent'].name in path:
-                                    path = os.path.dirname(path)
+                                while entry['torrent'].name in str(path):
+                                    path = Path(path).parent
 
                             candidate_files.append(local_file)
 

@@ -1,4 +1,3 @@
-import os
 from datetime import datetime
 
 import yaml
@@ -31,11 +30,11 @@ class Variables(Base):
 
 
 def variables_from_file(config_base, filename):
-    variables_file = os.path.join(config_base, filename)
-    if not os.path.exists(variables_file):
+    variables_file = config_base / filename
+    if not variables_file.exists():
         raise PluginError(f'File {variables_file} does not exist!')
     try:
-        with open(variables_file, 'rb') as f:
+        with variables_file.open('rb') as f:
             variables_dict = yaml.safe_load(f.read())
     except yaml.YAMLError as e:
         raise PluginError(f'Invalid variables file: {e}')
