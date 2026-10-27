@@ -83,7 +83,7 @@ dev = [
   "pytest-socket~=0.8.0",
   "pytest-xdist~=3.6",
   "ruff==0.17.2",
-  "vcrpy~=8.1",
+  "vcrpy~=9.2",
 ]
 test = [
   "pillow~=13.0",
