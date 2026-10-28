@@ -138,6 +138,26 @@ class ParserGuessit:
 
         return source
 
+    @staticmethod
+    def _color_range(guessit_result, other):
+        """Return the color range parts of a guessit result, in a form `qualities.Quality` understands."""
+        color_range = []
+        if 'dolby vision' in other:
+            color_range.append('dolbyvision')
+        if 'hdr10' in other:
+            # guessit has no HDR10+ property, it reports `HDR10` and leaves the plus sign behind
+            hdr_plus = any(
+                match.value == 'HDR10'
+                and re.match(
+                    r'[^\w]?(\+|plus\b|p\b)', match.input_string[match.end :], re.IGNORECASE
+                )
+                for match in guessit_result.matches['other']
+            )
+            color_range.append('hdrplus' if hdr_plus else 'hdr')
+        if not color_range and 'standard dynamic range' in other:
+            color_range.append('sdr')
+        return color_range
+
     def _quality(self, guessit_result):
         """Generate a FlexGet Quality from a guessit result."""
         resolution = normalize_component(guessit_result.values_list.get('screen_size'))
@@ -150,6 +170,8 @@ class ParserGuessit:
         codec = normalize_component(guessit_result.values_list.get('video_codec'))
         if '10bit' in normalize_component(guessit_result.values_list.get('color_depth')):
             codec.append('10bit')
+
+        color_range = self._color_range(guessit_result, other)
 
         audio = normalize_component(guessit_result.values_list.get('audio_codec'))
         audio_profile = normalize_component(guessit_result.values_list.get('audio_profile'))
@@ -164,7 +186,7 @@ class ParserGuessit:
 
         # Make sure everything are strings (guessit will return lists when there are multiples)
         flattened_qualities = []
-        for component in (resolution, source, codec, audio):
+        for component in (resolution, source, codec, color_range, audio):
             if isinstance(component, list):
                 flattened_qualities.append(' '.join(component))
             elif isinstance(component, str):
