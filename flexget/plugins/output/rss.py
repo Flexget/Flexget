@@ -1,7 +1,7 @@
 import base64
 import hashlib
-import os
 from datetime import datetime, timedelta
+from pathlib import Path
 
 from loguru import logger
 from sqlalchemy import String
@@ -289,17 +289,17 @@ class OutputRSS:
             return
 
         # write rss
-        fn = os.path.expanduser(config['file'])
-        with open(fn, 'wb') as file:
+        file_name = Path(config['file']).expanduser()
+        with file_name.open('wb') as file:
             try:
-                logger.verbose('Writing output rss to {}', fn)
+                logger.verbose('Writing output rss to {}', file_name)
                 rss.write_xml(file, encoding=config['encoding'])
             except LookupError:
                 logger.critical('Unknown encoding {}', config['encoding'])
                 return
             except OSError:
                 # TODO: plugins cannot raise PluginWarnings in terminate event ..
-                logger.critical('Unable to write {}', fn)
+                logger.critical('Unable to write {}', file_name)
                 return
 
 

@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import hashlib
-import os
 from typing import TYPE_CHECKING
 
 import requests
@@ -67,9 +66,8 @@ def dir_size(directory: Path) -> int:
     :return: Summed size of all files in Bytes.
     """
     size = 0
-    for file in os.listdir(directory):
-        filename = directory / file
-        size += filename.stat().st_size
+    for file in directory.iterdir():
+        size += file.stat().st_size
     return size
 
 
@@ -79,10 +77,10 @@ def trim_dir(directory: Path) -> None:
     :param directory: Directory to check
     """
 
-    def access_time(f: str) -> float:
-        return (directory / f).stat().st_atime
+    def access_time(f: Path) -> float:
+        return f.stat().st_atime
 
-    files = sorted(os.listdir(directory), key=access_time)
-    file_name = directory / files[0]
+    files = sorted(directory.iterdir(), key=access_time)
+    file_name = files[0]
     logger.debug('removing least accessed file: {}', file_name)
     file_name.unlink()
