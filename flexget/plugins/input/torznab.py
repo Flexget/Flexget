@@ -4,7 +4,7 @@ from xml.etree import ElementTree as ET
 from loguru import logger
 
 from flexget import options, plugin
-from flexget.components.sites.utils import torrent_availability
+from flexget.components.sites.utils import normalize_scene, normalize_unicode, torrent_availability
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.plugin import PluginError
@@ -36,6 +36,11 @@ class Torznab:
                 },
                 'url': {'type': 'string', 'format': 'url'},
                 'timeout': {'type': 'string', 'format': 'interval'},
+                'normalize': {
+                    'type': 'string',
+                    'enum': ['none', 'unicode', 'scene'],
+                    'default': 'none',
+                },
             },
             'required': ['url'],
             'additionalProperties': False,
@@ -58,7 +63,7 @@ class Torznab:
         entries = []
         for search_string in entry.get('search_strings', [query]):
             logger.debug('Searching for: {}', search_string)
-            params['q'] = search_string
+            params['q'] = self.normalize(search_string)
             results = self.create_entries_from_query(self._build_url(**params), task)
             entries.extend(results)
         return entries
@@ -83,6 +88,13 @@ class Torznab:
         self.params = {'extended': 1}
         if 'apikey' in config:
             self.params['apikey'] = config['apikey']
+
+        if config['normalize'] == 'unicode':
+            self.normalize = normalize_unicode
+        elif config['normalize'] == 'scene':
+            self.normalize = normalize_scene
+        else:
+            self.normalize = lambda q: q
 
         logger.debug('Config: {}', config)
         self._setup_caps(task, config['searcher'], config['categories'])
