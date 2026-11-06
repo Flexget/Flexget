@@ -1,6 +1,8 @@
+from email.utils import parsedate_to_datetime
 from urllib.parse import urlencode
 from xml.etree import ElementTree as ET
 
+import pendulum
 from loguru import logger
 
 from flexget import options, plugin
@@ -199,8 +201,18 @@ class Torznab:
             for child in item.iter():
                 if child.tag in ['{http://torznab.com/schemas/2015/feed}attr', 'enclosure']:
                     continue
-                if child.tag in ['description', 'title'] and child.text:
+                if (
+                    child.tag in ['description', 'title', 'guid', 'link', 'comments']
+                    and child.text
+                ):
                     entry[child.tag] = child.text
+                elif child.tag == 'pubDate' and child.text:
+                    try:
+                        entry['rss_pubdate'] = pendulum.instance(
+                            parsedate_to_datetime(child.text), tz='UTC'
+                        )
+                    except (TypeError, ValueError):
+                        logger.debug('Unable to parse pubDate `{}`', child.text)
             entries.append(entry)
         return entries
 
