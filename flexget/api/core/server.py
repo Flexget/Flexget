@@ -146,9 +146,7 @@ config_validation_schema = api.schema_model(
 )
 pid_schema = api.schema_model('server.pid', ObjectsContainer.pid_object)
 raw_config_schema = api.schema_model('raw_config', ObjectsContainer.raw_config_object)
-config_check_schema = api.schema_model(
-    'server.config_check', ObjectsContainer.config_check_object
-)
+config_check_schema = api.schema_model('server.config_check', ObjectsContainer.config_check_object)
 version_schema = api.schema_model('server.version', ObjectsContainer.version_object)
 dump_threads_schema = api.schema_model('server.dump_threads', ObjectsContainer.dump_threads_object)
 server_manage_schema = api.schema_model('server.manage', ObjectsContainer.server_manage)
