@@ -48,7 +48,7 @@ from flexget.api.app import (
     success_response,
 )
 from flexget.api.app import __version__ as __api_version__
-from flexget.config_schema import ConfigError
+from flexget.config_schema import ConfigError, process_config
 from flexget.utils.tools import get_latest_flexget_version_number
 
 if TYPE_CHECKING:
@@ -74,6 +74,23 @@ class ObjectsContainer:
     pid_object = {'type': 'object', 'properties': {'pid': {'type': 'integer'}}}
 
     raw_config_object = {'type': 'object', 'properties': {'raw_config': {'type': 'string'}}}
+
+    config_check_object = {
+        'type': 'object',
+        'properties': {
+            'valid': {'type': 'boolean'},
+            'errors': {
+                'type': 'array',
+                'items': {
+                    'type': 'object',
+                    'properties': {
+                        'error': {'type': 'string'},
+                        'config_path': {'type': 'string'},
+                    },
+                },
+            },
+        },
+    }
 
     version_object = {
         'type': 'object',
@@ -129,6 +146,9 @@ config_validation_schema = api.schema_model(
 )
 pid_schema = api.schema_model('server.pid', ObjectsContainer.pid_object)
 raw_config_schema = api.schema_model('raw_config', ObjectsContainer.raw_config_object)
+config_check_schema = api.schema_model(
+    'server.config_check', ObjectsContainer.config_check_object
+)
 version_schema = api.schema_model('server.version', ObjectsContainer.version_object)
 dump_threads_schema = api.schema_model('server.dump_threads', ObjectsContainer.dump_threads_object)
 server_manage_schema = api.schema_model('server.manage', ObjectsContainer.server_manage)
@@ -188,6 +208,28 @@ class ServerConfigAPI(APIResource):
     def get(self, session: Session = None) -> Response:
         """Get Flexget Config in JSON form."""
         return jsonify(self.manager.config)
+
+
+@server_api.route('/config/check/')
+class ServerConfigCheckAPI(APIResource):
+    @api.response(200, description='Config validation result', model=config_check_schema)
+    def get(self, session: Session = None) -> Response:
+        """Check whether the currently loaded config passes validation.
+
+        The config is validated exactly as it was loaded from the user's
+        file (before defaults are applied), so the result reflects the
+        config the scheduler will run with. Always returns 200; callers
+        monitoring from a dashboard should inspect the ``valid`` field.
+        Validation runs on a copy so the live config is never mutated.
+        """
+        config = copy.deepcopy(self.manager.user_config) or {}
+        errors = process_config(config=config, set_defaults=False)
+        return jsonify({
+            'valid': not errors,
+            'errors': [
+                {'error': error.message, 'config_path': error.json_pointer} for error in errors
+            ],
+        })
 
 
 @server_api.route('/raw_config/')
