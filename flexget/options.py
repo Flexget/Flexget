@@ -445,6 +445,8 @@ manager_parser.add_argument(
 )
 manager_parser.add_argument(
     '-c',
+    '--config',
+    '--configuration',
     dest='config',
     default='config.yml',
     help='Specify configuration file. Default: %(default)s',
