@@ -41,6 +41,7 @@ from flexget.api import APIResource, api
 from flexget.api.app import (
     APIError,
     BadRequest,
+    Conflict,
     base_message,
     base_message_schema,
     empty_response,
@@ -210,24 +211,30 @@ class ServerConfigAPI(APIResource):
 
 @server_api.route('/config/check/')
 class ServerConfigCheckAPI(APIResource):
-    @api.response(200, description='Config validation result', model=config_check_schema)
+    @api.response(200, description='Config is valid', model=config_check_schema)
+    @api.response(Conflict)
     def get(self, session: Session = None) -> Response:
         """Check whether the currently loaded config passes validation.
 
         The config is validated exactly as it was loaded from the user's
         file (before defaults are applied), so the result reflects the
-        config the scheduler will run with. Always returns 200; callers
-        monitoring from a dashboard should inspect the ``valid`` field.
-        Validation runs on a copy so the live config is never mutated.
+        config the scheduler will run with. A valid config returns ``200``
+        with ``valid: true``; an invalid one returns ``409 Conflict`` with
+        ``valid: false`` and the error list, so a monitor can branch on the
+        status code without parsing the body. Validation runs on a copy so
+        the live config is never mutated.
         """
         config = copy.deepcopy(self.manager.user_config) or {}
         errors = process_config(config=config, set_defaults=False)
-        return jsonify({
+        payload = {
             'valid': not errors,
             'errors': [
                 {'error': error.message, 'config_path': error.json_pointer} for error in errors
             ],
-        })
+        }
+        if errors:
+            raise Conflict('Configuration is invalid', payload=payload)
+        return jsonify(payload)
 
 
 @server_api.route('/raw_config/')

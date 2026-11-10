@@ -89,13 +89,15 @@ class TestServerAPI:
     def test_config_check_invalid(self, manager, api_client, schema_match):
         manager.user_config = {'tasks': {'test': {'rss': {'url': 123}}}}
         rsp = api_client.get('/server/config/check/')
-        assert rsp.status_code == 200
+        assert rsp.status_code == 409
         data = json.loads(rsp.get_data(as_text=True))
 
         errors = schema_match(OC.config_check_object, data)
         assert not errors
         assert data['valid'] is False
         assert data['errors']
+        assert data['status_code'] == 409
+        assert data['message'] == 'Configuration is invalid'
 
     def test_get_raw_config(self, manager, api_client, schema_match):
         manager._config_path = Path(__file__).parent / 'raw_config.yml'
