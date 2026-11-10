@@ -1,7 +1,7 @@
 import argparse
-import os
 import socket
 import sys
+from pathlib import Path
 
 from loguru import logger
 
@@ -54,11 +54,11 @@ def do_cli(manager, options):
     import win32serviceutil
 
     # We are in a virtualenv, there is some special setup
-    if hasattr(sys, 'real_prefix') and not os.path.exists(os.path.join(sys.prefix, 'python.exe')):
+    if hasattr(sys, 'real_prefix') and not (Path(sys.prefix) / 'python.exe').exists():
         console('Creating a hard link to virtualenv python.exe in root of virtualenv')
         win32file.CreateHardLink(
-            os.path.join(sys.prefix, 'python.exe'),
-            os.path.join(sys.prefix, 'Scripts', 'python.exe'),
+            str(Path(sys.prefix) / 'python.exe'),
+            str(Path(sys.prefix) / 'Scripts' / 'python.exe'),
         )
 
     argv = options.args
