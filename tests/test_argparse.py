@@ -1,6 +1,6 @@
 from argparse import Action
 
-from flexget.options import ArgumentParser
+from flexget.options import ArgumentParser, manager_parser
 
 
 def test_subparser_nested_namespace():
@@ -59,3 +59,12 @@ def test_post_defaults():
     # Custom action should be allowed to set default
     result = p.parse_args(['--custom'])
     assert result.post_set == 'custom'
+
+
+def test_config_option_aliases():
+    for flag in ('-c', '--config', '--configuration'):
+        result = manager_parser.parse_args([flag, 'custom.yml'])
+        assert result.config == 'custom.yml'
+
+    result = manager_parser.parse_args([])
+    assert result.config == 'config.yml'
