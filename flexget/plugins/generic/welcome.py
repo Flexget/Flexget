@@ -1,4 +1,3 @@
-import os
 import sys
 
 from loguru import logger
@@ -22,7 +21,7 @@ def welcome_message(manager):
         return
 
     # check for old users, assume old user if db larger than 2 MB
-    if count == 5 and os.stat(manager.db_filename).st_size / 1024 / 1024 >= 2:
+    if count == 5 and manager.db_filename.stat().st_size / 1024 / 1024 >= 2:
         logger.debug('Looks like old user, skipping welcome message')
         persistence['count'] = 0
         return

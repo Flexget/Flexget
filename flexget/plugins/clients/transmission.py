@@ -66,7 +66,7 @@ class TransmissionBase:
         config.setdefault('port', 9091)
         config.setdefault('main_file_ratio', 0.9)
         if 'netrc' in config:
-            netrc_path = os.path.expanduser(config['netrc'])
+            netrc_path = Path(config['netrc']).expanduser()
             try:
                 config['username'], _, config['password'] = netrc(netrc_path).authenticators(
                     config['host']
@@ -430,16 +430,16 @@ class PluginTransmission(TransmissionBase):
                     continue
 
                 # Verify the temp file exists
-                if downloaded and not os.path.exists(entry['file']):
-                    tmp_path = os.path.join(task.manager.config_base, 'temp')
+                if downloaded and not Path(entry['file']).exists():
+                    tmp_path = task.manager.config_base / 'temp'
                     logger.debug('entry: {}', entry)
-                    logger.debug('temp: {}', ', '.join(os.listdir(tmp_path)))
+                    logger.debug('temp: {}', ', '.join(tmp_path.iterdir()))
                     entry.fail("Downloaded temp file '{}' doesn't exist!?".format(entry['file']))
                     continue
 
                 try:
                     if downloaded:
-                        with open(entry['file'], 'rb') as f:
+                        with Path(entry['file']).open('rb') as f:
                             torrent_info = client.add_torrent(f, 30, **options['add'])
                     else:
                         if options['post'].get('magnetization_timeout', 0) > 0:
@@ -543,8 +543,7 @@ class PluginTransmission(TransmissionBase):
                         if options['post'].get('rename_like_files'):
                             for file_id, file in enumerate(file_list):
                                 # if this filename matches main filename we want to rename it as well
-                                fs = os.path.splitext(file.name)
-                                if fs[0] == os.path.splitext(file_list[main_id].name)[0]:
+                                if Path(file.name).stem == Path(file_list[main_id].name).stem:
                                     main_list.append(file_id)
                         else:
                             main_list = [main_id]
@@ -566,7 +565,7 @@ class PluginTransmission(TransmissionBase):
                             download_dir = options['add']['download_dir']
 
                         # Get new filename without ext
-                        file_ext = os.path.splitext(file_list[main_id].name)[1]
+                        file_ext = Path(file_list[main_id].name).suffix
                         file_path = os.path.dirname(
                             os.path.join(download_dir, file_list[main_id].name)
                         )

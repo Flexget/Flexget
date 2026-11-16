@@ -1,8 +1,8 @@
 import hashlib
 import http.client
-import os
 import posixpath
 import xml.sax
+from pathlib import Path
 from urllib.parse import urlparse, urlsplit
 from zoneinfo import ZoneInfo
 
@@ -204,16 +204,16 @@ class InputRSS:
             logger.critical('Received content looks a bit like login page')
         if b'error' in data.lower():
             logger.critical('Received content looks a bit like error page')
-        received = os.path.join(task.manager.config_base, 'received')
-        if not os.path.isdir(received):
-            os.mkdir(received)
+        received = task.manager.config_base / 'received'
+        if not received.is_dir():
+            received.mkdir()
         filename = task.name
         sourcename = urlparse(url).netloc
         if sourcename:
             filename += '-' + sourcename
         filename = pathscrub(filename, filename=True)
-        filepath = os.path.join(received, f'{filename}.{ext}')
-        with open(filepath, 'wb') as f:
+        filepath = received / f'{filename}.{ext}'
+        with filepath.open('wb') as f:
             f.write(data)
         logger.critical('I have saved the invalid content to {} for you to view', filepath)
 
@@ -353,7 +353,7 @@ class InputRSS:
                     logger.debug('last modified {} saved for task {}', modified, task.name)
         else:
             # This is a file, open it
-            with open(config['url'], 'rb') as f:
+            with Path(config['url']).open('rb') as f:
                 content = f.read()
             if config.get('ascii'):
                 # Just assuming utf-8 file in this case
