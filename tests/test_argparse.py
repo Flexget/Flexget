@@ -1,6 +1,6 @@
 from argparse import Action
 
-from flexget.options import ArgumentParser
+from flexget.options import ArgumentParser, get_parser
 
 
 def test_subparser_nested_namespace():
@@ -59,3 +59,8 @@ def test_post_defaults():
     # Custom action should be allowed to set default
     result = p.parse_args(['--custom'])
     assert result.post_set == 'custom'
+
+
+def test_execute_help_lists_inject():
+    help_text = get_parser('execute').format_help()
+    assert '--inject TITLE [URL ...]' in help_text
