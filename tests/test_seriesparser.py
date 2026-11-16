@@ -253,6 +253,21 @@ class TestSeriesParser:
         s = parse(name='ShowB', data='ShowB.S04E19.Name of Ep.720p.WEB-DL.DD5.1.H.264')
         assert s.quality.name == '720p webdl h264 dd5.1', f'failed to parse quality {s.data}'
 
+    def test_quality_color_range(self, parse):
+        """SeriesParser: color range is part of the quality."""
+        s = parse(name='Test', data='Test.S01E02.2160p.WEB-DL.DV.HDR.H.265.DDP5.1-FlexGet')
+        assert s.quality.name == '2160p webdl h265 hybrid_hdr dd+5.1', (
+            f'failed to parse quality from {s.data}'
+        )
+
+        s = parse(name='Test', data='Test.S01E02.2160p.WEB-DL.HDR.H.265-FlexGet')
+        assert s.quality.name == '2160p webdl h265 hdr', f'failed to parse quality from {s.data}'
+
+        s = parse(name='Test', data='Test.S01E02.2160p.WEB-DL.DV.H.265-FlexGet')
+        assert s.quality.name == '2160p webdl h265 dolbyvision', (
+            f'failed to parse quality from {s.data}'
+        )
+
     def test_quality_parenthesis(self, parse):
         """SeriesParser: quality in parenthesis."""
         s = parse(name='Foo Bar', data='Foo.Bar.S01E01.[720p].HDTV.x264-FlexGet')
