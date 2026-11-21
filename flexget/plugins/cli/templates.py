@@ -24,7 +24,7 @@ def list_file_templates(manager, options):
         else:
             plugin = '-'
         name = template_name.replace('.template', '').split('/')[-1]
-        with open(template.filename) as contents:
+        with open(template.filename, encoding='utf-8') as contents:
             table.add_row(name, plugin, template.filename, contents.read().strip())
 
     console(table)
