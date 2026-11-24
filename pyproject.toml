@@ -94,7 +94,7 @@ docs = [
   "pydata-sphinx-theme~=0.23.0",
   "sphinx~=9.1",
   "sphinx-copybutton~=0.5.2",
-  "sphinx-design~=0.7.0",
+  "sphinx-design~=0.8.0",
   "sphinxcontrib-svg2pdfconverter~=2.0",
 ]
 # This is all our optional deps installable via extras, not actually 'all'.
