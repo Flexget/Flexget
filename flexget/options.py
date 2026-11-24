@@ -519,7 +519,14 @@ class CoreArgumentParser(ArgumentParser):
         )
         exec_parser.add_argument('--profile', action='store_true', default=False, help=SUPPRESS)
         exec_parser.add_argument('--disable-phases', nargs='*', help=SUPPRESS)
-        exec_parser.add_argument('--inject', nargs='+', action=InjectAction, help=SUPPRESS)
+        exec_parser.add_argument(
+            '--inject',
+            nargs='+',
+            action=InjectAction,
+            metavar=('TITLE', 'URL'),
+            help='inject an entry with TITLE and an optional URL into the tasks. add `accept` to '
+            'accept it, `force` to keep plugins from rejecting it',
+        )
         # Plugins should respect these flags where appropriate
         exec_parser.add_argument(
             '--retry', action='store_true', dest='retry', default=False, help=SUPPRESS
