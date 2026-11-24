@@ -111,7 +111,7 @@ class TestTorrentMatch:
         assert len(task.accepted) == 1, (
             'Should have accepted multi_file_with_diff because its size is within threshold'
         )
-        assert task.accepted[0]['path'] == 'torrent_match_test_dir'
+        assert task.accepted[0]['path'] == Path('torrent_match_test_dir')
 
     def test_multi_torrent_is_root_dir(self, execute_task):
         task = execute_task('test_multi_torrent_is_root_dir')
@@ -119,7 +119,7 @@ class TestTorrentMatch:
         assert len(task.accepted) == 1, (
             'Should have accepted multi_file_with_diff because its size is within threshold'
         )
-        assert task.accepted[0]['path'] == 'torrent_match_test_dir'
+        assert task.accepted[0]['path'] == Path('torrent_match_test_dir')
 
     def test_with_filesystem(self, execute_task):
         task = execute_task('test_with_filesystem')

@@ -138,10 +138,10 @@ class Manager:
         self.autoreload_config = True
         self.config_file_hash: str | None = None
         self._config_path: Path | None = None
-        self.log_filename: str = ''
-        self.db_filename: str = ''
+        self.log_filename: Path = Path()
+        self.db_filename: Path = Path()
         self.engine: Engine | None = None
-        self.lockfile: str = ''
+        self.lockfile: Path = Path()
         self.database_uri: str = ''
         self.db_upgraded = False
         self._has_lock = False
@@ -159,7 +159,7 @@ class Manager:
         self._init_config(create=False)
         # When we are in test mode, we use a different lock file and db
         if self.options.test:
-            self.lockfile = os.path.join(self.config_base, f'.test-{self.config_name}-lock')
+            self.lockfile = self.config_base / f'.test-{self.config_name}-lock'
         self._init_logging()
 
         manager = self
@@ -213,10 +213,10 @@ class Manager:
 
     def _init_logging(self) -> None:
         """Initialize logging variables."""
-        log_file = os.path.expanduser(self.options.logfile)
+        log_file = Path(self.options.logfile).expanduser()
         # If an absolute path is not specified, use the config directory.
-        if not os.path.isabs(log_file):
-            log_file = os.path.join(self.config_base, log_file)
+        if not log_file.is_absolute():
+            log_file = self.config_base / log_file
         self.log_filename = log_file
 
     def initialize(self) -> None:
@@ -387,8 +387,8 @@ class Manager:
             return None
         if self.options.test:
             logger.info('Test mode, creating a copy from database ...')
-            db_test_filename = os.path.join(self.config_base, f'test-{self.config_name}.sqlite')
-            if os.path.exists(self.db_filename):
+            db_test_filename = self.config_base / f'test-{self.config_name}.sqlite'
+            if self.db_filename.exists():
                 shutil.copy(self.db_filename, db_test_filename)
                 logger.info('Test database created')
             self.db_filename = db_test_filename
@@ -615,13 +615,13 @@ class Manager:
             logger.critical('Failed to find configuration file {}', options_config)
             logger.info('Tried to read from: {}', ', '.join(str(p) for p in possible))
             raise OSError('No configuration file found.')
-        if not os.path.isfile(config):
+        if not config.is_file():
             raise OSError(f'Config `{config}` does not appear to be a file.')
 
         logger.debug('Config file {} selected', config)
         self._config_path = config
-        self.lockfile = str(self.config_base / f'.{self.config_name}-lock')
-        self.db_filename = str(self.config_base / f'db-{self.config_name}.sqlite')
+        self.lockfile = self.config_base / f'.{self.config_name}-lock'
+        self.db_filename = self.config_base / f'db-{self.config_name}.sqlite'
 
     def hash_config(self) -> str | None:
         if not self.config_path.exists():
@@ -640,7 +640,7 @@ class Manager:
         :raises: `ValueError` if there is a problem loading the config file
         """
         fire_event('manager.before_config_load', self)
-        with open(self.config_path, encoding='utf-8') as f:
+        with self.config_path.open(encoding='utf-8') as f:
             try:
                 raw_config = f.read()
             except UnicodeDecodeError:
@@ -723,10 +723,9 @@ class Manager:
         self.user_config = copy.deepcopy(new_user_config)
         fire_event('manager.config_updated', self)
 
-    def backup_config(self) -> str:
-        backup_path = os.path.join(
-            self.config_base,
-            f'{self.config_name}-{datetime.now().strftime("%y%m%d%H%M%S")}.bak',
+    def backup_config(self) -> Path:
+        backup_path = (
+            self.config_base / f'{self.config_name}-{datetime.now().strftime("%y%m%d%H%M%S")}.bak'
         )
 
         logger.debug('backing up old config to {} before new save', backup_path)
@@ -746,7 +745,7 @@ class Manager:
             self.backup_config()
         except OSError:
             return
-        with open(self.config_path, 'w') as config_file:
+        with self.config_path.open('w') as config_file:
             config_file.write(yaml.dump(self.user_config, default_flow_style=False))
 
     def config_changed(self) -> None:
@@ -790,11 +789,9 @@ class Manager:
 
         # SQLAlchemy
         if not self.database_uri:
-            # in case running on windows, needs double \\
-            filename = self.db_filename.replace('\\', '\\\\')
-            self.database_uri = f'sqlite:///{filename}'
+            self.database_uri = f'sqlite:///{self.db_filename}'
 
-        if self.db_filename and not os.path.exists(self.db_filename):
+        if self.db_filename and not self.db_filename.exists():
             logger.verbose('Creating new database {} - DO NOT INTERRUPT ...', self.db_filename)
 
         # fire up the engine
@@ -820,7 +817,7 @@ class Manager:
         try:
             Base.metadata.create_all(bind=self.engine)
         except OperationalError as e:
-            if os.path.exists(self.db_filename):
+            if self.db_filename.exists():
                 logger.critical(
                     '{} - make sure you have write permissions to file {}',
                     e.message,
@@ -836,9 +833,9 @@ class Manager:
 
     def _read_lock(self) -> dict | None:
         """Read the values from the lock file. Returns None if there is no current lock file."""
-        if self.lockfile and os.path.exists(self.lockfile):
+        if self.lockfile and self.lockfile.exists():
             result: dict[str, str | int] = {}
-            with open(self.lockfile, encoding='utf-8') as f:
+            with self.lockfile.open(encoding='utf-8') as f:
                 lines = [line for line in f if line]
             for line in lines:
                 try:
@@ -884,7 +881,7 @@ class Manager:
             if not self._has_lock:
                 # Exit if there is an existing lock.
                 if self.check_lock():
-                    with open(self.lockfile, encoding='utf-8') as f:
+                    with self.lockfile.open(encoding='utf-8') as f:
                         pid = f.read()
                     logger.critical(
                         'Another process ({}) is running, will exit.', pid.split('\n')[0]
@@ -908,14 +905,14 @@ class Manager:
 
     def write_lock(self, ipc_info: dict | None = None) -> None:
         assert self._has_lock
-        with open(self.lockfile, 'w', encoding='utf-8') as f:
+        with self.lockfile.open('w', encoding='utf-8') as f:
             f.write(f'PID: {os.getpid()}\n')
             if ipc_info:
                 f.writelines(f'{key}: {ipc_info[key]}\n' for key in sorted(ipc_info))
 
     def release_lock(self) -> None:
         try:
-            os.remove(self.lockfile)
+            self.lockfile.unlink()
         except OSError as e:
             if e.errno != errno.ENOENT:
                 raise
@@ -969,9 +966,9 @@ class Manager:
         sys.stdout.flush()
         sys.stderr.flush()
         with (
-            open(os.devnull) as si,
-            open(os.devnull, 'ab+') as so,
-            open(os.devnull, 'ab+', 0) as se,
+            Path(os.devnull).open() as si,
+            Path(os.devnull).open('ab+') as so,
+            Path(os.devnull).open('ab+', 0) as se,
         ):
             os.dup2(si.fileno(), sys.stdin.fileno())
             os.dup2(so.fileno(), sys.stdout.fileno())
@@ -1028,10 +1025,10 @@ class Manager:
         self.engine.dispose()
         # remove temporary database used in test mode
         if self.options.test:
-            if 'test' not in self.db_filename:
+            if 'test' not in str(self.db_filename):
                 raise RuntimeError('trying to delete non test database?')
             if self._has_lock:
-                os.remove(self.db_filename)
+                self.db_filename.unlink()
                 logger.info('Removed test database')
         global manager
         manager = None
@@ -1050,11 +1047,9 @@ class Manager:
         Will create a new log file containing the last 50 debug messages as well as the crash traceback.
         """
         if not self.unit_test:
-            log_dir = os.path.dirname(self.log_filename)
-            filename = os.path.join(
-                log_dir, datetime.now().strftime('crash_report.%Y.%m.%d.%H%M%S%f.log')
-            )
-            with codecs.open(filename, 'w', encoding='utf-8') as outfile:
+            log_dir = self.log_filename.parent
+            filename = log_dir / datetime.now().strftime('crash_report.%Y.%m.%d.%H%M%S%f.log')
+            with filename.open('w', encoding='utf-8') as outfile:
                 outfile.writelines(flexget.log.debug_buffer)
                 traceback.print_exc(file=outfile)
             logger.critical(
