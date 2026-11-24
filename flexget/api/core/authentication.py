@@ -42,7 +42,7 @@ def load_user_from_request(request: Request, session: Session = None) -> User | 
     if auth_value.startswith('Basic'):
         with suppress(TypeError, ValueError, UnicodeDecodeError):
             credentials = base64.b64decode(auth_value.replace('Basic ', '', 1)).decode()
-            username, password = credentials.split(':')
+            username, password = credentials.split(':', 1)
             user = session.query(User).filter(User.name == username).first()
             if user and user.password and check_password_hash(user.password, password):
                 return user
