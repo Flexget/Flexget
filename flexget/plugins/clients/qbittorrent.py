@@ -282,7 +282,8 @@ class OutputQBitTorrent:
 
             skip_check = entry.get('skip_check', config.get('skip_check'))
             if skip_check:
-                form_data['skip_checking'] = 'true'
+                form_data['skip_checking'] = 'true'  # qBittorrent v5.2-
+                form_data['seedMode'] = 'true'  # qBittorrent v5.3+
 
             maxupspeed = entry.get('maxupspeed', config.get('maxupspeed'))
             if maxupspeed:
